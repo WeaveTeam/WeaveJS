@@ -7,6 +7,9 @@ module.exports = function (grunt) {
         },
         browserify: {
             options: {
+                browserifyOptions: {
+                    debug: true
+                },
                 transform: [["babelify", {loose: "all"}]]
             },
             dist: {
