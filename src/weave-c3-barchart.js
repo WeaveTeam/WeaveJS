@@ -1,20 +1,21 @@
-import d3 from "d3"; //ignore-unused
 import c3 from "c3";
+import WeavePanel from "./WeavePanel";
+import jquery from "jquery";
 
-export default class {
-    constructor(targetDiv, toolPath) {
-        this.originalState = toolPath.getSessionState();
+export default class extends WeavePanel {
+    constructor(parent, toolPath) {
+        super(parent, toolPath);
+
         this.chart = c3.generate({
-            data: {type: "bar"},
-            bindto: targetDiv,
+            size: {
+                width: jquery(this.div).width(),
+                height: jquery(this.div).height()
+            },
+            data: {json: [], type: "bar"},
+            bindto: this.div[0],
             bar: {
                 width: {}
             }
         });
-    }
-
-    _findPlotter()
-    {
-        var plotters = this.originalState.children;
     }
 }
