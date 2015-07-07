@@ -7,5 +7,6 @@
     "no-underscore-dangle": [0],
     "no-unused-vars": [1],
     "strict": [0],
+    "no-console": [1],
   }
 }
