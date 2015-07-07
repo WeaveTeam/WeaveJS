@@ -14,16 +14,30 @@ function percentToNumber(percentString)
 }
 
 export default class {
-	constructor(parent, toolPath) {
-		this.toolPath = toolPath;
+    constructor(parent, toolPath) {
+        this.toolPath = toolPath;
         this.toolName = toolPath.getPath().pop();
-		this.div = jquery(parent).append("<div>")
+        var top, left, height, width;
+        if (toolPath.getState("maximized"))
+        {
+            top = 0;
+            left = 0;
+            height = jquery(parent).height();
+            width = jquery(parent).width();
+        }
+        else
+        {
+            top = percentToNumber(toolPath.getState("panelY")) * jquery(parent).height();
+            left = percentToNumber(toolPath.getState("panelX")) * jquery(parent).width();
+            height = percentToNumber(toolPath.getState("panelHeight")) * jquery(parent).height();
+            width = percentToNumber(toolPath.getState("panelWidth")) * jquery(parent).width();
+        }
+
+
+        this.element = jquery(parent).append("<div>")
             .attr("id", this.toolName)
             .css("position", "relative")
-            .css("top", percentToNumber(toolPath.getState("panelY")) * jquery(parent).height())
-            .css("left", percentToNumber(toolPath.getState("panelX")) * jquery(parent).width())
-            .css("height", percentToNumber(toolPath.getState("panelHeight")) * jquery(parent).height())
-            .css("width", percentToNumber(toolPath.getState("panelWidth")) * jquery(parent).width())
+            .css({top, left, height, width})
             .css("borderStyle", "solid");
-	}
+    }
 }
