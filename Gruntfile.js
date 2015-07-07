@@ -11,12 +11,22 @@ module.exports = function (grunt) {
             }
         },
         eslint: {
-            target: ['src/**/*']
+            target: ['src/**/*.js']
+        },
+        watch: {
+            scripts: {
+                files: ['src/**/*.js'],
+                tasks: ['eslint', 'browserify'],
+                options: {
+                    spawn: false,
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-eslint');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     grunt.registerTask('default', ['eslint', 'browserify']);
 };
