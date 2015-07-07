@@ -1,0 +1,18 @@
+<html>
+<head>
+<title>C3 Tools Export</title>
+<script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+<script src="weavec3.js"></script>
+</head>
+<body>
+<div id="barchart"/>
+<div id="scatterplot"/>
+<script>
+$(function ()
+{
+	var weave = opener.weave;
+	var barchart = new WeaveC3Barchart($("#barchart"), weave.path("CompoundBarChartTool"));
+});
+</script>
+</body>
+</html>
