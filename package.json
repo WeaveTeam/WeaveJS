@@ -1,0 +1,35 @@
+{
+  "name": "weave-c3",
+  "version": "0.0.0",
+  "description": "Proof of Concept Constructing C3 visualizations from Weave session state.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pkovac/weave-c3.git"
+  },
+  "keywords": [
+    "c3",
+    "visualization",
+    "weave"
+  ],
+  "author": "philip.kovac@iweave.com",
+  "license": "None",
+  "bugs": {
+    "url": "https://github.com/pkovac/weave-c3-barchart/issues"
+  },
+  "devDependencies": {
+    "babel": "^5.6.14",
+    "babel-eslint": "^3.1.23",
+    "babelify": "^6.1.2",
+    "browserify": "^10.2.4",
+    "c3": "^0.4.10",
+    "d3": "^3.5.6",
+    "eslint": "^0.24.0",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^3.8.0",
+    "grunt-eslint": "^16.0.0"
+  }
+}
