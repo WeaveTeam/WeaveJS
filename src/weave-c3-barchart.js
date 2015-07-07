@@ -1,13 +1,20 @@
-import d3 from "d3";
+import d3 from "d3"; //ignore-unused
 import c3 from "c3";
 
-class WeaveC3Barchart {
-	WeaveC3Barchart(targetDiv, weavePath) {
-
+export default class {
+    constructor(targetDiv, weavePath) {
+        this.originalState = weavePath.getState();
+        this.targetDiv = targetDiv;
+        this.chart = c3.generate({
+            data: {type: "bar"},
+            bar: {
+                width: {}
+            }
+        });
     }
 
-    _configureReadData(targetDiv, weavePath)
+    _findPlotter()
     {
-
+        var plotters = this.originalState.children;
     }
 }
