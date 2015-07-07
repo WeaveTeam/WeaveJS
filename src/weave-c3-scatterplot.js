@@ -1,15 +1,18 @@
 import d3 from "d3";
 import c3 from "c3";
-
+import WeavePanel from "./WeavePanel";
+import jquery from "jquery";
 
 // function _buildC3Visualization (weaveState) {
 //     this.c3Opts = {};
 // }
 
-export default class {
+export default class extends WeavePanel {
 
-    constructor(weavePath) {
-        this.weavePath = weavePath;
+    constructor(element, toolPath) {
+        super(element, toolPath);
+        this.toolPath = toolPath;
+        this.element = element;
     }
 
     // This function takes in a weave session state
@@ -18,20 +21,15 @@ export default class {
     // This function should not be called externally
     _buildC3Visualization() {
 
-        var plotterPath = this.weavePath.pushPlotter();
-
+        var plotterPath = this.toolPath.pushPlotter();
         var dataXPath = plotterPath.push("dataX");
         var dataYPath = plotterPath.push("dataY");
 
-        function getXLabel () {
-            return "X";
-        }
-
-        function getYLabel () {
-            return "Y";
-        }
-
         this._c3Opts = {
+             size: {
+                width: jquery(this.div).width(),
+                height: jquery(this.div).height()
+            },
             data: {
                 json: plotterPath.retrieveRecords({ x: dataXPath, y: dataYPath}),
                 keys: {
@@ -42,13 +40,14 @@ export default class {
             },
             axis: {
                 x: {
-                    label: getXLabel(),
+                    // needs to change
+                    label: dataXPath.push(null).getState().metadata.title,
                     tick: {
                         fit: false
                     }
                 },
                 y: {
-                    label: getYLabel()
+                    label: dataYPath.push(null).getState().metadata.title
                 }
             }
         };
@@ -56,10 +55,9 @@ export default class {
 
     // This function takes a DOM element ID as a target
     // for generating a c3 visualization.
-    generate(targetID) {
+    generate() {
         this.chart = this._buildC3Visualization();
-        this._c3Opts.bindto = "#" + targetID;
+        this._c3Opts.bindto = this.div[0];
         this.chart = c3.generate(this._c3Opts);
     }
-
 }
