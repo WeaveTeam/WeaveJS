@@ -1,7 +1,6 @@
 import c3 from "c3";
 import WeavePanel from "./WeavePanel";
 import jquery from "jquery";
-import lodash from "lodash";
 
 export default class extends WeavePanel {
     constructor(parent, toolPath) {
@@ -22,17 +21,28 @@ export default class extends WeavePanel {
             }
         });
 
-        this.getData();
+        var plotter = toolPath.pushPlotter("plot");
+
+        var boundDataChanged = this._dataChanged.bind(this);
+
+        ["heightColumns", "labelColumn", "sortColumn"].forEach(
+            (item) => {plotter.push(item).addCallback(boundDataChanged, true, false); }
+        );
     }
 
-    getData() {
+    _updateContents() {
+        this.chart.resize({height: jquery(this.element).height(),
+                      width: jquery(this.element).width()});
+    }
+
+    _dataChanged() {
         var plotter = this.toolPath.pushPlotter("plot");
         var heightColumnNames = [];
         var heightColumns = plotter.push("heightColumns").getChildren();
         var mapping =
         {
-            label: plotter.push("labelColumn")
-            //sort: plotter.push("sortColumn"),
+            label: plotter.push("labelColumn"),
+            sort: plotter.push("sortColumn")
         };
         var names = {};
 

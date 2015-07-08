@@ -5,14 +5,12 @@
 <script src="weavec3.js"></script>
 </head>
 <body>
-<div id="barchart"></div>
-<div id="weavejs" style="width: 50vw; height: 50vh; borderStyle: solid;"></div>
-<div id="scatterplot"></div>
+<div id="weavejs" style="width: 100vw; height: 100vh; borderStyle: solid;"></div>
 <script>
 $(function ()
 {
 	var weave = opener.weave;
-	var barchart = new WeaveC3Barchart($("#weavejs"), weave.path("CompoundBarChartTool"));
+	var barchart = new WeaveC3Barchart("#weavejs", weave.path("CompoundBarChartTool"));
 });
 </script>
 </body>

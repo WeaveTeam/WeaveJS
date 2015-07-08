@@ -16,8 +16,21 @@ function percentToNumber(percentString)
 export default class {
     constructor(parent, toolPath) {
         this.toolPath = toolPath;
+        this.parent = parent;
+
         this.toolName = toolPath.getPath().pop();
+        this.element = jquery("<div></div>").appendTo(parent).attr("id", this.toolName).css("borderStyle", "solid");
+
+        ["panelY", "panelX", "panelHeight", "panelWidth", "maximized"].forEach(
+            (item) => { this.toolPath.push(item).addCallback(this._panelChanged.bind(this), true, false); }
+        , this);
+    }
+
+    _panelChanged() {
         var top, left, height, width;
+        var toolPath = this.toolPath;
+        var parent = this.parent;
+
         if (toolPath.getState("maximized"))
         {
             top = 0;
@@ -33,11 +46,8 @@ export default class {
             width = percentToNumber(toolPath.getState("panelWidth")) * jquery(parent).width();
         }
 
-
-        this.element = jquery(parent).append("<div>")
-            .attr("id", this.toolName)
-            .css("position", "relative")
-            .css({top, left, height, width})
-            .css("borderStyle", "solid");
+        this.element.css("position", "relative")
+            .css({top, left, height, width, "max-height": height, "max-width": width});
+        this._updateContents();
     }
 }
