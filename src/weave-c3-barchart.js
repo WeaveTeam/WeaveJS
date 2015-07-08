@@ -1,6 +1,7 @@
 import c3 from "c3";
 import WeavePanel from "./WeavePanel";
 import jquery from "jquery";
+import lodash from "lodash";
 
 export default class extends WeavePanel {
     constructor(parent, toolPath) {
@@ -14,7 +15,6 @@ export default class extends WeavePanel {
             data: {json: [], type: "bar"},
             bindto: this.element[0],
             bar: {
-                width: {}
             },
             axis: {
                 x: { type: "category"}
@@ -39,6 +39,7 @@ export default class extends WeavePanel {
         var plotter = this.toolPath.pushPlotter("plot");
         var heightColumnNames = [];
         var heightColumns = plotter.push("heightColumns").getChildren();
+
         var mapping =
         {
             label: plotter.push("labelColumn"),
@@ -55,10 +56,15 @@ export default class extends WeavePanel {
             mapping[name] = column;
             heightColumnNames.push(name);
         }
+
         var json = this.toolPath.pushPlotter("plot").retrieveRecords(mapping);
-        /* [x, label, label, label] [heightColumn, value, value, value] */
+
+        json = lodash.sortBy(json, "sort");
+
         var keys = {x: "label", value: heightColumnNames};
 
-        this.chart.load({json, keys, names});
+        this.chart.load({json, keys, order: null, unload: null});
+        this.chart.data.names(names);
+
     }
 }
