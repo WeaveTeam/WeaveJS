@@ -1,4 +1,3 @@
-import d3 from "d3";
 import c3 from "c3";
 import WeavePanel from "./WeavePanel";
 import jquery from "jquery";
