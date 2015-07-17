@@ -9,6 +9,7 @@ export default class WeaveC3Barchart extends WeavePanel {
 
         this.indexCache = lodash({});
         this.dataNames = [];
+        this.chart = null;
         this.chart = c3.generate({
             size: {
                 width: jquery(this.element).width(),
@@ -25,15 +26,30 @@ export default class WeaveC3Barchart extends WeavePanel {
             }
         });
 
-        var plotter = toolPath.pushPlotter("plot");
+        this.setupCallbacks();
+    }
 
-        var boundDataChanged = this._dataChanged.bind(this);
+    setupCallbacks() {
+        this._boundDataChanged = this._dataChanged.bind(this);
+        this._boundSelectionChanged = this._selectionKeysChanged.bind(this);
+
+        var plotter = this.toolPath.pushPlotter("plot");
 
         ["heightColumns", "labelColumn", "sortColumn"].forEach(
-            (item) => {plotter.push(item).addCallback(boundDataChanged, true, false); }
-        );
+            (item) => {plotter.push(item).addCallback(this._boundDataChanged, true, false); },
+        this);
 
-        toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
+        this.toolPath.selection_keyset.addCallback(this._boundSelectionChanged, true, false);
+    }
+
+    teardownCallbacks() {
+        var plotter = this.toolPath.pushPlotter("plot");
+
+        ["heightColumns", "labelColumn", "sortColumn"].forEach(
+            (item) => {plotter.push(item).removeCallback(this._boundDataChanged); },
+        this);
+
+        this.toolPath.selection_keyset.removeCallback(this._boundSelectionChanged);
     }
 
     _updateContents() {
@@ -82,6 +98,13 @@ export default class WeaveC3Barchart extends WeavePanel {
         this.chart.load({json, keys, order: null, unload: true, selection: {enabled: true, multiple: true}});
 
         this.chart.data.names(names);
+    }
+
+    destroy() {
+        /* Cleanup callbacks */
+        this.teardownCallbacks();
+        this.chart.destroy();
+        super();
     }
 }
 

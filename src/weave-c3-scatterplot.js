@@ -105,8 +105,8 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     update() {
-        console.log(this._c3Options);
         this.chart = c3.generate(this._c3Options);
+        this.element.css("position", "absolute");
     }
 }
 
