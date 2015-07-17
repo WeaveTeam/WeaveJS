@@ -18,6 +18,7 @@ export default class {
 
     static createTool(parent, path) {
         var ToolClass = this.toolRegistry[path.getType()];
+        var tool;
 
         if (!this.tools)
         {
@@ -26,8 +27,10 @@ export default class {
 
         if (ToolClass)
         {
-            this.tools.push(new ToolClass(parent, path));
+            tool = new ToolClass(parent, path);
+            this.tools.push();
         }
+        return tool;
     }
 
     static registerToolImplementation(asClassName, jsClass) {
@@ -42,17 +45,25 @@ export default class {
         this.parent = parent;
 
         this.toolName = toolPath.getPath().pop();
-        this.element = jquery("<div></div>").appendTo(parent).attr("id", this.toolName).css("borderStyle", "solid");
+        this.element = jquery("<div></div>").appendTo(parent).attr("id", this.toolName)
+            .css("borderStyle", "solid")
+            .css("background", "rgba(255, 255, 255, 1.0)")
+            .css("position", "absolute");
 
-        ["panelY", "panelX", "panelHeight", "panelWidth", "maximized"].forEach(
-            (item) => { this.toolPath.push(item).addCallback(lodash.throttle(this._panelChanged.bind(this)), true, false); }
+        var boundFunc = lodash.debounce(this._panelChanged.bind(this), 100);
+
+        ["panelY", "panelX", "panelHeight", "panelWidth", "maximized", "zOrder"].forEach(
+            (item) => { this.toolPath.push(item).addCallback(boundFunc, true, false); }
         , this);
+
     }
 
     _panelChanged() {
-        var top, left, height, width;
+        var top, left, height, width, zOrder;
         var toolPath = this.toolPath;
         var parent = this.parent;
+
+        zOrder = toolPath.getState("zOrder");
 
         if (toolPath.getState("maximized"))
         {
@@ -70,8 +81,12 @@ export default class {
         }
 
         this.element.css("position", "absolute")
-            .css({top, left, height, width, "max-height": height, "max-width": width})
+            .css({top, left, height, width, "z-index": zOrder, "max-height": height, "max-width": width})
             .css({"-webkit-transform": "translateZ(0)"}); /* In Webkit, forces the div to be a compositing layer. */
         this._updateContents();
+    }
+
+    destroy() {
+        this.element.remove();
     }
 }

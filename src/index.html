@@ -10,9 +10,7 @@
 <script>
 $(function ()
 {
-	opener.weave.path().forEachChild(function (child) {
-		WeavePanel.createTool("#weavejs", child);
-	});
+	window.wpm = new WeavePanelManager("#weavejs", opener.weave);
 });
 </script>
 </body>

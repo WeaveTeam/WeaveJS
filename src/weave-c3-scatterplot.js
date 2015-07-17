@@ -86,7 +86,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                     if(_sizePath.getState().length) {
                         let minScreenRadius = _plotterPath.push("minScreenRadius").getState();
                         let maxScreenRadius = _plotterPath.push("maxScreenRadius").getState();
-                        return (minScreenRadius + _records[d.index].size) / (maxScreenRadius - minScreenRadius) || 0;
+                        return minScreenRadius + _records[d.index].size / (maxScreenRadius - minScreenRadius) || 0;
                     } else {
                        // if not we use the defaultScreenRadius size
                         return _plotterPath.push("defaultScreenRadius").getState() || 5; // or 5 just for sanity check.
@@ -98,17 +98,14 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this.indexCache = lodash({});
 
         [_dataXPath, _dataYPath, _sizePath, _colorPath].forEach( (item) => {
-            item.addCallback(this._dataChanged.bind(this), true, false);
+            item.addCallback(lodash.debounce(this._dataChanged.bind(this), true, false), 100);
         });
 
         [_dataXPath, _dataYPath, _xAxisPath, _yAxisPath].forEach((item) => {
-            item.addCallback(this._axisChanged.bind(this), true, false);
+            item.addCallback(lodash.debounce(this._axisChanged.bind(this), true, false), 100);
         });
 
-        [_colorPath, _sizePath].forEach( (item) => {
-            item.addCallback(this._pointPropChanged.bind(this), true, false);
-        });
-
+        // toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
         this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
         this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
@@ -120,8 +117,8 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this._c3Options.axis.y.label.text = _yAxisPath.push("overrideAxisName").getState() || _dataYPath.getValue("ColumnUtils.getTitle(this)");
         this._c3Options.axis.y.label.position = "outer-middle";
 
-        toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
         this._c3Options.bindto = this.element[0];
+        this.update = lodash.debounce(this._update.bind(this), 100);
         this.update();
     }
 
@@ -145,13 +142,10 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     _dataChanged() {
         let mapping = { x: _dataXPath, y: _dataYPath, size: _sizePath, color: _colorPath };
         _records = _plotterPath.retrieveRecords(mapping);
+        console.log(_records);
         this._c3Options.data.json = _records;
         this.indexCache = lodash(_records).map((item, idx) => {return [item.id, idx]; }).zipObject();
         this.dataNames = lodash.keys(mapping);
-        this.update();
-    }
-
-    _pointPropChanged() {
         this.update();
     }
 
@@ -163,19 +157,23 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this.update();
     }
 
-    _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
-        var indices = this.indexCache.pick(keys).values();
-        //console.log(this.dataNames, indices);
-        this.chart.select(this.dataNames, indices, true);
-        //this.update();
+    // _selectionKeysChanged() {
+    //     var keys = this.toolPath.selection_keyset.getKeys();
+    //     var indices = this.indexCache.pick(keys).values();
+    //     //console.log(this.dataNames, indices);
+    //     this.chart.select(this.dataNames, indices, true);
+    //     //this.update();
+    // }
+
+    _update() {
+        console.log("update called");
+        this.chart = c3.generate(this._c3Options);
+        this.element.css("position", "absolute");
     }
 
-    update() {
-        if(this.chart) {
-            this.chart.destroy();
-        }
-        this.chart = c3.generate(this._c3Options);
+    destroy() {
+        this.chart.destroy();
+        super();
     }
 }
 
