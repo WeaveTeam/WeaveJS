@@ -16,7 +16,7 @@ var _records = [];
 
 var _normalizedRecords = [];
 
-export default class extends WeavePanel {
+export default class WeaveC3ScatterPlot extends WeavePanel {
 
     constructor(parent, toolPath) {
         super(parent, toolPath);
@@ -179,4 +179,4 @@ export default class extends WeavePanel {
     }
 }
 
-
+WeavePanel.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);

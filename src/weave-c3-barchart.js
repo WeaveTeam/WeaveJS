@@ -3,7 +3,7 @@ import WeavePanel from "./WeavePanel";
 import jquery from "jquery";
 import lodash from "lodash";
 
-export default class extends WeavePanel {
+export default class WeaveC3Barchart extends WeavePanel {
     constructor(parent, toolPath) {
         super(parent, toolPath);
 
@@ -85,3 +85,5 @@ export default class extends WeavePanel {
         this.chart.data.names(names);
     }
 }
+
+WeavePanel.registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);

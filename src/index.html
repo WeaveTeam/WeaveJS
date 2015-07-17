@@ -10,9 +10,9 @@
 <script>
 $(function ()
 {
-	var weave = opener.weave;
-	var barchart = new window.WeaveC3Barchart("#weavejs", weave.path("CompoundBarChartTool"));
-	var scatterplot = new window.WeaveC3ScatterPlot("#weavejs", weave.path("ScatterPlotTool"));
+	opener.weave.path().forEachChild(function (child) {
+		WeavePanel.createTool("#weavejs", child);
+	});
 });
 </script>
 </body>

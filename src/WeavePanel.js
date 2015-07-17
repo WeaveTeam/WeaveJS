@@ -1,4 +1,5 @@
 import jquery from "jquery";
+import lodash from "lodash";
 
 function percentToNumber(percentString)
 {
@@ -14,6 +15,28 @@ function percentToNumber(percentString)
 }
 
 export default class {
+
+    static createTool(parent, path) {
+        var ToolClass = this.toolRegistry[path.getType()];
+
+        if (!this.tools)
+        {
+            this.tools = [];
+        }
+
+        if (ToolClass)
+        {
+            this.tools.push(new ToolClass(parent, path));
+        }
+    }
+
+    static registerToolImplementation(asClassName, jsClass) {
+        if (!this.toolRegistry)
+        {
+            this.toolRegistry = {};
+        }
+        this.toolRegistry[asClassName] = jsClass;
+    }
     constructor(parent, toolPath) {
         this.toolPath = toolPath;
         this.parent = parent;
@@ -22,7 +45,7 @@ export default class {
         this.element = jquery("<div></div>").appendTo(parent).attr("id", this.toolName).css("borderStyle", "solid");
 
         ["panelY", "panelX", "panelHeight", "panelWidth", "maximized"].forEach(
-            (item) => { this.toolPath.push(item).addCallback(this._panelChanged.bind(this), true, false); }
+            (item) => { this.toolPath.push(item).addCallback(lodash.throttle(this._panelChanged.bind(this)), true, false); }
         , this);
     }
 
