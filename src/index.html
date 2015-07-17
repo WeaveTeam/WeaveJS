@@ -1,4 +1,5 @@
 <html>
+<meta http-equiv="content-type" content="text/html; charset=UTF8">
 <head>
 <title>C3 Tools Export</title>
 <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -10,7 +11,8 @@
 $(function ()
 {
 	var weave = opener.weave;
-	var barchart = new WeaveC3Barchart("#weavejs", weave.path("CompoundBarChartTool"));
+	var barchart = new window.WeaveC3Barchart("#weavejs", weave.path("CompoundBarChartTool"));
+	var scatterplot = new window.WeaveC3ScatterPlot("#weavejs", weave.path("ScatterPlotTool"));
 });
 </script>
 </body>

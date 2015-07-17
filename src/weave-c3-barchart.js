@@ -22,7 +22,8 @@ export default class extends WeavePanel {
             },
             axis: {
                 x: { type: "category"}
-            }
+            },
+            legend: false
         });
 
         var plotter = toolPath.pushPlotter("plot");

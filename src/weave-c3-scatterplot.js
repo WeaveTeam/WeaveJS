@@ -1,7 +1,7 @@
 import c3 from "c3";
 import WeavePanel from "./WeavePanel";
 import jquery from "jquery";
-
+import lodash from "lodash";
 
 var _plotterPath;
 var _xAxisPath;
@@ -9,37 +9,27 @@ var _yAxisPath;
 var _dataXPath;
 var _dataYPath;
 
-var _xAxis;
-var _yAxis;
+var _colorPath;
+var _sizePath;
 
-class SimpleAxis {
+var _records = [];
 
-    // This class takes a weavePath to an SimpleAxis plotter
-    constructor(axisPath) {
-
-        this._c3Axis = {};
-        this._axisPath = axisPath;
-        axisPath.addCallback(function() {
-            this._c3Axis.min = this._axisPath.push("axisLineMinValue").getState();
-            this._c3Axis.max = this._axisPath.push("axisLineMaxValue").getState();
-            this._c3Axis.culling = this._axisPath.push("tickCountRequested").getState();
-            this._c3Axis.label = {
-                text: "", // the axis label needs to be set externally
-                position: "outer-center" // weave axisname currently has only one position.
-            };
-        }.bind(this), true, false);
-    }
-
-    // This function return a C3 Object configuation for an axis
-    getC3Axis () {
-        return this._c3Axis;
-    }
-}
+var _normalizedRecords = [];
 
 export default class extends WeavePanel {
 
     constructor(parent, toolPath) {
         super(parent, toolPath);
+
+        _plotterPath = toolPath.pushPlotter("plot");
+
+        _dataXPath = _plotterPath.push("dataX");
+        _dataYPath = _plotterPath.push("dataY");
+        _xAxisPath = toolPath.pushPlotter("xAxis");
+        _yAxisPath = toolPath.pushPlotter("yAxis");
+
+        _colorPath = _plotterPath.push("fill", "color");
+        _sizePath = _plotterPath.push("sizeBy");
 
         this._c3Options = {
             data: {
@@ -49,50 +39,119 @@ export default class extends WeavePanel {
                     x: "x",
                     value: ["y"]
                 },
-                type: "scatter"
+                type: "scatter"//,
+                // color: function (color, d) {
+                //     console.log(color, d, _pointPropMapping);
+                //     if(_pointPropMapping.length && d.index) {
+                //         return _pointPropMapping[d.index] ? _pointPropMapping[d.index].color : "#6baed6";
+                //     }
+                // }
             },
-            axis: {}
+            legend: {
+                show: false
+            },
+            axis: {
+                x: {
+                    min: "",
+                    max: "",
+                    label: {
+                        text: "",
+                        position: ""
+                    },
+                    tick: {
+                        count: 5
+                    }
+                },
+                y: {
+                    min: "",
+                    max: "",
+                    label: {
+                        text: "",
+                        position: ""
+                    }
+                }
+            },
+            grid: {
+                x: {
+                    show: true
+                },
+                y: {
+                    show: true
+                }
+            },
+            point: {
+                r: function(d) {
+                    // check if we have a size by column
+                    //console.log(_sizePath.getState());
+                    if(_sizePath.getState().length) {
+                        let minScreenRadius = _plotterPath.push("minScreenRadius").getState();
+                        let maxScreenRadius = _plotterPath.push("maxScreenRadius").getState();
+                        return (minScreenRadius + _records[d.index].size) / (maxScreenRadius - minScreenRadius) || 0;
+                    } else {
+                       // if not we use the defaultScreenRadius size
+                        return _plotterPath.push("defaultScreenRadius").getState() || 5; // or 5 just for sanity check.
+                    }
+                }
+            }
         };
-        _plotterPath = this.toolPath.pushPlotter("plot");
 
-        _dataXPath = _plotterPath.push("dataX");
-        _dataYPath = _plotterPath.push("dataY");
+        this.indexCache = lodash({});
 
-        _xAxisPath = this.toolPath.pushPlotter("xAxis");
-        _yAxisPath = this.toolPath.pushPlotter("yAxis");
-
-        _xAxis = new SimpleAxis(_xAxisPath);
-        _yAxis = new SimpleAxis(_yAxisPath);
-
-        [_dataXPath, _dataYPath].forEach( (item) => {
+        [_dataXPath, _dataYPath, _sizePath, _colorPath].forEach( (item) => {
             item.addCallback(this._dataChanged.bind(this), true, false);
         });
 
-        [_dataXPath, _dataYPath, _xAxisPath.push("overrideAxisName"), _yAxisPath.push("overrideAxisName")].forEach((item) => {
+        [_dataXPath, _dataYPath, _xAxisPath, _yAxisPath].forEach((item) => {
             item.addCallback(this._axisChanged.bind(this), true, false);
         });
 
+        [_colorPath, _sizePath].forEach( (item) => {
+            item.addCallback(this._pointPropChanged.bind(this), true, false);
+        });
+
+
+        this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
+        this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
+        this._c3Options.axis.x.label.text = _xAxisPath.push("overrideAxisName").getState() || _dataXPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.x.label.position = "outer-center";
+
+        this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
+        this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
+        this._c3Options.axis.y.label.text = _yAxisPath.push("overrideAxisName").getState() || _dataYPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.y.label.position = "outer-middle";
+
+        toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
         this._c3Options.bindto = this.element[0];
         this.update();
     }
 
     _updateContents () {
-        this._sizeChanged.call(this);
+        this._sizeChanged();
     }
 
     _axisChanged () {
-
-        this._c3Options.axis.x = _xAxis.getC3Axis();
+        this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
+        this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
         this._c3Options.axis.x.label.text = _xAxisPath.push("overrideAxisName").getState() || _dataXPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.x.label.position = "outer-center";
 
-        this._c3Options.axis.y = _yAxis.getC3Axis();
-        this._c3Options.axis.y.label.text = _xAxisPath.push("overrideAxisName").getState() || _dataXPath.getValue("ColumnUtils.getTitle(this)");
-
+        this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
+        this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
+        this._c3Options.axis.y.label.text = _yAxisPath.push("overrideAxisName").getState() || _dataYPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.y.label.position = "outer-middle";
         this.update();
     }
 
     _dataChanged() {
-        this._c3Options.data.json = _plotterPath.retrieveRecords({ x: _dataXPath, y: _dataYPath});
+        let mapping = { x: _dataXPath, y: _dataYPath, size: _sizePath, color: _colorPath };
+        _records = _plotterPath.retrieveRecords(mapping);
+        this._c3Options.data.json = _records;
+        this.indexCache = lodash(_records).map((item, idx) => {return [item.id, idx]; }).zipObject();
+        this.dataNames = lodash.keys(mapping);
+        this.update();
+    }
+
+    _pointPropChanged() {
         this.update();
     }
 
@@ -104,8 +163,18 @@ export default class extends WeavePanel {
         this.update();
     }
 
+    _selectionKeysChanged() {
+        var keys = this.toolPath.selection_keyset.getKeys();
+        var indices = this.indexCache.pick(keys).values();
+        //console.log(this.dataNames, indices);
+        this.chart.select(this.dataNames, indices, true);
+        //this.update();
+    }
+
     update() {
-        console.log(this._c3Options);
+        if(this.chart) {
+            this.chart.destroy();
+        }
         this.chart = c3.generate(this._c3Options);
     }
 }
