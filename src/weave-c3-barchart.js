@@ -44,12 +44,6 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 
     teardownCallbacks() {
-        var plotter = this.toolPath.pushPlotter("plot");
-
-        ["heightColumns", "labelColumn", "sortColumn"].forEach(
-            (item) => {plotter.push(item).removeCallback(this._boundDataChanged); },
-        this);
-
         this.toolPath.selection_keyset.removeCallback(this._boundSelectionChanged);
     }
 

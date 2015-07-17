@@ -63,8 +63,6 @@ export default class {
         var toolPath = this.toolPath;
         var parent = this.parent;
 
-        zOrder = toolPath.getState("zOrder");
-
         if (toolPath.getState("maximized"))
         {
             top = 0;
@@ -81,7 +79,7 @@ export default class {
         }
 
         this.element.css("position", "absolute")
-            .css({top, left, height, width, "z-index": zOrder, "max-height": height, "max-width": width})
+            .css({top, left, height, width, "max-height": height, "max-width": width})
             .css({"-webkit-transform": "translateZ(0)"}); /* In Webkit, forces the div to be a compositing layer. */
         this._updateContents();
     }
