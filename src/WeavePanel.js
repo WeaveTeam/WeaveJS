@@ -46,8 +46,9 @@ export default class {
             width = percentToNumber(toolPath.getState("panelWidth")) * jquery(parent).width();
         }
 
-        this.element.css("position", "relative")
-            .css({top, left, height, width, "max-height": height, "max-width": width});
+        this.element.css("position", "absolute")
+            .css({top, left, height, width, "max-height": height, "max-width": width})
+            .css({"-webkit-transform": "translateZ(0)"}); /* In Webkit, forces the div to be a compositing layer. */
         this._updateContents();
     }
 }
