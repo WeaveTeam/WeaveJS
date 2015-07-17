@@ -35,17 +35,19 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             data: {
                 size: {},
                 json: [],
+                order: null,
                 keys: {
                     x: "x",
-                    value: ["y"]
+                    value: ["y", "id"]
                 },
-                type: "scatter"//,
+                type: "scatter",//,
                 // color: function (color, d) {
                 //     console.log(color, d, _pointPropMapping);
                 //     if(_pointPropMapping.length && d.index) {
                 //         return _pointPropMapping[d.index] ? _pointPropMapping[d.index].color : "#6baed6";
                 //     }
                 // }
+                selection: {enabled: true, multiple: true}
             },
             legend: {
                 show: false
@@ -105,7 +107,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             item.addCallback(lodash.debounce(this._axisChanged.bind(this), true, false), 100);
         });
 
-        // toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
+        toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
         this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
         this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
@@ -141,7 +143,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
     _dataChanged() {
         let mapping = { x: _dataXPath, y: _dataYPath, size: _sizePath, color: _colorPath };
-        _records = _plotterPath.retrieveRecords(mapping);
+        _records = lodash.sortBy(_plotterPath.retrieveRecords(mapping), "id");
         console.log(_records);
         this._c3Options.data.json = _records;
         this.indexCache = lodash(_records).map((item, idx) => {return [item.id, idx]; }).zipObject();
@@ -157,16 +159,14 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this.update();
     }
 
-    // _selectionKeysChanged() {
-    //     var keys = this.toolPath.selection_keyset.getKeys();
-    //     var indices = this.indexCache.pick(keys).values();
-    //     //console.log(this.dataNames, indices);
-    //     this.chart.select(this.dataNames, indices, true);
-    //     //this.update();
-    // }
+    _selectionKeysChanged() {
+        var keys = this.toolPath.selection_keyset.getKeys();
+        var indices = this.indexCache.pick(keys).values().value();
+        console.log(indices);
+        this.chart.select("y", indices, true);
+    }
 
     _update() {
-        console.log("update called");
         this.chart = c3.generate(this._c3Options);
         this.element.css("position", "absolute");
     }
