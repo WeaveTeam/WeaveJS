@@ -9,8 +9,9 @@
 <script>
 $(function ()
 {
-	var weave = opener.weave;
-	var barchart = new WeaveC3Barchart("#weavejs", weave.path("CompoundBarChartTool"));
+	opener.weave.path().forEachChild(function (child) {
+		WeavePanel.createTool("#weavejs", child);
+	});
 });
 </script>
 </body>
