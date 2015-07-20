@@ -2,6 +2,7 @@ import c3 from "c3";
 import WeavePanel from "./WeavePanel";
 import jquery from "jquery";
 import lodash from "lodash";
+import d3 from "d3";
 
 var _plotterPath;
 var _xAxisPath;
@@ -9,12 +10,26 @@ var _yAxisPath;
 var _dataXPath;
 var _dataYPath;
 
-var _colorPath;
-var _sizePath;
+var _fillStylePath;
+var _lineStylePath;
 
+var _sizePath;
 var _records = [];
 
 var _normalizedRecords = [];
+
+/* private
+ * @param records array or records
+ * @param attributes array of attributes to be normalized
+ */
+function _normalizeRecords (records, attributes) {
+    
+    let normalizedRecords = [];
+    attributes.map(function(attr) {
+        //let min = records
+        //let column = records.
+    });
+}
 
 export default class WeaveC3ScatterPlot extends WeavePanel {
 
@@ -28,7 +43,8 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         _xAxisPath = toolPath.pushPlotter("xAxis");
         _yAxisPath = toolPath.pushPlotter("yAxis");
 
-        _colorPath = _plotterPath.push("fill", "color");
+        _fillStylePath = _plotterPath.push("fill");
+        _lineStylePath = _plotterPath.push("line");
         _sizePath = _plotterPath.push("sizeBy");
 
         this._c3Options = {
@@ -38,16 +54,16 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                 order: null,
                 keys: {
                     x: "x",
-                    value: ["y", "id"]
+                    value: ["y"]
                 },
                 type: "scatter",//,
-                // color: function (color, d) {
-                //     console.log(color, d, _pointPropMapping);
-                //     if(_pointPropMapping.length && d.index) {
-                //         return _pointPropMapping[d.index] ? _pointPropMapping[d.index].color : "#6baed6";
-                //     }
-                // }
-                selection: {enabled: true, multiple: true}
+                color: function (color, d) {
+                    if(_records && _records.length && _records[d.index]) {
+                        return _records[d.index].fill ? _records[d.index].fill.color : 0;
+                    }
+                },
+                selection: {enabled: true, multiple: true},
+                sort: "asc"
             },
             legend: {
                 show: false
@@ -99,7 +115,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         this.indexCache = lodash({});
 
-        [_dataXPath, _dataYPath, _sizePath, _colorPath].forEach( (item) => {
+        [_dataXPath, _dataYPath, _sizePath, _fillStylePath, _lineStylePath].forEach( (item) => {
             item.addCallback(lodash.debounce(this._dataChanged.bind(this), true, false), 100);
         });
 
@@ -142,8 +158,20 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _dataChanged() {
-        let mapping = { x: _dataXPath, y: _dataYPath, size: _sizePath, color: _colorPath };
-        _records = lodash.sortBy(_plotterPath.retrieveRecords(mapping), "id");
+        let mapping = { x: _dataXPath,
+                        y: _dataYPath,
+                        size: _sizePath,
+                        fill: {
+                            alpha: _fillStylePath.push("alpha"),
+                            color: _fillStylePath.push("color")
+                        },
+                        line: {
+                            alpha: _lineStylePath.push("alpha"),
+                            color: _lineStylePath.push("color"),
+                            caps: _lineStylePath.push("caps")
+                        }
+                    };
+        _records = lodash.sortBy(_plotterPath.retrieveRecords(mapping), ["x", "y"]);
         console.log(_records);
         this._c3Options.data.json = _records;
         this.indexCache = lodash(_records).map((item, idx) => {return [item.id, idx]; }).zipObject();
@@ -162,7 +190,6 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     _selectionKeysChanged() {
         var keys = this.toolPath.selection_keyset.getKeys();
         var indices = this.indexCache.pick(keys).values().value();
-        console.log(indices);
         this.chart.select("y", indices, true);
     }
 
