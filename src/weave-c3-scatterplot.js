@@ -14,9 +14,6 @@ var _fillStylePath;
 var _lineStylePath;
 
 var _sizeByPath;
-var _records = [];
-
-var _normalizedRecords = [];
 
 /* private
  * @param records array or records
@@ -57,6 +54,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
     constructor(parent, toolPath) {
         super(parent, toolPath);
+        this.lookup = {};
 
         _plotterPath = toolPath.pushPlotter("plot");
 
@@ -73,17 +71,17 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             data: {
                 size: {},
                 json: [],
+                hide: ["originalIndex"],
                 order: "asc",
                 keys: {
                     x: "x",
-                    value: ["y"]
+                    value: ["y", "originalIndex"]
                 },
                 type: "scatter",//,
-                color: function (color, d) {
-                    if(_records && _records.length && _records[d.index]) {
-                        return _records[d.index].fill ? _records[d.index].fill.color : 0;
-                    }
-                },
+                color: (color, d) => {
+                        var record = this.originalRecords[this.chartToOriginal(d.index)];
+                        return (record && record.fill) ? record.fill.color : 0;
+                    },
                 selection: {enabled: true, multiple: true}
             },
             legend: {
@@ -130,7 +128,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                 }
             },
             point: {
-                r: function(d) {
+                r: (d) => {
                     // check if we have a size by column
                     //var sizeColumn = lodash.pluck(_normalizedRecords, "size");
                     // sizeColumn.every(function(v) { retun v === null});
@@ -138,12 +136,15 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                     if(_sizeByPath.getState().length) {
                         let minScreenRadius = _plotterPath.push("minScreenRadius").getState();
                         let maxScreenRadius = _plotterPath.push("maxScreenRadius").getState();
-                        return minScreenRadius + _normalizedRecords[d.index].size * (maxScreenRadius - minScreenRadius);
+                        var normalizedRecord = this.normalizedRecords[this.chartToOriginal(d.index)];
+
+                        return normalizedRecord && normalizedRecord.size ?
+                                minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius) :
+                                (maxScreenRadius + minScreenRadius) / 2;
                     }
                     else {
                         return _plotterPath.push("defaultScreenRadius").getState();
                     }
-
                 }
             }
         };
@@ -196,6 +197,49 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this.update();
     }
 
+    keyToChart(key) {
+        return this.lookup.keyToChart[key];
+    }
+    keyToOriginal(key) {
+        return this.lookup.keyToRecord[key].originalIndex;
+    }
+
+    keyToRecord(key) {
+        return this.lookup.keyToRecord[key];
+    }
+
+    chartToOriginal(index) {
+        return this.lookup.chartToOriginal[index];
+    }
+
+    _buildChartIndices()
+    {
+        this.lookup.chartToOriginal = {};
+        this.lookup.originalToChart = {};
+
+        if (this.chart.data("originalIndex").length === 0)
+        {
+            return;
+        }
+        var chartData = this.chart.data("originalIndex")[0].values;
+
+        for (let chartIndex in chartData)
+        {
+            this.lookup.chartToOriginal[chartIndex] = chartData[chartIndex].value;
+            this.lookup.originalToChart[chartData[chartIndex].value] = chartIndex;
+        }
+    }
+    _buildKeyIndices()
+    {
+        this._buildChartIndices();
+        this.lookup.keyToChart = {};
+        for (let originalIndex in this.originalRecords)
+        {
+            let key = this.originalRecords[originalIndex].id;
+            this.lookup.keyToChart[key] = this.lookup.originalToChart[originalIndex];
+        }
+    }
+
     _dataChanged() {
         let mapping = { x: _dataXPath,
                         y: _dataYPath,
@@ -210,12 +254,17 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                             caps: _lineStylePath.push("caps")
                         }
                     };
-        _records = _plotterPath.retrieveRecords(mapping);
-        _records.forEach(function(record, i) {record.idx = i; });
-        _normalizedRecords = _normalizeRecords(_records, ["x", "y", "size"]);
-        this._c3Options.data.json = _records;
-        this.indexCache = lodash(_records).map((item, idx) => {return [item.id, idx]; }).zipObject();
-        this.dataNames = lodash.keys(mapping);
+
+        this.originalRecords = lodash(_plotterPath.retrieveRecords(mapping)).sortBy("id")
+            .forEach(function(record, index) {record.originalIndex = index; }).value();
+
+        this.normalizedRecords = _normalizeRecords(this.originalRecords, ["x", "y", "size"]);
+
+        this._c3Options.data.json = this.originalRecords;
+
+        this.lookup.keyToRecord = lodash.indexBy(this.originalRecords, "id");
+
+        this.keyToIndexLookup = null;
         this.update();
     }
 
@@ -229,13 +278,14 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
     _selectionKeysChanged() {
         var keys = this.toolPath.selection_keyset.getKeys();
-        var indices = this.indexCache.pick(keys).values().value();
+        var indices = keys.map(this.keyToChart, this).map(Number);
         this.chart.select("y", indices, true);
     }
 
     _update() {
         this.chart = c3.generate(this._c3Options);
         this.element.css("position", "absolute");
+        this._buildKeyIndices();
     }
 
     destroy() {
