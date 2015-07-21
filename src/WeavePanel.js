@@ -47,12 +47,14 @@ export default class {
         this.toolName = toolPath.getPath().pop();
         this.element = jquery("<div></div>").appendTo(parent).attr("id", this.toolName)
             .css("borderStyle", "solid")
+            .css("borderColor", "4D5258")
+            .css("borderWidth", "2px")
             .css("background", "rgba(255, 255, 255, 1.0)")
             .css("position", "absolute");
 
         var boundFunc = lodash.debounce(this._panelChanged.bind(this), 100);
 
-        ["panelY", "panelX", "panelHeight", "panelWidth", "maximized", "zOrder"].forEach(
+        ["panelY", "panelX", "panelHeight", "panelWidth", "maximized", "zOrder", "panelBorderColor"].forEach(
             (item) => { this.toolPath.push(item).addCallback(boundFunc, true, false); }
         , this);
 
@@ -77,6 +79,8 @@ export default class {
             height = percentToNumber(toolPath.getState("panelHeight")) * jquery(parent).height();
             width = percentToNumber(toolPath.getState("panelWidth")) * jquery(parent).width();
         }
+
+        this.element.css("borderColor", toolPath.getState("panelBorderColor"));
 
         this.element.css("position", "absolute")
             .css({top, left, height, width, "max-height": height, "max-width": width})
