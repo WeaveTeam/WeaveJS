@@ -4,6 +4,7 @@ import jquery from "jquery";
 import lodash from "lodash";
 import d3 from "d3";
 
+var _visualizationPath;
 var _plotterPath;
 var _xAxisPath;
 var _yAxisPath;
@@ -56,6 +57,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         super(parent, toolPath);
         this.lookup = {};
 
+        _visualizationPath = toolPath.push("children", "visualization");
         _plotterPath = toolPath.pushPlotter("plot");
 
         _dataXPath = _plotterPath.push("dataX");
@@ -159,7 +161,19 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             item.addCallback(lodash.debounce(this._axisChanged.bind(this), true, false), 100);
         });
 
+        ["axesAlpha",
+         "axesColor",
+         "axesThickness",
+         "gridLineAlpha",
+         "gridLineColor",
+         "gridLineThickness"].forEach((item) => {
+            _visualizationPath.push(item).addCallback(lodash.debounce(this._visualizationChanged.bind(this), true, false), 100);
+        });
+        _visualizationPath.addCallback(lodash.debounce(this._visualizationChanged.bind(this), true, false), 100);
+
         toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
+
+
 
         //this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
         //this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
@@ -282,8 +296,40 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this.chart.select("y", indices, true);
     }
 
+    _visualizationChanged() {
+
+        var axesAlpha = _visualizationPath.push("axesAlpha").getState();
+        var axesColor = _visualizationPath.push("axesColor").getState();
+        var axesThickness = _visualizationPath.push("axesThickness").getState();
+
+        var gridLineAlpha = _visualizationPath.push("gridLineAlpha").getState();
+        var gridLineColor = _visualizationPath.push("gridLineColor").getState();
+        var gridLineThickNess = _visualizationPath.push("gridLineThickness").getState();
+
+        jquery(this.element).find(".c3-axis-x").css("stroke", axesColor);
+        jquery(this.element).find(".c3-axis-y").css("stroke", axesColor);
+
+        jquery(this.element).find(".c3-axis-x").css("opacity", axesAlpha);
+        jquery(this.element).find(".c3-axis-y").css("opacity", axesAlpha);
+
+        jquery(this.element).find(".c3-axis-x").css("stroke-width", axesThickness);
+        jquery(this.element).find(".c3-axis-y").css("stroke-width", axesThickness);
+
+        jquery(this.element).find(".c3-xgrid").css("stroke", gridLineColor);
+        jquery(this.element).find(".c3-ygrid").css("stroke", gridLineColor);
+
+        jquery(this.element).find(".c3-xgrid").css("opacity", gridLineAlpha);
+        jquery(this.element).find(".c3-ygrid").css("opacity", gridLineAlpha);
+
+        jquery(this.element).find(".c3-xgrid").css("stroke-width", gridLineThickNess);
+        jquery(this.element).find(".c3-ygrid").css("stroke-width", gridLineThickNess);
+    }
+
     _update() {
         this.chart = c3.generate(this._c3Options);
+        d3.selectAll(this.element).selectAll("circle").style("stroke", "black")
+                                                      .style("stroke-opacity", _lineStylePath.push("alpha", "defaultValue").getState())
+                                                      .style("opacity", _fillStylePath.push("alpha", "defaultValue").getState());
         this.element.css("position", "absolute");
         this._buildKeyIndices();
     }
