@@ -13,7 +13,7 @@ var _dataYPath;
 var _fillStylePath;
 var _lineStylePath;
 
-var _sizePath;
+var _sizeByPath;
 var _records = [];
 
 var _normalizedRecords = [];
@@ -23,11 +23,33 @@ var _normalizedRecords = [];
  * @param attributes array of attributes to be normalized
  */
 function _normalizeRecords (records, attributes) {
-    
-    let normalizedRecords = [];
-    attributes.map(function(attr) {
-        //let min = records
-        //let column = records.
+
+    // to avoid computing the stats at each iteration.
+    var columnStatsCache = {};
+    attributes.forEach(function(attr) {
+        columnStatsCache[attr] = {
+            min: lodash.min(lodash.pluck(records, attr)),
+            max: lodash.max(lodash.pluck(records, attr))
+        };
+    });
+
+    return records.map(function(record) {
+
+        var obj = {};
+
+        attributes.forEach(function(attr) {
+          var min = columnStatsCache[attr].min;
+          var max = columnStatsCache[attr].max;
+          if(min && max && record[attr]) {
+            obj[attr] = (record[attr] - min) / (max - min);
+          } else {
+            // if any of the value above is null then
+            // we can't normalize
+            obj[attr] = null;
+          }
+        });
+
+        return obj;
     });
 }
 
@@ -45,13 +67,13 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         _fillStylePath = _plotterPath.push("fill");
         _lineStylePath = _plotterPath.push("line");
-        _sizePath = _plotterPath.push("sizeBy");
+        _sizeByPath = _plotterPath.push("sizeBy");
 
         this._c3Options = {
             data: {
                 size: {},
                 json: [],
-                order: null,
+                order: "asc",
                 keys: {
                     x: "x",
                     value: ["y"]
@@ -62,30 +84,40 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                         return _records[d.index].fill ? _records[d.index].fill.color : 0;
                     }
                 },
-                selection: {enabled: true, multiple: true},
-                sort: "asc"
+                selection: {enabled: true, multiple: true}
             },
             legend: {
                 show: false
             },
             axis: {
                 x: {
-                    min: "",
-                    max: "",
+                    //min: "",
+                    //max: "",
                     label: {
                         text: "",
                         position: ""
                     },
                     tick: {
-                        count: 5
+                        count: 10,
+                        fit: false,
+                        format: function(num) {
+                            return num.toFixed(2);
+                        }
                     }
                 },
                 y: {
-                    min: "",
-                    max: "",
+                    //min: "",
+                    //max: "",
                     label: {
                         text: "",
                         position: ""
+                    },
+                    tick: {
+                        count: 10,
+                        fit: false,
+                        format: function(num) {
+                            return num.toFixed(2);
+                        }
                     }
                 }
             },
@@ -100,22 +132,25 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             point: {
                 r: function(d) {
                     // check if we have a size by column
-                    //console.log(_sizePath.getState());
-                    if(_sizePath.getState().length) {
+                    //var sizeColumn = lodash.pluck(_normalizedRecords, "size");
+                    // sizeColumn.every(function(v) { retun v === null});
+
+                    if(_sizeByPath.getState().length) {
                         let minScreenRadius = _plotterPath.push("minScreenRadius").getState();
                         let maxScreenRadius = _plotterPath.push("maxScreenRadius").getState();
-                        return minScreenRadius + _records[d.index].size / (maxScreenRadius - minScreenRadius) || 0;
-                    } else {
-                       // if not we use the defaultScreenRadius size
-                        return _plotterPath.push("defaultScreenRadius").getState() || 5; // or 5 just for sanity check.
+                        return minScreenRadius + _normalizedRecords[d.index].size * (maxScreenRadius - minScreenRadius);
                     }
+                    else {
+                        return _plotterPath.push("defaultScreenRadius").getState();
+                    }
+
                 }
             }
         };
 
         this.indexCache = lodash({});
 
-        [_dataXPath, _dataYPath, _sizePath, _fillStylePath, _lineStylePath].forEach( (item) => {
+        [_dataXPath, _dataYPath, _sizeByPath, _fillStylePath, _lineStylePath].forEach( (item) => {
             item.addCallback(lodash.debounce(this._dataChanged.bind(this), true, false), 100);
         });
 
@@ -125,14 +160,16 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
-        this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
-        this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
+        //this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
+        //this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
         this._c3Options.axis.x.label.text = _xAxisPath.push("overrideAxisName").getState() || _dataXPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.x.tick.count = _xAxisPath.push("tickCountRequested").getState() || 10;
         this._c3Options.axis.x.label.position = "outer-center";
 
-        this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
-        this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
+        //this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
+        //this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
         this._c3Options.axis.y.label.text = _yAxisPath.push("overrideAxisName").getState() || _dataYPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.y.tick.count = _yAxisPath.push("tickCountRequested").getState() || 10;
         this._c3Options.axis.y.label.position = "outer-middle";
 
         this._c3Options.bindto = this.element[0];
@@ -145,14 +182,16 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _axisChanged () {
-        this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
-        this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
+        //this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
+        //this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
         this._c3Options.axis.x.label.text = _xAxisPath.push("overrideAxisName").getState() || _dataXPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.x.tick.count = _xAxisPath.push("tickCountRequested").getState();
         this._c3Options.axis.x.label.position = "outer-center";
 
-        this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
-        this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
+        //this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
+        //this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
         this._c3Options.axis.y.label.text = _yAxisPath.push("overrideAxisName").getState() || _dataYPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.y.tick.count = _yAxisPath.push("tickCountRequested").getState();
         this._c3Options.axis.y.label.position = "outer-middle";
         this.update();
     }
@@ -160,7 +199,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     _dataChanged() {
         let mapping = { x: _dataXPath,
                         y: _dataYPath,
-                        size: _sizePath,
+                        size: _sizeByPath,
                         fill: {
                             alpha: _fillStylePath.push("alpha"),
                             color: _fillStylePath.push("color")
@@ -171,8 +210,9 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                             caps: _lineStylePath.push("caps")
                         }
                     };
-        _records = lodash.sortBy(_plotterPath.retrieveRecords(mapping), ["x", "y"]);
-        console.log(_records);
+        _records = _plotterPath.retrieveRecords(mapping);
+        _records.forEach(function(record, i) {record.idx = i; });
+        _normalizedRecords = _normalizeRecords(_records, ["x", "y", "size"]);
         this._c3Options.data.json = _records;
         this.indexCache = lodash(_records).map((item, idx) => {return [item.id, idx]; }).zipObject();
         this.dataNames = lodash.keys(mapping);
