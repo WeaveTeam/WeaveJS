@@ -4,17 +4,7 @@ import jquery from "jquery";
 import lodash from "lodash";
 import d3 from "d3";
 
-var _visualizationPath;
-var _plotterPath;
-var _xAxisPath;
-var _yAxisPath;
-var _dataXPath;
-var _dataYPath;
 
-var _fillStylePath;
-var _lineStylePath;
-
-var _sizeByPath;
 
 /* private
  * @param records array or records
@@ -56,18 +46,17 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     constructor(parent, toolPath) {
         super(parent, toolPath);
         this.lookup = {};
+        this._visualizationPath = toolPath.push("children", "visualization");
+        this._plotterPath = toolPath.pushPlotter("plot");
 
-        _visualizationPath = toolPath.push("children", "visualization");
-        _plotterPath = toolPath.pushPlotter("plot");
+        this._dataXPath = this._plotterPath.push("dataX");
+        this._dataYPath = this._plotterPath.push("dataY");
+        this._xAxisPath = toolPath.pushPlotter("xAxis");
+        this._yAxisPath = toolPath.pushPlotter("yAxis");
 
-        _dataXPath = _plotterPath.push("dataX");
-        _dataYPath = _plotterPath.push("dataY");
-        _xAxisPath = toolPath.pushPlotter("xAxis");
-        _yAxisPath = toolPath.pushPlotter("yAxis");
-
-        _fillStylePath = _plotterPath.push("fill");
-        _lineStylePath = _plotterPath.push("line");
-        _sizeByPath = _plotterPath.push("sizeBy");
+        this._fillStylePath = this._plotterPath.push("fill");
+        this._lineStylePath = this._plotterPath.push("line");
+        this._sizeByPath = this._plotterPath.push("sizeBy");
 
         this._c3Options = {
             data: {
@@ -119,7 +108,10 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                             return num.toFixed(2);
                         }
                     }
-                }
+                },
+                color: "#B0B0B0",
+                alpha: "1",
+                thickness: "10"
             },
             grid: {
                 x: {
@@ -127,7 +119,10 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                 },
                 y: {
                     show: true
-                }
+                },
+                alpha: "1",
+                color: "#DDDDDD",
+                thickness: "1"
             },
             point: {
                 r: (d) => {
@@ -135,9 +130,9 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                     //var sizeColumn = lodash.pluck(_normalizedRecords, "size");
                     // sizeColumn.every(function(v) { retun v === null});
 
-                    if(_sizeByPath.getState().length) {
-                        let minScreenRadius = _plotterPath.push("minScreenRadius").getState();
-                        let maxScreenRadius = _plotterPath.push("maxScreenRadius").getState();
+                    if(this._sizeByPath.getState().length) {
+                        let minScreenRadius = this._plotterPath.push("minScreenRadius").getState();
+                        let maxScreenRadius = this._plotterPath.push("maxScreenRadius").getState();
                         var normalizedRecord = this.normalizedRecords[this.chartToOriginal(d.index)];
 
                         return normalizedRecord && normalizedRecord.size ?
@@ -145,7 +140,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                                 (maxScreenRadius + minScreenRadius) / 2;
                     }
                     else {
-                        return _plotterPath.push("defaultScreenRadius").getState();
+                        return this._plotterPath.push("defaultScreenRadius").getState();
                     }
                 }
             }
@@ -153,11 +148,11 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         this.indexCache = lodash({});
 
-        [_dataXPath, _dataYPath, _sizeByPath, _fillStylePath, _lineStylePath].forEach( (item) => {
+        [this._dataXPath, this._dataYPath, this._sizeByPath, this._fillStylePath, this._lineStylePath].forEach( (item) => {
             item.addCallback(lodash.debounce(this._dataChanged.bind(this), true, false), 100);
         });
 
-        [_dataXPath, _dataYPath, _xAxisPath, _yAxisPath].forEach((item) => {
+        [this._dataXPath, this._dataYPath, this._xAxisPath, this._yAxisPath].forEach((item) => {
             item.addCallback(lodash.debounce(this._axisChanged.bind(this), true, false), 100);
         });
 
@@ -167,9 +162,9 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
          "gridLineAlpha",
          "gridLineColor",
          "gridLineThickness"].forEach((item) => {
-            _visualizationPath.push(item).addCallback(lodash.debounce(this._visualizationChanged.bind(this), true, false), 100);
+            this._visualizationPath.push(item).addCallback(lodash.debounce(this._visualizationChanged.bind(this), true, false), 100);
         });
-        _visualizationPath.addCallback(lodash.debounce(this._visualizationChanged.bind(this), true, false), 100);
+        this._visualizationPath.addCallback(lodash.debounce(this._visualizationChanged.bind(this), true, false), 100);
 
         toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
@@ -177,14 +172,14 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         //this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
         //this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
-        this._c3Options.axis.x.label.text = _xAxisPath.push("overrideAxisName").getState() || _dataXPath.getValue("ColumnUtils.getTitle(this)");
-        this._c3Options.axis.x.tick.count = _xAxisPath.push("tickCountRequested").getState() || 10;
+        this._c3Options.axis.x.label.text = this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.x.tick.count = this._xAxisPath.push("tickCountRequested").getState() || 10;
         this._c3Options.axis.x.label.position = "outer-center";
 
         //this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
         //this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
-        this._c3Options.axis.y.label.text = _yAxisPath.push("overrideAxisName").getState() || _dataYPath.getValue("ColumnUtils.getTitle(this)");
-        this._c3Options.axis.y.tick.count = _yAxisPath.push("tickCountRequested").getState() || 10;
+        this._c3Options.axis.y.label.text = this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.y.tick.count = this._yAxisPath.push("tickCountRequested").getState() || 10;
         this._c3Options.axis.y.label.position = "outer-middle";
 
         this._c3Options.bindto = this.element[0];
@@ -199,14 +194,14 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     _axisChanged () {
         //this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
         //this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
-        this._c3Options.axis.x.label.text = _xAxisPath.push("overrideAxisName").getState() || _dataXPath.getValue("ColumnUtils.getTitle(this)");
-        this._c3Options.axis.x.tick.count = _xAxisPath.push("tickCountRequested").getState();
+        this._c3Options.axis.x.label.text = this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.x.tick.count = this._xAxisPath.push("tickCountRequested").getState();
         this._c3Options.axis.x.label.position = "outer-center";
 
         //this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
         //this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
-        this._c3Options.axis.y.label.text = _yAxisPath.push("overrideAxisName").getState() || _dataYPath.getValue("ColumnUtils.getTitle(this)");
-        this._c3Options.axis.y.tick.count = _yAxisPath.push("tickCountRequested").getState();
+        this._c3Options.axis.y.label.text = this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)");
+        this._c3Options.axis.y.tick.count = this._yAxisPath.push("tickCountRequested").getState();
         this._c3Options.axis.y.label.position = "outer-middle";
         this.update();
     }
@@ -255,21 +250,21 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _dataChanged() {
-        let mapping = { x: _dataXPath,
-                        y: _dataYPath,
-                        size: _sizeByPath,
+        let mapping = { x: this._dataXPath,
+                        y: this._dataYPath,
+                        size: this._sizeByPath,
                         fill: {
-                            alpha: _fillStylePath.push("alpha"),
-                            color: _fillStylePath.push("color")
+                            alpha: this._fillStylePath.push("alpha"),
+                            color: this._fillStylePath.push("color")
                         },
                         line: {
-                            alpha: _lineStylePath.push("alpha"),
-                            color: _lineStylePath.push("color"),
-                            caps: _lineStylePath.push("caps")
+                            alpha: this._lineStylePath.push("alpha"),
+                            color: this._lineStylePath.push("color"),
+                            caps: this._lineStylePath.push("caps")
                         }
                     };
 
-        this.originalRecords = lodash(_plotterPath.retrieveRecords(mapping)).sortBy("id")
+        this.originalRecords = lodash(this._plotterPath.retrieveRecords(mapping)).sortBy("id")
             .forEach(function(record, index) {record.originalIndex = index; }).value();
 
         this.normalizedRecords = _normalizeRecords(this.originalRecords, ["x", "y", "size"]);
@@ -298,39 +293,42 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
     _visualizationChanged() {
 
-        var axesAlpha = _visualizationPath.push("axesAlpha").getState();
-        var axesColor = _visualizationPath.push("axesColor").getState();
-        var axesThickness = _visualizationPath.push("axesThickness").getState();
+        this._c3Options.axis.alpha = this._visualizationPath.push("axesAlpha").getState();
+        this._c3Options.axis.color = this._visualizationPath.push("axesColor").getState();
+        this._c3Options.axis.thickness = this._visualizationPath.push("axesThickness").getState();
 
-        var gridLineAlpha = _visualizationPath.push("gridLineAlpha").getState();
-        var gridLineColor = _visualizationPath.push("gridLineColor").getState();
-        var gridLineThickNess = _visualizationPath.push("gridLineThickness").getState();
+        this._c3Options.grid.alpha = this._visualizationPath.push("gridLineAlpha").getState();
+        this._c3Options.grid.color = this._visualizationPath.push("gridLineColor").getState();
+        this._c3Options.grid.thickness = this._visualizationPath.push("gridLineThickness").getState();
+    }
 
-        jquery(this.element).find(".c3-axis-x").css("stroke", axesColor);
-        jquery(this.element).find(".c3-axis-y").css("stroke", axesColor);
+    _updateStyle() {
 
-        jquery(this.element).find(".c3-axis-x").css("opacity", axesAlpha);
-        jquery(this.element).find(".c3-axis-y").css("opacity", axesAlpha);
+        d3.selectAll(this.element).selectAll("circle").style("stroke", "black")
+                                                     .style("stroke-opacity", this._lineStylePath.push("alpha", "defaultValue").getState())
+                                                     .style("opacity", this._fillStylePath.push("alpha", "defaultValue").getState());
+        this.element.css("position", "absolute");
 
-        jquery(this.element).find(".c3-axis-x").css("stroke-width", axesThickness);
-        jquery(this.element).find(".c3-axis-y").css("stroke-width", axesThickness);
+        jquery(this.element).find(".c3-axis path").css("stroke", this._c3Options.axis.color);
+        jquery(this.element).find(".c3-axis path").css("opacity", this._c3Options.axis.alpha);
+        jquery(this.element).find(".c3-axis path").css("stroke-width", this._c3Options.axis.thickness);
 
-        jquery(this.element).find(".c3-xgrid").css("stroke", gridLineColor);
-        jquery(this.element).find(".c3-ygrid").css("stroke", gridLineColor);
+        jquery(this.element).find(".c3-xgrid").css("stroke-dasharray", 1);
+        jquery(this.element).find(".c3-ygrid").css("stroke-dasharray", 1);
 
-        jquery(this.element).find(".c3-xgrid").css("opacity", gridLineAlpha);
-        jquery(this.element).find(".c3-ygrid").css("opacity", gridLineAlpha);
+        jquery(this.element).find(".c3-xgrid").css("stroke", this._c3Options.grid.color);
+        jquery(this.element).find(".c3-ygrid").css("stroke", this._c3Options.grid.color);
 
-        jquery(this.element).find(".c3-xgrid").css("stroke-width", gridLineThickNess);
-        jquery(this.element).find(".c3-ygrid").css("stroke-width", gridLineThickNess);
+        jquery(this.element).find(".c3-xgrid").css("opacity", this._c3Options.grid.alpha);
+        jquery(this.element).find(".c3-ygrid").css("opacity", this._c3Options.grid.alpha);
+
+        jquery(this.element).find(".c3-xgrid").css("stroke-width", this._c3Options.grid.thickness);
+        jquery(this.element).find(".c3-ygrid").css("stroke-width", this._c3Options.grid.thickness);
     }
 
     _update() {
         this.chart = c3.generate(this._c3Options);
-        d3.selectAll(this.element).selectAll("circle").style("stroke", "black")
-                                                      .style("stroke-opacity", _lineStylePath.push("alpha", "defaultValue").getState())
-                                                      .style("opacity", _fillStylePath.push("alpha", "defaultValue").getState());
-        this.element.css("position", "absolute");
+        this._updateStyle();
         this._buildKeyIndices();
     }
 
