@@ -148,12 +148,12 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         this.indexCache = lodash({});
 
-        [this._dataXPath, this._dataYPath, this._sizeByPath, this._fillStylePath, this._lineStylePath].forEach( (item) => {
-            item.addCallback(lodash.debounce(this._dataChanged.bind(this), true, false), 100);
+        [this._dataXPath, this._dataYPath, this._sizeByPath, this._fillStylePath, this._lineStylePath].forEach( (path) => {
+            path.addCallback(lodash.debounce(this._dataChanged.bind(this), true, false), 100);
         });
 
-        [this._dataXPath, this._dataYPath, this._xAxisPath, this._yAxisPath].forEach((item) => {
-            item.addCallback(lodash.debounce(this._axisChanged.bind(this), true, false), 100);
+        [this._dataXPath, this._dataYPath, this._xAxisPath, this._yAxisPath].forEach((path) => {
+            path.addCallback(lodash.debounce(this._axisChanged.bind(this), true, false), 100);
         });
 
         ["axesAlpha",
@@ -313,8 +313,8 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         jquery(this.element).find(".c3-axis path").css("opacity", this._c3Options.axis.alpha);
         jquery(this.element).find(".c3-axis path").css("stroke-width", this._c3Options.axis.thickness);
 
-        jquery(this.element).find(".c3-xgrid").css("stroke-dasharray", 1);
-        jquery(this.element).find(".c3-ygrid").css("stroke-dasharray", 1);
+        jquery(this.element).find(".c3-xgrid").removeAttr("stroke-dasharray");
+        jquery(this.element).find(".c3-ygrid").removeAttr("stroke-dasharray");
 
         jquery(this.element).find(".c3-xgrid").css("stroke", this._c3Options.grid.color);
         jquery(this.element).find(".c3-ygrid").css("stroke", this._c3Options.grid.color);
