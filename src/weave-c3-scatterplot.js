@@ -3,7 +3,7 @@ import WeavePanel from "./WeavePanel";
 import jquery from "jquery";
 import lodash from "lodash";
 import d3 from "d3";
-
+import StandardLib from "./Utils/StandardLib";
 
 
 /* private
@@ -192,14 +192,14 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _axisChanged () {
-        //this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
-        //this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
+        this._c3Options.axis.x.min = this._xAxisPath.push("axisLineMinValue").getState();
+        this._c3Options.axis.x.max = this._xAxisPath.push("axisLineMaxValue").getState();
         this._c3Options.axis.x.label.text = this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)");
         this._c3Options.axis.x.tick.count = this._xAxisPath.push("tickCountRequested").getState();
         this._c3Options.axis.x.label.position = "outer-center";
 
-        //this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
-        //this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
+        this._c3Options.axis.y.min = this._yAxisPath.push("axisLineMinValue").getState();
+        this._c3Options.axis.y.max = this._yAxisPath.push("axisLineMaxValue").getState();
         this._c3Options.axis.y.label.text = this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)");
         this._c3Options.axis.y.tick.count = this._yAxisPath.push("tickCountRequested").getState();
         this._c3Options.axis.y.label.position = "outer-middle";
@@ -305,19 +305,19 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     _updateStyle() {
 
         d3.selectAll(this.element).selectAll("circle").style("stroke", "black")
-                                                     .style("stroke-opacity", this._lineStylePath.push("alpha", "defaultValue").getState())
-                                                     .style("opacity", this._fillStylePath.push("alpha", "defaultValue").getState());
+                                                     .style("stroke-opacity", 0.5)
+                                                     .style("opacity", 1);
         this.element.css("position", "absolute");
 
-        jquery(this.element).find(".c3-axis path").css("stroke", this._c3Options.axis.color);
+        jquery(this.element).find(".c3-axis path").css("stroke", "#" + StandardLib.decimalToHex(this._c3Options.axis.color));
         jquery(this.element).find(".c3-axis path").css("opacity", this._c3Options.axis.alpha);
         jquery(this.element).find(".c3-axis path").css("stroke-width", this._c3Options.axis.thickness);
 
         jquery(this.element).find(".c3-xgrid").removeAttr("stroke-dasharray");
         jquery(this.element).find(".c3-ygrid").removeAttr("stroke-dasharray");
 
-        jquery(this.element).find(".c3-xgrid").css("stroke", this._c3Options.grid.color);
-        jquery(this.element).find(".c3-ygrid").css("stroke", this._c3Options.grid.color);
+        jquery(this.element).find(".c3-xgrid").css("stroke", "#" + StandardLib.decimalToHex(this._c3Options.axis.color));
+        jquery(this.element).find(".c3-ygrid").css("stroke", "#" + StandardLib.decimalToHex(this._c3Options.axis.color));
 
         jquery(this.element).find(".c3-xgrid").css("opacity", this._c3Options.grid.alpha);
         jquery(this.element).find(".c3-ygrid").css("opacity", this._c3Options.grid.alpha);
