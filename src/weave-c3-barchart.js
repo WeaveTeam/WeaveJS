@@ -1,5 +1,6 @@
 import c3 from "c3";
 import WeavePanel from "./WeavePanel";
+import * as WeavePanelManager from "./WeavePanelManager.js";
 import jquery from "jquery";
 import lodash from "lodash";
 
@@ -24,7 +25,12 @@ export default class WeaveC3Barchart extends WeavePanel {
             axis: {
                 x: { type: "category"}
             },
-            legend: false
+            legend: false,
+            color: (color, d) => {
+                    console.log(d);
+                    var record = this.originalRecords[this.chartToOriginal(d.index)];
+                    return (record && record.fill) ? record.fill.color : 0;
+            }
         });
 
         this.setupCallbacks();
@@ -82,7 +88,6 @@ export default class WeaveC3Barchart extends WeavePanel {
         }
 
         var json = this.toolPath.pushPlotter("plot").retrieveRecords(mapping);
-
         json = lodash.sortBy(json, "sort");
 
         this.indexCache = lodash(json).map((item, idx) => {return [item.id, idx]; }).zipObject();
@@ -95,6 +100,14 @@ export default class WeaveC3Barchart extends WeavePanel {
         this.chart.data.names(names);
     }
 
+    _updateStyle() {}
+
+
+    _update() {
+        this.chart = c3.generate(this._c3Options);
+        this._updateStyle();
+    }
+
     destroy() {
         /* Cleanup callbacks */
         this.teardownCallbacks();
@@ -103,4 +116,4 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 }
 
-WeavePanel.registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
+WeavePanelManager.registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);

@@ -1,5 +1,6 @@
 import c3 from "c3";
 import WeavePanel from "./WeavePanel";
+import * as WeavePanelManager from "./WeavePanelManager.js";
 import jquery from "jquery";
 import lodash from "lodash";
 import d3 from "d3";
@@ -58,6 +59,9 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this._lineStylePath = this._plotterPath.push("line");
         this._sizeByPath = this._plotterPath.push("sizeBy");
 
+        this.lookup.chartToOriginal = {};
+        this.lookup.originalToChart = {};
+
         this._c3Options = {
             data: {
                 size: {},
@@ -70,9 +74,11 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                 },
                 type: "scatter",//,
                 color: (color, d) => {
+                    if(this.originalRecords) {
                         var record = this.originalRecords[this.chartToOriginal(d.index)];
                         return (record && record.fill) ? record.fill.color : 0;
-                    },
+                    }
+                },
                 selection: {enabled: true, multiple: true}
             },
             legend: {
@@ -282,6 +288,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                 height: jquery(this.element).height(),
                 width: jquery(this.element).width()
         };
+        this._updateStyle();
         this.update();
     }
 
@@ -334,8 +341,9 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
     destroy() {
         this.chart.destroy();
+        // teardown callbacks
         super();
     }
 }
 
-WeavePanel.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
+WeavePanelManager.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);

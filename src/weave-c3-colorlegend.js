@@ -1,18 +1,26 @@
 import c3 from "c3";
 import WeavePanel from "./WeavePanel";
+import * as WeavePanelManager from "./WeavePanelManager.js";
 import jquery from "jquery";
 import lodash from "lodash";
 import StandardLib from "./Utils/StandardLib";
+import SimpleAxisPlotter from "./weave/visualization/plotters/SimpleAxisPlotter";
+
 import d3 from "d3";
 
-const SHAPE_TYPE_CIRCLE:String = "circle";
-const SHAPE_TYPE_SQUARE:String = "square";
-const SHAPE_TYPE_LINE:String = "line";
+const SHAPE_TYPE_CIRCLE = "circle";
+const SHAPE_TYPE_SQUARE = "square";
+const SHAPE_TYPE_LINE = "line";
 
 export default class WeaveC3ColorLegend extends WeavePanel {
 
     constructor(parent, toolPath) {
         super(parent, toolPath);
+        this._svg = d3.select(this.element[0]).append("svg");
+        console.log(SimpleAxisPlotter);
+        this.axisPlotter = new SimpleAxisPlotter("test");
+        console.log(this.axisPlotter);
+
         this.lookup = {};
         this._plotterPath = toolPath.pushPlotter("plot");
         this.dynamicColorColumnPath = this._plotterPath.push("dynamicColorColumn").push(null);
@@ -25,8 +33,9 @@ export default class WeaveC3ColorLegend extends WeavePanel {
             get internalDynamicColumn() { return this._filteredColumnPath.push("internalDynamicColumn").getState(); }
         };
 
-        this._svg = d3.select(this.element[0]).append("svg");
-        this._colorColumnPath.addCallback(lodash.debounce(this.drawAll.bind(this), true, false), 100);
+
+        this.dynamicColorColumnPath.addCallback(lodash.debounce(this.drawAll.bind(this), true, false), 100);
+        this.update = lodash.debounce(this._update.bind(this), 100);
         this.update();
     }
 
@@ -43,6 +52,7 @@ export default class WeaveC3ColorLegend extends WeavePanel {
     }
 
     drawAll() {
+        this.axisPlotter.drawPlot(this._svg);
 
         var internalColorColumn = this.dynamicColorColumnPath.getState();
         if (Array.isArray(internalColorColumn) && internalColorColumn.length === 0) {
@@ -113,7 +123,6 @@ export default class WeaveC3ColorLegend extends WeavePanel {
         var xMap = (d) => { return xScale(d); };
 
         //var rMap = (d) => { return rScale(d); };
-
         if(width && height && numOfBins) {
             this._svg.attr("width", width)
                      .attr("height", height);
@@ -172,9 +181,10 @@ export default class WeaveC3ColorLegend extends WeavePanel {
     }
 
     destroy() {
-        this.chart.destroy();
+        this.element.remove();
+        // teardown callbacks
         super();
     }
 }
 
-WeavePanel.registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);
+WeavePanelManager.registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);
