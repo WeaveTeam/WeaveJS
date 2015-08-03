@@ -16,30 +16,6 @@ function percentToNumber(percentString)
 
 export default class {
 
-    static createTool(parent, path) {
-        var ToolClass = this.toolRegistry[path.getType()];
-        var tool;
-
-        if (!this.tools)
-        {
-            this.tools = [];
-        }
-
-        if (ToolClass)
-        {
-            tool = new ToolClass(parent, path);
-            this.tools.push();
-        }
-        return tool;
-    }
-
-    static registerToolImplementation(asClassName, jsClass) {
-        if (!this.toolRegistry)
-        {
-            this.toolRegistry = {};
-        }
-        this.toolRegistry[asClassName] = jsClass;
-    }
     constructor(parent, toolPath) {
         this.toolPath = toolPath;
         this.parent = parent;

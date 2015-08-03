@@ -1,54 +1,77 @@
 import jquery from "jquery";
 import lodash from "lodash";
-import WeavePanel from "./WeavePanel.js";
 
-export default class WeavePanelManager {
-	constructor(root, weave)
-	{
-		this.root = jquery(root);
-		this.tools = {};
-		this.weave = weave;
-		var path = this.path = weave.path();
+/**
+ * Weave panel manager "singleton" module
+ */
 
-		var toolsChanged = this._toolsChanged.bind(this);
-		path.getValue("childListCallbacks.addGroupedCallback")(null, toolsChanged, true);
-	}
+var toolRegistry = null;
+var tools = {};
+var weaveRootElmt = null;
+var weaveRootPath = null;
 
-	_toolsChanged()
-	{
-		var toolNames = lodash.keys(this.tools);
-		var newNames = this.path.getNames();
+function _createTool(parent, path) {
+    var ToolClass = toolRegistry[path.getType()];
+    var tool;
 
-		var removedToolNames = lodash.difference(toolNames, newNames);
-		var addedToolNames = lodash.difference(newNames, toolNames);
+    if (ToolClass)
+    {
+        tool = new ToolClass(parent, path);
+    }
+    return tool;
+}
 
-		removedToolNames.forEach(function (name) {
-			this.tools[name].destroy();
-			delete this.tools[name];
-		}, this);
+function _toolsChanged() {
+	var toolNames = lodash.keys(tools);
+	var newNames = weaveRootPath.getNames();
 
-		addedToolNames.forEach(function (name) {
-			var tool = WeavePanel.createTool(this.root, this.path.push(name));
-			if (tool)
-			{
-				this.tools[name] = tool;
-			}
-		}, this);
+	var removedToolNames = lodash.difference(toolNames, newNames);
+	var addedToolNames = lodash.difference(newNames, toolNames);
 
-		var zIndex = 0;
-		for (let idx in newNames)
+	removedToolNames.forEach(function (name) {
+		tools[name].destroy();
+		delete tools[name];
+	});
+
+	addedToolNames.forEach(function (name) {
+		var tool = _createTool(weaveRootElmt, weaveRootPath.push(name));
+		if (tool)
 		{
-			let tool = this.tools[newNames[idx]];
-
-			if (!tool)
-			{
-				continue;
-			}
-
-			let modifier = 9000 * tool.toolPath.push("zOrder").getState();
-			tool.element.css("z-index", zIndex + modifier);
-
-			zIndex++;
+			tools[name] = tool;
 		}
+	});
+
+	var zIndex = 0;
+	for (let idx in newNames)
+	{
+		let tool = tools[newNames[idx]];
+
+		if (!tool)
+		{
+			continue;
+		}
+
+		let modifier = 9000 * tool.toolPath.push("zOrder").getState();
+		tool.element.css("z-index", zIndex + modifier);
+
+		zIndex++;
 	}
+}
+
+// publicly exposed function
+export function registerToolImplementation(asClassName, jsClass) {
+    if (!toolRegistry)
+    {
+        toolRegistry = {};
+    }
+    toolRegistry[asClassName] = jsClass;
+}
+
+// publicly exposed function
+// initialize the weave panel manager
+// by setting up the callback.
+export function init(root, weave) {
+	weaveRootElmt = jquery(root);
+	weaveRootPath = weave.path();
+	weaveRootPath.getValue("childListCallbacks.addGroupedCallback")(null, _toolsChanged, true);
 }
