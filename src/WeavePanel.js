@@ -20,6 +20,7 @@ export default class {
         this.toolPath = toolPath;
         this.parent = parent;
 
+        this.plotManagerPath = toolPath.push("children", "visualization", "plotManager");
         this.toolName = toolPath.getPath().pop();
         this.element = jquery("<div></div>").appendTo(parent).attr("id", this.toolName)
             .css("borderStyle", "solid")
@@ -34,6 +35,41 @@ export default class {
             (item) => { this.toolPath.push(item).addCallback(boundFunc, true, false); }
         , this);
 
+    }
+
+    get panelBounds() {
+        var toolPath = this.toolPath;
+
+        return {
+            xMin: 0,
+            yMin: 0,
+            xMax: jquery(this.element).width(),
+            yMax: jquery(this.element).height()
+        };
+    }
+
+    get panelWidth() {
+        return percentToNumber(this.toolPath.getState("panelWidth")) * jquery(parent).width();
+    }
+
+    get panelHeight() {
+        return percentToNumber(this.toolPath.getState("panelHeight")) * jquery(parent).height();
+    }
+
+    get marginLeft() {
+        return this.plotManagerPath.getState("marginLeft");
+    }
+
+    get marginRight() {
+        return this.plotManagerPath.getState("marginRight");
+    }
+
+    get marginTop() {
+        return this.plotManagerPath.getState("marginTop");
+    }
+
+    get marginBottom() {
+        return this.plotManagerPath.getState("marginBottom");
     }
 
     _panelChanged() {

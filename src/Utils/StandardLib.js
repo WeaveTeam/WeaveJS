@@ -80,4 +80,13 @@ export default class StandardLib {
         }
         return (value - min) / (max - min);
     }
+
+
+    static getDataBounds(column) {
+
+        return {
+            min: _.min(column),
+            max: _.max(column)
+        };
+    }
 }

@@ -346,4 +346,4 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
+// WeavePanelManager.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
