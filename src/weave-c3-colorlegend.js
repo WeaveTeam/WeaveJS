@@ -51,8 +51,6 @@ export default class WeaveC3ColorLegend extends WeavePanel {
     }
 
     drawAll() {
-        this.axisPlotter.drawPlot(this._svg);
-        console.log(this.Bounds);
         var internalColorColumn = this.dynamicColorColumnPath.getState();
         if (Array.isArray(internalColorColumn) && internalColorColumn.length === 0) {
             return; // draw nothing

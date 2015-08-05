@@ -20,22 +20,39 @@ export default class {
         this.showAxisName = true;
         this.showLabels = true;
 
-        this.tickCountRequested = 10;
+        this.tickCountRequested = options.tickCountRequested;
         this.tickMaxValue = NaN;
         this.tickMinValue = NaN;
 
         this.axisGridLineThickness = 1;
-        this.axisGridLineColor = 0xDDDDDD;
+        this.axisGridLineColor = "#DDDDDD";
         this.axisGrideLineAlpha = 1;
 
         this.axesThickness = 10;
         this.axesAlpha = 1;
-        this.axesColor = 0xB0B0B0;
+        this.axesColor = "#B0B0B0";
 
         this.position = options.position;
         this.screenBounds = options.screenBounds;
         this.dataBounds = options.dataBounds;
         this.weavePath = options.weavePath;
+        this.orientation = options.orientation;
+        this.scales = options.scales;
+
+        let scale = null;
+        if(this.orientation === "bottom") {
+            scale = this.scales.x;
+        } else {
+            scale = this.scales.y;
+        }
+
+        this.axis = d3.svg.axis().scale(scale)
+                                 .orient(this.orientation)
+                                 .ticks(this.tickCountRequested);
+    }
+
+    get axisName () {
+        return this.weavePath.push("overrideAxisName").getState();
     }
 
     get niceDataBounds () {
@@ -45,23 +62,63 @@ export default class {
         };
     }
 
-    get axisName () {
-        return this.weavePath.push("overrideAxisName").getState();
+    drawPlot(destination) {
+        this.drawAxis(destination, this.orientation);
+        this.drawGridLines(destination, this.orientation);
     }
 
-    drawPlot(destination, orientation) {
-        // destination.append("class", "axis")
-        // .attr("width", 1440)
-        // .attr(   "height", 30);
+    drawAxis(destination) {
 
-        // Will be be in axis Optionsa
-        var scale = d3.scale.linear()
-                             .domain([this.niceDataBounds.min, this.niceDataBounds.max])
-                             .range([this.screenBounds.min, this.screenBounds.max]);
-
-        this.axis = destination.append("g")
+        destination.append("g")
                    .attr("class", "axis")
                    .attr("transform", "translate(" + this.position.x + ", " + this.position.y + ")")
-                   .call(d3.svg.axis().scale(scale).orient(orientation));
+                   .call(this.axis);
+
+        console.selection = $(destination[0]);
+        $(destination[0]).find(".axis").find("path").css({
+            "shape-rendering": "crispEdges",
+            "stroke": this.axisColor,
+            "fill": this.axisColor,
+            "stroke-width": this.axisThickness,
+            "stroke-opacity": this.axisAlpha
+        });
+    }
+
+    drawGridLines(destination) {
+
+        var ticks = this.axis.scale().ticks();
+        if(this.orientation === "bottom") {
+            ticks.forEach( (tickPos) => {
+                destination.append("line")
+                           .attr({
+                                     "x1": this.scales.x(tickPos),
+                                     "x2": this.scales.x(tickPos),
+                                     "y1": this.scales.y(this.dataBounds.yMin),
+                                     "y2": this.scales.y(this.dataBounds.yMax),
+                                     "fill": "none",
+                                     "shape-rendering": "crispEdges",
+                                     "stroke": this.axisGridLineColor,
+                                     "stroke-width": this.axisGridLineThickness,
+                                     "stroke-opacity": this.axisGrideLineAlpha
+                            });
+            });
+
+        } else {
+            ticks.forEach( (tickPos) => {
+                destination.append("line")
+                           .attr({
+                                    "x1": this.scales.x(this.dataBounds.xMin),
+                                    "x2": this.scales.x(this.dataBounds.xMax),
+                                    "y1": this.scales.y(tickPos),
+                                    "y2": this.scales.y(tickPos),
+                                    "fill": "none",
+                                    "shape-rendering": "crispEdges",
+                                    "stroke": this.axisGridLineColor,
+                                    "stroke-width": this.axisGridLineThickness,
+                                    "stroke-opacity": this.axisGrideLineAlpha
+                            });
+
+            });
+        }
     }
 }

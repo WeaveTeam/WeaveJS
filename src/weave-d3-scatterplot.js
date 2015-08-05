@@ -1,10 +1,8 @@
 
 import WeavePanel from "./WeavePanel";
 import * as WeavePanelManager from "./WeavePanelManager.js";
-import jquery from "jquery";
 import lodash from "lodash";
 import d3 from "d3";
-import StandardLib from "./Utils/StandardLib";
 import SimpleAxisPlotter from "./weave/visualization/plotters/SimpleAxisPlotter";
 
 /* private
@@ -78,8 +76,8 @@ export default class WeaveD3ScatterPlot extends WeavePanel {
     get screenBounds () {
         return {
             xMin: this.marginLeft,
-            yMin: this.marginBottom,
-            xMax: this.panelWidth - this.marginLeft - this.marginRight,
+            yMin: this.marginTop,
+            xMax: this.panelWidth - this.marginRight,
             yMax: this.panelHeight - this.marginTop - this.marginBottom
         };
     }
@@ -107,51 +105,80 @@ export default class WeaveD3ScatterPlot extends WeavePanel {
 
         this.normalizedRecords = _normalizeRecords(this.originalRecords, ["x", "y", "size"]);
 
-        var xColumn = lodash.pluck(this.originalRecords, "x");
-        var yColumn = lodash.pluck(this.originalRecords, "y");
+        var dataBounds = {
+            xMin: this._xAxisPath.push("axisLineMinValue").getState(),
+            xMax: this._xAxisPath.push("axisLineMaxValue").getState(),
+            yMin: this._yAxisPath.push("axisLineMinValue").getState(),
+            yMax: this._yAxisPath.push("axisLineMaxValue").getState()
+        };
 
-        var xBounds = StandardLib.getDataBounds(xColumn);
-        var yBounds = StandardLib.getDataBounds(yColumn);
+        // d3 scaling functions for the axis.
+        var xScale = d3.scale.linear()
+                             .domain([dataBounds.xMin,
+                                      dataBounds.xMax])
+                             .range([this.screenBounds.xMin,
+                                     this.screenBounds.xMax]);
+
+        var yScale = d3.scale.linear()
+                             .domain([dataBounds.yMin,
+                                      dataBounds.yMax])
+                             .range([this.screenBounds.yMax,
+                                     this.screenBounds.yMin]); // flipped because svg y axis is backward
 
         var xAxisOptions = {
-            position: {x: 0, y: this.screenBounds.yMax + this.screenBounds.yMin},
+            position: {x: 0, y: this.screenBounds.yMax},
+            dataBounds: dataBounds,
+            screenBounds: {min: this.screenBounds.xMin, max: this.screenBounds.xMax},
             weavePath: this._xAxisPath,
-            dataBounds: xBounds,
-            screenBounds: {min: this.screenBounds.xMin, max: this.screenBounds.xMax}
+            scales: {x: xScale, y: yScale},
+            orientation: "bottom",
+            tickCountRequested: this._xAxisPath.push("tickCountRequested").getState()
         };
 
         var yAxisOptions = {
             position: {x: this.screenBounds.xMin, y: 0},
+            dataBounds: dataBounds,
+            screenBounds: {min: this.screenBounds.yMax, max: this.screenBounds.yMin}, // flipped because svg axis is backward
             weavePath: this._yAxisPath,
-            dataBounds: yBounds,
-            screenBounds: {min: this.screenBounds.yMax, max: this.screenBounds.yMin} // flipped because svg axis is backward
+            scales: {x: xScale, y: yScale},
+            orientation: "left",
+            tickCountRequested: this._yAxisPath.push("tickCountRequested").getState()
         };
 
         this.xAxis = new SimpleAxisPlotter(xAxisOptions);
         this.yAxis = new SimpleAxisPlotter(yAxisOptions);
 
-        this.xAxis.drawPlot(this._svg, "bottom");
-        this.yAxis.drawPlot(this._svg, "left");
+        this.xAxis.drawPlot(this._svg);
+        this.yAxis.drawPlot(this._svg);
 
-        var xScale = d3.scale.linear()
-                     .domain([this._xAxisPath.push("axisLineMinValue").getState(),
-                              this._xAxisPath.push("axisLineMaxValue").getState()])
-                     .range([this.screenBounds.xMin, this.screenBounds.xMax]);
+        // variables to calculate the point size
+        var minScreenRadius = this._plotterPath.push("minScreenRadius").getState();
+        var maxScreenRadius = this._plotterPath.push("maxScreenRadius").getState();
 
-        var yScale = d3.scale.linear()
-                             .domain([this._yAxisPath.push("axisLineMinValue").getState(),
-                             this._yAxisPath.push("axisLineMaxValue").getState()])
-                             .range([this.screenBounds.yMax, this.screenBounds.yMin]); // flipped because svg y axis is backward
+        this.originalRecords.forEach((record, index) => {
 
-        this.originalRecords.forEach((record) => {
-            this._svg.append("circle")
+            var pointSize = 0;
+
+            var normalizedRecord = this.normalizedRecords[index];
+            if(normalizedRecord.size && normalizedRecord && normalizedRecord.size) {
+                pointSize = minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius);
+            } else {
+                pointSize = this._plotterPath.push("defaultScreenRadius").getState();
+            }
+
+            // check if record is within bounds
+            if( (record.x >= dataBounds.xMin && record.x <= dataBounds.xMax) &&
+                (record.y >= dataBounds.yMin && record.y <= dataBounds.yMax) ) {
+
+                this._svg.append("circle")
                      .attr("cx", xScale(record.x))
                      .attr("cy", yScale(record.y))
-                     .attr("r", record.size || this._plotterPath.push("defaultScreenRadius").getState())
+                     .attr("r", pointSize)
                              .style("fill", record.fill.color)
                              .style("fill-opacity", record.fill.alpha)
                              .style("stroke", "black")
                              .style("stroke-opacity", record.line.alpha);
+            }
         });
     }
 
