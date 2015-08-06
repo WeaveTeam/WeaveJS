@@ -38,8 +38,6 @@ export default class {
     }
 
     get panelBounds() {
-        var toolPath = this.toolPath;
-
         return {
             xMin: 0,
             yMin: 0,

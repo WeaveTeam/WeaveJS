@@ -28,9 +28,9 @@ export default class {
         this.axisGridLineColor = "#DDDDDD";
         this.axisGrideLineAlpha = 1;
 
-        this.axesThickness = 10;
+        this.axesThickness = 1;
         this.axesAlpha = 1;
-        this.axesColor = "#B0B0B0";
+        this.axesColor = "#333333";
 
         this.position = options.position;
         this.screenBounds = options.screenBounds;
@@ -39,7 +39,7 @@ export default class {
         this.orientation = options.orientation;
         this.scales = options.scales;
 
-        let scale = null;
+        var scale = null;
         if(this.orientation === "bottom") {
             scale = this.scales.x;
         } else {
@@ -49,6 +49,7 @@ export default class {
         this.axis = d3.svg.axis().scale(scale)
                                  .orient(this.orientation)
                                  .ticks(this.tickCountRequested);
+
     }
 
     get axisName () {
@@ -63,8 +64,8 @@ export default class {
     }
 
     drawPlot(destination) {
-        this.drawAxis(destination, this.orientation);
         this.drawGridLines(destination, this.orientation);
+        this.drawAxis(destination, this.orientation);
     }
 
     drawAxis(destination) {
@@ -74,22 +75,33 @@ export default class {
                    .attr("transform", "translate(" + this.position.x + ", " + this.position.y + ")")
                    .call(this.axis);
 
-        console.selection = $(destination[0]);
-        $(destination[0]).find(".axis").find("path").css({
-            "shape-rendering": "crispEdges",
-            "stroke": this.axisColor,
-            "fill": this.axisColor,
-            "stroke-width": this.axisThickness,
-            "stroke-opacity": this.axisAlpha
-        });
+        destination.selectAll(".axis path").style("shape-rendering", "crispEdges")
+                                           .style("fill", "none")
+                                           .style("stroke", "none")
+                                           .style("stroke-width", 1)
+                                           .style("stroke-opacity", 1);
     }
 
     drawGridLines(destination) {
 
         var ticks = this.axis.scale().ticks();
         if(this.orientation === "bottom") {
-            ticks.forEach( (tickPos) => {
-                destination.append("line")
+            ticks.forEach( (tickPos, index) => {
+                    if(index === 0) {
+                        destination.append("line")
+                           .attr({
+                                     "x1": this.scales.x(tickPos),
+                                     "x2": this.scales.x(tickPos),
+                                     "y1": this.scales.y(this.dataBounds.yMin),
+                                     "y2": this.scales.y(this.dataBounds.yMax),
+                                     "fill": "none",
+                                     "shape-rendering": "crispEdges",
+                                     "stroke": this.axesColor,
+                                     "stroke-width": this.axesThickness,
+                                     "stroke-opacity": this.axesAlpha
+                            });
+                    } else {
+                        destination.append("line")
                            .attr({
                                      "x1": this.scales.x(tickPos),
                                      "x2": this.scales.x(tickPos),
@@ -101,11 +113,26 @@ export default class {
                                      "stroke-width": this.axisGridLineThickness,
                                      "stroke-opacity": this.axisGrideLineAlpha
                             });
+                    }
             });
 
         } else {
-            ticks.forEach( (tickPos) => {
-                destination.append("line")
+            ticks.forEach( (tickPos, index) => {
+                if(index === 0) {
+                       destination.append("line")
+                           .attr({
+                                    "x1": this.scales.x(this.dataBounds.xMin),
+                                    "x2": this.scales.x(this.dataBounds.xMax),
+                                    "y1": this.scales.y(tickPos),
+                                    "y2": this.scales.y(tickPos),
+                                    "fill": "none",
+                                    "shape-rendering": "crispEdges",
+                                    "stroke": this.axesColor,
+                                    "stroke-width": this.axeshickness,
+                                    "stroke-opacity": this.axesAlpha
+                            });
+                } else {
+                       destination.append("line")
                            .attr({
                                     "x1": this.scales.x(this.dataBounds.xMin),
                                     "x2": this.scales.x(this.dataBounds.xMax),
@@ -117,7 +144,7 @@ export default class {
                                     "stroke-width": this.axisGridLineThickness,
                                     "stroke-opacity": this.axisGrideLineAlpha
                             });
-
+                }
             });
         }
     }

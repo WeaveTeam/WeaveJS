@@ -25,12 +25,7 @@ export default class WeaveC3Barchart extends WeavePanel {
             axis: {
                 x: { type: "category"}
             },
-            legend: false,
-            color: (color, d) => {
-                    console.log(d);
-                    var record = this.originalRecords[this.chartToOriginal(d.index)];
-                    return (record && record.fill) ? record.fill.color : 0;
-            }
+            legend: false
         });
 
         this.setupCallbacks();
@@ -116,4 +111,4 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
+//WeavePanelManager.registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
