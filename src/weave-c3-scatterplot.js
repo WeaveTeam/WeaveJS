@@ -29,7 +29,7 @@ function _normalizeRecords (records, attributes) {
         attributes.forEach(function(attr) {
           var min = columnStatsCache[attr].min;
           var max = columnStatsCache[attr].max;
-          if(min && max && record[attr]) {
+          if(record[attr]) {
             obj[attr] = (record[attr] - min) / (max - min);
           } else {
             // if any of the value above is null then
@@ -62,62 +62,52 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this.lookup.chartToOriginal = {};
         this.lookup.originalToChart = {};
 
+        this.plotterState = {};
+
+        this._plotterPath.addCallback(() => {
+            this.plotterState = this._plotterPath.getState();
+        }, true);
+
         this._c3Options = {
             data: {
-                size: {},
-                json: [],
-                hide: ["originalIndex"],
-                order: "asc",
-                keys: {
-                    x: "x",
-                    value: ["y", "originalIndex"]
-                },
+                rows: [],
+                x: "x",
+                xSort: false,
                 type: "scatter",//,
+                selection: {enabled: true, multiple: true},
                 color: (color, d) => {
-                    if(this.originalRecords) {
-                        var record = this.originalRecords[this.chartToOriginal(d.index)];
+                    if(this.records && d.hasOwnProperty("index")) {
+                        var record = this.records[d.index];
                         return (record && record.fill) ? record.fill.color : 0;
                     }
-                },
-                selection: {enabled: true, multiple: true}
+                }
             },
             legend: {
                 show: false
             },
             axis: {
                 x: {
-                    //min: "",
-                    //max: "",
                     label: {
-                        text: "",
-                        position: ""
+                        position: "outer-center"
                     },
                     tick: {
-                        count: 10,
-                        fit: false,
-                        format: function(num) {
-                            return num.toFixed(2);
-                        }
+                        fit: false
+                        // format: function(num) {
+                        //     return num.toFixed(2);
+                        // }
                     }
                 },
                 y: {
-                    //min: "",
-                    //max: "",
                     label: {
-                        text: "",
-                        position: ""
+                        position: "outer-middle"
                     },
                     tick: {
-                        count: 10,
-                        fit: false,
-                        format: function(num) {
-                            return num.toFixed(2);
-                        }
+                        fit: false
+                        // format: function(num) {
+                        //     return num.toFixed(2);
+                        // }
                     }
-                },
-                color: "#B0B0B0",
-                alpha: "1",
-                thickness: "10"
+                }
             },
             grid: {
                 x: {
@@ -125,72 +115,52 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                 },
                 y: {
                     show: true
-                },
-                alpha: "1",
-                color: "#DDDDDD",
-                thickness: "1"
+                }
             },
             point: {
                 r: (d) => {
-                    // check if we have a size by column
-                    //var sizeColumn = lodash.pluck(_normalizedRecords, "size");
-                    // sizeColumn.every(function(v) { retun v === null});
+                    if(this.plotterState && this.plotterState.sizeBy.length) {
+                        let minScreenRadius = this.plotterState.minScreenRadius;
+                        let maxScreenRadius = this.plotterState.maxScreenRadius;
 
-                    if(this._sizeByPath.getState().length) {
-                        let minScreenRadius = this._plotterPath.push("minScreenRadius").getState();
-                        let maxScreenRadius = this._plotterPath.push("maxScreenRadius").getState();
-                        var normalizedRecord = this.normalizedRecords[this.chartToOriginal(d.index)];
-
-                        return normalizedRecord && normalizedRecord.size ?
+                        var normalizedRecord = this.normalizedRecords[d.index];
+                        return (normalizedRecord && normalizedRecord.size ?
                                 minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius) :
-                                (maxScreenRadius + minScreenRadius) / 2;
+                                this.plotterState.defaultScreenRadius) || 1;
                     }
                     else {
-                        return this._plotterPath.push("defaultScreenRadius").getState();
+                        return (this.plotterState.defaultScreenRadius) || 1;
                     }
                 }
-            }
+                // focus: {
+                //     expand: {
+                //         r: point.r * 1.5
+                //     }
+                // },
+                // point: {
+                //     select: {
+                //         r: point.r * 1.5
+                //     }
+                // }
+            },
+            onrendered: this._updateStyle.bind(this)
         };
 
-        this.indexCache = lodash({});
-
+        var dataChanged = lodash.debounce(this._dataChanged.bind(this), 100);
         [this._dataXPath, this._dataYPath, this._sizeByPath, this._fillStylePath, this._lineStylePath].forEach( (path) => {
-            path.addCallback(lodash.debounce(this._dataChanged.bind(this), true, false), 100);
+            path.addCallback(dataChanged, true, false);
         });
 
+        var axisChanged = lodash.debounce(this._axisChanged.bind(this), 100);
         [this._dataXPath, this._dataYPath, this._xAxisPath, this._yAxisPath].forEach((path) => {
-            path.addCallback(lodash.debounce(this._axisChanged.bind(this), true, false), 100);
+            path.addCallback(axisChanged, true, false);
         });
-
-        ["axesAlpha",
-         "axesColor",
-         "axesThickness",
-         "gridLineAlpha",
-         "gridLineColor",
-         "gridLineThickness"].forEach((item) => {
-            this._visualizationPath.push(item).addCallback(lodash.debounce(this._visualizationChanged.bind(this), true, false), 100);
-        });
-        this._visualizationPath.addCallback(lodash.debounce(this._visualizationChanged.bind(this), true, false), 100);
 
         toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
-
-
-        //this._c3Options.axis.x.min = _xAxisPath.push("axisLineMinValue").getState();
-        //this._c3Options.axis.x.max = _xAxisPath.push("axisLineMaxValue").getState();
-        this._c3Options.axis.x.label.text = this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)");
-        this._c3Options.axis.x.tick.count = this._xAxisPath.push("tickCountRequested").getState() || 10;
-        this._c3Options.axis.x.label.position = "outer-center";
-
-        //this._c3Options.axis.y.min = _yAxisPath.push("axisLineMinValue").getState();
-        //this._c3Options.axis.y.max = _yAxisPath.push("axisLineMaxValue").getState();
-        this._c3Options.axis.y.label.text = this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)");
-        this._c3Options.axis.y.tick.count = this._yAxisPath.push("tickCountRequested").getState() || 10;
-        this._c3Options.axis.y.label.position = "outer-middle";
-
         this._c3Options.bindto = this.element[0];
-        this.update = lodash.debounce(this._update.bind(this), 100);
-        this.update();
+
+        this.chart = c3.generate(this._c3Options);
     }
 
     _updateContents () {
@@ -198,66 +168,27 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _axisChanged () {
-        this._c3Options.axis.x.min = this._xAxisPath.push("axisLineMinValue").getState();
-        this._c3Options.axis.x.max = this._xAxisPath.push("axisLineMaxValue").getState();
-        this._c3Options.axis.x.label.text = this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)");
-        this._c3Options.axis.x.tick.count = this._xAxisPath.push("tickCountRequested").getState();
-        this._c3Options.axis.x.label.position = "outer-center";
+        this.chart.axis.max({
+            x: this._xAxisPath.push("axisLineMaxValue").getState(),
+            y: this._yAxisPath.push("axisLineMaxValue").getState()
+        });
 
-        this._c3Options.axis.y.min = this._yAxisPath.push("axisLineMinValue").getState();
-        this._c3Options.axis.y.max = this._yAxisPath.push("axisLineMaxValue").getState();
-        this._c3Options.axis.y.label.text = this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)");
-        this._c3Options.axis.y.tick.count = this._yAxisPath.push("tickCountRequested").getState();
-        this._c3Options.axis.y.label.position = "outer-middle";
-        this.update();
-    }
+        this.chart.axis.min({
+            x: this._xAxisPath.push("axisLineMinValue").getState(),
+            y: this._yAxisPath.push("axisLineMinValue").getState()
+        });
 
-    keyToChart(key) {
-        return this.lookup.keyToChart[key];
-    }
-    keyToOriginal(key) {
-        return this.lookup.keyToRecord[key].originalIndex;
-    }
-
-    keyToRecord(key) {
-        return this.lookup.keyToRecord[key];
-    }
-
-    chartToOriginal(index) {
-        return this.lookup.chartToOriginal[index];
-    }
-
-    _buildChartIndices()
-    {
-        this.lookup.chartToOriginal = {};
-        this.lookup.originalToChart = {};
-
-        if (this.chart.data("originalIndex").length === 0)
-        {
-            return;
-        }
-        var chartData = this.chart.data("originalIndex")[0].values;
-
-        for (let chartIndex in chartData)
-        {
-            this.lookup.chartToOriginal[chartIndex] = chartData[chartIndex].value;
-            this.lookup.originalToChart[chartData[chartIndex].value] = chartIndex;
-        }
-    }
-    _buildKeyIndices()
-    {
-        this._buildChartIndices();
-        this.lookup.keyToChart = {};
-        for (let originalIndex in this.originalRecords)
-        {
-            let key = this.originalRecords[originalIndex].id;
-            this.lookup.keyToChart[key] = this.lookup.originalToChart[originalIndex];
-        }
+        this.chart.axis.labels({
+            x: this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)"),
+            y: this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)")
+        });
     }
 
     _dataChanged() {
-        let mapping = { x: this._dataXPath,
-                        y: this._dataYPath,
+        let mapping = { point: {
+                            x: this._dataXPath,
+                            y: this._dataYPath
+                        },
                         size: this._sizeByPath,
                         fill: {
                             alpha: this._fillStylePath.push("alpha"),
@@ -270,80 +201,46 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                         }
                     };
 
-        this.originalRecords = lodash(this._plotterPath.retrieveRecords(mapping)).sortBy("id")
-            .forEach(function(record, index) {record.originalIndex = index; }).value();
+        this.records = lodash.sortByOrder(this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter")), ["size", "id"], ["desc", "asc"]);
 
-        this.normalizedRecords = _normalizeRecords(this.originalRecords, ["x", "y", "size"]);
+        this.keyToIndex = {};
 
-        this._c3Options.data.json = this.originalRecords;
+        this.records.forEach((record, index) => {
+            this.keyToIndex[record.id] = index;
+        });
 
-        this.lookup.keyToRecord = lodash.indexBy(this.originalRecords, "id");
-
-        this.keyToIndexLookup = null;
-        this.update();
+        this.normalizedRecords = _normalizeRecords(this.records, ["size"]);
+        this.chart.load({data: lodash.pluck(this.records, "point")});
     }
 
     _sizeChanged() {
-        this._c3Options.size = {
+        var size = {
                 height: jquery(this.element).height(),
                 width: jquery(this.element).width()
         };
-        this._updateStyle();
-        this.update();
+        if(this.chart) {
+            this.chart.resize(size);
+        }
     }
 
     _selectionKeysChanged() {
         var keys = this.toolPath.selection_keyset.getKeys();
-        var indices = keys.map(this.keyToChart, this).map(Number);
+        var indices = keys.map((key) => {
+            return Number(this.keyToIndex[key]);
+        });
         this.chart.select("y", indices, true);
     }
 
-    _visualizationChanged() {
-
-        this._c3Options.axis.alpha = this._visualizationPath.push("axesAlpha").getState();
-        this._c3Options.axis.color = this._visualizationPath.push("axesColor").getState();
-        this._c3Options.axis.thickness = this._visualizationPath.push("axesThickness").getState();
-
-        this._c3Options.grid.alpha = this._visualizationPath.push("gridLineAlpha").getState();
-        this._c3Options.grid.color = this._visualizationPath.push("gridLineColor").getState();
-        this._c3Options.grid.thickness = this._visualizationPath.push("gridLineThickness").getState();
-    }
-
     _updateStyle() {
-
-        d3.selectAll(this.element).selectAll("circle").style("stroke", "black")
-                                                     .style("stroke-opacity", 0.5)
-                                                     .style("opacity", 1);
-        this.element.css("position", "absolute");
-
-        jquery(this.element).find(".c3-axis path").css("stroke", "#" + StandardLib.decimalToHex(this._c3Options.axis.color));
-        jquery(this.element).find(".c3-axis path").css("opacity", this._c3Options.axis.alpha);
-        jquery(this.element).find(".c3-axis path").css("stroke-width", this._c3Options.axis.thickness);
-
-        jquery(this.element).find(".c3-xgrid").removeAttr("stroke-dasharray");
-        jquery(this.element).find(".c3-ygrid").removeAttr("stroke-dasharray");
-
-        jquery(this.element).find(".c3-xgrid").css("stroke", "#" + StandardLib.decimalToHex(this._c3Options.axis.color));
-        jquery(this.element).find(".c3-ygrid").css("stroke", "#" + StandardLib.decimalToHex(this._c3Options.axis.color));
-
-        jquery(this.element).find(".c3-xgrid").css("opacity", this._c3Options.grid.alpha);
-        jquery(this.element).find(".c3-ygrid").css("opacity", this._c3Options.grid.alpha);
-
-        jquery(this.element).find(".c3-xgrid").css("stroke-width", this._c3Options.grid.thickness);
-        jquery(this.element).find(".c3-ygrid").css("stroke-width", this._c3Options.grid.thickness);
-    }
-
-    _update() {
-        this.chart = c3.generate(this._c3Options);
-        this._updateStyle();
-        this._buildKeyIndices();
+        d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
+                                                      .style("stroke", "black")
+                                                      .style("stroke-opacity", 0.5);
     }
 
     destroy() {
         this.chart.destroy();
-        // teardown callbacks
         super();
     }
 }
 
-// WeavePanelManager.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
+WeavePanelManager.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);

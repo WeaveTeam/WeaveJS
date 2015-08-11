@@ -63,29 +63,22 @@ export default class WeaveD3ScatterPlot extends WeavePanel {
                                               .attr("height", this.panelHeight);
 
         [this._dataXPath, this._dataYPath, this._sizeByPath, this._fillStylePath, this._lineStylePath].forEach( (path) => {
-            path.addCallback(lodash.debounce(this._updateContents.bind(this), true, false), 100);
+            path.addCallback(lodash.debounce(this._updateContents.bind(this), 20), true, false);
         });
 
-        this.update = lodash.debounce(this._update.bind(this), 100);
+        this.update = lodash.debounce(this._update.bind(this), 20);
     }
 
     _axisChanged () {
 
     }
 
-    get screenBounds () {
-        return {
-            xMin: this.marginLeft,
-            yMin: this.marginTop,
-            xMax: this.panelWidth - this.marginRight,
-            yMax: this.panelHeight - this.marginTop - this.marginBottom
-        };
-    }
 
     _updateContents() {
         //console.log("this runs");
         this._svg.selectAll("*").remove();
-
+        this._svg.attr("width", this.panelWidth)
+                 .attr("height", this.panelHeight);
         let mapping = { x: this._dataXPath,
                         y: this._dataYPath,
                         size: this._sizeByPath,
@@ -104,6 +97,13 @@ export default class WeaveD3ScatterPlot extends WeavePanel {
 
         this.normalizedRecords = _normalizeRecords(this.records, ["x", "y", "size"]);
 
+        var screenBounds = {
+            xMin: this.marginLeft,
+            yMin: this.marginTop,
+            xMax: this.panelWidth - this.marginRight,
+            yMax: this.panelHeight - this.marginTop - this.marginBottom
+        };
+
         var dataBounds = {
             xMin: this._xAxisPath.push("axisLineMinValue").getState(),
             xMax: this._xAxisPath.push("axisLineMaxValue").getState(),
@@ -115,19 +115,19 @@ export default class WeaveD3ScatterPlot extends WeavePanel {
         var xScale = d3.scale.linear()
                              .domain([dataBounds.xMin,
                                       dataBounds.xMax])
-                             .range([this.screenBounds.xMin,
-                                     this.screenBounds.xMax]);
+                             .range([screenBounds.xMin,
+                                     screenBounds.xMax]);
 
         var yScale = d3.scale.linear()
                              .domain([dataBounds.yMin,
                                       dataBounds.yMax])
-                             .range([this.screenBounds.yMax,
-                                     this.screenBounds.yMin]); // flipped because svg y axis is backward
+                             .range([screenBounds.yMax,
+                                     screenBounds.yMin]); // flipped because svg y axis is backward
 
         var xAxisOptions = {
-            position: {x: 0, y: this.screenBounds.yMax},
+            position: {x: 0, y: screenBounds.yMax},
             dataBounds: dataBounds,
-            screenBounds: {min: this.screenBounds.xMin, max: this.screenBounds.xMax},
+            screenBounds: {min: screenBounds.xMin, max: screenBounds.xMax},
             weavePath: this._xAxisPath,
             scales: {x: xScale, y: yScale},
             orientation: "bottom",
@@ -135,9 +135,9 @@ export default class WeaveD3ScatterPlot extends WeavePanel {
         };
 
         var yAxisOptions = {
-            position: {x: this.screenBounds.xMin, y: 0},
+            position: {x: screenBounds.xMin, y: 0},
             dataBounds: dataBounds,
-            screenBounds: {min: this.screenBounds.yMax, max: this.screenBounds.yMin}, // flipped because svg axis is backward
+            screenBounds: {min: screenBounds.yMax, max: screenBounds.yMin}, // flipped because svg axis is backward
             weavePath: this._yAxisPath,
             scales: {x: xScale, y: yScale},
             orientation: "left",
@@ -208,4 +208,4 @@ export default class WeaveD3ScatterPlot extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveD3ScatterPlot);
+// WeavePanelManager.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveD3ScatterPlot);
