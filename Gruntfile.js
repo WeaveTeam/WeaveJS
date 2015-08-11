@@ -18,7 +18,7 @@ module.exports = function (grunt) {
         },
         copy: {
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
-            c3css: {expand: true, flatten: true, cwd: 'node_modules/', src: 'c3/c3.min.css', dest: 'dist/'}
+            c3css: {expand: true, flatten: true, cwd: 'node_modules/', src: 'c3/c3.css', dest: 'dist/'}
         },
         eslint: {
             target: ['src/**/*.js']

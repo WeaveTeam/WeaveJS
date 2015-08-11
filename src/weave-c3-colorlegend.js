@@ -32,8 +32,8 @@ export default class WeaveC3ColorLegend extends WeavePanel {
         };
 
 
-        this.dynamicColorColumnPath.addCallback(lodash.debounce(this.drawAll.bind(this), true, false), 100);
-        this.update = lodash.debounce(this._update.bind(this), 100);
+        this.dynamicColorColumnPath.addCallback(lodash.debounce(this.drawAll.bind(this), true, false), 20);
+        this.update = lodash.debounce(this._update.bind(this), 20);
 
         this.update();
     }

@@ -16,9 +16,17 @@ export default class WeaveC3Barchart extends WeavePanel {
                 width: jquery(this.element).width(),
                 height: jquery(this.element).height()
             },
-            data: {json: [], type: "bar", selection: {
-                enabled: true, multiple: true
-            }},
+            data: {
+                json: [],
+                type: "bar",
+                selection: {
+                   enabled: true,
+                   multiple: true
+               },
+               color: (color, d) => {
+                    console.log(d);
+               }
+            },
             bindto: this.element[0],
             bar: {
             },
@@ -111,4 +119,4 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 }
 
-//WeavePanelManager.registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
+WeavePanelManager.registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
