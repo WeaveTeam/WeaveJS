@@ -47,6 +47,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     constructor(parent, toolPath) {
         super(parent, toolPath);
         this.lookup = {};
+        this._toolPath = toolPath;
         this._visualizationPath = toolPath.push("children", "visualization");
         this._plotterPath = toolPath.pushPlotter("plot");
 
@@ -69,6 +70,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         }, true);
 
         this._c3Options = {
+            bindto: this.element[0],
             data: {
                 rows: [],
                 x: "x",
@@ -119,34 +121,32 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             },
             point: {
                 r: (d) => {
-                    if(this.plotterState && this.plotterState.sizeBy.length) {
-                        let minScreenRadius = this.plotterState.minScreenRadius;
-                        let maxScreenRadius = this.plotterState.maxScreenRadius;
-
-                        var normalizedRecord = this.normalizedRecords[d.index];
-                        return (normalizedRecord && normalizedRecord.size ?
-                                minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius) :
-                                this.plotterState.defaultScreenRadius) || 1;
+                    if(d.hasOwnProperty("index")) {
+                        return this.normalizedPointSizes[d.index];
                     }
-                    else {
-                        return (this.plotterState.defaultScreenRadius) || 1;
+
+                },
+                focus: {
+                    expand: {
+                        r: 5
+                    }
+                },
+                point: {
+                    select: {
+                        r: 5
                     }
                 }
-                // focus: {
-                //     expand: {
-                //         r: point.r * 1.5
-                //     }
-                // },
-                // point: {
-                //     select: {
-                //         r: point.r * 1.5
-                //     }
-                // }
             },
             onrendered: this._updateStyle.bind(this)
         };
+        this.chart = c3.generate(this._c3Options);
 
+        this._setupCallbacks();
+    }
+
+    _setupCallbacks() {
         var dataChanged = lodash.debounce(this._dataChanged.bind(this), 100);
+
         [this._dataXPath, this._dataYPath, this._sizeByPath, this._fillStylePath, this._lineStylePath].forEach( (path) => {
             path.addCallback(dataChanged, true, false);
         });
@@ -156,11 +156,8 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             path.addCallback(axisChanged, true, false);
         });
 
-        toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
+        this._toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
-        this._c3Options.bindto = this.element[0];
-
-        this.chart = c3.generate(this._c3Options);
     }
 
     _updateContents () {
@@ -168,15 +165,15 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _axisChanged () {
-        this.chart.axis.max({
-            x: this._xAxisPath.push("axisLineMaxValue").getState(),
-            y: this._yAxisPath.push("axisLineMaxValue").getState()
-        });
+        // this.chart.axis.max({
+        //     x: this._xAxisPath.push("axisLineMaxValue").getState(),
+        //     y: this._yAxisPath.push("axisLineMaxValue").getState()
+        // });
 
-        this.chart.axis.min({
-            x: this._xAxisPath.push("axisLineMinValue").getState(),
-            y: this._yAxisPath.push("axisLineMinValue").getState()
-        });
+        // this.chart.axis.min({
+        //     x: this._xAxisPath.push("axisLineMinValue").getState(),
+        //     y: this._yAxisPath.push("axisLineMinValue").getState()
+        // });
 
         this.chart.axis.labels({
             x: this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)"),
@@ -210,6 +207,21 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         });
 
         this.normalizedRecords = _normalizeRecords(this.records, ["size"]);
+
+        this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord) => {
+            if(this.plotterState && this.plotterState.sizeBy.length) {
+                let minScreenRadius = this.plotterState.minScreenRadius;
+                let maxScreenRadius = this.plotterState.maxScreenRadius;
+
+                return (normalizedRecord && normalizedRecord.size ?
+                        minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius) :
+                        this.plotterState.defaultScreenRadius) || 1;
+            }
+            else {
+                return (this.plotterState.defaultScreenRadius) || 1;
+            }
+        });
+
         this.chart.load({data: lodash.pluck(this.records, "point")});
     }
 
