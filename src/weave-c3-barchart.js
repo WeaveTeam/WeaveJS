@@ -32,14 +32,16 @@ export default class WeaveC3Barchart extends WeavePanel {
                 xSort: false,
                 selection: {
                    enabled: true,
-                   multiple: true
+                   multiple: true,
+                   draggable: true
+
                },
                order: null,
                color: (color, d) => {
                     if(this.heightColumnNames.length === 1 && d.hasOwnProperty("index")) {
-                        return this.records[d.index].color;
+                        return this.records[d.index].color || "#C0CDD1";
                     } else {
-                        return color;
+                        return color || "C0CDD1";
                     }
                }
             },
@@ -117,17 +119,20 @@ export default class WeaveC3Barchart extends WeavePanel {
             path.addCallback(axisChanged, true, false);
         });
 
-        var groupingModeChanged = lodash.debounce(this._groupingModeChanged.bind(this), 100);
-        this._plotterPath.addCallback(groupingModeChanged, true, false);
+        var plotterChanged = lodash.debounce(this._plotterChanged.bind(this), 100);
+        this._plotterPath.addCallback(plotterChanged, true, false);
     }
 
     _teardownCallbacks() {
         this.toolPath.selection_keyset.removeCallback(this._boundSelectionChanged);
     }
 
-    _groupingModeChanged() {
+    _plotterChanged() {
+
+        this._updateColumns();
+
         var groupingMode = this._plotterPath.push("groupingMode").getState();
-        // var horizontalMode = this._plotterPath.push("horizontalMode").getState();
+        //var horizontalMode = this._plotterPath.push("horizontalMode").getState();
 
         // set axis rotation mode
         //this.chart.load({axes: { rotated: horizontalMode }});
@@ -172,13 +177,31 @@ export default class WeaveC3Barchart extends WeavePanel {
         });
     }
 
-    _dataChanged() {
+    _updateColumns() {
         this.heightColumnNames = [];
         this.heightColumnsLabels = [];
 
         var heightColumns = this._heightColumnsPath.getChildren();
 
-        var mapping =
+        for (let idx in heightColumns)
+        {
+            let column = heightColumns[idx];
+            let title = column.getValue("getMetadata('title')");
+            let name = column.getPath().pop();
+
+            this.heightColumnsLabels.push(title);
+            this.heightColumnNames.push(name);
+        }
+    }
+
+
+    _dataChanged() {
+
+        this._updateColumns();
+
+        var heightColumns = this._heightColumnsPath.getChildren();
+
+         var mapping =
         {
             label: this._labelColumnPath,
             sort: this._sortColumnPath,
@@ -188,12 +211,8 @@ export default class WeaveC3Barchart extends WeavePanel {
         for (let idx in heightColumns)
         {
             let column = heightColumns[idx];
-            let title = column.getValue("getMetadata('title')");
             let name = column.getPath().pop();
-
             mapping[name] = column;
-            this.heightColumnsLabels.push(title);
-            this.heightColumnNames.push(name);
         }
 
         this.records = this.toolPath.pushPlotter("plot").retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
@@ -229,7 +248,7 @@ export default class WeaveC3Barchart extends WeavePanel {
         // var horizontalMode = this._plotterPath.push("horizontalMode").getState();
 
         // set axis rotation mode
-        //this.chart.load({axes: { rotated: horizontalMode }});
+        // this.chart.load({axes: { rotated: horizontalMode }});
 
         if(groupingMode === "stack") {
             groups = [this.heightColumnNames];

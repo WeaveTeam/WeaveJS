@@ -76,11 +76,15 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                 x: "x",
                 xSort: false,
                 type: "scatter",//,
-                selection: {enabled: true, multiple: true},
+                selection: {
+                    enabled: true,
+                    multiple: true,
+                    draggable: true
+                },
                 color: (color, d) => {
                     if(this.records && d.hasOwnProperty("index")) {
                         var record = this.records[d.index];
-                        return (record && record.fill) ? record.fill.color : 0;
+                        return (record && record.fill) ? record.fill.color : "#C0CDD1";
                     }
                 }
             },

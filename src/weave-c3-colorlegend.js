@@ -17,25 +17,19 @@ export default class WeaveC3ColorLegend extends WeavePanel {
     constructor(parent, toolPath) {
         super(parent, toolPath);
         this._svg = d3.select(this.element[0]).append("svg");
-        this.axisPlotter = new SimpleAxisPlotter("test");
-
         this.lookup = {};
         this._plotterPath = toolPath.pushPlotter("plot");
         this.dynamicColorColumnPath = this._plotterPath.push("dynamicColorColumn").push(null);
         this._binningDefinition = this.dynamicColorColumnPath.push("internalDynamicColumn").push(null).push("binningDefinition").push(null);
 
-        this._filteredColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn").push(null).push("internalDynamicColumn").push(null);
+        this._setupCallbacks();
 
-        this._filteredColumn = {
-            get keyFilter() { return this._filteredColumnPath.push("filter").getState(); },
-            get internalDynamicColumn() { return this._filteredColumnPath.push("internalDynamicColumn").getState(); }
-        };
-
-
-        this.dynamicColorColumnPath.addCallback(lodash.debounce(this.drawAll.bind(this), true, false), 20);
         this.update = lodash.debounce(this._update.bind(this), 20);
-
         this.update();
+    }
+
+    _setupCallbacks() {
+        this.dynamicColorColumnPath.addCallback(lodash.debounce(this.drawAll.bind(this), 20), true, false);
     }
 
     _updateContents () {
@@ -127,7 +121,10 @@ export default class WeaveC3ColorLegend extends WeavePanel {
 
         this._svg.append("text")
                  .attr("y", yMap(0.5))
-                 .text(this.dynamicColorColumnPath.getValue("ColumnUtils.getTitle(this)"));
+                 .attr("x", 10)
+                 .text(this.dynamicColorColumnPath.getValue("ColumnUtils.getTitle(this)"))
+                 .attr("font-family", "sans-serif")
+                 .attr("font-size", "12px");
 
         _shapeSize = lodash.max([1, lodash.min([_shapeSize, height / numOfBins])]);
 
@@ -148,8 +145,10 @@ export default class WeaveC3ColorLegend extends WeavePanel {
                              .style("stroke-opacity", 0.5);
                     this._svg.append("text")
                              .attr("x", 50)
-                             .attr("y", yMap(i + 1))
-                             .text(textLabelFunction(i));
+                             .attr("y", yMap(i + 1) + r / 2)
+                             .text(textLabelFunction(i))
+                             .attr("font-family", "sans-serif")
+                             .attr("font-size", "12px");
                     break;
                 case SHAPE_TYPE_SQUARE :
                     break;
