@@ -30,6 +30,11 @@ export default class WeaveC3PieChart extends WeavePanel {
                },
                type: "pie"
             },
+            pie: {
+                label: {
+                    show: true
+                }
+            },
             bindto: this.element[0],
             legend: {
                 show: false

@@ -82,7 +82,7 @@ export default class WeaveC3Barchart extends WeavePanel {
             bindto: this.element[0],
             bar: {
                 width: {
-                    ratio: 0.9
+                    ratio: 0.8
                 }
             },
             legend: {
@@ -160,19 +160,8 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 
     _axisChanged () {
-        //console.log("axisChanged");
-        // this.chart.axis.max({
-        //     x: this._xAxisPath.push("axisLineMaxValue").getState(),
-        //     y: this._yAxisPath.push("axisLineMaxValue").getState()
-        // });
-
-        // this.chart.axis.min({
-        //     x: this._xAxisPath.push("axisLineMinValue").getState(),
-        //     y: this._yAxisPath.push("axisLineMinValue").getState()
-        // });
-
         this.chart.axis.labels({
-            x: "Sorted by " + this._sortColumnPath.getValue("ColumnUtils.getTitle(this)"),
+            x: this._xAxisPath.push("overrideAxisName").getState() || "Sorted by " + this._sortColumnPath.getValue("ColumnUtils.getTitle(this)"),
             y: this._yAxisPath.push("overrideAxisName").getState() || this.heightColumnsLabels.join(", ")
         });
     }
@@ -241,21 +230,6 @@ export default class WeaveC3Barchart extends WeavePanel {
             });
         } else {
             colors = {};
-        }
-
-        var groups = [];
-        var groupingMode = this._plotterPath.push("groupingMode").getState();
-        // var horizontalMode = this._plotterPath.push("horizontalMode").getState();
-
-        // set axis rotation mode
-        // this.chart.load({axes: { rotated: horizontalMode }});
-
-        if(groupingMode === "stack") {
-            groups = [this.heightColumnNames];
-        } else if(groupingMode === "group") {
-            groups = [];
-        } else if(groupingMode === "percentStack") {
-            groups = [this.heightColumnNames];
         }
 
         this.chart.load({json: this.records, colors, keys, unload: true, order: null, selection: {enabled: true, multiple: true, done: function() {

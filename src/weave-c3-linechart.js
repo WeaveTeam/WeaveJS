@@ -117,6 +117,7 @@ export default class WeaveC3LineChart extends WeavePanel {
         }
 
         this.records = this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
+        this.records = lodash.sortBy(this.records, "id");
         var columns = [];
 
         columns = this.records.map(function(record) {
