@@ -89,4 +89,62 @@ export default class StandardLib {
             max: _.max(column)
         };
     }
+
+    // // this function returns equally spaced bins given a number of bins
+// // the bins are returned as an array of bin. each bin contains an array of records,
+// // the bin bound (min and max) as well as the bin height computed using the aggregation function.
+// // the aggregation function takes in records, binnedColumnName and returns a single value
+// function simpleBinning(numberOfBins, records, binnedColumnName, columnToAggregateName, aggregationFunc) {
+//     var column = lodash.pluck(records, binnedColumnName);
+//     var columnMin = lodash.min(column);
+//     var columnMax = lodash.max(column);
+
+//     var binWidth = (columnMax - columnMin) / numberOfBins;
+
+//     var bins = [];
+//     var currentBinMin = columnMin;
+//     var currentBinMax = columnMin + binWidth;
+
+//     for(let i = 0; i < numberOfBins; i++) {
+
+//         let bin = {};
+
+//         bin.min = currentBinMin;
+//         bin.max = currentBinMax;
+
+//         bin.records = [];
+
+
+//         for (let j in records) {
+//             let record = records[j];
+//             if(record[binnedColumnName] > currentBinMin && record[binnedColumnName] < currentBinMax) {
+//                 bin.records.push(record);
+//             }
+//         }
+
+//         // hack, we should really use
+//         // interpolate color instead?
+//         bin.color = bin.records[0] ? bin.records[0].fill.color : "#C0CDD1";
+
+//         bins.push(bin);
+//         currentBinMin = currentBinMax;
+//         currentBinMax = currentBinMax + binWidth;
+//     }
+
+//     // add the column min and column max to first and last bin
+//     records.forEach( (record) => {
+//         if(record[binnedColumnName] === columnMin) {
+//             bins[0].records.push(record);
+//         } else if(record[binnedColumnName] === columnMax) {
+//             bins[numberOfBins - 1].records.push(record);
+//         }
+//     });
+
+//     bins.forEach((bin) => {
+//         bin.height = aggregationFunc(bin.records, columnToAggregateName);
+//     });
+//     console.log(bins);
+//     return bins;
+
+// }
 }

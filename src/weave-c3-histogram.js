@@ -5,83 +5,6 @@ import lodash from "lodash";
 import * as WeavePanelManager from "./WeavePanelManager.js";
 import jquery from "jquery";
 
-function sumAggregation(records, columnName) {
-    var values = lodash.pluck(records, columnName);
-    return lodash.reduce(values, (total, value) => {
-        return total + value;
-    });
-}
-
-function countAggregation(records, columnName) {
-    var values = lodash.pluck(records, columnName);
-    return lodash.reduce(values, (total) => {
-        return total + 1;
-    });
-}
-
-function meanAggregation(records, columnName) {
-    return sumAggregation(records, columnName) / records.length;
-}
-
-// this function returns equally spaced bins given a number of bins
-// the bins are returned as an array of bin. each bin contains an array of records,
-// the bin bound (min and max) as well as the bin height computed using the aggregation function.
-// the aggregation function takes in records, binnedColumnName and returns a single value
-function simpleBinning(numberOfBins, records, binnedColumnName, columnToAggregateName, aggregationFunc) {
-    var column = lodash.pluck(records, binnedColumnName);
-    var columnMin = lodash.min(column);
-    var columnMax = lodash.max(column);
-
-    var binWidth = (columnMax - columnMin) / numberOfBins;
-
-    var bins = [];
-
-    var currentBinMin = columnMin;
-    var currentBinMax = columnMin + binWidth;
-
-    for(let i = 0; i < numberOfBins; i++) {
-
-        let bin = {};
-
-        bin.min = currentBinMin;
-        bin.max = currentBinMax;
-
-        bin.records = [];
-
-
-        for (let j in records) {
-            let record = records[j];
-
-            if(record[binnedColumnName] > currentBinMin && record[binnedColumnName] < currentBinMax) {
-                bin.records.push(record);
-            }
-        }
-
-        bin.height = aggregationFunc(bin.records, columnToAggregateName);
-
-        // hack, we should really use
-        // interpolate color instead?
-        bin.color = bin.records[0] ? bin.records[0].fill.color : "#C0CDD1";
-
-        bins.push(bin);
-        currentBinMin = currentBinMax;
-        currentBinMax = currentBinMax + binWidth;
-    }
-
-    // add the column min and column max to first and last bin
-    records.forEach( (record) => {
-        if(record[binnedColumnName] === columnMin) {
-            bins[0].records.push(record);
-        } else if(record[binnedColumnName] === columnMax) {
-            bins[numberOfBins - 1].records.push(record);
-        }
-    });
-
-    return bins;
-
-}
-
-
 export default class WeaveC3Histogram extends WeavePanel {
     constructor(parent, toolPath) {
         super(parent, toolPath);
@@ -90,9 +13,7 @@ export default class WeaveC3Histogram extends WeavePanel {
 
         this._binnedColumnPath = this._plotterPath.push("binnedColumn");
 
-        this._binningDefinitionPath = this._binnedColumnPath.push("binningDefinition").push(null);
-
-        this._columnPath = this._binnedColumnPath.push("internalDynamicColumn").push(null).push("internalDynamicColumn").push(null);
+        this._columnPath = this._binnedColumnPath.push("internalDynamicColumn"); //.push(null).push("internalDynamicColumn").push(null);
 
         this._lineStylePath = this._plotterPath.push("lineStyle");
         this._fillStylePath = this._plotterPath.push("fillStyle");
@@ -218,42 +139,29 @@ export default class WeaveC3Histogram extends WeavePanel {
         this.chart.select("height", lodash.keys(selectedBins).map(Number), true);
     }
 
-    _axisChanged () {
-        this.chart.axis.labels({
-            x: this._xAxisPath.push("overrideAxisName").getState() || this._binnedColumnPath.getValue("ColumnUtils.getTitle(this)"),
-            y: function() {
-                var overrideAxisName = this._yAxisPath.push("overrideAxisName").getState();
-                if(overrideAxisName) {
-                    return overrideAxisName;
-                } else {
-                    if(this._columnToAggregatePath.getState().length) {
-                        switch(this._aggregationMethodPath.getState()) {
-                            case "count":
-                                return "Number of records";
-                            case "sum":
-                                return "Sum of " + this._columnToAggregatePath.getValue("ColumnUtils.getTitle(this)");
-                            case "mean":
-                                return "Mean of " + this._columnToAggregatePath.getValue("ColumnUtils.getTitle(this)");
-                        }
-                    } else {
-                        return "Number of records";
-                    }
-                }
-            }.bind(this)()
-        });
-    }
-
-    _getAggregationFunc() {
-        switch(this._aggregationMethodPath.getState()) {
-            case "count":
-                return countAggregation;
-            case "sum":
-                return sumAggregation;
-            case "mean":
-                return meanAggregation;
-            default:
-                return countAggregation;
-        }
+      _axisChanged () {
+        // this.chart.axis.labels({
+        //     x: this._xAxisPath.push("overrideAxisName").getState() || this._binnedColumnPath.getValue("ColumnUtils.getTitle(this)"),
+        //     y: function() {
+        //         var overrideAxisName = this._yAxisPath.push("overrideAxisName").getState();
+        //         if(overrideAxisName) {
+        //             return overrideAxisName;
+        //         } else {
+        //             if(this._columnToAggregatePath.getState().length) {
+        //                 switch(this._aggregationMethodPath.getState()) {
+        //                     case "count":
+        //                         return "Number of records";
+        //                     case "sum":
+        //                         return "Sum of " + this._columnToAggregatePath.getValue("ColumnUtils.getTitle(this)");
+        //                     case "mean":
+        //                         return "Mean of " + this._columnToAggregatePath.getValue("ColumnUtils.getTitle(this)");
+        //                 }
+        //             } else {
+        //                 return "Number of records";
+        //             }
+        //         }
+        //     }.bind(this)()
+        // });
     }
 
     _updateStyle() {
@@ -262,7 +170,8 @@ export default class WeaveC3Histogram extends WeavePanel {
 
     _dataChanged() {
         let mapping = {
-            binnedColumn: this._columnPath,
+            binnedColumn: this._binnedColumnPath,
+            column: this._columnPath,
             columnToAggregate: this._columnToAggregatePath,
             fill: {
                 alpha: this._fillStylePath.push("alpha"),
@@ -280,23 +189,63 @@ export default class WeaveC3Histogram extends WeavePanel {
         // plot has filtered keySet
         this.records = this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
 
-        var numberOfBins = this._binningDefinitionPath.push("numberOfBins").getState();
-        this.bins = [];
+        this.numberOfBins = this._binnedColumnPath.getValue("numberOfBins");
 
-        if(this._columnToAggregatePath.getState().length) {
-            this.bins = simpleBinning(numberOfBins, this.records, "binnedColumn", "columnToAggregate", this._getAggregationFunc());
-        } else {
-            this.bins = simpleBinning(numberOfBins, this.records, "binnedColumn", "binnedColumn", countAggregation);
+        this.histData = [];
+
+        // this._columnToAggregatePath.getValue("getInternatlColumn()");
+        for(let iBin = 0; iBin < this.numberOfBins; iBin++) {
+
+            let recordsInBin = lodash.filter(this.records, { binnedColumn: iBin });
+
+            if(recordsInBin) {
+               var obj = {};
+               if(this._columnToAggregatePath.getState().length) {
+                    obj.height = this.getAggregateValue(recordsInBin, "columnToAggregate", this._aggregationMethodPath.getState());
+                    this.histData.push(obj);
+                } else {
+                    obj.height = this.getAggregateValue(recordsInBin, "column", "count");
+                    this.histData.push(obj);
+                }
+            }
         }
 
-        this.binsToId = [];
+        var keys = { value: ["height"] };
+        this.chart.load({json: this.histData, keys, unload: true});
+    }
 
-        this.binsToId = this.bins.map(function(bin) {
-            return lodash.pluck(bin.records, "id");
+    getAggregateValue(records, columnToAggregateName, aggregationMethod) {
+
+        var count = 0;
+        var sum = 0;
+
+        if(!Array.isArray(records)) {
+            return 0;
+        }
+
+        records.forEach((record) => {
+            count++;
+            sum += record[columnToAggregateName];
         });
 
-        var keys = { value: ["height"] };
-        this.chart.load({json: this.bins, keys, unload: true});
+        if (aggregationMethod === "mean") {
+            return sum / count; // convert sum to mean
+        }
+
+        if (aggregationMethod === "count") {
+
+            return count; // use count of finite values
+        }
+
+        // sum
+        return sum;
+    }
+
+    destroy() {
+        /* Cleanup callbacks */
+        //this.teardownCallbacks();
+        this.chart.destroy();
+        super();
     }
 }
 
