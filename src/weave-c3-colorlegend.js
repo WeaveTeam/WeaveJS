@@ -32,16 +32,16 @@ export default class WeaveC3ColorLegend extends WeavePanel {
         this.dynamicColorColumnPath.addCallback(lodash.debounce(this.drawAll.bind(this), 20), true, false);
     }
 
+   _sizeChanged() {
+        this.drawAll();
+    }
+
     _updateContents () {
         this._sizeChanged();
     }
 
     _dataChanged() {
 
-    }
-
-    _sizeChanged() {
-        this.drawAll();
     }
 
     drawAll() {
@@ -140,7 +140,7 @@ export default class WeaveC3ColorLegend extends WeavePanel {
                              .attr("cx", 25)
                              .attr("cy", yMap(i + 1))
                              .attr("r", r)
-                             .style("fill", "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, numOfBins), ramp)))
+                             .style("fill", "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, numOfBins - 1), ramp)))
                              .style("stroke", "black")
                              .style("stroke-opacity", 0.5);
                     this._svg.append("text")

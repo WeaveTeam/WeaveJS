@@ -123,9 +123,9 @@ export default class WeaveC3Barchart extends WeavePanel {
         this._plotterPath.addCallback(plotterChanged, true, false);
     }
 
-    _teardownCallbacks() {
-        this.toolPath.selection_keyset.removeCallback(this._boundSelectionChanged);
-    }
+    // _teardownCallbacks() {
+    //     this.toolPath.selection_keyset.removeCallback(this._selectionKeysChanged);
+    // }
 
     _plotterChanged() {
 
@@ -240,15 +240,9 @@ export default class WeaveC3Barchart extends WeavePanel {
 
     _updateStyle() {}
 
-
-    _update() {
-        this.chart = c3.generate(this._c3Options);
-        this._updateStyle();
-    }
-
     destroy() {
         /* Cleanup callbacks */
-        this.teardownCallbacks();
+        //this.teardownCallbacks();
         this.chart.destroy();
         super();
     }
