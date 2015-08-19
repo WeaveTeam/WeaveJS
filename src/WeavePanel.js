@@ -31,43 +31,12 @@ export default class {
 
         var boundFunc = lodash.debounce(this._panelChanged.bind(this), 100);
 
+        jquery(window).resize(boundFunc);
+
         ["panelY", "panelX", "panelHeight", "panelWidth", "maximized", "zOrder", "panelBorderColor"].forEach(
             (item) => { this.toolPath.push(item).addCallback(boundFunc, true, false); }
         , this);
 
-    }
-
-    get panelBounds() {
-        return {
-            xMin: 0,
-            yMin: 0,
-            xMax: jquery(this.element).width(),
-            yMax: jquery(this.element).height()
-        };
-    }
-
-    get panelWidth() {
-        return percentToNumber(this.toolPath.getState("panelWidth")) * jquery(parent).width();
-    }
-
-    get panelHeight() {
-        return percentToNumber(this.toolPath.getState("panelHeight")) * jquery(parent).height();
-    }
-
-    get marginLeft() {
-        return this.plotManagerPath.getState("marginLeft");
-    }
-
-    get marginRight() {
-        return this.plotManagerPath.getState("marginRight");
-    }
-
-    get marginTop() {
-        return this.plotManagerPath.getState("marginTop");
-    }
-
-    get marginBottom() {
-        return this.plotManagerPath.getState("marginBottom");
     }
 
     _panelChanged() {
