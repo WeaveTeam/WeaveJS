@@ -46,7 +46,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
     constructor(parent, toolPath) {
         super(parent, toolPath);
-        this.lookup = {};
+
         this._toolPath = toolPath;
         this._visualizationPath = toolPath.push("children", "visualization");
         this._plotterPath = toolPath.pushPlotter("plot");
@@ -59,9 +59,6 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this._fillStylePath = this._plotterPath.push("fill");
         this._lineStylePath = this._plotterPath.push("line");
         this._sizeByPath = this._plotterPath.push("sizeBy");
-
-        this.lookup.chartToOriginal = {};
-        this.lookup.originalToChart = {};
 
         this.plotterState = {};
 
@@ -86,6 +83,26 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                         var record = this.records[d.index];
                         return (record && record.fill) ? record.fill.color : "#C0CDD1";
                     }
+                },
+                onselected: (d, element) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this._toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onunselected: (d, element) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this._toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onmouseover: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this._toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onmouseout: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this._toolPath.probe_keyset.setKeys([]);
+                    }
                 }
             },
             legend: {
@@ -98,9 +115,6 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                     },
                     tick: {
                         fit: false
-                        // format: function(num) {
-                        //     return num.toFixed(2);
-                        // }
                     }
                 },
                 y: {
@@ -109,9 +123,6 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                     },
                     tick: {
                         fit: false
-                        // format: function(num) {
-                        //     return num.toFixed(2);
-                        // }
                     }
                 }
             },
@@ -129,20 +140,12 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                         return this.normalizedPointSizes[d.index];
                     }
 
-                },
-                focus: {
-                    expand: {
-                        r: 5
-                    }
-                },
-                point: {
-                    select: {
-                        r: 5
-                    }
                 }
             },
             onrendered: this._updateStyle.bind(this)
         };
+
+        jquery(window).resize(this._updateContents);
         this.chart = c3.generate(this._c3Options);
 
         this._setupCallbacks();
@@ -162,23 +165,21 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         this._toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
+        this._toolPath.probe_keyset.addCallback(this._probeKeysChanged.bin(this), true, false);
+
     }
 
     _updateContents () {
-        this._sizeChanged();
+        var size = {
+                height: jquery(this.element).height(),
+                width: jquery(this.element).width()
+        };
+        if(this.chart) {
+            this.chart.resize(size);
+        }
     }
 
     _axisChanged () {
-        // this.chart.axis.max({
-        //     x: this._xAxisPath.push("axisLineMaxValue").getState(),
-        //     y: this._yAxisPath.push("axisLineMaxValue").getState()
-        // });
-
-        // this.chart.axis.min({
-        //     x: this._xAxisPath.push("axisLineMinValue").getState(),
-        //     y: this._yAxisPath.push("axisLineMinValue").getState()
-        // });
-
         this.chart.axis.labels({
             x: this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)"),
             y: this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)")
@@ -205,9 +206,11 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this.records = lodash.sortByOrder(this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter")), ["size", "id"], ["desc", "asc"]);
 
         this.keyToIndex = {};
+        this.indexToKey = {};
 
         this.records.forEach((record, index) => {
             this.keyToIndex[record.id] = index;
+            this.indexToKey[index] = record.id;
         });
 
         this.normalizedRecords = _normalizeRecords(this.records, ["size"]);
@@ -229,14 +232,12 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         this.chart.load({data: lodash.pluck(this.records, "point")});
     }
 
-    _sizeChanged() {
-        var size = {
-                height: jquery(this.element).height(),
-                width: jquery(this.element).width()
-        };
-        if(this.chart) {
-            this.chart.resize(size);
-        }
+    _selectionKeysChanged() {
+        var keys = this.toolPath.selection_keyset.getKeys();
+        var indices = keys.map((key) => {
+            return Number(this.keyToIndex[key]);
+        });
+        this.chart.select("y", indices, true);
     }
 
     _selectionKeysChanged() {
