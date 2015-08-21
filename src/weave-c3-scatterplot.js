@@ -145,7 +145,6 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             onrendered: this._updateStyle.bind(this)
         };
 
-        jquery(window).resize(this._updateContents);
         this.chart = c3.generate(this._c3Options);
 
         this._setupCallbacks();
@@ -165,7 +164,8 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         this._toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
-        this._toolPath.probe_keyset.addCallback(this._probeKeysChanged.bin(this), true, false);
+        //console.log(this._toolPath.probe_keyset);
+        this._toolPath.probe_keyset.addCallback(this._probedKeysChanged.bind(this), true, false);
 
     }
 
@@ -233,7 +233,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
+        var keys = this._toolPath.selection_keyset.getKeys();
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
         });
@@ -241,11 +241,19 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
+        var keys = this._toolPath.selection_keyset.getKeys();
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
         });
         this.chart.select("y", indices, true);
+    }
+
+    _probedKeysChanged() {
+        var keys = this._toolPath.probe_keyset.getKeys();
+        var indices = keys.map( (key) => {
+            return Number(this.keyToIndex[key]);
+        });
+        //this.chart.select("y", indices, true);
     }
 
     _updateStyle() {

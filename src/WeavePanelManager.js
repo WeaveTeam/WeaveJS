@@ -22,40 +22,40 @@ function _createTool(parent, path) {
 }
 
 function _toolsChanged() {
-	var toolNames = lodash.keys(tools);
-	var newNames = weaveRootPath.getNames();
+    var toolNames = lodash.keys(tools);
+    var newNames = weaveRootPath.getNames();
 
-	var removedToolNames = lodash.difference(toolNames, newNames);
-	var addedToolNames = lodash.difference(newNames, toolNames);
+    var removedToolNames = lodash.difference(toolNames, newNames);
+    var addedToolNames = lodash.difference(newNames, toolNames);
 
-	removedToolNames.forEach(function (name) {
-		tools[name].destroy();
-		delete tools[name];
-	});
+    removedToolNames.forEach(function (name) {
+        tools[name].destroy();
+        delete tools[name];
+    });
 
-	addedToolNames.forEach(function (name) {
-		var tool = _createTool(weaveRootElmt, weaveRootPath.push(name));
-		if (tool)
-		{
-			tools[name] = tool;
-		}
-	});
+    addedToolNames.forEach(function (name) {
+        var tool = _createTool(weaveRootElmt, weaveRootPath.push(name));
+        if (tool)
+        {
+            tools[name] = tool;
+        }
+    });
 
-	var zIndex = 0;
-	for (let idx in newNames)
-	{
-		let tool = tools[newNames[idx]];
+    var zIndex = 0;
+    for (let idx in newNames)
+    {
+        let tool = tools[newNames[idx]];
 
-		if (!tool)
-		{
-			continue;
-		}
+        if (!tool)
+        {
+            continue;
+        }
 
-		let modifier = 9000 * tool.toolPath.push("zOrder").getState();
-		tool.element.css("z-index", zIndex + modifier);
+        let modifier = 9000 * tool.toolPath.push("zOrder").getState();
+        tool.element.css("z-index", zIndex + modifier);
 
-		zIndex++;
-	}
+        zIndex++;
+    }
 }
 
 // publicly exposed function
@@ -71,7 +71,7 @@ export function registerToolImplementation(asClassName, jsClass) {
 // initialize the weave panel manager
 // by setting up the callback.
 export function init(root, weave) {
-	weaveRootElmt = jquery(root);
-	weaveRootPath = weave.path();
-	weaveRootPath.getValue("childListCallbacks.addGroupedCallback")(null, _toolsChanged, true);
+    weaveRootElmt = jquery(root);
+    weaveRootPath = weave.path();
+    weaveRootPath.getValue("childListCallbacks.addGroupedCallback")(null, _toolsChanged, true);
 }

@@ -9,6 +9,8 @@ export default class WeaveC3Histogram extends WeavePanel {
     constructor(parent, toolPath) {
         super(parent, toolPath);
 
+        this._toolPath = toolPath;
+
         this._plotterPath = this.toolPath.pushPlotter("plot");
 
         this._binnedColumnPath = this._plotterPath.push("binnedColumn");
@@ -25,6 +27,10 @@ export default class WeaveC3Histogram extends WeavePanel {
         this._xAxisPath = toolPath.pushPlotter("xAxis");
         this._yAxisPath = toolPath.pushPlotter("yAxis");
 
+        this.busy = false;
+
+        this.records = [];
+
         this.chart = c3.generate({
             size: {
                 width: jquery(this.element).width(),
@@ -39,11 +45,40 @@ export default class WeaveC3Histogram extends WeavePanel {
                },
                type: "bar",
                color: (color, d) => {
-                    if(d && d.hasOwnProperty("index") && this.bins) {
-                        return this.bins[d.index].color;
+                    if(d && d.hasOwnProperty("index")) {
+                        return "#" + this._fillStylePath.push("color").push("internalDynamicColumn").push(null).getValue("getColorFromDataValue")(d.index).toString(16);
                     }
                     return "#C0CDD1";
-               }
+               },
+               onselected: (d, element) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var selectedIds = this._binnedColumnPath.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this._toolPath.qkeyToString(qKey);
+                        });
+                        this._toolPath.selection_keyset.addKeys(selectedIds);
+                    }
+                },
+                onunselected: (d, element) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var unSelectedIds = this._binnedColumnPath.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this._toolPath.qkeyToString(qKey);
+                        });
+                        this._toolPath.selection_keyset.removeKeys(unSelectedIds);
+                    }
+                },
+                onmouseover: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var selectedIds = this._binnedColumnPath.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this._toolPath.qkeyToString(qKey);
+                        });
+                        this._toolPath.probe_keyset.setKeys(selectedIds);
+                    }
+                },
+                onmouseout: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this._toolPath.probe_keyset.setKeys([]);
+                    }
+                }
             },
             bindto: this.element[0],
             legend: {
@@ -106,7 +141,7 @@ export default class WeaveC3Histogram extends WeavePanel {
         });
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
-        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+        this._toolPath.selection_keyset.addCallback(selectionChanged, true, false);
 
         var axisChanged = lodash.debounce(this._axisChanged.bind(this), 100);
         [
@@ -126,42 +161,45 @@ export default class WeaveC3Histogram extends WeavePanel {
 
     _selectionKeysChanged() {
         var keys = this.toolPath.selection_keyset.getKeys();
-
         var selectedBins = {};
 
-        keys.forEach((key) => {
-            this.binsToId.forEach((ids, bin) => {
-                if(lodash.contains(ids, key)) {
-                    selectedBins[bin] = true;
-                }
+        if(this.idToRecord) {
+            keys.forEach((key) => {
+                var bin = this.idToRecord[key].binnedColumn;
+                selectedBins[bin] = true;
             });
-        });
+        }
+
         this.chart.select("height", lodash.keys(selectedBins).map(Number), true);
     }
 
       _axisChanged () {
-        // this.chart.axis.labels({
-        //     x: this._xAxisPath.push("overrideAxisName").getState() || this._binnedColumnPath.getValue("ColumnUtils.getTitle(this)"),
-        //     y: function() {
-        //         var overrideAxisName = this._yAxisPath.push("overrideAxisName").getState();
-        //         if(overrideAxisName) {
-        //             return overrideAxisName;
-        //         } else {
-        //             if(this._columnToAggregatePath.getState().length) {
-        //                 switch(this._aggregationMethodPath.getState()) {
-        //                     case "count":
-        //                         return "Number of records";
-        //                     case "sum":
-        //                         return "Sum of " + this._columnToAggregatePath.getValue("ColumnUtils.getTitle(this)");
-        //                     case "mean":
-        //                         return "Mean of " + this._columnToAggregatePath.getValue("ColumnUtils.getTitle(this)");
-        //                 }
-        //             } else {
-        //                 return "Number of records";
-        //             }
-        //         }
-        //     }.bind(this)()
-        // });
+        if(this.busy) {
+            return;
+        }
+
+        this.chart.axis.labels({
+            x: this._xAxisPath.push("overrideAxisName").getState() || this._binnedColumnPath.getValue("ColumnUtils.getTitle(this)"),
+            y: function() {
+                var overrideAxisName = this._yAxisPath.push("overrideAxisName").getState();
+                if(overrideAxisName) {
+                    return overrideAxisName;
+                } else {
+                    if(this._columnToAggregatePath.getState().length) {
+                        switch(this._aggregationMethodPath.getState()) {
+                            case "count":
+                                return "Number of records";
+                            case "sum":
+                                return "Sum of " + this._columnToAggregatePath.getValue("ColumnUtils.getTitle(this)");
+                            case "mean":
+                                return "Mean of " + this._columnToAggregatePath.getValue("ColumnUtils.getTitle(this)");
+                        }
+                    } else {
+                        return "Number of records";
+                    }
+                }
+            }.bind(this)()
+        });
     }
 
     _updateStyle() {
@@ -169,6 +207,10 @@ export default class WeaveC3Histogram extends WeavePanel {
     }
 
     _dataChanged() {
+        if(this.busy) {
+            return;
+        }
+
         let mapping = {
             binnedColumn: this._binnedColumnPath,
             column: this._columnPath,
@@ -185,22 +227,28 @@ export default class WeaveC3Histogram extends WeavePanel {
             }
         };
 
-        // binnedColumn's internalDynamicColumn has a dynamicKeyFilter
-        // plot has filtered keySet
         this.records = this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
+
+        this.idToRecord = {};
+
+        this.records.forEach((record) => {
+            this.idToRecord[record.id] = record;
+        });
 
         this.numberOfBins = this._binnedColumnPath.getValue("numberOfBins");
 
         this.histData = [];
 
         // this._columnToAggregatePath.getValue("getInternatlColumn()");
+        var columnToAggregateNameIsDefined = this._columnToAggregatePath.getState().length > 0;
+
         for(let iBin = 0; iBin < this.numberOfBins; iBin++) {
 
             let recordsInBin = lodash.filter(this.records, { binnedColumn: iBin });
 
             if(recordsInBin) {
                var obj = {};
-               if(this._columnToAggregatePath.getState().length) {
+               if(columnToAggregateNameIsDefined) {
                     obj.height = this.getAggregateValue(recordsInBin, "columnToAggregate", this._aggregationMethodPath.getState());
                     this.histData.push(obj);
                 } else {
@@ -211,7 +259,9 @@ export default class WeaveC3Histogram extends WeavePanel {
         }
 
         var keys = { value: ["height"] };
-        this.chart.load({json: this.histData, keys, unload: true});
+        this._axisChanged();
+        this.busy = true;
+        this.chart.load({json: this.histData, keys, unload: true, done: () => { this.busy = false; }});
     }
 
     getAggregateValue(records, columnToAggregateName, aggregationMethod) {
