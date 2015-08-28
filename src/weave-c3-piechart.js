@@ -9,14 +9,16 @@ export default class WeaveC3PieChart extends WeavePanel {
     constructor(parent, toolPath) {
         super(parent, toolPath);
 
+        this._toolPath = toolPath;
         this._plotterPath = this.toolPath.pushPlotter("plot");
 
         this._dataPath = this._plotterPath.push("data");
+        this._labelPath = this._plotterPath.push("label");
 
         this._lineStylePath = this._plotterPath.push("line");
         this._fillStylePath = this._plotterPath.push("fill");
 
-        this.chart = c3.generate({
+        this.config = {
             size: {
                 width: jquery(this.element).width(),
                 height: jquery(this.element).height()
@@ -28,11 +30,55 @@ export default class WeaveC3PieChart extends WeavePanel {
                    multiple: true,
                    draggable: true
                },
-               type: "pie"
+               type: "pie",
+                onselected: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this._toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onunselected: (d) => {
+                    if(d && d.hasOwnProperty("data")) {
+                        // d has a different structure than "onselected" argument
+                        this._toolPath.selection_keyset.setKeys([]);
+                    }
+                },
+                onmouseover: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this._toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onmouseout: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this._toolPath.probe_keyset.setKeys([]);
+                    }
+                }
             },
             pie: {
                 label: {
-                    show: true
+                    show: true,
+                    format: (value, ratio, id) => {
+                        if(this.records) {
+                            var record = this.records[this.keyToIndex[id]];
+                            if(record && record.label) {
+                                return record.label;
+                            }
+                            return value;
+                        }
+                    }
+                }
+            },
+            donut: {
+                label: {
+                    show: true,
+                    format: (value, ratio, id) => {
+                        if(this.records) {
+                            var record = this.records[this.keyToIndex[id]];
+                            if(record && record.label) {
+                                return record.label;
+                            }
+                            return value;
+                        }
+                    }
                 }
             },
             bindto: this.element[0],
@@ -40,8 +86,8 @@ export default class WeaveC3PieChart extends WeavePanel {
                 show: false
             },
             onrendered: this._updateStyle.bind(this)
-        });
-
+        };
+        this.chart = c3.generate(this.config);
         this._setupCallbacks();
     }
 
@@ -49,6 +95,7 @@ export default class WeaveC3PieChart extends WeavePanel {
         var dataChanged = lodash.debounce(this._dataChanged.bind(this), 100);
         [
             this._dataPath,
+            this._labelPath,
             this._lineStylePath,
             this._fillStylePath
         ].forEach((path) => {
@@ -56,7 +103,11 @@ export default class WeaveC3PieChart extends WeavePanel {
         });
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
-        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+        this._toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+
+        this._toolPath.probe_keyset.addCallback(this._probedKeysChanged.bind(this), true, false);
+
+        this._plotterPath.push("innerRadius").addCallback(dataChanged, true, false);
     }
 
     _updateContents() {
@@ -71,6 +122,14 @@ export default class WeaveC3PieChart extends WeavePanel {
         } else {
             this.chart.focus();
         }
+    }
+
+    _probedKeysChanged() {
+        var keys = this._toolPath.probe_keyset.getKeys();
+        var indices = keys.map( (key) => {
+            return Number(this.keyToIndex[key]);
+        });
+        this.chart.select("y", indices, true);
     }
 
     _updateStyle() {
@@ -91,18 +150,19 @@ export default class WeaveC3PieChart extends WeavePanel {
                 alpha: this._lineStylePath.push("alpha"),
                 color: this._lineStylePath.push("color"),
                 caps: this._lineStylePath.push("caps")
-            }
+            },
+            label: this._labelPath
         };
 
-        // for (let idx in children) {
-        //     let child = children[idx];
-        //     let title = child.getValue("getMetadata('title')");
-        //     let name = child.getPath().pop();
-        //     this.columnLabels.push(title);
-        //     this.columnNames.push(name);
-        // }
-
         this.records = this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
+
+        this.keyToIndex = {};
+        this.indexToKey = {};
+
+        this.records.forEach( (record, index) => {
+            this.indexToKey[index] = record.id;
+            this.keyToIndex[record.id] = index;
+        });
         //this.records = lodash.sortBy(this.records, "id");
         var columns = [];
 
@@ -113,12 +173,17 @@ export default class WeaveC3PieChart extends WeavePanel {
             return tempArr;
         });
 
+        var chartType = "pie";
+        if(this._plotterPath.push("innerRadius").getState() > 0) {
+            chartType = "donut";
+        }
+
         this.colors = {};
         this.records.forEach((record) => {
-            this.colors[record.id] = record.fill.color;
+            this.colors[record.id] = record.fill.color || "#C0CDD1";
         });
 
-        this.chart.load({columns: columns, colors: this.colors, unload: true});
+        this.chart.load({columns: columns, type: chartType, colors: this.colors, unload: true});
     }
 }
 

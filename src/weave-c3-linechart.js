@@ -5,6 +5,8 @@ import lodash from "lodash";
 import StandardLib from "./Utils/StandardLib";
 import * as WeavePanelManager from "./WeavePanelManager.js";
 import jquery from "jquery";
+import FormatUtils from "./Utils/FormatUtils";
+
 
 export default class WeaveC3LineChart extends WeavePanel {
     constructor(parent, toolPath) {
@@ -45,9 +47,15 @@ export default class WeaveC3LineChart extends WeavePanel {
             axis: {
                 x: {
                     tick: {
+                        multiline: false,
                         format: (d) => {
                             return this.columnLabels[d];
                         }
+                    }
+                },
+                y: {
+                    tick: {
+                        format: FormatUtils.defaultNumberFormatting
                     }
                 }
             },
@@ -65,7 +73,8 @@ export default class WeaveC3LineChart extends WeavePanel {
         var dataChanged = lodash.debounce(this._dataChanged.bind(this), 100);
         [
             this._columnsPath,
-            this._lineStylePath
+            this._lineStylePath,
+            this._plotterPath.push("curveType")
         ].forEach((path) => {
             path.addCallback(dataChanged, true, false);
         });
@@ -131,10 +140,15 @@ export default class WeaveC3LineChart extends WeavePanel {
 
         this.colors = {};
         this.records.forEach((record) => {
-            this.colors[record.id] = 0 || record.line.color;
+            this.colors[record.id] = record.line.color || "#C0CDD1";
         });
 
-        this.chart.load({columns: columns, colors: this.colors, unload: true});
+        var chartType = "line";
+        if(this._plotterPath.push("curveType").getState() === "double") {
+            chartType = "spline";
+        }
+
+        this.chart.load({columns: columns, colors: this.colors, type: chartType, unload: true});
     }
 }
 

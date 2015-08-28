@@ -1,9 +1,11 @@
+import d3 from "d3";
 import c3 from "c3";
 import WeavePanel from "./WeavePanel";
 import * as WeavePanelManager from "./WeavePanelManager.js";
 import jquery from "jquery";
 import lodash from "lodash";
 import StandardLib from "./Utils/StandardLib";
+import FormatUtils from "./Utils/FormatUtils";
 
 export default class WeaveC3Barchart extends WeavePanel {
     constructor(parent, toolPath) {
@@ -19,8 +21,13 @@ export default class WeaveC3Barchart extends WeavePanel {
         this._xAxisPath = toolPath.pushPlotter("xAxis");
         this._yAxisPath = toolPath.pushPlotter("yAxis");
 
+        this.groupingMode = this._plotterPath.push("groupingMode").getState();
+
         this.colorRamp = this._chartColorsPath.getState();
         this.chart = null;
+
+        this.busy = false;
+
         this.chart = c3.generate({
             size: {
                 width: jquery(this.element).width(),
@@ -41,7 +48,7 @@ export default class WeaveC3Barchart extends WeavePanel {
                     if(this.heightColumnNames.length === 1 && d.hasOwnProperty("index")) {
                         return this.records[d.index].color || "#C0CDD1";
                     } else {
-                        return color || "C0CDD1";
+                        return color || "#C0CDD1";
                     }
                }
             },
@@ -52,10 +59,18 @@ export default class WeaveC3Barchart extends WeavePanel {
                         position: "outer-center"
                     },
                     tick: {
-                        fit: false
-                        // format: function(num) {
-                        //     return num.toFixed(2);
-                        // }
+                        fit: false,
+                        multiline: false,
+                        format: (num) => {
+                            if(this.records) {
+                               var record = this.records[num];
+                               if(record && record.label) {
+                                    return record.label;
+                               } else {
+                                    return FormatUtils.defaultNumberFormatting(num);
+                               }
+                            }
+                        }
                     }
                 },
                 y: {
@@ -63,13 +78,16 @@ export default class WeaveC3Barchart extends WeavePanel {
                         position: "outer-middle"
                     },
                     tick: {
-                        fit: false
-                        // format: function(num) {
-                        //     return num.toFixed(2);
-                        // }
+                        fit: false,
+                        format: (num) => {
+                            if(this.groupingMode === "percentStack") {
+                                return d3.format(".0%")(num);
+                            } else {
+                                return FormatUtils.defaultNumberFormatting(num);
+                            }
+                        }
                     }
-                },
-                rotated: false
+                }
             },
             grid: {
                 x: {
@@ -90,6 +108,8 @@ export default class WeaveC3Barchart extends WeavePanel {
             }
         });
 
+        window.chart = this.chart;
+
         this._setupCallbacks();
     }
 
@@ -100,12 +120,10 @@ export default class WeaveC3Barchart extends WeavePanel {
          this._labelColumnPath,
          this._sortColumnPath,
          this._colorColumnPath,
-         this._chartColorsPath].forEach((path) => {
+         this._chartColorsPath,
+         this._plotterPath.push("groupingMode")].forEach((path) => {
             path.addCallback(dataChanged, true, false);
         });
-
-        // var chartColorsChanged = lodash.debounce(this._chartColorsChanged.bind(this), 100);
-        // this._chartColorsPath.addCallback(chartColorsChanged, true, false);
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
         this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
@@ -128,23 +146,9 @@ export default class WeaveC3Barchart extends WeavePanel {
     // }
 
     _plotterChanged() {
-
-        this._updateColumns();
-
-        var groupingMode = this._plotterPath.push("groupingMode").getState();
-        //var horizontalMode = this._plotterPath.push("horizontalMode").getState();
-
-        // set axis rotation mode
-        //this.chart.load({axes: { rotated: horizontalMode }});
-
-        if(groupingMode === "stack") {
-            this.chart.groups([this.heightColumnNames]);
-        } else if(groupingMode === "group") {
-            this.chart.groups([]);
-        } else if(groupingMode === "percentStack") {
-            this.chart.groups([this.heightColumnNames]);
-        }
+        this.groupingMode = this._plotterPath.push("groupingMode").getState();
     }
+
     _updateContents() {
         this.chart.resize({height: jquery(this.element).height(),
                       width: jquery(this.element).width()});
@@ -160,6 +164,10 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 
     _axisChanged () {
+        if(this.busy) {
+            return;
+        }
+
         this.chart.axis.labels({
             x: this._xAxisPath.push("overrideAxisName").getState() || "Sorted by " + this._sortColumnPath.getValue("ColumnUtils.getTitle(this)"),
             y: this._yAxisPath.push("overrideAxisName").getState() || this.heightColumnsLabels.join(", ")
@@ -186,6 +194,9 @@ export default class WeaveC3Barchart extends WeavePanel {
 
     _dataChanged() {
 
+        if(this.busy) {
+            return;
+        }
         this._updateColumns();
 
         var heightColumns = this._heightColumnsPath.getChildren();
@@ -205,7 +216,41 @@ export default class WeaveC3Barchart extends WeavePanel {
         }
 
         this.records = this.toolPath.pushPlotter("plot").retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
-        this.records = lodash.sortBy(this.records, "sort");
+        this.records = lodash.sortByAll(this.records, ["sort", "id"]);
+
+
+        this.groupingMode = this._plotterPath.push("groupingMode").getState();
+        //var horizontalMode = this._plotterPath.push("horizontalMode").getState();
+
+        // set axis rotation mode
+        //this.chart.load({axes: { rotated: horizontalMode }});
+
+        if(this.groupingMode === "stack") {
+            this.chart.groups([this.heightColumnNames]);
+        } else if(this.groupingMode === "group") {
+            this.chart.groups([]);
+        } else if(this.groupingMode === "percentStack") {
+            this.chart.groups([this.heightColumnNames]);
+        }
+
+        if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
+            // normalize the height columns to be percentages.
+            var newValues = this.records.map((record) => {
+                var heights = lodash.pick(record, this.heightColumnNames);
+                var sum = 0;
+                lodash.keys(heights).forEach((key) => {
+                    sum += heights[key];
+                });
+
+                lodash.keys(heights).forEach((key) => {
+                    heights[key] = heights[key] / sum;
+                });
+
+                return heights;
+            });
+
+            this.records = newValues;
+        }
 
         this.keyToIndex = {};
         this.records.forEach((record, index) => {
@@ -232,10 +277,9 @@ export default class WeaveC3Barchart extends WeavePanel {
             colors = {};
         }
 
-        this.chart.load({json: this.records, colors, keys, unload: true, order: null, selection: {enabled: true, multiple: true, done: function() {
-            this._groupingModeChanged();
-        }}});
-
+        this._axisChanged();
+        this.busy = true;
+        this.chart.load({json: this.records, colors, keys, unload: true, done: () => { this.busy = false; }});
     }
 
     _updateStyle() {}

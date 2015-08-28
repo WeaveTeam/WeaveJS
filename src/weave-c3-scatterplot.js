@@ -5,6 +5,7 @@ import jquery from "jquery";
 import lodash from "lodash";
 import d3 from "d3";
 import StandardLib from "./Utils/StandardLib";
+import FormatUtils from "./Utils/FormatUtils";
 
 
 /* private
@@ -29,7 +30,13 @@ function _normalizeRecords (records, attributes) {
         attributes.forEach(function(attr) {
           var min = columnStatsCache[attr].min;
           var max = columnStatsCache[attr].max;
+
+          if(!min || !max || max - min === 0) {
+            return 0;
+          }
+
           if(record[attr]) {
+            console.log( (record[attr] - min) / (max - min));
             obj[attr] = (record[attr] - min) / (max - min);
           } else {
             // if any of the value above is null then
@@ -64,6 +71,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
 
         this._plotterPath.addCallback(() => {
             this.plotterState = this._plotterPath.getState();
+            this._dataChanged();
         }, true);
 
         this._c3Options = {
@@ -81,8 +89,9 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                 color: (color, d) => {
                     if(this.records && d.hasOwnProperty("index")) {
                         var record = this.records[d.index];
-                        return (record && record.fill) ? record.fill.color : "#C0CDD1";
+                        return (record && record.fill && record.fill.color) ? record.fill.color : "#C0CDD1";
                     }
+                    return "#C0CDD1";
                 },
                 onselected: (d, element) => {
                     if(d && d.hasOwnProperty("index")) {
@@ -114,7 +123,8 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                         position: "outer-center"
                     },
                     tick: {
-                        fit: false
+                        fit: false,
+                        format: FormatUtils.defaultNumberFormatting
                     }
                 },
                 y: {
@@ -122,7 +132,8 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                         position: "outer-middle"
                     },
                     tick: {
-                        fit: false
+                        fit: false,
+                        format: FormatUtils.defaultNumberFormatting
                     }
                 }
             },
@@ -180,6 +191,11 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _axisChanged () {
+
+        if(this.busy) {
+            return;
+        }
+
         this.chart.axis.labels({
             x: this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)"),
             y: this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)")
@@ -187,6 +203,9 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _dataChanged() {
+        if(this.busy) {
+            return;
+        }
         let mapping = { point: {
                             x: this._dataXPath,
                             y: this._dataYPath
@@ -229,15 +248,9 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
             }
         });
 
-        this.chart.load({data: lodash.pluck(this.records, "point")});
-    }
-
-    _selectionKeysChanged() {
-        var keys = this._toolPath.selection_keyset.getKeys();
-        var indices = keys.map((key) => {
-            return Number(this.keyToIndex[key]);
-        });
-        this.chart.select("y", indices, true);
+        this._axisChanged();
+        this.busy = true;
+        this.chart.load({data: lodash.pluck(this.records, "point"), unload: true, done: () => { this.busy = false; }});
     }
 
     _selectionKeysChanged() {

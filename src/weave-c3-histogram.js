@@ -4,6 +4,8 @@ import WeavePanel from "./WeavePanel.js";
 import lodash from "lodash";
 import * as WeavePanelManager from "./WeavePanelManager.js";
 import jquery from "jquery";
+import FormatUtils from "./Utils/FormatUtils";
+
 
 export default class WeaveC3Histogram extends WeavePanel {
     constructor(parent, toolPath) {
@@ -91,6 +93,7 @@ export default class WeaveC3Histogram extends WeavePanel {
                         position: "outer-center"
                     },
                     tick: {
+                        multiline: false,
                         format: (d) => {
                             return this._binnedColumnPath.getValue("deriveStringFromNumber")(d);
                         }
@@ -101,10 +104,8 @@ export default class WeaveC3Histogram extends WeavePanel {
                         position: "outer-middle"
                     },
                     tick: {
-                        fit: false
-                        // format: function(num) {
-                        //     return num.toFixed(2);
-                        // }
+                        fit: false,
+                        format: FormatUtils.defaultNumberFormatting
                     }
                 },
                 rotated: false
@@ -160,17 +161,17 @@ export default class WeaveC3Histogram extends WeavePanel {
     }
 
     _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
-        var selectedBins = {};
+        // var keys = this.toolPath.selection_keyset.getKeys();
+        // var selectedBins = {};
 
-        if(this.idToRecord) {
-            keys.forEach((key) => {
-                var bin = this.idToRecord[key].binnedColumn;
-                selectedBins[bin] = true;
-            });
-        }
+        // if(this.idToRecord) {
+        //     keys.forEach((key) => {
+        //         var bin = this.idToRecord[key].binnedColumn;
+        //         selectedBins[bin] = true;
+        //     });
+        // }
 
-        this.chart.select("height", lodash.keys(selectedBins).map(Number), true);
+        // this.chart.select("height", lodash.keys(selectedBins).map(Number), true);
     }
 
       _axisChanged () {
