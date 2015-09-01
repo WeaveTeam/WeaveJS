@@ -12,28 +12,23 @@ import WeaveC3Histogram from "./weave-c3-histogram.js";
 import $ from "jquery";
 import React from "react";
 import Scatterplot from "./react-scatterplot.jsx";
+import Linechart from "./react-linechart.jsx";
+import Layout from "./Layout.jsx";
 
 $(function() {
 
-	var data = {
-		bindTo: "",
-        data: {
-           columns: [
-                ["data1", 30, 200, 100, 400, 150, 250],
-                ["data2", 50, 20, 10, 40, 15, 25]
-            ],
-            type: "scatter"
-        },
-        size: {
-            width: 500,
-            height: 500
-        }
-    };
+	var layout = {
+        v: ["scatterplot", "linechart", "linechart"]
+   };
+
+    // var weaveRootPath = opener.weave;
+    // var weaveRootElemt = $("#weavejs");
+
+
 
 	React.render(
-		<div>
-		<Scatterplot config = {data}/>
-		</div>, $("#react")[0]
+
+        <Layout layout={layout}></Layout>, document.body
 	);
 });
 
