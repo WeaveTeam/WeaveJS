@@ -1,13 +1,10 @@
 import React from "react";
+import VendorPrefix from "react-vendor-prefix";
 
 export default class Pane extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            flex: this.props.flex
-        };
-        console.log(this.props);
     }
 
     render() {
@@ -17,17 +14,19 @@ export default class Pane extends React.Component {
 
         var style = {
             display: "flex",
-            height: "100%",
-            widht: "100%"
+            border: "solid",
+            width: "100%",
+            height: "100%"
         };
 
-        console.log(this.state);
-        if(this.state.flex) {
-            style.flex = this.state.flex;
-        }
+        style.flex = this.props.flex || 100;
+
+        console.log(style.flex);
+
+        const prefixed = VendorPrefix.prefix({styles: style});
 
         return (
-            <div className={classes.join(" ")} style={style}>
+            <div className={classes.join(" ")} style={prefixed.styles}>
                 {this.props.children}
             </div>
         );
