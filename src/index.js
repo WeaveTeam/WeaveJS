@@ -17,19 +17,17 @@ import Layout from "./Layout.jsx";
 
 $(function() {
 
-	var layout = {
-        v: ["scatterplot", "linechart", "linechart"]
+    var layout = {
+        v: ["1", "2"]
    };
 
     // var weaveRootPath = opener.weave;
     // var weaveRootElemt = $("#weavejs");
 
-
-
-	React.render(
+    React.render(
 
         <Layout layout={layout}></Layout>, document.body
-	);
+    );
 });
 
 window.WeavePanelManager = WeavePanelManager;

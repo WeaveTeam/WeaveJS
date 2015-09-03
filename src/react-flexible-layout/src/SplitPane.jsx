@@ -9,11 +9,9 @@ export default class SplitPane extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            active: false,
-            resized: false
-        };
-        console.log(this);
+
+        this.oldMousePos = 0;
+        this.newMousePos = 0;
     }
 
 
@@ -22,11 +20,10 @@ export default class SplitPane extends React.Component {
         document.addEventListener("mousemove", this.onMouseMove.bind(this));
         var refs = [this.refs.pane1, this.refs.pane2];
 
-
         refs.forEach((ref) => {
-            if (ref && !this.state.resized) {
+            if (ref) {
                 ref.setState({
-                    flex: 100
+                    flex: 1
                 });
             }
         });
@@ -37,6 +34,15 @@ export default class SplitPane extends React.Component {
         document.removeEventListener("mousemove", this.onMouseMove);
     }
 
+    onMouseUp (event) {
+        var resizer = this.refs.resizer;
+
+        if(resizer && resizer.state) {
+            resizer.setState({
+                active: false
+            });
+        }
+    }
 
     onMouseMove (event) {
         var resizer = this.refs.resizer;
@@ -47,44 +53,38 @@ export default class SplitPane extends React.Component {
             if (pane1 && pane2) {
                 var element1 = React.findDOMNode(pane1);
                 var element2 = React.findDOMNode(pane2);
+                var container = React.findDOMNode(this);
 
                 if (window.getComputedStyle) {
-                    var styles = window.getComputedStyle(element1);
-                    var width = styles.width.replace("px", "");
-                    var height = styles.height.replace("px", "");
-                    console.log(width);
-                    console.log(height);
-                    var current = this.props.split === "vertical" ? event.clientX : event.clientY;
-                    var size = this.props.split === "vertical" ? width : height;
-                    var position = this.state.position;
+                    var styles1 = window.getComputedStyle(element1);
+                    var width1 = Number(styles1.width.replace("px", ""));
+                    var height1 = Number(styles1.height.replace("px", ""));
 
-                    var delta = position - current;
-                    this.newSize1 = size - delta;
-                    //var newSize2 = size + delta;
+                    var stylec = window.getComputedStyle(container);
+                    var widthc = Number(stylec.width.replace("px", ""));
+                    var heightc = Number(stylec.height.replace("px", ""));
 
-                    this.setState({
-                        position: current,
-                        resized: true
+                    this.newMousePos = this.props.split === "vertical" ? event.clientX : event.clientY;
+                    this.mouseDelta = this.newMousePos - this.oldMousePos;
+                    this.oldMousePos = this.newMousePos;
+
+                    var paneWidth1 = this.props.split === "vertical" ? width1 : height1;
+                    var containerWidth = this.props.split === "vertical" ? widthc : heightc;
+
+                    var newPaneWidth1 = paneWidth1 + this.mouseDelta;
+
+                    pane1.setState({
+                       flex: newPaneWidth1
                     });
 
-                    if (this.newSize1 >= this.props.minSize) {
-                        pane1.setState({
-                            flex: this.newSize1
-                        });
-                    } else {
-                        pane2.setState({
-                            flex: this.props.minSize
-                        });
-                    }
+                    pane2.setState({
+                        flex: containerWidth - newPaneWidth1
+                    });
+
+                    console.log(newPaneWidth1, containerWidth);
                 }
             }
         }
-    }
-
-    onMouseUp () {
-        this.setState({
-            active: false
-        });
     }
 
     merge (into, obj) {
@@ -98,20 +98,31 @@ export default class SplitPane extends React.Component {
         const children = this.props.children;
         const classes = ["SplitPane", "split"];
 
-        var style = {};
+        var style = {
+            display: "flex",
+            flex: 1,
+            position: "relative",
+            outline: "none",
+            overflow: "hidden",
+            userSelect: "none"
+        };
 
         if (split === "horizontal") {
             this.merge(style, {
                 flexDirection: "column",
+                display: "flex",
                 height: "100%",
                 width: "100%",
-                minHeight: "100%"
+                minHeight: "100%",
+                position: "absolute"
             });
         } else {
             this.merge(style, {
                 flexDirection: "row",
+                display: "flex",
                 width: "100%",
-                height: "100%"
+                height: "100%",
+                position: "absolute"
             });
         }
 
@@ -119,9 +130,9 @@ export default class SplitPane extends React.Component {
 
         return (
             <div className={classes.join(" ")} style={prefixed.styles} ref="SplitPane">
-                <Pane ref="pane1" split={split} flex={this.newSize1}> </Pane>
+                <Pane ref="pane1" split={split}>{children[0]}</Pane>
                 <Resizer ref="resizer" key="resizer" split={split}/>
-                <Pane ref="pane2" split={split}> </Pane>
+                <Pane ref="pane2" split={split}>{children[1]}</Pane>
             </div>
         );
     }

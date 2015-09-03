@@ -1,5 +1,6 @@
 import React from "react";
 import SplitPane from "./react-flexible-layout/src/SplitPane.jsx";
+//import SplitPane from "react-split-pane";
 import _ from "lodash";
 
 export default class Layout extends React.Component {
