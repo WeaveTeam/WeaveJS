@@ -9,24 +9,11 @@ export default class SplitPane extends React.Component {
 
     constructor(props) {
         super(props);
-
-        this.oldMousePos = 0;
-        this.newMousePos = 0;
     }
-
 
     componentDidMount () {
         document.addEventListener("mouseup", this.onMouseUp.bind(this));
         document.addEventListener("mousemove", this.onMouseMove.bind(this));
-        var refs = [this.refs.pane1, this.refs.pane2];
-
-        refs.forEach((ref) => {
-            if (ref) {
-                ref.setState({
-                    flex: 1
-                });
-            }
-        });
     }
 
     componentWillUnmount () {
@@ -35,56 +22,52 @@ export default class SplitPane extends React.Component {
     }
 
     onMouseUp (event) {
-        var resizer = this.refs.resizer;
-
-        if(resizer && resizer.state) {
-            resizer.setState({
-                active: false
-            });
-        }
+        this.resizerNames.forEach(resizerName => {
+            var resizer = this.refs[resizerName];
+            if(resizer && resizer.state) {
+                resizer.setState({
+                    active: false
+                });
+            }
+        });
     }
 
     onMouseMove (event) {
-        var resizer = this.refs.resizer;
-        if (resizer.state && resizer.state.active) {
-            var pane1 = this.refs.pane1;
-            var pane2 = this.refs.pane2;
-
-            if (pane1 && pane2) {
+        this.resizerNames.forEach(resizerName => {
+            var resizer = this.refs[resizerName];
+            if (resizer.state && resizer.state.active && window.getComputedStyle) {
+                var pane1 = this.refs[resizer.props.pane1];
+                var pane2 = this.refs[resizer.props.pane2];
                 var element1 = React.findDOMNode(pane1);
                 var element2 = React.findDOMNode(pane2);
+                var element2Style = window.getComputedStyle(element2);
                 var container = React.findDOMNode(this);
+                var rect = container.getBoundingClientRect();
+                var left = window.pageXOffset + rect.left;
+                var top = window.pageYOffset + rect.top;
 
-                if (window.getComputedStyle) {
-                    var styles1 = window.getComputedStyle(element1);
-                    var width1 = Number(styles1.width.replace("px", ""));
-                    var height1 = Number(styles1.height.replace("px", ""));
+                var mousePos, pane1Begin, pane2End;
 
-                    var stylec = window.getComputedStyle(container);
-                    var widthc = Number(stylec.width.replace("px", ""));
-                    var heightc = Number(stylec.height.replace("px", ""));
-
-                    this.newMousePos = this.props.split === "vertical" ? event.clientX : event.clientY;
-                    this.mouseDelta = this.newMousePos - this.oldMousePos;
-                    this.oldMousePos = this.newMousePos;
-
-                    var paneWidth1 = this.props.split === "vertical" ? width1 : height1;
-                    var containerWidth = this.props.split === "vertical" ? widthc : heightc;
-
-                    var newPaneWidth1 = paneWidth1 + this.mouseDelta;
-
-                    pane1.setState({
-                       flex: newPaneWidth1
-                    });
-
-                    pane2.setState({
-                        flex: containerWidth - newPaneWidth1
-                    });
-
-                    console.log(newPaneWidth1, containerWidth);
+                if (this.props.split === "horizontal") {
+                    var right = element2.offsetLeft + Number(element2Style.width.replace("px", ""));
+                    [mousePos, pane1Begin, pane2End] = [event.pageX - left, element1.offsetLeft, right];
                 }
+                else {
+                    var bottom = element2.offsetTop + Number(element2Style.height.replace("px", ""));
+                    [mousePos, pane1Begin, pane2End] = [event.pageY - top, element1.offsetTop, bottom];
+                }
+
+                mousePos = Math.max(pane1Begin + this.props.minSize, Math.min(mousePos, pane2End - this.props.minSize));
+
+                pane1.setState({
+                   flex: mousePos - pane1Begin
+                });
+
+                pane2.setState({
+                    flex: pane2End - mousePos
+                });
             }
-        }
+        });
     }
 
     merge (into, obj) {
@@ -94,7 +77,7 @@ export default class SplitPane extends React.Component {
     }
 
     render() {
-        const split = this.props.split || "vertical";
+        const split = this.props.split || "horizontal";
         const children = this.props.children;
         const classes = ["SplitPane", "split"];
 
@@ -107,32 +90,44 @@ export default class SplitPane extends React.Component {
             userSelect: "none"
         };
 
-        if (split === "horizontal") {
+        if (split === "vertical") {
             this.merge(style, {
                 flexDirection: "column",
                 display: "flex",
                 height: "100%",
-                width: "100%",
-                minHeight: "100%",
-                position: "absolute"
+                width: "100%"
             });
         } else {
             this.merge(style, {
                 flexDirection: "row",
                 display: "flex",
                 width: "100%",
-                height: "100%",
-                position: "absolute"
+                height: "100%"
             });
         }
 
         const prefixed = VendorPrefix.prefix({styles: style});
+        this.resizerNames = [];
+        this.paneNames = [];
+        var newChildren = new Array(children.length * 2 - 1);
+        var i;
+        for (i = 0; i < children.length; i++) {
+            var paneName = "pane" + i;
+            this.paneNames.push(paneName);
+            newChildren[i * 2] = <Pane ref={paneName} key={i * 2} split={split}>{children[i]}</Pane>;
+        }
+
+        for (i = 1; i < newChildren.length - 1; i += 2)
+        {
+            var resizerName = "resizer" + (i / 2);
+            this.resizerNames.push(resizerName);
+            var resizer = <Resizer ref={resizerName} key={i} split={split} pane1={newChildren[i - 1].ref} pane2={newChildren[i + 1].ref}/>;
+            newChildren[i] = resizer;
+        }
 
         return (
-            <div className={classes.join(" ")} style={prefixed.styles} ref="SplitPane">
-                <Pane ref="pane1" split={split}>{children[0]}</Pane>
-                <Resizer ref="resizer" key="resizer" split={split}/>
-                <Pane ref="pane2" split={split}>{children[1]}</Pane>
+            <div className={classes.join(" ")} style={prefixed.styles}>
+                {newChildren}
             </div>
         );
     }

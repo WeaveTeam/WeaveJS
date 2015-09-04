@@ -6,48 +6,39 @@ import _ from "lodash";
 export default class Layout extends React.Component {
     constructor(props) {
         super(props);
+        //this.state = this.props.state;
+        this.state = {id: props.state.id, direction: props.state.direction, children: props.state.children, flex: props.state.flex};
+    }
 
-        if(!props.layout) {
-            // error
-        }
+    onMouseUp (event) {
+    }
 
-        if(typeof props.layout === "string") {
-            this.state = {
-                e: props.layout
-            };
-        } else if(props.layout.v) {
-            this.state = {
-                v: props.layout.v
-            };
-        } else if(props.layout.h) {
-            this.state = {
-                h: props.layout.h
-            };
-        } else {
-            // error
+    handleStateChange()
+    {
+        console.log("on state change");
+        this.setState({
+            children: this.childRefs.map(ref => this.refs[ref])
+        });
+        if (this.props.onStateChange) {
+            this.props.onStateChange();
         }
     }
 
     render() {
-        return (
-                this.state.e ?
-                    <div> {this.state.e} </div>
-                             :
-                    <SplitPane split={this.state.v ? "vertical" : "horizontal"} minSize="100">
-                        {
-                            _.reduce((this.state.v || this.state.h), (result, layout, key) => {
-                                if(result.length === 2) {
-                                    let subLayout = this.state.v ? {v: result} : {h: result};
-                                    result = [<Layout key={key} layout={subLayout}/>];
-                                }
-
-                                result.push(layout);
-                                return result;
-
-                            }, [])
-
-                        }
-                    </SplitPane>
-        );
+        this.childRefs = [];
+        if (this.state.children) {
+            var children = this.state.children.map((childState, i) => {
+                var ref = "child" + i;
+                this.childRefs[i] = ref;
+                console.log(ref, childState, i);
+                var result = <Layout ref={ref} onStateChange={this.handleStateChange.bind(this)} state={childState} key={i}/>;
+                console.log(result);
+                return result;
+            });
+            return <SplitPane state={this.state} onStateChange={this.handleStateChange.bind(this)} split={this.state.direction} minSize={16} flex={this.state.flex}>
+                {children}
+            </SplitPane>;
+        }
+        return <div> {this.state.id} </div>;
     }
 }

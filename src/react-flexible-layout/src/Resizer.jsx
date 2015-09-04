@@ -17,7 +17,7 @@ resizerStyle.basic = {
 //         transition: all 2s ease;
 //     }
 
-resizerStyle.horizontal = {
+resizerStyle.vertical = {
     height: "11px",
     margin: "-5px 0",
     borderTop: "5px solid rgba(255, 255, 255, 0)",
@@ -26,12 +26,12 @@ resizerStyle.horizontal = {
     width: "100%"
 };
 
-    // .Resizer.horizontal:hover {
+    // .Resizer.vertical:hover {
     //     border-top: 5px solid rgba(0, 0, 0, 0.5);
     //     border-bottom: 5px solid rgba(0, 0, 0, 0.5);
     // }
 
-resizerStyle.vertical = {
+resizerStyle.horizontal = {
     width: "11px",
     margin: "0 -5px",
     borderLeft: "5px solid rgba(255, 255, 255, 0)",
@@ -40,7 +40,7 @@ resizerStyle.vertical = {
     height: "100%"
 };
 
-    // .Resizer.vertical:hover {
+    // .Resizer.horizontal:hover {
     //     border-left: 5px solid rgba(0, 0, 0, 0.5);
     //     border-right: 5px solid rgba(0, 0, 0, 0.5);
     // }
@@ -72,11 +72,7 @@ export default class Resizer extends React.Component {
     render() {
         var split = this.props.split;
         var style = resizerStyle.basic;
-        if(split === "vertical") {
-            this.merge(style, resizerStyle.vertical);
-        } else {
-            this.merge(style, resizerStyle.horizontal);
-        }
+        this.merge(style, resizerStyle[split]);
 
         var prefixed = VendorPrefix.prefix({styles: style});
 

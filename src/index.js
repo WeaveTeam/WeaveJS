@@ -17,16 +17,30 @@ import Layout from "./Layout.jsx";
 
 $(function() {
 
-    var layout = {
-        v: ["1", "2"]
-   };
+    var state = {
+        direction: "horizontal",
+        children: [
+            {id: "a", flex: 20},
+            {
+                direction: "vertical",
+                children: [
+                    {id: "b", flex: 30},
+                    {id: "c", flex: 40},
+                    {id: "d", flex: 20}
+                ],
+                flex: 50
+            },
+            {id: "e", flex: 30}
+        ],
+        flex: 100
+    };
 
     // var weaveRootPath = opener.weave;
     // var weaveRootElemt = $("#weavejs");
 
     React.render(
 
-        <Layout layout={layout}></Layout>, document.body
+        <Layout state={state}></Layout>, document.body
     );
 });
 
