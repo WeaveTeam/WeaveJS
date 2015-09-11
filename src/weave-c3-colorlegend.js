@@ -1,6 +1,5 @@
 import c3 from "c3";
-import WeavePanel from "./WeavePanel";
-import * as WeavePanelManager from "./WeavePanelManager.js";
+import {registerToolImplementation} from "./WeaveTool.jsx";
 import jquery from "jquery";
 import lodash from "lodash";
 import StandardLib from "./Utils/StandardLib";
@@ -12,11 +11,11 @@ const SHAPE_TYPE_CIRCLE = "circle";
 const SHAPE_TYPE_SQUARE = "square";
 const SHAPE_TYPE_LINE = "line";
 
-export default class WeaveC3ColorLegend extends WeavePanel {
+export default class WeaveC3ColorLegend {
 
-    constructor(parent, toolPath) {
-        super(parent, toolPath);
-        this._svg = d3.select(this.element[0]).append("svg");
+    constructor(element, toolPath) {
+        this.element = element;
+        this._svg = d3.select(this.element).append("svg");
         this.lookup = {};
         this._plotterPath = toolPath.pushPlotter("plot");
         this.dynamicColorColumnPath = this._plotterPath.push("dynamicColorColumn").push(null);
@@ -80,8 +79,8 @@ export default class WeaveC3ColorLegend extends WeavePanel {
         // clear the svg and rerender everything
         this._svg.selectAll("*").remove();
 
-        var width = jquery(this.element).width();
-        var height = jquery(this.element).height();
+        var width = jquery(this.element).innerWidth();
+        var height = jquery(this.element).innerHeight();
 
         var numOfBins = this.dynamicColorColumnPath.push("internalDynamicColumn")
                                                .push(null)
@@ -183,4 +182,4 @@ export default class WeaveC3ColorLegend extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);
+registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);

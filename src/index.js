@@ -13,35 +13,14 @@ import $ from "jquery";
 import React from "react";
 import Scatterplot from "./react-scatterplot.jsx";
 import Linechart from "./react-linechart.jsx";
-import Layout from "./Layout.jsx";
+import Layout from "./react-flexible-layout/Layout.jsx";
+import {WeaveLayoutManager} from "./WeaveLayoutManager.jsx";
 
 $(function() {
 
-    var state = {
-        direction: "horizontal",
-        children: [
-            {id: "a", flex: 20},
-            {
-                direction: "vertical",
-                children: [
-                    {id: "b", flex: 30},
-                    {id: "c", flex: 40},
-                    {id: "d", flex: 20}
-                ],
-                flex: 50
-            },
-            {id: "e", flex: 30}
-        ],
-        flex: 100
-    };
-
-    // var weaveRootPath = opener.weave;
-    // var weaveRootElemt = $("#weavejs");
+    var weave = opener.weave;
 
     React.render(
-
-        <Layout state={state}></Layout>, document.body
+        <WeaveLayoutManager weave={weave}/>, document.body
     );
 });
-
-window.WeavePanelManager = WeavePanelManager;

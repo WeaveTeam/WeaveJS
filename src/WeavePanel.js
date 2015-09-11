@@ -16,7 +16,7 @@ function percentToNumber(percentString)
 
 export default class {
 
-    constructor(parent, toolPath) {
+    constructor(parent, toolPath, ToolClass) {
         this.toolPath = toolPath;
         this.parent = parent;
 
@@ -29,6 +29,7 @@ export default class {
             .css("background", "rgba(255, 255, 255, 1.0)")
             .css("position", "absolute");
 
+        this.tool = new ToolClass(this.element, toolPath);
         var boundFunc = lodash.debounce(this._panelChanged.bind(this), 100);
 
         jquery(window).resize(boundFunc);
@@ -69,5 +70,6 @@ export default class {
 
     destroy() {
         this.element.remove();
+        this.tool.destroy();
     }
 }

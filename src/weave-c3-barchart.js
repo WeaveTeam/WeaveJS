@@ -1,17 +1,16 @@
 import d3 from "d3";
 import c3 from "c3";
-import WeavePanel from "./WeavePanel";
-import * as WeavePanelManager from "./WeavePanelManager.js";
+import {registerToolImplementation} from "./WeaveTool.jsx";
 import jquery from "jquery";
 import lodash from "lodash";
 import StandardLib from "./Utils/StandardLib";
 import FormatUtils from "./Utils/FormatUtils";
 
-export default class WeaveC3Barchart extends WeavePanel {
-    constructor(parent, toolPath) {
-        super(parent, toolPath);
-
-        this._plotterPath = this.toolPath.pushPlotter("plot");
+export default class WeaveC3Barchart {
+    constructor(element, toolPath) {
+        this.element = element;
+        this._toolPath = toolPath;
+        this._plotterPath = this._toolPath.pushPlotter("plot");
         this._heightColumnsPath = this._plotterPath.push("heightColumns");
         this._labelColumnPath = this._plotterPath.push("labelColumn");
         this._sortColumnPath = this._plotterPath.push("sortColumn");
@@ -29,10 +28,7 @@ export default class WeaveC3Barchart extends WeavePanel {
         this.busy = false;
 
         this.chart = c3.generate({
-            size: {
-                width: jquery(this.element).width(),
-                height: jquery(this.element).height()
-            },
+            size: this._getElementSize(),
             data: {
                 json: [],
                 type: "bar",
@@ -97,7 +93,7 @@ export default class WeaveC3Barchart extends WeavePanel {
                     show: true
                 }
             },
-            bindto: this.element[0],
+            bindto: this.element,
             bar: {
                 width: {
                     ratio: 0.8
@@ -107,8 +103,6 @@ export default class WeaveC3Barchart extends WeavePanel {
                 show: false
             }
         });
-
-        window.chart = this.chart;
 
         this._setupCallbacks();
     }
@@ -126,7 +120,7 @@ export default class WeaveC3Barchart extends WeavePanel {
         });
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
-        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+        this._toolPath.selection_keyset.addCallback(selectionChanged, true, false);
 
         var axisChanged = lodash.debounce(this._axisChanged.bind(this), 100);
         [this._heightColumnsPath,
@@ -142,7 +136,7 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 
     // _teardownCallbacks() {
-    //     this.toolPath.selection_keyset.removeCallback(this._selectionKeysChanged);
+    //     this._toolPath.selection_keyset.removeCallback(this._selectionKeysChanged);
     // }
 
     _plotterChanged() {
@@ -150,12 +144,18 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 
     _updateContents() {
-        this.chart.resize({height: jquery(this.element).height(),
-                      width: jquery(this.element).width()});
+        this.chart.resize(this._getElementSize());
+    }
+
+    _getElementSize() {
+        return {
+            width: this.element.clientWidth,
+            height: this.element.clientHeight
+        };
     }
 
     _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
+        var keys = this._toolPath.selection_keyset.getKeys();
         // var indices = this.indexCache.pick(keys).values();
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
@@ -191,7 +191,6 @@ export default class WeaveC3Barchart extends WeavePanel {
         }
     }
 
-
     _dataChanged() {
 
         if(this.busy) {
@@ -215,7 +214,7 @@ export default class WeaveC3Barchart extends WeavePanel {
             mapping[name] = column;
         }
 
-        this.records = this.toolPath.pushPlotter("plot").retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
+        this.records = this._toolPath.pushPlotter("plot").retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
         this.records = lodash.sortByAll(this.records, ["sort", "id"]);
 
 
@@ -292,4 +291,4 @@ export default class WeaveC3Barchart extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
+registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);

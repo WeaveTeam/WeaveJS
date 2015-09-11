@@ -1,16 +1,15 @@
 import c3 from "c3";
 import d3 from "d3";
-import WeavePanel from "./WeavePanel.js";
 import lodash from "lodash";
-import * as WeavePanelManager from "./WeavePanelManager.js";
+import {registerToolImplementation} from "./WeaveTool.jsx";
 import jquery from "jquery";
 
-export default class WeaveC3PieChart extends WeavePanel {
-    constructor(parent, toolPath) {
-        super(parent, toolPath);
+export default class WeaveC3PieChart {
+    constructor(element, toolPath) {
+        this.element = element;
 
         this._toolPath = toolPath;
-        this._plotterPath = this.toolPath.pushPlotter("plot");
+        this._plotterPath = this._toolPath.pushPlotter("plot");
 
         this._dataPath = this._plotterPath.push("data");
         this._labelPath = this._plotterPath.push("label");
@@ -19,10 +18,7 @@ export default class WeaveC3PieChart extends WeavePanel {
         this._fillStylePath = this._plotterPath.push("fill");
 
         this.config = {
-            size: {
-                width: jquery(this.element).width(),
-                height: jquery(this.element).height()
-            },
+            size: this._getElementSize(),
             data: {
                 columns: [],
                 selection: {
@@ -81,7 +77,7 @@ export default class WeaveC3PieChart extends WeavePanel {
                     }
                 }
             },
-            bindto: this.element[0],
+            bindto: this.element,
             legend: {
                 show: false
             },
@@ -111,12 +107,18 @@ export default class WeaveC3PieChart extends WeavePanel {
     }
 
     _updateContents() {
-        this.chart.resize({height: jquery(this.element).height(),
-                      width: jquery(this.element).width()});
+        this.chart.resize(this._getElementSize());
+    }
+
+    _getElementSize() {
+        return {
+            height: jquery(this.element).innerHeight(),
+            width: jquery(this.element).innerWidth()
+        };
     }
 
     _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
+        var keys = this._toolPath.selection_keyset.getKeys();
         if(keys.length) {
             this.chart.focus(keys);
         } else {
@@ -187,4 +189,4 @@ export default class WeaveC3PieChart extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::PieChartTool", WeaveC3PieChart);
+registerToolImplementation("weave.visualization.tools::PieChartTool", WeaveC3PieChart);

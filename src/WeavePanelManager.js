@@ -1,6 +1,6 @@
 import jquery from "jquery";
 import lodash from "lodash";
-
+import WeavePanel from "./WeavePanel.js";
 /**
  * Weave panel manager "singleton" module
  */
@@ -12,13 +12,13 @@ var weaveRootPath = null;
 
 function _createTool(parent, path) {
     var ToolClass = toolRegistry[path.getType()];
-    var tool;
+    var panel;
 
     if (ToolClass)
     {
-        tool = new ToolClass(parent, path);
+        panel = new WeavePanel(parent, path, ToolClass);
     }
-    return tool;
+    return panel;
 }
 
 function _toolsChanged() {

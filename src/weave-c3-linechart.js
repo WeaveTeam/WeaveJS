@@ -1,18 +1,18 @@
 import c3 from "c3";
 import d3 from "d3";
-import WeavePanel from "./WeavePanel.js";
 import lodash from "lodash";
-import StandardLib from "./Utils/StandardLib";
-import * as WeavePanelManager from "./WeavePanelManager.js";
+import {registerToolImplementation} from "./WeaveTool.jsx";
 import jquery from "jquery";
 import FormatUtils from "./Utils/FormatUtils";
 
 
-export default class WeaveC3LineChart extends WeavePanel {
-    constructor(parent, toolPath) {
-        super(parent, toolPath);
+export default class WeaveC3LineChart {
+    constructor(element, toolPath) {
+        this.element = element;
 
-        this._plotterPath = this.toolPath.pushPlotter("plot");
+        this._toolPath = toolPath;
+
+        this._plotterPath = this._toolPath.pushPlotter("plot");
         this._columnsPath = this._plotterPath.push("columns");
         this._lineStylePath = this._plotterPath.push("lineStyle");
 
@@ -20,10 +20,7 @@ export default class WeaveC3LineChart extends WeavePanel {
         this._yAxisPath = toolPath.pushPlotter("yAxis");
 
         this.chart = c3.generate({
-            size: {
-                width: jquery(this.element).width(),
-                height: jquery(this.element).height()
-            },
+            size: this._getElementSize(),
             data: {
                 columns: [],
                 xSort: false,
@@ -59,7 +56,7 @@ export default class WeaveC3LineChart extends WeavePanel {
                     }
                 }
             },
-            bindto: this.element[0],
+            bindto: this.element,
             legend: {
                 show: false
             },
@@ -80,16 +77,22 @@ export default class WeaveC3LineChart extends WeavePanel {
         });
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
-        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+        this._toolPath.selection_keyset.addCallback(selectionChanged, true, false);
     }
 
     _updateContents() {
-        this.chart.resize({height: jquery(this.element).height(),
-                      width: jquery(this.element).width()});
+        this.chart.resize(this._getElementSize());
+    }
+
+    _getElementSize() {
+        return {
+            height: jquery(this.element).innerHeight(),
+            width: jquery(this.element).innerWidth()
+        };
     }
 
     _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
+        var keys = this._toolPath.selection_keyset.getKeys();
         if(keys.length) {
             this.chart.focus(keys);
         } else {
@@ -152,4 +155,4 @@ export default class WeaveC3LineChart extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::LineChartTool", WeaveC3LineChart);
+registerToolImplementation("weave.visualization.tools::LineChartTool", WeaveC3LineChart);

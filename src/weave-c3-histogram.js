@@ -1,19 +1,17 @@
 import c3 from "c3";
-import d3 from "d3";
-import WeavePanel from "./WeavePanel.js";
 import lodash from "lodash";
-import * as WeavePanelManager from "./WeavePanelManager.js";
+import {registerToolImplementation} from "./WeaveTool.jsx";
 import jquery from "jquery";
 import FormatUtils from "./Utils/FormatUtils";
 
 
-export default class WeaveC3Histogram extends WeavePanel {
-    constructor(parent, toolPath) {
-        super(parent, toolPath);
+export default class WeaveC3Histogram {
+    constructor(element, toolPath) {
+        this.element = element;
 
         this._toolPath = toolPath;
 
-        this._plotterPath = this.toolPath.pushPlotter("plot");
+        this._plotterPath = toolPath.pushPlotter("plot");
 
         this._binnedColumnPath = this._plotterPath.push("binnedColumn");
 
@@ -34,10 +32,7 @@ export default class WeaveC3Histogram extends WeavePanel {
         this.records = [];
 
         this.chart = c3.generate({
-            size: {
-                width: jquery(this.element).width(),
-                height: jquery(this.element).height()
-            },
+            size: this._getElementSize(),
             data: {
                 columns: [],
                 selection: {
@@ -52,7 +47,7 @@ export default class WeaveC3Histogram extends WeavePanel {
                     }
                     return "#C0CDD1";
                },
-               onselected: (d, element) => {
+               onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         var selectedIds = this._binnedColumnPath.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
                             return this._toolPath.qkeyToString(qKey);
@@ -60,7 +55,7 @@ export default class WeaveC3Histogram extends WeavePanel {
                         this._toolPath.selection_keyset.addKeys(selectedIds);
                     }
                 },
-                onunselected: (d, element) => {
+                onunselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         var unSelectedIds = this._binnedColumnPath.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
                             return this._toolPath.qkeyToString(qKey);
@@ -82,7 +77,7 @@ export default class WeaveC3Histogram extends WeavePanel {
                     }
                 }
             },
-            bindto: this.element[0],
+            bindto: this.element,
             legend: {
                 show: false
             },
@@ -156,12 +151,18 @@ export default class WeaveC3Histogram extends WeavePanel {
     }
 
     _updateContents() {
-        this.chart.resize({height: jquery(this.element).height(),
-                   width: jquery(this.element).width()});
+        this.chart.resize(this._getElementSize());
+    }
+
+    _getElementSize() {
+        return {
+            height: jquery(this.element).innerHeight(),
+            width: jquery(this.element).innerWidth()
+        };
     }
 
     _selectionKeysChanged() {
-        // var keys = this.toolPath.selection_keyset.getKeys();
+        // var keys = this._toolPath.selection_keyset.getKeys();
         // var selectedBins = {};
 
         // if(this.idToRecord) {
@@ -300,4 +301,4 @@ export default class WeaveC3Histogram extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
+registerToolImplementation("weave.visualization.tools::HistogramTool", WeaveC3Histogram);

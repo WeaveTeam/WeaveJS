@@ -1,6 +1,5 @@
 import c3 from "c3";
-import WeavePanel from "./WeavePanel";
-import * as WeavePanelManager from "./WeavePanelManager.js";
+import {registerToolImplementation} from "./WeaveTool.jsx";
 import jquery from "jquery";
 import lodash from "lodash";
 import d3 from "d3";
@@ -49,11 +48,10 @@ function _normalizeRecords (records, attributes) {
     });
 }
 
-export default class WeaveC3ScatterPlot extends WeavePanel {
+export default class WeaveC3ScatterPlot {
 
-    constructor(parent, toolPath) {
-        super(parent, toolPath);
-
+    constructor(element, toolPath) {
+        this.element = element;
         this._toolPath = toolPath;
         this._visualizationPath = toolPath.push("children", "visualization");
         this._plotterPath = toolPath.pushPlotter("plot");
@@ -75,7 +73,7 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
         }, true);
 
         this._c3Options = {
-            bindto: this.element[0],
+            bindto: this.element,
             data: {
                 rows: [],
                 x: "x",
@@ -93,12 +91,12 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
                     }
                     return "#C0CDD1";
                 },
-                onselected: (d, element) => {
+                onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         this._toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
                     }
                 },
-                onunselected: (d, element) => {
+                onunselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         this._toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
                     }
@@ -181,13 +179,17 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 
     _updateContents () {
-        var size = {
-                height: jquery(this.element).height(),
-                width: jquery(this.element).width()
-        };
+        var size = this._getElementSize();
         if(this.chart) {
             this.chart.resize(size);
         }
+    }
+
+    _getElementSize() {
+        return {
+            width: jquery(this.element).innerWidth(),
+            height: jquery(this.element).innerHeight()
+        };
     }
 
     _axisChanged () {
@@ -281,4 +283,4 @@ export default class WeaveC3ScatterPlot extends WeavePanel {
     }
 }
 
-WeavePanelManager.registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
+registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
