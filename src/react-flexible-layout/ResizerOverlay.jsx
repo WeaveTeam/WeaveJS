@@ -5,6 +5,8 @@ var resizerStyle = {};
 
 var HORIZONTAL = "horizontal";
 
+var mousevents = ["mouseover", "mouseout", "mouseleave"];
+
 resizerStyle.basic = {
     background: "#000",
     opacity: .3,
@@ -14,32 +16,17 @@ resizerStyle.basic = {
     position: "absolute"
 };
 
-// var Resizer:hover {
-//         -webkit-transition: all 2s ease;
-//         transition: all 2s ease;
-//     }
-
 resizerStyle.vertical = {
     height: "4px",
     cursor: "row-resize",
     width: "100%"
 };
 
-    // .Resizer.vertical:hover {
-    //     border-top: 5px solid rgba(0, 0, 0, 0.5);
-    //     border-bottom: 5px solid rgba(0, 0, 0, 0.5);
-    // }
-
 resizerStyle.horizontal = {
     width: "4px",
     cursor: "col-resize",
     height: "100%"
 };
-
-    // .Resizer.horizontal:hover {
-    //     border-left: 5px solid rgba(0, 0, 0, 0.5);
-    //     border-right: 5px solid rgba(0, 0, 0, 0.5);
-    // }
 
 export default class ResizerOverlay extends React.Component {
 
@@ -53,17 +40,23 @@ export default class ResizerOverlay extends React.Component {
     componentDidMount() {
         this.element = React.findDOMNode(this);
         document.addEventListener("mousemove", this._onMouseMove = this.onMouseMove.bind(this), true);
+        mousevents.forEach( (mouseevent) => document.addEventListener(mouseevent, this._stopEventPropagation = this.stopEventPropagation.bind(this), true));
     }
 
     componentWillUnmount() {
         document.removeEventListener("mousemove", this._onMouseMove);
+        mousevents.forEach( (mouseevent) => document.removeEventListener(mouseevent, this._stopEventPropagation));
+    }
+
+    stopEventPropagation(event) {
+        if(this.state.active) {
+            event.stopImmediatePropagation();
+        }
     }
 
     onMouseMove (event) {
-
         if(this.state.active) {
-            console.log("stpfa0");
-            event.stopPropagation();
+            event.stopImmediatePropagation();
             var container = this.element.parentNode;
             var rect = container.getBoundingClientRect();
             var left = window.pageXOffset + rect.left;

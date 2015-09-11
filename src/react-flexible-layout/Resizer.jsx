@@ -1,7 +1,6 @@
 import React from "react";
 import VendorPrefix from "react-vendor-prefix";
 
-var OVERLAY = "overlay";
 var HORIZONTAL = "horizontal";
 
 var resizerStyle = {};
@@ -54,6 +53,7 @@ export default class Resizer extends React.Component {
         let element = React.findDOMNode(this);
         element.addEventListener("mousedown", this._onMouseDown = this.onMouseDown.bind(this));
     }
+
     componentWillUnmount () {
         let element = React.findDOMNode(this);
         element.removeEventListener("mousedown", this._onMouseDown);

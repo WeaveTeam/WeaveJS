@@ -25,8 +25,9 @@ export default class Layout extends React.Component {
         document.addEventListener("mouseup", this._onMouseUp = this.onMouseUp.bind(this));
         document.addEventListener("mousedown", this._onMouseDown = this.onMouseDown.bind(this));
 
-
         this.element = React.findDOMNode(this);
+
+        this.element.addEventListener("mousemove", this._onMouseMove = this.onMouseMove.bind(this));
     }
 
     componentWillReceiveProps (nextProps) {
@@ -36,6 +37,7 @@ export default class Layout extends React.Component {
     componentWillUnmount () {
         document.removeEventListener("mousedown", this._onMouseDown);
         document.removeEventListener("mouseup", this._onMouseUp);
+        document.removeEventListener("mouseMove", this._onMouseMove);
     }
 
     shouldComponentUpdate (nextProps, nextState) {
@@ -73,9 +75,17 @@ export default class Layout extends React.Component {
                     active: true,
                     range: overlayRange
                 });
-                console.log(resizerName, resizer.props.pane1, resizer.props.pane2, this.getResizerRange(resizer));
             }
         });
+    }
+
+    onMouseMove () {
+        if(this.grabberActive) {
+            console.log("mouse over on layout", this);
+        }
+
+
+        // handle the shadded area
     }
 
     getResizerRange(resizer) {
@@ -134,9 +144,10 @@ export default class Layout extends React.Component {
             }
         });
 
+        this.grabberActive = false;
     }
 
-    handleStateChange()
+    handleStateChange ()
     {
         this.setState({
             children: this.childNames.map(ref => this.refs[ref].state)
@@ -158,6 +169,12 @@ export default class Layout extends React.Component {
             flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
         };
 
+        var grabber = {
+            width: "32",
+            height: "32",
+            cursor: "move"
+        };
+
         if (this.state.children) {
             var newChildren = new Array(this.state.children.length * 2 - 1);
 
@@ -175,13 +192,12 @@ export default class Layout extends React.Component {
                 var resizer = <Resizer ref={resizerName} key={i} direction={this.state.direction} pane1={newChildren[i - 1].ref} pane2={newChildren[i + 1].ref}/>;
                 newChildren[i] = resizer;
             }
-
-
         }
 
         var prefixed = VendorPrefix.prefix({styles: style});
 
         return <div style={prefixed.styles}>
+                    { this.state.id ? <div onMouseDown={() => { this.grabberActive = true; } } style={grabber}/> : ""}
                     {newChildren}
                     <ResizerOverlay ref={RESIZEROVERLAY} direction={this.state.direction}/>
                </div>;
