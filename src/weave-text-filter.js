@@ -28,7 +28,7 @@ export default class WeaveTextFilter {
 		}
 		else if (firstEntry && typeof firstEntry === "object" && firstEntry.regexp)
 		{
-			value = firstEntry.regexp.slice(2, -2);
+			value = firstEntry.regexp;
 		}
 		else
 		{
