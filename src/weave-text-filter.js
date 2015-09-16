@@ -19,7 +19,23 @@ export default class WeaveTextFilter {
 
 	_filterChanged() {
 		var valuesPath = this._filterPath.push(null, "values");
-		this._textField.val(valuesPath.getState()[0]);
+
+		var firstEntry = valuesPath.getState() && valuesPath.getState()[0];
+		var value;
+		if (typeof firstEntry === "string")
+		{
+			value = firstEntry;
+		}
+		else if (firstEntry && typeof firstEntry === "object" && firstEntry.regexp)
+		{
+			value = firstEntry.regexp.slice(2, -2);
+		}
+		else
+		{
+			value = "";
+		}
+
+		this._textField.val(value);
 
 		var columnPath = this._filterPath.push(null, "column");
 
@@ -32,7 +48,7 @@ export default class WeaveTextFilter {
 		var value = this._textField.val();
 		if (value && value.length)
 		{
-			valuesPath.state([value]);
+			valuesPath.state([{regexp: value}]);
 			enabledPath.state(true);
 		}
 		else
