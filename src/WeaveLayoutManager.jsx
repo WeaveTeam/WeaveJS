@@ -12,7 +12,7 @@ export class WeaveLayoutManager extends React.Component {
 
         this.weave = this.props.weave;
         this.state = {
-            layout: this.weave.path(LAYOUT).request("LinkableVariable").getState()
+            layout: this.weave.path(LAYOUT).request("FlexibleLayout").getState()
         };
         this._boundHandleStateChange = this.handleStateChange.bind(this);
 
@@ -26,7 +26,7 @@ export class WeaveLayoutManager extends React.Component {
         this.weave.path(LAYOUT).addCallback(_.debounce(this._layoutChanged.bind(this), 100));
     }
 
-    ComponentWillUnmount() {
+    componentWillUnmount() {
         window.removeEventListener("resize", this._forceUpdate);
     }
 
@@ -42,9 +42,12 @@ export class WeaveLayoutManager extends React.Component {
         });
     }
 
-    render () {
+    onDragStart(id) {
+        this.refs[LAYOUT].startDrag(id);
+        console.log("drag start");
+    }
 
-        //console.log("rendered");
+    render () {
         this.weave.path(LAYOUT).state(this.state.layout);
         var paths = this.weave.path().getChildren();
         var children = [];
@@ -62,19 +65,21 @@ export class WeaveLayoutManager extends React.Component {
             var toolPosition;
             if(impl) {
                 if(this.refs[LAYOUT] && rect) {
-                    node = this.refs[LAYOUT].getDOMNodeFromId(toolName);
-                    toolRect = node.getBoundingClientRect();
-                    toolPosition = {
-                        top: toolRect.top - rect.top + this.margin,
-                        left: toolRect.left - rect.left + this.margin,
-                        width: toolRect.right - toolRect.left - 2 * this.margin,
-                        height: toolRect.bottom - toolRect.top - 2 * this.margin,
-                        position: "absolute"
-                    };
-                    toolPosition.maxHeight = toolPosition.height;
-                    toolPosition.maxWidth = toolPosition.width;
+                    node = this.refs[LAYOUT].getDOMNodeFromId(path.getPath());
+                    if(node) {
+                        toolRect = node.getBoundingClientRect();
+                        toolPosition = {
+                            top: toolRect.top - rect.top,
+                            left: toolRect.left - rect.left,
+                            width: toolRect.right - toolRect.left,
+                            height: toolRect.bottom - toolRect.top,
+                            position: "absolute"
+                        };
+                        toolPosition.maxHeight = toolPosition.height;
+                        toolPosition.maxWidth = toolPosition.width;
+                    }
                 }
-                children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} style={toolPosition}/>);
+                children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} onDragStart={this.onDragStart.bind(this, path.getPath())} margin={this.margin} style={toolPosition}/>);
             }
         }
         return (

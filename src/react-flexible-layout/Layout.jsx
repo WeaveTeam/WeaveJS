@@ -52,7 +52,7 @@ export default class Layout extends React.Component {
     }
 
     getDOMNodeFromId (id) {
-        if(this.state.id && this.state.id === id) {
+        if(this.state.id && _.isEqual(this.state.id, id)) {
             return this.element;
         } else {
             for(var i = 0; i < this.childNames.length; i++) {
@@ -143,7 +143,6 @@ export default class Layout extends React.Component {
                 this.handleStateChange();
             }
         });
-
         this.grabberActive = false;
     }
 
@@ -152,6 +151,10 @@ export default class Layout extends React.Component {
         this.setState({
             children: this.childNames.map(ref => this.refs[ref].state)
         });
+    }
+
+    startDrag (id) {
+        console.log("start drag in layout", id);
     }
 
     render() {
@@ -167,12 +170,6 @@ export default class Layout extends React.Component {
             overflow: "hidden",
             userSelect: "none",
             flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
-        };
-
-        var grabber = {
-            width: "32",
-            height: "32",
-            cursor: "move"
         };
 
         if (this.state.children) {
@@ -197,7 +194,6 @@ export default class Layout extends React.Component {
         var prefixed = VendorPrefix.prefix({styles: style});
 
         return <div style={prefixed.styles}>
-                    { this.state.id ? <div onMouseDown={() => { this.grabberActive = true; } } style={grabber}/> : ""}
                     {newChildren}
                     <ResizerOverlay ref={RESIZEROVERLAY} direction={this.state.direction}/>
                </div>;

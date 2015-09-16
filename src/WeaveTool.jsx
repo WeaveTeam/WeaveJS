@@ -25,7 +25,7 @@ export class WeaveTool extends React.Component {
 
     componentDidMount() {
         var ToolClass = getToolImplementation(this.toolPath.getType());
-        this.tool = new ToolClass(React.findDOMNode(this), this.toolPath);
+        this.tool = new ToolClass(React.findDOMNode(this.refs.toolDiv), this.toolPath);
         this.updateContents = _.debounce(this.tool._updateContents.bind(this.tool), 50);
     }
 
@@ -38,6 +38,21 @@ export class WeaveTool extends React.Component {
     }
 
     render() {
-        return <div style={this.props.style}/>;
+        var grabber = {
+            width: "16",
+            height: "16",
+            cursor: "move",
+            background: "url(http://placehold.it/32x32)"
+        };
+
+        return (
+            <div style={this.props.style}>
+                <div>
+                    <div onMouseDown={() => { this.props.onStartDrag(); } } style={grabber}/>
+                </div>
+                <div style={{padding: this.props.margin}}>
+                    <div ref="toolDiv" style={{width: "100%", height: "100%"}}/>
+                </div>
+            </div>);
     }
 }
