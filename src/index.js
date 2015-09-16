@@ -10,6 +10,7 @@ import SimpleAxisPlotter from "./weave/visualization/plotters/SimpleAxisPlotter.
 import WeaveTextFilter from "./weave-text-filter.js";
 import WeaveC3PieChart from "./weave-c3-piechart.js";
 import WeaveC3Histogram from "./weave-c3-histogram.js";
+import WeaveReactTable from "./weave-react-table.jsx";
 import $ from "jquery";
 import React from "react";
 import Scatterplot from "./react-scatterplot.jsx";
