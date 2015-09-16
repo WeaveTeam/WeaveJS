@@ -28,8 +28,29 @@ export default class WeaveTextFilter {
 	}
 	_entryChanged() {
 		var valuesPath = this._filterPath.push(null, "values");
-		valuesPath.state([this._textField.val()]);
+		var enabledPath = this._filterPath.push(null, "enabled");
+		var value = this._textField.val();
+		if (value && value.length)
+		{
+			valuesPath.state([value]);
+			enabledPath.state(true);
+		}
+		else
+		{
+			enabledPath.state(false);
+			valuesPath.state(null);
+		}
 	}
+
+	_updateContents() {
+		return;
+	}
+
+	destroy() {
+		return;
+	}
+
+
 }
 
 registerToolImplementation("weave.ui::DataFilterTool", WeaveTextFilter);
