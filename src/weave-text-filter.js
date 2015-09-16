@@ -19,7 +19,23 @@ export default class WeaveTextFilter {
 
 	_filterChanged() {
 		var valuesPath = this._filterPath.push(null, "values");
-		this._textField.val(valuesPath.getState()[0]);
+
+		var firstEntry = valuesPath.getState() && valuesPath.getState()[0];
+		var value;
+		if (typeof firstEntry === "string")
+		{
+			value = firstEntry;
+		}
+		else if (firstEntry && typeof firstEntry === "object" && firstEntry.regexp)
+		{
+			value = firstEntry.regexp;
+		}
+		else
+		{
+			value = "";
+		}
+
+		this._textField.val(value);
 
 		var columnPath = this._filterPath.push(null, "column");
 
@@ -28,8 +44,30 @@ export default class WeaveTextFilter {
 	}
 	_entryChanged() {
 		var valuesPath = this._filterPath.push(null, "values");
-		valuesPath.state([this._textField.val()]);
+		var enabledPath = this._filterPath.push(null, "enabled");
+		var value = this._textField.val();
+		if (value && value.length)
+		{
+			valuesPath.state([{regexp: value}]);
+			enabledPath.state(true);
+		}
+		else
+		{
+			enabledPath.state(false);
+			valuesPath.state(null);
+		}
 	}
+
+	_updateContents() {
+		return;
+	}
+
+	destroy() {
+		return;
+	}
+
+
 }
 
 registerToolImplementation("weave.ui::DataFilterTool", WeaveTextFilter);
+
