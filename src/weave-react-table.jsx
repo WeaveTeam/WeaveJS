@@ -38,6 +38,8 @@ class DataGrid extends React.Component {
             rows: []
         };
 
+        this._toolPath.push("selectionKeySet").addCallback(this._selectionKeysChanged.bind(this), true, false);
+
         this.SELECTED_ID = {};
     }
 
@@ -46,9 +48,22 @@ class DataGrid extends React.Component {
         this.setState({});
     }
 
+    _selectionKeysChanged () {
+        var keys = this._toolPath.push("selectionKeySet", null).getKeys();
+        this.SELECTED_ID = keys;
+        this.refs.grid.setState({
+            selected: keys
+        });
+        console.log(this.refs.grid);
+        // var indices = keys.map((key) => {
+        //     return Number(this.keyToIndex[key]);
+        // });
+    }
+
     _setupCallbacks() {
         var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
         this._columnsPath.addCallback(dataChanged, true, false);
+        opener.weave.path("defaultSubsetKeyFilter").addCallback(dataChanged, true, false);
     }
 
     _dataChanged() {
@@ -63,19 +78,20 @@ class DataGrid extends React.Component {
         this.setState({records, columns});
     }
 
-    onSelectionChange() {
-
+    onSelectionChange(selectedIds) {
+        this._toolPath.push("selectionKeySet", null).setKeys(selectedIds);
     }
 
     render() {
         return <ReactDataGrid
+                    ref="grid"
                     idProperty="id"
                     dataSource={this.state.records}
                     columns={this.state.columns}
                     style={{height: 400}}
-                    onColumnResize={this.onColumnResize}
+                    onColumnResize={this.onColumnResize.bind(this)}
                     selected={this.SELECTED_ID}
-                    onSelectionChange={this.onSelectionChange}
+                    onSelectionChange={this.onSelectionChange.bind(this)}
                     showCellBorders={true}/>;
     }
 }
