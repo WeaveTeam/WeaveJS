@@ -14,32 +14,7 @@ $(function ()
 	
 });
 </script>
-
-<script type="text/javascript" src="swfobject.js"></script>
-<script type="text/javascript">
-    // For version detection, set to min. required Flash Player version, or 0 (or 0.0.0), for no version detection. 
-    var swfVersionStr = "10.2.0";
-    // To use express install, set to playerProductInstall.swf, otherwise the empty string. 
-    var xiSwfUrlStr = "playerProductInstall.swf";
-    var flashvars = {};
-    var params = {};
-    params.quality = "high";
-    params.bgcolor = "#869ca7";
-    params.allowscriptaccess = "sameDomain";
-    params.allowfullscreen = "true";
-    var attributes = {};
-    attributes.id = "weave";
-    attributes.name = "weave";
-    attributes.align = "middle";
-    swfobject.embedSWF(
-        "weave.swf", "flashContent", 
-        "100%", "50%", 
-        swfVersionStr, xiSwfUrlStr, 
-        flashvars, params, attributes);
-    // JavaScript enabled so display the flashContent div in case it is not replaced with a swf object.
-    swfobject.createCSS("#flashContent", "display:block;text-align:left;");
-</script>
-
+<script type="text/javascript" src="../swfobject.js"></script>
 </head>
 
 
@@ -90,5 +65,33 @@ $(function ()
         <!--<![endif]-->
     </object>
 </noscript>
+<script type="text/javascript">
+        var loadFlashContent = function() {
+            var swfVersionStr = "10.2.0";
+            // To use express install, set to playerProductInstall.swf, otherwise the empty string. 
+            var xiSwfUrlStr = "playerProductInstall.swf";
+            var flashvars = {};
+            var params = {};
+            params.quality = "high";
+            params.bgcolor = "#869ca7";
+            params.allowscriptaccess = "sameDomain";
+            params.allowfullscreen = "true";
+            params.base = window.location.protocol+"//"+window.location.host;
+            var attributes = {};
+            attributes.id = "weave";
+            attributes.name = "weave";
+            attributes.align = "middle";
+            swfobject.embedSWF(
+                "/weave.swf", "flashContent", 
+                "100%", "100%", 
+                swfVersionStr, xiSwfUrlStr, 
+                flashvars, params, attributes);
+            // JavaScript enabled so display the flashContent div in case it is not replaced with a swf object.
+            swfobject.createCSS("#flashContent", "display:block;text-align:left;");
+        };
+        $('#flashContent').ready(function() {
+            setTimeout(loadFlashContent, 100);
+        });
+</script>
 </body>
 </html>

@@ -18,7 +18,8 @@ module.exports = function (grunt) {
         },
         copy: {
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
-            c3css: {expand: true, flatten: true, cwd: 'node_modules/', src: 'c3/c3.css', dest: 'dist/'},
+            c3css: {expand: true, flatten: true, cwd: 'node_modules/', src: ['c3/c3.css', 'bootstrap/dist/css/bootstrap.min.css', 'react-datagrid/dist/index.css'], dest: 'dist/'},
+            fonts: {expand: true, flatten: true, cwd: 'node_modules/bootstrap', src:'fonts/*.*', dest: 'dist/fonts/'},
             appcss: {expand: true, flatten: true, cwd: 'src/', src: 'app.css', dest: 'dist/'}
         },
         eslint: {

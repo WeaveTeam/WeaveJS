@@ -1,5 +1,3 @@
-import d3 from "d3";
-import c3 from "c3";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import _ from "lodash";
 import React from "react";
