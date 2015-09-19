@@ -73,12 +73,13 @@ export default class CustomSearchTool extends React.Component {
         for(var i in this.searchFields) {
             var field = this.searchFields[i].key;
             if(this.state.searchObject.hasOwnProperty(field)) {
-                var buttonBefore = <bs.Button key={"button" + i}>
+                var buttonBefore = <bs.Button key={"button" + i} bsSize={this.props.bsSize}>
                                             {this.searchFields[i].label}
                                             <bs.Glyphicon glyph="remove" style={glyphStyle} onClick={this.removeSearchOption.bind(this, field)}/>
                                     </bs.Button>;
                 var searchInput = <div style={inputStyle} key={"searchInput" + i}>
                                     <bs.Input
+                                        bsSize={this.props.bsSize}
                                         value={this.state.searchObject[field]}
                                         ref={field}
                                         type="text"
@@ -93,8 +94,8 @@ export default class CustomSearchTool extends React.Component {
         }
         return (
             <div style={customSearchStyle}>
-                <bs.Dropdown title="Dropdown" id="" onSelect={this.handleDropdownSelect.bind(this)}>
-                    <bs.Dropdown.Toggle>
+                <bs.Dropdown title="Dropdown" bsSize={this.props.bsSize} bsStyle="primary" id="" onSelect={this.handleDropdownSelect.bind(this)}>
+                    <bs.Dropdown.Toggle bsStyle="primary">
                         <bs.Glyphicon glyph="search"/>
                         Search
                     </bs.Dropdown.Toggle>

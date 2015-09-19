@@ -14,7 +14,10 @@ var tableContainer = {
 
 var leftPaneStyle = {
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
+    width: "100%",
+    height: "100%",
+    position: "relative"
 };
 
 export default class App extends React.Component {
@@ -65,6 +68,25 @@ export default class App extends React.Component {
 
     componentDidMount() {
         this.reactReady = true;
+        window.addEventListener("resize", this.setWeavePosition.bind(this));
+    }
+
+    setWeavePosition() {
+        var containerPosition = React.findDOMNode(this.refs.weaveContainer).getBoundingClientRect();
+        var appPosition = React.findDOMNode(this).getBoundingClientRect();
+
+        var position = {
+            top: containerPosition.top - appPosition.top,
+            left: containerPosition.left - appPosition.left,
+            width: containerPosition.right - containerPosition.left,
+            height: containerPosition.bottom - containerPosition.top,
+            position: "absolute"
+        };
+
+        if(!position.height) {
+            setTimeout(this.setWeavePosition.bind(this), 0);
+        }
+        this.refs.weave.setState({position});
     }
 
     handleWeaveReady() {
@@ -72,6 +94,7 @@ export default class App extends React.Component {
             this.weave = document.getElementById("weave");
         }
         if(this.reactReady) {
+            this.setWeavePosition();
             this.weave.path("practitionerSearch").request("LinkableVariable").addCallback(this.getSearchableFields.bind(this), true, false);
         } else {
             setTimeout(this.handleWeaveReady.bind(this), 200);
@@ -96,15 +119,13 @@ export default class App extends React.Component {
         }
 
         return (
-            <div style = { {display: "flex", flexDirection: "column"} }>
-                <CustomSearchTool ref="searchTool" searchFields={this.searchFields} handleSearch={_.debounce(this.handleSearch.bind(this), 100)}/>
-                <Weave/>
+            <div style = { {display: "flex", flexDirection: "column", height: "100%"} }>
+                <div style={{height: 65, marginLeft: "5px", marginRight: "5px", paddingTop: 20}}>
+                    <CustomSearchTool ref="searchTool" bsSize={"small"} searchFields={this.searchFields} handleSearch={_.debounce(this.handleSearch.bind(this), 200)}/>
+                </div>
+                <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
+                <Weave ref="weave"/>
             </div>
         );
-                     // <div style={ {flex: 40} }>
-                     //    <div style={leftPaneStyle} ref="datagrids">
-                     //        {datagrids}
-                     //    </div>
-                     // </div>
     }
 }
