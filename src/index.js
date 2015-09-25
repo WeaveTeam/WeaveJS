@@ -1,9 +1,7 @@
-import $ from "jquery";
 import React from "react";
-import App from "./app.jsx";
+import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
+import Test from "./test.jsx";
 
-$(function() {
-    React.render(
-		<App/>, document.getElementById("app")
-    );
-});
+React.render(
+		<WeaveLayoutManager/>,	document.body
+);

@@ -1,24 +1,23 @@
+import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import d3 from "d3";
 import c3 from "c3";
 import {registerToolImplementation} from "./WeaveTool.jsx";
-import jquery from "jquery";
 import lodash from "lodash";
 import StandardLib from "./Utils/StandardLib";
 import FormatUtils from "./Utils/FormatUtils";
 
-export default class WeaveC3Barchart {
-    constructor(element, toolPath) {
-        this.element = element;
-        this._toolPath = toolPath;
-        this._plotterPath = this._toolPath.pushPlotter("plot");
+export default class WeaveC3Barchart extends AbstractWeaveTool {
+    constructor(props) {
+        super(props);
+        this._plotterPath = this.toolPath.pushPlotter("plot");
         this._heightColumnsPath = this._plotterPath.push("heightColumns");
         this._labelColumnPath = this._plotterPath.push("labelColumn");
         this._sortColumnPath = this._plotterPath.push("sortColumn");
         this._colorColumnPath = this._plotterPath.push("colorColumn");
         this._chartColorsPath = this._plotterPath.push("chartColors");
 
-        this._xAxisPath = toolPath.pushPlotter("xAxis");
-        this._yAxisPath = toolPath.pushPlotter("yAxis");
+        this._xAxisPath = this.toolPath.pushPlotter("xAxis");
+        this._yAxisPath = this.toolPath.pushPlotter("yAxis");
 
         this.groupingMode = this._plotterPath.push("groupingMode").getState();
 
@@ -26,6 +25,8 @@ export default class WeaveC3Barchart {
         this.chart = null;
 
         this.busy = false;
+
+        this.keyToIndex = {};
 
         this.chart = c3.generate({
             size: this._getElementSize(),
@@ -120,7 +121,7 @@ export default class WeaveC3Barchart {
         });
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
-        this._toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
 
         var axisChanged = lodash.debounce(this._axisChanged.bind(this), 100);
         [this._heightColumnsPath,
@@ -136,14 +137,14 @@ export default class WeaveC3Barchart {
     }
 
     // _teardownCallbacks() {
-    //     this._toolPath.selection_keyset.removeCallback(this._selectionKeysChanged);
+    //     this.toolPath.selection_keyset.removeCallback(this._selectionKeysChanged);
     // }
 
     _plotterChanged() {
         this.groupingMode = this._plotterPath.push("groupingMode").getState();
     }
 
-    _updateContents() {
+    resize() {
         this.chart.resize(this._getElementSize());
     }
 
@@ -155,7 +156,7 @@ export default class WeaveC3Barchart {
     }
 
     _selectionKeysChanged() {
-        var keys = this._toolPath.selection_keyset.getKeys();
+        var keys = this.toolPath.selection_keyset.getKeys();
         // var indices = this.indexCache.pick(keys).values();
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
@@ -196,6 +197,7 @@ export default class WeaveC3Barchart {
         if(this.busy) {
             return;
         }
+
         this._updateColumns();
 
         var heightColumns = this._heightColumnsPath.getChildren();
@@ -214,7 +216,7 @@ export default class WeaveC3Barchart {
             mapping[name] = column;
         }
 
-        this.records = this._toolPath.pushPlotter("plot").retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
+        this.records = this.toolPath.pushPlotter("plot").retrieveRecords(mapping, this._plotterPath.push("filteredKeySet"));
         this.records = lodash.sortByAll(this.records, ["sort", "id"]);
 
 

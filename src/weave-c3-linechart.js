@@ -1,23 +1,20 @@
+import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import c3 from "c3";
 import d3 from "d3";
 import lodash from "lodash";
 import {registerToolImplementation} from "./WeaveTool.jsx";
-import jquery from "jquery";
 import FormatUtils from "./Utils/FormatUtils";
 
 
-export default class WeaveC3LineChart {
-    constructor(element, toolPath) {
-        this.element = element;
-
-        this._toolPath = toolPath;
-
-        this._plotterPath = this._toolPath.pushPlotter("plot");
+export default class WeaveC3LineChart extends AbstractWeaveTool {
+    constructor(props) {
+        super(props);
+        this._plotterPath = this.toolPath.pushPlotter("plot");
         this._columnsPath = this._plotterPath.push("columns");
         this._lineStylePath = this._plotterPath.push("lineStyle");
 
-        this._xAxisPath = toolPath.pushPlotter("xAxis");
-        this._yAxisPath = toolPath.pushPlotter("yAxis");
+        this._xAxisPath = this.toolPath.pushPlotter("xAxis");
+        this._yAxisPath = this.toolPath.pushPlotter("yAxis");
 
         this.chart = c3.generate({
             size: this._getElementSize(),
@@ -77,22 +74,15 @@ export default class WeaveC3LineChart {
         });
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
-        this._toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
     }
 
-    _updateContents() {
+    resize() {
         this.chart.resize(this._getElementSize());
     }
 
-    _getElementSize() {
-        return {
-            height: jquery(this.element).innerHeight(),
-            width: jquery(this.element).innerWidth()
-        };
-    }
-
     _selectionKeysChanged() {
-        var keys = this._toolPath.selection_keyset.getKeys();
+        var keys = this.toolPath.selection_keyset.getKeys();
         if(keys.length) {
             this.chart.focus(keys);
         } else {
@@ -128,7 +118,7 @@ export default class WeaveC3LineChart {
             this.columnNames.push(name);
         }
 
-        this.records = this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
+        this.records = this._plotterPath.retrieveRecords(mapping, this._plotterPath.push("filteredKeySet"));
         this.records = lodash.sortBy(this.records, "id");
         var columns = [];
 

@@ -7,6 +7,23 @@ import _ from "lodash";
  */
 export default class StandardLib {
 
+
+    /**
+     * Adds undefined values to new state for properties in
+     * current state not found in new state.
+     *
+     *
+     */
+     static includeMissingPropertyPlaceholders(currentState, newState) {
+
+        for(var key in currentState) {
+            if(!newState.hasOwnProperty(key)) {
+                newState[key] = undefined;
+            }
+        }
+        return newState;
+     }
+
     /**
      * Calculates an interpolated color for a normalized value.
      * @param normValue A Number between 0 and 1.

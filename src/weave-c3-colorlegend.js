@@ -1,26 +1,23 @@
-import c3 from "c3";
+import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import {registerToolImplementation} from "./WeaveTool.jsx";
-import jquery from "jquery";
 import lodash from "lodash";
 import StandardLib from "./Utils/StandardLib";
-import SimpleAxisPlotter from "./weave/visualization/plotters/SimpleAxisPlotter";
-
 import d3 from "d3";
 
 const SHAPE_TYPE_CIRCLE = "circle";
 const SHAPE_TYPE_SQUARE = "square";
 const SHAPE_TYPE_LINE = "line";
 
-export default class WeaveC3ColorLegend {
+export default class WeaveC3ColorLegend extends AbstractWeaveTool {
 
-    constructor(element, toolPath) {
-        this.element = element;
+    constructor(props) {
+        super(props);
         this._svg = d3.select(this.element).append("svg");
         this.lookup = {};
-        this._plotterPath = toolPath.pushPlotter("plot");
-        this.dynamicColorColumnPath = this._plotterPath.push("dynamicColorColumn").push(null);
+        this._plotterPath = this.toolPath.pushPlotter("plot");
+        this.dynamicColorColumnPath = this._plotterPath.push("dynamicColorColumn", null);
         this._binningDefinition = this.dynamicColorColumnPath.push("internalDynamicColumn").push(null).push("binningDefinition").push(null);
-
+        this._binnedColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn", null);
         this._setupCallbacks();
 
         this.update = lodash.debounce(this._update.bind(this), 20);
@@ -35,7 +32,7 @@ export default class WeaveC3ColorLegend {
         this.drawAll();
     }
 
-    _updateContents () {
+    resize () {
         this._sizeChanged();
     }
 
@@ -44,28 +41,14 @@ export default class WeaveC3ColorLegend {
     }
 
     drawAll() {
-        var internalColorColumn = this.dynamicColorColumnPath.getState();
-        if (Array.isArray(internalColorColumn) && internalColorColumn.length === 0) {
+        if (!this.dynamicColorColumnPath.getType(null)) {
             return; // draw nothing
         }
 
-        var binnedColumn = this.dynamicColorColumnPath.push("internalDynamicColumn")
-                                                  .push(null)
-                                                  .push("internalDynamicColumn")
-                                                  .push(null)
-                                                  .push("internalDynamicColumn")
-                                                  .push(null)
-                                                  .getState();
+        var numberOfBins = this._binnedColumnPath.getValue("numberOfBins");
 
-        var numberOfBins = this.dynamicColorColumnPath.push("internalDynamicColumn")
-                                               .push(null)
-                                               .push("binningDefinition")
-                                               .push(null)
-                                               .push("numberOfBins")
-                                               .getState();
-
-        if(!Array.isArray(binnedColumn) && numberOfBins) {
-            this.drawBinnedPlot();
+        if(numberOfBins) {
+            this.drawBinnedPlot(numberOfBins);
         } else {
             this.drawContinuousPlot();
         }
@@ -75,36 +58,25 @@ export default class WeaveC3ColorLegend {
 
     }
 
-    drawBinnedPlot() {
+    drawBinnedPlot(numberOfBins) {
         // clear the svg and rerender everything
         this._svg.selectAll("*").remove();
 
-        var width = jquery(this.element).innerWidth();
-        var height = jquery(this.element).innerHeight();
+        var width = this.element.clientWidth;
+        var height = this.element.clientHeight;
 
-        var numOfBins = this.dynamicColorColumnPath.push("internalDynamicColumn")
-                                               .push(null)
-                                               .push("binningDefinition")
-                                               .push(null)
-                                               .push("numberOfBins")
-                                               .getState();
-
-        var _shapeSize = this._plotterPath.push("shapeSize").getState();
-        var _shapeType = this._plotterPath.push("shapeType").getState();
+        var _shapeSize = this._plotterPath.getState("shapeSize");
+        var _shapeType = this._plotterPath.getState("shapeType");
 
         var xShapeOffset = _shapeSize / 2;
-        var ramp = this.dynamicColorColumnPath.push("ramp").getState();
-
-        if(!Array.isArray(ramp)) {
-            ramp = ramp.split(",");
-        }
+        var ramp = this.dynamicColorColumnPath.getState("ramp");
 
         var yScale = d3.scale.linear()
-                             .domain([0, numOfBins + 1])
+                             .domain([0, numberOfBins + 1])
                              .range([0, height]);
 
         var xScale = d3.scale.linear()
-                             .domain([0, numOfBins + 1])
+                             .domain([0, numberOfBins + 1])
                              .range([0, width]);
 
 
@@ -113,7 +85,7 @@ export default class WeaveC3ColorLegend {
         var xMap = (d) => { return xScale(d); };
 
         //var rMap = (d) => { return rScale(d); };
-        if(width && height && numOfBins) {
+        if(width && height && numberOfBins) {
             this._svg.attr("width", width)
                      .attr("height", height);
         }
@@ -125,21 +97,21 @@ export default class WeaveC3ColorLegend {
                  .attr("font-family", "sans-serif")
                  .attr("font-size", "12px");
 
-        _shapeSize = lodash.max([1, lodash.min([_shapeSize, height / numOfBins])]);
+        _shapeSize = lodash.max([1, lodash.min([_shapeSize, height / numberOfBins])]);
 
-        let r = (_shapeSize / 100 * height / numOfBins) / 2;
+        let r = (_shapeSize / 100 * height / numberOfBins) / 2;
 
-        var BinnedColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn").push(null);
+        var BinnedColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn", null);
         var textLabelFunction = BinnedColumnPath.getValue("deriveStringFromNumber");
 
-        for(var i = 0; i < numOfBins; i++) {
+        for(var i = 0; i < numberOfBins; i++) {
             switch(_shapeType) {
                 case SHAPE_TYPE_CIRCLE :
                     this._svg.append("circle")
                              .attr("cx", 25)
                              .attr("cy", yMap(i + 1))
                              .attr("r", r)
-                             .style("fill", "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, numOfBins - 1), ramp)))
+                             .style("fill", "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, numberOfBins - 1), ramp)))
                              .style("stroke", "black")
                              .style("stroke-opacity", 0.5);
                     this._svg.append("text")

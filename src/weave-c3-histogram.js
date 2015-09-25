@@ -1,17 +1,15 @@
+import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import c3 from "c3";
 import lodash from "lodash";
 import {registerToolImplementation} from "./WeaveTool.jsx";
-import jquery from "jquery";
 import FormatUtils from "./Utils/FormatUtils";
 
 
-export default class WeaveC3Histogram {
-    constructor(element, toolPath) {
-        this.element = element;
+export default class WeaveC3Histogram extends AbstractWeaveTool {
+    constructor(props) {
+        super(props);
 
-        this._toolPath = toolPath;
-
-        this._plotterPath = toolPath.pushPlotter("plot");
+        this._plotterPath = this.toolPath.pushPlotter("plot");
 
         this._binnedColumnPath = this._plotterPath.push("binnedColumn");
 
@@ -24,8 +22,8 @@ export default class WeaveC3Histogram {
 
         this._aggregationMethodPath = this._plotterPath.push("aggregationMethod");
 
-        this._xAxisPath = toolPath.pushPlotter("xAxis");
-        this._yAxisPath = toolPath.pushPlotter("yAxis");
+        this._xAxisPath = this.toolPath.pushPlotter("xAxis");
+        this._yAxisPath = this.toolPath.pushPlotter("yAxis");
 
         this.busy = false;
 
@@ -50,30 +48,30 @@ export default class WeaveC3Histogram {
                onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         var selectedIds = this._binnedColumnPath.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this._toolPath.qkeyToString(qKey);
+                            return this.toolPath.qkeyToString(qKey);
                         });
-                        this._toolPath.selection_keyset.addKeys(selectedIds);
+                        this.toolPath.selection_keyset.addKeys(selectedIds);
                     }
                 },
                 onunselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         var unSelectedIds = this._binnedColumnPath.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this._toolPath.qkeyToString(qKey);
+                            return this.toolPath.qkeyToString(qKey);
                         });
-                        this._toolPath.selection_keyset.removeKeys(unSelectedIds);
+                        this.toolPath.selection_keyset.removeKeys(unSelectedIds);
                     }
                 },
                 onmouseover: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         var selectedIds = this._binnedColumnPath.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this._toolPath.qkeyToString(qKey);
+                            return this.toolPath.qkeyToString(qKey);
                         });
-                        this._toolPath.probe_keyset.setKeys(selectedIds);
+                        this.toolPath.probe_keyset.setKeys(selectedIds);
                     }
                 },
                 onmouseout: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this._toolPath.probe_keyset.setKeys([]);
+                        this.toolPath.probe_keyset.setKeys([]);
                     }
                 }
             },
@@ -137,7 +135,7 @@ export default class WeaveC3Histogram {
         });
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
-        this._toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
 
         var axisChanged = lodash.debounce(this._axisChanged.bind(this), 100);
         [
@@ -150,19 +148,12 @@ export default class WeaveC3Histogram {
         });
     }
 
-    _updateContents() {
+    resize() {
         this.chart.resize(this._getElementSize());
     }
 
-    _getElementSize() {
-        return {
-            height: jquery(this.element).innerHeight(),
-            width: jquery(this.element).innerWidth()
-        };
-    }
-
     _selectionKeysChanged() {
-        // var keys = this._toolPath.selection_keyset.getKeys();
+        // var keys = this.toolPath.selection_keyset.getKeys();
         // var selectedBins = {};
 
         // if(this.idToRecord) {
@@ -229,7 +220,7 @@ export default class WeaveC3Histogram {
             }
         };
 
-        this.records = this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
+        this.records = this._plotterPath.retrieveRecords(mapping, this._plotterPath.push("filteredKeySet"));
 
         this.idToRecord = {};
 

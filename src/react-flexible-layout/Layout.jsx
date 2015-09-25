@@ -2,6 +2,7 @@
 
 import React from "react";
 //import SplitPane from "./react-flexible-layout/src/SplitPane.jsx";
+import StandardLib from "../Utils/StandardLib";
 import VendorPrefix from "react-vendor-prefix";
 import Resizer from "./Resizer.jsx";
 import ResizerOverlay from "./ResizerOverlay.jsx";
@@ -31,7 +32,7 @@ export default class Layout extends React.Component {
     }
 
     componentWillReceiveProps (nextProps) {
-        this.setState(nextProps.state);
+        this.setState(StandardLib.includeMissingPropertyPlaceholders(this.state, nextProps.state));
     }
 
     componentWillUnmount () {
@@ -51,8 +52,15 @@ export default class Layout extends React.Component {
         }
     }
 
+    setState(value, callback) {
+        super.setState(value, callback);
+    }
+
     getDOMNodeFromId (id) {
         if(this.state.id && _.isEqual(this.state.id, id)) {
+            if(_.isEqual(id, ["Weave"])) {
+                console.log(this.element.clientHeight);
+            }
             return this.element;
         } else {
             for(var i = 0; i < this.childNames.length; i++) {
@@ -67,7 +75,7 @@ export default class Layout extends React.Component {
     onMouseDown (event) {
         this.resizerNames.forEach(resizerName => {
             var resizer = this.refs[resizerName];
-            if (resizer.state && resizer.state.active) {
+            if (resizer && resizer.state && resizer.state.active) {
                 var overlayRange = this.getResizerRange(resizer);
                 overlayRange[0] += this.minSize;
                 overlayRange[1] -= this.minSize;
@@ -113,7 +121,7 @@ export default class Layout extends React.Component {
             var resizer = this.refs[resizerName];
             var resizerOverlay = this.refs[RESIZEROVERLAY];
 
-            if (resizer.state && resizer.state.active) {
+            if (resizer && resizer.state && resizer.state.active) {
                 var [begin, end] = this.getResizerRange(resizer);
 
                 var mousePos = this.state.direction === HORIZONTAL ? event.pageX : event.pageY;
@@ -149,7 +157,7 @@ export default class Layout extends React.Component {
     handleStateChange ()
     {
         this.setState({
-            children: this.childNames.map(ref => this.refs[ref].state)
+            children: this.childNames.filter(ref => this.refs[ref]).map(ref => this.refs[ref].state)
         });
     }
 

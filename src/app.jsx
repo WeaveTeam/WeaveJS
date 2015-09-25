@@ -35,9 +35,7 @@ export default class App extends React.Component {
             "Prescriptions": ["TableTool3", "columns"]
         };
 
-        this.searchFields = [{key: "FirstName", label: "First Name"}, {key: "MiddleName", label: "Middle Name"},
-                            {key: "LastName", label: "Last Name"}, {key: "Specialization", label: "Specialization"},
-                            {key: "CountyFIPS", label: "FIPS"}];
+        this.searchFields = ["First Name", "Middle Name", "Last Name", "Specialization", "CountyFIPS", "FIPS"];
     }
 
     handleSearch() {
@@ -68,25 +66,9 @@ export default class App extends React.Component {
 
     componentDidMount() {
         this.reactReady = true;
-        window.addEventListener("resize", this.setWeavePosition.bind(this));
-    }
-
-    setWeavePosition() {
-        var containerPosition = React.findDOMNode(this.refs.weaveContainer).getBoundingClientRect();
-        var appPosition = React.findDOMNode(this).getBoundingClientRect();
-
-        var position = {
-            top: containerPosition.top - appPosition.top,
-            left: containerPosition.left - appPosition.left,
-            width: containerPosition.right - containerPosition.left,
-            height: containerPosition.bottom - containerPosition.top,
-            position: "absolute"
-        };
-
-        if(!position.height) {
-            setTimeout(this.setWeavePosition.bind(this), 0);
-        }
-        this.refs.weave.setState({position});
+        this.element = React.findDOMNode(this);
+        this.weaveContainerElt = React.findDOMNode(this.refs.weaveContainer);
+        window.addEventListener("resize", () => { this.forceUpdate(); });
     }
 
     handleWeaveReady() {
@@ -94,7 +76,7 @@ export default class App extends React.Component {
             this.weave = document.getElementById("weave");
         }
         if(this.reactReady) {
-            this.setWeavePosition();
+            this.forceUpdate();
             this.weave.path("practitionerSearch").request("LinkableVariable").addCallback(this.getSearchableFields.bind(this), true, false);
         } else {
             setTimeout(this.handleWeaveReady.bind(this), 200);
@@ -112,6 +94,18 @@ export default class App extends React.Component {
     }
 
     render() {
+        if(this.weaveContainerElt) {
+            var containerPosition = this.weaveContainerElt.getBoundingClientRect();
+            var appPosition = this.element.getBoundingClientRect();
+
+            var style = {
+                top: containerPosition.top - appPosition.top,
+                left: containerPosition.left - appPosition.left,
+                width: containerPosition.right - containerPosition.left,
+                height: containerPosition.bottom - containerPosition.top,
+                position: "absolute"
+            };
+        }
 
         var datagrids = [];
         for(var key in this.tables) {
@@ -120,11 +114,11 @@ export default class App extends React.Component {
 
         return (
             <div style = { {display: "flex", flexDirection: "column", height: "100%"} }>
-                <div style={{height: 65, marginLeft: "5px", marginRight: "5px", paddingTop: 20}}>
-                    <CustomSearchTool ref="searchTool" bsSize={"small"} searchFields={this.searchFields} handleSearch={_.debounce(this.handleSearch.bind(this), 200)}/>
+                <div style={{height: 45, marginLeft: "5px", marginRight: "5px", paddingTop: 5}}>
+                    <CustomSearchTool ref="searchTool" bsSize={"small"} searchFields={this.searchFields} handleSearch={_.debounce(this.handleSearch.bind(this), 500)}/>
                 </div>
                 <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
-                <Weave ref="weave"/>
+                <Weave ref="weave" style={style} attributes={ {id: "weave"} }/>
             </div>
         );
     }

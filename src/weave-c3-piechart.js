@@ -1,15 +1,13 @@
+import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import c3 from "c3";
 import d3 from "d3";
 import lodash from "lodash";
 import {registerToolImplementation} from "./WeaveTool.jsx";
-import jquery from "jquery";
 
-export default class WeaveC3PieChart {
-    constructor(element, toolPath) {
-        this.element = element;
-
-        this._toolPath = toolPath;
-        this._plotterPath = this._toolPath.pushPlotter("plot");
+export default class WeaveC3PieChart extends AbstractWeaveTool{
+    constructor(props) {
+        super(props);
+        this._plotterPath = this.toolPath.pushPlotter("plot");
 
         this._dataPath = this._plotterPath.push("data");
         this._labelPath = this._plotterPath.push("label");
@@ -29,23 +27,23 @@ export default class WeaveC3PieChart {
                type: "pie",
                 onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this._toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
+                        this.toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onunselected: (d) => {
                     if(d && d.hasOwnProperty("data")) {
                         // d has a different structure than "onselected" argument
-                        this._toolPath.selection_keyset.setKeys([]);
+                        this.toolPath.selection_keyset.setKeys([]);
                     }
                 },
                 onmouseover: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this._toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                        this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onmouseout: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this._toolPath.probe_keyset.setKeys([]);
+                        this.toolPath.probe_keyset.setKeys([]);
                     }
                 }
             },
@@ -99,26 +97,19 @@ export default class WeaveC3PieChart {
         });
 
         var selectionChanged = this._selectionKeysChanged.bind(this);
-        this._toolPath.selection_keyset.addCallback(selectionChanged, true, false);
+        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
 
-        this._toolPath.probe_keyset.addCallback(this._probedKeysChanged.bind(this), true, false);
+        this.toolPath.probe_keyset.addCallback(this._probedKeysChanged.bind(this), true, false);
 
         this._plotterPath.push("innerRadius").addCallback(dataChanged, true, false);
     }
 
-    _updateContents() {
+    resize() {
         this.chart.resize(this._getElementSize());
     }
 
-    _getElementSize() {
-        return {
-            height: jquery(this.element).innerHeight(),
-            width: jquery(this.element).innerWidth()
-        };
-    }
-
     _selectionKeysChanged() {
-        var keys = this._toolPath.selection_keyset.getKeys();
+        var keys = this.toolPath.selection_keyset.getKeys();
         if(keys.length) {
             this.chart.focus(keys);
         } else {
@@ -127,7 +118,7 @@ export default class WeaveC3PieChart {
     }
 
     _probedKeysChanged() {
-        var keys = this._toolPath.probe_keyset.getKeys();
+        var keys = this.toolPath.probe_keyset.getKeys();
         var indices = keys.map( (key) => {
             return Number(this.keyToIndex[key]);
         });
@@ -156,7 +147,7 @@ export default class WeaveC3PieChart {
             label: this._labelPath
         };
 
-        this.records = this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter"));
+        this.records = this._plotterPath.retrieveRecords(mapping, this._plotterPath.push("filteredKeySet"));
 
         this.keyToIndex = {};
         this.indexToKey = {};

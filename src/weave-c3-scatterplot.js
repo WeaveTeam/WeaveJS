@@ -1,6 +1,6 @@
-import c3 from "c3";
+import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import {registerToolImplementation} from "./WeaveTool.jsx";
-import jquery from "jquery";
+import c3 from "c3";
 import lodash from "lodash";
 import d3 from "d3";
 import StandardLib from "./Utils/StandardLib";
@@ -48,18 +48,17 @@ function _normalizeRecords (records, attributes) {
     });
 }
 
-export default class WeaveC3ScatterPlot {
+export default class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
-    constructor(element, toolPath) {
-        this.element = element;
-        this._toolPath = toolPath;
-        this._visualizationPath = toolPath.push("children", "visualization");
-        this._plotterPath = toolPath.pushPlotter("plot");
+    constructor(props) {
+        super(props);
+        this._visualizationPath = this.toolPath.push("children", "visualization");
+        this._plotterPath = this.toolPath.pushPlotter("plot");
 
         this._dataXPath = this._plotterPath.push("dataX");
         this._dataYPath = this._plotterPath.push("dataY");
-        this._xAxisPath = toolPath.pushPlotter("xAxis");
-        this._yAxisPath = toolPath.pushPlotter("yAxis");
+        this._xAxisPath = this.toolPath.pushPlotter("xAxis");
+        this._yAxisPath = this.toolPath.pushPlotter("yAxis");
 
         this._fillStylePath = this._plotterPath.push("fill");
         this._lineStylePath = this._plotterPath.push("line");
@@ -93,22 +92,22 @@ export default class WeaveC3ScatterPlot {
                 },
                 onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this._toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
+                        this.toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onunselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this._toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
+                        this.toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onmouseover: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this._toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                        this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onmouseout: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this._toolPath.probe_keyset.setKeys([]);
+                        this.toolPath.probe_keyset.setKeys([]);
                     }
                 }
             },
@@ -171,25 +170,15 @@ export default class WeaveC3ScatterPlot {
             path.addCallback(axisChanged, true, false);
         });
 
-        this._toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
+        this.toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
 
-        //console.log(this._toolPath.probe_keyset);
-        this._toolPath.probe_keyset.addCallback(this._probedKeysChanged.bind(this), true, false);
+        //console.log(this.toolPath.probe_keyset);
+        this.toolPath.probe_keyset.addCallback(this._probedKeysChanged.bind(this), true, false);
 
     }
 
-    _updateContents () {
-        var size = this._getElementSize();
-        if(this.chart) {
-            this.chart.resize(size);
-        }
-    }
-
-    _getElementSize() {
-        return {
-            width: jquery(this.element).innerWidth(),
-            height: jquery(this.element).innerHeight()
-        };
+    resize () {
+        this.chart.resize(this._getElementSize());
     }
 
     _axisChanged () {
@@ -224,7 +213,7 @@ export default class WeaveC3ScatterPlot {
                         }
                     };
 
-        this.records = lodash.sortByOrder(this._plotterPath.retrieveRecords(mapping, opener.weave.path("defaultSubsetKeyFilter")), ["size", "id"], ["desc", "asc"]);
+        this.records = lodash.sortByOrder(this._plotterPath.retrieveRecords(mapping, this._plotterPath.push("filteredKeySet")), ["size", "id"], ["desc", "asc"]);
 
         this.keyToIndex = {};
         this.indexToKey = {};
@@ -256,7 +245,7 @@ export default class WeaveC3ScatterPlot {
     }
 
     _selectionKeysChanged() {
-        var keys = this._toolPath.selection_keyset.getKeys();
+        var keys = this.toolPath.selection_keyset.getKeys();
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
         });
@@ -264,7 +253,7 @@ export default class WeaveC3ScatterPlot {
     }
 
     _probedKeysChanged() {
-        var keys = this._toolPath.probe_keyset.getKeys();
+        var keys = this.toolPath.probe_keyset.getKeys();
         var indices = keys.map( (key) => {
             return Number(this.keyToIndex[key]);
         });
