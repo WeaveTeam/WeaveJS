@@ -13,7 +13,7 @@ module.exports = function (grunt) {
                 transform: [["babelify", {loose: "all"}]]
             },
             dist: {
-                files: {'dist/index.js': 'src/index.js'}
+                files: [{'dist/index.js': 'src/index.js'}, {'dist/index2.js': 'src/index2.js'}]
             }
         },
         copy: {
