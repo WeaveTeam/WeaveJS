@@ -29,39 +29,7 @@ export default class App extends React.Component {
             this.handleWeaveReady();
         };
 
-        this.tables = {
-            "Practitioners": ["TableTool", "columns"],
-            "Patients": ["TableTool2", "columns"],
-            "Prescriptions": ["TableTool3", "columns"]
-        };
-
         this.searchFields = ["First Name", "Middle Name", "Last Name", "Specialization", "CountyFIPS", "FIPS"];
-    }
-
-    handleSearch() {
-        if(this.weave) {
-            var weavePath = this.weave.path();
-            weavePath.push("practitionerSearch").state(this.refs.searchTool.state.searchObject);
-        }
-        // function getColumns(columnPath) {
-        //     let column = columnPath.getState();
-        //     return {
-        //         name: columnPath.getPath().pop(),
-        //         title: column.metadata.title
-        //     };
-        // }
-
-        // for(var key in this.tables) {
-        //     var tabletoolPath = this.weave.path(this.tables[key]);
-        //     var records = tabletoolPath.retrieveRecords(tabletoolPath);
-        //     var columns = tabletoolPath.getChildren().map(getColumns);
-        //     this.refs[key].setState({
-        //         records: records,
-        //         id: "id",
-        //         columnNames: columns
-
-        //     });
-        // }
     }
 
     componentDidMount() {
@@ -71,22 +39,16 @@ export default class App extends React.Component {
         window.addEventListener("resize", () => { this.forceUpdate(); });
     }
 
-    handleWeaveReady() {
+    handleWeaveReady(weave) {
         if(!this.weave) {
-            this.weave = document.getElementById("weave");
+            this.weave = weave;
         }
         if(this.reactReady) {
+            this.customSearchToolPath = this.weave.path("CustomSearchTool");
             this.forceUpdate();
-            this.weave.path("practitionerSearch").request("LinkableVariable").addCallback(this.getSearchableFields.bind(this), true, false);
         } else {
             setTimeout(this.handleWeaveReady.bind(this), 200);
         }
-    }
-
-    getSearchableFields() {
-        this.refs.searchTool.setState({
-            searchObject: this.weave.path("practitionerSearch").getState()
-        });
     }
 
     componentWillUnmount() {
@@ -112,13 +74,20 @@ export default class App extends React.Component {
             datagrids.push(<div key={key} style={tableContainer}>{key}<DataGrid key={key} ref={key}/></div>);
         }
 
+        var customSearchTool = <div/>;
+        if(this.customSearchToolPath) {
+             customSearchTool = <CustomSearchTool ref="searchTool" bsSize={"small"} toolPath={this.customSearchToolPath}/>;
+        }
+
         return (
             <div style = { {display: "flex", flexDirection: "column", height: "100%"} }>
                 <div style={{height: 45, marginLeft: "5px", marginRight: "5px", paddingTop: 5}}>
-                    <CustomSearchTool ref="searchTool" bsSize={"small"} searchFields={this.searchFields} handleSearch={_.debounce(this.handleSearch.bind(this), 500)}/>
+                   {
+                     customSearchTool
+                   }
                 </div>
                 <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
-                <Weave ref="weave" style={style} attributes={ {id: "weave"} }/>
+                <Weave ref="weave" style={style} onWeaveReady={this.handleWeaveReady.bind(this)}/>
             </div>
         );
     }

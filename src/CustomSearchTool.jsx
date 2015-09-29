@@ -30,7 +30,7 @@ export default class CustomSearchTool extends React.Component {
         super(props);
 
         this.state = {
-            searchObject: {}
+            searchObject: this.props.toolPath.getState("searchValues")
         };
         this.searchFields = this.props.toolPath.getState("searchFields");
     }
@@ -43,7 +43,6 @@ export default class CustomSearchTool extends React.Component {
         this.setState({
             searchObject: this.props.toolPath.getState("searchValues")
         });
-        this.searchFields = this.props.toolPath.getState("searchFields");
     }
 
     componentDidUpdate() {
@@ -75,6 +74,7 @@ export default class CustomSearchTool extends React.Component {
     }
 
     render() {
+
 
         var menuItems = this.searchFields.map((searchField, index) => {
             return <bs.MenuItem key={index} eventKey={searchField}> {searchField} </bs.MenuItem>;
