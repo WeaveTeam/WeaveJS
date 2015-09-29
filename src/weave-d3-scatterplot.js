@@ -204,7 +204,7 @@ export default class WeaveD3ScatterPlot extends WeavePanel {
     }
 
     destroy() {
-        super();
+
     }
 }
 

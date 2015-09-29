@@ -287,7 +287,6 @@ export default class WeaveC3Barchart {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
         this.chart.destroy();
-        super();
     }
 }
 

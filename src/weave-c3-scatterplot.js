@@ -279,7 +279,6 @@ export default class WeaveC3ScatterPlot {
 
     destroy() {
         this.chart.destroy();
-        super();
     }
 }
 

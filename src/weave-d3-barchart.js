@@ -234,7 +234,6 @@ export default class WeaveD3Barchart extends WeavePanel {
 
     destroy() {
         this.teardownCallbacks();
-        super();
     }
 }
 
