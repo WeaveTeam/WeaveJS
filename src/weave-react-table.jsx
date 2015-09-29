@@ -2,23 +2,13 @@ import {registerToolImplementation} from "./WeaveTool.jsx";
 import _ from "lodash";
 import React from "react";
 import ReactDataGrid from "react-datagrid";
+import AbstractWeaveTool from "./AbstractWeaveTool";
 
-export default class WeaveReactTable {
-    constructor(element, toolPath) {
-        this.element = element;
-        this._toolPath = toolPath;
+export default class WeaveReactTable extends AbstractWeaveTool {
+    constructor(props) {
+        super(props);
         React.render(
-            <DataGrid toolPath={this._toolPath} />, this.element);
-
-    }
-
-    _updateContents() {
-
-    }
-
-    destroy() {
-        /* Cleanup callbacks */
-        //this.teardownCallbacks();
+            <DataGrid toolPath={this.toolPath} />, this.element);
     }
 }
 
@@ -26,36 +16,30 @@ class DataGrid extends React.Component {
 
     constructor(props) {
         super(props);
-        this._toolPath = props.toolPath;
-        this._columnsPath = this._toolPath.push("columns");
+        this.toolPath = props.toolPath;
+        this._columnsPath = this.toolPath.push("columns");
 
         this._setupCallbacks();
 
         this.state = {
             columns: [],
-            rows: []
+            rows: [],
+            selected: {}
         };
 
-        this._toolPath.push("selectionKeySet").addCallback(this._selectionKeysChanged.bind(this), true, false);
-
-        this.SELECTED_ID = {};
+        this.toolPath.push("selectionKeySet").addCallback(this._selectionKeysChanged.bind(this), true, false);
     }
 
     onColumnResize(firstCol, firstSize) {
         firstCol.width = firstSize;
-        this.setState({});
+        // this.setState({});
     }
 
     _selectionKeysChanged () {
-        var keys = this._toolPath.push("selectionKeySet", null).getKeys();
-        this.SELECTED_ID = keys;
-        this.refs.grid.setState({
-            selected: keys
+        var keys = this.toolPath.push("selectionKeySet", null).getKeys();
+        this.setState({
+            selected: keys && keys.length ? keys[0] : {}
         });
-        console.log(this.refs.grid);
-        // var indices = keys.map((key) => {
-        //     return Number(this.keyToIndex[key]);
-        // });
     }
 
     _setupCallbacks() {
@@ -70,17 +54,20 @@ class DataGrid extends React.Component {
         var columns = this._columnsPath.getChildren().map((columnPath) => {
                         return {
                             name: columnPath.getPath().pop(),
-                            title: columnPath.getValue("getMetadata('title')")
+                            title: columnPath.getValue("getMetadata('title')"),
+                            width: 50
                         };
                     });
         this.setState({records, columns});
     }
 
     onSelectionChange(selectedIds) {
-        this._toolPath.push("selectionKeySet", null).setKeys(selectedIds);
+        console.log("selection changed", selectedIds);
+        // this.toolPath.push("selectionKeySet", null).setKeys(selectedIds);
     }
 
     render() {
+        console.log("rendered called", this.state.selected);
         return <ReactDataGrid
                     ref="grid"
                     idProperty="id"
@@ -88,7 +75,7 @@ class DataGrid extends React.Component {
                     columns={this.state.columns}
                     style={{height: 400}}
                     onColumnResize={this.onColumnResize.bind(this)}
-                    selected={this.SELECTED_ID}
+                    selected={this.state.selected}
                     onSelectionChange={this.onSelectionChange.bind(this)}
                     showCellBorders={true}/>;
     }

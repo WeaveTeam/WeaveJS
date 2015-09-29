@@ -25,12 +25,12 @@ export class WeaveTool extends React.Component {
     }
 
     componentDidMount() {
-            this.element = React.findDOMNode(this.refs.toolDiv);
-            if(React.Component.isPrototypeOf(this.ToolClass)) {
-                this.tool = this.refs.tool;
-            } else {
-                this.tool = new this.ToolClass(_.merge({element: React.findDOMNode(this.refs.toolDiv), toolPath: this.toolPath}, this.toolProps));
-            }
+        this.element = React.findDOMNode(this.refs.toolDiv);
+        if(React.Component.isPrototypeOf(this.ToolClass)) {
+            this.tool = this.refs.tool;
+        } else {
+            this.tool = new this.ToolClass(_.merge({element: React.findDOMNode(this.refs.toolDiv), toolPath: this.toolPath}));
+        }
     }
 
     componentWillUnmount() {
@@ -60,17 +60,11 @@ export class WeaveTool extends React.Component {
 
         return (
             <div style={this.props.style}>
-                <div style={{width: "100%", height: "100%", display: "flex", "flexDirection": "row"}}>
+                <div style={{width: "100%", height: "100%", display: "flex", "flexDirection": "column"}}>
                     <div style={{height: "25px", width: "100%"}}>
                         <div onMouseDown={() => { this.props.onStartDrag(); } } style={grabber}/>
                     </div>
-                    <div style={{flex: 1}}>
-                        <div ref="toolDiv" style={{width: "100%", height: "100%"}}>
-                            {
-                               reactTool
-                            }
-                        </div>
-                    </div>
+                    <div ref="toolDiv" style={{flex: 1}}/>
                 </div>
             </div>);
     }

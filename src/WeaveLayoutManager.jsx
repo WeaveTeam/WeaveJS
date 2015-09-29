@@ -13,6 +13,7 @@ import SimpleAxisPlotter from "./weave/visualization/plotters/SimpleAxisPlotter.
 import WeaveTextFilter from "./weave-text-filter.js";
 import WeaveC3PieChart from "./weave-c3-piechart.js";
 import WeaveC3Histogram from "./weave-c3-histogram.js";
+import WeaveReactTable from "./weave-react-table.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";
 import Weave from "./Weave.jsx";
@@ -93,7 +94,6 @@ export default class WeaveLayoutManager extends React.Component {
 
     onDragStart(id) {
         this.refs[LAYOUT].startDrag(id);
-        console.log("drag start");
     }
 
     render () {
@@ -127,9 +127,6 @@ export default class WeaveLayoutManager extends React.Component {
                         node = this.refs[LAYOUT].getDOMNodeFromId(path.getPath());
                         if(node) {
                             toolRect = node.getBoundingClientRect();
-                            if(toolName === "Weave") {
-                                console.log(toolRect);
-                            }
                             toolPosition = {
                                 top: toolRect.top - rect.top,
                                 left: toolRect.left - rect.left,
