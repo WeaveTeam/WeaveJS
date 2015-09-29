@@ -268,7 +268,6 @@ export default class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     destroy() {
         this.chart.destroy();
-        super();
     }
 }
 

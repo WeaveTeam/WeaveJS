@@ -289,7 +289,6 @@ export default class WeaveC3Barchart extends AbstractWeaveTool {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
         this.chart.destroy();
-        super();
     }
 }
 

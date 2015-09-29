@@ -8,9 +8,10 @@ module.exports = function (grunt) {
         browserify: {
             options: {
                 browserifyOptions: {
-                    debug: true
+                    debug: true,
+                    plugin: [['minifyify', {map: true}]]
                 },
-                transform: [["babelify", {loose: "all"}]]
+                transform: [["babelify", {"loose": "all"}]]
             },
             dist: {
                 files: [{'dist/index.js': 'src/index.js'}, {'dist/index2.js': 'src/index2.js'}]
@@ -48,6 +49,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-eslint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-minifyify');
 
     grunt.registerTask('default', ['eslint', 'browserify', 'copy']);
 };
