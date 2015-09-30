@@ -8,7 +8,7 @@ export default class WeaveReactTable extends AbstractWeaveTool {
     constructor(props) {
         super(props);
         React.render(
-            <DataGrid toolPath={this.toolPath} />, this.element);
+            <DataGrid toolPath={this.toolPath} element={this.element} />, this.element);
     }
 }
 
@@ -37,8 +37,12 @@ class DataGrid extends React.Component {
 
     _selectionKeysChanged () {
         var keys = this.toolPath.push("selectionKeySet", null).getKeys();
+        var selection = {};
+        keys.forEach((key) => {
+            selection[key] = {};
+        });
         this.setState({
-            selected: keys && keys.length ? keys[0] : {}
+            selected: selection
         });
     }
 
@@ -54,30 +58,33 @@ class DataGrid extends React.Component {
         var columns = this._columnsPath.getChildren().map((columnPath) => {
                         return {
                             name: columnPath.getPath().pop(),
-                            title: columnPath.getValue("getMetadata('title')"),
-                            width: 50
+                            title: columnPath.getValue("getMetadata('title')")
                         };
                     });
         this.setState({records, columns});
     }
 
     onSelectionChange(selectedIds) {
-        console.log("selection changed", selectedIds);
-        // this.toolPath.push("selectionKeySet", null).setKeys(selectedIds);
+        this.setState({
+            selected: selectedIds
+        });
+        this.toolPath.push("selectionKeySet", null).setKeys(_.keys(selectedIds));
     }
 
     render() {
-        console.log("rendered called", this.state.selected);
-        return <ReactDataGrid
-                    ref="grid"
-                    idProperty="id"
-                    dataSource={this.state.records}
-                    columns={this.state.columns}
-                    style={{height: 400}}
-                    onColumnResize={this.onColumnResize.bind(this)}
-                    selected={this.state.selected}
-                    onSelectionChange={this.onSelectionChange.bind(this)}
-                    showCellBorders={true}/>;
+        return <div style={{border: "solid"}}>
+                    <ReactDataGrid
+                        ref="grid"
+                        idProperty="id"
+                        dataSource={this.state.records}
+                        columns={this.state.columns}
+                        style={{height: this.props.element.clientHeight}}
+                        onColumnResize={this.onColumnResize.bind(this)}
+                        selected={this.state.selected}
+                        onSelectionChange={this.onSelectionChange.bind(this)}
+                        showCellBorders={false}>
+                    </ReactDataGrid>
+                </div>;
     }
 }
 
