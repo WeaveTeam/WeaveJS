@@ -122,7 +122,11 @@ export default class WeaveC3PieChart extends AbstractWeaveTool{
         var indices = keys.map( (key) => {
             return Number(this.keyToIndex[key]);
         });
-        this.chart.select("y", indices, true);
+        if(keys.length) {
+            this.chart.focus(keys);
+        } else {
+            this._selectionKeysChanged();
+        }
     }
 
     _updateStyle() {
