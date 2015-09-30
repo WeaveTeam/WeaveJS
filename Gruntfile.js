@@ -6,15 +6,24 @@ module.exports = function (grunt) {
             base: './dist'
         },
         browserify: {
-            options: {
-                browserifyOptions: {
-                    debug: true,
-                    plugin: [['minifyify', {map: true}]]
-                },
-                transform: [["babelify", {"loose": "all"}]]
-            },
             dist: {
-                files: [{'dist/index.js': 'src/index.js'}, {'dist/index2.js': 'src/index2.js'}]
+                options: {
+                    browserifyOptions: {
+                        plugin: [['minifyify', {map: false, exclude: "**/*.jsx"}]]
+                    },
+                    transform: [["babelify", {"loose": "all"}]]
+                },
+                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/index2.min.js': 'src/index2.js'}]
+            },
+            dev: {
+                options: {
+                    browserifyOptions: {
+                        debug: true,
+                        plugin: []
+                    },
+                    transform: [["babelify", {"loose": "all"}]]
+                },
+                files: [{'dist/index.js': 'src/index.js'}, {'dist/index2.js': 'src/index2.js'}]   
             }
         },
         copy: {
@@ -51,5 +60,6 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-minifyify');
 
-    grunt.registerTask('default', ['eslint', 'browserify', 'copy']);
+    grunt.registerTask('default', ['eslint', 'browserify:dev', 'copy']);
+    grunt.registerTask('dist', ['eslint', 'browserify:dist', 'copy']);
 };
