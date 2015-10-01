@@ -25,7 +25,8 @@ export class WeaveTool extends React.Component {
     }
 
     componentDidMount() {
-        this.element = React.findDOMNode(this.refs.toolDiv);
+        this.element = React.findDOMNode(this);
+        this.header = React.findDOMNode(this.refs.header);
         if(React.Component.isPrototypeOf(this.ToolClass)) {
             this.tool = this.refs.tool;
         } else {
@@ -58,13 +59,19 @@ export class WeaveTool extends React.Component {
             reactTool = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath}, this.toolProps));
         }
 
+        var toolHeight = "100%";
+
+        if(this.element) {
+            toolHeight = this.element.clientHeight - this.header.clientHeight;
+        }
+
         return (
             <div style={this.props.style}>
-                <div style={{width: "100%", height: "100%", display: "flex", "flexDirection": "column"}}>
-                    <div style={{height: "25px", width: "100%"}}>
-                        <div onMouseDown={() => { this.props.onStartDrag(); } } style={grabber}/>
-                    </div>
-                    <div ref="toolDiv" style={{flex: 1}}/>
+                <div ref="header" style={{height: "25px", width: "100%"}}>
+                    <div onMouseDown={() => { this.props.onStartDrag(); } } style={grabber}/>
+                </div>
+                <div style={{position: "relative", width: "100%", height: toolHeight, padding: 16}}>
+                    <div ref="toolDiv" style={{width: "100%", height: "100%", maxHeight: toolHeight}}/>
                 </div>
             </div>);
     }
