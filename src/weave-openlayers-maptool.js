@@ -98,7 +98,7 @@ class TileLayer extends Layer {
 		super(parent, layerName);
 
 		this.layer = new ol.layer.Tile();
-		this.servicePath = this.layerPath.push("service");
+		this.servicePath = this.layerPath.push("service", null);
 
 		this.servicePath.addCallback(this.updateTileSource.bind(this));
 	}
@@ -106,7 +106,7 @@ class TileLayer extends Layer {
 
 	getCustomWMSSource()
 	{
-		var customWMSPath = this.servicePath.push("CustomWMS");
+		var customWMSPath = this.servicePath;
 
 		if (customWMSPath.push("wmsURL").getType()) {
 			let url = customWMSPath.getState("wmsURL");
@@ -121,7 +121,7 @@ class TileLayer extends Layer {
 
 	getModestMapsSource()
 	{
-		var providerNamePath = this.servicePath.push("ModestMapsWMS", "providerName");
+		var providerNamePath = this.servicePath.push("providerName");
 
 		if (providerNamePath.getType()) {
 			let providerName = providerNamePath.getState();
@@ -150,14 +150,14 @@ class TileLayer extends Layer {
 
 	updateTileSource()
 	{
-		var serviceDriverName = this.servicePath.getNames()[0];
+		var serviceDriverName = this.servicePath.getType();
 
 		switch (serviceDriverName)
 		{
-			case "ModestMapsWMS":
+			case "weave.services.wms::ModestMapsWMS":
 				this.layer.setSource(this.getModestMapsSource());
 				break;
-			case "CustomWMS":
+			case "weave.services.wms::CustomWMS":
 				this.layer.setSource(this.getCustomWMSSource());
 				break;
 			default:
