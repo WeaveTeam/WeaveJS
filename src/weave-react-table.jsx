@@ -72,8 +72,7 @@ class DataGrid extends React.Component {
     }
 
     render() {
-        return <div style={{border: "solid"}}>
-                    <ReactDataGrid
+        return <ReactDataGrid
                         ref="grid"
                         idProperty="id"
                         dataSource={this.state.records}
@@ -81,10 +80,10 @@ class DataGrid extends React.Component {
                         style={{height: this.props.element.clientHeight}}
                         onColumnResize={this.onColumnResize.bind(this)}
                         selected={this.state.selected}
+                        rowStyle={this.rowStyle}
                         onSelectionChange={this.onSelectionChange.bind(this)}
-                        showCellBorders={false}>
-                    </ReactDataGrid>
-                </div>;
+                        showCellBorders={"vertical"}>
+                </ReactDataGrid>;
     }
 }
 
