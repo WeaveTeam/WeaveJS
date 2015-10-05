@@ -1,6 +1,4 @@
 import React from "react";
-import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
+import App from "./app.jsx";
 
-window.wlm = React.render(
-		<WeaveLayoutManager weave={opener.weave}/>,	document.body
-);
+React.render(<App/>, document.getElementById("app"));

@@ -1,9 +1,8 @@
-import $ from "jquery";
 import React from "react";
 import Layout from "./react-flexible-layout/Layout.jsx";
 import {WeaveLayoutManager} from "./WeaveLayoutManager.jsx";
 import DataGrid from "./DataGrid.jsx";
-import CustomSearchTool from "./CustomSearchTool.jsx";
+import CustomListView from "./CustomListView.jsx";
 import WeaveReactTable from "./weave-react-table.jsx";
 import Weave from "./Weave.jsx";
 import _ from "lodash";
@@ -28,8 +27,6 @@ export default class App extends React.Component {
         window.weaveReady = () => {
             this.handleWeaveReady();
         };
-
-        this.searchFields = ["First Name", "Middle Name", "Last Name", "Specialization", "CountyFIPS", "FIPS"];
     }
 
     componentDidMount() {
@@ -69,22 +66,10 @@ export default class App extends React.Component {
             };
         }
 
-        var datagrids = [];
-        for(var key in this.tables) {
-            datagrids.push(<div key={key} style={tableContainer}>{key}<DataGrid key={key} ref={key}/></div>);
-        }
-
-        var customSearchTool = <div/>;
-        if(this.customSearchToolPath) {
-             customSearchTool = <CustomSearchTool ref="searchTool" bsSize={"small"} toolPath={this.customSearchToolPath}/>;
-        }
-
         return (
-            <div style = { {display: "flex", flexDirection: "column", height: "100%"} }>
-                <div style={{height: 45, marginLeft: "5px", marginRight: "5px", paddingTop: 5}}>
-                   {
-                     customSearchTool
-                   }
+            <div style = { {display: "flex", flexDirection: "row", height: "100%"} }>
+                <div style={{width: 100, marginLeft: "5px", marginRight: "5px", paddingTop: 5}}>
+                    <CustomListView ref="listTool" bsSize={"small"}/>
                 </div>
                 <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
                 <Weave ref="weave" style={style} onWeaveReady={this.handleWeaveReady.bind(this)}/>
