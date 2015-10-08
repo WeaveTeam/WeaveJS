@@ -66,9 +66,9 @@ export class WeaveTool extends React.Component {
         }
 
         return (
-            <div style={this.props.style}>
+            <div style={this.props.style} onMouseUp={(event) => { this.props.onDragStop(event); }}>
                 <div ref="header" style={{height: "25px", width: "100%"}}>
-                    <div onMouseDown={() => { this.props.onStartDrag(); } } style={grabber}/>
+                    <div onMouseDown={() => { this.props.onDragStart(); } } style={grabber}/>
                 </div>
                 <div style={{position: "relative", width: "100%", height: toolHeight, padding: 16}}>
                     <div ref="toolDiv" style={{width: "100%", height: "100%", maxHeight: toolHeight}}/>

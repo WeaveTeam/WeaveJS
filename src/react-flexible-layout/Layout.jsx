@@ -88,12 +88,7 @@ export default class Layout extends React.Component {
     }
 
     onMouseMove () {
-        if(this.grabberActive) {
-            console.log("mouse over on layout", this);
-        }
 
-
-        // handle the shadded area
     }
 
     getResizerRange(resizer) {
@@ -151,7 +146,7 @@ export default class Layout extends React.Component {
                 this.handleStateChange();
             }
         });
-        this.grabberActive = false;
+        this.panelDragging = false;
     }
 
     handleStateChange ()
@@ -159,10 +154,6 @@ export default class Layout extends React.Component {
         this.setState({
             children: this.childNames.filter(ref => this.refs[ref]).map(ref => this.refs[ref].state)
         });
-    }
-
-    startDrag (id) {
-        console.log("start drag in layout", id);
     }
 
     render() {

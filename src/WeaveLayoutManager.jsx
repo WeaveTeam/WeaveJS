@@ -94,7 +94,20 @@ export default class WeaveLayoutManager extends React.Component {
     }
 
     onDragStart(id) {
-        this.refs[LAYOUT].startDrag(id);
+        this.toolDragged = id;
+        this.isDragging = true;
+    }
+
+    onDragStop(id) {
+        if(this.isDragging) {
+            this.toolDroppedOn = id;
+            this.isDragging = false;
+        }
+        this.updateLayout(this.toolDragged, this.toolDroppedOn);
+    }
+
+    updateLayout(toolDragged, toolDroppedOn) {
+
     }
 
     render () {
@@ -139,7 +152,7 @@ export default class WeaveLayoutManager extends React.Component {
                             toolPosition.maxWidth = toolPosition.width;
                         }
                     }
-                    children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} onDragStart={this.onDragStart.bind(this, path.getPath())} style={toolPosition}/>);
+                    children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} onDragStart={this.onDragStart.bind(this, path.getPath())} onDragStop={this.onDragStop.bind(this, path.getPath())} style={toolPosition}/>);
                 }
             }
         }
