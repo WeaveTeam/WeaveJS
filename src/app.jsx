@@ -4,6 +4,7 @@ import Layout from "./react-flexible-layout/Layout.jsx";
 import {WeaveLayoutManager} from "./WeaveLayoutManager.jsx";
 import DataGrid from "./DataGrid.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
+import CustomCardViewTool from "./CustomCardViewTool.jsx";
 import WeaveReactTable from "./weave-react-table.jsx";
 import Weave from "./Weave.jsx";
 import _ from "lodash";
@@ -45,6 +46,7 @@ export default class App extends React.Component {
         }
         if(this.reactReady) {
             this.customSearchToolPath = this.weave.path("CustomSearchTool");
+            this.customCardViewToolPath = this.weave.path("CustomCardViewTool");
             this.forceUpdate();
         } else {
             setTimeout(this.handleWeaveReady.bind(this), 200);
@@ -76,7 +78,12 @@ export default class App extends React.Component {
 
         var customSearchTool = <div/>;
         if(this.customSearchToolPath) {
-             customSearchTool = <CustomSearchTool ref="searchTool" bsSize={"small"} toolPath={this.customSearchToolPath}/>;
+             //customSearchTool = <CustomSearchTool ref="searchTool" bsSize={"small"} toolPath={this.customSearchToolPath}/>;
+        }
+
+        var customCardViewTool = <div/>;
+        if(this.customCardViewToolPath) {
+            customCardViewTool = <CustomCardViewTool ref="cardViewTool" toolPath={this.customCardViewToolPath}/>;
         }
 
         return (
@@ -85,6 +92,11 @@ export default class App extends React.Component {
                    {
                      customSearchTool
                    }
+                </div>
+                <div style={{height: 200, marginLeft: "5px", marginRight: "5px", marginBottom: "20px", paddingTop: 5, overflowY: "scroll"}}>
+                    {
+                        customCardViewTool
+                    }
                 </div>
                 <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
                 <Weave ref="weave" style={style} onWeaveReady={this.handleWeaveReady.bind(this)}/>
