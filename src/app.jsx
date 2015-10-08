@@ -68,10 +68,13 @@ export default class App extends React.Component {
 
         return (
             <div style = { {display: "flex", flexDirection: "row", height: "100%"} }>
-                <div style={{width: 100, marginLeft: "5px", marginRight: "5px", paddingTop: 5}}>
+                <div style={{width: 180, marginLeft: "5px", marginRight: "5px", paddingTop: 5}}>
                     <CustomListView ref="listTool" bsSize={"small"}/>
                 </div>
-                <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
+                <div style={{ display: "flex", flexDirection: "column", width: "100%"}}>
+                    <div style={{flex: 2}}/>
+                    <div ref="weaveContainer" style={ {flex: 4} }/>
+                </div>
                 <Weave ref="weave" style={style} onWeaveReady={this.handleWeaveReady.bind(this)}/>
             </div>
         );
