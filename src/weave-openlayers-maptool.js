@@ -99,8 +99,9 @@ class TileLayer extends Layer {
 
 		this.layer = new ol.layer.Tile();
 		this.servicePath = this.layerPath.push("service", null);
+		this.oldProviderName = null;
 
-		this.servicePath.addCallback(this.updateTileSource.bind(this));
+		this.servicePath.addCallback(this.updateTileSource.bind(this), true);
 	}
 
 
@@ -126,20 +127,24 @@ class TileLayer extends Layer {
 		if (providerNamePath.getType()) {
 			let providerName = providerNamePath.getState();
 
+			if (providerName === this.oldProviderName) {
+				return undefined;
+			}
+
 			switch (providerName)
 			{
 				case "Stamen WaterColor":
-					return new ol.source.Stamen({layer: "watercolor"});
+					return new ol.source.Stamen({layer: "watercolor", wrapX: false});
 				case "Stamen Toner":
-					return new ol.source.Stamen({layer: "toner"});
+					return new ol.source.Stamen({layer: "toner", wrapX: false});
 				case "Open MapQuest Aerial":
-					return new ol.source.MapQuest({layer: "sat"});
+					return new ol.source.MapQuest({layer: "sat", wrapX: false});
 				case "Open MapQuest":
-					return new ol.source.MapQuest({layer: "osm"});
+					return new ol.source.MapQuest({layer: "osm", wrapX: false});
 				case "Open Street Map":
 					return new ol.source.OSM({wrapX: false});
 				case "Blue Marble Map":
-					return new ol.source.TileWMS({url: "http://neowms.sci.gsfc.nasa.gov/wms/wms"});
+					return new ol.source.TileWMS({url: "http://neowms.sci.gsfc.nasa.gov/wms/wms", wrapX: false});
 				default:
 					return null;
 			}
@@ -151,17 +156,22 @@ class TileLayer extends Layer {
 	updateTileSource()
 	{
 		var serviceDriverName = this.servicePath.getType();
-
+		var newLayer = null;
 		switch (serviceDriverName)
 		{
 			case "weave.services.wms::ModestMapsWMS":
-				this.layer.setSource(this.getModestMapsSource());
+				newLayer = this.getModestMapsSource();
 				break;
 			case "weave.services.wms::CustomWMS":
-				this.layer.setSource(this.getCustomWMSSource());
+				newLayer = this.getCustomWMSSource();
 				break;
 			default:
-				this.layer.setSource(null);
+				newLayer = null;
+		}
+
+		if (newLayer !== undefined)
+		{
+			this.layer.setSource(newLayer);
 		}
 	}
 }
@@ -184,7 +194,7 @@ class GeometryLayer extends Layer {
 
 	updateGeometryData()
 	{
-		//var geoJson = this.geoColumnPath.getValue("ColumnUtils.getGeoJson()");
+		var geoJson = this.geoColumnPath.getValue("ColumnUtils.getGeoJson()");
 	}
 }
 
@@ -199,18 +209,45 @@ export default class WeaveOpenLayersMap {
 			target: this.element,
 			view: new ol.View({
 				center: [0, 0],
-				zoom: 2
+				zoom: 0
 			})
 		});
 
 		this.plottersPath = this.toolPath.push("children", "visualization", "plotManager", "plotters");
 		this.layerSettingsPath = this.toolPath.push("children", "visualization", "plotManager", "layerSettings");
+		this.zoomBoundsPath = this.toolPath.push("children", "visualization", "plotManager", "zoomBounds");
 
 
 		/* Register layer changes */
 
 		this.layers = {};
+		this.zoomBoundsPath.addCallback(this.getSessionCenter.bind(this), true);
+
+		this.map.getView().on("change:center", this.setSessionCenter, this);
+
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
+	}
+
+	setSessionCenter()
+	{
+		var extents = this.map.getView().calculateExtent(this.map.getSize());
+
+		this.zoomBoundsPath
+			.vars({xMin: extents[0], yMin: extents[1],
+					xMax: extents[2], yMax: extents[3]})
+			.getValue(
+				"setBounds(new Bounds2D(xMin, yMin, xMax, yMax));"
+			);
+	}
+
+	getSessionCenter()
+	{
+		var rect = this.zoomBoundsPath.getValue(
+				"tmp_bounds = new Bounds2D();" +
+				"getDataBounds(tmp_bounds);" +
+				"tmp_bounds.getRectangle(null, true)");
+		var extents = [rect.x, rect.y, rect.x + rect.width, rect.y + rect.height];
+		this.map.getView().fit(extents, this.map.getSize());
 	}
 
 	plottersChanged()
