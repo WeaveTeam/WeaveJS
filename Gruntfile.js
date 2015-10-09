@@ -5,14 +5,31 @@ module.exports = function (grunt) {
             port: 8000,
             base: './dist'
         },
+
         browserify: {
-            dist: {
-                options: {
+            options: {
                     browserifyOptions: {
                         plugin: [['minifyify', {map: false, exclude: "**/*.jsx"}]]
                     },
-                    transform: [["babelify", {"loose": "all"}]]
+                    transform: [["babelify", {"loose": "all"}]],
+                    external: [
+                        'react', 'react-datagrid', 'lodash', 'jquery', 'd3', 'c3',
+                        'openlayers', 'react-bootstrap',
+                    ],
+                    watch: true
+            },
+            libs: {
+                src: ['src/'],
+                dest: 'dist/libs.js',
+                options: {
+                    alias: [
+                        'react:', 'react-datagrid:', 'jquery:', 'lodash:', 'd3:', 'c3:', 'react-bootstrap:', 'openlayers:'
+                    ],
+                    external: null,
+                    transform: null
                 },
+            },
+            dist: {
                 files: [{'dist/index.min.js': 'src/index.js'}, {'dist/index2.min.js': 'src/index2.js'}]
             },
             dev: {
@@ -21,7 +38,6 @@ module.exports = function (grunt) {
                         debug: true,
                         plugin: []
                     },
-                    transform: [["babelify", {"loose": "all"}]]
                 },
                 files: [{'dist/index.js': 'src/index.js'}, {'dist/index2.js': 'src/index2.js'}]   
             }
@@ -36,19 +52,23 @@ module.exports = function (grunt) {
             target: ['src/**/*.js']
         },
         watch: {
-            js: {
-                files: ['src/**/*.js'],
-                tasks: ['eslint', 'browserify'],
+            options: {
+                spawn: false,
+            },
+            libs: {
+                files: ['node_modules/**/package.json'],
+                tasks: ['browserify:libs'],
                 options: {
-                    spawn: false,
+                    'interval': 500,
                 }
+            },
+            js: {
+                files: ['src/**/*.js*'],
+                tasks: ['eslint', 'browserify:dev']
             },
             html: {
                 files: ['src/index.html'],
-                tasks: ['copy'],
-                options: {
-                    spawn: false
-                }
+                tasks: ['copy']
             }
         }
     });
