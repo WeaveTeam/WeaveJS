@@ -78,7 +78,7 @@ export default class App extends React.Component {
 
         var customSearchTool = <div/>;
         if(this.customSearchToolPath) {
-             //customSearchTool = <CustomSearchTool ref="searchTool" bsSize={"small"} toolPath={this.customSearchToolPath}/>;
+             customSearchTool = <CustomSearchTool ref="searchTool" bsSize={"small"} toolPath={this.customSearchToolPath}/>;
         }
 
         var customCardViewTool = <div/>;

@@ -1,20 +1,7 @@
 import React from "react";
-import * as bs from "react-bootstrap";
-import _ from "lodash";
+import VendorPrefix from "react-vendor-prefix";
 import {registerToolImplementation} from "./WeaveTool.jsx";
-
-var cardStyle = {
-    height: "150",
-    width: "300",
-    marginLeft: "5",
-    marginRight: "5",
-    border: "solid",
-    padding: "5px",
-    borderWidth: "2px",
-    borderColor: "#EBEBEB",
-    boxShadow: "0 1px 1px rgba(0,0,0,.05)",
-    float: "left"
-};
+import _ from "lodash";
 
 export default class CustomCardViewTool extends React.Component {
 
@@ -26,12 +13,44 @@ export default class CustomCardViewTool extends React.Component {
         this.headerPath = this.props.toolPath.push("header");
         this.titlePath = this.props.toolPath.push("title");
         this.attributesPath = this.props.toolPath.push("attributes");
+        this.selectionKeySetPath = this.props.toolPath.push("selectionKeySet");
+        this.probeKeySetPath = this.props.toolPath.push("probeKeySet");
         this.formattedRecords = [];
     }
 
     componentDidMount() {
-        this.toolPath.addCallback(this.dataChanged.bind(this), true, false);
+        [this.headerPath,
+         this.titlePath,
+         this.attributesPath].forEach((path) => {
+            path.addCallback(_.debounce(this.dataChanged.bind(this), 100), true, false);
+        });
 
+         this.selectionKeySetPath.addCallback(_.debounce(this.setCardsSelection.bind(this), 100));
+         this.probeKeySetPath.addCallback(_.debounce(this.setCardsProbe.bind(this), 50));
+    }
+
+    setCardsSelection() {
+        var selectedKeys = this.selectionKeySetPath.getKeys();
+        for(var key in this.refs) {
+            var ref = this.refs[key];
+            if(selectedKeys.indexOf(ref.props.data.id) > -1) {
+                ref.setState({
+                    selected: true
+                });
+            }
+        }
+    }
+
+    setCardsProbe() {
+        var probedKeys = this.probeKeySetPath.getKeys();
+        for(var key in this.refs) {
+            var ref = this.refs[key];
+            if(probedKeys.indexOf(ref.props.data.id) > -1) {
+                ref.setState({
+                    probed: true
+                });
+            }
+        }
     }
 
     dataChanged() {
@@ -42,12 +61,10 @@ export default class CustomCardViewTool extends React.Component {
             attributes: this.attributesPath.getNames().map((name) => { return this.attributesPath.push(name); })
         };
 
-        console.log(mapping);
 
         var attributeNames = this.attributesPath.getNames();
 
         this.records = this.toolPath.retrieveRecords(mapping);
-        console.log(this.records);
 
         this.formattedRecords = this.records.map((record) => {
             var formattedRecord = {};
@@ -96,13 +113,36 @@ export default class CustomCardViewTool extends React.Component {
 
     }
 
+    onSelect() {
+        var selectedKeys = [];
+        for(var key in this.refs) {
+            var ref = this.refs[key];
+            if(ref.state.selected) {
+                selectedKeys.push(ref.props.data.id);
+            }
+        }
+        this.selectionKeySetPath.setKeys(selectedKeys);
+    }
+
+    onProbe() {
+        var probedKeys = [];
+
+        for(var key in this.refs) {
+            var ref = this.refs[key];
+            if(ref.state.probed) {
+                probedKeys.push(ref.props.data.id);
+            }
+        }
+        this.probeKeySetPath.setKeys(probedKeys);
+    }
+
     render() {
         var cards = this.formattedRecords.map((formattedRecord, index) => {
-            return <Card data={formattedRecord} key={index}/>;
+            return <Card data={formattedRecord} key={index} ref={index} onSelect={this.onSelect.bind(this)} onProbe={this.onProbe.bind(this)}/>;
         });
 
         return (
-            <div>
+            <div style={{width: "100%", height: "100%"}}>
                 {
                     cards
                 }
@@ -115,6 +155,23 @@ class Card extends React.Component {
 
     constructor(props) {
         super(props);
+
+        this.state = {
+            probed: false,
+            selected: false
+        };
+    }
+f
+    toggleSelect () {
+        this.setState({
+            selected: !this.state.selected
+        }, this.props.onSelect);
+    }
+
+    toggleProbe () {
+        this.setState({
+            probed: !this.state.probed
+        }, this.props.onProbe);
     }
 
     render() {
@@ -123,14 +180,40 @@ class Card extends React.Component {
 
         var contactIcon = {
             flex: 0.2,
-            backgroundColor: "white",
-            backgroundAlpha: "1",
+            //backgroundColor: this.state.probed ? "#8b8c8e" : "#e9eaed",
+            backgroundAlpha: "0",
             backgroundImage: "url(img/contact-icon.png)",
             backgroundSize: "contain",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center"
         };
 
+        var cardStyle = {
+            height: "150",
+            width: "300",
+            marginLeft: 5,
+            marginRight: 5,
+            marginBottom: 10,
+            backgroundColor: () => {
+                if(this.state.probed && this.state.selected) {
+                    return "#DCC6DC";
+                } else if (this.state.probed) {
+                    return "#dae2fc";
+                } else if (this.state.selected) {
+                    return "rgba(224, 141, 157, 0.4)";
+                } else {
+                    return "#e9eaed";
+                }
+            }(),
+            border: "solid",
+            padding: "5px",
+            borderWidth: "0px",
+            borderColor: "#286090",
+            boxShadow: "0 1px 1px rgba(0,0,0,.05)",
+            float: "left"
+        };
+
+        var cardStyleprefixed = VendorPrefix.prefix({styles: cardStyle});
 
         var rows = data.attributes.map((attribute, index) => {
             return (
@@ -142,15 +225,15 @@ class Card extends React.Component {
         });
 
         return (
-            <div style={cardStyle}>
+            <div style={cardStyleprefixed.styles} onClick={this.toggleSelect.bind(this)} onMouseOver={this.toggleProbe.bind(this)} onMouseOut={this.toggleProbe.bind(this)}>
                 <div style={{display: "flex", flexDirection: "row", flex: 0.2}}>
                     <div style={{flex: 0.8}}>
-                        <p style={{fontSize: "15px"}}>
+                        <p style={{fontSize: "15px", color: "#34495e"}}>
                             {
-                                data.header
+                                data.header.toUpperCase()
                             }
                         </p>
-                        <p style={{fontSize: "12px"}}>
+                        <p style={{fontSize: "12px", color: "#34495e", whiteSpace: "nowrap"}}>
                             {
                                 data.title
                             }
@@ -159,7 +242,7 @@ class Card extends React.Component {
                     <div style={contactIcon}/>
                 </div>
                 <div style={{flex: 0.8}}>
-                    <table style={{width: "100%", fontSize: "11px"}}>
+                    <table style={{width: "100%", fontSize: "11px", color: "#93a5aa"}}>
                       {
                         rows
                       }
