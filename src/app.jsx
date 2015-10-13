@@ -8,7 +8,10 @@ import CustomCardViewTool from "./CustomCardViewTool.jsx";
 import WeaveReactTable from "./weave-react-table.jsx";
 import Weave from "./Weave.jsx";
 import _ from "lodash";
+import ReactBurgerMenu from "react-burger-menu";
+import * as bs from "react-bootstrap";
 
+var Menu = ReactBurgerMenu.slide;
 var tableContainer = {
     flex: 1
 };
@@ -57,6 +60,9 @@ export default class App extends React.Component {
 
     }
 
+    showSettings(event) {
+    }
+
     render() {
         if(this.weaveContainerElt) {
             var containerPosition = this.weaveContainerElt.getBoundingClientRect();
@@ -86,14 +92,46 @@ export default class App extends React.Component {
             customCardViewTool = <CustomCardViewTool ref="cardViewTool" toolPath={this.customCardViewToolPath}/>;
         }
 
+        var menuItem = {
+            display: "block",
+            outline: "none",
+            padding: "0.8em",
+            fontSize: "1.15em"
+        };
+        var subMenuItem = {
+            padding: "0.2em",
+            outline: "none",
+            fontSize: "1.0em"
+        };
+
         return (
             <div style = { {display: "flex", flexDirection: "column", height: "100%"} }>
+
+                <div style={{height: 108, marginRight: "5px", zIndex: 10, backgroundColor: "#aeb4c9"}}>
+                    <Menu>
+                        <ul className="bm-item-list" style={{height: "100%"}}>
+                            <li style={menuItem}>
+                                <Item glyphName="plus" label="Vital Stats" href="javascript:void(0);"/>
+                                <ul style={{listStyleType: "none"}}>
+                                    <li style={subMenuItem}><Item href="javascript:void(0);" label="Birth"/></li>
+                                    <li style={subMenuItem}><Item href="javascript:void(0);" label="Deaths"/></li>
+                                </ul>
+                            </li>
+                            <li style={menuItem}><Item href="javascript:void(0);" glyphName="remove" label="Crime Stats"/></li>
+                            <li style={menuItem}><Item href="javascript:void(0);" glyphName="user" label="Demography"/></li>
+                            <li style={menuItem}><Item href="http://ivpr.oicweave.org/tnhr/dashboard.php?topic=health" glyphName="tower" label="TN Community Record"/></li>
+                        </ul>
+                    </Menu>
+                    <b style={{fontSize: 40, fontFamily: "Roboto, sans-serif", color: "#373a47", left: "20%", top: "20", fontWeight: "bold", position: "relative"}}>
+                        Prescription Drug Observation
+                    </b>
+                </div>
                 <div style={{height: 45, marginLeft: "5px", marginRight: "5px", paddingTop: 5}}>
                    {
                      customSearchTool
                    }
                 </div>
-                <div style={{height: 200, marginLeft: "5px", marginRight: "5px", marginBottom: "20px", paddingTop: 5, overflowY: "scroll"}}>
+                <div style={{height: 150, marginLeft: "5px", marginRight: "5px", marginBottom: "20px", paddingTop: 5, overflowY: "scroll"}}>
                     {
                         customCardViewTool
                     }
@@ -101,6 +139,36 @@ export default class App extends React.Component {
                 <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
                 <Weave ref="weave" style={style} onWeaveReady={this.handleWeaveReady.bind(this)}/>
             </div>
+        );
+    }
+}
+
+class Item extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            hovered: false
+        };
+    }
+
+    toggleHover () {
+        this.setState({
+            hovered: !this.state.hovered
+        });
+    }
+
+    render () {
+        return (
+            <a href={this.props.href} target="_blank" onMouseOver={this.toggleHover.bind(this)} onMouseOut={this.toggleHover.bind(this)} style={{color: this.state.hovered ? "#c94e50" : "#b8b7ad"}}>
+                {
+                    this.props.glyphName ? <bs.Glyphicon glyph={this.props.glyphName}/> : ""
+                }
+                {" "}
+                {
+                    this.props.label
+                }
+            </a>
         );
     }
 }

@@ -43,7 +43,7 @@
     "d3": "^3.5.6",
     "jquery": "^2.1.4",
     "lodash": "^3.10.0",
-    "openlayers": "^3.9.0",
+    "openlayers": "^3.10.1",
     "react": "^0.13.3",
     "react-bootstrap": "^0.25.2",
     "react-bootstrap-async-autocomplete": "0.0.3",

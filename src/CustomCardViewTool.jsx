@@ -14,19 +14,68 @@ export default class CustomCardViewTool extends React.Component {
         this.titlePath = this.props.toolPath.push("title");
         this.attributesPath = this.props.toolPath.push("attributes");
         this.selectionKeySetPath = this.props.toolPath.push("selectionKeySet");
+        this.sortColumnPath = this.props.toolPath.push("sort");
         this.probeKeySetPath = this.props.toolPath.push("probeKeySet");
         this.formattedRecords = [];
     }
 
     componentDidMount() {
+
+        var debouncedFunc = _.debounce(this.dataChanged.bind(this), 100);
         [this.headerPath,
          this.titlePath,
-         this.attributesPath].forEach((path) => {
-            path.addCallback(_.debounce(this.dataChanged.bind(this), 100), true, false);
+         this.attributesPath,
+         this.sortColumnPath].forEach((path) => {
+            path.addCallback(debouncedFunc, true, false);
         });
 
-         this.selectionKeySetPath.addCallback(_.debounce(this.setCardsSelection.bind(this), 100));
-         this.probeKeySetPath.addCallback(_.debounce(this.setCardsProbe.bind(this), 50));
+         this.selectionKeySetPath.addCallback(_.debounce(this.setCardsSelection.bind(this), 100), true, false);
+         this.probeKeySetPath.addCallback(_.debounce(this.setCardsProbe.bind(this), 50), true, false);
+
+         React.findDOMNode(this).parentNode.addEventListener("click", this.clearSelection.bind(this));
+    }
+
+    componentDidUpdate () {
+        this.setCardsSelection();
+        this.setCardsProbe();
+    }
+
+    clearSelection () {
+        this.selectionKeySetPath.setKeys([]);
+    }
+
+    onSelect(index) {
+
+        var selectedKeys = [];
+
+        if(!(event.ctrlKey || event.metaKey)) {
+            selectedKeys = this.refs[index].state.selected ? [this.refs[index].props.data.id] : [];
+        } else {
+            for(var key in this.refs) {
+                var ref = this.refs[key];
+                if(ref.state.selected) {
+                    selectedKeys.push(ref.props.data.id);
+                }
+            }
+        }
+        this.selectionKeySetPath.setKeys(selectedKeys);
+    }
+
+    onProbe(index) {
+
+        var probedKeys = [];
+
+        if(!(event.ctrlKey || event.metaKey)) {
+            probedKeys = this.refs[index].state.probed ? [this.refs[index].props.data.id] : [];
+        } else {
+            for(var key in this.refs) {
+                var ref = this.refs[key];
+                if(ref.state.probed) {
+                    probedKeys.push(ref.props.data.id);
+                }
+            }
+        }
+        this.probeKeySetPath.setKeys(probedKeys);
     }
 
     setCardsSelection() {
@@ -36,6 +85,10 @@ export default class CustomCardViewTool extends React.Component {
             if(selectedKeys.indexOf(ref.props.data.id) > -1) {
                 ref.setState({
                     selected: true
+                });
+            } else {
+                ref.setState({
+                    selected: false
                 });
             }
         }
@@ -49,6 +102,10 @@ export default class CustomCardViewTool extends React.Component {
                 ref.setState({
                     probed: true
                 });
+            } else {
+                ref.setState({
+                    probed: false
+                });
             }
         }
     }
@@ -58,13 +115,14 @@ export default class CustomCardViewTool extends React.Component {
         var mapping = {
             header: this.headerPath.getNames().map((name) => { return this.headerPath.push(name); }),
             title: this.titlePath.getNames().map((name) => { return this.titlePath.push(name); }),
-            attributes: this.attributesPath.getNames().map((name) => { return this.attributesPath.push(name); })
+            attributes: this.attributesPath.getNames().map((name) => { return this.attributesPath.push(name); }),
+            sort: this.sortColumnPath
         };
 
 
         var attributeNames = this.attributesPath.getNames();
 
-        this.records = this.toolPath.retrieveRecords(mapping);
+        this.records = _.sortByOrder(this.toolPath.retrieveRecords(mapping), "sort", "asc");
 
         this.formattedRecords = this.records.map((record) => {
             var formattedRecord = {};
@@ -109,36 +167,12 @@ export default class CustomCardViewTool extends React.Component {
 
     }
 
-    componentDidUpdate() {
-
-    }
-
-    onSelect() {
-        var selectedKeys = [];
-        for(var key in this.refs) {
-            var ref = this.refs[key];
-            if(ref.state.selected) {
-                selectedKeys.push(ref.props.data.id);
-            }
-        }
-        this.selectionKeySetPath.setKeys(selectedKeys);
-    }
-
-    onProbe() {
-        var probedKeys = [];
-
-        for(var key in this.refs) {
-            var ref = this.refs[key];
-            if(ref.state.probed) {
-                probedKeys.push(ref.props.data.id);
-            }
-        }
-        this.probeKeySetPath.setKeys(probedKeys);
-    }
-
     render() {
+        // this.selectionKeySetPath.setKeys(this.state.selected);
+        // this.probeKeySetPath.setKeys(this.state.probed);
+
         var cards = this.formattedRecords.map((formattedRecord, index) => {
-            return <Card data={formattedRecord} key={index} ref={index} onSelect={this.onSelect.bind(this)} onProbe={this.onProbe.bind(this)}/>;
+            return <Card data={formattedRecord} key={index} ref={index} onSelect={this.onSelect.bind(this, index)} onProbe={this.onProbe.bind(this, index)}/>;
         });
 
         return (
@@ -161,17 +195,28 @@ class Card extends React.Component {
             selected: false
         };
     }
-f
-    toggleSelect () {
-        this.setState({
-            selected: !this.state.selected
-        }, this.props.onSelect);
+
+    componentDidUpdate () {
+
     }
 
-    toggleProbe () {
+    toggleSelect (event) {
+
+        this.setState({
+            selected: !this.state.selected
+        }, () => {
+            this.props.onSelect(event);
+        });
+
+        event.stopPropagation();
+    }
+
+    toggleProbe (event) {
         this.setState({
             probed: !this.state.probed
-        }, this.props.onProbe);
+        }, () => {
+            this.props.onProbe(event);
+        });
     }
 
     render() {
