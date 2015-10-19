@@ -1,6 +1,7 @@
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import ol from "openlayers";
 import lodash from "lodash";
+import jquery from "jquery";
 
 /* Use ol.FeatureOverlay for probing */
 
@@ -129,8 +130,6 @@ class GlyphLayer extends Layer {
 		var rawProj = ol.proj.get("EPSG:4326");
 		var mapProj = this.parent.map.getView().getProjection();
 
-		console.log({recordIds, removedIds, records});
-
 		for (let id of removedIds)
 		{
 			let feature = this.source.getFeatureById(id);
@@ -161,14 +160,12 @@ class GlyphLayer extends Layer {
 
 	updateImages() {
 		/* Update feature styles */
-		console.log("updateImages()");
+
 		var records = this.layerPath.retrieveRecords(["imageURL", "imageSize"], this.layerPath.push("dataX"));
 
 		var recordIds = lodash.pluck(records, "id");
 
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
-
-		console.log({records, recordIds, removedIds});
 
 		/* Unset style for missing points */
 		for (let id of removedIds)
@@ -187,9 +184,15 @@ class GlyphLayer extends Layer {
 			feature.setStyle(null);
 		}
 
-		console.log("hello");
-
 		/* Update style for everyone else */
+
+		var images = new Map();
+
+		function setScale(icon, imageSize)
+		{
+			var maxDim = Math.max(this.naturalHeight, this.naturalWidth);
+			icon.setScale(imageSize / maxDim);
+		}
 
 		for (let record of records)
 		{
@@ -197,7 +200,6 @@ class GlyphLayer extends Layer {
 			let id = record.id;
 			let imageURL = record.imageURL;
 			let imageSize = record.imageSize;
-			console.log({id, imageURL, imageSize});
 
 			if (!feature)
 			{
@@ -212,14 +214,17 @@ class GlyphLayer extends Layer {
 				continue;
 			}
 
-			let style = new ol.style.Style({
-				image: new ol.style.Icon({
-					src: imageURL,
-					opacity: 1
-				})
+			let icon = new ol.style.Icon({
+				src: imageURL
 			});
 
-			console.log(style);
+			let img = icon.getImage();
+
+			jquery(img).one("load", setScale.bind(img, icon, imageSize));
+
+			let style = new ol.style.Style({
+				image: icon
+			});
 
 			feature.setStyle(style);
 		}
