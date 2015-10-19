@@ -65,8 +65,8 @@ class Layer {
 		var layerType = parent.plottersPath.push(layerName).getType();
 		switch (layerType)
 		{
-			case "weave.visualization.plotters::GeometryPlotter":
-				return new GeometryLayer(parent, layerName);
+			//case "weave.visualization.plotters::GeometryPlotter":
+			//	return new GeometryLayer(parent, layerName);
 			case "weave.visualization.plotters::ImageGlyphPlotter":
 				return new GlyphLayer(parent, layerName);
 			case "weave.visualization.plotters::WMSPlotter":
@@ -88,7 +88,141 @@ class GlyphLayer extends Layer {
 		super(parent, layerName);
 
 		this.layer = new ol.layer.Vector();
+		this.source = new ol.source.Vector();
+		this.layer.setSource(this.source);
+
 		/* Build a new set of point geometries and style them based on the properties in question */
+
+		this.boundUpdateLocations = this.updateLocations.bind(this);
+		this.boundUpdateImages = this.updateImages.bind(this);
+
+		this.layerPath.push("dataX").addCallback(this.boundUpdateLocations, true);
+		this.layerPath.push("dataY").addCallback(this.boundUpdateLocations, true);
+		this.layerPath.push("imageSize").addCallback(this.boundUpdateImages, true);
+		this.layerPath.push("imageURL").addCallback(this.boundUpdateImages, true);
+	}
+
+	_getFeatureIds() {
+		return lodash.map(this.source.getFeatures(), (item) => item.getId());
+	}
+
+	static _toPoint(datum, field1, field2) {
+		if (typeof datum === "object")
+		{
+			let firstPoly = datum[0];
+			return (firstPoly.bounds[field1] + firstPoly.bounds[field2]) / 2;
+		}
+		else
+		{
+			return datum;
+		}
+	}
+
+	updateLocations() {
+		/* Update feature locations */
+		var records = this.layerPath.retrieveRecords(["dataX", "dataY"], this.layerPath.push("dataX"));
+
+		var recordIds = lodash.pluck(records, "id");
+
+		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
+
+		var rawProj = ol.proj.get("EPSG:4326");
+		var mapProj = this.parent.map.getView().getProjection();
+
+		console.log({recordIds, removedIds, records});
+
+		for (let id of removedIds)
+		{
+			let feature = this.source.getFeatureById(id);
+			this.source.removeFeature(feature);
+		}
+
+		for (let record of records)
+		{
+			let feature = this.source.getFeatureById(record.id);
+
+			if (!feature)
+			{
+				feature = new ol.Feature({});
+				feature.setId(record.id);
+				this.source.addFeature(feature);
+			}
+
+			let dataX, dataY;
+
+			dataX = GlyphLayer._toPoint(record.dataX, "xMin", "xMax");
+			dataY = GlyphLayer._toPoint(record.dataY, "yMin", "yMax");
+
+			let point = new ol.geom.Point([dataX, dataY]);
+			point.transform(rawProj, mapProj);
+			feature.setGeometry(point);
+		}
+	}
+
+	updateImages() {
+		/* Update feature styles */
+		console.log("updateImages()");
+		var records = this.layerPath.retrieveRecords(["imageURL", "imageSize"], this.layerPath.push("dataX"));
+
+		var recordIds = lodash.pluck(records, "id");
+
+		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
+
+		console.log({records, recordIds, removedIds});
+
+		/* Unset style for missing points */
+		for (let id of removedIds)
+		{
+			if (!id)
+			{
+				continue;
+			}
+			let feature = this.source.getFeatureById(id);
+
+			if (!feature)
+			{
+				continue;
+			}
+
+			feature.setStyle(null);
+		}
+
+		console.log("hello");
+
+		/* Update style for everyone else */
+
+		for (let record of records)
+		{
+			let feature = this.source.getFeatureById(record.id);
+			let id = record.id;
+			let imageURL = record.imageURL;
+			let imageSize = record.imageSize;
+			console.log({id, imageURL, imageSize});
+
+			if (!feature)
+			{
+				feature = new ol.Feature({});
+				feature.setId(id);
+				this.source.addFeature(feature);
+			}
+
+			if (!imageURL)
+			{
+				feature.setStyle(null);
+				continue;
+			}
+
+			let style = new ol.style.Style({
+				image: new ol.style.Icon({
+					src: imageURL,
+					opacity: 1
+				})
+			});
+
+			console.log(style);
+
+			feature.setStyle(style);
+		}
 	}
 }
 
@@ -221,33 +355,74 @@ export default class WeaveOpenLayersMap {
 		/* Register layer changes */
 
 		this.layers = {};
-		this.zoomBoundsPath.addCallback(this.getSessionCenter.bind(this), true);
+		this.getSessionCenterBound = this.getSessionCenter.bind(this);
 
-		this.map.getView().on("change:center", this.setSessionCenter, this);
+		this.zoomBoundsPath.addCallback(this.getSessionCenterBound, true);
+
+		this.centerCallbackHandle = this.map.getView().on("change:center", this.setSessionCenter, this);
+		this.resolutionCallbackHandle = this.map.getView().on("change:resolution", this.setSessionZoom, this);
 
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
 	}
 
 	setSessionCenter()
 	{
-		var extents = this.map.getView().calculateExtent(this.map.getSize());
+		var [xCenter, yCenter] = this.map.getView().getCenter();
+
+		this.zoomBoundsPath.removeCallback(this.getSessionCenterBound);
 
 		this.zoomBoundsPath
-			.vars({xMin: extents[0], yMin: extents[1],
-					xMax: extents[2], yMax: extents[3]})
+			.vars({xCenter, yCenter})
 			.getValue(
-				"setBounds(new Bounds2D(xMin, yMin, xMax, yMax));"
+				"var tmp_data_bounds = new Bounds2D();" +
+				"getDataBounds(tmp_data_bounds);" +
+				"tmp_data_bounds.setXCenter(xCenter);" +
+				"tmp_data_bounds.setYCenter(yCenter);" +
+				"setDataBounds(tmp_data_bounds);"
 			);
+
+		this.zoomBoundsPath.addCallback(this.getSessionCenterBound);
+	}
+
+	setSessionZoom()
+	{
+		var resolution = this.map.getView().getResolution();
+
+		this.zoomBoundsPath.removeCallback(this.getSessionCenterBound);
+
+		this.zoomBoundsPath
+			.vars({resolution}).getValue(
+				"tmp_data_bounds = new Bounds2D();" +
+				"tmp_screen_bounds = new Bounds2D();" +
+				"getDataBounds(tmp_data_bounds);" +
+				"getScreenBounds(tmp_screen_bounds);" +
+				"tmp_data_bounds.setWidth(tmp_screen_bounds.getWidth() * resolution);" +
+				"tmp_data_bounds.setHeight(tmp_screen_bounds.getHeight() * resolution);" +
+				"setDataBounds(tmp_data_bounds);");
+
+		this.zoomBoundsPath.addCallback(this.getSessionCenterBound);
+
 	}
 
 	getSessionCenter()
 	{
-		var rect = this.zoomBoundsPath.getValue(
+		var center = this.zoomBoundsPath.getValue(
 				"tmp_bounds = new Bounds2D();" +
 				"getDataBounds(tmp_bounds);" +
-				"tmp_bounds.getRectangle(null, true)");
-		var extents = [rect.x, rect.y, rect.x + rect.width, rect.y + rect.height];
-		this.map.getView().fit(extents, this.map.getSize());
+				"[tmp_bounds.getXCenter(), tmp_bounds.getYCenter()];");
+
+		var scale = this.zoomBoundsPath.getValue("getXScale()");
+
+		this.map.getView().un("change:center", this.setSessionCenter, this);
+		this.map.getView().un("change:resolution", this.setSessionZoom, this);
+
+		this.map.getView().setCenter(center);
+		this.map.getView().setResolution(1 / scale);
+
+		lodash.defer(() => {
+			this.map.getView().on("change:center", this.setSessionCenter, this);
+			this.map.getView().on("change:resolution", this.setSessionZoom, this);
+		});
 	}
 
 	plottersChanged()
