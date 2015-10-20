@@ -46,6 +46,7 @@ export default class WeaveLayoutManager extends React.Component {
 
     componentDidUpdate() {
         if(this.weave) {
+            console.log(JSON.stringify(this.state.layout, null, 3));
             this.weave.path(LAYOUT).state(this.state.layout);
         }
     }
@@ -98,16 +99,73 @@ export default class WeaveLayoutManager extends React.Component {
         this.isDragging = true;
     }
 
-    onDragStop(id) {
+    onDragStop(id, event) {
         if(this.isDragging) {
             this.toolDroppedOn = id;
+            if(this.toolDragged !== this.toolDroppedOn) {
+                var toolNode = this.refs[LAYOUT].getDOMNodeFromId(id);
+                var toolNodePosition = toolNode.getBoundingClientRect();
+
+                var center = {
+                    x: (toolNodePosition.right - toolNodePosition.left) / 2,
+                    y: (toolNodePosition.bottom - toolNodePosition.top) / 2
+                };
+
+                var mousePosRelativeToCenter = {
+                    x: event.clientX - (toolNodePosition.left + center.x),
+                    y: event.clientY - (toolNodePosition.top + center.y)
+                };
+
+                var mouseNorm = {
+                    x: (mousePosRelativeToCenter.x) / (toolNodePosition.width / 2),
+                    y: (mousePosRelativeToCenter.y) / (toolNodePosition.height / 2)
+                };
+
+                var mousePolarCoord = {
+                    r: Math.sqrt(mouseNorm.x * mouseNorm.x + mouseNorm.y * mouseNorm.y),
+                    theta: Math.atan2(mouseNorm.y, mouseNorm.x)
+                };
+
+                var dropZone = "";
+                var zones = ["right", "bottom", "left", "top"];
+
+                var angle = Math.round((mousePolarCoord.theta / (2 * Math.PI) * 4) + 4) % 4;
+
+                if(mousePolarCoord.r < 0.34) {
+                    dropZone = "center";
+                } else {
+                    dropZone = zones[angle];
+                }
+
+                this.updateLayout(this.toolDragged, this.toolDroppedOn, dropZone);
+            }
             this.isDragging = false;
         }
-        this.updateLayout(this.toolDragged, this.toolDroppedOn);
     }
 
-    updateLayout(toolDragged, toolDroppedOn) {
+    updateLayout(toolDragged, toolDroppedOn, dropZone) {
+        var src = this.refs[LAYOUT].getComponentFromId(toolDragged);
+        var dest = this.refs[LAYOUT].getComponentFromId(toolDroppedOn);
 
+        if(dropZone === "center") {
+            var srcId = src.state.id;
+
+            src.setState({
+                id: dest.state.id
+            });
+
+            dest.setState({
+                id: srcId
+            });
+
+            return;
+        }
+        // src.setState({
+        //     id: "blah"
+        // });
+
+        // dest
+        // console.log(event);
     }
 
     render () {

@@ -52,19 +52,19 @@ export default class Layout extends React.Component {
         }
     }
 
-    setState(value, callback) {
-        super.setState(value, callback);
+    getDOMNodeFromId (id) {
+        var component = this.getComponentFromId(id);
+        if(component) {
+          return component.element;
+        }
     }
 
-    getDOMNodeFromId (id) {
+    getComponentFromId (id) {
         if(this.state.id && _.isEqual(this.state.id, id)) {
-            if(_.isEqual(id, ["Weave"])) {
-                console.log(this.element.clientHeight);
-            }
-            return this.element;
+            return this;
         } else {
             for(var i = 0; i < this.childNames.length; i++) {
-                var node = this.refs[this.childNames[i]].getDOMNodeFromId(id);
+                var node = this.refs[this.childNames[i]].getComponentFromId(id);
                 if(node) {
                     return node;
                 }
@@ -171,7 +171,7 @@ export default class Layout extends React.Component {
             flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
         };
 
-        if (this.state.children) {
+        if (this.state.children && this.state.children.length > 0) {
             var newChildren = new Array(this.state.children.length * 2 - 1);
 
             this.state.children.forEach((childState, i) => {
