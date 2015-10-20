@@ -7,12 +7,29 @@ import _ from "lodash";
  */
 export default class StandardLib {
 
+	/**
+	 * Searches for the first nested object with matching properties
+	 * @param root The root Object.
+	 * @param match Either an Object with properties to match, or a Function that checks for a match.
+	 */
+	static findDeep(root, match) {
+		if (typeof match !== 'function')
+			match = _.matches(match);
+		
+		if (match(root))
+			return root;
+		
+		for (var key in root)
+		{
+			var found = findMatchingObject(root[key], match);
+			if (found)
+				return found;
+		}
+	}
 
     /**
      * Adds undefined values to new state for properties in
      * current state not found in new state.
-     *
-     *
      */
      static includeMissingPropertyPlaceholders(currentState, newState) {
 

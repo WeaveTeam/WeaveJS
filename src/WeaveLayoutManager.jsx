@@ -18,6 +18,7 @@ import WeaveReactTable from "./weave-react-table.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";
 import Weave from "./Weave.jsx";
+import StandardLib from "../Utils/StandardLib";
 
 const LAYOUT = "Layout";
 
@@ -144,28 +145,21 @@ export default class WeaveLayoutManager extends React.Component {
     }
 
     updateLayout(toolDragged, toolDroppedOn, dropZone) {
-        var src = this.refs[LAYOUT].getComponentFromId(toolDragged);
-        var dest = this.refs[LAYOUT].getComponentFromId(toolDroppedOn);
+    	var newState = _.cloneDeep(this.state);
+        var src = StandardLib.findDeep(newState, {id: toolDragged});
+        var dest = StandardLib.findDeep(newState, {id: toolDroppedOn});
 
         if(dropZone === "center") {
-            var srcId = src.state.id;
-
-            src.setState({
-                id: dest.state.id
-            });
-
-            dest.setState({
-                id: srcId
-            });
-
-            return;
+            var srcId = src.id;
+            src.id = dest.id;
+            dest.id = srcId;
         }
-        // src.setState({
-        //     id: "blah"
-        // });
-
-        // dest
-        // console.log(event);
+        else
+        {
+        	//TODO
+        }
+        
+        this.setState(newState);
     }
 
     render () {
