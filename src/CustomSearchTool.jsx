@@ -33,12 +33,25 @@ export default class CustomSearchTool extends React.Component {
             searchObject: this.props.toolPath.getState("searchValues")
         };
         this.searchFields = this.props.toolPath.getState("searchFields");
+
+        this.updateStateFuncs = {};
+        this.searchFields.forEach(function (field) {
+            this.updateStateFuncs[field] = this.updateState.bind(this, field);
+        }, this);
+
+        this.debouncedComponentDidUpdate = _.debounce(() => {
+            this.props.toolPath.state("searchValues", this.state.searchObject);
+        }, 2000);
     }
 
     componentDidMount() {
         this.props.toolPath.addCallback(this.handleWeaveState.bind(this), true, false);
         this.props.toolPath.push("searchFields").addCallback(() => {
             this.searchFields = this.props.toolPath.getState("searchFields");
+            this.updateStateFuncs = {};
+            this.searchFields.forEach((field) => {
+                this.updateStateFuncs[field] = this.updateState.bind(this, field);
+            }, this);
         }, true);
     }
 
@@ -49,7 +62,7 @@ export default class CustomSearchTool extends React.Component {
     }
 
     componentDidUpdate() {
-        this.props.toolPath.state("searchValues", this.state.searchObject);
+        this.debouncedComponentDidUpdate();
     }
 
     updateState(field) {
@@ -103,7 +116,7 @@ export default class CustomSearchTool extends React.Component {
                                         buttonAfter={closeButton}
                                         hasFeedback={true}
                                         placeholder={"Enter " + this.searchFields[i]}
-                                        onChange={this.updateState.bind(this, field)}>
+                                        onChange={this.updateStateFuncs[field]}>
                                     </bs.Input>
                                    </div>;
                 inputs.push(searchInput);
