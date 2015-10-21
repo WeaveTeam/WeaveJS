@@ -19,11 +19,14 @@ export default class StandardLib {
 		if (match(root))
 			return root;
 		
-		for (var key in root)
+		if (typeof root == 'object')
 		{
-			var found = findMatchingObject(root[key], match);
-			if (found)
-				return found;
+			for (var key in root)
+			{
+				var found = findDeep(root[key], match);
+				if (found)
+					return found;
+			}
 		}
 	}
 
