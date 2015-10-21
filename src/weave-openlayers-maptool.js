@@ -66,8 +66,8 @@ class Layer {
 		var layerType = parent.plottersPath.push(layerName).getType();
 		switch (layerType)
 		{
-			//case "weave.visualization.plotters::GeometryPlotter":
-			//	return new GeometryLayer(parent, layerName);
+			case "weave.visualization.plotters::GeometryPlotter":
+				return new GeometryLayer(parent, layerName);
 			case "weave.visualization.plotters::ImageGlyphPlotter":
 				return new GlyphLayer(parent, layerName);
 			case "weave.visualization.plotters::WMSPlotter":
@@ -127,7 +127,7 @@ class GlyphLayer extends Layer {
 
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
 
-		var rawProj = ol.proj.get("EPSG:4326");
+		var rawProj = this.layerPath.getState("sourceProjection");
 		var mapProj = this.parent.map.getView().getProjection();
 
 		for (let id of removedIds)
@@ -185,8 +185,6 @@ class GlyphLayer extends Layer {
 		}
 
 		/* Update style for everyone else */
-
-		var images = new Map();
 
 		function setScale(icon, imageSize)
 		{
@@ -321,19 +319,39 @@ class GeometryLayer extends Layer {
 		super(parent, layerName);
 
 		this.layer = new ol.layer.Vector();
+		this.source = new ol.source.Vector();
+		this.layer.setSource(this.source);
 
-		this.geoColumnPath = this.layerPath.push("geometryColumn", "internalDynamicColumn");
+		this.geoJsonParser = new ol.format.GeoJSON();
+
+		this.geoColumnPath = this.layerPath.push("geometryColumn");
 		this.colorColumnPath = this.layerPath.push("fill", "color");
 
 		var boundUpdateGeo = this.updateGeometryData.bind(this);
 
-		this.geoColumnPath.addCallback(boundUpdateGeo);
-		this.colorColumnPath.addCallback(boundUpdateGeo);
+		this.geoColumnPath.addCallback(boundUpdateGeo, true);
 	}
 
 	updateGeometryData()
 	{
-		var geoJson = this.geoColumnPath.getValue("ColumnUtils.getGeoJson()");
+		var dataProjection = this.geoColumnPath.getState("projectionSRS");
+		var featureProjection = this.parent.map.getView().getProjection();
+		var keys = this.geoColumnPath.getValue("this.keys");
+		var rawGeometries = this.geoColumnPath.getValue("ColumnUtils.getGeoJsonGeometries(this, this.keys)");
+
+		this.source.clear();
+
+		for (let idx = 0; idx < keys.length; idx++)
+		{
+			let id = this.geoColumnPath.qkeyToString(keys[idx]);
+
+			let geometry = this.geoJsonParser.readGeometry(rawGeometries[idx], {dataProjection, featureProjection});
+
+			let feature = new ol.Feature({geometry});
+			feature.setId(id);
+
+			this.source.addFeature(feature);
+		}
 	}
 }
 
