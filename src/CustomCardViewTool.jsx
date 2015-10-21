@@ -111,6 +111,11 @@ export default class CustomCardViewTool extends React.Component {
         }
     }
 
+    handleCheckedCard(index, value) {
+        console.log(index, value);
+        console.log(this.formattedRecord[index]);
+    }
+
     dataChanged() {
 
         var mapping = {
@@ -173,7 +178,7 @@ export default class CustomCardViewTool extends React.Component {
         // this.probeKeySetPath.setKeys(this.state.probed);
 
         var cards = this.formattedRecords.map((formattedRecord, index) => {
-            return <Card data={formattedRecord} key={index} ref={index} onSelect={this.onSelect.bind(this, index)} onProbe={this.onProbe.bind(this, index)}/>;
+            return <Card data={formattedRecord} key={index} ref={index} onSelect={this.onSelect.bind(this, index)} handleChecks={this.handleCheckedCard.bind(this, index)} onProbe={this.onProbe.bind(this, index)}/>;
         });
 
         return (
@@ -273,7 +278,7 @@ class Card extends React.Component {
         return (
             <div style={cardStyleprefixed.styles} onClick={this.toggleSelect.bind(this)} onMouseOver={this.toggleProbe.bind(this)} onMouseOut={this.toggleProbe.bind(this)}>
                 <div>
-                    <input type="checkbox"/>
+                    <input type="checkbox" onChange={this.props.handleChecks}/>
                 </div>
                 <div style={{display: "flex", flexDirection: "row", flex: 0.2}}>
                     <div style={{flex: 0.8}}>
