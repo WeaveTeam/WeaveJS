@@ -13,19 +13,22 @@ export default class StandardLib {
 	 * @param match Either an Object with properties to match, or a Function that checks for a match.
 	 */
 	static findDeep(root, match) {
-		if (typeof match !== 'function')
+		if (typeof match !== "function") {
 			match = _.matches(match);
-		
-		if (match(root))
+        }
+
+		if (match(root)) {
 			return root;
-		
-		if (typeof root == 'object')
+        }
+
+		if (typeof root === "object")
 		{
 			for (var key in root)
 			{
-				var found = findDeep(root[key], match);
-				if (found)
+				var found = this.findDeep(root[key], match);
+				if (found) {
 					return found;
+                }
 			}
 		}
 	}

@@ -18,7 +18,7 @@ import WeaveReactTable from "./weave-react-table.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";
 import Weave from "./Weave.jsx";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "./Utils/StandardLib";
 
 const LAYOUT = "Layout";
 
@@ -145,7 +145,7 @@ export default class WeaveLayoutManager extends React.Component {
     }
 
     updateLayout(toolDragged, toolDroppedOn, dropZone) {
-    	var newState = _.cloneDeep(this.state);
+        var newState = _.cloneDeep(this.state);
         var src = StandardLib.findDeep(newState, {id: toolDragged});
         var dest = StandardLib.findDeep(newState, {id: toolDroppedOn});
 
@@ -154,11 +154,10 @@ export default class WeaveLayoutManager extends React.Component {
             src.id = dest.id;
             dest.id = srcId;
         }
-        else
-        {
-        	//TODO
+        else {
+            //TODO
         }
-        
+
         this.setState(newState);
     }
 

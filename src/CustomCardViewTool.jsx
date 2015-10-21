@@ -2,7 +2,6 @@ import React from "react";
 import VendorPrefix from "react-vendor-prefix";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import _ from "lodash";
-
 export default class CustomCardViewTool extends React.Component {
 
 
@@ -17,6 +16,8 @@ export default class CustomCardViewTool extends React.Component {
         this.sortColumnPath = this.props.toolPath.push("sort");
         this.probeKeySetPath = this.props.toolPath.push("probeKeySet");
         this.formattedRecords = [];
+
+        this.checkedRecords = [];
     }
 
     componentDidMount() {
@@ -271,6 +272,9 @@ class Card extends React.Component {
 
         return (
             <div style={cardStyleprefixed.styles} onClick={this.toggleSelect.bind(this)} onMouseOver={this.toggleProbe.bind(this)} onMouseOut={this.toggleProbe.bind(this)}>
+                <div>
+                    <input type="checkbox"/>
+                </div>
                 <div style={{display: "flex", flexDirection: "row", flex: 0.2}}>
                     <div style={{flex: 0.8}}>
                         <p style={{fontSize: "15px", color: "#34495e"}}>
