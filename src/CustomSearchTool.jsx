@@ -29,10 +29,12 @@ export default class CustomSearchTool extends React.Component {
     constructor(props) {
         super(props);
 
+        this.props.toolPath.request("ExternalTool");
+
         this.state = {
-            searchObject: this.props.toolPath.getState("searchValues")
+            searchObject: this.props.toolPath.push("searchValues").request("LinkableVariable").getState() || {}
         };
-        this.searchFields = this.props.toolPath.getState("searchFields");
+        this.searchFields = this.props.toolPath.push("searchFields").request("LinkableVariable").getState() || [];
 
         this.updateStateFuncs = {};
         this.searchFields.forEach(function (field) {
@@ -47,7 +49,7 @@ export default class CustomSearchTool extends React.Component {
     componentDidMount() {
         this.props.toolPath.addCallback(this.handleWeaveState.bind(this), true, false);
         this.props.toolPath.push("searchFields").addCallback(() => {
-            this.searchFields = this.props.toolPath.getState("searchFields");
+            this.searchFields = this.props.toolPath.getState("searchFields") || [];
             this.updateStateFuncs = {};
             this.searchFields.forEach((field) => {
                 this.updateStateFuncs[field] = this.updateState.bind(this, field);
@@ -57,7 +59,7 @@ export default class CustomSearchTool extends React.Component {
 
     handleWeaveState() {
         this.setState({
-            searchObject: this.props.toolPath.getState("searchValues")
+            searchObject: this.props.toolPath.getState("searchValues") || {}
         });
     }
 
