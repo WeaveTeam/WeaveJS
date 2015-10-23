@@ -2,11 +2,11 @@ import {registerToolImplementation} from "./WeaveTool.jsx";
 import ol from "openlayers";
 import lodash from "lodash";
 import jquery from "jquery";
+import StandardLib from "./Utils/StandardLib.js";
 
 /* Use ol.FeatureOverlay for probing */
 
 class Layer {
-
 
 	constructor(parent, layerName)
 	{
@@ -84,6 +84,7 @@ class Layer {
 }
 
 class GlyphLayer extends Layer {
+
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
@@ -230,6 +231,7 @@ class GlyphLayer extends Layer {
 }
 
 class TileLayer extends Layer {
+
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
@@ -288,8 +290,6 @@ class TileLayer extends Layer {
 		}
 	}
 
-
-
 	updateTileSource()
 	{
 		var serviceDriverName = this.servicePath.getType();
@@ -325,11 +325,19 @@ class GeometryLayer extends Layer {
 		this.geoJsonParser = new ol.format.GeoJSON();
 
 		this.geoColumnPath = this.layerPath.push("geometryColumn");
-		this.colorColumnPath = this.layerPath.push("fill", "color");
+		this.fillStylePath = this.layerPath.push("fill");
+		this.lineStylePath = this.layerPath.push("line");
+		this.filteredKeySet = this.layerPath.push("filteredKeySet");
 
 		var boundUpdateGeo = this.updateGeometryData.bind(this);
+		var boundUpdateStyleData = this.updateStyleData.bind(this);
+
+		this.styles = new Map();
 
 		this.geoColumnPath.addCallback(boundUpdateGeo, true);
+		this.fillStylePath.addCallback(boundUpdateStyleData);
+		this.lineStylePath.addCallback(boundUpdateStyleData);
+		boundUpdateStyleData();
 	}
 
 	updateGeometryData()
@@ -346,16 +354,88 @@ class GeometryLayer extends Layer {
 			let id = this.geoColumnPath.qkeyToString(keys[idx]);
 
 			let geometry = this.geoJsonParser.readGeometry(rawGeometries[idx], {dataProjection, featureProjection});
+			let style = this.styles.get(id);
 
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);
+			feature.setStyle(style);
 
 			this.source.addFeature(feature);
+		}
+	}
+
+	static _toColorArray(colorString, alpha)
+	{
+		var colorArray;
+		if (colorString[0] === "#")
+		{
+			colorArray = ol.color.asArray(colorString);
+		}
+		else
+		{
+			colorArray = ol.color.asArray("#" + StandardLib.decimalToHex(Number(colorString)));
+		}
+
+		if (!colorArray) {
+			console.error("Failed to convert color:", colorString, alpha);
+			return null;
+		}
+
+		colorArray[3] = Number(alpha);
+		return colorArray;
+	}
+
+
+
+	updateStyleData()
+	{
+		var styleRecords = this.layerPath.retrieveRecords({
+			fill: {
+				color: this.fillStylePath.push("color"),
+				alpha: this.fillStylePath.push("alpha"),
+				imageURL: this.fillStylePath.push("imageURL")
+			},
+			stroke: {
+				color: this.lineStylePath.push("color"),
+				alpha: this.lineStylePath.push("alpha"),
+				weight: this.lineStylePath.push("weight"),
+				lineCap: this.lineStylePath.push("caps"),
+				lineJoin: this.lineStylePath.push("joints"),
+				miterLimit: this.lineStylePath.push("miterLimit")
+			}
+		}, this.geoColumnPath);
+
+		this.rawStyles = styleRecords;
+
+		for (let record of styleRecords)
+		{
+			let style = new ol.style.Style({
+				fill: new ol.style.Fill({
+					color: (record.fill.color && GeometryLayer._toColorArray(record.fill.color, record.fill.alpha)) || [0, 0, 0, 0]
+				}),
+				stroke: new ol.style.Stroke({
+					color: GeometryLayer._toColorArray(record.stroke.color, record.stroke.alpha) || [0, 0, 0, 0.5],
+					width: Number(record.stroke.weight),
+					lineCap: record.stroke.lineCap === "none" ? "butt" : record.stroke.lineCap || "round",
+					lineJoin: record.stroke.lineJoin === null ? "round" : record.stroke.lineJoin || "round",
+					miterLimit: Number(record.stroke.miterLimit)
+				})
+			});
+
+			this.styles.set(record.id, style);
+
+			let feature = this.source.getFeatureById(record.id);
+
+			if (feature)
+			{
+				feature.setStyle(style);
+			}
 		}
 	}
 }
 
 export default class WeaveOpenLayersMap {
+
 	constructor(props)
 	{
 		window.debugMapTool = this;
@@ -421,6 +501,7 @@ export default class WeaveOpenLayersMap {
 				"getScreenBounds(tmp_screen_bounds);" +
 				"tmp_data_bounds.setWidth(tmp_screen_bounds.getWidth() * resolution);" +
 				"tmp_data_bounds.setHeight(tmp_screen_bounds.getHeight() * resolution);" +
+				"tmp_data_bounds.makeSizePositive();" +
 				"setDataBounds(tmp_data_bounds);");
 
 		this.zoomBoundsPath.addCallback(this.getSessionCenterBound);
