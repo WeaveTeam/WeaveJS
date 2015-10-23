@@ -2,38 +2,65 @@ import React from "react";
 import VendorPrefix from "react-vendor-prefix";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import _ from "lodash";
+import * as bs from "react-bootstrap";
+import ui from "./react-ui/ui.jsx";
+
+
+var OKglyphStyle = {
+    fontSize: "14px",
+    color: "green"
+};
+
+var RMglyphStyle = {
+    fontSize: "14px",
+    color: "red"
+};
+
 export default class CustomCardViewTool extends React.Component {
 
 
     constructor(props) {
         super(props);
 
-        this.toolPath = this.props.toolPath;
-        this.headerPath = this.props.toolPath.push("header");
-        this.titlePath = this.props.toolPath.push("title");
-        this.attributesPath = this.props.toolPath.push("attributes");
-        this.selectionKeySetPath = this.props.toolPath.push("selectionKeySet");
-        this.sortColumnPath = this.props.toolPath.push("sort");
-        this.probeKeySetPath = this.props.toolPath.push("probeKeySet");
-        this.formattedRecords = [];
 
+        this.setCardsSelection = _.debounce(this.setCardsSelection.bind(this), 100);
+        this.setCardsProbe = _.debounce(this.setCardsProbe.bind(this), 50);
+        this.resizeCards = this.resizeCards.bind(this);
+        this.resizePictures = this.resizePictures.bind(this);
+        this.resizeTool = this.resizeTool.bind(this);
+
+        this.dataChanged = _.debounce(this.dataChanged.bind(this), 100);
+
+        var mapping = [
+            { name: "header", type: "LinkableHashMap", callback: this.dataChanged },
+            { name: "title", type: "LinkableHashMap", callback: this.dataChanged },
+            { name: "attributes", type: "LinkableHashMap", callback: this.dataChanged },
+            { name: "sort", type: "DynamicColumn", callback: this.dataChanged },
+            { name: "selectionKeySet", type: "KeySet", callback: this.setCardsSelection },
+            { name: "probeKeySet", type: "KeySet", callback: this.setCardsProbe },
+            { name: "cardWidth", type: "LinkableNumber", callback: this.resizeCards },
+            { name: "cardHeight", type: "LinkableNumber", callback: this.resizeCards },
+            { name: "pictureHeight", type: "LinkableNumber", callback: this.resizePictures },
+            { name: "pictureWidth", type: "LinkableNumber", callback: this.resizePictures },
+            { name: "toolHeight", type: "LinkableNumber", callback: this.resizeTool }
+        ];
+
+        this.toolPath = this.props.toolPath;
+        this.paths = this.toolPath.initProperties(mapping);
+        this.formattedRecords = [];
         this.checkedRecords = [];
+        this.state = {
+            hiddenCardKeys: []
+        };
     }
 
     componentDidMount() {
 
-        var debouncedFunc = _.debounce(this.dataChanged.bind(this), 100);
-        [this.headerPath,
-         this.titlePath,
-         this.attributesPath,
-         this.sortColumnPath].forEach((path) => {
-            path.addCallback(debouncedFunc, true, false);
-        });
+        React.findDOMNode(this).parentNode.addEventListener("click", this.boundClearSelection = this.clearSelection.bind(this));
+    }
 
-         this.selectionKeySetPath.addCallback(_.debounce(this.setCardsSelection.bind(this), 100), true, false);
-         this.probeKeySetPath.addCallback(_.debounce(this.setCardsProbe.bind(this), 50), true, false);
-
-         React.findDOMNode(this).parentNode.addEventListener("click", this.clearSelection.bind(this));
+    componentWillUnmount() {
+         React.findDOMNode(this).parentNode.removeEventListener("click", this.boundClearSelection);
     }
 
     componentDidUpdate () {
@@ -42,13 +69,15 @@ export default class CustomCardViewTool extends React.Component {
     }
 
     clearSelection () {
-        this.selectionKeySetPath.setKeys([]);
+        // this.paths.selectionKeySet.setKeys([]);
     }
 
     onSelect(index) {
 
         var selectedKeys = [];
-
+        console.log(event);
+        console.log(event.ctrlKey, event.metaKey);
+        console.log(window.event);
         if(!(event.ctrlKey || event.metaKey)) {
             selectedKeys = this.refs[index].state.selected ? [this.refs[index].props.data.id] : [];
         } else {
@@ -59,7 +88,7 @@ export default class CustomCardViewTool extends React.Component {
                 }
             }
         }
-        this.selectionKeySetPath.setKeys(selectedKeys);
+        this.paths.selectionKeySet.setKeys(selectedKeys);
     }
 
     onProbe(index) {
@@ -76,11 +105,11 @@ export default class CustomCardViewTool extends React.Component {
                 }
             }
         }
-        this.probeKeySetPath.setKeys(probedKeys);
+        this.paths.probeKeySet.setKeys(probedKeys);
     }
 
     setCardsSelection() {
-        var selectedKeys = this.selectionKeySetPath.getKeys();
+        var selectedKeys = this.paths.selectionKeySet.getKeys();
         for(var key in this.refs) {
             var ref = this.refs[key];
             if(selectedKeys.indexOf(ref.props.data.id) > -1) {
@@ -96,7 +125,7 @@ export default class CustomCardViewTool extends React.Component {
     }
 
     setCardsProbe() {
-        var probedKeys = this.probeKeySetPath.getKeys();
+        var probedKeys = this.paths.probeKeySet.getKeys();
         for(var key in this.refs) {
             var ref = this.refs[key];
             if(probedKeys.indexOf(ref.props.data.id) > -1) {
@@ -111,22 +140,60 @@ export default class CustomCardViewTool extends React.Component {
         }
     }
 
-    handleCheckedCard(index, value) {
-        console.log(index, value);
-        console.log(this.formattedRecord[index]);
+    resizeCards() {
+
+    }
+
+    resizePictures() {
+
+    }
+
+    resizeTool() {
+
+    }
+
+    handleRemoveCard(index, event) {
+        // makes copy of state array
+        var keys = _.clone(this.state.hiddenCardKeys);
+        keys.push(this.refs[index].props.data.id);
+        this.setState({
+            hiddenCardKeys: _.uniq(keys)
+        });
+
+        this.paths.selectionKeySet.removeKeys(keys);
+
+        event.stopPropagation();
+    }
+
+    handleSaveCard(index, event) {
+
+        if(this.refs[index].state.selected) {
+            this.paths.selectionKeySet.removeKeys([this.refs[index].props.data.id]);
+        } else {
+            var keys = this.paths.selectionKeySet.getKeys();
+            keys.push(this.refs[index].props.data.id);
+            this.paths.selectionKeySet.setKeys(
+                _.uniq(keys)
+            );
+        }
+
+        event.stopPropagation();
     }
 
     dataChanged() {
 
         var mapping = {
-            header: this.headerPath.getNames().map((name) => { return this.headerPath.push(name); }),
-            title: this.titlePath.getNames().map((name) => { return this.titlePath.push(name); }),
-            attributes: this.attributesPath.getNames().map((name) => { return this.attributesPath.push(name); }),
-            sort: this.sortColumnPath
+            header: this.paths.header.getNames().map((name) => { return this.paths.header.push(name); }),
+            title: this.paths.title.getNames().map((name) => { return this.paths.title.push(name); }),
+            attributes: this.paths.attributes.getNames().map((name) => { return this.paths.attributes.push(name); }),
+            sort: this.paths.sortColumn
         };
 
+        this.setState({
+            hiddenCardKeys: []
+        });
 
-        var attributeNames = this.attributesPath.getNames();
+        var attributeNames = this.paths.attributes.getNames();
 
         this.records = _.sortByOrder(this.toolPath.retrieveRecords(mapping), "sort", "asc");
 
@@ -155,7 +222,7 @@ export default class CustomCardViewTool extends React.Component {
             if(record.hasOwnProperty("attributes")) {
                 for(var i in attributeNames) {
                     attributes.push({
-                        name: this.attributesPath.push(attributeNames[i]).getValue("getMetadata('title')"),
+                        name: this.paths.attributes.push(attributeNames[i]).getValue("getMetadata('title')"),
                         value: record.attributes[i]
                     });
                 }
@@ -169,16 +236,14 @@ export default class CustomCardViewTool extends React.Component {
         this.forceUpdate();
     }
 
-    handleWeaveState() {
-
-    }
-
     render() {
-        // this.selectionKeySetPath.setKeys(this.state.selected);
-        // this.probeKeySetPath.setKeys(this.state.probed);
-
-        var cards = this.formattedRecords.map((formattedRecord, index) => {
-            return <Card data={formattedRecord} key={index} ref={index} onSelect={this.onSelect.bind(this, index)} handleChecks={this.handleCheckedCard.bind(this, index)} onProbe={this.onProbe.bind(this, index)}/>;
+        // this.paths.selectionKeySet.setKeys(this.state.selected);
+        // this.paths.probeKeySet.setKeys(this.state.probed);
+        var filteredRecords = _.filter(this.formattedRecords, (formattedRecord) => {
+            return !_.includes(this.state.hiddenCardKeys, formattedRecord.id);
+        });
+        var cards = filteredRecords.map((formattedRecord, index) => {
+            return <Card data={formattedRecord} key={index} ref={index} onSelect={this.onSelect.bind(this, index)} handleSaveCard={this.handleSaveCard.bind(this, index)} handleRemoveCard={this.handleRemoveCard.bind(this, index)} onProbe={this.onProbe.bind(this, index)}/>;
         });
 
         return (
@@ -198,7 +263,9 @@ class Card extends React.Component {
 
         this.state = {
             probed: false,
-            selected: false
+            selected: false,
+            rmProbe: false,
+            checkProbe: false
         };
     }
 
@@ -207,7 +274,6 @@ class Card extends React.Component {
     }
 
     toggleSelect (event) {
-
         this.setState({
             selected: !this.state.selected
         }, () => {
@@ -222,6 +288,18 @@ class Card extends React.Component {
             probed: !this.state.probed
         }, () => {
             this.props.onProbe(event);
+        });
+    }
+
+    toggleCheckProbe () {
+        this.setState({
+            checkProbe: !this.state.checkProbe
+        });
+    }
+
+    toggleRmProbe () {
+        this.setState({
+           rmProbe: !this.state.rmProbe
         });
     }
 
@@ -246,14 +324,16 @@ class Card extends React.Component {
             marginRight: 5,
             marginBottom: 10,
             backgroundColor: () => {
-                if(this.state.probed && this.state.selected) {
-                    return "#DCC6DC";
-                } else if (this.state.probed) {
-                    return "#dae2fc";
+                if(this.state.selected && this.state.rmProbe) {
+                    return "#DCC6DC"; // purple
+                } else if(this.state.checkProbe) {
+                    return "#dae2fc"; // blue
+                } else if (this.state.rmProbe) {
+                    return "rgba(224, 141, 157, 0.4)"; // red
                 } else if (this.state.selected) {
-                    return "rgba(224, 141, 157, 0.4)";
+                    return "#dae2fc";
                 } else {
-                    return "#e9eaed";
+                    return "#e9eaed"; // default grey
                 }
             }(),
             border: "solid",
@@ -277,8 +357,15 @@ class Card extends React.Component {
 
         return (
             <div style={cardStyleprefixed.styles} onClick={this.toggleSelect.bind(this)} onMouseOver={this.toggleProbe.bind(this)} onMouseOut={this.toggleProbe.bind(this)}>
-                <div>
-                    <input type="checkbox" onChange={this.props.handleChecks}/>
+                <div style={{float: "right"}}>
+                    <ui.HBox>
+                        <div style={{paddingRight: 5}} onMouseOver={this.toggleCheckProbe.bind(this)} onMouseOut={this.toggleCheckProbe.bind(this)}>
+                            <bs.Glyphicon glyph="ok" style={OKglyphStyle} onClick={this.props.handleSaveCard.bind(this)}/>
+                        </div>
+                        <div onMouseOver={this.toggleRmProbe.bind(this)} onMouseOut={this.toggleRmProbe.bind(this)}>
+                            <bs.Glyphicon glyph="remove" style={RMglyphStyle} onClick={this.props.handleRemoveCard.bind(this)}/>
+                        </div>
+                    </ui.HBox>
                 </div>
                 <div style={{display: "flex", flexDirection: "row", flex: 0.2}}>
                     <div style={{flex: 0.8}}>
@@ -297,9 +384,11 @@ class Card extends React.Component {
                 </div>
                 <div style={{flex: 0.8}}>
                     <table style={{width: "100%", fontSize: "11px", color: "#93a5aa"}}>
-                      {
-                        rows
-                      }
+                        <tbody>
+                          {
+                            rows
+                          }
+                        </tbody>
                     </table>
                 </div>
             </div>
