@@ -16,6 +16,9 @@ var RMglyphStyle = {
     color: "red"
 };
 
+const OKBUTTON = "ok";
+const RMBUTTON = "rm";
+
 export default class CustomCardViewTool extends React.Component {
 
 
@@ -258,10 +261,18 @@ class Card extends React.Component {
     componentDidMount () {
         this.element = React.findDOMNode(this);
         this.element.addEventListener("click", this.boundToggleSelect = this.toggleSelect.bind(this));
+        this.okButton = React.findDOMNode(this.refs[OKBUTTON]);
+        this.rmButton = React.findDOMNode(this.refs[RMBUTTON]);
+
+        this.okButton.addEventListener("click", this.boundHandleSaveCard = this.props.handleSaveCard.bind(this));
+        this.rmButton.addEventListener("click", this.boundHandleRemoveCard = this.props.handleRemoveCard.bind(this));
+
     }
 
     componentWillUnmount() {
         this.element.removeEventListener("click", this.boundToggleSelect);
+        this.okButton.removeEventListener("click", this.boundHandleSaveCard);
+        this.rmButton.removeEventListener("click", this.boundHandleRemoveCard);
     }
 
     toggleSelect (event) {
@@ -351,10 +362,10 @@ class Card extends React.Component {
                 <div style={{float: "right"}}>
                     <ui.HBox>
                         <div style={{paddingRight: 5}} onMouseOver={this.toggleCheckProbe.bind(this)} onMouseOut={this.toggleCheckProbe.bind(this)}>
-                            <bs.Glyphicon glyph="ok" style={OKglyphStyle} onClick={this.props.handleSaveCard.bind(this)}/>
+                            <bs.Glyphicon glyph="ok" style={OKglyphStyle} ref={OKBUTTON}/>
                         </div>
                         <div onMouseOver={this.toggleRmProbe.bind(this)} onMouseOut={this.toggleRmProbe.bind(this)}>
-                            <bs.Glyphicon glyph="remove" style={RMglyphStyle} onClick={this.props.handleRemoveCard.bind(this)}/>
+                            <bs.Glyphicon glyph="remove" style={RMglyphStyle} ref={RMBUTTON}/>
                         </div>
                     </ui.HBox>
                 </div>
