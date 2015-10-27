@@ -69,7 +69,6 @@ export default class CustomSearchTool extends React.Component {
     }
 
     updateState(label, event, callback) {
-        console.log(event);
         var components = _.clone(this.state.searchObject);
         components[label] = event.target.value;
         this.setState({
@@ -95,7 +94,7 @@ export default class CustomSearchTool extends React.Component {
                 datePicker.gotoDate(new Date(event.target.value));
             }
         }
-        this.updateStateFuncs[label](event.target.value);
+        this.updateStateFuncs[label](event);
     }
 
     removeSearchOption(key) {
