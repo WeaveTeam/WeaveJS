@@ -19,7 +19,16 @@ class Layer {
 
 		this.linkProperty(this.settingsPath.push("alpha"), "opacity");
 		this.linkProperty(this.settingsPath.push("visible"), "visible");
+		this.linkProperty(this.settingsPath.push("selectable"), "selectable");
 		/* TODO max and minvisiblescale, map to min/max resolution. */
+	}
+
+	get source() {
+		return this.layer && this.layer.getSource();
+	}
+
+	set source(value) {
+		this.layer.setSource(value);
 	}
 
 	/* Handles initial apply of linked properties, adding/removing from map */
@@ -90,8 +99,7 @@ class GlyphLayer extends Layer {
 		super(parent, layerName);
 
 		this.layer = new ol.layer.Vector();
-		this.source = new ol.source.Vector();
-		this.layer.setSource(this.source);
+		this.source = new ol.source.Vector({wrapX: false});
 
 		/* Build a new set of point geometries and style them based on the properties in question */
 
@@ -308,7 +316,7 @@ class TileLayer extends Layer {
 
 		if (newLayer !== undefined)
 		{
-			this.layer.setSource(newLayer);
+			this.source = newLayer;
 		}
 	}
 }
@@ -319,8 +327,7 @@ class GeometryLayer extends Layer {
 		super(parent, layerName);
 
 		this.layer = new ol.layer.Vector();
-		this.source = new ol.source.Vector();
-		this.layer.setSource(this.source);
+		this.source = new ol.source.Vector({wrapX: false});
 
 		this.geoJsonParser = new ol.format.GeoJSON();
 
@@ -329,15 +336,16 @@ class GeometryLayer extends Layer {
 		this.lineStylePath = this.layerPath.push("line");
 		this.filteredKeySet = this.layerPath.push("filteredKeySet");
 
-		var boundUpdateGeo = this.updateGeometryData.bind(this);
-		var boundUpdateStyleData = this.updateStyleData.bind(this);
+		this.boundUpdateGeo = this.updateGeometryData.bind(this);
+		this.boundUpdateStyleData = this.updateStyleData.bind(this);
 
 		this.styles = new Map();
 
-		this.geoColumnPath.addCallback(boundUpdateGeo, true);
-		this.fillStylePath.addCallback(boundUpdateStyleData);
-		this.lineStylePath.addCallback(boundUpdateStyleData);
-		boundUpdateStyleData();
+
+		this.geoColumnPath.addCallback(this.boundUpdateGeo, true);
+		this.fillStylePath.addCallback(this.boundUpdateStyleData);
+		this.lineStylePath.addCallback(this.boundUpdateStyleData);
+		this.boundUpdateStyleData();
 	}
 
 	updateGeometryData()
@@ -375,6 +383,8 @@ class GeometryLayer extends Layer {
 		{
 			colorArray = ol.color.asArray("#" + StandardLib.decimalToHex(Number(colorString)));
 		}
+
+		colorArray = [].concat(colorArray); /* Should not be modified since it is cached in ol.color.asArray */
 
 		if (!colorArray) {
 			console.error("Failed to convert color:", colorString, alpha);
@@ -454,7 +464,6 @@ export default class WeaveOpenLayersMap {
 		this.layerSettingsPath = this.toolPath.push("children", "visualization", "plotManager", "layerSettings");
 		this.zoomBoundsPath = this.toolPath.push("children", "visualization", "plotManager", "zoomBounds");
 
-
 		/* Register layer changes */
 
 		this.layers = {};
@@ -466,6 +475,90 @@ export default class WeaveOpenLayersMap {
 		this.resolutionCallbackHandle = this.map.getView().on("change:resolution", this.setSessionZoom, this);
 
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
+
+		this.selectInteraction = new ol.interaction.Select({
+			layers: (layer) => layer.get("selectable"),
+			wrapX: false,
+			style: new ol.style.Style({
+				stroke: new ol.style.Stroke({width: 10})
+			})
+		});
+
+		this.probeInteraction = new ol.interaction.Select({
+			condition: ol.events.condition.pointerMove,
+			wrapX: false,
+			layers: (layer) => layer.get("selectable")
+//			style: WeaveOpenLayersMap.probeStyleFunction
+		});
+
+		this.map.addInteraction(this.selectInteraction);
+		//this.map.addInteraction(this.probeInteraction);
+
+		this.probeKeyset = this.toolPath.probe_keyset;
+		this.selectionKeyset = this.toolPath.selection_keyset;
+		this.subsetFilter = this.toolPath.subset_filter;
+
+		this.selectionKeyset.addCallback(this.fromSessionKeysToInteraction.bind(this, this.selectionKeyset, this.selectInteraction));
+		//this.probeKeyset.addKeySetCallback(this.fromSessionKeysToInteraction.bind(this, this.probeKeyset, this.probeInteraction));
+
+		this.selectInteraction.on("select", this.fromInteractionToSessionKeys.bind(this, this.selectionKeyset));
+		//this.probeInteraction.on("select", this.fromInteractionToSessionKeys.bind(this, this.probeKeyset));
+	}
+
+	static selectStyleFunction(feature, resolution) {
+
+	}
+
+	static probeStyleFunction(feature, resolution) {
+
+	}
+
+	getFeaturesById(ids) {
+		let features = [];
+		for (let layerName in this.layers)
+		{
+			let source = this.layers[layerName].source;
+			if (!source || !source.getFeatureById)
+			{
+				console.log(layerName + " lacks a source, skipping.");
+				continue;
+			}
+			for (let key of ids)
+			{
+				let feature = source.getFeatureById(key);
+				if (feature)
+				{
+					features.push(feature);
+				}
+				else
+				{
+					console.log("no feature " + key + " found in layer " + layerName);
+				}
+			}
+		}
+		return features;
+	}
+
+	fromSessionKeysToInteraction(keySetPath, interaction)
+	{
+		let featureCollection = interaction.getFeatures();
+		let keys = keySetPath.getKeys();
+		let selectedFeatures;
+
+		featureCollection.clear();
+
+		selectedFeatures = this.getFeaturesById(keys);
+		featureCollection.extend(selectedFeatures);
+	}
+
+	fromInteractionToSessionKeys(keySetPath, event)
+	{
+
+		let selectedKeys = lodash.map(event.selected, (feature) => feature.getId());
+		let deselectedKeys = lodash.map(event.deselected, (feature) => feature.getId());
+
+		keySetPath.addKeys(selectedKeys);
+		keySetPath.removeKeys(deselectedKeys);
 	}
 
 	setSessionCenter()
