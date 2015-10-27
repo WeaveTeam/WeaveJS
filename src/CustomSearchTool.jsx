@@ -15,7 +15,6 @@ var inputStyle = {
     paddingRight: 4
 };
 
-
 var searchButtonStyle = {
     flex: 1
 };
@@ -126,7 +125,7 @@ export default class CustomSearchTool extends React.Component {
 
             if(this.state.searchObject.hasOwnProperty(label)) {
 
-                var closeButton = <bs.Button key={"close" + i} onClick={this.removeSearchOption.bind(this, label)} bsSize={this.props.bsSize}>
+                var closeButton = <bs.Button className={"close-button"} key={"close" + i} tabIndex={-1} onClick={this.removeSearchOption.bind(this, label)} bsSize={this.props.bsSize}>
                                             <bs.Glyphicon glyph="remove" style={glyphStyle}/>
                                   </bs.Button>;
 
@@ -134,8 +133,9 @@ export default class CustomSearchTool extends React.Component {
 
 
                 if(type === "date") {
+                    var dateFormat = this.searchFields[i].dateFormat || "MM/DD/YYYY";
                     var datePicker = <bs.Popover>
-                                        <DatePicker ref={"datePicker" + label} date={this.state.searchObject[label]} onChange={this.updateDateField.bind(this, label)}/>
+                                        <DatePicker ref={"datePicker" + label} dateFormat={dateFormat} date={this.state.searchObject[label]} onChange={this.updateDateField.bind(this, label)}/>
                                      </bs.Popover>;
 
                     searchInput = <div style={inputStyle} key={"searchInput" + i}>
@@ -148,7 +148,7 @@ export default class CustomSearchTool extends React.Component {
                                 addonBefore={label}
                                 buttonAfter={closeButton}
                                 hasFeedback={true}
-                                placeholder={"yyyy/mm/dd"}
+                                placeholder={dateFormat}
                                 onChange={this.updateStateDateField.bind(this, label)}>
                             </bs.Input>
                        </bs.OverlayTrigger>

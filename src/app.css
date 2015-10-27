@@ -1,77 +1,79 @@
-    .Resizer {
-        background: #000;
-        opacity: .2;
-        z-index: 1;
-        -moz-box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-        box-sizing: border-box;
-        -moz-background-clip: padding;
-        -webkit-background-clip: padding;
-        background-clip: padding-box;
-    }
-
-     .Resizer:hover {
-        -webkit-transition: all 2s ease;
-        transition: all 2s ease;
-    }
-
-     .Resizer.horizontal {
-        height: 11px;
-        margin: -5px 0;
-        border-top: 5px solid rgba(255, 255, 255, 0);
-        border-bottom: 5px solid rgba(255, 255, 255, 0);
-        cursor: row-resize;
-        width: 100%;
-    }
-
-    .Resizer.horizontal:hover {
-        border-top: 5px solid rgba(0, 0, 0, 0.5);
-        border-bottom: 5px solid rgba(0, 0, 0, 0.5);
-    }
-
-    .Resizer.vertical {
-        width: 11px;
-        margin: 0 -5px;
-        border-left: 5px solid rgba(255, 255, 255, 0);
-        border-right: 5px solid rgba(255, 255, 255, 0);
-        cursor: col-resize;
-        height: 100%;
-    }
-
-    .Resizer.vertical:hover {
-        border-left: 5px solid rgba(0, 0, 0, 0.5);
-        border-right: 5px solid rgba(0, 0, 0, 0.5);
-    }
-
-    /* Color of burger icon */
-.bm-burger-icon {
-  background: #373a47;
-}
- 
-/* Color of close button cross */
-.bm-cross {
-  background: #bdc3c7;
-}
- 
-/* Background color of sidebar */
-.bm-menu {
-  background: #373a47;
-}
- 
-.bm-morph-shape {
-  fill: #373a47; /* Morph shape necessary with bubble or elastic */
-}
- 
-/* General menu styles */
-.bm-menu {
-  padding: 2.5em 1.5em 0;
-  font-size: 1.15em;
-}
- 
-/* Wrapper for item list */
-.bm-item-list {
-  color: #b8b7ad;
-  padding: 0.8em;
+.input-group-addon:first-child {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    color: white;
+    border-bottom-left-radius: 25px;
+    border-top-left-radius: 25px;
 }
 
-    /*! normalize.css v3.0.3 | MIT License | github.com/necolas/normalize.css */
+.form-control {
+    background: rgba(255,255,255,0.1);
+    color: whitesmoke;
+    border: none;
+}
+
+.form-control::-webkit-input-placeholder { /* WebKit browsers */
+    color:    #E8E8E8 ;
+}
+.form-control:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+    color:    #E8E8E8 ;
+}
+.form-control::-moz-placeholder { /* Mozilla Firefox 19+ */
+    color:    #E8E8E8 ;
+}
+.form-control:-ms-input-placeholder { /* Internet Explorer 10+ */
+    color:    #E8E8E8;
+}
+
+.btn.btn-sm.btn-default {
+    border: none;
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border-top-right-radius: 25px;
+    border-bottom-right-radius: 25px;
+}
+
+.Resizer {
+    background: #000;
+    opacity: .2;
+    z-index: 1;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    -moz-background-clip: padding;
+    -webkit-background-clip: padding;
+    background-clip: padding-box;
+}
+
+ .Resizer:hover {
+    -webkit-transition: all 2s ease;
+    transition: all 2s ease;
+}
+
+ .Resizer.horizontal {
+    height: 11px;
+    margin: -5px 0;
+    border-top: 5px solid rgba(255, 255, 255, 0);
+    border-bottom: 5px solid rgba(255, 255, 255, 0);
+    cursor: row-resize;
+    width: 100%;
+}
+
+.Resizer.horizontal:hover {
+    border-top: 5px solid rgba(0, 0, 0, 0.5);
+    border-bottom: 5px solid rgba(0, 0, 0, 0.5);
+}
+
+.Resizer.vertical {
+    width: 11px;
+    margin: 0 -5px;
+    border-left: 5px solid rgba(255, 255, 255, 0);
+    border-right: 5px solid rgba(255, 255, 255, 0);
+    cursor: col-resize;
+    height: 100%;
+}
+
+.Resizer.vertical:hover {
+    border-left: 5px solid rgba(0, 0, 0, 0.5);
+    border-right: 5px solid rgba(0, 0, 0, 0.5);
+}

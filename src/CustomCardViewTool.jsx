@@ -329,7 +329,7 @@ class Card extends React.Component {
                 if(this.state.selected && this.state.rmProbe) {
                     return "#DCC6DC"; // purple
                 } else if(this.state.checkProbe) {
-                    return "#dae2fc"; // blue
+                    return "#e9eaed"; // blue
                 } else if (this.state.rmProbe) {
                     return "rgba(224, 141, 157, 0.4)"; // red
                 } else if (this.state.selected) {
