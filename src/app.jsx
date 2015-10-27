@@ -11,6 +11,7 @@ import Weave from "./Weave.jsx";
 import _ from "lodash";
 //import ReactBurgerMenu from "react-burger-menu";
 import * as bs from "react-bootstrap";
+import Navbar from "./Navbar.jsx";
 
 console.log(ui);
 //var Menu = ReactBurgerMenu.slide;
@@ -127,11 +128,13 @@ export default class App extends React.Component {
 
         return (
             <ui.VBox>
-                <div style={{height: 45, marginLeft: "5px", marginRight: "5px", paddingTop: 5}}>
-                   {
-                     customSearchTool
-                   }
-                </div>
+                <Navbar>
+                    <div style={{marginTop: 10}}>
+                       {
+                         customSearchTool
+                       }
+                   </div>
+                </Navbar>
                 <div style={{height: 150, marginLeft: "5px", marginRight: "5px", marginBottom: "20px", paddingTop: 5, overflowY: "scroll"}}>
                     {
                         customCardViewTool

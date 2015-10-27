@@ -55,7 +55,6 @@ export default class CustomCardViewTool extends React.Component {
     }
 
     componentDidMount() {
-
         React.findDOMNode(this).parentNode.addEventListener("click", this.boundClearSelection = this.clearSelection.bind(this));
     }
 
@@ -72,12 +71,9 @@ export default class CustomCardViewTool extends React.Component {
         // this.paths.selectionKeySet.setKeys([]);
     }
 
-    onSelect(index) {
+    onSelect(index, event) {
 
         var selectedKeys = [];
-        console.log(event);
-        console.log(event.ctrlKey, event.metaKey);
-        console.log(window.event);
         if(!(event.ctrlKey || event.metaKey)) {
             selectedKeys = this.refs[index].state.selected ? [this.refs[index].props.data.id] : [];
         } else {
@@ -94,17 +90,7 @@ export default class CustomCardViewTool extends React.Component {
     onProbe(index) {
 
         var probedKeys = [];
-
-        if(!(event.ctrlKey || event.metaKey)) {
-            probedKeys = this.refs[index].state.probed ? [this.refs[index].props.data.id] : [];
-        } else {
-            for(var key in this.refs) {
-                var ref = this.refs[key];
-                if(ref.state.probed) {
-                    probedKeys.push(ref.props.data.id);
-                }
-            }
-        }
+        probedKeys = this.refs[index].state.probed ? [this.refs[index].props.data.id] : [];
         this.paths.probeKeySet.setKeys(probedKeys);
     }
 
@@ -269,8 +255,13 @@ class Card extends React.Component {
         };
     }
 
-    componentDidUpdate () {
+    componentDidMount () {
+        this.element = React.findDOMNode(this);
+        this.element.addEventListener("click", this.boundToggleSelect = this.toggleSelect.bind(this));
+    }
 
+    componentWillUnmount() {
+        this.element.removeEventListener("click", this.boundToggleSelect);
     }
 
     toggleSelect (event) {
@@ -356,7 +347,7 @@ class Card extends React.Component {
         });
 
         return (
-            <div style={cardStyleprefixed.styles} onClick={this.toggleSelect.bind(this)} onMouseOver={this.toggleProbe.bind(this)} onMouseOut={this.toggleProbe.bind(this)}>
+            <div style={cardStyleprefixed.styles} onMouseOver={this.toggleProbe.bind(this)} onMouseOut={this.toggleProbe.bind(this)}>
                 <div style={{float: "right"}}>
                     <ui.HBox>
                         <div style={{paddingRight: 5}} onMouseOver={this.toggleCheckProbe.bind(this)} onMouseOut={this.toggleCheckProbe.bind(this)}>

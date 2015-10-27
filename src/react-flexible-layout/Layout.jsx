@@ -17,8 +17,8 @@ export default class Layout extends React.Component {
         // this.state = this.props.state;
         this.state = {id: props.state.id, direction: props.state.direction, children: props.state.children, flex: props.state.flex};
         this.minSize = 16;
-        this._boundHandleStateChange = this.handleStateChange.bind(this);
         this.dragging = false;
+        this.dispatchStateChange = this.dispatchStateChange.bind(this);
     }
 
 
@@ -46,9 +46,9 @@ export default class Layout extends React.Component {
             || !_.isEqual(this.state, nextProps.state);
     }
 
-    componentDidUpdate() {
+    dispatchStateChange(newState) {
         if (this.props.onStateChange) {
-            this.props.onStateChange();
+            this.props.onStateChange(newState);
         }
     }
 
@@ -111,6 +111,7 @@ export default class Layout extends React.Component {
     }
 
     onMouseUp (event) {
+        var newState = _.cloneDeep(this.state);
 
         this.resizerNames.forEach(resizerName => {
             var resizer = this.refs[resizerName];
@@ -124,15 +125,26 @@ export default class Layout extends React.Component {
 
                 mousePos = Math.max(begin + this.minSize, Math.min(mousePos, end - this.minSize));
 
-                var pane1 = this.refs[resizer.props.pane1];
-                var pane2 = this.refs[resizer.props.pane2];
+                var ref1 = resizer.props.pane1;
+                var ref2 = resizer.props.pane2;
+                var pane1 = this.refs[ref1];
+                var pane2 = this.refs[ref2];
+
+                var index1 = this.childNames.indexOf(ref1);
+                var index2 = this.childNames.indexOf(ref2);
+
+                var flex1 = (mousePos - begin) / size;
+                var flex2 = (end - mousePos) / size;
+
+                newState.children[index1].flex = flex1;
+                newState.children[index2].flex = flex2;
 
                 pane1.setState({
-                   flex: (mousePos - begin) / size
+                   flex: flex1
                 });
 
                 pane2.setState({
-                    flex: (end - mousePos) / size
+                    flex: flex2
                 });
 
                 resizer.setState({
@@ -143,17 +155,22 @@ export default class Layout extends React.Component {
                     active: false
                 });
 
-                this.handleStateChange();
+                this.dispatchStateChange(newState);
+                //this.setState(newState, this.dispatchStateChange);
             }
         });
         this.panelDragging = false;
     }
 
-    handleStateChange ()
+    handleStateChange (childRef, newState)
     {
-        this.setState({
-            children: this.childNames.filter(ref => this.refs[ref]).map(ref => this.refs[ref].state)
-        });
+        var stateCopy = _.cloneDeep(this.state);
+        var index = this.childNames.indexOf(childRef);
+
+        stateCopy.children[index] = newState;
+
+        console.log("state copy", stateCopy);
+        this.setState(stateCopy, this.dispatchStateChange);
     }
 
     render() {
@@ -177,7 +194,7 @@ export default class Layout extends React.Component {
             this.state.children.forEach((childState, i) => {
                 var ref = "child" + i;
                 this.childNames[i] = ref;
-                newChildren[i * 2] = <Layout onStateChange={this._boundHandleStateChange} ref={ref} state={childState} key={i * 2}/>;
+                newChildren[i * 2] = <Layout onStateChange={this.handleStateChange.bind(this, ref)} ref={ref} state={childState} key={i * 2}/>;
             });
 
             var i;

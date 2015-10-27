@@ -19,6 +19,13 @@ import StandardLib from "./Utils/StandardLib";
 
 const LAYOUT = "Layout";
 
+const LEFT = "left";
+const RIGHT = "right";
+const TOP = "top";
+const BOTTOM = "bottom";
+const VERTICAL = "vertical";
+const HORIZONTAL = "horizontal";
+
 export default class WeaveLayoutManager extends React.Component {
 
     constructor(props) {
@@ -37,15 +44,14 @@ export default class WeaveLayoutManager extends React.Component {
                 }
             };
         }
-        this._boundHandleStateChange = this.handleStateChange.bind(this);
 
         this.margin = 8;
     }
 
     componentDidUpdate() {
         if(this.weave) {
-            console.log(JSON.stringify(this.state.layout, null, 3));
-            this.weave.path(LAYOUT).state(this.state.layout);
+            // console.log(JSON.stringify(this.state.layout, null, 3));
+            
         }
     }
 
@@ -68,7 +74,7 @@ export default class WeaveLayoutManager extends React.Component {
             this.element = React.findDOMNode(this);
 
             this.weave.path().getValue("childListCallbacks.addGroupedCallback")(null, _.debounce(this.forceUpdate.bind(this), 0), true);
-            this.weave.path(LAYOUT).addCallback(_.debounce(this._layoutChanged.bind(this), 0));
+            this.weave.path(LAYOUT).addCallback(this._layoutChanged.bind(this));
         } catch(e) {
             console.error(e);
         }
@@ -87,8 +93,11 @@ export default class WeaveLayoutManager extends React.Component {
     }
 
     handleStateChange() {
-        this.setState({
-            layout: this.refs[LAYOUT].state
+        // this.weave.path(LAYOUT).state(newState);
+        this.setState({}, () => {
+            if(this.weave) {
+                this.weave.path(LAYOUT).state(this.state.layout);
+            }
         });
     }
 
@@ -125,14 +134,14 @@ export default class WeaveLayoutManager extends React.Component {
                 };
 
                 var dropZone = "";
-                var zones = ["right", "bottom", "left", "top"];
+                var zones = [RIGHT, BOTTOM, LEFT, TOP];
 
-                var angle = Math.round((mousePolarCoord.theta / (2 * Math.PI) * 4) + 4) % 4;
+                var zoneIndex = Math.round((mousePolarCoord.theta / (2 * Math.PI) * 4) + 4) % 4;
 
                 if(mousePolarCoord.r < 0.34) {
                     dropZone = "center";
                 } else {
-                    dropZone = zones[angle];
+                    dropZone = zones[zoneIndex];
                 }
 
                 this.updateLayout(this.toolDragged, this.toolDroppedOn, dropZone);
@@ -142,7 +151,8 @@ export default class WeaveLayoutManager extends React.Component {
     }
 
     updateLayout(toolDragged, toolDroppedOn, dropZone) {
-        var newState = _.cloneDeep(this.state);
+
+        var newState = _.cloneDeep(this.state.layout);
         var src = StandardLib.findDeep(newState, {id: toolDragged});
         var dest = StandardLib.findDeep(newState, {id: toolDroppedOn});
 
@@ -152,10 +162,31 @@ export default class WeaveLayoutManager extends React.Component {
             dest.id = srcId;
         }
         else {
-            //TODO
-        }
+            var srcParentArray = StandardLib.findDeep(newState, (obj) => {
+                return Array.isArray(obj) && obj.indexOf(src) >= 0;
+            });
 
-        this.setState(newState);
+            srcParentArray.splice(srcParentArray.indexOf(src), 1);
+
+            delete dest.id;
+            dest.direction = (dropZone === TOP || dropZone === BOTTOM) ? VERTICAL : HORIZONTAL;
+
+            dest.children = [
+                {
+                    id: toolDragged,
+                    flex: 0.5
+                },
+                {
+                    id: toolDroppedOn,
+                    flex: 0.5
+                }
+           ];
+            if(dropZone === BOTTOM || dropZone === RIGHT) {
+                dest.children.reverse();
+            }
+        }
+        console.log(JSON.stringify(newState, null, 3));
+        this.weave.path(LAYOUT).state(newState);
     }
 
     render () {
@@ -207,7 +238,7 @@ export default class WeaveLayoutManager extends React.Component {
 
         return (
             <div style={{position: "absolute", width: "100%", height: "100%"}}>
-                <Layout onStateChange={this._boundHandleStateChange} key={LAYOUT} ref={LAYOUT} state={this.state.layout} weave={this.weave}/>
+                <Layout onStateChange={this.handleStateChange.bind(this)} key={LAYOUT} ref={LAYOUT} state={this.state.layout} weave={this.weave}/>
                 {children}
             </div>
         );

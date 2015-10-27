@@ -2,6 +2,7 @@ import React from "react";
 import * as bs from "react-bootstrap";
 import _ from "lodash";
 import {registerToolImplementation} from "./WeaveTool.jsx";
+import DatePicker from "react-date-picker";
 
 var customSearchStyle = {
     display: "flex",
@@ -38,7 +39,7 @@ export default class CustomSearchTool extends React.Component {
 
         this.updateStateFuncs = {};
         this.searchFields.forEach(function (field) {
-            this.updateStateFuncs[field] = this.updateState.bind(this, field);
+            this.updateStateFuncs[field.label] = this.updateState.bind(this, field.label);
         }, this);
 
         this.debouncedComponentDidUpdate = _.debounce(() => {
@@ -52,7 +53,7 @@ export default class CustomSearchTool extends React.Component {
             this.searchFields = this.props.toolPath.getState("searchFields") || [];
             this.updateStateFuncs = {};
             this.searchFields.forEach((field) => {
-                this.updateStateFuncs[field] = this.updateState.bind(this, field);
+                this.updateStateFuncs[field.label] = this.updateState.bind(this, field.label);
             }, this);
         }, true);
     }
@@ -67,12 +68,34 @@ export default class CustomSearchTool extends React.Component {
         this.debouncedComponentDidUpdate();
     }
 
-    updateState(field) {
+    updateState(label, event, callback) {
+        console.log(event);
         var components = _.clone(this.state.searchObject);
-        components[field] = this.refs[field].getInputDOMNode().value;
+        components[label] = event.target.value;
+        this.setState({
+            searchObject: components
+        }, callback);
+    }
+
+    updateDateField(label, value, moment) {
+        // TODO use moment object to manipulate format
+        var components = _.clone(this.state.searchObject);
+        components[label] = value;
         this.setState({
             searchObject: components
         });
+    }
+
+    updateStateDateField(label, event) {
+        var datePicker = this.refs["datePicker" + label];
+
+        // set the datepicker date so that it moves to that view
+        if(datePicker) {
+            if(isNaN(Date.parse(event.target.value)) === false) {
+                datePicker.gotoDate(new Date(event.target.value));
+            }
+        }
+        this.updateStateFuncs[label](event.target.value);
     }
 
     removeSearchOption(key) {
@@ -92,35 +115,61 @@ export default class CustomSearchTool extends React.Component {
     }
 
     render() {
-
-
         var menuItems = this.searchFields.map((searchField, index) => {
-            return <bs.MenuItem key={index} eventKey={searchField}> {searchField} </bs.MenuItem>;
+            return <bs.MenuItem key={index} eventKey={searchField.label}> {searchField.label} </bs.MenuItem>;
         });
 
         var inputs = [];
 
         for(var i in this.searchFields) {
-            var field = this.searchFields[i];
-            if(this.state.searchObject.hasOwnProperty(field)) {
+            var label = this.searchFields[i].label;
+            var type = this.searchFields[i].type;
 
-                var closeButton = <bs.Button key={"close" + i} onClick={this.removeSearchOption.bind(this, field)} bsSize={this.props.bsSize}>
+            if(this.state.searchObject.hasOwnProperty(label)) {
+
+                var closeButton = <bs.Button key={"close" + i} onClick={this.removeSearchOption.bind(this, label)} bsSize={this.props.bsSize}>
                                             <bs.Glyphicon glyph="remove" style={glyphStyle}/>
                                   </bs.Button>;
 
-                var searchInput = <div style={inputStyle} key={"searchInput" + i}>
-                                    <bs.Input
-                                        bsSize={this.props.bsSize}
-                                        value={this.state.searchObject[field]}
-                                        ref={field}
-                                        type="text"
-                                        addonBefore={this.searchFields[i]}
-                                        buttonAfter={closeButton}
-                                        hasFeedback={true}
-                                        placeholder={"Enter " + this.searchFields[i]}
-                                        onChange={this.updateStateFuncs[field]}>
-                                    </bs.Input>
-                                   </div>;
+                var searchInput = "";
+
+
+                if(type === "date") {
+                    var datePicker = <bs.Popover>
+                                        <DatePicker ref={"datePicker" + label} date={this.state.searchObject[label]} onChange={this.updateDateField.bind(this, label)}/>
+                                     </bs.Popover>;
+
+                    searchInput = <div style={inputStyle} key={"searchInput" + i}>
+                        <bs.OverlayTrigger trigger="click" rootClose placement="bottom" overlay={datePicker}>
+                            <bs.Input
+                                bsSize={this.props.bsSize}
+                                value={this.state.searchObject[label]}
+                                ref={label}
+                                type="text"
+                                addonBefore={label}
+                                buttonAfter={closeButton}
+                                hasFeedback={true}
+                                placeholder={"yyyy/mm/dd"}
+                                onChange={this.updateStateDateField.bind(this, label)}>
+                            </bs.Input>
+                       </bs.OverlayTrigger>
+                   </div>;
+
+                } else if (type === "text") {
+                    searchInput = <div style={inputStyle} key={"searchInput" + i}>
+                        <bs.Input
+                            bsSize={this.props.bsSize}
+                            value={this.state.searchObject[label]}
+                            ref={label}
+                            type="text"
+                            addonBefore={label}
+                            buttonAfter={closeButton}
+                            hasFeedback={true}
+                            placeholder={"Enter " + label}
+                            onChange={this.updateStateFuncs[label]}>
+                        </bs.Input>
+                   </div>;
+                }
                 inputs.push(searchInput);
             }
         }
