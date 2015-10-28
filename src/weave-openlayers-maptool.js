@@ -341,19 +341,83 @@ class GeometryLayer extends Layer {
 
 		this.styles = new Map();
 
+		this.probedSet = new Set();
+		this.selectedSet = new Set();
 
+		let selectionKeySet = this.layerPath.selection_keyset;
+		let probeKeySet = this.layerPath.probe_keyset;
+
+		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, selectionKeySet, this.selectedSet);
+		let probeKeyHandler = this.updateSetFromKeySet.bind(this, probeKeySet, this.probedSet);
+
+		selectionKeySet.addKeySetCallback(selectionKeyHandler);
+		probeKeySet.addKeySetCallback(probeKeyHandler);
+
+		this.subsetFilter = this.layerPath.push("filteredKeySet");
+
+		this.subsetFilter.addCallback(this.boundUpdateGeo);
 		this.geoColumnPath.addCallback(this.boundUpdateGeo, true);
+
 		this.fillStylePath.addCallback(this.boundUpdateStyleData);
 		this.lineStylePath.addCallback(this.boundUpdateStyleData);
+
 		this.boundUpdateStyleData();
+	}
+
+	updateSetFromKeySet(keySet, set, diff)
+	{
+		for (let key of diff.added)
+		{
+			set.add(key);
+		}
+
+		for (let key of diff.removed)
+		{
+			set.delete(key);
+		}
+
+		this.updateMetaStyles();
+	}
+
+	updateMetaStyles()
+	{
+		this.source.forEachFeature(
+			function (feature)
+			{
+				let id = feature.getId();
+
+				let normalStyle = feature.get("normalStyle");
+				let raisedNormalStyle = feature.get("normalStyle");
+				let selectedStyle = feature.get("selectedStyle");
+				let probedStyle = feature.get("probedStyle");
+
+				let newStyle = [].concat(normalStyle);
+
+				normalStyle[0].setZIndex(0);
+
+				if (this.selectedSet.has(id))
+				{
+					newStyle = newStyle.concat(selectedStyle);
+					normalStyle[0].setZIndex(Number.MAX_SAFE_INTEGER - 3);
+				}
+
+				if (this.probedSet.has(id))
+				{
+					newStyle = newStyle.concat(probedStyle);
+					normalStyle[0].setZIndex(Number.MAX_SAFE_INTEGER);
+				}
+
+				feature.setStyle(newStyle);
+			},
+		this);
 	}
 
 	updateGeometryData()
 	{
 		var dataProjection = this.geoColumnPath.getState("projectionSRS");
 		var featureProjection = this.parent.map.getView().getProjection();
-		var keys = this.geoColumnPath.getValue("this.keys");
-		var rawGeometries = this.geoColumnPath.getValue("ColumnUtils.getGeoJsonGeometries(this, this.keys)");
+		var keys = this.geoColumnPath.vars({filter: this.subsetFilter}).getValue("filter.keys");
+		var rawGeometries = this.geoColumnPath.vars({filter: this.subsetFilter}).getValue("ColumnUtils.getGeoJsonGeometries(this, filter.keys)");
 
 		this.source.clear();
 
@@ -362,14 +426,14 @@ class GeometryLayer extends Layer {
 			let id = this.geoColumnPath.qkeyToString(keys[idx]);
 
 			let geometry = this.geoJsonParser.readGeometry(rawGeometries[idx], {dataProjection, featureProjection});
-			let style = this.styles.get(id);
 
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);
-			feature.setStyle(style);
 
 			this.source.addFeature(feature);
 		}
+
+		this.updateStyleData();
 	}
 
 	static _toColorArray(colorString, alpha)
@@ -387,7 +451,6 @@ class GeometryLayer extends Layer {
 		colorArray = [].concat(colorArray); /* Should not be modified since it is cached in ol.color.asArray */
 
 		if (!colorArray) {
-			console.error("Failed to convert color:", colorString, alpha);
 			return null;
 		}
 
@@ -413,34 +476,71 @@ class GeometryLayer extends Layer {
 				lineJoin: this.lineStylePath.push("joints"),
 				miterLimit: this.lineStylePath.push("miterLimit")
 			}
-		}, this.geoColumnPath);
+		}, this.subsetFilter);
 
 		this.rawStyles = styleRecords;
 
 		for (let record of styleRecords)
 		{
-			let style = new ol.style.Style({
+			let weight = Number(record.stroke.weight);
+			let SELECT_WIDTH = 5;
+			let PROBE_WIDTH = 4;
+			let PROBE_LINE = 1;
+
+			let normalFill = new ol.style.Fill({
+				color: (record.fill.color && GeometryLayer._toColorArray(record.fill.color, record.fill.alpha)) || [0, 0, 0, 0]
+			});
+
+			let normalStyle = [new ol.style.Style({
 				fill: new ol.style.Fill({
-					color: (record.fill.color && GeometryLayer._toColorArray(record.fill.color, record.fill.alpha)) || [0, 0, 0, 0]
+					color: normalFill
 				}),
 				stroke: new ol.style.Stroke({
 					color: GeometryLayer._toColorArray(record.stroke.color, record.stroke.alpha) || [0, 0, 0, 0.5],
-					width: Number(record.stroke.weight),
+					width: weight,
 					lineCap: record.stroke.lineCap === "none" ? "butt" : record.stroke.lineCap || "round",
 					lineJoin: record.stroke.lineJoin === null ? "round" : record.stroke.lineJoin || "round",
 					miterLimit: Number(record.stroke.miterLimit)
-				})
-			});
+				}),
+				zIndex: 0
+			})];
 
-			this.styles.set(record.id, style);
+			let selectedStyle = [new ol.style.Style({
+				stroke: new ol.style.Stroke({
+					color: [0, 0, 0, 0.5],
+					width: weight + SELECT_WIDTH,
+					lineCap: record.stroke.lineCap === "none" ? "butt" : record.stroke.lineCap || "round",
+					lineJoin: record.stroke.lineJoin === null ? "round" : record.stroke.lineJoin || "round",
+					miterLimit: Number(record.stroke.miterLimit)
+				}),
+				zIndex: Number.MAX_SAFE_INTEGER - 4
+			})];
+
+			let probedStyle = [
+				new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: [0, 0, 0, 1],
+						width: weight + PROBE_WIDTH + PROBE_LINE
+					}),
+					zIndex: Number.MAX_SAFE_INTEGER - 2
+				}),
+				new ol.style.Style({
+					stroke: new ol.style.Stroke({
+						color: [255, 255, 255, 1],
+						width: weight + PROBE_WIDTH
+					}),
+					zIndex: Number.MAX_SAFE_INTEGER - 1
+				})
+			];
 
 			let feature = this.source.getFeatureById(record.id);
 
 			if (feature)
 			{
-				feature.setStyle(style);
+				feature.setProperties({normalStyle, selectedStyle, probedStyle, normalFill});
 			}
 		}
+		this.updateMetaStyles();
 	}
 }
 
@@ -475,90 +575,6 @@ export default class WeaveOpenLayersMap {
 		this.resolutionCallbackHandle = this.map.getView().on("change:resolution", this.setSessionZoom, this);
 
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
-
-		this.selectInteraction = new ol.interaction.Select({
-			layers: (layer) => layer.get("selectable"),
-			wrapX: false,
-			style: new ol.style.Style({
-				stroke: new ol.style.Stroke({width: 10})
-			})
-		});
-
-		this.probeInteraction = new ol.interaction.Select({
-			condition: ol.events.condition.pointerMove,
-			wrapX: false,
-			layers: (layer) => layer.get("selectable")
-//			style: WeaveOpenLayersMap.probeStyleFunction
-		});
-
-		this.map.addInteraction(this.selectInteraction);
-		//this.map.addInteraction(this.probeInteraction);
-
-		this.probeKeyset = this.toolPath.probe_keyset;
-		this.selectionKeyset = this.toolPath.selection_keyset;
-		this.subsetFilter = this.toolPath.subset_filter;
-
-		this.selectionKeyset.addCallback(this.fromSessionKeysToInteraction.bind(this, this.selectionKeyset, this.selectInteraction));
-		//this.probeKeyset.addKeySetCallback(this.fromSessionKeysToInteraction.bind(this, this.probeKeyset, this.probeInteraction));
-
-		this.selectInteraction.on("select", this.fromInteractionToSessionKeys.bind(this, this.selectionKeyset));
-		//this.probeInteraction.on("select", this.fromInteractionToSessionKeys.bind(this, this.probeKeyset));
-	}
-
-	static selectStyleFunction(feature, resolution) {
-
-	}
-
-	static probeStyleFunction(feature, resolution) {
-
-	}
-
-	getFeaturesById(ids) {
-		let features = [];
-		for (let layerName in this.layers)
-		{
-			let source = this.layers[layerName].source;
-			if (!source || !source.getFeatureById)
-			{
-				console.log(layerName + " lacks a source, skipping.");
-				continue;
-			}
-			for (let key of ids)
-			{
-				let feature = source.getFeatureById(key);
-				if (feature)
-				{
-					features.push(feature);
-				}
-				else
-				{
-					console.log("no feature " + key + " found in layer " + layerName);
-				}
-			}
-		}
-		return features;
-	}
-
-	fromSessionKeysToInteraction(keySetPath, interaction)
-	{
-		let featureCollection = interaction.getFeatures();
-		let keys = keySetPath.getKeys();
-		let selectedFeatures;
-
-		featureCollection.clear();
-
-		selectedFeatures = this.getFeaturesById(keys);
-		featureCollection.extend(selectedFeatures);
-	}
-
-	fromInteractionToSessionKeys(keySetPath, event)
-	{
-
-		let selectedKeys = lodash.map(event.selected, (feature) => feature.getId());
-		let deselectedKeys = lodash.map(event.deselected, (feature) => feature.getId());
-
-		keySetPath.addKeys(selectedKeys);
-		keySetPath.removeKeys(deselectedKeys);
 	}
 
 	setSessionCenter()
@@ -647,7 +663,7 @@ export default class WeaveOpenLayersMap {
 				continue;
 			}
 
-			layer.layer.setZIndex(idx);
+			layer.layer.setZIndex(idx + 2);
 		}
 	}
 
