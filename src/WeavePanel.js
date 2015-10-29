@@ -41,7 +41,7 @@ export default class {
     }
 
     _panelChanged() {
-        var top, left, height, width, zOrder;
+        var top, left, height, width;
         var toolPath = this.toolPath;
         var parent = this.parent;
 

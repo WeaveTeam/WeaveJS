@@ -68,21 +68,21 @@ export default class WeaveC3ColorLegend extends AbstractWeaveTool {
         var _shapeSize = this._plotterPath.getState("shapeSize");
         var _shapeType = this._plotterPath.getState("shapeType");
 
-        var xShapeOffset = _shapeSize / 2;
+        // var xShapeOffset = _shapeSize / 2;
         var ramp = this.dynamicColorColumnPath.getState("ramp");
 
         var yScale = d3.scale.linear()
                              .domain([0, numberOfBins + 1])
                              .range([0, height]);
 
-        var xScale = d3.scale.linear()
+        /* var xScale = d3.scale.linear()
                              .domain([0, numberOfBins + 1])
-                             .range([0, width]);
+                             .range([0, width]); */
 
 
         var yMap = (d) => { return yScale(d); };
 
-        var xMap = (d) => { return xScale(d); };
+        //var xMap = (d) => { return xScale(d); };
 
         //var rMap = (d) => { return rScale(d); };
         if(width && height && numberOfBins) {

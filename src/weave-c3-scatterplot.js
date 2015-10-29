@@ -3,7 +3,6 @@ import {registerToolImplementation} from "./WeaveTool.jsx";
 import c3 from "c3";
 import lodash from "lodash";
 import d3 from "d3";
-import StandardLib from "./Utils/StandardLib";
 import FormatUtils from "./Utils/FormatUtils";
 
 
@@ -35,7 +34,7 @@ function _normalizeRecords (records, attributes) {
           }
 
           if(record[attr]) {
-            console.log( (record[attr] - min) / (max - min));
+            // console.log( (record[attr] - min) / (max - min));
             obj[attr] = (record[attr] - min) / (max - min);
           } else {
             // if any of the value above is null then
@@ -253,11 +252,13 @@ export default class WeaveC3ScatterPlot extends AbstractWeaveTool {
     }
 
     _probedKeysChanged() {
+        /*
         var keys = this.toolPath.probe_keyset.getKeys();
         var indices = keys.map( (key) => {
             return Number(this.keyToIndex[key]);
         });
-        //this.chart.select("y", indices, true);
+        */
+        // this.chart.select("y", indices, true);
     }
 
     _updateStyle() {

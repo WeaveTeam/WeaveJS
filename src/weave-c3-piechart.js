@@ -119,9 +119,7 @@ export default class WeaveC3PieChart extends AbstractWeaveTool{
 
     _probedKeysChanged() {
         var keys = this.toolPath.probe_keyset.getKeys();
-        var indices = keys.map( (key) => {
-            return Number(this.keyToIndex[key]);
-        });
+
         if(keys.length) {
             this.chart.focus(keys);
         } else {
