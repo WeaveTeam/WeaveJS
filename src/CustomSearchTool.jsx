@@ -6,7 +6,8 @@ import DatePicker from "react-date-picker";
 
 var customSearchStyle = {
     display: "flex",
-    flexDirection: "row"
+    flexDirection: "row",
+    height: 30
 };
 
 var inputStyle = {
@@ -64,7 +65,12 @@ export default class CustomSearchTool extends React.Component {
     }
 
     componentDidUpdate() {
-        this.debouncedComponentDidUpdate();
+        // this.debouncedComponentDidUpdate();
+    }
+
+    submitSearch(event) {
+        this.props.toolPath.state("searchValues", this.state.searchObject);
+        event.preventDefault();
     }
 
     updateState(label, event, callback) {
@@ -174,18 +180,22 @@ export default class CustomSearchTool extends React.Component {
         }
         return (
             <div style={customSearchStyle}>
-                <bs.Dropdown title="Dropdown" bsSize={this.props.bsSize} bsStyle="primary" id="" onSelect={this.handleDropdownSelect.bind(this)}>
+                <bs.Dropdown title="Dropdown" bsSize={this.props.bsSize} bsStyle="primary" onSelect={this.handleDropdownSelect.bind(this)}>
                     <bs.Dropdown.Toggle bsStyle="primary">
                         <bs.Glyphicon glyph="search"/>
-                        Search
                     </bs.Dropdown.Toggle>
                     <bs.Dropdown.Menu>
                         {menuItems}
                     </bs.Dropdown.Menu>
                 </bs.Dropdown>
-                {
-                    inputs
-                }
+                <form onsubmit={this.submitSearch.bind(this)} style={customSearchStyle}>
+                    {
+                        inputs
+                    }
+                    <div style={{float: "right"}}>
+                        <bs.ButtonInput type="submit" bsStyle="primary" onClick={this.submitSearch.bind(this)}> Search </bs.ButtonInput>
+                    </div>
+                </form>
             </div>
         );
     }

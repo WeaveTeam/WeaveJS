@@ -129,7 +129,7 @@ export default class App extends React.Component {
         return (
             <ui.VBox>
                 <Navbar>
-                    <div style={{marginTop: 17}}>
+                    <div style={{marginTop: 17, marginLeft: 5, marginRight: 5}}>
                        {
                          customSearchTool
                        }

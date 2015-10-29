@@ -13,16 +13,17 @@
 }
 
 .form-control::-webkit-input-placeholder { /* WebKit browsers */
-    color:    #E8E8E8 ;
+    color: rgba(216,216,216, 0.5) 
+ ;
 }
 .form-control:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
-    color:    #E8E8E8 ;
+    color: rgba(216,216,216, 0.5);
 }
 .form-control::-moz-placeholder { /* Mozilla Firefox 19+ */
-    color:    #E8E8E8 ;
+    color: rgba(216,216,216, 0.5);
 }
 .form-control:-ms-input-placeholder { /* Internet Explorer 10+ */
-    color:    #E8E8E8;
+    color: rgba(216,216,216, 0.5);
 }
 
 .btn.btn-sm.btn-default {
