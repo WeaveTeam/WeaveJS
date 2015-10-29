@@ -17,6 +17,8 @@ export default class FeatureLayer extends Layer {
 
 		selectionKeySet.addKeySetCallback(selectionKeyHandler);
 		probeKeySet.addKeySetCallback(probeKeyHandler);
+
+		this.settingsPath.push("selectable").addCallback(this.updateMetaStyles.bind(this));
 	}
 
 	updateSetFromKeySet(keySet, set, diff)
@@ -36,6 +38,7 @@ export default class FeatureLayer extends Layer {
 
 	updateMetaStyles()
 	{
+		this.tempSelectable = this.settingsPath.push("selectable").getState();
 		this.source.forEachFeature(this.updateMetaStyle, this);
 	}
 
@@ -49,8 +52,13 @@ export default class FeatureLayer extends Layer {
 		let probedStyle = feature.get("probedStyle");
 		let newStyle;
 
-		/*
-		if (!this.selectedSet.has(id) && !this.probedSet.has(id) && this.selectedSet.length > 0)
+		if (!this.tempSelectable)
+		{
+			feature.setStyle(normalStyle);
+			return;
+		}
+
+		if (!this.selectedSet.has(id) && !this.probedSet.has(id) && this.selectedSet.size > 0)
 		{
 			newStyle = [].concat(unselectedStyle);
 		}
@@ -58,9 +66,6 @@ export default class FeatureLayer extends Layer {
 		{
 			newStyle = [].concat(normalStyle);
 		}
-		*/
-
-		newStyle = [].concat(normalStyle);
 
 		newStyle[0].setZIndex(0);
 

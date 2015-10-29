@@ -113,9 +113,25 @@ export default class GeometryLayer extends FeatureLayer {
 			});
 
 			let normalStyle = [new ol.style.Style({
-				fill: normalFill,
+				fill: new ol.style.Fill({
+					color: (record.fill.color && GeometryLayer._toColorArray(record.fill.color, record.fill.alpha)) || [0, 0, 0, 0]
+				}),
 				stroke: new ol.style.Stroke({
 					color: GeometryLayer._toColorArray(record.stroke.color, record.stroke.alpha) || [0, 0, 0, 0.5],
+					width: weight,
+					lineCap: record.stroke.lineCap === "none" ? "butt" : record.stroke.lineCap || "round",
+					lineJoin: record.stroke.lineJoin === null ? "round" : record.stroke.lineJoin || "round",
+					miterLimit: Number(record.stroke.miterLimit)
+				}),
+				zIndex: 0
+			})];
+
+			let unselectedStyle = [new ol.style.Style({
+				fill: new ol.style.Fill({
+					color: (record.fill.color && GeometryLayer._toColorArray(record.fill.color, record.fill.alpha * 0.5)) || [0, 0, 0, 0]
+				}),
+				stroke: new ol.style.Stroke({
+					color: GeometryLayer._toColorArray(record.stroke.color, record.stroke.alpha * 0.5) || [0, 0, 0, 0.5],
 					width: weight,
 					lineCap: record.stroke.lineCap === "none" ? "butt" : record.stroke.lineCap || "round",
 					lineJoin: record.stroke.lineJoin === null ? "round" : record.stroke.lineJoin || "round",
@@ -156,7 +172,7 @@ export default class GeometryLayer extends FeatureLayer {
 
 			if (feature)
 			{
-				feature.setProperties({normalStyle, selectedStyle, probedStyle, normalFill});
+				feature.setProperties({normalStyle, unselectedStyle, selectedStyle, probedStyle, normalFill});
 			}
 		}
 		this.updateMetaStyles();
