@@ -4,10 +4,13 @@ import lodash from "lodash";
 
 /* eslint-disable */
 import Layer from "./MapLayers/Layer.js";
+import FeatureLayer from "./MapLayers/FeatureLayer.js";
 import GeometryLayer from "./MapLayers/GeometryLayer.js"; 
 import TileLayer from "./MapLayers/TileLayer.js";
 import GlyphLayer from "./MapLayers/GlyphLayer.js";
 /* eslint-enable */
+
+
 
 export default class WeaveOpenLayersMap {
 
@@ -25,6 +28,10 @@ export default class WeaveOpenLayersMap {
 			})
 		});
 
+		this.map.addInteraction(new ol.interaction.Pointer({
+			handleMoveEvent: this.onMouseMove.bind(this)
+		}));
+
 		this.plottersPath = this.toolPath.push("children", "visualization", "plotManager", "plotters");
 		this.layerSettingsPath = this.toolPath.push("children", "visualization", "plotManager", "layerSettings");
 		this.zoomBoundsPath = this.toolPath.push("children", "visualization", "plotManager", "zoomBounds");
@@ -40,6 +47,40 @@ export default class WeaveOpenLayersMap {
 		this.resolutionCallbackHandle = this.map.getView().on("change:resolution", this.setSessionZoom, this);
 
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
+	}
+
+	onMouseMove(event)
+	{
+		let keySetMap = new Map();
+		this.map.forEachFeatureAtPixel(event.pixel,
+			function (feature, layer)
+			{
+				let weaveLayerObject = layer.get("layerObject");
+				let tmpKeySet = keySetMap.get(weaveLayerObject.probeKeySet);
+
+				if (!tmpKeySet)
+				{
+					if (!weaveLayerObject.probeKeySet)
+					{
+						return;
+					}
+					tmpKeySet = new Set();
+					keySetMap.set(weaveLayerObject.probeKeySet, tmpKeySet);
+
+				}
+
+				tmpKeySet.add(feature.getId());
+			},
+			function (layer)
+			{
+				return layer.getSelectable() && layer instanceof FeatureLayer;
+			});
+
+		for (let weaveKeySet of keySetMap.keys())
+		{
+			let keySet = keySetMap.get(weaveKeySet);
+			weaveKeySet.setKeys(Array.from(keySet));
+		}
 	}
 
 	setSessionCenter()

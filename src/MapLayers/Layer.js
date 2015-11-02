@@ -66,6 +66,8 @@ export default class Layer {
 		if (value) {
 			this.parent.map.addLayer(value);
 
+			value.set("layerObject", this); /* Need to store this backref */
+
 			if (value) {
 				for (let name in this._layerReadyCallbacks) {
 					this._layerReadyCallbacks[name]();

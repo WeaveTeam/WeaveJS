@@ -9,14 +9,14 @@ export default class FeatureLayer extends Layer {
 		this.probedSet = new Set();
 		this.selectedSet = new Set();
 
-		let selectionKeySet = this.layerPath.selection_keyset;
-		let probeKeySet = this.layerPath.probe_keyset;
+		this.selectionKeySet = this.layerPath.selection_keyset;
+		this.probeKeySet = this.layerPath.probe_keyset;
 
-		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, selectionKeySet, this.selectedSet);
-		let probeKeyHandler = this.updateSetFromKeySet.bind(this, probeKeySet, this.probedSet);
+		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, this.selectedSet);
+		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, this.probedSet);
 
-		selectionKeySet.addKeySetCallback(selectionKeyHandler);
-		probeKeySet.addKeySetCallback(probeKeyHandler);
+		this.selectionKeySet.addKeySetCallback(selectionKeyHandler);
+		this.probeKeySet.addKeySetCallback(probeKeyHandler);
 
 		this.settingsPath.push("selectable").addCallback(this.updateMetaStyles.bind(this));
 	}
