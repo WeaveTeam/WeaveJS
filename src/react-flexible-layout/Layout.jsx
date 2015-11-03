@@ -18,7 +18,6 @@ export default class Layout extends React.Component {
         this.state = {id: props.state.id, direction: props.state.direction, children: props.state.children, flex: props.state.flex};
         this.minSize = 16;
         this.dragging = false;
-        this.dispatchStateChange = this.dispatchStateChange.bind(this);
     }
 
 
@@ -46,9 +45,9 @@ export default class Layout extends React.Component {
             || !_.isEqual(this.state, nextProps.state);
     }
 
-    dispatchStateChange(newState) {
-        if (this.props.onStateChange) {
-            this.props.onStateChange(newState);
+    componentDidUpdate() {
+        if(this.props.onStateChange && this.state) {
+            this.props.onStateChange(this.state);
         }
     }
 
@@ -154,9 +153,7 @@ export default class Layout extends React.Component {
                 resizerOverlay.setState({
                     active: false
                 });
-
-                this.dispatchStateChange(newState);
-                //this.setState(newState, this.dispatchStateChange);
+                this.setState(newState);
             }
         });
         this.panelDragging = false;
@@ -168,9 +165,7 @@ export default class Layout extends React.Component {
         var index = this.childNames.indexOf(childRef);
 
         stateCopy.children[index] = newState;
-
-        console.log("state copy", stateCopy);
-        this.setState(stateCopy, this.dispatchStateChange);
+        this.setState(stateCopy);
     }
 
     render() {

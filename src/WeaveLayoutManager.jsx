@@ -45,14 +45,8 @@ export default class WeaveLayoutManager extends React.Component {
             };
         }
 
+        this.weaveReady = this.weaveReady.bind(this);
         this.margin = 8;
-    }
-
-    componentDidUpdate() {
-        if(this.weave) {
-            // console.log(JSON.stringify(this.state.layout, null, 3));
-            
-        }
     }
 
     componentDidMount() {
@@ -66,15 +60,14 @@ export default class WeaveLayoutManager extends React.Component {
             if (this.weave !== weave)
             {
                 this.weave = weave;
-                this.setState({
-                    layout: this.weave.path(LAYOUT).request("FlexibleLayout").getState()
-                });
             }
+
             window.addEventListener("resize", this._forceUpdate = () => { this.forceUpdate(); });
+
             this.element = React.findDOMNode(this);
 
             this.weave.path().getValue("childListCallbacks.addGroupedCallback")(null, _.debounce(this.forceUpdate.bind(this), 0), true);
-            this.weave.path(LAYOUT).addCallback(this._layoutChanged.bind(this));
+            this.weave.path(LAYOUT).addCallback(this._layoutChanged.bind(this), true);
         } catch(e) {
             console.error(e);
         }
@@ -85,20 +78,18 @@ export default class WeaveLayoutManager extends React.Component {
     }
 
     _layoutChanged() {
-        if(this.weave) {
+        var newState = this.weave.path(LAYOUT).getState();
+        this.refs[LAYOUT].setState(newState, () => {
             this.setState({
-                layout: this.weave.path(LAYOUT).getState()
+                layout: newState
             });
-        }
+        });
     }
 
-    handleStateChange() {
-        // this.weave.path(LAYOUT).state(newState);
-        this.setState({}, () => {
-            if(this.weave) {
-                this.weave.path(LAYOUT).state(this.state.layout);
-            }
-        });
+    handleStateChange(newState) {
+        if(this.weave) {
+            this.weave.path(LAYOUT).state(newState);
+        }
     }
 
     onDragStart(id) {
@@ -155,6 +146,11 @@ export default class WeaveLayoutManager extends React.Component {
         var newState = _.cloneDeep(this.state.layout);
         var src = StandardLib.findDeep(newState, {id: toolDragged});
         var dest = StandardLib.findDeep(newState, {id: toolDroppedOn});
+        console.log(src.id, dest.id);
+        if(_.isEqual(src.id, dest.id)) {
+            console.log("returning");
+            return;
+        }
 
         if(dropZone === "center") {
             var srcId = src.id;
@@ -185,7 +181,7 @@ export default class WeaveLayoutManager extends React.Component {
                 dest.children.reverse();
             }
         }
-        console.log(JSON.stringify(newState, null, 3));
+        console.log("after swap", JSON.stringify(newState, null, 3));
         this.weave.path(LAYOUT).state(newState);
     }
 
@@ -195,7 +191,7 @@ export default class WeaveLayoutManager extends React.Component {
 
         if(!this.weave) {
             // creates the weave flash instance as a WeaveTool React component
-            children.push(<WeaveTool ref="Weave" key="Weave" toolClass="Weave" toolProps={{onWeaveReady: this.weaveReady.bind(this)}}/>);
+            children.push(<WeaveTool ref="Weave" key="Weave" toolClass="Weave" toolProps={{onWeaveReady: this.weaveReady}}/>);
         } else {
             // during the second render, creates the other tools including weave
             var paths = this.weave.path().getChildren();

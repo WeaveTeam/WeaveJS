@@ -2,8 +2,8 @@
     background: rgba(255,255,255,0.2);
     border: none;
     color: white;
-    border-bottom-left-radius: 25px;
-    border-top-left-radius: 25px;
+    border-bottom-left-radius: 0px;
+    border-top-left-radius: 0px;
 }
 
 .form-control {
@@ -11,7 +11,12 @@
     color: whitesmoke;
     border: none;
 }
-
+body {
+  -webkit-user-select: none;
+     -moz-user-select: -moz-none;
+      -ms-user-select: none;
+          user-select: none;
+}
 .form-control::-webkit-input-placeholder { /* WebKit browsers */
     color: rgba(216,216,216, 0.5) 
  ;
