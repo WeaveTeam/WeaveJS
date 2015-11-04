@@ -49,6 +49,11 @@ export default class WeaveOpenLayersMap {
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
 	}
 
+	resize()
+	{
+		this.map.updateSize();
+	}
+
 	onMouseMove(event)
 	{
 		let keySetMap = new Map();
@@ -66,7 +71,6 @@ export default class WeaveOpenLayersMap {
 					}
 					tmpKeySet = new Set();
 					keySetMap.set(weaveLayerObject.probeKeySet, tmpKeySet);
-
 				}
 
 				tmpKeySet.add(feature.getId());
