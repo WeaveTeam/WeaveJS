@@ -14,6 +14,7 @@ import WeaveOpenLayersMap from "./weave-openlayers-maptool.js";
 import WeaveReactTable from "./weave-react-table.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";
+import ToolOverlay from "./ToolOverlay.jsx";
 import Weave from "./Weave.jsx";
 import StandardLib from "./Utils/StandardLib";
 
@@ -25,6 +26,10 @@ const TOP = "top";
 const BOTTOM = "bottom";
 const VERTICAL = "vertical";
 const HORIZONTAL = "horizontal";
+
+const TOOLOVERLAY = "tooloverlay";
+
+
 
 export default class WeaveLayoutManager extends React.Component {
 
@@ -46,13 +51,16 @@ export default class WeaveLayoutManager extends React.Component {
         }
 
         this.weaveReady = this.weaveReady.bind(this);
+        this.debouncedForceUpdate = _.debounce(this.forceUpdate.bind(this), 10);
         this.margin = 8;
     }
 
     componentDidMount() {
+        React.findDOMNode(this);
         if(this.weave) {
             this.weaveReady(this.weave);
         }
+        window.addEventListener("resize", this._forceUpdate = () => { this.forceUpdate(); });
     }
 
     weaveReady(weave) {
@@ -62,7 +70,6 @@ export default class WeaveLayoutManager extends React.Component {
                 this.weave = weave;
             }
 
-            window.addEventListener("resize", this._forceUpdate = () => { this.forceUpdate(); });
 
             this.element = React.findDOMNode(this);
 
@@ -78,7 +85,7 @@ export default class WeaveLayoutManager extends React.Component {
     }
 
     _layoutChanged() {
-        var newState = this.weave.path(LAYOUT).getState();
+        var newState = this.simplifyState(this.weave.path(LAYOUT).getState());
         this.refs[LAYOUT].setState(newState, () => {
             this.setState({
                 layout: newState
@@ -92,15 +99,82 @@ export default class WeaveLayoutManager extends React.Component {
         }
     }
 
-    onDragStart(id) {
+    onDragStart(id, event) {
         this.toolDragged = id;
-        this.isDragging = true;
+        var toolRef = id[0]; // toolName as used in the ref for the weave tool.
+        var element = React.findDOMNode(this.refs[toolRef].refs.toolDiv);
+        event.dataTransfer.setDragImage(element, 0, 0);
     }
 
-    onDragStop(id, event) {
-        if(this.isDragging) {
-            this.toolDroppedOn = id;
-            if(this.toolDragged !== this.toolDroppedOn) {
+    onDragEnd() {
+        if(this.toolDragged && this.toolOver) {
+            this.updateLayout(this.toolDragged, this.toolOver, this.dropZone);
+            this.toolDragged = null;
+            this.dropZone = null;
+            var toolOverlayStyle = _.clone(this.refs[TOOLOVERLAY].state.style);
+
+            toolOverlayStyle.visibility = "hidden";
+
+            this.refs[TOOLOVERLAY].setState({
+                style: toolOverlayStyle
+            });
+       }
+    }
+
+    onDragOver(toolOver, event) {
+
+        if(!this.toolDragged) {
+            return;
+        }
+
+        var toolOverlayStyle = _.clone(this.refs[TOOLOVERLAY].state.style);
+
+        if(_.isEqual(this.toolDragged, toolOver)) {
+            this.toolOver = null;
+            if(toolOverlayStyle.visibility !== "hidden") {
+                toolOverlayStyle.visibility = "hidden";
+                this.refs[TOOLOVERLAY].setState({
+                    style: toolOverlayStyle
+                });
+            }
+            return;
+        }
+
+        var toolNode = this.refs[LAYOUT].getDOMNodeFromId(toolOver);
+        var toolNodePosition = toolNode.getBoundingClientRect();
+
+        var dropZone = this.getDropZone(toolOver, event);
+        toolOverlayStyle.left = toolNodePosition.left;
+        toolOverlayStyle.top = toolNodePosition.top;
+        toolOverlayStyle.width = toolNodePosition.width;
+        toolOverlayStyle.height = toolNodePosition.height;
+        toolOverlayStyle.visibility = "visible";
+
+        if(dropZone === LEFT) {
+            toolOverlayStyle.width = toolNodePosition.width / 2;
+        } else if(dropZone === RIGHT) {
+            toolOverlayStyle.left = toolNodePosition.left + toolNodePosition.width / 2;
+            toolOverlayStyle.width = toolNodePosition.width / 2;
+        } else if(dropZone === BOTTOM) {
+            toolOverlayStyle.top = toolNodePosition.top + toolNodePosition.height / 2;
+            toolOverlayStyle.height = toolNodePosition.height / 2;
+        } else if(dropZone === TOP) {
+            toolOverlayStyle.height = toolNodePosition.height / 2;
+        }
+
+        if (dropZone !== this.dropZone || !_.isEqual(toolOver, this.toolOver)) {
+            this.refs[TOOLOVERLAY].setState({
+                style: toolOverlayStyle
+            });
+        }
+
+        this.dropZone = dropZone;
+        this.toolOver = toolOver;
+    }
+
+    getDropZone(id, event) {
+        if(this.toolDragged) {
+            if(!_.isEqual(this.toolDragged, id)) {
                 var toolNode = this.refs[LAYOUT].getDOMNodeFromId(id);
                 var toolNodePosition = toolNode.getBoundingClientRect();
 
@@ -124,31 +198,60 @@ export default class WeaveLayoutManager extends React.Component {
                     theta: Math.atan2(mouseNorm.y, mouseNorm.x)
                 };
 
-                var dropZone = "";
                 var zones = [RIGHT, BOTTOM, LEFT, TOP];
 
                 var zoneIndex = Math.round((mousePolarCoord.theta / (2 * Math.PI) * 4) + 4) % 4;
 
                 if(mousePolarCoord.r < 0.34) {
-                    dropZone = "center";
+                    return "center";
                 } else {
-                    dropZone = zones[zoneIndex];
+                    return zones[zoneIndex];
                 }
-
-                this.updateLayout(this.toolDragged, this.toolDroppedOn, dropZone);
             }
-            this.isDragging = false;
         }
+    }
+
+    simplifyState(state) {
+        var children = state.children;
+
+        if (!children) {
+            return state;
+        }
+
+        if (children.length === 1) {
+            return this.simplifyState(children[0]);
+        }
+
+        var simpleChildren = [];
+
+        for (var i = 0; i < children.length; i++) {
+            var child = this.simplifyState(children[i]);
+            if (child.children && child.direction === state.direction) {
+                var childChildren = child.children;
+                for (var ii = 0; ii < childChildren.length; ii++) {
+                    var childChild = childChildren[ii];
+                    childChild.flex *= child.flex;
+                    simpleChildren.push(childChild);
+                }
+            }
+            else {
+                simpleChildren.push(child);
+            }
+        }
+        state.children = simpleChildren;
+        return state;
     }
 
     updateLayout(toolDragged, toolDroppedOn, dropZone) {
 
+        if(!this.toolDragged || !this.toolOver || !this.dropZone) {
+            return;
+        }
+
         var newState = _.cloneDeep(this.state.layout);
         var src = StandardLib.findDeep(newState, {id: toolDragged});
         var dest = StandardLib.findDeep(newState, {id: toolDroppedOn});
-        console.log(src.id, dest.id);
         if(_.isEqual(src.id, dest.id)) {
-            console.log("returning");
             return;
         }
 
@@ -181,7 +284,6 @@ export default class WeaveLayoutManager extends React.Component {
                 dest.children.reverse();
             }
         }
-        console.log("after swap", JSON.stringify(newState, null, 3));
         this.weave.path(LAYOUT).state(newState);
     }
 
@@ -227,7 +329,9 @@ export default class WeaveLayoutManager extends React.Component {
                             toolPosition.maxWidth = toolPosition.width;
                         }
                     }
-                    children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} onDragStart={this.onDragStart.bind(this, path.getPath())} onDragStop={this.onDragStop.bind(this, path.getPath())} style={toolPosition}/>);
+                    children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} style={toolPosition}
+                                             onDragOver={this.onDragOver.bind(this, path.getPath())} onDragStart={this.onDragStart.bind(this, path.getPath())} onDragEnd={this.onDragEnd.bind(this)}
+                                  />);
                 }
             }
         }
@@ -236,9 +340,9 @@ export default class WeaveLayoutManager extends React.Component {
             <div style={{position: "absolute", width: "100%", height: "100%"}}>
                 <Layout onStateChange={this.handleStateChange.bind(this)} key={LAYOUT} ref={LAYOUT} state={this.state.layout} weave={this.weave}/>
                 {children}
+                <ToolOverlay ref={TOOLOVERLAY}/>
             </div>
         );
     }
-
 }
 

@@ -2,6 +2,12 @@ import _ from "lodash";
 import React from "react";
 var toolRegistry = {};
 
+const grabberStyle = {
+    width: "16",
+    height: "16",
+    cursor: "move",
+    background: "url(http://placehold.it/32x32)"
+};
 export function registerToolImplementation(asClassName, jsClass) {
     toolRegistry[asClassName] = jsClass;
 }
@@ -47,12 +53,6 @@ export class WeaveTool extends React.Component {
     }
 
     render() {
-        var grabber = {
-            width: "16",
-            height: "16",
-            cursor: "move",
-            background: "url(http://placehold.it/32x32)"
-        };
 
         var reactTool = "";
         if (React.Component.isPrototypeOf(this.ToolClass)) {
@@ -66,9 +66,9 @@ export class WeaveTool extends React.Component {
         }
 
         return (
-            <div style={this.props.style} onMouseUp={(event) => { this.props.onDragStop(event); }}>
+            <div style={this.props.style} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
                 <div ref="header" style={{height: "25px", width: "100%"}}>
-                    <div onMouseDown={() => { this.props.onDragStart(); } } style={grabber}/>
+                    <div draggable={true} onDragStart={this.props.onDragStart} style={grabberStyle}/>
                 </div>
                 <div style={{position: "relative", width: "100%", height: toolHeight, padding: 16}}>
                     <div ref="toolDiv" style={{width: "100%", height: "100%", maxHeight: toolHeight}}/>
