@@ -2,14 +2,34 @@
     background: rgba(255,255,255,0.2);
     border: none;
     color: white;
-    border-bottom-left-radius: 0px;
-    border-top-left-radius: 0px;
+    border-bottom-left-radius: 25px;
+    border-top-left-radius: 25px;
+}
+
+th, td {
+    padding: 3;
 }
 
 .form-control {
     background: rgba(255,255,255,0.1);
     color: whitesmoke;
     border: none;
+}
+
+.popover-content {
+    padding: 0px 0px;
+}
+
+.date-picker {
+    border: 0px;
+}
+
+.date-picker .dp-header {
+    background: #FFFFFF none repeat scroll 0% 0%;
+}
+
+.date-picker .dp-table .dp-cell {
+    padding: 2px;
 }
 body {
   -webkit-user-select: none;

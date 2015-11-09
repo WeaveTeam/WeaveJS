@@ -6,16 +6,6 @@ import * as bs from "react-bootstrap";
 import ui from "./react-ui/ui.jsx";
 
 
-var OKglyphStyle = {
-    fontSize: "14px",
-    color: "green"
-};
-
-var RMglyphStyle = {
-    fontSize: "14px",
-    color: "red"
-};
-
 const OKBUTTON = "ok";
 const RMBUTTON = "rm";
 
@@ -37,7 +27,8 @@ export default class CustomCardViewTool extends React.Component {
         var mapping = [
             { name: "header", type: "LinkableHashMap", callback: this.dataChanged },
             { name: "title", type: "LinkableHashMap", callback: this.dataChanged },
-            { name: "attributes", type: "LinkableHashMap", callback: this.dataChanged },
+            { name: "attributesLeft", type: "LinkableHashMap", callback: this.dataChanged },
+            { name: "attributesRight", type: "LinkableHashMap", callback: this.dataChanged },
             { name: "sort", type: "DynamicColumn", callback: this.dataChanged },
             { name: "selectionKeySet", type: "KeySet", callback: this.setCardsSelection },
             { name: "probeKeySet", type: "KeySet", callback: this.setCardsProbe },
@@ -174,7 +165,8 @@ export default class CustomCardViewTool extends React.Component {
         var mapping = {
             header: this.paths.header.getNames().map((name) => { return this.paths.header.push(name); }),
             title: this.paths.title.getNames().map((name) => { return this.paths.title.push(name); }),
-            attributes: this.paths.attributes.getNames().map((name) => { return this.paths.attributes.push(name); }),
+            attributesLeft: this.paths.attributesLeft.getNames().map((name) => { return this.paths.attributesLeft.push(name); }),
+            attributesRight: this.paths.attributesRight.getNames().map((name) => { return this.paths.attributesRight.push(name); }),
             sort: this.paths.sortColumn
         };
 
@@ -182,7 +174,9 @@ export default class CustomCardViewTool extends React.Component {
             hiddenCardKeys: []
         });
 
-        var attributeNames = this.paths.attributes.getNames();
+        var attributeNamesLeft = this.paths.attributesLeft.getNames();
+
+        var attributeNamesRight = this.paths.attributesRight.getNames();
 
         this.records = _.sortByOrder(this.toolPath.retrieveRecords(mapping), "sort", "asc");
 
@@ -207,17 +201,28 @@ export default class CustomCardViewTool extends React.Component {
 
             formattedRecord.title = title;
 
-            var attributes = [];
-            if(record.hasOwnProperty("attributes")) {
-                for(var i in attributeNames) {
-                    attributes.push({
-                        name: this.paths.attributes.push(attributeNames[i]).getValue("getMetadata('title')"),
-                        value: record.attributes[i]
+            var attributesLeft = [];
+            if(record.hasOwnProperty("attributesLeft")) {
+                for(var i in attributeNamesLeft) {
+                    attributesLeft.push({
+                        name: this.paths.attributesLeft.push(attributeNamesLeft[i]).getValue("getMetadata('title')"),
+                        value: record.attributesLeft[i]
                     });
                 }
             }
 
-            formattedRecord.attributes = attributes;
+            var attributesRight = [];
+            if(record.hasOwnProperty("attributesRight")) {
+                for(i in attributeNamesRight) {
+                    attributesRight.push({
+                        name: this.paths.attributesRight.push(attributeNamesRight[i]).getValue("getMetadata('title')"),
+                        value: record.attributesRight[i]
+                    });
+                }
+            }
+
+            formattedRecord.attributesLeft = attributesLeft;
+            formattedRecord.attributesRight = attributesRight;
 
             formattedRecord.imgUrl = record.imgUrl;
             return formattedRecord;
@@ -329,7 +334,7 @@ class Card extends React.Component {
                 if(this.state.selected && this.state.rmProbe) {
                     return "#DCC6DC"; // purple
                 } else if(this.state.checkProbe) {
-                    return "#e9eaed"; // blue
+                    return "#dae2fc"; // blue
                 } else if (this.state.rmProbe) {
                     return "rgba(224, 141, 157, 0.4)"; // red
                 } else if (this.state.selected) {
@@ -343,12 +348,46 @@ class Card extends React.Component {
             borderWidth: "0px",
             borderColor: "#286090",
             boxShadow: "0 1px 1px rgba(0,0,0,.05)",
-            float: "left"
+            float: "left",
+            overflow: "hidden"
         };
+
+        var OKglyphStyle = {
+            fontSize: "14px",
+            color: "#93a5aa",
+            cursor: "default"
+        };
+
+        var RMglyphStyle = {
+            fontSize: "14px",
+            color: "#93a5aa",
+            cursor: "default"
+        };
+
+        if(this.state.selected) {
+            OKglyphStyle.color = "green";
+        } else {
+            OKglyphStyle.color = "#93a5aa";
+        }
+
+        if(this.state.rmProbe) {
+            RMglyphStyle.color = "red";
+        } else {
+            RMglyphStyle.color = "#93a5aa";
+        }
 
         var cardStyleprefixed = VendorPrefix.prefix({styles: cardStyle});
 
-        var rows = data.attributes.map((attribute, index) => {
+        var rowsLeft = data.attributesLeft.map((attribute, index) => {
+            return (
+                <tr key={index}>
+                  <th>{attribute.name}</th>
+                  <td>{attribute.value}</td>
+                </tr>
+            );
+        });
+
+        var rowsRight = data.attributesRight.map((attribute, index) => {
             return (
                 <tr key={index}>
                   <th>{attribute.name}</th>
@@ -385,13 +424,26 @@ class Card extends React.Component {
                     <div style={contactIcon}/>
                 </div>
                 <div style={{flex: 0.8}}>
-                    <table style={{width: "100%", fontSize: "11px", color: "#93a5aa"}}>
-                        <tbody>
-                          {
-                            rows
-                          }
-                        </tbody>
-                    </table>
+                    <ui.HBox>
+                        <div style={{width: "50%"}}>
+                            <table style={{fontSize: "11px", color: "#93a5aa", marginRight: 5}}>
+                                <tbody>
+                                {
+                                 rowsLeft
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div style={{width: "50%"}}>
+                            <table style={{fontSize: "11px", color: "#93a5aa"}}>
+                                <tbody>
+                                {
+                                    rowsRight
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    </ui.HBox>
                 </div>
             </div>
         );
