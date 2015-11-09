@@ -14,7 +14,7 @@ function percentToNumber(percentString)
     }
 }
 
-export default class {
+class WeavePanel {
 
     constructor(parent, toolPath, ToolClass) {
         this.toolPath = toolPath;
@@ -73,3 +73,5 @@ export default class {
         this.tool.destroy();
     }
 }
+
+export default WeavePanel;

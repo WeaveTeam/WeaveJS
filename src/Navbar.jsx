@@ -8,7 +8,7 @@ var style = {
 	boxShadow: "0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28)"
 };
 
-export default class Navbar extends React.Component {
+class Navbar extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -30,3 +30,4 @@ export default class Navbar extends React.Component {
 		);
 	}
 }
+export default Navbar;

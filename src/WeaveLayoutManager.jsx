@@ -31,7 +31,7 @@ const TOOLOVERLAY = "tooloverlay";
 
 
 
-export default class WeaveLayoutManager extends React.Component {
+class WeaveLayoutManager extends React.Component {
 
     constructor(props) {
         super(props);
@@ -345,4 +345,4 @@ export default class WeaveLayoutManager extends React.Component {
         );
     }
 }
-
+export default WeaveLayoutManager;

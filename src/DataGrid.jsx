@@ -3,7 +3,7 @@ import ReactDataGrid from "react-datagrid";
 
 var DEFAULTHEIGHT = 300;
 
-export default class DataGrid extends React.Component {
+class DataGrid extends React.Component {
 
     constructor(props) {
         super(props);
@@ -26,3 +26,5 @@ export default class DataGrid extends React.Component {
                     showCellBorders={true}/>;
     }
 }
+
+export default DataGrid;

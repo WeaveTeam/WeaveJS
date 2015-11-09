@@ -12,7 +12,7 @@ import GlyphLayer from "./MapLayers/GlyphLayer.js";
 
 
 
-export default class WeaveOpenLayersMap {
+class WeaveOpenLayersMap {
 
 	constructor(props)
 	{
@@ -52,6 +52,7 @@ export default class WeaveOpenLayersMap {
 	resize()
 	{
 		this.map.updateSize();
+		/* TODO: Make sure this doesn't actually overfill the element */
 	}
 
 	onMouseMove(event)
@@ -164,7 +165,7 @@ export default class WeaveOpenLayersMap {
 		addedNames.forEach(function (name) {
 			this.layers[name] = Layer.newLayer(this, name);
 		}, this);
-
+		/* */
 		for (let idx in newNames)
 		{
 			let layer = this.layers[newNames[idx]];
@@ -182,5 +183,7 @@ export default class WeaveOpenLayersMap {
 
 	}
 }
+
+export default WeaveOpenLayersMap;
 
 registerToolImplementation("weave.visualization.tools::MapTool", WeaveOpenLayersMap);

@@ -6,7 +6,7 @@ import {registerToolImplementation} from "./WeaveTool.jsx";
 import FormatUtils from "./Utils/FormatUtils";
 
 
-export default class WeaveC3LineChart extends AbstractWeaveTool {
+class WeaveC3LineChart extends AbstractWeaveTool {
     constructor(props) {
         super(props);
         this._plotterPath = this.toolPath.pushPlotter("plot");
@@ -144,5 +144,7 @@ export default class WeaveC3LineChart extends AbstractWeaveTool {
         this.chart.load({columns: columns, colors: this.colors, type: chartType, unload: true});
     }
 }
+
+export default WeaveC3LineChart;
 
 registerToolImplementation("weave.visualization.tools::LineChartTool", WeaveC3LineChart);

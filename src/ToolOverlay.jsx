@@ -11,7 +11,7 @@ var toolOverlayStyle = {
     pointerEvents: "none"
 };
 
-export default class ToolOverlay extends React.Component {
+class ToolOverlay extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -24,3 +24,5 @@ export default class ToolOverlay extends React.Component {
 		return <div style={this.state.style}/>;
 	}
 }
+
+export default ToolOverlay;

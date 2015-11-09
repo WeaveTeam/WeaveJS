@@ -4,7 +4,7 @@ import {registerLayerImplementation} from "./Layer.js";
 import FeatureLayer from "./FeatureLayer.js";
 
 
-export default class GeometryLayer extends FeatureLayer {
+class GeometryLayer extends FeatureLayer {
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
@@ -178,5 +178,7 @@ export default class GeometryLayer extends FeatureLayer {
 		this.updateMetaStyles();
 	}
 }
+
+export default GeometryLayer;
 
 registerLayerImplementation("weave.visualization.plotters::GeometryPlotter", GeometryLayer);

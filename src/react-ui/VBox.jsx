@@ -1,12 +1,12 @@
 import React from "react";
 
-var hboxStyle = {
+var vboxStyle = {
 	display: "flex",
 	flexDirection: "column",
 	height: "100%"
 };
 
-export default class HBox extends React.Component {
+class VBox extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -15,7 +15,7 @@ export default class HBox extends React.Component {
 	render() {
 
 		return (
-			<div style={hboxStyle}>
+			<div style={vboxStyle}>
 				{
 					this.props.children
 				}
@@ -23,3 +23,5 @@ export default class HBox extends React.Component {
 		);
 	}
 }
+
+export default VBox;

@@ -2,7 +2,7 @@ import Layer from "./Layer.js";
 import ol from "openlayers";
 import {registerLayerImplementation} from "./Layer.js";
 
-export default class TileLayer extends Layer {
+class TileLayer extends Layer {
 
 	constructor(parent, layerName)
 	{
@@ -84,5 +84,7 @@ export default class TileLayer extends Layer {
 		}
 	}
 }
+
+export default TileLayer;
 
 registerLayerImplementation("weave.visualization.plotters::WMSPlotter", TileLayer);

@@ -4,7 +4,7 @@ import d3 from "d3";
 import lodash from "lodash";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 
-export default class WeaveC3PieChart extends AbstractWeaveTool{
+class WeaveC3PieChart extends AbstractWeaveTool{
     constructor(props) {
         super(props);
         this._plotterPath = this.toolPath.pushPlotter("plot");
@@ -181,5 +181,7 @@ export default class WeaveC3PieChart extends AbstractWeaveTool{
         this.chart.load({columns: columns, type: chartType, colors: this.colors, unload: true});
     }
 }
+
+export default WeaveC3PieChart;
 
 registerToolImplementation("weave.visualization.tools::PieChartTool", WeaveC3PieChart);

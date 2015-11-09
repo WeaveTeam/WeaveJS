@@ -1,6 +1,6 @@
 import Layer from "./Layer.js";
 
-export default class FeatureLayer extends Layer {
+class FeatureLayer extends Layer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
 	constructor(parent, layerName)
 	{
@@ -85,3 +85,5 @@ export default class FeatureLayer extends Layer {
 	}
 
 }
+
+export default FeatureLayer;

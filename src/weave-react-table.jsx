@@ -4,7 +4,7 @@ import React from "react";
 import ReactDataGrid from "react-datagrid";
 import AbstractWeaveTool from "./AbstractWeaveTool";
 
-export default class WeaveReactTable extends AbstractWeaveTool {
+class WeaveReactTable extends AbstractWeaveTool {
     constructor(props) {
         super(props);
         React.render(
@@ -86,5 +86,7 @@ class DataGrid extends React.Component {
                 </ReactDataGrid>;
     }
 }
+
+export default WeaveReactTable;
 
 registerToolImplementation("weave.visualization.tools::TableTool", WeaveReactTable);

@@ -24,7 +24,7 @@ var glyphStyle = {
     fontSize: "12px"
 };
 
-export default class CustomSearchTool extends React.Component {
+class CustomSearchTool extends React.Component {
 
 
     constructor(props) {
@@ -200,5 +200,7 @@ export default class CustomSearchTool extends React.Component {
         );
     }
 }
+
+export default CustomSearchTool;
 
 registerToolImplementation("CustomSearchTool", CustomSearchTool);

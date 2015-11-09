@@ -1,5 +1,5 @@
 {
-  "name": "weave-c3",
+  "name": "weave-html5",
   "version": "0.0.0",
   "description": "Proof of Concept Constructing C3 visualizations from Weave session state.",
   "main": "index.js",
@@ -16,7 +16,7 @@
     "weave"
   ],
   "author": "philip.kovac@iweave.com",
-  "license": "None",
+  "license": "MPL-2.0",
   "bugs": {
     "url": "https://github.com/pkovac/weave-c3-barchart/issues"
   },

@@ -8,7 +8,7 @@ const SHAPE_TYPE_CIRCLE = "circle";
 const SHAPE_TYPE_SQUARE = "square";
 const SHAPE_TYPE_LINE = "line";
 
-export default class WeaveC3ColorLegend extends AbstractWeaveTool {
+class WeaveC3ColorLegend extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
@@ -149,9 +149,9 @@ export default class WeaveC3ColorLegend extends AbstractWeaveTool {
 
     destroy() {
         this.element.remove();
-        // teardown callbacks
-        super();
     }
 }
+
+export default WeaveC3ColorLegend;
 
 registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);

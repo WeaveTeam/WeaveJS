@@ -5,7 +5,7 @@ import {registerToolImplementation} from "./WeaveTool.jsx";
 import FormatUtils from "./Utils/FormatUtils";
 
 
-export default class WeaveC3Histogram extends AbstractWeaveTool {
+class WeaveC3Histogram extends AbstractWeaveTool {
     constructor(props) {
         super(props);
 
@@ -288,8 +288,9 @@ export default class WeaveC3Histogram extends AbstractWeaveTool {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
         this.chart.destroy();
-        super();
     }
 }
+
+export default WeaveC3Histogram;
 
 registerToolImplementation("weave.visualization.tools::HistogramTool", WeaveC3Histogram);

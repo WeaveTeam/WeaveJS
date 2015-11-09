@@ -19,7 +19,7 @@ var RMglyphStyle = {
 const OKBUTTON = "ok";
 const RMBUTTON = "rm";
 
-export default class CustomCardViewTool extends React.Component {
+class CustomCardViewTool extends React.Component {
 
 
     constructor(props) {
@@ -325,7 +325,7 @@ class Card extends React.Component {
             marginLeft: 5,
             marginRight: 5,
             marginBottom: 10,
-            backgroundColor: () => {
+            backgroundColor: (() => {
                 if(this.state.selected && this.state.rmProbe) {
                     return "#DCC6DC"; // purple
                 } else if(this.state.checkProbe) {
@@ -337,7 +337,7 @@ class Card extends React.Component {
                 } else {
                     return "#e9eaed"; // default grey
                 }
-            }(),
+            })(),
             border: "solid",
             padding: "5px",
             borderWidth: "0px",
@@ -397,5 +397,7 @@ class Card extends React.Component {
         );
     }
 }
+
+export default CustomCardViewTool;
 
 registerToolImplementation("CustomCardViewTool", CustomCardViewTool);

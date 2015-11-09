@@ -4,7 +4,7 @@ import lodash from "lodash";
 import ol from "openlayers";
 import {registerLayerImplementation} from "./Layer.js";
 
-export default class GlyphLayer extends Layer {
+class GlyphLayer extends Layer {
 
 	constructor(parent, layerName)
 	{
@@ -149,5 +149,7 @@ export default class GlyphLayer extends Layer {
 		}
 	}
 }
+
+export default GlyphLayer;
 
 registerLayerImplementation("weave.visualization.plotters::ImageGlyphPlotter", GlyphLayer);
