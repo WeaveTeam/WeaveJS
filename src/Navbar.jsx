@@ -1,6 +1,7 @@
 import React from "react";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import ui from "./react-ui/ui.jsx";
+import SlidingMenu from "./react-sliding-menu/SlidingMenu.jsx";
 
 var style = {
 	backgroundColor: "#1C6AAD",
@@ -19,9 +20,11 @@ export default class Navbar extends React.Component {
 		return (
 			<div style={style}>
 				<ui.HBox>
-					<div style={{padding: 19}}>
-						<img src="img/burger-menu.png"/>
-					</div>
+					<SlidingMenu>
+						<div>
+							Test
+						</div>
+					</SlidingMenu>
 					{
 						this.props.children
 					}

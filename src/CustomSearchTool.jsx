@@ -7,7 +7,8 @@ import DatePicker from "react-date-picker";
 var customSearchStyle = {
     display: "flex",
     flexDirection: "row",
-    height: 30
+    height: 30,
+    width: "100%"
 };
 
 var inputStyle = {
@@ -192,9 +193,14 @@ export default class CustomSearchTool extends React.Component {
                     {
                         inputs
                     }
-                    <div style={{float: "right"}}>
-                        <bs.ButtonInput type="submit" bsStyle="primary" onClick={this.submitSearch.bind(this)}> Search </bs.ButtonInput>
-                    </div>
+                    {
+                        Object.keys(this.state.searchObject).length ?
+                            <div style={{float: "right"}}>
+                                <bs.ButtonInput type="submit" bsStyle="primary" onClick={this.submitSearch.bind(this)}> Search </bs.ButtonInput>
+                            </div>
+                        :
+                        null
+                    }
                 </form>
             </div>
         );

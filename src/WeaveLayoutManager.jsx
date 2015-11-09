@@ -102,7 +102,7 @@ export default class WeaveLayoutManager extends React.Component {
     onDragStart(id, event) {
         this.toolDragged = id;
         var toolRef = id[0]; // toolName as used in the ref for the weave tool.
-        var element = React.findDOMNode(this.refs[toolRef].refs.toolDiv);
+        var element = React.findDOMNode(this.refs[toolRef]);
         event.dataTransfer.setDragImage(element, 0, 0);
     }
 
