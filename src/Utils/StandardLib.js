@@ -130,6 +130,21 @@ export default class StandardLib {
         };
     }
 
+
+		static resolveRelative(path, base) {
+			// Upper directory
+			if (path.startsWith("../")) {
+				return StandardLib.resolveRelative(path.slice(3), base.replace(/\/[^\/]*$/, ""));
+			}
+			// Relative to the root
+			if (path.startsWith("/")) {
+				var match = base.match(/(\w*:\/\/)?[^\/]*\//) || [base];
+				return match[0] + path.slice(1);
+			}
+			//relative to the current directory
+			return base.replace(/\/[^\/]*$/, "") + "/" + path;
+		}
+
     // // this function returns equally spaced bins given a number of bins
 // // the bins are returned as an array of bin. each bin contains an array of records,
 // // the bin bound (min and max) as well as the bin height computed using the aggregation function.

@@ -12,6 +12,7 @@ import _ from "lodash";
 //import ReactBurgerMenu from "react-burger-menu";
 import * as bs from "react-bootstrap";
 import Navbar from "./Navbar.jsx";
+import * as StandardLib from "./Utils/StandardLib.js";
 
 //var Menu = ReactBurgerMenu.slide;
 var tableContainer = {
@@ -26,7 +27,6 @@ var leftPaneStyle = {
     position: "relative"
 };
 
-const FILE_PATH = "tn/";
 const PRACTITIONER = "practitioner";
 const PATIENT = "patient";
 const PRESCRIPTION = "prescription";
@@ -74,7 +74,7 @@ class PDO extends React.Component {
         	var newFile = this.state.view + ".weave";
 	    	if (this.currentFile !== newFile) {
 	    		this.currentFile = newFile;
-	        	this.weave.loadFile(FILE_PATH + newFile);
+	        	this.weave.loadFile(StandardLib.resolveRelative(newFile, window.location.pathname));
 	        }
         }
     }
