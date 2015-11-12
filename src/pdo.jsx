@@ -101,14 +101,14 @@ class PDO extends React.Component {
             }
         }
         if(icon === PATIENT) {
-            if(icon === this.state.vew) {
+            if(icon === this.state.view) {
                 return "img/patient-icon-active.png";
             } else {
                 return "img/patient-icon.png";
             }
         }
         if(icon === PRESCRIPTION) {
-            if(icon === this.state.vew) {
+            if(icon === this.state.view) {
                 return "img/rx-icon-active.png";
             } else {
                 return "img/rx-icon.png";
