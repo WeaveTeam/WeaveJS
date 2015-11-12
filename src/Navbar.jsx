@@ -30,7 +30,8 @@ class Navbar extends React.Component {
 								</div>
 								<div style={{flex: 1}}>
 									<bs.ListGroup>
-										<bs.ListGroupItem><div style={{fontFamily: "'Courgette' cursive", fontSize: "18", textTransform: "lowercase"}}>tnhr</div></bs.ListGroupItem>
+										<bs.ListGroupItem><div style={{fontFamily: "'Courgette' cursive", fontSize: "18", textTransform: "lowercase"}}>
+											<a href="http://ivpr.oicweave.org/tnhr/dashboard.php?topic=health" target="_blank">tnhr</a></div></bs.ListGroupItem>
 										<bs.ListGroupItem>About</bs.ListGroupItem>
 										<bs.ListGroupItem><bs.Glyphicon glyph="cog"/> Settings</bs.ListGroupItem>
 									</bs.ListGroup>
