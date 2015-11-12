@@ -14,8 +14,14 @@ export default class HBox extends React.Component {
 
 	render() {
 
+		var {style, ...otherProps} = this.props || {};
+		style = style || {};
+		style.display = style.display || hboxStyle.display;
+		style.width = style.width || hboxStyle.width;
+		style.flexDirection = hboxStyle.flexDirection;
+
 		return (
-			<div style={hboxStyle}>
+			<div style={style} {...otherProps}>
 				{
 					this.props.children
 				}
