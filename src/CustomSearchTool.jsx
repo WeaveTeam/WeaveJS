@@ -181,7 +181,7 @@ class CustomSearchTool extends React.Component {
         }
         return (
             <div style={customSearchStyle}>
-                <bs.Dropdown title="Dropdown" bsSize={this.props.bsSize} bsStyle="primary" onSelect={this.handleDropdownSelect.bind(this)}>
+                <bs.Dropdown id="dropdown" title="Dropdown" bsSize={this.props.bsSize} bsStyle="primary" onSelect={this.handleDropdownSelect.bind(this)}>
                     <bs.Dropdown.Toggle bsStyle="primary">
                         <bs.Glyphicon glyph="search"/>
                     </bs.Dropdown.Toggle>
