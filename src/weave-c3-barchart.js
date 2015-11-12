@@ -216,9 +216,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             mapping[name] = column;
         }
 
-        this.records = this.toolPath.pushPlotter("plot").retrieveRecords(mapping, this._plotterPath.push("filteredKeySet"));
+        this.records = this.toolPath.pushPlotter("plot").retrieveRecords(mapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
         this.records = lodash.sortByAll(this.records, ["sort", "id"]);
-
 
         this.groupingMode = this._plotterPath.push("groupingMode").getState();
         //var horizontalMode = this._plotterPath.push("horizontalMode").getState();

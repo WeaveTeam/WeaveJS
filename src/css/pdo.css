@@ -6,6 +6,16 @@
     border-top-left-radius: 25px;
 }
 
+.list-group-item:first-child {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+.list-group-item:last-child {
+  border-bottom-right-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
 th, td {
     padding: 3;
 }
@@ -38,7 +48,7 @@ body {
           user-select: none;
 }
 .form-control::-webkit-input-placeholder { /* WebKit browsers */
-    color: rgba(216,216,216, 0.5) 
+    color: rgba(216,216,216, 0.5)
  ;
 }
 .form-control:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
