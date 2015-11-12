@@ -1,6 +1,6 @@
 import React from "react";
 import MenuItem from "./MenuItem.jsx";
-
+import radium from "radium";
 
 var menuStyle = {
     display: "block"
@@ -14,7 +14,7 @@ var divStyle = {
     width: 300,
     height: "100%",
     boderBox: "",
-    transition: "-webkit-transform ease 300ms",
+    transition: "transform ease 300ms",
     background: "#f2f2f2"
 };
 
@@ -35,6 +35,7 @@ export default class Menu extends React.Component {
             delete divStyle.transform;
         }
 
+        //var menutItems = this.props.children.map((child) => 
         // do stufff
         return (<div style={menuStyle}>
                     <div style={divStyle}>
@@ -44,6 +45,7 @@ export default class Menu extends React.Component {
                 </div>);
     }
 }
+Menu = radium(Menu);
 
 class CloseButton extends React.Component {
 
@@ -51,49 +53,45 @@ class CloseButton extends React.Component {
         super(props);
     }
 
+   getCrossStyle(type) {
+        return {
+          position: "absolute",
+          width: 3,
+          height: 14,
+          top: 14,
+          right: 18,
+          cursor: "pointer",
+          transform: type === "before" ? "rotate(45deg)" : "rotate(-45deg)",
+          zIndex: 1,
+          background: "#888"
+        };
+    }
     render() {
+
+        var buttonStyle = {
+          width: 14,
+          height: 14,
+          position: "absolute",
+          right: 13,
+          top: 14,
+          padding: 0,
+          overflow: "hidden",
+          textIndent: 14,
+          fontSize: 14,
+          border: "none",
+          background: "transparent",
+          color: "transparent",
+          outline: "none",
+          zIndex: 1
+        };
+
         return (
             <div>
-                <span style={{
-                        background: "#888",
-                        cursor: "pointer",
-                        height: 14,
-                        position: "absolute",
-                        right: 18,
-                        top: 14,
-                        width: 3,
-                        zIndex: 1,
-                        WebkitTransform: "rotate(45deg)"
-                }}/>
-                <span style={{
-                    background: "#888",
-                    cursor: "pointer",
-                    height: 14,
-                    position: "absolute",
-                    right: 18,
-                    top: 14,
-                    width: 3,
-                    zIndex: 1,
-                    WebkitTransform: "rotate(-45deg)"
-                }}/>
-                <button onClick={this.props.hideMenu}
-                        style={{
-                            background: "transparent",
-                            border: "none",
-                            color: "transparent",
-                            fontSize: 14,
-                            height: 14,
-                            outline: "none",
-                            overflow: "hidden",
-                            padding: 0,
-                            position: "absolute",
-                            right: 13,
-                            textIndent: 14,
-                            top: 14,
-                            width: 14,
-                            zIndex: 1
-                }}/>
+                <span style={this.getCrossStyle("before")}/>
+                <span style={this.getCrossStyle("after")}/>
+                <button onClick={this.props.hideMenu} style={buttonStyle}/>
             </div>
         );
     }
 }
+CloseButton = radium(CloseButton);
