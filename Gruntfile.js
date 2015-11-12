@@ -39,14 +39,15 @@ module.exports = function (grunt) {
                         plugin: []
                     },
                 },
-                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}]   
+                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}]
             }
         },
         copy: {
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
             css: {expand: true, flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/'},
             fonts: {expand: true, flatten: true, cwd: 'node_modules/bootstrap', src:'fonts/*.*', dest: 'dist/fonts/'},
-            images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'}
+            images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'},
+            weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "dist/"}
         },
         eslint: {
             target: ['src/**/*.js']
