@@ -29,7 +29,7 @@ var leftPaneStyle = {
 const FILE_PATH = "tn/";
 const PRACTITIONER = "practitioner";
 const PATIENT = "patient";
-const PRESCRIPTIONS = "prescription";
+const PRESCRIPTION = "prescription";
 
 class PDO extends React.Component {
 
@@ -94,7 +94,7 @@ class PDO extends React.Component {
                 return "img/patient-icon.png";
             }
         }
-        if(icon === PRESCRIPTIONS) {
+        if(icon === PRESCRIPTION) {
             if(icon === this.state.vew) {
                 return "img/rx-icon-active.png";
             } else {
@@ -174,14 +174,14 @@ class PDO extends React.Component {
                                 }
                                 <font style={{margin: "auto", color: () => { return this.getActiveView() === PATIENT ? "rgb(245, 255, 142)" : "white"; }() }}> Patient </font>
                             </ui.VBox>
-                            <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PRESCRIPTIONS}, this.changeView.bind(this))}>
+                            <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PRESCRIPTION}, this.changeView.bind(this))}>
                                 {
-                                    this.getActiveView() === PRESCRIPTIONS ?
+                                    this.getActiveView() === PRESCRIPTION ?
                                         <img style={{margin: "auto"}} src="img/rx-icon-active.png" width="20" height="20"/>
                                                                           :
                                         <img style={{margin: "auto"}} src="img/rx-icon.png" width="20" height="20"/>
                                 }
-                                <font style={{margin: "auto", color: () => { return this.getActiveView() === PRESCRIPTIONS ? "rgb(245, 255, 142)" : "white"; }() }}> Prescriptions </font>
+                                <font style={{margin: "auto", color: () => { return this.getActiveView() === PRESCRIPTION ? "rgb(245, 255, 142)" : "white"; }() }}> Prescription </font>
                             </ui.VBox>
                        </ui.HBox>
                    </ui.HBox>
