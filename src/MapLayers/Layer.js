@@ -25,7 +25,7 @@ export function newLayer(parent, layerName)
 	}
 }
 
-export default class Layer {
+class Layer {
 
 	static newLayer(parent, layerName)
 	{
@@ -101,3 +101,4 @@ export default class Layer {
 		this.layer = undefined;
 	}
 }
+export default Layer;

@@ -6,7 +6,7 @@ var hboxStyle = {
 	width: "100%"
 };
 
-export default class HBox extends React.Component {
+class HBox extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -29,3 +29,5 @@ export default class HBox extends React.Component {
 		);
 	}
 }
+
+export default HBox;

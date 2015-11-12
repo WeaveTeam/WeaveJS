@@ -6,7 +6,7 @@ import lodash from "lodash";
 import StandardLib from "./Utils/StandardLib";
 import FormatUtils from "./Utils/FormatUtils";
 
-export default class WeaveC3Barchart extends AbstractWeaveTool {
+class WeaveC3Barchart extends AbstractWeaveTool {
     constructor(props) {
         super(props);
         this._plotterPath = this.toolPath.pushPlotter("plot");
@@ -291,5 +291,7 @@ export default class WeaveC3Barchart extends AbstractWeaveTool {
         this.chart.destroy();
     }
 }
+
+export default WeaveC3Barchart;
 
 registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);

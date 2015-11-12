@@ -1,5 +1,3 @@
-#!/bin/bash
-
 import React from "react";
 //import SplitPane from "./react-flexible-layout/src/SplitPane.jsx";
 import StandardLib from "../Utils/StandardLib";
@@ -11,7 +9,7 @@ import _ from "lodash";
 var RESIZEROVERLAY = "resizerOverlay";
 var HORIZONTAL = "horizontal";
 
-export default class Layout extends React.Component {
+class Layout extends React.Component {
     constructor(props) {
         super(props);
         // this.state = this.props.state;
@@ -210,3 +208,5 @@ export default class Layout extends React.Component {
                </div>;
     }
 }
+
+export default Layout;

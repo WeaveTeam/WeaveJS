@@ -47,7 +47,7 @@ function _normalizeRecords (records, attributes) {
     });
 }
 
-export default class WeaveC3ScatterPlot extends AbstractWeaveTool {
+class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
@@ -271,5 +271,6 @@ export default class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.chart.destroy();
     }
 }
+export default WeaveC3ScatterPlot;
 
 registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);

@@ -28,7 +28,7 @@ resizerStyle.horizontal = {
     height: "100%"
 };
 
-export default class ResizerOverlay extends React.Component {
+class ResizerOverlay extends React.Component {
 
     constructor(props) {
         super(props);
@@ -107,3 +107,6 @@ export default class ResizerOverlay extends React.Component {
         );
     }
 }
+
+export default ResizerOverlay;
+

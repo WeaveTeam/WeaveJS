@@ -3,7 +3,7 @@ import SwfObject from "./swfobject.jsx";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import AbstractWeaveTool from "./AbstractWeaveTool";
 
-export default class Weave extends React.Component {
+class Weave extends React.Component {
 
     constructor(props) {
         super(props);
@@ -28,5 +28,7 @@ export default class Weave extends React.Component {
 
     }
 }
+
+export default Weave;
 
 registerToolImplementation("Weave", Weave);

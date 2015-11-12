@@ -1,7 +1,7 @@
 import React from "react";
 import swfobject from "swfobject-amd";
 
-export default class Swfobject extends React.Component {
+class Swfobject extends React.Component {
 
     constructor(props) {
         super(props);
@@ -73,3 +73,5 @@ Swfobject.propTypes = {
         align: React.PropTypes.string
     })
 };
+
+export default Swfobject;

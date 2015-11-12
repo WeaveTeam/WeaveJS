@@ -40,7 +40,7 @@ resizerStyle.horizontal = {
     //     border-right: 5px solid rgba(0, 0, 0, 0.5);
     // }
 
-export default class Resizer extends React.Component {
+class Resizer extends React.Component {
 
     constructor(props) {
         super(props);
@@ -81,3 +81,5 @@ export default class Resizer extends React.Component {
         return <span style={prefixed.styles}/>;
     }
 }
+
+export default Resizer;

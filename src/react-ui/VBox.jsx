@@ -6,7 +6,7 @@ var vboxStyle = {
 	height: "100%"
 };
 
-export default class VBox extends React.Component {
+class VBox extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -28,3 +28,5 @@ export default class VBox extends React.Component {
 		);
 	}
 }
+
+export default VBox;

@@ -30,7 +30,7 @@ const PRACTITIONER = "practitioner";
 const PATIENT = "patient";
 const PRESCRIPTIONS = "prescriptions";
 
-export default class App extends React.Component {
+class App extends React.Component {
 
     constructor(props) {
         super(props);
@@ -204,4 +204,33 @@ export default class App extends React.Component {
         );
     }
 }
+// class Item extends React.Component {
 
+//     constructor(props) {
+//         super(props);
+//         this.state = {
+//             hovered: false
+//         };
+//     }
+
+//     toggleHover () {
+//         this.setState({
+//             hovered: !this.state.hovered
+//         });
+//     }
+
+//     render () {
+//         return (
+//             <a href={this.props.href} target="_blank" onMouseOver={this.toggleHover.bind(this)} onMouseOut={this.toggleHover.bind(this)} style={{color: this.state.hovered ? "#c94e50" : "#b8b7ad"}}>
+//                 {
+//                     this.props.glyphName ? <bs.Glyphicon glyph={this.props.glyphName}/> : ""
+//                 }
+//                 {" "}
+//                 {
+//                     this.props.label
+//                 }
+//             </a>
+//         );
+//     }
+// }
+export default App;
