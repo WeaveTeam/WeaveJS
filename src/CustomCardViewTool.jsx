@@ -265,7 +265,7 @@ class Card extends React.Component {
 
     componentDidMount () {
         this.element = React.findDOMNode(this);
-        this.element.addEventListener("click", this.boundToggleSelect = this.toggleSelect.bind(this));
+        //this.element.addEventListener("click", this.boundToggleSelect = this.toggleSelect.bind(this));
         this.okButton = React.findDOMNode(this.refs[OKBUTTON]);
         this.rmButton = React.findDOMNode(this.refs[RMBUTTON]);
 
@@ -275,7 +275,7 @@ class Card extends React.Component {
     }
 
     componentWillUnmount() {
-        this.element.removeEventListener("click", this.boundToggleSelect);
+        //this.element.removeEventListener("click", this.boundToggleSelect);
         this.okButton.removeEventListener("click", this.boundHandleSaveCard);
         this.rmButton.removeEventListener("click", this.boundHandleRemoveCard);
     }
