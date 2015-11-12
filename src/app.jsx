@@ -13,7 +13,6 @@ import _ from "lodash";
 import * as bs from "react-bootstrap";
 import Navbar from "./Navbar.jsx";
 
-console.log(ui);
 //var Menu = ReactBurgerMenu.slide;
 var tableContainer = {
     flex: 1
@@ -27,6 +26,10 @@ var leftPaneStyle = {
     position: "relative"
 };
 
+const PRACTITIONER = "practitioner";
+const PATIENT = "patient";
+const PRESCRIPTIONS = "prescriptions";
+
 export default class App extends React.Component {
 
     constructor(props) {
@@ -35,8 +38,9 @@ export default class App extends React.Component {
         window.weaveReady = () => {
             this.handleWeaveReady();
         };
-
-        this.searchFields = ["First Name", "Middle Name", "Last Name", "Specialization", "CountyFIPS", "FIPS"];
+        this.state = {
+            view: PRACTITIONER
+        };
     }
 
     componentDidMount() {
@@ -51,6 +55,7 @@ export default class App extends React.Component {
             this.weave = weave;
         }
         if(this.reactReady) {
+            this.changeView();
             this.customSearchToolPath = this.weave.path("CustomSearchTool");
             this.customCardViewToolPath = this.weave.path("CustomCardViewTool");
             this.forceUpdate();
@@ -59,14 +64,67 @@ export default class App extends React.Component {
         }
     }
 
+    getActiveView() {
+        return this.state.view;
+    }
+
+    changeView() {
+        if(this.weave) {
+            switch(this.state.view) {
+                case PRACTITIONER:
+                    this.weave.loadFile("tn/demo7.weave");
+                    break;
+                case PATIENT:
+                    this.weave.loadFile("tn/stub.weave");
+                    break;
+                case PRESCRIPTIONS:
+                    this.weave.loadFile("tn/stub.weave");
+                    break;
+                default:
+                    return;
+            }
+        }
+    }
+
+    getViewIconURL(icon) {
+        if(icon === PRACTITIONER) {
+            if(icon === this.state.vew) {
+                return "img/practitioner-icon-active.png";
+            } else {
+                return "img/practitioner-icon.png";
+            }
+        }
+        if(icon === PATIENT) {
+            if(icon === this.state.vew) {
+                return "img/patient-icon-active.png";
+            } else {
+                return "img/patient-icon.png";
+            }
+        }
+        if(icon === PRESCRIPTIONS) {
+            if(icon === this.state.vew) {
+                return "img/rx-icon-active.png";
+            } else {
+                return "img/rx-icon.png";
+            }
+        }
+    }
+
     componentWillUnmount() {
 
     }
 
-    showSettings(event) {
-    }
+
 
     render() {
+
+        var viewsIconStyle = {
+            flex: 1,
+            borderLeft: "1px solid",
+            borderColor: "rgba(255,255,255, 0.2)",
+            cursor: "pointer"
+        };
+
         if(this.weaveContainerElt) {
             var containerPosition = this.weaveContainerElt.getBoundingClientRect();
             var appPosition = this.element.getBoundingClientRect();
@@ -95,45 +153,45 @@ export default class App extends React.Component {
             customCardViewTool = <CustomCardViewTool ref="cardViewTool" toolPath={this.customCardViewToolPath}/>;
         }
 
-        // var menuItem = {
-        //     display: "block",
-        //     outline: "none",
-        //     padding: "0.8em",
-        //     fontSize: "1.15em"
-        // };
-        // var subMenuItem = {
-        //     padding: "0.2em",
-        //     outline: "none",
-        //     fontSize: "1.0em"
-        // };
-                // <div style={{height: 108, marginRight: "5px", zIndex: 10, backgroundColor: "#aeb4c9"}}>
-                //     <Menu>
-                //         <ul className="bm-item-list" style={{height: "100%"}}>
-                //             <li style={menuItem}>
-                //                 <Item glyphName="plus" label="Vital Stats" href="javascript:void(0);"/>
-                //                 <ul style={{listStyleType: "none"}}>
-                //                     <li style={subMenuItem}><Item href="javascript:void(0);" label="Birth"/></li>
-                //                     <li style={subMenuItem}><Item href="javascript:void(0);" label="Deaths"/></li>
-                //                 </ul>
-                //             </li>
-                //             <li style={menuItem}><Item href="javascript:void(0);" glyphName="remove" label="Crime Stats"/></li>
-                //             <li style={menuItem}><Item href="javascript:void(0);" glyphName="user" label="Demography"/></li>
-                //             <li style={menuItem}><Item href="http://ivpr.oicweave.org/tnhr/dashboard.php?topic=health" glyphName="tower" label="TN Community Record"/></li>
-                //         </ul>
-                //     </Menu>
-                //     <b style={{fontSize: 40, fontFamily: "Roboto, sans-serif", color: "#373a47", left: "20%", top: "20", fontWeight: "bold", position: "relative"}}>
-                //         Prescription Drug Observation
-                //     </b>
-                // </div>
-
         return (
             <ui.VBox>
                 <Navbar>
-                    <div style={{marginTop: 17, marginLeft: 5, marginRight: 5, width: "100%"}}>
-                       {
-                         customSearchTool
-                       }
-                   </div>
+                    <ui.HBox>
+                        <ui.HBox style={{marginTop: 17, marginLeft: 5, marginRight: 5, width: "80%"}}>
+                           {
+                             customSearchTool
+                           }
+                       </ui.HBox>
+                        <ui.HBox style={{width: "20%", height: 30, margin: "auto"}}>
+                            <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PRACTITIONER}, this.changeView.bind(this))}>
+                                {
+                                    this.getActiveView() === PRACTITIONER ?
+                                        <img style={{margin: "auto"}} src="img/practitioner-icon-active.png" width="20" height="20"/>
+                                                                          :
+                                        <img style={{margin: "auto"}} src="img/practitioner-icon.png" width="20" height="20"/>
+                                }
+                                <font style={{margin: "auto", color: () => { return this.getActiveView() === PRACTITIONER ? "rgb(245, 255, 142)" : "white"; }() }}> Practitioner </font>
+                            </ui.VBox>
+                            <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PATIENT}, this.changeView.bind(this))}>
+                                {
+                                    this.getActiveView() === PATIENT ?
+                                        <img style={{margin: "auto"}} src="img/patient-icon-active.png" width="20" height="20"/>
+                                                                          :
+                                        <img style={{margin: "auto"}} src="img/patient-icon.png" width="20" height="20"/>
+                                }
+                                <font style={{margin: "auto", color: () => { return this.getActiveView() === PATIENT ? "rgb(245, 255, 142)" : "white"; }() }}> Patient </font>
+                            </ui.VBox>
+                            <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PRESCRIPTIONS}, this.changeView.bind(this))}>
+                                {
+                                    this.getActiveView() === PRESCRIPTIONS ?
+                                        <img style={{margin: "auto"}} src="img/rx-icon-active.png" width="20" height="20"/>
+                                                                          :
+                                        <img style={{margin: "auto"}} src="img/rx-icon.png" width="20" height="20"/>
+                                }
+                                <font style={{margin: "auto", color: () => { return this.getActiveView() === PRESCRIPTIONS ? "rgb(245, 255, 142)" : "white"; }() }}> Prescriptions </font>
+                            </ui.VBox>
+                       </ui.HBox>
+                   </ui.HBox>
                 </Navbar>
                 <div style={{height: 150, marginLeft: "5px", marginRight: "5px", marginBottom: "20px", paddingTop: 5, overflowY: "scroll"}}>
                     {
@@ -147,32 +205,3 @@ export default class App extends React.Component {
     }
 }
 
-// class Item extends React.Component {
-
-//     constructor(props) {
-//         super(props);
-//         this.state = {
-//             hovered: false
-//         };
-//     }
-
-//     toggleHover () {
-//         this.setState({
-//             hovered: !this.state.hovered
-//         });
-//     }
-
-//     render () {
-//         return (
-//             <a href={this.props.href} target="_blank" onMouseOver={this.toggleHover.bind(this)} onMouseOut={this.toggleHover.bind(this)} style={{color: this.state.hovered ? "#c94e50" : "#b8b7ad"}}>
-//                 {
-//                     this.props.glyphName ? <bs.Glyphicon glyph={this.props.glyphName}/> : ""
-//                 }
-//                 {" "}
-//                 {
-//                     this.props.label
-//                 }
-//             </a>
-//         );
-//     }
-// }
