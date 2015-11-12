@@ -46,7 +46,8 @@ module.exports = function (grunt) {
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
             css: {expand: true, flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/'},
             fonts: {expand: true, flatten: true, cwd: 'node_modules/bootstrap', src:'fonts/*.*', dest: 'dist/fonts/'},
-            appcss: {expand: true, flatten: true, cwd: 'src/', src: 'app.css', dest: 'dist/'}
+            appcss: {expand: true, flatten: true, cwd: 'src/', src: 'app.css', dest: 'dist/'},
+            images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'}
         },
         eslint: {
             target: ['src/**/*.js']
@@ -67,7 +68,7 @@ module.exports = function (grunt) {
                 tasks: ['eslint', 'browserify:dev']
             },
             html: {
-                files: ['src/index.html'],
+                files: ['src/*.html', 'src/**/*.css', 'img/*'],
                 tasks: ['copy']
             }
         }
@@ -81,4 +82,5 @@ module.exports = function (grunt) {
 
     grunt.registerTask('default', ['eslint', 'browserify:dev', 'copy']);
     grunt.registerTask('dist', ['eslint', 'browserify:dist', 'copy']);
+    grunt.registerTask('libs', ['browserify:libs']);
 };
