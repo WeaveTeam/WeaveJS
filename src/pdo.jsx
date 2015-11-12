@@ -30,7 +30,7 @@ const PRACTITIONER = "practitioner";
 const PATIENT = "patient";
 const PRESCRIPTIONS = "prescriptions";
 
-class App extends React.Component {
+class PDO extends React.Component {
 
     constructor(props) {
         super(props);
@@ -72,13 +72,13 @@ class App extends React.Component {
         if(this.weave) {
             switch(this.state.view) {
                 case PRACTITIONER:
-                    this.weave.loadFile("tn/demo7.weave");
+                    this.weave.loadFile("tn/practitioner.weave");
                     break;
                 case PATIENT:
-                    this.weave.loadFile("tn/stub.weave");
+                    this.weave.loadFile("tn/patient.weave");
                     break;
                 case PRESCRIPTIONS:
-                    this.weave.loadFile("tn/stub.weave");
+                    this.weave.loadFile("tn/prescriptions.weave");
                     break;
                 default:
                     return;
@@ -233,4 +233,4 @@ class App extends React.Component {
 //         );
 //     }
 // }
-export default App;
+export default PDO;
