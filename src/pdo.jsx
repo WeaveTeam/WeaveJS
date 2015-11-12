@@ -26,9 +26,10 @@ var leftPaneStyle = {
     position: "relative"
 };
 
+const FILE_PATH = "tn/";
 const PRACTITIONER = "practitioner";
 const PATIENT = "patient";
-const PRESCRIPTIONS = "prescriptions";
+const PRESCRIPTIONS = "prescription";
 
 class PDO extends React.Component {
 
@@ -70,19 +71,11 @@ class PDO extends React.Component {
 
     changeView() {
         if(this.weave) {
-            switch(this.state.view) {
-                case PRACTITIONER:
-                    this.weave.loadFile("tn/practitioner.weave");
-                    break;
-                case PATIENT:
-                    this.weave.loadFile("tn/patient.weave");
-                    break;
-                case PRESCRIPTIONS:
-                    this.weave.loadFile("tn/prescriptions.weave");
-                    break;
-                default:
-                    return;
-            }
+        	var newFile = this.state.view + ".weave";
+	    	if (this.currentFile !== newFile) {
+	    		this.currentFile = newFile;
+	        	this.weave.loadFile(FILE_PATH + newFile);
+	        }
         }
     }
 

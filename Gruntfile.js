@@ -30,7 +30,7 @@ module.exports = function (grunt) {
                 },
             },
             dist: {
-                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/index2.min.js': 'src/index2.js'}]
+                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}]
             },
             dev: {
                 options: {
