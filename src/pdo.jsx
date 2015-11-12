@@ -56,7 +56,11 @@ class PDO extends React.Component {
             this.weave = weave;
         }
         if(this.reactReady) {
-            this.changeView();
+        	var file = this.getFileName();
+        	if (file)
+	        	this.setState({view: file.split(".")[0]});
+	        else
+	            this.changeView();
             this.customSearchToolPath = this.weave.path("CustomSearchTool");
             this.customCardViewToolPath = this.weave.path("CustomCardViewTool");
             this.forceUpdate();
@@ -64,6 +68,15 @@ class PDO extends React.Component {
             setTimeout(this.handleWeaveReady.bind(this), 200);
         }
     }
+
+	getFileName() {
+		var file = this.weave.path().getValue("Weave.fileName");
+		if (file === "defaults.xml")
+			return null;
+		if (!this.currentFile)
+			this.currentFile = file;
+		return file;
+	}
 
     getActiveView() {
         return this.state.view;
@@ -81,7 +94,7 @@ class PDO extends React.Component {
 
     getViewIconURL(icon) {
         if(icon === PRACTITIONER) {
-            if(icon === this.state.vew) {
+            if(icon === this.state.view) {
                 return "img/practitioner-icon-active.png";
             } else {
                 return "img/practitioner-icon.png";
