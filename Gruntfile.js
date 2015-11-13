@@ -11,7 +11,7 @@ module.exports = function (grunt) {
                     browserifyOptions: {
                         plugin: [['minifyify', {map: false, exclude: "**/*.jsx"}]]
                     },
-                    transform: [["babelify", {"loose": "all"}]],
+                    transform: ["babelify"],
                     external: [
                         'react', 'react-datagrid', 'lodash', 'jquery', 'd3', 'c3',
                         'openlayers', 'react-bootstrap',

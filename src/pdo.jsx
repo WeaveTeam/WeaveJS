@@ -163,7 +163,7 @@ class PDO extends React.Component {
                                                                           :
                                         <img style={{margin: "auto"}} src="img/practitioner-icon.png" width="20" height="20"/>
                                 }
-                                <font style={{margin: "auto", color: () => { return this.getActiveView() === PRACTITIONER ? "rgb(245, 255, 142)" : "white"; }() }}> Practitioner </font>
+                                <font style={{margin: "auto", color: (() => { return this.getActiveView() === PRACTITIONER ? "rgb(245, 255, 142)" : "white"; })() }}> Practitioner </font>
                             </ui.VBox>
                             <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PATIENT}, this.changeView.bind(this))}>
                                 {
@@ -172,7 +172,7 @@ class PDO extends React.Component {
                                                                           :
                                         <img style={{margin: "auto"}} src="img/patient-icon.png" width="20" height="20"/>
                                 }
-                                <font style={{margin: "auto", color: () => { return this.getActiveView() === PATIENT ? "rgb(245, 255, 142)" : "white"; }() }}> Patient </font>
+                                <font style={{margin: "auto", color: (() => { return this.getActiveView() === PATIENT ? "rgb(245, 255, 142)" : "white"; })() }}> Patient </font>
                             </ui.VBox>
                             <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PRESCRIPTION}, this.changeView.bind(this))}>
                                 {
@@ -181,7 +181,7 @@ class PDO extends React.Component {
                                                                           :
                                         <img style={{margin: "auto"}} src="img/rx-icon.png" width="20" height="20"/>
                                 }
-                                <font style={{margin: "auto", color: () => { return this.getActiveView() === PRESCRIPTION ? "rgb(245, 255, 142)" : "white"; }() }}> Prescription </font>
+                                <font style={{margin: "auto", color: (() => { return this.getActiveView() === PRESCRIPTION ? "rgb(245, 255, 142)" : "white"; })() }}> Prescription </font>
                             </ui.VBox>
                        </ui.HBox>
                    </ui.HBox>
