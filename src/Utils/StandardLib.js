@@ -25,7 +25,7 @@ export default class StandardLib {
 		{
 			for (var key in root)
 			{
-				var found = this.findDeep(root[key], match);
+				var found = StandardLib.findDeep(root[key], match);
 				if (found) {
 					return found;
                 }
