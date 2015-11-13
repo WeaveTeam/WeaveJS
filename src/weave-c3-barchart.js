@@ -43,7 +43,12 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                order: null,
                color: (color, d) => {
                     if(this.heightColumnNames.length === 1 && d.hasOwnProperty("index")) {
-                        return this.records[d.index].color || "#C0CDD1";
+
+                        // find the corresponding index of numericRecords in stringRecords
+                        var id = this.indexToKey[d.index];
+                        var index = lodash.pluck(this.stringRecords, "id").indexOf(id);
+
+                        return this.stringRecords[index].color || "#C0CDD1";
                     } else {
                         return color || "#C0CDD1";
                     }
@@ -58,14 +63,19 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     tick: {
                         fit: false,
                         multiline: false,
+                        rotate: 0,
                         format: (num) => {
-                            if(this.records) {
-                               var record = this.records[num];
-                               if(record && record.label) {
-                                    return record.label;
-                               } else {
-                                    return FormatUtils.defaultNumberFormatting(num);
+                            if(this.stringRecords && this.stringRecords.length) {
+                               // find the corresponding index of numericRecords in stringRecords
+                               var id = this.indexToKey[num];
+                               var index = lodash.pluck(this.stringRecord, "id").indexOf(id);
+
+                               var record = this.stringRecords[index];
+                               if(record && record.xLabel) {
+                                    return record.xLabel;
                                }
+                            } else {
+                                return FormatUtils.defaultNumberFormatting(num);
                             }
                         }
                     }
@@ -74,14 +84,11 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     label: {
                         position: "outer-middle"
                     },
-                    tick: {
-                        fit: false,
-                        format: (num) => {
-                            if(this.groupingMode === "percentStack") {
-                                return d3.format(".0%")(num);
-                            } else {
-                                return FormatUtils.defaultNumberFormatting(num);
-                            }
+                    tick: (num) => {
+                        if(this.groupingMode === "percentStack") {
+                            return d3.format(".0%")(num);
+                        } else {
+                            return FormatUtils.defaultNumberFormatting(num);
                         }
                     }
                 }
@@ -202,22 +209,42 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
         var heightColumns = this._heightColumnsPath.getChildren();
 
-         var mapping =
-        {
-            label: this._labelColumnPath,
+         var numericMapping = {
             sort: this._sortColumnPath,
-            color: this._colorColumnPath
+            xLabel: this._labelColumnPath
+        };
+
+        var stringMapping = {
+            sort: this._sortColumnPath,
+            color: this._colorColumnPath,
+            xLabel: this._labelColumnPath
         };
 
         for (let idx in heightColumns)
         {
             let column = heightColumns[idx];
             let name = column.getPath().pop();
-            mapping[name] = column;
+            numericMapping[name] = column; // all height columns as numeric value for the chart
+
+            if(idx === 0 || idx === "0") {
+              stringMapping.yLabel = column; // only using the first column to label the y axis
+              numericMapping.yLabel = column;
+            }
         }
 
-        this.records = this.toolPath.pushPlotter("plot").retrieveRecords(mapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
-        this.records = lodash.sortByAll(this.records, ["sort", "id"]);
+        this.numericRecords = this.toolPath.pushPlotter("plot").retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
+        this.numericRecords = lodash.sortByAll(this.numericRecords, ["sort", "id"]);
+
+        this.stringRecords = this.toolPath.pushPlotter("plot").retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
+
+        this.keyToIndex = {};
+        this.indexToKey = {};
+
+        this.numericRecords.forEach((record, index) => {
+            this.keyToIndex[record.id] = index;
+            this.indexToKey[index] = record.id;
+        });
+
 
         this.groupingMode = this._plotterPath.push("groupingMode").getState();
         //var horizontalMode = this._plotterPath.push("horizontalMode").getState();
@@ -235,7 +262,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
         if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
             // normalize the height columns to be percentages.
-            var newValues = this.records.map((record) => {
+            var newValues = this.numericRecords.map((record) => {
                 var heights = lodash.pick(record, this.heightColumnNames);
                 var sum = 0;
                 lodash.keys(heights).forEach((key) => {
@@ -249,18 +276,18 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                 return heights;
             });
 
-            this.records = newValues;
+            this.numericRecords = newValues;
         }
 
         this.keyToIndex = {};
-        this.records.forEach((record, index) => {
+        this.numericRecords.forEach((record, index) => {
             this.keyToIndex[record.id] = index;
         });
 
         var keys = {};
         // if label column is specified
         if(this._labelColumnPath.getState().length) {
-            keys.x = "label";
+            keys.x = "xLabel";
         }
 
         keys.value = this.heightColumnNames;
@@ -279,7 +306,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
         this._axisChanged();
         this.busy = true;
-        this.chart.load({json: this.records, colors, keys, unload: true, done: () => { this.busy = false; }});
+        this.chart.load({json: this.numericRecords, colors, keys, unload: true, done: () => { this.busy = false; }});
     }
 
     _updateStyle() {}

@@ -13,8 +13,6 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
         this._binnedColumnPath = this._plotterPath.push("binnedColumn");
 
-        this._columnPath = this._binnedColumnPath.push("internalDynamicColumn"); //.push(null).push("internalDynamicColumn").push(null);
-
         this._lineStylePath = this._plotterPath.push("lineStyle");
         this._fillStylePath = this._plotterPath.push("fillStyle");
 
@@ -27,7 +25,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
         this.busy = false;
 
-        this.records = [];
+        this.numericRecords = [];
 
         this.chart = c3.generate({
             size: this._getElementSize(),
@@ -87,6 +85,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     },
                     tick: {
                         multiline: false,
+                        rotate: 0,
                         format: (d) => {
                             return this._binnedColumnPath.getValue("deriveStringFromNumber")(d);
                         }
@@ -204,28 +203,25 @@ class WeaveC3Histogram extends AbstractWeaveTool {
             return;
         }
 
-        let mapping = {
-            binnedColumn: this._binnedColumnPath,
-            column: this._columnPath,
-            columnToAggregate: this._columnToAggregatePath,
-            fill: {
-                alpha: this._fillStylePath.push("alpha"),
-                color: this._fillStylePath.push("color"),
-                caps: this._fillStylePath.push("caps")
-            },
-            line: {
-                alpha: this._lineStylePath.push("alpha"),
-                color: this._lineStylePath.push("color"),
-                caps: this._lineStylePath.push("caps")
-            }
+        let numericMapping = {
+          binnedColumn: this._binnedColumnPath,
+          columnToAggregate: this._columnToAggregatePath
         };
 
-        this.records = this._plotterPath.retrieveRecords(mapping, this._plotterPath.push("filteredKeySet"));
+        this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
 
         this.idToRecord = {};
 
-        this.records.forEach((record) => {
+        this.numericRecords.forEach((record) => {
             this.idToRecord[record.id] = record;
+        });
+
+        this.keyToIndex = {};
+        this.indexToKey = {};
+
+        this.numericRecords.forEach((record, index) => {
+            this.keyToIndex[record.id] = index;
+            this.indexToKey[index] = record.id;
         });
 
         this.numberOfBins = this._binnedColumnPath.getValue("numberOfBins");
@@ -237,7 +233,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
         for(let iBin = 0; iBin < this.numberOfBins; iBin++) {
 
-            let recordsInBin = lodash.filter(this.records, { binnedColumn: iBin });
+            let recordsInBin = lodash.filter(this.numericRecords, { binnedColumn: iBin });
 
             if(recordsInBin) {
                var obj = {};
@@ -245,7 +241,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     obj.height = this.getAggregateValue(recordsInBin, "columnToAggregate", this._aggregationMethodPath.getState());
                     this.histData.push(obj);
                 } else {
-                    obj.height = this.getAggregateValue(recordsInBin, "column", "count");
+                    obj.height = this.getAggregateValue(recordsInBin, "binnedColumn", "count");
                     this.histData.push(obj);
                 }
             }

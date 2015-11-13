@@ -42,6 +42,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                 x: {
                     tick: {
                         multiline: false,
+                        rotate: 0,
                         format: (d) => {
                             return this.columnLabels[d];
                         }
@@ -101,12 +102,17 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         this.columnNames = [];
 
         var children = this._columnsPath.getChildren();
-        let mapping = {
+        let numericMapping = {
+            columns: children
+        };
+
+
+        let stringMapping = {
             columns: children,
             line: {
-                alpha: this._lineStylePath.push("alpha"),
-                color: this._lineStylePath.push("color"),
-                caps: this._lineStylePath.push("caps")
+                //alpha: this._lineStylePath.push("alpha"),
+                color: this._lineStylePath.push("color")
+                //caps: this._lineStylePath.push("caps")
             }
         };
 
@@ -118,11 +124,22 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             this.columnNames.push(name);
         }
 
-        this.records = this._plotterPath.retrieveRecords(mapping, this._plotterPath.push("filteredKeySet"));
-        this.records = lodash.sortBy(this.records, "id");
+        this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
+        this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
+
+        this.numericRecords = lodash.sortBy(this.numericRecords, "id");
+
+        this.keyToIndex = {};
+        this.indexToKey = {};
+
+        this.numericRecords.forEach((record, index) => {
+            this.keyToIndex[record.id] = index;
+            this.indexToKey[index] = record.id;
+        });
+
         var columns = [];
 
-        columns = this.records.map(function(record) {
+        columns = this.numericRecords.map(function(record) {
             var tempArr = [];
             tempArr.push(record.id);
             lodash.keys(record.columns).forEach((key) => {
@@ -132,7 +149,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         });
 
         this.colors = {};
-        this.records.forEach((record) => {
+        this.stringRecords.forEach((record) => {
             this.colors[record.id] = record.line.color || "#C0CDD1";
         });
 

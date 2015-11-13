@@ -76,15 +76,20 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                 rows: [],
                 x: "x",
                 xSort: false,
-                type: "scatter",//,
+                type: "scatter",
                 selection: {
                     enabled: true,
                     multiple: true,
                     draggable: true
                 },
                 color: (color, d) => {
-                    if(this.records && d.hasOwnProperty("index")) {
-                        var record = this.records[d.index];
+                    if(this.stringRecords && d.hasOwnProperty("index")) {
+
+                        // find the corresponding index of numericRecords in stringRecords
+                        var id = this.indexToKey[d.index];
+                        var index = lodash.pluck(this.stringRecords, "id").indexOf(id);
+
+                        var record = this.stringRecords[index];
                         return (record && record.fill && record.fill.color) ? record.fill.color : "#C0CDD1";
                     }
                     return "#C0CDD1";
@@ -120,7 +125,21 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     },
                     tick: {
                         fit: false,
-                        format: FormatUtils.defaultNumberFormatting
+                        rotate: 0,
+                        format: (num) => {
+                            if(this.stringRecords && this.stringRecords.length) {
+                              // find the corresponding index of numericRecords in stringRecords
+                              var id = this.indexToKey[num];
+                              var index = lodash.pluck(this.stringRecords, "id").indexOf(id);
+
+                              var record = this.stringRecords[index];
+                              if(record && record.point && record.point.x) {
+                                return record.point.x;
+                              }
+                            } else {
+                                return FormatUtils.defaultNumberFormatting(num);
+                            }
+                        }
                     }
                 },
                 y: {
@@ -196,33 +215,42 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         if(this.busy) {
             return;
         }
-        let mapping = { point: {
-                            x: this._dataXPath,
-                            y: this._dataYPath
-                        },
-                        size: this._sizeByPath,
-                        fill: {
-                            alpha: this._fillStylePath.push("alpha"),
-                            color: this._fillStylePath.push("color")
-                        },
-                        line: {
-                            alpha: this._lineStylePath.push("alpha"),
-                            color: this._lineStylePath.push("color"),
-                            caps: this._lineStylePath.push("caps")
-                        }
-                    };
+        let numericMapping = {
+          point: {
+            x: this._dataXPath,
+            y: this._dataYPath
+          },
+          size: this._sizeByPath
+        };
 
-        this.records = lodash.sortByOrder(this._plotterPath.retrieveRecords(mapping, this._plotterPath.push("filteredKeySet")), ["size", "id"], ["desc", "asc"]);
+        let stringMapping = {
+            point: {
+              x: this._dataXPath,
+              y: this._dataYPath
+            },
+            fill: {
+              //alpha: this._fillStylePath.push("alpha"),
+              color: this._fillStylePath.push("color")
+            },
+            line: {
+              //alpha: this._lineStylePath.push("alpha"),
+              color: this._lineStylePath.push("color")
+              //caps: this._lineStylePath.push("caps")
+            }
+        };
+
+        this.numericRecords = lodash.sortByOrder(this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"}), ["size", "id"], ["desc", "asc"]);
+        this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
 
         this.keyToIndex = {};
         this.indexToKey = {};
 
-        this.records.forEach((record, index) => {
+        this.numericRecords.forEach((record, index) => {
             this.keyToIndex[record.id] = index;
             this.indexToKey[index] = record.id;
         });
 
-        this.normalizedRecords = _normalizeRecords(this.records, ["size"]);
+        this.normalizedRecords = _normalizeRecords(this.numericRecords, ["size"]);
 
         this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord) => {
             if(this.plotterState && this.plotterState.sizeBy.length) {
@@ -240,7 +268,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         this._axisChanged();
         this.busy = true;
-        this.chart.load({data: lodash.pluck(this.records, "point"), unload: true, done: () => { this.busy = false; }});
+        this.chart.load({data: lodash.pluck(this.numericRecords, "point"), unload: true, done: () => { this.busy = false; }});
     }
 
     _selectionKeysChanged() {

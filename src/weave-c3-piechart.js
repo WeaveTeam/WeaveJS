@@ -51,8 +51,8 @@ class WeaveC3PieChart extends AbstractWeaveTool{
                 label: {
                     show: true,
                     format: (value, ratio, id) => {
-                        if(this.records) {
-                            var record = this.records[this.keyToIndex[id]];
+                        if(this.stringRecords && this.stringRecords.length) {
+                            var record = this.stringRecords[this.keyToIndex[id]];
                             if(record && record.label) {
                                 return record.label;
                             }
@@ -65,8 +65,8 @@ class WeaveC3PieChart extends AbstractWeaveTool{
                 label: {
                     show: true,
                     format: (value, ratio, id) => {
-                        if(this.records) {
-                            var record = this.records[this.keyToIndex[id]];
+                        if(this.stringRecords && this.stringRecords.length) {
+                            var record = this.stringRecords[this.keyToIndex[id]];
                             if(record && record.label) {
                                 return record.label;
                             }
@@ -134,34 +134,39 @@ class WeaveC3PieChart extends AbstractWeaveTool{
     }
 
     _dataChanged() {
-        let mapping = {
-            data: this._dataPath,
+        let numericMapping = {
+            data: this._dataPath
+        };
+
+        let stringMapping = {
             fill: {
-                alpha: this._fillStylePath.push("alpha"),
-                color: this._fillStylePath.push("color"),
-                caps: this._fillStylePath.push("caps")
+                //alpha: this._fillStylePath.push("alpha"),
+                color: this._fillStylePath.push("color")
+                //caps: this._fillStylePath.push("caps")
             },
             line: {
-                alpha: this._lineStylePath.push("alpha"),
-                color: this._lineStylePath.push("color"),
-                caps: this._lineStylePath.push("caps")
+                //alpha: this._lineStylePath.push("alpha"),
+                //color: this._lineStylePath.push("color")
+                //caps: this._lineStylePath.push("caps")
             },
             label: this._labelPath
         };
 
-        this.records = this._plotterPath.retrieveRecords(mapping, this._plotterPath.push("filteredKeySet"));
+        this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
+        this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
 
         this.keyToIndex = {};
         this.indexToKey = {};
 
-        this.records.forEach( (record, index) => {
+        this.numericRecords.forEach( (record, index) => {
             this.indexToKey[index] = record.id;
             this.keyToIndex[record.id] = index;
         });
+
         //this.records = lodash.sortBy(this.records, "id");
         var columns = [];
 
-        columns = this.records.map(function(record) {
+        columns = this.numericRecords.map(function(record) {
             var tempArr = [];
             tempArr.push(record.id);
             tempArr.push(record.data);
@@ -174,7 +179,7 @@ class WeaveC3PieChart extends AbstractWeaveTool{
         }
 
         this.colors = {};
-        this.records.forEach((record) => {
+        this.stringRecords.forEach((record) => {
             this.colors[record.id] = record.fill.color || "#C0CDD1";
         });
 
