@@ -1,4 +1,3 @@
-import $ from "jquery";
 import React from "react";
 import Layout from "./react-flexible-layout/Layout.jsx";
 import {WeaveLayoutManager} from "./WeaveLayoutManager.jsx";
@@ -12,7 +11,7 @@ import _ from "lodash";
 //import ReactBurgerMenu from "react-burger-menu";
 import * as bs from "react-bootstrap";
 import Navbar from "./Navbar.jsx";
-import * as StandardLib from "./Utils/StandardLib.js";
+import StandardLib from "./Utils/StandardLib.js";
 
 //var Menu = ReactBurgerMenu.slide;
 var tableContainer = {
@@ -56,27 +55,30 @@ class PDO extends React.Component {
             this.weave = weave;
         }
         if(this.reactReady) {
-        	var file = this.getFileName();
-        	if (file)
-	        	this.setState({view: file.split(".")[0]});
-	        else
-	            this.changeView();
-            this.customSearchToolPath = this.weave.path("CustomSearchTool");
-            this.customCardViewToolPath = this.weave.path("CustomCardViewTool");
-            this.forceUpdate();
+          var file = this.getFileName();
+          if (file) {
+            this.setState({view: file.split(".")[0]});
+          } else {
+              this.changeView();
+          }
+          this.customSearchToolPath = this.weave.path("CustomSearchTool");
+          this.customCardViewToolPath = this.weave.path("CustomCardViewTool");
+          this.forceUpdate();
         } else {
             setTimeout(this.handleWeaveReady.bind(this), 200);
         }
     }
 
-	getFileName() {
-		var file = this.weave.path().getValue("Weave.fileName");
-		if (file === "defaults.xml")
-			return null;
-		if (!this.currentFile)
-			this.currentFile = file;
-		return file;
-	}
+  getFileName() {
+    var file = this.weave.path().getValue("Weave.fileName");
+    if (file === "defaults.xml") {
+      return null;
+    }
+    if (!this.currentFile) {
+      this.currentFile = file;
+    }
+    return file;
+  }
 
     getActiveView() {
         return this.state.view;
@@ -84,11 +86,11 @@ class PDO extends React.Component {
 
     changeView() {
         if(this.weave) {
-        	var newFile = this.state.view + ".weave";
-	    	if (this.currentFile !== newFile) {
-	    		this.currentFile = newFile;
-	        	this.weave.loadFile(StandardLib.resolveRelative(newFile, window.location.pathname));
-	        }
+          var newFile = this.state.view + ".weave";
+          if (this.currentFile !== newFile) {
+            this.currentFile = newFile;
+            this.weave.loadFile(StandardLib.resolveRelative(newFile, window.location.pathname));
+          }
         }
     }
 
