@@ -67,6 +67,7 @@ export default class WeaveTextFilter {
 	}
 
 
+
 }
 
 registerToolImplementation("weave.ui::DataFilterTool", WeaveTextFilter);
