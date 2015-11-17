@@ -180,7 +180,11 @@ class PDO extends React.Component {
                                                                           :
                                         <img style={{margin: "auto"}} src="img/practitioner-icon.png" width="20" height="20"/>
                                 }
-                                <font style={{margin: "auto", color: (() => { return this.getActiveView() === PRACTITIONER ? "rgb(245, 255, 142)" : "white"; })() }}> Practitioner </font>
+                                <ui.HBox>
+                                  <font style={{margin: "auto", fontSize: 10, color: (() => { return this.getActiveView() === PRACTITIONER ? "rgb(245, 255, 142)" : "white"; })() }}> Top50 </font>
+                                  |
+                                  <font style={{margin: "auto", fontSize: 10, color: (() => { return this.getActiveView() === PRACTITIONER ? "rgb(245, 255, 142)" : "white"; })() }}> Practitioner </font>
+                                </ui.HBox>
                             </ui.VBox>
                             <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PATIENT}, this.changeView.bind(this))}>
                                 {

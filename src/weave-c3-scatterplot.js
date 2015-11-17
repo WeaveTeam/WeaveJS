@@ -1,7 +1,7 @@
 import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import c3 from "c3";
-import lodash from "lodash";
+import _ from "lodash";
 import d3 from "d3";
 import FormatUtils from "./Utils/FormatUtils";
 
@@ -16,8 +16,8 @@ function _normalizeRecords (records, attributes) {
     var columnStatsCache = {};
     attributes.forEach(function(attr) {
         columnStatsCache[attr] = {
-            min: lodash.min(lodash.pluck(records, attr)),
-            max: lodash.max(lodash.pluck(records, attr))
+            min: _.min(_.pluck(records, attr)),
+            max: _.max(_.pluck(records, attr))
         };
     });
 
@@ -87,7 +87,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
                         // find the corresponding index of numericRecords in stringRecords
                         var id = this.indexToKey[d.index];
-                        var index = lodash.pluck(this.stringRecords, "id").indexOf(id);
+                        var index = _.pluck(this.stringRecords, "id").indexOf(id);
 
                         var record = this.stringRecords[index];
                         return (record && record.fill && record.fill.color) ? record.fill.color : "#C0CDD1";
@@ -127,18 +127,11 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                         fit: false,
                         rotate: 0,
                         format: (num) => {
-                            if(this.stringRecords && this.stringRecords.length) {
-                              // find the corresponding index of numericRecords in stringRecords
-                              var id = this.indexToKey[num];
-                              var index = lodash.pluck(this.stringRecords, "id").indexOf(id);
-
-                              var record = this.stringRecords[index];
-                              if(record && record.point && record.point.x) {
-                                return record.point.x;
-                              }
-                            } else {
-                                return FormatUtils.defaultNumberFormatting(num);
-                            }
+                          if(this._dataXPath && this.xAxisValueToLabel && this.dataXType !== "number") {
+                            return this.xAxisValueToLabel[num] || "";
+                          } else {
+                            return FormatUtils.defaultNumberFormatting(num);
+                          }
                         }
                     }
                 },
@@ -148,7 +141,13 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     },
                     tick: {
                         fit: false,
-                        format: FormatUtils.defaultNumberFormatting
+                        format: (num) => {
+                          if(this._dataYPath && this.yAxisValueToLabel && this.dataYType !== "number") {
+                            return this.yAxisValueToLabel[num] || "";
+                          } else {
+                            return FormatUtils.defaultNumberFormatting(num);
+                          }
+                        }
                     }
                 }
             },
@@ -177,13 +176,13 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     }
 
     _setupCallbacks() {
-        var dataChanged = lodash.debounce(this._dataChanged.bind(this), 100);
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
 
         [this._dataXPath, this._dataYPath, this._sizeByPath, this._fillStylePath, this._lineStylePath].forEach( (path) => {
             path.addCallback(dataChanged, true, false);
         });
 
-        var axisChanged = lodash.debounce(this._axisChanged.bind(this), 100);
+        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
         [this._dataXPath, this._dataYPath, this._xAxisPath, this._yAxisPath].forEach((path) => {
             path.addCallback(axisChanged, true, false);
         });
@@ -239,15 +238,30 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             }
         };
 
-        this.numericRecords = lodash.sortByOrder(this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"}), ["size", "id"], ["desc", "asc"]);
+        this.dataXType = this._dataXPath.getValue("getMetadata('dataType')");
+        this.dataYType = this._dataYPath.getValue("getMetadata('dataType')");
+
+        this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
         this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
+
+        this.records = _.zip(this.numericRecords, this.stringRecords);
+        this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
+
+        [this.numericRecords, this.stringRecords] = _.unzip(this.records);
 
         this.keyToIndex = {};
         this.indexToKey = {};
+        this.yAxisValueToLabel = {};
+        this.xAxisValueToLabel = {};
 
         this.numericRecords.forEach((record, index) => {
             this.keyToIndex[record.id] = index;
             this.indexToKey[index] = record.id;
+        });
+
+        this.stringRecords.forEach((record, index) => {
+          this.xAxisValueToLabel[this.numericRecords[index].point.x] = record.point.x;
+          this.yAxisValueToLabel[this.numericRecords[index].point.y] = record.point.y;
         });
 
         this.normalizedRecords = _normalizeRecords(this.numericRecords, ["size"]);
@@ -268,7 +282,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         this._axisChanged();
         this.busy = true;
-        this.chart.load({data: lodash.pluck(this.numericRecords, "point"), unload: true, done: () => { this.busy = false; }});
+        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => { this.busy = false; }});
     }
 
     _selectionKeysChanged() {

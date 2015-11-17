@@ -1,5 +1,5 @@
 import React from "react";
-
+import radium from "radium";
 
 var buttonStyle = {
 	border: 0,
@@ -25,9 +25,9 @@ export default class Button extends React.Component {
 
 		// do stufff
 		return <div style={{padding: 19}}>
-					<button style={buttonStyle}>
-						<img src="img/burger-menu.png"/>
-					</button>
-				</div>;
+						<button style={buttonStyle}>
+							<img src="img/burger-menu.png"/>
+						</button>
+					</div>;
 	}
 }

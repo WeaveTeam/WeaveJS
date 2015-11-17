@@ -1,7 +1,7 @@
 import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import c3 from "c3";
 import d3 from "d3";
-import lodash from "lodash";
+import _ from "lodash";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import FormatUtils from "./Utils/FormatUtils";
 
@@ -50,7 +50,13 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                 },
                 y: {
                     tick: {
-                        format: FormatUtils.defaultNumberFormatting
+                        format: (num) => {
+                          if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("getMetadata('dataType')") !== "number") {
+                            return this.yAxisValueToLabel[num] || "";
+                          } else {
+                            return FormatUtils.defaultNumberFormatting(num);
+                          }
+                        }
                     }
                 }
             },
@@ -65,7 +71,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
     }
 
     _setupCallbacks() {
-        var dataChanged = lodash.debounce(this._dataChanged.bind(this), 100);
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
         [
             this._columnsPath,
             this._lineStylePath,
@@ -102,8 +108,12 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         this.columnNames = [];
 
         var children = this._columnsPath.getChildren();
+
+        this.yLabelColumnPath = children[0];
+
         let numericMapping = {
-            columns: children
+            columns: children,
+            yLabel: this.yLabelColumnPath
         };
 
 
@@ -113,7 +123,8 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                 //alpha: this._lineStylePath.push("alpha"),
                 color: this._lineStylePath.push("color")
                 //caps: this._lineStylePath.push("caps")
-            }
+            },
+            yLabel: this.yLabelColumnPath
         };
 
         for (let idx in children) {
@@ -127,14 +138,22 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
         this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
 
-        this.numericRecords = lodash.sortBy(this.numericRecords, "id");
+        this.records = _.zip(this.numericRecords, this.stringRecords);
+        this.records = _.sortBy(this.records, [0, "id"]);
+        [this.numericRecords, this.stringRecords] = _.unzip(this.records);
 
         this.keyToIndex = {};
         this.indexToKey = {};
+        this.yAxisValueToLabel = {};
 
         this.numericRecords.forEach((record, index) => {
             this.keyToIndex[record.id] = index;
             this.indexToKey[index] = record.id;
+        });
+
+        this.stringRecords.forEach((record, index) => {
+          var numericRecord = this.numericRecords[index];
+          this.yAxisValueToLabel[numericRecord.yLabel] = record.yLabel;
         });
 
         var columns = [];
@@ -142,7 +161,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         columns = this.numericRecords.map(function(record) {
             var tempArr = [];
             tempArr.push(record.id);
-            lodash.keys(record.columns).forEach((key) => {
+            _.keys(record.columns).forEach((key) => {
                 tempArr.push(record.columns[key]);
             });
             return tempArr;

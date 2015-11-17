@@ -2,7 +2,7 @@ import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import d3 from "d3";
 import c3 from "c3";
 import {registerToolImplementation} from "./WeaveTool.jsx";
-import lodash from "lodash";
+import _ from "lodash";
 import StandardLib from "./Utils/StandardLib";
 import FormatUtils from "./Utils/FormatUtils";
 
@@ -14,6 +14,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this._labelColumnPath = this._plotterPath.push("labelColumn");
         this._sortColumnPath = this._plotterPath.push("sortColumn");
         this._colorColumnPath = this._plotterPath.push("colorColumn");
+
         this._chartColorsPath = this._plotterPath.push("chartColors");
 
         this._xAxisPath = this.toolPath.pushPlotter("xAxis");
@@ -46,7 +47,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
                         // find the corresponding index of numericRecords in stringRecords
                         var id = this.indexToKey[d.index];
-                        var index = lodash.pluck(this.stringRecords, "id").indexOf(id);
+                        var index = _.pluck(this.stringRecords, "id").indexOf(id);
 
                         return this.stringRecords[index].color || "#C0CDD1";
                     } else {
@@ -63,20 +64,12 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     tick: {
                         fit: false,
                         multiline: false,
-                        rotate: 0,
                         format: (num) => {
-                            if(this.stringRecords && this.stringRecords.length) {
-                               // find the corresponding index of numericRecords in stringRecords
-                               var id = this.indexToKey[num];
-                               var index = lodash.pluck(this.stringRecord, "id").indexOf(id);
-
-                               var record = this.stringRecords[index];
-                               if(record && record.xLabel) {
-                                    return record.xLabel;
-                               }
-                            } else {
-                                return FormatUtils.defaultNumberFormatting(num);
-                            }
+                             if(this.stringRecords && this.stringRecords[num]) {
+                               return this.stringRecords[num].xLabel;
+                             } else {
+                               return "";
+                             }
                         }
                     }
                 },
@@ -84,12 +77,18 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     label: {
                         position: "outer-middle"
                     },
-                    tick: (num) => {
-                        if(this.groupingMode === "percentStack") {
+                    tick: {
+                      fit: false,
+                      multiline: false,
+                      format: (num) => {
+                          if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
+                            return this.yAxisValueToLabel[num] || "";
+                          } else if (this.groupingMode === "percentStack") {
                             return d3.format(".0%")(num);
-                        } else {
+                          } else {
                             return FormatUtils.defaultNumberFormatting(num);
-                        }
+                          }
+                      }
                     }
                 }
             },
@@ -116,7 +115,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     _setupCallbacks() {
-        var dataChanged = lodash.debounce(this._dataChanged.bind(this), 100);
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
 
         [this._heightColumnsPath,
          this._labelColumnPath,
@@ -130,7 +129,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         var selectionChanged = this._selectionKeysChanged.bind(this);
         this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
 
-        var axisChanged = lodash.debounce(this._axisChanged.bind(this), 100);
+        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
         [this._heightColumnsPath,
          this._labelColumnPath,
          this._sortColumnPath,
@@ -139,7 +138,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             path.addCallback(axisChanged, true, false);
         });
 
-        var plotterChanged = lodash.debounce(this._plotterChanged.bind(this), 100);
+        var plotterChanged = _.debounce(this._plotterChanged.bind(this), 100);
         this._plotterPath.addCallback(plotterChanged, true, false);
     }
 
@@ -227,16 +226,24 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             numericMapping[name] = column; // all height columns as numeric value for the chart
 
             if(idx === 0 || idx === "0") {
+              this.yLabelColumnPath = column;
               stringMapping.yLabel = column; // only using the first column to label the y axis
               numericMapping.yLabel = column;
             }
         }
 
-        this.numericRecords = this.toolPath.pushPlotter("plot").retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
-        this.numericRecords = lodash.sortByAll(this.numericRecords, ["sort", "id"]);
+        this.yLabelColumnDataType = this.yLabelColumnPath.getValue("getMetadata('dataType')");
 
+        this.numericRecords = this.toolPath.pushPlotter("plot").retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
         this.stringRecords = this.toolPath.pushPlotter("plot").retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
 
+        this.records = _.zip(this.numericRecords, this.stringRecords);
+        this.records = _.sortByAll(this.records, [[0, "sort"], [0, "id"]]);
+
+        [this.numericRecords, this.stringRecords] = _.unzip(this.records);
+
+        this.yAxisValueToLabel = {};
+        this.xAxisValueToLabel = {};
         this.keyToIndex = {};
         this.indexToKey = {};
 
@@ -245,6 +252,12 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             this.indexToKey[index] = record.id;
         });
 
+
+        this.stringRecords.forEach((record, index) => {
+          var numericRecord = this.numericRecords[index];
+          this.yAxisValueToLabel[numericRecord.yLabel] = record.yLabel;
+          this.xAxisValueToLabel[numericRecord.xLabel] = record.xLabel;
+        });
 
         this.groupingMode = this._plotterPath.push("groupingMode").getState();
         //var horizontalMode = this._plotterPath.push("horizontalMode").getState();
@@ -263,13 +276,13 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
             // normalize the height columns to be percentages.
             var newValues = this.numericRecords.map((record) => {
-                var heights = lodash.pick(record, this.heightColumnNames);
+                var heights = _.pick(record, this.heightColumnNames);
                 var sum = 0;
-                lodash.keys(heights).forEach((key) => {
+                _.keys(heights).forEach((key) => {
                     sum += heights[key];
                 });
 
-                lodash.keys(heights).forEach((key) => {
+                _.keys(heights).forEach((key) => {
                     heights[key] = heights[key] / sum;
                 });
 
@@ -279,10 +292,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             this.numericRecords = newValues;
         }
 
-        this.keyToIndex = {};
-        this.numericRecords.forEach((record, index) => {
-            this.keyToIndex[record.id] = index;
-        });
+
 
         var keys = {};
         // if label column is specified
@@ -300,7 +310,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                 var color = StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.colorRamp);
                 colors[name] = "#" + color.toString(16);
             });
-        } else {
             colors = {};
         }
 

@@ -35,7 +35,7 @@ export default class Menu extends React.Component {
             delete divStyle.transform;
         }
 
-        //var menutItems = this.props.children.map((child) => 
+        //var menutItems = this.props.children.map((child) =>
         // do stufff
         return (<div style={menuStyle}>
                     <div style={divStyle}>

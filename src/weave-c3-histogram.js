@@ -85,9 +85,8 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     },
                     tick: {
                         multiline: false,
-                        rotate: 0,
-                        format: (d) => {
-                            return this._binnedColumnPath.getValue("deriveStringFromNumber")(d);
+                        format: (num) => {
+                            return this._binnedColumnPath.getValue("deriveStringFromNumber")(num);
                         }
                     }
                 },
@@ -208,18 +207,20 @@ class WeaveC3Histogram extends AbstractWeaveTool {
           columnToAggregate: this._columnToAggregatePath
         };
 
+        let stringMapping = {
+          binnedColumn: this._binnedColumnPath
+        };
+
+        this.binnedColumnDataType = this._binnedColumnPath.getValue("getMetadata('dataType')");
         this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
+        this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
 
         this.idToRecord = {};
-
-        this.numericRecords.forEach((record) => {
-            this.idToRecord[record.id] = record;
-        });
-
         this.keyToIndex = {};
         this.indexToKey = {};
 
         this.numericRecords.forEach((record, index) => {
+            this.idToRecord[record.id] = record;
             this.keyToIndex[record.id] = index;
             this.indexToKey[index] = record.id;
         });
