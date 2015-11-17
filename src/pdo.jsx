@@ -39,8 +39,10 @@ class PDO extends React.Component {
             this.handleWeaveReady();
         };
         this.state = {
-            view: PRACTITIONER
+            view: PRACTITIONER,
+            toolHeight: 150
         };
+        this.forceUpdate = this.forceUpdate.bind(this);
     }
 
     componentDidMount() {
@@ -61,9 +63,10 @@ class PDO extends React.Component {
           } else {
               this.changeView();
           }
-          this.customSearchToolPath = this.weave.path("CustomSearchTool");
-          this.customCardViewToolPath = this.weave.path("CustomCardViewTool");
-          this.forceUpdate();
+          this.customSearchToolPath = this.weave.path("CustomSearchTool").request("ExternalTool");
+          this.customCardViewToolPath = this.weave.path("CustomCardViewTool").request("ExternalTool");
+          this.toolHeightPath = this.customCardViewToolPath.push("toolHeight").request("LinkableNumber");
+          this.toolHeightPath.addCallback(this.forceUpdate, true);
         } else {
             setTimeout(this.handleWeaveReady.bind(this), 200);
         }
@@ -161,6 +164,8 @@ class PDO extends React.Component {
             customCardViewTool = <CustomCardViewTool ref="cardViewTool" toolPath={this.customCardViewToolPath}/>;
         }
 
+        var toolHeight = this.toolHeightPath ? this.toolHeightPath.getState() : 160;
+
         return (
             <ui.VBox>
                 <Navbar>
@@ -201,7 +206,7 @@ class PDO extends React.Component {
                        </ui.HBox>
                    </ui.HBox>
                 </Navbar>
-                <div style={{height: 150, marginLeft: "5px", marginRight: "5px", marginBottom: "20px", paddingTop: 5, overflowY: "scroll"}}>
+                <div style={{height: toolHeight, marginLeft: "5px", marginRight: "5px", paddingTop: 5, overflowY: toolHeight ? "scroll" : "hidden"}}>
                     {
                         customCardViewTool
                     }
