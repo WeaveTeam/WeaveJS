@@ -39,10 +39,8 @@ class PDO extends React.Component {
             this.handleWeaveReady();
         };
         this.state = {
-            view: PRACTITIONER,
-            toolHeight: 150
+            view: PRACTITIONER
         };
-        this.forceUpdate = this.forceUpdate.bind(this);
     }
 
     componentDidMount() {
@@ -66,7 +64,7 @@ class PDO extends React.Component {
           this.customSearchToolPath = this.weave.path("CustomSearchTool").request("ExternalTool");
           this.customCardViewToolPath = this.weave.path("CustomCardViewTool").request("ExternalTool");
           this.toolHeightPath = this.customCardViewToolPath.push("toolHeight").request("LinkableNumber");
-          this.toolHeightPath.addCallback(this.forceUpdate, true);
+          this.toolHeightPath.addCallback(this.forceUpdate.bind(this), true);
         } else {
             setTimeout(this.handleWeaveReady.bind(this), 200);
         }
@@ -164,9 +162,7 @@ class PDO extends React.Component {
             customCardViewTool = <CustomCardViewTool ref="cardViewTool" toolPath={this.customCardViewToolPath}/>;
         }
 
-        var toolHeight = this.toolHeightPath ? this.toolHeightPath.getState() : 160;
-        toolHeight = toolHeight || 160;
-
+        var toolHeight = this.toolHeightPath ? this.toolHeightPath.getState() : 0;
         return (
             <ui.VBox>
                 <Navbar>
