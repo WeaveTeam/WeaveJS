@@ -165,6 +165,7 @@ class PDO extends React.Component {
         }
 
         var toolHeight = this.toolHeightPath ? this.toolHeightPath.getState() : 160;
+        toolHeight = toolHeight || 160;
 
         return (
             <ui.VBox>
