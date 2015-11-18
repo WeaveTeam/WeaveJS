@@ -27,6 +27,7 @@ var leftPaneStyle = {
 };
 
 const PRACTITIONER = "practitioner";
+const TOPPRACTITIONER = "practitioner-n";
 const PATIENT = "patient";
 const PRESCRIPTION = "prescription";
 
@@ -162,6 +163,9 @@ class PDO extends React.Component {
             customCardViewTool = <CustomCardViewTool ref="cardViewTool" toolPath={this.customCardViewToolPath}/>;
         }
 
+        var getColor = (activeView) => {
+          return this.getActiveView() === activeView ? "rgb(245, 255, 142)" : "white";
+        };
         var toolHeight = this.toolHeightPath ? this.toolHeightPath.getState() : 0;
         return (
             <ui.VBox>
@@ -173,17 +177,21 @@ class PDO extends React.Component {
                            }
                        </ui.HBox>
                         <ui.HBox style={{width: "20%", height: 30, margin: "auto"}}>
-                            <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PRACTITIONER}, this.changeView.bind(this))}>
-                                {
-                                    this.getActiveView() === PRACTITIONER ?
-                                        <img style={{margin: "auto"}} src="img/practitioner-icon-active.png" width="20" height="20"/>
-                                                                          :
-                                        <img style={{margin: "auto"}} src="img/practitioner-icon.png" width="20" height="20"/>
-                                }
+                            <ui.VBox style={viewsIconStyle}>
+                                <div  style={{margin: "auto"}} onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))}>
+                                      {
+                                          (this.getActiveView() === PRACTITIONER || this.getActiveView() === TOPPRACTITIONER) ?
+                                            <img src="img/practitioner-icon-active.png" width="20" height="20"/>
+                                                                              :
+                                            <img src="img/practitioner-icon.png" width="20" height="20"/>
+                                      }
+                                </div>
                                 <ui.HBox>
-                                  <font style={{margin: "auto", fontSize: 10, color: (() => { return this.getActiveView() === PRACTITIONER ? "rgb(245, 255, 142)" : "white"; })() }}> Top50 </font>
-                                  |
-                                  <font style={{margin: "auto", fontSize: 10, color: (() => { return this.getActiveView() === PRACTITIONER ? "rgb(245, 255, 142)" : "white"; })() }}> Practitioner </font>
+                                  <span style={{textAlign: "center", color: "white", width: "100%"}}>
+                                    <a onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))} style={{margin: "auto", fontSize: 10, color: getColor(TOPPRACTITIONER)}}> Top N </a>
+                                    |
+                                    <a onClick={() => this.setState({view: PRACTITIONER}, this.changeView.bind(this))} style={{margin: "auto", fontSize: 10, color: getColor(PRACTITIONER)}}> Practitioner </a>
+                                  </span>
                                 </ui.HBox>
                             </ui.VBox>
                             <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PATIENT}, this.changeView.bind(this))}>
