@@ -71,7 +71,9 @@ class CustomSearchTool extends React.Component {
 
     submitSearch(event) {
         this.props.toolPath.state("searchValues", this.state.searchObject);
-        event.preventDefault();
+        if(event) {
+          event.preventDefault();
+        }
     }
 
     updateState(label, event, callback) {
@@ -109,6 +111,9 @@ class CustomSearchTool extends React.Component {
         this.setState({
             searchObject: components
         });
+        if(!Object.keys(components).length) {
+          this.submitSearch();
+        }
     }
 
     handleDropdownSelect (event, eventKey){
