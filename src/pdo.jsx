@@ -40,7 +40,7 @@ class PDO extends React.Component {
             this.handleWeaveReady();
         };
         this.state = {
-            view: PRACTITIONER
+            view: TOPPRACTITIONER
         };
     }
 
