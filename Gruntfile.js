@@ -1,3 +1,5 @@
+/*eslint quotes: 0, comma-dangle: 0  */
+/*global module */
 module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -48,7 +50,7 @@ module.exports = function (grunt) {
             olcss: {expand: true, flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
             fontawesomecss: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
             fontawesomefont: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
-            fonts: {expand: true, flatten: true, cwd: 'node_modules/bootstrap', src:'fonts/*.*', dest: 'dist/fonts/'},
+            fonts: {expand: true, flatten: true, cwd: 'node_modules/bootstrap', src: 'fonts/*.*', dest: 'dist/fonts/'},
             images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'},
             weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "dist/"}
         },
