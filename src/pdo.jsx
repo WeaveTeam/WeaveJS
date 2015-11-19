@@ -175,12 +175,12 @@ class PDO extends React.Component {
             <ui.VBox>
                 <Navbar>
                     <ui.HBox>
-                        <ui.HBox style={{marginTop: 17, marginLeft: 5, marginRight: 5, width: "80%"}}>
+                        <ui.HBox style={{marginTop: 17, marginLeft: 5, marginRight: 5, flex: 1}}>
                            {
                              customSearchTool
                            }
                        </ui.HBox>
-                        <ui.HBox style={{width: "20%", height: 30, margin: "auto"}}>
+                        <ui.HBox style={{width: "20%", minWidth: 240, height: 30, margin: "auto"}}>
                             <ui.VBox style={viewsIconStyle}>
                                 <div style={{margin: "auto", marginBottom: 5}} onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))}>
                                       {
@@ -229,7 +229,7 @@ class PDO extends React.Component {
                     }
                 </div>
                 <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
-                <Weave ref="weave" style={style} onWeaveReady={this.handleWeaveReady.bind(this)}/>
+                <Weave ref="weave" style={style} onWeaveReady={_.debounce(this.handleWeaveReady.bind(this), 100)}/>
             </ui.VBox>
         );
     }
