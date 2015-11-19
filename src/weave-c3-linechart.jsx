@@ -4,20 +4,30 @@ import d3 from "d3";
 import _ from "lodash";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import FormatUtils from "./Utils/FormatUtils";
-
+import React from "react";
 
 class WeaveC3LineChart extends AbstractWeaveTool {
     constructor(props) {
         super(props);
-        this._plotterPath = this.toolPath.pushPlotter("plot");
-        this._columnsPath = this._plotterPath.push("columns");
-        this._lineStylePath = this._plotterPath.push("lineStyle");
 
-        this._xAxisPath = this.toolPath.pushPlotter("xAxis");
-        this._yAxisPath = this.toolPath.pushPlotter("yAxis");
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
+        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
+        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 20);
+        var plotterPath = this.toolPath.pushPlotter("plot");
+        var mapping = [
+          { name: "plotter", path: plotterPath, callbacks: null},
+          { name: "columns", path: plotterPath.push("columns"), callbacks: dataChanged },
+          { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
+          { name: "curveType", path: plotterPath.push("curveType"), callbacks: dataChanged },
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
+          { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+        ];
 
-        this.chart = c3.generate({
-            size: this._getElementSize(),
+        this.initializePaths(mapping);
+
+        this.c3Config = {
+            //size: this.getElementSize(),
             data: {
                 columns: [],
                 xSort: false,
@@ -65,27 +75,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                 show: false
             },
             onrendered: this._updateStyle.bind(this)
-        });
-
-        this._setupCallbacks();
-    }
-
-    _setupCallbacks() {
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
-        [
-            this._columnsPath,
-            this._lineStylePath,
-            this._plotterPath.push("curveType")
-        ].forEach((path) => {
-            path.addCallback(dataChanged, true, false);
-        });
-
-        var selectionChanged = this._selectionKeysChanged.bind(this);
-        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
-    }
-
-    resize() {
-        this.chart.resize(this._getElementSize());
+        };
     }
 
     _selectionKeysChanged() {
@@ -95,6 +85,10 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         } else {
             this.chart.focus();
         }
+    }
+
+    _probedKeysChanged() {
+
     }
 
     _updateStyle() {
@@ -107,7 +101,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         this.columnLabels = [];
         this.columnNames = [];
 
-        var children = this._columnsPath.getChildren();
+        var children = this.paths.columns.getChildren();
 
         this.yLabelColumnPath = children[0];
 
@@ -121,7 +115,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             columns: children,
             line: {
                 //alpha: this._lineStylePath.push("alpha"),
-                color: this._lineStylePath.push("color")
+                color: this.paths.lineStyle.push("color")
                 //caps: this._lineStylePath.push("caps")
             },
             yLabel: this.yLabelColumnPath
@@ -135,8 +129,8 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             this.columnNames.push(name);
         }
 
-        this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
-        this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.plotter.push("filteredKeySet"), dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.plotter.push("filteredKeySet"), dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortBy(this.records, [0, "id"]);
@@ -173,11 +167,32 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         });
 
         var chartType = "line";
-        if(this._plotterPath.push("curveType").getState() === "double") {
+        if(this.paths.plotter.push("curveType").getState() === "double") {
             chartType = "spline";
         }
 
         this.chart.load({columns: columns, colors: this.colors, type: chartType, unload: true});
+    }
+
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        this.chart.resize(this.getElementSize());
+    }
+
+    componentWillUnmount() {
+        /* Cleanup callbacks */
+        //this.teardownCallbacks();
+        super.componentWillUnmount();
+        this.chart.destroy();
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.chart = c3.generate(this.c3Config);
+    }
+
+    render() {
+        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
     }
 }
 

@@ -31,48 +31,19 @@ export class WeaveTool extends React.Component {
     }
 
     componentDidMount() {
-        this.element = React.findDOMNode(this);
         this.header = React.findDOMNode(this.refs.header);
-        if(React.Component.isPrototypeOf(this.ToolClass)) {
-            this.tool = this.refs.tool;
-        } else {
-            this.tool = new this.ToolClass(_.merge({element: React.findDOMNode(this.refs.toolDiv), toolPath: this.toolPath}));
-        }
-    }
-
-    componentWillUnmount() {
-        if(this.tool.destroy) {
-            this.tool.destroy();
-        }
-    }
-
-    componentDidUpdate() {
-        if(this.tool.resize) {
-            this.tool.resize();
-        }
     }
 
     render() {
-
-        var reactTool = "";
-        if (React.Component.isPrototypeOf(this.ToolClass)) {
-            reactTool = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath}, this.toolProps));
-        }
-
-        var toolHeight = "100%";
-
-        if(this.element) {
-            toolHeight = this.element.clientHeight - this.header.clientHeight;
-        }
-
+        var chart = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath}, this.toolProps));
         return (
             <div style={this.props.style} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
                 <div ref="header" style={{height: "25px", width: "100%"}}>
                     <div draggable={true} onDragStart={this.props.onDragStart} style={grabberStyle}/>
                 </div>
-                <div style={{position: "relative", width: "100%", height: toolHeight, padding: 16}}>
-                    <div ref="toolDiv" style={{width: "100%", height: "100%", maxHeight: toolHeight}}/>
-                </div>
+                {
+                  chart
+                }
             </div>);
     }
 }

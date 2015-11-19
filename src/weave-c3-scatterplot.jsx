@@ -4,7 +4,7 @@ import c3 from "c3";
 import _ from "lodash";
 import d3 from "d3";
 import FormatUtils from "./Utils/FormatUtils";
-
+import React from "react";
 
 /* private
  * @param records array or records
@@ -51,26 +51,29 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
-        this._visualizationPath = this.toolPath.push("children", "visualization");
-        this._plotterPath = this.toolPath.pushPlotter("plot");
 
-        this._dataXPath = this._plotterPath.push("dataX");
-        this._dataYPath = this._plotterPath.push("dataY");
-        this._xAxisPath = this.toolPath.pushPlotter("xAxis");
-        this._yAxisPath = this.toolPath.pushPlotter("yAxis");
+        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
+        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
+        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 30);
+        var plotterPath = this.toolPath.pushPlotter("plot");
+        var mapping = [
+          { name: "plotter", path: plotterPath, callbacks: null},
+          { name: "dataX", path: plotterPath.push("dataX"), callbacks: [dataChanged, axisChanged] },
+          { name: "dataY", path: plotterPath.push("dataY"), callbacks: [dataChanged, axisChanged] },
+          { name: "sizeBy", path: plotterPath.push("sizeBy"), callbacks: dataChanged },
+          { name: "fill", path: plotterPath.push("fill"), callbacks: [dataChanged] },
+          { name: "line", path: plotterPath.push("line"), callbacks: dataChanged },
+          { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
+          { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
+          { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+        ];
 
-        this._fillStylePath = this._plotterPath.push("fill");
-        this._lineStylePath = this._plotterPath.push("line");
-        this._sizeByPath = this._plotterPath.push("sizeBy");
+        this.initializePaths(mapping);
 
-        this.plotterState = {};
-
-        this._plotterPath.addCallback(() => {
-            this.plotterState = this._plotterPath.getState();
-            this._dataChanged();
-        }, true);
-
-        this._c3Options = {
+        this.c3Config = {
             bindto: this.element,
             data: {
                 rows: [],
@@ -169,33 +172,6 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             },
             onrendered: this._updateStyle.bind(this)
         };
-
-        this.chart = c3.generate(this._c3Options);
-
-        this._setupCallbacks();
-    }
-
-    _setupCallbacks() {
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
-
-        [this._dataXPath, this._dataYPath, this._sizeByPath, this._fillStylePath, this._lineStylePath].forEach( (path) => {
-            path.addCallback(dataChanged, true, false);
-        });
-
-        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
-        [this._dataXPath, this._dataYPath, this._xAxisPath, this._yAxisPath].forEach((path) => {
-            path.addCallback(axisChanged, true, false);
-        });
-
-        this.toolPath.selection_keyset.addCallback(this._selectionKeysChanged.bind(this), true, false);
-
-        //console.log(this.toolPath.probe_keyset);
-        this.toolPath.probe_keyset.addCallback(this._probedKeysChanged.bind(this), true, false);
-
-    }
-
-    resize () {
-        this.chart.resize(this._getElementSize());
     }
 
     _axisChanged () {
@@ -205,8 +181,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         }
 
         this.chart.axis.labels({
-            x: this._xAxisPath.push("overrideAxisName").getState() || this._dataXPath.getValue("ColumnUtils.getTitle(this)"),
-            y: this._yAxisPath.push("overrideAxisName").getState() || this._dataYPath.getValue("ColumnUtils.getTitle(this)")
+            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("ColumnUtils.getTitle(this)"),
+            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("ColumnUtils.getTitle(this)")
         });
     }
 
@@ -216,33 +192,33 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         }
         let numericMapping = {
           point: {
-            x: this._dataXPath,
-            y: this._dataYPath
+            x: this.paths.dataX,
+            y: this.paths.dataY
           },
-          size: this._sizeByPath
+          size: this.paths.sizeBy
         };
 
         let stringMapping = {
             point: {
-              x: this._dataXPath,
-              y: this._dataYPath
+              x: this.paths.dataX,
+              y: this.paths.dataY
             },
             fill: {
               //alpha: this._fillStylePath.push("alpha"),
-              color: this._fillStylePath.push("color")
+              color: this.paths.fill.push("color")
             },
             line: {
               //alpha: this._lineStylePath.push("alpha"),
-              color: this._lineStylePath.push("color")
+              color: this.paths.line.push("color")
               //caps: this._lineStylePath.push("caps")
             }
         };
 
-        this.dataXType = this._dataXPath.getValue("getMetadata('dataType')");
-        this.dataYType = this._dataYPath.getValue("getMetadata('dataType')");
+        this.dataXType = this.paths.dataX.getValue("getMetadata('dataType')");
+        this.dataYType = this.paths.dataY.getValue("getMetadata('dataType')");
 
-        this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
-        this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
@@ -309,8 +285,26 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                                                       .style("stroke-opacity", 0.5);
     }
 
-    destroy() {
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        this.chart.resize(this.getElementSize());
+    }
+
+    componentWillUnmount() {
+        /* Cleanup callbacks */
+        //this.teardownCallbacks();
+        super.componentWillUnmount();
         this.chart.destroy();
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.chart = c3.generate(this.c3Config);
+        this.forceUpdate();
+    }
+
+    render() {
+        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
     }
 }
 export default WeaveC3ScatterPlot;

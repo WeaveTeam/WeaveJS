@@ -1,22 +1,35 @@
 import AbstractWeaveTool from "./AbstractWeaveTool.js";
 import c3 from "c3";
 import d3 from "d3";
-import lodash from "lodash";
+import _ from "lodash";
 import {registerToolImplementation} from "./WeaveTool.jsx";
+import React from "react";
 
-class WeaveC3PieChart extends AbstractWeaveTool{
+class WeaveC3PieChart extends AbstractWeaveTool {
     constructor(props) {
         super(props);
-        this._plotterPath = this.toolPath.pushPlotter("plot");
 
-        this._dataPath = this._plotterPath.push("data");
-        this._labelPath = this._plotterPath.push("label");
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
+        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
+        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 100);
+        var plotterPath = this.toolPath.pushPlotter("plot");
+        var manifest = [
+          { name: "plotter", path: plotterPath, callbacks: null},
+          { name: "data", path: plotterPath.push("data"), callbacks: dataChanged },
+          { name: "label", path: plotterPath.push("label"), callbacks: dataChanged },
+          { name: "fillStyle", path: plotterPath.push("fill"), callbacks: dataChanged },
+          { name: "lineStyle", path: plotterPath.push("line"), callbacks: dataChanged },
+          { name: "innerRadius", path: plotterPath.push("innerRadius"), callback: dataChanged },
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
+          { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+        ];
 
-        this._lineStylePath = this._plotterPath.push("line");
-        this._fillStylePath = this._plotterPath.push("fill");
+        this.initializePaths(manifest);
 
-        this.config = {
-            size: this._getElementSize(),
+        this.c3Config = {
+            //size: this.getElementSize(),
+            bindto: this.element,
             data: {
                 columns: [],
                 selection: {
@@ -75,56 +88,33 @@ class WeaveC3PieChart extends AbstractWeaveTool{
                     }
                 }
             },
-            bindto: this.element,
             legend: {
                 show: false
             },
             onrendered: this._updateStyle.bind(this)
         };
-        this.chart = c3.generate(this.config);
-        this._setupCallbacks();
-    }
-
-    _setupCallbacks() {
-        var dataChanged = lodash.debounce(this._dataChanged.bind(this), 100);
-        [
-            this._dataPath,
-            this._labelPath,
-            this._lineStylePath,
-            this._fillStylePath
-        ].forEach((path) => {
-            path.addCallback(dataChanged, true, false);
-        });
-
-        var selectionChanged = this._selectionKeysChanged.bind(this);
-        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
-
-        this.toolPath.probe_keyset.addCallback(this._probedKeysChanged.bind(this), true, false);
-
-        this._plotterPath.push("innerRadius").addCallback(dataChanged, true, false);
-    }
-
-    resize() {
-        this.chart.resize(this._getElementSize());
     }
 
     _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
-        if(keys.length) {
-            this.chart.focus(keys);
-        } else {
-            this.chart.focus();
-        }
+      if(!this.chart)
+        return;
+
+      var keys = this.toolPath.selection_keyset.getKeys();
+      if(keys.length) {
+          this.chart.focus(keys);
+      } else {
+          this.chart.focus();
+      }
     }
 
     _probedKeysChanged() {
-        var keys = this.toolPath.probe_keyset.getKeys();
+      var keys = this.toolPath.probe_keyset.getKeys();
 
-        if(keys.length) {
-            this.chart.focus(keys);
-        } else {
-            this._selectionKeysChanged();
-        }
+      if(keys.length) {
+          this.chart.focus(keys);
+      } else {
+          this._selectionKeysChanged();
+      }
     }
 
     _updateStyle() {
@@ -134,14 +124,17 @@ class WeaveC3PieChart extends AbstractWeaveTool{
     }
 
     _dataChanged() {
+        if(!this.chart)
+          return;
+
         let numericMapping = {
-            data: this._dataPath
+            data: this.paths.data
         };
 
         let stringMapping = {
             fill: {
                 //alpha: this._fillStylePath.push("alpha"),
-                color: this._fillStylePath.push("color")
+                color: this.paths.fillStyle.push("color")
                 //caps: this._fillStylePath.push("caps")
             },
             line: {
@@ -149,11 +142,11 @@ class WeaveC3PieChart extends AbstractWeaveTool{
                 //color: this._lineStylePath.push("color")
                 //caps: this._lineStylePath.push("caps")
             },
-            label: this._labelPath
+            label: this.paths.label
         };
 
-        this.numericRecords = this._plotterPath.retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
-        this.stringRecords = this._plotterPath.retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.keyToIndex = {};
         this.indexToKey = {};
@@ -163,7 +156,7 @@ class WeaveC3PieChart extends AbstractWeaveTool{
             this.keyToIndex[record.id] = index;
         });
 
-        //this.records = lodash.sortBy(this.records, "id");
+        //this.records = _.sortBy(this.records, "id");
         var columns = [];
 
         columns = this.numericRecords.map(function(record) {
@@ -174,7 +167,7 @@ class WeaveC3PieChart extends AbstractWeaveTool{
         });
 
         var chartType = "pie";
-        if(this._plotterPath.push("innerRadius").getState() > 0) {
+        if(this.paths.plotter.getState("innerRadius") > 0) {
             chartType = "donut";
         }
 
@@ -184,6 +177,27 @@ class WeaveC3PieChart extends AbstractWeaveTool{
         });
 
         this.chart.load({columns: columns, type: chartType, colors: this.colors, unload: true});
+    }
+
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        this.chart.resize(this.getElementSize());
+    }
+
+    componentWillUnmount() {
+        /* Cleanup callbacks */
+        //this.teardownCallbacks();
+        super.componentWillUnmount();
+        this.chart.destroy();
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+        this.chart = c3.generate(this.c3Config);
+    }
+
+    render() {
+        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
     }
 }
 

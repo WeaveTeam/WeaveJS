@@ -5,32 +5,35 @@ import {registerToolImplementation} from "./WeaveTool.jsx";
 import _ from "lodash";
 import StandardLib from "./Utils/StandardLib";
 import FormatUtils from "./Utils/FormatUtils";
+import React from "react";
 
 class WeaveC3Barchart extends AbstractWeaveTool {
+
     constructor(props) {
         super(props);
-        this._plotterPath = this.toolPath.pushPlotter("plot");
-        this._heightColumnsPath = this._plotterPath.push("heightColumns");
-        this._labelColumnPath = this._plotterPath.push("labelColumn");
-        this._sortColumnPath = this._plotterPath.push("sortColumn");
-        this._colorColumnPath = this._plotterPath.push("colorColumn");
 
-        this._chartColorsPath = this._plotterPath.push("chartColors");
+        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
 
-        this._xAxisPath = this.toolPath.pushPlotter("xAxis");
-        this._yAxisPath = this.toolPath.pushPlotter("yAxis");
+        var plotterPath = this.toolPath.pushPlotter("plot");
+        var mapping = [
+          { name: "plotter", path: plotterPath, callbacks: null},
+          { name: "heightColumns", path: plotterPath.push("heightColumns"), callbacks: [dataChanged, axisChanged] },
+          { name: "labelColumn", path: plotterPath.push("labelColumn"), callbacks: [dataChanged, axisChanged] },
+          { name: "sortColumn", path: plotterPath.push("sortColumn"), callbacks: [dataChanged, axisChanged] },
+          { name: "colorColumn", path: plotterPath.push("colorColumn"), callbacks: dataChanged },
+          { name: "chartColors", path: plotterPath.push("chartColors"), callbacks: dataChanged },
+          { name: "groupingMode", path: plotterPath.push("groupingMode"), callbacks: dataChanged },
+          { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
+          { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")}
+        ];
 
-        this.groupingMode = this._plotterPath.push("groupingMode").getState();
-
-        this.colorRamp = this._chartColorsPath.getState();
-        this.chart = null;
+        this.initializePaths(mapping);
 
         this.busy = false;
-
-        this.keyToIndex = {};
-
-        this.chart = c3.generate({
-            size: this._getElementSize(),
+        this.c3Config = {
+            //size: this.getElementSize(),
             data: {
                 json: [],
                 type: "bar",
@@ -109,55 +112,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             legend: {
                 show: false
             }
-        });
-
-        this._setupCallbacks();
-    }
-
-    _setupCallbacks() {
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
-
-        [this._heightColumnsPath,
-         this._labelColumnPath,
-         this._sortColumnPath,
-         this._colorColumnPath,
-         this._chartColorsPath,
-         this._plotterPath.push("groupingMode")].forEach((path) => {
-            path.addCallback(dataChanged, true, false);
-        });
-
-        var selectionChanged = this._selectionKeysChanged.bind(this);
-        this.toolPath.selection_keyset.addCallback(selectionChanged, true, false);
-
-        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
-        [this._heightColumnsPath,
-         this._labelColumnPath,
-         this._sortColumnPath,
-         this._xAxisPath,
-         this._yAxisPath].forEach((path) => {
-            path.addCallback(axisChanged, true, false);
-        });
-
-        var plotterChanged = _.debounce(this._plotterChanged.bind(this), 100);
-        this._plotterPath.addCallback(plotterChanged, true, false);
-    }
-
-    // _teardownCallbacks() {
-    //     this.toolPath.selection_keyset.removeCallback(this._selectionKeysChanged);
-    // }
-
-    _plotterChanged() {
-        this.groupingMode = this._plotterPath.push("groupingMode").getState();
-    }
-
-    resize() {
-        this.chart.resize(this._getElementSize());
-    }
-
-    _getElementSize() {
-        return {
-            width: this.element.clientWidth,
-            height: this.element.clientHeight
         };
     }
 
@@ -171,13 +125,15 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     _axisChanged () {
-        if(this.busy) {
-            return;
-        }
+        if(!this.chart)
+          return;
+
+        if(this.busy)
+          return;
 
         this.chart.axis.labels({
-            x: this._xAxisPath.push("overrideAxisName").getState() || "Sorted by " + this._sortColumnPath.getValue("ColumnUtils.getTitle(this)"),
-            y: this._yAxisPath.push("overrideAxisName").getState() || this.heightColumnsLabels.join(", ")
+            x: this.paths.xAxisPath.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getValue("ColumnUtils.getTitle(this)"),
+            y: this.paths.yAxisPath.push("overrideAxisName").getState() || this.heightColumnsLabels.join(", ")
         });
     }
 
@@ -185,7 +141,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.heightColumnNames = [];
         this.heightColumnsLabels = [];
 
-        var heightColumns = this._heightColumnsPath.getChildren();
+        var heightColumns = this.paths.heightColumns.getChildren();
 
         for (let idx in heightColumns)
         {
@@ -199,6 +155,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     _dataChanged() {
+        if(!this.chart) {
+          return;
+        }
 
         if(this.busy) {
             return;
@@ -206,17 +165,17 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
         this._updateColumns();
 
-        var heightColumns = this._heightColumnsPath.getChildren();
+        var heightColumns = this.paths.heightColumns.getChildren();
 
          var numericMapping = {
-            sort: this._sortColumnPath,
-            xLabel: this._labelColumnPath
+            sort: this.paths.sortColumn,
+            xLabel: this.paths.labelColumn
         };
 
         var stringMapping = {
-            sort: this._sortColumnPath,
-            color: this._colorColumnPath,
-            xLabel: this._labelColumnPath
+            sort: this.paths.sortColumn,
+            color: this.paths.colorColumn,
+            xLabel: this.paths.labelColumn
         };
 
         for (let idx in heightColumns)
@@ -234,8 +193,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
         this.yLabelColumnDataType = this.yLabelColumnPath.getValue("getMetadata('dataType')");
 
-        this.numericRecords = this.toolPath.pushPlotter("plot").retrieveRecords(numericMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "number"});
-        this.stringRecords = this.toolPath.pushPlotter("plot").retrieveRecords(stringMapping, {keySet: this._plotterPath.push("filteredKeySet"), dataType: "string"});
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByAll(this.records, [[0, "sort"], [0, "id"]]);
@@ -259,7 +218,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
           this.xAxisValueToLabel[numericRecord.xLabel] = record.xLabel;
         });
 
-        this.groupingMode = this._plotterPath.push("groupingMode").getState();
+        this.groupingMode = this.paths.groupingMode.getState();
         //var horizontalMode = this._plotterPath.push("horizontalMode").getState();
 
         // set axis rotation mode
@@ -292,11 +251,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             this.numericRecords = newValues;
         }
 
-
-
         var keys = {};
         // if label column is specified
-        if(this._labelColumnPath.getState().length) {
+        if(this.paths.labelColumn.getState().length) {
             keys.x = "xLabel";
         }
 
@@ -305,7 +262,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         var colors = {};
 
         if(this.heightColumnNames.length > 1) {
-            this.colorRamp = this._chartColorsPath.getState();
+            this.colorRamp = this.paths.chartColors.getState();
             this.heightColumnNames.map((name, index) => {
                 var color = StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.colorRamp);
                 colors[name] = "#" + color.toString(16);
@@ -319,11 +276,29 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     _updateStyle() {}
+    // _teardownCallbacks() {
+    //     this.toolPath.selection_keyset.removeCallback(this._selectionKeysChanged);
+    // }
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        this.chart.resize(this.getElementSize());
+    }
 
-    destroy() {
+    componentWillUnmount() {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
+        super.componentWillUnmount();
         this.chart.destroy();
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+
+        this.chart = c3.generate(this.c3Config);
+    }
+
+    render() {
+        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
     }
 }
 
