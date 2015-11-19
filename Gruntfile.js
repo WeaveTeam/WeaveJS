@@ -1,4 +1,3 @@
-/*eslint quotes: 0, comma-dangle: 0  */
 /*global module */
 module.exports = function (grunt) {
     grunt.initConfig({
@@ -16,7 +15,7 @@ module.exports = function (grunt) {
                     transform: ["babelify"],
                     external: [
                         'react', 'react-datagrid', 'lodash', 'jquery', 'd3', 'c3',
-                        'openlayers', 'react-bootstrap',
+                        'openlayers', 'react-bootstrap'
                     ],
                     watch: true
             },
@@ -29,7 +28,7 @@ module.exports = function (grunt) {
                     ],
                     external: null,
                     transform: null
-                },
+                }
             },
             dist: {
                 files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}]
@@ -39,7 +38,7 @@ module.exports = function (grunt) {
                     browserifyOptions: {
                         debug: true,
                         plugin: []
-                    },
+                    }
                 },
                 files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}]
             }
@@ -59,13 +58,13 @@ module.exports = function (grunt) {
         },
         watch: {
             options: {
-                spawn: false,
+                spawn: false
             },
             libs: {
                 files: ['node_modules/**/package.json'],
                 tasks: ['browserify:libs'],
                 options: {
-                    'interval': 500,
+                    'interval': 500
                 }
             },
             js: {
