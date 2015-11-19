@@ -10,7 +10,7 @@ import WeaveC3LineChart from "./weave-c3-linechart.js";
 import WeaveTextFilter from "./weave-text-filter.js";
 import WeaveC3PieChart from "./weave-c3-piechart.js";
 import WeaveC3Histogram from "./weave-c3-histogram.js";
-import WeaveOpenLayersMap from "./weave-openlayers-maptool.js";
+import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./weave-react-table.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";

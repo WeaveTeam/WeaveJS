@@ -45,6 +45,9 @@ module.exports = function (grunt) {
         copy: {
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
             css: {expand: true, flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/'},
+            olcss: {expand: true, flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
+            fontawesomecss: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
+            fontawesomefont: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
             fonts: {expand: true, flatten: true, cwd: 'node_modules/bootstrap', src:'fonts/*.*', dest: 'dist/fonts/'},
             images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'},
             weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*.weave", dest: "dist/"}
