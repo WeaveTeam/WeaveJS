@@ -130,9 +130,13 @@ class PDO extends React.Component {
 
         var viewsIconStyle = {
             flex: 1,
+            whiteSpace: "nowrap",
+            minWidth: "80px",
             borderLeft: "1px solid",
             borderColor: "rgba(255,255,255, 0.2)",
-            cursor: "pointer"
+            cursor: "pointer",
+            paddingLeft: 1,
+            paddingRight: 1
         };
 
         if(this.weaveContainerElt) {
@@ -178,7 +182,7 @@ class PDO extends React.Component {
                        </ui.HBox>
                         <ui.HBox style={{width: "20%", height: 30, margin: "auto"}}>
                             <ui.VBox style={viewsIconStyle}>
-                                <div  style={{margin: "auto"}} onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))}>
+                                <div style={{margin: "auto", marginBottom: 5}} onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))}>
                                       {
                                           (this.getActiveView() === PRACTITIONER || this.getActiveView() === TOPPRACTITIONER) ?
                                             <img src="img/practitioner-icon-active.png" width="20" height="20"/>
@@ -187,30 +191,34 @@ class PDO extends React.Component {
                                       }
                                 </div>
                                 <ui.HBox>
-                                  <span style={{textAlign: "center", color: "white", width: "100%"}}>
-                                    <a onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))} style={{margin: "auto", fontSize: 10, color: getColor(TOPPRACTITIONER)}}> Top N </a>
+                                  <span style={{textAlign: "center", color: "white", fontSize: 10, width: "100%"}}>
+                                    <a onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))} style={{margin: "auto", fontSize: 10, color: getColor(TOPPRACTITIONER)}}> Top </a>
                                     |
                                     <a onClick={() => this.setState({view: PRACTITIONER}, this.changeView.bind(this))} style={{margin: "auto", fontSize: 10, color: getColor(PRACTITIONER)}}> Practitioner </a>
                                   </span>
                                 </ui.HBox>
                             </ui.VBox>
-                            <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PATIENT}, this.changeView.bind(this))}>
+                            <ui.VBox style={viewsIconStyle}>
+                                <div style={{margin: "auto", marginBottom: 5}} onClick={() => this.setState({view: PATIENT}, this.changeView.bind(this))}>
                                 {
                                     this.getActiveView() === PATIENT ?
                                         <img style={{margin: "auto"}} src="img/patient-icon-active.png" width="20" height="20"/>
                                                                           :
                                         <img style={{margin: "auto"}} src="img/patient-icon.png" width="20" height="20"/>
                                 }
-                                <font style={{margin: "auto", color: (() => { return this.getActiveView() === PATIENT ? "rgb(245, 255, 142)" : "white"; })() }}> Patient </font>
+                                </div>
+                                <a style={{margin: "auto", fontSize: 10, color: (() => { return this.getActiveView() === PATIENT ? "rgb(245, 255, 142)" : "white"; })() }}> Patient </a>
                             </ui.VBox>
-                            <ui.VBox style={viewsIconStyle} onClick={() => this.setState({view: PRESCRIPTION}, this.changeView.bind(this))}>
+                            <ui.VBox style={viewsIconStyle}>
+                                <div style={{margin: "auto", marginBottom: 5}} onClick={() => this.setState({view: PRESCRIPTION}, this.changeView.bind(this))}>
                                 {
                                     this.getActiveView() === PRESCRIPTION ?
                                         <img style={{margin: "auto"}} src="img/rx-icon-active.png" width="20" height="20"/>
                                                                           :
                                         <img style={{margin: "auto"}} src="img/rx-icon.png" width="20" height="20"/>
                                 }
-                                <font style={{margin: "auto", color: (() => { return this.getActiveView() === PRESCRIPTION ? "rgb(245, 255, 142)" : "white"; })() }}> Prescription </font>
+                                </div>
+                                <a style={{margin: "auto", fontSize: 10, color: (() => { return this.getActiveView() === PRESCRIPTION ? "rgb(245, 255, 142)" : "white"; })() }}> Prescription </a>
                             </ui.VBox>
                        </ui.HBox>
                    </ui.HBox>
