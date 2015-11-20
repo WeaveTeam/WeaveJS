@@ -11,108 +11,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
-
-        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
-
-        var plotterPath = this.toolPath.pushPlotter("plot");
-        var mapping = [
-          { name: "plotter", path: plotterPath, callbacks: null},
-          { name: "heightColumns", path: plotterPath.push("heightColumns"), callbacks: [dataChanged, axisChanged] },
-          { name: "labelColumn", path: plotterPath.push("labelColumn"), callbacks: [dataChanged, axisChanged] },
-          { name: "sortColumn", path: plotterPath.push("sortColumn"), callbacks: [dataChanged, axisChanged] },
-          { name: "colorColumn", path: plotterPath.push("colorColumn"), callbacks: dataChanged },
-          { name: "chartColors", path: plotterPath.push("chartColors"), callbacks: dataChanged },
-          { name: "groupingMode", path: plotterPath.push("groupingMode"), callbacks: dataChanged },
-          { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
-          { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")}
-        ];
-
-        this.initializePaths(mapping);
-
         this.busy = false;
-        this.c3Config = {
-            //size: this.getElementSize(),
-            data: {
-                json: [],
-                type: "bar",
-                xSort: false,
-                selection: {
-                   enabled: true,
-                   multiple: true,
-                   draggable: true
-
-               },
-               order: null,
-               color: (color, d) => {
-                    if(this.heightColumnNames.length === 1 && d.hasOwnProperty("index")) {
-
-                        // find the corresponding index of numericRecords in stringRecords
-                        var id = this.indexToKey[d.index];
-                        var index = _.pluck(this.stringRecords, "id").indexOf(id);
-
-                        return this.stringRecords[index].color || "#C0CDD1";
-                    } else {
-                        return color || "#C0CDD1";
-                    }
-               }
-            },
-            axis: {
-                x: {
-                    type: "category",
-                    label: {
-                        position: "outer-center"
-                    },
-                    tick: {
-                        fit: false,
-                        multiline: false,
-                        format: (num) => {
-                             if(this.stringRecords && this.stringRecords[num]) {
-                               return this.stringRecords[num].xLabel;
-                             } else {
-                               return "";
-                             }
-                        }
-                    }
-                },
-                y: {
-                    label: {
-                        position: "outer-middle"
-                    },
-                    tick: {
-                      fit: false,
-                      multiline: false,
-                      format: (num) => {
-                          if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
-                            return this.yAxisValueToLabel[num] || "";
-                          } else if (this.groupingMode === "percentStack") {
-                            return d3.format(".0%")(num);
-                          } else {
-                            return FormatUtils.defaultNumberFormatting(num);
-                          }
-                      }
-                    }
-                }
-            },
-            grid: {
-                x: {
-                    show: true
-                },
-                y: {
-                    show: true
-                }
-            },
-            bindto: this.element,
-            bar: {
-                width: {
-                    ratio: 0.8
-                }
-            },
-            legend: {
-                show: false
-            }
-        };
     }
 
     _selectionKeysChanged() {
@@ -132,8 +31,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
           return;
 
         this.chart.axis.labels({
-            x: this.paths.xAxisPath.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getValue("ColumnUtils.getTitle(this)"),
-            y: this.paths.yAxisPath.push("overrideAxisName").getState() || this.heightColumnsLabels.join(", ")
+            x: this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getValue("ColumnUtils.getTitle(this)"),
+            y: this.paths.yAxis.push("overrideAxisName").getState() || this.heightColumnsLabels.join(", ")
         });
     }
 
@@ -294,11 +193,111 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     componentDidMount() {
         super.componentDidMount();
 
+        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
+
+        var plotterPath = this.toolPath.pushPlotter("plot");
+        var mapping = [
+          { name: "plotter", path: plotterPath, callbacks: null},
+          { name: "heightColumns", path: plotterPath.push("heightColumns"), callbacks: [dataChanged, axisChanged] },
+          { name: "labelColumn", path: plotterPath.push("labelColumn"), callbacks: [dataChanged, axisChanged] },
+          { name: "sortColumn", path: plotterPath.push("sortColumn"), callbacks: [dataChanged, axisChanged] },
+          { name: "colorColumn", path: plotterPath.push("colorColumn"), callbacks: dataChanged },
+          { name: "chartColors", path: plotterPath.push("chartColors"), callbacks: dataChanged },
+          { name: "groupingMode", path: plotterPath.push("groupingMode"), callbacks: dataChanged },
+          { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
+          { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")}
+        ];
+
+        this.initializePaths(mapping);
+
+        this.c3Config = {
+            //size: this.getElementSize(),
+            data: {
+                json: [],
+                type: "bar",
+                xSort: false,
+                selection: {
+                   enabled: true,
+                   multiple: true,
+                   draggable: true
+
+               },
+               order: null,
+               color: (color, d) => {
+                    if(this.heightColumnNames.length === 1 && d.hasOwnProperty("index")) {
+
+                        // find the corresponding index of numericRecords in stringRecords
+                        var id = this.indexToKey[d.index];
+                        var index = _.pluck(this.stringRecords, "id").indexOf(id);
+
+                        return this.stringRecords[index].color || "#C0CDD1";
+                    } else {
+                        return color || "#C0CDD1";
+                    }
+               }
+            },
+            axis: {
+                x: {
+                    type: "category",
+                    label: {
+                        position: "outer-center"
+                    },
+                    tick: {
+                        fit: false,
+                        multiline: false,
+                        format: (num) => {
+                             if(this.stringRecords && this.stringRecords[num]) {
+                               return this.stringRecords[num].xLabel;
+                             } else {
+                               return "";
+                             }
+                        }
+                    }
+                },
+                y: {
+                    label: {
+                        position: "outer-middle"
+                    },
+                    tick: {
+                      fit: false,
+                      multiline: false,
+                      format: (num) => {
+                          if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
+                            return this.yAxisValueToLabel[num] || "";
+                          } else if (this.groupingMode === "percentStack") {
+                            return d3.format(".0%")(num);
+                          } else {
+                            return FormatUtils.defaultNumberFormatting(num);
+                          }
+                      }
+                    }
+                }
+            },
+            grid: {
+                x: {
+                    show: true
+                },
+                y: {
+                    show: true
+                }
+            },
+            bindto: this.element,
+            bar: {
+                width: {
+                    ratio: 0.8
+                }
+            },
+            legend: {
+                show: false
+            }
+        };
         this.chart = c3.generate(this.c3Config);
     }
 
     render() {
-        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
+        return <div style={{width: this.props.width || "100%", height: this.props.height || "100%"}}/>;
     }
 }
 

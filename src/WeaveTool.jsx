@@ -1,5 +1,6 @@
 import _ from "lodash";
 import React from "react";
+import ui from "./react-ui/ui.jsx";
 var toolRegistry = {};
 
 const grabberStyle = {
@@ -32,18 +33,35 @@ export class WeaveTool extends React.Component {
 
     componentDidMount() {
         this.header = React.findDOMNode(this.refs.header);
+        this.toolElt = React.findDOMNode(this.refs.tool);
     }
 
     render() {
-        var chart = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath}, this.toolProps));
+        var props = {
+          key: "tool",
+          ref: "tool",
+          toolPath: this.toolPath
+        };
+
+        if(this.toolElt) {
+          props.width = this.toolElt.clientWidth;
+          props.height = this.toolElt.clientHeight;
+        }
+
+        props = _.merge(props, this.toolProps);
+
+        var chart = React.createElement(this.ToolClass, props);
+
         return (
-            <div style={this.props.style} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
+            <ui.VBox style={this.props.style} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
                 <div ref="header" style={{height: "25px", width: "100%"}}>
                     <div draggable={true} onDragStart={this.props.onDragStart} style={grabberStyle}/>
                 </div>
-                {
-                  chart
-                }
-            </div>);
+                <div style={{flex: 1}} ref="tool">
+                  {
+                    chart
+                  }
+                </div>
+            </ui.VBox>);
     }
 }

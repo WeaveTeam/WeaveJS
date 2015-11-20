@@ -51,7 +51,134 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
+    }
 
+    _axisChanged () {
+
+        if(this.busy) {
+            return;
+        }
+
+        this.chart.axis.labels({
+            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("ColumnUtils.getTitle(this)"),
+            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("ColumnUtils.getTitle(this)")
+        });
+    }
+
+    _dataChanged() {
+        if(this.busy) {
+            return;
+        }
+        let numericMapping = {
+          point: {
+            x: this.paths.dataX,
+            y: this.paths.dataY
+          },
+          size: this.paths.sizeBy
+        };
+
+        let stringMapping = {
+            point: {
+              x: this.paths.dataX,
+              y: this.paths.dataY
+            },
+            fill: {
+              //alpha: this._fillStylePath.push("alpha"),
+              color: this.paths.fill.push("color")
+            },
+            line: {
+              //alpha: this._lineStylePath.push("alpha"),
+              color: this.paths.line.push("color")
+              //caps: this._lineStylePath.push("caps")
+            }
+        };
+
+        this.dataXType = this.paths.dataX.getValue("getMetadata('dataType')");
+        this.dataYType = this.paths.dataY.getValue("getMetadata('dataType')");
+
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+
+        this.records = _.zip(this.numericRecords, this.stringRecords);
+        this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
+
+        [this.numericRecords, this.stringRecords] = _.unzip(this.records);
+
+        this.keyToIndex = {};
+        this.indexToKey = {};
+        this.yAxisValueToLabel = {};
+        this.xAxisValueToLabel = {};
+
+        this.numericRecords.forEach((record, index) => {
+            this.keyToIndex[record.id] = index;
+            this.indexToKey[index] = record.id;
+        });
+
+        this.stringRecords.forEach((record, index) => {
+          this.xAxisValueToLabel[this.numericRecords[index].point.x] = record.point.x;
+          this.yAxisValueToLabel[this.numericRecords[index].point.y] = record.point.y;
+        });
+
+        this.normalizedRecords = _normalizeRecords(this.numericRecords, ["size"]);
+
+        this.plotterState = this.paths.plotter.getState();
+        this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord) => {
+            if(this.plotterState && this.plotterState.sizeBy.length) {
+                let minScreenRadius = this.paths.plotter.minScreenRadius;
+                let maxScreenRadius = this.plotterState.maxScreenRadius;
+
+                return (normalizedRecord && normalizedRecord.size ?
+                        minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius) :
+                        this.plotterState.defaultScreenRadius) || 1;
+            }
+            else {
+                return (this.plotterState.defaultScreenRadius) || 1;
+            }
+        });
+
+        this._axisChanged();
+        this.busy = true;
+        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => { this.busy = false; }});
+    }
+
+    _selectionKeysChanged() {
+        var keys = this.toolPath.selection_keyset.getKeys();
+        var indices = keys.map((key) => {
+            return Number(this.keyToIndex[key]);
+        });
+        this.chart.select("y", indices, true);
+    }
+
+    _probedKeysChanged() {
+        /*
+        var keys = this.toolPath.probe_keyset.getKeys();
+        var indices = keys.map( (key) => {
+            return Number(this.keyToIndex[key]);
+        });
+        */
+        // this.chart.select("y", indices, true);
+    }
+
+    _updateStyle() {
+        d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
+                                                      .style("stroke", "black")
+                                                      .style("stroke-opacity", 0.5);
+    }
+
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        this.chart.resize(this.getElementSize());
+    }
+
+    componentWillUnmount() {
+        /* Cleanup callbacks */
+        //this.teardownCallbacks();
+        super.componentWillUnmount();
+        this.chart.destroy();
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
         var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
@@ -172,139 +299,11 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             },
             onrendered: this._updateStyle.bind(this)
         };
-    }
-
-    _axisChanged () {
-
-        if(this.busy) {
-            return;
-        }
-
-        this.chart.axis.labels({
-            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("ColumnUtils.getTitle(this)"),
-            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("ColumnUtils.getTitle(this)")
-        });
-    }
-
-    _dataChanged() {
-        if(this.busy) {
-            return;
-        }
-        let numericMapping = {
-          point: {
-            x: this.paths.dataX,
-            y: this.paths.dataY
-          },
-          size: this.paths.sizeBy
-        };
-
-        let stringMapping = {
-            point: {
-              x: this.paths.dataX,
-              y: this.paths.dataY
-            },
-            fill: {
-              //alpha: this._fillStylePath.push("alpha"),
-              color: this.paths.fill.push("color")
-            },
-            line: {
-              //alpha: this._lineStylePath.push("alpha"),
-              color: this.paths.line.push("color")
-              //caps: this._lineStylePath.push("caps")
-            }
-        };
-
-        this.dataXType = this.paths.dataX.getValue("getMetadata('dataType')");
-        this.dataYType = this.paths.dataY.getValue("getMetadata('dataType')");
-
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
-
-        this.records = _.zip(this.numericRecords, this.stringRecords);
-        this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
-
-        [this.numericRecords, this.stringRecords] = _.unzip(this.records);
-
-        this.keyToIndex = {};
-        this.indexToKey = {};
-        this.yAxisValueToLabel = {};
-        this.xAxisValueToLabel = {};
-
-        this.numericRecords.forEach((record, index) => {
-            this.keyToIndex[record.id] = index;
-            this.indexToKey[index] = record.id;
-        });
-
-        this.stringRecords.forEach((record, index) => {
-          this.xAxisValueToLabel[this.numericRecords[index].point.x] = record.point.x;
-          this.yAxisValueToLabel[this.numericRecords[index].point.y] = record.point.y;
-        });
-
-        this.normalizedRecords = _normalizeRecords(this.numericRecords, ["size"]);
-
-        this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord) => {
-            if(this.plotterState && this.plotterState.sizeBy.length) {
-                let minScreenRadius = this.plotterState.minScreenRadius;
-                let maxScreenRadius = this.plotterState.maxScreenRadius;
-
-                return (normalizedRecord && normalizedRecord.size ?
-                        minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius) :
-                        this.plotterState.defaultScreenRadius) || 1;
-            }
-            else {
-                return (this.plotterState.defaultScreenRadius) || 1;
-            }
-        });
-
-        this._axisChanged();
-        this.busy = true;
-        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => { this.busy = false; }});
-    }
-
-    _selectionKeysChanged() {
-        var keys = this.toolPath.selection_keyset.getKeys();
-        var indices = keys.map((key) => {
-            return Number(this.keyToIndex[key]);
-        });
-        this.chart.select("y", indices, true);
-    }
-
-    _probedKeysChanged() {
-        /*
-        var keys = this.toolPath.probe_keyset.getKeys();
-        var indices = keys.map( (key) => {
-            return Number(this.keyToIndex[key]);
-        });
-        */
-        // this.chart.select("y", indices, true);
-    }
-
-    _updateStyle() {
-        d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
-                                                      .style("stroke", "black")
-                                                      .style("stroke-opacity", 0.5);
-    }
-
-    componentDidUpdate() {
-        super.componentDidUpdate();
-        this.chart.resize(this.getElementSize());
-    }
-
-    componentWillUnmount() {
-        /* Cleanup callbacks */
-        //this.teardownCallbacks();
-        super.componentWillUnmount();
-        this.chart.destroy();
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
         this.chart = c3.generate(this.c3Config);
-        this.forceUpdate();
     }
 
     render() {
-        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
+      return <div style={{width: "100%", height: "100%"}}/>;
     }
 }
 export default WeaveC3ScatterPlot;

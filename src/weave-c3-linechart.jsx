@@ -9,73 +9,6 @@ import React from "react";
 class WeaveC3LineChart extends AbstractWeaveTool {
     constructor(props) {
         super(props);
-
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
-        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
-        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 20);
-        var plotterPath = this.toolPath.pushPlotter("plot");
-        var mapping = [
-          { name: "plotter", path: plotterPath, callbacks: null},
-          { name: "columns", path: plotterPath.push("columns"), callbacks: dataChanged },
-          { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
-          { name: "curveType", path: plotterPath.push("curveType"), callbacks: dataChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
-          { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
-          { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
-        ];
-
-        this.initializePaths(mapping);
-
-        this.c3Config = {
-            //size: this.getElementSize(),
-            data: {
-                columns: [],
-                xSort: false,
-                selection: {
-                   enabled: true,
-                   multiple: true,
-                   draggable: true
-               }
-            },
-            tooltip: {
-                show: false
-            },
-            grid: {
-                x: {
-                    show: true
-                },
-                y: {
-                    show: true
-                }
-            },
-            axis: {
-                x: {
-                    tick: {
-                        multiline: false,
-                        rotate: 0,
-                        format: (d) => {
-                            return this.columnLabels[d];
-                        }
-                    }
-                },
-                y: {
-                    tick: {
-                        format: (num) => {
-                          if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("getMetadata('dataType')") !== "number") {
-                            return this.yAxisValueToLabel[num] || "";
-                          } else {
-                            return FormatUtils.defaultNumberFormatting(num);
-                          }
-                        }
-                    }
-                }
-            },
-            bindto: this.element,
-            legend: {
-                show: false
-            },
-            onrendered: this._updateStyle.bind(this)
-        };
     }
 
     _selectionKeysChanged() {
@@ -188,11 +121,79 @@ class WeaveC3LineChart extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
+
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
+        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
+        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 20);
+        var plotterPath = this.toolPath.pushPlotter("plot");
+        var mapping = [
+          { name: "plotter", path: plotterPath, callbacks: null},
+          { name: "columns", path: plotterPath.push("columns"), callbacks: dataChanged },
+          { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
+          { name: "curveType", path: plotterPath.push("curveType"), callbacks: dataChanged },
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
+          { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+        ];
+
+        this.initializePaths(mapping);
+
+        this.c3Config = {
+            //size: this.getElementSize(),
+            data: {
+                columns: [],
+                xSort: false,
+                selection: {
+                   enabled: true,
+                   multiple: true,
+                   draggable: true
+               }
+            },
+            tooltip: {
+                show: false
+            },
+            grid: {
+                x: {
+                    show: true
+                },
+                y: {
+                    show: true
+                }
+            },
+            axis: {
+                x: {
+                    tick: {
+                        multiline: false,
+                        rotate: 0,
+                        format: (d) => {
+                            return this.columnLabels[d];
+                        }
+                    }
+                },
+                y: {
+                    tick: {
+                        format: (num) => {
+                          if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("getMetadata('dataType')") !== "number") {
+                            return this.yAxisValueToLabel[num] || "";
+                          } else {
+                            return FormatUtils.defaultNumberFormatting(num);
+                          }
+                        }
+                    }
+                }
+            },
+            bindto: this.element,
+            legend: {
+                show: false
+            },
+            onrendered: this._updateStyle.bind(this)
+        };
+
         this.chart = c3.generate(this.c3Config);
     }
 
     render() {
-        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
+      return <div style={{width: "100%", height: "100%"}}/>;
     }
 }
 

@@ -29,8 +29,6 @@ const HORIZONTAL = "horizontal";
 
 const TOOLOVERLAY = "tooloverlay";
 
-
-
 class WeaveLayoutManager extends React.Component {
 
     constructor(props) {
@@ -337,7 +335,7 @@ class WeaveLayoutManager extends React.Component {
         }
 
         return (
-            <div style={{position: "absolute", width: "100%", height: "100%"}}>
+            <div style={{width: "100%", height: "100%"}}>
                 <Layout onStateChange={this.handleStateChange.bind(this)} key={LAYOUT} ref={LAYOUT} state={this.state.layout} weave={this.weave}/>
                 {children}
                 <ToolOverlay ref={TOOLOVERLAY}/>

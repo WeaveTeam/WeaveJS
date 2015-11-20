@@ -8,121 +8,7 @@ import React from "react";
 class WeaveC3Histogram extends AbstractWeaveTool {
     constructor(props) {
         super(props);
-
-        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
-        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
-        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 100);
-        var plotterPath = this.toolPath.pushPlotter("plot");
-        var mapping = [
-          { name: "plotter", path: plotterPath, callbacks: null},
-          { name: "binnedColumn", path: plotterPath.push("binnedColumn"), callbacks: [dataChanged, axisChanged] },
-          { name: "columnToAggregate", path: plotterPath.push("columnToAggregate"), callbacks: dataChanged },
-          { name: "aggregationMethod", path: plotterPath.push("aggregationMethod"), callbacks: [dataChanged, axisChanged] },
-          { name: "fillStyle", path: plotterPath.push("fillStyle"), callbacks: dataChanged },
-          { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
-          { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
-          { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
-          { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
-          { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
-        ];
-
-        this.initializePaths(mapping);
-
         this.busy = false;
-
-        this.numericRecords = [];
-
-        this.c3Config = {
-            //size: this.getElementSize(),
-            data: {
-                columns: [],
-                selection: {
-                   enabled: true,
-                   multiple: true,
-                   draggable: true
-               },
-               type: "bar",
-               color: (color, d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        return "#" + this.paths.fillStyle.push("color").push("internalDynamicColumn").push(null).getValue("getColorFromDataValue")(d.index).toString(16);
-                    }
-                    return "#C0CDD1";
-               },
-               onselected: (d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.selection_keyset.addKeys(selectedIds);
-                    }
-                },
-                onunselected: (d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        var unSelectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.selection_keyset.removeKeys(unSelectedIds);
-                    }
-                },
-                onmouseover: (d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.probe_keyset.setKeys(selectedIds);
-                    }
-                },
-                onmouseout: (d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.probe_keyset.setKeys([]);
-                    }
-                }
-            },
-            bindto: this.element,
-            legend: {
-                show: false
-            },
-            axis: {
-                x: {
-                    type: "category",
-                    label: {
-                        position: "outer-center"
-                    },
-                    tick: {
-                        multiline: false,
-                        format: (num) => {
-                            return this.paths.binnedColumn.getValue("deriveStringFromNumber")(num);
-                        }
-                    }
-                },
-                y: {
-                    label: {
-                        position: "outer-middle"
-                    },
-                    tick: {
-                        fit: false,
-                        format: FormatUtils.defaultNumberFormatting
-                    }
-                },
-                rotated: false
-            },
-            grid: {
-                x: {
-                    show: true
-                },
-                y: {
-                    show: true
-                }
-            },
-            bar: {
-                width: {
-                    ratio: 0.95
-                }
-            },
-            onrendered: this._updateStyle.bind(this)
-        };
     }
 
     _selectionKeysChanged() {
@@ -278,11 +164,123 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
+
+        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
+        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
+        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
+        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 100);
+        var plotterPath = this.toolPath.pushPlotter("plot");
+        var mapping = [
+          { name: "plotter", path: plotterPath, callbacks: null},
+          { name: "binnedColumn", path: plotterPath.push("binnedColumn"), callbacks: [dataChanged, axisChanged] },
+          { name: "columnToAggregate", path: plotterPath.push("columnToAggregate"), callbacks: dataChanged },
+          { name: "aggregationMethod", path: plotterPath.push("aggregationMethod"), callbacks: [dataChanged, axisChanged] },
+          { name: "fillStyle", path: plotterPath.push("fillStyle"), callbacks: dataChanged },
+          { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
+          { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
+          { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
+          { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+        ];
+
+        this.initializePaths(mapping);
+
+        this.c3Config = {
+            //size: this.getElementSize(),
+            data: {
+                columns: [],
+                selection: {
+                   enabled: true,
+                   multiple: true,
+                   draggable: true
+               },
+               type: "bar",
+               color: (color, d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        return "#" + this.paths.fillStyle.push("color").push("internalDynamicColumn").push(null).getValue("getColorFromDataValue")(d.index).toString(16);
+                    }
+                    return "#C0CDD1";
+               },
+               onselected: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this.toolPath.qkeyToString(qKey);
+                        });
+                        this.toolPath.selection_keyset.addKeys(selectedIds);
+                    }
+                },
+                onunselected: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var unSelectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this.toolPath.qkeyToString(qKey);
+                        });
+                        this.toolPath.selection_keyset.removeKeys(unSelectedIds);
+                    }
+                },
+                onmouseover: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this.toolPath.qkeyToString(qKey);
+                        });
+                        this.toolPath.probe_keyset.setKeys(selectedIds);
+                    }
+                },
+                onmouseout: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this.toolPath.probe_keyset.setKeys([]);
+                    }
+                }
+            },
+            bindto: this.element,
+            legend: {
+                show: false
+            },
+            axis: {
+                x: {
+                    type: "category",
+                    label: {
+                        position: "outer-center"
+                    },
+                    tick: {
+                        multiline: false,
+                        format: (num) => {
+                            return this.paths.binnedColumn.getValue("deriveStringFromNumber")(num);
+                        }
+                    }
+                },
+                y: {
+                    label: {
+                        position: "outer-middle"
+                    },
+                    tick: {
+                        fit: false,
+                        format: FormatUtils.defaultNumberFormatting
+                    }
+                },
+                rotated: false
+            },
+            grid: {
+                x: {
+                    show: true
+                },
+                y: {
+                    show: true
+                }
+            },
+            bar: {
+                width: {
+                    ratio: 0.95
+                }
+            },
+            onrendered: this._updateStyle.bind(this)
+        };
+
         this.chart = c3.generate(this.c3Config);
     }
 
     render() {
-        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
+      return <div style={{width: "100%", height: "100%"}}/>;
     }
 }
 

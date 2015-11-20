@@ -8,7 +8,107 @@ import React from "react";
 class WeaveC3PieChart extends AbstractWeaveTool {
     constructor(props) {
         super(props);
+    }
 
+    _selectionKeysChanged() {
+      if(!this.chart)
+        return;
+
+      var keys = this.toolPath.selection_keyset.getKeys();
+      if(keys.length) {
+          this.chart.focus(keys);
+      } else {
+          this.chart.focus();
+      }
+    }
+
+    _probedKeysChanged() {
+      var keys = this.toolPath.probe_keyset.getKeys();
+
+      if(keys.length) {
+          this.chart.focus(keys);
+      } else {
+          this._selectionKeysChanged();
+      }
+    }
+
+    _updateStyle() {
+        d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
+                                                      .style("stroke", "black")
+                                                      .style("stroke-opacity", 0.5);
+    }
+
+    _dataChanged() {
+        console.log("data changed called");
+        if(!this.chart)
+          return;
+
+        let numericMapping = {
+            data: this.paths.data
+        };
+
+        let stringMapping = {
+            fill: {
+                //alpha: this._fillStylePath.push("alpha"),
+                color: this.paths.fillStyle.push("color")
+                //caps: this._fillStylePath.push("caps")
+            },
+            line: {
+                //alpha: this._lineStylePath.push("alpha"),
+                //color: this._lineStylePath.push("color")
+                //caps: this._lineStylePath.push("caps")
+            },
+            label: this.paths.label
+        };
+
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+
+        this.keyToIndex = {};
+        this.indexToKey = {};
+
+        this.numericRecords.forEach( (record, index) => {
+            this.indexToKey[index] = record.id;
+            this.keyToIndex[record.id] = index;
+        });
+
+        //this.records = _.sortBy(this.records, "id");
+        var columns = [];
+
+        columns = this.numericRecords.map(function(record) {
+            var tempArr = [];
+            tempArr.push(record.id);
+            tempArr.push(record.data);
+            return tempArr;
+        });
+
+        var chartType = "pie";
+        if(this.paths.plotter.getState("innerRadius") > 0) {
+            chartType = "donut";
+        }
+
+        this.colors = {};
+        this.stringRecords.forEach((record) => {
+            this.colors[record.id] = record.fill.color || "#C0CDD1";
+        });
+
+        this.chart.load({columns: columns, type: chartType, colors: this.colors, unload: true});
+    }
+
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        this.chart.resize(this.getElementSize());
+    }
+
+    componentWillUnmount() {
+        /* Cleanup callbacks */
+        //this.teardownCallbacks();
+        super.componentWillUnmount();
+        this.chart.destroy();
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
         var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
         var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 100);
@@ -93,111 +193,11 @@ class WeaveC3PieChart extends AbstractWeaveTool {
             },
             onrendered: this._updateStyle.bind(this)
         };
-    }
-
-    _selectionKeysChanged() {
-      if(!this.chart)
-        return;
-
-      var keys = this.toolPath.selection_keyset.getKeys();
-      if(keys.length) {
-          this.chart.focus(keys);
-      } else {
-          this.chart.focus();
-      }
-    }
-
-    _probedKeysChanged() {
-      var keys = this.toolPath.probe_keyset.getKeys();
-
-      if(keys.length) {
-          this.chart.focus(keys);
-      } else {
-          this._selectionKeysChanged();
-      }
-    }
-
-    _updateStyle() {
-        d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
-                                                      .style("stroke", "black")
-                                                      .style("stroke-opacity", 0.5);
-    }
-
-    _dataChanged() {
-        if(!this.chart)
-          return;
-
-        let numericMapping = {
-            data: this.paths.data
-        };
-
-        let stringMapping = {
-            fill: {
-                //alpha: this._fillStylePath.push("alpha"),
-                color: this.paths.fillStyle.push("color")
-                //caps: this._fillStylePath.push("caps")
-            },
-            line: {
-                //alpha: this._lineStylePath.push("alpha"),
-                //color: this._lineStylePath.push("color")
-                //caps: this._lineStylePath.push("caps")
-            },
-            label: this.paths.label
-        };
-
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
-
-        this.keyToIndex = {};
-        this.indexToKey = {};
-
-        this.numericRecords.forEach( (record, index) => {
-            this.indexToKey[index] = record.id;
-            this.keyToIndex[record.id] = index;
-        });
-
-        //this.records = _.sortBy(this.records, "id");
-        var columns = [];
-
-        columns = this.numericRecords.map(function(record) {
-            var tempArr = [];
-            tempArr.push(record.id);
-            tempArr.push(record.data);
-            return tempArr;
-        });
-
-        var chartType = "pie";
-        if(this.paths.plotter.getState("innerRadius") > 0) {
-            chartType = "donut";
-        }
-
-        this.colors = {};
-        this.stringRecords.forEach((record) => {
-            this.colors[record.id] = record.fill.color || "#C0CDD1";
-        });
-
-        this.chart.load({columns: columns, type: chartType, colors: this.colors, unload: true});
-    }
-
-    componentDidUpdate() {
-        super.componentDidUpdate();
-        this.chart.resize(this.getElementSize());
-    }
-
-    componentWillUnmount() {
-        /* Cleanup callbacks */
-        //this.teardownCallbacks();
-        super.componentWillUnmount();
-        this.chart.destroy();
-    }
-
-    componentDidMount() {
-        super.componentDidMount();
         this.chart = c3.generate(this.c3Config);
     }
 
     render() {
-        return <div style={{width: "100%", height: "100%" /*, maxHeight: this.getElementSize().height, maxWidth: this.getElementSize().width*/}}/>;
+      return <div style={{width: "100%", height: "100%"}}/>;
     }
 }
 
