@@ -36,8 +36,8 @@ class PDO extends React.Component {
     constructor(props) {
         super(props);
 
-        window.weaveReady = () => {
-            this.handleWeaveReady();
+        window.weaveReady = weave => {
+            this.handleWeaveReady(weave);
         };
         this.state = {
             view: TOPPRACTITIONER
