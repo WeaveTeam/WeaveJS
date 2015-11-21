@@ -54,6 +54,7 @@ class PDO extends React.Component {
     handleWeaveReady(weave) {
         if(!this.weave) {
             this.weave = weave;
+            weave.path().exec('WeaveAPI.topLevelApplication.visApp.hack_loadFileSaveLocalState = true;');
         }
         if(this.reactReady) {
           var file = this.getFileName();
