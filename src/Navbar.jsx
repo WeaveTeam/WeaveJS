@@ -64,12 +64,13 @@ class Navbar extends React.Component {
 				<ui.HBox>
 					<SlidingMenu>
 						<ui.VBox>
-								<img style={{width: "140px", height: "140px"}} src="http://placeholdit.imgix.net/~text?txtsize=30&txt=logo+placeholder&w=140&h=140&txttrack=0"/>
+								<img style={{width: "140px", height: "140px"}} src="img/tn-logo.svg"/>
 								<div>
 									<bs.ListGroup>
 										<bs.ListGroupItem>
-											<a onClick={() => this.setActiveView(TOPPRACTITIONER)} style={getLinkStyle(TOPPRACTITIONER)}>Top</a>
-											<span> | </span>
+											<a onClick={() => this.setActiveView(TOPPRACTITIONER)} style={getLinkStyle(TOPPRACTITIONER)}>Top Practitioner</a>
+										</bs.ListGroupItem>
+										<bs.ListGroupItem>
 											<a onClick={() => this.setActiveView(PRACTITIONER)} style={getLinkStyle(PRACTITIONER)}>Practitioner</a>
 										</bs.ListGroupItem>
 										<bs.ListGroupItem>
