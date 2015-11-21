@@ -10,7 +10,6 @@ var divStyle = {
     position: "absolute",
     top: 0,
     left: -300,
-    width: 300,
     height: "100%",
     boderBox: "",
     transition: "transform ease 300ms",

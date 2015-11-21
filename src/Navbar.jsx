@@ -30,6 +30,7 @@ class Navbar extends React.Component {
 	setActiveView(viewName) {
 		let pdo = this.pdo;
 		pdo.setState({view: viewName}, pdo.changeView.bind(pdo));
+		this.slidingMenu.hideMenu();
 	}
 
 	render() {
@@ -59,39 +60,46 @@ class Navbar extends React.Component {
         	}
         }
 
+        var viewItems = [
+        	[TOPPRACTITIONER, "Top Practitioner Test"],
+        	[PRACTITIONER, "Practitioner"],
+        	[PATIENT, "Patient"],
+        	[PRESCRIPTION, "Prescription"]
+        ];
+
+        var viewSelectionNodes = viewItems.map(function (viewItem)
+        {
+        	return (
+        		<bs.ListGroupItem key={viewItem[0]}>
+        			<a onClick={() => this.setActiveView(viewItem[0])} style={getLinkStyle(viewItem[0])}>{viewItem[1]}</a>
+        		</bs.ListGroupItem>
+        	)
+        }, this);
+
+        let slidingMenu = (
+	        <SlidingMenu ref={(slidingMenu) => {this.slidingMenu = slidingMenu;}}>
+				<ui.VBox>
+						<img style={{width: "140px", height: "140px"}} src="img/tn-logo.svg"/>
+						<div>
+							<bs.ListGroup>
+								{viewSelectionNodes}
+							</bs.ListGroup>
+							<bs.ListGroup>
+								<bs.ListGroupItem>
+									<a href="http://ivpr.oicweave.org/tnhr/dashboard.php?topic=health" target="_blank">TN Community Profile</a>
+								</bs.ListGroupItem>
+								<bs.ListGroupItem>About</bs.ListGroupItem>
+								<bs.ListGroupItem><bs.Glyphicon glyph="cog"/> Settings</bs.ListGroupItem>
+							</bs.ListGroup>
+						</div>
+				</ui.VBox>
+			</SlidingMenu>);
+
 		return (
 			<div style={style}>
 				<ui.HBox>
-					<SlidingMenu>
-						<ui.VBox>
-								<img style={{width: "140px", height: "140px"}} src="img/tn-logo.svg"/>
-								<div>
-									<bs.ListGroup>
-										<bs.ListGroupItem>
-											<a onClick={() => this.setActiveView(TOPPRACTITIONER)} style={getLinkStyle(TOPPRACTITIONER)}>Top Practitioner</a>
-										</bs.ListGroupItem>
-										<bs.ListGroupItem>
-											<a onClick={() => this.setActiveView(PRACTITIONER)} style={getLinkStyle(PRACTITIONER)}>Practitioner</a>
-										</bs.ListGroupItem>
-										<bs.ListGroupItem>
-											<a onClick={() => this.setActiveView(PATIENT)} style={getLinkStyle(PATIENT)}>Patient</a>
-										</bs.ListGroupItem>
-										<bs.ListGroupItem>
-											<a onClick={() => this.setActiveView(PRESCRIPTION)} style={getLinkStyle(PRESCRIPTION)}>Prescription</a>
-										</bs.ListGroupItem>
-									</bs.ListGroup>
-									<bs.ListGroup>
-										<bs.ListGroupItem>
-											<a href="http://ivpr.oicweave.org/tnhr/dashboard.php?topic=health" target="_blank">TN Community Profile</a>
-										</bs.ListGroupItem>
-										<bs.ListGroupItem>About</bs.ListGroupItem>
-										<bs.ListGroupItem><bs.Glyphicon glyph="cog"/> Settings</bs.ListGroupItem>
-									</bs.ListGroup>
-								</div>
-						</ui.VBox>
-					</SlidingMenu>
 					{
-						this.props.children
+						[slidingMenu].concat(this.props.children)
 					}
 				</ui.HBox>
 			</div>
