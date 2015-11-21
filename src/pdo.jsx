@@ -91,7 +91,7 @@ class PDO extends React.Component {
           var newFile = this.state.view + ".weave";
           if (this.currentFile !== newFile) {
             this.currentFile = newFile;
-            this.weave.loadFile(StandardLib.resolveRelative(newFile, window.location.pathname));
+            this.weave.loadFile(StandardLib.resolveRelative(newFile, window.location.pathname), null, true);
           }
         }
     }
