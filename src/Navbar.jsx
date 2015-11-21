@@ -10,28 +10,79 @@ var style = {
 	boxShadow: "0 0 4px rgba(0, 0, 0, .14), 0 4px 8px rgba(0, 0, 0, .28)"
 };
 
+
+const PRACTITIONER = "practitioner";
+const TOPPRACTITIONER = "practitioner-n";
+const PATIENT = "patient";
+const PRESCRIPTION = "prescription";
+
 class Navbar extends React.Component {
 
 	constructor(props) {
 		super(props);
+		this.pdo = props.pdo;
+	}
 
+	getActiveView() {
+		let pdo = this.pdo;
+		return pdo.getActiveView();
+	}
+	setActiveView(viewName) {
+		let pdo = this.pdo;
+		pdo.setState({view: viewName}, pdo.changeView.bind(pdo));
 	}
 
 	render() {
+		var viewsIconStyle = {
+            whiteSpace: "nowrap",
+            borderLeft: "1px solid",
+            backgroundColor: "rgba(0,0,0,1)",
+            borderColor: "rgba(255,255,255, 0.2)",
+            cursor: "pointer",
+            paddingLeft: 1,
+            paddingRight: 1
+        };
+
+        var getColor = (activeView) => {
+          return this.getActiveView() === activeView ? "rgb(245, 255, 142)" : "black";
+        };
+
+        var getLinkStyle = (activeView) => {
+        	return this.getActiveView() === activeView ? 
+        	{
+        		cursor: "pointer",
+        		fontWeight: "bold"
+        	} :
+        	{
+        		cursor: "pointer",
+        		fontWeight: "normal"
+        	}
+        }
+
 		return (
 			<div style={style}>
 				<ui.HBox>
 					<SlidingMenu>
 						<ui.VBox>
-								<div style={{height: 300, display: "block"}}>
-									<div style={{top: "140", left: "100", position: "relative"}}>
-										logo placeholder
-									</div>
-								</div>
-								<div style={{flex: 1}}>
+								<img style={{width: "140px", height: "140px"}} src="http://placeholdit.imgix.net/~text?txtsize=30&txt=logo+placeholder&w=140&h=140&txttrack=0"/>
+								<div>
 									<bs.ListGroup>
-										<bs.ListGroupItem><div style={{fontFamily: "'Courgette' cursive", fontSize: "18", textTransform: "lowercase"}}>
-											<a href="http://ivpr.oicweave.org/tnhr/dashboard.php?topic=health" target="_blank">tnhr</a></div></bs.ListGroupItem>
+										<bs.ListGroupItem>
+											<a onClick={() => this.setActiveView(TOPPRACTITIONER)} style={getLinkStyle(TOPPRACTITIONER)}>Top</a>
+											<span> | </span>
+											<a onClick={() => this.setActiveView(PRACTITIONER)} style={getLinkStyle(PRACTITIONER)}>Practitioner</a>
+										</bs.ListGroupItem>
+										<bs.ListGroupItem>
+											<a onClick={() => this.setActiveView(PATIENT)} style={getLinkStyle(PATIENT)}>Patient</a>
+										</bs.ListGroupItem>
+										<bs.ListGroupItem>
+											<a onClick={() => this.setActiveView(PRESCRIPTION)} style={getLinkStyle(PRESCRIPTION)}>Prescription</a>
+										</bs.ListGroupItem>
+									</bs.ListGroup>
+									<bs.ListGroup>
+										<bs.ListGroupItem>
+											<a href="http://ivpr.oicweave.org/tnhr/dashboard.php?topic=health" target="_blank">TN Community Profile</a>
+										</bs.ListGroupItem>
 										<bs.ListGroupItem>About</bs.ListGroupItem>
 										<bs.ListGroupItem><bs.Glyphicon glyph="cog"/> Settings</bs.ListGroupItem>
 									</bs.ListGroup>
