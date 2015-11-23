@@ -110,10 +110,11 @@ class CustomSearchTool extends React.Component {
         delete components[key];
         this.setState({
             searchObject: components
+        }, () => {
+	        if(!Object.keys(this.state.searchObject).length) {
+	          this.submitSearch();
+	        }
         });
-        if(!Object.keys(components).length) {
-          this.submitSearch();
-        }
     }
 
     handleDropdownSelect (event, eventKey){

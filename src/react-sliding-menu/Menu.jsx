@@ -8,14 +8,13 @@ var menuStyle = {
 
 var divStyle = {
     position: "absolute",
-    zIndex: 2,
     top: 0,
     left: -300,
-    width: 300,
     height: "100%",
     boderBox: "",
     transition: "transform ease 300ms",
-    background: "#f2f2f2"
+    background: "#f2f2f2",
+    zIndex: 300,
 };
 
 export default class Menu extends React.Component {
@@ -62,7 +61,6 @@ class CloseButton extends React.Component {
           right: 18,
           cursor: "pointer",
           transform: type === "before" ? "rotate(45deg)" : "rotate(-45deg)",
-          zIndex: 1,
           background: "#888"
         };
     }
@@ -82,7 +80,6 @@ class CloseButton extends React.Component {
           background: "transparent",
           color: "transparent",
           outline: "none",
-          zIndex: 1
         };
 
         return (

@@ -11,112 +11,7 @@ import TileLayer from "./map/layers/TileLayer.js";
 import GlyphLayer from "./map/layers/GlyphLayer.js";
 /* eslint-enable */
 
-class PanCluster {
-	constructor(optOptions)
-	{
-		var options = optOptions || {};
-		let parent = jquery(`
-		<div style="background-color: rgba(0,0,0,0)" class="ol-unselectable ol-control panCluster">
-			<table style="font-size:75%">
-				<tr>
-					<td></td><td class="ol-control" style="position:relative"><button class="panCluster N">N</button></td><td></td>
-				</tr>
-				<tr>
-					<td class="ol-control" style="position:relative"><button class="panCluster W">W</button></td>
-					<td class="ol-control" style="position:relative"><button class="panCluster X glyphicon glyphicon-fullscreen"></button></td>
-					<td class="ol-control" style="position:relative"><button class="panCluster E">E</button></td>
-				</tr>
-				<tr>
-					<td></td><td class="ol-control" style="position:relative"><button class="panCluster S">S</button></td><td></td>
-				</tr>
-			</table>
-		</div>`);
-
-		var directions = {
-			N: [0, 1],
-			E: [1, 0],
-			S: [0, -1],
-			W: [-1, 0],
-			X: [null, null]
-		};
-
-		let self = this;
-
-		let pan = function (xSign, ySign, event)
-		{
-			let panPercent = 0.3;
-			let map = self.getMap();
-			let view = map.getView();
-			let extent = view.calculateExtent(map.getSize());
-
-			let extentWidth = Math.abs(extent[0] - extent[2]);
-			let extentHeight = Math.abs(extent[1] - extent[3]);
-
-			let center = view.getCenter();
-
-			center[0] += extentWidth * xSign * panPercent;
-			center[1] += extentWidth * ySign * panPercent;
-
-			view.setCenter(center);
-		};
-
-		let zoomExtent = function (event)
-		{
-			let map = self.getMap();
-			let view = map.getView();
-			let extent = view.getProjection().getExtent();
-			let size = map.getSize();
-			view.fit(extent, size);
-		};
-
-		for (let direction in directions)
-		{
-			let xSign = directions[direction][0];
-			let ySign = directions[direction][1];
-
-			let button = parent.find(".panCluster." + direction);
-
-			if (xSign !== null)
-			{
-				button.click(pan.bind(this, xSign, ySign));
-			}
-			else
-			{
-				button.click(zoomExtent.bind(this));
-			}
-
-			console.log(direction);
-		}
-
-		ol.control.Control.call(this, {element: parent[0], target: options.target});
-	}
-}
-
-ol.inherits(PanCluster, ol.control.Control);
-
-class InteractionModeCluster {
-	constructor (optOptions)
-	{
-		var options = optOptions || {};
-		var buttonTable = jquery(`
-			<table class="ol-unselectable ol-control iModeCluster">
-				<tr style="font-size: 80%">
-					<td><button class="iModeCluster pan fa fa-hand-grab-o"></button></td>
-					<td><button class="iModeCluster select fa fa-mouse-pointer"></button></td>
-					<td><button class="iModeCluster zoom fa fa-search-plus"></button></td>
-				</tr>
-			</table>
-		`);
-
-		buttonTable.find("button.iModeCluster.pan").click( () => this.getMap().setPanInteraction() );
-		buttonTable.find("button.iModeCluster.select").click( () => this.getMap().setScaleInteraction() );
-		buttonTable.find("button.iModeCluster.zoom").click( () => this.getMap().setZoomInteraction() );
-
-		ol.control.Control.call(this, {element: buttonTable[0], target: options.target});
-	}
-}
-
-ol.inherits(InteractionModeCluster, ol.control.Control);
+import {PanCluster, InteractionModeCluster} from "./map/controls.js";
 
 class WeaveOpenLayersMap {
 
@@ -130,9 +25,10 @@ class WeaveOpenLayersMap {
 		this.slider = new ol.control.ZoomSlider();
 
 		this.pan = new PanCluster();
-		this.mouseModeButtons = new InteractionModeCluster();
+		this.mouseModeButtons = new InteractionModeCluster({weaveMap: this});
 
 		this.map = new ol.Map({
+			interactions: ol.interaction.defaults({dragPan: false}),
 			controls: [],
 			target: this.element,
 			view: new ol.View({
@@ -141,8 +37,52 @@ class WeaveOpenLayersMap {
 			})
 		});
 
+		this.dragPan = new ol.interaction.DragPan();
+		this.dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});
+		this.dragSelect = new ol.interaction.DragBox();
+
+		this.dragSelect.on('boxstart', function (e) {
+
+		}, this);
+		this.dragSelect.on('boxend', function (e) {
+			let extent = this.dragSelect.getGeometry().getExtent();
+			let selectedFeatures = new Set();
+			let alteredKeySets = new Set();
+			let selectFeature = (feature) => { selectedFeatures.add(feature.getId()); };
+
+			for (let weaveLayerName in this.layers)
+			{
+				let weaveLayer = this.layers[weaveLayerName];
+				let olLayer = weaveLayer.layer;
+				console.log(olLayer.getProperties());
+				let selectable = olLayer.get("selectable");
+
+				if (weaveLayer instanceof FeatureLayer && selectable)
+				{
+					let keySet = weaveLayer.selectionKeySet;
+					let keySetString = JSON.stringify(keySet.getPath());
+					let source = olLayer.getSource();
+
+					if (!alteredKeySets.has(keySetString))
+					{
+						keySet.setKeys([]);	
+					}
+					alteredKeySets.add(keySetString);
+
+					source.forEachFeatureIntersectingExtent(extent, selectFeature);
+					weaveLayer.selectionKeySet.addKeys(Array.from(selectedFeatures));
+				}
+			}
+		}, this);
+
+		this.map.addInteraction(this.dragPan);
+		this.map.addInteraction(this.dragZoom);
+		this.map.addInteraction(this.dragSelect);
+
 		this.toolPath.push("showZoomControls").addCallback(this.onZoomControlToggle.bind(this), true);
 		this.toolPath.push("showMouseModeControls").addCallback(this.onMouseModeControlToggle.bind(this), true);
+		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode")
+			.addCallback(this.onInteractionModeChange.bind(this), true);
 
 		this.map.addInteraction(new ol.interaction.Pointer({
 			handleMoveEvent: this.onMouseMove.bind(this)
@@ -165,9 +105,28 @@ class WeaveOpenLayersMap {
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
 	}
 
-	resize()
+	resize() {this.map.updateSize(); }
+
+	setPanInteraction() {this.interactionModePath.state("pan"); }
+
+	setSelectInteraction() {this.interactionModePath.state("select"); }
+
+	setZoomInteraction() {this.interactionModePath.state("zoom"); }
+
+	onInteractionModeChange()
 	{
-		this.map.updateSize();
+		console.log("onInteractionModeChange");
+		let interactionMode = this.interactionModePath.getState();
+
+		this.dragPan.setActive(interactionMode === "pan");
+		this.dragSelect.setActive(interactionMode === "select");
+		this.dragZoom.setActive(interactionMode === "zoom");
+
+		console.log({
+			dragPan: this.dragPan.getActive(),
+			dragSelect: this.dragSelect.getActive(),
+			dragZoom: this.dragZoom.getActive()
+		});
 	}
 
 	updateControlPositions()

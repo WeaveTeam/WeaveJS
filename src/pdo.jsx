@@ -36,8 +36,8 @@ class PDO extends React.Component {
     constructor(props) {
         super(props);
 
-        window.weaveReady = () => {
-            this.handleWeaveReady();
+        window.weaveReady = weave => {
+            this.handleWeaveReady(weave);
         };
         this.state = {
             view: TOPPRACTITIONER
@@ -54,6 +54,7 @@ class PDO extends React.Component {
     handleWeaveReady(weave) {
         if(!this.weave) {
             this.weave = weave;
+            weave.path().exec('WeaveAPI.topLevelApplication.visApp.hack_loadFileSaveLocalState = true;');
         }
         if(this.reactReady) {
           var file = this.getFileName();
@@ -91,7 +92,7 @@ class PDO extends React.Component {
           var newFile = this.state.view + ".weave";
           if (this.currentFile !== newFile) {
             this.currentFile = newFile;
-            this.weave.loadFile(StandardLib.resolveRelative(newFile, window.location.pathname));
+            this.weave.loadFile(StandardLib.resolveRelative(newFile, window.location.pathname), null, true);
           }
         }
     }
@@ -173,53 +174,12 @@ class PDO extends React.Component {
         var toolHeight = this.toolHeightPath ? this.toolHeightPath.getState() : 0;
         return (
             <ui.VBox>
-                <Navbar>
+                <Navbar pdo={this}>
                     <ui.HBox>
                         <ui.HBox style={{marginTop: 17, marginLeft: 5, marginRight: 5, flex: 1}}>
                            {
                              customSearchTool
                            }
-                       </ui.HBox>
-                        <ui.HBox style={{width: "20%", minWidth: 240, height: 30, margin: "auto"}}>
-                            <ui.VBox style={viewsIconStyle}>
-                                <div style={{margin: "auto", marginBottom: 5}} onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))}>
-                                      {
-                                          (this.getActiveView() === PRACTITIONER || this.getActiveView() === TOPPRACTITIONER) ?
-                                            <img src="img/practitioner-icon-active.png" width="20" height="20"/>
-                                                                              :
-                                            <img src="img/practitioner-icon.png" width="20" height="20"/>
-                                      }
-                                </div>
-                                <ui.HBox>
-                                  <span style={{textAlign: "center", color: "white", fontSize: 10, width: "100%"}}>
-                                    <a onClick={() => this.setState({view: TOPPRACTITIONER}, this.changeView.bind(this))} style={{margin: "auto", fontSize: 10, color: getColor(TOPPRACTITIONER)}}> Top </a>
-                                    |
-                                    <a onClick={() => this.setState({view: PRACTITIONER}, this.changeView.bind(this))} style={{margin: "auto", fontSize: 10, color: getColor(PRACTITIONER)}}> Practitioner </a>
-                                  </span>
-                                </ui.HBox>
-                            </ui.VBox>
-                            <ui.VBox style={viewsIconStyle}>
-                                <div style={{margin: "auto", marginBottom: 5}} onClick={() => this.setState({view: PATIENT}, this.changeView.bind(this))}>
-                                {
-                                    this.getActiveView() === PATIENT ?
-                                        <img style={{margin: "auto"}} src="img/patient-icon-active.png" width="20" height="20"/>
-                                                                          :
-                                        <img style={{margin: "auto"}} src="img/patient-icon.png" width="20" height="20"/>
-                                }
-                                </div>
-                                <a style={{margin: "auto", fontSize: 10, color: (() => { return this.getActiveView() === PATIENT ? "rgb(245, 255, 142)" : "white"; })() }}> Patient </a>
-                            </ui.VBox>
-                            <ui.VBox style={viewsIconStyle}>
-                                <div style={{margin: "auto", marginBottom: 5}} onClick={() => this.setState({view: PRESCRIPTION}, this.changeView.bind(this))}>
-                                {
-                                    this.getActiveView() === PRESCRIPTION ?
-                                        <img style={{margin: "auto"}} src="img/rx-icon-active.png" width="20" height="20"/>
-                                                                          :
-                                        <img style={{margin: "auto"}} src="img/rx-icon.png" width="20" height="20"/>
-                                }
-                                </div>
-                                <a style={{margin: "auto", fontSize: 10, color: (() => { return this.getActiveView() === PRESCRIPTION ? "rgb(245, 255, 142)" : "white"; })() }}> Prescription </a>
-                            </ui.VBox>
                        </ui.HBox>
                    </ui.HBox>
                 </Navbar>

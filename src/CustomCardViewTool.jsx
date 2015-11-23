@@ -30,6 +30,7 @@ class CustomCardViewTool extends React.Component {
             { name: "attributesLeft", type: "LinkableHashMap", callback: this.dataChanged },
             { name: "attributesRight", type: "LinkableHashMap", callback: this.dataChanged },
             { name: "sort", type: "DynamicColumn", callback: this.dataChanged },
+            { name: "sortDirection", type: "LinkableString", callback: this.dataChanged },
             { name: "selectionKeySet", type: "KeySet", callback: this.setCardsSelection },
             { name: "probeKeySet", type: "KeySet", callback: this.setCardsProbe },
             { name: "cardWidth", type: "LinkableNumber", callback: this.resizeCards },
@@ -178,7 +179,7 @@ class CustomCardViewTool extends React.Component {
 
         var attributeNamesRight = this.paths.attributesRight.getNames();
 
-        this.records = _.sortByOrder(this.toolPath.retrieveRecords(mapping), "sort", this.toolPath.getState("sortOrder") || "asc");
+        this.records = _.sortByOrder(this.toolPath.retrieveRecords(mapping), "sort", this.toolPath.getState('sortDirection') || 'desc');
 
         this.formattedRecords = this.records.map((record) => {
             var formattedRecord = {};
@@ -415,9 +416,9 @@ class Card extends React.Component {
                                 data.header.toUpperCase()
                             }
                         </p>
-                        <p style={{fontSize: "12px", color: "#34495e", whiteSpace: "nowrap"}}>
+                        <p style={{fontSize: "12px", color: "#34495e", whiteSpace: "nowrap"}} dangerouslySetInnerHTML={{__html: data.title}}>
                             {
-                                data.title
+                                //data.title
                             }
                         </p>
                     </div>
