@@ -61,7 +61,7 @@ class Navbar extends React.Component {
         }
 
         var viewItems = [
-        	[TOPPRACTITIONER, "Top Practitioner Test"],
+        	[TOPPRACTITIONER, "Top Practitioner"],
         	[PRACTITIONER, "Practitioner"],
         	[PATIENT, "Patient"],
         	[PRESCRIPTION, "Prescription"]

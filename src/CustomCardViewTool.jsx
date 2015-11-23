@@ -416,9 +416,9 @@ class Card extends React.Component {
                                 data.header.toUpperCase()
                             }
                         </p>
-                        <p style={{fontSize: "12px", color: "#34495e", whiteSpace: "nowrap"}}>
+                        <p style={{fontSize: "12px", color: "#34495e", whiteSpace: "nowrap"}} dangerouslySetInnerHTML={{__html: data.title}}>
                             {
-                                data.title
+                                //data.title
                             }
                         </p>
                     </div>
