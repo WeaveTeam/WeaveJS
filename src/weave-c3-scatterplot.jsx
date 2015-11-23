@@ -166,8 +166,15 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     }
 
     componentDidUpdate() {
-        super.componentDidUpdate();
-        this.chart.resize(this.getElementSize());
+      super.componentDidUpdate();
+      //console.log("resizing");
+      //var start = Date.now();
+      var newElementSize = this.getElementSize();
+      if(!_.isEqual(newElementSize, this.elementSize)) {
+        this.chart.resize(newElementSize);
+        this.elementSize = newElementSize;
+      }
+      //var end = Date.now();
     }
 
     componentWillUnmount() {
@@ -202,6 +209,11 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         this.c3Config = {
             bindto: this.element,
+            padding: {
+              top: 20,
+              bottom: 20,
+              right: 30
+            },
             data: {
                 rows: [],
                 x: "x",
@@ -300,10 +312,6 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             onrendered: this._updateStyle.bind(this)
         };
         this.chart = c3.generate(this.c3Config);
-    }
-
-    render() {
-      return <div style={{width: "100%", height: "100%"}}/>;
     }
 }
 export default WeaveC3ScatterPlot;

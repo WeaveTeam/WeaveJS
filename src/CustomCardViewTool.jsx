@@ -178,7 +178,7 @@ class CustomCardViewTool extends React.Component {
 
         var attributeNamesRight = this.paths.attributesRight.getNames();
 
-        this.records = _.sortByOrder(this.toolPath.retrieveRecords(mapping), "sort", "asc");
+        this.records = _.sortByOrder(this.toolPath.retrieveRecords(mapping), "sort", this.toolPath.getState("sortOrder") || "asc");
 
         this.formattedRecords = this.records.map((record) => {
             var formattedRecord = {};

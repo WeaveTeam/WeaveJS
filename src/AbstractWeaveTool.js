@@ -49,6 +49,6 @@ export default class AbstractWeaveTool extends React.Component {
     }
 
 		render() {
-
-		}
+        return <div style={{height: this.props.height, maxHeight: this.props.height}}/>;
+    }
 }

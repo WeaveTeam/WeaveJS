@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React from "react";
-import ui from "./react-ui/ui.jsx";
 var toolRegistry = {};
+import ui from "./react-ui/ui.jsx";
 
 const grabberStyle = {
     width: "16",
@@ -9,6 +9,7 @@ const grabberStyle = {
     cursor: "move",
     background: "url(http://placehold.it/32x32)"
 };
+
 export function registerToolImplementation(asClassName, jsClass) {
     toolRegistry[asClassName] = jsClass;
 }
@@ -29,39 +30,59 @@ export class WeaveTool extends React.Component {
             toolType = this.toolPath.getState("toolClass");
         }
         this.ToolClass = getToolImplementation(toolType);
+
+        if(this.toolPath) {
+          this.toolPath.push("panelTitle").addCallback(this.forceUpdate.bind(this));
+        }
     }
 
     componentDidMount() {
-        this.header = React.findDOMNode(this.refs.header);
-        this.toolElt = React.findDOMNode(this.refs.tool);
+        this.element = React.findDOMNode(this.refs.toolDiv);
+        if(React.Component.isPrototypeOf(this.ToolClass)) {
+            this.tool = this.refs.tool;
+        } else {
+            this.tool = new this.ToolClass(_.merge({element: React.findDOMNode(this.refs.toolDiv), toolPath: this.toolPath}, this.toolProps));
+        }
+    }
+
+    componentWillUnmount() {
+        if(this.tool.destroy) {
+            this.tool.destroy();
+        }
+    }
+
+    componentDidUpdate() {
+        if(this.tool.resize) {
+            this.tool.resize();
+        }
     }
 
     render() {
-        var props = {
-          key: "tool",
-          ref: "tool",
-          toolPath: this.toolPath
+        var windowBar = {
+            width: "100%",
+            height: 25,
+            cursor: "move",
+            backgroundColor: "#4D5258"
         };
 
-        if(this.toolElt) {
-          props.width = this.toolElt.clientWidth;
-          props.height = this.toolElt.clientHeight;
+        var toolHeight = this.props.style ? this.props.style.height - 50 : "100%";
+
+        var reactTool = "";
+        if (React.Component.isPrototypeOf(this.ToolClass)) {
+            reactTool = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath, height: toolHeight}, this.toolProps));
         }
 
-        props = _.merge(props, this.toolProps);
-
-        var chart = React.createElement(this.ToolClass, props);
 
         return (
-            <ui.VBox style={this.props.style} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
-                <div ref="header" style={{height: "25px", width: "100%"}}>
-                    <div draggable={true} onDragStart={this.props.onDragStart} style={grabberStyle}/>
-                </div>
-                <div style={{flex: 1}} ref="tool">
-                  {
-                    chart
-                  }
-                </div>
-            </ui.VBox>);
+          <ui.VBox style={this.props.style} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
+              <div ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}/>
+              <span style={{height: 25, textAlign: "center"}}>{this.toolPath.getState("panelTitle")}</span>
+              {
+                reactTool ?
+                  reactTool
+                          :
+                  <div ref="toolDiv" style={{width: "100%", height: toolHeight}}></div>
+              }
+          </ui.VBox>);
     }
 }

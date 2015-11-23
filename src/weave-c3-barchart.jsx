@@ -180,7 +180,15 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     // }
     componentDidUpdate() {
         super.componentDidUpdate();
-        this.chart.resize(this.getElementSize());
+        //console.log("resizing");
+        //var start = Date.now();
+        var newElementSize = this.getElementSize();
+        if(!_.isEqual(newElementSize, this.elementSize)) {
+          this.chart.resize(newElementSize);
+          this.elementSize = newElementSize;
+        }
+        //var end = Date.now();
+        //console.log(end - start);
     }
 
     componentWillUnmount() {
@@ -214,6 +222,11 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
         this.c3Config = {
             //size: this.getElementSize(),
+            padding: {
+              top: 20,
+              bottom: 20,
+              right: 30
+            },
             data: {
                 json: [],
                 type: "bar",
@@ -294,10 +307,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             }
         };
         this.chart = c3.generate(this.c3Config);
-    }
-
-    render() {
-        return <div style={{width: this.props.width || "100%", height: this.props.height || "100%"}}/>;
     }
 }
 

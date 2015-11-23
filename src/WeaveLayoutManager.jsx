@@ -323,6 +323,8 @@ class WeaveLayoutManager extends React.Component {
                                 height: toolRect.bottom - toolRect.top,
                                 position: "absolute"
                             };
+                            if(toolName === "CompoundBarChartTool")
+                              console.log(toolPosition.height);
                             toolPosition.maxHeight = toolPosition.height;
                             toolPosition.maxWidth = toolPosition.width;
                         }
