@@ -172,14 +172,18 @@ class Layout extends React.Component {
         var style = {
             display: "flex",
             flex: this.state.flex,
-            width: "100%",
-            height: "100%",
             position: "relative",
             outline: "none",
             overflow: "hidden",
             userSelect: "none",
             flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
         };
+
+        if(this.state.direction === HORIZONTAL) {
+          style.height = "100%";
+        } else {
+          style.width = "100%";
+        }
 
         if (this.state.children && this.state.children.length > 0) {
             var newChildren = new Array(this.state.children.length * 2 - 1);
