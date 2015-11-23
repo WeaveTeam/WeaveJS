@@ -54,7 +54,7 @@ var overlayStyle = {
     height: "100%",
     background: "rgba(0,0,0,0.3)",
     transition: "background-color 300ms linear",
-    zIndex: 201,
+    zIndex: 201
 };
 
 
@@ -70,4 +70,3 @@ class Overlay extends React.Component {
 		return this.state.visible ? <div style={overlayStyle}/> : <div/>;
 	}
 }
-
