@@ -12,6 +12,7 @@ import WeaveC3PieChart from "./tools/weave-c3-piechart.jsx";
 import WeaveC3Histogram from "./tools/weave-c3-histogram.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table.jsx";
+import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";
 import ToolOverlay from "./ToolOverlay.jsx";
