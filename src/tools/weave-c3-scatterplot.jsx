@@ -29,7 +29,10 @@ function _normalizeRecords (records, attributes) {
           var min = columnStatsCache[attr].min;
           var max = columnStatsCache[attr].max;
 
-          if(!min || !max || max - min === 0) {
+          if(!min)
+            min = 0;
+
+          if(max - min === 0) {
             return 0;
           }
 
@@ -120,19 +123,17 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         });
 
         this.normalizedRecords = _normalizeRecords(this.numericRecords, ["size"]);
-
         this.plotterState = this.paths.plotter.getState();
         this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord) => {
             if(this.plotterState && this.plotterState.sizeBy.length) {
-                let minScreenRadius = this.paths.plotter.minScreenRadius;
+                let minScreenRadius = this.plotterState.minScreenRadius;
                 let maxScreenRadius = this.plotterState.maxScreenRadius;
-
                 return (normalizedRecord && normalizedRecord.size ?
                         minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius) :
-                        this.plotterState.defaultScreenRadius) || 1;
+                        this.plotterState.defaultScreenRadius) || 3;
             }
             else {
-                return (this.plotterState.defaultScreenRadius) || 1;
+                return (this.plotterState.defaultScreenRadius) || 3;
             }
         });
 
@@ -180,8 +181,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     componentWillUnmount() {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
-        super.componentWillUnmount();
         this.chart.destroy();
+        super.componentWillUnmount();
     }
 
     componentDidMount() {
