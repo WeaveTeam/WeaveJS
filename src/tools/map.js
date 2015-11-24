@@ -8,7 +8,7 @@ import Layer from "./map/layers/Layer.js";
 import FeatureLayer from "./map/layers/FeatureLayer.js";
 import GeometryLayer from "./map/layers/GeometryLayer.js"; 
 import TileLayer from "./map/layers/TileLayer.js";
-import GlyphLayer from "./map/layers/GlyphLayer.js";
+import ImageGlyphLayer from "./map/layers/ImageGlyphLayer.js";
 /* eslint-enable */
 
 import {PanCluster, InteractionModeCluster} from "./map/controls.js";
@@ -41,10 +41,10 @@ class WeaveOpenLayersMap {
 		this.dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});
 		this.dragSelect = new ol.interaction.DragBox();
 
-		this.dragSelect.on('boxstart', function (e) {
+		this.dragSelect.on('boxstart', function () {
 
 		}, this);
-		this.dragSelect.on('boxend', function (e) {
+		this.dragSelect.on('boxend', function () {
 			let extent = this.dragSelect.getGeometry().getExtent();
 			let selectedFeatures = new Set();
 			let alteredKeySets = new Set();
@@ -54,7 +54,6 @@ class WeaveOpenLayersMap {
 			{
 				let weaveLayer = this.layers[weaveLayerName];
 				let olLayer = weaveLayer.layer;
-				console.log(olLayer.getProperties());
 				let selectable = olLayer.get("selectable");
 
 				if (weaveLayer instanceof FeatureLayer && selectable)
@@ -65,7 +64,7 @@ class WeaveOpenLayersMap {
 
 					if (!alteredKeySets.has(keySetString))
 					{
-						keySet.setKeys([]);	
+						keySet.setKeys([]);
 					}
 					alteredKeySets.add(keySetString);
 
@@ -115,18 +114,11 @@ class WeaveOpenLayersMap {
 
 	onInteractionModeChange()
 	{
-		console.log("onInteractionModeChange");
 		let interactionMode = this.interactionModePath.getState();
 
 		this.dragPan.setActive(interactionMode === "pan");
 		this.dragSelect.setActive(interactionMode === "select");
 		this.dragZoom.setActive(interactionMode === "zoom");
-
-		console.log({
-			dragPan: this.dragPan.getActive(),
-			dragSelect: this.dragSelect.getActive(),
-			dragZoom: this.dragZoom.getActive()
-		});
 	}
 
 	updateControlPositions()
@@ -163,7 +155,6 @@ class WeaveOpenLayersMap {
 	onZoomControlToggle()
 	{
 		let showZoomControls = this.toolPath.push("showZoomControls").getState();
-		console.log("showZoomControls", showZoomControls);
 		if (showZoomControls)
 		{
 			this.map.addControl(this.slider);

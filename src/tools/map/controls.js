@@ -31,7 +31,7 @@ export class PanCluster {
 
 		let self = this;
 
-		let pan = function (xSign, ySign, event)
+		let pan = function (xSign, ySign)
 		{
 			let panPercent = 0.3;
 			let map = self.getMap();
@@ -49,7 +49,7 @@ export class PanCluster {
 			view.setCenter(center);
 		};
 
-		let zoomExtent = function (event)
+		let zoomExtent = function ()
 		{
 			let map = self.getMap();
 			let view = map.getView();
@@ -73,8 +73,6 @@ export class PanCluster {
 			{
 				button.click(zoomExtent.bind(this));
 			}
-
-			console.log(direction);
 		}
 
 		ol.control.Control.call(this, {element: parent[0], target: options.target});

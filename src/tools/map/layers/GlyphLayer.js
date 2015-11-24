@@ -1,27 +1,17 @@
-import jquery from "jquery";
-import Layer from "./Layer.js";
+import FeatureLayer from "./FeatureLayer.js";
 import lodash from "lodash";
 import ol from "openlayers";
-import {registerLayerImplementation} from "./Layer.js";
 
-class GlyphLayer extends Layer {
+class GlyphLayer extends FeatureLayer {
 
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
 
-		this.layer = new ol.layer.Vector();
-		this.source = new ol.source.Vector({wrapX: false});
-
-		/* Build a new set of point geometries and style them based on the properties in question */
-
 		this.boundUpdateLocations = this.updateLocations.bind(this);
-		this.boundUpdateImages = this.updateImages.bind(this);
 
 		this.layerPath.push("dataX").addCallback(this.boundUpdateLocations, true);
 		this.layerPath.push("dataY").addCallback(this.boundUpdateLocations, true);
-		this.layerPath.push("imageSize").addCallback(this.boundUpdateImages, true);
-		this.layerPath.push("imageURL").addCallback(this.boundUpdateImages, true);
 	}
 
 	_getFeatureIds() {
@@ -77,79 +67,9 @@ class GlyphLayer extends Layer {
 			point.transform(rawProj, mapProj);
 			feature.setGeometry(point);
 		}
-	}
-
-	updateImages() {
-		/* Update feature styles */
-
-		var records = this.layerPath.retrieveRecords(["imageURL", "imageSize"], this.layerPath.push("dataX"));
-
-		var recordIds = lodash.pluck(records, "id");
-
-		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
-
-		/* Unset style for missing points */
-		for (let id of removedIds)
-		{
-			if (!id)
-			{
-				continue;
-			}
-			let feature = this.source.getFeatureById(id);
-
-			if (!feature)
-			{
-				continue;
-			}
-
-			feature.setStyle(null);
-		}
-
-		/* Update style for everyone else */
-
-		function setScale(icon, imageSize)
-		{
-			var maxDim = Math.max(this.naturalHeight, this.naturalWidth);
-			icon.setScale(imageSize / maxDim);
-		}
-
-		for (let record of records)
-		{
-			let feature = this.source.getFeatureById(record.id);
-			let id = record.id;
-			let imageURL = record.imageURL;
-			let imageSize = record.imageSize;
-
-			if (!feature)
-			{
-				feature = new ol.Feature({});
-				feature.setId(id);
-				this.source.addFeature(feature);
-			}
-
-			if (!imageURL)
-			{
-				feature.setStyle(null);
-				continue;
-			}
-
-			let icon = new ol.style.Icon({
-				src: imageURL
-			});
-
-			let img = icon.getImage();
-
-			jquery(img).one("load", setScale.bind(img, icon, imageSize));
-
-			let style = new ol.style.Style({
-				image: icon
-			});
-
-			feature.setStyle(style);
-		}
+		this.updateFilteredKeySet();
+		this.updateStyleData();
 	}
 }
 
 export default GlyphLayer;
-
-registerLayerImplementation("weave.visualization.plotters::ImageGlyphPlotter", GlyphLayer);
