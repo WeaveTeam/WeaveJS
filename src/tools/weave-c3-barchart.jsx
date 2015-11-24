@@ -61,7 +61,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         if(this.busy) {
             return;
         }
-
         this._updateColumns();
 
         var heightColumns = this.paths.heightColumns.getChildren();
@@ -244,8 +243,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                         // find the corresponding index of numericRecords in stringRecords
                         var id = this.indexToKey[d.index];
                         var index = _.pluck(this.stringRecords, "id").indexOf(id);
-
-                        return this.stringRecords[index].color || "#C0CDD1";
+                        return this.stringRecords[index] ? this.stringRecords[index].color : "#C0CDD1";
                     } else {
                         return color || "#C0CDD1";
                     }

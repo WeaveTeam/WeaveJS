@@ -61,11 +61,10 @@ export class WeaveTool extends React.Component {
         var windowBar = {
             width: "100%",
             height: 25,
-            cursor: "move",
-            backgroundColor: "#4D5258"
+            cursor: "move"
         };
 
-        var toolHeight = this.props.style ? this.props.style.height - 50 : "100%";
+        var toolHeight = this.props.style ? this.props.style.height - 25 : "100%";
 
         var reactTool = "";
         if (React.Component.isPrototypeOf(this.ToolClass)) {
@@ -75,8 +74,9 @@ export class WeaveTool extends React.Component {
 
         return (
           <ui.VBox style={this.props.style} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
-              <div ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}/>
-              <span style={{height: 25, textAlign: "center"}}>{this.toolPath.getState("panelTitle")}</span>
+              <div ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
+                <p style={{height: 25, marginLeft: 5, textAlign: "center", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis"}}>{this.toolPath.getValue("this.title")}</p>
+              </div>
               {
                 reactTool ?
                   reactTool

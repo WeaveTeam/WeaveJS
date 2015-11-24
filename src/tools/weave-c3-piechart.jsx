@@ -39,7 +39,7 @@ class WeaveC3PieChart extends AbstractWeaveTool {
     }
 
     _dataChanged() {
-        console.log("data changed called");
+
         if(!this.chart)
           return;
 
