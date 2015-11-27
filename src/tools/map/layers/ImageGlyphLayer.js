@@ -17,7 +17,6 @@ class ImageGlyphLayer extends GlyphLayer {
 	}
 
 	updateStyleData() {
-		console.log("ImageGlyphLayer.updateStyleData");
 		/* Update feature styles */
 
 		var records = this.layerPath.retrieveRecords(["imageURL", "imageSize"], this.layerPath.push("dataX"));
@@ -54,14 +53,11 @@ class ImageGlyphLayer extends GlyphLayer {
 		for (let record of records)
 		{
 			let feature = this.source.getFeatureById(record.id);
-			let id = record.id;
 			let imageURL = record.imageURL;
 			let imageSize = record.imageSize;
-			console.log({feature, id, imageURL});
 
 			if (!feature)
 			{
-				console.log("Feature missing, skipping.");
 				continue;
 			}
 

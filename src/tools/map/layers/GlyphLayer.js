@@ -10,7 +10,7 @@ class GlyphLayer extends FeatureLayer {
 
 		this.boundUpdateLocations = this.updateLocations.bind(this);
 
-		this.layerPath.push("dataX").addCallback(this.boundUpdateLocations, true);
+		this.layerPath.push("dataX").addCallback(this.boundUpdateLocations);
 		this.layerPath.push("dataY").addCallback(this.boundUpdateLocations, true);
 	}
 
@@ -38,7 +38,7 @@ class GlyphLayer extends FeatureLayer {
 
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
 
-		var rawProj = this.layerPath.getState("sourceProjection");
+		var rawProj = this.layerPath.getState("sourceProjection") || "EPSG:4326";
 		var mapProj = this.parent.map.getView().getProjection();
 
 		for (let id of removedIds)

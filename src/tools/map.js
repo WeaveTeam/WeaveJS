@@ -11,6 +11,7 @@ import FeatureLayer from "./map/layers/FeatureLayer.js";
 import GeometryLayer from "./map/layers/GeometryLayer.js"; 
 import TileLayer from "./map/layers/TileLayer.js";
 import ImageGlyphLayer from "./map/layers/ImageGlyphLayer.js";
+import ScatterPlotLayer from "./map/layers/ScatterPlotLayer.js";
 /* eslint-enable */
 
 import {PanCluster, InteractionModeCluster} from "./map/controls.js";
