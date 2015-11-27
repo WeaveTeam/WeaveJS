@@ -3,6 +3,8 @@ import ol from "openlayers";
 import lodash from "lodash";
 import jquery from "jquery";
 
+import AbstractWeaveTool from "./AbstractWeaveTool.js";
+
 /* eslint-disable */
 import Layer from "./map/layers/Layer.js";
 import FeatureLayer from "./map/layers/FeatureLayer.js";
@@ -13,29 +15,17 @@ import ImageGlyphLayer from "./map/layers/ImageGlyphLayer.js";
 
 import {PanCluster, InteractionModeCluster} from "./map/controls.js";
 
-class WeaveOpenLayersMap {
+class WeaveOpenLayersMap extends AbstractWeaveTool {
 
 	constructor(props)
 	{
-		window.debugMapTool = this;
-		this.element = props.element;
-		this.toolPath = props.toolPath;
+		super(props);
 
 		this.zoomButtons = new ol.control.Zoom();
 		this.slider = new ol.control.ZoomSlider();
 
 		this.pan = new PanCluster();
 		this.mouseModeButtons = new InteractionModeCluster({weaveMap: this});
-
-		this.map = new ol.Map({
-			interactions: ol.interaction.defaults({dragPan: false}),
-			controls: [],
-			target: this.element,
-			view: new ol.View({
-				center: [0, 0],
-				zoom: 0
-			})
-		});
 
 		this.dragPan = new ol.interaction.DragPan();
 		this.dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});
@@ -44,6 +34,7 @@ class WeaveOpenLayersMap {
 		this.dragSelect.on('boxstart', function () {
 
 		}, this);
+
 		this.dragSelect.on('boxend', function () {
 			let extent = this.dragSelect.getGeometry().getExtent();
 			let selectedFeatures = new Set();
@@ -74,9 +65,28 @@ class WeaveOpenLayersMap {
 			}
 		}, this);
 
-		this.map.addInteraction(this.dragPan);
-		this.map.addInteraction(this.dragZoom);
-		this.map.addInteraction(this.dragSelect);
+		/* Register layer changes */
+
+		this.layers = {};
+		this.getSessionCenterBound = this.getSessionCenter.bind(this);
+	}
+
+	componentDidMount()
+	{
+		super.componentDidMount();
+
+		this.map = new ol.Map({
+			interactions: ol.interaction.defaults({dragPan: false}),
+			controls: [],
+			target: this.element,
+			view: new ol.View({
+				center: [0, 0],
+				zoom: 0
+			})
+		});
+
+		this.centerCallbackHandle = this.map.getView().on("change:center", this.setSessionCenter, this);
+		this.resolutionCallbackHandle = this.map.getView().on("change:resolution", this.setSessionZoom, this);
 
 		this.toolPath.push("showZoomControls").addCallback(this.onZoomControlToggle.bind(this), true);
 		this.toolPath.push("showMouseModeControls").addCallback(this.onMouseModeControlToggle.bind(this), true);
@@ -91,17 +101,13 @@ class WeaveOpenLayersMap {
 		this.layerSettingsPath = this.toolPath.push("children", "visualization", "plotManager", "layerSettings");
 		this.zoomBoundsPath = this.toolPath.push("children", "visualization", "plotManager", "zoomBounds");
 
-		/* Register layer changes */
-
-		this.layers = {};
-		this.getSessionCenterBound = this.getSessionCenter.bind(this);
-
-		this.zoomBoundsPath.addCallback(this.getSessionCenterBound, true);
-
-		this.centerCallbackHandle = this.map.getView().on("change:center", this.setSessionCenter, this);
-		this.resolutionCallbackHandle = this.map.getView().on("change:resolution", this.setSessionZoom, this);
+		this.map.addInteraction(this.dragPan);
+		this.map.addInteraction(this.dragZoom);
+		this.map.addInteraction(this.dragSelect);
 
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
+
+		this.zoomBoundsPath.addCallback(this.getSessionCenterBound, true);
 	}
 
 	resize() {this.map.updateSize(); }
