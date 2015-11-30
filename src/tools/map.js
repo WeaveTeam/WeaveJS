@@ -3,12 +3,12 @@ import ol from "openlayers";
 import lodash from "lodash";
 import jquery from "jquery";
 
-import AbstractWeaveTool from "./AbstractWeaveTool.js";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 
 /* eslint-disable */
 import Layer from "./map/layers/Layer.js";
 import FeatureLayer from "./map/layers/FeatureLayer.js";
-import GeometryLayer from "./map/layers/GeometryLayer.js"; 
+import GeometryLayer from "./map/layers/GeometryLayer.js";
 import TileLayer from "./map/layers/TileLayer.js";
 import ImageGlyphLayer from "./map/layers/ImageGlyphLayer.js";
 import ScatterPlotLayer from "./map/layers/ScatterPlotLayer.js";

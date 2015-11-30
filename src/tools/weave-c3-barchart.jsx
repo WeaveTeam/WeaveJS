@@ -1,4 +1,4 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.js";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 import d3 from "d3";
 import c3 from "c3";
 import {registerToolImplementation} from "../WeaveTool.jsx";
@@ -11,7 +11,104 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
-        this.busy = false;
+
+        this.c3Config = {
+            //size: this.getElementSize(),
+            padding: {
+              top: 20,
+              bottom: 20,
+              right: 30
+            },
+            data: {
+                json: [],
+                type: "bar",
+                xSort: false,
+                selection: {
+                   enabled: true,
+                   multiple: true,
+                   draggable: true
+
+               },
+               labels: {
+                 format: (v, id, i, j) => {
+                   if(this.showValueLabels) {
+                     return v;
+                   } else {
+                     return "";
+                   }
+                 }
+               },
+               order: null,
+               color: (color, d) => {
+                    if(this.heightColumnNames.length === 1 && d.hasOwnProperty("index")) {
+
+                        // find the corresponding index of numericRecords in stringRecords
+                        var id = this.indexToKey[d.index];
+                        var index = _.pluck(this.stringRecords, "id").indexOf(id);
+                        return this.stringRecords[index] ? this.stringRecords[index].color : "#C0CDD1";
+                    } else {
+                        return color || "#C0CDD1";
+                    }
+               }
+            },
+            axis: {
+                x: {
+                    type: "category",
+                    label: {
+                        position: "outer-center"
+                    },
+                    tick: {
+                        fit: false,
+                        multiline: false,
+                        format: (num) => {
+                             if(this.stringRecords && this.stringRecords[num]) {
+                               return this.stringRecords[num].xLabel;
+                             } else {
+                               return "";
+                             }
+                        }
+                    }
+                },
+                y: {
+                    label: {
+                        position: "outer-middle"
+                    },
+                    tick: {
+                      fit: false,
+                      multiline: false,
+                      format: (num) => {
+                          if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
+                            return this.yAxisValueToLabel[num] || "";
+                          } else if (this.groupingMode === "percentStack") {
+                            return d3.format(".0%")(num);
+                          } else {
+                            return FormatUtils.defaultNumberFormatting(num);
+                          }
+                      }
+                    }
+                }
+            },
+            grid: {
+                x: {
+                    show: true
+                },
+                y: {
+                    show: true
+                }
+            },
+            bindto: null,
+            bar: {
+                width: {
+                    ratio: 0.8
+                }
+            },
+            legend: {
+                show: false
+            },
+            onrendered: () => {
+              this.busy = false;
+            }
+        };
     }
 
     _selectionKeysChanged() {
@@ -23,17 +120,38 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.chart.select(this.heightColumnNames, indices, true);
     }
 
+    rotateAxes() {
+      this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
+      setTimeout(() => {
+        this.busy = true;
+        c3.generate(this.c3Config);
+      }, 10);
+    }
+
     _axisChanged () {
         if(!this.chart)
           return;
 
-        if(this.busy)
+        if(this.busy) {
+          setTimeout(this._axisChanged, 20);
           return;
+        }
+
+        var xLabel = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getValue("ColumnUtils.getTitle(this)");
+        var yLabel = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
 
         this.chart.axis.labels({
-            x: this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getValue("ColumnUtils.getTitle(this)"),
-            y: this.paths.yAxis.push("overrideAxisName").getState() || this.heightColumnsLabels.join(", ")
+          x: xLabel,
+          y: yLabel
         });
+
+        this.c3Config.axis.x.label.text = xLabel;
+        this.c3Config.axis.y.label.text = yLabel;
+    }
+
+    handleShowValueLabels () {
+      this.showValueLabels = this.paths.showValueLabels.getState();
+      this.chart.flush();
     }
 
     _updateColumns() {
@@ -59,8 +177,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         }
 
         if(this.busy) {
-            return;
+          return;
         }
+
         this._updateColumns();
 
         var heightColumns = this.paths.heightColumns.getChildren();
@@ -156,52 +275,48 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         }
 
         keys.value = this.heightColumnNames;
-
         var colors = {};
 
         if(this.heightColumnNames.length > 1) {
             this.colorRamp = this.paths.chartColors.getState();
             this.heightColumnNames.map((name, index) => {
                 var color = StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.colorRamp);
-                colors[name] = "#" + color.toString(16);
+                colors[name] = "#" + StandardLib.decimalToHex(color);
             });
             colors = {};
         }
 
-        this._axisChanged();
+        var data = _.cloneDeep(this.c3Config.data);
+        data.json = this.numericRecords;
+        data.colors = colors;
+        data.keys = keys;
+        data.unload = true;
+        data.done = () => { this.busy = false; };
+        this.c3Config.data = data;
         this.busy = true;
-        this.chart.load({json: this.numericRecords, colors, keys, unload: true, done: () => { this.busy = false; }});
+        this.chart.load(data);
     }
 
     _updateStyle() {}
-    // _teardownCallbacks() {
-    //     this.toolPath.selection_keyset.removeCallback(this._selectionKeysChanged);
-    // }
+
     componentDidUpdate() {
         super.componentDidUpdate();
-        //console.log("resizing");
-        //var start = Date.now();
-        var newElementSize = this.getElementSize();
-        if(!_.isEqual(newElementSize, this.elementSize)) {
-          this.chart.resize(newElementSize);
-          this.elementSize = newElementSize;
-        }
-        //var end = Date.now();
-        //console.log(end - start);
+        this.chart.resize({ width: this.props.width, height: this.props.height});
     }
 
     componentWillUnmount() {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
-        super.componentWillUnmount();
         this.chart.destroy();
+        super.componentWillUnmount();
     }
 
     componentDidMount() {
         super.componentDidMount();
-
         var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
+        var handleShowValueLabels = _.debounce(this.handleShowValueLabels.bind(this), 10);
+        var rotateAxes = _.debounce(this.rotateAxes.bind(this), 10);
 
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
@@ -212,98 +327,15 @@ class WeaveC3Barchart extends AbstractWeaveTool {
           { name: "colorColumn", path: plotterPath.push("colorColumn"), callbacks: dataChanged },
           { name: "chartColors", path: plotterPath.push("chartColors"), callbacks: dataChanged },
           { name: "groupingMode", path: plotterPath.push("groupingMode"), callbacks: dataChanged },
+          { name: "horizontalMode", path: plotterPath.push("horizontalMode"), callbacks: rotateAxes },
+          { name: "showValueLabels", path: plotterPath.push("showValueLabels"), callbacks: handleShowValueLabels},
           { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
           { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")}
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged}
         ];
 
         this.initializePaths(mapping);
-
-        this.c3Config = {
-            //size: this.getElementSize(),
-            padding: {
-              top: 20,
-              bottom: 20,
-              right: 30
-            },
-            data: {
-                json: [],
-                type: "bar",
-                xSort: false,
-                selection: {
-                   enabled: true,
-                   multiple: true,
-                   draggable: true
-
-               },
-               order: null,
-               color: (color, d) => {
-                    if(this.heightColumnNames.length === 1 && d.hasOwnProperty("index")) {
-
-                        // find the corresponding index of numericRecords in stringRecords
-                        var id = this.indexToKey[d.index];
-                        var index = _.pluck(this.stringRecords, "id").indexOf(id);
-                        return this.stringRecords[index] ? this.stringRecords[index].color : "#C0CDD1";
-                    } else {
-                        return color || "#C0CDD1";
-                    }
-               }
-            },
-            axis: {
-                x: {
-                    type: "category",
-                    label: {
-                        position: "outer-center"
-                    },
-                    tick: {
-                        fit: false,
-                        multiline: false,
-                        format: (num) => {
-                             if(this.stringRecords && this.stringRecords[num]) {
-                               return this.stringRecords[num].xLabel;
-                             } else {
-                               return "";
-                             }
-                        }
-                    }
-                },
-                y: {
-                    label: {
-                        position: "outer-middle"
-                    },
-                    tick: {
-                      fit: false,
-                      multiline: false,
-                      format: (num) => {
-                          if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
-                            return this.yAxisValueToLabel[num] || "";
-                          } else if (this.groupingMode === "percentStack") {
-                            return d3.format(".0%")(num);
-                          } else {
-                            return FormatUtils.defaultNumberFormatting(num);
-                          }
-                      }
-                    }
-                }
-            },
-            grid: {
-                x: {
-                    show: true
-                },
-                y: {
-                    show: true
-                }
-            },
-            bindto: this.element,
-            bar: {
-                width: {
-                    ratio: 0.8
-                }
-            },
-            legend: {
-                show: false
-            }
-        };
+        this.c3Config.bindto = this.element;
         this.chart = c3.generate(this.c3Config);
     }
 }

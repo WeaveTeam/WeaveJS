@@ -2,7 +2,7 @@ import {registerToolImplementation} from "../WeaveTool.jsx";
 import _ from "lodash";
 import React from "react";
 import ReactDataGrid from "react-datagrid";
-import AbstractWeaveTool from "./AbstractWeaveTool";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 
 class WeaveReactTable extends AbstractWeaveTool {
     constructor(props) {

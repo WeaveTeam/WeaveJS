@@ -1,6 +1,6 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.js";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 import {registerToolImplementation} from "../WeaveTool.jsx";
-import lodash from "lodash";
+import _ from "lodash";
 import StandardLib from "../Utils/StandardLib";
 import d3 from "d3";
 
@@ -12,41 +12,26 @@ class WeaveC3ColorLegend extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
-        this._svg = d3.select(this.element).append("svg");
         this.lookup = {};
         this._plotterPath = this.toolPath.pushPlotter("plot");
         this.dynamicColorColumnPath = this._plotterPath.push("dynamicColorColumn", null);
         this._binningDefinition = this.dynamicColorColumnPath.push("internalDynamicColumn").push(null).push("binningDefinition").push(null);
         this._binnedColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn", null);
         this._setupCallbacks();
-
-        this.update = lodash.debounce(this._update.bind(this), 20);
-        this.update();
     }
 
     _setupCallbacks() {
-        this.dynamicColorColumnPath.addCallback(lodash.debounce(this.drawAll.bind(this), 20), true, false);
+        this.dynamicColorColumnPath.addCallback(this.forceUpdate.bind(this));
     }
 
-   _sizeChanged() {
-        this.drawAll();
+    componentDidMount() {
+      super.componentDidMount();
+        this._svg = d3.select(this.element).append("svg");
     }
 
-    resize () {
-        this._sizeChanged();
-    }
-
-    _dataChanged() {
-
-    }
-
-    drawAll() {
-        if (!this.dynamicColorColumnPath.getType(null)) {
-            return; // draw nothing
-        }
-
+    componentDidUpdate() {
+        super.componentDidUpdate();
         var numberOfBins = this._binnedColumnPath.getValue("numberOfBins");
-
         if(numberOfBins) {
             this.drawBinnedPlot(numberOfBins);
         } else {
@@ -97,12 +82,11 @@ class WeaveC3ColorLegend extends AbstractWeaveTool {
                  .attr("font-family", "sans-serif")
                  .attr("font-size", "12px");
 
-        _shapeSize = lodash.max([1, lodash.min([_shapeSize, height / numberOfBins])]);
+        _shapeSize = _.max([1, _.min([_shapeSize, height / numberOfBins])]);
 
         let r = (_shapeSize / 100 * height / numberOfBins) / 2;
 
-        var BinnedColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn", null);
-        var textLabelFunction = BinnedColumnPath.getValue("deriveStringFromNumber");
+        var textLabelFunction = this._binnedColumnPath.getValue("deriveStringFromNumber");
 
         for(var i = 0; i < numberOfBins; i++) {
             switch(_shapeType) {
@@ -127,7 +111,6 @@ class WeaveC3ColorLegend extends AbstractWeaveTool {
                 case SHAPE_TYPE_LINE :
                     break;
             }
-
         }
     }
 
@@ -139,16 +122,9 @@ class WeaveC3ColorLegend extends AbstractWeaveTool {
 
     }
 
-    _updateStyle() {
-
-    }
-
-    _update() {
-        this._updateStyle();
-    }
-
-    destroy() {
+    componentWillUnmount() {
         this.element.remove();
+        super.componentWillUnmount();
     }
 }
 

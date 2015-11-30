@@ -1,4 +1,4 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.js";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 import c3 from "c3";
 import d3 from "d3";
 import _ from "lodash";
@@ -127,8 +127,8 @@ class WeaveC3PieChart extends AbstractWeaveTool {
           { name: "label", path: plotterPath.push("label"), callbacks: dataChanged },
           { name: "fillStyle", path: plotterPath.push("fill"), callbacks: dataChanged },
           { name: "lineStyle", path: plotterPath.push("line"), callbacks: dataChanged },
-          { name: "innerRadius", path: plotterPath.push("innerRadius"), callback: dataChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "innerRadius", path: plotterPath.push("innerRadius"), callbacks: dataChanged },
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged },
           { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
           { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
         ];

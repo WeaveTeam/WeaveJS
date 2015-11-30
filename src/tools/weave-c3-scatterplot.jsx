@@ -1,4 +1,4 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.js";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 import {registerToolImplementation} from "../WeaveTool.jsx";
 import c3 from "c3";
 import _ from "lodash";
@@ -201,7 +201,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
           { name: "line", path: plotterPath.push("line"), callbacks: dataChanged },
           { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
           { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged },
           { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
           { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
         ];

@@ -12,8 +12,8 @@ export default class AbstractWeaveTool extends React.Component {
 
 		getElementSize() {
         return {
-            width: this.element.clientWidth,
-            height: this.element.clientHeight
+            width: this.props.width,
+            height: this.props.height
         };
     }
 
@@ -49,6 +49,6 @@ export default class AbstractWeaveTool extends React.Component {
     }
 
 		render() {
-        return <div style={{height: this.props.height, maxHeight: this.props.height}}/>;
+        return <div style={{height: this.props.height, maxHeight: this.props.height, width: this.props.width}}/>;
     }
 }

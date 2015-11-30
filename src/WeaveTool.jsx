@@ -64,13 +64,13 @@ export class WeaveTool extends React.Component {
             cursor: "move"
         };
 
-        var toolHeight = this.props.style ? this.props.style.height - 25 : "100%";
+        var toolHeight = this.props.style ? this.props.style.height - 25 : 320;
+        var toolWidth = this.props.style ? this.props.style.width : 320;
 
         var reactTool = "";
         if (React.Component.isPrototypeOf(this.ToolClass)) {
-            reactTool = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath, height: toolHeight}, this.toolProps));
+            reactTool = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath, height: toolHeight, width: toolWidth}, this.toolProps));
         }
-
 
         return (
           <ui.VBox style={this.props.style} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
@@ -81,7 +81,7 @@ export class WeaveTool extends React.Component {
                 reactTool ?
                   reactTool
                           :
-                  <div ref="toolDiv" style={{width: "100%", height: toolHeight}}></div>
+                  <div ref="toolDiv" style={{width: toolWidth, height: toolHeight}}></div>
               }
           </ui.VBox>);
     }

@@ -1,14 +1,111 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.js";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 import c3 from "c3";
 import _ from "lodash";
 import {registerToolImplementation} from "../WeaveTool.jsx";
 import FormatUtils from "../Utils/FormatUtils";
+import StandardLib from "../Utils/StandardLib";
 import React from "react";
 
 class WeaveC3Histogram extends AbstractWeaveTool {
     constructor(props) {
         super(props);
         this.busy = false;
+
+        this.c3Config = {
+            //size: this.getElementSize(),
+            padding: {
+              top: 20,
+              bottom: 20,
+              right: 30
+            },
+            data: {
+                columns: [],
+                selection: {
+                   enabled: true,
+                   multiple: true,
+                   draggable: true
+               },
+               type: "bar",
+               color: (color, d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var decColor = this.paths.fillStyle.push("color").push("internalDynamicColumn", null).getValue("getColorFromDataValue")(d.index).toString(16);
+                        return "#" + StandardLib.decimalToHex(decColor);
+                    }
+                    return "#C0CDD1";
+               },
+               onselected: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this.toolPath.qkeyToString(qKey);
+                        });
+                        this.toolPath.selection_keyset.addKeys(selectedIds);
+                    }
+                },
+                onunselected: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var unSelectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this.toolPath.qkeyToString(qKey);
+                        });
+                        this.toolPath.selection_keyset.removeKeys(unSelectedIds);
+                    }
+                },
+                onmouseover: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                            return this.toolPath.qkeyToString(qKey);
+                        });
+                        this.toolPath.probe_keyset.setKeys(selectedIds);
+                    }
+                },
+                onmouseout: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this.toolPath.probe_keyset.setKeys([]);
+                    }
+                }
+            },
+            bindto: this.element,
+            legend: {
+                show: false
+            },
+            axis: {
+                x: {
+                    type: "category",
+                    label: {
+                        position: "outer-center"
+                    },
+                    tick: {
+                        multiline: false,
+                        format: (num) => {
+                            return this.paths.binnedColumn.getValue("deriveStringFromNumber")(num);
+                        }
+                    }
+                },
+                y: {
+                    label: {
+                        position: "outer-middle"
+                    },
+                    tick: {
+                        fit: false,
+                        format: FormatUtils.defaultNumberFormatting
+                    }
+                },
+                rotated: false
+            },
+            grid: {
+                x: {
+                    show: true
+                },
+                y: {
+                    show: true
+                }
+            },
+            bar: {
+                width: {
+                    ratio: 0.95
+                }
+            },
+            onrendered: this._updateStyle.bind(this)
+        };
     }
 
     _selectionKeysChanged() {
@@ -26,6 +123,11 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     }
     _probedKeysChanged() {
 
+    }
+
+    rotateAxes() {
+      this.c3Config.axis.rotated = true;
+      this.forceUpdate();
     }
 
     _axisChanged () {
@@ -187,107 +289,14 @@ class WeaveC3Histogram extends AbstractWeaveTool {
           { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
           { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
           { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged},
           { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
           { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
         ];
 
         this.initializePaths(mapping);
 
-        this.c3Config = {
-            //size: this.getElementSize(),
-            padding: {
-              top: 20,
-              bottom: 20,
-              right: 30
-            },
-            data: {
-                columns: [],
-                selection: {
-                   enabled: true,
-                   multiple: true,
-                   draggable: true
-               },
-               type: "bar",
-               color: (color, d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        return "#" + this.paths.fillStyle.push("color").push("internalDynamicColumn").push(null).getValue("getColorFromDataValue")(d.index).toString(16);
-                    }
-                    return "#C0CDD1";
-               },
-               onselected: (d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.selection_keyset.addKeys(selectedIds);
-                    }
-                },
-                onunselected: (d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        var unSelectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.selection_keyset.removeKeys(unSelectedIds);
-                    }
-                },
-                onmouseover: (d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.probe_keyset.setKeys(selectedIds);
-                    }
-                },
-                onmouseout: (d) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.probe_keyset.setKeys([]);
-                    }
-                }
-            },
-            bindto: this.element,
-            legend: {
-                show: false
-            },
-            axis: {
-                x: {
-                    type: "category",
-                    label: {
-                        position: "outer-center"
-                    },
-                    tick: {
-                        multiline: false,
-                        format: (num) => {
-                            return this.paths.binnedColumn.getValue("deriveStringFromNumber")(num);
-                        }
-                    }
-                },
-                y: {
-                    label: {
-                        position: "outer-middle"
-                    },
-                    tick: {
-                        fit: false,
-                        format: FormatUtils.defaultNumberFormatting
-                    }
-                },
-                rotated: false
-            },
-            grid: {
-                x: {
-                    show: true
-                },
-                y: {
-                    show: true
-                }
-            },
-            bar: {
-                width: {
-                    ratio: 0.95
-                }
-            },
-            onrendered: this._updateStyle.bind(this)
-        };
+        this.c3Config.bindto = this.element;
 
         this.chart = c3.generate(this.c3Config);
     }

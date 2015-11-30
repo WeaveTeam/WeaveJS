@@ -1,7 +1,7 @@
 import React from "react";
 import {ListGroupItem, ListGroup} from "react-bootstrap";
 import {registerToolImplementation} from "../WeaveTool.jsx";
-import AbstractWeaveTool from "./AbstractWeaveTool";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 
 class SessionStateMenuTool extends AbstractWeaveTool {
 
@@ -32,14 +32,16 @@ class SessionStateMenuTool extends AbstractWeaveTool {
     var menus = this.choices.getNames().map((choice, index) => {
 
       return choice === selectedChoice ? <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
-                                       : <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
+    : <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
     });
 
-    return (<ListGroup>
-      {
-        menus
-      }
-    </ListGroup>);
+    return (<div style={{overflowY: "scroll"}}>
+      <ListGroup>
+        {
+          menus
+        }
+      </ListGroup>
+    </div>);
   }
 }
 

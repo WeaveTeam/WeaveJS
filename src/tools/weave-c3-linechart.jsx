@@ -1,4 +1,4 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.js";
+import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 import c3 from "c3";
 import d3 from "d3";
 import _ from "lodash";
@@ -139,7 +139,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
           { name: "columns", path: plotterPath.push("columns"), callbacks: dataChanged },
           { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
           { name: "curveType", path: plotterPath.push("curveType"), callbacks: dataChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet")},
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged },
           { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
           { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
         ];
@@ -185,6 +185,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                 },
                 y: {
                     tick: {
+                        multiline: true,
                         format: (num) => {
                           if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("getMetadata('dataType')") !== "number") {
                             return this.yAxisValueToLabel[num] || "";
