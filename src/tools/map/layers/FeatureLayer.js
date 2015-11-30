@@ -100,6 +100,7 @@ export default class FeatureLayer extends Layer {
 		let selectedStyle = feature.get("selectedStyle") || nullStyle;
 		let probedStyle = feature.get("probedStyle") || nullStyle;
 		let zOrder = feature.get("zOrder") || 0;
+		let replace = feature.get("replace");
 		let newStyle;
 
 		if (!this.filteredSet.has(id))
@@ -127,13 +128,29 @@ export default class FeatureLayer extends Layer {
 
 		if (this.selectedSet.has(id))
 		{
-			newStyle = newStyle.concat(selectedStyle);
+			if (replace)
+			{
+				newStyle = selectedStyle;
+			}
+			else
+			{
+				newStyle = newStyle.concat(selectedStyle);	
+			}
+			
 			newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER - 3);
 		}
 
 		if (this.probedSet.has(id))
 		{
-			newStyle = newStyle.concat(probedStyle);
+			if (replace)
+			{
+				newStyle = probedStyle;
+			}
+			else
+			{
+				newStyle = newStyle.concat(probedStyle);
+			}
+			
 			newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER);
 		}
 

@@ -21,29 +21,6 @@ class ImageGlyphLayer extends GlyphLayer {
 
 		var records = this.layerPath.retrieveRecords(["imageURL", "imageSize"], this.layerPath.push("dataX"));
 
-		var recordIds = lodash.pluck(records, "id");
-
-		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
-
-		/* Unset style for missing points */
-		for (let id of removedIds)
-		{
-			if (!id)
-			{
-				continue;
-			}
-			let feature = this.source.getFeatureById(id);
-
-			if (!feature)
-			{
-				continue;
-			}
-
-			feature.setStyle(null);
-		}
-
-		/* Update style for everyone else */
-
 		function setScale(icon, imageSize)
 		{
 			var maxDim = Math.max(this.naturalHeight, this.naturalWidth);
@@ -53,7 +30,7 @@ class ImageGlyphLayer extends GlyphLayer {
 		for (let record of records)
 		{
 			let feature = this.source.getFeatureById(record.id);
-			let imageURL = record.imageURL;
+			let src = record.imageURL;
 			let imageSize = record.imageSize;
 
 			if (!feature)
@@ -61,25 +38,39 @@ class ImageGlyphLayer extends GlyphLayer {
 				continue;
 			}
 
-			if (!imageURL)
+			if (!src)
 			{
 				feature.setStyle(null);
 				continue;
 			}
 
-			let icon = new ol.style.Icon({
-				src: imageURL
-			});
+			let styles = {};
+			let icons = {};
 
-			let img = icon.getImage();
+			for (let stylePrefix of ["normal", "selected", "probed", "unselected"])
+			{
 
-			jquery(img).one("load", setScale.bind(img, icon, imageSize));
+				let styleName = stylePrefix + "Style";
+				icons[stylePrefix] = new ol.style.Icon({src});
 
-			let normalStyle = [new ol.style.Style({
-				image: icon
-			})];
+				styles[styleName] = [new ol.style.Style({
+					image: icons[stylePrefix]
+				})];
+			}
 
-			feature.setProperties({normalStyle});
+			icons.unselected.setOpacity(0.33);
+
+			icons.normal.load();
+			let img = icons.normal.getImage();
+
+			jquery(img).one("load", setScale.bind(img, icons.normal, imageSize))
+				.one("load", setScale.bind(img, icons.selected, imageSize))
+				.one("load", setScale.bind(img, icons.unselected, imageSize))
+				.one("load", setScale.bind(img, icons.probed, imageSize * 2));
+
+			styles.replace = true;
+
+			feature.setProperties(styles);
 		}
 		this.updateMetaStyles();
 	}
