@@ -99,6 +99,7 @@ export default class FeatureLayer extends Layer {
 		let normalStyle = feature.get("normalStyle") || nullStyle;
 		let selectedStyle = feature.get("selectedStyle") || nullStyle;
 		let probedStyle = feature.get("probedStyle") || nullStyle;
+		let zOrder = feature.get("zOrder") || 0;
 		let newStyle;
 
 		if (!this.filteredSet.has(id))
@@ -122,7 +123,7 @@ export default class FeatureLayer extends Layer {
 			newStyle = [].concat(normalStyle);
 		}
 
-		newStyle[0].setZIndex(0);
+		newStyle[0].setZIndex(zOrder);
 
 		if (this.selectedSet.has(id))
 		{

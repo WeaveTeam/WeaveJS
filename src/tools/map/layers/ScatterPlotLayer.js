@@ -64,7 +64,9 @@ class ScatterPlotLayer extends GlyphLayer {
 		let maxScreenRadius = this.maxRadiusPath.getState();
 		let defaultScreenRadius = this.defaultRadiusPath.getState();
 
+		styleRecords = lodash.sortByOrder(styleRecords, ["sizeBy", "id"], ["desc"], ["asc"]);
 
+		let zOrder = 0;
 
 		for (let record of styleRecords)
 		{
@@ -135,8 +137,10 @@ class ScatterPlotLayer extends GlyphLayer {
 
 			if (feature)
 			{
-				feature.setProperties({normalStyle, unselectedStyle, selectedStyle, probedStyle});
+				feature.setProperties({normalStyle, unselectedStyle, selectedStyle, probedStyle, zOrder});
 			}
+
+			zOrder++;
 		}
 	}
 }
