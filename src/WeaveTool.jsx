@@ -56,6 +56,14 @@ export class WeaveTool extends React.Component {
         }
     }
 
+    get title() {
+      if(this.toolPath) {
+        return this.toolPath.getValue("this.hasOwnProperty('title') ? this.title : ''") || this.toolPath.getPath().pop();
+      } else {
+        return this.tool ? this.tool.title : "";
+      }
+    }
+
     componentDidUpdate() {
         if(this.tool.resize) {
             this.tool.resize();
@@ -113,7 +121,7 @@ export class WeaveTool extends React.Component {
                 <ui.HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
                      <Glyphicon glyph="cog"/>
                 </ui.HBox>
-                <p style={titleStyle}>{this.toolPath.getValue("this.title")}</p>
+                <p style={titleStyle}>{this.title}</p>
                 <ui.HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
                     <div style={{marginRight: 5}}>
                         <Glyphicon glyph="unchecked"/>

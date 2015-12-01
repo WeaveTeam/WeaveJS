@@ -4,5 +4,5 @@ import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
 /* eslint-enable */
 
 window.wlm = React.render(
-		<WeaveLayoutManager weave={opener.weave}/>,	document.body
+		<WeaveLayoutManager weave={opener ? opener.weave : null}/>,	document.body
 );
