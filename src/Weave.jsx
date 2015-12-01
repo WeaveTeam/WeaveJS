@@ -9,14 +9,27 @@ class Weave extends React.Component {
     }
 
     onSwfLoaded (event) {
-        event.ref.weaveReady = this.props.onWeaveReady;
+        event.ref.weaveReady = this.weaveReady.bind(this);
+    }
+
+    weaveReady (weave) {
+      this.weave = weave;
+      this.props.onWeaveReady(weave);
     }
 
     render() {
-       return (<SwfObject swfUrl="../weave.swf" attributes={{id: "weave"}} onLoad={this.onSwfLoaded.bind(this)} style={this.props.style}/>);
+       return (<SwfObject swfUrl="../weave.swf" attributes={{id: "weave"}} onLoad={this.onSwfLoaded.bind(this)} style={{height: this.props.height, maxHeight: this.props.height, width: this.props.width}}/>);
+    }
+
+    componentDidUpdate() {
+
     }
 
     componentWillUnmount () {
+    }
+
+    get title() {
+      return "Weave";
     }
 
     destroy() {
