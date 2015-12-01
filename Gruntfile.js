@@ -31,7 +31,7 @@ module.exports = function (grunt) {
                 }
             },
             dist: {
-                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}]
+                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
             },
             dev: {
                 options: {
@@ -40,7 +40,7 @@ module.exports = function (grunt) {
                         plugin: []
                     }
                 },
-                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}]
+                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
             }
         },
         copy: {

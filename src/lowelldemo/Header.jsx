@@ -1,0 +1,25 @@
+import React from "react";
+import ui from "../react-ui/ui.jsx";
+
+export default class Header extends React.Component {
+
+  constructor(props) {
+    super(props);
+  }
+
+  render() {
+
+    var navBarStyle = {
+      background: "#f3f3f4",
+      height: 60,
+      minHeight: 50,
+      borderBottom: "solid",
+      borderBottomWidth: 1,
+      borderBottomColor: "rgba(100,100,100,0.1)"
+    };
+
+    return (<ui.VBox style={navBarStyle}>
+      {this.props.children}
+    </ui.VBox>);
+  }
+}
