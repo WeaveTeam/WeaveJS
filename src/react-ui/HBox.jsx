@@ -3,7 +3,7 @@ import React from "react";
 var hboxStyle = {
 	display: "flex",
 	flexDirection: "row",
-	width: "100%"
+	flex: 1
 };
 
 class HBox extends React.Component {
