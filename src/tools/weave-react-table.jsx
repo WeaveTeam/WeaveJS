@@ -7,6 +7,10 @@ import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 class WeaveReactTable extends AbstractWeaveTool {
     constructor(props) {
         super(props);
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
         React.render(
             <DataGrid toolPath={this.toolPath} element={this.element} />, this.element);
     }
@@ -49,12 +53,12 @@ class DataGrid extends React.Component {
     _setupCallbacks() {
         var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
         this._columnsPath.addCallback(dataChanged, true, false);
-        opener.weave.path("defaultSubsetKeyFilter").addCallback(dataChanged, true, false);
+        this.toolPath.push("filteredKeySet").addCallback(dataChanged, true, false);
     }
 
     _dataChanged() {
 
-        var records = this._columnsPath.retrieveRecords(this._columnsPath.getNames(), opener.weave.path("defaultSubsetKeyFilter"));
+        var records = this._columnsPath.retrieveRecords(this._columnsPath.getNames(), this.toolPath.push("filteredKeySet"));
         var columns = this._columnsPath.getChildren().map((columnPath) => {
                         return {
                             name: columnPath.getPath().pop(),
