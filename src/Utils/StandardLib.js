@@ -145,6 +145,11 @@ export default class StandardLib {
 			return base.replace(/\/[^\/]*$/, "") + "/" + path;
 		}
 
+		static merge (into, obj) {
+        for (let attr in obj) {
+            into[attr] = obj[attr];
+        }
+    }
     // // this function returns equally spaced bins given a number of bins
 // // the bins are returned as an array of bin. each bin contains an array of records,
 // // the bin bound (min and max) as well as the bin height computed using the aggregation function.
