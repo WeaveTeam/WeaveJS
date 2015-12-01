@@ -3,7 +3,7 @@ import React from "react";
 var hboxStyle = {
 	display: "flex",
 	flexDirection: "row",
-	flex: 1
+	height: "100%"
 };
 
 class HBox extends React.Component {
@@ -17,7 +17,7 @@ class HBox extends React.Component {
 		var {style, ...otherProps} = this.props || {};
 		style = style || {};
 		style.display = style.display || hboxStyle.display;
-		style.width = style.width || hboxStyle.width;
+		style.height = style.height || hboxStyle.height;
 		style.flexDirection = hboxStyle.flexDirection;
 
 		return (

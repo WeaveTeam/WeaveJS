@@ -3,7 +3,7 @@ import React from "react";
 var vboxStyle = {
 	display: "flex",
 	flexDirection: "column",
-	flex: 1
+	width: "100%"
 };
 
 class VBox extends React.Component {
@@ -16,7 +16,7 @@ class VBox extends React.Component {
 		var {style, ...otherProps} = this.props;
 		style = style || {};
 		style.display = style.display || vboxStyle.display;
-		style.height = style.height || vboxStyle.height;
+		style.width = style.width || vboxStyle.width;
 		style.flexDirection = vboxStyle.flexDirection;
 
 		return (
