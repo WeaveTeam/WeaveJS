@@ -292,7 +292,6 @@ class WeaveLayoutManager extends React.Component {
 
         if(!this.weave) {
             // creates the weave flash instance as a WeaveTool React component
-            console.log("creates weave instance as react component");
             children.push(<WeaveTool ref="Weave" key="Weave" toolClass="Weave" toolProps={{onWeaveReady: this.weaveReady}}/>);
         } else {
             // during the second render, creates the other tools including weave

@@ -31,14 +31,11 @@ export class WeaveTool extends React.Component {
           showControls: false
         };
         var toolType = this.toolPath ? this.toolPath.getType() : this.props.toolClass;
-        if(toolType === "weave.visualization.tools::ExternalTool" && this.toolPath && this.toolPath.getType("toolClass")) {
+        if(toolType === "weave.visualization.tools::ExternalTool" && this.toolPath.getType("toolClass")) {
             toolType = this.toolPath.getState("toolClass");
         }
         this.ToolClass = getToolImplementation(toolType);
-
-        if(this.toolPath) {
-          this.toolPath.push("panelTitle").addCallback(this.forceUpdate.bind(this));
-        }
+        this.forceUpdate = this.forceUpdate.bind(this);
     }
 
     componentDidMount() {
@@ -58,13 +55,21 @@ export class WeaveTool extends React.Component {
 
     get title() {
       if(this.toolPath) {
-        return this.toolPath.getValue("this.hasOwnProperty('title') ? this.title : ''") || this.toolPath.getPath().pop();
+        return this.toolPath.getValue("this.hasOwnProperty('title') ? this.title : ''")
+          || (this.toolPath.getType('title') ? this.toolPath.getState('title') : '')
+          || this.toolPath.getPath().pop();
       } else {
         return this.tool ? this.tool.title : "";
       }
     }
 
     componentDidUpdate() {
+        this.toolPath = this.props.toolPath;
+        this.toolProps = this.props.toolProps;
+        if(this.toolPath) {
+          this.toolPath.addCallback(this.forceUpdate);
+        }
+
         if(this.tool.resize) {
             this.tool.resize();
         }

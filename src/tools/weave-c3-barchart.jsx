@@ -121,11 +121,11 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     rotateAxes() {
-      this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
-      setTimeout(() => {
-        this.busy = true;
-        c3.generate(this.c3Config);
-      }, 10);
+    //   this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
+    //   setTimeout(() => {
+    //     this.busy = true;
+    //     c3.generate(this.c3Config);
+    //   }, 10);
     }
 
     _axisChanged () {
