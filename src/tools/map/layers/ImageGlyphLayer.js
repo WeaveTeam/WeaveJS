@@ -1,5 +1,4 @@
 import jquery from "jquery";
-import lodash from "lodash";
 import ol from "openlayers";
 import GlyphLayer from "./GlyphLayer.js";
 import {registerLayerImplementation} from "./Layer.js";

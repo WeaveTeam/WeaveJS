@@ -29,6 +29,7 @@ class GeometryLayer extends FeatureLayer {
 		var featureProjection = this.parent.map.getView().getProjection();
 		var keys = this.geoColumnPath.getKeys();
 		var rawGeometries = this.geoColumnPath.getValue("ColumnUtils.getGeoJsonGeometries(this, this.keys)");
+		this.rawGeometries = rawGeometries;
 
 
 		this.source.clear();
@@ -65,7 +66,7 @@ class GeometryLayer extends FeatureLayer {
 				lineJoin: this.lineStylePath.push("joints"),
 				miterLimit: this.lineStylePath.push("miterLimit")
 			}
-		});
+		}, this.geoColumnPath);
 
 		this.rawStyles = styleRecords;
 

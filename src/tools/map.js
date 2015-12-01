@@ -180,23 +180,29 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 	onMouseMove(event)
 	{
 		let keySetMap = new Map();
+
+		/* We need to have sets for all the layers so that probing over an empty area correctly empties the keyset */
+		this.map.getLayers().forEach(
+			function (layer)
+			{
+				let weaveLayerObject = layer.get("layerObject");
+
+				if (weaveLayerObject.probeKeySet && !keySetMap.get(weaveLayerObject.probeKeySet))
+				{
+					keySetMap.set(weaveLayerObject.probeKeySet, new Map());
+				}
+			},
+			this);
 		this.map.forEachFeatureAtPixel(event.pixel,
 			function (feature, layer)
 			{
 				let weaveLayerObject = layer.get("layerObject");
+
 				let tmpKeySet = keySetMap.get(weaveLayerObject.probeKeySet);
 
-				if (!tmpKeySet)
-				{
-					if (!weaveLayerObject.probeKeySet)
-					{
-						return;
-					}
-					tmpKeySet = new Set();
-					keySetMap.set(weaveLayerObject.probeKeySet, tmpKeySet);
-				}
+				/* No need to check here, we created one for every probeKeySet in the prior forEach */
 
-				tmpKeySet.add(feature.getId());
+				tmpKeySet.set(feature.getId(), layer.getZIndex());
 			},
 			function (layer)
 			{
@@ -206,7 +212,23 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		for (let weaveKeySet of keySetMap.keys())
 		{
 			let keySet = keySetMap.get(weaveKeySet);
-			weaveKeySet.setKeys(Array.from(keySet));
+
+			let top = {key: null, index: -Infinity};
+
+			for (let key of keySet.keys())
+			{
+				let index = keySet.get(key);
+				if (index > top.index)
+				{
+					top.index = index;
+					top.key = key;
+				}
+
+			}
+			if (top.key)
+			{
+				weaveKeySet.setKeys([top.key]);
+			}
 		}
 	}
 

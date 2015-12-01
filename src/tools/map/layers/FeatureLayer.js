@@ -134,9 +134,9 @@ export default class FeatureLayer extends Layer {
 			}
 			else
 			{
-				newStyle = newStyle.concat(selectedStyle);	
+				newStyle = newStyle.concat(selectedStyle);
 			}
-			
+
 			newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER - 3);
 		}
 
@@ -150,7 +150,7 @@ export default class FeatureLayer extends Layer {
 			{
 				newStyle = newStyle.concat(probedStyle);
 			}
-			
+
 			newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER);
 		}
 
