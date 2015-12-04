@@ -4,8 +4,8 @@ import c3 from "c3";
 import _ from "lodash";
 import d3 from "d3";
 import FormatUtils from "../Utils/FormatUtils";
+import StandardLib from "../Utils/StandardLib";
 import React from "react";
-
 /* private
  * @param records array or records
  * @param attributes array of attributes to be normalized
@@ -50,7 +50,7 @@ function _normalizeRecords (records, attributes) {
     });
 }
 
-class WeaveC3ScatterPlot extends AbstractWeaveTool {
+class CustomLineChart extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
@@ -72,13 +72,24 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         if(this.busy) {
             return;
         }
+
+        var linePlotters = this.toolPath.push('children', 'visualization', 'plotManager', 'plotters').getValue('getObjects(LineChartPlotter)');
+
         let numericMapping = {
           point: {
             x: this.paths.dataX,
             y: this.paths.dataY
           },
-          size: this.paths.sizeBy
+          size: this.paths.sizeBy,
+          lines: {}
         };
+        let lines = numericMapping.lines;
+        let xs = {};
+        linePlotters.forEach((plotter, i) => {
+          xs['y'+i] = 'x'+i;
+          lines['x'+i] = plotter.push('dataX');
+          lines['y'+i] = plotter.push('dataY');
+        });
 
         let stringMapping = {
             point: {
@@ -149,7 +160,26 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         this._axisChanged();
         this.busy = true;
-        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => { this.busy = false; }});
+        var loadParams = {unload: true, done: () => { this.busy = false; }};
+
+        if (linePlotters.length) {
+          loadParams.xs = xs, loadParams.data = _.pluck(this.numericRecords, 'lines');
+          var colors = {};
+          var names = {};
+          var columnTitleToColor = {};
+          linePlotters.forEach((linePlotter, i) => {
+             colors["y"+i] = "#" + StandardLib.decimalToHex(linePlotter.getState("lineStyle", "color", "defaultValue"));
+             names["y"+i] = linePlotter.push("dataY").getValue("getMetadata('title')");
+             columnTitleToColor[names["y"+i]] = colors["y"+i];
+          });
+          this.props.updateTitleToColor(columnTitleToColor);
+        }
+        else {
+          loadParams.data = _.pluck(this.numericRecords, 'point');
+        }
+        this.chart.load(loadParams);
+        this.chart.data.names(names);
+        this.chart.data.colors(colors);
     }
 
     _selectionKeysChanged() {
@@ -221,32 +251,22 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         this.c3Config = {
             bindto: this.element,
+            tooltip: {
+              show: false
+            },
             padding: {
-              top: 20,
-              bottom: 20,
-              right: 30
+              top: 10,
+              bottom: 10,
+              right: 10
             },
             data: {
                 rows: [],
-                x: "x",
-                xSort: false,
-                type: "scatter",
+                //xSort: false,
+                type: "line",
                 selection: {
                     enabled: true,
-                    multiple: true,
-                    draggable: true
-                },
-                color: (color, d) => {
-                    if(this.stringRecords && d.hasOwnProperty("index")) {
-
-                        // find the corresponding index of numericRecords in stringRecords
-                        var id = this.indexToKey[d.index];
-                        var index = _.pluck(this.stringRecords, "id").indexOf(id);
-
-                        var record = this.stringRecords[index];
-                        return (record && record.fill && record.fill.color) ? record.fill.color : "#C0CDD1";
-                    }
-                    return "#C0CDD1";
+                    multiple: false,
+                    draggable: false
                 },
                 onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
@@ -270,7 +290,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                 }
             },
             legend: {
-                show: false
+                show: true
             },
             axis: {
                 x: {
@@ -281,7 +301,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                         fit: false,
                         rotate: 0,
                         format: (num) => {
-                          if(this._dataXPath && this.xAxisValueToLabel && this.dataXType !== "number") {
+                          if(this.paths.dataX && this.xAxisValueToLabel && this.dataXType !== "number") {
                             return this.xAxisValueToLabel[num] || "";
                           } else {
                             return FormatUtils.defaultNumberFormatting(num);
@@ -296,7 +316,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     tick: {
                         fit: false,
                         format: (num) => {
-                          if(this._dataYPath && this.yAxisValueToLabel && this.dataYType !== "number") {
+                          if(this.paths.dataY && this.yAxisValueToLabel && this.dataYType !== "number") {
                             return this.yAxisValueToLabel[num] || "";
                           } else {
                             return FormatUtils.defaultNumberFormatting(num);
@@ -318,14 +338,12 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     if(d.hasOwnProperty("index")) {
                         return this.normalizedPointSizes[d.index];
                     }
-
-                }
+                },
+                show: false
             },
             onrendered: this._updateStyle.bind(this)
         };
         this.chart = c3.generate(this.c3Config);
     }
 }
-export default WeaveC3ScatterPlot;
-
-registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
+export default CustomLineChart;

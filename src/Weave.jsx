@@ -22,7 +22,6 @@ class Weave extends React.Component {
     }
 
     componentDidUpdate() {
-      console.log(this.props.toolPath)
     }
 
     componentWillUnmount () {
