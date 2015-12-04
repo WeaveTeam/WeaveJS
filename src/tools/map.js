@@ -31,9 +31,10 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.dragPan = new ol.interaction.DragPan();
 		this.dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});
 		this.dragSelect = new ol.interaction.DragBox();
+		this.probeInteraction = new ol.interaction.Pointer({handleMoveEvent: this.onMouseMove.bind(this)});
 
 		this.dragSelect.on('boxstart', function () {
-
+			this.probeInteraction.setActive(false);
 		}, this);
 
 		this.dragSelect.on('boxend', function () {
@@ -64,6 +65,8 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 					weaveLayer.selectionKeySet.addKeys(Array.from(selectedFeatures));
 				}
 			}
+
+			this.probeInteraction.setActive(true);
 		}, this);
 
 		/* Register layer changes */
@@ -79,24 +82,16 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.map = new ol.Map({
 			interactions: ol.interaction.defaults({dragPan: false}),
 			controls: [],
-			target: this.element,
-			view: new ol.View({
-				center: [0, 0],
-				zoom: 0
-			})
+			target: this.element
 		});
 
-		this.centerCallbackHandle = this.map.getView().on("change:center", this.setSessionCenter, this);
-		this.resolutionCallbackHandle = this.map.getView().on("change:resolution", this.setSessionZoom, this);
+		this.toolPath.push("projectionSRS").addCallback(this.onProjectionChanged.bind(this), true);
 
 		this.toolPath.push("showZoomControls").addCallback(this.onZoomControlToggle.bind(this), true);
 		this.toolPath.push("showMouseModeControls").addCallback(this.onMouseModeControlToggle.bind(this), true);
+
 		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode")
 			.addCallback(this.onInteractionModeChange.bind(this), true);
-
-		this.map.addInteraction(new ol.interaction.Pointer({
-			handleMoveEvent: this.onMouseMove.bind(this)
-		}));
 
 		this.plottersPath = this.toolPath.push("children", "visualization", "plotManager", "plotters");
 		this.layerSettingsPath = this.toolPath.push("children", "visualization", "plotManager", "layerSettings");
@@ -105,10 +100,23 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.map.addInteraction(this.dragPan);
 		this.map.addInteraction(this.dragZoom);
 		this.map.addInteraction(this.dragSelect);
+		this.map.addInteraction(this.probeInteraction);
 
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
 
 		this.zoomBoundsPath.addCallback(this.getSessionCenterBound, true);
+	}
+
+	onProjectionChanged()
+	{
+		let projectionSRS = this.toolPath.push("projectionSRS").getState() || "EPSG:3857";
+		let view = new ol.View({projection: projectionSRS});
+
+		this.centerCallbackHandle = view.on("change:center", this.setSessionCenter, this);
+		this.resolutionCallbackHandle = view.on("change:resolution", this.setSessionZoom, this);
+		this.map.setView(view);
+
+		this.getSessionCenter();
 	}
 
 	resize() {this.map.updateSize(); }
@@ -229,6 +237,10 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 			{
 				weaveKeySet.setKeys([top.key]);
 			}
+			else
+			{
+				weaveKeySet.setKeys([]);
+			}
 		}
 	}
 
@@ -280,6 +292,8 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 				"[tmp_bounds.getXCenter(), tmp_bounds.getYCenter()];");
 
 		var scale = this.zoomBoundsPath.getValue("getXScale()");
+
+		console.log(center, scale);
 
 		this.map.getView().un("change:center", this.setSessionCenter, this);
 		this.map.getView().un("change:resolution", this.setSessionZoom, this);

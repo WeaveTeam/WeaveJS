@@ -11,7 +11,7 @@ class ImageGlyphLayer extends GlyphLayer {
 
 		this.boundUpdateStyleData = this.updateStyleData.bind(this);
 
-		this.layerPath.push("imageSize").addCallback(this.boundUpdateStyleData, true);
+		this.layerPath.push("imageSize").addCallback(this.boundUpdateStyleData);
 		this.layerPath.push("imageURL").addCallback(this.boundUpdateStyleData, true);
 	}
 
@@ -20,17 +20,20 @@ class ImageGlyphLayer extends GlyphLayer {
 
 		var records = this.layerPath.retrieveRecords(["imageURL", "imageSize"], this.layerPath.push("dataX"));
 
+		this.rawStyleRecords = records;
+
 		function setScale(icon, imageSize)
 		{
 			var maxDim = Math.max(this.naturalHeight, this.naturalWidth);
 			icon.setScale(imageSize / maxDim);
+			//console.log(this, icon, imageSize);
 		}
 
 		for (let record of records)
 		{
 			let feature = this.source.getFeatureById(record.id);
 			let src = record.imageURL;
-			let imageSize = record.imageSize;
+			let imageSize = Number(record.imageSize);
 
 			if (!feature)
 			{
@@ -59,13 +62,24 @@ class ImageGlyphLayer extends GlyphLayer {
 
 			icons.unselected.setOpacity(0.33);
 
-			icons.normal.load();
 			let img = icons.normal.getImage();
 
-			jquery(img).one("load", setScale.bind(img, icons.normal, imageSize))
-				.one("load", setScale.bind(img, icons.selected, imageSize))
-				.one("load", setScale.bind(img, icons.unselected, imageSize))
-				.one("load", setScale.bind(img, icons.probed, imageSize * 2));
+			if (!img.complete)
+			{
+				jquery(img).one("load", setScale.bind(img, icons.normal, imageSize))
+					.one("load", setScale.bind(img, icons.selected, imageSize))
+					.one("load", setScale.bind(img, icons.unselected, imageSize))
+					.one("load", setScale.bind(img, icons.probed, imageSize * 2));
+			}
+			else
+			{
+				setScale.call(img, icons.normal, imageSize);
+				setScale.call(img, icons.selected, imageSize);
+				setScale.call(img, icons.unselected, imageSize);
+				setScale.call(img, icons.probed, imageSize * 2);
+			}
+
+			icons.normal.load();
 
 			styles.replace = true;
 

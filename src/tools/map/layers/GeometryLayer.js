@@ -2,7 +2,6 @@ import ol from "openlayers";
 import {registerLayerImplementation} from "./Layer.js";
 import FeatureLayer from "./FeatureLayer.js";
 
-
 class GeometryLayer extends FeatureLayer {
 	constructor(parent, layerName)
 	{
@@ -25,14 +24,13 @@ class GeometryLayer extends FeatureLayer {
 
 	updateGeometryData()
 	{
-		var dataProjection = this.geoColumnPath.getState("projectionSRS");
-		var featureProjection = this.parent.map.getView().getProjection();
-		var keys = this.geoColumnPath.getKeys();
-		var rawGeometries = this.geoColumnPath.getValue("ColumnUtils.getGeoJsonGeometries(this, this.keys)");
-		this.rawGeometries = rawGeometries;
-
-
+		var metadata = this.geoColumnPath.push("internalDynamicColumn", "ReferencedColumn", "metadata").getState();
+		var dataProjection = metadata.projection || "EPSG:4326";
+		var featureProjection = this.geoColumnPath.push("projectionSRS").getState() || "EPSG:4326";
 		this.source.clear();
+
+		var keys = this.geoColumnPath.getKeys();
+		var rawGeometries = this.geoColumnPath.push("internalDynamicColumn").getValue("ColumnUtils.getGeoJsonGeometries(this, this.keys)");
 
 		for (let idx = 0; idx < keys.length; idx++)
 		{
