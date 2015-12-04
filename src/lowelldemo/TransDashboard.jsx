@@ -6,11 +6,14 @@ import Panel from "./Panel.jsx";
 import Weave from "../Weave.jsx";
 import _ from "lodash";
 import c3 from "c3";
+import CustomLineChart from "../tools/custom-linechart.jsx";
+import SlidingMenu from "../react-sliding-menu/SlidingMenu.jsx";
+import {Button} from "react-bootstrap";
 
 const styles = {
   title: {
     margin: "auto",
-    color: "#888888",
+    color: "#BBBBBB",
     fontSize: 24
   }
 };
@@ -19,48 +22,17 @@ class TransDashboard extends React.Component {
 
   constructor(props) {
     super(props);
+    this.charts = {};
   }
 
   componentDidMount() {
 
   }
 
-  getPanel(panelConfig) {
-      return (
-        <Panel style={panelConfig.style}>
-          <ui.VBox style={{marginRight: "15%"}}>
-            <h4 style={{marginBottom: 0}}>
-              {panelConfig.title}
-            </h4>
-            <span style={{height: 2, backgroundColor: "#65A8D4"}}/>
-          </ui.VBox>
-          <ui.HBox>
-            <div style={{flex: 5}}>
-              <div style={{margin: 5, width: "100%", height: "100%"}} ref={panelConfig.chartRef}>
-                This is the chart
-              </div>
-            </div>
-            <div style={{flex: 1}}>
-               <div style={{margin: "auto"}}>
-                 This is the interactive table on the right
-               </div>
-            </div>
-          </ui.HBox>
-        </Panel>
-      );
-  }
+
 
   componentDidUpdate() {
-    var chart = React.findDOMNode(this.refs.chart);
-    c3.generate({
-      data: {
-        columns: [
-            ['data1', 30, 200, 100, 400, 150, 250],
-            ['data2', 50, 20, 10, 40, 15, 25]
-        ]
-      },
-      bindto: chart
-    });
+
   }
 
   onWeaveReady(weave) {
@@ -68,75 +40,66 @@ class TransDashboard extends React.Component {
     this.weave.path("lowelltrans").addCallback(this.forceUpdate.bind(this), true);
   }
 
+  openParcel() {
+    window.open("/weave.html?file=Lowell_Transactions_Parcel_Yearly_20150715_Demo.weave", "Parcel", {
+      height: 300,
+      width: 400,
+      menubar: 0,
+      toolbar: 0,
+      titlebar: 0
+    });
+  }
+
+  openCensusTract() {
+    window.open("/weave.html?file=Lowell_Transactions_CT_Map_20150730_Demo.weave", "Census", {
+      height: 300,
+      width: 400,
+      menubar: 0,
+      toolbar: 0,
+      titlebar: 0
+    });
+  }
+
   render() {
 
-    if(!this.weave) {
-      return <Weave ref="weave" onWeaveReady={_.debounce(this.onWeaveReady.bind(this), 100)} style={{width: 1, height: 1}}></Weave>;
-    }
+    var panels = this.weave ? this.weave.path("lowelltrans").getChildren().map((childPath, index) => {
+      return <Panel panelPath={childPath} key={index} style={{margin: 15, flex: 1 }}></Panel>
+    }) : "";
 
     return (
       <ui.VBox>
-        <Header>
-          <ui.HBox>
-            <Weave ref="weave" width={1} height={1}></Weave>
-          </ui.HBox>
-          <p style={styles.title}>
-            Lowell Housing Transactions
-          </p>
-        </Header>
-
-
-        <Panel style={{height: 300, margin: 30}}>
-          <ui.VBox style={{marginRight: "15%"}}>
-            <h4 style={{marginBottom: 0}}>
-              City of Lowell Mean Values: Single, Two and Three Family; and Condominium
-            </h4>
-            <span style={{height: 2, backgroundColor: "#65A8D4"}}/>
-          </ui.VBox>
-          <ui.HBox>
-            <div style={{flex: 1}}>
-              <p>
-                This is a descriptive paragprah
-              </p>
-            </div>
-            <div style={{flex: 4}}>
-              <div style={{margin: "auto", width: "100%", height: "100%"}} ref="chart">
+        <ui.VBox style={{height: 1000}}>
+          <Header>
+            <SlidingMenu/>
+            <p style={styles.title}>
+              Lowell Housing Dashboard
+            </p>
+            <ui.HBox style={{float: "right !important"}}>
+              <div style={{borderLeft: "1px solid", borderColor: "#BBBBBB"}}>
+                <div style={{margin: 20}}>
+                  <p style={{fontSize: 16, color: "#BBBBBB"}}>About</p>
+                </div>
               </div>
-            </div>
-            <div style={{flex: 1}}>
-               <div style={{margin: "auto"}}>
-                 This is the interactive table on the right
-               </div>
-            </div>
-          </ui.HBox>
-        </Panel>
-
-        <Panel style={{height: 300, margin: 10}}>
-          <ui.VBox style={{marginRight: "15%"}}>
-            <h4 style={{marginBottom: 0}}>
-              City of Lowell: $ of Sales: Single, Two and Three Family; and Condominium
-            </h4>
-            <span style={{height: 2, backgroundColor: "#65A8D4"}}/>
-          </ui.VBox>
-          <ui.HBox>
-            <div style={{flex: 1}}>
-              <p>
-                This is a descriptive paragprah
-              </p>
-            </div>
-            <div style={{flex: 1}}>
-              <div style={{margin: "auto"}}>
-                This is the chart
+              <div style={{borderLeft: "1px solid", borderColor: "#BBBBBB"}}>
+                <div style={{margin: 20}}>
+                  <p style={{fontSize: 16, color: "#BBBBBB"}}>Settings</p>
+                </div>
               </div>
+            </ui.HBox>
+          </Header>
+          <ui.HBox style={{marginLeft: "80%", marginTop: 5}}>
+            <div style={{marginRight: 10}}>
+              <Button onClick={this.openParcel.bind(this)}>Launch Parcel Map</Button>
             </div>
-            <div style={{flex: 1}}>
-               <div style={{margin: "auto"}}>
-                 This is the interactive table on the right
-               </div>
+            <div>
+              <Button onClick={this.openCensusTract.bind(this)}>Census Tract</Button>
             </div>
           </ui.HBox>
-        </Panel>
-
+          {
+            panels
+          }
+        </ui.VBox>
+        <Weave ref="weave" onWeaveReady={_.debounce(this.onWeaveReady.bind(this), 100)} width="100%" height="100%"></Weave>
       </ui.VBox>
     );
   }

@@ -10,7 +10,7 @@ export default class Header extends React.Component {
   render() {
 
     var navBarStyle = {
-      background: "#f3f3f4",
+      background: "#333",
       height: 60,
       minHeight: 50,
       borderBottom: "solid",
@@ -18,8 +18,8 @@ export default class Header extends React.Component {
       borderBottomColor: "rgba(100,100,100,0.1)"
     };
 
-    return (<ui.VBox style={navBarStyle}>
+    return (<ui.HBox style={navBarStyle}>
       {this.props.children}
-    </ui.VBox>);
+    </ui.HBox>);
   }
 }
