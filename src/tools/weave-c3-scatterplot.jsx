@@ -99,13 +99,23 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.dataXType = this.paths.dataX.getValue("getMetadata('dataType')");
         this.dataYType = this.paths.dataY.getValue("getMetadata('dataType')");
 
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+        var timeout = Date.now() + 3000;
+        while (Date.now() < timeout)
+        {
+          this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+          this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+          if (this.numericRecords.length === this.stringRecords.length)
+            break;
+        }
+
+        if (this.numericRecords.length !== this.stringRecords.length)
+          throw new Error("Failed to retrieve records.");
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
 
-        [this.numericRecords, this.stringRecords] = _.unzip(this.records);
+        if(this.records.length)
+          [this.numericRecords, this.stringRecords] = _.unzip(this.records);
 
         this.keyToIndex = {};
         this.indexToKey = {};
@@ -187,10 +197,11 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
-        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
+        var axisChanged = this._axisChanged.bind(this);
+        var dataChanged = this._dataChanged.bind(this);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
-        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 30);
+        var probeKeySetChanged = this._probedKeysChanged.bind(this);
+
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
           { name: "plotter", path: plotterPath, callbacks: null},
