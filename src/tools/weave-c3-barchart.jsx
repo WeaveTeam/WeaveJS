@@ -121,11 +121,11 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     rotateAxes() {
-    //   this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
-    //   setTimeout(() => {
-    //     this.busy = true;
-    //     c3.generate(this.c3Config);
-    //   }, 10);
+      // this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
+      // setTimeout(() => {
+      //   this.busy = true;
+      //   c3.generate(this.c3Config);
+      // }, 10);
     }
 
     _axisChanged () {
@@ -236,7 +236,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         });
 
         this.groupingMode = this.paths.groupingMode.getState();
-        //var horizontalMode = this._plotterPath.push("horizontalMode").getState();
+        //var horizontalMode = this.paths.plotter.push("horizontalMode").getState();
 
         // set axis rotation mode
         //this.chart.load({axes: { rotated: horizontalMode }});
@@ -301,7 +301,11 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     componentDidUpdate() {
         super.componentDidUpdate();
-        this.chart.resize({ width: this.props.width, height: this.props.height});
+        var newElementSize = this.getElementSize();
+        if(!_.isEqual(newElementSize, this.elementSize)) {
+          this.chart.resize(newElementSize);
+          this.elementSize = newElementSize;
+        }
     }
 
     componentWillUnmount() {

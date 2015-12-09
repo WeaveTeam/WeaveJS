@@ -117,7 +117,7 @@ export class WeaveTool extends React.Component {
 
         var reactTool = "";
         if (React.Component.isPrototypeOf(this.ToolClass)) {
-            reactTool = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath, height: toolHeight, width: toolWidth}, this.toolProps));
+            reactTool = React.createElement(this.ToolClass, _.merge({key: "tool", ref: "tool", toolPath: this.toolPath, style: { height: toolHeight, width: toolWidth }}, this.toolProps));
         }
 
         return (
