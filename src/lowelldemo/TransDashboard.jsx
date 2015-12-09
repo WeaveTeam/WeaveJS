@@ -87,13 +87,18 @@ class TransDashboard extends React.Component {
               </div>
             </ui.HBox>
           </Header>
-          <ui.HBox style={{marginLeft: "80%", marginTop: 5}}>
-            <div style={{marginRight: 10}}>
-              <Button onClick={this.openParcel.bind(this)}>Launch Parcel Map</Button>
-            </div>
-            <div>
-              <Button onClick={this.openCensusTract.bind(this)}>Census Tract</Button>
-            </div>
+          <ui.HBox>
+            <ui.HBox style={{flex: 1}}>
+
+            </ui.HBox>
+            <ui.HBox style={{marginTop: 5, marginRight: 15}}>
+              <div style={{marginRight: 10}}>
+                <Button onClick={this.openParcel.bind(this)}>Launch Parcel Map</Button>
+              </div>
+              <div>
+                <Button onClick={this.openCensusTract.bind(this)}>Census Tract</Button>
+              </div>
+            </ui.HBox>
           </ui.HBox>
           {
             panels

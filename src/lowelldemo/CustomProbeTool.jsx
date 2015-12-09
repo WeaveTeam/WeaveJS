@@ -35,6 +35,10 @@ export default class CustomProbeTool extends React.Component {
     var data = columnsPath.retrieveRecords(columnNames, probeKeySet);
 
     var tableStyle = {
+      margin: "10px 0",
+      width: "100%",
+      display: "block",
+      overflowY: "scroll",
       borderCollapse: "collapse",
       borderSpacing: 0,
       backgroundColor: "fff",
@@ -43,7 +47,8 @@ export default class CustomProbeTool extends React.Component {
       opacity: 0.9,
       background: "#fff",
       marginBottom: "1.25rem",
-      border: "solid 1px #ddd"
+      border: "solid 1px #ddd",
+      fontSize: 12
     };
 
     var tables = data.map((record, index) => {
@@ -53,13 +58,13 @@ export default class CustomProbeTool extends React.Component {
           var value = record[columnName];
           rows.push(<tr key={columnName}>
             <td>{title}</td>
-            <td style={{color: this.state.columnTitleToColor[title]}}>{value}</td>
+            <td style={{color: this.state.columnTitleToColor[title], overflow: "hidden", textOverflow: "ellipsis"}}>{value}</td>
           </tr>);
         }
-        return <table key={index} style={VendorPrefix.prefix({style: tableStyle}).styles}>
-          {
-            rows
-          }
+        return <table key={index} style={VendorPrefix.prefix({styles: tableStyle}).styles}>
+            {
+              rows
+            }
         </table>;
     });
 

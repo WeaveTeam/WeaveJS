@@ -50,9 +50,7 @@ export default class Panel extends React.Component {
         <ui.HBox style={{flex: 1}}>
           <CustomLineChart ref="chart" toolPath={this.path.weave.path(panelConfig.chartRef)} style={{flex: 2}} updateTitleToColor={this.updateTitleToColor.bind(this)}/>
           <div style={{flex: 1}}>
-             <div style={{margin: "auto"}}>
-               <CustomProbeTool toolPath={this.path} ref="probeTool"/>
-             </div>
+             <CustomProbeTool toolPath={this.path} ref="probeTool"/>
           </div>
         </ui.HBox>
       </ui.VBox>
