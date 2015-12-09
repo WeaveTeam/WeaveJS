@@ -1,7 +1,8 @@
 import {registerToolImplementation} from "../WeaveTool.jsx";
 import _ from "lodash";
 import React from "react";
-import ReactDataGrid from "react-datagrid";
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+//import ReactDataGrid from "react-datagrid";
 import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
 
 class WeaveReactTable extends AbstractWeaveTool {
@@ -12,60 +13,34 @@ class WeaveReactTable extends AbstractWeaveTool {
     componentDidMount() {
         super.componentDidMount();
         React.render(
-            <DataGrid toolPath={this.toolPath} element={this.element} />, this.element);
+            <DataTable toolPath={this.toolPath}/>, this.element);
     }
 }
 
-class DataGrid extends React.Component {
+class DataTable extends React.Component {
 
     constructor(props) {
         super(props);
         this.toolPath = props.toolPath;
         this._columnsPath = this.toolPath.push("columns");
 
-        this._setupCallbacks();
+        this.forceUpdate = this.forceUpdate.bind(this);
+    }
 
-        this.state = {
-            columns: [],
-            rows: [],
-            selected: {}
-        };
-
+    componentDidMount() {
+        this._columnsPath.addCallback(this.forceUpdate, true, false);
+        this.toolPath.push("filteredKeySet").addCallback(this.forceUpdate, true, false);
         this.toolPath.push("selectionKeySet").addCallback(this._selectionKeysChanged.bind(this), true, false);
     }
-
-    onColumnResize(firstCol, firstSize) {
-        firstCol.width = firstSize;
-        // this.setState({});
-    }
-
     _selectionKeysChanged () {
-        var keys = this.toolPath.push("selectionKeySet", null).getKeys();
-        var selection = {};
-        keys.forEach((key) => {
-            selection[key] = {};
-        });
-        this.setState({
-            selected: selection
-        });
-    }
-
-    _setupCallbacks() {
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
-        this._columnsPath.addCallback(dataChanged, true, false);
-        this.toolPath.push("filteredKeySet").addCallback(dataChanged, true, false);
-    }
-
-    _dataChanged() {
-
-        var records = this._columnsPath.retrieveRecords(this._columnsPath.getNames(), this.toolPath.push("filteredKeySet"));
-        var columns = this._columnsPath.getChildren().map((columnPath) => {
-                        return {
-                            name: columnPath.getPath().pop(),
-                            title: columnPath.getValue("getMetadata('title')")
-                        };
-                    });
-        this.setState({records, columns});
+        // var keys = this.toolPath.push("selectionKeySet", null).getKeys();
+        // var selection = {};
+        // keys.forEach((key) => {
+        //     selection[key] = {};
+        // });
+        // this.setState({
+        //     selected: selection
+        // });
     }
 
     onSelectionChange(selectedIds) {
@@ -76,18 +51,27 @@ class DataGrid extends React.Component {
     }
 
     render() {
-        return <ReactDataGrid
-                        ref="grid"
-                        idProperty="id"
-                        dataSource={this.state.records}
-                        columns={this.state.columns}
-                        style={{height: this.props.element.clientHeight}}
-                        onColumnResize={this.onColumnResize.bind(this)}
-                        selected={this.state.selected}
-                        rowStyle={this.rowStyle}
-                        onSelectionChange={this.onSelectionChange.bind(this)}
-                        showCellBorders={"vertical"}>
-                </ReactDataGrid>;
+        var data = this._columnsPath.retrieveRecords(this._columnsPath.getNames(), this.toolPath.push("filteredKeySet")) || [];
+        var columns = this._columnsPath.getChildren().map((columnPath) => {
+                        return {
+                            name: columnPath.getPath().pop(),
+                            title: columnPath.getValue("getMetadata('title')")
+                        };
+                    });
+        columns.push({
+          name: "id",
+          title: "id"
+        });
+
+        var columnHeaders = columns.map((column, index) => {
+          return <TableHeaderColumn dataField={column.name} key={index} dataAlign="left" dataSort={true}>column.title</TableHeaderColumn>;
+        });
+
+        return <BootstrapTable data={data} keyField="id" striped={true} hover={true}>
+                  {
+                    columnHeaders
+                  }
+                </BootstrapTable>;
     }
 }
 
