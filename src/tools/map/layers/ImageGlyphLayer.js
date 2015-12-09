@@ -1,6 +1,8 @@
 import jquery from "jquery";
 import ol from "openlayers";
 import GlyphLayer from "./GlyphLayer.js";
+import FeatureLayer from "./FeatureLayer.js";
+import ImageGlyphCache from "./ImageGlyphCache.js";
 import {registerLayerImplementation} from "./Layer.js";
 
 class ImageGlyphLayer extends GlyphLayer {
@@ -10,82 +12,83 @@ class ImageGlyphLayer extends GlyphLayer {
 		super(parent, layerName);
 
 		this.boundUpdateStyleData = this.updateStyleData.bind(this);
+		this.imageGlyphCache = new ImageGlyphCache();
 
 		this.layerPath.push("imageSize").addCallback(this.boundUpdateStyleData);
 		this.layerPath.push("imageURL").addCallback(this.boundUpdateStyleData, true);
 	}
 
+	setIconStyle(feature, img, iconSize)
+	{
+		let styles = {};
+
+		if (!img.complete || !img.src)
+		{
+			jquery(img).one("load", this.setIconStyle.bind(this, feature, img, iconSize));
+			return;
+		}
+
+		let maxDim = Math.max(img.naturalHeight, img.naturalWidth);
+
+		let scale = iconSize / maxDim;
+		console.log(scale, iconSize, maxDim);
+		let imgSize = [img.naturalWidth, img.naturalHeight];
+
+		for (let stylePrefix of ["normal", "selected", "probed", "unselected"])
+		{
+			let icon;
+			if (stylePrefix === "probed")
+			{
+				icon = new ol.style.Icon({img, imgSize, scale: scale * 2.0});
+			}
+			else
+			{
+				icon = new ol.style.Icon({img, imgSize, scale});
+			}
+
+			if (stylePrefix === "unselected")
+			{
+				icon.setOpacity(1 / 3);
+			}
+			console.log(stylePrefix, icon.getOpacity(), icon.getScale());
+
+			styles[stylePrefix + "Style"] = new ol.style.Style({image: icon});
+		}
+
+		styles.replace = true;
+
+		feature.setProperties(styles);
+	}
+
 	updateStyleData() {
 		/* Update feature styles */
 
-		var records = this.layerPath.retrieveRecords(["imageURL", "imageSize"], this.layerPath.push("dataX"));
+		var records = this.layerPath.retrieveRecords(["alpha", "color", "imageURL", "imageSize"], this.layerPath.push("dataX"));
 
 		this.rawStyleRecords = records;
-
-		function setScale(icon, imageSize)
-		{
-			var maxDim = Math.max(this.naturalHeight, this.naturalWidth);
-			icon.setScale(imageSize / maxDim);
-			//console.log(this, icon, imageSize);
-		}
 
 		for (let record of records)
 		{
 			let feature = this.source.getFeatureById(record.id);
-			let src = record.imageURL;
-			let imageSize = Number(record.imageSize);
 
 			if (!feature)
 			{
 				continue;
 			}
 
-			if (!src)
+			let imageSize = Number(record.imageSize);
+			let color = FeatureLayer.toColorRGBA(record.color, record.alpha);
+
+			if (!record.imageURL)
 			{
 				feature.setStyle(null);
 				continue;
 			}
 
-			let styles = {};
-			let icons = {};
+			let img = this.imageGlyphCache.getImage(record.imageURL, color);
 
-			for (let stylePrefix of ["normal", "selected", "probed", "unselected"])
-			{
-
-				let styleName = stylePrefix + "Style";
-				icons[stylePrefix] = new ol.style.Icon({src});
-
-				styles[styleName] = [new ol.style.Style({
-					image: icons[stylePrefix]
-				})];
-			}
-
-			icons.unselected.setOpacity(0.33);
-
-			let img = icons.normal.getImage();
-
-			if (!img.complete)
-			{
-				jquery(img).one("load", setScale.bind(img, icons.normal, imageSize))
-					.one("load", setScale.bind(img, icons.selected, imageSize))
-					.one("load", setScale.bind(img, icons.unselected, imageSize))
-					.one("load", setScale.bind(img, icons.probed, imageSize * 2));
-			}
-			else
-			{
-				setScale.call(img, icons.normal, imageSize);
-				setScale.call(img, icons.selected, imageSize);
-				setScale.call(img, icons.unselected, imageSize);
-				setScale.call(img, icons.probed, imageSize * 2);
-			}
-
-			icons.normal.load();
-
-			styles.replace = true;
-
-			feature.setProperties(styles);
+			this.setIconStyle(feature, img, imageSize);
 		}
-		this.updateMetaStyles();
 	}
 }
 

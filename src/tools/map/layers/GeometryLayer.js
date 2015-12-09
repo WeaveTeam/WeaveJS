@@ -98,7 +98,6 @@ class GeometryLayer extends FeatureLayer {
 				feature.setProperties({normalStyle, unselectedStyle, selectedStyle, probedStyle});
 			}
 		}
-		this.updateMetaStyles();
 	}
 }
 

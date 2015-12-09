@@ -1,5 +1,6 @@
 import Layer from "./Layer.js";
 import StandardLib from "../../../Utils/StandardLib.js";
+import lodash from "lodash";
 import ol from "openlayers";
 
 export default class FeatureLayer extends Layer {
@@ -11,6 +12,10 @@ export default class FeatureLayer extends Layer {
 		this.layer = new ol.layer.Vector();
 		this.source = new ol.source.Vector({wrapX: false});
 
+		/* Every feature that is added should register a handler to automatically recompute the metastyles when the styles change. */
+		this.source.on("addfeature", this.onFeatureAdd, this);
+
+		this.changedItems = new Set();
 		this.probedSet = new Set();
 		this.selectedSet = new Set();
 		this.filteredSet = new Set();
@@ -29,6 +34,28 @@ export default class FeatureLayer extends Layer {
 
 		this.subsetFilter.addCallback(this.updateFilteredKeySet.bind(this), true);
 		this.settingsPath.push("selectable").addCallback(boundUpdateMetaStyles);
+	}
+
+	onFeatureAdd(vectorEvent)
+	{
+		vectorEvent.feature.on("propertychange", this.onFeaturePropertyChange, this);
+	}
+
+	onFeaturePropertyChange(objectEvent)
+	{
+		let propertyName = objectEvent.key;
+		let feature = objectEvent.currentTarget;
+
+		if (!lodash.contains(FeatureLayer.styles, propertyName))
+		{
+			/* The property that changed isn't one of our metaStyle properties, so we don't care. */
+			return;
+		}
+		else
+		{
+			/* The property that changed was a metastyle, and as such the style should be recomputed */
+			lodash.defer(this.updateMetaStyle.bind(this), feature);
+		}
 	}
 
 	static toColorArray(colorString, alpha)
@@ -53,20 +80,48 @@ export default class FeatureLayer extends Layer {
 		return colorArray;
 	}
 
+	static toColorRGBA(colorString, alpha)
+	{
+		var colorArray = FeatureLayer.toColorArray(colorString, alpha);
+		return ol.color.asString(colorArray);
+	}
 
 	updateSetFromKeySet(keySet, set, diff)
 	{
+		let wasEmpty = set.size === 0;
+
+		this.changedItems.clear();
+
 		for (let key of diff.added)
 		{
 			set.add(key);
+			this.changedItems.add(key);
 		}
 
 		for (let key of diff.removed)
 		{
 			set.delete(key);
+			this.changedItems.add(key);
 		}
 
-		this.updateMetaStyles();
+		let isEmpty = set.size === 0;
+
+		/* If a set becomes empty or nonempty, we should recompute all the styles. Otherwise, only recompute the styles of the features which changed. */
+		if (isEmpty !== wasEmpty)
+		{
+			this.updateMetaStyles();
+		}
+		else
+		{
+			this.changedItems.forEach(function (featureId)
+			{
+				let feature = this.source.getFeatureById(featureId);
+				if (feature)
+				{
+					this.updateMetaStyle(feature);
+				}
+			}, this);
+		}
 	}
 
 	updateFilteredKeySet()
@@ -117,27 +172,40 @@ export default class FeatureLayer extends Layer {
 
 		if (!this.selectedSet.has(id) && !this.probedSet.has(id) && this.selectedSet.size > 0)
 		{
-			newStyle = [].concat(unselectedStyle);
+			if (replace)
+			{
+				newStyle = unselectedStyle;
+				newStyle.setZIndex(zOrder);
+			}
+			else
+			{
+				newStyle = [].concat(unselectedStyle);
+				newStyle[0].setZIndex(zOrder);
+			}
+
 		}
 		else
 		{
 			newStyle = [].concat(normalStyle);
+			newStyle[0].setZIndex(zOrder);
 		}
 
-		newStyle[0].setZIndex(zOrder);
+		
 
 		if (this.selectedSet.has(id))
 		{
 			if (replace)
 			{
 				newStyle = selectedStyle;
+				newStyle.setZIndex(Number.MAX_SAFE_INTEGER - 3);
 			}
 			else
 			{
 				newStyle = newStyle.concat(selectedStyle);
+				newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER - 3);
 			}
 
-			newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER - 3);
+			
 		}
 
 		if (this.probedSet.has(id))
@@ -145,13 +213,13 @@ export default class FeatureLayer extends Layer {
 			if (replace)
 			{
 				newStyle = probedStyle;
+				newStyle.setZIndex(Number.MAX_SAFE_INTEGER);
 			}
 			else
 			{
 				newStyle = newStyle.concat(probedStyle);
+				newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER);
 			}
-
-			newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER);
 		}
 
 		feature.setStyle(newStyle);
