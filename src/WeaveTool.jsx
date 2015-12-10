@@ -34,6 +34,8 @@ export class WeaveTool extends React.Component {
         if(toolType === "weave.visualization.tools::ExternalTool" && this.toolPath.getType("toolClass")) {
             toolType = this.toolPath.getState("toolClass");
         }
+        if (toolType === "weavejs.core.LinkableHashMap" && this.toolPath.getType("class"))
+            toolType = this.toolPath.getState("class");
         this.ToolClass = getToolImplementation(toolType);
         this.forceUpdate = this.forceUpdate.bind(this);
     }

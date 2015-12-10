@@ -62,20 +62,16 @@ class WeaveLayoutManager extends React.Component {
     }
 
     weaveReady(weave) {
-        try {
-            if (this.weave !== weave)
-            {
-                this.weave = weave;
-            }
-
-
-            this.element = React.findDOMNode(this);
-
-            this.weave.path().getValue("childListCallbacks.addGroupedCallback")(null, _.debounce(this.forceUpdate.bind(this), 0), true);
-            this.weave.path(LAYOUT).addCallback(this._layoutChanged.bind(this), true);
-        } catch(e) {
-            console.error(e);
+        if (this.weave !== weave)
+        {
+            this.weave = weave;
         }
+
+
+        this.element = React.findDOMNode(this);
+
+        this.weave.path().getValue("this.childListCallbacks.addGroupedCallback.bind(this.childListCallbacks)")(null, _.debounce(this.forceUpdate.bind(this), 0), true);
+        this.weave.path(LAYOUT).addCallback(this._layoutChanged.bind(this), true);
     }
 
     componentWillUnmount() {
@@ -306,6 +302,8 @@ class WeaveLayoutManager extends React.Component {
                 if(impl === "weave.visualization.tools::ExternalTool" && path.getType("toolClass")) {
                     impl = path.getState("toolClass");
                 }
+                if (impl === "weavejs.core.LinkableHashMap" && path.getType("class"))
+                	impl = path.getState("class");
                 impl = getToolImplementation(impl);
                 var toolName = path.getPath()[0];
                 var node;
