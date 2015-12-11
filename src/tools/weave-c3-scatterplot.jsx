@@ -96,8 +96,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             }
         };
 
-        this.dataXType = this.paths.dataX.getValue("getMetadata('dataType')");
-        this.dataYType = this.paths.dataY.getValue("getMetadata('dataType')");
+        this.dataXType = this.paths.dataX.getValue("this.getMetadata('dataType')");
+        this.dataYType = this.paths.dataY.getValue("this.getMetadata('dataType')");
 
         var timeout = Date.now() + 3000;
         while (Date.now() < timeout)
