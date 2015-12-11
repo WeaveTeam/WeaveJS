@@ -63,8 +63,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         }
 
         this.chart.axis.labels({
-            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("ColumnUtils.getTitle(this)"),
-            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("ColumnUtils.getTitle(this)")
+            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("this.getMetadata('title')"),
+            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("this.getMetadata('title')")
         });
     }
 
