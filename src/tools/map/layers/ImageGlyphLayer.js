@@ -31,7 +31,7 @@ class ImageGlyphLayer extends GlyphLayer {
 		let maxDim = Math.max(img.naturalHeight, img.naturalWidth);
 
 		let scale = iconSize / maxDim;
-		console.log(scale, iconSize, maxDim);
+
 		let imgSize = [img.naturalWidth, img.naturalHeight];
 
 		for (let stylePrefix of ["normal", "selected", "probed", "unselected"])
@@ -50,7 +50,6 @@ class ImageGlyphLayer extends GlyphLayer {
 			{
 				icon.setOpacity(1 / 3);
 			}
-			console.log(stylePrefix, icon.getOpacity(), icon.getScale());
 
 			styles[stylePrefix + "Style"] = new ol.style.Style({image: icon});
 		}

@@ -190,8 +190,6 @@ export default class FeatureLayer extends Layer {
 			newStyle[0].setZIndex(zOrder);
 		}
 
-		
-
 		if (this.selectedSet.has(id))
 		{
 			if (replace)
@@ -204,8 +202,6 @@ export default class FeatureLayer extends Layer {
 				newStyle = newStyle.concat(selectedStyle);
 				newStyle[0].setZIndex(Number.MAX_SAFE_INTEGER - 3);
 			}
-
-			
 		}
 
 		if (this.probedSet.has(id))

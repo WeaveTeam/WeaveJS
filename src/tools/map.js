@@ -15,6 +15,7 @@ import ScatterPlotLayer from "./map/layers/ScatterPlotLayer.js";
 /* eslint-enable */
 
 import {PanCluster, InteractionModeCluster} from "./map/controls.js";
+import weaveMapInteractions from "./map/interactions.js";
 
 class WeaveOpenLayersMap extends AbstractWeaveTool {
 
@@ -22,85 +23,37 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 	{
 		super(props);
 
-		this.zoomButtons = new ol.control.Zoom();
-		this.slider = new ol.control.ZoomSlider();
-
-		this.pan = new PanCluster();
-		this.mouseModeButtons = new InteractionModeCluster({weaveMap: this});
-
-		this.dragPan = new ol.interaction.DragPan();
-		this.dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});
-		this.dragSelect = new ol.interaction.DragBox();
-		this.probeInteraction = new ol.interaction.Pointer({handleMoveEvent: this.onMouseMove.bind(this)});
-
-		this.dragSelect.on('boxstart', function () {
-			this.probeInteraction.setActive(false);
-		}, this);
-
-		this.dragSelect.on('boxend', function () {
-			let extent = this.dragSelect.getGeometry().getExtent();
-			let selectedFeatures = new Set();
-			let alteredKeySets = new Set();
-			let selectFeature = (feature) => { selectedFeatures.add(feature.getId()); };
-
-			for (let weaveLayerName in this.layers)
-			{
-				let weaveLayer = this.layers[weaveLayerName];
-				let olLayer = weaveLayer.layer;
-				let selectable = olLayer.get("selectable");
-
-				if (weaveLayer instanceof FeatureLayer && selectable)
-				{
-					let keySet = weaveLayer.selectionKeySet;
-					let keySetString = JSON.stringify(keySet.getPath());
-					let source = olLayer.getSource();
-
-					if (!alteredKeySets.has(keySetString))
-					{
-						keySet.setKeys([]);
-					}
-					alteredKeySets.add(keySetString);
-
-					source.forEachFeatureIntersectingExtent(extent, selectFeature);
-					weaveLayer.selectionKeySet.addKeys(Array.from(selectedFeatures));
-				}
-			}
-
-			this.probeInteraction.setActive(true);
-		}, this);
-
-		/* Register layer changes */
-
 		this.layers = {};
-		this.getSessionCenterBound = this.getSessionCenter.bind(this);
 	}
 
 	componentDidMount()
 	{
 		super.componentDidMount();
 
+		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode");
+
 		this.map = new ol.Map({
-			interactions: ol.interaction.defaults({dragPan: false}),
+			interactions: weaveMapInteractions(this),
 			controls: [],
 			target: this.element
 		});
 
-		this.toolPath.push("projectionSRS").addCallback(this.onProjectionChanged.bind(this), true);
 
+		this.zoomButtons = new ol.control.Zoom();
+		this.slider = new ol.control.ZoomSlider();
+		this.pan = new PanCluster();
+
+		this.getSessionCenterBound = this.getSessionCenter.bind(this);
+
+		this.toolPath.push("projectionSRS").addCallback(this.onProjectionChanged.bind(this), true);
 		this.toolPath.push("showZoomControls").addCallback(this.onZoomControlToggle.bind(this), true);
 		this.toolPath.push("showMouseModeControls").addCallback(this.onMouseModeControlToggle.bind(this), true);
 
-		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode")
-			.addCallback(this.onInteractionModeChange.bind(this), true);
+		this.mouseModeButtons = new InteractionModeCluster({interactionModePath: this.interactionModePath});
 
 		this.plottersPath = this.toolPath.push("children", "visualization", "plotManager", "plotters");
 		this.layerSettingsPath = this.toolPath.push("children", "visualization", "plotManager", "layerSettings");
 		this.zoomBoundsPath = this.toolPath.push("children", "visualization", "plotManager", "zoomBounds");
-
-		this.map.addInteraction(this.dragPan);
-		this.map.addInteraction(this.dragZoom);
-		this.map.addInteraction(this.dragSelect);
-		this.map.addInteraction(this.probeInteraction);
 
 		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
 
@@ -120,21 +73,6 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 	}
 
 	resize() {this.map.updateSize(); }
-
-	setPanInteraction() {this.interactionModePath.state("pan"); }
-
-	setSelectInteraction() {this.interactionModePath.state("select"); }
-
-	setZoomInteraction() {this.interactionModePath.state("zoom"); }
-
-	onInteractionModeChange()
-	{
-		let interactionMode = this.interactionModePath.getState();
-
-		this.dragPan.setActive(interactionMode === "pan");
-		this.dragSelect.setActive(interactionMode === "select");
-		this.dragZoom.setActive(interactionMode === "zoom");
-	}
 
 	updateControlPositions()
 	{
@@ -185,65 +123,6 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.updateControlPositions();
 	}
 
-	onMouseMove(event)
-	{
-		let keySetMap = new Map();
-
-		/* We need to have sets for all the layers so that probing over an empty area correctly empties the keyset */
-		this.map.getLayers().forEach(
-			function (layer)
-			{
-				let weaveLayerObject = layer.get("layerObject");
-
-				if (weaveLayerObject.probeKeySet && !keySetMap.get(weaveLayerObject.probeKeySet))
-				{
-					keySetMap.set(weaveLayerObject.probeKeySet, new Map());
-				}
-			},
-			this);
-		this.map.forEachFeatureAtPixel(event.pixel,
-			function (feature, layer)
-			{
-				let weaveLayerObject = layer.get("layerObject");
-
-				let tmpKeySet = keySetMap.get(weaveLayerObject.probeKeySet);
-
-				/* No need to check here, we created one for every probeKeySet in the prior forEach */
-
-				tmpKeySet.set(feature.getId(), layer.getZIndex());
-			},
-			function (layer)
-			{
-				return layer.getSelectable() && layer instanceof FeatureLayer;
-			});
-
-		for (let weaveKeySet of keySetMap.keys())
-		{
-			let keySet = keySetMap.get(weaveKeySet);
-
-			let top = {key: null, index: -Infinity};
-
-			for (let key of keySet.keys())
-			{
-				let index = keySet.get(key);
-				if (index > top.index)
-				{
-					top.index = index;
-					top.key = key;
-				}
-
-			}
-			if (top.key)
-			{
-				weaveKeySet.setKeys([top.key]);
-			}
-			else
-			{
-				weaveKeySet.setKeys([]);
-			}
-		}
-	}
-
 	setSessionCenter()
 	{
 		var [xCenter, yCenter] = this.map.getView().getCenter();
@@ -292,8 +171,6 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 				"[tmp_bounds.getXCenter(), tmp_bounds.getYCenter()];");
 
 		var scale = this.zoomBoundsPath.getValue("getXScale()");
-
-		console.log(center, scale);
 
 		this.map.getView().un("change:center", this.setSessionCenter, this);
 		this.map.getView().un("change:resolution", this.setSessionZoom, this);

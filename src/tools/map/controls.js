@@ -84,6 +84,7 @@ ol.inherits(PanCluster, ol.control.Control);
 export class InteractionModeCluster {
 	constructor (optOptions)
 	{
+		var interactionModePath = optOptions.interactionModePath;
 		var options = optOptions || {};
 		var buttonTable = jquery(`
 			<table class="ol-unselectable ol-control iModeCluster">
@@ -95,9 +96,9 @@ export class InteractionModeCluster {
 			</table>
 		`);
 
-		buttonTable.find("button.iModeCluster.pan").click( () => options.weaveMap.setPanInteraction() );
-		buttonTable.find("button.iModeCluster.select").click( () => options.weaveMap.setSelectInteraction() );
-		buttonTable.find("button.iModeCluster.zoom").click( () => options.weaveMap.setZoomInteraction() );
+		buttonTable.find("button.iModeCluster.pan").click( () => interactionModePath.state("pan") );
+		buttonTable.find("button.iModeCluster.select").click( () => interactionModePath.state("select") );
+		buttonTable.find("button.iModeCluster.zoom").click( () => interactionModePath.state("zoom") );
 
 		ol.control.Control.call(this, {element: buttonTable[0], target: options.target});
 	}
