@@ -24,14 +24,10 @@ export default class AbstractWeaveTool extends React.Component {
 			properties.forEach((pathConf) => {
 				this.paths[pathConf.name] = pathConf.path;
 				if(pathConf.callbacks) {
-					var callbacks = pathConf.callbacks;
-					if(Array.isArray(callbacks)){
-						callbacks.forEach((callback) => {
-							this.paths[pathConf.name].addCallback(callback);
-						});
-					} else {
-						this.paths[pathConf.name].addCallback(pathConf.callbacks, true);
-					}
+					var callbacks = Array.isArray(pathConf.callbacks) ? pathConf.callbacks : [pathConf.callbacks];
+					callbacks.forEach((callback) => {
+						this.paths[pathConf.name].addCallback(callback, true);
+					});
 				}
 			});
 		}
