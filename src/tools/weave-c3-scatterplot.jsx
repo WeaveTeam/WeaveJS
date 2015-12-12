@@ -59,6 +59,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     _axisChanged () {
 
         if(this.busy) {
+        	this.busy++;
             return;
         }
 
@@ -70,6 +71,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     _dataChanged() {
         if(this.busy) {
+        	this.busy++;
             return;
         }
         let numericMapping = {
@@ -139,8 +141,16 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         });
 
         this._axisChanged();
-        this.busy = true;
-        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => { this.busy = false; }});
+        this.busy = 1;
+        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => {
+            if (this.busy > 1) {
+            	this.busy = 0;
+            	this._dataChanged();
+            }
+            else {
+                this.busy = 0;
+            }
+        }});
     }
 
     _selectionKeysChanged() {
@@ -195,7 +205,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
-          { name: "plotter", path: plotterPath, callbacks: null},
+          { name: "plotter", path: plotterPath, callbacks: dataChanged},
           { name: "dataX", path: plotterPath.push("dataX"), callbacks: [dataChanged, axisChanged] },
           { name: "dataY", path: plotterPath.push("dataY"), callbacks: [dataChanged, axisChanged] },
           { name: "sizeBy", path: plotterPath.push("sizeBy"), callbacks: dataChanged },
