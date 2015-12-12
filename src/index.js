@@ -8,7 +8,6 @@ var weave = window.weave || (opener && opener.weave);
 if (!weave)
 {
 	weave = new Weave();
-	weave.path().state(WeaveTest.getIrisState());
 }
 window.wlm = React.render(
 		<WeaveLayoutManager weave={weave}/>,	document.body

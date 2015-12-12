@@ -137,7 +137,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
           return;
         }
 
-        var xLabel = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getValue("ColumnUtils.getTitle(this)");
+        var xLabel = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getValue("this.getMetadata('title')");
         var yLabel = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
 
         this.chart.axis.labels({
@@ -163,7 +163,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         for (let idx in heightColumns)
         {
             let column = heightColumns[idx];
-            let title = column.getValue("getMetadata('title')");
+            let title = column.getValue("this.getMetadata('title')");
             let name = column.getPath().pop();
 
             this.heightColumnsLabels.push(title);
@@ -208,15 +208,25 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             }
         }
 
-        this.yLabelColumnDataType = this.yLabelColumnPath.getValue("getMetadata('dataType')");
+        this.yLabelColumnDataType = this.yLabelColumnPath.getValue("this.getMetadata('dataType')");
 
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+        var timeout = Date.now() + 3000;
+        while (Date.now() < timeout)
+        {
+          this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+          this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+          if (this.numericRecords.length === this.stringRecords.length)
+            break;
+        }
+
+        if (this.numericRecords.length !== this.stringRecords.length)
+          throw new Error("Failed to retrieve records.");
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByAll(this.records, [[0, "sort"], [0, "id"]]);
 
-        [this.numericRecords, this.stringRecords] = _.unzip(this.records);
+        if(this.records.length)
+          [this.numericRecords, this.stringRecords] = _.unzip(this.records);
 
         this.yAxisValueToLabel = {};
         this.xAxisValueToLabel = {};

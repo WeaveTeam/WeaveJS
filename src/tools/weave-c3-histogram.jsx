@@ -28,14 +28,14 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                type: "bar",
                color: (color, d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        var decColor = this.paths.fillStyle.push("color").push("internalDynamicColumn", null).getValue("getColorFromDataValue")(d.index).toString(16);
+                        var decColor = this.paths.fillStyle.push("color").push("internalDynamicColumn", null).getValue("this.getColorFromDataValue.bind(this)")(d.index).toString(16);
                         return "#" + StandardLib.decimalToHex(decColor);
                     }
                     return "#C0CDD1";
                },
                onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                        var selectedIds = this.paths.binnedColumn.getValue("this.getKeysFromBinIndex.bind(this)")(d.index).map( (qKey) => {
                             return this.toolPath.qkeyToString(qKey);
                         });
                         this.toolPath.selection_keyset.addKeys(selectedIds);
@@ -43,7 +43,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                 },
                 onunselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        var unSelectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                        var unSelectedIds = this.paths.binnedColumn.getValue("this.getKeysFromBinIndex.bind(this)")(d.index).map( (qKey) => {
                             return this.toolPath.qkeyToString(qKey);
                         });
                         this.toolPath.selection_keyset.removeKeys(unSelectedIds);
@@ -51,7 +51,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                 },
                 onmouseover: (d) => {
                     if(d && d.hasOwnProperty("index")) {
-                        var selectedIds = this.paths.binnedColumn.getValue("getKeysFromBinIndex")(d.index).map( (qKey) => {
+                        var selectedIds = this.paths.binnedColumn.getValue("this.getKeysFromBinIndex.bind(this)")(d.index).map( (qKey) => {
                             return this.toolPath.qkeyToString(qKey);
                         });
                         this.toolPath.probe_keyset.setKeys(selectedIds);
@@ -76,7 +76,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     tick: {
                         multiline: false,
                         format: (num) => {
-                            return this.paths.binnedColumn.getValue("deriveStringFromNumber")(num);
+                            return this.paths.binnedColumn.getValue("this.deriveStringFromNumber.bind(this)")(num);
                         }
                     }
                 },
@@ -138,7 +138,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         return;
 
       this.chart.axis.labels({
-          x: this.paths.xAxis.push("overrideAxisName").getState() || this.paths.binnedColumn.getValue("ColumnUtils.getTitle(this)"),
+          x: this.paths.xAxis.push("overrideAxisName").getState() || this.paths.binnedColumn.getValue("this.getMetadata('title')"),
           y: function() {
               var overrideAxisName = this.paths.yAxis.push("overrideAxisName").getState();
               if(overrideAxisName) {
@@ -149,9 +149,9 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                           case "count":
                               return "Number of records";
                           case "sum":
-                              return "Sum of " + this.paths.columnToAggregate.getValue("ColumnUtils.getTitle(this)");
+                              return "Sum of " + this.paths.columnToAggregate.getValue("this.getMetadata('title')");
                           case "mean":
-                              return "Mean of " + this.paths.columnToAggregate.getValue("ColumnUtils.getTitle(this)");
+                              return "Mean of " + this.paths.columnToAggregate.getValue("this.getMetadata('title')");
                       }
                   } else {
                       return "Number of records";
@@ -182,9 +182,19 @@ class WeaveC3Histogram extends AbstractWeaveTool {
           binnedColumn: this.paths.binnedColumn
         };
 
-        this.binnedColumnDataType = this.paths.binnedColumn.getValue("getMetadata('dataType')");
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.plotter.push("filteredKeySet"), dataType: "number"});
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.plotter.push("filteredKeySet"), dataType: "string"});
+        this.binnedColumnDataType = this.paths.binnedColumn.getValue("this.getMetadata('dataType')");
+        
+        var timeout = Date.now() + 3000;
+        while (Date.now() < timeout)
+        {
+          this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+          this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+          if (this.numericRecords.length === this.stringRecords.length)
+            break;
+        }
+
+        if (this.numericRecords.length !== this.stringRecords.length)
+          throw new Error("Failed to retrieve records.");
 
         this.idToRecord = {};
         this.keyToIndex = {};
@@ -196,11 +206,11 @@ class WeaveC3Histogram extends AbstractWeaveTool {
             this.indexToKey[index] = record.id;
         });
 
-        this.numberOfBins = this.paths.binnedColumn.getValue("numberOfBins");
+        this.numberOfBins = this.paths.binnedColumn.getValue("this.numberOfBins");
 
         this.histData = [];
 
-        // this._columnToAggregatePath.getValue("getInternatlColumn()");
+        // this._columnToAggregatePath.getValue("this.getInternalColumn()");
         var columnToAggregateNameIsDefined = this.paths.columnToAggregate.getState().length > 0;
 
         for(let iBin = 0; iBin < this.numberOfBins; iBin++) {

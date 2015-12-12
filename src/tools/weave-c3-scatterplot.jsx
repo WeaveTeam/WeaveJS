@@ -133,7 +133,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         });
 
         this.normalizedRecords = _normalizeRecords(this.numericRecords, ["size"]);
-        this.plotterState = this.paths.plotter.getState();
+        this.plotterState = this.paths.plotter.getUntypedState ? this.paths.plotter.getUntypedState() : this.paths.plotter.getState();
         this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord) => {
             if(this.plotterState && this.plotterState.sizeBy.length) {
                 let minScreenRadius = this.plotterState.minScreenRadius;

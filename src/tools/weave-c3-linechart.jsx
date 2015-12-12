@@ -56,18 +56,29 @@ class WeaveC3LineChart extends AbstractWeaveTool {
 
         for (let idx in children) {
             let child = children[idx];
-            let title = child.getValue("getMetadata('title')");
+            let title = child.getValue("this.getMetadata('title')");
             let name = child.getPath().pop();
             this.columnLabels.push(title);
             this.columnNames.push(name);
         }
 
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.plotter.push("filteredKeySet"), dataType: "number"});
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.plotter.push("filteredKeySet"), dataType: "string"});
+        var timeout = Date.now() + 3000;
+        while (Date.now() < timeout)
+        {
+          this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+          this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+          if (this.numericRecords.length === this.stringRecords.length)
+            break;
+        }
+
+        if (this.numericRecords.length !== this.stringRecords.length)
+          throw new Error("Failed to retrieve records.");
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortBy(this.records, [0, "id"]);
-        [this.numericRecords, this.stringRecords] = _.unzip(this.records);
+        
+        if(this.records.length)
+          [this.numericRecords, this.stringRecords] = _.unzip(this.records);
 
         this.keyToIndex = {};
         this.indexToKey = {};
@@ -187,7 +198,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                     tick: {
                         multiline: true,
                         format: (num) => {
-                          if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("getMetadata('dataType')") !== "number") {
+                          if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("this.getMetadata('dataType')") !== "number") {
                             return this.yAxisValueToLabel[num] || "";
                           } else {
                             return FormatUtils.defaultNumberFormatting(num);
