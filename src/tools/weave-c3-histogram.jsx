@@ -184,17 +184,8 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
         this.binnedColumnDataType = this.paths.binnedColumn.getValue("this.getMetadata('dataType')");
         
-        var timeout = Date.now() + 3000;
-        while (Date.now() < timeout)
-        {
-          this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-          this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
-          if (this.numericRecords.length === this.stringRecords.length)
-            break;
-        }
-
-        if (this.numericRecords.length !== this.stringRecords.length)
-          throw new Error("Failed to retrieve records.");
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.idToRecord = {};
         this.keyToIndex = {};

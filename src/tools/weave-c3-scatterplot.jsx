@@ -99,17 +99,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.dataXType = this.paths.dataX.getValue("this.getMetadata('dataType')");
         this.dataYType = this.paths.dataY.getValue("this.getMetadata('dataType')");
 
-        var timeout = Date.now() + 3000;
-        while (Date.now() < timeout)
-        {
-          this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-          this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
-          if (this.numericRecords.length === this.stringRecords.length)
-            break;
-        }
-
-        if (this.numericRecords.length !== this.stringRecords.length)
-          throw new Error("Failed to retrieve records.");
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
@@ -244,9 +235,9 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                         var index = _.pluck(this.stringRecords, "id").indexOf(id);
 
                         var record = this.stringRecords[index];
-                        return (record && record.fill && record.fill.color) ? record.fill.color : "#C0CDD1";
+                        return (record && record.fill && record.fill.color) ? record.fill.color : "#000000";
                     }
-                    return "#C0CDD1";
+                    return "#000000";
                 },
                 onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {

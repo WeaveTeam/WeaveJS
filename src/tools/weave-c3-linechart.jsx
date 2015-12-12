@@ -62,17 +62,8 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             this.columnNames.push(name);
         }
 
-        var timeout = Date.now() + 3000;
-        while (Date.now() < timeout)
-        {
-          this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-          this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
-          if (this.numericRecords.length === this.stringRecords.length)
-            break;
-        }
-
-        if (this.numericRecords.length !== this.stringRecords.length)
-          throw new Error("Failed to retrieve records.");
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortBy(this.records, [0, "id"]);
