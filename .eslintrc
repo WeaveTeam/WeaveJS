@@ -12,5 +12,6 @@
     "strict": [0],
     "no-console": [1],
     "curly": 0,
+    "no-undef": 2
   }
 }
