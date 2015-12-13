@@ -54,6 +54,10 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
+        this.keyToIndex = {};
+        this.indexToKey = {};
+        this.yAxisValueToLabel = {};
+        this.xAxisValueToLabel = {};
     }
 
     _axisChanged () {
