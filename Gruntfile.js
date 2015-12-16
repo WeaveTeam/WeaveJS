@@ -30,6 +30,21 @@ module.exports = function (grunt) {
                     transform: null
                 }
             },
+            devlibs: {
+                src: ['src/'],
+                dest: 'dist/libs.js',
+                options: {
+                    alias: [
+                        'react:', 'react-datagrid:', 'jquery:', 'lodash:', 'd3:', 'c3:', 'react-bootstrap:'
+                    ],
+                    external: null,
+                    transform: null,
+                    browserifyOptions: {
+                        debug: true,
+                        plugin: []
+                    }
+                }
+            },
             dist: {
                 files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
             },
@@ -87,4 +102,5 @@ module.exports = function (grunt) {
     grunt.registerTask('default', ['eslint', 'browserify:dev', 'copy']);
     grunt.registerTask('dist', ['eslint', 'browserify:dist', 'copy']);
     grunt.registerTask('libs', ['browserify:libs']);
+    grunt.registerTask('devlibs', ['browserify:devlibs']);
 };
