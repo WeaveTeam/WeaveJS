@@ -233,6 +233,12 @@ class WeaveLayoutManager extends React.Component {
             }
         }
         state.children = simpleChildren;
+        var totalSize = _.sum(_.map(state.children, "flex"));
+        if(totalSize < 1.0){
+          for(var i = 0; i < state.children.length; i++) {
+            state.children[i].flex = StandardLib.normalize(state.children[i].flex,0.0,totalSize);
+          }
+        }
         return state;
     }
 
