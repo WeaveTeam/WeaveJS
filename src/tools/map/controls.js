@@ -12,7 +12,7 @@ export class PanCluster {
 				</tr>
 				<tr>
 					<td class="ol-control" style="position:relative"><button class="panCluster W">W</button></td>
-					<td class="ol-control" style="position:relative"><button class="panCluster X glyphicon glyphicon-fullscreen"></button></td>
+					<td class="ol-control" style="position:relative"><button class="panCluster X fa fa-arrows-alt"></button></td>
 					<td class="ol-control" style="position:relative"><button class="panCluster E">E</button></td>
 				</tr>
 				<tr>
@@ -99,6 +99,11 @@ export class InteractionModeCluster {
 		buttonTable.find("button.iModeCluster.pan").click( () => interactionModePath.state("pan") );
 		buttonTable.find("button.iModeCluster.select").click( () => interactionModePath.state("select") );
 		buttonTable.find("button.iModeCluster.zoom").click( () => interactionModePath.state("zoom") );
+
+		interactionModePath.addCallback(() => {
+			buttonTable.find("button.iModeCluster").removeClass("active");
+			buttonTable.find("button.iModeCluster." + interactionModePath.getState()).addClass("active");
+		}, true);
 
 		ol.control.Control.call(this, {element: buttonTable[0], target: options.target});
 	}

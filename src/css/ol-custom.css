@@ -1,0 +1,7 @@
+.ol-control {
+    background-color: rgba(128,128,128,0.4);
+}
+
+.ol-control button.active {
+    border-style: solid
+}
