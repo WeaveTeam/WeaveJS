@@ -86,8 +86,7 @@ export class WeaveTool extends React.Component {
         var titleStyle = {
             cursor: "move",
             height: 25,
-            marginLeft: 5,
-            textAlign: "left",
+            textAlign: "center",
             overflow: "hidden",
             whiteSpace: "nowrap",
             flex: 1,
