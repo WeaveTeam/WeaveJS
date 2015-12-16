@@ -1,4 +1,8 @@
 /*global module */
+
+var libraries = ['react', 'react-datagrid', 'jquery', 'lodash', 'd3', 'c3', 'react-bootstrap', 'openlayers'];
+var libraries_colon = libraries.map(function (d) { return d + ":"});
+
 module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
@@ -13,19 +17,14 @@ module.exports = function (grunt) {
                         plugin: [['minifyify', {map: false, exclude: "**/*.jsx"}]]
                     },
                     transform: ["babelify"],
-                    external: [
-                        'react', 'react-datagrid', 'lodash', 'jquery', 'd3', 'c3',
-                        'openlayers', 'react-bootstrap'
-                    ],
+                    external: libraries,
                     watch: true
             },
             libs: {
                 src: ['src/'],
                 dest: 'dist/libs.js',
                 options: {
-                    alias: [
-                        'react:', 'react-datagrid:', 'jquery:', 'lodash:', 'd3:', 'c3:', 'react-bootstrap:', 'openlayers:'
-                    ],
+                    alias: libraries_colon,
                     external: null,
                     transform: null
                 }
@@ -34,9 +33,7 @@ module.exports = function (grunt) {
                 src: ['src/'],
                 dest: 'dist/libs.js',
                 options: {
-                    alias: [
-                        'react:', 'react-datagrid:', 'jquery:', 'lodash:', 'd3:', 'c3:', 'react-bootstrap:'
-                    ],
+                    alias: libraries_colon,
                     external: null,
                     transform: null,
                     browserifyOptions: {
