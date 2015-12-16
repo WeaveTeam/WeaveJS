@@ -94,6 +94,7 @@ class WeaveLayoutManager extends React.Component {
     }
 
     onDragStart(id, event) {
+        event.dataTransfer.setData('text/html',null);
         this.toolDragged = id;
         var toolRef = id[0]; // toolName as used in the ref for the weave tool.
         var element = React.findDOMNode(this.refs[toolRef]);
