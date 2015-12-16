@@ -28,3 +28,6 @@ node_modules
 
 # Output directory
 dist
+
+#Other
+.DS_STORE
