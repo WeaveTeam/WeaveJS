@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import Layout from "./react-flexible-layout/Layout.jsx";
 import {WeaveLayoutManager} from "./WeaveLayoutManager.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
@@ -44,8 +45,8 @@ class PDO extends React.Component {
 
     componentDidMount() {
         this.reactReady = true;
-        this.element = React.findDOMNode(this);
-        this.weaveContainerElt = React.findDOMNode(this.refs.weaveContainer);
+        this.element = ReactDOM.findDOMNode(this);
+        this.weaveContainerElt = ReactDOM.findDOMNode(this.refs.weaveContainer);
         window.addEventListener("resize", () => { this.forceUpdate(); });
     }
 

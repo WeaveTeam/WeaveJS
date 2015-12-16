@@ -1,5 +1,6 @@
 import _ from "lodash";
 import React from "react";
+import ReactDOM from "react-dom";
 var toolRegistry = {};
 import ui from "./react-ui/ui.jsx";
 import VendorPrefix from "react-vendor-prefix";
@@ -41,11 +42,11 @@ export class WeaveTool extends React.Component {
     }
 
     componentDidMount() {
-        this.element = React.findDOMNode(this.refs.toolDiv);
+        this.element = ReactDOM.findDOMNode(this.refs.toolDiv);
         if(React.Component.isPrototypeOf(this.ToolClass)) {
             this.tool = this.refs.tool;
         } else {
-            this.tool = new this.ToolClass(_.merge({element: React.findDOMNode(this.refs.toolDiv), toolPath: this.toolPath}, this.toolProps));
+            this.tool = new this.ToolClass(_.merge({element: ReactDOM.findDOMNode(this.refs.toolDiv), toolPath: this.toolPath}, this.toolProps));
         }
     }
 

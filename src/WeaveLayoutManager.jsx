@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import Layout from "./react-flexible-layout/Layout.jsx";
 import _ from "lodash";
 import WeavePanel from "./WeavePanel.js";
@@ -9,13 +10,15 @@ import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend.jsx";
 import WeaveC3LineChart from "./tools/weave-c3-linechart.jsx";
 import WeaveC3PieChart from "./tools/weave-c3-piechart.jsx";
 import WeaveC3Histogram from "./tools/weave-c3-histogram.jsx";
+import Barchart from "./tools/weave-barchart.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table.jsx";
 import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
+import {Weave, weavejs} from "./weave-shim.js";
 import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";
 import ToolOverlay from "./ToolOverlay.jsx";
-import Weave from "./Weave.jsx";
+// import Weave from "./Weave.jsx";
 import StandardLib from "./Utils/StandardLib";
 
 const LAYOUT = "Layout";
@@ -34,44 +37,18 @@ class WeaveLayoutManager extends React.Component {
     constructor(props) {
         super(props);
 
-        if(this.props.weave) {
-            this.weave = this.props.weave;
-            this.state = {
-                layout: this.weave.path(LAYOUT).request("FlexibleLayout").getState()
-            };
-        } else {
-            this.state = {
-                layout: {
-                    id: ["Weave"],
-                    flex: 1
-                }
-            };
-        }
+        this.weave = this.props.weave || new Weave();
+        this.state = {
+            layout: this.weave.path(LAYOUT).request("FlexibleLayout").getState()
+        };
 
-        this.weaveReady = this.weaveReady.bind(this);
-        this.debouncedForceUpdate = _.debounce(this.forceUpdate.bind(this), 10);
+        this.weave.root.childListCallbacks.addGroupedCallback(null, this.forceUpdate.bind(this), true);
+        this.weave.path(LAYOUT).addCallback(this._layoutChanged.bind(this), true);
         this.margin = 8;
     }
 
     componentDidMount() {
-        React.findDOMNode(this);
-        if(this.weave) {
-            this.weaveReady(this.weave);
-        }
         window.addEventListener("resize", this._forceUpdate = () => { this.forceUpdate(); });
-    }
-
-    weaveReady(weave) {
-        if (this.weave !== weave)
-        {
-            this.weave = weave;
-        }
-
-
-        this.element = React.findDOMNode(this);
-
-        this.weave.path().getValue("this.childListCallbacks.addGroupedCallback.bind(this.childListCallbacks)")(null, _.debounce(this.forceUpdate.bind(this), 0), true);
-        this.weave.path(LAYOUT).addCallback(this._layoutChanged.bind(this), true);
     }
 
     componentWillUnmount() {
@@ -98,7 +75,8 @@ class WeaveLayoutManager extends React.Component {
         event.dataTransfer.setData('text/html',null);
         this.toolDragged = id;
         var toolRef = id[0]; // toolName as used in the ref for the weave tool.
-        var element = React.findDOMNode(this.refs[toolRef]);
+        var element = ReactDOM.findDOMNode(this.refs[toolRef]);
+        console.log(element);
         event.dataTransfer.setDragImage(element, 0, 0);
     }
 
@@ -298,53 +276,48 @@ class WeaveLayoutManager extends React.Component {
 
         var children = [];
 
-        if(!this.weave) {
-            // creates the weave flash instance as a WeaveTool React component
-            children.push(<WeaveTool ref="Weave" key="Weave" toolClass="Weave" toolProps={{onWeaveReady: this.weaveReady}}/>);
-        } else {
-            // during the second render, creates the other tools including weave
-            var paths = this.weave.path().getChildren();
-            var rect;
-            if(this.element) {
-                rect = this.element.getBoundingClientRect();
-            }
+          // during the second render, creates the other tools including weave
+          var paths = this.weave.path().getChildren();
+          var rect;
+          if(this.element) {
+              rect = this.element.getBoundingClientRect();
+          }
 
-            for(var i = 0; i < paths.length; i++) {
-                var path = paths[i];
-                var impl = path.getType();
-                if(impl === "weave.visualization.tools::ExternalTool" && path.getType("toolClass")) {
-                    impl = path.getState("toolClass");
-                }
-                if (impl === "weavejs.core.LinkableHashMap" && path.getType("class"))
-                	impl = path.getState("class");
-                impl = getToolImplementation(impl);
-                var toolName = path.getPath()[0];
-                var node;
-                var toolRect;
-                var toolPosition;
-                if(impl) {
-                    if(this.refs[LAYOUT] && rect) {
-                        node = this.refs[LAYOUT].getDOMNodeFromId(path.getPath());
-                        if(node) {
-                            toolRect = node.getBoundingClientRect();
-                            toolPosition = {
-                                top: toolRect.top - rect.top,
-                                left: toolRect.left - rect.left,
-                                width: toolRect.right - toolRect.left,
-                                height: toolRect.bottom - toolRect.top,
-                                position: "absolute"
-                            };
-                        }
-                    }
-                    children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} style={toolPosition}
-                                             onDragOver={this.onDragOver.bind(this, path.getPath())} onDragStart={this.onDragStart.bind(this, path.getPath())} onDragEnd={this.onDragEnd.bind(this)}
-                                  />);
-                }
-            }
+          for(var i = 0; i < paths.length; i++) {
+              var path = paths[i];
+              var impl = path.getType();
+              if(impl === "weave.visualization.tools::ExternalTool" && path.getType("toolClass")) {
+                  impl = path.getState("toolClass");
+              }
+              if (impl === "weavejs.core.LinkableHashMap" && path.getType("class"))
+              	impl = path.getState("class");
+              impl = getToolImplementation(impl);
+              var toolName = path.getPath()[0];
+              var node;
+              var toolRect;
+              var toolPosition;
+              if(impl) {
+                  if(this.refs[LAYOUT] && rect) {
+                      node = this.refs[LAYOUT].getDOMNodeFromId(path.getPath());
+                      if(node) {
+                          toolRect = node.getBoundingClientRect();
+                          toolPosition = {
+                              top: toolRect.top - rect.top,
+                              left: toolRect.left - rect.left,
+                              width: toolRect.right - toolRect.left,
+                              height: toolRect.bottom - toolRect.top,
+                              position: "absolute"
+                          };
+                      }
+                  }
+                  children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} style={toolPosition}
+                                           onDragOver={this.onDragOver.bind(this, path.getPath())} onDragStart={this.onDragStart.bind(this, path.getPath())} onDragEnd={this.onDragEnd.bind(this)}
+                                />);
+              }
         }
 
         return (
-            <div style={{width: "100%", height: "100%", display: "flex"}}>
+            <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%", display: "flex"}}>
                 <Layout onStateChange={this.handleStateChange.bind(this)} key={LAYOUT} ref={LAYOUT} state={this.state.layout} weave={this.weave}/>
                 {children}
                 <ToolOverlay ref={TOOLOVERLAY}/>

@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import radium from "radium";
 
 var buttonStyle = {
@@ -13,7 +14,7 @@ export default class Button extends React.Component {
 	}
 
 	componentDidMount() {
-		this.element = React.findDOMNode(this);
+		this.element = ReactDOM.findDOMNode(this);
 		this.element.addEventListener("click", this.props.onClick);
 	}
 

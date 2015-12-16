@@ -1,11 +1,11 @@
 import React from "react";
+import ReactDOM from "react-dom";
 
 export default class AbstractWeaveTool extends React.Component {
 
 
 		constructor(props) {
 			super(props);
-			this.props = props;
 			this.toolPath = props.toolPath;
 			this.paths = {};
 		}
@@ -37,8 +37,6 @@ export default class AbstractWeaveTool extends React.Component {
     }
 
 		componentDidMount() {
-			this.wrapper = React.findDOMNode(this);
-			this.element = React.findDOMNode(this.refs.chart);
 			// need to trigger one more render because the first time the c3
 			// chart is not sized properly
 			this.forceUpdate();
@@ -49,8 +47,8 @@ export default class AbstractWeaveTool extends React.Component {
     }
 
 		render() {
-        return <div style={this.props.style}>
-					<div ref="chart" style={{width: "100%", height: "100%", maxHeight: "100%"}}></div>
+        return <div ref={(elt) => { this.wrapper = elt}} style={this.props.style}>
+					<div ref={(elt) => { this.element = elt}} style={{width: "100%", height: "100%", maxHeight: "100%"}}></div>
         </div>;
     }
 }
