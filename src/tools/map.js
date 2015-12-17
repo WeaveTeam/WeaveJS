@@ -14,6 +14,8 @@ import ImageGlyphLayer from "./map/layers/ImageGlyphLayer.js";
 import ScatterPlotLayer from "./map/layers/ScatterPlotLayer.js";
 /* eslint-enable */
 
+/*global weavejs*/
+
 import {PanCluster, InteractionModeCluster} from "./map/controls.js";
 import weaveMapInteractions from "./map/interactions.js";
 
@@ -43,11 +45,9 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.slider = new ol.control.ZoomSlider();
 		this.pan = new PanCluster();
 
-		this.getSessionCenterBound = this.getSessionCenter.bind(this);
-
-		this.toolPath.push("projectionSRS").addCallback(this.onProjectionChanged.bind(this), true);
-		this.toolPath.push("showZoomControls").addCallback(this.onZoomControlToggle.bind(this), true);
-		this.toolPath.push("showMouseModeControls").addCallback(this.onMouseModeControlToggle.bind(this), true);
+		this.toolPath.push("projectionSRS").addCallback(this, this.onProjectionChanged, true);
+		this.toolPath.push("showZoomControls").addCallback(this, this.onZoomControlToggle, true);
+		this.toolPath.push("showMouseModeControls").addCallback(this, this.onMouseModeControlToggle, true);
 
 		this.mouseModeButtons = new InteractionModeCluster({interactionModePath: this.interactionModePath});
 
@@ -55,9 +55,9 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.layerSettingsPath = this.toolPath.push("children", "visualization", "plotManager", "layerSettings");
 		this.zoomBoundsPath = this.toolPath.push("children", "visualization", "plotManager", "zoomBounds");
 
-		this.plottersPath.getValue("childListCallbacks.addGroupedCallback")(null, this.plottersChanged.bind(this), true);
+		this.plottersPath.getObject().childListCallbacks.addGroupedCallback(this, this.plottersChanged, true);
 
-		this.zoomBoundsPath.addCallback(this.getSessionCenterBound, true);
+		this.zoomBoundsPath.addCallback(this, this.getSessionCenter, true);
 	}
 
 	onProjectionChanged()
@@ -72,7 +72,13 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.getSessionCenter();
 	}
 
-	resize() {this.map.updateSize(); }
+	resize()
+	{
+		this.map.updateSize();
+		var viewport = this.map.getViewport();
+		var screenBounds = new weavejs.geom.Bounds2D(0, 0, viewport.clientWidth, viewport.clientHeight);
+		this.zoomBoundsPath.getObject().setScreenBounds(screenBounds, true);
+	}
 
 	updateControlPositions()
 	{
@@ -127,50 +133,48 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 	{
 		var [xCenter, yCenter] = this.map.getView().getCenter();
 
-		this.zoomBoundsPath.removeCallback(this.getSessionCenterBound);
+		var zoomBounds = this.zoomBoundsPath.getObject();
+		// remove callback temporarily to avoid triggering due to rounding error?
+		// TODO - avoid rounding error
+		this.zoomBoundsPath.removeCallback(this, this.getSessionCenter);
 
-		this.zoomBoundsPath
-			.vars({xCenter, yCenter})
-			.getValue(
-				"var tmp_data_bounds = new Bounds2D();" +
-				"getDataBounds(tmp_data_bounds);" +
-				"tmp_data_bounds.setXCenter(xCenter);" +
-				"tmp_data_bounds.setYCenter(yCenter);" +
-				"setDataBounds(tmp_data_bounds);"
-			);
-
-		this.zoomBoundsPath.addCallback(this.getSessionCenterBound);
+		var dataBounds = new weavejs.geom.Bounds2D();
+		zoomBounds.getDataBounds(dataBounds);
+		dataBounds.setXCenter(xCenter);
+		dataBounds.setYCenter(yCenter);
+		zoomBounds.setDataBounds(dataBounds);
+		
+		this.zoomBoundsPath.addCallback(this, this.getSessionCenter);
 	}
 
 	setSessionZoom()
 	{
 		var resolution = this.map.getView().getResolution();
 
-		this.zoomBoundsPath.removeCallback(this.getSessionCenterBound);
+		var zoomBounds = this.zoomBoundsPath.getObject();
+		// remove callback temporarily to avoid triggering due to rounding error?
+		// TODO - avoid rounding error
+		this.zoomBoundsPath.removeCallback(this, this.getSessionCenter);
 
-		this.zoomBoundsPath
-			.vars({resolution}).getValue(
-				"tmp_data_bounds = new Bounds2D();" +
-				"tmp_screen_bounds = new Bounds2D();" +
-				"getDataBounds(tmp_data_bounds);" +
-				"getScreenBounds(tmp_screen_bounds);" +
-				"tmp_data_bounds.setWidth(tmp_screen_bounds.getWidth() * resolution);" +
-				"tmp_data_bounds.setHeight(tmp_screen_bounds.getHeight() * resolution);" +
-				"tmp_data_bounds.makeSizePositive();" +
-				"setDataBounds(tmp_data_bounds);");
-
-		this.zoomBoundsPath.addCallback(this.getSessionCenterBound);
-
+		var dataBounds = new weavejs.geom.Bounds2D();
+		var screenBounds = new weavejs.geom.Bounds2D();
+		zoomBounds.getDataBounds(dataBounds);
+		zoomBounds.getScreenBounds(screenBounds);
+		dataBounds.setWidth(screenBounds.getWidth() * resolution);
+		dataBounds.setHeight(screenBounds.getHeight() * resolution);
+		dataBounds.makeSizePositive();
+		zoomBounds.setDataBounds(dataBounds);
+		
+		this.zoomBoundsPath.addCallback(this, this.getSessionCenter);
 	}
 
 	getSessionCenter()
 	{
-		var center = this.zoomBoundsPath.getValue(
-				"tmp_bounds = new Bounds2D();" +
-				"getDataBounds(tmp_bounds);" +
-				"[tmp_bounds.getXCenter(), tmp_bounds.getYCenter()];");
-
-		var scale = this.zoomBoundsPath.getValue("getXScale()");
+		var zoomBounds = this.zoomBoundsPath.getObject();
+		var dataBounds = new weavejs.geom.Bounds2D();
+		zoomBounds.getDataBounds(dataBounds);
+		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
+		var scale = zoomBounds.getXScale();
 
 		this.map.getView().un("change:center", this.setSessionCenter, this);
 		this.map.getView().un("change:resolution", this.setSessionZoom, this);

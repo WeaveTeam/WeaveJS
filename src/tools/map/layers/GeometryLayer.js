@@ -1,6 +1,7 @@
 import ol from "openlayers";
 import {registerLayerImplementation} from "./Layer.js";
 import FeatureLayer from "./FeatureLayer.js";
+/*global weavejs*/
 
 class GeometryLayer extends FeatureLayer {
 	constructor(parent, layerName)
@@ -13,13 +14,10 @@ class GeometryLayer extends FeatureLayer {
 		this.fillStylePath = this.layerPath.push("fill");
 		this.lineStylePath = this.layerPath.push("line");
 
-		this.boundUpdateGeo = this.updateGeometryData.bind(this);
-		this.boundUpdateStyleData = this.updateStyleData.bind(this);
+		this.geoColumnPath.addCallback(this, this.updateGeometryData, true);
 
-		this.geoColumnPath.addCallback(this.boundUpdateGeo, true);
-
-		this.fillStylePath.addCallback(this.boundUpdateStyleData);
-		this.lineStylePath.addCallback(this.boundUpdateStyleData, true);
+		this.fillStylePath.addCallback(this, this.updateStyleData);
+		this.lineStylePath.addCallback(this, this.updateStyleData, true);
 	}
 
 	updateGeometryData()
@@ -29,8 +27,9 @@ class GeometryLayer extends FeatureLayer {
 		var featureProjection = this.geoColumnPath.push("projectionSRS").getState() || "EPSG:4326";
 		this.source.clear();
 
-		var keys = this.geoColumnPath.getKeys();
-		var rawGeometries = this.geoColumnPath.push("internalDynamicColumn").getValue("ColumnUtils.getGeoJsonGeometries(this, this.keys)");
+		var keys = this.geoColumnPath.push('internalDynamicColumn').getKeys();
+		var idc = this.geoColumnPath.getObject("internalDynamicColumn");
+		var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, idc.keys);
 
 		for (let idx = 0; idx < keys.length; idx++)
 		{

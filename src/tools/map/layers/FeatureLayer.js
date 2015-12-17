@@ -22,7 +22,7 @@ export default class FeatureLayer extends Layer {
 
 		this.selectionKeySet = this.layerPath.selection_keyset;
 		this.probeKeySet = this.layerPath.probe_keyset;
-		this.subsetFilter = this.layerPath.push("filteredKeySet");
+		this.subsetFilter = this.layerPath.subset_filter;//push("filteredKeySet");
 
 		let boundUpdateMetaStyles = this.updateMetaStyles.bind(this);
 
@@ -44,9 +44,9 @@ export default class FeatureLayer extends Layer {
 	onFeaturePropertyChange(objectEvent)
 	{
 		let propertyName = objectEvent.key;
-		let feature = objectEvent.currentTarget;
+		let feature = objectEvent.target;
 
-		if (!lodash.contains(FeatureLayer.styles, propertyName))
+		if (!lodash.contains(FeatureLayer.Styles, propertyName))
 		{
 			/* The property that changed isn't one of our metaStyle properties, so we don't care. */
 			return;
@@ -131,7 +131,8 @@ export default class FeatureLayer extends Layer {
 
 		this.filteredSet.clear();
 
-		for (let key of this.subsetFilter.filterKeys(sourceKeys))
+		var filteredKeys = this.subsetFilter.filterKeys(sourceKeys);
+		for (let key of filteredKeys)
 		{
 			this.filteredSet.add(key);
 		}
