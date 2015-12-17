@@ -242,7 +242,7 @@ class WeaveLayoutManager extends React.Component {
         state.flex = 1;
         var totalSizeChildren = _.sum(_.map(state.children, "flex"));
 
-        //Scale Values between 0 and 1 if less than 1. Parent layout will have flex of 1
+        //Scale Values between 0 and 1. Parent layout will have flex of 1, so children need to sum to 1.
           for(var i = 0; i < state.children.length; i++) {
             state.children[i].flex = StandardLib.normalize(state.children[i].flex,0.0,totalSizeChildren);
           }
