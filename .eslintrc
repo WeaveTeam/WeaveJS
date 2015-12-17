@@ -5,7 +5,6 @@
   },
   "rules": {
     "quotes": 0,
-    "no-trailing-spaces": [1],
     "no-extra-semi": [1],
     "no-underscore-dangle": [0],
     "no-unused-vars": [1],
