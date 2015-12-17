@@ -1,5 +1,7 @@
 import ol from "openlayers";
+import lodash from "lodash";
 import FeatureLayer from "./layers/FeatureLayer.js";
+import CustomDragBox from "./CustomDragBox.js";
 
 function getProbeInteraction(mapTool)
 {
@@ -65,43 +67,78 @@ function getProbeInteraction(mapTool)
 
 function getDragSelect(mapTool, probeInteraction)
 {
-	let dragSelect = new ol.interaction.DragBox();
+	let ADD = "+";
+	let SUBTRACT = "-";
+	let SET = "=";
+	let dragSelect = new CustomDragBox();
+	let mode = SET;
 
-	dragSelect.on('boxstart', function () {
-		probeInteraction.setActive(false);
-	}, mapTool);
-
-	dragSelect.on('boxend', function () {
-		let extent = dragSelect.getGeometry().getExtent();
+	function updateSelection(extent) {
 		let selectedFeatures = new Set();
-		let alteredKeySets = new Set();
 		let selectFeature = (feature) => { selectedFeatures.add(feature.getId()); };
 
-		for (let weaveLayerName in this.layers)
+		for (let weaveLayerName of lodash.keys(mapTool.layers))
 		{
-			let weaveLayer = this.layers[weaveLayerName];
+			let weaveLayer = mapTool.layers[weaveLayerName];
 			let olLayer = weaveLayer.layer;
 			let selectable = olLayer.get("selectable");
 
 			if (weaveLayer instanceof FeatureLayer && selectable)
 			{
 				let keySet = weaveLayer.selectionKeySet;
-				let keySetString = JSON.stringify(keySet.getPath());
 				let source = olLayer.getSource();
 
-				if (!alteredKeySets.has(keySetString))
-				{
-					keySet.setKeys([]);
-				}
-				alteredKeySets.add(keySetString);
-
 				source.forEachFeatureIntersectingExtent(extent, selectFeature);
-				weaveLayer.selectionKeySet.addKeys(Array.from(selectedFeatures));
+
+				let keys = Array.from(selectedFeatures);
+
+				switch (mode)
+				{
+					case SET:
+						keySet.setKeys(keys);
+						break;
+					case ADD:
+						keySet.addKeys(keys);
+						break;
+					case SUBTRACT:
+						keySet.removeKeys(keys);
+						break;
+				}
 			}
 		}
+	}
 
+	dragSelect.on('boxstart', function (dragBoxEvent) {
+		probeInteraction.setActive(false);
+
+		let event = dragBoxEvent.innerEvent.originalEvent;
+		if (event.ctrlKey)
+		{
+			mode = ADD;
+			if (event.shiftKey)
+			{
+				mode = SUBTRACT;
+			}
+		}
+		else
+		{
+			mode = SET;
+		}
+	});
+
+	dragSelect.on('boxend', function () {
+		let extent = dragSelect.getGeometry().getExtent();
+
+		updateSelection(extent);
 		probeInteraction.setActive(true);
-	}, mapTool);
+		mode = SET;
+	});
+
+	dragSelect.on('boxdrag', lodash.debounce(function() {
+		let extent = dragSelect.getGeometry().getExtent();
+
+		updateSelection(extent);
+	}));
 
 	return dragSelect;
 }

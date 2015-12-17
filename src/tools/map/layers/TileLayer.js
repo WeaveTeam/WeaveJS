@@ -10,12 +10,18 @@ class TileLayer extends Layer {
 
 		this.layer = new ol.layer.Tile();
 		this.servicePath = this.layerPath.push("service", null);
+		this.projectionPath = this.layerPath.push("srs");
 		this.oldProviderName = null;
 
 		this.servicePath.addCallback(this.updateTileSource.bind(this), true);
+		this.projectionPath.addCallback(this.updateValidExtents.bind(this), true);
 	}
 
-
+	updateValidExtents()
+	{
+		var proj = ol.proj.get(this.projectionPath.getState());
+		this.layer.setExtent(proj.getExtent());
+	}
 	getCustomWMSSource()
 	{
 		var customWMSPath = this.servicePath;
