@@ -80,6 +80,7 @@ class WeaveLayoutManager extends React.Component {
 
     _layoutChanged() {
         var newState = this.simplifyState(this.weave.path(LAYOUT).getState());
+        newState.flex = 1;
         this.refs[LAYOUT].setState(newState, () => {
             this.setState({
                 layout: newState
@@ -212,7 +213,7 @@ class WeaveLayoutManager extends React.Component {
         if (!children) {
           //simple base case, flex will be 1, and will be appropriately scaled based on
           //number of siblings in recursive calls
-            state.flex = 1;
+            //state.flex = 1;
             return state;
         }
 
@@ -237,12 +238,10 @@ class WeaveLayoutManager extends React.Component {
             }
         }
         state.children = simpleChildren;
-        //Parent layout will have flex of 1, until recursive call scales appropriately between 0 and 1.
-        //Final call (top Layout) will be set appropriately to 1
-        state.flex = 1;
         var totalSizeChildren = _.sum(_.map(state.children, "flex"));
 
-        //Scale Values between 0 and 1. Parent layout will have flex of 1, so children need to sum to 1.
+        //Scale Values between 0 and 1 so they sum to 1.Eliminating an apparent
+        //flex bug where space is lost if sum of flex values are less than 1
           for(var i = 0; i < state.children.length; i++) {
             state.children[i].flex = StandardLib.normalize(state.children[i].flex,0.0,totalSizeChildren);
           }
