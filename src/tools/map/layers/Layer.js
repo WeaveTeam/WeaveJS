@@ -13,7 +13,8 @@ export function registerLayerImplementation(asClassName, jsClass)
 
 export function newLayer(parent, layerName)
 {
-	let layerType = parent.plottersPath.push(layerName).getType();
+	var path = parent.plottersPath.push(layerName);
+	let layerType = path.getType();
 	let LayerClass = layerRegistry[layerType];
 	if (!LayerClass)
 	{

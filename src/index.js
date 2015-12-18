@@ -1,8 +1,9 @@
 import React from "react";
 /* eslint-disable */
 import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
-import Weave from "./weave-shim.js";
 /* eslint-enable */
+
+/*global Weave*/
 
 var weave = window.weave || (opener && opener.weave);
 if (!weave)
