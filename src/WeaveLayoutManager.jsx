@@ -242,9 +242,9 @@ class WeaveLayoutManager extends React.Component {
 
         //Scale Values between 0 and 1 so they sum to 1.Eliminating an apparent
         //flex bug where space is lost if sum of flex values are less than 1
-          for(var i = 0; i < state.children.length; i++) {
-            state.children[i].flex = StandardLib.normalize(state.children[i].flex,0.0,totalSizeChildren);
-          }
+        for(var i = 0; i < state.children.length; i++) {
+            state.children[i].flex = StandardLib.normalize(state.children[i].flex, 0, totalSizeChildren);
+        }
 
         return state;
     }
