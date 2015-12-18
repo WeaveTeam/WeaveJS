@@ -122,6 +122,7 @@ class Layout extends React.Component {
 
                 var ref1 = resizer.props.pane1;
                 var ref2 = resizer.props.pane2;
+
                 var pane1 = this.refs[ref1];
                 var pane2 = this.refs[ref2];
 
