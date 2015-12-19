@@ -67,7 +67,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortBy(this.records, [0, "id"]);
-        
+
         if(this.records.length)
           [this.numericRecords, this.stringRecords] = _.unzip(this.records);
 

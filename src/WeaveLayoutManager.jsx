@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import Layout from "./react-flexible-layout/Layout.jsx";
 import _ from "lodash";
 import WeavePanel from "./WeavePanel.js";
@@ -15,7 +14,7 @@ import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table.jsx";
 import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
-import {Weave, weavejs} from "/weave-shim.js";
+/* global Weave, weavejs */
 import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";
 import ToolOverlay from "./ToolOverlay.jsx";
 import StandardLib from "./Utils/StandardLib";
@@ -41,30 +40,47 @@ class WeaveLayoutManager extends React.Component {
     }
 
     componentDidMount() {
-        window.addEventListener("resize", this._forceUpdate = () => { this.forceUpdate(); });
-        //console.log(this.weave.path(LAYOUT).getState());
-        this.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate, true);
-        this.weave.path(LAYOUT).addCallback(this, () => {
-            this.forceUpdate();
-        }, true);
+        this.element = React.findDOMNode(this);
+        window.addEventListener("resize", this._forceUpdate = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30));
+        this.weave.root.childListCallbacks.addGroupedCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
+        this.weave.path(LAYOUT).addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
     }
 
     componentWillUnmount() {
         window.removeEventListener("resize", this._forceUpdate);
     }
 
+    componentDidUpdate() {
+        if(Weave.detectChange(this, this.weave.getObject(LAYOUT)) || this.dirty) {
+            // dirty flag to trigger render on window resize
+            this.dirty = false;
+            this.forceUpdate();
+        }
+    }
+
     saveState(newState) {
         newState = this.simplifyState(newState);
         newState.flex = 1;
         this.weave.path(LAYOUT).state(newState);
+        // temporary hack because weave
+        // doesn't properly callback forceUpdate
     }
 
     onDragStart(id, event) {
-        event.dataTransfer.setData('text/html', null);
         this.toolDragged = id;
         var toolRef = id[0]; // toolName as used in the ref for the weave tool.
-        var element = ReactDOM.findDOMNode(this.refs[toolRef]);
+        var element = React.findDOMNode(this.refs[toolRef]);
         event.dataTransfer.setDragImage(element, 0, 0);
+        event.dataTransfer.setData('text/html', null);
+    }
+
+    hideOverlay() {
+        var toolOverlayStyle = _.clone(this.refs[TOOLOVERLAY].state.style);
+        toolOverlayStyle.visibility = "hidden";
+        toolOverlayStyle.left = toolOverlayStyle.top = toolOverlayStyle.width = toolOverlayStyle.height = 0;
+        this.refs[TOOLOVERLAY].setState({
+            style: toolOverlayStyle
+        });
     }
 
     onDragEnd() {
@@ -72,13 +88,7 @@ class WeaveLayoutManager extends React.Component {
             this.updateLayout(this.toolDragged, this.toolOver, this.dropZone);
             this.toolDragged = null;
             this.dropZone = null;
-            var toolOverlayStyle = _.clone(this.refs[TOOLOVERLAY].state.style);
-
-            toolOverlayStyle.visibility = "hidden";
-
-            this.refs[TOOLOVERLAY].setState({
-                style: toolOverlayStyle
-            });
+            this.hideOverlay();
         }
     }
 
@@ -86,23 +96,17 @@ class WeaveLayoutManager extends React.Component {
         if(!this.toolDragged) {
             return;
         }
-
-        var toolOverlayStyle = _.clone(this.refs[TOOLOVERLAY].state.style);
-
         if(_.isEqual(this.toolDragged, toolOver)) {
+            // hide the overlay if hovering over the tool being dragged
             this.toolOver = null;
-            if(toolOverlayStyle.visibility !== "hidden") {
-                toolOverlayStyle.visibility = "hidden";
-                this.refs[TOOLOVERLAY].setState({
-                    style: toolOverlayStyle
-                });
-            }
+            this.hideOverlay();
             return;
         }
 
         var toolNode = this.refs[LAYOUT].getDOMNodeFromId(toolOver);
         var toolNodePosition = toolNode.getBoundingClientRect();
 
+        var toolOverlayStyle = _.clone(this.refs[TOOLOVERLAY].state.style);
         var dropZone = this.getDropZone(toolOver, event);
         toolOverlayStyle.left = toolNodePosition.left;
         toolOverlayStyle.top = toolNodePosition.top;
@@ -216,7 +220,7 @@ class WeaveLayoutManager extends React.Component {
             return;
         }
 
-        var newState = this.weave.path(LAYOUT).getState();
+        var newState = _.cloneDeep(this.weave.path(LAYOUT).getState());
         var src = StandardLib.findDeep(newState, {id: toolDragged});
         var dest = StandardLib.findDeep(newState, {id: toolDroppedOn});
         if(_.isEqual(src.id, dest.id)) {
@@ -299,7 +303,7 @@ class WeaveLayoutManager extends React.Component {
             }
 
             return (
-                <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%", display: "flex"}}>
+                <div style={{width: "100%", height: "100%", display: "flex"}}>
                     <Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
                     {children}
                     <ToolOverlay ref={TOOLOVERLAY}/>

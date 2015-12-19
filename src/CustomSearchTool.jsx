@@ -49,8 +49,8 @@ class CustomSearchTool extends React.Component {
     }
 
     componentDidMount() {
-        this.props.toolPath.addCallback(this.handleWeaveState.bind(this), true, false);
-        this.props.toolPath.push("searchFields").addCallback(() => {
+        this.props.toolPath.addCallback(this, this.handleWeaveState, true, false);
+        this.props.toolPath.push("searchFields").addCallback(this, () => {
             this.searchFields = this.props.toolPath.getState("searchFields") || [];
             this.updateStateFuncs = {};
             this.searchFields.forEach((field) => {

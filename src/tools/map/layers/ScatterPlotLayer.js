@@ -10,16 +10,14 @@ class ScatterPlotLayer extends GlyphLayer {
 	{
 		super(parent, layerName);
 
-		let boundUpdateStyleData = this.updateStyleData.bind(this);
+		this.sizeBy = this.layerPath.push("sizeBy").addCallback(this, this.updateStyleData, true);
 
-		this.sizeBy = this.layerPath.push("sizeBy").addCallback(boundUpdateStyleData, true);
+		this.fillStylePath = this.layerPath.push("fill").addCallback(this, this.updateStyleData);
+		this.lineStylePath = this.layerPath.push("line").addCallback(this, this.updateStyleData);
+		this.maxRadiusPath = this.layerPath.push("maxScreenRadius").addCallback(this, this.updateStyleData);
+		this.minRadiusPath = this.layerPath.push("minScreenRadius").addCallback(this, this.updateStyleData);
 
-		this.fillStylePath = this.layerPath.push("fill").addCallback(boundUpdateStyleData);
-		this.lineStylePath = this.layerPath.push("line").addCallback(boundUpdateStyleData);
-		this.maxRadiusPath = this.layerPath.push("maxScreenRadius").addCallback(boundUpdateStyleData);
-		this.minRadiusPath = this.layerPath.push("minScreenRadius").addCallback(boundUpdateStyleData);
-
-		this.defaultRadiusPath = this.layerPath.push("defaultScreenRadius").addCallback(boundUpdateStyleData, true);
+		this.defaultRadiusPath = this.layerPath.push("defaultScreenRadius").addCallback(this, this.updateStyleData, true);
 	}
 
 	updateStyleData()

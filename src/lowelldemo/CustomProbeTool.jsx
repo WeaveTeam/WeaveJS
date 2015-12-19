@@ -8,10 +8,7 @@ export default class CustomProbeTool extends React.Component {
   constructor(props) {
     super(props);
     this.path = this.props.toolPath;
-
-    this.forceUpdate = this.forceUpdate.bind(this);
-    this.dataChanged = this.dataChanged.bind(this);
-    this.path.addCallback(this.dataChanged);
+    this.path.addCallback(this, this.dataChanged);
 
     this.state = {
       columnTitleToColor: {}

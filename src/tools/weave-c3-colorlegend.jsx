@@ -21,7 +21,7 @@ class WeaveC3ColorLegend extends AbstractWeaveTool {
     }
 
     _setupCallbacks() {
-        this.dynamicColorColumnPath.addCallback(this.forceUpdate.bind(this));
+        this.dynamicColorColumnPath.addCallback(this, _.debounce(this.forceUpdate.bind(this), 0));
     }
 
     componentDidMount() {

@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import $ from "jquery";
 /* eslint-disable */
 import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
@@ -9,5 +8,5 @@ import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
 
 var weave = window.weave || (opener && opener.weave);
 $(() => {
-  ReactDOM.render(<WeaveLayoutManager weave={weave}/>,	document.getElementById("weaveElt"));
+  React.render(<WeaveLayoutManager weave={weave}/>,	document.getElementById("weaveElt"));
 });

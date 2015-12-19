@@ -1,7 +1,6 @@
 import React from "react";
-// import ReactDOM from "react-dom";
-import {Weave, weavejs} from "../weave-shim.js";
-
+//
+/* global Weave, weavejs */
 
 export default class Barchart extends React.Component {
 

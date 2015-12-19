@@ -11,11 +11,10 @@ class ImageGlyphLayer extends GlyphLayer {
 	{
 		super(parent, layerName);
 
-		this.boundUpdateStyleData = this.updateStyleData.bind(this);
 		this.imageGlyphCache = new ImageGlyphCache();
 
-		this.layerPath.push("imageSize").addCallback(this.boundUpdateStyleData);
-		this.layerPath.push("imageURL").addCallback(this.boundUpdateStyleData, true);
+		this.layerPath.push("imageSize").addCallback(this, this.updateStyleData);
+		this.layerPath.push("imageURL").addCallback(this, this.updateStyleData, true);
 	}
 
 	setIconStyle(feature, img, iconSize)

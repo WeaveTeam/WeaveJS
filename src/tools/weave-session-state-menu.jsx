@@ -2,14 +2,14 @@ import React from "react";
 import {ListGroupItem, ListGroup} from "react-bootstrap";
 import {registerToolImplementation} from "../WeaveTool.jsx";
 import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
+import _ from "lodash";
 
 class SessionStateMenuTool extends AbstractWeaveTool {
 
   constructor(props) {
     super(props);
-    var boundForceUpdate = this.forceUpdate.bind(this);
-    this.toolPath.push("choices").addCallback(boundForceUpdate);
-    this.toolPath.push("selectedChoice").addCallback(boundForceUpdate);
+    this.toolPath.push("choices").addCallback(this, _.debounce(this.forceUpdate.bind(this), 0));
+    this.toolPath.push("selectedChoice").addCallback(this, _.debounce(this.forceUpdate.bind(this), 0));
   }
 
   componentDidMount() {

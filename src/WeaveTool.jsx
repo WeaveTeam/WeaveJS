@@ -1,6 +1,5 @@
 import _ from "lodash";
 import React from "react";
-import ReactDOM from "react-dom";
 var toolRegistry = {};
 import ui from "./react-ui/ui.jsx";
 import VendorPrefix from "react-vendor-prefix";
@@ -38,15 +37,14 @@ export class WeaveTool extends React.Component {
         if (toolType === "weavejs.core.LinkableHashMap" && this.toolPath.getType("class"))
             toolType = this.toolPath.getState("class");
         this.ToolClass = getToolImplementation(toolType);
-        this.forceUpdate = this.forceUpdate.bind(this);
     }
 
     componentDidMount() {
-        this.element = ReactDOM.findDOMNode(this.refs.toolDiv);
+        this.element = React.findDOMNode(this.refs.toolDiv);
         if(React.Component.isPrototypeOf(this.ToolClass)) {
             this.tool = this.refs.tool;
         } else {
-            this.tool = new this.ToolClass(_.merge({element: ReactDOM.findDOMNode(this.refs.toolDiv), toolPath: this.toolPath}, this.toolProps));
+            this.tool = new this.ToolClass(_.merge({element: React.findDOMNode(this.refs.toolDiv), toolPath: this.toolPath}, this.toolProps));
         }
     }
 
@@ -70,10 +68,10 @@ export class WeaveTool extends React.Component {
         this.toolPath = this.props.toolPath;
         this.toolProps = this.props.toolProps;
         if(this.toolPath) {
-          this.toolPath.addCallback(this.forceUpdate);
+          this.toolPath.addCallback(this, _.debounce(this.forceUpdate.bind(this), 0));
         }
 
-        if(this.tool.resize) {
+        if(this.tool && this.tool.resize) {
             this.tool.resize();
         }
     }
@@ -81,7 +79,8 @@ export class WeaveTool extends React.Component {
     render() {
         var windowBar = {
             width: "100%",
-            height: 25
+            height: 25,
+            backgroundColor: this.state.showControls ? "#f8f8f8": ""
         };
 
         var titleStyle = {

@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import VendorPrefix from "react-vendor-prefix";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import _ from "lodash";

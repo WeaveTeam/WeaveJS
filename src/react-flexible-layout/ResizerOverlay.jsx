@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import VendorPrefix from "react-vendor-prefix";
 
 var resizerStyle = {};
@@ -40,6 +39,7 @@ class ResizerOverlay extends React.Component {
 
     componentDidMount() {
         document.addEventListener("mousemove", this._onMouseMove = this.onMouseMove.bind(this), true);
+        this.element = React.findDOMNode(this);
         mousevents.forEach( (mouseevent) => document.addEventListener(mouseevent, this._stopEventPropagation = this.stopEventPropagation.bind(this), true));
     }
 
@@ -103,7 +103,7 @@ class ResizerOverlay extends React.Component {
         var prefixed = VendorPrefix.prefix({styles: style});
 
         return (
-            <span ref={(elt) => { this.element = elt }} style={prefixed.styles}/>
+            <span style={prefixed.styles}/>
         );
     }
 }

@@ -1,5 +1,4 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import VendorPrefix from "react-vendor-prefix";
 
 var HORIZONTAL = "horizontal";
@@ -51,6 +50,7 @@ class Resizer extends React.Component {
     }
 
     componentDidMount () {
+        this.element = React.findDOMNode(this);
         this.element.addEventListener("mousedown", this._onMouseDown = this.onMouseDown.bind(this));
     }
 
@@ -77,7 +77,7 @@ class Resizer extends React.Component {
         this.merge(style, resizerStyle[direction]);
 
         var prefixed = VendorPrefix.prefix({styles: style});
-        return <span ref={(elt) => { this.element = elt }} style={prefixed.styles}/>;
+        return <span style={prefixed.styles}/>;
     }
 }
 
