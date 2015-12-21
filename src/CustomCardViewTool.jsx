@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import VendorPrefix from "react-vendor-prefix";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import _ from "lodash";
@@ -50,11 +51,11 @@ class CustomCardViewTool extends React.Component {
     }
 
     componentDidMount() {
-        React.findDOMNode(this).parentNode.addEventListener("click", this.boundClearSelection = this.clearSelection.bind(this));
+        this.element.parentNode.addEventListener("click", this.boundClearSelection = this.clearSelection.bind(this));
     }
 
     componentWillUnmount() {
-         React.findDOMNode(this).parentNode.removeEventListener("click", this.boundClearSelection);
+        this.element.parentNode.removeEventListener("click", this.boundClearSelection);
     }
 
     componentDidUpdate () {
@@ -242,7 +243,7 @@ class CustomCardViewTool extends React.Component {
         });
 
         return (
-            <div style={{width: "100%", height: "100%"}}>
+            <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%"}}>
                 {
                     cards
                 }
@@ -265,10 +266,9 @@ class Card extends React.Component {
     }
 
     componentDidMount () {
-        this.element = React.findDOMNode(this);
         //this.element.addEventListener("click", this.boundToggleSelect = this.toggleSelect.bind(this));
-        this.okButton = React.findDOMNode(this.refs[OKBUTTON]);
-        this.rmButton = React.findDOMNode(this.refs[RMBUTTON]);
+        this.okButton = ReactDOM.findDOMNode(this.refs[OKBUTTON]);
+        this.rmButton = ReactDOM.findDOMNode(this.refs[RMBUTTON]);
 
         this.okButton.addEventListener("click", this.boundHandleSaveCard = this.props.handleSaveCard.bind(this));
         this.rmButton.addEventListener("click", this.boundHandleRemoveCard = this.props.handleRemoveCard.bind(this));
@@ -398,7 +398,7 @@ class Card extends React.Component {
         });
 
         return (
-            <div style={cardStyleprefixed.styles} onMouseOver={this.toggleProbe.bind(this)} onMouseOut={this.toggleProbe.bind(this)}>
+            <div ref={(elt) => { this.element = elt; }} style={cardStyleprefixed.styles} onMouseOver={this.toggleProbe.bind(this)} onMouseOut={this.toggleProbe.bind(this)}>
                 <div style={{float: "right"}}>
                     <ui.HBox>
                         <div style={{paddingRight: 5}} onMouseOver={this.toggleCheckProbe.bind(this)} onMouseOut={this.toggleCheckProbe.bind(this)}>

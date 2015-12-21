@@ -1,5 +1,5 @@
 import React from "react";
-//import SplitPane from "./react-flexible-layout/src/SplitPane.jsx";
+import ReactDOM from "react-dom";
 import StandardLib from "../Utils/StandardLib";
 import VendorPrefix from "react-vendor-prefix";
 import Resizer from "./Resizer.jsx";
@@ -22,9 +22,6 @@ class Layout extends React.Component {
     componentDidMount () {
         document.addEventListener("mouseup", this._onMouseUp = this.onMouseUp.bind(this));
         document.addEventListener("mousedown", this._onMouseDown = this.onMouseDown.bind(this));
-
-        this.element = React.findDOMNode(this);
-
         this.element.addEventListener("mousemove", this._onMouseMove = this.onMouseMove.bind(this));
     }
 
@@ -93,8 +90,8 @@ class Layout extends React.Component {
         var pane1 = this.refs[resizer.props.pane1];
         var pane2 = this.refs[resizer.props.pane2];
 
-        var element1 = React.findDOMNode(pane1);
-        var element2 = React.findDOMNode(pane2);
+        var element1 = ReactDOM.findDOMNode(pane1);
+        var element2 = ReactDOM.findDOMNode(pane2);
 
         var rect = this.element.getBoundingClientRect();
         var pageLeft = window.pageXOffset + rect.left;
@@ -124,6 +121,7 @@ class Layout extends React.Component {
 
                 var ref1 = resizer.props.pane1;
                 var ref2 = resizer.props.pane2;
+
                 var pane1 = this.refs[ref1];
                 var pane2 = this.refs[ref2];
 
@@ -206,7 +204,7 @@ class Layout extends React.Component {
 
         var prefixed = VendorPrefix.prefix({styles: style});
 
-        return <div style={prefixed.styles}>
+        return <div ref={(elt) => { this.element = elt; }} style={prefixed.styles}>
                     {newChildren}
                     <ResizerOverlay ref={RESIZEROVERLAY} direction={this.state.direction}/>
                </div>;

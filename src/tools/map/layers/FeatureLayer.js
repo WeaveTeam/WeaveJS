@@ -24,16 +24,14 @@ export default class FeatureLayer extends Layer {
 		this.probeKeySet = this.layerPath.probe_keyset;
 		this.subsetFilter = this.layerPath.subset_filter;//push("filteredKeySet");
 
-		let boundUpdateMetaStyles = this.updateMetaStyles.bind(this);
-
 		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, this.selectedSet);
 		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, this.probedSet);
 
 		this.selectionKeySet.addKeySetCallback(selectionKeyHandler);
 		this.probeKeySet.addKeySetCallback(probeKeyHandler);
 
-		this.subsetFilter.addCallback(this.updateFilteredKeySet.bind(this), true);
-		this.settingsPath.push("selectable").addCallback(boundUpdateMetaStyles);
+		this.subsetFilter.addCallback(this, this.updateFilteredKeySet, true);
+		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
 	}
 
 	onFeatureAdd(vectorEvent)

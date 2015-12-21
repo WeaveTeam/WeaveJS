@@ -3,14 +3,14 @@ import ui from "../react-ui/ui.jsx";
 import StandardLib from "../Utils/StandardLib";
 import CustomLineChart from "../tools/custom-linechart.jsx";
 import CustomProbeTool from "./CustomProbeTool.jsx";
+import _ from "lodash";
 
 export default class Panel extends React.Component {
 
   constructor(props) {
     super(props);
     this.path = this.props.panelPath;
-    this.forceUpdate = this.forceUpdate.bind(this);
-    this.path.push("config").addCallback(this.forceUpdate);
+    this.path.push("config").addCallback(this, _.debounce(this.forceUpdate.bind(this), 0));
   }
 
   componentDidMount() {

@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import Layout from "./react-flexible-layout/Layout.jsx";
 import {WeaveLayoutManager} from "./WeaveLayoutManager.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
@@ -44,8 +45,8 @@ class PDO extends React.Component {
 
     componentDidMount() {
         this.reactReady = true;
-        this.element = React.findDOMNode(this);
-        this.weaveContainerElt = React.findDOMNode(this.refs.weaveContainer);
+        this.element = ReactDOM.findDOMNode(this);
+        this.weaveContainerElt = ReactDOM.findDOMNode(this.refs.weaveContainer);
         window.addEventListener("resize", () => { this.forceUpdate(); });
     }
 
@@ -64,7 +65,7 @@ class PDO extends React.Component {
           this.customSearchToolPath = this.weave.path("CustomSearchTool").request("ExternalTool");
           this.customCardViewToolPath = this.weave.path("CustomCardViewTool").request("ExternalTool");
           this.toolHeightPath = this.customCardViewToolPath.push("toolHeight").request("LinkableNumber");
-          this.toolHeightPath.addCallback(this.forceUpdate.bind(this), true);
+          this.toolHeightPath.addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
         } else {
             setTimeout(this.handleWeaveReady.bind(this), 200);
         }

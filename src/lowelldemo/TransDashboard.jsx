@@ -37,7 +37,7 @@ class TransDashboard extends React.Component {
 
   onWeaveReady(weave) {
     this.weave = weave;
-    this.weave.path("lowelltrans").addCallback(this.forceUpdate.bind(this), true);
+    this.weave.path("lowelltrans").addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
   }
 
   openParcel() {

@@ -100,7 +100,7 @@ export class InteractionModeCluster {
 		buttonTable.find("button.iModeCluster.select").click( () => interactionModePath.state("select") );
 		buttonTable.find("button.iModeCluster.zoom").click( () => interactionModePath.state("zoom") );
 
-		interactionModePath.addCallback(() => {
+		interactionModePath.addCallback(this, () => {
 			buttonTable.find("button.iModeCluster").removeClass("active");
 			buttonTable.find("button.iModeCluster." + interactionModePath.getState()).addClass("active");
 		}, true);

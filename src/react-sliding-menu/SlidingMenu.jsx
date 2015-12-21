@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import Button from "./Button.jsx";
 import Menu from "./Menu.jsx";
 
@@ -29,7 +30,7 @@ export default class SlidingMenu extends React.Component {
 		}
 	}
 	componentDidMount() {
-		React.findDOMNode(this.refs.overlay).addEventListener("click", this.hideMenu.bind(this));
+		ReactDOM.findDOMNode(this.refs.overlay).addEventListener("click", this.hideMenu.bind(this));
 	}
 
 	render () {

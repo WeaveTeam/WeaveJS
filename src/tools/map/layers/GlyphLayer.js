@@ -8,13 +8,11 @@ class GlyphLayer extends FeatureLayer {
 	{
 		super(parent, layerName);
 
-		this.boundUpdateLocations = this.updateLocations.bind(this);
+		this.layerPath.push("destinationProjection").addCallback(this, this.updateLocations);
+		this.layerPath.push("sourceProjection").addCallback(this, this.updateLocations);
 
-		this.layerPath.push("destinationProjection").addCallback(this.boundUpdateLocations);
-		this.layerPath.push("sourceProjection").addCallback(this.boundUpdateLocations);
-
-		this.layerPath.push("dataX").addCallback(this.boundUpdateLocations);
-		this.layerPath.push("dataY").addCallback(this.boundUpdateLocations, true);
+		this.layerPath.push("dataX").addCallback(this, this.updateLocations);
+		this.layerPath.push("dataY").addCallback(this, this.updateLocations, true);
 	}
 
 	_getFeatureIds() {

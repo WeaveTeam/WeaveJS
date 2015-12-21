@@ -126,8 +126,8 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     }
 
     rotateAxes() {
-      this.c3Config.axis.rotated = true;
-      this.forceUpdate();
+      //this.c3Config.axis.rotated = true;
+      //this.forceUpdate();
     }
 
     _axisChanged () {
@@ -183,7 +183,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         };
 
         this.binnedColumnDataType = this.paths.binnedColumn.getValue("this.getMetadata('dataType')");
-        
+
         this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
         this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 

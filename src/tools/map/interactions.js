@@ -153,7 +153,7 @@ function weaveMapInteractions(mapTool)
 	let dragPan = new ol.interaction.DragPan({});
 	let dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});
 
-	mapTool.interactionModePath.addCallback( () => {
+	mapTool.interactionModePath.addCallback(this, () => {
 		let interactionMode = mapTool.interactionModePath.getState();
 		dragPan.setActive(interactionMode === "pan");
 		dragSelect.setActive(interactionMode === "select");

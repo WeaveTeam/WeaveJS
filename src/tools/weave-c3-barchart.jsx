@@ -137,7 +137,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
           return;
         }
 
-        var xLabel = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getValue("this.getMetadata('title')");
+        var xLabel = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getObject().getMetadata('title');
         var yLabel = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
 
         this.chart.axis.labels({

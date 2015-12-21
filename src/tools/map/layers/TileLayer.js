@@ -13,8 +13,8 @@ class TileLayer extends Layer {
 		this.projectionPath = this.layerPath.push("srs");
 		this.oldProviderName = null;
 
-		this.servicePath.addCallback(this.updateTileSource.bind(this), true);
-		this.projectionPath.addCallback(this.updateValidExtents.bind(this), true);
+		this.servicePath.addCallback(this, this.updateTileSource, true);
+		this.projectionPath.addCallback(this, this.updateValidExtents, true);
 	}
 
 	updateValidExtents()

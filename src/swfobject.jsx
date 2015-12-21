@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import swfobject from "swfobject-amd";
 
 class Swfobject extends React.Component {
@@ -10,7 +11,7 @@ class Swfobject extends React.Component {
     componentDidMount() {
 
         swfobject.embedSWF(
-            this.props.swfUrl, React.findDOMNode(this.refs.swfobject),
+            this.props.swfUrl, ReactDOM.findDOMNode(this.refs.swfobject),
             "100%", "100%",
             this.props.swfVersionStr, this.props.xiSwfUrlStr,
             this.props.flashvars, this.props.params, this.props.attributes, this.props.onLoad);

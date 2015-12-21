@@ -94,7 +94,7 @@ class Layer {
 
 		this._layerReadyCallbacks[propertyName] = callback;
 
-		propertyPath.addCallback(callback, false, false);
+		propertyPath.addCallback(this, callback, false, false);
 	}
 
 	destroy()

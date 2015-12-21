@@ -178,7 +178,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     _updateStyle() {
         d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
                                                       .style("stroke", "black")
-                                                      .style("stroke-opacity", 0.5);
+                                                      .style("stroke-opacity", 1);
     }
 
     componentDidUpdate() {
