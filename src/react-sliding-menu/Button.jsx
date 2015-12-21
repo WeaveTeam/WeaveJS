@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import radium from "radium";
 
 var buttonStyle = {
@@ -13,7 +14,6 @@ export default class Button extends React.Component {
 	}
 
 	componentDidMount() {
-		this.element = React.findDOMNode(this);
 		this.element.addEventListener("click", this.props.onClick);
 	}
 
@@ -24,7 +24,7 @@ export default class Button extends React.Component {
 	render () {
 
 		// do stufff
-		return <div style={{padding: 19}}>
+		return <div ref={(elt) => { this.element = elt; }} style={{padding: 19}}>
 						<button style={buttonStyle}>
 							<img src="img/burger-menu.png"/>
 						</button>

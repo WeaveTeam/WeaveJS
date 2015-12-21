@@ -1,6 +1,7 @@
 import {registerToolImplementation} from "../WeaveTool.jsx";
 import _ from "lodash";
 import React from "react";
+import ReactDOM from "react-dom";
 //import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 //import ReactDataGrid from "react-datagrid";
 import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
@@ -12,7 +13,7 @@ class WeaveReactTable extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
-        React.render(
+        ReactDOM.render(
             <DataTable toolPath={this.toolPath}/>, this.element);
     }
 }

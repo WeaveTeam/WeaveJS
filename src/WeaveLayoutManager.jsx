@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import Layout from "./react-flexible-layout/Layout.jsx";
 import _ from "lodash";
 import WeavePanel from "./WeavePanel.js";
@@ -40,7 +41,6 @@ class WeaveLayoutManager extends React.Component {
     }
 
     componentDidMount() {
-        this.element = React.findDOMNode(this);
         window.addEventListener("resize", this._forceUpdate = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30));
         this.weave.root.childListCallbacks.addGroupedCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
         this.weave.path(LAYOUT).addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
@@ -54,6 +54,7 @@ class WeaveLayoutManager extends React.Component {
         if(Weave.detectChange(this, this.weave.getObject(LAYOUT)) || this.dirty) {
             // dirty flag to trigger render on window resize
             this.dirty = false;
+            //_.debounce(this.forceUpdate.bind(this), 0)();
             this.forceUpdate();
         }
     }
@@ -64,12 +65,13 @@ class WeaveLayoutManager extends React.Component {
         this.weave.path(LAYOUT).state(newState);
         // temporary hack because weave
         // doesn't properly callback forceUpdate
+        //this.forceUpdate();
     }
 
     onDragStart(id, event) {
         this.toolDragged = id;
         var toolRef = id[0]; // toolName as used in the ref for the weave tool.
-        var element = React.findDOMNode(this.refs[toolRef]);
+        var element = ReactDOM.findDOMNode(this.refs[toolRef]);
         event.dataTransfer.setDragImage(element, 0, 0);
         event.dataTransfer.setData('text/html', null);
     }
@@ -303,7 +305,7 @@ class WeaveLayoutManager extends React.Component {
             }
 
             return (
-                <div style={{width: "100%", height: "100%", display: "flex"}}>
+                <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%", display: "flex"}}>
                     <Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
                     {children}
                     <ToolOverlay ref={TOOLOVERLAY}/>

@@ -1,4 +1,5 @@
 import React from "react";
+import ReactDOM from "react-dom";
 import Layout from "./react-flexible-layout/Layout.jsx";
 import _ from "lodash";
 import WeavePanel from "./WeavePanel.js";
@@ -54,7 +55,6 @@ class WeaveLayoutManager extends React.Component {
     }
 
     componentDidMount() {
-        React.findDOMNode(this);
         if(this.weave) {
             this.weaveReady(this.weave);
         }
@@ -66,10 +66,6 @@ class WeaveLayoutManager extends React.Component {
         {
             this.weave = weave;
         }
-
-
-        this.element = React.findDOMNode(this);
-
         this.weave.path().getValue("this.childListCallbacks.addGroupedCallback.bind(this.childListCallbacks)")(null, _.debounce(this.forceUpdate.bind(this), 0), true);
         this.weave.path(LAYOUT).addCallback(this._layoutChanged.bind(this), true);
     }
@@ -98,7 +94,7 @@ class WeaveLayoutManager extends React.Component {
         event.dataTransfer.setData('text/html',null);
         this.toolDragged = id;
         var toolRef = id[0]; // toolName as used in the ref for the weave tool.
-        var element = React.findDOMNode(this.refs[toolRef]);
+        var element = ReactDOM.findDOMNode(this.refs[toolRef]);
         event.dataTransfer.setDragImage(element, 0, 0);
     }
 
@@ -344,7 +340,7 @@ class WeaveLayoutManager extends React.Component {
         }
 
         return (
-            <div style={{width: "100%", height: "100%", display: "flex"}}>
+            <div ref={(elt) => {this.element = elt; }} style={{width: "100%", height: "100%", display: "flex"}}>
                 <Layout onStateChange={this.handleStateChange.bind(this)} key={LAYOUT} ref={LAYOUT} state={this.state.layout} weave={this.weave}/>
                 {children}
                 <ToolOverlay ref={TOOLOVERLAY}/>
