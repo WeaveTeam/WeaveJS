@@ -29,5 +29,8 @@ node_modules
 # Output directory
 dist
 
+#IDEA project configurations
+.idea
+
 #Other
 .DS_STORE
