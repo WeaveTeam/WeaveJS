@@ -62,6 +62,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                    }
                },
                onunselected: (d) => {
+                   this.flag = true;
                    if(d && d.hasOwnProperty("index")) {
                        this.toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
                    }

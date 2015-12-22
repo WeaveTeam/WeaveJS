@@ -42,6 +42,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                  }
                },
                onselected: (d) => {
+                   this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
                         var selectedIds = this.paths.binnedColumn.getValue("this.getKeysFromBinIndex.bind(this)")(d.index).map( (qKey) => {
                             return this.toolPath.qkeyToString(qKey);
@@ -50,6 +51,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     }
                 },
                 onunselected: (d) => {
+                    this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
                         var unSelectedIds = this.paths.binnedColumn.getValue("this.getKeysFromBinIndex.bind(this)")(d.index).map( (qKey) => {
                             return this.toolPath.qkeyToString(qKey);
@@ -131,6 +133,13 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     }
     _probedKeysChanged() {
 
+    }
+
+    handleClick(event) {
+        if(!this.flag) {
+            this.toolPath.selection_keyset.setKeys([]);
+        }
+        this.flag = false;
     }
 
     toggleKey(event) {

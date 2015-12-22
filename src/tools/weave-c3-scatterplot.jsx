@@ -166,13 +166,13 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     }
 
     _probedKeysChanged() {
-        /*
-        var keys = this.toolPath.probe_keyset.getKeys();
-        var indices = keys.map( (key) => {
-            return Number(this.keyToIndex[key]);
-        });
-        */
-        // this.chart.select("y", indices, true);
+
+        //var keys = this.toolPath.probe_keyset.getKeys();
+        //var indices = keys.map( (key) => {
+        //    return Number(this.keyToIndex[key]);
+        //});
+        //
+        //this.chart.select("y", indices, true);
     }
 
 
@@ -282,6 +282,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     }
                 },
                 onunselected: (d) => {
+                    this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
                     }
