@@ -41,9 +41,13 @@ export default class AbstractWeaveTool extends React.Component {
 	componentWillUnmount() {
 	}
 
+	handleClick(event) {
+
+	}
+
 	render() {
 		return <div ref={(elt) => { this.wrapper = elt; }} style={this.props.style}>
-			<div ref={(elt) => {this.element = elt; }} style={{width: "100%", height: "100%", maxHeight: "100%"}}></div>
+			<div ref={(elt) => {this.element = elt; }} onClick={this.handleClick.bind(this)} style={{width: "100%", height: "100%", maxHeight: "100%"}}></div>
 		</div>;
 	}
 }

@@ -33,6 +33,14 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     }
                     return "#C0CDD1";
                },
+               onclick: (d) => {
+                 if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                     var selectedIds = this.paths.binnedColumn.getValue("this.getKeysFromBinIndex.bind(this)")(d.index).map( (qKey) => {
+                         return this.toolPath.qkeyToString(qKey);
+                     });
+                     this.toolPath.selection_keyset.setKeys(selectedIds);
+                 }
+               },
                onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         var selectedIds = this.paths.binnedColumn.getValue("this.getKeysFromBinIndex.bind(this)")(d.index).map( (qKey) => {
@@ -123,6 +131,12 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     }
     _probedKeysChanged() {
 
+    }
+
+    toggleKey(event) {
+        if((event.keyIdentifier == "Control")||(event.keyIdentifier == "Meta")) {
+            this.keyDown = !this.keyDown;
+        }
     }
 
     rotateAxes() {
@@ -276,6 +290,8 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     componentDidMount() {
         super.componentDidMount();
 
+        document.addEventListener("keydown", this.toggleKey.bind(this));
+        document.addEventListener("keyup", this.toggleKey.bind(this));
         var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);

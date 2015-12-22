@@ -175,6 +175,20 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         // this.chart.select("y", indices, true);
     }
 
+
+  	handleClick(event) {
+      if(!this.flag) {
+        this.toolPath.selection_keyset.setKeys([]);
+      }
+      this.flag = false;
+    }
+
+    toggleKey(event) {
+        if((event.keyIdentifier == "Control")||(event.keyIdentifier == "Meta")) {
+            this.keyDown = !this.keyDown;
+        }
+    }
+
     _updateStyle() {
         d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
                                                       .style("stroke", "black")
@@ -202,6 +216,9 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
+
+        document.addEventListener("keydown", this.toggleKey.bind(this));
+        document.addEventListener("keyup", this.toggleKey.bind(this));
         var axisChanged = this._axisChanged.bind(this);
         var dataChanged = this._dataChanged.bind(this);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
@@ -253,7 +270,13 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     }
                     return "#000000";
                 },
+                onclick: (d) => {
+                  if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                      this.toolPath.selection_keyset.setKeys([this.indexToKey[d.index]]);
+                  }
+                },
                 onselected: (d) => {
+                    this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
                     }

@@ -49,6 +49,32 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     } else {
                         return color || "#C0CDD1";
                     }
+               },
+               onclick: (d) => {
+                 if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                     this.toolPath.selection_keyset.setKeys([this.indexToKey[d.index]]);
+                 }
+               },
+               onselected: (d) => {
+                   this.flag = true;
+                   if(d && d.hasOwnProperty("index")) {
+                       this.toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
+                   }
+               },
+               onunselected: (d) => {
+                   if(d && d.hasOwnProperty("index")) {
+                       this.toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
+                   }
+               },
+               onmouseover: (d) => {
+                   if(d && d.hasOwnProperty("index")) {
+                       this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                   }
+               },
+               onmouseout: (d) => {
+                   if(d && d.hasOwnProperty("index")) {
+                       this.toolPath.probe_keyset.setKeys([]);
+                   }
                }
             },
             axis: {
@@ -111,13 +137,31 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         };
     }
 
-    _selectionKeysChanged() {
+    _selectionKeysChanged () {
         var keys = this.toolPath.selection_keyset.getKeys();
         // var indices = this.indexCache.pick(keys).values();
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
         });
+
         this.chart.select(this.heightColumnNames, indices, true);
+    }
+
+    _probedKeysChanged () {
+
+    }
+
+    handleClick(event) {
+      if(!this.flag) {
+        this.toolPath.selection_keyset.setKeys([]);
+      }
+      this.flag = false;
+    }
+
+    toggleKey(event) {
+        if((event.keyIdentifier == "Control")||(event.keyIdentifier == "Meta")) {
+            this.keyDown = !this.keyDown;
+        }
     }
 
     rotateAxes() {
@@ -318,9 +362,13 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
+        document.addEventListener("keydown", this.toggleKey.bind(this));
+        document.addEventListener("keyup", this.toggleKey.bind(this));
         var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
         var handleShowValueLabels = _.debounce(this.handleShowValueLabels.bind(this), 10);
+        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
+        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 100);
         var rotateAxes = _.debounce(this.rotateAxes.bind(this), 10);
 
         var plotterPath = this.toolPath.pushPlotter("plot");
@@ -336,7 +384,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
           { name: "showValueLabels", path: plotterPath.push("showValueLabels"), callbacks: handleShowValueLabels},
           { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
           { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged}
+          { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged},
+          { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
+          { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
         ];
 
         this.initializePaths(mapping);

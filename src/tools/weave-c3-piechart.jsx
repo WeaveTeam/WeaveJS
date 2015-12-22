@@ -32,6 +32,19 @@ class WeaveC3PieChart extends AbstractWeaveTool {
       }
     }
 
+    handleClick(event) {
+      if(!this.flag) {
+        this.toolPath.selection_keyset.setKeys([]);
+      }
+      this.flag = false;
+    }
+
+    toggleKey(event) {
+        if((event.keyIdentifier == "Control")||(event.keyIdentifier == "Meta")) {
+            this.keyDown = !this.keyDown;
+        }
+    }
+
     _updateStyle() {
         d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
                                                       .style("stroke", "black")
@@ -98,7 +111,7 @@ class WeaveC3PieChart extends AbstractWeaveTool {
     componentDidUpdate() {
       super.componentDidUpdate();
       //console.log("resizing");
-      var start = Date.now();
+      //var start = Date.now();
       var newElementSize = this.getElementSize();
       if(!_.isEqual(newElementSize, this.elementSize)) {
         this.chart.resize(newElementSize);
@@ -117,6 +130,8 @@ class WeaveC3PieChart extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
+        document.addEventListener("keydown", this.toggleKey.bind(this));
+        document.addEventListener("keyup", this.toggleKey.bind(this));
         var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
         var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 100);
@@ -151,6 +166,11 @@ class WeaveC3PieChart extends AbstractWeaveTool {
                    draggable: true
                },
                type: "pie",
+               onclick: (d) => {
+                 if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                     this.toolPath.selection_keyset.setKeys([this.indexToKey[d.index]]);
+                 }
+               },
                 onselected: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
