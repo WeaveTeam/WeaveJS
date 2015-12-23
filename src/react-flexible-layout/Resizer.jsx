@@ -1,11 +1,11 @@
-/// <reference path="../../typings/react/react.d.ts" />
-/// <reference path="../../typings/react/react-dom.d.ts"/>
-/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-import * as VendorPrefix from "react-vendor-prefix";
-import * as React from "react";
-import StandardLib from "../Utils/StandardLib";
-const HORIZONTAL = "horizontal";
+import React from "react";
+import ReactDOM from "react-dom";
+import VendorPrefix from "react-vendor-prefix";
+
+var HORIZONTAL = "horizontal";
+
 var resizerStyle = {};
+
 resizerStyle.basic = {
     background: "#000",
     opacity: .1,
@@ -13,40 +13,72 @@ resizerStyle.basic = {
     boxSizing: "border-box",
     backgroundClip: "padding"
 };
+
+// var Resizer:hover {
+//         -webkit-transition: all 2s ease;
+//         transition: all 2s ease;
+//     }
+
 resizerStyle.vertical = {
     height: "4px",
     cursor: "row-resize",
     width: "100%"
 };
+
+    // .Resizer.vertical:hover {
+    //     border-top: 5px solid rgba(0, 0, 0, 0.5);
+    //     border-bottom: 5px solid rgba(0, 0, 0, 0.5);
+    // }
+
 resizerStyle.horizontal = {
     width: "4px",
     cursor: "col-resize",
     height: "100%"
 };
-export default class Resizer extends React.Component {
+
+    // .Resizer.HORIZONTAL:hover {
+    //     border-left: 5px solid rgba(0, 0, 0, 0.5);
+    //     border-right: 5px solid rgba(0, 0, 0, 0.5);
+    // }
+
+class Resizer extends React.Component {
+
     constructor(props) {
         super(props);
         this.state = {
             active: false
         };
     }
-    componentDidMount() {
-        this.element.addEventListener("mousedown", this.boundMouseDown = this.onMouseDown.bind(this));
+
+    componentDidMount () {
+        this.element.addEventListener("mousedown", this._onMouseDown = this.onMouseDown.bind(this));
     }
-    componentWillUnmount() {
-        this.element.removeEventListener("mousedown", this.boundMouseDown);
+
+    componentWillUnmount () {
+        this.element.removeEventListener("mousedown", this._onMouseDown);
     }
-    onMouseDown() {
+
+    onMouseDown () {
         this.setState({
             active: true
         });
     }
+
+    merge (into, obj) {
+        for (let attr in obj) {
+            into[attr] = obj[attr];
+        }
+    }
+
     render() {
         var direction = this.props.direction;
         var style = resizerStyle.basic;
-        StandardLib.merge(style, resizerStyle[direction]);
-        var prefixed = VendorPrefix.prefix({ styles: style });
-        return <span ref={(elt) => { this.element = elt; }} style={prefixed.styles}/>;
+
+        this.merge(style, resizerStyle[direction]);
+
+        var prefixed = VendorPrefix.prefix({styles: style});
+        return <span ref={(elt) => {this.element = elt; }} style={prefixed.styles}/>;
     }
 }
-//# sourceMappingURL=Resizer.jsx.map
+
+export default Resizer;

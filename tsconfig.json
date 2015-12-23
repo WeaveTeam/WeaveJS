@@ -4,7 +4,7 @@
     "jsx": "preserve",
     "sourceMap": true,
     "target": "es6",
-    "outDir": "src"
+    "outDir": "outts"
   },
   "exclude":[
     "node_modules"

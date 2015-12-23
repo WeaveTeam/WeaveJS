@@ -44,8 +44,6 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
 
     private panelDragging: boolean = false;
 
-    private boundHandleStateChange: Function;
-
     private element: Element;
 
     private childNames:string[];
@@ -54,17 +52,15 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
     constructor(props: LayoutProps, state: LayoutState) {
         super(props, state);
 
-        this.state = props.state;
+        this.state = {id: props.state.id, direction: props.state.direction, children: props.state.children, flex: props.state.flex};
         this.minSize = 16;
-        this.boundHandleStateChange = this.handleStateChange.bind(this);
         this.dragging = false;
     }
 
     componentDidMount(): void {
       document.addEventListener("mouseup", this.boundMouseUp = this.onMouseUp.bind(this));
       document.addEventListener("mousedown", this.boundMouseDown = this.onMouseDown.bind(this));
-
-      this.element.addEventListener("mousemove", this.boundMouseMove = this.onMouseMove.bind(this));
+      document.addEventListener("mousemove", this.boundMouseMove = this.onMouseMove.bind(this));
     }
 
     componentWillReceiveProps(nextProps: LayoutProps): void {
@@ -74,7 +70,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
     compoenentWillUnmount(): void {
       document.removeEventListener("mousedown", this.boundMouseDown);
       document.removeEventListener("mouseup", this.boundMouseUp);
-      this.element.removeEventListener("mouseMove", this.boundMouseMove);
+      document.removeEventListener("mouseMove", this.boundMouseMove);
     }
 
     shouldComponentUpdate(nextProps:LayoutProps, nextState:LayoutState): boolean {
@@ -82,9 +78,16 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
     }
 
     componentDidUpdate():void {
-      if(this.props.onStateChange) {
-        this.props.onStateChange();
+      if(this.props.onStateChange && this.state) {
+        this.props.onStateChange(this.state);
       }
+    }
+
+    public getDOMNodeFromId (id: number): Element {
+        var component = this.getComponentFromId(id);
+        if(component) {
+          return component.element;
+        }
     }
 
     private getComponentFromId (id: number): Layout {
@@ -100,16 +103,11 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
       }
     }
 
-    private getDOMNodeFromId (id: number): Element {
-        var component = this.getComponentFromId(id);
-        if(component) {
-          return component.element;
-        }
-    }
+
 
     private onMouseDown (event: MouseEvent): void {
       this.resizerNames.forEach((resizerName:string) => {
-          var resizer: Resizer = this.refs[resizerName] as Resizer;
+          var resizer:Resizer = this.refs[resizerName] as Resizer;
           if(resizer && resizer.state && resizer.state.active) {
             var overlayRange:number[] = this.getResizerRange(resizer);
             overlayRange[0] += this.minSize;
@@ -146,6 +144,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
     }
 
     onMouseUp (event:MouseEvent) {
+        var newState:LayoutState = _.cloneDeep(this.state);
 
         this.resizerNames.forEach(resizerName => {
             var resizer:Resizer = this.refs[resizerName] as Resizer;
@@ -160,15 +159,28 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
 
                 mousePos = Math.max(begin + this.minSize, Math.min(mousePos, end - this.minSize));
 
-                var pane1: Layout = this.refs[resizer.props.pane1] as Layout;
-                var pane2: Layout = this.refs[resizer.props.pane2] as Layout;
+                var ref1:string = resizer.props.pane1;
+                var ref2:string = resizer.props.pane2;
+
+                var pane1: Layout = this.refs[ref1] as Layout;
+                var pane2: Layout = this.refs[ref2] as Layout;
+
+
+                var index1:number = this.childNames.indexOf(ref1);
+                var index2:number = this.childNames.indexOf(ref2);
+
+                var flex1:number = (mousePos - begin) / size;
+                var flex2: number = (end - mousePos) / size;
+
+                newState.children[index1].flex = flex1;
+                newState.children[index2].flex = flex2;
 
                 pane1.setState({
-                   flex: (mousePos - begin) / size
+                   flex: flex1
                 });
 
                 pane2.setState({
-                    flex: (end - mousePos) / size
+                    flex: flex2
                 });
 
                 resizer.setState({
@@ -178,21 +190,18 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
                 resizerOverlay.setState({
                     active: false
                 });
-
-                this.handleStateChange();
+                this.setState(newState);
             }
         });
         this.panelDragging = false;
     }
 
-    handleStateChange(): void {
-      this.setState({
-          children: this.childNames.filter((ref:string) => {
-              return this.refs[ref] ? true : false;
-          }).map((ref:string) => {
-            return (this.refs[ref] as Layout).state;
-          })
-      });
+    handleStateChange(childRef:string, newState:LayoutState): void {
+        var stateCopy:LayoutState = _.cloneDeep(this.state);
+        var index = this.childNames.indexOf(childRef);
+
+        stateCopy.children[index] = newState;
+        this.setState(stateCopy);
     }
 
     render() {
@@ -201,8 +210,6 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
         var style:any = {
             display: "flex",
             flex: this.state.flex,
-            width: "100%",
-            height: "100%",
             position: "relative",
             outline: "none",
             overflow: "hidden",
@@ -210,13 +217,19 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
             flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
         };
 
+        if(this.state.direction === HORIZONTAL) {
+          style.height = "100%";
+        } else {
+          style.width = "100%";
+        }
+
         if (this.state.children && this.state.children.length > 0) {
            var newChildren:JSX.Element[] = new Array(this.state.children.length * 2 - 1);
 
            this.state.children.forEach((childState:LayoutState, i:number) => {
               var ref:string = "child" + i;
               this.childNames[i] = ref;
-              newChildren[i * 2] = <Layout onStateChange={this.boundHandleStateChange} ref={ref} state={childState} key={i * 2}/>;
+              newChildren[i * 2] = <Layout onStateChange={this.handleStateChange.bind(this, ref)} ref={ref} state={childState} key={i * 2}/>;
            });
 
            var i:number;

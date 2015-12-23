@@ -46,8 +46,8 @@ export default class StandardLib {
        if(!newState.hasOwnProperty(key)) {
          newState[key] = undefined;
        }
-       return newState;
      }
+     return newState;
    }
 
    /**
@@ -136,6 +136,20 @@ export default class StandardLib {
        into[attr] = obj[attr];
      }
    }
+
+   static resolveRelative(path:string, base:string):string {
+    	// Upper directory
+    	if (path.startsWith("../")) {
+    		return StandardLib.resolveRelative(path.slice(3), base.replace(/\/[^\/]*$/, ""));
+    	}
+    	// Relative to the root
+    	if (path.startsWith("/")) {
+    		var match = base.match(/(\w*:\/\/)?[^\/]*\//) || [base];
+    		return match[0] + path.slice(1);
+    	}
+    	//relative to the current directory
+	    return base.replace(/\/[^\/]*$/, "") + "/" + path;
+    }
 
    static getDataBounds(column: number[]) {
        return {
