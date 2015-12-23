@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "preserve",
+    "sourceMap": true,
+    "target": "es6",
+    "outDir": "src"
+  },
+  "exclude":[
+    "node_modules"
+  ]
+}
