@@ -1,5 +1,5 @@
 import React from "react";
-import ui from "../react-ui/ui.jsx";
+import ui from "../../outts/react-ui/ui.jsx";
 import VendorPrefix from "react-vendor-prefix";
 
 export default class CustomProbeTool extends React.Component {

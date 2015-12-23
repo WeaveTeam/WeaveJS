@@ -1,5 +1,5 @@
 import React from "react";
-import ui from "../react-ui/ui.jsx";
+import ui from "../../outts/react-ui/ui.jsx";
 import StandardLib from "../Utils/StandardLib";
 import CustomLineChart from "../tools/custom-linechart.jsx";
 import CustomProbeTool from "./CustomProbeTool.jsx";

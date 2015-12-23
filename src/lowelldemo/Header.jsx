@@ -1,5 +1,5 @@
 import React from "react";
-import ui from "../react-ui/ui.jsx";
+import ui from "../../outts/react-ui/ui.jsx";
 
 export default class Header extends React.Component {
 

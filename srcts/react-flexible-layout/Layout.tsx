@@ -21,7 +21,7 @@ interface LayoutState {
     flex?: number
 }
 
-interface LayoutProps {
+interface LayoutProps extends React.Props<Layout> {
     state: LayoutState;
     onStateChange: Function;
     pane1?: string;
