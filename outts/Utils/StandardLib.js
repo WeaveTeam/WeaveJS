@@ -1,3 +1,4 @@
+/// <reference path="../../typings/lodash/lodash.d.ts"/>
 import * as _ from "lodash";
 export default class StandardLib {
     static findDeep(root, match) {

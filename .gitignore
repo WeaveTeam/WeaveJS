@@ -29,6 +29,9 @@ node_modules
 #typscript cache
 .tscache
 
+#typescript outdir
+outts
+
 # Output directory
 dist
 

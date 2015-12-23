@@ -1,3 +1,7 @@
+/// <reference path="../../typings/react/react.d.ts" />
+/// <reference path="../../typings/react/react-dom.d.ts"/>
+/// <reference path="../../typings/lodash/lodash.d.ts"/>
+/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
@@ -168,7 +172,7 @@ export default class Layout extends React.Component {
         var prefixed = VendorPrefix.prefix({ styles: style });
         return (<div ref={(elt) => { this.element = elt; }} style={prefixed.styles}>
                 {newChildren}
-                <ResizerOverlay ref={RESIZEROVERLAY} direction={this.state.direction}/>
+                <ResizerOverlay ref={RESIZEROVERLAY} key={RESIZEROVERLAY} direction={this.state.direction}/>
             </div>);
     }
 }

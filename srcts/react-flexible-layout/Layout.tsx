@@ -246,7 +246,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
         return (
             <div ref={(elt:Element) => { this.element = elt; }} style={prefixed.styles}>
                 {newChildren}
-                <ResizerOverlay ref={RESIZEROVERLAY} direction={this.state.direction}/>
+                <ResizerOverlay ref={RESIZEROVERLAY} key={RESIZEROVERLAY} direction={this.state.direction}/>
             </div>
         );
     }

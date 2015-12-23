@@ -1,3 +1,4 @@
+/// <reference path="../../typings/react/react.d.ts"/>
 import * as React from "react";
 export default class HBox extends React.Component {
     constructor(props, state) {

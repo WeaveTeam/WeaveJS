@@ -1,3 +1,6 @@
+/// <reference path="../../typings/react/react.d.ts" />
+/// <reference path="../../typings/react/react-dom.d.ts"/>
+/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
 import * as VendorPrefix from "react-vendor-prefix";
 import * as React from "react";
 import StandardLib from "../Utils/StandardLib";
