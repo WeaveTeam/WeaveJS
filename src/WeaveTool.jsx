@@ -2,7 +2,7 @@ import _ from "lodash";
 import React from "react";
 import ReactDOM from "react-dom";
 var toolRegistry = {};
-import ui from "./react-ui/ui.jsx";
+import ui from "../outts/react-ui/ui.jsx";
 import VendorPrefix from "react-vendor-prefix";
 import StandardLib from "./Utils/StandardLib";
 import {Glyphicon} from "react-bootstrap";

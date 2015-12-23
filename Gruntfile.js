@@ -10,7 +10,11 @@ module.exports = function (grunt) {
             port: 8000,
             base: './dist'
         },
-
+        ts: {
+            default: {
+                tsconfig: true
+            }
+        },
         browserify: {
             options: {
                     browserifyOptions: {
@@ -49,7 +53,8 @@ module.exports = function (grunt) {
                 options: {
                     browserifyOptions: {
                         debug: true,
-                        plugin: []
+                        plugin: [],
+                        extensions: ['.jsx']
                     }
                 },
                 files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
@@ -91,14 +96,15 @@ module.exports = function (grunt) {
         }
     });
 
+    grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-eslint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-minifyify');
 
-    grunt.registerTask('default', ['eslint', 'browserify:dev', 'copy']);
-    grunt.registerTask('dist', ['eslint', 'browserify:dist', 'copy']);
+    grunt.registerTask('default', ['ts','eslint', 'browserify:dev', 'copy']);
+    grunt.registerTask('dist', ['ts', 'eslint', 'browserify:dist', 'copy']);
     grunt.registerTask('libs', ['browserify:libs']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);
 };

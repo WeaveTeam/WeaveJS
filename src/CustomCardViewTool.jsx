@@ -4,7 +4,7 @@ import VendorPrefix from "react-vendor-prefix";
 import {registerToolImplementation} from "./WeaveTool.jsx";
 import _ from "lodash";
 import * as bs from "react-bootstrap";
-import ui from "./react-ui/ui.jsx";
+import ui from "../outts/react-ui/ui.jsx";
 
 
 const OKBUTTON = "ok";

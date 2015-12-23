@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Layout from "./react-flexible-layout/Layout.jsx";
+import Layout from "../outts/react-flexible-layout/Layout.jsx";
 import _ from "lodash";
 import WeavePanel from "./WeavePanel.js";
 import * as WeavePanelManager from "./WeavePanelManager.js";

@@ -1,6 +1,6 @@
 import React from "react";
 import CustomSearchTool from "./CustomSearchTool.jsx";
-import ui from "./react-ui/ui.jsx";
+import ui from "../outts/react-ui/ui.jsx";
 import SlidingMenu from "./react-sliding-menu/SlidingMenu.jsx";
 import * as bs from "react-bootstrap";
 
