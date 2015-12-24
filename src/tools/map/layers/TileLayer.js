@@ -20,7 +20,10 @@ class TileLayer extends Layer {
 	updateValidExtents()
 	{
 		var proj = ol.proj.get(this.projectionPath.getState());
-		this.layer.setExtent(proj.getExtent());
+		if (proj)
+			this.layer.setExtent(proj.getExtent());
+		else
+			console.log('no proj -> no extent');
 	}
 	getCustomWMSSource()
 	{
