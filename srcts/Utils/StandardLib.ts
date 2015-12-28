@@ -137,13 +137,28 @@ export default class StandardLib {
      }
    }
 
+   /**
+    * Temporary polyfill workaround for String.startsWith
+    * for projects that are targetting es5
+    *
+    *  determines whether a string begins with the characters of another string, returning true or false as appropriate.
+    *
+    * @param str {string} the str string in which to search for in str.startsWith
+    * @param searchString {string} The characters to be searched for at the start of this string.
+    * @param position {number?} Optional. The position in this string at which to begin searching for searchString; defaults to 0.
+    *
+    */
+   static startsWith(str:string, searchString:string, position?:number) {
+       position = position || 0;
+       return str.indexOf(searchString, position) === position;
+   }
    static resolveRelative(path:string, base:string):string {
     	// Upper directory
-    	if (path.startsWith("../")) {
+    	if (StandardLib.startsWith(path, "../")) {
     		return StandardLib.resolveRelative(path.slice(3), base.replace(/\/[^\/]*$/, ""));
     	}
     	// Relative to the root
-    	if (path.startsWith("/")) {
+    	if (StandardLib.startsWith(path, "/")) {
     		var match = base.match(/(\w*:\/\/)?[^\/]*\//) || [base];
     		return match[0] + path.slice(1);
     	}
