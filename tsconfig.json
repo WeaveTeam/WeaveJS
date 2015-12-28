@@ -2,6 +2,7 @@
   "compilerOptions": {
     "noImplicitAny": true,
     "jsx": "preserve",
+    "removeComments": false,
     "sourceMap": true,
     "target": "es6",
     "outDir": "outts"
