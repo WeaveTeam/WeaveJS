@@ -69,7 +69,7 @@ export class WeaveTool extends React.Component {
         this.toolPath = this.props.toolPath;
         this.toolProps = this.props.toolProps;
         if(this.toolPath) {
-          this.toolPath.addCallback(this, _.debounce(this.forceUpdate.bind(this), 0));
+          this.toolPath.addCallback(this, this.forceUpdate);
         }
 
         if(this.tool && this.tool.resize) {
