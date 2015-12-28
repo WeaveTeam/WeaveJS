@@ -147,7 +147,7 @@ class CustomSearchTool extends React.Component {
 
                 if(type === "date") {
                     var dateFormat = this.searchFields[i].dateFormat || "MM/DD/YYYY";
-                    var datePicker = <bs.Popover>
+                    var datePicker = <bs.Popover id="date picker">
                                         <DatePicker ref={"datePicker" + label} dateFormat={dateFormat} date={this.state.searchObject[label]} onChange={this.updateDateField.bind(this, label)}/>
                                      </bs.Popover>;
 

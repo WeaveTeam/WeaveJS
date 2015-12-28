@@ -67,7 +67,7 @@ class Navbar extends React.Component {
           [PRESCRIPTION, "Prescription"]
         ];
 
-        var viewSelectionNodes = viewItems.map(function (viewItem)
+        var viewSelectionNodes = viewItems.map(function (viewItem, index)
         {
           return (
             <bs.ListGroupItem key={viewItem[0]}>
@@ -99,7 +99,10 @@ class Navbar extends React.Component {
       <div style={style}>
         <ui.HBox>
           {
-            [slidingMenu].concat(this.props.children)
+              slidingMenu
+          }
+          {
+              this.props.children
           }
         </ui.HBox>
       </div>
