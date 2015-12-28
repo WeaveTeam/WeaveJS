@@ -33,12 +33,12 @@ resizerStyle.horizontal = {
     height: "100%"
 };
 
-interface IResizerOverlayProps extends React.Props<ResizerOverlay> {
+export interface IResizerOverlayProps extends React.Props<ResizerOverlay> {
     ref: string;
     direction: string
 }
 
-interface IResizerOverlayState {
+export interface IResizerOverlayState {
     active?: boolean;
     range?: number[];
     x?: number;

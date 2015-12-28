@@ -17,9 +17,6 @@
   ],
   "author": "philip.kovac@iweave.com",
   "license": "MPL-2.0",
-  "bugs": {
-    "url": "https://github.com/pkovac/weave-c3-barchart/issues"
-  },
   "devDependencies": {
     "babel": "^6.1.18",
     "babel-eslint": "^5.0.0-beta6",

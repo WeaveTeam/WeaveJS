@@ -31,7 +31,7 @@ resizerStyle.horizontal = {
     height: "100%"
 };
 
-interface IResizerProps extends React.Props<Resizer> {
+export interface IResizerProps extends React.Props<Resizer> {
 	ref: string;
 	key: number;
 	direction: string;
@@ -39,7 +39,7 @@ interface IResizerProps extends React.Props<Resizer> {
 	pane2: string;
 }
 
-interface IResizerState {
+export interface IResizerState {
 	active?: boolean;
 }
 

@@ -14,14 +14,14 @@ import ResizerOverlay from "./ResizerOverlay";
 const RESIZEROVERLAY:string = "resizer";
 const HORIZONTAL:string = "horizontal";
 
-interface LayoutState {
+export interface LayoutState {
     id?: string[];
     children?: LayoutState[];
     direction?: string;
     flex?: number
 }
 
-interface LayoutProps extends React.Props<Layout> {
+export interface LayoutProps extends React.Props<Layout> {
     state: LayoutState;
     onStateChange: Function;
     pane1?: string;
