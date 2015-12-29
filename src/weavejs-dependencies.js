@@ -52,7 +52,8 @@ goog.addDependency('../../../weavejs/data/bin/SingleValueClassifier.js', ['weave
 goog.addDependency('../../../weavejs/data/bin/AbstractBinningDefinition.js', ['weavejs.data.bin.AbstractBinningDefinition'], ['weavejs.api.data.IBinClassifier', 'weavejs.api.data.IBinningDefinition']);
 goog.addDependency('../../../weavejs/api/data/IBinningDefinition.js', ['weavejs.api.data.IBinningDefinition'], ['weavejs.api.core.ILinkableObject']);
 goog.addDependency('../../../weavejs/api/data/IBinClassifier.js', ['weavejs.api.data.IBinClassifier'], ['weavejs.api.core.ILinkableObject']);
-goog.addDependency('../../../weavejs/core/WeaveArchive.js', ['weavejs.core.WeaveArchive'], []);
+goog.addDependency('../../../weavejs/core/WeaveArchive.js', ['weavejs.core.WeaveArchive'], ['weavejs.util.JSByteArray']);
+goog.addDependency('../../../weavejs/util/JSByteArray.js', ['weavejs.util.JSByteArray'], []);
 goog.addDependency('../../../weavejs/core/LinkableSynchronizer.js', ['weavejs.core.LinkableSynchronizer'], ['weavejs.api.core.ILinkableObject']);
 goog.addDependency('../../../weavejs/core/LinkableNumber.js', ['weavejs.core.LinkableNumber'], ['weavejs.core.LinkableVariable']);
 goog.addDependency('../../../weavejs/core/LinkableFunction.js', ['weavejs.core.LinkableFunction'], ['weavejs.core.LinkableString']);
@@ -176,5 +177,5 @@ goog.addDependency('../../../weavejs/core/ClassRegistryImpl.js', ['weavejs.core.
 goog.addDependency('../../../weavejs/api/core/IClassRegistry.js', ['weavejs.api.core.IClassRegistry'], []);
 goog.addDependency('../../../weavejs/util/JS.js', ['weavejs.util.JS'], []);
 		goog.require("WeaveJS");
-
+		
 /* eslint-enable */
