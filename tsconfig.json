@@ -5,7 +5,9 @@
     "removeComments": false,
     "sourceMap": true,
     "target": "es6",
-    "outDir": "outts"
+    "outDir": "outts",
+    "inlineSources": true,
+    "inlineSourceMap": true
   },
   "exclude":[
     "node_modules"
