@@ -9,3 +9,4 @@
 /// <reference path="react-swf/react-swf.d.ts" />
 /// <reference path="react-vendor-prefix/react-vendor-prefix.d.ts" />
 /// <reference path="react/react-dom.d.ts" />
+/// <reference path="swfobject/swfobject.d.ts" />
