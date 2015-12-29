@@ -2,12 +2,6 @@
 
 import * as _ from "lodash";
 
-/**
- * This provides a set of useful static functions.
- * All the functions defined in this class are pure functions, meaning they always return the same result with the same arguments, and they have no side-effects.
- *
- * @author fkamayou
- */
 export default class StandardLib {
 
   /**
