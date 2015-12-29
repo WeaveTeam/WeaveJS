@@ -13,6 +13,7 @@ var weave = window.weave || (opener && opener.weave);
 var urlParams = StandardLib.getUrlParams();
 if (!weave && urlParams.file)
 {
+	weave = new Weave();
 	weavejs.core.WeaveArchive.loadUrl(weave, urlParams.file).then(() => {
 		$(() => {
 			ReactDOM.render(<WeaveLayoutManager weave={weave}/>,	document.getElementById("weaveElt"));
