@@ -147,11 +147,15 @@ export default class StandardLib {
     * @param searchString {string} The characters to be searched for at the start of this string.
     * @param position {number?} Optional. The position in this string at which to begin searching for searchString; defaults to 0.
     *
+    * @returns true or false
+    *
     */
-   static startsWith(str:string, searchString:string, position?:number) {
+   static startsWith(str:string, searchString:string, position?:number):boolean {
        position = position || 0;
        return str.indexOf(searchString, position) === position;
    }
+
+
    static resolveRelative(path:string, base:string):string {
     	// Upper directory
     	if (StandardLib.startsWith(path, "../")) {
@@ -171,5 +175,34 @@ export default class StandardLib {
            min: _.min(column),
            max: _.max(column)
        };
+   }
+
+   /**
+    *
+    *   This function return and object whose keys are url
+    *   parameters and value
+    */
+   static getUrlParams():any {
+
+       var queryParams:any = {};
+       var query:string = window.location.search.substring(1);
+       if(!query) {
+           return {};
+       }
+       var vars:string[] = query.split("&");
+       for (var i:number = 0; i < vars.length; i++) {
+           var pair:string[] = vars[i].split("=");
+           if (typeof queryParams[pair[0]] === "undefined") {
+               queryParams[pair[0]] = decodeURIComponent(pair[1]);
+               // If second entry with this name
+           } else if (typeof queryParams[pair[0]] === "string") {
+               var arr:string[] = [ queryParams[pair[0]], decodeURIComponent(pair[1]) ];
+               queryParams[pair[0]] = arr;
+               // If third or later entry with this name
+           } else {
+               queryParams[pair[0]].push(decodeURIComponent(pair[1]));
+           }
+       }
+       return queryParams;
    }
 }
