@@ -6,12 +6,22 @@ import StandardLib from "../outts/Utils/StandardLib";
 import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
 /* eslint-enable */
 
-/*global Weave*/
+/*global Weave, weavejs*/
 
 var weave = window.weave || (opener && opener.weave);
 
-console.log(StandardLib.getUrlParams());
-
-$(() => {
-  ReactDOM.render(<WeaveLayoutManager weave={weave}/>,	document.getElementById("weaveElt"));
-});
+var urlParams = StandardLib.getUrlParams();
+if (!weave && urlParams.file)
+{
+	weavejs.core.WeaveArchive.loadUrl(weave, urlParams.file).then(() => {
+		$(() => {
+			ReactDOM.render(<WeaveLayoutManager weave={weave}/>,	document.getElementById("weaveElt"));
+		});
+	});
+}
+else
+{
+	$(() => {
+		ReactDOM.render(<WeaveLayoutManager weave={weave}/>,	document.getElementById("weaveElt"));
+	});
+}
