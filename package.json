@@ -43,6 +43,7 @@
     "d3": "^3.5.9",
     "inline-style-prefixer": "^0.5.4",
     "jquery": "^2.1.4",
+    "jszip": "^2.5.0",
     "lodash": "^3.10.0",
     "openlayers": "^3.11.2",
     "radium": "^0.15.3",

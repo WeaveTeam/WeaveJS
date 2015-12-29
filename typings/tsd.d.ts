@@ -10,3 +10,4 @@
 /// <reference path="react-vendor-prefix/react-vendor-prefix.d.ts" />
 /// <reference path="react/react-dom.d.ts" />
 /// <reference path="swfobject/swfobject.d.ts" />
+/// <reference path="jszip/jszip.d.ts" />
