@@ -158,21 +158,36 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     }
 
     _selectionKeysChanged() {
+        if(!this.chart)
+            return;
+
         var keys = this.toolPath.selection_keyset.getKeys();
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
         });
-        this.chart.select("y", indices, true);
+        //this.chart.focus();
+        if(indices.length) {
+            this.chart.select("y", indices, true);
+        }
     }
 
     _probedKeysChanged() {
 
-        //var keys = this.toolPath.probe_keyset.getKeys();
-        //var indices = keys.map( (key) => {
-        //    return Number(this.keyToIndex[key]);
-        //});
+        var keys = this.toolPath.probe_keyset.getKeys();
+        var indices = keys.map( (key) => {
+            return Number(this.keyToIndex[key]);
+        });
         //
         //this.chart.select("y", indices, true);
+        if(indices.length) {
+            //this.chart.defocus();
+            //indices.forEach( (index) => {
+            //    d3.select(d3.select(this.element).selectAll("circle")[0][index]).classed(c3.chart.internal.fn.CLASS.focused, true).classed(c3.chart.internal.fn.CLASS.defocused, false);;
+            //});
+        }else{
+            this._selectionKeysChanged()
+        }
+
     }
 
 
@@ -190,7 +205,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     }
 
     _updateStyle() {
-        d3.selectAll(this.element).selectAll("circle").style("opacity", 1)
+        d3.select(this.element).selectAll("circle").style("opacity", 1)
                                                       .style("stroke", "black")
                                                       .style("stroke-opacity", 1);
     }
