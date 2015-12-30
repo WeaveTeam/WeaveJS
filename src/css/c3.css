@@ -47,7 +47,9 @@
 
 .c3-selected-circle {
   fill: white;
-  stroke-width: 2px; }
+  stroke-width: 2px;
+  opacity: 0;
+}
 
 /*-- Bar --*/
 .c3-bar {

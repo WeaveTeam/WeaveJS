@@ -3,7 +3,7 @@ import Header from "./Header.jsx";
 import SideBar from "./SideBar.jsx";
 import ui from "../../outts/react-ui/ui.jsx";
 import Panel from "./Panel.jsx";
-import Weave from "../Weave.jsx";
+import Weave from "../../outts/Weave.jsx";
 import _ from "lodash";
 import c3 from "c3";
 import CustomLineChart from "../tools/custom-linechart.jsx";

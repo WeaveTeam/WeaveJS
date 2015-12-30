@@ -119,17 +119,13 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     }
 
     _selectionKeysChanged() {
-        // var keys = this.toolPath.selection_keyset.getKeys();
-        // var selectedBins = {};
-
-        // if(this.idToRecord) {
-        //     keys.forEach((key) => {
-        //         var bin = this.idToRecord[key].binnedColumn;
-        //         selectedBins[bin] = true;
-        //     });
-        // }
-
-        // this.chart.select("height", _.keys(selectedBins).map(Number), true);
+        //var keys = this.toolPath.selection_keyset.getKeys();
+        //// var indices = this.indexCache.pick(keys).values();
+        //var indices = keys.map((key) => {
+        //    return Number(this.keyToIndex[key]);
+        //});
+        //
+        //this.chart.select(this.heightColumnNames, indices, true);
     }
     _probedKeysChanged() {
 

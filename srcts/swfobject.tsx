@@ -11,7 +11,7 @@ interface ISwfObjectProps extends React.Props<Swfobject> {
     xiSwfUrlStr?:string;
     swfVersionStr?:string;
     flashvars?:Object;
-    params: {
+    params?: {
         quality?:string;
         bgcolor?:string;
         allowscriptaccess?:string;

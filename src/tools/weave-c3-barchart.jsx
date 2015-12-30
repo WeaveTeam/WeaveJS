@@ -145,11 +145,24 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             return Number(this.keyToIndex[key]);
         });
 
-        this.chart.select(this.heightColumnNames, indices, true);
+        this.chart.focus();
+        if(indices.length) {
+            this.chart.select(this.heightColumnNames, indices, true);
+        }
+
     }
 
     _probedKeysChanged () {
-
+        var keys = this.toolPath.probe_keyset.getKeys();
+        var indices = keys.map((key) => {
+            return Number(this.keyToIndex[key]);
+        });
+        if(indices.length) {
+            //this.chart.select(this.heightColumnNames,indices,true);
+            this.chart.focus()
+        }else{
+            this._selectionKeysChanged();
+        }
     }
 
     handleClick(event) {

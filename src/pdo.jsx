@@ -4,7 +4,7 @@ import Layout from "./react-flexible-layout/Layout.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import CustomCardViewTool from "./CustomCardViewTool.jsx";
 import ui from "../outts/react-ui/ui.jsx";
-import Weave from "./Weave.jsx";
+import Weave from "../outts/Weave.jsx";
 import _ from "lodash";
 //import ReactBurgerMenu from "react-burger-menu";
 import * as bs from "react-bootstrap";
