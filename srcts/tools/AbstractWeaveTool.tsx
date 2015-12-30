@@ -5,12 +5,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-interface IAbstractWeaveToolProps extends React.Props<AbstractWeaveTool> {
+export interface IAbstractWeaveToolProps extends React.Props<AbstractWeaveTool> {
     toolPath:WeavePath;
     style:React.CSSProperties
 }
 
-interface IAbstractWeaveToolState {
+export interface IAbstractWeaveToolState {
 
 }
 

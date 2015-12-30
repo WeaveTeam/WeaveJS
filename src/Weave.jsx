@@ -1,6 +1,6 @@
 import React from "react";
 import SwfObject from "../outts/swfobject.jsx";
-import {registerToolImplementation} from "./WeaveTool.jsx";
+import {registerToolImplementation} from "../outts/WeaveTool.jsx";
 
 class Weave extends React.Component {
 
