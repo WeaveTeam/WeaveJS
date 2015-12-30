@@ -1,7 +1,7 @@
 import React from "react";
 import {ListGroupItem, ListGroup} from "react-bootstrap";
 import {registerToolImplementation} from "../WeaveTool.jsx";
-import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
+import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 import _ from "lodash";
 
 class SessionStateMenuTool extends AbstractWeaveTool {

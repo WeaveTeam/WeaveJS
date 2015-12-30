@@ -15,18 +15,18 @@ weavejs.util.JS.JSZip = JSZip;
 var weave = window.weave || (opener && opener.weave);
 
 var urlParams = StandardLib.getUrlParams();
-if (!weave && urlParams.file)
-{
-	window.weave = weave = new Weave();
-	weavejs.core.WeaveArchive.loadUrl(weave, urlParams.file).then(render, e => { console.error(e) });
+if (!weave && urlParams.file) {
+    window.weave = weave = new Weave();
+    weavejs.core.WeaveArchive.loadUrl(weave, urlParams.file).then(render, e => {
+        console.error(e)
+    });
 }
-else
-{
-	render();
+else {
+    render();
 }
 
 function render() {
-	$(() => {
-		ReactDOM.render(<WeaveLayoutManager weave={weave}/>,	document.getElementById("weaveElt"));
-	});
+    $(() => {
+        ReactDOM.render(<WeaveLayoutManager weave={weave}/>, document.getElementById("weaveElt"));
+    });
 }

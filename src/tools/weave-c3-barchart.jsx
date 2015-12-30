@@ -1,4 +1,4 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
+import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 import d3 from "d3";
 import c3 from "c3";
 import {registerToolImplementation} from "../WeaveTool.jsx";

@@ -4,7 +4,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 //import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 //import ReactDataGrid from "react-datagrid";
-import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
+import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 
 class WeaveReactTable extends AbstractWeaveTool {
     constructor(props) {
