@@ -16,8 +16,8 @@ import WeaveReactTable from "./tools/weave-react-table.jsx";
 import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 /* global Weave, weavejs */
-import {WeaveTool, getToolImplementation} from "./WeaveTool.jsx";
-import ToolOverlay from "./ToolOverlay.jsx";
+import {WeaveTool, getToolImplementation} from "../outts/WeaveTool.jsx";
+import ToolOverlay from "../outts/ToolOverlay.jsx";
 import StandardLib from "./Utils/StandardLib";
 
 const LAYOUT = "Layout";

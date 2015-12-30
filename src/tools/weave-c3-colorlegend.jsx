@@ -1,4 +1,4 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
+import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 import {registerToolImplementation} from "../WeaveTool.jsx";
 import _ from "lodash";
 import StandardLib from "../Utils/StandardLib";
