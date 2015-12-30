@@ -126,7 +126,8 @@ goog.addDependency('../../../weavejs/api/core/ILinkableObjectWithBusyStatus.js',
 goog.addDependency('../../../weavejs/api/core/ILinkableDynamicObject.js', ['weavejs.api.core.ILinkableDynamicObject'], ['weavejs.api.core.ILinkableCompositeObject']);
 goog.addDependency('../../../weavejs/util/WeaveTreeItem.js', ['weavejs.util.WeaveTreeItem'], []);
 goog.addDependency('../../../weavejs/core/ProgressIndicator.js', ['weavejs.core.ProgressIndicator'], ['weavejs.api.core.IProgressIndicator']);
-goog.addDependency('../../../weavejs/core/LinkableHashMap.js', ['weavejs.core.LinkableHashMap'], ['weavejs.api.core.DynamicState', 'weavejs.core.CallbackCollection', 'weavejs.core.ChildListCallbackInterface', 'weavejs.api.core.IChildListCallbackInterface', 'weavejs.api.core.ILinkableHashMap']);
+goog.addDependency('../../../weavejs/core/LinkableHashMap.js', ['weavejs.core.LinkableHashMap'], ['weavejs.api.core.DynamicState', 'weavejs.core.CallbackCollection', 'weavejs.core.ChildListCallbackInterface', 'weavejs.util.BackwardsCompatibility', 'weavejs.api.core.IChildListCallbackInterface', 'weavejs.api.core.ILinkableHashMap']);
+goog.addDependency('../../../weavejs/util/BackwardsCompatibility.js', ['weavejs.util.BackwardsCompatibility'], ['weavejs.api.core.ILinkableHashMap']);
 goog.addDependency('../../../weavejs/api/core/ILinkableHashMap.js', ['weavejs.api.core.ILinkableHashMap'], ['weavejs.api.core.ILinkableCompositeObject']);
 goog.addDependency('../../../weavejs/core/ChildListCallbackInterface.js', ['weavejs.core.ChildListCallbackInterface'], ['weavejs.core.CallbackCollection', 'weavejs.api.core.IChildListCallbackInterface']);
 goog.addDependency('../../../weavejs/api/core/IChildListCallbackInterface.js', ['weavejs.api.core.IChildListCallbackInterface'], ['weavejs.api.core.ICallbackCollection']);
@@ -176,6 +177,5 @@ goog.addDependency('../../../weavejs/api/core/ILocaleManager.js', ['weavejs.api.
 goog.addDependency('../../../weavejs/core/ClassRegistryImpl.js', ['weavejs.core.ClassRegistryImpl'], ['weavejs.util.JS', 'weavejs.api.core.IClassRegistry']);
 goog.addDependency('../../../weavejs/api/core/IClassRegistry.js', ['weavejs.api.core.IClassRegistry'], []);
 goog.addDependency('../../../weavejs/util/JS.js', ['weavejs.util.JS'], []);
-		goog.require("WeaveJS");
-		
+		goog.require("WeaveJS");		
 /* eslint-enable */
