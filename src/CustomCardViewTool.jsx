@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import VendorPrefix from "react-vendor-prefix";
-import {registerToolImplementation} from "./WeaveTool.jsx";
+import {registerToolImplementation} from "../outts/WeaveTool.jsx";
 import _ from "lodash";
 import * as bs from "react-bootstrap";
 import ui from "../outts/react-ui/ui.jsx";

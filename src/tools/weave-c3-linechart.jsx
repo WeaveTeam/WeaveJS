@@ -2,7 +2,7 @@ import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 import c3 from "c3";
 import d3 from "d3";
 import _ from "lodash";
-import {registerToolImplementation} from "../WeaveTool.jsx";
+import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import FormatUtils from "../Utils/FormatUtils";
 import React from "react";
 

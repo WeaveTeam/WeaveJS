@@ -75,7 +75,7 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
 
     componentDidMount():void {
         this.element = ReactDOM.findDOMNode(this.refs["toolDiv"]);
-        if(this.ToolClass instanceof AbstractWeaveTool) {
+        if(React.Component.isPrototypeOf(this.ToolClass)) {
             this.tool = this.refs["tool"];
         } else {
             this.tool = new this.ToolClass(_.merge({element: ReactDOM.findDOMNode(this.refs["toolDiv"]), toolPath: this.toolPath}, this.toolProps));

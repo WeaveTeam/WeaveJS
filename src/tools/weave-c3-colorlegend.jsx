@@ -1,5 +1,5 @@
 import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
-import {registerToolImplementation} from "../WeaveTool.jsx";
+import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import _ from "lodash";
 import StandardLib from "../Utils/StandardLib";
 import d3 from "d3";

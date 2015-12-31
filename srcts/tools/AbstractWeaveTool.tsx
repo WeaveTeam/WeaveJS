@@ -33,7 +33,7 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
     private toolPath:WeavePath;
     private wrapper:HTMLElement;
     private element:HTMLElement;
-    private paths:{[name:string] : WeavePath};
+    public paths:{[name:string] : WeavePath};
 
     constructor(props:IAbstractWeaveToolProps) {
         super(props);

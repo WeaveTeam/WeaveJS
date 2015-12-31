@@ -1,7 +1,7 @@
 import React from "react";
 import * as bs from "react-bootstrap";
 import _ from "lodash";
-import {registerToolImplementation} from "./WeaveTool.jsx";
+import {registerToolImplementation} from "../outts/WeaveTool.jsx";
 import DatePicker from "react-date-picker";
 
 var customSearchStyle = {

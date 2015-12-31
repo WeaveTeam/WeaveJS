@@ -1,4 +1,4 @@
-import {registerToolImplementation} from "../WeaveTool.jsx";
+import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import ol from "openlayers";
 import lodash from "lodash";
 import jquery from "jquery";
@@ -143,7 +143,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		dataBounds.setXCenter(xCenter);
 		dataBounds.setYCenter(yCenter);
 		zoomBounds.setDataBounds(dataBounds);
-		
+
 		this.zoomBoundsPath.addCallback(this, this.getSessionCenter);
 	}
 
@@ -164,7 +164,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		dataBounds.setHeight(screenBounds.getHeight() * resolution);
 		dataBounds.makeSizePositive();
 		zoomBounds.setDataBounds(dataBounds);
-		
+
 		this.zoomBoundsPath.addCallback(this, this.getSessionCenter);
 	}
 
