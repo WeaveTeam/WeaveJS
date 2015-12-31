@@ -23,7 +23,7 @@ declare type NumericRecords = {[name:string]: number} | {[name:string]: NumericR
 /* private
  * @param records array or records
  * @param attributes array of attributes to be normalized
- */
+ * /
 class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     private keyToIndex:{[key:string]: number};
@@ -179,4 +179,4 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             }
         }});
     }
-}
+}*/
