@@ -61,7 +61,6 @@ module.exports = function (grunt) {
             }
         },
         copy: {
-        	weavejsdeps: {expand: true, flatten: true, cwd: 'src/', src: 'weavejs-dependencies.js', dest: 'dist/'},
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
             css: {expand: true, flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/'},
             olcss: {expand: true, flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
