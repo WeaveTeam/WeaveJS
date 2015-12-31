@@ -3,6 +3,7 @@
 import * as React from "react";
 import SwfObject from "./swfobject";
 import {ICallbackObj} from "swfobject-amd";
+import {registerToolImplementation} from "./WeaveTool";
 
 declare type WeaveObject = any;
 
@@ -59,3 +60,5 @@ class Weave extends React.Component <IWeaveProps, IWeaveState> {
 }
 
 export default Weave;
+
+registerToolImplementation("Weave", Weave);
