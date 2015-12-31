@@ -17,7 +17,11 @@ export interface IAbstractWeaveToolState {
 
 }
 
-interface ElementSize {
+export interface IAbstractWeaveToolPaths {
+    [name:string] : WeavePath
+}
+
+export interface ElementSize {
     width:number;
     height:number;
 }
@@ -30,10 +34,11 @@ interface PathConfig {
 
 export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToolProps, IAbstractWeaveToolState> {
 
-    private toolPath:WeavePath;
+    protected toolPath:WeavePath;
     private wrapper:HTMLElement;
-    private element:HTMLElement;
-    public paths:{[name:string] : WeavePath};
+    protected element:HTMLElement;
+    protected paths:IAbstractWeaveToolPaths;
+    protected elementSize:ElementSize;
 
     constructor(props:IAbstractWeaveToolProps) {
         super(props);

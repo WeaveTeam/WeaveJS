@@ -1,30 +1,47 @@
-/*
 ///<reference path="../../typings/c3/c3.d.ts"/>
 ///<reference path="../../typings/d3/d3.d.ts"/>
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
+///<reference path="../../typings/weave/WeavePath.d.ts"/>
+
 
 import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
-import * as c3 from "c3";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../Utils/FormatUtils";
 import * as React from "react";
 import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
-import ChartAPI = c3.ChartAPI;
+import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
+import {ElementSize} from "./AbstractWeaveTool";
+import {ChartConfiguration, ChartAPI, generate} from "c3";
+import {MouseEvent} from "react";
 
 interface IColumnStats {
     min: number;
     max: number;
 }
 
-declare type NumericRecords = {[name:string]: number} | {[name:string]: NumericRecords}
+interface IScatterplotPaths extends IAbstractWeaveToolPaths {
+    plotter: WeavePath;
+    dataX: WeavePath;
+    dataY: WeavePath;
+    sizeBy: WeavePath;
+    fill: WeavePath;
+    line: WeavePath;
+    xAxis: WeavePath;
+    yAxis: WeavePath;
+    filteredKeySet: WeavePath;
+    selectionKeySet: WeavePath;
+    probeKeySet: WeavePath;
+}
 
-/!* private
+declare type Record = {[name:string]: number} | {[name:string]: string} | {[name:string]: Record}
+
+/* private
  * @param records array or records
  * @param attributes array of attributes to be normalized
- *!/
+ */
 class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     private keyToIndex:{[key:string]: number};
@@ -34,7 +51,20 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     private chart:ChartAPI;
     private dataXType:string;
     private dataYType:string;
-    private numericRecords
+    private numericRecords:Record[];
+    private stringRecords:Record[];
+    private normalizedRecords:Record[];
+    private records:Record[][];
+
+    protected paths:IScatterplotPaths;
+    private plotterState:any;
+    private normalizedPointSizes:number[];
+
+    private flag:boolean;
+    private keyDown:boolean;
+
+    private c3Config:ChartConfiguration;
+
     constructor(props:IAbstractWeaveToolProps) {
         super(props);
         this.keyToIndex = {};
@@ -43,10 +73,10 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.xAxisValueToLabel = {};
     }
 
-    private normalizeRecords (records:any[], attributes:string[]) {
+    private normalizeRecords (records:Record[], attributes:string[]):any[] {
 
         // to avoid computing the stats at each iteration.
-        var columnStatsCache:{[attribute:string]:IColoumnStats} = {};
+        var columnStatsCache:{[attribute:string]:IColumnStats} = {};
         attributes.forEach(function(attr:string) {
             columnStatsCache[attr] = {
                 min: _.min(_.pluck(records, attr)),
@@ -126,11 +156,11 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             }
         };
 
-        this.dataXType = this.paths["dataX"].getValue("this.getMetadata('dataType')");
-        this.dataYType = this.paths["dataY"].getValue("this.getMetadata('dataType')");
+        this.dataXType = this.paths.dataX.getValue("this.getMetadata('dataType')");
+        this.dataYType = this.paths.dataY.getValue("this.getMetadata('dataType')");
 
-        this.numericRecords = this.paths["plotter"].retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = this.paths["plotter"].retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
@@ -143,24 +173,24 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.yAxisValueToLabel = {};
         this.xAxisValueToLabel = {};
 
-        this.numericRecords.forEach((record, index) => {
-            this.keyToIndex[record.id] = index;
-            this.indexToKey[index] = record.id;
+        this.numericRecords.forEach((record:Record, index:number) => {
+            this.keyToIndex[record["id"] as string] = index;
+            this.indexToKey[index] = record["id"] as string;
         });
 
-        this.stringRecords.forEach((record, index) => {
-            this.xAxisValueToLabel[this.numericRecords[index].point.x] = record.point.x;
-            this.yAxisValueToLabel[this.numericRecords[index].point.y] = record.point.y;
+        this.stringRecords.forEach((record:any, index:number) => {
+            this.xAxisValueToLabel[(this.numericRecords[index]["point"] as Record)["x"] as number] = (record["point"] as Record)["x"] as string;
+            this.yAxisValueToLabel[(this.numericRecords[index]["point"] as Record)["y"] as number] = (record["point"] as Record)["y"] as string;
         });
 
         this.normalizedRecords = this.normalizeRecords(this.numericRecords, ["size"]);
         this.plotterState = this.paths.plotter.getUntypedState ? this.paths.plotter.getUntypedState() : this.paths.plotter.getState();
-        this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord) => {
+        this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord:Record) => {
             if(this.plotterState && this.plotterState.sizeBy.length) {
                 let minScreenRadius = this.plotterState.minScreenRadius;
                 let maxScreenRadius = this.plotterState.maxScreenRadius;
-                return (normalizedRecord && normalizedRecord.size ?
-                    minScreenRadius + normalizedRecord.size * (maxScreenRadius - minScreenRadius) :
+                return (normalizedRecord && normalizedRecord["size"] ?
+                    minScreenRadius + normalizedRecord["size"] as number * (maxScreenRadius - minScreenRadius) :
                         this.plotterState.defaultScreenRadius) || 3;
             }
             else {
@@ -168,16 +198,246 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             }
         });
 
-        this._axisChanged();
+        this.axisChanged();
         this.busy = 1;
+
         this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => {
             if (this.busy > 1) {
                 this.busy = 0;
-                this._dataChanged();
+                this.dataChanged();
             }
             else {
                 this.busy = 0;
             }
         }});
     }
-}*/
+
+    _selectionKeysChanged() {
+        if(!this.chart)
+            return;
+
+        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var selectedIndices:number[] = selectedKeys.map((key:string) => {
+            return Number(this.keyToIndex[key]);
+        });
+        var keys:string[] = Object.keys(this.keyToIndex);
+        var indices:number[] = keys.map((key:string) => {
+            return Number(this.keyToIndex[key]);
+        });
+
+        var unselectedIndices:number[] = _.difference(indices, selectedIndices);
+        if(selectedIndices.length) {
+            this.customDeFocus(unselectedIndices, "circle", ".c3-shape");
+            this.customFocus(selectedIndices, "circle", ".c3-shape");
+            this.chart.select(["y"], selectedIndices, true);
+        }else{
+            this.customFocus(indices, "circle", ".c3-shape");
+            this.chart.select(["y"], [], true);
+        }
+    }
+
+    _probedKeysChanged() {
+
+        var selectedKeys:string[] = this.toolPath.probe_keyset.getKeys();
+        var selectedIndices:number[] = selectedKeys.map( (key:string) => {
+            return Number(this.keyToIndex[key]);
+        });
+        var keys:string[] = Object.keys(this.keyToIndex);
+        var indices:number[] = keys.map((key:string) => {
+            return Number(this.keyToIndex[key]);
+        });
+        var unselectedIndices:number[] = _.difference(indices, selectedIndices);
+
+        if(selectedIndices.length) {
+            this.customDeFocus(unselectedIndices, "circle", ".c3-shape");
+            this.customFocus(selectedIndices, "circle", ".c3-shape");
+        }else{
+            this._selectionKeysChanged()
+        }
+
+    }
+
+
+    handleClick(event:MouseEvent):void {
+        if(!this.flag) {
+            this.toolPath.selection_keyset.setKeys([]);
+        }
+        this.flag = false;
+    }
+
+    toggleKey(event:KeyboardEvent):void {
+        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
+            this.keyDown = !this.keyDown;
+        }
+    }
+
+    _updateStyle() {
+        d3.select(this.element).selectAll("circle").style("opacity", 1)
+            .style("stroke", "black")
+            .style("stroke-opacity", 1);
+    }
+
+    componentDidUpdate() {
+        super.componentDidUpdate();
+        //console.log("resizing");
+        //var start = Date.now();
+        var newElementSize:ElementSize = this.getElementSize();
+        if(!_.isEqual(newElementSize, this.elementSize)) {
+            this.chart.resize(newElementSize);
+            this.elementSize = newElementSize;
+        }
+        //var end = Date.now();
+    }
+
+    componentWillUnmount() {
+        /* Cleanup callbacks */
+        //this.teardownCallbacks();
+        this.chart.destroy();
+        super.componentWillUnmount();
+    }
+
+    componentDidMount() {
+        super.componentDidMount();
+
+        document.addEventListener("keydown", this.toggleKey.bind(this));
+        document.addEventListener("keyup", this.toggleKey.bind(this));
+        var axisChanged = this.axisChanged.bind(this);
+        var dataChanged = this.dataChanged.bind(this);
+        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
+        var probeKeySetChanged = this._probedKeysChanged.bind(this);
+
+        var plotterPath = this.toolPath.pushPlotter("plot");
+        var mapping = [
+            { name: "plotter", path: plotterPath, callbacks: dataChanged},
+            { name: "dataX", path: plotterPath.push("dataX"), callbacks: [dataChanged, axisChanged] },
+            { name: "dataY", path: plotterPath.push("dataY"), callbacks: [dataChanged, axisChanged] },
+            { name: "sizeBy", path: plotterPath.push("sizeBy"), callbacks: dataChanged },
+            { name: "fill", path: plotterPath.push("fill"), callbacks: [dataChanged] },
+            { name: "line", path: plotterPath.push("line"), callbacks: dataChanged },
+            { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
+            { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
+            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged },
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
+            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+        ];
+
+        this.initializePaths(mapping);
+
+        this.c3Config = {
+            bindto: this.element,
+            padding: {
+                top: 20,
+                bottom: 20,
+                right: 30
+            },
+            data: {
+                rows: [],
+                x: "x",
+                xSort: false,
+                type: "scatter",
+                selection: {
+                    enabled: true,
+                    multiple: true,
+                    draggable: true
+                },
+                color: (color:string, d:any):string => {
+                    if(this.stringRecords && d.hasOwnProperty("index")) {
+
+                        // find the corresponding index of numericRecords in stringRecords
+                        var id:string = this.indexToKey[d.index as number];
+                        var index:number = _.pluck(this.stringRecords, "id").indexOf(id);
+
+                        var record:Record = this.stringRecords[index];
+                        return (record && record["fill"] && (record["fill"] as Record)["color"]) ? (record["fill"] as Record)["color"] as string : "#000000";
+                    }
+                    return "#000000";
+                },
+                onclick: (d:any) => {
+                    if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                        this.toolPath.selection_keyset.setKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onselected: (d:any) => {
+                    this.flag = true;
+                    if(d && d.hasOwnProperty("index")) {
+                        this.toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onunselected: (d) => {
+                    this.flag = true;
+                    if(d && d.hasOwnProperty("index")) {
+                        this.toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onmouseover: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                    }
+                },
+                onmouseout: (d) => {
+                    if(d && d.hasOwnProperty("index")) {
+                        this.toolPath.probe_keyset.setKeys([]);
+                    }
+                }
+            },
+            legend: {
+                show: false
+            },
+            axis: {
+                x: {
+                    label: {
+                        text: "",
+                        position: "outer-center"
+                    },
+                    tick: {
+                        fit: false,
+                        rotate: 0,
+                        format: (num:number):string => {
+                            if(this.paths.dataX && this.xAxisValueToLabel && this.dataXType !== "number") {
+                                return this.xAxisValueToLabel[num] || "";
+                            } else {
+                                return String(FormatUtils.defaultNumberFormatting(num));
+                            }
+                        }
+                    }
+                },
+                y: {
+                    label: {
+                        text: "",
+                        position: "outer-middle"
+                    },
+                    tick: {
+                        format: (num:number):string => {
+                            if(this.paths.dataY && this.yAxisValueToLabel && this.dataYType !== "number") {
+                                return this.yAxisValueToLabel[num] || "";
+                            } else {
+                                return String(FormatUtils.defaultNumberFormatting(num));
+                            }
+                        }
+                    }
+                }
+            },
+            grid: {
+                x: {
+                    show: true
+                },
+                y: {
+                    show: true
+                }
+            },
+            point: {
+                r: (d:any):number => {
+                    if(d.hasOwnProperty("index")) {
+                        return this.normalizedPointSizes[d.index];
+                    }
+
+                }
+            },
+            onrendered: this._updateStyle.bind(this)
+        };
+        this.chart = generate(this.c3Config);
+    }
+}
+export default WeaveC3ScatterPlot;
+
+registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);

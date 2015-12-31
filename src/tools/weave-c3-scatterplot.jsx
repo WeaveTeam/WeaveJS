@@ -146,6 +146,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         this._axisChanged();
         this.busy = 1;
+        console.log(_.pluck(this.numericRecords, "point"));
         this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => {
             if (this.busy > 1) {
             	this.busy = 0;

@@ -288,7 +288,7 @@ declare module c3 {
          */
         xFormat?: string;
         //xLocaltime?: any;
-        //xSort?: any;
+        xSort?: boolean;
         /**
          * Set custom data name.
          */
@@ -385,10 +385,10 @@ declare module c3 {
          * - d is the data where mouse cursor moves out. In this callback, this will be the Chart object.
          */
         onmouseout?: (d: any, element?: any) => void;
-        // onselected?: any;
-        // onunselected?: any;
-        // ondragstart?: any;
-        // ondragend?: any;
+        onselected?: (d: any, element?: any) => void;
+        onunselected?: (d: any, element?: any) => void;
+        ondragstart?: any;
+        ondragend?: any;
     }
 
     interface Axis {
@@ -747,7 +747,7 @@ declare module c3 {
         /**
          * The radius size of each point.
          */
-        r?: number;
+        r?: number | ((d: any) => number);
 
         focus?: {
             expand: {
@@ -820,6 +820,7 @@ declare module c3 {
          */
         load(args: {
             url?: string;
+            data?:Array<Object>;
             json?: Object;
             keys?: { x?: string; value: Array<string>; }
             rows?: Array<PrimitiveArray>;
