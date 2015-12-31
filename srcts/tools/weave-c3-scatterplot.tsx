@@ -1,3 +1,4 @@
+/*
 ///<reference path="../../typings/c3/c3.d.ts"/>
 ///<reference path="../../typings/d3/d3.d.ts"/>
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
@@ -20,10 +21,10 @@ interface IColumnStats {
 
 declare type NumericRecords = {[name:string]: number} | {[name:string]: NumericRecords}
 
-/* private
+/!* private
  * @param records array or records
  * @param attributes array of attributes to be normalized
- * /
+ *!/
 class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     private keyToIndex:{[key:string]: number};

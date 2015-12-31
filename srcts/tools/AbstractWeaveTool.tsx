@@ -1,9 +1,12 @@
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/react/react-dom.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../../typings/d3/d3.d.ts"/>
+
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as d3 from "d3";
 
 export interface IAbstractWeaveToolProps extends React.Props<AbstractWeaveTool> {
     toolPath:WeavePath;
@@ -80,5 +83,17 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
         return <div ref={(elt:HTMLElement) => { this.wrapper = elt; }} style={this.props.style}>
             <div ref={(elt:HTMLElement) => {this.element = elt; }} onClick={this.handleClick.bind(this)} style={{width: "100%", height: "100%", maxHeight: "100%"}}></div>
         </div>;
+    }
+
+    customFocus(array:Array<number>, type:string, filter:string) {
+        array.forEach( (index) => {
+            d3.select(d3.select(this.element).selectAll(type).filter(filter)[0][index]).style("opacity",1.0);
+        });
+    }
+
+    customDeFocus(array:Array<number>, type:string, filter:string) {
+        array.forEach( (index) => {
+            d3.select(d3.select(this.element).selectAll(type).filter(filter)[0][index]).style("opacity",0.3);
+        });
     }
 }
