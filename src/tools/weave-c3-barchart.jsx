@@ -11,6 +11,10 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     constructor(props) {
         super(props);
+        this.keyToIndex = {};
+        this.indexToKey = {};
+        this.yAxisValueToLabel = {};
+        this.xAxisValueToLabel = {};
 
         this.c3Config = {
             //size: this.getElementSize(),
@@ -139,29 +143,45 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     _selectionKeysChanged () {
-        var keys = this.toolPath.selection_keyset.getKeys();
-        // var indices = this.indexCache.pick(keys).values();
+        if(!this.chart)
+            return;
+
+        var selectedKeys = this.toolPath.selection_keyset.getKeys();
+        var selectedIndices = selectedKeys.map((key) => {
+            return Number(this.keyToIndex[key]);
+        });
+        var keys = Object.keys(this.keyToIndex);
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
         });
-
-        this.chart.focus();
-        if(indices.length) {
-            this.chart.select(this.heightColumnNames, indices, true);
+        var unselectedIndices = _.difference(indices,selectedIndices);
+        if(selectedIndices.length) {
+            this.customDeFocus(unselectedIndices, "path", ".c3-shape");
+            this.customFocus(selectedIndices, "path", ".c3-shape");
+            this.chart.select(this.heightColumnNames, selectedIndices, true);
+        }else{
+            this.customFocus(indices, "path", ".c3-shape");
+            this.chart.select(this.heightColumnNames, [], true);
         }
 
     }
 
     _probedKeysChanged () {
-        var keys = this.toolPath.probe_keyset.getKeys();
+        var selectedKeys = this.toolPath.probe_keyset.getKeys();
+        var selectedIndices = selectedKeys.map( (key) => {
+            return Number(this.keyToIndex[key]);
+        });
+        var keys = Object.keys(this.keyToIndex);
         var indices = keys.map((key) => {
             return Number(this.keyToIndex[key]);
         });
-        if(indices.length) {
-            //this.chart.select(this.heightColumnNames,indices,true);
-            this.chart.focus()
+        var unselectedIndices = _.difference(indices,selectedIndices);
+
+        if(selectedIndices.length) {
+            this.customDeFocus(unselectedIndices, "path", ".c3-shape");
+            this.customFocus(selectedIndices, "path", ".c3-shape");
         }else{
-            this._selectionKeysChanged();
+            this._selectionKeysChanged()
         }
     }
 
