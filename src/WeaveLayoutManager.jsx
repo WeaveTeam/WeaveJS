@@ -8,7 +8,7 @@ import WeaveC3Barchart from "./tools/weave-c3-barchart.jsx";
 import WeaveC3ScatterPlot from "../outts/tools/weave-c3-scatterplot.jsx";
 import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend.jsx";
 import WeaveC3LineChart from "./tools/weave-c3-linechart.jsx";
-import WeaveC3PieChart from "./tools/weave-c3-piechart.jsx";
+import WeaveC3PieChart from "../outts/tools/weave-c3-piechart.jsx";
 import WeaveC3Histogram from "./tools/weave-c3-histogram.jsx";
 import Barchart from "./tools/weave-barchart.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
