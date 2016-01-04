@@ -198,19 +198,19 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         };
     }
 
-    _selectionKeysChanged () {
+    private selectionKeysChanged ():void {
         if(!this.chart)
             return;
 
-        var selectedKeys = this.toolPath.selection_keyset.getKeys();
-        var selectedIndices = selectedKeys.map((key:string) => {
+        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var selectedIndices:number[] = selectedKeys.map((key:string) => {
             return Number(this.keyToIndex[key]);
         });
-        var keys = Object.keys(this.keyToIndex);
-        var indices = keys.map((key:string) => {
+        var keys:string[] = Object.keys(this.keyToIndex);
+        var indices:number[] = keys.map((key:string) => {
             return Number(this.keyToIndex[key]);
         });
-        var unselectedIndices = _.difference(indices,selectedIndices);
+        var unselectedIndices:number[] = _.difference(indices,selectedIndices);
         if(selectedIndices.length) {
             this.customDeFocus(unselectedIndices, "path", ".c3-shape");
             this.customFocus(selectedIndices, "path", ".c3-shape");
@@ -222,22 +222,22 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     }
 
-    _probedKeysChanged () {
-        var selectedKeys = this.toolPath.probe_keyset.getKeys();
-        var selectedIndices = selectedKeys.map( (key:string) => {
+    private probedKeysChanged (): void {
+        var selectedKeys:string[] = this.toolPath.probe_keyset.getKeys();
+        var selectedIndices:number[] = selectedKeys.map( (key:string) => {
             return Number(this.keyToIndex[key]);
         });
-        var keys = Object.keys(this.keyToIndex);
-        var indices = keys.map((key:string) => {
+        var keys:string[] = Object.keys(this.keyToIndex);
+        var indices:number[] = keys.map((key:string) => {
             return Number(this.keyToIndex[key]);
         });
-        var unselectedIndices = _.difference(indices,selectedIndices);
+        var unselectedIndices:number[] = _.difference(indices,selectedIndices);
 
         if(selectedIndices.length) {
             this.customDeFocus(unselectedIndices, "path", ".c3-shape");
             this.customFocus(selectedIndices, "path", ".c3-shape");
         }else{
-            this._selectionKeysChanged()
+            this.selectionKeysChanged()
         }
     }
 
@@ -363,8 +363,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
 
         this.stringRecords.forEach((record:Record, index:number) => {
-            this.xAxisValueToLabel[(this.numericRecords[index]["point"] as Record)["x"] as number] = (record["point"] as Record)["x"] as string;
-            this.yAxisValueToLabel[(this.numericRecords[index]["point"] as Record)["y"] as number] = (record["point"] as Record)["y"] as string;
+            var numericRecord:Record = this.numericRecords[index];
+            this.yAxisValueToLabel[numericRecord["yLabel"] as number] = record["yLabel"] as string;
+            this.xAxisValueToLabel[numericRecord["xLabel"] as number] = record["xLabel"] as string;
         });
 
         this.groupingMode = this.paths.groupingMode.getState();
@@ -452,12 +453,12 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         super.componentDidMount();
         document.addEventListener("keydown", this.toggleKey.bind(this));
         document.addEventListener("keyup", this.toggleKey.bind(this));
-        var axisChanged = _.debounce(this._axisChanged.bind(this), 100);
-        var dataChanged = _.debounce(this._dataChanged.bind(this), 100);
-        var handleShowValueLabels = _.debounce(this.handleShowValueLabels.bind(this), 10);
-        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
-        var probeKeySetChanged = _.debounce(this._probedKeysChanged.bind(this), 100);
-        var rotateAxes = _.debounce(this.rotateAxes.bind(this), 10);
+        var axisChanged:Function = _.debounce(this._axisChanged.bind(this), 100);
+        var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
+        var handleShowValueLabels:Function = _.debounce(this.handleShowValueLabels.bind(this), 10);
+        var selectionKeySetChanged:Function = this.selectionKeysChanged.bind(this);
+        var probeKeySetChanged:Function = _.debounce(this.probedKeysChanged.bind(this), 100);
+        var rotateAxes:Function = _.debounce(this.rotateAxes.bind(this), 10);
 
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
@@ -479,7 +480,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
         this.initializePaths(mapping);
         this.c3Config.bindto = this.element;
-        this.chart = c3.generate(this.c3Config);
+        this.chart = generate(this.c3Config);
     }
 }
 
