@@ -25,8 +25,6 @@ interface IPieChartPaths extends IAbstractWeaveToolPaths {
     probeKeySet:WeavePath;
 };
 
-declare type Record = {[name:string]: number} | {[name:string]: string} | {[name:string]: Record}
-
 export default class WeaveC3PieChart extends AbstractWeaveTool {
 
     private keyToIndex:{[key:string]: number};
@@ -160,10 +158,10 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
         super.componentDidMount();
         document.addEventListener("keydown", this.toggleKey.bind(this));
         document.addEventListener("keyup", this.toggleKey.bind(this));
-        var dataChanged = _.debounce(this.dataChanged.bind(this), 100);
-        var selectionKeySetChanged = this.selectionKeysChanged.bind(this);
-        var probeKeySetChanged = _.debounce(this.probedKeysChanged.bind(this), 100);
-        var plotterPath = this.toolPath.pushPlotter("plot");
+        var dataChanged:Function = _.debounce(this.dataChanged.bind(this), 100);
+        var selectionKeySetChanged:Function = this.selectionKeysChanged.bind(this);
+        var probeKeySetChanged:Function = _.debounce(this.probedKeysChanged.bind(this), 100);
+        var plotterPath:WeavePath = this.toolPath.pushPlotter("plot");
         var manifest = [
           { name: "plotter", path: plotterPath, callbacks: null},
           { name: "data", path: plotterPath.push("data"), callbacks: dataChanged },
