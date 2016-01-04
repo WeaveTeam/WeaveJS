@@ -9,7 +9,7 @@ import WeaveC3ScatterPlot from "../outts/tools/weave-c3-scatterplot.jsx";
 import WeaveC3ColorLegend from "../outts/tools/weave-c3-colorlegend.jsx";
 import WeaveC3LineChart from "./tools/weave-c3-linechart.jsx";
 import WeaveC3PieChart from "../outts/tools/weave-c3-piechart.jsx";
-import WeaveC3Histogram from "./tools/weave-c3-histogram.jsx";
+import WeaveC3Histogram from "../outts/tools/weave-c3-histogram.jsx";
 import Barchart from "./tools/weave-barchart.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table.jsx";
