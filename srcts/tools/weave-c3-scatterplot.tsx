@@ -36,8 +36,6 @@ interface IScatterplotPaths extends IAbstractWeaveToolPaths {
     probeKeySet: WeavePath;
 }
 
-declare type Record = {[name:string]: number} | {[name:string]: string} | {[name:string]: Record}
-
 /* private
  * @param records array or records
  * @param attributes array of attributes to be normalized

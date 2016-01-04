@@ -351,6 +351,10 @@ declare module c3 {
          */
         colors?: { [key: string]: string | d3.Rgb };
         /**
+         * Set done flag for data.
+         */
+        done?: () => any | boolean;
+        /**
          * Hide each data when the chart appears.
          * If true specified, all of data will be hidden. If multiple ids specified as an array, those will be hidden.
          */
@@ -359,6 +363,10 @@ declare module c3 {
          * Set text displayed when empty data.
          */
         empty?: { label: { text: string } };
+        /**
+         * Set unload property
+         */
+        unload?: boolean;
 
         selection?: {
             enabled?: boolean;
@@ -563,6 +571,12 @@ declare module c3 {
          * The position of the ticks will be calculated precisely, so the values on the ticks will not be rounded nicely. In the case, axis.y.tick.format or axis.y.tick.values will be helpful.
         */
         count?: number;
+        /**
+         * Fit y axis ticks.
+         * If true set, the ticks will be positioned nicely. If false set, the ticks will be positioned according to y value of the data points.
+         */
+        fit?: boolean;
+        multiline?: boolean; // Undocumented
     }
 
     interface CullingConfiguration {

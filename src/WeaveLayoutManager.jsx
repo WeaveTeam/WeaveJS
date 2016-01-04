@@ -4,7 +4,7 @@ import Layout from "../outts/react-flexible-layout/Layout.jsx";
 import _ from "lodash";
 import WeavePanel from "./WeavePanel.js";
 import * as WeavePanelManager from "./WeavePanelManager.js";
-import WeaveC3Barchart from "./tools/weave-c3-barchart.jsx";
+import WeaveC3Barchart from "../outts/tools/weave-c3-barchart.jsx";
 import WeaveC3ScatterPlot from "../outts/tools/weave-c3-scatterplot.jsx";
 import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend.jsx";
 import WeaveC3LineChart from "./tools/weave-c3-linechart.jsx";
