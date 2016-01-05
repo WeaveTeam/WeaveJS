@@ -1,5 +1,6 @@
 import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 import c3 from "c3";
+import d3 from "d3";
 import _ from "lodash";
 import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import FormatUtils from "../Utils/FormatUtils";
@@ -10,6 +11,9 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     constructor(props) {
         super(props);
         this.busy = false;
+        this.idToRecord = {};
+        this.keyToIndex = {};
+        this.indexToKey = {};
 
         this.c3Config = {
             //size: this.getElementSize(),
@@ -118,17 +122,42 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         };
     }
 
-    _selectionKeysChanged() {
-        //var keys = this.toolPath.selection_keyset.getKeys();
-        //// var indices = this.indexCache.pick(keys).values();
-        //var indices = keys.map((key) => {
-        //    return Number(this.keyToIndex[key]);
-        //});
-        //
-        //this.chart.select(this.heightColumnNames, indices, true);
-    }
-    _probedKeysChanged() {
+    _selectionKeysChanged () {
+        if(!this.chart)
+            return;
 
+        var selectedKeys = this.toolPath.selection_keyset.getKeys();
+        var selectedRecords = _.filter(this.numericRecords, function(record) {
+            return _.includes(selectedKeys, record.id);
+        });
+        var selectedBinIndices = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
+        var binIndices = _.pluck(_.uniq(this.numericRecords, 'binnedColumn'), 'binnedColumn');
+        var unselectedBinIndices = _.difference(binIndices,selectedBinIndices);
+
+        if(selectedBinIndices.length) {
+            this.customDeFocus(unselectedBinIndices, "path", ".c3-shape");
+            this.customFocus(selectedBinIndices, "path", ".c3-shape");
+        }else{
+            this.customFocus(binIndices, "path", ".c3-shape");
+            this.chart.select(this.heightColumnNames, [], true);
+        }
+    }
+
+    _probedKeysChanged () {
+        var selectedKeys = this.toolPath.probe_keyset.getKeys();
+        var selectedRecords = _.filter(this.numericRecords, function(record) {
+            return _.includes(selectedKeys, record.id);
+        });
+        var selectedBinIndices = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
+        var binIndices = _.pluck(_.uniq(this.numericRecords, 'binnedColumn'), 'binnedColumn');
+        var unselectedBinIndices = _.difference(binIndices,selectedBinIndices);
+
+        if(selectedBinIndices.length) {
+            this.customDeFocus(unselectedBinIndices, "path", ".c3-shape");
+            this.customFocus(selectedBinIndices, "path", ".c3-shape");
+        }else{
+            this._selectionKeysChanged()
+        }
     }
 
     handleClick(event) {
@@ -139,7 +168,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     }
 
     toggleKey(event) {
-        if((event.keyIdentifier == "Control")||(event.keyIdentifier == "Meta")) {
+        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
             this.keyDown = !this.keyDown;
         }
     }
