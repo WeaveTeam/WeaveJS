@@ -2,7 +2,8 @@ import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import _ from "lodash";
 import React from "react";
 import ReactDOM from "react-dom";
-//import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import {round} from "d3";
+import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
 //import ReactDataGrid from "react-datagrid";
 import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 
@@ -13,8 +14,12 @@ class WeaveReactTable extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
-        ReactDOM.render(
-            <DataTable toolPath={this.toolPath}/>, this.element);
+        // ReactDOM render here creates another render root
+        // performances here shouldn't affect
+        // performances on the rest of the page.
+        // var toolSize = this.getElementSize();
+
+        ReactDOM.render(<DataTable toolPath={this.toolPath} container={this.element}/>, this.element);
     }
 }
 
@@ -49,21 +54,33 @@ class DataTable extends React.Component {
         this.toolPath.push("selectionKeySet", null).setKeys(_.keys(selectedIds));
     }
 
+    customFormat(cell, row) {
+        if(typeof cell === "number") {
+            return round(cell, 2)
+        } else {
+            return cell;
+        }
+    }
+
     render() {
         var data = this._columnsPath.retrieveRecords(this._columnsPath.getNames(), this.toolPath.push("filteredKeySet")) || [];
+
         var columns = this._columnsPath.getChildren().map((columnPath) => {
-                        return {
-                            name: columnPath.getPath().pop(),
-                            title: columnPath.getValue("getMetadata('title')")
-                        };
-                    });
-        columns.push({
-          name: "id",
-          title: "id"
+            return {
+                name: columnPath.getPath().pop(),
+                title: columnPath.getPath().pop()
+            };
         });
 
+        columns.push({
+            name: "id",
+            title: "id"
+        });
+
+        //var columnWidth = this.props.container.clientWidth / columns.length;
+
         var columnHeaders = columns.map((column, index) => {
-          return <TableHeaderColumn dataField={column.name} key={index} dataAlign="left" dataSort={true}>column.title</TableHeaderColumn>;
+          return <TableHeaderColumn dataField={column.name} key={index} dataAlign="left" dataFormat={this.customFormat} dataSort={true}>column.title</TableHeaderColumn>;
         });
 
         return <BootstrapTable data={data} keyField="id" striped={true} hover={true}>
