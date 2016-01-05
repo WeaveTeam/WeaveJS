@@ -343,6 +343,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.yLabelColumnDataType = this.yLabelColumnPath.getValue("this.getMetadata('dataType')");
 
         this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        if(!this.numericRecords.length)
+            return;
         this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
@@ -365,12 +367,10 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
 
         this.stringRecords.forEach((record:Record, index:number) => {
-            if(record) {
-                var numericRecord:Record = this.numericRecords[index];
-                if(numericRecord) {
-                    this.yAxisValueToLabel[numericRecord["yLabel"] as number] = record["yLabel"] as string;
-                    this.xAxisValueToLabel[numericRecord["xLabel"] as number] = record["xLabel"] as string;
-                }
+            var numericRecord:Record = this.numericRecords[index];
+            if(numericRecord) {
+                this.yAxisValueToLabel[numericRecord["yLabel"] as number] = record["yLabel"] as string;
+                this.xAxisValueToLabel[numericRecord["xLabel"] as number] = record["xLabel"] as string;
             }
         });
 
@@ -403,6 +403,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                         heights[key] = heights[key] / sum;
                     });
                 }
+
                 return heights;
             });
 
