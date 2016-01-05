@@ -12,14 +12,11 @@ class WeaveReactTable extends AbstractWeaveTool {
         super(props);
     }
 
-    componentDidMount() {
-        super.componentDidMount();
-        // ReactDOM render here creates another render root
-        // performances here shouldn't affect
-        // performances on the rest of the page.
-        // var toolSize = this.getElementSize();
-
-        ReactDOM.render(<DataTable toolPath={this.toolPath} container={this.element}/>, this.element);
+    componentDidUpdate() {
+        var elementSize = this.element ? this.getElementSize() : null;
+        ReactDOM.render(
+            <DataTable toolPath={this.toolPath} width={elementSize.width + "px"} height={elementSize.height + "px"}/>
+        , this.element);
     }
 }
 
@@ -68,7 +65,7 @@ class DataTable extends React.Component {
         var columns = this._columnsPath.getChildren().map((columnPath) => {
             return {
                 name: columnPath.getPath().pop(),
-                title: columnPath.getPath().pop()
+                title: columnPath.getValue("this.getMetadata('title')")
             };
         });
 
@@ -80,10 +77,10 @@ class DataTable extends React.Component {
         //var columnWidth = this.props.container.clientWidth / columns.length;
 
         var columnHeaders = columns.map((column, index) => {
-          return <TableHeaderColumn dataField={column.name} key={index} dataAlign="left" dataFormat={this.customFormat} dataSort={true}>column.title</TableHeaderColumn>;
+          return <TableHeaderColumn dataField={column.name} key={index} dataAlign="left" dataFormat={this.customFormat} dataSort={true}>{column.title}</TableHeaderColumn>;
         });
 
-        return <BootstrapTable data={data} keyField="id" striped={true} hover={true}>
+        return <BootstrapTable data={data} keyField="id" striped={true} hover={true} width={this.props.width} height={this.props.height}>
                   {
                     columnHeaders
                   }
