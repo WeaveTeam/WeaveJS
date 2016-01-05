@@ -13,7 +13,7 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 
-export default class WeaveC3ColorLegent extends AbstractWeaveTool {
+class WeaveC3ColorLegend extends AbstractWeaveTool {
 
     private plotterPath:WeavePath;
     private dynamicColorColumnPath:WeavePath;
@@ -24,7 +24,8 @@ export default class WeaveC3ColorLegent extends AbstractWeaveTool {
     constructor(props:IAbstractWeaveToolProps) {
         super(props);
         this.plotterPath = this.toolPath.pushPlotter("plot");
-        this.dynamicColorColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn").push(null).push("binningDefinition").push(null);
+        this.dynamicColorColumnPath = this.plotterPath.push("dynamicColorColumn", null);
+        this.binningDefinition = this.dynamicColorColumnPath.push("internalDynamicColumn").push(null).push("binningDefinition").push(null);
         this.binnedColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn", null);
         this.setupCallbacks();
     }
@@ -40,7 +41,7 @@ export default class WeaveC3ColorLegent extends AbstractWeaveTool {
 
     componentDidUpdate() {
         super.componentDidUpdate();
-        var numberOfBins:number = this.binnedColumnPath.getValue("numberOfBins");
+        var numberOfBins:number = this.binnedColumnPath.getValue("this.numberOfBins");
 
         if(numberOfBins) {
             this.drawBinnedPlot(numberOfBins)
@@ -75,7 +76,7 @@ export default class WeaveC3ColorLegent extends AbstractWeaveTool {
         this.svg.append("text")
                 .attr("y", yMap(0.5))
                 .attr("x", 10)
-                .text(this.dynamicColorColumnPath.getValue("ColumnUtils.getTitle(this)"))
+                .text(this.dynamicColorColumnPath.getValue("this.getMetadata('title')"))
                  .attr("font-family", "sans-serif")
                  .attr("font-size", "12px");
 
@@ -83,7 +84,7 @@ export default class WeaveC3ColorLegent extends AbstractWeaveTool {
 
         let r:number = (shapeSize / 100 * height / numberOfBins) / 2;
 
-        var textLabelFunction = this.binnedColumnPath.getValue("deriveStringFromNumber");
+        var textLabelFunction:Function = this.binnedColumnPath.getValue("this.deriveStringFromNumber.bind(this)            ");
 
         for(var i = 0; i < numberOfBins; i++) {
             switch(shapeType) {
@@ -124,3 +125,8 @@ export default class WeaveC3ColorLegent extends AbstractWeaveTool {
         super.componentWillUnmount();
     }
 }
+
+
+export default WeaveC3ColorLegend;
+
+registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);

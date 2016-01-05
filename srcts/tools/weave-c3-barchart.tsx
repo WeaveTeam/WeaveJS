@@ -357,15 +357,21 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.indexToKey = {};
 
         this.numericRecords.forEach((record:Record, index:number) => {
-            this.keyToIndex[record["id"] as string] = index;
-            this.indexToKey[index] = record["id"] as string;
+            if(record) {
+                this.keyToIndex[record["id"] as string] = index;
+                this.indexToKey[index] = record["id"] as string;
+            }
         });
 
 
         this.stringRecords.forEach((record:Record, index:number) => {
-            var numericRecord:Record = this.numericRecords[index];
-            this.yAxisValueToLabel[numericRecord["yLabel"] as number] = record["yLabel"] as string;
-            this.xAxisValueToLabel[numericRecord["xLabel"] as number] = record["xLabel"] as string;
+            if(record) {
+                var numericRecord:Record = this.numericRecords[index];
+                if(numericRecord) {
+                    this.yAxisValueToLabel[numericRecord["yLabel"] as number] = record["yLabel"] as string;
+                    this.xAxisValueToLabel[numericRecord["xLabel"] as number] = record["xLabel"] as string;
+                }
+            }
         });
 
         this.groupingMode = this.paths.groupingMode.getState();
@@ -385,16 +391,18 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
             // normalize the height columns to be percentages.
             var newValues = this.numericRecords.map((record:Record) => {
-                var heights:{[key:string]: number} = _.pick(record, this.heightColumnNames) as {[key:string]: number};
-                var sum:number = 0;
-                _.keys(heights).forEach((key:string) => {
-                    sum += heights[key];
-                });
+                var heights:{[key:string]: number};
+                if(record) {
+                    heights = _.pick(record, this.heightColumnNames) as {[key:string]: number};
+                    var sum:number = 0;
+                    _.keys(heights).forEach((key:string) => {
+                        sum += heights[key];
+                    });
 
-                _.keys(heights).forEach((key:string) => {
-                    heights[key] = heights[key] / sum;
-                });
-
+                    _.keys(heights).forEach((key:string) => {
+                        heights[key] = heights[key] / sum;
+                    });
+                }
                 return heights;
             });
 
