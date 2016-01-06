@@ -1,8 +1,8 @@
 {
   "name": "weave-html5",
   "version": "0.0.0",
-  "description": "Proof of Concept Constructing C3 visualizations from Weave session state.",
-  "main": "index.js",
+  "description": "Collection of UI visualization tools for the WeaveJS projects",
+  "main": "WeaveUI.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,7 +11,6 @@
     "url": "https://github.com/pkovac/weave-c3.git"
   },
   "keywords": [
-    "c3",
     "visualization",
     "weave"
   ],
