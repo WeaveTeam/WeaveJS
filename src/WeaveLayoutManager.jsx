@@ -44,6 +44,7 @@ class WeaveLayoutManager extends React.Component {
         window.addEventListener("resize", this._forceUpdate = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30));
         this.weave.root.childListCallbacks.addGroupedCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
         this.weave.path(LAYOUT).addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
+        this.weave.path(LAYOUT).state(this.simplifyState(this.weave.path(LAYOUT).getState()));
     }
 
     componentWillUnmount() {
@@ -205,7 +206,7 @@ class WeaveLayoutManager extends React.Component {
             }
         }
         state.children = simpleChildren;
-        var totalSizeChildren = _.sum(_.map(state.children, "flex"));
+        var totalSizeChildren = _.sum(_.map(children, "flex"));
 
         //Scale flex values between 0 and 1 so they sum to 1, avoiding an apparent
         //flex bug where space is lost if sum of flex values is less than 1.

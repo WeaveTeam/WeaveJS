@@ -145,7 +145,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     },
                     tick: {
                         fit: false,
-                        multiline: false,
+                        multiline: true,
                         format: (num:number):string => {
                             if(this.stringRecords && this.stringRecords[num]) {
                                 return this.stringRecords[num]["xLabel"] as string;
