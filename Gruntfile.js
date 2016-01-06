@@ -47,7 +47,7 @@ module.exports = function (grunt) {
                 }
             },
             dist: {
-                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
+                files: [{'dist/WeaveUI.js': 'src/WeaveUI.jsx'},{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
             },
             dev: {
                 options: {
@@ -57,8 +57,8 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
-            }
+                files: [{'dist/WeaveUI.js': 'src/WeaveUI.jsx'}, {'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
+            },
         },
         copy: {
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
