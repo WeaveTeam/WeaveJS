@@ -9,15 +9,19 @@ import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table.jsx";
 import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
 
-export default {
-    WeaveLayoutManager,
-    WeaveC3Barchart,
-    WeaveC3ScatterPlot,
-    WeaveC3ColorLegend,
-    WeaveC3LineChart,
-    WeaveC3PieChart,
-    WeaveC3Histogram,
-    WeaveOpenLayersMap,
-    WeaveReactTable,
-    SessionStateMenuTool
-}
+// namespace WeaveUI
+var WeaveUI = {
+    Layout: WeaveLayoutManager,
+    Barchart: WeaveC3Barchart,
+    ScatterPlot: WeaveC3ScatterPlot,
+    ColorLegend: WeaveC3ColorLegend,
+    LineChart: WeaveC3LineChart,
+    PieChart: WeaveC3PieChart,
+    Histogram: WeaveC3Histogram,
+    Map: WeaveOpenLayersMap,
+    DataTable: WeaveReactTable,
+    MenuTool: SessionStateMenuTool
+};
+
+window.WeaveUI = WeaveUI;
+export default WeaveUI;
