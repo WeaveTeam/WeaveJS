@@ -25,9 +25,9 @@ class WeaveC3LineChart extends AbstractWeaveTool {
     }
 
     _updateStyle() {
-        d3.select(this.element).selectAll("circle").style("opacity", 1)
-                                                      .style("stroke", "black")
-                                                      .style("stroke-opacity", 0.5);
+        d3.select(this.element).selectAll("circle").style("opacity", 1);
+                                                      //.style("stroke", "black")
+                                                      //.style("stroke-opacity", 0.5);
     }
 
     _dataChanged() {
