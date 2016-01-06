@@ -80,6 +80,9 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
         } else {
             this.tool = new this.ToolClass(_.merge({element: ReactDOM.findDOMNode(this.refs["toolDiv"]), toolPath: this.toolPath}, this.toolProps));
         }
+        if(this.toolPath) {
+            this.toolPath.addCallback(this, this.forceUpdate);
+        }
     }
 
     componentWillUnmount():void {
@@ -99,12 +102,6 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
     }
 
     componentDidUpdate() {
-        this.toolPath = this.props.toolPath;
-        this.toolProps = this.props.toolProps;
-        if(this.toolPath) {
-            this.toolPath.addCallback(this, this.forceUpdate);
-        }
-
         if(this.tool && this.tool.resize) {
             this.tool.resize();
         }
