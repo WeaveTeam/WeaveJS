@@ -12,7 +12,7 @@ import WeaveC3PieChart from "../outts/tools/weave-c3-piechart.jsx";
 import WeaveC3Histogram from "../outts/tools/weave-c3-histogram.jsx";
 import Barchart from "./tools/weave-barchart.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
-import WeaveReactTable from "./tools/weave-react-table.jsx";
+import WeaveReactTable from "./tools/weave-react-table-2.jsx";
 import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 /* global Weave, weavejs */
@@ -306,7 +306,7 @@ class WeaveLayoutManager extends React.Component {
             }
 
             return (
-                <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%", display: "flex"}}>
+                <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%", display: "flex", position: "relative"}}>
                     <Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
                     {children}
                     <ToolOverlay ref={TOOLOVERLAY}/>
