@@ -225,11 +225,11 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         var unselectedIndices:number[] = _.difference(indices, selectedIndices);
         if(selectedIndices.length) {
-            this.customDeFocus(unselectedIndices, "circle", ".c3-shape");
-            this.customFocus(selectedIndices, "circle", ".c3-shape");
+            this.customStyle(unselectedIndices, "circle", ".c3-shape", "opacity", "0.3");
+            this.customStyle(selectedIndices, "circle", ".c3-shape", "opacity", "1.0");
             this.chart.select(["y"], selectedIndices, true);
         }else{
-            this.customFocus(indices, "circle", ".c3-shape");
+            this.customStyle(indices, "circle", ".c3-shape", "opacity", "1.0");
             this.chart.select(["y"], [], true);
         }
     }
@@ -247,8 +247,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         var unselectedIndices:number[] = _.difference(indices, selectedIndices);
 
         if(selectedIndices.length) {
-            this.customDeFocus(unselectedIndices, "circle", ".c3-shape");
-            this.customFocus(selectedIndices, "circle", ".c3-shape");
+            this.customStyle(unselectedIndices, "circle", ".c3-shape", "opacity", "0.3");
+            this.customStyle(selectedIndices, "circle", ".c3-shape", "opacity", "1.0");
         }else{
             this._selectionKeysChanged()
         }
