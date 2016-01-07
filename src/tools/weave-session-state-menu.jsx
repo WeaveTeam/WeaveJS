@@ -4,6 +4,8 @@ import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 import _ from "lodash";
 
+const sessionStateMenuStyle = {width: "100%"};
+
 class SessionStateMenuTool extends AbstractWeaveTool {
 
   constructor(props) {
@@ -35,7 +37,7 @@ class SessionStateMenuTool extends AbstractWeaveTool {
     : <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
     });
 
-    return (<div style={{overflowY: "scroll"}}>
+    return (<div style={sessionStateMenuStyle}>
       <ListGroup>
         {
           menus
