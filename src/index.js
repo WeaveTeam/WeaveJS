@@ -26,7 +26,7 @@ else {
 }
 
 function render() {
-    if(!weave) {
+    if(weave) {
         $(() => {
             ReactDOM.render(<WeaveLayoutManager weave={weave}/>, document.getElementById("weaveElt"));
         });
