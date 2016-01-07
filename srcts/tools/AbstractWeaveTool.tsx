@@ -90,15 +90,9 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
         </div>;
     }
 
-    customFocus(array:Array<number>, type:string, filter:string) {
+    customStyle(array:Array<number>, type:string, filter:string, style:string, value:string) {
         array.forEach( (index) => {
-            d3.select(d3.select(this.element).selectAll(type).filter(filter)[0][index]).style("opacity",1.0);
-        });
-    }
-
-    customDeFocus(array:Array<number>, type:string, filter:string) {
-        array.forEach( (index) => {
-            d3.select(d3.select(this.element).selectAll(type).filter(filter)[0][index]).style("opacity",0.3);
+            d3.select(d3.select(this.element).selectAll(type).filter(filter)[0][index]).style(style, value);
         });
     }
 }
