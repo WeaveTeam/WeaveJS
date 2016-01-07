@@ -10,7 +10,6 @@ class TileLayer extends Layer {
 
 		this.layer = new ol.layer.Tile();
 		this.servicePath = this.layerPath.push("service", null);
-		this.projectionPath = this.layerPath.push("srs");
 		this.oldProviderName = null;
 
 		this.servicePath.addCallback(this, this.updateTileSource, true);
@@ -19,11 +18,11 @@ class TileLayer extends Layer {
 
 	updateValidExtents()
 	{
-		var proj = ol.proj.get(this.projectionPath.getState());
+		var proj = ol.proj.get(this.projectionPath.getState() || "EPSG:3857");
 		if (proj)
 			this.layer.setExtent(proj.getExtent());
 		else
-			console.log('no proj -> no extent');
+			console.log('invalid proj -> no extent');
 	}
 	getCustomWMSSource()
 	{

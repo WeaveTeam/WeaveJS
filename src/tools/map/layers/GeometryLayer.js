@@ -15,6 +15,7 @@ class GeometryLayer extends FeatureLayer {
 		this.lineStylePath = this.layerPath.push("line");
 
 		this.geoColumnPath.addCallback(this, this.updateGeometryData, true);
+		this.projectionPath.addCallback(this, this.updateGeometryData, true);
 
 		this.fillStylePath.addCallback(this, this.updateStyleData);
 		this.lineStylePath.addCallback(this, this.updateStyleData, true);
@@ -22,9 +23,11 @@ class GeometryLayer extends FeatureLayer {
 
 	updateGeometryData()
 	{
-		var metadata = this.geoColumnPath.push("internalDynamicColumn", "ReferencedColumn", "metadata").getState();
-		var dataProjection = metadata.projection || "EPSG:4326";
-		var featureProjection = this.geoColumnPath.push("projectionSRS").getState() || "EPSG:4326";
+		var projectionSpec = this.geoColumnPath.getObject("internalDynamicColumn", null).getMetadata('projection');
+	
+		var outputProjection = this.projectionPath.getState() || "EPSG:3857";
+		var inputProjection = projectionSpec || outputProjection;
+
 		this.source.clear();
 
 		var keys = this.geoColumnPath.push('internalDynamicColumn').getKeys();
@@ -35,7 +38,7 @@ class GeometryLayer extends FeatureLayer {
 		{
 			let id = keys[idx];
 
-			let geometry = this.geoJsonParser.readGeometry(rawGeometries[idx], {dataProjection, featureProjection});
+			let geometry = this.geoJsonParser.readGeometry(rawGeometries[idx], {dataProjection: inputProjection, featureProjection: outputProjection});
 
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);

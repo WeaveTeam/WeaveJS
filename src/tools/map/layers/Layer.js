@@ -37,6 +37,7 @@ class Layer {
 	{
 		this.layerPath = parent.plottersPath.push(layerName);
 		this.settingsPath = parent.layerSettingsPath.push(layerName);
+		this.projectionPath = parent.toolPath.push("projectionSRS");
 		this.parent = parent;
 		this.layerName = layerName;
 		this.layer = null;

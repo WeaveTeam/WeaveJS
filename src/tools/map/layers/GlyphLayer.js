@@ -8,7 +8,7 @@ class GlyphLayer extends FeatureLayer {
 	{
 		super(parent, layerName);
 
-		this.layerPath.push("destinationProjection").addCallback(this, this.updateLocations);
+		this.projectionPath.addCallback(this, this.updateLocations);
 		this.layerPath.push("sourceProjection").addCallback(this, this.updateLocations);
 
 		this.layerPath.push("dataX").addCallback(this, this.updateLocations);
@@ -40,7 +40,7 @@ class GlyphLayer extends FeatureLayer {
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
 
 		var rawProj = this.layerPath.getState("sourceProjection") || "EPSG:4326";
-		var mapProj = this.layerPath.getState("destinationProjection") || "EPSG:3857";
+		var mapProj = this.projectionPath.getState() || "EPSG:3857";
 
 		for (let id of removedIds)
 		{
