@@ -8,8 +8,15 @@ import WeaveC3Histogram from "../outts/tools/weave-c3-histogram.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table.jsx";
 import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
+import JSZip from "jszip";
 
-// namespace WeaveUI
+import React from "react";
+import ReactDOM from "react-dom";
+
+/*global Weave, weavejs*/
+
+weavejs.util.JS.JSZip = JSZip;
+
 var WeaveUI = {
     Layout: WeaveLayoutManager,
     Barchart: WeaveC3Barchart,
@@ -23,5 +30,21 @@ var WeaveUI = {
     MenuTool: SessionStateMenuTool
 };
 
+WeaveUI.loadLayout = function(weave, fileName, targetEltId) {
+
+    function render() {
+        ReactDOM.render(
+            <WeaveUI.Layout weave={weave}/>, document.getElementById(targetEltId)
+        );
+    }
+
+    weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, e => {
+        console.error(e)
+    });
+
+}
+
+// namespace WeaveUI
 window.WeaveUI = WeaveUI;
+
 export default WeaveUI;

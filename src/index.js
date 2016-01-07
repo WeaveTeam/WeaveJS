@@ -26,7 +26,11 @@ else {
 }
 
 function render() {
-    $(() => {
-        ReactDOM.render(<WeaveLayoutManager weave={weave}/>, document.getElementById("weaveElt"));
-    });
+    if(!weave) {
+        $(() => {
+            ReactDOM.render(<WeaveLayoutManager weave={weave}/>, document.getElementById("weaveElt"));
+        });
+    } else {
+        console.warn("missing weave instance.");
+    }
 }
