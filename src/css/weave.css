@@ -1,0 +1,32 @@
+.list-group-item:first-child {
+    margin-bottom: 0;
+    border-top-right-radius: 0px;
+    border-top-left-radius: 0px;
+}
+
+.list-group-item:last-child {
+    margin-bottom: 0;
+    border-bottom-right-radius: 0px;
+    border-bottom-left-radius: 0px;
+}
+
+.list-group-item {
+    outline: none;
+    padding: 3px 15px;
+}
+
+.list-group-item.active, .list-group-item.active:focus, .list-group-item.active:hover {
+    z-index: 2;
+    color: -webkit-text;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+}
+
+.react-bs-container .table-container>table>tbody>tr>td, .react-bs-container .table-container>table>thead>tr>th, .react-bs-container .table-header>table>thead>tr>th .table-header-column {
+    line-height: 14px;
+}
+
+.table-header {
+    background-color: #eee;
+    color: -webkit-text;
+}
