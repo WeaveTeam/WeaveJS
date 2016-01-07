@@ -19,20 +19,22 @@ class SessionStateMenuTool extends AbstractWeaveTool {
   }
 
   handleItemClick(index, event) {
+    console.log(index);
     this.toolPath.state("selectedChoice", this.choices.getNames()[index]);
-    // var targets = this.toolPath.push("targets");
-    // var choice = this.choices.getState(index);
-    // targets.forEach(choice, (value, key) => {
-    //   this.push(key, null).state(value)
-    // });
+     var targets = this.toolPath.push("targets");
+     var choice = this.choices.getState(index);
+     targets.forEach(choice, function (value, key) {
+       this.push(key, null).state(value)
+     });
   }
 
   render() {
 
     this.choices = this.toolPath.push("choices");
     var selectedChoice = this.toolPath.getState("selectedChoice");
+    console.log("SelectedChoice",selectedChoice);
+    console.log("WeaveObject",weave.path(["MapTool", "children", "visualization", "plotManager", "zoomBounds"]).getState());
     var menus = this.choices.getNames().map((choice, index) => {
-
       return choice === selectedChoice ? <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
     : <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
     });
