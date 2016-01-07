@@ -46,8 +46,20 @@ module.exports = function (grunt) {
                     }
                 }
             },
+            // module: {
+            //     files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}],
+            //     options: {
+            //         alias: null,
+            //         external:null,
+            //         browserifyOptions: {
+            //             debug: true,
+            //             extensions: ['.jsx'],
+            //             plugin: [["minifyify", {map: false}]]
+            //         }
+            //     },
+            // },
             dist: {
-                files: [{'dist/WeaveUI.js': 'src/WeaveUI.jsx'},{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
+                files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}, {'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
             },
             dev: {
                 options: {
@@ -57,7 +69,7 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/WeaveUI.js': 'src/WeaveUI.jsx'}, {'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
+                files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}, {'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
             },
         },
         copy: {
@@ -106,4 +118,5 @@ module.exports = function (grunt) {
     grunt.registerTask('dist', ['ts', 'eslint', 'browserify:dist', 'copy']);
     grunt.registerTask('libs', ['browserify:libs']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);
+    grunt.registerTask('module', ['browserify:module']);
 };

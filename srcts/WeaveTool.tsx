@@ -155,18 +155,18 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
         return (
             <ui.VBox style={this.props.style} onMouseEnter={() => { this.setState({ showControls: true }); }} onMouseLeave={() => { this.setState({ showControls: false }); }} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
                 <ui.HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
-                    <ui.HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
+                    {/*<ui.HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
                         <Glyphicon glyph="cog"/>
-                    </ui.HBox>
+                    </ui.HBox>*/}
                     <p style={titleStyle}>{this.title}</p>
-                    <ui.HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
+                    {/*<ui.HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
                         <div style={{marginRight: 5}}>
                             <Glyphicon glyph="unchecked"/>
                         </div>
                         <div style={{marginRight: 5}}>
                             <Glyphicon glyph="remove"/>
                         </div>
-                    </ui.HBox>
+                    </ui.HBox>*/}
                 </ui.HBox>
                 {
                     reactTool ?
