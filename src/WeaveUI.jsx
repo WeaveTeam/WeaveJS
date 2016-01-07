@@ -8,6 +8,7 @@ import WeaveC3Histogram from "../outts/tools/weave-c3-histogram.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table.jsx";
 import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
+import StandardLib from "../outts/Utils/StandardLib.js";
 import JSZip from "jszip";
 
 import React from "react";
@@ -27,14 +28,17 @@ var WeaveUI = {
     Histogram: WeaveC3Histogram,
     Map: WeaveOpenLayersMap,
     DataTable: WeaveReactTable,
-    MenuTool: SessionStateMenuTool
+    MenuTool: SessionStateMenuTool,
+    loadUrlParams: StandardLib.loadUrlParams
 };
 
-WeaveUI.loadLayout = function(weave, fileName, targetEltId) {
+WeaveUI.loadLayout = function(weave, fileName, targetEltId, callback) {
 
     function render() {
         ReactDOM.render(
-            <WeaveUI.Layout weave={weave}/>, document.getElementById(targetEltId)
+            <WeaveUI.Layout weave={weave}/>,
+            document.getElementById(targetEltId),
+            callback
         );
     }
 
