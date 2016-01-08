@@ -2,7 +2,7 @@
   "name": "weave-html5",
   "version": "0.0.0",
   "description": "Collection of UI visualization tools for the WeaveJS projects",
-  "main": "WeaveUI.js",
+  "main": "dist/WeaveUI.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

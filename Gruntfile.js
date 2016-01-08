@@ -1,6 +1,6 @@
 /*global module */
 
-var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'react-bootstrap', 'openlayers'];
+var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'react-bootstrap', 'openlayers', 'jszip'];
 var libraries_colon = libraries.map(function (d) { return d + ":"});
 
 module.exports = function (grunt) {
@@ -17,12 +17,12 @@ module.exports = function (grunt) {
         },
         browserify: {
             options: {
-                    browserifyOptions: {
-                        plugin: [['minifyify', {map: false, exclude: "**/*.jsx"}]]
-                    },
-                    transform: ["babelify"],
-                    external: libraries,
-                    watch: true
+                browserifyOptions: {
+                    plugin: [['minifyify', {map: false, exclude: "**/*.jsx"}]]
+                },
+                transform: ["babelify"],
+                external: libraries,
+                watch: true
             },
             libs: {
                 src: ['src/'],
@@ -46,20 +46,21 @@ module.exports = function (grunt) {
                     }
                 }
             },
-            // module: {
-            //     files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}],
-            //     options: {
-            //         alias: null,
-            //         external:null,
-            //         browserifyOptions: {
-            //             debug: true,
-            //             extensions: ['.jsx'],
-            //             plugin: [["minifyify", {map: false}]]
-            //         }
-            //     },
-            // },
+            module: {
+                files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}],
+                options: {
+                    alias: null,
+                    external: libraries,
+                    browserifyOptions: {
+                         standalone: "WeaveUI",
+                         debug: true,
+                         extensions: ['.jsx'],
+                         plugin: []
+                    }
+                },
+            },
             dist: {
-                files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}, {'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
+                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
             },
             dev: {
                 options: {
@@ -69,7 +70,7 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}, {'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
+                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
             },
         },
         copy: {
@@ -115,6 +116,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-minifyify');
 
     grunt.registerTask('default', ['ts','eslint', 'browserify:dev', 'copy']);
+    grunt.registerTask('default-nolint', ['ts', 'browserify:dev', 'copy']);
     grunt.registerTask('dist', ['ts', 'eslint', 'browserify:dist', 'copy']);
     grunt.registerTask('libs', ['browserify:libs']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);
