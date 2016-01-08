@@ -225,11 +225,11 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         var unselectedIndices:number[] = _.difference(indices, selectedIndices);
         if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3});
-            this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0});
+            this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
+            this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
             this.chart.select(["y"], selectedIndices, true);
         }else{
-            this.customStyle(indices, "circle", ".c3-shape", {opacity: 1.0});
+            this.customStyle(indices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.0});
             this.chart.select(["y"], [], true);
         }
     }
@@ -247,8 +247,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         var unselectedIndices:number[] = _.difference(indices, selectedIndices);
 
         if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3});
-            this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0});
+            this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
+            this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.0});
         }else{
             this._selectionKeysChanged()
         }
@@ -270,9 +270,9 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     }
 
     _updateStyle() {
-        d3.select(this.element).selectAll("circle").style("opacity", 1);
-            //.style("stroke", "black")
-            //.style("stroke-opacity", 1);
+        d3.select(this.element).selectAll("circle").style("opacity", 1)
+            .style("stroke", "black")
+            .style("stroke-opacity", 0.0);
     }
 
     componentDidUpdate() {
