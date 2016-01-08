@@ -3,7 +3,7 @@ import _ from "lodash";
 import React from "react";
 import ReactDOM from "react-dom";
 import {round} from "d3";
-import {BootstrapTable, TableHeaderColumn} from 'react-bootstrap-table';
+import ReactBootstrapTable from "../../outts/react-bootstrap-datatable/ReactBootstrapTable";
 //import ReactDataGrid from "react-datagrid";
 import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 
@@ -38,7 +38,6 @@ class DataTable extends React.Component {
     }
 
     componentWillUnmount() {
-        console.log("component unmounted");
         this._columnsPath.removeCallback(this, this.columnsChanged);
         this.toolPath.push("filteredKeySet").removeCallback(this, this.filteredKeySetChanged);
         this.toolPath.push("selectionKeySet").removeCallback(this, this.selectionKeySetChanged);
@@ -77,36 +76,15 @@ class DataTable extends React.Component {
     render() {
         var data = this._columnsPath.retrieveRecords(this._columnsPath.getNames(), this.toolPath.push("filteredKeySet")) || [];
 
-        var columns = this._columnsPath.getChildren().map((columnPath) => {
-            return {
-                name: columnPath.getPath().pop(),
-                title: columnPath.getValue("this.getMetadata('title')")
-            };
+        var columns = {};
+
+        columns.id = "Key";
+
+        this._columnsPath.getChildren().forEach((columnPath) => {
+            columns[columnPath.getPath().pop()] = columnPath.getValue("this.getMetadata('title')");
         });
 
-        columns.push({
-            name: "id",
-            title: "id"
-        });
-
-        var selectRowProp = {
-          mode: "checkbox",
-          clickToSelect: true,
-          bgColor: "rgb(238, 193, 213)",
-          onSelect: this.onRowSelect.bind(this)
-        };
-
-        //var columnWidth = this.props.container.clientWidth / columns.length;
-
-        var columnHeaders = columns.map((column, index) => {
-          return <TableHeaderColumn dataField={column.name} key={index} dataAlign="left" dataFormat={this.customFormat} dataSort={true}>{column.title}</TableHeaderColumn>;
-        });
-
-        return <BootstrapTable data={data} keyField="id" selectRow={selectRowProp} striped={true} hover={true} width={this.props.width} height={this.props.height}>
-                  {
-                    columnHeaders
-                  }
-                </BootstrapTable>;
+        return <ReactBootstrapTable columnTitles={columns} rows={data} idProperty="id" height={this.props.height} striped={true} hover={true} bordered={true} condensed={true}/>
     }
 }
 
