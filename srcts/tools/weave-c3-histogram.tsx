@@ -182,10 +182,10 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
 
         if(selectedBinIndices.length) {
-            this.customStyle(unselectedBinIndices, "path", ".c3-shape", "opacity", "0.3");
-            this.customStyle(selectedBinIndices, "path", ".c3-shape", "opacity", "1.0");
+            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3});
+            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0});
         }else{
-            this.customStyle(binIndices, "path", ".c3-shape", "opacity", "1.0");
+            this.customStyle(binIndices, "path", ".c3-shape", {opacity: 1.0});
             this.chart.select(this.heightColumnNames, [], true);
         }
     }
@@ -200,8 +200,8 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
 
         if(selectedBinIndices.length) {
-            this.customStyle(unselectedBinIndices, "path", ".c3-shape", "opacity", "0.3");
-            this.customStyle(selectedBinIndices, "path", ".c3-shape", "opacity", "1.0");
+            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3});
+            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0});
         }else{
             this._selectionKeysChanged()
         }

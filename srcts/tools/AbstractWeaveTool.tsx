@@ -90,9 +90,9 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
         </div>;
     }
 
-    customStyle(array:Array<number>, type:string, filter:string, style:string, value:string) {
+    customStyle(array:Array<number>, type:string, filter:string, style:any) {
         array.forEach( (index) => {
-            d3.select(d3.select(this.element).selectAll(type).filter(filter)[0][index]).style(style, value);
+            d3.select(d3.select(this.element).selectAll(type).filter(filter)[0][index]).style(style);
         });
     }
 }

@@ -212,11 +212,11 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         });
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
         if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "path", ".c3-shape", "opacity", "0.3");
-            this.customStyle(selectedIndices, "path", ".c3-shape", "opacity", "1.0");
+            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3});
+            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0});
             this.chart.select(this.heightColumnNames, selectedIndices, true);
         }else{
-            this.customStyle(indices, "path", ".c3-shape", "opacity", "1.0");
+            this.customStyle(indices, "path", ".c3-shape", {opacity: 1.0});
             this.chart.select(this.heightColumnNames, [], true);
         }
 
@@ -234,8 +234,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
 
         if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "path", ".c3-shape", "opacity", "0.3");
-            this.customStyle(selectedIndices, "path", ".c3-shape", "opacity", "1.0");
+            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3});
+            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0});
         }else{
             this.selectionKeysChanged()
         }
