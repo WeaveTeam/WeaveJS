@@ -37,17 +37,17 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                 var circleCount = d3.select(d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index])[0][0].length;
                 var selectedCircles = _.range(0,circleCount);
                 selectedCircles.forEach( (i) => {
-                    d3.select(d3.select(d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index])[0][0][i]).style("opacity", "1.0");
+                    d3.select(d3.select(d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index])[0][0][i]).style({opacity: 1.0, "stroke-opacity": 1.0});
                 });
             });
 
-            this.customStyle(unselectedIndices, "path", ".c3-shape.c3-line", "opacity", "0.1");
-            this.customStyle(selectedIndices, "path", ".c3-shape.c3-line", "opacity", "1.0");
+            this.customStyle(unselectedIndices, "path", ".c3-shape.c3-line", {opacity: 0.1});
+            this.customStyle(selectedIndices, "path", ".c3-shape.c3-line", {opacity: 1.0});
             this.chart.select(["y"], selectedIndices, true);
         }else{
             //focus all circles
-            d3.select(this.element).selectAll("circle").filter(".c3-shape").style("opacity", "1.0");
-            this.customStyle(indices, "path", ".c3-shape.c3-line", "opacity", "1.0");
+            d3.select(this.element).selectAll("circle").filter(".c3-shape").style({opacity: 1.0, "stroke-opacity": 0.0});
+            this.customStyle(indices, "path", ".c3-shape.c3-line", {opacity: 1.0});
             this.chart.select(["y"], [], true);
         }
     }
@@ -65,28 +65,28 @@ class WeaveC3LineChart extends AbstractWeaveTool {
 
         if (selectedIndices.length) {
             //unfocus all circles
-            d3.select(this.element).selectAll("circle").filter(".c3-shape").style("opacity", "0.1");
+            d3.select(this.element).selectAll("circle").filter(".c3-shape").style({opacity: 0.1, "stroke-opacity": 0.0});
 
             selectedIndices.forEach( (index) => {
                 //custom style for circles on probed lines
                 var circleCount = d3.select(d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index])[0][0].length;
                 var selectedCircles = _.range(0,circleCount);
                 selectedCircles.forEach( (i) => {
-                    d3.select(d3.select(d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index])[0][0][i]).style("opacity", "1.0");
+                    d3.select(d3.select(d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index])[0][0][i]).style({opacity: 1.0, "stroke-opacity": 0.0});
                 });
             });
 
-            this.customStyle(unselectedIndices, "path", ".c3-shape.c3-line", "opacity", "0.1");
-            this.customStyle(selectedIndices, "path", ".c3-shape.c3-line", "opacity", "1.0");
+            this.customStyle(unselectedIndices, "path", ".c3-shape.c3-line", {opacity: 0.1});
+            this.customStyle(selectedIndices, "path", ".c3-shape.c3-line", {opacity: 1.0});
         } else {
             this._selectionKeysChanged()
         }
     }
 
     _updateStyle() {
-        d3.select(this.element).selectAll("circle").style("opacity", 1);
-                                                      //.style("stroke", "black")
-                                                      //.style("stroke-opacity", 0.5);
+        d3.select(this.element).selectAll("circle").style("opacity", 1)
+                                                      .style("stroke", "black")
+                                                      .style("stroke-opacity", 0.0);
     }
 
     _dataChanged() {
