@@ -18,21 +18,51 @@ import ReactDOM from "react-dom";
 
 weavejs.util.JS.JSZip = JSZip;
 
-var WeaveUI = {
-    Layout: WeaveLayoutManager,
-    Barchart: WeaveC3Barchart,
-    ScatterPlot: WeaveC3ScatterPlot,
-    ColorLegend: WeaveC3ColorLegend,
-    LineChart: WeaveC3LineChart,
-    PieChart: WeaveC3PieChart,
-    Histogram: WeaveC3Histogram,
-    Map: WeaveOpenLayersMap,
-    DataTable: WeaveReactTable,
-    MenuTool: SessionStateMenuTool,
-    loadUrlParams: StandardLib.loadUrlParams
-};
+// var WeaveUI = {
+//     Layout: WeaveLayoutManager,
+//     Barchart: WeaveC3Barchart,
+//     ScatterPlot: WeaveC3ScatterPlot,
+//     ColorLegend: WeaveC3ColorLegend,
+//     LineChart: WeaveC3LineChart,
+//     PieChart: WeaveC3PieChart,
+//     Histogram: WeaveC3Histogram,
+//     Map: WeaveOpenLayersMap,
+//     DataTable: WeaveReactTable,
+//     MenuTool: SessionStateMenuTool,
+//     getUrlParams: StandardLib.getUrlParams,
+//     loadLayout: function(weave, fileName, targetEltId, callback) {
+//
+//         function render() {
+//             ReactDOM.render(
+//                 <WeaveUI.Layout weave={weave}/>,
+//                 document.getElementById(targetEltId),
+//                 callback
+//             );
+//         }
+//
+//         weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, e => {
+//             console.error(e)
+//         });
+//
+//     }
+// };
+//
+// // namespace WeaveUI
+// export default WeaveUI;
 
-WeaveUI.loadLayout = function(weave, fileName, targetEltId, callback) {
+export var Layout = WeaveLayoutManager;
+export var Barchart = WeaveC3Barchart;
+export var ScatterPlot = WeaveC3ScatterPlot;
+export var ColorLegend = WeaveC3ColorLegend;
+export var LineChart = WeaveC3LineChart;
+export var PieChart = WeaveC3PieChart;
+export var Histogram = WeaveC3Histogram;
+export var Map = WeaveOpenLayersMap;
+export var DataTable = WeaveReactTable;
+export var MenuTool = SessionStateMenuTool;
+export var getUrlParams = StandardLib.getUrlParams;
+
+export var loadLayout = function(weave, fileName, targetEltId, callback) {
 
     function render() {
         ReactDOM.render(
@@ -42,13 +72,11 @@ WeaveUI.loadLayout = function(weave, fileName, targetEltId, callback) {
         );
     }
 
+    if(!fileName && weave) {
+        render();
+    }
+
     weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, e => {
         console.error(e)
     });
-
-}
-
-// namespace WeaveUI
-window.WeaveUI = WeaveUI;
-
-export default WeaveUI;
+};
