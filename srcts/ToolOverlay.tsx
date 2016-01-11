@@ -8,7 +8,7 @@ const toolOverlayStyle:React.CSSProperties = {
     zIndex: 3,
     boxSizing: "border-box",
     backgroundClip: "padding",
-    position: "absolute",
+    position: "fixed",
     visibility: "hidden",
     pointerEvents: "none"
 };
