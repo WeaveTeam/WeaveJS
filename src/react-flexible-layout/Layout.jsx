@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../../outts/utils/StandardLib.js";
 import VendorPrefix from "react-vendor-prefix";
 import Resizer from "./Resizer.jsx";
 import ResizerOverlay from "./ResizerOverlay.jsx";

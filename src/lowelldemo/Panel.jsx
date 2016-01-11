@@ -1,6 +1,6 @@
 import React from "react";
 import ui from "../../outts/react-ui/ui.jsx";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../../outts/utils/StandardLib.js";
 import CustomLineChart from "../tools/custom-linechart.jsx";
 import CustomProbeTool from "./CustomProbeTool.jsx";
 import _ from "lodash";

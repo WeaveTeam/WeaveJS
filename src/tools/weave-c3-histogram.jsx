@@ -3,8 +3,8 @@ import c3 from "c3";
 import d3 from "d3";
 import _ from "lodash";
 import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
-import FormatUtils from "../Utils/FormatUtils";
-import StandardLib from "../Utils/StandardLib";
+import FormatUtils from "../utils/FormatUtils";
+import StandardLib from "../../outts/utils/StandardLib.js";
 import React from "react";
 
 class WeaveC3Histogram extends AbstractWeaveTool {

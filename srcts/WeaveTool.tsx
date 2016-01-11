@@ -9,7 +9,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ui from "./react-ui/ui";
 import * as VendorPrefix from "react-vendor-prefix";
-import StandardLib from "./Utils/StandardLib";
+import StandardLib from "./utils/StandardLib";
 import {Glyphicon} from "react-bootstrap";
 import AbstractWeaveTool from "./tools/AbstractWeaveTool";
 import {CSSProperties} from "react";

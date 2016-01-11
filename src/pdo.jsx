@@ -4,12 +4,13 @@ import Layout from "./react-flexible-layout/Layout.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import CustomCardViewTool from "./CustomCardViewTool.jsx";
 import ui from "../outts/react-ui/ui.jsx";
-import Weave from "../outts/Weave.jsx";
 import _ from "lodash";
 //import ReactBurgerMenu from "react-burger-menu";
 import * as bs from "react-bootstrap";
 import Navbar from "./Navbar.jsx";
-import StandardLib from "./Utils/StandardLib.js";
+import StandardLib from "../outts/utils/StandardLib.js";
+import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
+/*global Weave, weavejs*/
 
 //var Menu = ReactBurgerMenu.slide;
 var tableContainer = {
@@ -34,65 +35,35 @@ class PDO extends React.Component {
     constructor(props) {
         super(props);
 
-        window.weaveReady = weave => {
-            this.handleWeaveReady(weave);
-        };
+        this.weave = props.weave;
         this.state = {
             view: TOPPRACTITIONER
         };
     }
 
     componentDidMount() {
-        this.reactReady = true;
         this.element = ReactDOM.findDOMNode(this);
         this.weaveContainerElt = ReactDOM.findDOMNode(this.refs.weaveContainer);
         window.addEventListener("resize", () => { this.forceUpdate(); });
-    }
+		this.changeView();
+		this.customSearchToolPath = this.weave.path("CustomSearchTool").request("ExternalTool");
+		this.customCardViewToolPath = this.weave.path("CustomCardViewTool").request("ExternalTool");
+		this.toolHeightPath = this.customCardViewToolPath.push("toolHeight").request("LinkableNumber");
+		this.toolHeightPath.addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
+	}
 
-    handleWeaveReady(weave) {
-        if(!this.weave) {
-            this.weave = weave;
-            weave.path().exec('WeaveAPI.topLevelApplication.visApp.hack_loadFileSaveLocalState = true;');
-        }
-        if(this.reactReady) {
-          var file = this.getFileName();
-          if (file) {
-            this.setState({view: file.split(".")[0]});
-          } else {
-              this.changeView();
-          }
-          this.customSearchToolPath = this.weave.path("CustomSearchTool").request("ExternalTool");
-          this.customCardViewToolPath = this.weave.path("CustomCardViewTool").request("ExternalTool");
-          this.toolHeightPath = this.customCardViewToolPath.push("toolHeight").request("LinkableNumber");
-          this.toolHeightPath.addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
-        } else {
-            setTimeout(this.handleWeaveReady.bind(this), 200);
-        }
-    }
-
-  getFileName() {
-    var file = this.weave.path().getValue("Weave.fileName");
-    if (file === "defaults.xml") {
-      return null;
-    }
-    if (!this.currentFile) {
-      this.currentFile = file;
-    }
-    return file;
-  }
-
-    getActiveView() {
-        return this.state.view;
-    }
+	getActiveView() {
+		return this.state.view;
+	}
 
     changeView() {
-        if(this.weave) {
-          var newFile = this.state.view + ".weave";
-          if (this.currentFile !== newFile) {
-            this.currentFile = newFile;
-            this.weave.loadFile(StandardLib.resolveRelative(newFile, window.location.pathname), null, true);
-          }
-        }
+		if(this.weave) {
+			var newFile = this.state.view + ".weave";
+			if (this.currentFile !== newFile) {
+				this.currentFile = newFile;
+				weavejs.core.WeaveArchive.loadUrl(this.weave, newFile);
+			}
+		}
     }
 
     getViewIconURL(icon) {
@@ -138,19 +109,6 @@ class PDO extends React.Component {
             paddingRight: 1
         };
 
-        if(this.weaveContainerElt) {
-            var containerPosition = this.weaveContainerElt.getBoundingClientRect();
-            var appPosition = this.element.getBoundingClientRect();
-
-            var style = {
-                top: containerPosition.top - appPosition.top,
-                left: containerPosition.left - appPosition.left,
-                width: containerPosition.right - containerPosition.left,
-                height: containerPosition.bottom - containerPosition.top,
-                position: "absolute"
-            };
-        }
-
         var datagrids = [];
         for(var key in this.tables) {
             datagrids.push(<div key={key} style={tableContainer}>{key}<DataGrid key={key} ref={key}/></div>);
@@ -186,8 +144,9 @@ class PDO extends React.Component {
                         customCardViewTool
                     }
                 </div>
-                <div ref="weaveContainer" style={ {display: "flex", flex: 1} }/>
-                <Weave ref="weave" style={style} onWeaveReady={_.debounce(this.handleWeaveReady.bind(this), 100)}/>
+                <div style={ {flex: 1} }>
+                	<WeaveLayoutManager ref="weaveContainer" weave={this.weave}/>
+                </div>
             </ui.VBox>
         );
     }

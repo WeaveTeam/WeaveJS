@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-export default class HBox extends React.Component<any, any> {
+export default class VBox extends React.Component<any, any> {
 
     constructor(props:any, state:any) {
         super(props);

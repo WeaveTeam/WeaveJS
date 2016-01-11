@@ -7,7 +7,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import * as VendorPrefix from "react-vendor-prefix";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../utils/StandardLib";
 import Resizer from "./Resizer";
 import ResizerOverlay from "./ResizerOverlay";
 
@@ -51,8 +51,8 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
 
     constructor(props: LayoutProps, state: LayoutState) {
         super(props, state);
-
-        this.state = {id: props.state.id, direction: props.state.direction, children: props.state.children, flex: props.state.flex};
+        var ps = props.state || {};
+        this.state = {id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex};
         this.minSize = 16;
         this.dragging = false;
     }

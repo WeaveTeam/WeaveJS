@@ -10,8 +10,8 @@ import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
-import FormatUtils from "../Utils/FormatUtils";
-import StandardLib from "../Utils/StandardLib"
+import FormatUtils from "../utils/FormatUtils";
+import StandardLib from "../utils/StandardLib"
 import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
 import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import {ElementSize} from "./AbstractWeaveTool";
@@ -165,7 +165,9 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     ratio: 0.95
                 }
             },
-            onrendered: this._updateStyle.bind(this)
+            onrendered: () => {
+                this._updateStyle();
+            }
         };
     }
 
@@ -182,10 +184,10 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
 
         if(selectedBinIndices.length) {
-            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3});
-            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0});
+            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
+            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
         }else{
-            this.customStyle(binIndices, "path", ".c3-shape", {opacity: 1.0});
+            this.customStyle(binIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
             this.chart.select(this.heightColumnNames, [], true);
         }
     }
@@ -200,8 +202,8 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
 
         if(selectedBinIndices.length) {
-            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3});
-            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0});
+            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
+            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
         }else{
             this._selectionKeysChanged()
         }
@@ -257,7 +259,10 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     }
 
     _updateStyle() {
-
+        d3.select(this.element).selectAll("path").style("opacity", 1)
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("stroke-opacity", 0.5);
     }
 
     _dataChanged() {

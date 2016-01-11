@@ -4,7 +4,7 @@ import ReactDOM from "react-dom";
 var toolRegistry = {};
 import ui from "../outts/react-ui/ui.jsx";
 import VendorPrefix from "react-vendor-prefix";
-import StandardLib from "./Utils/StandardLib";
+import StandardLib from "../outts/utils/StandardLib.js";
 import {Glyphicon} from "react-bootstrap";
 
 const grabberStyle = {

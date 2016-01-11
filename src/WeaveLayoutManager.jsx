@@ -18,7 +18,7 @@ import CustomSearchTool from "./CustomSearchTool.jsx";
 /* global Weave, weavejs */
 import {WeaveTool, getToolImplementation} from "../outts/WeaveTool.jsx";
 import ToolOverlay from "../outts/ToolOverlay.jsx";
-import StandardLib from "./Utils/StandardLib";
+import StandardLib from "../outts/utils/StandardLib.js";
 
 const LAYOUT = "Layout";
 
@@ -182,6 +182,8 @@ class WeaveLayoutManager extends React.Component {
     }
 
     simplifyState(state) {
+    	if (!state)
+    		return {};
         var children = state.children;
 
         if (!children) {

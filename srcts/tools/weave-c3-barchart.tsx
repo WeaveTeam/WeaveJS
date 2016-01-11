@@ -3,21 +3,21 @@
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
-///<reference path="../Utils/StandardLib.ts"/>
+///<reference path="../utils/StandardLib.ts"/>
 
 
 import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
-import FormatUtils from "../Utils/FormatUtils";
+import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
 import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import {ElementSize} from "./AbstractWeaveTool";
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../utils/StandardLib";
 
 
 interface IBarchartPaths extends IAbstractWeaveToolPaths {
@@ -194,6 +194,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             },
             onrendered: () => {
                 this.busy = false;
+                this._updateStyle();
             }
         };
     }
@@ -212,11 +213,11 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         });
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
         if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3});
-            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0});
+            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
+            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
             this.chart.select(this.heightColumnNames, selectedIndices, true);
         }else{
-            this.customStyle(indices, "path", ".c3-shape", {opacity: 1.0});
+            this.customStyle(indices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
             this.chart.select(this.heightColumnNames, [], true);
         }
 
@@ -234,8 +235,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
 
         if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3});
-            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0});
+            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
+            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
         }else{
             this.selectionKeysChanged()
         }
@@ -440,7 +441,12 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.chart.load(data);
     }
 
-    _updateStyle() {}
+    _updateStyle() {
+        d3.select(this.element).selectAll("path").style("opacity", 1)
+            .style("stroke", "black")
+            .style("stroke-width", "1px")
+            .style("stroke-opacity", 0.5);
+    }
 
     componentDidUpdate() {
         super.componentDidUpdate();
