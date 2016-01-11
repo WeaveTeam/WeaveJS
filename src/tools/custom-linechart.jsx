@@ -1,9 +1,9 @@
-import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
+import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import c3 from "c3";
 import _ from "lodash";
 import d3 from "d3";
-import FormatUtils from "../utils/FormatUtils";
+import FormatUtils from "../../outts/utils/FormatUtils";
 import StandardLib from "../../outts/utils/StandardLib.js";
 import React from "react";
 /* private
