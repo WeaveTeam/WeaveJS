@@ -45,26 +45,11 @@ class PDO extends React.Component {
         this.element = ReactDOM.findDOMNode(this);
         this.weaveContainerElt = ReactDOM.findDOMNode(this.refs.weaveContainer);
         window.addEventListener("resize", () => { this.forceUpdate(); });
-		var file = this.getFileName();
-		if (file)
-			this.setState({ view: file.split(".")[0] });
-		else
-			this.changeView();
+		this.changeView();
 		this.customSearchToolPath = this.weave.path("CustomSearchTool").request("ExternalTool");
 		this.customCardViewToolPath = this.weave.path("CustomCardViewTool").request("ExternalTool");
 		this.toolHeightPath = this.customCardViewToolPath.push("toolHeight").request("LinkableNumber");
 		this.toolHeightPath.addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
-	}
-
-	getFileName() {
-		var file = this.weave.path().getValue("Weave.fileName");
-		if (file === "defaults.xml") {
-			return null;
-		}
-		if (!this.currentFile) {
-			this.currentFile = file;
-		}
-		return file;
 	}
 
 	getActiveView() {
@@ -159,7 +144,9 @@ class PDO extends React.Component {
                         customCardViewTool
                     }
                 </div>
-                <WeaveLayoutManager ref="weaveContainer" style={ {display: "flex", flex: 1} } weave={this.weave}/>
+                <div style={ {flex: 1} }>
+                	<WeaveLayoutManager ref="weaveContainer" weave={this.weave}/>
+                </div>
             </ui.VBox>
         );
     }
