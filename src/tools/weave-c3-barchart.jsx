@@ -3,8 +3,8 @@ import d3 from "d3";
 import c3 from "c3";
 import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import _ from "lodash";
-import StandardLib from "../Utils/StandardLib";
-import FormatUtils from "../Utils/FormatUtils";
+import StandardLib from "../../outts/utils/StandardLib.js";
+import FormatUtils from "../utils/FormatUtils";
 import React from "react";
 
 class WeaveC3Barchart extends AbstractWeaveTool {

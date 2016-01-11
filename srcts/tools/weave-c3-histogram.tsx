@@ -10,8 +10,8 @@ import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
-import FormatUtils from "../Utils/FormatUtils";
-import StandardLib from "../Utils/StandardLib"
+import FormatUtils from "../utils/FormatUtils";
+import StandardLib from "../utils/StandardLib"
 import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
 import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import {ElementSize} from "./AbstractWeaveTool";

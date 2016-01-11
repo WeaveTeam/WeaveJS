@@ -9,7 +9,7 @@ import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
-import FormatUtils from "../Utils/FormatUtils";
+import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
 import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";

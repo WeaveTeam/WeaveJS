@@ -1,5 +1,5 @@
 import ol from "openlayers";
-import StandardLib from "../../../Utils/StandardLib.js";
+import StandardLib from "../../../../outts/utils/StandardLib.js";
 import FeatureLayer from "./FeatureLayer.js";
 import {registerLayerImplementation} from "./Layer.js";
 import GlyphLayer from "./GlyphLayer.js";

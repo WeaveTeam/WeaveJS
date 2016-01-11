@@ -3,7 +3,7 @@ import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import c3 from "c3";
 import _ from "lodash";
 import d3 from "d3";
-import FormatUtils from "../Utils/FormatUtils";
+import FormatUtils from "../utils/FormatUtils";
 import React from "react";
 
 /* private

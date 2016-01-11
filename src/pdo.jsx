@@ -9,7 +9,7 @@ import _ from "lodash";
 //import ReactBurgerMenu from "react-burger-menu";
 import * as bs from "react-bootstrap";
 import Navbar from "./Navbar.jsx";
-import StandardLib from "./Utils/StandardLib.js";
+import StandardLib from "../outts/utils/StandardLib.js";
 
 //var Menu = ReactBurgerMenu.slide;
 var tableContainer = {

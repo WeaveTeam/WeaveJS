@@ -8,7 +8,7 @@ import WeaveC3Histogram from "../outts/tools/weave-c3-histogram.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table.jsx";
 import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
-import StandardLib from "../outts/Utils/StandardLib.js";
+import StandardLib from "../outts/utils/StandardLib.js";
 import JSZip from "jszip";
 
 import React from "react";

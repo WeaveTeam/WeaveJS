@@ -1,7 +1,7 @@
 import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
 import _ from "lodash";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../../outts/utils/StandardLib.js";
 import d3 from "d3";
 
 const SHAPE_TYPE_CIRCLE = "circle";

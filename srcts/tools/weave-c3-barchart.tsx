@@ -3,21 +3,21 @@
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
-///<reference path="../Utils/StandardLib.ts"/>
+///<reference path="../utils/StandardLib.ts"/>
 
 
 import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
-import FormatUtils from "../Utils/FormatUtils";
+import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
 import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import {ElementSize} from "./AbstractWeaveTool";
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../utils/StandardLib";
 
 
 interface IBarchartPaths extends IAbstractWeaveToolPaths {

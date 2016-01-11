@@ -14,7 +14,7 @@ import * as d3 from "d3";
 import * as React from "react";
 import ui from "../react-ui/ui";
 import {IAbstractWeaveToolProps, IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../utils/StandardLib";
 import * as ReactDOM from "react-dom";
 
 const SHAPE_TYPE_CIRCLE:string = "circle";

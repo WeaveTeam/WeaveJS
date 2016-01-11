@@ -5,7 +5,7 @@
 import * as VendorPrefix from "react-vendor-prefix";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../utils/StandardLib";
 
 const HORIZONTAL: string = "horizontal";
 
