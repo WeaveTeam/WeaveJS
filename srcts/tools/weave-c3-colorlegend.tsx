@@ -72,7 +72,8 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     private setupCallbacks() {
         this.dynamicColorColumnPath.addCallback(this, this.forceUpdate);
         this.maxColumnsPath.addCallback(this, this.forceUpdate);
-        this.filteredKeySet.addCallback(this,this.forceUpdate);
+        this.filteredKeySet.addCallback(this, this.forceUpdate);
+        this.plotterPath.push("shapeSize").addCallback(this, this.forceUpdate);
     }
 
     handleClick(bin:number):void {
@@ -218,14 +219,14 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                                 if(i<this.numberOfBins){
                                     element.push(
                                         <ui.HBox key={i} style={{width:"100%",flex:1.0}} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
-                                                <ui.HBox style={{width:"100%", flex:0.2, position:"relative", padding:"0px 0px 0px 0px", minWidth:"10px"}}>
+                                                <ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
                                                     <svg style={{position:"absolute"}}
                                                          viewBox="0 0 100 100" width="100%" height="100%">
                                                         <circle cx="50%" cy="50%" r="45%" style={{fill:"#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)), stroke:"black", strokeOpacity:0.5}}></circle>
                                                     </svg>
                                                 </ui.HBox>
                                                 <ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
-                                                     <span style={{textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", display:"table-cell"}}>{textLabelFunction(i)}</span>
+                                                     <span style={{textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5}}>{textLabelFunction(i)}</span>
                                                 </ui.HBox>
                                         </ui.HBox>
                                     );
@@ -236,13 +237,27 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                                 }
                             }
                         }
-                        elements.push(
-                            <ui.VBox key={i} style={{width:"100%", flex: columnFlex}}>
+                        {
+                            this.props.width > this.props.height ?
+                                elements.push(
+                                    <ui.VBox key={i} style={{height:"100%", flex: columnFlex}}>
+                                        {
+                                            element
+                                            }
+                                    </ui.VBox>
+                                )
+                                :
+                            elements.push(
+                                <ui.HBox key={i} style={{width:"100%", flex: columnFlex}}>
                                     {
                                         element
-                                    }
-                            </ui.VBox>
-                        );
+                                        }
+                                </ui.HBox>
+                            );
+
+                        }
+
+
                         finalElements[j] = elements;
                     }
                         break;
@@ -257,12 +272,21 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
                 <ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
                     <ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
-                        <span style={{textAlign:"left",fontFamily:"sans-serif", fontSize:"12px", verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", display:"table-cell"}}>{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</span>
+                        <span style={{textAlign:"left",fontFamily:"sans-serif", fontSize:"12px", verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis"}}>{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</span>
                     </ui.HBox>
-                    <ui.HBox style={{width:"100%", flex: 0.9}}> {
-                        finalElements
+                    {
+                        this.props.width > this.props.height ?
+                        <ui.HBox style={{width:"100%", flex: 0.9}}> {
+                            finalElements
+                            }
+                        </ui.HBox>
+                        :
+                        <ui.VBox style={{height:"100%", flex: 0.9}}> {
+                            finalElements
+                            }
+                        </ui.VBox>
+
                         }
-                    </ui.HBox>
                 </ui.VBox>
             </div>);
         }
