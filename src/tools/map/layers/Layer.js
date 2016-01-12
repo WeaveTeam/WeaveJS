@@ -1,5 +1,5 @@
 import lodash from "lodash";
-
+/*global Weave*/
 export var layerRegistry = {};
 
 export function registerLayerImplementation(asClassName, jsClass)
@@ -33,6 +33,11 @@ class Layer {
 		return newLayer(parent, layerName);
 	}
 
+	handleMissingSessionStateProperties(newState)
+	{
+
+	}
+
 	constructor(parent, layerName)
 	{
 		this.layerPath = parent.plottersPath.push(layerName);
@@ -50,7 +55,7 @@ class Layer {
 	}
 
 	get source() {
-		return this.layer && this.layer.getSource();
+		return this.internalLayer && this.layer.getSource();
 	}
 
 	set source(value) {
@@ -58,12 +63,8 @@ class Layer {
 	}
 
 	/* Handles initial apply of linked properties, adding/removing from map */
-	set layer(value) {
-		if (this._layer != null) {
-			this.parent.map.removeLayer(this._layer);
-		}
-
-		this._layer = value;
+	set olLayer(value) {
+		this._olLayer = value;
 
 		if (value) {
 			this.parent.map.addLayer(value);
@@ -78,8 +79,8 @@ class Layer {
 		}
 	}
 
-	get layer() {
-		return this._layer;
+	get olLayer() {
+		return this._olLayer;
 	}
 
 	linkProperty(propertyPath, propertyName, inTransform)
@@ -98,9 +99,12 @@ class Layer {
 		propertyPath.addCallback(this, callback, false, false);
 	}
 
-	destroy()
+	dispose()
 	{
-		this.layer = undefined;
+		if (this._layer != null) {
+			this.parent.map.removeLayer(this._layer);
+		}
 	}
 }
 export default Layer;
+Weave.registerClass("weavejs.tools.AbstractLayer", Layer, [weavejs.api.core.ILinkableObjectWithNewProperties]);

@@ -14,8 +14,6 @@ import ImageGlyphLayer from "./map/layers/ImageGlyphLayer.js";
 import ScatterPlotLayer from "./map/layers/ScatterPlotLayer.js";
 /* eslint-enable */
 
-/*global weavejs*/
-
 import {PanCluster, InteractionModeCluster} from "./map/controls.js";
 import weaveMapInteractions from "./map/interactions.js";
 
@@ -67,7 +65,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.zoomBoundsPath = this.plotManager.push("zoomBounds");
 
 
-		this.plottersPath.getObject().childListCallbacks.addGroupedCallback(this, this.plottersChanged, true);
+		this.plottersPath.getObject().childListCallbacks.addImmediateCallback(this, this.plottersChanged, true);
 
 		this.zoomBoundsPath.addCallback(this, this.getSessionCenter, true);
 	}
@@ -221,12 +219,16 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		var addedNames = lodash.difference(newNames, oldNames);
 
 		removedNames.forEach(function (name) {
-			if (this.layers[name]) { this.layers[name].destroy(); }
+			if (this.layers[name]) { 
+				this.layers[name].olLayer
+				this.layers[name].dispose(); 
+			}
+
 			delete this.layers[name];
 		}, this);
 
 		addedNames.forEach(function (name) {
-			this.layers[name] = Layer.newLayer(this, name);
+			this.layers[name] = 
 		}, this);
 		/* */
 		for (let idx in newNames)
