@@ -53,7 +53,7 @@ export class PanCluster {
 		{
 			let map = self.getMap();
 			let view = map.getView();
-			let extent = view.getProjection().getExtent();
+			let extent = view.get("extent") || view.getProjection().getExtent();
 			let size = map.getSize();
 			view.fit(extent, size);
 		};
