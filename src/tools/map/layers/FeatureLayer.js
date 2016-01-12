@@ -45,7 +45,6 @@ export default class FeatureLayer extends Layer {
 	onFeaturePropertyChange(objectEvent)
 	{
 		let propertyName = objectEvent.key;
-		let feature = objectEvent.target;
 
 		if (!lodash.contains(FeatureLayer.Styles, propertyName))
 		{
@@ -54,8 +53,7 @@ export default class FeatureLayer extends Layer {
 		}
 		else
 		{
-			/* The property that changed was a metastyle, and as such the style should be recomputed */
-			//lodash.defer(this.updateMetaStyle, feature);
+			/* The property that changed was a metastyle, and as such the styles should be recomputed */
 			this.debounced_updateMetaStyles();
 		}
 	}

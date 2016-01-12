@@ -45,25 +45,49 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.slider = new ol.control.ZoomSlider();
 		this.pan = new PanCluster();
 
-		this.toolPath.push("projectionSRS").addCallback(this, this.onProjectionChanged, true);
 		this.toolPath.push("showZoomControls").addCallback(this, this.onZoomControlToggle, true);
 		this.toolPath.push("showMouseModeControls").addCallback(this, this.onMouseModeControlToggle, true);
 
 		this.mouseModeButtons = new InteractionModeCluster({interactionModePath: this.interactionModePath});
 
-		this.plottersPath = this.toolPath.push("children", "visualization", "plotManager", "plotters");
-		this.layerSettingsPath = this.toolPath.push("children", "visualization", "plotManager", "layerSettings");
-		this.zoomBoundsPath = this.toolPath.push("children", "visualization", "plotManager", "zoomBounds");
+		this.plotManager = this.toolPath.push("children", "visualization", "plotManager");
+
+		/* Todo replace override[X,Y][Min,Max] with a single overrideZoomBounds element; alternatively,
+		 * make a set of parameters on zoombounds itself. */
+
+		for (let extreme of ["Min", "Max"])
+			for (let axis of ["X", "Y"])
+				this.plotManager.push("override" + axis + extreme).addCallback(this, this.onViewParametersChanged);
+
+		this.toolPath.push("projectionSRS").addCallback(this, this.onViewParametersChanged, true);
+
+
+		this.plottersPath = this.plotManager.push("plotters");
+		this.layerSettingsPath = this.plotManager.push("layerSettings");
+		this.zoomBoundsPath = this.plotManager.push("zoomBounds");
+
 
 		this.plottersPath.getObject().childListCallbacks.addGroupedCallback(this, this.plottersChanged, true);
 
 		this.zoomBoundsPath.addCallback(this, this.getSessionCenter, true);
 	}
 
-	onProjectionChanged()
+	onViewParametersChanged()
 	{
-		let projectionSRS = this.toolPath.push("projectionSRS").getState() || "EPSG:3857";
-		let view = new ol.View({projection: projectionSRS});
+		let extent = [];
+
+		for (let extreme of ["Min", "Max"])
+			for (let axis of ["X", "Y"])
+				extent.push(this.plotManager.push("override" + axis + extreme).getState());
+
+		if (!lodash.every(extent, Number.isFinite))
+		{
+			extent = null;
+		}
+
+		let projection = this.toolPath.push("projectionSRS").getState() || "EPSG:3857";
+		let view = new ol.View({projection, extent});
+		view.set("extent", extent);
 
 		this.centerCallbackHandle = view.on("change:center", this.setSessionCenter, this);
 		this.resolutionCallbackHandle = view.on("change:resolution", this.setSessionZoom, this);
