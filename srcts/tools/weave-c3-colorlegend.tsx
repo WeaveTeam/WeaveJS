@@ -46,6 +46,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     private dynamicColorColumnPath:WeavePath;
     private binningDefinition:WeavePath;
     private binnedColumnPath:WeavePath;
+    private maxColumnsPath:WeavePath;
     private numberOfBins:number;
     private toolPath:WeavePath;
 
@@ -56,10 +57,13 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.dynamicColorColumnPath = this.plotterPath.push("dynamicColorColumn", null);
         this.binningDefinition = this.dynamicColorColumnPath.push("internalDynamicColumn").push(null).push("binningDefinition").push(null);
         this.binnedColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn", null);
+        this.maxColumnsPath = this.plotterPath.push("maxColumns");
+
     }
 
     private setupCallbacks() {
         this.dynamicColorColumnPath.addCallback(this, this.forceUpdate);
+        this.maxColumnsPath.addCallback(this, this.forceUpdate);
     }
 
     componentDidMount() {
@@ -150,8 +154,9 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             var height:number = this.props.height;
             var shapeSize:number = this.plotterPath.getState("shapeSize");
             var shapeType:string = this.plotterPath.getState("shapeType");
-            var maxColumns:number = this.plotterPath.getState("maxColumns");
+            var maxColumns:number = this.maxColumnsPath.getState();
             var columnFlex:number = 1.0/maxColumns;
+            var extraBins:number = this.numberOfBins%maxColumns == 0 ? 0 : maxColumns-(this.numberOfBins%maxColumns);
             var ramp:any[] = this.dynamicColorColumnPath.getState("ramp");
             var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
             var yMap:Function = (d:number):number => { return yScale(d); };
@@ -164,33 +169,40 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                 switch(shapeType) {
                     case SHAPE_TYPE_CIRCLE :
                     {
-
+                        var element:JSX.Element[] = [];
                         var elements:JSX.Element[] = [];
-                        for(var i=0; i<this.numberOfBins; i++) {
+                        for(var i=0; i<this.numberOfBins+extraBins; i++) {
                             if(i%maxColumns == j) {
-                                elements.push(
-                                    <ui.VBox style={{height:"100%", flex: columnFlex}}>
-                                        <ui.HBox key={i} style={{width:"100%",flex:1.0}}>
-                                            <ui.HBox
-                                                style={{width:"100%", flex:0.2, position:"relative", padding:"0px 0px 0px 0px", minWidth:"10px"}}>
-                                                <svg style={{position:"absolute"}}
-                                                     viewBox="0 0 100 100" width="100%" height="100%">
-                                                    <circle cx="50%" cy="50%" r="45%"
-                                                            style={{fill:"#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)), stroke:"black", strokeOpacity:0.5}}></circle>
-                                                </svg>
-                                            </ui.HBox>
-                                            <ui.HBox style={{width:"100%", flex:0.8}}>
-                                                <ui.VBox style={{height:"100%", flex: 1.0}}>
-                                                    <div style={{display:"table", height:"100%"}}>
-                                                        <span style={{textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", display:"table-cell"}}>{textLabelFunction(i)}</span>
-                                                    </div>
-                                                </ui.VBox>
-                                            </ui.HBox>
+
+                                if(i<this.numberOfBins){
+                                    console.log("Pushing ",i," to Column ",j);
+                                    element.push(
+                                        <ui.HBox style={{width:"100%",flex:1.0}}>
+                                                <ui.HBox style={{width:"100%", flex:0.2, position:"relative", padding:"0px 0px 0px 0px", minWidth:"10px"}}>
+                                                    <svg style={{position:"absolute"}}
+                                                         viewBox="0 0 100 100" width="100%" height="100%">
+                                                        <circle cx="50%" cy="50%" r="45%" style={{fill:"#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)), stroke:"black", strokeOpacity:0.5}}></circle>
+                                                    </svg>
+                                                </ui.HBox>
+                                                <ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
+                                                     <span style={{textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", display:"table-cell"}}>{textLabelFunction(i)}</span>
+                                                </ui.HBox>
                                         </ui.HBox>
-                                    </ui.VBox>
-                                );
+                                    );
+                                }else{
+                                    element.push(
+                                        <ui.HBox style={{width:"100%", flex:1.0}}/>
+                                    );
+                                }
                             }
                         }
+                        elements.push(
+                            <ui.VBox key={i} style={{width:"100%", flex: columnFlex}}>
+                                    {
+                                        element
+                                    }
+                            </ui.VBox>
+                        );
                         finalElements[j] = elements;
                     }
                         break;
@@ -203,7 +215,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             }
 
             return (<div style={{width:"100%", height:"100%"}}>
-                <ui.VBox style={{height:"100%",flex: 1.0}}>
+                <ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
                     <ui.HBox style={{width:"100%", flex: 0.1}}>
                         <svg width="100%" height="100%"><text y={yMap(0.5)} x={10} fontFamily="sans-serif" fontSize="12px">{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</text></svg>
                     </ui.HBox>
