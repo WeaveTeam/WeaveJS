@@ -8,6 +8,9 @@ export default class FeatureLayer extends Layer {
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
+		
+		this.updateMetaStyle = this.updateMetaStyle.bind(this);
+		this.debounced_updateMetaStyles = lodash.debounce(this.updateMetaStyles.bind(this), 0);
 
 		this.layer = new ol.layer.Vector();
 		this.source = new ol.source.Vector({wrapX: false});
@@ -52,7 +55,8 @@ export default class FeatureLayer extends Layer {
 		else
 		{
 			/* The property that changed was a metastyle, and as such the style should be recomputed */
-			lodash.defer(this.updateMetaStyle.bind(this), feature);
+			//lodash.defer(this.updateMetaStyle, feature);
+			this.debounced_updateMetaStyles();
 		}
 	}
 
@@ -86,6 +90,8 @@ export default class FeatureLayer extends Layer {
 
 	updateSetFromKeySet(keySet, set, diff)
 	{
+		if (!this.source) return; //HACK
+		
 		let wasEmpty = set.size === 0;
 
 		this.changedItems.clear();
@@ -124,8 +130,9 @@ export default class FeatureLayer extends Layer {
 
 	updateFilteredKeySet()
 	{
+		if (!this.source) return; //HACK
+		
 		let sourceKeys = this.source.getFeatures().map(feature => feature.getId());
-
 
 		this.filteredSet.clear();
 
@@ -140,6 +147,8 @@ export default class FeatureLayer extends Layer {
 
 	updateMetaStyles()
 	{
+		if (!this.source) return; //HACK
+		
 		this.tempSelectable = this.settingsPath.push("selectable").getState();
 
 		this.source.forEachFeature(this.updateMetaStyle, this);

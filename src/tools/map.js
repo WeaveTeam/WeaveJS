@@ -3,7 +3,7 @@ import ol from "openlayers";
 import lodash from "lodash";
 import jquery from "jquery";
 
-import AbstractWeaveTool from "./AbstractWeaveTool.jsx";
+import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
 
 /* eslint-disable */
 import Layer from "./map/layers/Layer.js";

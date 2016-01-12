@@ -207,7 +207,7 @@ class CustomCardViewTool extends React.Component {
             if(record.hasOwnProperty("attributesLeft")) {
                 for(var i in attributeNamesLeft) {
                     attributesLeft.push({
-                        name: this.paths.attributesLeft.push(attributeNamesLeft[i]).getValue("getMetadata('title')"),
+                        name: this.paths.attributesLeft.getObject(attributeNamesLeft[i]).getMetadata('title'),
                         value: record.attributesLeft[i]
                     });
                 }
@@ -217,7 +217,7 @@ class CustomCardViewTool extends React.Component {
             if(record.hasOwnProperty("attributesRight")) {
                 for(i in attributeNamesRight) {
                     attributesRight.push({
-                        name: this.paths.attributesRight.push(attributeNamesRight[i]).getValue("getMetadata('title')"),
+                        name: this.paths.attributesRight.getObject(attributeNamesRight[i]).getMetadata('title'),
                         value: record.attributesRight[i]
                     });
                 }

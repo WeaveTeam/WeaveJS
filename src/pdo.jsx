@@ -1,6 +1,5 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import Layout from "./react-flexible-layout/Layout.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 import CustomCardViewTool from "./CustomCardViewTool.jsx";
 import ui from "../outts/react-ui/ui.jsx";
