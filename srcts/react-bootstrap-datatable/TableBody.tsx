@@ -10,7 +10,11 @@ import {IRow} from "./TableRow";
 interface ITableBodyProps extends React.Props<TableBody> {
     rows:IRow[];
     idProperty:string;
-    onMouseOver:(idPropety:string) => void
+    selectedIds:string[];
+    probedIds:string[];
+    onMouseOver:(id:string, status:boolean) => void;
+    onClick:(id:string) => void;
+    showIdColumn:boolean
 }
 
 interface ITableBodyState {
@@ -19,22 +23,15 @@ interface ITableBodyState {
 
 export default class TableBody extends React.Component<ITableBodyProps, ITableBodyState> {
 
-    public tableRows:TableRow[];
+    private tableRows:{[id:string]: TableRow};
 
     constructor(props:ITableBodyProps) {
         super(props);
 
-        this.tableRows = [];
+        this.tableRows = {};
     }
 
     componentDidUpdate() {
-    }
-
-    onMouseOver(index:number) {
-    }
-
-    onClick(index:number) {
-        console.log("clicked on : ", this.props.rows[index][this.props.idProperty]);
     }
 
     render():JSX.Element {
@@ -43,12 +40,15 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
                 {
                     this.props.rows.map((row:IRow, index:number) => {
                         return <TableRow
-                                         ref={(tableRow:TableRow) => { this.tableRows[index] = tableRow }}
-                                         onMouseOver={this.onMouseOver.bind(this, index)}
-                                         onClick={this.onClick.bind(this, index)}
-                                         idProperty={this.props.idProperty}
-                                         key={index}
-                                         row={row}
+                                     ref={(tableRow:TableRow) => { this.tableRows[row[this.props.idProperty]] = tableRow }}
+                                     key={index}
+                                     onMouseOver={this.props.onMouseOver.bind(this, row[this.props.idProperty])}
+                                     onClick={this.props.onClick.bind(this, row[this.props.idProperty])}
+                                     idProperty={this.props.idProperty}
+                                     row={row}
+                                     probed={this.props.probedIds.indexOf(row[this.props.idProperty]) > -1}
+                                     selected={this.props.selectedIds.indexOf(row[this.props.idProperty]) > -1}
+                                     showIdColumn={this.props.showIdColumn}
                                 />;
                     })
                 }

@@ -25,40 +25,23 @@ class DataTable extends React.Component {
     constructor(props) {
         super(props);
         this.toolPath = props.toolPath;
-        this._columnsPath = this.toolPath.push("columns");
+        this.columnsPath = this.toolPath.push("columns");
+        this.state = {
+            data: []
+        };
     }
 
     componentDidMount() {
-        this.filteredKeySetChanged = this.forceUpdate.bind(this)
-        this.selectionKeySetChanged = this._selectionKeysChanged;
-        this.columnsChanged = this.forceUpdate.bind(this);
-        this._columnsPath.addCallback(this, this.columnsChanged, true);
-        this.toolPath.push("filteredKeySet").addCallback(this, this.filteredKeySetChanged, true);
-        this.toolPath.push("selectionKeySet").addCallback(this, this.selectionKeySetChanged, true);
+        this.columnsPath.addCallback(this, this.dataChanged, true);
+        this.toolPath.push("filteredKeySet").addCallback(this, this.dataChanged, true);
+        this.toolPath.push("selectionKeySet").addCallback(this, this.forceUpdate, true);
+        this.toolPath.probe_keyset.addCallback(this, this.forceUpdate, true);
     }
 
-    componentWillUnmount() {
-        this._columnsPath.removeCallback(this, this.columnsChanged);
-        this.toolPath.push("filteredKeySet").removeCallback(this, this.filteredKeySetChanged);
-        this.toolPath.push("selectionKeySet").removeCallback(this, this.selectionKeySetChanged);
-    }
-
-    _selectionKeysChanged () {
-        // var keys = this.toolPath.push("selectionKeySet", null).getKeys();
-        // var selection = {};
-        // keys.forEach((key) => {
-        //     selection[key] = {};
-        // });
-        // this.setState({
-        //     selected: selection
-        // });
-    }
-
-    onSelectionChange(selectedIds) {
+    dataChanged() {
         this.setState({
-            selected: selectedIds
+            data: this.columnsPath.retrieveRecords(this.columnsPath.getNames(), this.toolPath.push("filteredKeySet"))
         });
-        this.toolPath.push("selectionKeySet", null).setKeys(_.keys(selectedIds));
     }
 
     customFormat(cell, row) {
@@ -69,22 +52,38 @@ class DataTable extends React.Component {
         }
     }
 
-    onRowSelect(cell, row) {
-        this.toolPath.selection_keyset.addKeys([row.id]);
+    handleProbe(id) {
+        this.toolPath.probe_keyset.setKeys(id);
+    }
+
+    handleSelection(id) {
+        this.toolPath.push("selectionKeySet", null).setKeys(id);
     }
 
     render() {
-        var data = this._columnsPath.retrieveRecords(this._columnsPath.getNames(), this.toolPath.push("filteredKeySet")) || [];
 
         var columns = {};
 
         columns.id = "Key";
 
-        this._columnsPath.getChildren().forEach((columnPath) => {
+        this.columnsPath.getChildren().forEach((columnPath) => {
             columns[columnPath.getPath().pop()] = columnPath.getValue("this.getMetadata('title')");
         });
 
-        return <ReactBootstrapTable columnTitles={columns} rows={data} idProperty="id" height={this.props.height} striped={true} hover={true} bordered={true} condensed={true}/>
+        return <ReactBootstrapTable columnTitles={columns}
+                                    rows={this.state.data}
+                                    idProperty="id"
+                                    height={this.props.height}
+                                    striped={true}
+                                    hover={true}
+                                    bordered={true}
+                                    condensed={true}
+                                    selectedIds={this.toolPath.push("selectionKeySet", null).getKeys()}
+                                    probedIds={this.toolPath.probe_keyset.getKeys()}
+                                    onProbe={this.handleProbe.bind(this)}
+                                    onSelection={this.handleSelection.bind(this)}
+                                    showIdColumn={false}
+                />
     }
 }
 

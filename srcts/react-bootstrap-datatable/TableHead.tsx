@@ -10,7 +10,9 @@ export interface IColumnTitles {
 }
 
 interface ITableHeadProps extends React.Props<TableHead> {
-    columnTitles:IColumnTitles
+    columnTitles:IColumnTitles;
+    showIdColumn:boolean;
+    idProperty:string;
 }
 
 interface ITableHeadState {
@@ -24,13 +26,22 @@ export default class TableHead extends React.Component<ITableHeadProps, ITableHe
     }
 
     render():JSX.Element {
+
+        var headers:JSX.Element[] = [];
+
+        var keys:string[] = Object.keys(this.props.columnTitles);
+        if(!this.props.showIdColumn) {
+            keys.splice(keys.indexOf(this.props.idProperty), 1);
+        }
+        headers = keys.map((columnId:string) => {
+            return <th key={columnId}>{this.props.columnTitles[columnId]}</th>;
+        });
+
         return (
-            <thead>
+            <thead className="table-header">
                 <tr>
                     {
-                        Object.keys(this.props.columnTitles).map((columnId:string) => {
-                            return <th key={columnId}>{this.props.columnTitles[columnId]}</th>;
-                        })
+                        headers
                     }
                 </tr>
             </thead>
