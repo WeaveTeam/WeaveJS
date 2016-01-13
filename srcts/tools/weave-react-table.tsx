@@ -1,28 +1,49 @@
-import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
-import _ from "lodash";
-import React from "react";
-import ReactDOM from "react-dom";
+/// <reference path="../../typings/lodash/lodash.d.ts"/>
+/// <reference path="../../typings/react/react.d.ts"/>
+/// <reference path="../../typings/react/react-dom.d.ts"/>
+/// <reference path="../../typings/weave/WeavePath.d.ts"/>
+
+import {registerToolImplementation} from "../WeaveTool";
+import * as _ from "lodash";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import {round} from "d3";
-import ReactBootstrapTable from "../../outts/react-bootstrap-datatable/ReactBootstrapTable";
-//import ReactDataGrid from "react-datagrid";
-import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
+import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootStrapTable";
+import AbstractWeaveTool from "./AbstractWeaveTool";
+import {IAbstractWeaveToolProps, IAbstractWeaveToolState, ElementSize} from "./AbstractWeaveTool";
 
 class WeaveReactTable extends AbstractWeaveTool {
-    constructor(props) {
+    constructor(props:IAbstractWeaveToolProps) {
         super(props);
     }
 
     componentDidUpdate() {
-        var elementSize = this.element ? this.getElementSize() : null;
-        ReactDOM.render(
-            <DataTable toolPath={this.toolPath} width={elementSize.width + "px"} height={elementSize.height + "px"}/>
-        , this.element);
+        var newElementSize:ElementSize = this.getElementSize();
+        if(!_.isEqual(newElementSize, this.elementSize)) {
+            this.elementSize = newElementSize;
+            ReactDOM.render(
+                <DataTable toolPath={this.toolPath} width={newElementSize.width + "px"} height={newElementSize.height + "px"}/>
+                , this.element);
+        }
     }
 }
 
-class DataTable extends React.Component {
+interface IDataTableProps {
+    toolPath:WeavePath;
+    width:string;
+    height:string;
+}
 
-    constructor(props) {
+interface IDataTableState {
+    data:{[key:string]: string}[]
+}
+
+class DataTable extends React.Component<IDataTableProps, IDataTableState> {
+
+    private toolPath:WeavePath;
+    private columnsPath:WeavePath;
+
+    constructor(props:IDataTableProps) {
         super(props);
         this.toolPath = props.toolPath;
         this.columnsPath = this.toolPath.push("columns");
@@ -44,29 +65,29 @@ class DataTable extends React.Component {
         });
     }
 
-    customFormat(cell, row) {
-        if(typeof cell === "number") {
-            return round(cell, 2)
-        } else {
-            return cell;
-        }
-    }
+    // customFormat(cell, row) {
+    //     if(typeof cell === "number") {
+    //         return round(cell, 2)
+    //     } else {
+    //         return cell;
+    //     }
+    // }
 
-    handleProbe(id) {
+    handleProbe(id:string) {
         this.toolPath.probe_keyset.setKeys(id);
     }
 
-    handleSelection(id) {
+    handleSelection(id:string) {
         this.toolPath.push("selectionKeySet", null).setKeys(id);
     }
 
     render() {
 
-        var columns = {};
+        var columns:{[columnId:string]: string} = {};
 
-        columns.id = "Key";
+        columns["id"] = "Key";
 
-        this.columnsPath.getChildren().forEach((columnPath) => {
+        this.columnsPath.getChildren().forEach((columnPath:WeavePath) => {
             columns[columnPath.getPath().pop()] = columnPath.getValue("this.getMetadata('title')");
         });
 

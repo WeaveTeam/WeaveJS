@@ -13,7 +13,7 @@ import WeaveC3Histogram from "../outts/tools/weave-c3-histogram.jsx";
 import SessionStateMenuTool from "../outts/tools/weave-session-state-menu.jsx";
 import Barchart from "./tools/weave-barchart.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
-import WeaveReactTable from "./tools/weave-react-table-2.jsx";
+import WeaveReactTable from "../outts/tools/weave-react-table.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 /* global Weave, weavejs */
 import {WeaveTool, getToolImplementation} from "../outts/WeaveTool.jsx";
