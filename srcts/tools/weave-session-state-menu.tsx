@@ -28,7 +28,6 @@ class SessionStateMenuTool extends AbstractWeaveTool {
     }
 
     componentDidMount() {
-        super.componentDidMount();
     }
 
     handleItemClick(index:number, event:MouseEvent):void {
@@ -41,11 +40,10 @@ class SessionStateMenuTool extends AbstractWeaveTool {
     }
 
     render() {
-
         this.choices = this.toolPath.push("choices");
-        var selectedChoice:any = this.toolPath.getState("selectedChoice");
+        var selectedChoice:string = this.toolPath.getState("selectedChoice");
 
-        var menus:JSX.Element = this.choices.getNames().map((choice:any, index:number) => {
+        var menus:JSX.Element[] = this.choices.getNames().map((choice:string, index:number) => {
             return choice === selectedChoice ? <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
                 : <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
         });
@@ -54,7 +52,7 @@ class SessionStateMenuTool extends AbstractWeaveTool {
             <ListGroup>
                 {
                     menus
-                    }
+                }
             </ListGroup>
         </div>);
     }
