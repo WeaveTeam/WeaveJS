@@ -12,9 +12,10 @@ import * as _ from "lodash";
 import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
 import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import {MouseEvent} from "react";
-import CSSProperties = __React.CSSProperties;
+import {CSSProperties} from "react";
 
-
+//TODO: This is a hack to allow react to be imported in generated JSX. Without this, import is missing and render encounters an exception
+var stub:any = React;
 const sessionStateMenuStyle:CSSProperties = {width: "100%"};
 
 class SessionStateMenuTool extends AbstractWeaveTool {
