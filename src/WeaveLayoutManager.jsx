@@ -15,7 +15,6 @@ import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
 import Barchart from "./tools/weave-barchart.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
 import WeaveReactTable from "./tools/weave-react-table-2.jsx";
-import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
 import CustomSearchTool from "./CustomSearchTool.jsx";
 /* global Weave, weavejs */
 import {WeaveTool, getToolImplementation} from "../outts/WeaveTool.jsx";
