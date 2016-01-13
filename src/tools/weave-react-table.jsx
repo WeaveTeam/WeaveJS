@@ -29,10 +29,21 @@ class DataTable extends React.Component {
     }
 
     componentDidMount() {
-        this._columnsPath.addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true, false);
-        this.toolPath.push("filteredKeySet").addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true, false);
-        this.toolPath.push("selectionKeySet").addCallback(this, this._selectionKeysChanged, true, false);
+        this.filteredKeySetChanged = this.forceUpdate.bind(this)
+        this.selectionKeySetChanged = this._selectionKeysChanged;
+        this.columnsChanged = this.forceUpdate.bind(this);
+        this._columnsPath.addCallback(this, this.columnsChanged, true);
+        this.toolPath.push("filteredKeySet").addCallback(this, this.filteredKeySetChanged, true);
+        this.toolPath.push("selectionKeySet").addCallback(this, this.selectionKeySetChanged, true);
     }
+
+    componentWillUnmount() {
+        console.log("component unmounted");
+        this._columnsPath.removeCallback(this, this.columnsChanged);
+        this.toolPath.push("filteredKeySet").removeCallback(this, this.filteredKeySetChanged);
+        this.toolPath.push("selectionKeySet").removeCallback(this, this.selectionKeySetChanged);
+    }
+
     _selectionKeysChanged () {
         // var keys = this.toolPath.push("selectionKeySet", null).getKeys();
         // var selection = {};
@@ -59,6 +70,10 @@ class DataTable extends React.Component {
         }
     }
 
+    onRowSelect(cell, row) {
+        this.toolPath.selection_keyset.addKeys([row.id]);
+    }
+
     render() {
         var data = this._columnsPath.retrieveRecords(this._columnsPath.getNames(), this.toolPath.push("filteredKeySet")) || [];
 
@@ -74,13 +89,20 @@ class DataTable extends React.Component {
             title: "id"
         });
 
+        var selectRowProp = {
+          mode: "checkbox",
+          clickToSelect: true,
+          bgColor: "rgb(238, 193, 213)",
+          onSelect: this.onRowSelect.bind(this)
+        };
+
         //var columnWidth = this.props.container.clientWidth / columns.length;
 
         var columnHeaders = columns.map((column, index) => {
           return <TableHeaderColumn dataField={column.name} key={index} dataAlign="left" dataFormat={this.customFormat} dataSort={true}>{column.title}</TableHeaderColumn>;
         });
 
-        return <BootstrapTable data={data} keyField="id" striped={true} hover={true} width={this.props.width} height={this.props.height}>
+        return <BootstrapTable data={data} keyField="id" selectRow={selectRowProp} striped={true} hover={true} width={this.props.width} height={this.props.height}>
                   {
                     columnHeaders
                   }
