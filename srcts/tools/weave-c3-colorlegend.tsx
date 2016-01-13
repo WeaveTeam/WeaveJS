@@ -16,7 +16,8 @@ import ui from "../react-ui/ui";
 import {IAbstractWeaveToolProps, IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import StandardLib from "../utils/StandardLib";
 import * as ReactDOM from "react-dom";
-import CSSProperties = __React.CSSProperties;
+import {CSSProperties} from "react";
+import * as Prefixer from "react-vendor-prefix";
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -53,6 +54,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     private probeKeySet:WeavePath;
     private numberOfBins:number;
     private toolPath:WeavePath;
+    private spanStyle:CSSProperties;
 
     private keyDown:boolean;
 
@@ -69,6 +71,8 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.probeKeySet = this.toolPath.push("probeKeySet");
         this.numberOfBins = this.binnedColumnPath.getValue("this.numberOfBins");
         this.state = {selected:[], probed:[]};
+
+        this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
 
     private setupCallbacks() {
@@ -205,6 +209,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             var r:number = (shapeSize / 100 * height / this.numberOfBins) / 2;
             var textLabelFunction:Function = this.binnedColumnPath.getValue("this.deriveStringFromNumber.bind(this)");
             var finalElements:any[] = [];
+            var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
             for(var j:number = 0; j<maxColumns; j++) {
                 switch(shapeType) {
                     case SHAPE_TYPE_CIRCLE :
@@ -224,7 +229,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                                                     </svg>
                                                 </ui.HBox>
                                                 <ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
-                                                     <span style={{textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5}}>{textLabelFunction(i)}</span>
+                                                     <span style={prefixerStyle}>{textLabelFunction(i)}</span>
                                                 </ui.HBox>
                                         </ui.HBox>
                                     );
@@ -270,7 +275,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
                 <ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
                     <ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
-                        <span style={{textAlign:"left",fontFamily:"sans-serif", fontSize:"12px", verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis"}}>{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</span>
+                        <span style={prefixerStyle}>{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</span>
                     </ui.HBox>
                     {
                         this.props.width > this.props.height ?
