@@ -19,7 +19,6 @@ class SessionStateMenuTool extends AbstractWeaveTool {
   }
 
   handleItemClick(index, event) {
-    console.log(index);
     this.toolPath.state("selectedChoice", this.choices.getNames()[index]);
      var targets = this.toolPath.push("targets");
      var choice = this.choices.getState(index);
