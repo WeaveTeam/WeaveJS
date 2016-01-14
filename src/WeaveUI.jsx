@@ -6,7 +6,7 @@ import WeaveC3LineChart from "../outts/tools/weave-c3-linechart.jsx";
 import WeaveC3PieChart from "../outts/tools/weave-c3-piechart.jsx";
 import WeaveC3Histogram from "../outts/tools/weave-c3-histogram.jsx";
 import WeaveOpenLayersMap from "./tools/map.js";
-import WeaveReactTable from "./tools/weave-react-table.jsx";
+import WeaveReactTable from "..outts/tools/weave-react-table.jsx";
 import SessionStateMenuTool from "../outts/tools/weave-session-state-menu.jsx";
 import StandardLib from "../outts/utils/StandardLib.js";
 import JSZip from "jszip";
