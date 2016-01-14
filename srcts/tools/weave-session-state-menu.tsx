@@ -28,6 +28,11 @@ class SessionStateMenuTool extends AbstractWeaveTool {
         this.toolPath.push("selectedChoice").addCallback(this, this.forceUpdate);
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
+
     componentDidMount() {
     }
 
@@ -62,3 +67,4 @@ class SessionStateMenuTool extends AbstractWeaveTool {
 export default SessionStateMenuTool;
 
 registerToolImplementation("weave.ui::SessionStateMenuTool", SessionStateMenuTool);
+//Weave.registerClass("weavejs.tools.SessionStateMenuTool", SessionStateMenuTool, [weavejs.api.core.ILinkableObjectWithNewProperties]);

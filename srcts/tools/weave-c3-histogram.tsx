@@ -171,6 +171,10 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         };
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+    {
+
+    }
     _selectionKeysChanged () {
         if(!this.chart)
             return;
@@ -408,3 +412,4 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 export default WeaveC3Histogram;
 
 registerToolImplementation("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
+//Weave.registerClass("weavejs.tools.HistogramTool", WeaveC3Histogram, [weavejs.api.core.ILinkableObjectWithNewProperties]);

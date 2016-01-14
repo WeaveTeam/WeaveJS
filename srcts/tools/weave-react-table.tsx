@@ -52,6 +52,11 @@ class DataTable extends React.Component<IDataTableProps, IDataTableState> {
         };
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
+
     componentDidMount() {
         this.columnsPath.addCallback(this, this.dataChanged, true);
         this.toolPath.push("filteredKeySet").addCallback(this, this.dataChanged, true);
@@ -111,3 +116,4 @@ class DataTable extends React.Component<IDataTableProps, IDataTableState> {
 export default WeaveReactTable;
 
 registerToolImplementation("weave.visualization.tools::TableTool", WeaveReactTable);
+//Weave.registerClass("weavejs.tools.TableTool", WeaveReactTable, [weavejs.api.core.ILinkableObjectWithNewProperties]);

@@ -71,6 +71,11 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.xAxisValueToLabel = {};
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
+
     private normalizeRecords (records:Record[], attributes:string[]):any[] {
 
         // to avoid computing the stats at each iteration.
@@ -439,3 +444,4 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 export default WeaveC3ScatterPlot;
 
 registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
+//Weave.registerClass("weavejs.tools.ScatterPlotTool", WeaveC3ScatterPlot, [weavejs.api.core.ILinkableObjectWithNewProperties]);

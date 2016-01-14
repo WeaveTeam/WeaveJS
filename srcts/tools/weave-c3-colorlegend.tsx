@@ -75,6 +75,11 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
+
     private setupCallbacks() {
         this.dynamicColorColumnPath.addCallback(this, this.forceUpdate);
         this.maxColumnsPath.addCallback(this, this.forceUpdate);
@@ -304,3 +309,4 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
 export default WeaveC3ColorLegend;
 
 registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);
+//Weave.registerClass("weavejs.tools.ColorBinLegendTool", WeaveC3ColorLegend, [weavejs.api.core.ILinkableObjectWithNewProperties]);

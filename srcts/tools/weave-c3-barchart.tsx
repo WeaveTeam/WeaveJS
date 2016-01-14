@@ -226,7 +226,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         };
     }
 
-    private handleMissingSessionStateProperties(newState:any)
+    protected handleMissingSessionStateProperties(newState:any)
 	{
 
 	}
@@ -540,4 +540,4 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
 export default WeaveC3Barchart;
 registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
-//Weave.registerClass("weavejs.tools.AbstractLayer", WeaveC3Barchart, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+//Weave.registerClass("weavejs.tools.CompoundBarChartTool", WeaveC3Barchart, [weavejs.api.core.ILinkableObjectWithNewProperties]);

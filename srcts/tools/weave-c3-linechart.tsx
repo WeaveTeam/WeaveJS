@@ -52,6 +52,11 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         this.yAxisValueToLabel = {};
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
+
     _selectionKeysChanged() {
         if(!this.chart)
             return;
@@ -352,3 +357,4 @@ class WeaveC3LineChart extends AbstractWeaveTool {
 export default WeaveC3LineChart;
 
 registerToolImplementation("weave.visualization.tools::LineChartTool", WeaveC3LineChart);
+//Weave.registerClass("weavejs.tools.LineChartTool", WeaveC3LineChart, [weavejs.api.core.ILinkableObjectWithNewProperties]);

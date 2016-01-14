@@ -68,6 +68,11 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
         });
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+    {
+
+    }
+
     componentDidUpdate () {
 
     }
