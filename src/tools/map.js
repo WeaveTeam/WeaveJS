@@ -82,7 +82,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 
 		if (!lodash.every(extent, Number.isFinite))
 		{
-			extent = null;
+			extent = undefined;
 		}
 
 		let projection = this.toolPath.push("projectionSRS").getState() || "EPSG:3857";
