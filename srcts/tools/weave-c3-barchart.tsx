@@ -4,7 +4,8 @@
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
 ///<reference path="../utils/StandardLib.ts"/>
-
+/// <reference path="../../typings/weave/weavejs.d.ts"/>
+/// <reference path="../../typings/weave/Weave.d.ts"/>
 
 import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
@@ -18,7 +19,6 @@ import {ElementSize} from "./AbstractWeaveTool";
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
 import StandardLib from "../utils/StandardLib";
-
 
 interface IBarchartPaths extends IAbstractWeaveToolPaths {
     plotter: WeavePath;
@@ -198,6 +198,11 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             }
         };
     }
+
+    private handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
 
     private selectionKeysChanged ():void {
         if(!this.chart)
@@ -500,5 +505,5 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 }
 
 export default WeaveC3Barchart;
-
 registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
+//Weave.registerClass("weavejs.tools.AbstractLayer", WeaveC3Barchart, [weavejs.api.core.ILinkableObjectWithNewProperties]);
