@@ -13,11 +13,11 @@ const toolOverlayStyle:React.CSSProperties = {
     pointerEvents: "none"
 };
 
-interface IToolOverlayProps extends React.Props<ToolOverlay> {
+export interface IToolOverlayProps extends React.Props<ToolOverlay> {
 
 }
 
-interface IToolOverlayState {
+export interface IToolOverlayState {
     style: React.CSSProperties;
 }
 class ToolOverlay extends React.Component<IToolOverlayProps, IToolOverlayState> {

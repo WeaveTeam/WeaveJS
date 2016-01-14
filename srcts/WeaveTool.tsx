@@ -35,8 +35,8 @@ export function getToolImplementation(asClassName:string):any {
 
 interface IWeaveToolProps extends React.Props<WeaveTool> {
     toolPath:WeavePath;
-    toolProps:IAbstractWeaveToolProps;
-    toolClass:string;
+    toolProps?:IAbstractWeaveToolProps;
+    toolClass?:string;
     style:CSSProperties;
     onDragStart:React.MouseEvent;
     onDragEnd:React.MouseEvent;
