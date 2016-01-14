@@ -11,8 +11,15 @@
 }
 
 .list-group-item {
+    width: 100%;
     outline: none;
     padding: 3px 15px;
+}
+
+.list-group {
+    height:100%;
+    margin-bottom: 5px;
+    min-width:max-content;
 }
 
 .list-group-item.active, .list-group-item.active:focus {

@@ -16,7 +16,7 @@ import {CSSProperties} from "react";
 
 //TODO: This is a hack to allow react to be imported in generated JSX. Without this, import is missing and render encounters an exception
 var stub:any = React;
-const sessionStateMenuStyle:CSSProperties = {width: "100%"};
+const sessionStateMenuStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column", overflow:"auto"};
 
 class SessionStateMenuTool extends AbstractWeaveTool {
     private choices:WeavePath;

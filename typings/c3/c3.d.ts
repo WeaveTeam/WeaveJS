@@ -550,6 +550,7 @@ declare module c3 {
          */
         outer?: boolean;
         multiline?: boolean; // Undocumented
+        width?: number; // Undocumented
     }
 
     interface YTickConfiguration {

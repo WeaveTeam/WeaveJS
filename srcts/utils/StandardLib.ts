@@ -199,4 +199,18 @@ export default class StandardLib {
        }
        return queryParams;
    }
+
+    /**
+     *
+     * This function returns the width of a text string,
+     * in pixels, based on its font style
+     */
+    static getTextWidth(text:string, font:string):number {
+        // create a dummy canvas element to perform the calculation
+        var canvas:HTMLCanvasElement = document.createElement("canvas");
+        var context:CanvasRenderingContext2D = canvas.getContext("2d");
+        context.font = font;
+        var metrics:TextMetrics = context.measureText(text);
+        return metrics.width;
+    };
 }
