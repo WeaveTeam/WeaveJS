@@ -528,7 +528,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.probedKeysChanged}
         ];
 
-        this.chart = generate(this.c3Config);
         this.initializePaths(mapping);
         this.c3Config.bindto = this.element;
         if(this.paths.labelColumn.getState().length){
