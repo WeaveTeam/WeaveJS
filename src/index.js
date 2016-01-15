@@ -13,7 +13,7 @@ import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
 // temporary solution
 weavejs.util.JS.JSZip = JSZip;
 
-var weave = window.weave || (opener && opener.weave);
+var weave = window.weave;
 
 var urlParams = StandardLib.getUrlParams();
 if (!weave && urlParams.file) {
