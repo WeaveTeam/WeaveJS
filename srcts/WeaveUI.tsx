@@ -78,11 +78,15 @@ export var loadLayout = function(weave:Weave, fileName:string, targetEltId:strin
         );
     }
 
-    if(!fileName && weave) {
-        render();
+    if(weave) {
+        if(!fileName) {
+            render();
+        } else {
+            weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, (e:Error) => {
+                console.error(e)
+            });
+        }
+    } else {
+        console.error("Missing Weave instance!")
     }
-
-    weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, (e:Error) => {
-        console.error(e)
-    });
 };
