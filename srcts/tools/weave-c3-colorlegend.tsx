@@ -1,4 +1,4 @@
-/// <reference path="../../typings/d3/d3.d.ts"/>
+// <reference path="../../typings/d3/d3.d.ts"/>
 /// <reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
 /// <reference path="../../typings/weave/WeavePath.d.ts"/>
@@ -246,7 +246,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                             }
                         }
                         {
-                            this.props.width > this.props.height ?
+                            this.props.width > this.props.height * 2 ?
                                 elements.push(
                                     <ui.HBox key={i} style={{width:"100%", flex: columnFlex}}>
                                         {
@@ -283,7 +283,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                         <span style={prefixerStyle}>{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</span>
                     </ui.HBox>
                     {
-                        this.props.width > this.props.height ?
+                        this.props.width > this.props.height * 2 ?
                         <ui.HBox style={{width:"100%", flex: 0.9}}> {
                             finalElements
                             }
