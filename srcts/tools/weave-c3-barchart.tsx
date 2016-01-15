@@ -150,11 +150,14 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                             if(this.stringRecords && this.stringRecords[num]) {
                                 if(this.element && this.getElementSize().height > 0) {
                                     var labelHeight:number = (this.getElementSize().height* 0.2)/Math.cos(45*(Math.PI/180));
-                                    var labelString:string = this.stringRecords[num]["xLabel"] as string;
-                                    var stringSize:number = StandardLib.getTextWidth(labelString,"14pt Helvetica Neue");
-                                    var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight/stringSize));
-                                    console.log(labelString,"Label Height",labelHeight,"Predicted Size",14*labelString.length,"String Size",stringSize);
-                                    return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
+                                    var labelString:string = (this.stringRecords[num]["xLabel"] as string);
+                                    if(labelString) {
+                                        var stringSize:number = StandardLib.getTextWidth(labelString, "14pt Helvetica Neue");
+                                        var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
+                                        return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
+                                    }else{
+                                        return "";
+                                    }
                                 }else {
                                     return this.stringRecords[num]["xLabel"] as string;
                                 }
@@ -181,6 +184,21 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                                 return String(FormatUtils.defaultNumberFormatting(num));
                             }
                         }
+                    }
+                }
+            },
+            tooltip: {
+                format: {
+                    title: (num:number):string => {
+                        if(this.stringRecords && this.stringRecords[num]) {
+                            return this.stringRecords[num]["xLabel"] as string;
+                        }else{
+                            return "";
+                        }
+                    },
+                    name: (name:string, ratio:number, id:string, index:number):string => {
+                        var labelIndex:number = this.heightColumnNames.indexOf(name);
+                        return (this.heightColumnsLabels ? this.heightColumnsLabels[labelIndex] : "");
                     }
                 }
             },
