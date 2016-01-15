@@ -181,6 +181,8 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
 
         this.initializePaths(manifest);
 
+       	this.paths.filteredKeySet.getObject().setSingleKeySource(this.paths.data.getObject());
+        
         this.c3Config = {
             //size: this.getElementSize(),
             bindto: this.element,

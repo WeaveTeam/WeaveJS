@@ -62,6 +62,8 @@ class DataTable extends React.Component<IDataTableProps, IDataTableState> {
         this.toolPath.push("filteredKeySet").addCallback(this, this.dataChanged, true);
         this.toolPath.push("selectionKeySet").addCallback(this, this.forceUpdate, true);
         this.toolPath.probe_keyset.addCallback(this, this.forceUpdate, true);
+        
+        this.toolPath.getObject("filteredKeySet").setColumnKeySources(this.toolPath.getObject("columns").getObjects());
     }
 
     dataChanged() {

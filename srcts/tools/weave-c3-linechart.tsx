@@ -75,13 +75,14 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             //unfocus all circles
             d3.select(this.element).selectAll("circle").filter(".c3-shape").style("opacity", "0.1");
 
+            var filtered = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape");
             selectedIndices.forEach( (index:number) => {
                 //custom style for circles on selected lines
-                var circleCount = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index].length;
+                var circleCount = filtered[index] ? filtered[index].length : 0;
                 var selectedCircles = _.range(0,circleCount);
                 selectedCircles.forEach( (i:number) => {
-                    (d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index][i] as HTMLElement).style.opacity = "1.0";
-                    (d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index][i] as HTMLElement).style.strokeOpacity = "1.0";
+                    (filtered[index][i] as HTMLElement).style.opacity = "1.0";
+                    (filtered[index][i] as HTMLElement).style.strokeOpacity = "1.0";
                 });
             });
 
@@ -111,13 +112,14 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             //unfocus all circles
             d3.select(this.element).selectAll("circle").filter(".c3-shape").style({opacity: 0.1, "stroke-opacity": 0.0});
 
+            var filtered = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape");
             selectedIndices.forEach( (index:number) => {
                 //custom style for circles on probed lines
-                var circleCount:number = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index].length;
+                var circleCount:number = filtered[index] ? filtered[index].length : 0;
                 var selectedCircles:number[] = _.range(0,circleCount);
                 selectedCircles.forEach( (i:number) => {
-                    (d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index][i] as HTMLElement).style.opacity = "1.0";
-                    (d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape")[index][i] as HTMLElement).style.strokeOpacity = "0.0";
+                    (filtered[index][i] as HTMLElement).style.opacity = "1.0";
+                    (filtered[index][i] as HTMLElement).style.strokeOpacity = "0.0";
                 });
             });
 
@@ -252,6 +254,8 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
+        
+       	this.paths.filteredKeySet.getObject().setColumnKeySources(this.paths.columns.getObject().getObjects());
 
         this.c3Config = {
             //size: this.getElementSize(),

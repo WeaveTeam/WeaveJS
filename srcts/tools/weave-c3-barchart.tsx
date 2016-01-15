@@ -529,6 +529,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
+        
+        this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.sortColumn.getObject()]);
+        
         this.c3Config.bindto = this.element;
         if(this.paths.labelColumn.getState().length){
             this.c3Config.axis.x.height = this.getElementSize().height * 0.2;

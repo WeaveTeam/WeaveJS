@@ -433,6 +433,9 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
+        
+       	this.paths.filteredKeySet.getObject().setSingleKeySource(this.paths.fillStyle.getObject('color', 'internalDynamicColumn'));
+        
         this.c3Config.bindto = this.element;
         if(this.paths.binnedColumn.push("internalDynamicColumn").getState().length){
             this.c3Config.axis.x.height = this.getElementSize().height * 0.2;

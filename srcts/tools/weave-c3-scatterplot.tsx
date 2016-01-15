@@ -325,6 +325,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
+        
+        this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.dataX.getObject(), this.paths.dataY.getObject()]);
 
         this.c3Config = {
             bindto: this.element,
