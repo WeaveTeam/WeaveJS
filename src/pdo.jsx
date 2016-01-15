@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import CustomSearchTool from "./CustomSearchTool.jsx";
+import CustomSearchTool from "../outts/CustomSearchTool.jsx";
 import CustomCardViewTool from "./CustomCardViewTool.jsx";
 import ui from "../outts/react-ui/ui.jsx";
 import _ from "lodash";

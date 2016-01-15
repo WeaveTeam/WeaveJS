@@ -4,7 +4,7 @@ import $ from "jquery";
 import StandardLib from "../outts/utils/StandardLib.js";
 import JSZip from "jszip";
 /* eslint-disable */
-import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
+import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
 // import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
 /* eslint-enable */
 

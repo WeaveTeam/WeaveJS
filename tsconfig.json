@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "jsx": "preserve",
     "removeComments": false,
     "target": "es6",
