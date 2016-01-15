@@ -23,15 +23,17 @@ import WeaveReactTable from "./tools/weave-react-table";
 // Temporary solution
 // because typescript removes
 // unused imports
-var v1:any = WeaveC3Barchart;
-var v2:any = WeaveC3ScatterPlot;
-var v3:any = WeaveC3ColorLegend;
-var v4:any = WeaveC3LineChart;
-var v5:any = WeaveC3PieChart;
-var v6:any = WeaveC3Histogram;
-var v7:any = SessionStateMenuTool;
-var v8:any = WeaveOpenLayersMap;
-var v9:any = WeaveReactTable;
+var v1:any = [
+	WeaveC3Barchart,
+	WeaveC3ScatterPlot,
+	WeaveC3ColorLegend,
+	WeaveC3LineChart,
+	WeaveC3PieChart,
+	WeaveC3Histogram,
+	SessionStateMenuTool,
+	WeaveOpenLayersMap,
+	WeaveReactTable
+];
 ///////////////////////////////
 
 //import CustomSearchTool from "./outts/CustomSearchTool.jsx";
