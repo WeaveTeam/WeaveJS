@@ -1,9 +1,15 @@
-import jquery from "jquery";
-import ol from "openlayers";
-import GlyphLayer from "./GlyphLayer.js";
-import FeatureLayer from "./FeatureLayer.js";
-import ImageGlyphCache from "./ImageGlyphCache.js";
-import {registerLayerImplementation} from "./Layer.js";
+///<reference path="../../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+
+import * as jquery from "jquery";
+import * as ol from "openlayers";
+import GlyphLayer from "./GlyphLayer";
+import FeatureLayer from "./FeatureLayer";
+import ImageGlyphCache from "./ImageGlyphCache";
+
+declare var weavejs:any;
+declare var Weave:any;
 
 class ImageGlyphLayer extends GlyphLayer {
 
@@ -15,6 +21,11 @@ class ImageGlyphLayer extends GlyphLayer {
 
 		this.layerPath.push("imageSize").addCallback(this, this.updateStyleData);
 		this.layerPath.push("imageURL").addCallback(this, this.updateStyleData, true);
+	}
+
+	handleMissingSessionStateProperties(newState) 
+	{
+
 	}
 
 	setIconStyle(feature, img, iconSize)
@@ -92,4 +103,4 @@ class ImageGlyphLayer extends GlyphLayer {
 
 export default ImageGlyphLayer;
 
-registerLayerImplementation("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer);
+Weave.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);

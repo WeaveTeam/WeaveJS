@@ -1,9 +1,14 @@
-import Layer from "./Layer.js";
-import StandardLib from "../../../../outts/utils/StandardLib.js";
-import lodash from "lodash";
-import ol from "openlayers";
+///<reference path="../../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
 
-export default class FeatureLayer extends Layer {
+import * as ol from "openlayers";
+import * as lodash from "lodash";
+
+import Layer from "./Layer";
+import StandardLib from "../../utils/StandardLib";
+
+class FeatureLayer extends Layer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
 	constructor(parent, layerName)
 	{
@@ -227,7 +232,7 @@ export default class FeatureLayer extends Layer {
 		feature.setStyle(newStyle);
 	}
 
-	static olFillFromWeaveFill(fill, fade)
+	static olFillFromWeaveFill(fill, fade?)
 	{
 		if (fade === undefined) fade = 1;
 
@@ -235,16 +240,16 @@ export default class FeatureLayer extends Layer {
 		return new ol.style.Fill({color});
 	}
 
-	static olStrokeFromWeaveStroke(stroke, fade)
+	static olStrokeFromWeaveStroke(stroke:Object, fade?:number)
 	{
 		if (fade === undefined) fade = 1;
 
-		let color = stroke.color && FeatureLayer.toColorArray(stroke.color, stroke.alpha * fade) || [0, 0, 0, 1];
+		let color:Array<number> = stroke.color && FeatureLayer.toColorArray(stroke.color, stroke.alpha * fade) || [0, 0, 0, 1];
 
-		let lineCap = stroke.lineCap === "none" ? "butt" : stroke.lineCap || "round";
-		let lineJoin = stroke.lineJoin === null ? "round" : stroke.lineJoin || "round";
-		let miterLimit = Number(stroke.miterLimit);
-		let width = Number(stroke.weight);
+		let lineCap:string = stroke.lineCap === "none" ? "butt" : stroke.lineCap || "round";
+		let lineJoin:string = stroke.lineJoin === null ? "round" : stroke.lineJoin || "round";
+		let miterLimit:number = Number(stroke.miterLimit);
+		let width:number = Number(stroke.weight);
 
 		return new ol.style.Stroke({color, lineCap, lineJoin, miterLimit, width});
 	}
@@ -286,17 +291,16 @@ export default class FeatureLayer extends Layer {
 				zIndex: Number.MAX_SAFE_INTEGER - 4
 		})];
 	}
+
+	static SELECT_WIDTH:number = 5;
+	static PROBE_HALO_WIDTH:number = 4;
+	static PROBE_LINE_WIDTH:number = 1;
+	static Styles:Object = {
+		NORMAL: "normalStyle",
+		UNSELECTED: "unselectedStyle", /* For the case where a selection has been made in the layer but the element is not one of them. */
+		SELECTED: "selectedStyle",
+		PROBED: "probedStyle"	
+	}
 }
-
-FeatureLayer.SELECT_WIDTH = 5;
-FeatureLayer.PROBE_HALO_WIDTH = 4;
-FeatureLayer.PROBE_LINE_WIDTH = 1;
-
-FeatureLayer.Styles = {
-	NORMAL: "normalStyle",
-	UNSELECTED: "unselectedStyle", /* For the case where a selection has been made in the layer but the element is not one of them. */
-	SELECTED: "selectedStyle",
-	PROBED: "probedStyle"
-};
 
 export default FeatureLayer;

@@ -1,25 +1,11 @@
-import ol from "openlayers";
-import jquery from "jquery";
-import lodash from "lodash";
+///<reference path="../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../typings/weave/WeavePath.d.ts"/>
 
-// var inherits = function(childCtor, parentCtor) {
-//   /** @constructor */
-//   function tempCtor() {}
-//   tempCtor.prototype = parentCtor.prototype;
-//   childCtor.superClass_ = parentCtor.prototype;
-//   childCtor.prototype = new tempCtor();
-//   /** @override */
-//   childCtor.prototype.constructor = childCtor;
-// };
+import * as ol from "openlayers";
+import * as lodash from "lodash";
+import * as jquery from "jquery";
 
-// var CustomDragBoxEvent = function (type, innerEvent) {
-// 	ol.MapEvent.call(this, type, innerEvent.map, innerEvent.frameState)
-// 	this.innerEvent = innerEvent;
-// };
-
-// console.log(ol.MapBrowserEvent);
-// inherits(CustomDragBoxEvent, ol.MapBrowserEvent);
-//
 class BoxControl extends ol.control.Control {
 	constructor(opt_options) {
 		let options = opt_options ? opt_options : {};
@@ -62,7 +48,7 @@ class BoxControl extends ol.control.Control {
 		];
 		var map = this.getMap();
 
-		var coordinates = pixels.map(map.getCoordinateFromPixel, map);
+		var coordinates:Array<ol.Coordinate> = pixels.map(map.getCoordinateFromPixel, map);
 		// close the polygon
 		coordinates[4] = coordinates[0].slice();
 

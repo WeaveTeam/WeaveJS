@@ -1,21 +1,29 @@
-import {registerToolImplementation} from "../../outts/WeaveTool.jsx";
-import ol from "openlayers";
-import lodash from "lodash";
-import jquery from "jquery";
+///<reference path="../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../typings/jquery/jquery.d.ts"/>
+///<reference path="../../typings/weave/WeavePath.d.ts"/>
 
-import AbstractWeaveTool from "../../outts/tools/AbstractWeaveTool.jsx";
+import * as ol from "openlayers";
+import * as lodash from "lodash";
+import * as jquery from "jquery";
+
+import AbstractWeaveTool from "./AbstractWeaveTool";
 
 /* eslint-disable */
-import Layer from "./map/layers/Layer.js";
-import FeatureLayer from "./map/layers/FeatureLayer.js";
-import GeometryLayer from "./map/layers/GeometryLayer.js";
-import TileLayer from "./map/layers/TileLayer.js";
-import ImageGlyphLayer from "./map/layers/ImageGlyphLayer.js";
-import ScatterPlotLayer from "./map/layers/ScatterPlotLayer.js";
+import Layer from "./OpenLayersMap/Layers/Layer";
+import FeatureLayer from "./OpenLayersMap/Layers/FeatureLayer";
+import GeometryLayer from "./OpenLayersMap/Layers/GeometryLayer";
+import TileLayer from "./OpenLayersMap/Layers/TileLayer";
+import ImageGlyphLayer from "./OpenLayersMap/Layers/ImageGlyphLayer";
+import ScatterPlotLayer from "./OpenLayersMap/Layers/ScatterPlotLayer";
 /* eslint-enable */
 
-import {PanCluster, InteractionModeCluster} from "./map/controls.js";
-import weaveMapInteractions from "./map/interactions.js";
+import {PanCluster, InteractionModeCluster} from "./OpenLayersMap/controls.js";
+import weaveMapInteractions from "./OpenLayersMap/interactions.js";
+/* global Weave, weavejs */
+
+declare var Weave:any;
+declare var weavejs:any;
 
 class WeaveOpenLayersMap extends AbstractWeaveTool {
 
@@ -24,6 +32,11 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		super(props);
 
 		this.layers = {};
+	}
+
+	handleMissingSessionStateProperties(newState)
+	{
+
 	}
 
 	componentDidMount()
@@ -220,7 +233,6 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 
 		removedNames.forEach(function (name) {
 			if (this.layers[name]) { 
-				this.layers[name].olLayer
 				this.layers[name].dispose(); 
 			}
 
@@ -228,7 +240,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		}, this);
 
 		addedNames.forEach(function (name) {
-			this.layers[name] = 
+			//this.layers[name] = 
 		}, this);
 		/* */
 		for (let idx in newNames)
@@ -251,4 +263,4 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 
 export default WeaveOpenLayersMap;
 
-registerToolImplementation("weave.visualization.tools::MapTool", WeaveOpenLayersMap);
+Weave.registerClass("weave.visualization.tools::MapTool", WeaveOpenLayersMap, [weavejs.api.core.ILinkableObjectWithNewProperties]);

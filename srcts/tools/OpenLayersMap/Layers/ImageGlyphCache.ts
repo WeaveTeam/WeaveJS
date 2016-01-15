@@ -1,4 +1,8 @@
-import jquery from "jquery";
+///<reference path="../../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+
+import * as jquery from "jquery";
 
 class Map2D {
 	constructor()

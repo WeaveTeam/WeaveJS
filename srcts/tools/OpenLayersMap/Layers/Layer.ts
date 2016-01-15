@@ -1,37 +1,8 @@
-import lodash from "lodash";
-/*global Weave*/
-export var layerRegistry = {};
-
-export function registerLayerImplementation(asClassName, jsClass)
-{
-	if (!layerRegistry)
-	{
-		layerRegistry = {};
-	}
-	layerRegistry[asClassName] = jsClass;
-}
-
-export function newLayer(parent, layerName)
-{
-	var path = parent.plottersPath.push(layerName);
-	let layerType = path.getType();
-	let LayerClass = layerRegistry[layerType];
-	if (!LayerClass)
-	{
-		return null;
-	}
-	else
-	{
-		return new LayerClass(parent, layerName);
-	}
-}
+import * as lodash from "lodash";
+declare var weavejs:any;
+declare var Weave:any;
 
 class Layer {
-
-	static newLayer(parent, layerName)
-	{
-		return newLayer(parent, layerName);
-	}
 
 	handleMissingSessionStateProperties(newState)
 	{

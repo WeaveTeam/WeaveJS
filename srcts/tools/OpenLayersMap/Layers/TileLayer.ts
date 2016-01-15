@@ -1,6 +1,9 @@
-import Layer from "./Layer.js";
-import ol from "openlayers";
-import {registerLayerImplementation} from "./Layer.js";
+///<reference path="../../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+
+import * as ol from "openlayers";
+import Layer from "./Layer";
 
 class TileLayer extends Layer {
 
@@ -14,6 +17,11 @@ class TileLayer extends Layer {
 
 		this.servicePath.addCallback(this, this.updateTileSource, true);
 		this.projectionPath.addCallback(this, this.updateValidExtents, true);
+	}
+
+	handleMissingSessionStateProperties(newState)
+	{
+		
 	}
 
 	updateValidExtents()
@@ -95,4 +103,4 @@ class TileLayer extends Layer {
 
 export default TileLayer;
 
-registerLayerImplementation("weave.visualization.plotters::WMSPlotter", TileLayer);
+Weave.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);

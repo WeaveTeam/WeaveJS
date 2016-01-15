@@ -1,6 +1,10 @@
-import FeatureLayer from "./FeatureLayer.js";
-import lodash from "lodash";
-import ol from "openlayers";
+///<reference path="../../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+
+import FeatureLayer from "./FeatureLayer";
+import * as lodash from "lodash";
+import * as ol from "openlayers";
 
 class GlyphLayer extends FeatureLayer {
 

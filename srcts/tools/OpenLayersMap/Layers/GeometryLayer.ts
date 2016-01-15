@@ -1,7 +1,8 @@
-import ol from "openlayers";
-import {registerLayerImplementation} from "./Layer.js";
-import FeatureLayer from "./FeatureLayer.js";
-/*global weavejs*/
+import * as ol from "openlayers";
+import FeatureLayer from "./FeatureLayer";
+
+declare var weavejs:any;
+declare var Weave:any;
 
 class GeometryLayer extends FeatureLayer {
 	constructor(parent, layerName)
@@ -19,6 +20,11 @@ class GeometryLayer extends FeatureLayer {
 
 		this.fillStylePath.addCallback(this, this.updateStyleData);
 		this.lineStylePath.addCallback(this, this.updateStyleData, true);
+	}
+
+	handleMissingSessionStateProperties(newState)
+	{
+
 	}
 
 	updateGeometryData()
@@ -105,4 +111,4 @@ class GeometryLayer extends FeatureLayer {
 
 export default GeometryLayer;
 
-registerLayerImplementation("weave.visualization.plotters::GeometryPlotter", GeometryLayer);
+Weave.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);

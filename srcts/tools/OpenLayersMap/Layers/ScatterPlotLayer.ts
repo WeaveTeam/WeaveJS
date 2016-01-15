@@ -1,9 +1,13 @@
-import ol from "openlayers";
-import StandardLib from "../../../../outts/utils/StandardLib.js";
-import FeatureLayer from "./FeatureLayer.js";
-import {registerLayerImplementation} from "./Layer.js";
-import GlyphLayer from "./GlyphLayer.js";
-import lodash from "lodash";
+///<reference path="../../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+
+import * as ol from "openlayers";
+import * as lodash from "lodash";
+
+import StandardLib from "../../utils/StandardLib";
+import FeatureLayer from "./FeatureLayer";
+import GlyphLayer from "./GlyphLayer";
 
 class ScatterPlotLayer extends GlyphLayer {
 	constructor(parent, layerName)
@@ -18,6 +22,11 @@ class ScatterPlotLayer extends GlyphLayer {
 		this.minRadiusPath = this.layerPath.push("minScreenRadius").addCallback(this, this.updateStyleData);
 
 		this.defaultRadiusPath = this.layerPath.push("defaultScreenRadius").addCallback(this, this.updateStyleData, true);
+	}
+
+	handleMissingSessionStateProperties(newState)
+	{
+
 	}
 
 	updateStyleData()
@@ -145,4 +154,4 @@ class ScatterPlotLayer extends GlyphLayer {
 
 export default ScatterPlotLayer;
 
-registerLayerImplementation("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer);
+Weave.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
