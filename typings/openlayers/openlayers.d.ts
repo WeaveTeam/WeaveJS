@@ -115,44 +115,6 @@ declare module olx {
         projection?: ol.proj.ProjectionLike;
     }
 
-    interface ImageWMSOptions extends BaseWMSOptions {
-
-        /** experimental Optional function to load an image given a URL. */
-        imageLoadFunction?: ol.ImageLoadFunctionType;
-
-        /** Ratio. 1 means image requests are the size of the map viewport, 2 means twice the width and height of the map viewport, and so on. Must be 1 or higher. Default is 1.5. */
-        ratio?: number;
-
-        /** Resolutions. If specified, requests will be made for these resolutions only. */
-        resolutions?: Array<number>;
-    }
-
-    interface TileWMSOptions {
-
-        /** The size in pixels of the gutter around image tiles to ignore. By setting this property to a non-zero value, images will be requested that are wider and taller than the tile size by a value of 2 x gutter. Defaults to zero. Using a non-zero value allows artifacts of rendering at tile edges to be ignored. If you control the WMS service it is recommended to address "artifacts at tile edges" issues by properly configuring the WMS service. For example, MapServer has a tile_map_edge_buffer configuration parameter for this. See http://mapserver.org/output/tile_mode.html. */
-        gutter?: number;
-
-        /** Tile grid. Base this on the resolutions, tilesize and extent supported by the server. If this is not defined, a default grid will be used: if there is a projection extent, the grid will be based on that; if not, a grid based on a global extent with origin at 0,0 will be used. */
-        tileGrid?: ol.tilegrid.TileGrid;
-
-        /** experimental Maximum zoom. */
-        maxZoom?: number;
-
-        /** experimental Optional function to load a tile given a URL. */
-        tileLoadFunction?: ol.TileLoadFunctionType;
-
-        /** WMS service URL. */
-        url?: string;
-
-        /** WMS service urls. Use this instead of url when the WMS supports multiple urls for GetMap requests. */
-        urls?: Array<string>;
-
-        /** experimental The type of the remote WMS server. Currently only used when hidpi is true. Default is undefined. */
-        serverType?: ol.source.wms.ServerType;
-
-        /** experimental Whether to wrap the world horizontally. When set to false, only one world will be rendered. When true, tiles will be requested for one world only, but they will be wrapped horizontally to render multiple worlds. The default is true. */
-        wrapX?: boolean;
-    }
     /**
      * Object literal with config options for the map logo.
      */
@@ -500,6 +462,12 @@ declare module olx {
             //TODO: Replace with olx.control.ZoomOptions
             zoomOptions?: any;
         }
+
+        interface ControlOptions {
+            element?:HTMLElement;
+            render?:Function;
+            target?:Element|string;
+        }
     }
 
     module interaction {
@@ -514,7 +482,25 @@ declare module olx {
             pinchZoom?: boolean;
             zoomDelta?: number;
             zoomDuration?: number;
-          }
+        }
+
+        interface PointerOptions {
+            handleDownEvent?:Function;
+            handleDragEvent?:Function;
+            handleEvent?:Function;
+            handleMoveEvent?:Function;
+            handleUpEvent?:Function;
+        }
+
+        interface DragPanOptions {
+            kinetic?:ol.Kinetic;
+        }
+
+        interface DragZoomOptions {
+            className?:string;
+            condition?:ol.events.ConditionType;
+            duration?:number;
+        }
     }
 
     module layer {
@@ -664,6 +650,86 @@ declare module olx {
 
     module source {
 
+        interface ImageWMSOptions extends BaseWMSOptions {
+
+            /** experimental Optional function to load an image given a URL. */
+            imageLoadFunction?: ol.ImageLoadFunctionType;
+
+            /** Ratio. 1 means image requests are the size of the map viewport, 2 means twice the width and height of the map viewport, and so on. Must be 1 or higher. Default is 1.5. */
+            ratio?: number;
+
+            /** Resolutions. If specified, requests will be made for these resolutions only. */
+            resolutions?: Array<number>;
+        }
+
+        interface TileWMSOptions {
+
+            /** The size in pixels of the gutter around image tiles to ignore. By setting this property to a non-zero value, images will be requested that are wider and taller than the tile size by a value of 2 x gutter. Defaults to zero. Using a non-zero value allows artifacts of rendering at tile edges to be ignored. If you control the WMS service it is recommended to address "artifacts at tile edges" issues by properly configuring the WMS service. For example, MapServer has a tile_map_edge_buffer configuration parameter for this. See http://mapserver.org/output/tile_mode.html. */
+            gutter?: number;
+
+            /** Tile grid. Base this on the resolutions, tilesize and extent supported by the server. If this is not defined, a default grid will be used: if there is a projection extent, the grid will be based on that; if not, a grid based on a global extent with origin at 0,0 will be used. */
+            tileGrid?: ol.tilegrid.TileGrid;
+
+            /** experimental Maximum zoom. */
+            maxZoom?: number;
+
+            /** experimental Optional function to load a tile given a URL. */
+            tileLoadFunction?: ol.TileLoadFunctionType;
+
+            /** WMS service URL. */
+            url?: string;
+
+            /** WMS service urls. Use this instead of url when the WMS supports multiple urls for GetMap requests. */
+            urls?: Array<string>;
+
+            /** experimental The type of the remote WMS server. Currently only used when hidpi is true. Default is undefined. */
+            serverType?: ol.source.wms.ServerType;
+
+            /** experimental Whether to wrap the world horizontally. When set to false, only one world will be rendered. When true, tiles will be requested for one world only, but they will be wrapped horizontally to render multiple worlds. The default is true. */
+            wrapX?: boolean;
+        }
+
+        interface OSMOptions {
+            attributions?:Array<ol.Attribution>;
+            crossOrigin?:string;
+            maxZoom?:number;
+            minZoom?:number;
+            reprojectionErrorThreshold?:number;
+            tileLoadFunction?:Function;
+            url?:string;
+            wrapX?:boolean;
+        }
+
+        interface MapQuestOptions {
+            layer:string;
+            reprojectionErrorThreshold?:number;
+            tileLoadFunction?:Function;
+            url?:string;
+        }
+        interface StamenOptions {
+            layer:string;
+            minZoom?:number;
+            maxZoom?:number;
+            opaque?:boolean;
+            reprojectionErrorThreshold?:boolean;
+            tileLoadFunction?:Function;
+            url?:string;
+        }
+
+        interface XYZOptions {
+            attributions?: Array<ol.Attribution>;
+            crossOrigin?:string;
+            logo?:string;
+            projection?:ol.proj.ProjectionLike;
+            reprojectionErrorThreshold?:number;
+            maxZoom?:number;
+            minZoom?:number;
+            /** Incomplete */
+            url?:string;
+            urls?:Array<string>;
+            wrapX?:boolean;
+        }
+
         interface VectorOptions {
             /**
              * Attributions.
@@ -728,6 +794,40 @@ declare module olx {
 
         interface FillOptions {
             color?: ol.Color | string;
+        }
+
+        interface StrokeOptions {
+            color?: ol.Color | string;
+            lineCap?: string;
+            lineJoin?: string;
+            lineDash?: string;
+            miterLimit?: number;
+            width?: number;
+        }
+
+        interface CircleOptions {
+            fill?: ol.style.Fill;
+            radius: number;
+            snapToPixel?: boolean;
+            stroke?: ol.style.Stroke;
+        }
+
+        interface IconOptions {
+            anchor?:Array<number>;
+            anchorOrigin?:string;
+            anchorXUnits?:string;
+            anchorYUnits?:string;
+            crossOrigin?:string;
+            img?:any;
+            offset?:Array<number>;
+            offsetOrigin?:string;
+            opacity?:number;
+            scale?:number;
+            snapToPixel?:boolean;
+            rotateWithView?:boolean;
+            size?:ol.Size;
+            imgSize?:ol.Size;
+            src?:string;
         }
 
         interface StyleOptions {
@@ -2279,6 +2379,7 @@ declare module ol {
         }
 
         class Control {
+            constructor(options?: olx.control.ControlOptions);
         }
 
         class FullScreen {
@@ -2400,6 +2501,9 @@ declare module ol {
     module events {
         module condition {
         }
+
+        interface ConditionType { (event: ol.MapBrowserEvent ): boolean}
+
     }
 
     module extent {
@@ -3396,6 +3500,7 @@ declare module ol {
         }
 
         class DragPan {
+            constructor(opt_options?:olx.interaction.DragPanOptions);
         }
 
         class DragRotate {
@@ -3405,6 +3510,7 @@ declare module ol {
         }
 
         class DragZoom {
+            constructor(opt_options?:olx.interaction.DragZoomOptions);
         }
 
         class Draw {
@@ -3435,6 +3541,7 @@ declare module ol {
         }
 
         class Pointer {
+            constructor(opt_options?:olx.interaction.PointerOptions)
         }
 
         class Select {
@@ -3932,20 +4039,22 @@ declare module ol {
         }
 
         class ImageWMS {
-            constructor(options: olx.ImageWMSOptions);
+            constructor(options: olx.source.ImageWMSOptions);
         }
 
         class MapQuest {
-            constructor(options: any);
+            constructor(options: olx.source.MapQuestOptions);
         }
 
         class OSM {
+            constructor(options: olx.source.OSMOptions);
         }
 
         class Source {
         }
 
         class Stamen {
+            constructor(options: olx.source.StamenOptions);
         }
 
         class Tile {
@@ -3973,7 +4082,7 @@ declare module ol {
         }
 
         class TileWMS {
-            constructor(options: olx.TileWMSOptions);
+            constructor(options: olx.source.TileWMSOptions);
         }
 
         class Vector {
@@ -3994,6 +4103,7 @@ declare module ol {
         }
 
         class XYZ {
+            constructor(opt_options?: olx.source.XYZOptions)
         }
 
         class Zoomify {
@@ -4015,6 +4125,7 @@ declare module ol {
         }
 
         class Circle {
+            constructor(opt_options?: olx.style.CircleOptions)
         }
 
         /**
@@ -4035,6 +4146,7 @@ declare module ol {
         }
 
         class Icon {
+            constructor(opt_options?: olx.style.IconOptions);
         }
 
         class Image {
@@ -4048,7 +4160,7 @@ declare module ol {
         }
 
         class Stroke {
-            constructor();
+            constructor(opt_options: olx.style.StrokeOptions);
         }
 
         /**
