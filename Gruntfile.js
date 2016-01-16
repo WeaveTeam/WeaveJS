@@ -47,7 +47,7 @@ module.exports = function (grunt) {
                 }
             },
             module: {
-                files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}],
+                files: [{'dist/WeaveUI.js':'outts/WeaveUI.jsx'}],
                 options: {
                     alias: null,
                     external: libraries,
