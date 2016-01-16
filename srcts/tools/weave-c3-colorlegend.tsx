@@ -57,6 +57,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     private spanStyle:CSSProperties;
 
     private keyDown:boolean;
+    private selectedBins:number[];
 
     constructor(props:IColorLegendProps) {
         super(props);
@@ -71,7 +72,8 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.probeKeySet = this.toolPath.push("probeKeySet");
         this.numberOfBins = this.binnedColumnPath.getValue("this.numberOfBins");
         this.state = {selected:[], probed:[]};
-
+        this.keyDown = false;
+        this.selectedBins = [];
         this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
 
@@ -100,7 +102,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         keys.forEach( (key:string) => {
             selectedBins.push(this.getBinIndexFromKey(key));
         });
-        return selectedBins;
+        return _.unique(selectedBins);
     }
 
     getProbedBins():number[] {
@@ -109,16 +111,27 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         keys.forEach( (key:string) => {
             probedBins.push(this.getBinIndexFromKey(key));
         });
-        return probedBins;
+        return _.unique(probedBins);
     }
 
-    handleClick(bin:number):void {
+    handleClick(bin:number,temp:any):void {
         var binnedKeys:any[] = this.binnedColumnPath.getObject()._binnedKeysArray;
         //setKeys
-        if(this.keyDown) {
-            this.toolPath.selection_keyset.addKeys(binnedKeys[bin]);
+        if(_.contains(this.selectedBins,bin)){
+            var currentSelection:any[] = this.toolPath.selection_keyset.getKeys();
+            currentSelection = _.difference(currentSelection,binnedKeys[bin]);
+            this.toolPath.selection_keyset.setKeys(currentSelection);
+            _.remove(this.selectedBins, (value:number) =>{
+                return value == bin;
+            });
         }else {
-            this.toolPath.selection_keyset.setKeys(binnedKeys[bin]);
+            if (this.keyDown) {
+                this.toolPath.selection_keyset.addKeys(binnedKeys[bin]);
+                this.selectedBins.push(bin);
+            } else {
+                this.toolPath.selection_keyset.setKeys(binnedKeys[bin]);
+                this.selectedBins = [bin];
+            }
         }
     }
 
@@ -129,7 +142,6 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         }else{
             this.toolPath.probe_keyset.setKeys([]);
         }
-
     }
 
     toggleKey(event:KeyboardEvent):void {
@@ -188,6 +200,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         if (selectedBins.length) {
             if (selectedBins.indexOf(bin) >= 0) {
                 selectedStyle.borderWidth = 1;
+                selectedStyle.opacity = 1;
             }else if(probedBins.indexOf(bin) == -1){
                 selectedStyle.opacity = 0.3;
             }
