@@ -189,7 +189,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.normalizedRecords = this.normalizeRecords(this.numericRecords, ["size"]);
         this.plotterState = this.paths.plotter.getUntypedState ? this.paths.plotter.getUntypedState() : this.paths.plotter.getState();
         this.normalizedPointSizes = this.normalizedRecords.map((normalizedRecord:Record) => {
-            if(this.plotterState && this.plotterState.sizeBy.length) {
+            if(this.plotterState && this.plotterState.sizeBy) {
                 let minScreenRadius = this.plotterState.minScreenRadius;
                 let maxScreenRadius = this.plotterState.maxScreenRadius;
                 return (normalizedRecord && normalizedRecord["size"] ?
@@ -428,6 +428,60 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                 },
                 y: {
                     show: true
+                }
+            },
+            tooltip: {
+                format: {
+                    title: (num:number):string => {
+                        return this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("this.getMetadata('title')");
+                    },
+                    name: (name:string, ratio:number, id:string, index:number):string => {
+                        return this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("this.getMetadata('title')");
+                    }
+                },
+                contents: (d:any, defaultTitleFormat:string, defaultValueFormat:string, color:any):string => {
+                    var $$ = this.chart.internal, config = $$.config,
+                        titleFormat = config.tooltip_format_title || defaultTitleFormat,
+                        nameFormat = config.tooltip_format_name || function (name) { return name; },
+                        valueFormat = config.tooltip_format_value || defaultValueFormat,
+                        text, i, title, value, name;
+                    if(d.length) {
+                        text = "<table class='" + $$.CLASS.tooltip + "'>";
+                        //xvalue text
+                        text += "<tr class='" + $$.CLASS.tooltipName + "-" + d[0].id + "'>";
+                        text += "<td class='name'>" + titleFormat(d[0].x) + "</td>";
+                        text += "<td class='value'>" + d[0].x + "</td>";
+                        text += "</tr>";
+
+                        //loop trhough all y dimensions of data (Scatter plot should only have 1)
+                        for (i = 0; i < d.length; i++) {
+                            if (!(d[i] && (d[i].value || d[i].value === 0))) {
+                                continue;
+                            }
+                            if (!text) {
+                                title = titleFormat ? titleFormat(d[i].x) : d[i].x;
+
+                            }
+                            name = nameFormat(d[i].name);
+                            value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
+
+                            text += "<tr class='" + $$.CLASS.tooltipName + "-" + d[i].id + "'>";
+                            text += "<td class='name'>" + name + "</td>";
+                            text += "<td class='value'>" + value + "</td>";
+                            text += "</tr>";
+                        }
+
+                        //sizeBy text
+                        var sizeByText = this.paths.sizeBy.getValue("this.getMetadata('title')");
+                        if(sizeByText) {
+                            text += "<tr class='" + $$.CLASS.tooltipName + "-" + d[0].id + "'>";
+                            text += "<td class='name'>" + sizeByText + "</td>";
+                            text += "<td class='value'>" + this.numericRecords[d[0].index]["size"] + "</td>";
+                            text += "</tr>";
+                        }
+
+                        return text + "</table>";
+                    }
                 }
             },
             point: {
