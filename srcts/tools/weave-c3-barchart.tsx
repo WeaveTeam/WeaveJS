@@ -232,30 +232,45 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 	}
 
     private selectionKeysChanged ():void {
-        if(!this.chart)
+        if(!this.chart || !this.heightColumnNames)
             return;
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
         var selectedIndices:number[] = selectedKeys.map((key:string) => {
             return Number(this.keyToIndex[key]);
+        });
+        var probedIndices:number[] = probedKeys.map((key:string) => {
+           return Number(this.keyToIndex[key]);
         });
         var keys:string[] = Object.keys(this.keyToIndex);
         var indices:number[] = keys.map((key:string) => {
             return Number(this.keyToIndex[key]);
         });
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
+        unselectedIndices = _.difference(unselectedIndices,probedIndices);
+        this.heightColumnNames.forEach((item:string) => {
+            if(selectedIndices.length) {
+                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 0.3, "stroke-opacity": 0.0});
+                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 1.0});
+                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":0.3});
+                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+            }else if(!probedIndices.length){
+                this.customSelectorStyle(indices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 0.5});
+                this.customSelectorStyle(indices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+            }
+        });
         if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
             this.chart.select(this.heightColumnNames, selectedIndices, true);
-        }else{
-            this.customStyle(indices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
+        }else if(!probedIndices.length){
             this.chart.select(this.heightColumnNames, [], true);
         }
-
     }
 
     private probedKeysChanged (): void {
+        if(!this.chart || !this.heightColumnNames)
+            return;
+
         var selectedKeys:string[] = this.toolPath.probe_keyset.getKeys();
         var selectedIndices:number[] = selectedKeys.map( (key:string) => {
             return Number(this.keyToIndex[key]);
@@ -266,12 +281,16 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         });
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
 
-        if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-        }else{
-            this.selectionKeysChanged()
-        }
+        this.heightColumnNames.forEach((item:string) => {
+            if(selectedIndices.length) {
+                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 0.3, "stroke-opacity": 0.0});
+                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 0.5});
+                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":0.3});
+                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+            }
+        });
+
+        this.selectionKeysChanged();
     }
 
     handleClick(event:MouseEvent):void {

@@ -62,7 +62,11 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             return;
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
         var selectedIndices:number[] = selectedKeys.map((key:string) => {
+            return Number(this.keyToIndex[key]);
+        });
+        var probedIndices:number[] = probedKeys.map((key:string) => {
             return Number(this.keyToIndex[key]);
         });
         var keys:string[] = Object.keys(this.keyToIndex);
@@ -71,6 +75,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         });
 
         var unselectedIndices = _.difference(indices, selectedIndices);
+        unselectedIndices = _.difference(unselectedIndices,probedIndices);
         if(selectedIndices.length) {
             //unfocus all circles
             d3.select(this.element).selectAll("circle").filter(".c3-shape").style("opacity", "0.1");
@@ -89,7 +94,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             this.customStyle(unselectedIndices, "path", ".c3-shape.c3-line", {opacity: 0.1});
             this.customStyle(selectedIndices, "path", ".c3-shape.c3-line", {opacity: 1.0});
             this.chart.select(["y"], selectedIndices, true);
-        }else{
+        }else if(!probedIndices.length){
             //focus all circles
             d3.select(this.element).selectAll("circle").filter(".c3-shape").style({opacity: 1.0, "stroke-opacity": 0.0});
             this.customStyle(indices, "path", ".c3-shape.c3-line", {opacity: 1.0});
@@ -125,8 +130,9 @@ class WeaveC3LineChart extends AbstractWeaveTool {
 
             this.customStyle(unselectedIndices, "path", ".c3-shape.c3-line", {opacity: 0.1});
             this.customStyle(selectedIndices, "path", ".c3-shape.c3-line", {opacity: 1.0});
+            this._selectionKeysChanged();
         } else {
-            this._selectionKeysChanged()
+            this._selectionKeysChanged();
         }
     }
 

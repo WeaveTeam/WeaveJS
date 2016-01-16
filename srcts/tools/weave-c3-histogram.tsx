@@ -203,17 +203,23 @@ class WeaveC3Histogram extends AbstractWeaveTool {
             return;
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
         var selectedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
             return _.includes(selectedKeys, record["id"]);
         });
+        var probedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
+            return _.includes(probedKeys, record["id"]);
+        });
         var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
+        var probedBinIndices:number[] = _.pluck(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn');
         var binIndices:number[] = _.pluck(_.uniq(this.numericRecords, 'binnedColumn'), 'binnedColumn');
         var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
+        unselectedBinIndices = _.difference(unselectedBinIndices,probedBinIndices);
 
         if(selectedBinIndices.length) {
             this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-        }else{
+        }else if(!probedBinIndices.length){
             this.customStyle(binIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
             this.chart.select(this.heightColumnNames, [], true);
         }
@@ -231,8 +237,9 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         if(selectedBinIndices.length) {
             this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
+            this._selectionKeysChanged();
         }else{
-            this._selectionKeysChanged()
+            this._selectionKeysChanged();
         }
     }
 

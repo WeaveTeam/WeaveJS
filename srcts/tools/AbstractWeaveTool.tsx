@@ -102,4 +102,11 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
         		d3.select(filtered[0][index]).style(style);
         });
     }
+
+    customSelectorStyle(array:Array<number>, selector, style:any) {
+        array.forEach( (index) => {
+            if (selector.length)
+                d3.select(selector[0][index]).style(style);
+        });
+    }
 }

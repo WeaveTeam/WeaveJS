@@ -220,8 +220,12 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             return;
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
         var selectedIndices:number[] = selectedKeys.map((key:string) => {
             return Number(this.keyToIndex[key]);
+        });
+        var probedIndices:number[] = probedKeys.map((key:string) => {
+           return Number(this.keyToIndex[key]);
         });
         var keys:string[] = Object.keys(this.keyToIndex);
         var indices:number[] = keys.map((key:string) => {
@@ -229,11 +233,15 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         });
 
         var unselectedIndices:number[] = _.difference(indices, selectedIndices);
+        unselectedIndices = _.difference(unselectedIndices,probedIndices);
+        if(probedIndices.length){
+            this.customStyle(probedIndices, "circle", ".c3-shape", {opacity:1.0, "stroke-opacity": 0.0});
+        }
         if(selectedIndices.length) {
             this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
             this.chart.select(["y"], selectedIndices, true);
-        }else{
+        }else if (!probedIndices.length){
             this.customStyle(indices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.0});
             this.chart.select(["y"], [], true);
         }
@@ -254,8 +262,9 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         if(selectedIndices.length) {
             this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.0});
+            this._selectionKeysChanged();
         }else{
-            this._selectionKeysChanged()
+            this._selectionKeysChanged();
         }
 
     }
