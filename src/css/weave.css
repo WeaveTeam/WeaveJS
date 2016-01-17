@@ -25,19 +25,19 @@
 .list-group-item.active, .list-group-item.active:focus {
     z-index: 2;
     color: -webkit-text;
-    background-color: #DAE2FC;
+    background-color: #D1D1E1;
     border: 1px solid #ddd;
 }
 
 .list-group-item.active:hover {
     z-index: 2;
     color: -webkit-text;
-    background-color: #DCC6DC;
+    background-color: #E0E0EB;
     border: 1px solid #ddd;
 }
 
 button.list-group-item:hover {
-    background-color: rgba(224, 141, 157, 0.4);
+    background-color: rgba(224, 224, 235, 0.4);
 }
 
 .react-bs-container .table-container>table>tbody>tr>td, .react-bs-container .table-container>table>thead>tr>th, .react-bs-container .table-header>table>thead>tr>th .table-header-column {

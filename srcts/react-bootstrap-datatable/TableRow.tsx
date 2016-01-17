@@ -41,17 +41,17 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         super(props);
 
         this.selectedStyle = {
-            backgroundColor: "#DAE2FC"
+            backgroundColor: "#D1D1E1"
         };
 
         this.clear = {};
 
         this.probedAndSelected = {
-            backgroundColor: "#DCC6DC"
+            backgroundColor: "#E0E0EB"
         };
 
         this.probedStyle = {
-            backgroundColor: "rgba(224, 141, 157, 0.4)"
+            backgroundColor: "rgba(224, 224, 235, 0.4)"
         }
     }
 
