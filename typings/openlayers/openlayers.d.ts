@@ -2380,6 +2380,8 @@ declare module ol {
 
         class Control {
             constructor(options?: olx.control.ControlOptions);
+
+            getMap():ol.Map;
         }
 
         class FullScreen {
@@ -2499,11 +2501,25 @@ declare module ol {
     }
 
     module events {
-        module condition {
-        }
-
         interface ConditionType { (event: ol.MapBrowserEvent ): boolean}
 
+        class condition {
+            static altKeyOnly:ol.events.ConditionType;
+            static altShiftKeysOnly:ol.events.ConditionType;
+            static always:ol.events.ConditionType;
+            static click:ol.events.ConditionType;
+            static doubleClick:ol.events.ConditionType;
+            static mouseOnly:ol.events.ConditionType;
+            static never:ol.events.ConditionType;
+            static noModifierKeys:ol.events.ConditionType;
+            static platformModifierKeyOnly:ol.events.ConditionType;
+            static pointerMove:ol.events.ConditionType;
+            static shiftKeyOnly:ol.events.ConditionType;
+            static singleClick:ol.events.ConditionType;
+            static targetNotEditable:ol.events.ConditionType;
+        }
+
+        
     }
 
     module extent {
