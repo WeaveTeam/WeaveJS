@@ -4,7 +4,8 @@ import $ from "jquery";
 import StandardLib from "../outts/utils/StandardLib.js";
 import JSZip from "jszip";
 /* eslint-disable */
-import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
+import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
+// import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
 /* eslint-enable */
 
 /*global Weave, weavejs*/
@@ -12,7 +13,7 @@ import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
 // temporary solution
 weavejs.util.JS.JSZip = JSZip;
 
-var weave = window.weave || (opener && opener.weave);
+var weave = window.weave;
 
 var urlParams = StandardLib.getUrlParams();
 if (!weave && urlParams.file) {

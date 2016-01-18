@@ -42,6 +42,11 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
         super(props);
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
+
     private selectionKeysChanged():void {
         if(!this.chart)
             return;
@@ -176,6 +181,8 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
 
         this.initializePaths(manifest);
 
+       	this.paths.filteredKeySet.getObject().setSingleKeySource(this.paths.data.getObject());
+        
         this.c3Config = {
             //size: this.getElementSize(),
             bindto: this.element,
@@ -257,3 +264,4 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
 }
 
 registerToolImplementation("weave.visualization.tools::PieChartTool", WeaveC3PieChart);
+//Weave.registerClass("weavejs.tools.PieChartTool", WeaveC3PieChart, [weavejs.api.core.ILinkableObjectWithNewProperties]);

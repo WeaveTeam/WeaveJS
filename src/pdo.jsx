@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import CustomSearchTool from "./CustomSearchTool.jsx";
+import CustomSearchTool from "../outts/CustomSearchTool.jsx";
 import CustomCardViewTool from "./CustomCardViewTool.jsx";
 import ui from "../outts/react-ui/ui.jsx";
 import _ from "lodash";
@@ -8,7 +8,7 @@ import _ from "lodash";
 import * as bs from "react-bootstrap";
 import Navbar from "./Navbar.jsx";
 import StandardLib from "../outts/utils/StandardLib.js";
-import WeaveLayoutManager from "./WeaveLayoutManager.jsx";
+import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
 /*global Weave, weavejs*/
 
 //var Menu = ReactBurgerMenu.slide;

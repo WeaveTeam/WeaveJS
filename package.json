@@ -44,6 +44,7 @@
     "d3": "^3.5.9",
     "inline-style-prefixer": "^0.5.4",
     "jquery": "^2.1.4",
+    "jquery-resizable-columns": "^0.2.3",
     "jszip": "^2.5.0",
     "lodash": "^3.10.0",
     "openlayers": "^3.11.2",
@@ -51,7 +52,6 @@
     "react": "^0.14.3",
     "react-bootstrap": "^0.28.1",
     "react-bootstrap-async-autocomplete": "0.0.3",
-    "react-bootstrap-table": "^1.4.0",
     "react-date-picker": "^3.1.8",
     "react-vendor-prefix": "0.0.1",
     "swfobject-amd": "^2.3.1"

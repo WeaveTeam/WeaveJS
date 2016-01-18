@@ -1,6 +1,6 @@
 /*global module */
 
-var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'react-bootstrap', 'openlayers', 'jszip'];
+var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'react-bootstrap', 'openlayers', 'jszip', 'radium', 'react-vendor-prefix', 'react-date-picker', 'swfobject-amd'];
 var libraries_colon = libraries.map(function (d) { return d + ":"});
 
 module.exports = function (grunt) {
@@ -47,7 +47,7 @@ module.exports = function (grunt) {
                 }
             },
             module: {
-                files: [{'dist/WeaveUI.js':'src/WeaveUI.jsx'}],
+                files: [{'dist/WeaveUI.js':'outts/WeaveUI.jsx'}],
                 options: {
                     alias: null,
                     external: libraries,

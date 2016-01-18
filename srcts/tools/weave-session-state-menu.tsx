@@ -1,0 +1,70 @@
+///<reference path="../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../typings/react/react.d.ts"/>
+///<reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
+///<reference path="../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../utils/StandardLib.ts"/>
+
+import AbstractWeaveTool from "./AbstractWeaveTool";
+import {registerToolImplementation} from "../WeaveTool";
+import * as React from "react";
+import {ListGroupItem, ListGroup} from "react-bootstrap";
+import * as _ from "lodash";
+import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
+import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
+import {MouseEvent} from "react";
+import {CSSProperties} from "react";
+
+//TODO: This is a hack to allow react to be imported in generated JSX. Without this, import is missing and render encounters an exception
+var stub:any = React;
+const sessionStateMenuStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column", overflow:"auto"};
+
+class SessionStateMenuTool extends AbstractWeaveTool {
+    private choices:WeavePath;
+    protected toolPath:WeavePath;
+
+    constructor(props:IAbstractWeaveToolProps) {
+        super(props);
+        this.toolPath.push("choices").addCallback(this, this.forceUpdate);
+        this.toolPath.push("selectedChoice").addCallback(this, this.forceUpdate);
+    }
+
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
+
+    componentDidMount() {
+    }
+
+    handleItemClick(index:number, event:MouseEvent):void {
+        this.toolPath.state("selectedChoice", this.choices.getNames()[index]);
+        var targets:WeavePath = this.toolPath.push("targets");
+        var choice:any = this.choices.getState(index);
+        targets.forEach(choice, function (value:any, key:string) {
+            this.push(key, null).state(value)
+        });
+    }
+
+    render() {
+        this.choices = this.toolPath.push("choices");
+        var selectedChoice:string = this.toolPath.getState("selectedChoice");
+
+        var menus:JSX.Element[] = this.choices.getNames().map((choice:string, index:number) => {
+            return choice === selectedChoice ? <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
+                : <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
+        });
+
+        return (<div style={sessionStateMenuStyle}>
+            <ListGroup>
+                {
+                    menus
+                }
+            </ListGroup>
+        </div>);
+    }
+}
+
+export default SessionStateMenuTool;
+
+registerToolImplementation("weave.ui::SessionStateMenuTool", SessionStateMenuTool);
+//Weave.registerClass("weavejs.tools.SessionStateMenuTool", SessionStateMenuTool, [weavejs.api.core.ILinkableObjectWithNewProperties]);

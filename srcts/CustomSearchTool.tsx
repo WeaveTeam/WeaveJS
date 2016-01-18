@@ -1,8 +1,15 @@
-import React from "react";
+/// <reference path="../typings/react/react.d.ts"/>
+/// <reference path="../typings/react-bootstrap/react-bootstrap.d.ts"/>
+/// <reference path="../typings/react-bootstrap/react-bootstrap-custom.d.ts"/>
+
+import * as React from "react";
 import * as bs from "react-bootstrap";
-import _ from "lodash";
-import {registerToolImplementation} from "../outts/WeaveTool.jsx";
-import DatePicker from "react-date-picker";
+import {Dropdown} from "react-bootstrap";
+import * as _ from "lodash";
+import {registerToolImplementation} from "./WeaveTool";
+import * as DatePicker from "react-date-picker";
+
+declare var Dropdown:any;
 
 var customSearchStyle = {
     display: "flex",
@@ -25,8 +32,11 @@ var glyphStyle = {
     fontSize: "12px"
 };
 
-class CustomSearchTool extends React.Component {
+class CustomSearchTool extends React.Component<any, any> {
 
+    searchFields:any;
+    updateStateFuncs:any;
+    debouncedComponentDidUpdate:any;
 
     constructor(props) {
         super(props);
@@ -94,7 +104,7 @@ class CustomSearchTool extends React.Component {
     }
 
     updateStateDateField(label, event) {
-        var datePicker = this.refs["datePicker" + label];
+        var datePicker:any = this.refs["datePicker" + label] as any;
 
         // set the datepicker date so that it moves to that view
         if(datePicker) {
@@ -112,7 +122,7 @@ class CustomSearchTool extends React.Component {
             searchObject: components
         }, () => {
 	        if(!Object.keys(this.state.searchObject).length) {
-	          this.submitSearch();
+	          this.submitSearch({});
 	        }
         });
     }
@@ -142,7 +152,7 @@ class CustomSearchTool extends React.Component {
                                             <bs.Glyphicon glyph="remove" style={glyphStyle}/>
                                   </bs.Button>;
 
-                var searchInput = "";
+                var searchInput:any = "";
 
 
                 if(type === "date") {
@@ -187,15 +197,15 @@ class CustomSearchTool extends React.Component {
         }
         return (
             <div style={customSearchStyle}>
-                <bs.Dropdown id="dropdown" title="Dropdown" bsSize={this.props.bsSize} bsStyle="primary" onSelect={this.handleDropdownSelect.bind(this)}>
-                    <bs.Dropdown.Toggle bsStyle="primary">
+                <Dropdown id="dropdown" title="Dropdown" bsSize={this.props.bsSize} bsStyle="primary" onSelect={this.handleDropdownSelect.bind(this)}>
+                    <Dropdown.Toggle bsStyle="primary">
                         <bs.Glyphicon glyph="search"/>
-                    </bs.Dropdown.Toggle>
-                    <bs.Dropdown.Menu>
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
                         {menuItems}
-                    </bs.Dropdown.Menu>
-                </bs.Dropdown>
-                <form onsubmit={this.submitSearch.bind(this)} style={customSearchStyle}>
+                    </Dropdown.Menu>
+                </Dropdown>
+                <form onSubmit={this.submitSearch.bind(this)} style={customSearchStyle}>
                     {
                         inputs
                     }

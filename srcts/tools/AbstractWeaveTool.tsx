@@ -68,6 +68,11 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
         });
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+    {
+
+    }
+
     componentDidUpdate () {
 
     }
@@ -95,6 +100,13 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
         	var filtered = d3.select(this.element).selectAll(type).filter(filter);
         	if (filtered.length)
         		d3.select(filtered[0][index]).style(style);
+        });
+    }
+
+    customSelectorStyle(array:Array<number>, selector, style:any) {
+        array.forEach( (index) => {
+            if (selector.length)
+                d3.select(selector[0][index]).style(style);
         });
     }
 }

@@ -550,6 +550,7 @@ declare module c3 {
          */
         outer?: boolean;
         multiline?: boolean; // Undocumented
+        width?: number; // Undocumented
     }
 
     interface YTickConfiguration {
@@ -1060,6 +1061,8 @@ declare module c3 {
          * Reset the chart object and remove element and events completely.
          */
         destroy(): void;
+
+        internal: any;
     }
 
     interface GridOperations {

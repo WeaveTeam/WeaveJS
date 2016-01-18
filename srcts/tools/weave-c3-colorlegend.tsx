@@ -1,4 +1,4 @@
-/// <reference path="../../typings/d3/d3.d.ts"/>
+// <reference path="../../typings/d3/d3.d.ts"/>
 /// <reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
 /// <reference path="../../typings/weave/WeavePath.d.ts"/>
@@ -16,6 +16,8 @@ import ui from "../react-ui/ui";
 import {IAbstractWeaveToolProps, IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import StandardLib from "../utils/StandardLib";
 import * as ReactDOM from "react-dom";
+import {CSSProperties} from "react";
+import * as Prefixer from "react-vendor-prefix";
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -52,8 +54,10 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     private probeKeySet:WeavePath;
     private numberOfBins:number;
     private toolPath:WeavePath;
+    private spanStyle:CSSProperties;
 
     private keyDown:boolean;
+    private selectedBins:number[];
 
     constructor(props:IColorLegendProps) {
         super(props);
@@ -67,22 +71,67 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.selectionKeySet = this.toolPath.push("selectionKeySet");
         this.probeKeySet = this.toolPath.push("probeKeySet");
         this.numberOfBins = this.binnedColumnPath.getValue("this.numberOfBins");
+        this.state = {selected:[], probed:[]};
+        this.keyDown = false;
+        this.selectedBins = [];
+        this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
+
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
 
     private setupCallbacks() {
         this.dynamicColorColumnPath.addCallback(this, this.forceUpdate);
         this.maxColumnsPath.addCallback(this, this.forceUpdate);
         this.filteredKeySet.addCallback(this, this.forceUpdate);
         this.plotterPath.push("shapeSize").addCallback(this, this.forceUpdate);
+        this.binnedColumnPath.addCallback(this, this.forceUpdate);
+        this.toolPath.selection_keyset.addCallback(this, this.forceUpdate);
+        this.toolPath.probe_keyset.addCallback(this, this.forceUpdate);
     }
 
-    handleClick(bin:number):void {
+    getBinIndexFromKey(key:any):number {
+        return this.binnedColumnPath.getObject().getValueFromKey(key,Number);
+    }
+
+    getSelectedBins():number[] {
+        var keys = this.toolPath.selection_keyset.getKeys();
+        var selectedBins:number[] = [];
+        keys.forEach( (key:string) => {
+            selectedBins.push(this.getBinIndexFromKey(key));
+        });
+        return _.unique(selectedBins);
+    }
+
+    getProbedBins():number[] {
+        var keys = this.toolPath.probe_keyset.getKeys();
+        var probedBins:number[] = [];
+        keys.forEach( (key:string) => {
+            probedBins.push(this.getBinIndexFromKey(key));
+        });
+        return _.unique(probedBins);
+    }
+
+    handleClick(bin:number,temp:any):void {
         var binnedKeys:any[] = this.binnedColumnPath.getObject()._binnedKeysArray;
         //setKeys
-        if(!this.keyDown) {
-            this.toolPath.selection_keyset.addKeys(binnedKeys[bin]);
+        if(_.contains(this.selectedBins,bin)){
+            var currentSelection:any[] = this.toolPath.selection_keyset.getKeys();
+            currentSelection = _.difference(currentSelection,binnedKeys[bin]);
+            this.toolPath.selection_keyset.setKeys(currentSelection);
+            _.remove(this.selectedBins, (value:number) =>{
+                return value == bin;
+            });
         }else {
-            this.toolPath.selection_keyset.setKeys(binnedKeys[bin]);
+            if (this.keyDown) {
+                this.toolPath.selection_keyset.addKeys(binnedKeys[bin]);
+                this.selectedBins.push(bin);
+            } else {
+                this.toolPath.selection_keyset.setKeys(binnedKeys[bin]);
+                this.selectedBins = [bin];
+            }
         }
     }
 
@@ -93,7 +142,6 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         }else{
             this.toolPath.probe_keyset.setKeys([]);
         }
-
     }
 
     toggleKey(event:KeyboardEvent):void {
@@ -114,64 +162,6 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     drawContinuousPlot() {
 
     }
-    //drawBinnedPlot(numberOfBins:number) {
-    //    // clear the svg and rerender everything
-    //    this.svg.selectAll("*").remove();
-    //
-    //    var width:number = this.element.clientWidth;
-    //    var height:number = this.element.clientHeight;
-    //
-    //    var shapeSize:number = this.plotterPath.getState("shapeSize");
-    //    var shapeType:string = this.plotterPath.getState("shapeType");
-    //
-    //    var ramp:any[] = this.dynamicColorColumnPath.getState("ramp");
-    //
-    //    var yScale:Function = d3.scale.linear().domain([0, numberOfBins + 1]).range([0, height]);
-    //
-    //    var yMap:Function = (d:number):number => { return yScale(d); };
-    //
-    //    if(width && height && numberOfBins) {
-    //        this.svg.attr("width", width).attr("height", height);
-    //    }
-    //
-    //    this.svg.append("text")
-    //            .attr("y", yMap(0.5))
-    //            .attr("x", 10)
-    //            .text(this.dynamicColorColumnPath.getValue("this.getMetadata('title')"))
-    //             .attr("font-family", "sans-serif")
-    //             .attr("font-size", "12px");
-    //
-    //    shapeSize = _.max([1, _.min([shapeSize, height / numberOfBins])]);
-    //
-    //    let r:number = (shapeSize / 100 * height / numberOfBins) / 2;
-    //
-    //    var textLabelFunction:Function = this.binnedColumnPath.getValue("this.deriveStringFromNumber.bind(this)            ");
-    //
-    //    for(var i = 0; i < numberOfBins; i++) {
-    //        switch(shapeType) {
-    //            case SHAPE_TYPE_CIRCLE :
-    //                this.svg.append("circle")
-    //                         .attr("cx", 25)
-    //                         .attr("cy", yMap(i + 1))
-    //                         .attr("r", r)
-    //                         .style("fill", "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, numberOfBins - 1), ramp)))
-    //                         .style("stroke", "black")
-    //                         .style("stroke-opacity", 0.5);
-    //                this.svg.append("text")
-    //                         .attr("x", 50)
-    //                         .attr("y", yMap(i + 1) + r / 2)
-    //                         .text(textLabelFunction(i))
-    //                         .attr("font-family", "sans-serif")
-    //                         .attr("font-size", "12px");
-    //                break;
-    //            case SHAPE_TYPE_SQUARE :
-    //                break;
-    //
-    //            case SHAPE_TYPE_LINE :
-    //                break;
-    //        }
-    //    }
-    //}
 
     selectionKeysChanged() {
 
@@ -188,6 +178,36 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     componentWillUnmount() {
     }
 
+    getInteractionStyle(bin:number):CSSProperties {
+        var selectedStyle:CSSProperties = {
+            width:"100%",
+            flex:1.0,
+            borderWidth:0,
+            borderColor:"black",
+            borderStyle:"solid",
+            opacity: 1.0
+        };
+
+        var probedBins:number[] = this.getProbedBins();
+        if(probedBins.length){
+            if (probedBins.indexOf(bin) >= 0) {
+                selectedStyle.opacity = 1;
+            }else{
+                selectedStyle.opacity = 0.3;
+            }
+        }
+        var selectedBins:number[] = this.getSelectedBins();
+        if (selectedBins.length) {
+            if (selectedBins.indexOf(bin) >= 0) {
+                selectedStyle.borderWidth = 1;
+                selectedStyle.opacity = 1;
+            }else if(probedBins.indexOf(bin) == -1){
+                selectedStyle.opacity = 0.3;
+            }
+        }
+        return selectedStyle;
+    }
+
     render() {
         this.numberOfBins = this.binnedColumnPath.getValue("this.numberOfBins");
         if(this.numberOfBins) {
@@ -196,7 +216,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             var height:number = this.props.height;
             var shapeSize:number = this.plotterPath.getState("shapeSize");
             var shapeType:string = this.plotterPath.getState("shapeType");
-            var maxColumns:number = this.maxColumnsPath.getState();
+            var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
             var columnFlex:number = 1.0/maxColumns;
             var extraBins:number = this.numberOfBins%maxColumns == 0 ? 0 : maxColumns-(this.numberOfBins%maxColumns);
             var ramp:any[] = this.dynamicColorColumnPath.getState("ramp");
@@ -207,6 +227,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             var r:number = (shapeSize / 100 * height / this.numberOfBins) / 2;
             var textLabelFunction:Function = this.binnedColumnPath.getValue("this.deriveStringFromNumber.bind(this)");
             var finalElements:any[] = [];
+            var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
             for(var j:number = 0; j<maxColumns; j++) {
                 switch(shapeType) {
                     case SHAPE_TYPE_CIRCLE :
@@ -218,7 +239,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
 
                                 if(i<this.numberOfBins){
                                     element.push(
-                                        <ui.HBox key={i} style={{width:"100%",flex:1.0}} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
+                                        <ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
                                                 <ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
                                                     <svg style={{position:"absolute"}}
                                                          viewBox="0 0 100 100" width="100%" height="100%">
@@ -226,7 +247,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                                                     </svg>
                                                 </ui.HBox>
                                                 <ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
-                                                     <span style={{textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5}}>{textLabelFunction(i)}</span>
+                                                     <span style={prefixerStyle}>{textLabelFunction(i)}</span>
                                                 </ui.HBox>
                                         </ui.HBox>
                                     );
@@ -238,21 +259,21 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                             }
                         }
                         {
-                            this.props.width > this.props.height ?
+                            this.props.width > this.props.height * 2 ?
                                 elements.push(
-                                    <ui.VBox key={i} style={{height:"100%", flex: columnFlex}}>
+                                    <ui.HBox key={i} style={{width:"100%", flex: columnFlex}}>
                                         {
                                             element
                                             }
-                                    </ui.VBox>
+                                    </ui.HBox>
                                 )
                                 :
                             elements.push(
-                                <ui.HBox key={i} style={{width:"100%", flex: columnFlex}}>
+                                <ui.VBox key={i} style={{height:"100%", flex: columnFlex}}>
                                     {
                                         element
                                         }
-                                </ui.HBox>
+                                </ui.VBox>
                             );
 
                         }
@@ -272,10 +293,10 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
                 <ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
                     <ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
-                        <span style={{textAlign:"left",fontFamily:"sans-serif", fontSize:"12px", verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis"}}>{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</span>
+                        <span style={prefixerStyle}>{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</span>
                     </ui.HBox>
                     {
-                        this.props.width > this.props.height ?
+                        this.props.width > this.props.height * 2 ?
                         <ui.HBox style={{width:"100%", flex: 0.9}}> {
                             finalElements
                             }
@@ -301,3 +322,4 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
 export default WeaveC3ColorLegend;
 
 registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);
+//Weave.registerClass("weavejs.tools.ColorBinLegendTool", WeaveC3ColorLegend, [weavejs.api.core.ILinkableObjectWithNewProperties]);

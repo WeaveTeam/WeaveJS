@@ -26,8 +26,6 @@ export interface LayoutProps extends React.Props<Layout> {
     onStateChange: Function;
     pane1?: string;
     pane2?:string;
-    key: number;
-    ref: string;
     weave?: any
 }
 
@@ -83,14 +81,14 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
       }
     }
 
-    public getDOMNodeFromId (id: number): Element {
+    public getDOMNodeFromId (id:string[]): Element {
         var component = this.getComponentFromId(id);
         if(component) {
           return component.element;
         }
     }
 
-    private getComponentFromId (id: number): Layout {
+    private getComponentFromId (id:string[]): Layout {
       if(this.state.id && _.isEqual(this.state.id, id)) {
         return this;
       } else {

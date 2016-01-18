@@ -8,7 +8,7 @@ import * as lodash from "lodash";
 import * as jquery from "jquery";
 
 import AbstractWeaveTool from "./AbstractWeaveTool";
-
+import {registerToolImplementation} from "../WeaveTool";
 /* eslint-disable */
 import Layer from "./OpenLayersMap/Layers/Layer";
 import FeatureLayer from "./OpenLayersMap/Layers/FeatureLayer";
@@ -110,7 +110,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 
 		if (!lodash.every(extent, Number.isFinite))
 		{
-			extent = null;
+			extent = undefined;
 		}
 
 		let projection = this.toolPath.push("projectionSRS").getState() || "EPSG:3857";
@@ -249,8 +249,8 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		var addedNames = lodash.difference(newNames, oldNames);
 
 		removedNames.forEach(function (name) {
-			if (this.layers.get(name)) { 
-				this.layers.get(name).dispose(); 
+			if (this.layers.get(name)) {
+				this.layers.get(name).dispose();
 			}
 			this.layers.delete(name);
 		}, this);
@@ -278,5 +278,5 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 }
 
 export default WeaveOpenLayersMap;
-
-Weave.registerClass("weave.visualization.tools::MapTool", WeaveOpenLayersMap, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+registerToolImplementation("weave.visualization.tools::MapTool", WeaveOpenLayersMap);
+//Weave.registerClass("weave.visualization.tools::MapTool", WeaveOpenLayersMap, [weavejs.api.core.ILinkableObjectWithNewProperties]);

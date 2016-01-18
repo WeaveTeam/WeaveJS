@@ -35,8 +35,8 @@ export function getToolImplementation(asClassName:string):any {
 
 interface IWeaveToolProps extends React.Props<WeaveTool> {
     toolPath:WeavePath;
-    toolProps:IAbstractWeaveToolProps;
-    toolClass:string;
+    toolProps?:IAbstractWeaveToolProps;
+    toolClass?:string;
     style:CSSProperties;
     onDragStart:React.MouseEvent;
     onDragEnd:React.MouseEvent;
@@ -94,7 +94,7 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
     get title():string {
         if(this.toolPath) {
             return this.toolPath.getValue("this.hasOwnProperty('title') ? this.title : ''")
-                || (this.toolPath.getType('title') ? this.toolPath.getState('title') : '')
+                || (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '')
                 || this.toolPath.getPath().pop();
         } else {
             return this.tool ? this.tool.title : "";
@@ -121,7 +121,8 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
             overflow: "hidden",
             whiteSpace: "nowrap",
             flex: 1,
-            textOverflow: "ellipsis"
+            textOverflow: "ellipsis",
+            paddingTop: "3"
         };
 
         var transitions:CSSProperties = {
@@ -158,7 +159,7 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
                     {/*<ui.HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
                         <Glyphicon glyph="cog"/>
                     </ui.HBox>*/}
-                    <p style={titleStyle}>{this.title}</p>
+                    <span style={titleStyle}>{this.title}</span>
                     {/*<ui.HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
                         <div style={{marginRight: 5}}>
                             <Glyphicon glyph="unchecked"/>

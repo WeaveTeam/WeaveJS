@@ -4,7 +4,8 @@
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
 ///<reference path="../utils/StandardLib.ts"/>
-
+/// <reference path="../../typings/weave/weavejs.d.ts"/>
+/// <reference path="../../typings/weave/Weave.d.ts"/>
 
 import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
@@ -18,7 +19,6 @@ import {ElementSize} from "./AbstractWeaveTool";
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
 import StandardLib from "../utils/StandardLib";
-
 
 interface IBarchartPaths extends IAbstractWeaveToolPaths {
     plotter: WeavePath;
@@ -144,11 +144,23 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                         position: "outer-center"
                     },
                     tick: {
-                        fit: false,
-                        multiline: true,
+                        rotate: -45,
+                        multiline: false,
                         format: (num:number):string => {
                             if(this.stringRecords && this.stringRecords[num]) {
-                                return this.stringRecords[num]["xLabel"] as string;
+                                if(this.element && this.getElementSize().height > 0) {
+                                    var labelHeight:number = (this.getElementSize().height* 0.2)/Math.cos(45*(Math.PI/180));
+                                    var labelString:string = (this.stringRecords[num]["xLabel"] as string);
+                                    if(labelString) {
+                                        var stringSize:number = StandardLib.getTextWidth(labelString, "14pt Helvetica Neue");
+                                        var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
+                                        return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
+                                    }else{
+                                        return "";
+                                    }
+                                }else {
+                                    return this.stringRecords[num]["xLabel"] as string;
+                                }
                             } else {
                                 return "";
                             }
@@ -172,6 +184,21 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                                 return String(FormatUtils.defaultNumberFormatting(num));
                             }
                         }
+                    }
+                }
+            },
+            tooltip: {
+                format: {
+                    title: (num:number):string => {
+                        if(this.stringRecords && this.stringRecords[num]) {
+                            return this.stringRecords[num]["xLabel"] as string;
+                        }else{
+                            return "";
+                        }
+                    },
+                    name: (name:string, ratio:number, id:string, index:number):string => {
+                        var labelIndex:number = this.heightColumnNames.indexOf(name);
+                        return (this.heightColumnsLabels ? this.heightColumnsLabels[labelIndex] : "");
                     }
                 }
             },
@@ -199,31 +226,51 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         };
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+
+	}
+
     private selectionKeysChanged ():void {
-        if(!this.chart)
+        if(!this.chart || !this.heightColumnNames)
             return;
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
         var selectedIndices:number[] = selectedKeys.map((key:string) => {
             return Number(this.keyToIndex[key]);
+        });
+        var probedIndices:number[] = probedKeys.map((key:string) => {
+           return Number(this.keyToIndex[key]);
         });
         var keys:string[] = Object.keys(this.keyToIndex);
         var indices:number[] = keys.map((key:string) => {
             return Number(this.keyToIndex[key]);
         });
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
+        unselectedIndices = _.difference(unselectedIndices,probedIndices);
+        this.heightColumnNames.forEach((item:string) => {
+            if(selectedIndices.length) {
+                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 0.3, "stroke-opacity": 0.0});
+                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 1.0});
+                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":0.3});
+                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+            }else if(!probedIndices.length){
+                this.customSelectorStyle(indices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 0.5});
+                this.customSelectorStyle(indices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+            }
+        });
         if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
             this.chart.select(this.heightColumnNames, selectedIndices, true);
-        }else{
-            this.customStyle(indices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
+        }else if(!probedIndices.length){
             this.chart.select(this.heightColumnNames, [], true);
         }
-
     }
 
     private probedKeysChanged (): void {
+        if(!this.chart || !this.heightColumnNames)
+            return;
+
         var selectedKeys:string[] = this.toolPath.probe_keyset.getKeys();
         var selectedIndices:number[] = selectedKeys.map( (key:string) => {
             return Number(this.keyToIndex[key]);
@@ -234,12 +281,16 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         });
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
 
-        if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-            this.customStyle(selectedIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-        }else{
-            this.selectionKeysChanged()
-        }
+        this.heightColumnNames.forEach((item:string) => {
+            if(selectedIndices.length) {
+                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 0.3, "stroke-opacity": 0.0});
+                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 0.5});
+                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":0.3});
+                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+            }
+        });
+
+        this.selectionKeysChanged();
     }
 
     handleClick(event:MouseEvent):void {
@@ -263,12 +314,12 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         // }, 10);
     }
 
-    _axisChanged () {
+    private axisChanged():void {
         if(!this.chart)
             return;
 
         if(this.busy) {
-            setTimeout(this._axisChanged, 20);
+            setTimeout(this.axisChanged, 20);
             return;
         }
 
@@ -285,11 +336,13 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     handleShowValueLabels () {
+        if(!this.chart)
+            return;
         this.showValueLabels = this.paths.showValueLabels.getState();
         this.chart.flush();
     }
 
-    _updateColumns() {
+    private updateColumns():void {
         this.heightColumnNames = [];
         this.heightColumnsLabels = [];
 
@@ -306,7 +359,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         }
     }
 
-    _dataChanged() {
+    private dataChanged():void {
         if(!this.chart) {
             return;
         }
@@ -315,7 +368,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             return;
         }
 
-        this._updateColumns();
+        this.updateColumns();
 
         var heightColumns:WeavePath[] = this.paths.heightColumns.getChildren();
 
@@ -451,8 +504,15 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     componentDidUpdate() {
         super.componentDidUpdate();
         var newElementSize = this.getElementSize();
+
         if(!_.isEqual(newElementSize, this.elementSize)) {
-            this.chart.resize(newElementSize);
+            if(this.paths.labelColumn.getState().length){
+                this.c3Config.axis.x.height = newElementSize.height * 0.2;
+            }else{
+                this.c3Config.axis.x.height = null;
+            }
+            this.c3Config.size = newElementSize;
+            this.chart= generate(this.c3Config);
             this.elementSize = newElementSize;
         }
     }
@@ -468,37 +528,37 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         super.componentDidMount();
         document.addEventListener("keydown", this.toggleKey.bind(this));
         document.addEventListener("keyup", this.toggleKey.bind(this));
-        var axisChanged:Function = _.debounce(this._axisChanged.bind(this), 100);
-        var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
-        var handleShowValueLabels:Function = _.debounce(this.handleShowValueLabels.bind(this), 10);
-        var selectionKeySetChanged:Function = this.selectionKeysChanged.bind(this);
-        var probeKeySetChanged:Function = _.debounce(this.probedKeysChanged.bind(this), 100);
-        var rotateAxes:Function = _.debounce(this.rotateAxes.bind(this), 10);
 
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
             { name: "plotter", path: plotterPath, callbacks: null},
-            { name: "heightColumns", path: plotterPath.push("heightColumns"), callbacks: [dataChanged, axisChanged] },
-            { name: "labelColumn", path: plotterPath.push("labelColumn"), callbacks: [dataChanged, axisChanged] },
-            { name: "sortColumn", path: plotterPath.push("sortColumn"), callbacks: [dataChanged, axisChanged] },
-            { name: "colorColumn", path: plotterPath.push("colorColumn"), callbacks: dataChanged },
-            { name: "chartColors", path: plotterPath.push("chartColors"), callbacks: dataChanged },
-            { name: "groupingMode", path: plotterPath.push("groupingMode"), callbacks: dataChanged },
-            { name: "horizontalMode", path: plotterPath.push("horizontalMode"), callbacks: rotateAxes },
-            { name: "showValueLabels", path: plotterPath.push("showValueLabels"), callbacks: handleShowValueLabels},
-            { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
-            { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged},
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+            { name: "heightColumns", path: plotterPath.push("heightColumns"), callbacks: [this.dataChanged, this.axisChanged] },
+            { name: "labelColumn", path: plotterPath.push("labelColumn"), callbacks: [this.dataChanged, this.axisChanged] },
+            { name: "sortColumn", path: plotterPath.push("sortColumn"), callbacks: [this.dataChanged, this.axisChanged] },
+            { name: "colorColumn", path: plotterPath.push("colorColumn"), callbacks: this.dataChanged },
+            { name: "chartColors", path: plotterPath.push("chartColors"), callbacks: this.dataChanged },
+            { name: "groupingMode", path: plotterPath.push("groupingMode"), callbacks: this.dataChanged },
+            { name: "horizontalMode", path: plotterPath.push("horizontalMode"), callbacks: this.rotateAxes },
+            { name: "showValueLabels", path: plotterPath.push("showValueLabels"), callbacks: this.handleShowValueLabels},
+            { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: this.axisChanged },
+            { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: this.axisChanged },
+            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: this.dataChanged},
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.selectionKeysChanged},
+            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.probedKeysChanged}
         ];
 
         this.initializePaths(mapping);
+        
+        this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.sortColumn.getObject()]);
+        
         this.c3Config.bindto = this.element;
+        if(this.paths.labelColumn.getState().length){
+            this.c3Config.axis.x.height = this.getElementSize().height * 0.2;
+        }
         this.chart = generate(this.c3Config);
     }
 }
 
 export default WeaveC3Barchart;
-
 registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
+//Weave.registerClass("weavejs.tools.CompoundBarChartTool", WeaveC3Barchart, [weavejs.api.core.ILinkableObjectWithNewProperties]);

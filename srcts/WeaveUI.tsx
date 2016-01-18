@@ -1,18 +1,25 @@
-import WeaveLayoutManager from "./WeaveLayoutManager";
-import WeaveC3Barchart from "../outts/tools/weave-c3-barchart.jsx";
-import WeaveC3ScatterPlot from "../outts/tools/weave-c3-scatterplot.jsx";
-import WeaveC3ColorLegend from "../outts/tools/weave-c3-colorlegend.jsx";
-import WeaveC3LineChart from "./tools/weave-c3-linechart.jsx";
-import WeaveC3PieChart from "../outts/tools/weave-c3-piechart.jsx";
-import WeaveC3Histogram from "../outts/tools/weave-c3-histogram.jsx";
-import WeaveOpenLayersMap from "./tools/map.js";
-import WeaveReactTable from "./tools/weave-react-table.jsx";
-import SessionStateMenuTool from "./tools/weave-session-state-menu.jsx";
-import StandardLib from "../outts/utils/StandardLib.js";
-import JSZip from "jszip";
+/// <reference path="../typings/jszip/jszip.d.ts"/>
+/// <reference path="../typings/react/react.d.ts"/>
+/// <reference path="../typings/react/react-dom.d.ts"/>
+/// <reference path="../typings/weave/Weave.d.ts"/>
+/// <reference path="../typings/weave/weavejs.d.ts"/>
 
-import React from "react";
-import ReactDOM from "react-dom";
+import WeaveLayoutManager from "./WeaveLayoutManager";
+import WeaveC3Barchart from "./tools/weave-c3-barchart";
+import WeaveC3ScatterPlot from "./tools/weave-c3-scatterplot";
+import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend";
+import WeaveC3BarChartLegend from "./tools/weave-c3-barchartlegend";
+import WeaveC3LineChart from "./tools/weave-c3-linechart";
+import WeaveC3PieChart from "./tools/weave-c3-piechart";
+import WeaveC3Histogram from "./tools/weave-c3-histogram";
+import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
+import WeaveReactTable from "./tools/weave-react-table";
+import SessionStateMenuTool from "./tools/weave-session-state-menu";
+import StandardLib from "./utils/StandardLib";
+import * as JSZip from "jszip";
+
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 /*global Weave, weavejs*/
 
@@ -54,6 +61,7 @@ export var Layout = WeaveLayoutManager;
 export var Barchart = WeaveC3Barchart;
 export var ScatterPlot = WeaveC3ScatterPlot;
 export var ColorLegend = WeaveC3ColorLegend;
+export var BarChartLegend = WeaveC3BarChartLegend;
 export var LineChart = WeaveC3LineChart;
 export var PieChart = WeaveC3PieChart;
 export var Histogram = WeaveC3Histogram;
@@ -62,21 +70,25 @@ export var DataTable = WeaveReactTable;
 export var MenuTool = SessionStateMenuTool;
 export var getUrlParams = StandardLib.getUrlParams;
 
-export var loadLayout = function(weave, fileName, targetEltId, callback) {
+export var loadLayout = function(weave:Weave, fileName:string, targetEltId:string, callback:() => void) {
 
     function render() {
         ReactDOM.render(
-            <WeaveUI.Layout weave={weave}/>,
+            <Layout weave={weave}/>,
             document.getElementById(targetEltId),
             callback
         );
     }
 
-    if(!fileName && weave) {
-        render();
+    if(weave) {
+        if(!fileName) {
+            render();
+        } else {
+            weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, (e:Error) => {
+                console.error(e)
+            });
+        }
+    } else {
+        console.error("Missing Weave instance!")
     }
-
-    weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, e => {
-        console.error(e)
-    });
 };

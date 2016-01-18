@@ -132,9 +132,22 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                         position: "outer-center"
                     },
                     tick: {
+                        rotate: -45,
                         multiline: false,
                         format: (num:number):string => {
-                            return this.paths.binnedColumn.getValue("this.deriveStringFromNumber.bind(this)")(num);
+                            if(this.element && this.getElementSize().height > 0) {
+                                var labelHeight:number = (this.getElementSize().height* 0.2)/Math.cos(45*(Math.PI/180));
+                                var labelString:string = this.paths.binnedColumn.getValue("this.deriveStringFromNumber.bind(this)")(num);
+                                if(labelString) {
+                                    var stringSize:number = StandardLib.getTextWidth(labelString, "14pt Helvetica Neue");
+                                    var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
+                                    return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
+                                }else{
+                                    return "";
+                                }
+                            }else {
+                                return this.paths.binnedColumn.getValue("this.deriveStringFromNumber.bind(this)")(num);
+                            }
                         }
                     }
                 },
@@ -151,6 +164,16 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     }
                 },
                 rotated: false
+            },
+            tooltip: {
+                format: {
+                    title: (num:number):string => {
+                        return this.paths.binnedColumn.getValue("this.deriveStringFromNumber.bind(this)")(num);
+                    },
+                    name: (name:string, ratio:number, id:string, index:number):string => {
+                        return this.getYAxisLabel();
+                    }
+                }
             },
             grid: {
                 x: {
@@ -171,22 +194,32 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         };
     }
 
+    protected handleMissingSessionStateProperties(newState:any)
+    {
+
+    }
     _selectionKeysChanged () {
         if(!this.chart)
             return;
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
         var selectedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
             return _.includes(selectedKeys, record["id"]);
         });
+        var probedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
+            return _.includes(probedKeys, record["id"]);
+        });
         var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
+        var probedBinIndices:number[] = _.pluck(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn');
         var binIndices:number[] = _.pluck(_.uniq(this.numericRecords, 'binnedColumn'), 'binnedColumn');
         var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
+        unselectedBinIndices = _.difference(unselectedBinIndices,probedBinIndices);
 
         if(selectedBinIndices.length) {
             this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-        }else{
+        }else if(!probedBinIndices.length){
             this.customStyle(binIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
             this.chart.select(this.heightColumnNames, [], true);
         }
@@ -204,8 +237,9 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         if(selectedBinIndices.length) {
             this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
+            this._selectionKeysChanged();
         }else{
-            this._selectionKeysChanged()
+            this._selectionKeysChanged();
         }
     }
 
@@ -227,6 +261,26 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         //this.forceUpdate();
     }
 
+    private getYAxisLabel():string {
+        var overrideAxisName = this.paths.yAxis.push("overrideAxisName").getState();
+        if(overrideAxisName) {
+            return overrideAxisName;
+        } else {
+            if(this.paths.columnToAggregate.getState().length) {
+                switch(this.paths.aggregationMethod.getState()) {
+                    case "count":
+                        return "Number of records";
+                    case "sum":
+                        return "Sum of " + this.paths.columnToAggregate.getValue("this.getMetadata('title')");
+                    case "mean":
+                        return "Mean of " + this.paths.columnToAggregate.getValue("this.getMetadata('title')");
+                }
+            } else {
+                return "Number of records";
+            }
+        }
+    }
+
     _axisChanged () {
         if(!this.chart)
             return;
@@ -236,25 +290,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
         this.chart.axis.labels({
             x: this.paths.xAxis.push("overrideAxisName").getState() || this.paths.binnedColumn.getValue("this.getMetadata('title')"),
-            y: function():string {
-                var overrideAxisName = this.paths.yAxis.push("overrideAxisName").getState();
-                if(overrideAxisName) {
-                    return overrideAxisName;
-                } else {
-                    if(this.paths.columnToAggregate.getState().length) {
-                        switch(this.paths.aggregationMethod.getState()) {
-                            case "count":
-                                return "Number of records";
-                            case "sum":
-                                return "Sum of " + this.paths.columnToAggregate.getValue("this.getMetadata('title')");
-                            case "mean":
-                                return "Mean of " + this.paths.columnToAggregate.getValue("this.getMetadata('title')");
-                        }
-                    } else {
-                        return "Number of records";
-                    }
-                }
-            }.bind(this)()
+            y: this.getYAxisLabel.bind(this)()
         });
     }
 
@@ -359,7 +395,13 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         //var start = Date.now();
         var newElementSize = this.getElementSize();
         if(!_.isEqual(newElementSize, this.elementSize)) {
-            this.chart.resize(newElementSize);
+            if(this.paths.binnedColumn.push("internalDynamicColumn").getState().length){
+                this.c3Config.axis.x.height = newElementSize.height * 0.2;
+            }else{
+                this.c3Config.axis.x.height = null;
+            }
+            this.c3Config.size = newElementSize;
+            this.chart= generate(this.c3Config);
             this.elementSize = newElementSize;
         }
         //var end = Date.now();
@@ -398,9 +440,13 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
-
+        
+       	this.paths.filteredKeySet.getObject().setSingleKeySource(this.paths.fillStyle.getObject('color', 'internalDynamicColumn'));
+        
         this.c3Config.bindto = this.element;
-
+        if(this.paths.binnedColumn.push("internalDynamicColumn").getState().length){
+            this.c3Config.axis.x.height = this.getElementSize().height * 0.2;
+        }
         this.chart = generate(this.c3Config);
     }
 }
@@ -408,3 +454,4 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 export default WeaveC3Histogram;
 
 registerToolImplementation("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
+//Weave.registerClass("weavejs.tools.HistogramTool", WeaveC3Histogram, [weavejs.api.core.ILinkableObjectWithNewProperties]);
