@@ -1,8 +1,12 @@
+///<reference path="../../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+
 import * as lodash from "lodash";
 declare var weavejs:any;
 declare var Weave:any;
 
-class Layer {
+abstract class Layer {
 
 	handleMissingSessionStateProperties(newState)
 	{
@@ -12,6 +16,12 @@ class Layer {
 	layerPath:WeavePath;
 	settingsPath:WeavePath;
 	projectionPath:WeavePath;
+	layerName:string;
+	parent:any;
+
+	_olLayer:ol.layer.Layer;
+	_layerReadyCallbacks:Map<string,Function>;
+
 
 	constructor(parent, layerName)
 	{
@@ -20,8 +30,8 @@ class Layer {
 		this.projectionPath = parent.toolPath.push("projectionSRS");
 		this.parent = parent;
 		this.layerName = layerName;
-		this.layer = null;
-		this._layerReadyCallbacks = {};
+		this._olLayer = null;
+		this._layerReadyCallbacks = new Map<string,Function>();
 
 		this.linkProperty(this.settingsPath.push("alpha"), "opacity");
 		this.linkProperty(this.settingsPath.push("visible"), "visible");
@@ -30,7 +40,7 @@ class Layer {
 	}
 
 	get source() {
-		return this.olLayer && this.layer.getSource();
+		return this.olLayer && this.olLayer.getSource();
 	}
 
 	set source(value) {
@@ -48,7 +58,7 @@ class Layer {
 
 			if (value) {
 				for (let name in this._layerReadyCallbacks) {
-					this._layerReadyCallbacks[name]();
+					this._layerReadyCallbacks.get(name)();
 				}
 			}
 		}
@@ -58,26 +68,26 @@ class Layer {
 		return this._olLayer;
 	}
 
-	linkProperty(propertyPath:WeavePath, propertyName:String, inTransform?:Function)
+	linkProperty(propertyPath:WeavePath, propertyName:string, inTransform?:Function)
 	{
 		/* change in path modifying propertyName */
 		inTransform = inTransform || lodash.identity;
 
 		var callback = () => {
-				if (this.layer) {
-					this.layer.set(propertyName, inTransform(propertyPath.getState()));
+				if (this.olLayer) {
+					this.olLayer.set(propertyName, inTransform(propertyPath.getState()));
 				}
 			};
 
-		this._layerReadyCallbacks[propertyName] = callback;
+		this._layerReadyCallbacks.set(propertyName, callback);
 
 		propertyPath.addCallback(this, callback, false, false);
 	}
 
 	dispose()
 	{
-		if (this._layer != null) {
-			this.parent.map.removeLayer(this._layer);
+		if (this._olLayer != null) {
+			this.parent.map.removeLayer(this._olLayer);
 		}
 	}
 }

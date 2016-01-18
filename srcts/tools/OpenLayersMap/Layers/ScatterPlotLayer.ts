@@ -6,13 +6,21 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 
 import StandardLib from "../../utils/StandardLib";
-import FeatureLayer from "./FeatureLayer";
+import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 import GlyphLayer from "./GlyphLayer";
 
 declare var Weave:any;
 declare var weavejs:any;
 
 class ScatterPlotLayer extends GlyphLayer {
+
+	sizeBy:WeavePath;
+	fillStylePath:WeavePath;
+	lineStylePath:WeavePath;
+	maxRadiusPath:WeavePath;
+	minRadiusPath:WeavePath;
+	defaultRadiusPath:WeavePath;
+
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
@@ -34,7 +42,7 @@ class ScatterPlotLayer extends GlyphLayer {
 
 	updateStyleData()
 	{
-		var styleRecords = this.layerPath.retrieveRecords({
+		var styleRecords:any = this.layerPath.retrieveRecords({
 			fill: {
 				color: this.fillStylePath.push("color"),
 				alpha: this.fillStylePath.push("alpha"),
@@ -57,14 +65,12 @@ class ScatterPlotLayer extends GlyphLayer {
 		for (let record of sizeByNumeric)
 		{
 			let id = record.id;
-			let fullRecord = styleRecordsIndex[id];
+			let fullRecord:any = styleRecordsIndex[id];
 			if (fullRecord)
 			{
 				fullRecord.sizeBy = record.sizeBy;
 			}
 		}
-
-		this.rawStyles = styleRecords;
 
 		let sizeBy = lodash.pluck(styleRecords, "sizeBy");
 		let sizeByMax = lodash.max(sizeBy);
@@ -147,7 +153,14 @@ class ScatterPlotLayer extends GlyphLayer {
 
 			if (feature)
 			{
-				feature.setProperties({normalStyle, unselectedStyle, selectedStyle, probedStyle, zOrder});
+				let metaStyle:any = {};
+
+				metaStyle.normalStyle = normalStyle;
+				metaStyle.unselectedStyle = unselectedStyle;
+				metaStyle.selectedStyle = selectedStyle;
+				metaStyle.probedStyle = probedStyle;
+				
+				feature.setProperties(metaStyle);
 			}
 
 			zOrder++;

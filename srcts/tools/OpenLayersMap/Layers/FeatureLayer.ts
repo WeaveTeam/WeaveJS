@@ -8,7 +8,7 @@ import * as lodash from "lodash";
 import Layer from "./Layer";
 import StandardLib from "../../utils/StandardLib";
 
-class FeatureLayer extends Layer {
+export abstract class FeatureLayer extends Layer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
 	private updateMetaStyle:Function;
 	private debounced_updateMetaStyles:Function;
@@ -22,6 +22,8 @@ class FeatureLayer extends Layer {
 	private probeKeySet:WeavePath;
 	private subsetFilter:WeavePath;
 	private tempSelectable:boolean;
+
+	source:ol.source.Vector;
 
 	constructor(parent, layerName)
 	{
@@ -75,6 +77,8 @@ class FeatureLayer extends Layer {
 			this.debounced_updateMetaStyles();
 		}
 	}
+
+	abstract updateStyleData():void;
 
 	static toColorArray(colorString, alpha)
 	{
@@ -253,7 +257,7 @@ class FeatureLayer extends Layer {
 		return new ol.style.Fill({color});
 	}
 
-	static olStrokeFromWeaveStroke(stroke:Object, fade?:number)
+	static olStrokeFromWeaveStroke(stroke:any, fade?:number)
 	{
 		if (fade === undefined) fade = 1;
 
@@ -314,6 +318,13 @@ class FeatureLayer extends Layer {
 		SELECTED: "selectedStyle",
 		PROBED: "probedStyle"	
 	}
-}
+};
+
+export interface MetaStyleProperties {
+	normalStyle: ol.style.Style|Array<ol.style.Style>;
+	unselectedStyle: ol.style.Style|Array<ol.style.Style>;
+	selectedStyle: ol.style.Style|Array<ol.style.Style>;
+	probedStyle: ol.style.Style|Array<ol.style.Style>;
+};
 
 export default FeatureLayer;

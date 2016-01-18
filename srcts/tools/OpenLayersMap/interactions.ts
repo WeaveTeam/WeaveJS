@@ -121,14 +121,10 @@ function getDragSelect(mapTool, probeInteraction)
 	dragSelect.on('boxstart', function (dragBoxEvent) {
 		probeInteraction.setActive(false);
 
-		let event = dragBoxEvent.innerEvent.originalEvent;
-		if (event.ctrlKey)
+		
+		if (ol.events.condition.platformModifierKeyOnly(dragBoxEvent))
 		{
 			mode = ADD;
-			if (event.shiftKey)
-			{
-				mode = SUBTRACT;
-			}
 		}
 		else
 		{

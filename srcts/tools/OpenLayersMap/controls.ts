@@ -5,7 +5,7 @@
 
 import * as ol from "openlayers";
 import * as jquery from "jquery";
-export class PanCluster {
+export class PanCluster extends ol.control.Control {
 	constructor(optOptions?)
 	{
 		var options = optOptions || {};
@@ -80,13 +80,11 @@ export class PanCluster {
 			}
 		}
 
-		ol.control.Control.call(this, {element: parent[0], target: options.target});
+		super({element: parent[0], target: options.target});
 	}
 }
 
-ol.inherits(PanCluster, ol.control.Control);
-
-export class InteractionModeCluster {
+export class InteractionModeCluster extends ol.control.Control {
 	constructor (optOptions)
 	{
 		var interactionModePath = optOptions.interactionModePath;
@@ -110,8 +108,6 @@ export class InteractionModeCluster {
 			buttonTable.find("button.iModeCluster." + interactionModePath.getState()).addClass("active");
 		}, true);
 
-		ol.control.Control.call(this, {element: buttonTable[0], target: options.target});
+		super({element: buttonTable[0], target: options.target});
 	}
 }
-
-ol.inherits(InteractionModeCluster, ol.control.Control);

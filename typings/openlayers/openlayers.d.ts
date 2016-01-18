@@ -2039,7 +2039,7 @@ declare module ol {
          * @param ref The object to use as this in listener.
          * @returns Unique key for the listener.
          */
-        un(type: Array<string>, listener: (event: MapBrowserEvent) => void, ref?: any): any;
+        un(type: Array<string>|string, listener: (event: MapBrowserEvent) => void, ref?: any): any;
 
         /**
          * Removes an event listener using the key returned by on() or once(). Note that using the ol.Observable.unByKey static function is to be preferred.
@@ -2222,6 +2222,8 @@ declare module ol {
          */
         constrainResolution(resolution: number, delta?: number, direction?: number): number;
 
+        fit(geometry:ol.geom.SimpleGeometry|ol.Extent, size:ol.Size, opt_options?:any):void;
+
         /**
          * Fit the map view to the passed extent and size. The size is pixel dimensions of the box to fit the extent into. In most cases you will want to use the map size, that is map.getSize().
          * @param extent Extent.
@@ -2378,7 +2380,7 @@ declare module ol {
         class Attribution {
         }
 
-        class Control {
+        class Control extends ol.Object {
             constructor(options?: olx.control.ControlOptions);
 
             getMap():ol.Map;
@@ -2399,13 +2401,13 @@ declare module ol {
         class ScaleLine {
         }
 
-        class Zoom {
+        class Zoom extends Control {
         }
 
-        class ZoomSlider {
+        class ZoomSlider extends Control {
         }
 
-        class ZoomToExtent {
+        class ZoomToExtent extends Control {
         }
     }
 
@@ -2909,6 +2911,8 @@ declare module ol {
              * @returns Extent
              */
             getExtent(extent?: ol.Extent): ol.Extent;
+
+            transform(source: ol.proj.ProjectionLike, destination: ol.proj.ProjectionLike):ol.geom.Geometry;
         }
 
         /**
@@ -3512,10 +3516,10 @@ declare module ol {
         class DragAndDropEvent {
         }
 
-        class DragBox {
+        class DragBox extends Pointer {
         }
 
-        class DragPan {
+        class DragPan extends Pointer {
             constructor(opt_options?:olx.interaction.DragPanOptions);
         }
 
@@ -3525,7 +3529,7 @@ declare module ol {
         class DragRotateAndZoom {
         }
 
-        class DragZoom {
+        class DragZoom extends Pointer {
             constructor(opt_options?:olx.interaction.DragZoomOptions);
         }
 
@@ -3535,7 +3539,9 @@ declare module ol {
         class DrawEvent {
         }
 
-        class Interaction {
+        class Interaction extends ol.Object {
+            setActive(active:boolean);
+            getActive():boolean;
         }
 
         class KeyboardPan {
@@ -3556,7 +3562,7 @@ declare module ol {
         class PinchZoom {
         }
 
-        class Pointer {
+        class Pointer extends Interaction {
             constructor(opt_options?:olx.interaction.PointerOptions)
         }
 
@@ -3581,6 +3587,10 @@ declare module ol {
              * @param options Layer options.
              */
             constructor(options?: olx.layer.BaseOptions);
+
+            setZIndex(zindex:number):void;
+
+            getZIndex():number;
 
             /**
              * Return the brightness of the layer.
@@ -4010,7 +4020,8 @@ declare module ol {
         function transformExtent(extent: Extent, source: ProjectionLike, destination: ProjectionLike): Extent;
 
         class Projection {
-            constructor(options: olx.Projection)
+            constructor(options: olx.Projection);
+            getExtent():ol.Extent;
         }
     }
 
@@ -4036,7 +4047,7 @@ declare module ol {
         class Cluster {
         }
 
-        class Image {
+        class Image extends Source {
         }
 
         class ImageCanvas {
@@ -4054,26 +4065,26 @@ declare module ol {
         class ImageVector {
         }
 
-        class ImageWMS {
+        class ImageWMS extends Image {
             constructor(options: olx.source.ImageWMSOptions);
         }
 
-        class MapQuest {
+        class MapQuest extends XYZ {
             constructor(options: olx.source.MapQuestOptions);
         }
 
-        class OSM {
+        class OSM extends XYZ {
             constructor(options: olx.source.OSMOptions);
         }
 
-        class Source {
+        class Source extends ol.Object {
         }
 
-        class Stamen {
+        class Stamen extends XYZ {
             constructor(options: olx.source.StamenOptions);
         }
 
-        class Tile {
+        class Tile extends Source {
         }
 
         class TileArcGISRest {
@@ -4085,7 +4096,7 @@ declare module ol {
         class TileEvent {
         }
 
-        class TileImage {
+        class TileImage extends Tile {
         }
 
         class TileJSON {
@@ -4101,7 +4112,7 @@ declare module ol {
             constructor(options: olx.source.TileWMSOptions);
         }
 
-        class Vector {
+        class Vector extends Source {
           constructor(opts: olx.source.VectorOptions)
 
           /**
@@ -4110,6 +4121,18 @@ declare module ol {
           getExtent(): ol.Extent;
 
           getFeaturesInExtent(extent: ol.Extent): ol.Feature[];
+
+          clear(fast?:boolean):void
+
+          forEachFeature(callback:Function, opt_this:any);
+
+          getFeatures():Array<ol.Feature>;
+
+          addFeature(feature:ol.Feature):void;
+
+          removeFeature(feature:ol.Feature):void;
+
+          getFeatureById(id:string|number):ol.Feature;
         }
 
         class VectorEvent {
@@ -4118,7 +4141,7 @@ declare module ol {
         class WMTS {
         }
 
-        class XYZ {
+        class XYZ extends TileImage {
             constructor(opt_options?: olx.source.XYZOptions)
         }
 
@@ -4186,6 +4209,9 @@ declare module ol {
          */
         class Style {
           constructor(opts: olx.style.StyleOptions);
+          getStroke():ol.style.Stroke;
+          getZIndex():number;
+          getFill():ol.style.Fill;
         }
 
         /**

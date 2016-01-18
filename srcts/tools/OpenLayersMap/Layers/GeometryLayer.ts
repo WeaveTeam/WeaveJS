@@ -1,10 +1,20 @@
+///<reference path="../../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+
 import * as ol from "openlayers";
-import FeatureLayer from "./FeatureLayer";
+import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 
 declare var weavejs:any;
 declare var Weave:any;
 
 class GeometryLayer extends FeatureLayer {
+
+	geoJsonParser:any; //TODO ol.format.GeoJSON
+	geoColumnPath:WeavePath;
+	fillStylePath:WeavePath;
+	lineStylePath:WeavePath;
+
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
@@ -74,8 +84,6 @@ class GeometryLayer extends FeatureLayer {
 			}
 		}, this.geoColumnPath);
 
-		this.rawStyles = styleRecords;
-
 		for (let record of styleRecords)
 		{
 			let olStroke = FeatureLayer.olStrokeFromWeaveStroke(record.stroke);
@@ -103,7 +111,14 @@ class GeometryLayer extends FeatureLayer {
 
 			if (feature)
 			{
-				feature.setProperties({normalStyle, unselectedStyle, selectedStyle, probedStyle});
+				let metaStyle:any = {};
+				
+				metaStyle.normalStyle = normalStyle;
+				metaStyle.unselectedStyle = unselectedStyle;
+				metaStyle.selectedStyle = selectedStyle;
+				metaStyle.probedStyle = probedStyle;
+
+				feature.setProperties(metaStyle);
 			}
 		}
 	}

@@ -13,6 +13,7 @@ declare var Weave:any;
 
 class ImageGlyphLayer extends GlyphLayer {
 
+	private imageGlyphCache:ImageGlyphCache;
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
@@ -30,7 +31,7 @@ class ImageGlyphLayer extends GlyphLayer {
 
 	setIconStyle(feature, img, iconSize)
 	{
-		let styles = {};
+		let styles:any = {};
 
 		if (!img.complete || !img.src)
 		{
@@ -73,8 +74,6 @@ class ImageGlyphLayer extends GlyphLayer {
 		/* Update feature styles */
 
 		var records = this.layerPath.retrieveRecords(["alpha", "color", "imageURL", "imageSize"], this.layerPath.push("dataX"));
-
-		this.rawStyleRecords = records;
 
 		for (let record of records)
 		{

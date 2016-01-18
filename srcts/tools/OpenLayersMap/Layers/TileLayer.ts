@@ -10,11 +10,14 @@ declare var weavejs:any;
 
 class TileLayer extends Layer {
 
+	servicePath:WeavePath;
+	oldProviderName:string;
+
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
 
-		this.layer = new ol.layer.Tile();
+		this.olLayer = new ol.layer.Tile();
 		this.servicePath = this.layerPath.push("service", null);
 		this.oldProviderName = null;
 
@@ -31,7 +34,7 @@ class TileLayer extends Layer {
 	{
 		var proj = ol.proj.get(this.projectionPath.getState() || "EPSG:3857");
 		if (proj)
-			this.layer.setExtent(proj.getExtent());
+			this.olLayer.setExtent(proj.getExtent());
 		else
 			console.log('invalid proj -> no extent');
 	}

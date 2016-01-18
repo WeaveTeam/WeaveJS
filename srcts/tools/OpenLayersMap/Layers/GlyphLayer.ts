@@ -6,7 +6,7 @@ import FeatureLayer from "./FeatureLayer";
 import * as lodash from "lodash";
 import * as ol from "openlayers";
 
-class GlyphLayer extends FeatureLayer {
+abstract class GlyphLayer extends FeatureLayer {
 
 	constructor(parent, layerName)
 	{
@@ -20,7 +20,7 @@ class GlyphLayer extends FeatureLayer {
 	}
 
 	_getFeatureIds() {
-		return lodash.map(this.source.getFeatures(), (item) => item.getId());
+		return lodash.map(this.source.getFeatures(), (item:ol.Feature) => item.getId());
 	}
 
 	static _toPoint(datum, field1, field2) {

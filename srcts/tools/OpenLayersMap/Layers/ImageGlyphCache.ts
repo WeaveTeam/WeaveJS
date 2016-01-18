@@ -4,7 +4,8 @@
 
 import * as jquery from "jquery";
 
-class Map2D {
+class Map2D<K1,K2,D> {
+	private _map:Map<K1,Map<K2,D>>;
 	constructor()
 	{
 		this._map = new Map();
@@ -29,11 +30,15 @@ class Map2D {
 	}
 }
 class ImageGlyphCache {
+	private baseImageElements:Map<string,HTMLImageElement>;
+	private canvasMap:Map2D<string,string,HTMLCanvasElement>;
+	private imageMap:Map2D<string,string,HTMLImageElement>;
+
 	constructor()
 	{
 		this.baseImageElements = new Map();
-		this.canvasMap = new Map2D();
-		this.imageMap = new Map2D();
+		this.canvasMap = new Map2D<string,string,HTMLCanvasElement>();
+		this.imageMap = new Map2D<string,string,HTMLImageElement>();
 	}
 
 	requestBaseImageElement(url, callback)

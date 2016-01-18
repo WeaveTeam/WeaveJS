@@ -27,11 +27,28 @@ declare var weavejs:any;
 
 class WeaveOpenLayersMap extends AbstractWeaveTool {
 
+	layers:Map<string,Layer>;
+	interactionModePath:WeavePath;
+	map:ol.Map;
+	zoomButtons:ol.control.Zoom;
+	slider:ol.control.ZoomSlider;
+	pan:PanCluster;
+	mouseModeButtons:InteractionModeCluster;
+	plotManager:WeavePath;
+	plottersPath:WeavePath;
+	layerSettingsPath:WeavePath;
+	zoomBoundsPath:WeavePath;
+
+	centerCallbackHandle:any;
+	resolutionCallbackHandle:any;
+
+
+
 	constructor(props)
 	{
 		super(props);
 
-		this.layers = {};
+		this.layers = new Map<string,Layer>();
 	}
 
 	handleMissingSessionStateProperties(newState)
@@ -225,33 +242,32 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 
 	plottersChanged()
 	{
-		var oldNames = lodash.keys(this.layers);
+		var oldNames = Array.from(this.layers.keys());
 		var newNames = this.plottersPath.getNames();
 
 		var removedNames = lodash.difference(oldNames, newNames);
 		var addedNames = lodash.difference(newNames, oldNames);
 
 		removedNames.forEach(function (name) {
-			if (this.layers[name]) { 
-				this.layers[name].dispose(); 
+			if (this.layers.get(name)) { 
+				this.layers.get(name).dispose(); 
 			}
-
-			delete this.layers[name];
+			this.layers.delete(name);
 		}, this);
 
 		addedNames.forEach(function (name) {
-			//this.layers[name] = 
+			// ???
 		}, this);
 		/* */
 		for (let idx in newNames)
 		{
-			let layer = this.layers[newNames[idx]];
+			let layer:Layer = this.layers.get(newNames[idx]);
 
-			if (!layer || !layer.layer) {
+			if (!layer || !layer.olLayer) {
 				continue;
 			}
 
-			layer.layer.setZIndex(idx + 2);
+			layer.olLayer.setZIndex(idx + 2);
 		}
 	}
 
