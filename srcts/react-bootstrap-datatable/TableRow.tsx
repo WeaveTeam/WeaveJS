@@ -6,7 +6,7 @@
 import * as React from "react";
 import {Table} from "react-bootstrap";
 import {CSSProperties} from "react";
-import StandardLib from "../Utils/StandardLib";
+import StandardLib from "../utils/StandardLib";
 import * as Prefixer from "react-vendor-prefix";
 
 export interface IRow {
