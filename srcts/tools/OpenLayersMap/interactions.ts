@@ -1,8 +1,16 @@
-import ol from "openlayers";
-import lodash from "lodash";
-import FeatureLayer from "./layers/FeatureLayer.js";
-import CustomDragBox from "./CustomDragBox.js";
+///<reference path="../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../typings/jquery/jquery.d.ts"/>
+///<reference path="../../../typings/weave/WeavePath.d.ts"/>
+
+import * as ol from "openlayers";
+import * as lodash from "lodash";
+import FeatureLayer from "./Layers/FeatureLayer";
+import CustomDragBox from "./CustomDragBox";
 /*global Weave*/
+
+declare var Weave:any;
+declare var weavejs:any;
 
 function getProbeInteraction(mapTool)
 {

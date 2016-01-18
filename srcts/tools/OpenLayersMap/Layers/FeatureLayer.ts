@@ -10,14 +10,27 @@ import StandardLib from "../../utils/StandardLib";
 
 class FeatureLayer extends Layer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
+	private updateMetaStyle:Function;
+	private debounced_updateMetaStyles:Function;
+
+	private changedItems:Set<string>;
+	private probedSet:Set<string>;
+	private selectedSet:Set<string>;
+	private filteredSet:Set<string>;
+
+	private selectionKeySet:WeavePath;
+	private probeKeySet:WeavePath;
+	private subsetFilter:WeavePath;
+	private tempSelectable:boolean;
+
 	constructor(parent, layerName)
 	{
 		super(parent, layerName);
 		
-		this.updateMetaStyle = this.updateMetaStyle.bind(this);
+		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
 		this.debounced_updateMetaStyles = lodash.debounce(this.updateMetaStyles.bind(this), 0);
 
-		this.layer = new ol.layer.Vector();
+		this.olLayer = new ol.layer.Vector();
 		this.source = new ol.source.Vector({wrapX: false});
 
 		/* Every feature that is added should register a handler to automatically recompute the metastyles when the styles change. */
@@ -157,7 +170,7 @@ class FeatureLayer extends Layer {
 		this.source.forEachFeature(this.updateMetaStyle, this);
 	}
 
-	updateMetaStyle(feature)
+	updateMetaStyle_unbound(feature)
 	{
 		let id = feature.getId();
 		let nullStyle = new ol.style.Style({});

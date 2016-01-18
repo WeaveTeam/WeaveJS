@@ -1,7 +1,12 @@
-import ol from "openlayers";
-import jquery from "jquery";
+///<reference path="../../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../../typings/openlayers/openlayers.d.ts"/>
+///<reference path="../../../typings/jquery/jquery.d.ts"/>
+///<reference path="../../../typings/weave/WeavePath.d.ts"/>
+
+import * as ol from "openlayers";
+import * as jquery from "jquery";
 export class PanCluster {
-	constructor(optOptions)
+	constructor(optOptions?)
 	{
 		var options = optOptions || {};
 		let parent = jquery(`

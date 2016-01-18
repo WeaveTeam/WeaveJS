@@ -9,6 +9,10 @@ class Layer {
 
 	}
 
+	layerPath:WeavePath;
+	settingsPath:WeavePath;
+	projectionPath:WeavePath;
+
 	constructor(parent, layerName)
 	{
 		this.layerPath = parent.plottersPath.push(layerName);
@@ -26,11 +30,11 @@ class Layer {
 	}
 
 	get source() {
-		return this.internalLayer && this.layer.getSource();
+		return this.olLayer && this.layer.getSource();
 	}
 
 	set source(value) {
-		this.layer.setSource(value);
+		this.olLayer.setSource(value);
 	}
 
 	/* Handles initial apply of linked properties, adding/removing from map */
@@ -54,7 +58,7 @@ class Layer {
 		return this._olLayer;
 	}
 
-	linkProperty(propertyPath, propertyName, inTransform)
+	linkProperty(propertyPath:WeavePath, propertyName:String, inTransform?:Function)
 	{
 		/* change in path modifying propertyName */
 		inTransform = inTransform || lodash.identity;

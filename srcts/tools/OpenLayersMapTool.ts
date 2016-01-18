@@ -18,8 +18,8 @@ import ImageGlyphLayer from "./OpenLayersMap/Layers/ImageGlyphLayer";
 import ScatterPlotLayer from "./OpenLayersMap/Layers/ScatterPlotLayer";
 /* eslint-enable */
 
-import {PanCluster, InteractionModeCluster} from "./OpenLayersMap/controls.js";
-import weaveMapInteractions from "./OpenLayersMap/interactions.js";
+import {PanCluster, InteractionModeCluster} from "./OpenLayersMap/controls";
+import weaveMapInteractions from "./OpenLayersMap/interactions";
 /* global Weave, weavejs */
 
 declare var Weave:any;

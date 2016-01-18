@@ -9,6 +9,9 @@ import StandardLib from "../../utils/StandardLib";
 import FeatureLayer from "./FeatureLayer";
 import GlyphLayer from "./GlyphLayer";
 
+declare var Weave:any;
+declare var weavejs:any;
+
 class ScatterPlotLayer extends GlyphLayer {
 	constructor(parent, layerName)
 	{
@@ -71,7 +74,7 @@ class ScatterPlotLayer extends GlyphLayer {
 		let maxScreenRadius = this.maxRadiusPath.getState();
 		let defaultScreenRadius = this.defaultRadiusPath.getState();
 
-		styleRecords = lodash.sortByOrder(styleRecords, ["sizeBy", "id"], ["desc"], ["asc"]);
+		styleRecords = lodash.sortByOrder(styleRecords, ["sizeBy", "id"], ["desc", "asc"]);
 
 		let zOrder = 0;
 

@@ -5,6 +5,9 @@
 import * as ol from "openlayers";
 import Layer from "./Layer";
 
+declare var Weave:any;
+declare var weavejs:any;
+
 class TileLayer extends Layer {
 
 	constructor(parent, layerName)
@@ -61,13 +64,13 @@ class TileLayer extends Layer {
 			switch (providerName)
 			{
 				case "Stamen WaterColor":
-					return new ol.source.Stamen({layer: "watercolor", wrapX: false});
+					return new ol.source.Stamen({layer: "watercolor"});
 				case "Stamen Toner":
-					return new ol.source.Stamen({layer: "toner", wrapX: false});
+					return new ol.source.Stamen({layer: "toner"});
 				case "Open MapQuest Aerial":
-					return new ol.source.MapQuest({layer: "sat", wrapX: false});
+					return new ol.source.MapQuest({layer: "sat"});
 				case "Open MapQuest":
-					return new ol.source.MapQuest({layer: "osm", wrapX: false});
+					return new ol.source.MapQuest({layer: "osm"});
 				case "Open Street Map":
 					return new ol.source.OSM({wrapX: false});
 				case "Blue Marble Map":
