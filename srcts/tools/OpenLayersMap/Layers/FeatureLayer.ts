@@ -6,7 +6,7 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 
 import Layer from "./Layer";
-import StandardLib from "../../utils/StandardLib";
+import StandardLib from "../../../utils/StandardLib";
 
 export abstract class FeatureLayer extends Layer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */

@@ -5,7 +5,7 @@
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 
-import StandardLib from "../../utils/StandardLib";
+import StandardLib from "../../../utils/StandardLib";
 import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 import GlyphLayer from "./GlyphLayer";
 

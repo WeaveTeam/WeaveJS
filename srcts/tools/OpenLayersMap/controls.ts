@@ -34,6 +34,8 @@ export class PanCluster extends ol.control.Control {
 			X: [null, null]
 		};
 
+		super({element: parent[0], target: options.target});
+
 		let self = this;
 
 		let pan = function (xSign, ySign)
@@ -79,8 +81,6 @@ export class PanCluster extends ol.control.Control {
 				button.click(zoomExtent.bind(this));
 			}
 		}
-
-		super({element: parent[0], target: options.target});
 	}
 }
 
@@ -103,11 +103,11 @@ export class InteractionModeCluster extends ol.control.Control {
 		buttonTable.find("button.iModeCluster.select").click( () => interactionModePath.state("select") );
 		buttonTable.find("button.iModeCluster.zoom").click( () => interactionModePath.state("zoom") );
 
+		super({element: buttonTable[0], target: options.target});
+
 		interactionModePath.addCallback(this, () => {
 			buttonTable.find("button.iModeCluster").removeClass("active");
 			buttonTable.find("button.iModeCluster." + interactionModePath.getState()).addClass("active");
 		}, true);
-
-		super({element: buttonTable[0], target: options.target});
 	}
 }
