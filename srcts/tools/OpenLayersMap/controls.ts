@@ -4,7 +4,7 @@
 ///<reference path="../../../typings/weave/WeavePath.d.ts"/>
 
 import * as ol from "openlayers";
-import * as jquery from "jquery";
+import jquery from "jquery";
 export class PanCluster extends ol.control.Control {
 	constructor(optOptions?)
 	{

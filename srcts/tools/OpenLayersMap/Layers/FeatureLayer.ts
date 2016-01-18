@@ -18,9 +18,9 @@ export abstract class FeatureLayer extends Layer {
 	private selectedSet:Set<string>;
 	private filteredSet:Set<string>;
 
-	private selectionKeySet:WeavePath;
-	private probeKeySet:WeavePath;
-	private subsetFilter:WeavePath;
+	public selectionKeySet:WeavePath;
+	public probeKeySet:WeavePath;
+	public subsetFilter:WeavePath;
 	private tempSelectable:boolean;
 
 	source:ol.source.Vector;

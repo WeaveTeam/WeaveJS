@@ -5,7 +5,7 @@
 
 import * as ol from "openlayers";
 import * as lodash from "lodash";
-import * as jquery from "jquery";
+import jquery from "jquery";
 
 import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
@@ -47,7 +47,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 	constructor(props)
 	{
 		super(props);
-
+		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; /* Forces the inclusion of the layers. */
 		this.layers = new Map<string,Layer>();
 	}
 

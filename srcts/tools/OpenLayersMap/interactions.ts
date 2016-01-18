@@ -6,6 +6,7 @@
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 import FeatureLayer from "./Layers/FeatureLayer";
+import Layer from "./Layers/Layer";
 import CustomDragBox from "./CustomDragBox";
 /*global Weave*/
 
@@ -84,19 +85,19 @@ function getDragSelect(mapTool, probeInteraction)
 	let mode = SET;
 
 	function updateSelection(extent) {
-		let selectedFeatures = new Set();
-		let selectFeature = (feature) => { selectedFeatures.add(feature.getId()); };
+		let selectedFeatures:Set<string> = new Set();
+		let selectFeature:Function = (feature) => { selectedFeatures.add(feature.getId()); };
 
-		for (let weaveLayerName of lodash.keys(mapTool.layers))
+		for (let weaveLayerName of mapTool.layers.keys())
 		{
-			let weaveLayer = mapTool.layers[weaveLayerName];
-			let olLayer = weaveLayer.layer;
-			let selectable = olLayer.get("selectable");
+			let weaveLayer:Layer = mapTool.layers.get(weaveLayerName);
+			let olLayer:ol.layer.Layer = weaveLayer.olLayer;
+			let selectable:boolean = <boolean>olLayer.get("selectable");
 
 			if (weaveLayer instanceof FeatureLayer && selectable)
 			{
 				let keySet = weaveLayer.selectionKeySet;
-				let source = olLayer.getSource();
+				let source:ol.source.Vector = <ol.source.Vector>olLayer.getSource();
 
 				source.forEachFeatureIntersectingExtent(extent, selectFeature);
 
@@ -118,11 +119,11 @@ function getDragSelect(mapTool, probeInteraction)
 		}
 	}
 
-	dragSelect.on('boxstart', function (dragBoxEvent) {
+	dragSelect.on('boxstart', function (dragBoxEvent:any) {
 		probeInteraction.setActive(false);
 
 		
-		if (ol.events.condition.platformModifierKeyOnly(dragBoxEvent))
+		if (ol.events.condition.platformModifierKeyOnly(dragBoxEvent.innerEvent))
 		{
 			mode = ADD;
 		}

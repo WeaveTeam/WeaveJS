@@ -4,7 +4,7 @@
 
 import * as ol from "openlayers";
 import * as lodash from "lodash";
-import * as jquery from "jquery";
+import jquery from "jquery";
 
 class BoxControl extends ol.control.Control {
 

@@ -4122,6 +4122,8 @@ declare module ol {
 
           getFeaturesInExtent(extent: ol.Extent): ol.Feature[];
 
+          forEachFeatureIntersectingExtent(extent: ol.Extent, callback: Function, opt_this?:any):any;
+
           clear(fast?:boolean):void
 
           forEachFeature(callback:Function, opt_this:any);

@@ -81,7 +81,7 @@ abstract class Layer {
 			value.set("layerObject", this); /* Need to store this backref */
 
 			if (value) {
-				for (let name in this._layerReadyCallbacks) {
+				for (let name of this._layerReadyCallbacks.keys()) {
 					this._layerReadyCallbacks.get(name)();
 				}
 			}

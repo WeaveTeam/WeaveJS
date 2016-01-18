@@ -2,7 +2,7 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
 
-import * as jquery from "jquery";
+import jquery from "jquery";
 import * as ol from "openlayers";
 import GlyphLayer from "./GlyphLayer";
 import FeatureLayer from "./FeatureLayer";
@@ -101,5 +101,5 @@ class ImageGlyphLayer extends GlyphLayer {
 	}
 }
 
-export default ImageGlyphLayer;
 Layer.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+export default ImageGlyphLayer;

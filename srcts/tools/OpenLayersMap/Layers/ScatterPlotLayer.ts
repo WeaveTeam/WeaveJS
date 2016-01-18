@@ -168,6 +168,5 @@ class ScatterPlotLayer extends GlyphLayer {
 		}
 	}
 }
-
-export default ScatterPlotLayer;
 Layer.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+export default ScatterPlotLayer;

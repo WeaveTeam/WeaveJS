@@ -125,6 +125,5 @@ class GeometryLayer extends FeatureLayer {
 	}
 }
 
-export default GeometryLayer;
-
 Layer.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+export default GeometryLayer;

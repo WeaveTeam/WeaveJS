@@ -2,7 +2,7 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
 
-import * as jquery from "jquery";
+import jquery from "jquery";
 
 class Map2D<K1,K2,D> {
 	private _map:Map<K1,Map<K2,D>>;
