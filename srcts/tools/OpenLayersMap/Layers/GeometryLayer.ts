@@ -4,6 +4,7 @@
 
 import * as ol from "openlayers";
 import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
+import Layer from "./Layer";
 
 declare var weavejs:any;
 declare var Weave:any;
@@ -126,4 +127,4 @@ class GeometryLayer extends FeatureLayer {
 
 export default GeometryLayer;
 
-Weave.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Layer.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);

@@ -7,6 +7,7 @@ import * as ol from "openlayers";
 import GlyphLayer from "./GlyphLayer";
 import FeatureLayer from "./FeatureLayer";
 import ImageGlyphCache from "./ImageGlyphCache";
+import Layer from "./Layer";
 
 declare var weavejs:any;
 declare var Weave:any;
@@ -101,5 +102,4 @@ class ImageGlyphLayer extends GlyphLayer {
 }
 
 export default ImageGlyphLayer;
-
-Weave.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Layer.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);

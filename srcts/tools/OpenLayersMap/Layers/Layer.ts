@@ -2,11 +2,35 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
 
+import OpenLayersMapTool from "../../OpenLayersMapTool";
 import * as lodash from "lodash";
 declare var weavejs:any;
 declare var Weave:any;
 
+
+
 abstract class Layer {
+	static layerRegistry:Map<string,any>;
+	static registerClass(asClassName:string, jsClass:any, interfaces?:Array<any>)
+	{
+		if (!Layer.layerRegistry)
+		{
+			Layer.layerRegistry = new Map<string,any>();
+		}
+		Layer.layerRegistry.set(asClassName, jsClass);
+	}
+
+	static newLayer(parent:OpenLayersMapTool, layerName:string)
+	{
+		let path:WeavePath = parent.plottersPath.push(layerName);
+		let layerType:string = path.getType();
+		let LayerClass:any = Layer.layerRegistry.get(layerType);
+		if (LayerClass)
+		{
+			return new LayerClass(parent, layerName);
+		}
+		return null;
+	}
 
 	handleMissingSessionStateProperties(newState)
 	{
@@ -92,4 +116,3 @@ abstract class Layer {
 	}
 }
 export default Layer;
-Weave.registerClass("weavejs.tools.AbstractLayer", Layer, [weavejs.api.core.ILinkableObjectWithNewProperties]);

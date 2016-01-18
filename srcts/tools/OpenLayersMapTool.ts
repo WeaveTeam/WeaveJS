@@ -256,7 +256,8 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		}, this);
 
 		addedNames.forEach(function (name) {
-			// ???
+			let layer:Layer = Layer.newLayer(this, name);
+			this.layers.set(name, layer);
 		}, this);
 		/* */
 		for (let idx in newNames)
@@ -278,5 +279,5 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 }
 
 export default WeaveOpenLayersMap;
+
 registerToolImplementation("weave.visualization.tools::MapTool", WeaveOpenLayersMap);
-//Weave.registerClass("weave.visualization.tools::MapTool", WeaveOpenLayersMap, [weavejs.api.core.ILinkableObjectWithNewProperties]);

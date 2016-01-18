@@ -8,6 +8,7 @@ import * as lodash from "lodash";
 import StandardLib from "../../../utils/StandardLib";
 import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 import GlyphLayer from "./GlyphLayer";
+import Layer from "./Layer";
 
 declare var Weave:any;
 declare var weavejs:any;
@@ -169,5 +170,4 @@ class ScatterPlotLayer extends GlyphLayer {
 }
 
 export default ScatterPlotLayer;
-
-Weave.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Layer.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
