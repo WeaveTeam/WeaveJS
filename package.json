@@ -40,7 +40,7 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.5",
-    "c3": "^0.4.11-rc4",
+    "c3": "https://github.com/WeaveTeam/c3.git",
     "d3": "^3.5.9",
     "inline-style-prefixer": "^0.5.4",
     "jquery": "^2.1.4",
