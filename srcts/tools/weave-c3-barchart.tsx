@@ -57,6 +57,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     private yLabelColumnPath:WeavePath;
     private c3Config:ChartConfiguration;
     private chart:ChartAPI;
+    private debounced_dataChanged:Function;
+    private debounced_axisChanged:Function;
 
     protected paths:IBarchartPaths;
 
@@ -70,6 +72,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.indexToKey = {};
         this.yAxisValueToLabel = {};
         this.xAxisValueToLabel = {};
+        
+        this.debounced_dataChanged = _.debounce(this.dataChanged.bind(this), 20);
+        this.debounced_axisChanged = _.debounce(this.axisChanged.bind(this), 20);
 
         this.c3Config = {
             //size: this.getElementSize(),
@@ -324,7 +329,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             return;
 
         if(this.busy) {
-            setTimeout(this.axisChanged, 20);
+            this.debounced_axisChanged();
             return;
         }
 
@@ -386,6 +391,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         }
 
         if(this.busy) {
+            this.debounced_dataChanged();
             return;
         }
 
