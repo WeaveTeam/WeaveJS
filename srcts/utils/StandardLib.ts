@@ -213,4 +213,17 @@ export default class StandardLib {
         var metrics:TextMetrics = context.measureText(text);
         return metrics.width;
     };
+
+
+    static getTextHeight(text:string, font:string):number {
+        var body = document.getElementsByTagName("body")[0];
+        var dummy = document.createElement("div");
+        var dummyText = document.createTextNode("M");
+        dummy.appendChild(dummyText);
+        dummy.setAttribute("style", font);
+        body.appendChild(dummy);
+        var result = dummy.offsetHeight;
+        body.removeChild(dummy);
+        return result;
+    };
 }

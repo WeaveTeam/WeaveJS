@@ -53,6 +53,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     private records:Record[][];
     private colorRamp:string[];
     private showValueLabels:boolean;
+    private showXAxisLabel:boolean;
     private yLabelColumnPath:WeavePath;
     private c3Config:ChartConfiguration;
     private chart:ChartAPI;
@@ -145,6 +146,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     },
                     tick: {
                         rotate: -45,
+                        culling: {
+                            max: null
+                        },
                         multiline: false,
                         format: (num:number):string => {
                             if(this.stringRecords && this.stringRecords[num]) {
@@ -185,7 +189,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                             }
                         }
                     }
-                }
+                },
+                rotated: false
             },
             tooltip: {
                 format: {
@@ -326,13 +331,29 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getObject().getMetadata('title');
         var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
 
+        if(!this.showXAxisLabel){
+            xLabel = " ";
+        }
+
         this.chart.axis.labels({
             x: xLabel,
             y: yLabel
         });
 
+        this.axisLabelsChanged();
+
         this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
         this.c3Config.axis.y.label = {text:yLabel, position:"outer-middle"};
+        this.generate();
+    }
+
+    private axisLabelsChanged():void {
+        var chartWidth:number = this.chart.internal.width;
+        var textHeight:number = StandardLib.getTextHeight("test","14pt Helvetica Neue");
+        var labelsToShow:number = Math.floor(chartWidth/textHeight);
+        labelsToShow = Math.max(2,labelsToShow);
+
+        this.c3Config.axis.x.tick.culling = {max: labelsToShow};
     }
 
     handleShowValueLabels () {
@@ -480,7 +501,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                 var color = StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.colorRamp);
                 colors[name] = "#" + StandardLib.decimalToHex(color);
             });
-            colors = {};
         }
 
         var data = _.cloneDeep(this.c3Config.data);
@@ -501,6 +521,10 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             .style("stroke-opacity", 0.5);
     }
 
+    generate() {
+        this.chart = generate(this.c3Config);
+    }
+
     componentDidUpdate() {
         super.componentDidUpdate();
         var newElementSize = this.getElementSize();
@@ -512,8 +536,15 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                 this.c3Config.axis.x.height = null;
             }
             this.c3Config.size = newElementSize;
-            this.chart= generate(this.c3Config);
+            this.generate();
             this.elementSize = newElementSize;
+            if(this.paths.labelColumn.getState().length) {
+                //TODO: For now we have no choice by to update axis for label spacing after generate,
+                //so we can get new width and then update label spacing appropriately, but this
+                //then requires another call to generate. We may want to try and calculate this
+                //width ourselves to save the extra generate call in axisChanged()
+                this.axisChanged();
+            }
         }
     }
 
@@ -528,6 +559,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         super.componentDidMount();
         document.addEventListener("keydown", this.toggleKey.bind(this));
         document.addEventListener("keyup", this.toggleKey.bind(this));
+        this.showXAxisLabel = false;
 
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
@@ -555,7 +587,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         if(this.paths.labelColumn.getState().length){
             this.c3Config.axis.x.height = this.getElementSize().height * 0.2;
         }
-        this.chart = generate(this.c3Config);
+        this.generate();
     }
 }
 
