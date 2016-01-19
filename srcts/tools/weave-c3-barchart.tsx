@@ -281,14 +281,16 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
         unselectedIndices = _.difference(unselectedIndices,probedIndices);
         this.heightColumnNames.forEach((item:string) => {
+        	var paths = d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path");
+        	var texts = d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text");
             if(selectedIndices.length) {
-                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 0.3, "stroke-opacity": 0.0});
-                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 1.0});
-                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":0.3});
-                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+                this.customSelectorStyle(unselectedIndices, paths, {opacity: 0.3, "stroke-opacity": 0.0});
+                this.customSelectorStyle(selectedIndices, paths, {opacity: 1.0, "stroke-opacity": 1.0});
+                this.customSelectorStyle(unselectedIndices, texts, {"fill-opacity":0.3});
+                this.customSelectorStyle(selectedIndices, texts, {"fill-opacity":1.0});
             }else if(!probedIndices.length){
-                this.customSelectorStyle(indices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 0.5});
-                this.customSelectorStyle(indices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+                this.customSelectorStyle(indices, paths, {opacity: 1.0, "stroke-opacity": 0.5});
+                this.customSelectorStyle(indices, texts, {"fill-opacity":1.0});
             }
         });
         if(selectedIndices.length) {
@@ -313,11 +315,13 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         var unselectedIndices:number[] = _.difference(indices,selectedIndices);
 
         this.heightColumnNames.forEach((item:string) => {
+        	var paths = d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path");
+        	var texts = d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text");
             if(selectedIndices.length) {
-                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 0.3, "stroke-opacity": 0.0});
-                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path"), {opacity: 1.0, "stroke-opacity": 0.5});
-                this.customSelectorStyle(unselectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":0.3});
-                this.customSelectorStyle(selectedIndices,d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text"), {"fill-opacity":1.0});
+                this.customSelectorStyle(unselectedIndices, paths, {opacity: 0.3, "stroke-opacity": 0.0});
+                this.customSelectorStyle(selectedIndices, paths, {opacity: 1.0, "stroke-opacity": 0.5});
+                this.customSelectorStyle(unselectedIndices, texts, {"fill-opacity":0.3});
+                this.customSelectorStyle(selectedIndices, texts, {"fill-opacity":1.0});
             }
         });
 
@@ -363,10 +367,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     private axisChanged():void {
-        if(!this.chart)
-            return;
-
-        if(this.busy) {
+        if (!this.chart || this.busy) {
             this.debounced_axisChanged();
             return;
         }
@@ -392,9 +393,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     private axisLabelsChanged():void {
         var chartWidth:number = this.chart.internal.width;
-        var chartHeight:number =this.chart.internal.height;
-        var textHeight:number = StandardLib.getTextHeight("test","14pt Helvetica Neue");
-        var xLabelsToShow:number = Math.floor(chartWidth/textHeight);
+        var chartHeight:number = this.chart.internal.height;
+        var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
+        var xLabelsToShow:number = Math.floor(chartWidth / textHeight);
         xLabelsToShow = Math.max(2,xLabelsToShow);
 
         this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
@@ -425,11 +426,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     private dataChanged():void {
-        if(!this.chart) {
-            return;
-        }
-
-        if(this.busy) {
+        if (!this.chart || this.busy) {
             this.debounced_dataChanged();
             return;
         }
