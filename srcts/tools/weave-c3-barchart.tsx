@@ -550,7 +550,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         data.colors = colors;
         data.keys = keys;
         data.unload = true;
-        data.done = () => { this.busy = false; };
         this.c3Config.data = data;
         this.busy = true;
         this.chart.load(data);
@@ -564,6 +563,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     generate() {
+    	this.busy = true;
         this.chart = generate(this.c3Config);
     }
 
