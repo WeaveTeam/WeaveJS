@@ -70,6 +70,9 @@ class GeometryLayer extends FeatureLayer {
 
 	updateStyleData()
 	{
+		let fillEnabled = this.fillStylePath.push("enable").getState();
+		let strokeEnabled = this.lineStylePath.push("enable").getState();
+
 		var styleRecords = this.layerPath.retrieveRecords({
 			fill: {
 				color: this.fillStylePath.push("color"),
@@ -95,19 +98,19 @@ class GeometryLayer extends FeatureLayer {
 			let olFillFaded = FeatureLayer.olFillFromWeaveFill(record.fill, 0.5);
 
 			let normalStyle = [new ol.style.Style({
-				fill: olFill,
-				stroke: olStroke,
+				fill: fillEnabled ? olFill : undefined,
+				stroke: strokeEnabled ? olStroke : undefined,
 				zIndex: 0
 			})];
 
 			let unselectedStyle = [new ol.style.Style({
-				fill: olFillFaded,
-				stroke: olStrokeFaded,
+				fill: fillEnabled ? olFill : undefined,
+				stroke: strokeEnabled ? olStrokeFaded : undefined,
 				zIndex: 0
 			})];
 
-			let selectedStyle = FeatureLayer.getOlSelectionStyle(olStroke);
-			let probedStyle = FeatureLayer.getOlProbedStyle(olStroke);
+			let selectedStyle = (strokeEnabled || fillEnabled) && FeatureLayer.getOlSelectionStyle(olStroke);
+			let probedStyle = (strokeEnabled || fillEnabled) && FeatureLayer.getOlProbedStyle(olStroke);
 
 			let feature = this.source.getFeatureById(record.id);
 

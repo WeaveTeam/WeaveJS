@@ -43,6 +43,10 @@ class ScatterPlotLayer extends GlyphLayer {
 
 	updateStyleData()
 	{
+
+		let fillEnabled = this.fillStylePath.push("enable").getState();
+		let strokeEnabled = this.lineStylePath.push("enable").getState();
+
 		var styleRecords:any = this.layerPath.retrieveRecords({
 			fill: {
 				color: this.fillStylePath.push("color"),
@@ -76,7 +80,7 @@ class ScatterPlotLayer extends GlyphLayer {
 		let sizeBy = lodash.pluck(styleRecords, "sizeBy");
 		let sizeByMax = lodash.max(sizeBy);
 		let sizeByMin = lodash.min(sizeBy);
-		let absMax = Math.max(sizeByMax, sizeByMin);
+		let absMax = Math.max(Math.abs(sizeByMax), Math.abs(sizeByMin));
 		let minScreenRadius = this.minRadiusPath.getState();
 		let maxScreenRadius = this.maxRadiusPath.getState();
 		let defaultScreenRadius = this.defaultRadiusPath.getState();
@@ -111,19 +115,19 @@ class ScatterPlotLayer extends GlyphLayer {
 
 			let normalStyle = [new ol.style.Style({
 				image: new ol.style.Circle({
-					fill: olFill, stroke: olStroke,
+					fill: fillEnabled ? olFill : undefined, stroke: strokeEnabled ? olStroke : undefined,
 					radius: screenRadius
 				})
 			})];
 
 			let unselectedStyle = [new ol.style.Style({
 				image: new ol.style.Circle({
-					fill: olFillFaded, stroke: olStrokeFaded,
+					fill: fillEnabled ? olFillFaded : undefined, stroke: strokeEnabled ? olStrokeFaded : undefined,
 					radius: screenRadius
 				})
 			})];
 
-			let selectedStyle = [
+			let selectedStyle = (strokeEnabled || fillEnabled) && [
 				new ol.style.Style({
 					image: new ol.style.Circle({
 						stroke: olSelectionStyle[0].getStroke(),
@@ -133,7 +137,7 @@ class ScatterPlotLayer extends GlyphLayer {
 				})
 			];
 
-			let probedStyle = [
+			let probedStyle = (strokeEnabled || fillEnabled) && [
 				new ol.style.Style({
 					image: new ol.style.Circle({
 						stroke: olProbedStyle[0].getStroke(),
