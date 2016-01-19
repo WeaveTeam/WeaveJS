@@ -406,13 +406,15 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.heightColumnNames = [];
         this.heightColumnsLabels = [];
 
-        var heightColumns = this.paths.heightColumns.getChildren();
+        var lhm = this.paths.heightColumns.getObject();
+        var columns = lhm.getObjects();
+        var names = lhm.getNames();
 
-        for (let idx in heightColumns)
+        for (let idx in columns)
         {
-            let column = heightColumns[idx];
-            let title = column.getValue("this.getMetadata('title')");
-            let name = column.getPath().pop();
+            let column = columns[idx];
+            let name = names[idx];
+            let title = column.getMetadata('title');
 
             this.heightColumnsLabels.push(title);
             this.heightColumnNames.push(name);
