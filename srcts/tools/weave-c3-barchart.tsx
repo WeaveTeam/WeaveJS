@@ -177,6 +177,27 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     }
                 },
                 y: {
+                    show: true,
+                    label: {
+                        text:"",
+                        position: "outer-middle"
+                    },
+                    tick: {
+                        fit: false,
+                        multiline: false,
+                        format: (num:number):string => {
+                            if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
+                                return this.yAxisValueToLabel[num] || "";
+                            } else if (this.groupingMode === "percentStack") {
+                                return d3.format(".0%")(num);
+                            } else {
+                                return String(FormatUtils.defaultNumberFormatting(num));
+                            }
+                        }
+                    }
+                },
+                y2: {
+                    show:false,
                     label: {
                         text:"",
                         position: "outer-middle"
@@ -316,6 +337,22 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         }
     }
 
+    setAxes() {
+        var temp:string = this.c3Config.data.keys.value[0];
+        if(this.c3Config.axis.y.show == true){
+            this.c3Config.axis.y2.show = true;
+            this.c3Config.axis.y.show = false;
+            this.c3Config.data.axes = {[temp]:'y2'};
+            this.c3Config.axis.y2.label = this.c3Config.axis.y.label;
+        }else{
+            this.c3Config.axis.y.show = true;
+            this.c3Config.axis.y2.show = false;
+            this.c3Config.data.axes = {[temp]:'y'};
+            this.c3Config.axis.y.label = this.c3Config.axis.y2.label;
+        }
+        this.generate();
+    }
+
     rotateAxes() {
         this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
         this.generate();
@@ -355,11 +392,12 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     private axisLabelsChanged():void {
         var chartWidth:number = this.chart.internal.width;
+        var chartHeight:number =this.chart.internal.height;
         var textHeight:number = StandardLib.getTextHeight("test","14pt Helvetica Neue");
-        var labelsToShow:number = Math.floor(chartWidth/textHeight);
-        labelsToShow = Math.max(2,labelsToShow);
+        var xLabelsToShow:number = Math.floor(chartWidth/textHeight);
+        xLabelsToShow = Math.max(2,xLabelsToShow);
 
-        this.c3Config.axis.x.tick.culling = {max: labelsToShow};
+        this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
     }
 
     handleShowValueLabels () {
