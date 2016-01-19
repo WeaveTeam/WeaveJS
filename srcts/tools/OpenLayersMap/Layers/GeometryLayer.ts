@@ -31,6 +31,7 @@ class GeometryLayer extends FeatureLayer {
 
 		this.fillStylePath.addCallback(this, this.updateStyleData);
 		this.lineStylePath.addCallback(this, this.updateStyleData, true);
+		this.filteredKeySet.getObject().setColumnKeySources([this.geoColumnPath.getObject("internalDynamicColumn")]);
 	}
 
 	handleMissingSessionStateProperties(newState)

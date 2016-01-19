@@ -20,7 +20,7 @@ export abstract class FeatureLayer extends Layer {
 
 	public selectionKeySet:WeavePath;
 	public probeKeySet:WeavePath;
-	public subsetFilter:WeavePath;
+	public filteredKeySet:WeavePath;
 	private tempSelectable:boolean;
 
 	source:ol.source.Vector;
@@ -45,7 +45,7 @@ export abstract class FeatureLayer extends Layer {
 
 		this.selectionKeySet = this.layerPath.selection_keyset;
 		this.probeKeySet = this.layerPath.probe_keyset;
-		this.subsetFilter = this.layerPath.subset_filter;//push("filteredKeySet");
+		this.filteredKeySet = this.layerPath.push("filteredKeySet");
 
 		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, this.selectedSet);
 		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, this.probedSet);
@@ -53,7 +53,7 @@ export abstract class FeatureLayer extends Layer {
 		this.selectionKeySet.addKeySetCallback(selectionKeyHandler);
 		this.probeKeySet.addKeySetCallback(probeKeyHandler);
 
-		this.subsetFilter.addCallback(this, this.updateFilteredKeySet, true);
+		this.filteredKeySet.addCallback(this, this.updateFilteredKeySet, true);
 		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
 	}
 
@@ -156,7 +156,7 @@ export abstract class FeatureLayer extends Layer {
 
 		this.filteredSet.clear();
 
-		var filteredKeys = this.subsetFilter.filterKeys(sourceKeys);
+		var filteredKeys = this.filteredKeySet.filterKeys(sourceKeys);
 		for (let key of filteredKeys)
 		{
 			this.filteredSet.add(key);
