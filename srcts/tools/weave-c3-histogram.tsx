@@ -42,6 +42,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     private heightColumnNames:string[];
     private binnedColumnDataType:string;
     private numberOfBins:number;
+    private showXAxisLabel:boolean;
     private histData:{}[];
     private c3Config:ChartConfiguration;
     private chart:ChartAPI;
@@ -288,8 +289,14 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         if(this.busy)
             return;
 
+
+        var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() || this.paths.binnedColumn.getValue("this.getMetadata('title')");
+        if(!this.showXAxisLabel){
+            xLabel = " ";
+        }
+
         this.chart.axis.labels({
-            x: this.paths.xAxis.push("overrideAxisName").getState() || this.paths.binnedColumn.getValue("this.getMetadata('title')"),
+            x: xLabel,
             y: this.getYAxisLabel.bind(this)()
         });
     }
@@ -420,6 +427,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
         document.addEventListener("keydown", this.toggleKey.bind(this));
         document.addEventListener("keyup", this.toggleKey.bind(this));
+        this.showXAxisLabel = false;
         var axisChanged:Function = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
         var selectionKeySetChanged:Function = this._selectionKeysChanged.bind(this);
