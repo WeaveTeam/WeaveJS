@@ -49,7 +49,6 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
     protected paths:IHistogramPaths;
 
-    private keyDown:boolean;
     private flag:boolean;
 
     constructor(props:IAbstractWeaveToolProps) {
@@ -82,7 +81,8 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     return "#C0CDD1";
                 },
                 onclick: (d:any) => {
-                    if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                    var event:MouseEvent = this.chart.internal.d3 as MouseEvent;
+                    if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
                         var selectedIds:string[] = this.paths.binnedColumn.getValue("this.getKeysFromBinIndex.bind(this)")(d.index).map( (qKey:{}) => {
                             return this.toolPath.qkeyToString(qKey);
                         });
@@ -249,12 +249,6 @@ class WeaveC3Histogram extends AbstractWeaveTool {
             this.toolPath.selection_keyset.setKeys([]);
         }
         this.flag = false;
-    }
-
-    toggleKey(event:KeyboardEvent) {
-        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
-            this.keyDown = !this.keyDown;
-        }
     }
 
     rotateAxes() {
@@ -425,8 +419,6 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     componentDidMount() {
         super.componentDidMount();
 
-        document.addEventListener("keydown", this.toggleKey.bind(this));
-        document.addEventListener("keyup", this.toggleKey.bind(this));
         this.showXAxisLabel = false;
         var axisChanged:Function = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
@@ -448,9 +440,9 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
-        
+
        	this.paths.filteredKeySet.getObject().setSingleKeySource(this.paths.fillStyle.getObject('color', 'internalDynamicColumn'));
-        
+
         this.c3Config.bindto = this.element;
         if(this.paths.binnedColumn.push("internalDynamicColumn").getState().length){
             this.c3Config.axis.x.height = this.getElementSize().height * 0.2;

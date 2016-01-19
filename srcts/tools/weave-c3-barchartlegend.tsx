@@ -53,8 +53,6 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
     private spanStyle:CSSProperties;
     private numberOfLabels:number;
 
-    private keyDown:boolean;
-
     constructor(props:IBarChartLegendProps) {
         super(props);
         this.toolPath = props.toolPath;
@@ -64,7 +62,6 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
         this.maxColumnsPath = this.plotterPath.push("maxColumns");
         this.filteredKeySet = this.plotterPath.push("filteredKeySet");
         this.state = {selected:[], probed:[]};
-        this.keyDown = false;
         this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
 
@@ -95,16 +92,8 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
 
     }
 
-    toggleKey(event:KeyboardEvent):void {
-        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
-            this.keyDown = !this.keyDown;
-        }
-    }
-
     componentDidMount() {
         this.setupCallbacks();
-        document.addEventListener("keydown", this.toggleKey.bind(this));
-        document.addEventListener("keyup", this.toggleKey.bind(this));
     }
 
     componentDidUpdate() {

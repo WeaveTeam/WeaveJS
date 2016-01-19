@@ -56,7 +56,6 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     private toolPath:WeavePath;
     private spanStyle:CSSProperties;
 
-    private keyDown:boolean;
     private selectedBins:number[];
 
     constructor(props:IColorLegendProps) {
@@ -72,7 +71,6 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.probeKeySet = this.toolPath.push("probeKeySet");
         this.numberOfBins = this.binnedColumnPath.getValue("this.numberOfBins");
         this.state = {selected:[], probed:[]};
-        this.keyDown = false;
         this.selectedBins = [];
         this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
@@ -114,7 +112,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         return _.unique(probedBins);
     }
 
-    handleClick(bin:number,temp:any):void {
+    handleClick(bin:number, event:React.MouseEvent):void {
         var binnedKeys:any[] = this.binnedColumnPath.getObject()._binnedKeysArray;
         //setKeys
         if(_.contains(this.selectedBins,bin)){
@@ -125,7 +123,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                 return value == bin;
             });
         }else {
-            if (this.keyDown) {
+            if ((event.ctrlKey || event.metaKey)) {
                 this.toolPath.selection_keyset.addKeys(binnedKeys[bin]);
                 this.selectedBins.push(bin);
             } else {
@@ -144,16 +142,8 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         }
     }
 
-    toggleKey(event:KeyboardEvent):void {
-        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
-            this.keyDown = !this.keyDown;
-        }
-    }
-
     componentDidMount() {
         this.setupCallbacks();
-        document.addEventListener("keydown", this.toggleKey.bind(this));
-        document.addEventListener("keyup", this.toggleKey.bind(this));
     }
 
     componentDidUpdate() {

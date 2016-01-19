@@ -39,7 +39,6 @@ class WeaveC3LineChart extends AbstractWeaveTool {
     private records:Record[][];
     private columnLabels:string[];
     private columnNames:string[];
-    private keyDown:boolean;
     private flag:boolean;
 
     private c3Config:ChartConfiguration;
@@ -243,8 +242,6 @@ class WeaveC3LineChart extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
-        document.addEventListener("keydown", this.toggleKey.bind(this));
-        document.addEventListener("keyup", this.toggleKey.bind(this));
         var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
         var selectionKeySetChanged:Function = this._selectionKeysChanged.bind(this);
         var probeKeySetChanged:Function = _.debounce(this._probedKeysChanged.bind(this), 100);
@@ -260,7 +257,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
-        
+
        	this.paths.filteredKeySet.getObject().setColumnKeySources(this.paths.columns.getObject().getObjects());
 
         this.c3Config = {
@@ -279,7 +276,8 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                     draggable: true
                 },
                 onclick: (d:any) => {
-                    if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                    var event:MouseEvent = this.chart.internal.d3.event as MouseEvent;
+                    if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
                         this.toolPath.selection_keyset.setKeys([d.id]);
                     }
                 },
@@ -355,12 +353,6 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             this.toolPath.selection_keyset.setKeys([]);
         }
         this.flag = false;
-    }
-
-    toggleKey(event:KeyboardEvent):void {
-        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
-            this.keyDown = !this.keyDown;
-        }
     }
 }
 

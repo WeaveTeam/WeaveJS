@@ -50,22 +50,11 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     }
 
     componentDidMount() {
-        document.addEventListener("keydown", this.toggleKey.bind(this), true);
-        document.addEventListener("keyup", this.toggleKey.bind(this), false)
+
     }
 
     componentWillUnmount() {
         // TODO: remove event listeners
-    }
-
-    toggleKey(event:React.KeyboardEvent) {
-        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
-            this.keyDown = !this.keyDown;
-        }
-        if(event.keyCode === 16) {
-            this.shiftDown = !this.shiftDown;
-            console.log(this.shiftDown);
-        }
     }
 
     onMouseOver(id:string, status:boolean) {
@@ -88,7 +77,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         });
     }
 
-    onClick(id:string) {
+    onClick(id:string, event:React.MouseEvent) {
         var selectedIds:string[] = this.state.selectedIds.slice(0);
 
         // in single selection mode,
@@ -96,13 +85,13 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         // already selected keys get unselected
         var keyLocation:number = selectedIds.indexOf(id);
         if(keyLocation > -1) {
-            if(this.keyDown) {
+            if((event.ctrlKey || event.metaKey)) {
                 selectedIds.splice(keyLocation, 1);
             } else {
                 selectedIds = [];
             }
         } else {
-            if(this.keyDown) {
+            if((event.ctrlKey || event.metaKey)) {
                 selectedIds.push(id)
             } else {
                 selectedIds = [id];

@@ -59,7 +59,6 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     private normalizedPointSizes:number[];
 
     private flag:boolean;
-    private keyDown:boolean;
 
     private c3Config:ChartConfiguration;
 
@@ -277,12 +276,6 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.flag = false;
     }
 
-    toggleKey(event:KeyboardEvent):void {
-        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
-            this.keyDown = !this.keyDown;
-        }
-    }
-
     _updateStyle() {
         d3.select(this.element).selectAll("circle").style("opacity", 1)
             .style("stroke", "black")
@@ -311,8 +304,6 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     componentDidMount() {
         super.componentDidMount();
 
-        document.addEventListener("keydown", this.toggleKey.bind(this));
-        document.addEventListener("keyup", this.toggleKey.bind(this));
         var axisChanged = this.axisChanged.bind(this);
         var dataChanged = this.dataChanged.bind(this);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
@@ -334,7 +325,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
-        
+
         this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.dataX.getObject(), this.paths.dataY.getObject()]);
 
         this.c3Config = {
@@ -367,7 +358,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     return "#000000";
                 },
                 onclick: (d:any) => {
-                    if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                    var event:MouseEvent = (this.chart.internal.d3).event as MouseEvent;
+                    if(!(event.ctrlKey||event.metaKey) && d && d.hasOwnProperty("index")) {
                         this.toolPath.selection_keyset.setKeys([this.indexToKey[d.index]]);
                     }
                 },

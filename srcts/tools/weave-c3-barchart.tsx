@@ -63,7 +63,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     protected paths:IBarchartPaths;
 
     private flag:boolean;
-    private keyDown:boolean;
     private busy:boolean;
 
     constructor(props:IAbstractWeaveToolProps) {
@@ -72,7 +71,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.indexToKey = {};
         this.yAxisValueToLabel = {};
         this.xAxisValueToLabel = {};
-        
+
         this.debounced_dataChanged = _.debounce(this.dataChanged.bind(this), 20);
         this.debounced_axisChanged = _.debounce(this.axisChanged.bind(this), 20);
 
@@ -115,7 +114,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
                     }
                 },
                 onclick: (d:any) => {
-                    if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                    var event:MouseEvent = this.chart.internal.d3.event as MouseEvent;
+                    if(!(event.ctrlKey || event.metaKey)&& d && d.hasOwnProperty("index")) {
                         this.toolPath.selection_keyset.setKeys([this.indexToKey[d.index]]);
                     }
                 },
@@ -333,12 +333,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             this.toolPath.selection_keyset.setKeys([]);
         }
         this.flag = false;
-    }
-
-    toggleKey(event:KeyboardEvent):void {
-        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
-            this.keyDown = !this.keyDown;
-        }
     }
 
     setAxes() {
@@ -599,8 +593,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
-        document.addEventListener("keydown", this.toggleKey.bind(this));
-        document.addEventListener("keyup", this.toggleKey.bind(this));
         this.showXAxisLabel = false;
 
         var plotterPath = this.toolPath.pushPlotter("plot");
@@ -622,9 +614,9 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         ];
 
         this.initializePaths(mapping);
-        
+
         this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.sortColumn.getObject()]);
-        
+
         this.c3Config.bindto = this.element;
         if(this.paths.labelColumn.getState().length){
             this.c3Config.axis.x.height = this.getElementSize().height * 0.2;

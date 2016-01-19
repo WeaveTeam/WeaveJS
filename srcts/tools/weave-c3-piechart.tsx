@@ -31,7 +31,6 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
     private indexToKey:{[index:number]: string};
     private chart:ChartAPI;
     private c3Config:ChartConfiguration;
-    private keyDown:boolean;
     protected paths:IPieChartPaths;
     private flag:boolean;
     private numericRecords:Record[];
@@ -78,12 +77,6 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
             this.toolPath.selection_keyset.setKeys([])
         }
         this.flag = false;
-    }
-
-    toggleKey(event:KeyboardEvent):void {
-        if((event.keyCode === 17)||(event.keyCode === 91) || (event.keyCode === 224)) {
-            this.keyDown = !this.keyDown;
-        }
     }
 
     private dataChanged():void {
@@ -161,8 +154,6 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
 
     componentDidMount() {
         super.componentDidMount();
-        document.addEventListener("keydown", this.toggleKey.bind(this));
-        document.addEventListener("keyup", this.toggleKey.bind(this));
         var dataChanged:Function = _.debounce(this.dataChanged.bind(this), 100);
         var selectionKeySetChanged:Function = this.selectionKeysChanged.bind(this);
         var probeKeySetChanged:Function = _.debounce(this.probedKeysChanged.bind(this), 100);
@@ -182,7 +173,7 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
         this.initializePaths(manifest);
 
        	this.paths.filteredKeySet.getObject().setSingleKeySource(this.paths.data.getObject());
-        
+
         this.c3Config = {
             //size: this.getElementSize(),
             bindto: this.element,
@@ -200,7 +191,8 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
                },
                type: "pie",
                onclick: (d:any) => {
-                 if(!this.keyDown && d && d.hasOwnProperty("index")) {
+                 var event:MouseEvent = this.chart.internal.d3.event as MouseEvent;
+                 if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
                      this.toolPath.selection_keyset.setKeys([this.indexToKey[d.index]]);
                  }
                },
