@@ -87,7 +87,7 @@ class GeometryLayer extends FeatureLayer {
 				lineJoin: this.lineStylePath.push("joints"),
 				miterLimit: this.lineStylePath.push("miterLimit")
 			}
-		}, this.geoColumnPath);
+		}, this.geoColumnPath.push("internalDynamicColumn"));
 
 		for (let record of styleRecords)
 		{
