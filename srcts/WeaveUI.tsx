@@ -16,15 +16,14 @@ import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import WeaveReactTable from "./tools/weave-react-table";
 import SessionStateMenuTool from "./tools/weave-session-state-menu";
 import StandardLib from "./utils/StandardLib";
-import * as JSZip from "jszip";
+import JSZip from "jszip";
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 /*global Weave, weavejs*/
-
+var stub:any = React;
 weavejs.util.JS.JSZip = JSZip;
-
 // var WeaveUI = {
 //     Layout: WeaveLayoutManager,
 //     Barchart: WeaveC3Barchart,

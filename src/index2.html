@@ -1,31 +1,28 @@
 <html>
-<meta http-equiv="content-type" content="text/html; charset=UTF8">
-<head>
-<title>Weave</title>
-<link href="c3.css" rel="stylesheet" type="text/css">
-<link href="ol.css" rel="stylesheet" type="text/css">
-<link href="ol-custom.css" rel="stylesheet" type="text/css">
-<link href="css/font-awesome.css" rel="stylesheet" type="text/css">
-<link href="datagrid.css" rel="stylesheet" type="text/css">
-<link href="bootstrap.min.css" rel="stylesheet">
-<link rel="stylesheet" href="react-bootstrap-table-all.min.css">
-
-<style>
-#resizable { width: 150px; height: 150px; padding: 0.5em; }
-#resizable h3 { text-align: center; margin: 0; }
-</style>
-
-</head>
-<body>
-	<script src="../weavejs/js-release/WeaveJS.js"></script>
-	<script type="text/javascript">
-		new WeaveJS().start();
-	</script>
-	<script src="libs.js"></script>
-	<script src="WeaveUI.js"></script>
-	<div>
-		<div id="weaveElt" style="position:relative"></div>
-		<div id="weaveElt2" style="position:relative"></div>
-	<div>
-</body>
+	<meta http-equiv="content-type" content="text/html; charset=UTF8">
+	<head>
+		<title>Weave</title>
+		<link href="c3.css" rel="stylesheet" type="text/css">
+		<link href="ol.css" rel="stylesheet" type="text/css">
+		<link href="ol-custom.css" rel="stylesheet" type="text/css">
+		<link href="css/font-awesome.css" rel="stylesheet" type="text/css">
+		<link href="bootstrap.min.css" rel="stylesheet">
+		<link href="weave.css" rel="stylesheet" type="text/css">
+	</head>
+	<body>
+		<script src="../weavejs/js-release/WeaveJS.js"></script>
+		<script type="text/javascript">
+			new WeaveJS().start();
+		</script>
+		<script src="libs.js"></script>
+		<script src="WeaveUI.js"></script>
+		<div>
+			<div id="weaveElt" style="position:relative"></div>
+			<div id="weaveElt2" style="position:relative"></div>
+		<div>
+		<script>
+			var weave = new Weave();
+			WeaveUI.loadLayout(weave, "KSA.weave", "weaveElt");
+		</script>
+	</body>
 </html>

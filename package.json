@@ -53,6 +53,7 @@
     "react-bootstrap": "^0.28.1",
     "react-bootstrap-async-autocomplete": "0.0.3",
     "react-date-picker": "^3.1.8",
+    "react-dom": "^0.14.6",
     "react-vendor-prefix": "0.0.1",
     "swfobject-amd": "^2.3.1"
   }
