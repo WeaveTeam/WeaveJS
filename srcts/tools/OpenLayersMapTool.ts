@@ -16,6 +16,7 @@ import GeometryLayer from "./OpenLayersMap/Layers/GeometryLayer";
 import TileLayer from "./OpenLayersMap/Layers/TileLayer";
 import ImageGlyphLayer from "./OpenLayersMap/Layers/ImageGlyphLayer";
 import ScatterPlotLayer from "./OpenLayersMap/Layers/ScatterPlotLayer";
+import LabelLayer from "./OpenLayersMap/Layers/LabelLayer";
 /* eslint-enable */
 
 import {PanCluster, InteractionModeCluster} from "./OpenLayersMap/controls";
@@ -47,7 +48,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 	constructor(props)
 	{
 		super(props);
-		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; /* Forces the inclusion of the layers. */
+		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;/* Forces the inclusion of the layers. */
 		this.layers = new Map<string,Layer>();
 	}
 
