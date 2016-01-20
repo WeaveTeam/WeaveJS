@@ -3,7 +3,7 @@
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
-
+/// <reference path="../../typings/react/react-dom.d.ts"/>
 
 import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
@@ -17,7 +17,8 @@ import {ElementSize} from "./AbstractWeaveTool";
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
 import {getTooltipContent} from "./tooltip";
-
+import Tooltip from "./tooltip";
+import * as ReactDOM from "react-dom";
 interface IColumnStats {
     min: number;
     max: number;
@@ -163,7 +164,6 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.dataYType = this.paths.dataY.getValue("this.getMetadata('dataType')");
 
         this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        console.log(this.numericRecords);
         this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
@@ -379,12 +379,37 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                 },
                 onmouseover: (d) => {
                     if(d && d.hasOwnProperty("index")) {
+                        this.toolPath.probe_keyset.setKeys([]);
+                        var columnNamesToValue:{[columnName:string] : string|number } = {};
+                        var xValue:number = this.numericRecords[d.index]["point"]["x"];
+                        if(xValue) {
+                            columnNamesToValue[this.paths.dataX.getValue("this.getMetadata('title')")] = xValue;
+                        }
+
+                        var yValue:number = this.numericRecords[d.index]["point"]["y"]
+                        if(yValue) {
+                            columnNamesToValue[this.paths.dataY.getValue("this.getMetadata('title')")] = yValue;
+                        }
+
+                        var sizeByValue:number = this.numericRecords[d.index]["size"] as number;
+                        if(sizeByValue) {
+                            columnNamesToValue[this.paths.sizeBy.getValue("this.getMetadata('title')")] =  sizeByValue;
+                        }
                         this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                        this.toolTip.setState({
+                            x: this.chart.internal.d3.event.pageX,
+                            y: this.chart.internal.d3.event.pageY,
+                            showTooltip: true,
+                            columnNamesToValue: columnNamesToValue
+                        });
                     }
                 },
                 onmouseout: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.probe_keyset.setKeys([]);
+                        this.toolTip.setState({
+                            showTooltip: false
+                        });
                     }
                 }
             },
@@ -442,32 +467,33 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                         return this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("this.getMetadata('title')");
                     }
                 },
-                contents: (d:any, defaultTitleFormat:string, defaultValueFormat:string, color:any):string => {
-                    var $$ = this.chart.internal, config = $$.config,
-                        titleFormat = config.tooltip_format_title || defaultTitleFormat,
-                        nameFormat = config.tooltip_format_name || function (name) { return name; },
-                        valueFormat = config.tooltip_format_value || defaultValueFormat,
-                        text, i, title, value, name;
-
-                    if(d.length) {
-                        var columnNamesToValue:{[columnName:string] : string|number } = {};
-                        var xValue:number = this.numericRecords[d[0].index]["point"]["x"];
-                        if(xValue) {
-                            columnNamesToValue[this.paths.dataX.getValue("this.getMetadata('title')")] = xValue;
-                        }
-
-                        var yValue:number = this.numericRecords[d[0].index]["point"]["y"]
-                        if(yValue) {
-                            columnNamesToValue[this.paths.dataY.getValue("this.getMetadata('title')")] = yValue;
-                        }
-
-                        var sizeByValue:number = this.numericRecords[d[0].index]["size"] as number;
-                        if(sizeByValue) {
-                            columnNamesToValue[this.paths.sizeBy.getValue("this.getMetadata('title')")] =  sizeByValue;
-                        }
-                        return getTooltipContent(columnNamesToValue);
-                    }
-                }
+                show: false
+                //contents: (d:any, defaultTitleFormat:string, defaultValueFormat:string, color:any):string => {
+                    // var $$ = this.chart.internal, config = $$.config,
+                    //     titleFormat = config.tooltip_format_title || defaultTitleFormat,
+                    //     nameFormat = config.tooltip_format_name || function (name) { return name; },
+                    //     valueFormat = config.tooltip_format_value || defaultValueFormat,
+                    //     text, i, title, value, name;
+                    //
+                    // if(d.length) {
+                    //     var columnNamesToValue:{[columnName:string] : string|number } = {};
+                    //     var xValue:number = this.numericRecords[d[0].index]["point"]["x"];
+                    //     if(xValue) {
+                    //         columnNamesToValue[this.paths.dataX.getValue("this.getMetadata('title')")] = xValue;
+                    //     }
+                    //
+                    //     var yValue:number = this.numericRecords[d[0].index]["point"]["y"]
+                    //     if(yValue) {
+                    //         columnNamesToValue[this.paths.dataY.getValue("this.getMetadata('title')")] = yValue;
+                    //     }
+                    //
+                    //     var sizeByValue:number = this.numericRecords[d[0].index]["size"] as number;
+                    //     if(sizeByValue) {
+                    //         columnNamesToValue[this.paths.sizeBy.getValue("this.getMetadata('title')")] =  sizeByValue;
+                    //     }
+                    //     return getTooltipContent(columnNamesToValue);
+                    // }
+                //}
             },
             point: {
                 r: (d:any):number => {

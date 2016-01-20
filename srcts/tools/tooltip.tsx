@@ -4,6 +4,7 @@
 
 import * as _ from "lodash";
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 export function getTooltipContent(
                                     columnNamesToValue:{[columnName:string]: string|number},
@@ -37,23 +38,23 @@ export function getTooltipContent(
     return template;
 }
 
-interface IToolTipPros extends React.Props<ToolTip>{
-    event:MouseEvent,
-    columnNamesToValue:{[columnName:string]: string|number},
-    toolTipClass?:string,
-    title?:string,
-    tooltipContainerClass?:string,
-    nameFormat?:Function,
-    valueFormat?:Function,
-    titleFormat?:Function,
-    showTooltip:boolean
+export interface IToolTipProps extends React.Props<ToolTip>{
+    toolTipClass?:string;
+    tooltipContainerClass?:string;
+    nameFormat?:Function;
+    valueFormat?:Function;
+    titleFormat?:Function;
 }
 
-interface IToolTipState {
-
+export interface IToolTipState {
+    x?:number;
+    y?:number;
+    title?:string;
+    columnNamesToValue?:{[columnName:string]: string|number};
+    showTooltip?:boolean;
 }
 
-export default class ToolTip extends React.Component<IToolTipPros, IToolTipState> {
+export default class ToolTip extends React.Component<IToolTipProps, IToolTipState> {
 
     private nameFormat:Function;
     private valueFormat:Function;
@@ -63,7 +64,7 @@ export default class ToolTip extends React.Component<IToolTipPros, IToolTipState
     private containerStyle:React.CSSProperties;
     private element:HTMLElement;
 
-    constructor(props:IToolTipPros) {
+    constructor(props:IToolTipProps) {
         super(props);
 
         this.nameFormat = this.props.nameFormat || _.identity;
@@ -72,17 +73,23 @@ export default class ToolTip extends React.Component<IToolTipPros, IToolTipState
         this.toolTipClass = this.props.toolTipClass || "c3-tooltip";
         this.tooltipContainerClass = this.props.tooltipContainerClass || "c3-tooltip-container";
 
+        this.state = {
+            x: 0,
+            y: 0,
+            title: "",
+            columnNamesToValue: {},
+            showTooltip: false
+        }
+
         this.containerStyle = {
-            position: "relative",
+            position: "absolute",
             pointerEvents: "none",
-            display: "none",
-            left: this.props.event.clientX,
-            top: this.props.event.clientY
+            display: "block",
         }
     }
 
     componentDidMount() {
-
+        //this.element = ReactDOM.findDOMNode(this);
     }
 
     getToolTipHtml():string {
@@ -91,32 +98,46 @@ export default class ToolTip extends React.Component<IToolTipPros, IToolTipState
 
     render():JSX.Element {
 
-        var tableRows:JSX.Element[] = [];
-        this.containerStyle.display = this.props.showTooltip ? "none" : "block";
-        var columnNames:string[] = Object.keys(this.props.columnNamesToValue);
-        if(columnNames.length) {
-            tableRows = columnNames.map((columnName:string) => {
-                return (
-                    <tr key={columnName}>
-                        <td className="name">{this.nameFormat(columnName)}</td>
-                        <td className="value">{this.valueFormat(this.props.columnNamesToValue[columnName])}</td>
-                    </tr>
-                )
-            });
-        }
+        if(!(this.element && this.state.showTooltip)) {
+            return <div ref={(c:HTMLElement) => { this.element = c }}></div>;
+        } else {
+            var tableRows:JSX.Element[] = [];
+            this.containerStyle.display = "block";
 
-        return (
-            <div ref={(c:HTMLElement) => { this.element = c }} className={this.tooltipContainerClass}>
+            var container:any = this.element.parentNode as Element;
+            var rect:ClientRect = container.getBoundingClientRect();
+            var left: number = window.pageXOffset + rect.left;
+            var top: number = window.pageYOffset + rect.top;
+            this.containerStyle.left = this.state.x - left;
+            this.containerStyle.top = this.state.y - top;
+
+            var columnNames:string[] = Object.keys(this.state.columnNamesToValue);
+            if(columnNames.length) {
+                tableRows = columnNames.map((columnName:string) => {
+                    return (
+                        <tr key={columnName}>
+                        <td className="name">{this.nameFormat(columnName)}</td>
+                        <td className="value">{this.valueFormat(this.state.columnNamesToValue[columnName])}</td>
+                        </tr>
+                    )
+                });
+            }
+
+            return (
+                <div style={this.containerStyle} ref={(c:HTMLElement) => { this.element = c }} className={this.tooltipContainerClass}>
                 <table className={this.toolTipClass}>
-                    {
-                        this.props.title ? <tr><th colSpan={2}>{this.titleFormat(this.props.title)}</th></tr> : ""
-                    }
-                    {
-                        tableRows
-                    }
+                    <tbody>
+                        {
+                            <tr><th colSpan={2}>{this.state.title ? this.titleFormat(this.state.title): ""}</th></tr>
+                        }
+                        {
+                            tableRows
+                        }
+                    </tbody>
                 </table>
-            </div>
-        )
+                </div>
+            )
+        }
     }
 
 }

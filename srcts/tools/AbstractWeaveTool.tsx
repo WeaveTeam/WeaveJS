@@ -7,6 +7,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
+import ToolTip from "./tooltip";
+import {IToolTipProps, IToolTipState} from "./tooltip";
 
 export interface IAbstractWeaveToolProps extends React.Props<AbstractWeaveTool> {
     toolPath:WeavePath;
@@ -39,6 +41,7 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
     protected element:HTMLElement;
     protected paths:IAbstractWeaveToolPaths;
     protected elementSize:ElementSize;
+    protected toolTip:React.Component<IToolTipProps, IToolTipState>;
 
     constructor(props:IAbstractWeaveToolProps) {
         super(props);
@@ -90,9 +93,12 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
     }
 
     render():JSX.Element {
-        return <div ref={(elt:HTMLElement) => { this.wrapper = elt; }} style={this.props.style}>
-            <div ref={(elt:HTMLElement) => {this.element = elt; }} onClick={this.handleClick.bind(this)} style={{width: "100%", height: "100%", maxHeight: "100%"}}></div>
-        </div>;
+        return (
+            <div ref={(elt:HTMLElement) => { this.wrapper = elt; }} style={this.props.style}>
+                <ToolTip ref={(c:React.Component<IToolTipProps, IToolTipState>) => { this.toolTip = c }}/>
+                <div ref={(elt:HTMLElement) => {this.element = elt; }} onClick={this.handleClick.bind(this)} style={{width: "100%", height: "100%", maxHeight: "100%"}}></div>
+            </div>
+        );
     }
 
     customStyle(array:Array<number>, type:string, filter:string, style:any) {
