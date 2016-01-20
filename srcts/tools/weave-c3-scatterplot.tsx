@@ -16,6 +16,7 @@ import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import {ElementSize} from "./AbstractWeaveTool";
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
+import {getTooltipContent} from "./tooltip";
 
 interface IColumnStats {
     min: number;
@@ -162,6 +163,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.dataYType = this.paths.dataY.getValue("this.getMetadata('dataType')");
 
         this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        console.log(this.numericRecords);
         this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
@@ -446,42 +448,24 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                         nameFormat = config.tooltip_format_name || function (name) { return name; },
                         valueFormat = config.tooltip_format_value || defaultValueFormat,
                         text, i, title, value, name;
+
                     if(d.length) {
-                        text = "<table class='" + $$.CLASS.tooltip + "'>";
-                        //xvalue text
-                        text += "<tr class='" + $$.CLASS.tooltipName + "-" + d[0].id + "'>";
-                        text += "<td class='name'>" + titleFormat(d[0].x) + "</td>";
-                        text += "<td class='value'>" + d[0].x + "</td>";
-                        text += "</tr>";
-
-                        //loop trhough all y dimensions of data (Scatter plot should only have 1)
-                        for (i = 0; i < d.length; i++) {
-                            if (!(d[i] && (d[i].value || d[i].value === 0))) {
-                                continue;
-                            }
-                            if (!text) {
-                                title = titleFormat ? titleFormat(d[i].x) : d[i].x;
-
-                            }
-                            name = nameFormat(d[i].name);
-                            value = valueFormat(d[i].value, d[i].ratio, d[i].id, d[i].index);
-
-                            text += "<tr class='" + $$.CLASS.tooltipName + "-" + d[i].id + "'>";
-                            text += "<td class='name'>" + name + "</td>";
-                            text += "<td class='value'>" + value + "</td>";
-                            text += "</tr>";
+                        var columnNamesToValue:{[columnName:string] : string|number } = {};
+                        var xValue:number = this.numericRecords[d[0].index]["point"]["x"];
+                        if(xValue) {
+                            columnNamesToValue[this.paths.dataX.getValue("this.getMetadata('title')")] = xValue;
                         }
 
-                        //sizeBy text
-                        var sizeByText = this.paths.sizeBy.getValue("this.getMetadata('title')");
-                        if(sizeByText) {
-                            text += "<tr class='" + $$.CLASS.tooltipName + "-" + d[0].id + "'>";
-                            text += "<td class='name'>" + sizeByText + "</td>";
-                            text += "<td class='value'>" + this.numericRecords[d[0].index]["size"] + "</td>";
-                            text += "</tr>";
+                        var yValue:number = this.numericRecords[d[0].index]["point"]["y"]
+                        if(yValue) {
+                            columnNamesToValue[this.paths.dataY.getValue("this.getMetadata('title')")] = yValue;
                         }
 
-                        return text + "</table>";
+                        var sizeByValue:number = this.numericRecords[d[0].index]["size"] as number;
+                        if(sizeByValue) {
+                            columnNamesToValue[this.paths.sizeBy.getValue("this.getMetadata('title')")] =  sizeByValue;
+                        }
+                        return getTooltipContent(columnNamesToValue);
                     }
                 }
             },
