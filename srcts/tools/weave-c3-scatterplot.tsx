@@ -8,20 +8,17 @@
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
-
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
-import {ChartConfiguration, ChartAPI} from "c3";
-import * as c3 from "c3";
+import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
 import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 import * as ReactDOM from "react-dom";
 import StandardLib from "../utils/StandardLib";
-
 interface IColumnStats {
     min: number;
     max: number;
@@ -120,24 +117,38 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         });
     }
 
+    private busy:number;
     private  axisChanged():void {
-        this.c3Config.axis.x.label = {
-            text: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title'),
-            position: "outer-center"
-        };
-        this.c3Config.axis.y.label = {
-            text: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title'),
-            position: "outer-middle"
-        };
+        if(this.busy) {
+            this.busy++;
+            return;
+        }
+
+        this.chart.axis.labels({
+            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title'),
+            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title')
+        })
+
+        this.axisLabelsChanged();
+        this.generate();
+
+    }
+
+    private axisLabelsChanged():void {
         var chartWidth:number = this.chart.internal.width;
         var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
         var xLabelsToShow:number = Math.floor(chartWidth / textHeight);
         xLabelsToShow = Math.max(2,xLabelsToShow);
+
         this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
-        this.generate();
     }
 
     private dataChanged() {
+        if(this.busy) {
+            this.busy++;
+            return;
+        }
+
         let numericMapping:any = {
             point: {
                 x: this.paths.dataX,
@@ -203,7 +214,10 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
                 return (this.plotterState.defaultScreenRadius) || 3;
             }
         });
+
         this.axisChanged();
+        this.busy = 1;
+
         this.generate();
     }
 
@@ -276,9 +290,28 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
     }
 
     generate() {
-        console.log("generate");
-        this.chart = c3.generate(this.c3Config);
-        this.chart.load({data: _.map(this.numericRecords, "point"), unload: true});
+        this.chart = generate(this.c3Config);
+        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => {
+            if (this.busy > 1) {
+                this.busy = 0;
+                this.dataChanged();
+            }
+            else {
+                this.busy = 0;
+            }
+        }});
+    }
+
+    componentDidUpdate() {
+        //console.log("resizing");
+        //var start = Date.now();
+        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
+            this.c3Config.axis.x.height = this.props.style.height * 0.2;
+            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
+            this.chart = generate(this.c3Config);
+            this.axisChanged();
+        }
+        //var end = Date.now();
     }
 
     componentWillUnmount() {
@@ -288,6 +321,7 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
     }
 
     componentDidMount() {
+        this.element.addEventListener("click", this.handleClick.bind(this));
         var axisChanged = this.axisChanged.bind(this);
         var dataChanged = this.dataChanged.bind(this);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
@@ -314,8 +348,8 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
 
         this.c3Config = {
             size: {
-                width: this.props.style.width,
-                height: this.props.style.height
+                height: this.props.style.height,
+                width: this.props.style.width
             },
             bindto: this.element,
             padding: {
@@ -515,8 +549,8 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         };
 
         this.c3Config.axis.x.height = this.props.style.height * 0.2;
-        this.generate();
-        this.generate = _.debounce(this.generate.bind(this), 0);
+
+        this.chart = generate(this.c3Config);
     }
 }
 export default WeaveC3ScatterPlot;
