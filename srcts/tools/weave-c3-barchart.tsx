@@ -57,8 +57,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     private yLabelColumnPath:WeavePath;
     private c3Config:ChartConfiguration;
     private chart:ChartAPI;
-    private debounced_dataChanged:Function;
-    private debounced_axisChanged:Function;
 
     protected paths:IBarchartPaths;
 
@@ -71,9 +69,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.indexToKey = {};
         this.yAxisValueToLabel = {};
         this.xAxisValueToLabel = {};
-
-        this.debounced_dataChanged = _.debounce(this.dataChanged.bind(this), 20);
-        this.debounced_axisChanged = _.debounce(this.axisChanged.bind(this), 20);
 
         this.c3Config = {
             //size: this.getElementSize(),
@@ -361,10 +356,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     private axisChanged():void {
-        if (!this.chart || this.busy) {
-            this.debounced_axisChanged();
-            return;
-        }
+        if (!this.chart || this.busy)
+        	return StandardLib.debounce(this, 'axisChanged');
 
         var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getObject().getMetadata('title');
         var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
@@ -421,10 +414,8 @@ class WeaveC3Barchart extends AbstractWeaveTool {
     }
 
     private dataChanged():void {
-        if (!this.chart || this.busy) {
-            this.debounced_dataChanged();
-            return;
-        }
+        if (!this.chart || this.busy)
+        	return StandardLib.debounce(this, 'dataChanged');
 
         this.updateColumns();
 
