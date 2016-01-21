@@ -7,7 +7,6 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 import FeatureLayer from "./Layers/FeatureLayer";
 import Layer from "./Layers/Layer";
-import CustomDragBox from "./CustomDragBox";
 import {IToolTipState} from "../tooltip";
 /*global Weave*/
 
@@ -91,7 +90,7 @@ function getDragSelect(mapTool, probeInteraction)
 	let ADD = "+";
 	let SUBTRACT = "-";
 	let SET = "=";
-	let dragSelect = new CustomDragBox();
+	let dragSelect:ol.interaction.DragBox = new ol.interaction.DragBox({ boxEndCondition: () => true });
 	let mode = SET;
 
 	function updateSelection(extent) {
@@ -129,11 +128,12 @@ function getDragSelect(mapTool, probeInteraction)
 		}
 	}
 
-	dragSelect.on('boxstart', function (dragBoxEvent:any) {
+	dragSelect.on('boxstart', function (event:any) {
 		probeInteraction.setActive(false);
 
-		
-		if (ol.events.condition.platformModifierKeyOnly(dragBoxEvent.innerEvent))
+		let dragBoxEvent: ol.DragBoxEvent = <ol.DragBoxEvent>event;
+
+		if (ol.events.condition.platformModifierKeyOnly(dragBoxEvent.mapBrowserEvent))
 		{
 			mode = ADD;
 		}
@@ -143,17 +143,17 @@ function getDragSelect(mapTool, probeInteraction)
 		}
 	});
 
-	dragSelect.on('boxend', function () {
-		let extent = dragSelect.getGeometry().getExtent();
+	dragSelect.on('boxend', function (event:any) {
 
+		let extent = dragSelect.getGeometry().getExtent();
 		updateSelection(extent);
+
 		probeInteraction.setActive(true);
 		mode = SET;
 	});
 
 	dragSelect.on('boxdrag', lodash.debounce(function() {
 		let extent = dragSelect.getGeometry().getExtent();
-
 		updateSelection(extent);
 	}));
 

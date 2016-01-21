@@ -471,6 +471,11 @@ declare module olx {
     }
 
     module interaction {
+        interface DragBoxOptions {
+            className?: string;
+            condition?: ol.events.ConditionType;
+            boxEndCondition?: ol.interaction.DragBoxEndConditionType;
+        }
         interface DefaultsOptions {
             altShiftDragRotate?: boolean;
             doubleClickZoom?: boolean;
@@ -1232,11 +1237,15 @@ declare module ol {
      * Events emitted by ol.interaction.DragBox instances are instances of this type.
      */
     class DragBoxEvent {
-
         /**
          * The coordinate of the drag event.
          */
         coordinate: ol.Coordinate;
+
+        /**
+         * The originating MapBrowserEvent
+         */
+        mapBrowserEvent: ol.MapBrowserEvent;
     }
 
     /**
@@ -2003,16 +2012,7 @@ declare module ol {
          * @param ref The object to use as this in listener.
          * @returns Unique key for the listener.
          */
-        on(type: string, listener: (event: MapBrowserEvent) => void, ref?: any): any;
-
-        /**
-         * Listen for a certain type of event.
-         * @param type The array of event types.
-         * @param listener The listener function.
-         * @param ref The object to use as this in listener.
-         * @returns Unique key for the listener.
-         */
-        on(type: Array<string>, listener: (event: MapBrowserEvent) => void, ref?: any): any;
+        on(type: string|Array<string>, listener: (event: MapBrowserEvent) => void, ref?: any): any;
 
         /**
          * Listen once for a certain type of event.
@@ -3516,7 +3516,12 @@ declare module ol {
         class DragAndDropEvent {
         }
 
+        interface DragBoxEndConditionType { (event: ol.MapBrowserEvent, startPixel: ol.Pixel, endPixel: ol.Pixel): boolean }
+
         class DragBox extends Pointer {
+            constructor(opt_options?: olx.interaction.DragBoxOptions);
+
+            getGeometry(): ol.geom.Polygon;
         }
 
         class DragPan extends Pointer {
