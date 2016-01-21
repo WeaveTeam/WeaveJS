@@ -68,9 +68,9 @@ function getProbeInteraction(mapTool)
 				if (top.key)
 				{
 					weaveKeySet.replaceKeys([top.key]);
-
+					let browserEvent: MouseEvent = <MouseEvent>event.originalEvent;
 					toolTipState.showTooltip = true;
-					[toolTipState.x, toolTipState.y] = event.pixel;
+					[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
 					toolTipState.title = FeatureLayer.getToolTipTitle(top.key);
 					toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(top.key);
 				}
@@ -133,7 +133,13 @@ function getDragSelect(mapTool, probeInteraction)
 
 		let dragBoxEvent: ol.DragBoxEvent = <ol.DragBoxEvent>event;
 
-		if (ol.events.condition.platformModifierKeyOnly(dragBoxEvent.mapBrowserEvent))
+		let browserEvent: MouseEvent = <MouseEvent>dragBoxEvent.mapBrowserEvent.originalEvent;
+
+		if (browserEvent.ctrlKey && browserEvent.shiftKey)
+		{
+			mode = SUBTRACT
+		}
+		else if (browserEvent.ctrlKey)
 		{
 			mode = ADD;
 		}
