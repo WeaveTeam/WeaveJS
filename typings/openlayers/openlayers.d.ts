@@ -3547,6 +3547,8 @@ declare module ol {
         class Interaction extends ol.Object {
             setActive(active:boolean);
             getActive():boolean;
+            getMap(): ol.Map;
+            setMap(map: ol.Map): void;
         }
 
         class KeyboardPan {
