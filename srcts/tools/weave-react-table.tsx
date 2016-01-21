@@ -95,7 +95,7 @@ class DataTable extends React.Component<IDataTableProps, IDataTableState> {
         columns["id"] = "Key";
 
         this.columnsPath.getChildren().forEach((columnPath:WeavePath) => {
-            columns[columnPath.getPath().pop()] = columnPath.getValue("this.getMetadata('title')");
+            columns[columnPath.getPath().pop()] = columnPath.getObject().getMetadata('title');
         });
 
         return <ReactBootstrapTable columnTitles={columns}

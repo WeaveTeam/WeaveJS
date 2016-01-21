@@ -167,7 +167,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
 
         for (let idx in children) {
             let child = children[idx];
-            let title = child.getValue("this.getMetadata('title')");
+            let title = child.getObject().getMetadata('title');
             let name = child.getPath().pop();
             this.columnLabels.push(title);
             this.columnNames.push(name);
@@ -329,7 +329,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                     tick: {
                         multiline: true,
                         format: (num:number):string => {
-                            if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("this.getMetadata('dataType')") !== "number") {
+                            if(this.yLabelColumnPath && this.yLabelColumnPath.getObject().getMetadata('dataType') !== "number") {
                                 return this.yAxisValueToLabel[num] || "";
                             } else {
                                 return String(FormatUtils.defaultNumberFormatting(num));

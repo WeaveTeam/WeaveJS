@@ -452,7 +452,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             }
         });
 
-        this.yLabelColumnDataType = this.yLabelColumnPath.getValue("this.getMetadata('dataType')");
+        this.yLabelColumnDataType = this.yLabelColumnPath.getObject().getMetadata('dataType');
 
         this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
         if(!this.numericRecords.length)

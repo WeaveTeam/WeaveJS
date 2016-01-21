@@ -73,5 +73,5 @@ export function registerToolImplementation(asClassName, jsClass) {
 export function init(root, weave) {
     weaveRootElmt = jquery(root);
     weaveRootPath = weave.path();
-    weaveRootPath.getValue("childListCallbacks.addGroupedCallback")(null, _toolsChanged, true);
+    weaveRootPath.getObject().childListCallbacks.addGroupedCallback(null, _toolsChanged, true);
 }

@@ -126,8 +126,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         }
 
         this.chart.axis.labels({
-            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("this.getMetadata('title')"),
-            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("this.getMetadata('title')")
+            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title'),
+            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title')
         })
 
         this.axisLabelsChanged();
@@ -174,8 +174,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             }
         };
 
-        this.dataXType = this.paths.dataX.getValue("this.getMetadata('dataType')");
-        this.dataYType = this.paths.dataY.getValue("this.getMetadata('dataType')");
+        this.dataXType = this.paths.dataX.getObject().getMetadata('dataType');
+        this.dataYType = this.paths.dataY.getObject().getMetadata('dataType');
 
         this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
         this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
@@ -405,17 +405,17 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                         var columnNamesToValue:{[columnName:string] : string|number } = {};
                         var xValue:number = this.numericRecords[d.index]["point"]["x"];
                         if(xValue) {
-                            columnNamesToValue[this.paths.dataX.getValue("this.getMetadata('title')")] = xValue;
+                            columnNamesToValue[this.paths.dataX.getObject().getMetadata('title')] = xValue;
                         }
 
                         var yValue:number = this.numericRecords[d.index]["point"]["y"]
                         if(yValue) {
-                            columnNamesToValue[this.paths.dataY.getValue("this.getMetadata('title')")] = yValue;
+                            columnNamesToValue[this.paths.dataY.getObject().getMetadata('title')] = yValue;
                         }
 
                         var sizeByValue:number = this.numericRecords[d.index]["size"] as number;
                         if(sizeByValue) {
-                            columnNamesToValue[this.paths.sizeBy.getValue("this.getMetadata('title')")] =  sizeByValue;
+                            columnNamesToValue[this.paths.sizeBy.getObject().getMetadata('title')] =  sizeByValue;
                         }
                         this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
                         this.toolTip.setState({
@@ -505,10 +505,10 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             tooltip: {
                 format: {
                     title: (num:number):string => {
-                        return this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("this.getMetadata('title')");
+                        return this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title');
                     },
                     name: (name:string, ratio:number, id:string, index:number):string => {
-                        return this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("this.getMetadata('title')");
+                        return this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title');
                     }
                 },
                 show: false
@@ -523,17 +523,17 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     //     var columnNamesToValue:{[columnName:string] : string|number } = {};
                     //     var xValue:number = this.numericRecords[d[0].index]["point"]["x"];
                     //     if(xValue) {
-                    //         columnNamesToValue[this.paths.dataX.getValue("this.getMetadata('title')")] = xValue;
+                    //         columnNamesToValue[this.paths.dataX.getObject().getMetadata('title')] = xValue;
                     //     }
                     //
                     //     var yValue:number = this.numericRecords[d[0].index]["point"]["y"]
                     //     if(yValue) {
-                    //         columnNamesToValue[this.paths.dataY.getValue("this.getMetadata('title')")] = yValue;
+                    //         columnNamesToValue[this.paths.dataY.getObject().getMetadata('title')] = yValue;
                     //     }
                     //
                     //     var sizeByValue:number = this.numericRecords[d[0].index]["size"] as number;
                     //     if(sizeByValue) {
-                    //         columnNamesToValue[this.paths.sizeBy.getValue("this.getMetadata('title')")] =  sizeByValue;
+                    //         columnNamesToValue[this.paths.sizeBy.getObject().getMetadata('title')] =  sizeByValue;
                     //     }
                     //     return getTooltipContent(columnNamesToValue);
                     // }

@@ -69,7 +69,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.filteredKeySet = this.plotterPath.push("filteredKeySet");
         this.selectionKeySet = this.toolPath.push("selectionKeySet");
         this.probeKeySet = this.toolPath.push("probeKeySet");
-        this.numberOfBins = this.binnedColumnPath.getValue("this.numberOfBins");
+        this.numberOfBins = this.binnedColumnPath.getObject().numberOfBins;
         this.state = {selected:[], probed:[]};
         this.selectedBins = [];
         this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
@@ -199,7 +199,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     }
 
     render() {
-        this.numberOfBins = this.binnedColumnPath.getValue("this.numberOfBins");
+        this.numberOfBins = this.binnedColumnPath.getObject().numberOfBins;
         if(this.numberOfBins) {
             //Binned plot case
             var width:number = this.props.width;
@@ -215,7 +215,8 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
 
             shapeSize = _.max([1, _.min([shapeSize, height / this.numberOfBins])]);
             var r:number = (shapeSize / 100 * height / this.numberOfBins) / 2;
-            var textLabelFunction:Function = this.binnedColumnPath.getValue("this.deriveStringFromNumber.bind(this)");
+            var bc:any = this.binnedColumnPath.getObject();
+            var textLabelFunction:Function = bc.deriveStringFromNumber.bind(bc);
             var finalElements:any[] = [];
             var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
             for(var j:number = 0; j<maxColumns; j++) {
@@ -283,7 +284,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
                 <ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
                     <ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
-                        <span style={prefixerStyle}>{this.dynamicColorColumnPath.getValue("this.getMetadata('title')")}</span>
+                        <span style={prefixerStyle}>{this.dynamicColorColumnPath.getObject().getMetadata('title')}</span>
                     </ui.HBox>
                     {
                         this.props.width > this.props.height * 2 ?

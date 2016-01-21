@@ -93,8 +93,7 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
 
     get title():string {
         if(this.toolPath) {
-            return this.toolPath.getValue("this.hasOwnProperty('title') ? this.title : ''")
-                || (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '')
+            return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '')
                 || this.toolPath.getPath().pop();
         } else {
             return this.tool ? this.tool.title : "";

@@ -142,7 +142,7 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
 
         var labels:string[] = this.columnsPath.getState().map( (column:any):string => {
             var columnName:string = column.objectName;
-            return this.columnsPath.push(columnName).getValue("this.getMetadata('title')");
+            return this.columnsPath.push(columnName).getObject().getMetadata('title');
         });
         var finalElements:any[] = [];
         var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
