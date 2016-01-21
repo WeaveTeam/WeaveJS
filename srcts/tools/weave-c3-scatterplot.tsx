@@ -19,6 +19,7 @@ import {MouseEvent} from "react";
 import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 import * as ReactDOM from "react-dom";
+import StandardLib from "../utils/StandardLib";
 interface IColumnStats {
     min: number;
     max: number;
@@ -128,6 +129,19 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getValue("this.getMetadata('title')"),
             y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getValue("this.getMetadata('title')")
         })
+
+        this.axisLabelsChanged();
+        this.generate();
+
+    }
+
+    private axisLabelsChanged():void {
+        var chartWidth:number = this.chart.internal.width;
+        var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
+        var xLabelsToShow:number = Math.floor(chartWidth / textHeight);
+        xLabelsToShow = Math.max(2,xLabelsToShow);
+
+        this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
     }
 
     private dataChanged() {
@@ -205,15 +219,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.axisChanged();
         this.busy = 1;
 
-        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => {
-            if (this.busy > 1) {
-                this.busy = 0;
-                this.dataChanged();
-            }
-            else {
-                this.busy = 0;
-            }
-        }});
+        this.generate();
     }
 
     _selectionKeysChanged() {
@@ -284,14 +290,30 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             .style("stroke-opacity", 0.0);
     }
 
+    generate() {
+        this.chart = generate(this.c3Config);
+        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => {
+            if (this.busy > 1) {
+                this.busy = 0;
+                this.dataChanged();
+            }
+            else {
+                this.busy = 0;
+            }
+        }});
+    }
+
     componentDidUpdate() {
         super.componentDidUpdate();
         //console.log("resizing");
         //var start = Date.now();
         var newElementSize:ElementSize = this.getElementSize();
         if(!_.isEqual(newElementSize, this.elementSize)) {
-            this.chart.resize(newElementSize);
+            this.c3Config.axis.x.height = newElementSize.height * 0.2;
+            this.c3Config.size = newElementSize;
+            this.chart = generate(this.c3Config);
             this.elementSize = newElementSize;
+            this.axisChanged();
         }
         //var end = Date.now();
     }
@@ -423,15 +445,37 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                         position: "outer-center"
                     },
                     tick: {
-                        fit: false,
-                        rotate: 0,
                         format: (num:number):string => {
                             if(this.paths.dataX && this.xAxisValueToLabel && this.dataXType !== "number") {
                                 return this.xAxisValueToLabel[num] || "";
                             } else {
                                 return String(FormatUtils.defaultNumberFormatting(num));
                             }
-                        }
+                        },
+                        rotate: -45,
+                        culling: {
+                            max: null
+                        },
+                        fit: false//,
+                        //format: (num:number):string => {
+                        //    if(this.stringRecords && this.stringRecords[num]) {
+                        //        if(this.element && this.getElementSize().height > 0) {
+                        //            var labelHeight:number = (this.getElementSize().height* 0.2)/Math.cos(45*(Math.PI/180));
+                        //            var labelString:string = (this.stringRecords[num]["xLabel"] as string);
+                        //            if(labelString) {
+                        //                var stringSize:number = StandardLib.getTextWidth(labelString, "14pt Helvetica Neue");
+                        //                var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
+                        //                return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
+                        //            }else{
+                        //                return "";
+                        //            }
+                        //        }else {
+                        //            return this.stringRecords[num]["xLabel"] as string;
+                        //        }
+                        //    } else {
+                        //        return "";
+                        //    }
+                        //}
                     }
                 },
                 y: {
@@ -505,6 +549,9 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             },
             onrendered: this._updateStyle.bind(this)
         };
+
+        this.c3Config.axis.x.height = this.getElementSize().height * 0.2;
+
         this.chart = generate(this.c3Config);
     }
 }

@@ -387,7 +387,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 
     private axisLabelsChanged():void {
         var chartWidth:number = this.chart.internal.width;
-        var chartHeight:number = this.chart.internal.height;
         var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
         var xLabelsToShow:number = Math.floor(chartWidth / textHeight);
         xLabelsToShow = Math.max(2,xLabelsToShow);
