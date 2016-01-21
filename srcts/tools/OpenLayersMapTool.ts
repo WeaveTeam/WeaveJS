@@ -64,7 +64,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode");
 
 		this.map = new ol.Map({
-			interactions: weaveMapInteractions(this),
+			interactions: weaveMapInteractions(this, this.toolTip),
 			controls: [],
 			target: this.element
 		});

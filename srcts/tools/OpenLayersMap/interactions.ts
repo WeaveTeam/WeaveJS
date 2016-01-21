@@ -6,6 +6,7 @@
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 import FeatureLayer from "./Layers/FeatureLayer";
+import OpenLayersMapTool from "../OpenLayersMapTool";
 import Layer from "./Layers/Layer";
 import {IToolTipState} from "../tooltip";
 /*global Weave*/
@@ -13,76 +14,116 @@ import {IToolTipState} from "../tooltip";
 declare var Weave:any;
 declare var weavejs:any;
 
-function getProbeInteraction(mapTool)
+class ProbeInteraction extends ol.interaction.Pointer
 {
-	return new ol.interaction.Pointer({
-		handleMoveEvent: function (event:ol.MapBrowserEvent) {
-			// weavepath -> keystring -> zindex
-			let d2d_keySet_keyString_layer:Map<any,Map<string,ol.layer.Layer>> = new Map<any,Map<string,ol.layer.Layer>>();
-			/* We need to have sets for all the layers so that probing over an empty area correctly empties the keyset */
-			mapTool.map.getLayers().forEach(
-				function (layer)
-				{
-					let weaveLayerObject = layer.get("layerObject");
+	private topKeyString: string;
+	private topZIndex: number;
+	private topKeySet: any;
+	private toolTip: any;
 
-					if (weaveLayerObject.probeKeySet && !d2d_keySet_keyString_layer.get(weaveLayerObject.probeKeySet))
-					{
-						d2d_keySet_keyString_layer.set(weaveLayerObject.probeKeySet.getObject(), new Map<string,ol.layer.Layer>());
-					}
-				},
-				mapTool);
-			mapTool.map.forEachFeatureAtPixel(event.pixel,
-				function (feature, layer)
-				{
-					let weaveLayerObject = layer.get("layerObject");
+	constructor(toolTip:any)
+	{
+		super({handleMoveEvent: ProbeInteraction.prototype.handleMoveEvent});
+		this.toolTip = toolTip;
+	}
 
-					let map_keyString_layer:Map<string,ol.layer.Layer> = d2d_keySet_keyString_layer.get(weaveLayerObject.probeKeySet.getObject());
+	setMap(map:ol.Map)
+	{
+		super.setMap(map);
+		let element: Element = map.getTargetElement();
 
-					/* No need to check here, we created one for every probeKeySet in the prior forEach */
+		map.getTargetElement().addEventListener('mouseout', this.handleOutEvent.bind(this));
+	}
 
-					map_keyString_layer.set(feature.getId(), layer);
-				},
-				function (layer)
-				{
-					return layer.getSelectable() && layer instanceof FeatureLayer;
-				});
+	private onFeatureAtPixel(feature: ol.Feature, layer: ol.layer.Layer):void
+	{
+		let zIndex: number = layer.getZIndex();
 
-			for (let weaveKeySet of d2d_keySet_keyString_layer.keys())
+
+		if (zIndex > this.topZIndex)
+		{
+			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
+			this.topKeySet = weaveLayerObject.probeKeySet && weaveLayerObject.probeKeySet.getObject() || this.topKeySet;
+			this.topZIndex = zIndex;
+			this.topKeyString = feature.getId().toString();
+		}
+	}
+
+	private static layerFilter(layer:ol.layer.Base):boolean
+	{
+		return layer.get("selectable");
+	}
+
+	private pixelToKey(pixel:ol.Pixel):any
+	{
+		let map: ol.Map = this.getMap();
+
+		this.topKeySet = null;
+		this.topZIndex = -Infinity;
+		this.topKeyString = null;
+		let topKey: any /*IQualifiedKey */;
+		
+		map.forEachFeatureAtPixel(pixel, this.onFeatureAtPixel, this, ProbeInteraction.layerFilter);
+
+
+
+		if (this.topKeyString && this.topKeySet)
+		{
+			topKey = weavejs.WeaveAPI.QKeyManager.stringToQKey(this.topKeyString);
+			this.topKeySet.replaceKeys([topKey]);
+		}
+		
+		for (let layer of map.getLayers().getArray())
+		{
+			if (!ProbeInteraction.layerFilter(layer)) continue;
+			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
+			let keySet:any = weaveLayerObject.probeKeySet && weaveLayerObject.probeKeySet.getObject();
+			if (keySet && keySet != this.topKeySet)
 			{
-				let map_keyString_layer:Map<string,ol.layer.Layer> = d2d_keySet_keyString_layer.get(weaveKeySet);
-
-				let top = {key: null, index: -Infinity, layer: null};
-
-				for (let key of map_keyString_layer.keys())
-				{
-					let layer:ol.layer.Layer = map_keyString_layer.get(key);
-					let index = layer.getZIndex();
-					if (index > top.index)
-					{
-						top.index = index;
-						top.key = key;
-						top.layer = layer;
-					}
-				}
-				let toolTipState: IToolTipState = {};
-				if (top.key)
-				{
-					weaveKeySet.replaceKeys([top.key]);
-					let browserEvent: MouseEvent = <MouseEvent>event.originalEvent;
-					toolTipState.showTooltip = true;
-					[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
-					toolTipState.title = FeatureLayer.getToolTipTitle(top.key);
-					toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(top.key);
-				}
-				else
-				{
-					toolTipState.showTooltip = false;
-					weaveKeySet.replaceKeys([]);
-				}
-				mapTool.toolTip.setState(toolTipState);
+				keySet.clearKeys();
 			}
 		}
-	});
+
+		return topKey;
+	}
+
+	private handleMoveEvent(event:ol.MapBrowserEvent)
+	{
+		let key:any /*IQualifiedKey*/ = this.pixelToKey(event.pixel);
+		console.log(key);
+		let toolTipState: IToolTipState = {};
+
+		if (key) {
+			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
+
+			toolTipState.showTooltip = true;
+			toolTipState.title = FeatureLayer.getToolTipTitle(key);
+			toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(key);
+			[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
+		}
+		else
+		{
+			toolTipState.showTooltip = false;
+		}
+
+		this.toolTip.setState(toolTipState);
+	}
+
+	handleOutEvent(event:MouseEvent)
+	{
+		for (let layer of this.getMap().getLayers().getArray()) {
+			if (!ProbeInteraction.layerFilter(layer)) continue;
+			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
+			let keySet: any = weaveLayerObject.probeKeySet && weaveLayerObject.probeKeySet.getObject();
+			if (keySet) {
+				keySet.clearKeys();
+			}
+		}
+
+		let toolTipState: IToolTipState = {};
+		toolTipState.showTooltip = false;
+		this.toolTip.setState(toolTipState);
+	}
 }
 
 function getDragSelect(mapTool, probeInteraction)
@@ -166,10 +207,10 @@ function getDragSelect(mapTool, probeInteraction)
 	return dragSelect;
 }
 
-function weaveMapInteractions(mapTool)
+function weaveMapInteractions(mapTool, toolTip)
 {
 
-	let probeInteraction = getProbeInteraction(mapTool);
+	let probeInteraction = new ProbeInteraction(toolTip);
 	let dragSelect = getDragSelect(mapTool, probeInteraction);
 	let dragPan = new ol.interaction.DragPan({});
 	let dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});
