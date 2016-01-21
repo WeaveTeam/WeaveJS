@@ -45,7 +45,7 @@ abstract class GlyphLayer extends FeatureLayer {
 
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
 
-		var rawProj = this.layerPath.getState("sourceProjection") || "EPSG:4326";
+		var rawProj = this.layerPath.getState("sourceProjection") || this.layerPath.getObject("dataX").getMetadata("projection") || "EPSG:4326";
 		var mapProj = this.projectionPath.getState() || "EPSG:3857";
 
 		for (let id of removedIds)
