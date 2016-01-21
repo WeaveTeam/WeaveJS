@@ -2,31 +2,19 @@
 ///<reference path="../../typings/react/react-dom.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
 ///<reference path="../../typings/d3/d3.d.ts"/>
+/// <reference path="../../typings/c3/c3.d.ts"/>
 
+import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
+import {ChartAPI, ChartConfiguration} from "c3";
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
-import ToolTip from "./tooltip";
-import {IToolTipProps, IToolTipState} from "./tooltip";
 
-export interface IAbstractWeaveToolProps extends React.Props<AbstractWeaveTool> {
-    toolPath:WeavePath;
-    style:React.CSSProperties
-}
-
-export interface IAbstractWeaveToolState {
-
-}
-
-export interface IAbstractWeaveToolPaths {
+export interface IToolPaths {
     [name:string] : WeavePath
 }
 
-export interface ElementSize {
-    width:number;
-    height:number;
-}
 
 interface PathConfig {
     name: string;
@@ -34,26 +22,33 @@ interface PathConfig {
     callbacks?: Function|Function[];
 }
 
-export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToolProps, IAbstractWeaveToolState> {
+export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
     protected toolPath:WeavePath;
-    private wrapper:HTMLElement;
     protected element:HTMLElement;
-    protected paths:IAbstractWeaveToolPaths;
-    protected elementSize:ElementSize;
-    protected toolTip:React.Component<IToolTipProps, IToolTipState>;
+    protected paths:IToolPaths;
+    protected chart:ChartAPI;
+    protected c3Config:ChartConfiguration;
 
-    constructor(props:IAbstractWeaveToolProps) {
+    private previousWidth:number;
+    private previousHeight:number;
+
+    constructor(props:IVisToolProps) {
         super(props);
         this.toolPath = props.toolPath;
         this.paths = {};
     }
 
-    getElementSize():ElementSize {
-        return {
-            width: this.wrapper.clientWidth,
-            height: this.wrapper.clientHeight
-        };
+    get title():string {
+       return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
+    }
+
+
+    componentDidUpdate():void {
+        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
+            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
+            this.chart.resize({width:this.props.style.width, height:this.props.style.height});
+        }
     }
 
     // this function accepts an arry of path configurations
@@ -76,31 +71,6 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
 
     }
 
-    componentDidUpdate () {
-
-    }
-
-    componentDidMount () {
-
-    }
-
-    componentWillUnmount () {
-
-    }
-
-    handleClick(event:React.MouseEvent):void {
-
-    }
-
-    render():JSX.Element {
-        return (
-            <div ref={(elt:HTMLElement) => { this.wrapper = elt; }} style={this.props.style}>
-                <ToolTip ref={(c:React.Component<IToolTipProps, IToolTipState>) => { this.toolTip = c }}/>
-                <div ref={(elt:HTMLElement) => {this.element = elt; }} onClick={this.handleClick.bind(this)} style={{width: "100%", height: "100%", maxHeight: "100%"}}></div>
-            </div>
-        );
-    }
-
     customStyle(array:Array<number>, type:string, filter:string, style:any) {
         array.forEach( (index) => {
         	var filtered = d3.select(this.element).selectAll(type).filter(filter);
@@ -114,5 +84,9 @@ export default class AbstractWeaveTool extends React.Component<IAbstractWeaveToo
             if (selector.length)
                 d3.select(selector[0][index]).style(style);
         });
+    }
+
+    render():JSX.Element {
+        return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
     }
 }

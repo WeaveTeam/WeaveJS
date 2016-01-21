@@ -3,47 +3,26 @@
 /// <reference path="../../typings/react/react-dom.d.ts"/>
 /// <reference path="../../typings/weave/WeavePath.d.ts"/>
 
+
+import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
+
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {round} from "d3";
 import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootStrapTable";
-import AbstractWeaveTool from "./AbstractWeaveTool";
-import {IAbstractWeaveToolProps, IAbstractWeaveToolState, ElementSize} from "./AbstractWeaveTool";
 
-class WeaveReactTable extends AbstractWeaveTool {
-    constructor(props:IAbstractWeaveToolProps) {
-        super(props);
-    }
-
-    componentDidUpdate() {
-        var newElementSize:ElementSize = this.getElementSize();
-        if(!_.isEqual(newElementSize, this.elementSize)) {
-            this.elementSize = newElementSize;
-            ReactDOM.render(
-                <DataTable toolPath={this.toolPath} width={newElementSize.width + "px"} height={newElementSize.height + "px"}/>
-                , this.element);
-        }
-    }
-}
-
-interface IDataTableProps {
-    toolPath:WeavePath;
-    width:string;
-    height:string;
-}
-
-interface IDataTableState {
+interface IDataTableState extends IVisToolState {
     data:{[key:string]: string}[]
 }
 
-class DataTable extends React.Component<IDataTableProps, IDataTableState> {
+class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
 
     private toolPath:WeavePath;
     private columnsPath:WeavePath;
 
-    constructor(props:IDataTableProps) {
+    constructor(props:IVisToolProps) {
         super(props);
         this.toolPath = props.toolPath;
         this.columnsPath = this.toolPath.push("columns");
@@ -57,13 +36,21 @@ class DataTable extends React.Component<IDataTableProps, IDataTableState> {
 
 	}
 
+    get title():string {
+       return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
+    }
+
     componentDidMount() {
         this.columnsPath.addCallback(this, this.dataChanged, true);
         this.toolPath.push("filteredKeySet").addCallback(this, this.dataChanged, true);
         this.toolPath.push("selectionKeySet").addCallback(this, this.forceUpdate, true);
         this.toolPath.probe_keyset.addCallback(this, this.forceUpdate, true);
-        
+
         this.toolPath.getObject("filteredKeySet").setColumnKeySources(this.toolPath.getObject("columns").getObjects());
+    }
+
+    componentDidUpdate() {
+
     }
 
     dataChanged() {
@@ -101,7 +88,7 @@ class DataTable extends React.Component<IDataTableProps, IDataTableState> {
         return <ReactBootstrapTable columnTitles={columns}
                                     rows={this.state.data}
                                     idProperty="id"
-                                    height={this.props.height}
+                                    height={this.props.style.height}
                                     striped={true}
                                     hover={true}
                                     bordered={true}

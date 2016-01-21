@@ -5,15 +5,13 @@
 ///<reference path="../react-ui/ui.tsx"/>
 ///<reference path="../../typings/react/react-dom.d.ts"/>
 
+import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
-
-import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
 import ui from "../react-ui/ui";
-import {IAbstractWeaveToolProps, IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import StandardLib from "../utils/StandardLib";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
@@ -23,27 +21,12 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 
-class WeaveC3ColorLegend extends AbstractWeaveTool {
-    constructor(props:IAbstractWeaveToolProps) {
-        super(props);
-    }
+interface IColorLegendState {
 
-    componentDidUpdate() {
-        var elementSize = this.element ? this.getElementSize() : null;
-        ReactDOM.render(
-            <ColorLegend toolPath={this.toolPath} width={elementSize.width} height={elementSize.height}/>
-            , this.element);
-    }
 }
 
-interface IColorLegendProps {
-    toolPath:WeavePath;
-    width:number;
-    height:number;
-}
 
-class ColorLegend extends React.Component<IColorLegendProps, any> {
-
+class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
     private plotterPath:WeavePath;
     private dynamicColorColumnPath:WeavePath;
     private binningDefinition:WeavePath;
@@ -52,13 +35,13 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
     private filteredKeySet:WeavePath;
     private selectionKeySet:WeavePath;
     private probeKeySet:WeavePath;
-    private numberOfBins:number;
-    private toolPath:WeavePath;
+    protected toolPath:WeavePath;
     private spanStyle:CSSProperties;
-
     private selectedBins:number[];
+    private selectionStatus:{[bin:number]: boolean};
+    private probeStatus:{[bin:number]: boolean};
 
-    constructor(props:IColorLegendProps) {
+    constructor(props:IVisToolProps) {
         super(props);
         this.toolPath = props.toolPath;
         this.plotterPath = this.toolPath.pushPlotter("plot");
@@ -69,10 +52,19 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.filteredKeySet = this.plotterPath.push("filteredKeySet");
         this.selectionKeySet = this.toolPath.push("selectionKeySet");
         this.probeKeySet = this.toolPath.push("probeKeySet");
-        this.numberOfBins = this.binnedColumnPath.getObject().numberOfBins;
         this.state = {selected:[], probed:[]};
         this.selectedBins = [];
         this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
+        this.selectionStatus = {};
+        this.probeStatus = {};
+    }
+
+    get title():string {
+       return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
+    }
+
+    get numberOfBins():number {
+        return this.binnedColumnPath.getObject().numberOfBins;
     }
 
     protected handleMissingSessionStateProperties(newState:any)
@@ -86,8 +78,8 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         this.filteredKeySet.addCallback(this, this.forceUpdate);
         this.plotterPath.push("shapeSize").addCallback(this, this.forceUpdate);
         this.binnedColumnPath.addCallback(this, this.forceUpdate);
-        this.toolPath.selection_keyset.addCallback(this, this.forceUpdate);
-        this.toolPath.probe_keyset.addCallback(this, this.forceUpdate);
+        this.toolPath.selection_keyset.addCallback(this, this.setSelectedBins);
+        this.toolPath.probe_keyset.addCallback(this, this.setProbedBins);
     }
 
     getBinIndexFromKey(key:any):number {
@@ -112,32 +104,64 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         return _.unique(probedBins);
     }
 
+    setSelectedBins():void {
+        var selectedBins = this.getSelectedBins();
+        for(var iBin:number = 0; iBin < this.numberOfBins; iBin++) {
+            if(selectedBins.indexOf(iBin) > -1) {
+                this.selectionStatus[iBin] = true;
+            } else {
+                this.selectionStatus[iBin] = false;
+            }
+        }
+        this.forceUpdate();
+    }
+
+    setProbedBins():void {
+        var probed = this.getProbedBins();
+        for(var iBin:number = 0; iBin < this.numberOfBins; iBin++) {
+            if(probed.indexOf(iBin) > -1) {
+                this.probeStatus[iBin] = true;
+            } else {
+                this.probeStatus[iBin] = false;
+            }
+        }
+        this.forceUpdate();
+    }
+
     handleClick(bin:number, event:React.MouseEvent):void {
         var binnedKeys:any[] = this.binnedColumnPath.getObject()._binnedKeysArray;
-        //setKeys
-        if(_.contains(this.selectedBins,bin)){
-            var currentSelection:any[] = this.toolPath.selection_keyset.getKeys();
-            currentSelection = _.difference(currentSelection,binnedKeys[bin]);
-            this.toolPath.selection_keyset.setKeys(currentSelection);
-            _.remove(this.selectedBins, (value:number) =>{
-                return value == bin;
-            });
-        }else {
-            if ((event.ctrlKey || event.metaKey)) {
-                this.toolPath.selection_keyset.addKeys(binnedKeys[bin]);
-                this.selectedBins.push(bin);
-            } else {
-                this.toolPath.selection_keyset.setKeys(binnedKeys[bin]);
-                this.selectedBins = [bin];
+
+        // multiple selection mode
+        if(event.ctrlKey || event.metaKey) {
+            if(this.selectionStatus[bin]) { // if the bin is already selected, remove it
+                var obj:Object = {};
+                this.selectionStatus[bin] = false;
+                this.toolPath.selection_keyset.removeKeys(this.binnedColumnPath.getObject().getKeysFromBinIndex(bin));
+            } else { // otherwise we add it.
+                var obj:Object = {};
+                this.selectionStatus[bin] = true;
+                this.toolPath.selection_keyset.addKeys(this.binnedColumnPath.getObject().getKeysFromBinIndex(bin));
+            }
+        }
+        // single selection mode
+        else {
+            for(var iBin:number = 0; iBin < this.numberOfBins; iBin++) {
+                if(bin == iBin) {
+                    this.selectionStatus[iBin] = true;
+                    this.toolPath.selection_keyset.setKeys(this.binnedColumnPath.getObject().getKeysFromBinIndex(bin));
+                } else {
+                    this.selectionStatus[iBin] = false;
+                }
             }
         }
     }
 
     handleProbe(bin:number, mouseOver:boolean):void {
         if(mouseOver){
-            var binnedKeys:any[] = this.binnedColumnPath.getObject()._binnedKeysArray;
-            this.toolPath.probe_keyset.setKeys(binnedKeys[bin]);
+            this.probeStatus[bin] = true;
+            this.toolPath.probe_keyset.setKeys(this.binnedColumnPath.getObject().getKeysFromBinIndex(bin));
         }else{
+            this.probeStatus[bin] = false;
             this.toolPath.probe_keyset.setKeys([]);
         }
     }
@@ -178,32 +202,29 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
             opacity: 1.0
         };
 
-        var probedBins:number[] = this.getProbedBins();
-        if(probedBins.length){
-            if (probedBins.indexOf(bin) >= 0) {
-                selectedStyle.opacity = 1;
-            }else{
-                selectedStyle.opacity = 0.3;
-            }
+        if(this.probeStatus[bin]){
+            selectedStyle.opacity = 1;
+        } else {
+            selectedStyle.opacity = 0.3;
         }
-        var selectedBins:number[] = this.getSelectedBins();
-        if (selectedBins.length) {
-            if (selectedBins.indexOf(bin) >= 0) {
-                selectedStyle.borderWidth = 1;
-                selectedStyle.opacity = 1;
-            }else if(probedBins.indexOf(bin) == -1){
-                selectedStyle.opacity = 0.3;
-            }
+
+        if(this.selectionStatus[bin]){
+            selectedStyle.borderWidth = 1;
+            selectedStyle.opacity = 1;
+        } else {
+            selectedStyle.opacity = 0.3;
         }
+        // if none of the bins are selected or probed
+        // the opacity should be 1
+
         return selectedStyle;
     }
 
     render() {
-        this.numberOfBins = this.binnedColumnPath.getObject().numberOfBins;
         if(this.numberOfBins) {
             //Binned plot case
-            var width:number = this.props.width;
-            var height:number = this.props.height;
+            var width:number = this.props.style.width;
+            var height:number = this.props.style.height;
             var shapeSize:number = this.plotterPath.getState("shapeSize");
             var shapeType:string = this.plotterPath.getState("shapeType");
             var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
@@ -225,10 +246,10 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                     {
                         var element:JSX.Element[] = [];
                         var elements:JSX.Element[] = [];
-                        for(var i=0; i<this.numberOfBins+extraBins; i++) {
+                        for(var i:number = 0; i < this.numberOfBins + extraBins; i++) {
                             if(i%maxColumns == j) {
 
-                                if(i<this.numberOfBins){
+                                if(i < this.numberOfBins){
                                     element.push(
                                         <ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
                                                 <ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
@@ -250,7 +271,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                             }
                         }
                         {
-                            this.props.width > this.props.height * 2 ?
+                            this.props.style.width > this.props.style.height * 2 ?
                                 elements.push(
                                     <ui.HBox key={i} style={{width:"100%", flex: columnFlex}}>
                                         {
@@ -287,7 +308,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
                         <span style={prefixerStyle}>{this.dynamicColorColumnPath.getObject().getMetadata('title')}</span>
                     </ui.HBox>
                     {
-                        this.props.width > this.props.height * 2 ?
+                        this.props.style.width > this.props.style.height * 2 ?
                         <ui.HBox style={{width:"100%", flex: 0.9}}> {
                             finalElements
                             }
@@ -308,7 +329,6 @@ class ColorLegend extends React.Component<IColorLegendProps, any> {
         }
     }
 }
-
 
 export default WeaveC3ColorLegend;
 

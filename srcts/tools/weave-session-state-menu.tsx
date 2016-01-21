@@ -4,14 +4,14 @@
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
 ///<reference path="../utils/StandardLib.ts"/>
 
-import AbstractWeaveTool from "./AbstractWeaveTool";
+import {IVisToolProps, IVisToolState} from "./IVisTool";
+import {IVisTool} from "./IVisTool";
+
 import {registerToolImplementation} from "../WeaveTool";
 import * as React from "react";
 import ui from "../react-ui/ui";
 import {ListGroupItem, ListGroup, DropdownButton, MenuItem} from "react-bootstrap";
 import * as _ from "lodash";
-import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
-import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 
@@ -20,12 +20,13 @@ var stub:any = React;
 const sessionStateMenuStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column", overflow:"auto"};
 const sessionStateComboBoxStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column"};
 
-class SessionStateMenuTool extends AbstractWeaveTool {
+class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState> {
     private choices:WeavePath;
     protected toolPath:WeavePath;
 
-    constructor(props:IAbstractWeaveToolProps) {
+    constructor(props:IVisToolProps) {
         super(props);
+        this.toolPath = this.props.toolPath;
         this.toolPath.push("choices").addCallback(this, this.forceUpdate);
         this.toolPath.push("selectedChoice").addCallback(this, this.forceUpdate);
         this.toolPath.push("layoutMode").addCallback(this, this.forceUpdate);

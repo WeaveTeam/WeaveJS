@@ -5,27 +5,29 @@
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
 /// <reference path="../../typings/react/react-dom.d.ts"/>
 
-import AbstractWeaveTool from "./AbstractWeaveTool";
+import {IVisToolProps} from "./IVisTool";
+import {IToolPaths} from "./AbstractC3Tool";
+import AbstractC3Tool from "./AbstractC3Tool";
+
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
-import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
-import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
-import {ElementSize} from "./AbstractWeaveTool";
-import {ChartConfiguration, ChartAPI, generate} from "c3";
+import {ChartConfiguration, ChartAPI} from "c3";
+import * as c3 from "c3";
 import {MouseEvent} from "react";
 import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 import * as ReactDOM from "react-dom";
 import StandardLib from "../utils/StandardLib";
+
 interface IColumnStats {
     min: number;
     max: number;
 }
 
-interface IScatterplotPaths extends IAbstractWeaveToolPaths {
+interface IScatterplotPaths extends IToolPaths {
     plotter: WeavePath;
     dataX: WeavePath;
     dataY: WeavePath;
@@ -43,13 +45,13 @@ interface IScatterplotPaths extends IAbstractWeaveToolPaths {
  * @param records array or records
  * @param attributes array of attributes to be normalized
  */
-class WeaveC3ScatterPlot extends AbstractWeaveTool {
+class WeaveC3ScatterPlot extends AbstractC3Tool {
 
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: string};
     private xAxisValueToLabel:{[value:number]: string};
     private yAxisValueToLabel:{[value:number]: string};
-    private chart:ChartAPI;
+    protected chart:ChartAPI;
     private dataXType:string;
     private dataYType:string;
     private numericRecords:Record[];
@@ -63,9 +65,9 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
     private flag:boolean;
 
-    private c3Config:ChartConfiguration;
+    protected c3Config:ChartConfiguration;
 
-    constructor(props:IAbstractWeaveToolProps) {
+    constructor(props:IVisToolProps) {
         super(props);
         this.keyToIndex = {};
         this.indexToKey = {};
@@ -118,38 +120,24 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         });
     }
 
-    private busy:number;
     private  axisChanged():void {
-        if(this.busy) {
-            this.busy++;
-            return;
-        }
-
-        this.chart.axis.labels({
-            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title'),
-            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title')
-        })
-
-        this.axisLabelsChanged();
-        this.generate();
-
-    }
-
-    private axisLabelsChanged():void {
+        this.c3Config.axis.x.label = {
+            text: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title'),
+            position: "outer-center"
+        };
+        this.c3Config.axis.y.label = {
+            text: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title'),
+            position: "outer-middle"
+        };
         var chartWidth:number = this.chart.internal.width;
         var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
         var xLabelsToShow:number = Math.floor(chartWidth / textHeight);
         xLabelsToShow = Math.max(2,xLabelsToShow);
-
         this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
+        this.generate();
     }
 
     private dataChanged() {
-        if(this.busy) {
-            this.busy++;
-            return;
-        }
-
         let numericMapping:any = {
             point: {
                 x: this.paths.dataX,
@@ -215,10 +203,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                 return (this.plotterState.defaultScreenRadius) || 3;
             }
         });
-
         this.axisChanged();
-        this.busy = 1;
-
         this.generate();
     }
 
@@ -291,43 +276,18 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
     }
 
     generate() {
-        this.chart = generate(this.c3Config);
-        this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true, done: () => {
-            if (this.busy > 1) {
-                this.busy = 0;
-                this.dataChanged();
-            }
-            else {
-                this.busy = 0;
-            }
-        }});
-    }
-
-    componentDidUpdate() {
-        super.componentDidUpdate();
-        //console.log("resizing");
-        //var start = Date.now();
-        var newElementSize:ElementSize = this.getElementSize();
-        if(!_.isEqual(newElementSize, this.elementSize)) {
-            this.c3Config.axis.x.height = newElementSize.height * 0.2;
-            this.c3Config.size = newElementSize;
-            this.chart = generate(this.c3Config);
-            this.elementSize = newElementSize;
-            this.axisChanged();
-        }
-        //var end = Date.now();
+        console.log("generate");
+        this.chart = c3.generate(this.c3Config);
+        this.chart.load({data: _.map(this.numericRecords, "point"), unload: true});
     }
 
     componentWillUnmount() {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
         this.chart.destroy();
-        super.componentWillUnmount();
     }
 
     componentDidMount() {
-        super.componentDidMount();
-
         var axisChanged = this.axisChanged.bind(this);
         var dataChanged = this.dataChanged.bind(this);
         var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
@@ -353,6 +313,10 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.dataX.getObject(), this.paths.dataY.getObject()]);
 
         this.c3Config = {
+            size: {
+                width: this.props.style.width,
+                height: this.props.style.height
+            },
             bindto: this.element,
             padding: {
                 top: 20,
@@ -418,10 +382,10 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                             columnNamesToValue[this.paths.sizeBy.getObject().getMetadata('title')] =  sizeByValue;
                         }
                         this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
-                        this.toolTip.setState({
+                        this.props.toolTip.setState({
                             x: this.chart.internal.d3.event.pageX,
                             y: this.chart.internal.d3.event.pageY,
-                            showTooltip: true,
+                            showToolTip: true,
                             columnNamesToValue: columnNamesToValue
                         });
                     }
@@ -429,8 +393,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                 onmouseout: (d) => {
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.probe_keyset.setKeys([]);
-                        this.toolTip.setState({
-                            showTooltip: false
+                        this.props.toolTip.setState({
+                            showToolTip: false
                         });
                     }
                 }
@@ -550,9 +514,9 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             onrendered: this._updateStyle.bind(this)
         };
 
-        this.c3Config.axis.x.height = this.getElementSize().height * 0.2;
-
-        this.chart = generate(this.c3Config);
+        this.c3Config.axis.x.height = this.props.style.height * 0.2;
+        this.generate();
+        this.generate = _.debounce(this.generate.bind(this), 0);
     }
 }
 export default WeaveC3ScatterPlot;

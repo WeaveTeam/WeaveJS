@@ -69,17 +69,17 @@ function getProbeInteraction(mapTool)
 				{
 					weaveKeySet.replaceKeys([top.key]);
 					let browserEvent: MouseEvent = <MouseEvent>event.originalEvent;
-					toolTipState.showTooltip = true;
+					toolTipState.showToolTip = true;
 					[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
 					toolTipState.title = FeatureLayer.getToolTipTitle(top.key);
 					toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(top.key);
 				}
 				else
 				{
-					toolTipState.showTooltip = false;
+					toolTipState.showToolTip = false;
 					weaveKeySet.replaceKeys([]);
 				}
-				mapTool.toolTip.setState(toolTipState);
+				mapTool.props.toolTip.setState(toolTipState);
 			}
 		}
 	});
