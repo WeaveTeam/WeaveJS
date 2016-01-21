@@ -8,6 +8,7 @@ import * as lodash from "lodash";
 import FeatureLayer from "./Layers/FeatureLayer";
 import Layer from "./Layers/Layer";
 import CustomDragBox from "./CustomDragBox";
+import {IToolTipState} from "../tooltip";
 /*global Weave*/
 
 declare var Weave:any;
@@ -16,18 +17,18 @@ declare var weavejs:any;
 function getProbeInteraction(mapTool)
 {
 	return new ol.interaction.Pointer({
-		handleMoveEvent: function (event) {
+		handleMoveEvent: function (event:ol.MapBrowserEvent) {
 			// weavepath -> keystring -> zindex
-			let d2d_keySet_keyString_zIndex = new Map();
+			let d2d_keySet_keyString_layer:Map<any,Map<string,ol.layer.Layer>> = new Map<any,Map<string,ol.layer.Layer>>();
 			/* We need to have sets for all the layers so that probing over an empty area correctly empties the keyset */
 			mapTool.map.getLayers().forEach(
 				function (layer)
 				{
 					let weaveLayerObject = layer.get("layerObject");
 
-					if (weaveLayerObject.probeKeySet && !d2d_keySet_keyString_zIndex.get(weaveLayerObject.probeKeySet))
+					if (weaveLayerObject.probeKeySet && !d2d_keySet_keyString_layer.get(weaveLayerObject.probeKeySet))
 					{
-						d2d_keySet_keyString_zIndex.set(weaveLayerObject.probeKeySet.getObject(), new Map());
+						d2d_keySet_keyString_layer.set(weaveLayerObject.probeKeySet.getObject(), new Map<string,ol.layer.Layer>());
 					}
 				},
 				mapTool);
@@ -36,41 +37,50 @@ function getProbeInteraction(mapTool)
 				{
 					let weaveLayerObject = layer.get("layerObject");
 
-					let map_keyString_zIndex = d2d_keySet_keyString_zIndex.get(weaveLayerObject.probeKeySet.getObject());
+					let map_keyString_layer:Map<string,ol.layer.Layer> = d2d_keySet_keyString_layer.get(weaveLayerObject.probeKeySet.getObject());
 
 					/* No need to check here, we created one for every probeKeySet in the prior forEach */
 
-					map_keyString_zIndex.set(feature.getId(), layer.getZIndex());
+					map_keyString_layer.set(feature.getId(), layer);
 				},
 				function (layer)
 				{
 					return layer.getSelectable() && layer instanceof FeatureLayer;
 				});
 
-			for (let weaveKeySet of d2d_keySet_keyString_zIndex.keys())
+			for (let weaveKeySet of d2d_keySet_keyString_layer.keys())
 			{
-				let map_keyString_zIndex = d2d_keySet_keyString_zIndex.get(weaveKeySet);
+				let map_keyString_layer:Map<string,ol.layer.Layer> = d2d_keySet_keyString_layer.get(weaveKeySet);
 
-				let top = {key: null, index: -Infinity};
+				let top = {key: null, index: -Infinity, layer: null};
 
-				for (let key of map_keyString_zIndex.keys())
+				for (let key of map_keyString_layer.keys())
 				{
-					let index = map_keyString_zIndex.get(key);
+					let layer:ol.layer.Layer = map_keyString_layer.get(key);
+					let index = layer.getZIndex();
 					if (index > top.index)
 					{
 						top.index = index;
 						top.key = key;
+						top.layer = layer;
 					}
-
 				}
+				let toolTipState: IToolTipState = {};
 				if (top.key)
 				{
-					Weave.getPath(weaveKeySet).setKeys([top.key]);
+					weaveKeySet.replaceKeys([top.key]);
+
+					toolTipState.showTooltip = true;
+					[toolTipState.x, toolTipState.y] = event.pixel;
+					toolTipState.title = FeatureLayer.getToolTipTitle(top.key);
+					toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(top.key);
 				}
 				else
 				{
-					Weave.getPath(weaveKeySet).setKeys([]);
+					toolTipState.showTooltip = false;
+					weaveKeySet.replaceKeys([]);
 				}
+				mapTool.toolTip.setState(toolTipState);
 			}
 		}
 	});

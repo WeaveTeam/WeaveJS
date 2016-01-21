@@ -8,6 +8,8 @@ import * as lodash from "lodash";
 import Layer from "./Layer";
 import StandardLib from "../../../utils/StandardLib";
 
+declare var weave;
+
 export abstract class FeatureLayer extends Layer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
 	private updateMetaStyle:Function;
@@ -79,6 +81,39 @@ export abstract class FeatureLayer extends Layer {
 	}
 
 	abstract updateStyleData():void;
+
+	getToolTipColumns(): Array<any> /* Array<IAttributeColumn> */
+	{
+		return [];
+	}
+
+	/* TODO: Move this into AbstractWeaveTool */
+	static getToolTipData(key:any /* IQualifiedKey */, additionalColumns:Array<any> = [] /* Array<IAttributeColumn */): { [columnName: string]: string | number } 
+	{
+		let columnHashMap = weave.root.getObject("Probed Columns");
+
+		var result: { [columnName: string]: string | number } = {};
+
+		for (let child of columnHashMap.getObjects().concat(additionalColumns))
+		{
+			let title:string = child.getMetadata("title");
+			let value:string = child.getValueFromKey(key, String);
+			if (value)
+			{
+				result[title] = value;
+			}
+		}
+
+		return result;
+	}
+
+	/* TODO: Move this into AbstractWeaveTool */
+	static getToolTipTitle(key:any /* IQualifiedKey */): string
+	{
+		let titleHashMap = weave.root.getObject("Probe Header Columns");
+
+		return lodash.map(titleHashMap.getObjects(), (d:any) => d.getValueFromKey(key, String)).join(", ");
+	}
 
 	static toColorArray(colorString, alpha)
 	{
