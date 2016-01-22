@@ -67,7 +67,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode");
 
 		this.map = new ol.Map({
-			interactions: weaveMapInteractions(this, this.toolTip),
+			interactions: weaveMapInteractions(this),
 			controls: [],
 			target: this.element
 		});

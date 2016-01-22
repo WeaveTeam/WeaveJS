@@ -6,13 +6,11 @@
 ///<reference path="../../typings/react/react-dom.d.ts"/>
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
-import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
 import ui from "../react-ui/ui";
-import {IAbstractWeaveToolProps, IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import StandardLib from "../utils/StandardLib";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";

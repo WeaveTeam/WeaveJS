@@ -83,7 +83,6 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
     }
 
     render() {
-        console.log("render called");
         var toolHeight:number = this.props.style ? this.props.style.height - this.titleBarHeight : 320;
         var toolWidth:number = this.props.style ? this.props.style.width : 320;
 

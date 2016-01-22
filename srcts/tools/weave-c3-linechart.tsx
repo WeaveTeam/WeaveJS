@@ -325,18 +325,18 @@ class WeaveC3LineChart extends AbstractC3Tool {
                        columnNamesToValue[label] = this.numericRecords[d.index]["columns"][index] as number;
                     });
 
-                    this.toolTip.setState({
+                    this.props.toolTip.setState({
                         x: this.chart.internal.d3.event.pageX,
                         y: this.chart.internal.d3.event.pageY,
-                        showTooltip: true,
+                        showToolTip: true,
                         columnNamesToValue: columnNamesToValue
                     });
                 },
                 onmouseout: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.probe_keyset.setKeys([]);
-                        this.toolTip.setState({
-                            showTooltip: false
+                        this.props.toolTip.setState({
+                            showToolTip: false
                         });
                     }
                 }
