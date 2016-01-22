@@ -19,6 +19,7 @@ class ProbeInteraction extends ol.interaction.Pointer
 	private topKeyString: string;
 	private topZIndex: number;
 	private topKeySet: any;
+	private topLayer: FeatureLayer;
 	private toolTip: any;
 
 	constructor(toolTip:any)
@@ -46,6 +47,7 @@ class ProbeInteraction extends ol.interaction.Pointer
 			this.topKeySet = weaveLayerObject.probeKeySet && weaveLayerObject.probeKeySet.getObject() || this.topKeySet;
 			this.topZIndex = zIndex;
 			this.topKeyString = feature.getId().toString();
+			this.topLayer = weaveLayerObject;
 		}
 	}
 
@@ -60,6 +62,7 @@ class ProbeInteraction extends ol.interaction.Pointer
 
 		this.topKeySet = null;
 		this.topZIndex = -Infinity;
+		this.topLayer = null;
 		this.topKeyString = null;
 		let topKey: any /*IQualifiedKey */;
 		
@@ -97,7 +100,7 @@ class ProbeInteraction extends ol.interaction.Pointer
 
 			toolTipState.showTooltip = true;
 			toolTipState.title = FeatureLayer.getToolTipTitle(key);
-			toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(key);
+			toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(key, this.topLayer.getToolTipColumns());
 			[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
 		}
 		else

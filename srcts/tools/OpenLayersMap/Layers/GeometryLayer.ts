@@ -68,6 +68,21 @@ class GeometryLayer extends FeatureLayer {
 		this.updateFilteredKeySet();
 	}
 
+	getToolTipColumns(): Array<any> /* Array<IAttributeColumn> */
+	{
+		let additionalColumns: Array<any> = new Array<any>();
+
+		for (let column of this.fillStylePath.getChildren().concat(this.lineStylePath.getChildren()))
+		{
+			let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column.getObject());
+			if (internalColumn)
+				additionalColumns.push(internalColumn);
+		}
+
+		return additionalColumns;
+	}
+
+
 	updateStyleData()
 	{
 		let fillEnabled = this.fillStylePath.push("enable").getState();

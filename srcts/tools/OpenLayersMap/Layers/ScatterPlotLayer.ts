@@ -41,6 +41,23 @@ class ScatterPlotLayer extends GlyphLayer {
 
 	}
 
+	getToolTipColumns(): Array<any> /* Array<IAttributeColumn> */ {
+		let additionalColumns: Array<any> = new Array<any>();
+		let internalColumn: any;
+
+		for (let column of this.fillStylePath.getChildren().concat(this.lineStylePath.getChildren())) {
+			internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column.getObject());
+			if (internalColumn)
+				additionalColumns.push(internalColumn);
+		}
+
+		internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(this.sizeBy.getObject());
+		if (internalColumn)
+			additionalColumns.push(internalColumn);
+
+		return additionalColumns;
+	}
+
 	updateStyleData()
 	{
 
