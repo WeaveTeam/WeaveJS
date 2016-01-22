@@ -24,7 +24,8 @@ import LabelLayer from "./OpenLayersMap/Layers/LabelLayer";
 /* eslint-enable */
 
 import {PanCluster, InteractionModeCluster} from "./OpenLayersMap/controls";
-import weaveMapInteractions from "./OpenLayersMap/interactions";
+import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
+import DragSelection from "./OpenLayersMap/DragSelection";
 /* global Weave, weavejs */
 
 declare var Weave:any;
@@ -64,14 +65,34 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 	componentDidMount()
 	{
-		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode");
-
 		this.map = new ol.Map({
-			interactions: weaveMapInteractions(this),
+			interactions: ol.interaction.defaults({ dragPan: false }),
 			controls: [],
 			target: this.element
 		});
 
+		/* Setup custom interactions */
+
+		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode");
+
+		let dragPan: ol.interaction.DragPan = new ol.interaction.DragPan();
+		let dragSelect: DragSelection = new DragSelection();
+		let probeInteraction: ProbeInteraction = new ProbeInteraction(this);
+		let dragZoom: ol.interaction.DragZoom = new ol.interaction.DragZoom({ condition: ol.events.condition.always });
+
+		this.map.addInteraction(dragPan);
+		this.map.addInteraction(dragSelect);
+		this.map.addInteraction(probeInteraction);
+		this.map.addInteraction(dragZoom);
+
+		this.interactionModePath.addCallback(this, () => {
+			let interactionMode = this.interactionModePath.getState();
+			dragPan.setActive(interactionMode === "pan");
+			dragSelect.setActive(interactionMode === "select");
+			dragZoom.setActive(interactionMode === "zoom");
+		});
+
+		/* Setup custom controls */
 
 		this.zoomButtons = new ol.control.Zoom();
 		this.slider = new ol.control.ZoomSlider();
