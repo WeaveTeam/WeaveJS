@@ -23,7 +23,8 @@ import ScatterPlotLayer from "./OpenLayersMap/Layers/ScatterPlotLayer";
 import LabelLayer from "./OpenLayersMap/Layers/LabelLayer";
 /* eslint-enable */
 
-import {PanCluster, InteractionModeCluster} from "./OpenLayersMap/controls";
+import PanCluster from "./OpenLayersMap/PanCluster";
+import InteractionModeCluster from "./OpenLayersMap/InteractionModeCluster";
 import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
 import DragSelection from "./OpenLayersMap/DragSelection";
 /* global Weave, weavejs */

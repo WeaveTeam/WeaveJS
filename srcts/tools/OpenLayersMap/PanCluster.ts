@@ -5,9 +5,9 @@
 
 import * as ol from "openlayers";
 import jquery from "jquery";
-export class PanCluster extends ol.control.Control {
-	constructor(optOptions?)
-	{
+
+export default class PanCluster extends ol.control.Control {
+	constructor(optOptions?) {
 		var options = optOptions || {};
 		let parent = jquery(`
 		<div style="background-color: rgba(0,0,0,0)" class="ol-unselectable ol-control panCluster">
@@ -34,12 +34,11 @@ export class PanCluster extends ol.control.Control {
 			X: [null, null]
 		};
 
-		super({element: parent[0], target: options.target});
+		super({ element: parent[0], target: options.target });
 
 		let self = this;
 
-		let pan = function (xSign, ySign)
-		{
+		let pan = function(xSign, ySign) {
 			let panPercent = 0.3;
 			let map = self.getMap();
 			let view = map.getView();
@@ -56,8 +55,7 @@ export class PanCluster extends ol.control.Control {
 			view.setCenter(center);
 		};
 
-		let zoomExtent = function ()
-		{
+		let zoomExtent = function() {
 			let map = self.getMap();
 			let view = map.getView();
 			let extent = view.get("extent") || view.getProjection().getExtent();
@@ -65,49 +63,18 @@ export class PanCluster extends ol.control.Control {
 			view.fit(extent, size);
 		};
 
-		for (let direction in directions)
-		{
+		for (let direction in directions) {
 			let xSign = directions[direction][0];
 			let ySign = directions[direction][1];
 
 			let button = parent.find(".panCluster." + direction);
 
-			if (xSign !== null)
-			{
+			if (xSign !== null) {
 				button.click(pan.bind(this, xSign, ySign));
 			}
-			else
-			{
+			else {
 				button.click(zoomExtent.bind(this));
 			}
 		}
-	}
-}
-
-export class InteractionModeCluster extends ol.control.Control {
-	constructor (optOptions)
-	{
-		var interactionModePath = optOptions.interactionModePath;
-		var options = optOptions || {};
-		var buttonTable = jquery(`
-			<table class="ol-unselectable ol-control iModeCluster">
-				<tr style="font-size: 80%">
-					<td><button class="iModeCluster pan fa fa-hand-grab-o"></button></td>
-					<td><button class="iModeCluster select fa fa-mouse-pointer"></button></td>
-					<td><button class="iModeCluster zoom fa fa-search-plus"></button></td>
-				</tr>
-			</table>
-		`);
-
-		buttonTable.find("button.iModeCluster.pan").click( () => interactionModePath.state("pan") );
-		buttonTable.find("button.iModeCluster.select").click( () => interactionModePath.state("select") );
-		buttonTable.find("button.iModeCluster.zoom").click( () => interactionModePath.state("zoom") );
-
-		super({element: buttonTable[0], target: options.target});
-
-		interactionModePath.addCallback(this, () => {
-			buttonTable.find("button.iModeCluster").removeClass("active");
-			buttonTable.find("button.iModeCluster." + interactionModePath.getState()).addClass("active");
-		}, true);
 	}
 }
