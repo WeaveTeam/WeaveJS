@@ -5,6 +5,18 @@ import * as _ from "lodash";
 export default class StandardLib {
 
 	/**
+	 * Generates an "rgba()" string for CSS.
+	 * @param r A number between 0 and 255.
+	 * @param g A number between 0 and 255.
+	 * @param b A number between 0 and 255.
+	 * @param a A number between 0 and 1.
+	 */
+	static rgba(r:number, g:number, b:number, a:number)
+	{
+		return `rgba(${r},${g},${b},${a})`;
+	}
+	
+	/**
 	 * Use this as a temporary solution before we use Weave.registerClass().
 	 */
 	static debounce(target:any, methodName:string, delay:number = 20):void

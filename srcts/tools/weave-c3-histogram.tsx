@@ -218,7 +218,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                 }
             },
             onrendered: () => {
-                this._updateStyle();
+                this.updateStyle();
             }
         };
     }
@@ -226,50 +226,6 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     protected handleMissingSessionStateProperties(newState:any)
     {
 
-    }
-    _selectionKeysChanged () {
-        if(!this.chart)
-            return;
-
-        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
-        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
-        var selectedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
-            return _.includes(selectedKeys, record["id"]);
-        });
-        var probedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
-            return _.includes(probedKeys, record["id"]);
-        });
-        var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
-        var probedBinIndices:number[] = _.pluck(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn');
-        var binIndices:number[] = _.pluck(_.uniq(this.numericRecords, 'binnedColumn'), 'binnedColumn');
-        var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
-        unselectedBinIndices = _.difference(unselectedBinIndices,probedBinIndices);
-
-        if(selectedBinIndices.length) {
-            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-        }else if(!probedBinIndices.length){
-            this.customStyle(binIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
-            this.chart.select(this.heightColumnNames, [], true);
-        }
-    }
-
-    _probedKeysChanged () {
-        var selectedKeys:string[] = this.toolPath.probe_keyset.getKeys();
-        var selectedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
-            return _.includes(selectedKeys, record["id"]);
-        });
-        var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
-        var binIndices:number[] = _.pluck(_.uniq(this.numericRecords, 'binnedColumn'), 'binnedColumn');
-        var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
-
-        if(selectedBinIndices.length) {
-            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-            this._selectionKeysChanged();
-        }else{
-            this._selectionKeysChanged();
-        }
     }
 
     handleClick(event:MouseEvent) {
@@ -340,11 +296,39 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         });
     }
 
-    _updateStyle() {
+    updateStyle() {
+    	if (!this.chart)
+    		return;
+    	
         d3.select(this.element).selectAll("path").style("opacity", 1)
             .style("stroke", "black")
             .style("stroke-width", "1px")
             .style("stroke-opacity", 0.5);
+
+        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
+        var selectedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
+            return _.includes(selectedKeys, record["id"]);
+        });
+        var probedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
+            return _.includes(probedKeys, record["id"]);
+        });
+        var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
+        var probedBinIndices:number[] = _.pluck(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn');
+        var binIndices:number[] = _.pluck(_.uniq(this.numericRecords, 'binnedColumn'), 'binnedColumn');
+        var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
+        unselectedBinIndices = _.difference(unselectedBinIndices,probedBinIndices);
+
+        if(selectedBinIndices.length)
+        {
+            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
+            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
+        }
+        else if(!probedBinIndices.length)
+        {
+            this.customStyle(binIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
+            this.chart.select(this.heightColumnNames, [], true);
+        }
     }
 
     _dataChanged() {
@@ -470,8 +454,6 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         this.showXAxisLabel = false;
         var axisChanged:Function = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
-        var selectionKeySetChanged:Function = this._selectionKeysChanged.bind(this);
-        var probeKeySetChanged:Function = _.debounce(this._probedKeysChanged.bind(this), 100);
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
             { name: "plotter", path: plotterPath, callbacks: null},
@@ -482,9 +464,9 @@ class WeaveC3Histogram extends AbstractWeaveTool {
             { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
             { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
             { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged},
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged },
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
+            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
         ];
 
         this.initializePaths(mapping);

@@ -250,9 +250,23 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         this.generate();
     }
 
-    _selectionKeysChanged() {
-        if(!this.chart)
-            return;
+    handleClick(event:MouseEvent):void {
+        if(!this.flag) {
+            this.toolPath.selection_keyset.setKeys([]);
+        }
+        this.flag = false;
+    }
+
+    updateStyle()
+    {
+    	if (!this.chart)
+    		return;
+    	
+        d3.select(this.element)
+	        .selectAll("circle")
+	        .style("opacity", 1)
+            .style("stroke", "black")
+            .style("stroke-opacity", 0.0);
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
         var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
@@ -269,53 +283,21 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         var unselectedIndices:number[] = _.difference(indices, selectedIndices);
         unselectedIndices = _.difference(unselectedIndices,probedIndices);
-        if(probedIndices.length){
+        if (probedIndices.length)
+        {
             this.customStyle(probedIndices, "circle", ".c3-shape", {opacity:1.0, "stroke-opacity": 0.0});
         }
-        if(selectedIndices.length) {
+        if (selectedIndices.length)
+        {
             this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
             this.chart.select(["y"], selectedIndices, true);
-        }else if (!probedIndices.length){
+        }
+        else if (!probedIndices.length)
+        {
             this.customStyle(indices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.0});
             this.chart.select(["y"], [], true);
         }
-    }
-
-    _probedKeysChanged() {
-
-        var selectedKeys:string[] = this.toolPath.probe_keyset.getKeys();
-        var selectedIndices:number[] = selectedKeys.map( (key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-        var keys:string[] = Object.keys(this.keyToIndex);
-        var indices:number[] = keys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-        var unselectedIndices:number[] = _.difference(indices, selectedIndices);
-
-        if(selectedIndices.length) {
-            this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-            this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.0});
-            this._selectionKeysChanged();
-        }else{
-            this._selectionKeysChanged();
-        }
-
-    }
-
-
-    handleClick(event:MouseEvent):void {
-        if(!this.flag) {
-            this.toolPath.selection_keyset.setKeys([]);
-        }
-        this.flag = false;
-    }
-
-    _updateStyle() {
-        d3.select(this.element).selectAll("circle").style("opacity", 1)
-            .style("stroke", "black")
-            .style("stroke-opacity", 0.0);
     }
 
     generate() {
@@ -358,8 +340,6 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         var axisChanged = this.axisChanged.bind(this);
         var dataChanged = this.dataChanged.bind(this);
-        var selectionKeySetChanged = this._selectionKeysChanged.bind(this);
-        var probeKeySetChanged = this._probedKeysChanged.bind(this);
 
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
@@ -372,8 +352,8 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
             { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
+            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
         ];
 
         this.initializePaths(mapping);
@@ -591,7 +571,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
                 }
             },
-            onrendered: this._updateStyle.bind(this)
+            onrendered: this.updateStyle.bind(this)
         };
 
         this.c3Config.axis.x.height = this.getElementSize().height * 0.2;

@@ -246,7 +246,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             },
             onrendered: () => {
                 this.busy = false;
-                this._updateStyle();
+                this.updateStyle();
             }
         };
     }
@@ -255,72 +255,6 @@ class WeaveC3Barchart extends AbstractWeaveTool {
 	{
 
 	}
-
-    private selectionKeysChanged ():void {
-        if(!this.chart || !this.heightColumnNames)
-            return;
-
-        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
-        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
-        var selectedIndices:number[] = selectedKeys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-        var probedIndices:number[] = probedKeys.map((key:string) => {
-           return Number(this.keyToIndex[key]);
-        });
-        var keys:string[] = Object.keys(this.keyToIndex);
-        var indices:number[] = keys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-        var unselectedIndices:number[] = _.difference(indices,selectedIndices);
-        unselectedIndices = _.difference(unselectedIndices,probedIndices);
-        this.heightColumnNames.forEach((item:string) => {
-        	var paths = d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path");
-        	var texts = d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text");
-            if(selectedIndices.length) {
-                this.customSelectorStyle(unselectedIndices, paths, {opacity: 0.3, "stroke-opacity": 0.0});
-                this.customSelectorStyle(selectedIndices, paths, {opacity: 1.0, "stroke-opacity": 1.0});
-                this.customSelectorStyle(unselectedIndices, texts, {"fill-opacity":0.3});
-                this.customSelectorStyle(selectedIndices, texts, {"fill-opacity":1.0});
-            }else if(!probedIndices.length){
-                this.customSelectorStyle(indices, paths, {opacity: 1.0, "stroke-opacity": 0.5});
-                this.customSelectorStyle(indices, texts, {"fill-opacity":1.0});
-            }
-        });
-        if(selectedIndices.length) {
-            this.chart.select(this.heightColumnNames, selectedIndices, true);
-        }else if(!probedIndices.length){
-            this.chart.select(this.heightColumnNames, [], true);
-        }
-    }
-
-    private probedKeysChanged (): void {
-        if(!this.chart || !this.heightColumnNames)
-            return;
-
-        var selectedKeys:string[] = this.toolPath.probe_keyset.getKeys();
-        var selectedIndices:number[] = selectedKeys.map( (key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-        var keys:string[] = Object.keys(this.keyToIndex);
-        var indices:number[] = keys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-        var unselectedIndices:number[] = _.difference(indices,selectedIndices);
-
-        this.heightColumnNames.forEach((item:string) => {
-        	var paths = d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path");
-        	var texts = d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text");
-            if(selectedIndices.length) {
-                this.customSelectorStyle(unselectedIndices, paths, {opacity: 0.3, "stroke-opacity": 0.0});
-                this.customSelectorStyle(selectedIndices, paths, {opacity: 1.0, "stroke-opacity": 0.5});
-                this.customSelectorStyle(unselectedIndices, texts, {"fill-opacity":0.3});
-                this.customSelectorStyle(selectedIndices, texts, {"fill-opacity":1.0});
-            }
-        });
-
-        this.selectionKeysChanged();
-    }
 
     handleClick(event:MouseEvent):void {
         if(!this.flag) {
@@ -554,12 +488,53 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.chart.load(data);
     }
 
-    _updateStyle() {
-        d3.select(this.element).selectAll("path").style("opacity", 1)
+    updateStyle() {
+    	if(!this.chart || !this.heightColumnNames)
+    		return;
+    	
+        d3.select(this.element)
+        	.selectAll("path")
+        	.style("opacity", 1)
             .style("stroke", "black")
             .style("stroke-width", "1px")
             .style("stroke-opacity", 0.5);
+
+        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
+        var selectedIndices:number[] = selectedKeys.map((key:string) => {
+            return Number(this.keyToIndex[key]);
+        });
+        var probedIndices:number[] = probedKeys.map((key:string) => {
+           return Number(this.keyToIndex[key]);
+        });
+        var keys:string[] = Object.keys(this.keyToIndex);
+        var indices:number[] = keys.map((key:string) => {
+            return Number(this.keyToIndex[key]);
+        });
+        var unselectedIndices:number[] = _.difference(indices,selectedIndices);
+        unselectedIndices = _.difference(unselectedIndices,probedIndices);
+        this.heightColumnNames.forEach((item:string) => {
+        	var paths = d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path");
+        	var texts = d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text");
+            if(selectedIndices.length)
+            {
+                this.customSelectorStyle(unselectedIndices, paths, {opacity: 0.3, "stroke-opacity": 0.0});
+                this.customSelectorStyle(selectedIndices, paths, {opacity: 1.0, "stroke-opacity": 1.0});
+                this.customSelectorStyle(unselectedIndices, texts, {"fill-opacity":0.3});
+                this.customSelectorStyle(selectedIndices, texts, {"fill-opacity":1.0});
+            }
+            else if(!probedIndices.length)
+            {
+                this.customSelectorStyle(indices, paths, {opacity: 1.0, "stroke-opacity": 0.5});
+                this.customSelectorStyle(indices, texts, {"fill-opacity":1.0});
+            }
+        });
+        if (selectedIndices.length)
+            this.chart.select(this.heightColumnNames, selectedIndices, true);
+        else if(!probedIndices.length)
+            this.chart.select(this.heightColumnNames, [], true);
     }
+
 
     generate() {
     	this.busy = true;
@@ -610,12 +585,12 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             { name: "chartColors", path: plotterPath.push("chartColors"), callbacks: this.dataChanged },
             { name: "groupingMode", path: plotterPath.push("groupingMode"), callbacks: this.dataChanged },
             { name: "horizontalMode", path: plotterPath.push("horizontalMode"), callbacks: this.rotateAxes },
-            { name: "showValueLabels", path: plotterPath.push("showValueLabels"), callbacks: this.handleShowValueLabels},
+            { name: "showValueLabels", path: plotterPath.push("showValueLabels"), callbacks: this.handleShowValueLabels },
             { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: this.axisChanged },
             { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: this.axisChanged },
-            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: this.dataChanged},
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.selectionKeysChanged},
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.probedKeysChanged}
+            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: this.dataChanged },
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
+            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
         ];
 
         this.initializePaths(mapping);
