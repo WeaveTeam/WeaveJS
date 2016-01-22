@@ -2,12 +2,16 @@
 ///<reference path="../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../typings/jquery/jquery.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
+/// <reference path="../../typings/react/react.d.ts"/>
+/// <reference path="../../typings/react/react-dom.d.ts"/>
 
 import * as ol from "openlayers";
 import * as lodash from "lodash";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import jquery from "jquery";
 
-import AbstractWeaveTool from "./AbstractWeaveTool";
+import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import {registerToolImplementation} from "../WeaveTool";
 /* eslint-disable */
 import Layer from "./OpenLayersMap/Layers/Layer";
@@ -26,7 +30,7 @@ import weaveMapInteractions from "./OpenLayersMap/interactions";
 declare var Weave:any;
 declare var weavejs:any;
 
-class WeaveOpenLayersMap extends AbstractWeaveTool {
+class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 	layers:Map<string,Layer>;
 	interactionModePath:WeavePath;
@@ -42,14 +46,15 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 
 	centerCallbackHandle:any;
 	resolutionCallbackHandle:any;
-
-
+	private element:Element;
+	private toolPath:WeavePath;
 
 	constructor(props)
 	{
 		super(props);
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;/* Forces the inclusion of the layers. */
 		this.layers = new Map<string,Layer>();
+		this.toolPath = props.toolPath;
 	}
 
 	handleMissingSessionStateProperties(newState)
@@ -59,8 +64,6 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 
 	componentDidMount()
 	{
-		super.componentDidMount();
-
 		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode");
 
 		this.map = new ol.Map({
@@ -125,7 +128,7 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 		this.getSessionCenter();
 	}
 
-	resize()
+	componentDidUpdate()
 	{
 		this.map.updateSize();
 		var viewport = this.map.getViewport();
@@ -277,6 +280,10 @@ class WeaveOpenLayersMap extends AbstractWeaveTool {
 	{
 
 	}
+
+	render():JSX.Element {
+        return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%"}}/>;
+    }
 }
 
 export default WeaveOpenLayersMap;

@@ -51,7 +51,7 @@ export interface IToolTipState {
     y?:number;
     title?:string;
     columnNamesToValue?:{[columnName:string]: string|number};
-    showTooltip?:boolean;
+    showToolTip?:boolean;
 }
 
 export default class ToolTip extends React.Component<IToolTipProps, IToolTipState> {
@@ -78,7 +78,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             y: 0,
             title: "",
             columnNamesToValue: {},
-            showTooltip: false
+            showToolTip: false
         }
 
         this.containerStyle = {
@@ -98,7 +98,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 
     render():JSX.Element {
 
-        if(!(this.element && this.state.showTooltip)) {
+        if(!(this.element && this.state.showToolTip)) {
             return <div ref={(c:HTMLElement) => { this.element = c }}></div>;
         } else {
             var tableRows:JSX.Element[] = [];

@@ -5,15 +5,13 @@
 ///<reference path="../react-ui/ui.tsx"/>
 ///<reference path="../../typings/react/react-dom.d.ts"/>
 
+import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
-
-import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
 import ui from "../react-ui/ui";
-import {IAbstractWeaveToolProps, IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import StandardLib from "../utils/StandardLib";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
@@ -23,26 +21,7 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 
-class WeaveC3BarChartLegend extends AbstractWeaveTool {
-    constructor(props:IAbstractWeaveToolProps) {
-        super(props);
-    }
-
-    componentDidUpdate() {
-        var elementSize = this.element ? this.getElementSize() : null;
-        ReactDOM.render(
-            <BarChartLegend toolPath={this.toolPath} width={elementSize.width} height={elementSize.height}/>
-            , this.element);
-    }
-}
-
-interface IBarChartLegendProps {
-    toolPath:WeavePath;
-    width:number;
-    height:number;
-}
-
-class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
+class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
     private plotterPath:WeavePath;
     private colorRampPath:WeavePath;
@@ -53,7 +32,7 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
     private spanStyle:CSSProperties;
     private numberOfLabels:number;
 
-    constructor(props:IBarChartLegendProps) {
+    constructor(props:IVisToolProps) {
         super(props);
         this.toolPath = props.toolPath;
         this.plotterPath = this.toolPath.pushPlotter("plot");
@@ -68,6 +47,10 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
     protected handleMissingSessionStateProperties(newState:any)
     {
 
+    }
+
+    get title():string {
+       return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
     }
 
     private setupCallbacks() {
@@ -131,8 +114,8 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
     }
 
     render() {
-        var width:number = this.props.width;
-        var height:number = this.props.height;
+        var width:number = this.props.style.width;
+        var height:number = this.props.style.height;
         var shapeSize:number = this.plotterPath.getState("shapeSize");
         this.numberOfLabels = this.columnsPath.getState().length;
         var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
@@ -174,7 +157,7 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
                 }
             }
             {
-                this.props.width > this.props.height * 2 ?
+                this.props.style.width > this.props.style.height * 2 ?
                     elements.push(
                         <ui.HBox key={i} style={{width:"100%", flex: columnFlex}}>
                             {
@@ -202,7 +185,7 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
                     <span style={prefixerStyle}>Bar color</span>
                 </ui.HBox>
                 {
-                    this.props.width > this.props.height * 2 ?
+                    this.props.style.width > this.props.style.height * 2 ?
                     <ui.HBox style={{width:"100%", flex: 0.9}}> {
                         finalElements
                         }
@@ -218,6 +201,8 @@ class BarChartLegend extends React.Component<IBarChartLegendProps, any> {
         </div>);
     }
 }
+
+
 
 
 export default WeaveC3BarChartLegend;

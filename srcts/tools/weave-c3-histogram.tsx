@@ -5,20 +5,21 @@
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
 
 
-import AbstractWeaveTool from "./AbstractWeaveTool";
+import {IVisToolProps} from "./IVisTool";
+import {IToolPaths} from "./AbstractC3Tool";
+import AbstractC3Tool from "./AbstractC3Tool";
+
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
 import FormatUtils from "../utils/FormatUtils";
 import StandardLib from "../utils/StandardLib"
-import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
-import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
-import {ElementSize} from "./AbstractWeaveTool";
+
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
 
-interface IHistogramPaths extends IAbstractWeaveToolPaths {
+interface IHistogramPaths extends IToolPaths {
     plotter: WeavePath;
     binnedColumn: WeavePath;
     columnToAggregate: WeavePath;
@@ -32,7 +33,7 @@ interface IHistogramPaths extends IAbstractWeaveToolPaths {
     probeKeySet: WeavePath;
 }
 
-class WeaveC3Histogram extends AbstractWeaveTool {
+class WeaveC3Histogram extends AbstractC3Tool {
     private busy:boolean;
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
@@ -44,14 +45,14 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     private numberOfBins:number;
     private showXAxisLabel:boolean;
     private histData:{}[];
-    private c3Config:ChartConfiguration;
-    private chart:ChartAPI;
+    protected c3Config:ChartConfiguration;
+    protected chart:ChartAPI;
 
     protected paths:IHistogramPaths;
 
     private flag:boolean;
 
-    constructor(props:IAbstractWeaveToolProps) {
+    constructor(props:IVisToolProps) {
         super(props);
         this.busy = false;
         this.idToRecord = {};
@@ -59,7 +60,10 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         this.indexToKey = {};
 
         this.c3Config = {
-            //size: this.getElementSize(),
+            size: {
+                width: this.props.style.width,
+                height: this.props.style.height
+            },
             padding: {
                 top: 20,
                 bottom: 20,
@@ -143,8 +147,8 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                         rotate: -45,
                         multiline: false,
                         format: (num:number):string => {
-                            if(this.element && this.getElementSize().height > 0) {
-                                var labelHeight:number = (this.getElementSize().height* 0.2)/Math.cos(45*(Math.PI/180));
+                            if(this.element && this.props.style.height > 0) {
+                                var labelHeight:number = (this.props.style.height* 0.2)/Math.cos(45*(Math.PI/180));
                                 var labelString:string;
                                 if(this.c3Config.axis.y2.show){
                                     //handle case where labels need to be reversed
@@ -423,34 +427,23 @@ class WeaveC3Histogram extends AbstractWeaveTool {
     }
 
     componentDidUpdate() {
-        super.componentDidUpdate();
-        //console.log("component did update");
-        //var start = Date.now();
-        var newElementSize = this.getElementSize();
-        if(!_.isEqual(newElementSize, this.elementSize)) {
-            if(this.paths.binnedColumn.push("internalDynamicColumn").getState().length){
-                this.c3Config.axis.x.height = newElementSize.height * 0.2;
-            }else{
-                this.c3Config.axis.x.height = null;
-            }
-            this.c3Config.size = newElementSize;
-            this.chart= generate(this.c3Config);
-            this.elementSize = newElementSize;
+        // TODO avoid calling generate at each componentDidUpdate
+        this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
+        if(this.paths.binnedColumn.push("internalDynamicColumn").getState().length){
+            this.c3Config.axis.x.height = this.props.style.height * 0.2;
+        }else{
+            this.c3Config.axis.x.height = null;
         }
-        //var end = Date.now();
-        //console.log(end - start);
+        this.chart = generate(this.c3Config);
     }
 
     componentWillUnmount() {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
-        super.componentWillUnmount();
         this.chart.destroy();
     }
 
     componentDidMount() {
-        super.componentDidMount();
-
         this.showXAxisLabel = false;
         var axisChanged:Function = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
@@ -475,7 +468,7 @@ class WeaveC3Histogram extends AbstractWeaveTool {
 
         this.c3Config.bindto = this.element;
         if(this.paths.binnedColumn.push("internalDynamicColumn").getState().length){
-            this.c3Config.axis.x.height = this.getElementSize().height * 0.2;
+            this.c3Config.axis.x.height = this.props.style.height * 0.2;
         }
         this.chart = generate(this.c3Config);
     }

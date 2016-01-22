@@ -5,6 +5,7 @@
 ///<reference path="../react-ui/ui.tsx"/>
 ///<reference path="../../typings/react/react-dom.d.ts"/>
 
+import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import AbstractWeaveTool from "./AbstractWeaveTool";
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
@@ -21,30 +22,7 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 
-class WeaveC3ColorLegend extends AbstractWeaveTool
-{
-	constructor(props:IAbstractWeaveToolProps)
-	{
-		super(props);
-	}
-
-	componentDidUpdate()
-	{
-		var elementSize = this.element ? this.getElementSize() : null;
-		ReactDOM.render(
-			<ColorLegend toolPath={this.toolPath} width={elementSize.width} height={elementSize.height}/>
-		, this.element);
-	}
-}
-
-interface IColorLegendProps
-{
-	toolPath:WeavePath;
-	width:number;
-	height:number;
-}
-
-class ColorLegend extends React.Component<IColorLegendProps, any>
+class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 {
 	private plotterPath:WeavePath;
 	private dynamicColorColumnPath:WeavePath;
@@ -54,13 +32,12 @@ class ColorLegend extends React.Component<IColorLegendProps, any>
 	private filteredKeySet:WeavePath;
 	private selectionKeySet:WeavePath;
 	private probeKeySet:WeavePath;
-	private numberOfBins:number;
-	private toolPath:WeavePath;
+	protected toolPath:WeavePath;
 	private spanStyle:CSSProperties;
 
 	private selectedBins:number[];
 
-	constructor(props:IColorLegendProps)
+	constructor(props:IVisToolProps)
 	{
 		super(props);
 		this.toolPath = props.toolPath;
@@ -72,7 +49,6 @@ class ColorLegend extends React.Component<IColorLegendProps, any>
 		this.filteredKeySet = this.plotterPath.push("filteredKeySet");
 		this.selectionKeySet = this.toolPath.push("selectionKeySet");
 		this.probeKeySet = this.toolPath.push("probeKeySet");
-		this.numberOfBins = this.binnedColumnPath.getObject().numberOfBins;
 		this.state = {selected:[], probed:[]};
 		this.selectedBins = [];
 		this.spanStyle = {
@@ -86,7 +62,17 @@ class ColorLegend extends React.Component<IColorLegendProps, any>
 		};
 	}
 
-	protected handleMissingSessionStateProperties(newState:any)
+	get title():string
+	{
+		return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
+	}
+	
+	get numberOfBins():number
+	{
+		return this.binnedColumnPath.getObject().numberOfBins;
+	}
+
+    protected handleMissingSessionStateProperties(newState:any)
 	{
 
 	}
@@ -197,17 +183,16 @@ class ColorLegend extends React.Component<IColorLegendProps, any>
 
 	render()
 	{
-		this.numberOfBins = this.binnedColumnPath.getObject().numberOfBins;
 		if (this.numberOfBins)
 		{
 			//Binned plot case
-			var width:number = this.props.width;
-			var height:number = this.props.height;
+			var width:number = this.props.style.width;
+			var height:number = this.props.style.height;
 			var shapeSize:number = this.plotterPath.getState("shapeSize");
 			var shapeType:string = this.plotterPath.getState("shapeType");
 			var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
 			var columnFlex:number = 1.0/maxColumns;
-			var extraBins:number = this.numberOfBins%maxColumns == 0 ? 0 : maxColumns-(this.numberOfBins%maxColumns);
+			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
 			var ramp:any[] = this.dynamicColorColumnPath.getState("ramp");
 			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
 			var yMap:Function = (d:number):number => { return yScale(d); };
@@ -238,7 +223,11 @@ class ColorLegend extends React.Component<IColorLegendProps, any>
 												<ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
 													<svg style={{position:"absolute"}}
 														 viewBox="0 0 100 100" width="100%" height="100%">
-														<circle cx="50%" cy="50%" r="45%" style={{fill:"#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)), stroke:"black", strokeOpacity:0.5}}></circle>
+														<circle cx="50%" cy="50%" r="45%" style={{
+															fill: "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)),
+															stroke: "black",
+															strokeOpacity: 0.5
+														}}/>
 													</svg>
 												</ui.HBox>
 												<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
@@ -256,7 +245,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any>
 							}
 						}
 						
-						if (this.props.width > this.props.height * 2)
+						if (this.props.style.width > this.props.style.height * 2)
 						{
 							elements.push(
 								<ui.HBox key={i} style={{width:"100%", flex: columnFlex}}> { element } </ui.HBox>
@@ -286,7 +275,7 @@ class ColorLegend extends React.Component<IColorLegendProps, any>
 						<span style={prefixerStyle}>{this.dynamicColorColumnPath.getObject().getMetadata('title')}</span>
 					</ui.HBox>
 					{
-						this.props.width > this.props.height * 2
+						this.props.style.width > this.props.style.height * 2
 						? <ui.HBox style={{width:"100%", flex: 0.9}}> { finalElements } </ui.HBox>
 						: <ui.VBox style={{height:"100%", flex: 0.9}}> { finalElements } </ui.VBox>
 				   	}
