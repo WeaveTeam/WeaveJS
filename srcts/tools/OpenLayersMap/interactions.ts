@@ -90,7 +90,6 @@ class ProbeInteraction extends ol.interaction.Pointer
 	private handleMoveEvent(event:ol.MapBrowserEvent)
 	{
 		let key:any /*IQualifiedKey*/ = this.pixelToKey(event.pixel);
-		console.log(key);
 		let toolTipState: IToolTipState = {};
 
 		if (key) {
@@ -126,51 +125,45 @@ class ProbeInteraction extends ol.interaction.Pointer
 	}
 }
 
-function getDragSelect(mapTool, probeInteraction)
+
+enum DragSelectionMode {
+	SUBTRACT = -1,
+	SET = 0,
+	ADD = 1
+};
+
+class WeaveDragSelection extends ol.interaction.DragBox
 {
-	let ADD = "+";
-	let SUBTRACT = "-";
-	let SET = "=";
-	let dragSelect:ol.interaction.DragBox = new ol.interaction.DragBox({ boxEndCondition: () => true });
-	let mode = SET;
+	private mapTool: OpenLayersMapTool;
+	private mode: DragSelectionMode;
+	private _probeInteraction: ProbeInteraction;
 
-	function updateSelection(extent) {
-		let selectedFeatures:Set<string> = new Set();
-		let selectFeature:Function = (feature) => { selectedFeatures.add(feature.getId()); };
+	constructor()
+	{
+		super({ boxEndCondition: () => true });
 
-		for (let weaveLayerName of mapTool.layers.keys())
-		{
-			let weaveLayer:Layer = mapTool.layers.get(weaveLayerName);
-			let olLayer:ol.layer.Layer = weaveLayer.olLayer;
-			let selectable:boolean = <boolean>olLayer.get("selectable");
+		this.on('boxstart', WeaveDragSelection.prototype.onBoxStart, this);
+		this.on('boxdrag', WeaveDragSelection.prototype.onBoxDrag, this);
+		this.on('boxend', WeaveDragSelection.prototype.onBoxEnd, this);
+	}
 
-			if (weaveLayer instanceof FeatureLayer && selectable)
-			{
-				let keySet = weaveLayer.selectionKeySet;
-				let source:ol.source.Vector = <ol.source.Vector>olLayer.getSource();
-
-				source.forEachFeatureIntersectingExtent(extent, selectFeature);
-
-				let keys = Array.from(selectedFeatures);
-
-				switch (mode)
-				{
-					case SET:
-						keySet.setKeys(keys);
-						break;
-					case ADD:
-						keySet.addKeys(keys);
-						break;
-					case SUBTRACT:
-						keySet.removeKeys(keys);
-						break;
+	private get probeInteraction():ProbeInteraction
+	{
+		if (!this._probeInteraction) {
+			for (let interaction of this.getMap().getInteractions().getArray()) {
+				if (interaction instanceof ProbeInteraction) {
+					this._probeInteraction = interaction;
+					break;
 				}
 			}
 		}
+
+		return this._probeInteraction;
 	}
 
-	dragSelect.on('boxstart', function (event:any) {
-		probeInteraction.setActive(false);
+	onBoxStart(event: any) {
+		if (this.probeInteraction)
+			this.probeInteraction.setActive(false);
 
 		let dragBoxEvent: ol.DragBoxEvent = <ol.DragBoxEvent>event;
 
@@ -178,40 +171,73 @@ function getDragSelect(mapTool, probeInteraction)
 
 		if (browserEvent.ctrlKey && browserEvent.shiftKey)
 		{
-			mode = SUBTRACT
+			this.mode = DragSelectionMode.SUBTRACT;
 		}
 		else if (browserEvent.ctrlKey)
 		{
-			mode = ADD;
+			this.mode = DragSelectionMode.ADD;
 		}
 		else
 		{
-			mode = SET;
+			this.mode = DragSelectionMode.SET;
 		}
-	});
+	}
 
-	dragSelect.on('boxend', function (event:any) {
+	updateSelection(extent)
+	{
+		let selectedFeatures: Set<string> = new Set();
+		let selectFeature: Function = (feature) => { selectedFeatures.add(feature.getId()); };
+		let mapTool: OpenLayersMapTool = this.mapTool;
 
-		let extent = dragSelect.getGeometry().getExtent();
-		updateSelection(extent);
+		for (let olLayer of this.getMap().getLayers().getArray()) {
+			let selectable: boolean = <boolean>olLayer.get("selectable");
+			let weaveLayer: Layer = olLayer.get("layerObject");
 
-		probeInteraction.setActive(true);
-		mode = SET;
-	});
+			if (weaveLayer instanceof FeatureLayer && selectable) {
+				let keySet = weaveLayer.selectionKeySet;
+				let source: ol.source.Vector = <ol.source.Vector>(<ol.layer.Vector>olLayer).getSource();
 
-	dragSelect.on('boxdrag', lodash.debounce(function() {
-		let extent = dragSelect.getGeometry().getExtent();
-		updateSelection(extent);
-	}));
+				source.forEachFeatureIntersectingExtent(extent, selectFeature);
 
-	return dragSelect;
+				let keys = Array.from(selectedFeatures);
+
+				switch (this.mode) {
+					case DragSelectionMode.SET:
+						keySet.setKeys(keys);
+						break;
+					case DragSelectionMode.ADD:
+						keySet.addKeys(keys);
+						break;
+					case DragSelectionMode.SUBTRACT:
+						keySet.removeKeys(keys);
+						break;
+				}
+			}
+		}
+	}
+
+	onBoxDrag(event:any)
+	{
+		let extent = this.getGeometry().getExtent();
+
+		this.updateSelection(extent);
+	}
+
+	onBoxEnd(event:any)
+	{
+		let extent = this.getGeometry().getExtent();
+
+		this.updateSelection(extent);
+		if (this.probeInteraction)
+			this.probeInteraction.setActive(true);
+	}
 }
 
 function weaveMapInteractions(mapTool, toolTip)
 {
 
 	let probeInteraction = new ProbeInteraction(toolTip);
-	let dragSelect = getDragSelect(mapTool, probeInteraction);
+	let dragSelect = new WeaveDragSelection();
 	let dragPan = new ol.interaction.DragPan({});
 	let dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});
 
