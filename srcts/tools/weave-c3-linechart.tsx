@@ -4,22 +4,21 @@
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/WeavePath.d.ts"/>
 
+import {IVisToolProps} from "./IVisTool";
+import {IToolPaths} from "./AbstractC3Tool";
+import AbstractC3Tool from "./AbstractC3Tool";
 
-import AbstractWeaveTool from "./AbstractWeaveTool";
+import {registerToolImplementation} from "../WeaveTool";
 import * as d3 from "d3";
 import * as _ from "lodash";
-import {registerToolImplementation} from "../WeaveTool";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
-import {IAbstractWeaveToolProps} from "./AbstractWeaveTool";
-import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
-import {ElementSize} from "./AbstractWeaveTool";
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
 import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 
-interface ILineChartPaths extends IAbstractWeaveToolPaths {
+interface ILineChartPaths extends IToolPaths {
     plotter: WeavePath;
     columns: WeavePath;
     lineStyle: WeavePath;
@@ -29,13 +28,12 @@ interface ILineChartPaths extends IAbstractWeaveToolPaths {
     probeKeySet: WeavePath;
 }
 
-class WeaveC3LineChart extends AbstractWeaveTool {
+class WeaveC3LineChart extends AbstractC3Tool {
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: string};
     private yAxisValueToLabel:{[value:number]: string};
     private colors:{[id:string]: string};
     private yLabelColumnPath:WeavePath;
-    private chart:ChartAPI;
     private numericRecords:Record[];
     private stringRecords:Record[];
     private records:Record[][];
@@ -43,10 +41,11 @@ class WeaveC3LineChart extends AbstractWeaveTool {
     private columnNames:string[];
     private flag:boolean;
 
-    private c3Config:ChartConfiguration;
+    protected chart:ChartAPI;
+    protected c3Config:ChartConfiguration;
     protected paths:ILineChartPaths;
 
-    constructor(props:IAbstractWeaveToolProps) {
+    constructor(props:IVisToolProps) {
         super(props);
         this.keyToIndex = {};
         this.indexToKey = {};
@@ -256,28 +255,13 @@ class WeaveC3LineChart extends AbstractWeaveTool {
         this.chart.load({columns: columns, colors: this.colors, type: chartType, unload: true});
     }
 
-    componentDidUpdate() {
-        super.componentDidUpdate();
-        //console.log("resizing");
-        //var start = Date.now();
-        var newElementSize:ElementSize = this.getElementSize();
-        if(!_.isEqual(newElementSize, this.elementSize)) {
-            this.chart.resize(newElementSize);
-            this.elementSize = newElementSize;
-        }
-        //var end = Date.now();
-        //console.log(end - start);
-    }
-
     componentWillUnmount() {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
-        super.componentWillUnmount();
         this.chart.destroy();
     }
 
     componentDidMount() {
-        super.componentDidMount();
         var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
         var selectionKeySetChanged:Function = this._selectionKeysChanged.bind(this);
         var probeKeySetChanged:Function = _.debounce(this._probedKeysChanged.bind(this), 100);
@@ -297,7 +281,10 @@ class WeaveC3LineChart extends AbstractWeaveTool {
        	this.paths.filteredKeySet.getObject().setColumnKeySources(this.paths.columns.getObject().getObjects());
 
         this.c3Config = {
-            //size: this.getElementSize(),
+            size: {
+                width: this.props.style.width,
+                height: this.props.style.height
+            },
             padding: {
                 top: 20,
                 bottom: 20
@@ -338,18 +325,18 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                        columnNamesToValue[label] = this.numericRecords[d.index]["columns"][index] as number;
                     });
 
-                    this.toolTip.setState({
+                    this.props.toolTip.setState({
                         x: this.chart.internal.d3.event.pageX,
                         y: this.chart.internal.d3.event.pageY,
-                        showTooltip: true,
+                        showToolTip: true,
                         columnNamesToValue: columnNamesToValue
                     });
                 },
                 onmouseout: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.probe_keyset.setKeys([]);
-                        this.toolTip.setState({
-                            showTooltip: false
+                        this.props.toolTip.setState({
+                            showToolTip: false
                         });
                     }
                 }

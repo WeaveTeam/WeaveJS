@@ -20,12 +20,12 @@ class ProbeInteraction extends ol.interaction.Pointer
 	private topZIndex: number;
 	private topKeySet: any;
 	private topLayer: FeatureLayer;
-	private toolTip: any;
+	private tool: any;
 
-	constructor(toolTip:any)
+	constructor(tool:any)
 	{
 		super({handleMoveEvent: ProbeInteraction.prototype.handleMoveEvent});
-		this.toolTip = toolTip;
+		this.tool = tool;
 	}
 
 	setMap(map:ol.Map)
@@ -98,17 +98,17 @@ class ProbeInteraction extends ol.interaction.Pointer
 		if (key) {
 			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
 
-			toolTipState.showTooltip = true;
+			toolTipState.showToolTip = true;
 			toolTipState.title = FeatureLayer.getToolTipTitle(key);
 			toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(key, this.topLayer.getToolTipColumns());
 			[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
 		}
 		else
 		{
-			toolTipState.showTooltip = false;
+			toolTipState.showToolTip = false;
 		}
 
-		this.toolTip.setState(toolTipState);
+		this.tool.props.toolTip.setState(toolTipState);
 	}
 
 	handleOutEvent(event:MouseEvent)
@@ -123,8 +123,8 @@ class ProbeInteraction extends ol.interaction.Pointer
 		}
 
 		let toolTipState: IToolTipState = {};
-		toolTipState.showTooltip = false;
-		this.toolTip.setState(toolTipState);
+		toolTipState.showToolTip = false;
+		this.tool.props.toolTip.setState(toolTipState);
 	}
 }
 
@@ -236,10 +236,10 @@ class WeaveDragSelection extends ol.interaction.DragBox
 	}
 }
 
-function weaveMapInteractions(mapTool, toolTip)
+function weaveMapInteractions(mapTool)
 {
 
-	let probeInteraction = new ProbeInteraction(toolTip);
+	let probeInteraction = new ProbeInteraction(mapTool);
 	let dragSelect = new WeaveDragSelection();
 	let dragPan = new ol.interaction.DragPan({});
 	let dragZoom = new ol.interaction.DragZoom({condition: ol.events.condition.always});

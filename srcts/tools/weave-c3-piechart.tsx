@@ -4,16 +4,18 @@
 /// <reference path="../../typings/react/react.d.ts"/>
 /// <reference path="../../typings/weave/WeavePath.d.ts"/>
 
-import {ChartAPI, ChartConfiguration, generate} from "c3";
+
+import {IVisToolProps} from "./IVisTool";
+import {IToolPaths} from "./AbstractC3Tool";
+import AbstractC3Tool from "./AbstractC3Tool";
+
+import {registerToolImplementation} from "../WeaveTool";
 import * as d3 from "d3";
 import * as _ from "lodash";
 import * as React from "react";
-import {IAbstractWeaveToolProps, IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
-import {ElementSize} from "./AbstractWeaveTool";
-import AbstractWeaveTool from "./AbstractWeaveTool";
-import {registerToolImplementation} from "../WeaveTool";
+import {ChartAPI, ChartConfiguration, generate} from "c3";
 
-interface IPieChartPaths extends IAbstractWeaveToolPaths {
+interface IPieChartPaths extends IToolPaths {
     plotter: WeavePath;
     data: WeavePath;
     label: WeavePath;
@@ -25,19 +27,19 @@ interface IPieChartPaths extends IAbstractWeaveToolPaths {
     probeKeySet:WeavePath;
 };
 
-export default class WeaveC3PieChart extends AbstractWeaveTool {
+export default class WeaveC3PieChart extends AbstractC3Tool {
 
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: string};
-    private chart:ChartAPI;
-    private c3Config:ChartConfiguration;
+    protected chart:ChartAPI;
+    protected c3Config:ChartConfiguration;
     protected paths:IPieChartPaths;
     private flag:boolean;
     private numericRecords:Record[];
     private stringRecords:Record[];
     private colors:{[key:string] : string};
 
-    constructor(props:IAbstractWeaveToolProps) {
+    constructor(props:IVisToolProps) {
         super(props);
     }
 
@@ -135,25 +137,13 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
         });
     }
 
-    componentDidUpdate():void {
-        super.componentDidUpdate();
-
-        var newElementSize:ElementSize = this.getElementSize();
-        if(!_.isEqual(newElementSize, this.elementSize)) {
-            this.chart.resize(newElementSize);
-            this.elementSize = newElementSize;
-        }
-    }
-
     componentWillUnmount():void {
         /* Cleanup callbacks */
         //this.teardownCallbacks();
-        super.componentWillUnmount();
         this.chart.destroy();
     }
 
     componentDidMount() {
-        super.componentDidMount();
         var dataChanged:Function = _.debounce(this.dataChanged.bind(this), 100);
         var selectionKeySetChanged:Function = this.selectionKeysChanged.bind(this);
         var probeKeySetChanged:Function = _.debounce(this.probedKeysChanged.bind(this), 100);
@@ -175,7 +165,10 @@ export default class WeaveC3PieChart extends AbstractWeaveTool {
        	this.paths.filteredKeySet.getObject().setSingleKeySource(this.paths.data.getObject());
 
         this.c3Config = {
-            //size: this.getElementSize(),
+            size: {
+                width: this.props.style.width,
+                height: this.props.style.height
+            },
             bindto: this.element,
             padding: {
               top: 20,

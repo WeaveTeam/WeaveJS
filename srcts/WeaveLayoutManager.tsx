@@ -328,13 +328,13 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 
         for(var i = 0; i < paths.length; i++) {
             var path:WeavePath = paths[i];
-            var impl:string = path.getType();
+            var impl:string|Function = path.getType();
             if(impl === "weave.visualization.tools::ExternalTool" && path.getType("toolClass")) {
                 impl = path.getState("toolClass");
             }
             if (impl === "weavejs.core.LinkableHashMap" && path.getType("class"))
             impl = path.getState("class");
-            impl = getToolImplementation(impl);
+            impl = getToolImplementation(impl as string);
             var toolName:string = path.getPath()[0];
             var node:Element;
             var toolRect:ClientRect;

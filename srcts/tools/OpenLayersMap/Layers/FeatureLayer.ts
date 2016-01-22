@@ -87,7 +87,7 @@ export abstract class FeatureLayer extends Layer {
 		return [];
 	}
 
-	/* TODO: Move this into AbstractWeaveTool */
+	/* TODO: Move this into WeaveTool */
 	static getToolTipData(key:any /* IQualifiedKey */, additionalColumns:Array<any> = [] /* Array<IAttributeColumn */): { [columnName: string]: string | number } 
 	{
 		let columnHashMap = weave.root.getObject("Probed Columns");
@@ -107,7 +107,7 @@ export abstract class FeatureLayer extends Layer {
 		return result;
 	}
 
-	/* TODO: Move this into AbstractWeaveTool */
+	/* TODO: Move this into WeaveTool */
 	static getToolTipTitle(key:any /* IQualifiedKey */): string
 	{
 		let titleHashMap = weave.root.getObject("Probe Header Columns");
