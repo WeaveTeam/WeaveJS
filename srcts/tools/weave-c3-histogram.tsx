@@ -403,7 +403,6 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         }
 
         var keys = { value: ["height"] };
-        console.log(this.histData,keys);
         if(this.c3Config.axis.y2.show){
             this.histData = this.histData.reverse();
         }
