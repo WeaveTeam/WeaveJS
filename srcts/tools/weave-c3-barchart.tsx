@@ -74,8 +74,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             //size: this.getElementSize(),
             padding: {
                 top: 20,
-                bottom: 20,
-                right: 30
+                bottom: 20
             },
             data: {
                 json: [],
@@ -330,7 +329,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.flag = false;
     }
 
-    setAxes() {
+    mirrorVertical() {
         var temp:string = this.c3Config.data.keys.value[0];
         if(this.c3Config.axis.y.show == true){
             this.c3Config.axis.y2.show = true;
@@ -343,6 +342,7 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             this.c3Config.data.axes = {[temp]:'y'};
             this.c3Config.axis.y.label = this.c3Config.axis.y2.label;
         }
+        this.dataChanged();
         this.generate();
     }
 
@@ -366,10 +366,17 @@ class WeaveC3Barchart extends AbstractWeaveTool {
             xLabel = " ";
         }
 
-        this.chart.axis.labels({
-            x: xLabel,
-            y: yLabel
-        });
+        if(this.c3Config.axis.y.show){
+            this.chart.axis.labels({
+                x: xLabel,
+                y: yLabel
+            });
+        }else{
+            this.chart.axis.labels({
+                x: xLabel,
+                y2: yLabel
+            });
+        }
 
         this.axisLabelsChanged();
 
@@ -451,7 +458,13 @@ class WeaveC3Barchart extends AbstractWeaveTool {
         this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
-        this.records = _.sortByAll(this.records, [[0, "sort"], [0, "id"]]);
+        //this.records = _.sortByOrder(this.records, ["sort", "id"], ['asc', 'asc']);
+        this.records = _.sortBy(this.records, (record) =>{
+            return record[0]["sort"];
+        });
+        if(this.c3Config.axis.y.show == false) {
+            this.records = this.records.reverse();
+        }
 
         if(this.records.length)
             [this.numericRecords, this.stringRecords] = _.unzip(this.records);

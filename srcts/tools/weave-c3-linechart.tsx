@@ -141,6 +141,29 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             .style("stroke-opacity", 0.0);
     }
 
+    mirrorVertical() {
+        var temp:any =  {};
+        if(this.c3Config.axis.y.show == true){
+            this.stringRecords.forEach( (record) => {
+                temp[record["id"].toString()] = 'y2';
+            });
+            this.c3Config.axis.y2.show = true;
+            this.c3Config.axis.y.show = false;
+            this.c3Config.data.axes = temp;
+            this.c3Config.axis.y2.label = this.c3Config.axis.y.label;
+        }else{
+            this.stringRecords.forEach( (record) => {
+                temp[record["id"].toString()] = 'y';
+            });
+            this.c3Config.axis.y.show = true;
+            this.c3Config.axis.y2.show = false;
+            this.c3Config.data.axes = temp;
+            this.c3Config.axis.y.label = this.c3Config.axis.y2.label;
+        }
+        this.chart = generate(this.c3Config);
+        this._dataChanged();
+    }
+
     _dataChanged() {
         this.columnLabels = [];
         this.columnNames = [];
@@ -217,6 +240,17 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             chartType = "spline";
         }
 
+        if(this.c3Config.axis.y2.show){
+            columns.forEach( (column:any[], index:number, array:any) => {
+                var temp:any[] = [];
+                temp.push(column.shift());
+                column = column.reverse();
+                column.forEach( (item:any) => {
+                    temp.push(item);
+                });
+                array[index] = temp;
+            });
+        }
         this.chart.load({columns: columns, colors: this.colors, type: chartType, unload: true});
     }
 
@@ -264,8 +298,7 @@ class WeaveC3LineChart extends AbstractWeaveTool {
             //size: this.getElementSize(),
             padding: {
                 top: 20,
-                bottom: 20,
-                right: 30
+                bottom: 20
             },
             data: {
                 columns: [],
@@ -321,11 +354,33 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                         multiline: false,
                         rotate: 0,
                         format: (d:number):string => {
-                            return this.columnLabels[d];
+                            if(this.c3Config.axis.y2.show){
+                                //handle case where labels need to be reversed
+                                var temp:number = this.columnLabels.length-1;
+                                return this.columnLabels[temp-d];
+                            }else{
+                                return this.columnLabels[d];
+                            }
                         }
                     }
                 },
                 y: {
+                    show: true,
+                    tick: {
+                        multiline: true,
+                        format: (num:number):string => {
+                            if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("this.getMetadata('dataType')") !== "number") {
+                                return this.yAxisValueToLabel[num] || "";
+                            } else {
+                                return String(FormatUtils.defaultNumberFormatting(num));
+                            }
+                        }
+                    }
+                },
+                y2: {
+                    show: false,
+                    min: null,
+                    max: null,
                     tick: {
                         multiline: true,
                         format: (num:number):string => {

@@ -118,6 +118,23 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
         });
     }
 
+    mirrorVertical() {
+        var temp:string = "y";
+        if(this.c3Config.axis.y.show == true){
+            this.c3Config.axis.y2.show = true;
+            this.c3Config.axis.y.show = false;
+            this.c3Config.data.axes = {[temp]:'y2'};
+            this.c3Config.axis.y2.label = this.c3Config.axis.y.label;
+        }else{
+            this.c3Config.axis.y.show = true;
+            this.c3Config.axis.y2.show = false;
+            this.c3Config.data.axes = {[temp]:'y'};
+            this.c3Config.axis.y.label = this.c3Config.axis.y2.label;
+        }
+        this.dataChanged();
+        this.generate();
+    }
+
     private busy:number;
     private  axisChanged():void {
         if(this.busy) {
@@ -125,10 +142,17 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             return;
         }
 
-        this.chart.axis.labels({
-            x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title'),
-            y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title')
-        })
+        if(this.c3Config.axis.y.show){
+            this.chart.axis.labels({
+                x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title'),
+                y: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title')
+            });
+        }else{
+            this.chart.axis.labels({
+                x: this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title'),
+                y2: this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title')
+            });
+        }
 
         this.axisLabelsChanged();
         this.generate();
@@ -182,6 +206,10 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
+
+        if(this.c3Config.axis.y.show == false) {
+            this.records = this.records.reverse();
+        }
 
         if(this.records.length)
             [this.numericRecords, this.stringRecords] = _.unzip(this.records);
@@ -356,8 +384,7 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
             bindto: this.element,
             padding: {
                 top: 20,
-                bottom: 20,
-                right: 30
+                bottom: 20
             },
             data: {
                 rows: [],
@@ -479,6 +506,23 @@ class WeaveC3ScatterPlot extends AbstractWeaveTool {
                     }
                 },
                 y: {
+                    show: true,
+                    label: {
+                        text: "",
+                        position: "outer-middle"
+                    },
+                    tick: {
+                        format: (num:number):string => {
+                            if(this.paths.dataY && this.yAxisValueToLabel && this.dataYType !== "number") {
+                                return this.yAxisValueToLabel[num] || "";
+                            } else {
+                                return String(FormatUtils.defaultNumberFormatting(num));
+                            }
+                        }
+                    }
+                },
+                y2: {
+                    show: false,
                     label: {
                         text: "",
                         position: "outer-middle"

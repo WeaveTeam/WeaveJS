@@ -75,7 +75,14 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                 type: "bar",
                 color: (color:string, d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        var decColor:number = this.paths.fillStyle.push("color").getObject("internalDynamicColumn", null).getColorFromDataValue(d.index).toString(16);
+                        var decColor:number;
+                        if(this.c3Config.axis.y2.show){
+                            //handle case where labels need to be reversed for chart flip
+                            var temp:number = this.histData.length-1;
+                            decColor = this.paths.fillStyle.push("color").getObject("internalDynamicColumn", null).getColorFromDataValue(temp-d.index).toString(16);
+                        }else{
+                            decColor = this.paths.fillStyle.push("color").getObject("internalDynamicColumn", null).getColorFromDataValue(d.index).toString(16);
+                        }
                         return "#" + StandardLib.decimalToHex(decColor);
                     }
                     return "#C0CDD1";
@@ -138,7 +145,14 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                         format: (num:number):string => {
                             if(this.element && this.getElementSize().height > 0) {
                                 var labelHeight:number = (this.getElementSize().height* 0.2)/Math.cos(45*(Math.PI/180));
-                                var labelString:string = this.paths.binnedColumn.getObject().deriveStringFromNumber(num);
+                                var labelString:string;
+                                if(this.c3Config.axis.y2.show){
+                                    //handle case where labels need to be reversed
+                                    var temp:number = this.histData.length-1;
+                                    labelString = this.paths.binnedColumn.getObject().deriveStringFromNumber(temp-num);
+                                }else{
+                                    labelString = this.paths.binnedColumn.getObject().deriveStringFromNumber(num);
+                                }
                                 if(labelString) {
                                     var stringSize:number = StandardLib.getTextWidth(labelString, "14pt Helvetica Neue");
                                     var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
@@ -153,6 +167,20 @@ class WeaveC3Histogram extends AbstractWeaveTool {
                     }
                 },
                 y: {
+                    show: true,
+                    label: {
+                        text: "",
+                        position: "outer-middle"
+                    },
+                    tick: {
+                        fit: false,
+                        format: (num:number):string => {
+                            return String(FormatUtils.defaultNumberFormatting(num));
+                        }
+                    }
+                },
+                y2: {
+                    show: false,
                     label: {
                         text: "",
                         position: "outer-middle"
@@ -276,6 +304,23 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         }
     }
 
+    mirrorVertical() {
+        var temp:string = "height";
+        if(this.c3Config.axis.y.show == true){
+            this.c3Config.axis.y2.show = true;
+            this.c3Config.axis.y.show = false;
+            this.c3Config.data.axes = {[temp]:'y2'};
+            this.c3Config.axis.y2.label = this.c3Config.axis.y.label;
+        }else{
+            this.c3Config.axis.y.show = true;
+            this.c3Config.axis.y2.show = false;
+            this.c3Config.data.axes = {[temp]:'y'};
+            this.c3Config.axis.y.label = this.c3Config.axis.y2.label;
+        }
+        this.chart = generate(this.c3Config);
+        this._dataChanged();
+    }
+
     _axisChanged () {
         if(!this.chart)
             return;
@@ -358,6 +403,10 @@ class WeaveC3Histogram extends AbstractWeaveTool {
         }
 
         var keys = { value: ["height"] };
+        console.log(this.histData,keys);
+        if(this.c3Config.axis.y2.show){
+            this.histData = this.histData.reverse();
+        }
         this._axisChanged();
         this.busy = true;
         this.chart.load({json: this.histData, keys, unload: true, done: () => { this.busy = false; }});
