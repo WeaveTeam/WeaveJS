@@ -16,6 +16,8 @@ import {IAbstractWeaveToolPaths} from "./AbstractWeaveTool";
 import {ElementSize} from "./AbstractWeaveTool";
 import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
+import {getTooltipContent} from "./tooltip";
+import Tooltip from "./tooltip";
 
 interface ILineChartPaths extends IAbstractWeaveToolPaths {
     plotter: WeavePath;
@@ -330,10 +332,25 @@ class WeaveC3LineChart extends AbstractWeaveTool {
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.probe_keyset.setKeys([d.id]);
                     }
+
+                    var columnNamesToValue:{[columnName:string] : string|number } = {};
+                    this.columnLabels.forEach( (label:string,index:number,array:any[]) => {
+                       columnNamesToValue[label] = this.numericRecords[d.index]["columns"][index] as number;
+                    });
+
+                    this.toolTip.setState({
+                        x: this.chart.internal.d3.event.pageX,
+                        y: this.chart.internal.d3.event.pageY,
+                        showTooltip: true,
+                        columnNamesToValue: columnNamesToValue
+                    });
                 },
                 onmouseout: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.probe_keyset.setKeys([]);
+                        this.toolTip.setState({
+                            showTooltip: false
+                        });
                     }
                 }
             },
