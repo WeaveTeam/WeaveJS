@@ -22,8 +22,8 @@ interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable> {
     idProperty:string;
     selectedIds:string[];
     probedIds:string[];
-    onProbe:(id:string[]) => void;
-    onSelection:(id:string[]) => void;
+    onProbe?:(id:string[]) => void;
+    onSelection?:(id:string[]) => void;
     showIdColumn:boolean;
 }
 
@@ -40,6 +40,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     private shiftDown:boolean;
     private firstIndex:number;
     private secondIndex:number;
+    private lastClicked:string;
 
     constructor(props:IReactBootstrapTableProps) {
         super(props);
@@ -49,18 +50,11 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         }
     }
 
-    componentDidMount() {
-
-    }
-
-    componentWillUnmount() {
-        // TODO: remove event listeners
-    }
-
     onMouseOver(id:string, status:boolean) {
 
         var probedIds:string[] = this.state.probedIds.slice(0);
 
+        // find the selected record location
         var keyLocation:number = probedIds.indexOf(id);
         if(!status && keyLocation > -1) {
             probedIds.splice(keyLocation, 1);
@@ -71,7 +65,6 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         if(this.props.onProbe) {
             this.props.onProbe(probedIds);
         }
-
         this.setState({
             probedIds
         });
@@ -80,52 +73,74 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     onClick(id:string, event:React.MouseEvent) {
         var selectedIds:string[] = this.state.selectedIds.slice(0);
 
+
         // in single selection mode,
         // or ctrl/cmd selcection mode
         // already selected keys get unselected
+
+        // find the selected record location
         var keyLocation:number = selectedIds.indexOf(id);
-        if(keyLocation > -1) {
-            if((event.ctrlKey || event.metaKey)) {
+
+        // multiple selection
+        if((event.ctrlKey || event.metaKey))
+        {
+            // if the record is already in the selection
+            // we remove it
+            if(keyLocation > -1)
+            {
                 selectedIds.splice(keyLocation, 1);
-            } else {
-                selectedIds = [];
             }
-        } else {
-            if((event.ctrlKey || event.metaKey)) {
+            else
+            {
                 selectedIds.push(id)
-            } else {
-                selectedIds = [id];
             }
+            this.lastClicked = id;
         }
 
-        // if(this.shiftDown) {
-        //     if(this.firstIndex < 0) {
-        //
-        //         this.firstIndex = this.props.rows.map((row) => { return row[this.props.idProperty] }).indexOf(id);
-        //     } else {
-        //         this.secondIndex = this.props.rows.map((row) => { return row[this.props.idProperty] }).indexOf(id);
-        //     }
-        //
-        //     // first time selection is clicked,
-        //     // there is no second index, in which case
-        //     // we select the first item
-        //     if(this.secondIndex < -1) {
-        //         selectedIds = [this.props.rows[this.firstIndex][this.props.idProperty]];
-        //     }
-        //
-        //     if(this.firstIndex > this.secondIndex && this.secondIndex < 0) {
-        //         var temp:number = this.firstIndex;
-        //         this.firstIndex = this.secondIndex;
-        //         this.secondIndex = temp;
-        //     }
-        //     selectedIds = [];
-        //     for(var i:number = this.firstIndex; i < this.secondIndex; i++) {
-        //         selectedIds.push(this.props.rows[i][this.props.idProperty]);
-        //     }
-        // } else {
-        //     this.firstIndex = -1;
-        //     this.secondIndex = -1;
-        // }
+        // shift selection
+        else if(event.shiftKey) {
+            selectedIds = [];
+            if(!this.lastClicked)
+            {
+            } else {
+                var start:number = _.findIndex(this.props.rows, (row:IRow) => {
+                    return row["id"] == this.lastClicked;
+                });
+
+                var end:number = _.findIndex(this.props.rows, (row:IRow) => {
+                    return row["id"] == id;
+                });
+
+                if(start > end) {
+                    let temp:number = start;
+                    start = end;
+                    end = temp;
+                }
+
+                for(var i:number = start; i <= end; i++) {
+                    selectedIds.push(this.props.rows[i]["id"]);
+                }
+            }
+
+        }
+
+        // single selection
+        else
+        {
+            // if there was only one record selected
+            // and we are clicking on it again, then we want to
+            // clear the selection.
+            if(selectedIds.length == 1 && selectedIds[0] == id)
+            {
+                selectedIds = [];
+                this.lastClicked = null;
+            }
+            else
+            {
+                selectedIds = [id];
+                this.lastClicked = id;
+            }
+        }
 
         if(this.props.onSelection) {
             this.props.onSelection(selectedIds);
