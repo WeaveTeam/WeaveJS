@@ -8,6 +8,7 @@ import {Table} from "react-bootstrap";
 import {CSSProperties} from "react";
 import StandardLib from "../utils/StandardLib";
 import * as Prefixer from "react-vendor-prefix";
+import * as _ from "lodash";
 
 export interface IRow {
     [columnId:string]: string
@@ -53,6 +54,13 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         this.probedStyle = {
             backgroundColor: "rgba(153, 214, 255, 0.4)"
         }
+    }
+
+    shouldComponentUpdate(nextProps:ITableRowProps, nextState:ITableRowState) {
+        // only update the row if the key has changed
+        return (this.props.selected != nextProps.selected) ||
+               (this.props.probed != nextProps.probed) ||
+               (!_.isEqual(this.props.row, nextProps.row));
     }
 
     render():JSX.Element {
