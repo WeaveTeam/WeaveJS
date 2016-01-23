@@ -303,7 +303,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
     updateStyle() {
     	if (!this.chart)
     		return;
-    	
+
         d3.select(this.element).selectAll("path").style("opacity", 1)
             .style("stroke", "black")
             .style("stroke-width", "1px")
@@ -396,6 +396,8 @@ class WeaveC3Histogram extends AbstractC3Tool {
         }
         this._axisChanged();
         this.busy = true;
+        this.c3Config.data.json = this.histData;
+        this.c3Config.data.keys = keys;
         this.chart.load({json: this.histData, keys, unload: true, done: () => { this.busy = false; }});
     }
 
