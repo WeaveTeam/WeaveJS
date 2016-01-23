@@ -12,7 +12,8 @@ export function getTooltipContent(
                                     nameFormat?:Function,
                                     valueFormat?:Function,
                                     titleFormat?:Function,
-                                    toolTipClass?:string
+                                    toolTipClass?:string,
+                                    columnNamesToColor?:{[columnName:string]: string}
                                 ):string
 {
     nameFormat = nameFormat || _.identity;
@@ -28,7 +29,11 @@ export function getTooltipContent(
 
         columnNames.forEach((columnName:string) => {
             template += "<tr>";
-            template += "<td class='name'>" + nameFormat(columnName) + "</td>";
+            template += "<td class='name'>";
+            if(columnNamesToColor && columnNamesToColor[columnName]){
+                template += "<span style=" + "'background-color': " + this.state.columnNamesToColor[columnName] + "/>";
+            }
+            template += "<div style='display':'inline'>" + nameFormat(columnName) + "</div></td>";
             template += "<td class='value'>" + valueFormat(columnNamesToValue[columnName]) + "</td>";
             template += "</tr>";
         });
@@ -51,6 +56,7 @@ export interface IToolTipState {
     y?:number;
     title?:string;
     columnNamesToValue?:{[columnName:string]: string|number};
+    columnNamesToColor?:{[columnName:string]: string};
     showToolTip?:boolean;
 }
 
@@ -78,6 +84,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             y: 0,
             title: "",
             columnNamesToValue: {},
+            columnNamesToColor: {},
             showToolTip: false
         }
 
@@ -114,9 +121,10 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             var columnNames:string[] = Object.keys(this.state.columnNamesToValue);
             if(columnNames.length) {
                 tableRows = columnNames.map((columnName:string) => {
+                    var colorSpan:JSX.Element = this.state.columnNamesToColor[columnName] ? (<span style={{backgroundColor: this.state.columnNamesToColor[columnName]}}/>) : (null);
                     return (
                         <tr key={columnName}>
-                        <td className="name">{this.nameFormat(columnName)}</td>
+                        <td className="name">{colorSpan}<div style={{display:"inline"}}>{this.nameFormat(columnName)}</div></td>
                         <td className="value">{this.valueFormat(this.state.columnNamesToValue[columnName])}</td>
                         </tr>
                     )
