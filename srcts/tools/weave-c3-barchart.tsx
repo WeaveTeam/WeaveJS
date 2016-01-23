@@ -129,6 +129,28 @@ class WeaveC3Barchart extends AbstractC3Tool {
                 },
                 onmouseover: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
+                        this.toolPath.probe_keyset.setKeys([]);
+                        var columnNamesToValue:{[columnName:string] : string|number } = {};
+                        var xValue:number = this.numericRecords[d.index]["point"]["x"];
+                        if(xValue) {
+                            columnNamesToValue[this.paths.dataX.getObject().getMetadata('title')] = xValue;
+                        }
+
+                        var yValue:number = this.numericRecords[d.index]["point"]["y"]
+                        if(yValue) {
+                            columnNamesToValue[this.paths.dataY.getObject().getMetadata('title')] = yValue;
+                        }
+
+                        var sizeByValue:number = this.numericRecords[d.index]["size"] as number;
+                        if(sizeByValue) {
+                            columnNamesToValue[this.paths.sizeBy.getObject().getMetadata('title')] =  sizeByValue;
+                        }
+                        this.props.toolTip.setState({
+                            x: this.chart.internal.d3.event.pageX,
+                            y: this.chart.internal.d3.event.pageY,
+                            showToolTip: true,
+                            columnNamesToValue: columnNamesToValue
+                        });
                         this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
                     }
                 },
@@ -493,7 +515,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
     updateStyle() {
     	if(!this.chart || !this.heightColumnNames)
     		return;
-    	
+
         d3.select(this.element)
         	.selectAll("path")
         	.style("opacity", 1)

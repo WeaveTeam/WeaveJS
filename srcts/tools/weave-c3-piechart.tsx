@@ -144,6 +144,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
     }
 
     componentDidMount() {
+        this.element.addEventListener("click", this.handleClick.bind(this));
         var dataChanged:Function = _.debounce(this.dataChanged.bind(this), 100);
         var selectionKeySetChanged:Function = this.selectionKeysChanged.bind(this);
         var probeKeySetChanged:Function = _.debounce(this.probedKeysChanged.bind(this), 100);
@@ -175,6 +176,9 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
               bottom: 20,
               right: 30
             },
+            tooltip: {
+                show: false
+            },
             data: {
                 columns: [],
                 selection: {
@@ -202,12 +206,23 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
                 },
                 onmouseover: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
+                        var columnNamesToValue:{[columnName:string] : string|number } = {};
+                        columnNamesToValue[this.paths.data.getObject().getMetadata("title")] = d.value;
                         this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                        this.props.toolTip.setState({
+                            showToolTip: true,
+                            x: this.chart.internal.d3.event.pageX,
+                            y: this.chart.internal.d3.event.pageY,
+                            columnNamesToValue: columnNamesToValue
+                        });
                     }
                 },
                 onmouseout: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.probe_keyset.setKeys([]);
+                        this.props.toolTip.setState({
+                            showToolTip: false
+                        });
                     }
                 }
             },

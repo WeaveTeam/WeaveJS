@@ -446,6 +446,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
     }
 
     componentDidMount() {
+        this.element.addEventListener("click", this.handleClick.bind(this));
         this.showXAxisLabel = false;
         var axisChanged:Function = _.debounce(this._axisChanged.bind(this), 100);
         var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);

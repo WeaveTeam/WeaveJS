@@ -262,6 +262,7 @@ class WeaveC3LineChart extends AbstractC3Tool {
     }
 
     componentDidMount() {
+        this.element.addEventListener("click", this.handleClick.bind(this));
         var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
         var selectionKeySetChanged:Function = this._selectionKeysChanged.bind(this);
         var probeKeySetChanged:Function = _.debounce(this._probedKeysChanged.bind(this), 100);
