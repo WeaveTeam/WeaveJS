@@ -120,9 +120,8 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.layerSettingsPath = this.plotManager.push("layerSettings");
 		this.zoomBoundsPath = this.plotManager.push("zoomBounds");
 
-
+		this.plotManager.addCallback(this, this.requestDetail, true);
 		this.plottersPath.getObject().childListCallbacks.addImmediateCallback(this, this.plottersChanged, true);
-
 		this.zoomBoundsPath.addCallback(this, this.getSessionCenter, true);
 	}
 
@@ -212,17 +211,12 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		var [xCenter, yCenter] = this.map.getView().getCenter();
 
 		var zoomBounds = this.zoomBoundsPath.getObject();
-		// remove callback temporarily to avoid triggering due to rounding error?
-		// TODO - avoid rounding error
-		this.zoomBoundsPath.removeCallback(this, this.getSessionCenter);
 
 		var dataBounds = new weavejs.geom.Bounds2D();
 		zoomBounds.getDataBounds(dataBounds);
 		dataBounds.setXCenter(xCenter);
 		dataBounds.setYCenter(yCenter);
 		zoomBounds.setDataBounds(dataBounds);
-
-		this.zoomBoundsPath.addCallback(this, this.getSessionCenter);
 	}
 
 	setSessionZoom()
@@ -230,9 +224,6 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		var resolution = this.map.getView().getResolution();
 
 		var zoomBounds = this.zoomBoundsPath.getObject();
-		// remove callback temporarily to avoid triggering due to rounding error?
-		// TODO - avoid rounding error
-		this.zoomBoundsPath.removeCallback(this, this.getSessionCenter);
 
 		var dataBounds = new weavejs.geom.Bounds2D();
 		var screenBounds = new weavejs.geom.Bounds2D();
@@ -242,8 +233,6 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		dataBounds.setHeight(screenBounds.getHeight() * resolution);
 		dataBounds.makeSizePositive();
 		zoomBounds.setDataBounds(dataBounds);
-
-		this.zoomBoundsPath.addCallback(this, this.getSessionCenter);
 	}
 
 	getSessionCenter()
@@ -253,7 +242,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		zoomBounds.getDataBounds(dataBounds);
 		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
 		var scale = zoomBounds.getXScale();
-
+		
 		this.map.getView().un("change:center", this.setSessionCenter, this);
 		this.map.getView().un("change:resolution", this.setSessionZoom, this);
 
@@ -264,6 +253,16 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 			this.map.getView().on("change:center", this.setSessionCenter, this);
 			this.map.getView().on("change:resolution", this.setSessionZoom, this);
 		});
+	}
+	
+	requestDetail()
+	{
+		var zoomBounds = this.zoomBoundsPath.getObject();
+		for (var sgc of Weave.getDescendants(this.toolPath.getObject(), weavejs.data.column.StreamedGeometryColumn))
+		{
+			//TODO - this doesn't handle a dataBounds of different projection than the streamed geometries are in
+			sgc.requestGeometryDetailForZoomBounds(zoomBounds);
+		}
 	}
 
 	plottersChanged()
