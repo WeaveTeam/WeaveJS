@@ -318,7 +318,8 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
             this.c3Config.axis.x.height = this.props.style.height * 0.2;
             this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-            this.chart = generate(this.c3Config);
+            //this.chart = generate(this.c3Config);
+            this.generate();
             this.axisChanged();
         }
         //var end = Date.now();

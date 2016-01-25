@@ -576,20 +576,22 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.chart = generate(this.c3Config);
     }
 
-    resize(width:number, height:number) {
-        if(this.paths.labelColumn.getState().length){
-            this.c3Config.axis.x.height = height * 0.2;
-        }else{
-            this.c3Config.axis.x.height = null;
-        }
-        this.c3Config.size = {width, height};
-        this.generate();
-        if(this.paths.labelColumn.getState().length) {
-            //TODO: For now we have no choice by to update axis for label spacing after generate,
-            //so we can get new width and then update label spacing appropriately, but this
-            //then requires another call to generate. We may want to try and calculate this
-            //width ourselves to save the extra generate call in axisChanged()
-            this.axisChanged();
+    componentDidUpdate() {
+        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
+            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
+            if(this.paths.labelColumn.getState().length){
+                this.c3Config.axis.x.height = this.c3Config.size.height * 0.2;
+            }else{
+                this.c3Config.axis.x.height = null;
+            }
+            this.generate();
+            if(this.paths.labelColumn.getState().length) {
+                //TODO: For now we have no choice by to update axis for label spacing after generate,
+                //so we can get new width and then update label spacing appropriately, but this
+                //then requires another call to generate. We may want to try and calculate this
+                //width ourselves to save the extra generate call in axisChanged()
+                this.axisChanged();
+            }
         }
     }
 
