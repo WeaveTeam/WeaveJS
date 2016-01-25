@@ -103,6 +103,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 
     componentWillUnmount():void {
         window.removeEventListener("resize", this._forceUpdate);
+        Weave.dispose(this);
     }
 
     componentDidUpdate():void {
