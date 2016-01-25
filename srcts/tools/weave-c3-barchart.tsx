@@ -82,6 +82,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                 json: [],
                 type: "bar",
                 xSort: false,
+                names: {},
                 selection: {
                     enabled: true,
                     multiple: true,
@@ -268,7 +269,8 @@ class WeaveC3Barchart extends AbstractC3Tool {
                 }
             },
             legend: {
-                show: false
+                show: false,
+                position: "right"
             },
             onrendered: () => {
                 this.busy = false;
@@ -495,23 +497,30 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
         keys.value = this.heightColumnNames;
         var colors:{[name:string]: string} = {};
+        var names:{[name:string]: string} = {};
 
         if(this.heightColumnNames.length > 1) {
             this.colorRamp = this.paths.chartColors.getState();
             this.heightColumnNames.map((name, index) => {
                 var color = StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.colorRamp);
                 colors[name] = "#" + StandardLib.decimalToHex(color);
+                names[name] = this.heightColumnsLabels[index];
             });
+            this.c3Config.legend.show = true;
         }
+
+
 
         var data = _.cloneDeep(this.c3Config.data);
         data.json = this.numericRecords;
         data.colors = colors;
         data.keys = keys;
+        data.names = names;
         data.unload = true;
         this.c3Config.data = data;
         this.busy = true;
-        this.chart.load(data);
+        this.generate();
+        //this.chart.load(data);
     }
 
     updateStyle() {
