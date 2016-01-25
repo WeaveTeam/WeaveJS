@@ -90,6 +90,9 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 
 	private handleMoveEvent(event:ol.MapBrowserEvent)
 	{
+        if (!this.tool.props.toolTip)
+            return;
+        
 		let key:any /*IQualifiedKey*/ = this.pixelToKey(event.pixel);
 		let toolTipState: IToolTipState = {};
 
