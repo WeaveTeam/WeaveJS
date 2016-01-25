@@ -83,6 +83,9 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
     private toolDragged:string[];
     private toolOver:string[];
     private dropZone:string;
+    private prevClientWidth:number;
+    private prevClientHeight:number;
+    
     constructor(props:IWeaveLayoutManagerProps) {
         super(props);
         this.weave = this.props.weave || new Weave();
@@ -95,6 +98,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
         this.weave.root.childListCallbacks.addGroupedCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
         this.weave.path(LAYOUT).addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
         this.weave.path(LAYOUT).state(this.simplifyState(this.weave.path(LAYOUT).getState()));
+        weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, frameHandler, true);
     }
 
     componentWillUnmount():void {
@@ -106,6 +110,17 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
             // dirty flag to trigger render on window resize
             this.dirty = false;
             //_.debounce(this.forceUpdate.bind(this), 0)();
+            this.forceUpdate();
+        }
+    }
+    
+    frameHandler()
+    {
+        var node:HTMLElement = ReactDOM.findDOMNode(this);
+        if (this.prevClientWidth != node.clientWidth || this.prevClientHeight != node.clientHeight)
+        {
+            this.prevClientWidth = node.clientWidth;
+            this.prevClientHeight = node.clientHeight;
             this.forceUpdate();
         }
     }
