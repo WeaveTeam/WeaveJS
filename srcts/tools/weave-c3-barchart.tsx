@@ -16,8 +16,10 @@ import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
-import {ChartConfiguration, ChartAPI, generate} from "c3";
+import * as c3 from "c3";
+import {ChartConfiguration, ChartAPI} from "c3";
 import StandardLib from "../utils/StandardLib";
+/* global Weave, weavejs */
 
 interface IBarchartPaths extends IToolPaths {
     plotter: WeavePath;
@@ -55,11 +57,13 @@ class WeaveC3Barchart extends AbstractC3Tool {
     private showXAxisLabel:boolean;
     private yLabelColumnPath:WeavePath;
     protected c3Config:ChartConfiguration;
+    protected c3ConfigYAxis:c3.YAxisConfiguration;
     protected chart:ChartAPI;
 
     protected paths:IBarchartPaths;
 
     private busy:boolean;
+    private dirty:boolean;
 
     constructor(props:IVisToolProps) {
         super(props);
@@ -67,6 +71,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.indexToKey = {};
         this.yAxisValueToLabel = {};
         this.xAxisValueToLabel = {};
+        this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.c3Config = {
             size: {
@@ -189,46 +194,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
                         }
                     }
                 },
-                y: {
-                    show: true,
-                    label: {
-                        text:"",
-                        position: "outer-middle"
-                    },
-                    tick: {
-                        fit: false,
-                        multiline: false,
-                        format: (num:number):string => {
-                            if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
-                                return this.yAxisValueToLabel[num] || "";
-                            } else if (this.groupingMode === "percentStack") {
-                                return d3.format(".0%")(num);
-                            } else {
-                                return String(FormatUtils.defaultNumberFormatting(num));
-                            }
-                        }
-                    }
-                },
-                y2: {
-                    show:false,
-                    label: {
-                        text:"",
-                        position: "outer-middle"
-                    },
-                    tick: {
-                        fit: false,
-                        multiline: false,
-                        format: (num:number):string => {
-                            if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
-                                return this.yAxisValueToLabel[num] || "";
-                            } else if (this.groupingMode === "percentStack") {
-                                return d3.format(".0%")(num);
-                            } else {
-                                return String(FormatUtils.defaultNumberFormatting(num));
-                            }
-                        }
-                    }
-                },
                 rotated: false
             },
             tooltip: {
@@ -247,6 +212,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                 },
                 show: false
             },
+            transition: { duration: 0 },
             grid: {
                 x: {
                     show: true
@@ -268,6 +234,28 @@ class WeaveC3Barchart extends AbstractC3Tool {
             onrendered: () => {
                 this.busy = false;
                 this.updateStyle();
+                if (this.dirty)
+                    this.validate();
+            }
+        };
+        this.c3ConfigYAxis = {
+            show: true,
+            label: {
+                text:"",
+                position: "outer-middle"
+            },
+            tick: {
+                fit: false,
+                multiline: false,
+                format: (num:number):string => {
+                    if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
+                        return this.yAxisValueToLabel[num] || "";
+                    } else if (this.groupingMode === "percentStack") {
+                        return d3.format(".0%")(num);
+                    } else {
+                        return String(FormatUtils.defaultNumberFormatting(num));
+                    }
+                }
             }
         };
     }
@@ -284,71 +272,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
             this.toolPath.selection_keyset.setKeys([]);
         else
             this.toolPath.selection_keyset.setKeys(probeKeys);
-    }
-
-    mirrorVertical() {
-        var temp:string = this.c3Config.data.keys.value[0];
-        if(this.c3Config.axis.y.show == true){
-            this.c3Config.axis.y2.show = true;
-            this.c3Config.axis.y.show = false;
-            this.c3Config.data.axes = {[temp]:'y2'};
-            this.c3Config.axis.y2.label = this.c3Config.axis.y.label;
-        }else{
-            this.c3Config.axis.y.show = true;
-            this.c3Config.axis.y2.show = false;
-            this.c3Config.data.axes = {[temp]:'y'};
-            this.c3Config.axis.y.label = this.c3Config.axis.y2.label;
-        }
-        this.dataChanged();
-        this.generate();
-    }
-
-    rotateAxes() {
-        this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
-        this.generate();
-        // setTimeout(() => {
-        //   this.busy = true;
-        //   c3.generate(this.c3Config);
-        // }, 10);
-    }
-
-    private axisChanged():void {
-        if (!this.chart || this.busy)
-        	return StandardLib.debounce(this, 'axisChanged');
-
-        var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getObject().getMetadata('title');
-        var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
-
-        if(!this.showXAxisLabel){
-            xLabel = " ";
-        }
-
-        if(this.c3Config.axis.y.show){
-            this.chart.axis.labels({
-                x: xLabel,
-                y: yLabel
-            });
-        }else{
-            this.chart.axis.labels({
-                x: xLabel,
-                y2: yLabel
-            });
-        }
-
-        this.axisLabelsChanged();
-
-        this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
-        this.c3Config.axis.y.label = {text:yLabel, position:"outer-middle"};
-        this.generate();
-    }
-
-    private axisLabelsChanged():void {
-        var width:number = this.chart.internal.width;
-        var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
-        var xLabelsToShow:number = Math.floor(width / textHeight);
-        xLabelsToShow = Math.max(2,xLabelsToShow);
-
-        this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
     }
 
     handleShowValueLabels () {
@@ -378,9 +301,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
     }
 
     private dataChanged():void {
-        if (!this.chart || this.busy)
-        	return StandardLib.debounce(this, 'dataChanged');
-
         this.updateColumns();
 
         var heightColumns:WeavePath[] = this.paths.heightColumns.getChildren();
@@ -419,7 +339,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.records = _.sortBy(this.records, (record) =>{
             return record[0]["sort"];
         });
-        if(this.c3Config.axis.y.show == false) {
+        if(this.c3ConfigYAxis.show == false) {
             this.records = this.records.reverse();
         }
 
@@ -513,9 +433,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
         data.names = names;
         data.unload = true;
         this.c3Config.data = data;
-        this.busy = true;
-        this.generate();
-        //this.chart.load(data);
     }
 
     updateStyle() {
@@ -565,29 +482,20 @@ class WeaveC3Barchart extends AbstractC3Tool {
             this.chart.select(this.heightColumnNames, [], true);
     }
 
-
-    generate() {
-    	this.busy = true;
-        this.chart = generate(this.c3Config);
-    }
-
     componentDidUpdate() {
         if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
             this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-            if(this.paths.labelColumn.getState().length){
+            if (this.paths.labelColumn.getState().length)
                 this.c3Config.axis.x.height = this.c3Config.size.height * 0.2;
-            }else{
+            else
                 this.c3Config.axis.x.height = null;
-            }
-            this.generate();
-            if(this.paths.labelColumn.getState().length) {
-                //TODO: For now we have no choice by to update axis for label spacing after generate,
-                //so we can get new width and then update label spacing appropriately, but this
-                //then requires another call to generate. We may want to try and calculate this
-                //width ourselves to save the extra generate call in axisChanged()
-                this.axisChanged();
-            }
+            
+            this.validate(true);
         }
+    }
+    
+    detectChange(...pathNames):boolean {
+        return Weave.detectChange.apply(Weave, pathNames.map(name => this.paths[name].getObject()));
     }
 
     componentDidMount() {
@@ -596,20 +504,20 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
-            { name: "plotter", path: plotterPath, callbacks: null},
-            { name: "heightColumns", path: plotterPath.push("heightColumns"), callbacks: [this.dataChanged, this.axisChanged] },
-            { name: "labelColumn", path: plotterPath.push("labelColumn"), callbacks: [this.dataChanged, this.axisChanged] },
-            { name: "sortColumn", path: plotterPath.push("sortColumn"), callbacks: [this.dataChanged, this.axisChanged] },
-            { name: "colorColumn", path: plotterPath.push("colorColumn"), callbacks: this.dataChanged },
-            { name: "chartColors", path: plotterPath.push("chartColors"), callbacks: this.dataChanged },
-            { name: "groupingMode", path: plotterPath.push("groupingMode"), callbacks: this.dataChanged },
-            { name: "horizontalMode", path: plotterPath.push("horizontalMode"), callbacks: this.rotateAxes },
-            { name: "showValueLabels", path: plotterPath.push("showValueLabels"), callbacks: this.handleShowValueLabels },
-            { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: this.axisChanged },
-            { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: this.axisChanged },
-            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: this.dataChanged },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
+            { name: "plotter", path: plotterPath, callbacks: this.validate },
+            { name: "heightColumns", path: plotterPath.push("heightColumns") },
+            { name: "labelColumn", path: plotterPath.push("labelColumn") },
+            { name: "sortColumn", path: plotterPath.push("sortColumn") },
+            { name: "colorColumn", path: plotterPath.push("colorColumn") },
+            { name: "chartColors", path: plotterPath.push("chartColors") },
+            { name: "groupingMode", path: plotterPath.push("groupingMode") },
+            { name: "horizontalMode", path: plotterPath.push("horizontalMode") },
+            { name: "showValueLabels", path: plotterPath.push("showValueLabels") },
+            { name: "xAxis", path: this.toolPath.pushPlotter("xAxis") },
+            { name: "yAxis", path: this.toolPath.pushPlotter("yAxis") },
+            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset },
+            { name: "probeKeySet", path: this.toolPath.probe_keyset }
         ];
 
         this.initializePaths(mapping);
@@ -620,7 +528,80 @@ class WeaveC3Barchart extends AbstractC3Tool {
         if(this.paths.labelColumn.getState().length){
             this.c3Config.axis.x.height = this.props.style.height * 0.2;
         }
-        this.generate();
+        this.validate(true);
+    }
+    
+    validate(forced:boolean = false):void
+    {
+        if (this.busy)
+        {
+            this.dirty = true;
+            return;
+        }
+        this.dirty = false;
+        
+        var changeDetected:boolean = false;
+        var axisChange:boolean = this.detectChange('heightColumns', 'labelColumn', 'sortColumn');
+        var axisSettingsChange:boolean = this.detectChange('xAxis', 'yAxis');
+        if (axisChange || this.detectChange('colorColumn', 'chartColors', 'groupingMode', 'filteredKeySet'))
+        {
+            changeDetected = true;
+            this.dataChanged();
+        }
+        if (axisChange)
+        {
+            changeDetected = true;
+            var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getObject().getMetadata('title');
+            var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
+    
+            if(!this.showXAxisLabel){
+                xLabel = " ";
+            }
+            
+            if (this.heightColumnNames && this.heightColumnNames.length)
+            {
+                if (weavejs.WeaveAPI.Locale.reverseLayout)
+                {
+                    this.c3Config.data.axes = {[this.heightColumnNames[0]]:'y2'};
+                    this.c3Config.axis.y2 = this.c3ConfigYAxis;
+                    this.c3Config.axis.y = {show: false};
+                }
+                else
+                {
+                    this.c3Config.data.axes = {[this.heightColumnNames[0]]:'y'};
+                    this.c3Config.axis.y = this.c3ConfigYAxis;
+                    delete this.c3Config.axis.y2;
+                }
+            }
+    
+            // axis label culling requires this.chart.internal.width
+            if (this.chart)
+            {
+                var width:number = this.chart.internal.width;
+                var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
+                var xLabelsToShow:number = Math.floor(width / textHeight);
+                xLabelsToShow = Math.max(2,xLabelsToShow);
+                this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
+            }
+    
+            this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
+            this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
+        }
+        if (this.detectChange('horizontalMode'))
+        {
+            changeDetected = true;
+            this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
+        }
+        if (this.detectChange('showValueLabels'))
+        {
+            changeDetected = true;
+            this.showValueLabels = this.paths.showValueLabels.getState();
+        }
+        if (changeDetected || forced)
+        {
+            this.busy = true;
+            this.chart = c3.generate(this.c3Config);
+        }
     }
 }
 
