@@ -60,7 +60,7 @@ module.exports = function (grunt) {
                 },
             },
             dist: {
-                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}, {'dist/pdo-app.min.js': 'src/lowelltrans-app.js'}]
+                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}]
             },
             dev: {
                 options: {
@@ -70,7 +70,7 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}, {'dist/lowelltrans-app.min.js': 'src/lowelltrans-app.js'}]
+                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}]
             },
         },
         copy: {
@@ -83,8 +83,20 @@ module.exports = function (grunt) {
             images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'},
             weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"}
         },
+        clean: {
+            ts: ["outts"],
+            libs: ["dist"]
+        },
         eslint: {
             target: ['src/**/*.js']
+        },
+        tslint: {
+            options: {
+           // can be a configuration object or a filepath to tslint.json
+           configuration: "tslint.json"
+           },
+           files: {
+           }
         },
         watch: {
             options: {
@@ -110,15 +122,17 @@ module.exports = function (grunt) {
 
     grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-browserify');
-    grunt.loadNpmTasks('grunt-eslint');
+    // grunt.loadNpmTasks('grunt-eslint');
+    // grunt.loadNpmTasks('grunt-tslint');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
 
-    grunt.registerTask('default', ['ts','eslint', 'browserify:dev', 'copy']);
-    grunt.registerTask('default-nolint', ['ts', 'browserify:dev', 'copy']);
-    grunt.registerTask('dist', ['ts', 'eslint', 'browserify:dist', 'copy']);
-    grunt.registerTask('libs', ['browserify:libs']);
-    grunt.registerTask('devlibs', ['browserify:devlibs']);
+    grunt.registerTask('default', ['clean:ts', 'ts', 'browserify:dev', 'copy']);
+    //grunt.registerTask('default-nolint', ['ts', 'browserify:dev', 'copy']);
+    grunt.registerTask('dist', ['ts', 'browserify:dist', 'copy']);
+    grunt.registerTask('libs', ['clean:libs', 'browserify:libs']);
+    grunt.registerTask('devlibs', ['clean:libs', 'browserify:devlibs']);
     grunt.registerTask('module', ['browserify:module']);
 };
