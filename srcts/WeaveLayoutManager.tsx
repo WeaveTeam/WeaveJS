@@ -78,31 +78,32 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
     private element:HTMLElement;
     private weave:Weave;
     private margin:number;
-    private _forceUpdate:() => void;
     private dirty:boolean;
     private toolDragged:string[];
     private toolOver:string[];
     private dropZone:string;
     private prevClientWidth:number;
     private prevClientHeight:number;
+    private throttledForceUpdate:() => void;
     
     constructor(props:IWeaveLayoutManagerProps) {
         super(props);
         this.weave = this.props.weave || new Weave();
         this.weave.path(LAYOUT).request("FlexibleLayout");
         this.margin = 8;
+        this.throttledForceUpdate = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30);
     }
 
     componentDidMount():void {
-        window.addEventListener("resize", this._forceUpdate = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30));
-        this.weave.root.childListCallbacks.addGroupedCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
-        this.weave.path(LAYOUT).addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
+        window.addEventListener("resize", this.throttledForceUpdate);
+        this.weave.root.childListCallbacks.addGroupedCallback(this, this.throttledForceUpdate, true);
+        this.weave.path(LAYOUT).addCallback(this, this.throttledForceUpdate, true);
         this.weave.path(LAYOUT).state(this.simplifyState(this.weave.path(LAYOUT).getState()));
-        weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.frameHandler, true);
+        weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.frameHandler, true);
     }
 
     componentWillUnmount():void {
-        window.removeEventListener("resize", this._forceUpdate);
+        window.removeEventListener("resize", this.throttledForceUpdate);
         Weave.dispose(this);
     }
 
