@@ -85,17 +85,21 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
     private prevClientWidth:number;
     private prevClientHeight:number;
     private throttledForceUpdate:() => void;
+    private throttledForceUpdateTwice:() => void;
     
     constructor(props:IWeaveLayoutManagerProps) {
         super(props);
         this.weave = this.props.weave || new Weave();
         this.weave.path(LAYOUT).request("FlexibleLayout");
         this.margin = 8;
-        this.throttledForceUpdate = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30);
+        this.throttledForceUpdate = _.throttle(() => { this.forceUpdate(); }, 30);
+        this.throttledForceUpdateTwice = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30);
     }
 
     componentDidMount():void {
-        window.addEventListener("resize", this.throttledForceUpdate);
+        this.savePrevClientSize();
+        
+        window.addEventListener("resize", this.throttledForceUpdateTwice);
         this.weave.root.childListCallbacks.addGroupedCallback(this, this.throttledForceUpdate, true);
         this.weave.path(LAYOUT).addCallback(this, this.throttledForceUpdate, true);
         this.weave.path(LAYOUT).state(this.simplifyState(this.weave.path(LAYOUT).getState()));
@@ -108,11 +112,12 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
     }
 
     componentDidUpdate():void {
+        this.savePrevClientSize();
+        
         if(Weave.detectChange(this, this.weave.getObject(LAYOUT)) || this.dirty) {
             // dirty flag to trigger render on window resize
             this.dirty = false;
-            //_.debounce(this.forceUpdate.bind(this), 0)();
-            this.forceUpdate();
+            this.throttledForceUpdate();
         }
     }
     
@@ -120,20 +125,21 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
     {
         var node:Element = ReactDOM.findDOMNode(this);
         if (this.prevClientWidth != node.clientWidth || this.prevClientHeight != node.clientHeight)
-        {
-            this.prevClientWidth = node.clientWidth;
-            this.prevClientHeight = node.clientHeight;
-            this.forceUpdate();
-        }
+            this.throttledForceUpdateTwice();
+        this.savePrevClientSize();
+    }
+    
+    savePrevClientSize()
+    {
+        var node:Element = ReactDOM.findDOMNode(this);
+        this.prevClientWidth = node.clientWidth;
+        this.prevClientHeight = node.clientHeight;
     }
 
     saveState(newState:LayoutState):void {
         newState = this.simplifyState(newState);
         newState.flex = 1;
         this.weave.path(LAYOUT).state(newState);
-        // temporary hack because weave
-        // doesn't properly callback forceUpdate
-        //this.forceUpdate();
     }
 
     onDragStart(id:string[], event:React.MouseEvent):void {
