@@ -98,7 +98,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
         this.weave.root.childListCallbacks.addGroupedCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
         this.weave.path(LAYOUT).addCallback(this, _.debounce(this.forceUpdate.bind(this), 0), true);
         this.weave.path(LAYOUT).state(this.simplifyState(this.weave.path(LAYOUT).getState()));
-        weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, frameHandler, true);
+        weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.frameHandler, true);
     }
 
     componentWillUnmount():void {
@@ -117,7 +117,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
     
     frameHandler()
     {
-        var node:HTMLElement = ReactDOM.findDOMNode(this);
+        var node:Element = ReactDOM.findDOMNode(this);
         if (this.prevClientWidth != node.clientWidth || this.prevClientHeight != node.clientHeight)
         {
             this.prevClientWidth = node.clientWidth;
