@@ -480,4 +480,6 @@ class WeaveC3Histogram extends AbstractC3Tool {
 export default WeaveC3Histogram;
 
 registerToolImplementation("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
+registerToolImplementation("weave.visualization.tools::ColormapHistogramTool", WeaveC3Histogram);
 //Weave.registerClass("weavejs.tools.HistogramTool", WeaveC3Histogram, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+//Weave.registerClass("weavejs.tools.ColormapHistogramTool", WeaveC3Histogram, [weavejs.api.core.ILinkableObjectWithNewProperties]);
