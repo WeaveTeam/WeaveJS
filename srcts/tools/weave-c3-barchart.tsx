@@ -59,7 +59,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
     protected paths:IBarchartPaths;
 
-    private flag:boolean;
     private busy:boolean;
 
     constructor(props:IVisToolProps) {
@@ -111,19 +110,13 @@ class WeaveC3Barchart extends AbstractC3Tool {
                     }
                 },
                 onclick: (d:any) => {
-                    var event:MouseEvent = this.chart.internal.d3.event as MouseEvent;
-                    if(!(event.ctrlKey || event.metaKey)&& d && d.hasOwnProperty("index")) {
-                        this.toolPath.selection_keyset.setKeys([this.indexToKey[d.index]]);
-                    }
                 },
                 onselected: (d:any) => {
-                    this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onunselected: (d:any) => {
-                    this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
                         this.toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
                     }
@@ -284,11 +277,13 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
 	}
 
-    handleClick(event:MouseEvent):void {
-        if(!this.flag) {
+    handlePointClick(event:MouseEvent):void {
+        var probeKeys:any[] = this.toolPath.probe_keyset.getKeys();
+        var selectionKeys:any[] = this.toolPath.selection_keyset.getKeys();
+        if (_.isEqual(probeKeys, selectionKeys))
             this.toolPath.selection_keyset.setKeys([]);
-        }
-        this.flag = false;
+        else
+            this.toolPath.selection_keyset.setKeys(probeKeys);
     }
 
     mirrorVertical() {
@@ -596,7 +591,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
     }
 
     componentDidMount() {
-        this.element.addEventListener("click", this.handleClick.bind(this));
+        StandardLib.addPointClickListener(this.element, this.handlePointClick.bind(this));
         this.showXAxisLabel = false;
 
         var plotterPath = this.toolPath.pushPlotter("plot");

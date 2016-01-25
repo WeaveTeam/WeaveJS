@@ -234,7 +234,7 @@ export default class StandardLib {
         context.font = font;
         var metrics:TextMetrics = context.measureText(text);
         return metrics.width;
-    };
+    }
 
 
     static getTextHeight(text:string, font:string):number {
@@ -247,5 +247,25 @@ export default class StandardLib {
         var result = dummy.offsetHeight;
         body.removeChild(dummy);
         return result;
-    };
+    }
+    
+    static addPointClickListener(target:HTMLElement, listener:EventListener):void
+    {
+    	listener['onMouseDown'] = function(event:MouseEvent):void {
+    		listener['mouseDownEvent'] = event;
+    	};
+    	listener['onClick'] = function(event:MouseEvent):void {
+            var mde:MouseEvent = listener['mouseDownEvent'];
+            if (mde.clientX === event.clientX && mde.clientY === event.clientY)
+                listener(event);
+    	};
+    	target.addEventListener('mousedown', listener['onMouseDown']);
+    	target.addEventListener('click', listener['onClick']);
+    }
+    
+    static removePointClickListener(target:HTMLElement, listener:EventListener):void
+    {
+    	target.removeEventListener('mousedown', listener['onMouseDown']);
+    	target.removeEventListener('click', listener['onClick']);
+    }
 }
