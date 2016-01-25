@@ -123,23 +123,22 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
     }
 
     getResizerRange(resizer:Resizer): number[] {
-      var direction:string = resizer.props.direction;
-      var pane1:Layout = this.refs[resizer.props.pane1] as Layout;
-      var pane2:Layout = this.refs[resizer.props.pane2] as Layout;
-
-      var element1:HTMLElement = ReactDOM.findDOMNode(pane1) as HTMLElement;
-      var element2:HTMLElement = ReactDOM.findDOMNode(pane2) as HTMLElement;
-
-      var rect:ClientRect = this.element.getBoundingClientRect();
-      var pageLeft:number = window.pageXOffset + rect.left;
-      var pageTop:number = window.pageYOffset + rect.top;
-
-      if(direction === HORIZONTAL) {
-        return [element1.offsetLeft + pageLeft, element2.offsetLeft + element2.clientWidth + pageLeft];
-        } else {
-            return [element1.offsetTop + pageTop, element2.offsetTop + element2.clientHeight + pageTop];
-        }
-    }
+		var direction:string = resizer.props.direction;
+		var pane1:Layout = this.refs[resizer.props.pane1] as Layout;
+		var pane2:Layout = this.refs[resizer.props.pane2] as Layout;
+		
+		var element1:HTMLElement = ReactDOM.findDOMNode(pane1) as HTMLElement;
+		var element2:HTMLElement = ReactDOM.findDOMNode(pane2) as HTMLElement;
+		
+		var rect:ClientRect = this.element.getBoundingClientRect();
+		var pageLeft:number = window.pageXOffset + rect.left;
+		var pageTop:number = window.pageYOffset + rect.top;
+		
+		if(direction === HORIZONTAL)
+			return [element1.offsetLeft + pageLeft, element2.offsetLeft + element2.clientWidth + pageLeft];
+		else
+			return [element1.offsetTop + pageTop, element2.offsetTop + element2.clientHeight + pageTop];
+	}
 
     onMouseUp (event:MouseEvent) {
         var newState:LayoutState = _.cloneDeep(this.state);
@@ -229,6 +228,9 @@ export default class Layout extends React.Component<LayoutProps, LayoutState> {
               this.childNames[i] = ref;
               newChildren[i * 2] = <Layout onStateChange={this.handleStateChange.bind(this, ref)} ref={ref} state={childState} key={i * 2}/>;
            });
+           
+           if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout)
+        	   newChildren.reverse();
 
            var i:number;
            for(i = 1; i < newChildren.length - 1; i += 2) {

@@ -290,6 +290,14 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
             dest.id = srcId;
         }
         else {
+            if (weavejs.WeaveAPI.Locale.reverseLayout)
+            {
+            	if (dropZone === LEFT)
+            		dropZone = RIGHT;
+            	else if (dropZone === RIGHT)
+            		dropZone = LEFT;
+            }
+
             var srcParentArray:LayoutState[] = StandardLib.findDeep(newState, (obj:LayoutState) => {
                 return Array.isArray(obj) && obj.indexOf(src) >= 0;
             });
