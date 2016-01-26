@@ -27,6 +27,7 @@ import PanCluster from "./OpenLayersMap/PanCluster";
 import InteractionModeCluster from "./OpenLayersMap/InteractionModeCluster";
 import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
 import DragSelection from "./OpenLayersMap/DragSelection";
+import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 /* global Weave, weavejs */
 
 declare var Weave:any;
@@ -39,6 +40,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 	map:ol.Map;
 	zoomButtons:ol.control.Zoom;
 	slider:ol.control.ZoomSlider;
+	zoomExtent: ol.control.ZoomToExtent;
 	pan:PanCluster;
 	mouseModeButtons:InteractionModeCluster;
 	plotManager:WeavePath;
@@ -98,6 +100,9 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.zoomButtons = new ol.control.Zoom();
 		this.slider = new ol.control.ZoomSlider();
 		this.pan = new PanCluster();
+		this.zoomExtent = new CustomZoomToExtent({ label: jquery("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0]});
+
+		this.map.addControl(this.zoomButtons);
 
 		this.toolPath.push("showZoomControls").addCallback(this, this.onZoomControlToggle, true);
 		this.toolPath.push("showMouseModeControls").addCallback(this, this.onMouseModeControlToggle, true);
@@ -168,7 +173,9 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		}
 		else
 		{
-			jquery(this.element).find(".ol-control");
+			jquery(this.element).find(".ol-control.ol-zoom-extent").css({top: "0.5em", left: "0.5em"});
+			jquery(this.element).find(".ol-control.ol-zoom").css({ top: "2.625em", left: "0.5em" });
+			jquery(this.element).find(".ol-control.iModeCluster").css({ top: "5.6em", left: "0.5em" });
 		}
 	}
 
@@ -195,13 +202,13 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		{
 			this.map.addControl(this.slider);
 			this.map.addControl(this.pan);
-			this.map.addControl(this.zoomButtons);
+			this.map.removeControl(this.zoomExtent);
 		}
 		else
 		{
 			this.map.removeControl(this.slider);
 			this.map.removeControl(this.pan);
-			this.map.removeControl(this.zoomButtons);
+			this.map.addControl(this.zoomExtent);
 		}
 		this.updateControlPositions();
 	}

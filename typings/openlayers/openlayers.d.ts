@@ -468,6 +468,14 @@ declare module olx {
             render?:Function;
             target?:Element|string;
         }
+
+        interface ZoomToExtentOptions {
+            className?: string;
+            target?: HTMLElement;
+            label?: string | HTMLElement;
+            tipLabel?: string;
+            extent?: ol.Extent;
+        }
     }
 
     module interaction {
