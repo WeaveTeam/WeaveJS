@@ -52,8 +52,8 @@ export abstract class FeatureLayer extends Layer {
 		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, this.selectedSet);
 		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, this.probedSet);
 
-		this.selectionKeySet.addKeySetCallback(selectionKeyHandler);
-		this.probeKeySet.addKeySetCallback(probeKeyHandler);
+		this.selectionKeySet.addKeySetCallback(selectionKeyHandler, true);
+		this.probeKeySet.addKeySetCallback(probeKeyHandler, true);
 
 		this.filteredKeySet.addCallback(this, this.updateFilteredKeySet, true);
 		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
