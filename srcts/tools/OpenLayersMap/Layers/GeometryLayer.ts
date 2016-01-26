@@ -41,7 +41,7 @@ class GeometryLayer extends FeatureLayer {
 
 	updateGeometryData()
 	{
-		var projectionSpec = this.geoColumnPath.getObject("internalDynamicColumn", null).getMetadata('projection');
+		var projectionSpec = this.geoColumnPath.getObject("internalDynamicColumn").getMetadata('projection');
 	
 		var outputProjection = this.projectionPath.getState() || "EPSG:3857";
 		var inputProjection = projectionSpec || outputProjection;
