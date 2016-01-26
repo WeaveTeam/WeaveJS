@@ -54,9 +54,13 @@ class GeometryLayer extends FeatureLayer {
 
 		for (let idx = 0; idx < keys.length; idx++)
 		{
+            let rawGeom = rawGeometries[idx];
+            if (!rawGeom)
+                continue;
+            
 			let id = keys[idx];
 
-			let geometry = this.geoJsonParser.readGeometry(rawGeometries[idx], {dataProjection: inputProjection, featureProjection: outputProjection});
+			let geometry = this.geoJsonParser.readGeometry(rawGeom, {dataProjection: inputProjection, featureProjection: outputProjection});
 
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);
