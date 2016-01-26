@@ -516,8 +516,8 @@ class WeaveC3Barchart extends AbstractC3Tool {
             { name: "xAxis", path: this.toolPath.pushPlotter("xAxis") },
             { name: "yAxis", path: this.toolPath.pushPlotter("yAxis") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset },
-            { name: "probeKeySet", path: this.toolPath.probe_keyset }
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
+            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
         ];
 
         this.initializePaths(mapping);
