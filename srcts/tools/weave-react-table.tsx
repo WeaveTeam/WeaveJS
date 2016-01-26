@@ -55,7 +55,7 @@ class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> im
 
     dataChanged() {
         this.setState({
-            data: this.columnsPath.retrieveRecords(this.columnsPath.getNames(), this.toolPath.push("filteredKeySet"))
+            data: this.columnsPath.retrieveRecords(this.columnsPath.getNames(), {keySet: this.toolPath.push("filteredKeySet"), dataType: "string"})
         });
     }
 
