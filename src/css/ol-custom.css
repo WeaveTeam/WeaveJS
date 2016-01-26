@@ -3,5 +3,6 @@
 }
 
 .ol-control button.active {
-    border-style: solid
+    border-style: solid;
+    border-width: 2;
 }

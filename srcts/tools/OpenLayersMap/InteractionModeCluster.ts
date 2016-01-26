@@ -20,9 +20,9 @@ export default class InteractionModeCluster extends ol.control.Control {
 			</table>
 		`);
 
-		buttonTable.find("button.iModeCluster.pan").click(() => interactionModePath.state("pan"));
-		buttonTable.find("button.iModeCluster.select").click(() => interactionModePath.state("select"));
-		buttonTable.find("button.iModeCluster.zoom").click(() => interactionModePath.state("zoom"));
+		buttonTable.find("button.iModeCluster.pan").click(() => interactionModePath.state("pan")).css({ "font-weight": "normal" });
+		buttonTable.find("button.iModeCluster.select").click(() => interactionModePath.state("select")).css({ "font-weight": "normal" });
+		buttonTable.find("button.iModeCluster.zoom").click(() => interactionModePath.state("zoom")).css({"font-weight": "normal"});
 
 		super({ element: buttonTable[0], target: options.target });
 
