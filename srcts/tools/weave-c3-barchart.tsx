@@ -493,10 +493,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
             this.validate(true);
         }
     }
-    
-    detectChange(...pathNames):boolean {
-        return Weave.detectChange.apply(Weave, pathNames.map(name => this.paths[name].getObject()));
-    }
 
     componentDidMount() {
         StandardLib.addPointClickListener(this.element, this.handlePointClick.bind(this));
@@ -529,6 +525,10 @@ class WeaveC3Barchart extends AbstractC3Tool {
             this.c3Config.axis.x.height = this.props.style.height * 0.2;
         }
         this.validate(true);
+    }
+    
+    detectChange(...pathNames):boolean {
+        return Weave.detectChange.apply(Weave, [this].concat(pathNames.map(name => this.paths[name].getObject())));
     }
     
     validate(forced:boolean = false):void
@@ -565,12 +565,16 @@ class WeaveC3Barchart extends AbstractC3Tool {
                     this.c3Config.data.axes = {[this.heightColumnNames[0]]:'y2'};
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
+                    this.c3Config.padding.left = 20;
+                    this.c3Config.padding.right = undefined;
                 }
                 else
                 {
                     this.c3Config.data.axes = {[this.heightColumnNames[0]]:'y'};
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
+                    this.c3Config.padding.left = undefined;
+                    this.c3Config.padding.right = 20;
                 }
             }
     

@@ -12,6 +12,7 @@ import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
 
 // TEMPORARY SOLUTION
 weavejs.util.JS.JSZip = JSZip;
+//weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
 var weave = window.weave;
 if (weave)
