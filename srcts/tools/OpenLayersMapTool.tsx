@@ -87,11 +87,11 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.map.addInteraction(dragZoom);
 
 		this.interactionModePath.addCallback(this, () => {
-			let interactionMode = this.interactionModePath.getState();
+			let interactionMode = this.interactionModePath.getState() || "select";
 			dragPan.setActive(interactionMode === "pan");
 			dragSelect.setActive(interactionMode === "select");
 			dragZoom.setActive(interactionMode === "zoom");
-		});
+		}, true);
 
 		/* Setup custom controls */
 
