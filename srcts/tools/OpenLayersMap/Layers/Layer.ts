@@ -41,7 +41,7 @@ abstract class Layer {
 	settingsPath:WeavePath;
 	projectionPath:WeavePath;
 	layerName:string;
-	parent:any;
+	parent:OpenLayersMapTool;
 
 	_olLayer:ol.layer.Layer;
 	_layerReadyCallbacks:Map<string,Function>;
@@ -90,6 +90,16 @@ abstract class Layer {
 
 	get olLayer() {
 		return this._olLayer;
+	}
+	
+	get inputProjection()
+	{
+		return null;
+	}
+	
+	get outputProjection()
+	{
+		return this.projectionPath.getState() || "EPSG:3857";
 	}
 
 	linkProperty(propertyPath:WeavePath, propertyName:string, inTransform?:Function)

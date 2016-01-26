@@ -38,14 +38,15 @@ class GeometryLayer extends FeatureLayer {
 	{
 
 	}
-
-	updateGeometryData()
+    
+	get inputProjection()
 	{
 		var projectionSpec = this.geoColumnPath.getObject("internalDynamicColumn").getMetadata('projection');
+		return projectionSpec || this.outputProjection;
+	}
 	
-		var outputProjection = this.projectionPath.getState() || "EPSG:3857";
-		var inputProjection = projectionSpec || outputProjection;
-
+	updateGeometryData()
+	{
 		this.source.clear();
 
 		var keys = this.geoColumnPath.push('internalDynamicColumn').getKeys();
@@ -60,7 +61,7 @@ class GeometryLayer extends FeatureLayer {
             
 			let id = keys[idx];
 
-			let geometry = this.geoJsonParser.readGeometry(rawGeom, {dataProjection: inputProjection, featureProjection: outputProjection});
+			let geometry = this.geoJsonParser.readGeometry(rawGeom, {dataProjection: this.inputProjection, featureProjection: this.outputProjection});
 
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);

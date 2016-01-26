@@ -59,12 +59,12 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.toolPath = props.toolPath;
 	}
 
-	handleMissingSessionStateProperties(newState)
+	handleMissingSessionStateProperties(newState):void
 	{
 
 	}
 
-	componentDidMount()
+	componentDidMount():void
 	{
 		this.map = new ol.Map({
 			interactions: ol.interaction.defaults({ dragPan: false }),
@@ -125,7 +125,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.zoomBoundsPath.addCallback(this, this.getSessionCenter, true);
 	}
 
-	onViewParametersChanged()
+	onViewParametersChanged():void
 	{
 		let extent = [];
 
@@ -149,7 +149,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.getSessionCenter();
 	}
 
-	componentDidUpdate()
+	componentDidUpdate():void
 	{
 		this.map.updateSize();
 		var viewport = this.map.getViewport();
@@ -157,7 +157,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.zoomBoundsPath.getObject().setScreenBounds(screenBounds, true);
 	}
 
-	updateControlPositions()
+	updateControlPositions():void
 	{
 		if (this.toolPath.push("showZoomControls").getState())
 		{
@@ -173,7 +173,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 	}
 
 
-	onMouseModeControlToggle()
+	onMouseModeControlToggle():void
 	{
 		let showMouseModeControls = this.toolPath.push("showMouseModeControls").getState();
 		if (showMouseModeControls)
@@ -188,7 +188,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 	}
 
 
-	onZoomControlToggle()
+	onZoomControlToggle():void
 	{
 		let showZoomControls = this.toolPath.push("showZoomControls").getState();
 		if (showZoomControls)
@@ -206,7 +206,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.updateControlPositions();
 	}
 
-	setSessionCenter()
+	setSessionCenter():void
 	{
 		var [xCenter, yCenter] = this.map.getView().getCenter();
 
@@ -219,7 +219,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		zoomBounds.setDataBounds(dataBounds);
 	}
 
-	setSessionZoom()
+	setSessionZoom():void
 	{
 		var resolution = this.map.getView().getResolution();
 
@@ -235,7 +235,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		zoomBounds.setDataBounds(dataBounds);
 	}
 
-	getSessionCenter()
+	getSessionCenter():void
 	{
 		var zoomBounds = this.zoomBoundsPath.getObject();
 		var dataBounds = new weavejs.geom.Bounds2D();
@@ -255,17 +255,32 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		});
 	}
 	
-	requestDetail()
+	requestDetail():void
 	{
 		var zoomBounds = this.zoomBoundsPath.getObject();
-		for (var sgc of Weave.getDescendants(this.toolPath.getObject(), weavejs.data.column.StreamedGeometryColumn))
+		for (var name of this.plottersPath.getNames())
 		{
-			//TODO - this doesn't handle a dataBounds of different projection than the streamed geometries are in
-			sgc.requestGeometryDetailForZoomBounds(zoomBounds);
+			var layer:Layer = this.layers.get(name);
+			if (!layer)
+				continue;
+			for (var sgc of Weave.getDescendants(this.plottersPath.getObject(name), weavejs.data.column.StreamedGeometryColumn))
+			{
+				if (layer.inputProjection == layer.outputProjection)
+				{
+					weavejs.data.column.StreamedGeometryColumn.metadataRequestMode = 'xyz';
+					sgc.requestGeometryDetailForZoomBounds(zoomBounds);
+				}
+				else
+				{
+					//TODO - don't request everything when reprojecting
+					weavejs.data.column.StreamedGeometryColumn.metadataRequestMode = 'all';
+					sgc.requestGeometryDetail(sgc.collectiveBounds, 0);
+				}
+			}
 		}
 	}
 
-	plottersChanged()
+	plottersChanged():void
 	{
 		var oldNames = Array.from(this.layers.keys());
 		var newNames = this.plottersPath.getNames();
@@ -297,7 +312,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		}
 	}
 
-	destroy()
+	destroy():void
 	{
 
 	}
