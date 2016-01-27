@@ -85,7 +85,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
                 color: (color:string, d:any) => {
                     if(d && d.hasOwnProperty("index")) {
                         var decColor:number;
-                        if(this.c3Config.axis.y2.show){
+                        if(weavejs.WeaveAPI.Locale.reverseLayout){
                             //handle case where labels need to be reversed for chart flip
                             var temp:number = this.histData.length-1;
                             decColor = this.paths.fillStyle.push("color").getObject("internalDynamicColumn", null).getColorFromDataValue(temp-d.index).toString(16);
@@ -158,7 +158,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
                             if(this.element && this.props.style.height > 0) {
                                 var labelHeight:number = (this.props.style.height* 0.2)/Math.cos(45*(Math.PI/180));
                                 var labelString:string;
-                                if(this.c3Config.axis.y2.show){
+                                if(weavejs.WeaveAPI.Locale.reverseLayout){
                                     //handle case where labels need to be reversed
                                     var temp:number = this.histData.length-1;
                                     labelString = this.paths.binnedColumn.getObject().deriveStringFromNumber(temp-num);
