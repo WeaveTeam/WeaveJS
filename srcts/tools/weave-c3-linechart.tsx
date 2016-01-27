@@ -62,6 +62,20 @@ class WeaveC3LineChart extends AbstractC3Tool {
         this.columns = [];
         this.validate = _.debounce(this.validate.bind(this), 30);
 
+        this.c3ConfigYAxis = {
+            show: true,
+            tick: {
+                multiline: true,
+                format: (num:number):string => {
+                    if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("this.getMetadata('dataType')") !== "number") {
+                        return this.yAxisValueToLabel[num] || "";
+                    } else {
+                        return String(FormatUtils.defaultNumberFormatting(num));
+                    }
+                }
+            }
+        }
+
         this.c3Config = {
             size: {
                 width: this.props.style.width,
@@ -143,7 +157,7 @@ class WeaveC3LineChart extends AbstractC3Tool {
                         multiline: false,
                         rotate: -45,
                         format: (d:number):string => {
-                            if(this.c3Config.axis.y2.show){
+                            if(this.c3ConfigYAxis.show == false){
                                 //handle case where labels need to be reversed
                                 var temp:number = this.columnLabels.length-1;
                                 return this.columnLabels[temp-d];
@@ -165,19 +179,6 @@ class WeaveC3LineChart extends AbstractC3Tool {
                     this.validate();
             }
         };
-        this.c3ConfigYAxis = {
-            show: true,
-            tick: {
-                multiline: true,
-                format: (num:number):string => {
-                    if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("this.getMetadata('dataType')") !== "number") {
-                        return this.yAxisValueToLabel[num] || "";
-                    } else {
-                        return String(FormatUtils.defaultNumberFormatting(num));
-                    }
-                }
-            }
-        }
     }
 
     protected handleMissingSessionStateProperties(newState:any)
