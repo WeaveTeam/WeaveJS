@@ -77,8 +77,8 @@ abstract class GlyphLayer extends FeatureLayer {
 			}
 			feature.setGeometry(point);
 		}
-		this.updateFilteredKeySet();
 		this.updateStyleData();
+		this.updateMetaStyles();
 	}
 }
 

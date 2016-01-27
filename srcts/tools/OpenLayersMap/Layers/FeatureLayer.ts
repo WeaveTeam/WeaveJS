@@ -18,11 +18,12 @@ export abstract class FeatureLayer extends Layer {
 	private changedItems:Set<string>;
 	private probedSet:Set<string>;
 	private selectedSet:Set<string>;
-	private filteredSet:Set<string>;
 
 	public selectionKeySet:WeavePath;
 	public probeKeySet:WeavePath;
 	public filteredKeySet:WeavePath;
+	public filteredKeySetObject: any;
+
 	private tempSelectable:boolean;
 
 	source:ol.source.Vector;
@@ -43,7 +44,6 @@ export abstract class FeatureLayer extends Layer {
 		this.changedItems = new Set();
 		this.probedSet = new Set();
 		this.selectedSet = new Set();
-		this.filteredSet = new Set();
 
 		this.selectionKeySet = this.layerPath.selection_keyset;
 		this.probeKeySet = this.layerPath.probe_keyset;
@@ -55,7 +55,8 @@ export abstract class FeatureLayer extends Layer {
 		this.selectionKeySet.addKeySetCallback(selectionKeyHandler, true);
 		this.probeKeySet.addKeySetCallback(probeKeyHandler, true);
 
-		this.filteredKeySet.addCallback(this, this.updateFilteredKeySet, true);
+		this.filteredKeySet.addCallback(this, this.updateMetaStyles, true);
+		this.filteredKeySetObject = this.filteredKeySet.getObject();
 		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
 	}
 
@@ -183,23 +184,6 @@ export abstract class FeatureLayer extends Layer {
 		}
 	}
 
-	updateFilteredKeySet()
-	{
-		if (!this.source) return; //HACK
-		
-		let sourceKeys = this.source.getFeatures().map(feature => feature.getId());
-
-		this.filteredSet.clear();
-
-		var filteredKeys = this.filteredKeySet.filterKeys(sourceKeys);
-		for (let key of filteredKeys)
-		{
-			this.filteredSet.add(key);
-		}
-
-		this.updateMetaStyles();
-	}
-
 	updateMetaStyles()
 	{
 		if (!this.source) return; //HACK
@@ -221,7 +205,7 @@ export abstract class FeatureLayer extends Layer {
 		let replace = feature.get("replace");
 		let newStyle;
 
-		if (!this.filteredSet.has(id))
+		if (!this.filteredKeySetObject.containsKey(id))
 		{
 			feature.setStyle(nullStyle);
 			return;

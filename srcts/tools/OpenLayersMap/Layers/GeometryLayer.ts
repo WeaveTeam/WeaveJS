@@ -26,12 +26,15 @@ class GeometryLayer extends FeatureLayer {
 		this.fillStylePath = this.layerPath.push("fill");
 		this.lineStylePath = this.layerPath.push("line");
 
-		this.geoColumnPath.addCallback(this, this.updateGeometryData, true);
-		this.projectionPath.addCallback(this, this.updateGeometryData, true);
+		this.geoColumnPath.addCallback(this, this.updateGeometryData);
+		this.projectionPath.addCallback(this, this.updateGeometryData);
+		this.filteredKeySet.removeCallback(this, this.updateMetaStyles);
 
 		this.fillStylePath.addCallback(this, this.updateStyleData);
-		this.lineStylePath.addCallback(this, this.updateStyleData, true);
+		this.lineStylePath.addCallback(this, this.updateStyleData);
 		this.filteredKeySet.getObject().setColumnKeySources([this.geoColumnPath.getObject("internalDynamicColumn")]);
+
+		this.filteredKeySet.addCallback(this, this.updateGeometryData, true);
 	}
 
 	handleMissingSessionStateProperties(newState)
@@ -49,9 +52,9 @@ class GeometryLayer extends FeatureLayer {
 	{
 		this.source.clear();
 
-		var keys = this.geoColumnPath.push('internalDynamicColumn').getKeys();
 		var idc = this.geoColumnPath.getObject("internalDynamicColumn");
-		var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, idc.keys);
+		var keys = this.filteredKeySet.getObject().keys;
+		var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, keys);
 
 		for (let idx = 0; idx < keys.length; idx++)
 		{
@@ -70,7 +73,7 @@ class GeometryLayer extends FeatureLayer {
 		}
 
 		this.updateStyleData();
-		this.updateFilteredKeySet();
+		this.updateMetaStyles();
 	}
 
 	getToolTipColumns(): Array<any> /* Array<IAttributeColumn> */
@@ -107,7 +110,7 @@ class GeometryLayer extends FeatureLayer {
 				lineJoin: this.lineStylePath.push("joints"),
 				miterLimit: this.lineStylePath.push("miterLimit")
 			}
-		}, this.geoColumnPath.push("internalDynamicColumn"));
+		}, this.filteredKeySet);
 
 		for (let record of styleRecords)
 		{
