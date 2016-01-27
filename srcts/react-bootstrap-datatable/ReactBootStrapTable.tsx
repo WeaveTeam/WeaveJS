@@ -151,6 +151,12 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         });
     }
 
+    componentWillReceiveProps(nextProps:IReactBootstrapTableProps) {
+        this.setState({
+            selectedIds: nextProps.selectedIds,
+            probedIds: nextProps.probedIds
+        });
+    }
 
     render() {
 
@@ -162,17 +168,17 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         var selectedIds:string[];
         var probedIds:string[];
 
-        if(this.props.selectedIds) {
-            selectedIds = this.props.selectedIds;
-        } else {
-            selectedIds = this.state.selectedIds;
-        }
-
-        if(this.props.probedIds) {
-            probedIds = this.props.probedIds;
-        } else {
-            probedIds = this.state.probedIds;
-        }
+        // if(this.props.selectedIds) {
+        //     selectedIds = this.props.selectedIds;
+        // } else {
+        //     selectedIds = this.state.selectedIds;
+        // }
+        //
+        // if(this.props.probedIds) {
+        //     probedIds = this.props.probedIds;
+        // } else {
+        //     probedIds = this.state.probedIds;
+        // }
 
         return (
             <div style={tableContainer}>
@@ -187,8 +193,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
                                onMouseOver={this.onMouseOver.bind(this)}
                                onClick={this.onClick.bind(this)}
                                rows={this.props.rows}
-                               selectedIds={selectedIds}
-                               probedIds={probedIds}
+                               selectedIds={this.state.selectedIds}
+                               probedIds={this.state.probedIds}
                                showIdColumn={this.props.showIdColumn}/>
                 </Table>
             </div>
