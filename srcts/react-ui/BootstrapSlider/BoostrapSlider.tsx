@@ -5,16 +5,34 @@
 import * as React from "react";
 import BootstrapSlider from "bootstrap-slider";
 
-export default class Slider extends React.Component<any, any> {
+interface SliderProps {
+    min:number;
+    max:number;
+    step:number;
+    value:number;
+    orientation:string;
+    onChange?:React.EventHandler<React.FormEvent>;
+    style?:React.CSSProperties;
+    label?:string;
+}
+
+export default class Slider extends React.Component<SliderProps, any> {
 
     private element:HTMLElement;
+    private sliderOptions:BootstrapSlider.SliderOptions;
 
-    constructor(props:any) {
+    constructor(props:SliderProps) {
         super(props);
     }
 
-    componentDidMount() {
+    componentDidUpdate() {
         console.log(BootstrapSlider);
+        this.sliderOptions = {
+            min: this.props.min,
+            max: this.props.max,
+            step: this.props.step,
+            orientation: this.props.orientation,
+        };
         console.log(new BootstrapSlider("#slider", {
             // initial options object
         }));
