@@ -31,6 +31,10 @@ interface IBarchartPaths extends IToolPaths {
     groupingMode: WeavePath;
     horizontalMode: WeavePath;
     showValueLabels: WeavePath;
+    marginTop: WeavePath;
+    marginBottom: WeavePath;
+    marginLeft: WeavePath;
+    marginRight: WeavePath;
     xAxis: WeavePath;
     yAxis: WeavePath;
     filteredKeySet: WeavePath;
@@ -80,7 +84,9 @@ class WeaveC3Barchart extends AbstractC3Tool {
             },
             padding: {
                 top: 20,
-                bottom: 20
+                bottom: 0,
+                left: 100,
+                right: 20
             },
             data: {
                 json: [],
@@ -176,7 +182,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                         format: (num:number):string => {
                             if(this.stringRecords && this.stringRecords[num]) {
                                 if(this.element && this.props.style.height > 0) {
-                                    var labelHeight:number = (this.props.style.height* 0.2)/Math.cos(45*(Math.PI/180));
+                                    var labelHeight:number = Number(this.paths.marginBottom.getState())/Math.cos(45*(Math.PI/180));
                                     var labelString:string = (this.stringRecords[num]["xLabel"] as string);
                                     if(labelString) {
                                         var stringSize:number = StandardLib.getTextWidth(labelString, "14pt Helvetica Neue");
@@ -229,7 +235,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
             },
             legend: {
                 show: false,
-                position: "right"
+                position: "bottom"
             },
             onrendered: () => {
                 this.busy = false;
@@ -339,7 +345,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.records = _.sortBy(this.records, (record) =>{
             return record[0]["sort"];
         });
-        if(this.c3ConfigYAxis.show == false) {
+        if(weavejs.WeaveAPI.Locale.reverseLayout) {
             this.records = this.records.reverse();
         }
 
@@ -435,6 +441,10 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.c3Config.data = data;
     }
 
+    get internalWidth():number {
+        return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
+    }
+
     updateStyle() {
     	if(!this.chart || !this.heightColumnNames)
     		return;
@@ -485,11 +495,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
     componentDidUpdate() {
         if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
             this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-            if (this.paths.labelColumn.getState().length)
-                this.c3Config.axis.x.height = this.c3Config.size.height * 0.2;
-            else
-                this.c3Config.axis.x.height = null;
-            
             this.validate(true);
         }
     }
@@ -511,6 +516,10 @@ class WeaveC3Barchart extends AbstractC3Tool {
             { name: "showValueLabels", path: plotterPath.push("showValueLabels") },
             { name: "xAxis", path: this.toolPath.pushPlotter("xAxis") },
             { name: "yAxis", path: this.toolPath.pushPlotter("yAxis") },
+            { name: "marginBottom", path: this.plotManagerPath.push("marginBottom") },
+            { name: "marginLeft", path: this.plotManagerPath.push("marginLeft") },
+            { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
+            { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
             { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
             { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
@@ -521,9 +530,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.sortColumn.getObject()]);
 
         this.c3Config.bindto = this.element;
-        if(this.paths.labelColumn.getState().length){
-            this.c3Config.axis.x.height = this.props.style.height * 0.2;
-        }
         this.validate(true);
     }
     
@@ -537,7 +543,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.dirty = false;
         
         var changeDetected:boolean = false;
-        var axisChange:boolean = this.detectChange('heightColumns', 'labelColumn', 'sortColumn');
+        var axisChange:boolean = this.detectChange('heightColumns', 'labelColumn', 'sortColumn', 'marginBottom', 'marginTop', 'marginLeft', 'marginRight');
         var axisSettingsChange:boolean = this.detectChange('xAxis', 'yAxis');
         if (axisChange || this.detectChange('colorColumn', 'chartColors', 'groupingMode', 'filteredKeySet'))
         {
@@ -556,40 +562,46 @@ class WeaveC3Barchart extends AbstractC3Tool {
             
             if (this.heightColumnNames && this.heightColumnNames.length)
             {
+                var temp:any =  {};
                 if (weavejs.WeaveAPI.Locale.reverseLayout)
                 {
-                    this.c3Config.data.axes = {[this.heightColumnNames[0]]:'y2'};
+                    this.heightColumnNames.forEach( (name) => {
+                        temp[name] = 'y2';
+                    });
+                    this.c3Config.data.axes = temp;
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
                     this.c3Config.padding.left = 20;
-                    this.c3Config.padding.right = undefined;
-                    if(this.c3Config.axis.x.tick.rotate)
-                        this.c3Config.axis.x.tick.rotate = 45;
+                    this.c3Config.padding.right = 100;
+                    this.c3Config.axis.x.tick.rotate = 45;
                 }
                 else
                 {
-                    this.c3Config.data.axes = {[this.heightColumnNames[0]]:'y'};
+                    this.heightColumnNames.forEach( (name) => {
+                        temp[name] = 'y';
+                    });
+                    this.c3Config.data.axes = temp;
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
-                    this.c3Config.padding.left = undefined;
-                    this.c3Config.padding.right = undefined;
-                    if(this.c3Config.axis.x.tick.rotate)
-                        this.c3Config.axis.x.tick.rotate = -45;
+                    this.c3Config.padding.left = 100;
+                    this.c3Config.padding.right = 20;
+                    this.c3Config.axis.x.tick.rotate = -45;
                 }
-            }
-    
-            // axis label culling requires this.chart.internal.width
-            if (this.chart)
-            {
-                var width:number = this.chart.internal.width;
-                var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
-                var xLabelsToShow:number = Math.floor(width / textHeight);
-                xLabelsToShow = Math.max(2,xLabelsToShow);
-                this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
             }
     
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
+
+            this.c3Config.padding.top = Number(this.paths.marginTop.getState());
+            this.c3Config.axis.x.height = Number(this.paths.marginBottom.getState());
+            if(weavejs.WeaveAPI.Locale.reverseLayout){
+                this.c3Config.padding.left = Number(this.paths.marginRight.getState());
+                this.c3Config.padding.right = Number(this.paths.marginLeft.getState());
+            }else{
+                this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
+                this.c3Config.padding.right = Number(this.paths.marginRight.getState());
+            }
+
         }
         if (this.detectChange('horizontalMode'))
         {
@@ -601,6 +613,17 @@ class WeaveC3Barchart extends AbstractC3Tool {
             changeDetected = true;
             this.showValueLabels = this.paths.showValueLabels.getState();
         }
+
+        // axis label culling requires this.chart.internal.width
+        if (this.chart)
+        {
+            var width:number = this.internalWidth;
+            var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
+            var xLabelsToShow:number = Math.floor(width / textHeight);
+            xLabelsToShow = Math.max(2,xLabelsToShow);
+            this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
+        }
+
         if (changeDetected || forced)
         {
             this.busy = true;

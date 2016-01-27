@@ -391,7 +391,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
             }
 
             return (
-                <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%", display: "flex", position: "relative"}}>
+                <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%", display: "flex", position: "relative", overflow: "hidden"}}>
                     <Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
                     {children}
                     <ToolOverlay ref={TOOLOVERLAY}/>

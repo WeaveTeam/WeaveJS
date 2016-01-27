@@ -349,7 +349,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
         }
 
         this.keys = { value: ["height"] };
-        if(this.c3ConfigYAxis.show == false){
+        if(weavejs.WeaveAPI.Locale.reverseLayout){
             this.histData = this.histData.reverse();
         }
 
