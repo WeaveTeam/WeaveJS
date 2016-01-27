@@ -107,7 +107,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 
     render() {
         var direction: string = this.props.direction;
-        var style:any = {};
+        var style:React.CSSProperties = {};
 
         StandardLib.merge(style, resizerStyle.basic);
         StandardLib.merge(style, resizerStyle[direction]);
@@ -120,10 +120,10 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
             style.visibility = "hidden";
         }
 
-        var prefixed = VendorPrefix.prefix({ styles: style });
+        style = VendorPrefix.prefix({ styles: style }).styles;
 
         return (
-            <span ref={(elt:Element) => { this.element = elt; }} style={prefixed.styles}/>
+            <span ref={(elt:Element) => { this.element = elt; }} style={style}/>
         );
     }
 }
