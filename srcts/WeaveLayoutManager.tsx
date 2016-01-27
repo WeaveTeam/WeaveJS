@@ -283,7 +283,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
             }
         }
         state.children = simpleChildren;
-        var totalSizeChildren:number = _.sum(_.map(children, "flex"));
+        var totalSizeChildren:number = _.sum(_.map(state.children, "flex"));
 
         //Scale flex values between 0 and 1 so they sum to 1, avoiding an apparent
         //flex bug where space is lost if sum of flex values is less than 1.
