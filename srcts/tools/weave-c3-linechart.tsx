@@ -117,8 +117,14 @@ class WeaveC3LineChart extends AbstractC3Tool {
                     }
 
                     var columnNamesToValue:{[columnName:string] : string|number } = {};
+                    var lineIndex:number = _.findIndex(this.numericRecords, (record) => {
+                        return record["id"].toString() == d.id;
+                    });
+
                     this.columnLabels.forEach( (label:string,index:number,array:any[]) => {
-                        columnNamesToValue[label] = this.numericRecords[d.index]["columns"][index] as number;
+                        if(this.numericRecords && this.numericRecords[lineIndex]) {
+                            columnNamesToValue[label] = this.numericRecords[lineIndex]["columns"][index] as number;
+                        }
                     });
 
                     this.props.toolTip.setState({
