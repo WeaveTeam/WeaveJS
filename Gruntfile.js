@@ -85,7 +85,7 @@ module.exports = function (grunt) {
         },
         clean: {
             ts: ["outts"],
-            libs: ["dist"]
+            dist: ["dist/*.js", "dist/*.css", "dist/*.html"]
         },
         eslint: {
             target: ['src/**/*.js']
@@ -129,10 +129,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
 
-    grunt.registerTask('default', ['clean:ts', 'ts', 'browserify:dev', 'copy']);
+    grunt.registerTask('default', ['ts', 'browserify:dev', 'copy']);
     //grunt.registerTask('default-nolint', ['ts', 'browserify:dev', 'copy']);
     grunt.registerTask('dist', ['ts', 'browserify:dist', 'copy']);
-    grunt.registerTask('libs', ['clean:libs', 'browserify:libs']);
-    grunt.registerTask('devlibs', ['clean:libs', 'browserify:devlibs']);
+    grunt.registerTask('libs', ['browserify:libs']);
+    grunt.registerTask('devlibs', ['browserify:devlibs']);
     grunt.registerTask('module', ['browserify:module']);
+    grunt.registerTask('all', ['clean', 'devlibs', 'default', 'module']);
 };
