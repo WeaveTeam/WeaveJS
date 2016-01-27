@@ -56,15 +56,6 @@ abstract class GlyphLayer extends FeatureLayer {
 
 		for (let record of records)
 		{
-			let feature = this.source.getFeatureById(record.id);
-
-			if (!feature)
-			{
-				feature = new ol.Feature({});
-				feature.setId(record.id);
-				this.source.addFeature(feature);
-			}
-
 			let dataX, dataY;
 
 			dataX = GlyphLayer._toPoint(record.dataX, "xMin", "xMax");
@@ -72,6 +63,18 @@ abstract class GlyphLayer extends FeatureLayer {
 
 			let point = new ol.geom.Point([dataX, dataY]);
 			point.transform(rawProj, mapProj);
+			
+			var coords = point.getCoordinates();
+			if (!isFinite(coords[0]) || !isFinite(coords[1]))
+				continue;
+			
+			let feature = this.source.getFeatureById(record.id);
+			if (!feature)
+			{
+				feature = new ol.Feature({});
+				feature.setId(record.id);
+				this.source.addFeature(feature);
+			}
 			feature.setGeometry(point);
 		}
 		this.updateFilteredKeySet();
