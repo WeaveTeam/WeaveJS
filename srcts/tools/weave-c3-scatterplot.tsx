@@ -533,6 +533,7 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         if(!this.chart || this.busy)
             return StandardLib.debounce(this, 'loadData');
         this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true});
+
     }
 }
 export default WeaveC3ScatterPlot;

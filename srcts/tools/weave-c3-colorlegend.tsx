@@ -86,17 +86,13 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 		this.toolPath.probe_keyset.addCallback(this, this.forceUpdate);
 	}
 
-	getBinIndexFromKey(key:any):number
-	{
-		return this.binnedColumnPath.getObject().getValueFromKey(key,Number);
-	}
-
 	getSelectedBins():number[]
 	{
 		var keys = this.toolPath.selection_keyset.getKeys();
 		var selectedBins:number[] = [];
+		var binnedColumnObject = this.binnedColumnPath.getObject();
 		keys.forEach( (key:string) => {
-			selectedBins.push(this.getBinIndexFromKey(key));
+			selectedBins.push(binnedColumnObject.getValueFromKey(key, Number));
 		});
 		return _.unique(selectedBins);
 	}
@@ -105,8 +101,9 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	{
 		var keys = this.toolPath.probe_keyset.getKeys();
 		var probedBins:number[] = [];
+		var binnedColumnObject = this.binnedColumnPath.getObject();
 		keys.forEach( (key:string) => {
-			probedBins.push(this.getBinIndexFromKey(key));
+			probedBins.push(binnedColumnObject.getValueFromKey(key, Number));
 		});
 		return _.unique(probedBins);
 	}
