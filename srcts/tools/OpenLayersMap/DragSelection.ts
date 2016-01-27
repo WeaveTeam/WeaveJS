@@ -6,7 +6,6 @@
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 import FeatureLayer from "./Layers/FeatureLayer";
-import OpenLayersMapTool from "../OpenLayersMapTool";
 import Layer from "./Layers/Layer";
 import ProbeInteraction from "./ProbeInteraction";
 
@@ -21,14 +20,15 @@ enum DragSelectionMode {
 
 export default class DragSelection extends ol.interaction.DragBox
 {
-	private mapTool: OpenLayersMapTool;
 	private mode: DragSelectionMode;
 	private _probeInteraction: ProbeInteraction;
+	private debouncedUpdateSelection: Function;
 
 	constructor()
 	{
 		super({ boxEndCondition: () => true });
 
+		this.debouncedUpdateSelection = lodash.debounce(DragSelection.prototype.updateSelection, 25);
 		this.on('boxstart', DragSelection.prototype.onBoxStart, this);
 		this.on('boxdrag', DragSelection.prototype.onBoxDrag, this);
 		this.on('boxend', DragSelection.prototype.onBoxEnd, this);
@@ -74,7 +74,6 @@ export default class DragSelection extends ol.interaction.DragBox
 	{
 		let selectedFeatures: Set<string> = new Set();
 		let selectFeature: Function = (feature) => { selectedFeatures.add(feature.getId()); };
-		let mapTool: OpenLayersMapTool = this.mapTool;
 
 		for (let olLayer of this.getMap().getLayers().getArray()) {
 			let selectable: boolean = <boolean>olLayer.get("selectable");
@@ -107,14 +106,14 @@ export default class DragSelection extends ol.interaction.DragBox
 	{
 		let extent = this.getGeometry().getExtent();
 
-		this.updateSelection(extent);
+		this.debouncedUpdateSelection(extent);
 	}
 
 	onBoxEnd(event:any)
 	{
 		let extent = this.getGeometry().getExtent();
 
-		this.updateSelection(extent);
+		this.debouncedUpdateSelection(extent);
 		if (this.probeInteraction)
 			this.probeInteraction.setActive(true);
 	}
