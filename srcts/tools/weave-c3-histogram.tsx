@@ -8,16 +8,17 @@
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
-
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
+import * as c3 from "c3";
+import {ChartConfiguration, ChartAPI} from "c3";
 import FormatUtils from "../utils/FormatUtils";
 import StandardLib from "../utils/StandardLib"
-
-import {ChartConfiguration, ChartAPI, generate} from "c3";
 import {MouseEvent} from "react";
+import {getTooltipContent} from "./tooltip";
+import Tooltip from "./tooltip";
 
 interface IHistogramPaths extends IToolPaths {
     plotter: WeavePath;
@@ -34,7 +35,6 @@ interface IHistogramPaths extends IToolPaths {
 }
 
 class WeaveC3Histogram extends AbstractC3Tool {
-    private busy:boolean;
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: string};
@@ -45,12 +45,16 @@ class WeaveC3Histogram extends AbstractC3Tool {
     private numberOfBins:number;
     private showXAxisLabel:boolean;
     private histData:{}[];
+    private keys:{x?:string, value:string[]};
     protected c3Config:ChartConfiguration;
+    protected c3ConfigYAxis:c3.YAxisConfiguration;
     protected chart:ChartAPI;
 
     protected paths:IHistogramPaths;
 
     private flag:boolean;
+    private busy:boolean;
+    private dirty:boolean;
 
     constructor(props:IVisToolProps) {
         super(props);
@@ -58,6 +62,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
         this.idToRecord = {};
         this.keyToIndex = {};
         this.indexToKey = {};
+        this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.c3Config = {
             size: {
@@ -132,7 +137,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
                     }
                 }
             },
-            bindto: this.element,
+            bindto: null,
             legend: {
                 show: false
             },
@@ -145,6 +150,9 @@ class WeaveC3Histogram extends AbstractC3Tool {
                     },
                     tick: {
                         rotate: -45,
+                        culling: {
+                            max: null
+                        },
                         multiline: false,
                         format: (num:number):string => {
                             if(this.element && this.props.style.height > 0) {
@@ -170,32 +178,6 @@ class WeaveC3Histogram extends AbstractC3Tool {
                         }
                     }
                 },
-                y: {
-                    show: true,
-                    label: {
-                        text: "",
-                        position: "outer-middle"
-                    },
-                    tick: {
-                        fit: false,
-                        format: (num:number):string => {
-                            return String(FormatUtils.defaultNumberFormatting(num));
-                        }
-                    }
-                },
-                y2: {
-                    show: false,
-                    label: {
-                        text: "",
-                        position: "outer-middle"
-                    },
-                    tick: {
-                        fit: false,
-                        format: (num:number):string => {
-                            return String(FormatUtils.defaultNumberFormatting(num));
-                        }
-                    }
-                },
                 rotated: false
             },
             tooltip: {
@@ -206,8 +188,10 @@ class WeaveC3Histogram extends AbstractC3Tool {
                     name: (name:string, ratio:number, id:string, index:number):string => {
                         return this.getYAxisLabel();
                     }
-                }
+                },
+                show: false
             },
+            transition: { duration: 0 },
             grid: {
                 x: {
                     show: true
@@ -222,9 +206,25 @@ class WeaveC3Histogram extends AbstractC3Tool {
                 }
             },
             onrendered: () => {
+                this.busy = false;
                 this.updateStyle();
+                if (this.dirty)
+                    this.validate();
             }
         };
+        this.c3ConfigYAxis = {
+            show: true,
+            label: {
+                text: "",
+                position: "outer-middle"
+            },
+            tick: {
+                fit: false,
+                format: (num:number):string => {
+                    return String(FormatUtils.defaultNumberFormatting(num));
+                }
+            }
+        }
     }
 
     protected handleMissingSessionStateProperties(newState:any)
@@ -264,42 +264,6 @@ class WeaveC3Histogram extends AbstractC3Tool {
         }
     }
 
-    mirrorVertical() {
-        var temp:string = "height";
-        if(this.c3Config.axis.y.show == true){
-            this.c3Config.axis.y2.show = true;
-            this.c3Config.axis.y.show = false;
-            this.c3Config.data.axes = {[temp]:'y2'};
-            this.c3Config.axis.y2.label = this.c3Config.axis.y.label;
-        }else{
-            this.c3Config.axis.y.show = true;
-            this.c3Config.axis.y2.show = false;
-            this.c3Config.data.axes = {[temp]:'y'};
-            this.c3Config.axis.y.label = this.c3Config.axis.y2.label;
-        }
-        this.chart = generate(this.c3Config);
-        this._dataChanged();
-    }
-
-    _axisChanged () {
-        if(!this.chart)
-            return;
-
-        if(this.busy)
-            return;
-
-
-        var xLabel:string = this.paths.xAxis.getState("overrideAxisName") || this.paths.binnedColumn.getObject().getMetadata('title');
-        if(!this.showXAxisLabel){
-            xLabel = " ";
-        }
-
-        this.chart.axis.labels({
-            x: xLabel,
-            y: this.getYAxisLabel.bind(this)()
-        });
-    }
-
     updateStyle() {
     	if (!this.chart)
     		return;
@@ -335,13 +299,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
         }
     }
 
-    _dataChanged() {
-
-        if(!this.chart)
-            return;
-        if(this.busy) {
-            return;
-        }
+    private dataChanged() {
 
         var numericMapping:any = {
             binnedColumn: this.paths.binnedColumn,
@@ -390,16 +348,15 @@ class WeaveC3Histogram extends AbstractC3Tool {
             }
         }
 
-        var keys = { value: ["height"] };
-        if(this.c3Config.axis.y2.show){
+        this.keys = { value: ["height"] };
+        if(this.c3ConfigYAxis.show == false){
             this.histData = this.histData.reverse();
         }
-        this._axisChanged();
+
         this.busy = true;
         this.c3Config.data.json = this.histData;
-        this.c3Config.data.keys = keys;
-        this.chart.load({json: this.histData, keys, unload: true, done: () => { this.busy = false; }});
-    }
+        this.c3Config.data.keys = this.keys;
+      }
 
     private getAggregateValue(records:Record[], columnToAggregateName:string, aggregationMethod:WeavePath):number {
 
@@ -436,7 +393,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
         }else{
             this.c3Config.axis.x.height = null;
         }
-        this.chart = generate(this.c3Config);
+        this.validate(true);
     }
 
     componentWillUnmount() {
@@ -448,19 +405,17 @@ class WeaveC3Histogram extends AbstractC3Tool {
     componentDidMount() {
         this.element.addEventListener("click", this.handleClick.bind(this));
         this.showXAxisLabel = false;
-        var axisChanged:Function = _.debounce(this._axisChanged.bind(this), 100);
-        var dataChanged:Function = _.debounce(this._dataChanged.bind(this), 100);
         var plotterPath = this.toolPath.pushPlotter("plot");
         var mapping = [
-            { name: "plotter", path: plotterPath, callbacks: null},
-            { name: "binnedColumn", path: plotterPath.push("binnedColumn"), callbacks: [dataChanged, axisChanged] },
-            { name: "columnToAggregate", path: plotterPath.push("columnToAggregate"), callbacks: dataChanged },
-            { name: "aggregationMethod", path: plotterPath.push("aggregationMethod"), callbacks: [dataChanged, axisChanged] },
-            { name: "fillStyle", path: plotterPath.push("fillStyle"), callbacks: dataChanged },
-            { name: "lineStyle", path: plotterPath.push("lineStyle"), callbacks: dataChanged },
-            { name: "xAxis", path: this.toolPath.pushPlotter("xAxis"), callbacks: axisChanged },
-            { name: "yAxis", path: this.toolPath.pushPlotter("yAxis"), callbacks: axisChanged },
-            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet"), callbacks: dataChanged },
+            { name: "plotter", path: plotterPath, callbacks: this.validate},
+            { name: "binnedColumn", path: plotterPath.push("binnedColumn") },
+            { name: "columnToAggregate", path: plotterPath.push("columnToAggregate") },
+            { name: "aggregationMethod", path: plotterPath.push("aggregationMethod") },
+            { name: "fillStyle", path: plotterPath.push("fillStyle") },
+            { name: "lineStyle", path: plotterPath.push("lineStyle") },
+            { name: "xAxis", path: this.toolPath.pushPlotter("xAxis") },
+            { name: "yAxis", path: this.toolPath.pushPlotter("yAxis") },
+            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
             { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
             { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
         ];
@@ -473,7 +428,86 @@ class WeaveC3Histogram extends AbstractC3Tool {
         if(this.paths.binnedColumn.push("internalDynamicColumn").getState().length){
             this.c3Config.axis.x.height = this.props.style.height * 0.2;
         }
-        this.chart = generate(this.c3Config);
+        this.validate(true);
+    }
+
+    validate(forced:boolean = false):void
+    {
+        if (this.busy)
+        {
+            this.dirty = true;
+            return;
+        }
+        this.dirty = false;
+
+        var changeDetected:boolean = false;
+        var axisChange:boolean = this.detectChange('binnedColumn', 'aggregationMethod');
+        var axisSettingsChange:boolean = this.detectChange('xAxis', 'yAxis');
+        if (axisChange || this.detectChange('plotter', 'columnToAggregate', 'fillStyle', 'lineStyle','filteredKeySet'))
+        {
+            changeDetected = true;
+            this.dataChanged();
+        }
+        if (axisChange)
+        {
+            changeDetected = true;
+            var xLabel:string = this.paths.xAxis.getState("overrideAxisName") || this.paths.binnedColumn.getObject().getMetadata('title');
+            if(!this.showXAxisLabel){
+                xLabel = " ";
+            }var yLabel:string = this.getYAxisLabel.bind(this)();
+
+
+            if (this.numericRecords)
+            {
+                var temp:string = "height";
+                if (weavejs.WeaveAPI.Locale.reverseLayout)
+                {
+                    this.c3Config.data.axes = {[temp]:'y2'};
+                    this.c3Config.axis.y2 = this.c3ConfigYAxis;
+                    this.c3Config.axis.y = {show: false};
+                    this.c3Config.padding.left = 20;
+                    this.c3Config.padding.right = undefined;
+                    if(this.c3Config.axis.x.tick.rotate)
+                        this.c3Config.axis.x.tick.rotate = 45;
+                }
+                else
+                {
+                    this.c3Config.data.axes = {[temp]:'y'};
+                    this.c3Config.axis.y = this.c3ConfigYAxis;
+                    delete this.c3Config.axis.y2;
+                    this.c3Config.padding.left = undefined;
+                    this.c3Config.padding.right = 20;
+                    if(this.c3Config.axis.x.tick.rotate)
+                        this.c3Config.axis.x.tick.rotate = -45;
+                }
+            }
+
+            // axis label culling requires this.chart.internal.width
+            if (this.chart)
+            {
+                var width:number = this.chart.internal.width;
+                var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
+                var xLabelsToShow:number = Math.floor(width / textHeight);
+                xLabelsToShow = Math.max(2,xLabelsToShow);
+                this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
+            }
+
+            this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
+            this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
+
+        }
+        if (changeDetected || forced)
+        {
+            this.busy = true;
+            this.chart = c3.generate(this.c3Config);
+            this.loadData();
+        }
+    }
+
+    loadData() {
+        if(!this.chart || this.busy)
+            return StandardLib.debounce(this, 'loadData');
+        this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; }});
     }
 }
 
