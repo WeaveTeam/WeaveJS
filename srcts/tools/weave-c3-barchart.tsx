@@ -527,10 +527,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.validate(true);
     }
     
-    detectChange(...pathNames):boolean {
-        return Weave.detectChange.apply(Weave, [this].concat(pathNames.map(name => this.paths[name].getObject())));
-    }
-    
     validate(forced:boolean = false):void
     {
         if (this.busy)
@@ -578,7 +574,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                     this.c3Config.padding.left = undefined;
                     this.c3Config.padding.right = 20;
                     if(this.c3Config.axis.x.tick.rotate)
-                        this.c3Config.axis.x.tick.rotate = -45;
+                        this.c3Config.axis.x.tick.rotate = this.c3Config.axis.x.tick.rotate * -1;
                 }
             }
     

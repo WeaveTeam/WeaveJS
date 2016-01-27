@@ -89,4 +89,8 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     render():JSX.Element {
         return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
     }
+
+    detectChange(...pathNames):boolean {
+        return Weave.detectChange.apply(Weave, [this].concat(pathNames.map(name => this.paths[name].getObject())));
+    }
 }
