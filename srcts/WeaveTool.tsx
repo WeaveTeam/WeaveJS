@@ -100,7 +100,11 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
         }
 
         return (
-            <ui.VBox style={this.props.style} onMouseEnter={() => { this.titleBar.setState({ showControls: true }); }} onMouseLeave={() => { this.titleBar.setState({ showControls: false }); }} onDragOver={this.props.onDragOver} onDragEnd={this.props.onDragEnd}>
+            <ui.VBox style={this.props.style}
+                    onMouseEnter={() => { this.titleBar.setState({ showControls: true }); }}
+                    onMouseLeave={() => { this.titleBar.setState({ showControls: false }); this.toolTip.setState({ showToolTip: false }); }}
+                    onDragOver={this.props.onDragOver}
+                    onDragEnd={this.props.onDragEnd}>
                 <TitleBar ref={(c:React.Component<ITitleBarProps, ITitleBarState>) => { this.titleBar = c; } }
                           onDragStart={this.props.onDragStart}
                           titleBarHeight={this.titleBarHeight}
