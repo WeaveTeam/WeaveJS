@@ -25,6 +25,7 @@ interface PathConfig {
 export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
     protected toolPath:WeavePath;
+    protected plotManagerPath:WeavePath;
     protected element:HTMLElement;
     protected paths:IToolPaths;
     protected chart:ChartAPI;
@@ -36,6 +37,7 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     constructor(props:IVisToolProps) {
         super(props);
         this.toolPath = props.toolPath;
+        this.plotManagerPath = this.toolPath.push(["children","visualization","plotManager"]);
         this.paths = {};
     }
 
