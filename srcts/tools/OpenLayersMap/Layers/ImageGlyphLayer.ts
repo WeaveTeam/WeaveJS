@@ -32,7 +32,7 @@ class ImageGlyphLayer extends GlyphLayer {
 
 	}
 
-	setIconStyle(feature, img, iconSize)
+	setIconStyle(feature:ol.Feature, img, iconSize: number)
 	{
 		let styles:any = {};
 
@@ -42,9 +42,16 @@ class ImageGlyphLayer extends GlyphLayer {
 			return;
 		}
 
-		let maxDim = Math.max(img.naturalHeight, img.naturalWidth);
-
-		let scale = iconSize / maxDim;
+		let maxDim: number = Math.max(img.naturalHeight, img.naturalWidth);
+		let scale: number;
+		if (isNaN(iconSize))
+		{
+			scale = 1;
+		}
+		else
+		{
+			scale = iconSize / maxDim;
+		}
 
 		let imgSize = [img.naturalWidth, img.naturalHeight];
 
@@ -87,7 +94,7 @@ class ImageGlyphLayer extends GlyphLayer {
 				continue;
 			}
 
-			let imageSize = Number(record.imageSize);
+			let imageSize = Number(record.imageSize || NaN);
 			let color = FeatureLayer.toColorRGBA(record.color, record.alpha);
 
 			if (!record.imageURL)
