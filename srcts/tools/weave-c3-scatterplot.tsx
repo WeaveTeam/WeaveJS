@@ -539,7 +539,10 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         if(!this.chart || this.busy)
             return StandardLib.debounce(this, 'loadData');
         this.chart.load({data: _.pluck(this.numericRecords, "point"), unload: true});
-
+        //after data is loaded we need to remove the clip-path so that points are not
+        // clipped when rendered near edge of chart
+        //TODO: determine if adding padding to axes range will further improve aesthetics of chart
+        this.chart.internal.main.select('.c3-chart').attr('clip-path',null);
     }
 }
 export default WeaveC3ScatterPlot;
