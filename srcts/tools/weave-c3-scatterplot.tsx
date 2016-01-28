@@ -529,7 +529,7 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
             var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
             var xLabelsToShow:number = Math.floor(width / textHeight);
             xLabelsToShow = Math.max(2,xLabelsToShow);
-            this.c3Config.axis.x.tick.count = xLabelsToShow;
+            this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
         }
 
         if (changeDetected || forced)
