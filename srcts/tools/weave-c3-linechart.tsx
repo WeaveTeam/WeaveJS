@@ -198,9 +198,13 @@ class WeaveC3LineChart extends AbstractC3Tool {
 
 	}
 
-    _selectionKeysChanged() {
+    private updateStyle() {
         if(!this.chart)
             return;
+
+        d3.select(this.element).selectAll("circle").style("opacity", 1)
+            .style("stroke", "black")
+            .style("stroke-opacity", 0.0);
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
         var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
@@ -217,6 +221,22 @@ class WeaveC3LineChart extends AbstractC3Tool {
 
         var unselectedIndices = _.difference(indices, selectedIndices);
         unselectedIndices = _.difference(unselectedIndices,probedIndices);
+        if(probedIndices.length){
+            //unfocus all circles
+            //d3.select(this.element).selectAll("circle").filter(".c3-shape").style({opacity: 0.1, "stroke-opacity": 0.0});
+
+            var filtered = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape");
+            probedIndices.forEach( (index:number) => {
+                //custom style for circles on probed lines
+                var circleCount:number = filtered[index] ? filtered[index].length : 0;
+                var probedCircles:number[] = _.range(0,circleCount);
+                probedCircles.forEach( (i:number) => {
+                    (filtered[index][i] as HTMLElement).style.opacity = "1.0";
+                    (filtered[index][i] as HTMLElement).style.strokeOpacity = "0.0";
+                });
+            });
+            this.customStyle(probedIndices, "path", ".c3-shape.c3-line", {opacity: 1.0});
+        }
         if(selectedIndices.length) {
             //unfocus all circles
             d3.select(this.element).selectAll("circle").filter(".c3-shape").style("opacity", "0.1");
@@ -241,46 +261,6 @@ class WeaveC3LineChart extends AbstractC3Tool {
             this.customStyle(indices, "path", ".c3-shape.c3-line", {opacity: 1.0});
             this.chart.select(["y"], [], true);
         }
-    }
-
-    _probedKeysChanged() {
-        var selectedKeys:string[] = this.toolPath.probe_keyset.getKeys();
-        var selectedIndices:number[] = selectedKeys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-        var keys:string[] = Object.keys(this.keyToIndex);
-        var indices:number[] = keys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-        var unselectedIndices:number[] = _.difference(indices, selectedIndices);
-
-        if (selectedIndices.length) {
-            //unfocus all circles
-            d3.select(this.element).selectAll("circle").filter(".c3-shape").style({opacity: 0.1, "stroke-opacity": 0.0});
-
-            var filtered = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape");
-            selectedIndices.forEach( (index:number) => {
-                //custom style for circles on probed lines
-                var circleCount:number = filtered[index] ? filtered[index].length : 0;
-                var selectedCircles:number[] = _.range(0,circleCount);
-                selectedCircles.forEach( (i:number) => {
-                    (filtered[index][i] as HTMLElement).style.opacity = "1.0";
-                    (filtered[index][i] as HTMLElement).style.strokeOpacity = "0.0";
-                });
-            });
-
-            this.customStyle(unselectedIndices, "path", ".c3-shape.c3-line", {opacity: 0.1});
-            this.customStyle(selectedIndices, "path", ".c3-shape.c3-line", {opacity: 1.0});
-            this._selectionKeysChanged();
-        } else {
-            this._selectionKeysChanged();
-        }
-    }
-
-    private updateStyle() {
-        d3.select(this.element).selectAll("circle").style("opacity", 1)
-            .style("stroke", "black")
-            .style("stroke-opacity", 0.0);
     }
 
     private dataChanged() {
@@ -378,8 +358,6 @@ class WeaveC3LineChart extends AbstractC3Tool {
 
     componentDidMount() {
         this.element.addEventListener("click", this.handleClick.bind(this));
-        var selectionKeySetChanged:Function = this._selectionKeysChanged.bind(this);
-        var probeKeySetChanged:Function = _.debounce(this._probedKeysChanged.bind(this), 100);
 
         var plotterPath:WeavePath = this.toolPath.pushPlotter("plot");
         var mapping = [
@@ -392,8 +370,8 @@ class WeaveC3LineChart extends AbstractC3Tool {
             { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
             { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
+            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
         ];
 
         this.initializePaths(mapping);
