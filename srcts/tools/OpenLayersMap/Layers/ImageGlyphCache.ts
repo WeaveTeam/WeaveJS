@@ -112,13 +112,14 @@ class ImageGlyphCache {
 		{
 			image = new Image();
 			weavejs.WeaveAPI.URLRequestUtils.request(this, {url, responseType: "datauri", mimeType: ""}).then(
-				function (dataUri)
+				(dataUri) =>
 				{
 					this.requestDataUrl(dataUri, color, function (dataUrl) {
 						image.src = dataUrl;
 					})
 				}
 			)
+			this.imageMap.set(url, color, image);
 		}
 
 		return image;

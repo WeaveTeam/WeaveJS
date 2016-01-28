@@ -22,7 +22,9 @@ class ImageGlyphLayer extends GlyphLayer {
 		this.imageGlyphCache = new ImageGlyphCache();
 
 		this.layerPath.push("imageSize").addCallback(this, this.updateStyleData);
-		this.layerPath.push("imageURL").addCallback(this, this.updateStyleData, true);
+		this.layerPath.push("imageURL").addCallback(this, this.updateStyleData);
+		this.layerPath.push("alpha").addCallback(this, this.updateStyleData);
+		this.layerPath.push("color").addCallback(this, this.updateStyleData, true);
 	}
 
 	handleMissingSessionStateProperties(newState) 
