@@ -32,6 +32,10 @@ interface IScatterplotPaths extends IToolPaths {
     sizeBy: WeavePath;
     fill: WeavePath;
     line: WeavePath;
+    marginTop: WeavePath;
+    marginBottom: WeavePath;
+    marginLeft: WeavePath;
+    marginRight: WeavePath;
     xAxis: WeavePath;
     yAxis: WeavePath;
     filteredKeySet: WeavePath;
@@ -84,7 +88,9 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
             bindto: null,
             padding: {
                 top: 20,
-                bottom: 20
+                bottom: 0,
+                left:100,
+                right:20
             },
             data: {
                 rows: [],
@@ -322,7 +328,7 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
 
-        if(this.c3ConfigYAxis.show == false) {
+        if(weavejs.WeaveAPI.Locale.reverseLayout) {
             this.records = this.records.reverse();
         }
 
@@ -411,15 +417,10 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
     }
 
     componentDidUpdate() {
-        //console.log("resizing");
-        //var start = Date.now();
         if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
-            this.c3Config.axis.x.height = this.props.style.height * 0.2;
             this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-            //this.chart = generate(this.c3Config);
             this.validate(true);
         }
-        //var end = Date.now();
     }
 
     componentWillUnmount() {
@@ -441,6 +442,10 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
             { name: "line", path: plotterPath.push("line") },
             { name: "xAxis", path: this.toolPath.pushPlotter("xAxis") },
             { name: "yAxis", path: this.toolPath.pushPlotter("yAxis") },
+            { name: "marginBottom", path: this.plotManagerPath.push("marginBottom") },
+            { name: "marginLeft", path: this.plotManagerPath.push("marginLeft") },
+            { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
+            { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
             { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
             { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
@@ -451,8 +456,6 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.dataX.getObject(), this.paths.dataY.getObject()]);
 
         this.c3Config.bindto = this.element;
-        this.c3Config.axis.x.height = this.props.style.height * 0.2;
-
         this.validate(true);
     }
 
@@ -466,7 +469,7 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         this.dirty = false;
 
         var changeDetected:boolean = false;
-        var axisChange:boolean = this.detectChange('dataX', 'dataY');
+        var axisChange:boolean = this.detectChange('dataX', 'dataY', 'marginBottom', 'marginTop', 'marginLeft', 'marginRight');
         var axisSettingsChange:boolean = this.detectChange('xAxis', 'yAxis');
         if (axisChange || this.detectChange('plotter', 'sizeBy', 'fill', 'line','filteredKeySet'))
         {
@@ -489,10 +492,7 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
                     this.c3Config.data.axes = {[temp]:'y2'};
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
-                    this.c3Config.padding.left = 20;
-                    this.c3Config.padding.right = undefined;
-                    if(this.c3Config.axis.x.tick.rotate)
-                        this.c3Config.axis.x.tick.rotate = 45;
+                    this.c3Config.axis.x.tick.rotate = 45;
                 }
                 else
                 {
@@ -500,11 +500,21 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
                     this.c3Config.data.axes = {[temp]:'y'};
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
-                    this.c3Config.padding.left = undefined;
-                    this.c3Config.padding.right = 20;
-                    if(this.c3Config.axis.x.tick.rotate)
-                        this.c3Config.axis.x.tick.rotate = -45;
+                    this.c3Config.axis.x.tick.rotate = -45;
                 }
+            }
+
+            this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
+            this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
+
+            this.c3Config.padding.top = Number(this.paths.marginTop.getState());
+            this.c3Config.axis.x.height = Number(this.paths.marginBottom.getState());
+            if(weavejs.WeaveAPI.Locale.reverseLayout){
+                this.c3Config.padding.left = Number(this.paths.marginRight.getState());
+                this.c3Config.padding.right = Number(this.paths.marginLeft.getState());
+            }else{
+                this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
+                this.c3Config.padding.right = Number(this.paths.marginRight.getState());
             }
 
             // axis label culling requires this.chart.internal.width
@@ -516,10 +526,6 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
                 xLabelsToShow = Math.max(2,xLabelsToShow);
                 this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
             }
-
-            this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
-            this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
-
         }
         if (changeDetected || forced)
         {

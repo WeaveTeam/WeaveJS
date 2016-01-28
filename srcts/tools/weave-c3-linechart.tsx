@@ -24,6 +24,10 @@ interface ILineChartPaths extends IToolPaths {
     columns: WeavePath;
     lineStyle: WeavePath;
     curveType: WeavePath;
+    marginTop: WeavePath;
+    marginBottom: WeavePath;
+    marginLeft: WeavePath;
+    marginRight: WeavePath;
     filteredKeySet: WeavePath;
     selectionKeySet: WeavePath;
     probeKeySet: WeavePath;
@@ -83,7 +87,9 @@ class WeaveC3LineChart extends AbstractC3Tool {
             },
             padding: {
                 top: 20,
-                bottom: 20
+                bottom: 0,
+                left:100,
+                right:20
             },
             data: {
                 columns: [],
@@ -163,7 +169,7 @@ class WeaveC3LineChart extends AbstractC3Tool {
                         multiline: false,
                         rotate: -45,
                         format: (d:number):string => {
-                            if(this.c3ConfigYAxis.show == false){
+                            if(weavejs.WeaveAPI.Locale.reverseLayout){
                                 //handle case where labels need to be reversed
                                 var temp:number = this.columnLabels.length-1;
                                 return this.columnLabels[temp-d];
@@ -351,7 +357,7 @@ class WeaveC3LineChart extends AbstractC3Tool {
             this.chartType = "spline";
         }
 
-        if(this.c3ConfigYAxis.show == false){
+        if(weavejs.WeaveAPI.Locale.reverseLayout){
             this.columns.forEach( (column:any[], index:number, array:any) => {
                 var temp:any[] = [];
                 temp.push(column.shift());
@@ -381,6 +387,10 @@ class WeaveC3LineChart extends AbstractC3Tool {
             { name: "columns", path: plotterPath.push("columns") },
             { name: "lineStyle", path: plotterPath.push("lineStyle") },
             { name: "curveType", path: plotterPath.push("curveType") },
+            { name: "marginBottom", path: this.plotManagerPath.push("marginBottom") },
+            { name: "marginLeft", path: this.plotManagerPath.push("marginLeft") },
+            { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
+            { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
             { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: selectionKeySetChanged},
             { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: probeKeySetChanged}
@@ -391,10 +401,6 @@ class WeaveC3LineChart extends AbstractC3Tool {
        	this.paths.filteredKeySet.getObject().setColumnKeySources(this.paths.columns.getObject().getObjects());
 
         this.c3Config.bindto = this.element;
-        if(this.paths.columns.getState().length){
-            this.c3Config.axis.x.height = this.props.style.height * 0.2;
-        }
-
         this.validate(true);
     }
 
@@ -406,14 +412,10 @@ class WeaveC3LineChart extends AbstractC3Tool {
     }
 
     componentDidUpdate() {
-        // TODO avoid calling generate at each componentDidUpdate
-        this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-        if(this.paths.columns.getState().length){
-            this.c3Config.axis.x.height = this.props.style.height * 0.2;
-        }else{
-            this.c3Config.axis.x.height = null;
+        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
+            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
+            this.validate(true);
         }
-        this.validate(true);
     }
 
     validate(forced:boolean = false):void
@@ -450,10 +452,7 @@ class WeaveC3LineChart extends AbstractC3Tool {
                     this.c3Config.data.axes = temp;
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
-                    this.c3Config.padding.left = 20;
-                    this.c3Config.padding.right = undefined;
-                    if(this.c3Config.axis.x.tick.rotate)
-                        this.c3Config.axis.x.tick.rotate = 45;
+                    this.c3Config.axis.x.tick.rotate = 45;
                 }
                 else
                 {
@@ -463,11 +462,21 @@ class WeaveC3LineChart extends AbstractC3Tool {
                     this.c3Config.data.axes = temp;
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
-                    this.c3Config.padding.left = undefined;
-                    this.c3Config.padding.right = 20;
-                    if(this.c3Config.axis.x.tick.rotate)
-                        this.c3Config.axis.x.tick.rotate = -45;
+                    this.c3Config.axis.x.tick.rotate = -45;
                 }
+            }
+
+            this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
+            this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
+
+            this.c3Config.padding.top = Number(this.paths.marginTop.getState());
+            this.c3Config.axis.x.height = Number(this.paths.marginBottom.getState());
+            if(weavejs.WeaveAPI.Locale.reverseLayout){
+                this.c3Config.padding.left = Number(this.paths.marginRight.getState());
+                this.c3Config.padding.right = Number(this.paths.marginLeft.getState());
+            }else{
+                this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
+                this.c3Config.padding.right = Number(this.paths.marginRight.getState());
             }
 
             // axis label culling requires this.chart.internal.width
@@ -479,9 +488,6 @@ class WeaveC3LineChart extends AbstractC3Tool {
                 xLabelsToShow = Math.max(2,xLabelsToShow);
                 this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
             }
-
-            this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
-            this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
         }
         if (changeDetected || forced)

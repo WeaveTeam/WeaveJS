@@ -571,8 +571,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
                     this.c3Config.data.axes = temp;
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
-                    this.c3Config.padding.left = 20;
-                    this.c3Config.padding.right = 100;
                     this.c3Config.axis.x.tick.rotate = 45;
                 }
                 else
@@ -583,8 +581,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
                     this.c3Config.data.axes = temp;
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
-                    this.c3Config.padding.left = 100;
-                    this.c3Config.padding.right = 20;
                     this.c3Config.axis.x.tick.rotate = -45;
                 }
             }
