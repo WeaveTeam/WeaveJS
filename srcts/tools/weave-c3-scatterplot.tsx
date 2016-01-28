@@ -373,6 +373,10 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         this.flag = false;
     }
 
+    get internalWidth():number {
+        return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
+    }
+
     updateStyle()
     {
     	if (!this.chart || !this.dataXType)
@@ -516,17 +520,18 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
                 this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
                 this.c3Config.padding.right = Number(this.paths.marginRight.getState());
             }
-
-            // axis label culling requires this.chart.internal.width
-            if (this.chart)
-            {
-                var width:number = this.chart.internal.width;
-                var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
-                var xLabelsToShow:number = Math.floor(width / textHeight);
-                xLabelsToShow = Math.max(2,xLabelsToShow);
-                this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
-            }
         }
+
+        // axis label culling requires this.chart.internal.width
+        if (this.chart)
+        {
+            var width:number = this.internalWidth;
+            var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
+            var xLabelsToShow:number = Math.floor(width / textHeight);
+            xLabelsToShow = Math.max(2,xLabelsToShow);
+            this.c3Config.axis.x.tick.count = xLabelsToShow;
+        }
+
         if (changeDetected || forced)
         {
             this.busy = true;
