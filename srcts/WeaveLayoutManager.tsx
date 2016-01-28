@@ -20,7 +20,7 @@ import WeaveC3Histogram from "./tools/weave-c3-histogram";
 import SessionStateMenuTool from "./tools/weave-session-state-menu";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import WeaveReactTable from "./tools/weave-react-table";
-
+import DataFilterTool from "./tools/DataFilterTool";
 // Temporary solution
 // because typescript removes
 // unused imports
@@ -34,7 +34,8 @@ var v1:any = [
 	WeaveC3Histogram,
 	SessionStateMenuTool,
 	WeaveOpenLayersMap,
-	WeaveReactTable
+	WeaveReactTable,
+	DataFilterTool
 ];
 ///////////////////////////////
 
@@ -86,7 +87,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
     private prevClientHeight:number;
     private throttledForceUpdate:() => void;
     private throttledForceUpdateTwice:() => void;
-    
+
     constructor(props:IWeaveLayoutManagerProps) {
         super(props);
         this.weave = this.props.weave || new Weave();
@@ -98,7 +99,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 
     componentDidMount():void {
         this.savePrevClientSize();
-        
+
         window.addEventListener("resize", this.throttledForceUpdateTwice);
         this.weave.root.childListCallbacks.addGroupedCallback(this, this.throttledForceUpdate, true);
         this.weave.path(LAYOUT).addCallback(this, this.throttledForceUpdate, true);
@@ -113,14 +114,14 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 
     componentDidUpdate():void {
         this.savePrevClientSize();
-        
+
         if(Weave.detectChange(this, this.weave.getObject(LAYOUT)) || this.dirty) {
             // dirty flag to trigger render on window resize
             this.dirty = false;
             this.throttledForceUpdate();
         }
     }
-    
+
     frameHandler()
     {
         var node:Element = ReactDOM.findDOMNode(this);
@@ -128,7 +129,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
             this.throttledForceUpdateTwice();
         this.savePrevClientSize();
     }
-    
+
     savePrevClientSize()
     {
         var node:Element = ReactDOM.findDOMNode(this);

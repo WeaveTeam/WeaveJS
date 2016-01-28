@@ -15,7 +15,6 @@ import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/tooltip";
 import {IToolTipProps, IToolTipState} from "./tools/tooltip";
-import Slider from "./react-ui/BootstrapSlider/BoostrapSlider";
 
 const toolRegistry:{[name:string]: Function} = {};
 
@@ -113,9 +112,6 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
                 {
                     <div style={{width: toolWidth, height: toolHeight}}>
                         <div style={{width: "100%", height: "100%", maxHeight: "100%"}}>
-                            {/*}<ui.HSlider min={0} max={100} step={10} value={20} onChange={(event:React.FormEvent) => { console.log(event.target["value"]);}}/>
-                            <ui.VSlider min={0} max={100} step={1} value={10}/>*/}
-                            <Slider/>
                             {
                                 reactTool
                             }
