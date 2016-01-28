@@ -16,15 +16,11 @@ import * as React from "react";
 import {ChartAPI, ChartConfiguration, generate} from "c3";
 
 interface IPieChartPaths extends IToolPaths {
-    plotter: WeavePath;
     data: WeavePath;
     label: WeavePath;
     fillStyle:WeavePath;
     lineStyle:WeavePath;
     innerRadius:WeavePath;
-    filteredKeySet:WeavePath;
-    selectionKeySet:WeavePath;
-    probeKeySet:WeavePath;
 };
 
 export default class WeaveC3PieChart extends AbstractC3Tool {

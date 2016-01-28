@@ -22,7 +22,6 @@ import StandardLib from "../utils/StandardLib";
 /* global Weave, weavejs */
 
 interface IBarchartPaths extends IToolPaths {
-    plotter: WeavePath;
     heightColumns: WeavePath;
     labelColumn: WeavePath;
     sortColumn: WeavePath;
@@ -31,15 +30,6 @@ interface IBarchartPaths extends IToolPaths {
     groupingMode: WeavePath;
     horizontalMode: WeavePath;
     showValueLabels: WeavePath;
-    marginTop: WeavePath;
-    marginBottom: WeavePath;
-    marginLeft: WeavePath;
-    marginRight: WeavePath;
-    xAxis: WeavePath;
-    yAxis: WeavePath;
-    filteredKeySet: WeavePath;
-    selectionKeySet: WeavePath;
-    probeKeySet: WeavePath;
 }
 
 
@@ -441,10 +431,6 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.c3Config.data = data;
     }
 
-    get internalWidth():number {
-        return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
-    }
-
     updateStyle() {
     	if(!this.chart || !this.heightColumnNames)
     		return;
@@ -610,20 +596,11 @@ class WeaveC3Barchart extends AbstractC3Tool {
             this.showValueLabels = this.paths.showValueLabels.getState();
         }
 
-        // axis label culling requires this.chart.internal.width
-        if (this.chart)
-        {
-            var width:number = this.internalWidth;
-            var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
-            var xLabelsToShow:number = Math.floor(width / textHeight);
-            xLabelsToShow = Math.max(2,xLabelsToShow);
-            this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
-        }
-
         if (changeDetected || forced)
         {
             this.busy = true;
             this.chart = c3.generate(this.c3Config);
+            this.cullAxes();
         }
     }
 }

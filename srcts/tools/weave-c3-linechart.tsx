@@ -20,18 +20,10 @@ import Tooltip from "./tooltip";
 import StandardLib from "../utils/StandardLib";
 
 interface ILineChartPaths extends IToolPaths {
-    plotter: WeavePath;
     columns: WeavePath;
     lineStyle: WeavePath;
     curveType: WeavePath;
-    marginTop: WeavePath;
-    marginBottom: WeavePath;
-    marginLeft: WeavePath;
-    marginRight: WeavePath;
     overrideYMax: WeavePath;
-    filteredKeySet: WeavePath;
-    selectionKeySet: WeavePath;
-    probeKeySet: WeavePath;
 }
 
 class WeaveC3LineChart extends AbstractC3Tool {
@@ -198,10 +190,6 @@ class WeaveC3LineChart extends AbstractC3Tool {
 	{
 
 	}
-
-    get internalWidth():number {
-        return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
-    }
 
     private updateStyle() {
         if(!this.chart)
@@ -466,21 +454,12 @@ class WeaveC3LineChart extends AbstractC3Tool {
             this.c3Config.axis.y.max = this.paths.overrideYMax.getState();
         }
 
-        // axis label culling requires this.chart.internal.width
-        if (this.chart)
-        {
-            var width:number = this.internalWidth;
-            var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
-            var xLabelsToShow:number = Math.floor(width / textHeight);
-            xLabelsToShow = Math.max(2,xLabelsToShow);
-            this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
-        }
-
         if (changeDetected || forced)
         {
             this.busy = true;
             this.chart = c3.generate(this.c3Config);
             this.loadData();
+            this.cullAxes();
         }
     }
 

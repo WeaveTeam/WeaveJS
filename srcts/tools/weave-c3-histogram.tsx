@@ -21,21 +21,11 @@ import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 
 interface IHistogramPaths extends IToolPaths {
-    plotter: WeavePath;
     binnedColumn: WeavePath;
     columnToAggregate: WeavePath;
     aggregationMethod: WeavePath;
     fillStyle: WeavePath;
     lineStyle: WeavePath;
-    marginTop: WeavePath;
-    marginBottom: WeavePath;
-    marginLeft: WeavePath;
-    marginRight: WeavePath;
-    xAxis: WeavePath;
-    yAxis: WeavePath;
-    filteredKeySet: WeavePath;
-    selectionKeySet: WeavePath;
-    probeKeySet: WeavePath;
 }
 
 class WeaveC3Histogram extends AbstractC3Tool {
@@ -269,10 +259,6 @@ class WeaveC3Histogram extends AbstractC3Tool {
         }
     }
 
-    get internalWidth():number {
-        return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
-    }
-
     updateStyle() {
     	if (!this.chart)
     		return;
@@ -495,16 +481,6 @@ class WeaveC3Histogram extends AbstractC3Tool {
             }
         }
 
-        // axis label culling requires this.chart.internal.width
-        if (this.chart)
-        {
-            var width:number = this.internalWidth;
-            var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
-            var xLabelsToShow:number = Math.floor(width / textHeight);
-            xLabelsToShow = Math.max(2,xLabelsToShow);
-            this.c3Config.axis.x.tick.culling = {max: xLabelsToShow};
-        }
-
         if (changeDetected || forced)
         {
             this.busy = true;
@@ -516,7 +492,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
     loadData() {
         if(!this.chart || this.busy)
             return StandardLib.debounce(this, 'loadData');
-        this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; }});
+        this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; this.cullAxes();}});
     }
 }
 
