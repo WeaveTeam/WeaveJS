@@ -102,6 +102,8 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.pan = new PanCluster();
 		this.zoomExtent = new CustomZoomToExtent({ label: jquery("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0]});
 
+		jquery(this.element).find("canvas.ol-unselectable").attr("tabIndex", 1024); /* Hack to make the canvas focusable. */
+
 		this.map.addControl(this.zoomButtons);
 
 		this.toolPath.push("showZoomControls").addCallback(this, this.updateEnableZoomControl_weaveToOl, true);
