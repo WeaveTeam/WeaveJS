@@ -1289,7 +1289,7 @@ declare module ol {
         /**
          * @returns Id.
          */
-        getId(): string | number;
+        getId(): any;
 
         /**
          * Get the feature's style. This return for this method depends on what was provided to the ol.Feature#setStyle method.
@@ -1319,13 +1319,7 @@ declare module ol {
          * Set the feature id. The feature id is considered stable and may be used when requesting features or comparing identifiers returned from a remote source. The feature id can be used with the ol.source.Vector#getFeatureById method.
          * @param id The feature id.
          */
-        setId(id: number): void;
-
-        /**
-         * Set the feature id. The feature id is considered stable and may be used when requesting features or comparing identifiers returned from a remote source. The feature id can be used with the ol.source.Vector#getFeatureById method.
-         * @param id The feature id.
-         */
-        setId(id: string): void;
+        setId(id: any): void;
 
         /**
          * Set the style for the feature. This can be a single style object, an array of styles, or a function that takes a resolution and returns an array of styles. If it is null the feature has no style (a null style).
@@ -4149,7 +4143,7 @@ declare module ol {
 
           removeFeature(feature:ol.Feature):void;
 
-          getFeatureById(id:string|number):ol.Feature;
+          getFeatureById(id:any):ol.Feature;
         }
 
         class VectorEvent {
