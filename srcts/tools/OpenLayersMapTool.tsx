@@ -104,8 +104,8 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 		this.map.addControl(this.zoomButtons);
 
-		this.toolPath.push("showZoomControls").addCallback(this, this.onZoomControlToggle, true);
-		this.toolPath.push("showMouseModeControls").addCallback(this, this.onMouseModeControlToggle, true);
+		this.toolPath.push("showZoomControls").addCallback(this, this.updateEnableZoomControl_weaveToOl, true);
+		this.toolPath.push("showMouseModeControls").addCallback(this, this.updateEnableMouseModeControl_weaveToOl, true);
 
 		this.mouseModeButtons = new InteractionModeCluster({interactionModePath: this.interactionModePath});
 
@@ -116,9 +116,9 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 		for (let extreme of ["Min", "Max"])
 			for (let axis of ["X", "Y"])
-				this.plotManager.push("override" + axis + extreme).addCallback(this, this.onViewParametersChanged);
+				this.plotManager.push("override" + axis + extreme).addCallback(this, this.updateViewParameters_weaveToOl);
 
-		this.toolPath.push("projectionSRS").addCallback(this, this.onViewParametersChanged, true);
+		this.toolPath.push("projectionSRS").addCallback(this, this.updateViewParameters_weaveToOl, true);
 
 
 		this.plottersPath = this.plotManager.push("plotters");
@@ -126,11 +126,11 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.zoomBoundsPath = this.plotManager.push("zoomBounds");
 
 		this.plotManager.addCallback(this, this.requestDetail, true);
-		this.plottersPath.getObject().childListCallbacks.addImmediateCallback(this, this.plottersChanged, true);
-		this.zoomBoundsPath.addCallback(this, this.getSessionCenter, true);
+		this.plottersPath.getObject().childListCallbacks.addImmediateCallback(this, this.updatePlotters_weaveToOl, true);
+		this.zoomBoundsPath.addCallback(this, this.updateZoomAndCenter_weaveToOl, true);
 	}
 
-	onViewParametersChanged():void
+	updateViewParameters_weaveToOl():void
 	{
 		let extent = [];
 
@@ -147,11 +147,11 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		let view = new ol.View({projection, extent});
 		view.set("extent", extent);
 
-		this.centerCallbackHandle = view.on("change:center", this.setSessionCenter, this);
-		this.resolutionCallbackHandle = view.on("change:resolution", this.setSessionZoom, this);
+		this.centerCallbackHandle = view.on("change:center", this.updateCenter_olToWeave, this);
+		this.resolutionCallbackHandle = view.on("change:resolution", this.updateZoom_olToWeave, this);
 		this.map.setView(view);
 
-		this.getSessionCenter();
+		this.updateZoomAndCenter_weaveToOl();
 	}
 
 	componentDidUpdate():void
@@ -180,7 +180,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 	}
 
 
-	onMouseModeControlToggle():void
+	updateEnableMouseModeControl_weaveToOl():void
 	{
 		let showMouseModeControls = this.toolPath.push("showMouseModeControls").getState();
 		if (showMouseModeControls)
@@ -195,7 +195,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 	}
 
 
-	onZoomControlToggle():void
+	updateEnableZoomControl_weaveToOl():void
 	{
 		let showZoomControls = this.toolPath.push("showZoomControls").getState();
 		if (showZoomControls)
@@ -213,7 +213,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.updateControlPositions();
 	}
 
-	setSessionCenter():void
+	updateCenter_olToWeave():void
 	{
 		var [xCenter, yCenter] = this.map.getView().getCenter();
 
@@ -226,9 +226,20 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		zoomBounds.setDataBounds(dataBounds);
 	}
 
-	setSessionZoom():void
+	updateZoom_olToWeave():void
 	{
-		var resolution = this.map.getView().getResolution();
+		let view = this.map.getView();
+		var resolution = view.getResolution();
+
+		/* If the resolution is being set between constrained levels, 
+		 * odds are good that this is the result of a slider manipulation.
+		 * While the user is dragging the slider, we shouldn't update the
+		 * session state, because this will trigger reconstraining the 
+		 * resolution, which will lead to it feeling "jerky" */
+		if (resolution != view.constrainResolution(resolution))
+		{
+			return;
+		}
 
 		var zoomBounds = this.zoomBoundsPath.getObject();
 
@@ -242,7 +253,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		zoomBounds.setDataBounds(dataBounds);
 	}
 
-	getSessionCenter():void
+	updateZoomAndCenter_weaveToOl():void
 	{
 		var zoomBounds = this.zoomBoundsPath.getObject();
 		var dataBounds = new weavejs.geom.Bounds2D();
@@ -251,15 +262,15 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		var scale = zoomBounds.getXScale();
 		let view = this.map.getView();
 		
-		view.un("change:center", this.setSessionCenter, this);
-		view.un("change:resolution", this.setSessionZoom, this);
+		view.un("change:center", this.updateCenter_olToWeave, this);
+		view.un("change:resolution", this.updateZoom_olToWeave, this);
 
 		view.setCenter(center);
 		view.setResolution(view.constrainResolution(1 / scale));
 
 		lodash.defer(() => {
-			view.on("change:center", this.setSessionCenter, this);
-			view.on("change:resolution", this.setSessionZoom, this);
+			view.on("change:center", this.updateCenter_olToWeave, this);
+			view.on("change:resolution", this.updateZoom_olToWeave, this);
 		});
 	}
 	
@@ -288,7 +299,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		}
 	}
 
-	plottersChanged():void
+	updatePlotters_weaveToOl():void
 	{
 		var oldNames = Array.from(this.layers.keys());
 		var newNames = this.plottersPath.getNames();
