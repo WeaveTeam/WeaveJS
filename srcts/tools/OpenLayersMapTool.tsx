@@ -249,16 +249,17 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		zoomBounds.getDataBounds(dataBounds);
 		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
 		var scale = zoomBounds.getXScale();
+		let view = this.map.getView();
 		
-		this.map.getView().un("change:center", this.setSessionCenter, this);
-		this.map.getView().un("change:resolution", this.setSessionZoom, this);
+		view.un("change:center", this.setSessionCenter, this);
+		view.un("change:resolution", this.setSessionZoom, this);
 
-		this.map.getView().setCenter(center);
-		this.map.getView().setResolution(1 / scale);
+		view.setCenter(center);
+		view.setResolution(view.constrainResolution(1 / scale));
 
 		lodash.defer(() => {
-			this.map.getView().on("change:center", this.setSessionCenter, this);
-			this.map.getView().on("change:resolution", this.setSessionZoom, this);
+			view.on("change:center", this.setSessionCenter, this);
+			view.on("change:resolution", this.setSessionZoom, this);
 		});
 	}
 	
