@@ -28,6 +28,7 @@ interface ILineChartPaths extends IToolPaths {
     marginBottom: WeavePath;
     marginLeft: WeavePath;
     marginRight: WeavePath;
+    overrideYMax: WeavePath;
     filteredKeySet: WeavePath;
     selectionKeySet: WeavePath;
     probeKeySet: WeavePath;
@@ -373,6 +374,7 @@ class WeaveC3LineChart extends AbstractC3Tool {
             { name: "marginLeft", path: this.plotManagerPath.push("marginLeft") },
             { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
             { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
+            { name: "overrideYMax", path: this.plotManagerPath.push("overrideYMax") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
             { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
             { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
@@ -410,7 +412,7 @@ class WeaveC3LineChart extends AbstractC3Tool {
         this.dirty = false;
 
         var changeDetected:boolean = false;
-        var axisChange:boolean = this.detectChange('columns');
+        var axisChange:boolean = this.detectChange('columns', 'overrideYMax');
         if (axisChange || this.detectChange('plotter', 'curveType', 'lineStyle','filteredKeySet'))
         {
             changeDetected = true;
@@ -460,6 +462,8 @@ class WeaveC3LineChart extends AbstractC3Tool {
                 this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
                 this.c3Config.padding.right = Number(this.paths.marginRight.getState());
             }
+
+            this.c3Config.axis.y.max = this.paths.overrideYMax.getState();
         }
 
         // axis label culling requires this.chart.internal.width
