@@ -10,9 +10,20 @@ import {ChartAPI, ChartConfiguration} from "c3";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
+import StandardLib from "../utils/StandardLib";
 
 export interface IToolPaths {
-    [name:string] : WeavePath
+    [name:string] : WeavePath;
+    plotter: WeavePath;
+    marginTop: WeavePath;
+    marginBottom: WeavePath;
+    marginLeft: WeavePath;
+    marginRight: WeavePath;
+    xAxis: WeavePath;
+    yAxis: WeavePath;
+    filteredKeySet: WeavePath;
+    selectionKeySet: WeavePath;
+    probeKeySet: WeavePath;
 }
 
 
@@ -30,6 +41,9 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     protected paths:IToolPaths;
     protected chart:ChartAPI;
     protected c3Config:ChartConfiguration;
+    private xAxisClass:string;
+    private yAxisClass:string;
+    private y2AxisClass:string;
 
     private previousWidth:number;
     private previousHeight:number;
@@ -38,13 +52,55 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
         super(props);
         this.toolPath = props.toolPath;
         this.plotManagerPath = this.toolPath.push(["children","visualization","plotManager"]);
-        this.paths = {};
+        this.xAxisClass = "c3-axis-x";
+        this.yAxisClass = "c3-axis-y";
+        this.y2AxisClass = "c3-axis-y2";
+        this.paths = {
+            plotter: {},
+            marginTop: {},
+            marginBottom: {},
+            marginLeft: {},
+            marginRight: {},
+            xAxis: {},
+            yAxis: {},
+            filteredKeySet: {},
+            selectionKeySet: {},
+            probeKeySet: {}
+        };
     }
 
     get title():string {
        return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
     }
 
+    get internalWidth():number {
+        return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
+    }
+
+    get internalHeight():number {
+        return this.props.style.height - this.c3Config.padding.top - Number(this.paths.marginBottom.getState());
+    }
+
+    private cullAxis(axisSize:number, axisClass:string):void {
+        var intervalForCulling:number = this.getCullingInterval(axisSize,axisClass);
+        d3.select(this.element).selectAll('.' + axisClass + ' .tick text').each(function (e, index) {
+            if (index >= 0) {
+                d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
+            }
+        });
+    }
+
+    protected cullAxes() {
+        //cull axes
+        var width:number = this.internalWidth;
+        var height:number = this.internalHeight;
+        this.cullAxis(width, this.xAxisClass);
+        if(weavejs.WeaveAPI.Locale.reverseLayout) {
+            this.cullAxis(height, this.y2AxisClass);
+        }else{
+            this.cullAxis(height, this.yAxisClass);
+        }
+    }
 
     componentDidUpdate():void {
         if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
@@ -94,5 +150,22 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 
     detectChange(...pathNames):boolean {
         return Weave.detectChange.apply(Weave, [this].concat(pathNames.map(name => this.paths[name].getObject())));
+    }
+
+    getCullingInterval(size:number,axisClass:string):number {
+        //TODO: Get Actual browser font with JS
+        var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
+        var labelsToShow:number = Math.floor(size / textHeight);
+        labelsToShow = Math.max(2,labelsToShow);
+
+        var tickValues:number = d3.select(this.element).selectAll('.' + axisClass + ' .tick text').size();
+        var intervalForCulling:number;
+        for (var i:number = 1; i < tickValues; i++) {
+            if (tickValues / i < labelsToShow) {
+                intervalForCulling = i;
+                break;
+            }
+        }
+        return intervalForCulling;
     }
 }
