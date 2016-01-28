@@ -6,6 +6,8 @@ import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
+// This function generate and html string and is unsafe to use.
+// Create a react element instead.
 export function getTooltipContent(
                                     columnNamesToValue:{[columnName:string]: string|number},
                                     title?:string,
@@ -104,19 +106,19 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
     }
 
     render():JSX.Element {
-
         if(!(this.element && this.state.showToolTip)) {
             return <div ref={(c:HTMLElement) => { this.element = c }}></div>;
         } else {
+            var style:React.CSSProperties = _.clone(this.containerStyle);
             var tableRows:JSX.Element[] = [];
-            this.containerStyle.display = "block";
+            style.display = "block";
 
             var container:any = this.element.parentNode as Element;
             var rect:ClientRect = container.getBoundingClientRect();
             var left: number = window.pageXOffset + rect.left;
             var top: number = window.pageYOffset + rect.top;
-            this.containerStyle.left = this.state.x - left;
-            this.containerStyle.top = this.state.y - top;
+            style.left = this.state.x - left;
+            style.top = this.state.y - top;
 
             var columnNames:string[] = Object.keys(this.state.columnNamesToValue);
             if(columnNames.length) {
@@ -132,17 +134,17 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             }
 
             return (
-                <div style={this.containerStyle} ref={(c:HTMLElement) => { this.element = c }} className={this.tooltipContainerClass}>
-                <table className={this.toolTipClass}>
-                    <tbody>
-                        {
-                            <tr><th colSpan={2}>{this.state.title ? this.titleFormat(this.state.title): ""}</th></tr>
-                        }
-                        {
-                            tableRows
-                        }
-                    </tbody>
-                </table>
+                <div style={style} ref={(c:HTMLElement) => { this.element = c }} className={this.tooltipContainerClass}>
+                    <table className={this.toolTipClass}>
+                        <tbody>
+                            {
+                                <tr><th colSpan={2}>{this.state.title ? this.titleFormat(this.state.title): ""}</th></tr>
+                            }
+                            {
+                                tableRows
+                            }
+                        </tbody>
+                    </table>
                 </div>
             )
         }
