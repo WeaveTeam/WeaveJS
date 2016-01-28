@@ -18,7 +18,7 @@ abstract class GlyphLayer extends FeatureLayer {
 		this.layerPath.push("dataX").addCallback(this, this.updateLocations);
 		this.layerPath.push("dataY").addCallback(this, this.updateLocations, true);
 
-		this.filteredKeySet.getObject().setColumnKeySources([this.layerPath.push("dataX").getObject(), this.layerPath.push("dataY").getObject()]);
+		(<any>this.filteredKeySet).setColumnKeySources([this.layerPath.push("dataX").getObject(), this.layerPath.push("dataY").getObject()]);
 	}
 
 	_getFeatureIds() {

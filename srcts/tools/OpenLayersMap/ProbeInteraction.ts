@@ -14,9 +14,9 @@ declare var weavejs:any;
 
 export default class ProbeInteraction extends ol.interaction.Pointer
 {
-	private topKeyString: string;
+	private topKey: IQualifiedKey;
 	private topZIndex: number;
-	private topKeySet: any;
+	private topKeySet: KeySet;
 	private topLayer: FeatureLayer;
 	private tool: OpenLayersMapTool;
 
@@ -42,9 +42,9 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		if (zIndex > this.topZIndex)
 		{
 			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
-			this.topKeySet = weaveLayerObject.probeKeySet && weaveLayerObject.probeKeySet.getObject() || this.topKeySet;
+			this.topKeySet = weaveLayerObject.probeKeySet || this.topKeySet;
 			this.topZIndex = zIndex;
-			this.topKeyString = feature.getId().toString();
+			this.topKey = feature.getId();
 			this.topLayer = weaveLayerObject;
 		}
 	}
@@ -61,31 +61,29 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		this.topKeySet = null;
 		this.topZIndex = -Infinity;
 		this.topLayer = null;
-		this.topKeyString = null;
-		let topKey: any /*IQualifiedKey */;
+		this.topKey = null;
 		
 		map.forEachFeatureAtPixel(pixel, this.onFeatureAtPixel, this, ProbeInteraction.layerFilter);
 
 
 
-		if (this.topKeyString && this.topKeySet)
+		if (this.topKey && this.topKeySet)
 		{
-			topKey = weavejs.WeaveAPI.QKeyManager.stringToQKey(this.topKeyString);
-			this.topKeySet.replaceKeys([topKey]);
+			this.topKeySet.replaceKeys([this.topKey]);
 		}
 		
 		for (let layer of map.getLayers().getArray())
 		{
 			if (!ProbeInteraction.layerFilter(layer)) continue;
 			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
-			let keySet:any = weaveLayerObject.probeKeySet && weaveLayerObject.probeKeySet.getObject();
+			let keySet: KeySet = weaveLayerObject.probeKeySet;
 			if (keySet && keySet != this.topKeySet)
 			{
 				keySet.clearKeys();
 			}
 		}
 
-		return topKey;
+		return this.topKey;
 	}
 
 	private handleMoveEvent(event:ol.MapBrowserEvent)
@@ -117,7 +115,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		for (let layer of this.getMap().getLayers().getArray()) {
 			if (!ProbeInteraction.layerFilter(layer)) continue;
 			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
-			let keySet: any = weaveLayerObject.probeKeySet && weaveLayerObject.probeKeySet.getObject();
+			let keySet: KeySet = weaveLayerObject.probeKeySet;
 			if (keySet) {
 				keySet.clearKeys();
 			}

@@ -32,9 +32,9 @@ class GeometryLayer extends FeatureLayer {
 
 		this.fillStylePath.addCallback(this, this.updateStyleData);
 		this.lineStylePath.addCallback(this, this.updateStyleData);
-		this.filteredKeySet.getObject().setColumnKeySources([this.geoColumnPath.getObject("internalDynamicColumn")]);
+		(<any>this.filteredKeySet).setColumnKeySources([this.geoColumnPath.getObject("internalDynamicColumn")]);
 
-		this.filteredKeySet.addCallback(this, this.updateGeometryData, true);
+		this.filteredKeySet.addGroupedCallback(this, this.updateGeometryData, true);
 	}
 
 	handleMissingSessionStateProperties(newState)
@@ -53,7 +53,7 @@ class GeometryLayer extends FeatureLayer {
 		this.source.clear();
 
 		var idc = this.geoColumnPath.getObject("internalDynamicColumn");
-		var keys = this.filteredKeySet.getObject().keys;
+		var keys:Array<IQualifiedKey> = this.filteredKeySet.keys;
 		var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, keys);
 
 		for (let idx = 0; idx < keys.length; idx++)

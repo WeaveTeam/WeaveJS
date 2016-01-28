@@ -72,30 +72,29 @@ export default class DragSelection extends ol.interaction.DragBox
 
 	updateSelection(extent)
 	{
-		let selectedFeatures: Set<string> = new Set();
-		let selectFeature: Function = (feature) => { selectedFeatures.add(feature.getId()); };
+		let selectedFeatures: Set<IQualifiedKey> = new Set();
+		let selectFeature: Function = (feature: ol.Feature) => { selectedFeatures.add(<IQualifiedKey>feature.getId()); };
 
 		for (let olLayer of this.getMap().getLayers().getArray()) {
 			let selectable: boolean = <boolean>olLayer.get("selectable");
 			let weaveLayer: Layer = olLayer.get("layerObject");
 
 			if (weaveLayer instanceof FeatureLayer && selectable) {
-				let keySet = weaveLayer.selectionKeySet;
 				let source: ol.source.Vector = <ol.source.Vector>(<ol.layer.Vector>olLayer).getSource();
 
 				source.forEachFeatureIntersectingExtent(extent, selectFeature);
 
-				let keys = Array.from(selectedFeatures);
+				let keys:Array<IQualifiedKey> = Array.from(selectedFeatures);
 
 				switch (this.mode) {
 					case DragSelectionMode.SET:
-						keySet.setKeys(keys);
+						weaveLayer.selectionKeySet.replaceKeys(keys);
 						break;
 					case DragSelectionMode.ADD:
-						keySet.addKeys(keys);
+						weaveLayer.selectionKeySet.addKeys(keys);
 						break;
 					case DragSelectionMode.SUBTRACT:
-						keySet.removeKeys(keys);
+						weaveLayer.selectionKeySet.removeKeys(keys);
 						break;
 				}
 			}

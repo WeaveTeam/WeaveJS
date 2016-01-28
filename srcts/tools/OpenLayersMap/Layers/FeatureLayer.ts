@@ -1,6 +1,7 @@
 ///<reference path="../../../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
 import * as ol from "openlayers";
 import * as lodash from "lodash";
@@ -15,14 +16,13 @@ export abstract class FeatureLayer extends Layer {
 	private updateMetaStyle:Function;
 	private debounced_updateMetaStyles:Function;
 
-	private changedItems:Set<string>;
-	private probedSet:Set<string>;
-	private selectedSet:Set<string>;
+	private changedItems:Set<IQualifiedKey>;
 
-	public selectionKeySet:WeavePath;
-	public probeKeySet:WeavePath;
-	public filteredKeySet:WeavePath;
-	public filteredKeySetObject: any;
+	public selectionKeySet:KeySet;
+
+	public probeKeySet:KeySet;
+
+	public filteredKeySet:KeySet;
 
 	private tempSelectable:boolean;
 
@@ -42,21 +42,19 @@ export abstract class FeatureLayer extends Layer {
 		this.source.on("addfeature", this.onFeatureAdd, this);
 
 		this.changedItems = new Set();
-		this.probedSet = new Set();
-		this.selectedSet = new Set();
 
-		this.selectionKeySet = this.layerPath.selection_keyset;
-		this.probeKeySet = this.layerPath.probe_keyset;
-		this.filteredKeySet = this.layerPath.push("filteredKeySet");
+		this.selectionKeySet = weave.getObject("defaultSelectionKeySet")
+		this.probeKeySet = weave.getObject("defaultProbeKeySet");
+		this.filteredKeySet = this.layerPath.getObject("filteredKeySet");
 
-		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, this.selectedSet);
-		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, this.probedSet);
+		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, new Set<IQualifiedKey>());
+		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, new Set<IQualifiedKey>());
 
-		this.selectionKeySet.addKeySetCallback(selectionKeyHandler, true);
-		this.probeKeySet.addKeySetCallback(probeKeyHandler, true);
+		this.selectionKeySet.addGroupedCallback(this, selectionKeyHandler, true);
+		this.probeKeySet.addGroupedCallback(this, probeKeyHandler, true);
 
-		this.filteredKeySet.addCallback(this, this.updateMetaStyles, true);
-		this.filteredKeySetObject = this.filteredKeySet.getObject();
+		this.filteredKeySet.addGroupedCallback(this, this.updateMetaStyles, true);
+
 		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
 	}
 
@@ -144,35 +142,37 @@ export abstract class FeatureLayer extends Layer {
 		return ol.color.asString(colorArray);
 	}
 
-	updateSetFromKeySet(keySet, set, diff)
+	updateSetFromKeySet(keySet:KeySet, previousContents:Set<IQualifiedKey>)
 	{
 		if (!this.source) return; //HACK
 		
-		let wasEmpty = set.size === 0;
+		let wasEmpty:boolean = previousContents.size === 0;
+		let isEmpty:boolean = keySet.keys.length !== 0;
 
-		this.changedItems.clear();
-
-		for (let key of diff.added)
-		{
-			set.add(key);
-			this.changedItems.add(key);
-		}
-
-		for (let key of diff.removed)
-		{
-			set.delete(key);
-			this.changedItems.add(key);
-		}
-
-		let isEmpty = set.size === 0;
-
-		/* If a set becomes empty or nonempty, we should recompute all the styles. Otherwise, only recompute the styles of the features which changed. */
-		if (isEmpty !== wasEmpty)
+		/* If the selection keyset becomes empty or nonempty, we should recompute all the styles. Otherwise, only recompute the styles of the features which changed. */
+		if (keySet === this.selectionKeySet && isEmpty !== wasEmpty)
 		{
 			this.updateMetaStyles();
 		}
 		else
 		{
+			this.changedItems.clear();
+
+			for (let key of keySet.keys) {
+				if (!previousContents.has(key))
+					this.changedItems.add(key);
+				else
+					previousContents.delete(key);
+			}
+
+			for (let key of previousContents) {
+				if (!keySet.containsKey(key))
+					this.changedItems.add(key);
+			}
+
+			previousContents.clear();
+			for (let key of keySet.keys) previousContents.add(key);
+
 			this.changedItems.forEach(function (featureId)
 			{
 				let feature = this.source.getFeatureById(featureId);
@@ -195,7 +195,7 @@ export abstract class FeatureLayer extends Layer {
 
 	updateMetaStyle_unbound(feature)
 	{
-		let id = feature.getId();
+		let id:IQualifiedKey = <IQualifiedKey>feature.getId();
 		let nullStyle = new ol.style.Style({});
 		let unselectedStyle = feature.get("unselectedStyle") || nullStyle;
 		let normalStyle = feature.get("normalStyle") || nullStyle;
@@ -205,7 +205,7 @@ export abstract class FeatureLayer extends Layer {
 		let replace = feature.get("replace");
 		let newStyle;
 
-		if (!this.filteredKeySetObject.containsKey(id))
+		if (!this.filteredKeySet.containsKey(id))
 		{
 			feature.setStyle(nullStyle);
 			return;
@@ -217,7 +217,7 @@ export abstract class FeatureLayer extends Layer {
 			return;
 		}
 
-		if (!this.selectedSet.has(id) && !this.probedSet.has(id) && this.selectedSet.size > 0)
+		if (!this.selectionKeySet.containsKey(id) && !this.probeKeySet.containsKey(id) && this.selectionKeySet.keys.length > 0)
 		{
 			if (replace)
 			{
@@ -237,7 +237,7 @@ export abstract class FeatureLayer extends Layer {
 			newStyle[0].setZIndex(zOrder);
 		}
 
-		if (this.selectedSet.has(id))
+		if (this.selectionKeySet.containsKey(id))
 		{
 			if (replace)
 			{
@@ -251,7 +251,7 @@ export abstract class FeatureLayer extends Layer {
 			}
 		}
 
-		if (this.probedSet.has(id))
+		if (this.probeKeySet.containsKey(id))
 		{
 			if (replace)
 			{
