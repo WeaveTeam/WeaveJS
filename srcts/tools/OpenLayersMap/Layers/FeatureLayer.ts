@@ -24,7 +24,7 @@ export abstract class FeatureLayer extends Layer {
 
 	public filteredKeySet:KeySet;
 
-	private tempSelectable:boolean;
+	private selectableBoolean: any; /*LinkableBoolean*/
 
 	source:ol.source.Vector;
 
@@ -54,6 +54,7 @@ export abstract class FeatureLayer extends Layer {
 		this.probeKeySet.addGroupedCallback(this, probeKeyHandler, true);
 
 		this.filteredKeySet.addGroupedCallback(this, this.updateMetaStyles, true);
+		this.selectableBoolean = this.settingsPath.getObject("selectable");
 
 		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
 	}
@@ -147,7 +148,7 @@ export abstract class FeatureLayer extends Layer {
 		if (!this.source) return; //HACK
 		
 		let wasEmpty:boolean = previousContents.size === 0;
-		let isEmpty:boolean = keySet.keys.length !== 0;
+		let isEmpty:boolean = keySet.keys.length === 0;
 
 		/* If the selection keyset becomes empty or nonempty, we should recompute all the styles. Otherwise, only recompute the styles of the features which changed. */
 		if (keySet === this.selectionKeySet && isEmpty !== wasEmpty)
@@ -161,17 +162,12 @@ export abstract class FeatureLayer extends Layer {
 			for (let key of keySet.keys) {
 				if (!previousContents.has(key))
 					this.changedItems.add(key);
-				else
-					previousContents.delete(key);
 			}
 
 			for (let key of previousContents) {
 				if (!keySet.containsKey(key))
 					this.changedItems.add(key);
 			}
-
-			previousContents.clear();
-			for (let key of keySet.keys) previousContents.add(key);
 
 			this.changedItems.forEach(function (featureId)
 			{
@@ -182,13 +178,14 @@ export abstract class FeatureLayer extends Layer {
 				}
 			}, this);
 		}
+
+		previousContents.clear();
+		for (let key of keySet.keys) previousContents.add(key);
 	}
 
 	updateMetaStyles()
 	{
 		if (!this.source) return; //HACK
-		
-		this.tempSelectable = this.settingsPath.push("selectable").getState();
 
 		this.source.forEachFeature(this.updateMetaStyle, this);
 	}
@@ -211,7 +208,7 @@ export abstract class FeatureLayer extends Layer {
 			return;
 		}
 
-		if (!this.tempSelectable)
+		if (!this.selectableBoolean.state)
 		{
 			feature.setStyle(normalStyle);
 			return;
