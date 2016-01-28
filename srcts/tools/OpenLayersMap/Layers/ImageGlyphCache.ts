@@ -33,9 +33,11 @@ class ImageGlyphCache {
 	private baseImageElements:Map<string,HTMLImageElement>;
 	private canvasMap:Map2D<string,string,HTMLCanvasElement>;
 	private imageMap:Map2D<string,string,HTMLImageElement>;
+	private context: any /* ILinkableObject, context for URL request */
 
-	constructor()
+	constructor(context)
 	{
+		this.context = context;
 		this.baseImageElements = new Map();
 		this.canvasMap = new Map2D<string,string,HTMLCanvasElement>();
 		this.imageMap = new Map2D<string,string,HTMLImageElement>();
@@ -111,7 +113,7 @@ class ImageGlyphCache {
 		if (!image)
 		{
 			image = new Image();
-			weavejs.WeaveAPI.URLRequestUtils.request(this, {url, responseType: "datauri", mimeType: ""}).then(
+			weavejs.WeaveAPI.URLRequestUtils.request(this.context, {url, responseType: "datauri", mimeType: ""}).then(
 				(dataUri) =>
 				{
 					this.requestDataUrl(dataUri, color, function (dataUrl) {

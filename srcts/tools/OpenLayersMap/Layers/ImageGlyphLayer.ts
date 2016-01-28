@@ -19,7 +19,7 @@ class ImageGlyphLayer extends GlyphLayer {
 	{
 		super(parent, layerName);
 
-		this.imageGlyphCache = new ImageGlyphCache();
+		this.imageGlyphCache = new ImageGlyphCache(this.layerPath.getObject());
 
 		this.layerPath.push("imageSize").addCallback(this, this.updateStyleData);
 		this.layerPath.push("imageURL").addCallback(this, this.updateStyleData);
