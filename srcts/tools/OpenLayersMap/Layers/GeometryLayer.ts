@@ -18,17 +18,8 @@ class GeometryLayer extends FeatureLayer {
 	geoColumnPath: WeavePath;
 
 	fillStylePath: WeavePath;
-	fillColorColumn: IAttributeColumn;
-	fillAlphaColumn: IAttributeColumn;
-	fillImageURLColumn: IAttributeColumn;
 
 	lineStylePath: WeavePath;
-	lineColorColumn: IAttributeColumn;
-	lineAlphaColumn: IAttributeColumn;
-	lineWeightColumn: IAttributeColumn;
-	lineCapColumn: IAttributeColumn;
-	lineJoinColumn: IAttributeColumn;
-	lineMiterColumn: IAttributeColumn;
 
 	constructor(parent, layerName)
 	{
@@ -39,18 +30,7 @@ class GeometryLayer extends FeatureLayer {
 		this.geoColumnPath = this.layerPath.push("geometryColumn");
 		this.fillStylePath = this.layerPath.push("fill");
 
-		this.fillColorColumn = this.fillStylePath.getObject("color");
-		this.fillAlphaColumn = this.fillStylePath.getObject("alpha");
-		this.fillImageURLColumn = this.fillStylePath.getObject("imageURL");
-
 		this.lineStylePath = this.layerPath.push("line");
-
-		this.lineColorColumn = this.lineStylePath.getObject("color");
-		this.lineAlphaColumn = this.lineStylePath.getObject("alpha");
-		this.lineWeightColumn = this.lineStylePath.getObject("weight");
-		this.lineCapColumn = this.lineStylePath.getObject("caps");
-		this.lineJoinColumn = this.lineStylePath.getObject("joints");
-		this.lineMiterColumn = this.lineStylePath.getObject("miterLimit");
 
 		this.geoColumnPath.addCallback(this, this.updateGeometryData);
 		this.projectionPath.addCallback(this, this.updateGeometryData);
@@ -116,42 +96,23 @@ class GeometryLayer extends FeatureLayer {
 		return additionalColumns;
 	}
 
-	getFillObjectFromKey(key:IQualifiedKey):Object
-	{
-		let color:number = this.fillColorColumn.getValueFromKey(key, Number);
-		let alpha: number = this.fillAlphaColumn.getValueFromKey(key, Number);
-		let imageURL: number = this.fillAlphaColumn.getValueFromKey(key, String);
-
-		return { color, alpha, imageURL };
-	}
-
-	getStrokeObjectFromKey(key:IQualifiedKey):Object
-	{
-		let color: number = this.lineColorColumn.getValueFromKey(key, Number);
-		let alpha: number = this.lineAlphaColumn.getValueFromKey(key, Number);
-		let weight: number = this.lineWeightColumn.getValueFromKey(key, Number);
-		let lineCap: number = this.lineCapColumn.getValueFromKey(key, String);
-		let lineJoin: number = this.lineJoinColumn.getValueFromKey(key, String);
-		let miterLimit: number = this.lineMiterColumn.getValueFromKey(key, Number);
-
-		return { color, alpha, weight, lineCap, lineJoin, miterLimit };
-
-	}
-
 	updateStyleData()
 	{
 		let fillEnabled: boolean = this.fillStylePath.getObject("enable").state;
 		let strokeEnabled: boolean = this.lineStylePath.getObject("enable").state;
+		let fillStyle = this.fillStylePath.getObject();
+		let strokeStyle = this.lineStylePath.getObject();
 
 		for (let key of this.filteredKeySet.keys)
 		{
 			let record: any = {};
 
 			record.id = key;
-			record.fill = this.getFillObjectFromKey(key);
-			record.stroke = this.getStrokeObjectFromKey(key);
+			record.fill = fillStyle.getStyle(key);
+			record.stroke = strokeStyle.getStyle(key);
 
 			let olStroke = FeatureLayer.olStrokeFromWeaveStroke(record.stroke);
+
 			let olFill = FeatureLayer.olFillFromWeaveFill(record.fill);
 
 			let olStrokeFaded = FeatureLayer.olStrokeFromWeaveStroke(record.stroke, 0.5);

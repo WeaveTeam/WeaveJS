@@ -115,16 +115,22 @@ export abstract class FeatureLayer extends Layer {
 		return lodash.map(titleHashMap.getObjects(), (d:any) => d.getValueFromKey(key, String)).join(", ");
 	}
 
-	static toColorArray(colorString, alpha)
+	static toColorArray(color: string|number, alpha)
 	{
 		var colorArray;
-		if (colorString[0] === "#")
+
+		if (typeof color == "number")
 		{
-			colorArray = ol.color.asArray(colorString);
+			colorArray = ol.color.asArray("#" + StandardLib.decimalToHex(color as number));
 		}
-		else
+		else /* if typeof color is string */
 		{
-			colorArray = ol.color.asArray("#" + StandardLib.decimalToHex(Number(colorString)));
+			if (color[0] === "#") {
+				colorArray = ol.color.asArray(color as string);
+			}
+			else {
+				colorArray = ol.color.asArray("#" + StandardLib.decimalToHex(Number(color as string)));
+			}
 		}
 
 		colorArray = [].concat(colorArray); /* Should not be modified since it is cached in ol.color.asArray */
@@ -277,12 +283,13 @@ export abstract class FeatureLayer extends Layer {
 	{
 		if (fade === undefined) fade = 1;
 
-		let color:Array<number> = stroke.color && FeatureLayer.toColorArray(stroke.color, stroke.alpha * fade) || [0, 0, 0, 1];
+		let color:Array<number> = (stroke.color !== undefined && stroke.color !== null) && FeatureLayer.toColorArray(stroke.color, stroke.alpha * fade) || [0, 0, 0, 1];
 
 		let lineCap:string = stroke.lineCap === "none" ? "butt" : stroke.lineCap || "round";
 		let lineJoin:string = stroke.lineJoin === null ? "round" : stroke.lineJoin || "round";
 		let miterLimit:number = Number(stroke.miterLimit);
 		let width:number = Number(stroke.weight);
+		if (width == 0) color[3] = 0; /* If the width is 0, set alpha to 0 to avoid rendering; canvas context would ignore setting width to 0 */
 
 		return new ol.style.Stroke({color, lineCap, lineJoin, miterLimit, width});
 	}
