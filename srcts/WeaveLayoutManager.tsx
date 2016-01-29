@@ -66,7 +66,8 @@ declare type PolarPoint = {
 };
 
 interface IWeaveLayoutManagerProps extends React.Props<WeaveLayoutManager> {
-    weave:Weave
+    weave: Weave,
+	style?: any
 }
 
 interface IWeaveLayoutManagerState {
@@ -353,18 +354,18 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 
         var paths:WeavePath[] = this.weave.path().getChildren();
         var rect:ClientRect;
-        if(this.element) {
+        if (this.element)
             rect = this.element.getBoundingClientRect();
-        }
 
-        for(var i = 0; i < paths.length; i++) {
+        for (var i = 0; i < paths.length; i++)
+		{
             var path:WeavePath = paths[i];
             var impl:string|Function = path.getType();
             if(impl === "weave.visualization.tools::ExternalTool" && path.getType("toolClass")) {
                 impl = path.getState("toolClass");
             }
             if (impl === "weavejs.core.LinkableHashMap" && path.getType("class"))
-            impl = path.getState("class");
+				impl = path.getState("class");
             impl = getToolImplementation(impl as string);
             var toolName:string = path.getPath()[0];
             var node:Element;
@@ -384,19 +385,23 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
                         };
                     }
                 }
-                children.push(<WeaveTool ref={toolName} key={toolName} toolPath={path} style={toolPosition}
-                    onDragOver={this.onDragOver.bind(this, path.getPath())} onDragStart={this.onDragStart.bind(this, path.getPath())} onDragEnd={this.onDragEnd.bind(this)}
-                    />);
-                }
+                children.push(
+					<WeaveTool
+						ref={toolName} key={toolName} toolPath={path} style={toolPosition}
+	                    onDragOver={this.onDragOver.bind(this, path.getPath())}
+						onDragStart={this.onDragStart.bind(this, path.getPath())}
+						onDragEnd={this.onDragEnd.bind(this)} />
+				);
             }
-
-            return (
-                <div ref={(elt) => { this.element = elt; }} style={{width: "100%", height: "100%", display: "flex", position: "relative", overflow: "hidden"}}>
-                    <Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
-                    {children}
-                    <ToolOverlay ref={TOOLOVERLAY}/>
-                </div>
-            );
         }
+
+        return (
+            <div ref={(elt) => { this.element = elt; }} style={StandardLib.merge({display: "flex", position: "relative", overflow: "hidden"}, this.props.style)}>
+                <Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
+                {children}
+                <ToolOverlay ref={TOOLOVERLAY}/>
+            </div>
+        );
     }
-    export default WeaveLayoutManager;
+}
+export default WeaveLayoutManager;

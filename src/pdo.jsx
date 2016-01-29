@@ -128,7 +128,7 @@ class PDO extends React.Component {
         };
         var toolHeight = this.toolHeightPath ? this.toolHeightPath.getState() : 0;
         return (
-            <ui.VBox>
+            <ui.VBox style={{display: 'flex', height: "100%"}}>
                 <Navbar pdo={this}>
                     <ui.HBox>
                         <ui.HBox style={{marginTop: 17, marginLeft: 5, marginRight: 5, flex: 1}}>
@@ -143,9 +143,7 @@ class PDO extends React.Component {
                         customCardViewTool
                     }
                 </div>
-                <div style={ {flex: 1} }>
-                	<WeaveLayoutManager ref="weaveContainer" weave={this.weave}/>
-                </div>
+               	<WeaveLayoutManager ref="weaveContainer" weave={this.weave} style={{flex: 1, width: "100%"}}/>
             </ui.VBox>
         );
     }
