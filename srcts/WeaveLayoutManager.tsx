@@ -375,13 +375,25 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		}
 		this.saveState(newState);
 	}
+	
+	getIdPaths(state:any, output?:WeavePath[]):WeavePath[]
+	{
+		if (!output)
+			output = [];
+		if (state && state.id)
+			output.push(this.weave.path(state.id));
+		if (state && state.children)
+			for (var child of state.children)
+				this.getIdPaths(child, output);
+		return output;
+	}
 
 	render():JSX.Element
 	{
 		var children:LayoutState[] = [];
 		var newState:LayoutState = this.weave.path(LAYOUT).getState();
 
-		var paths:WeavePath[] = this.weave.path().getChildren();
+		var paths:WeavePath[] = this.getIdPaths(newState);
 		var rect:ClientRect;
 		if (this.element)
 			rect = this.element.getBoundingClientRect();
@@ -389,41 +401,32 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		for (var i = 0; i < paths.length; i++)
 		{
 			var path:WeavePath = paths[i];
-			var impl:string|Function = path.getType();
-			if (impl === "weave.visualization.tools::ExternalTool" && path.getType("toolClass"))
-				impl = path.getState("toolClass");
-			if (impl === "weavejs.core.LinkableHashMap" && path.getType("class"))
-				impl = path.getState("class");
-			impl = getToolImplementation(impl as string);
 			var toolName:string = path.getPath()[0];
 			var node:Element;
 			var toolRect:ClientRect;
 			var toolPosition:React.CSSProperties;
-			if (impl)
+			if (this.refs[LAYOUT] && rect)
 			{
-				if (this.refs[LAYOUT] && rect)
+				node = (this.refs[LAYOUT] as Layout).getDOMNodeFromId(path.getPath());
+				if (node)
 				{
-					node = (this.refs[LAYOUT] as Layout).getDOMNodeFromId(path.getPath());
-					if (node)
-					{
-						toolRect = node.getBoundingClientRect();
-						toolPosition = {
-							top: toolRect.top - rect.top,
-							left: toolRect.left - rect.left,
-							width: toolRect.right - toolRect.left,
-							height: toolRect.bottom - toolRect.top,
-							position: "absolute"
-						};
-					}
+					toolRect = node.getBoundingClientRect();
+					toolPosition = {
+						top: toolRect.top - rect.top,
+						left: toolRect.left - rect.left,
+						width: toolRect.right - toolRect.left,
+						height: toolRect.bottom - toolRect.top,
+						position: "absolute"
+					};
 				}
-				children.push(
-					<WeaveTool
-						ref={toolName} key={toolName} toolPath={path} style={toolPosition}
-						onDragOver={this.onDragOver.bind(this, path.getPath())}
-						onDragStart={this.onDragStart.bind(this, path.getPath())}
-						onDragEnd={this.onDragEnd.bind(this)} />
-				);
 			}
+			children.push(
+				<WeaveTool
+					ref={toolName} key={toolName} toolPath={path} style={toolPosition}
+					onDragOver={this.onDragOver.bind(this, path.getPath())}
+					onDragStart={this.onDragStart.bind(this, path.getPath())}
+					onDragEnd={this.onDragEnd.bind(this)} />
+			);
 		}
 
 		return (
