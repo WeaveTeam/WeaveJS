@@ -79,7 +79,7 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
     }
 
     get title():string {
-        return this.tool ? this.tool.title : "";
+        return this.tool ? this.tool.title : this.toolPath.getPath().pop();
     }
 
     render() {
