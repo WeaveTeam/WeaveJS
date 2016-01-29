@@ -44,6 +44,6 @@ else
 
 function render() {
 	$(() => {
-		ReactDOM.render(<WeaveLayoutManager weave={weave}/>, document.getElementById("weaveElt"));
+		ReactDOM.render(<WeaveLayoutManager weave={weave} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
 	});
 }
