@@ -9,12 +9,26 @@ import Layer from "./Layer";
 declare var weavejs:any;
 declare var Weave:any;
 
+import ILinkableHashMap = weavejs_fake.api.core.ILinkableHashMap;
+import IAttributeColumn = weavejs_fake.api.data.IAttributeColumn;
+
 class GeometryLayer extends FeatureLayer {
 
 	geoJsonParser:any; //TODO ol.format.GeoJSON
-	geoColumnPath:WeavePath;
-	fillStylePath:WeavePath;
-	lineStylePath:WeavePath;
+	geoColumnPath: WeavePath;
+
+	fillStylePath: WeavePath;
+	fillColorColumn: IAttributeColumn;
+	fillAlphaColumn: IAttributeColumn;
+	fillImageURLColumn: IAttributeColumn;
+
+	lineStylePath: WeavePath;
+	lineColorColumn: IAttributeColumn;
+	lineAlphaColumn: IAttributeColumn;
+	lineWeightColumn: IAttributeColumn;
+	lineCapColumn: IAttributeColumn;
+	lineJoinColumn: IAttributeColumn;
+	lineMiterColumn: IAttributeColumn;
 
 	constructor(parent, layerName)
 	{
@@ -24,7 +38,19 @@ class GeometryLayer extends FeatureLayer {
 
 		this.geoColumnPath = this.layerPath.push("geometryColumn");
 		this.fillStylePath = this.layerPath.push("fill");
+
+		this.fillColorColumn = this.fillStylePath.getObject("color");
+		this.fillAlphaColumn = this.fillStylePath.getObject("alpha");
+		this.fillImageURLColumn = this.fillStylePath.getObject("imageURL");
+
 		this.lineStylePath = this.layerPath.push("line");
+
+		this.lineColorColumn = this.lineStylePath.getObject("color");
+		this.lineAlphaColumn = this.lineStylePath.getObject("alpha");
+		this.lineWeightColumn = this.lineStylePath.getObject("weight");
+		this.lineCapColumn = this.lineStylePath.getObject("caps");
+		this.lineJoinColumn = this.lineStylePath.getObject("joints");
+		this.lineMiterColumn = this.lineStylePath.getObject("miterLimit");
 
 		this.geoColumnPath.addCallback(this, this.updateGeometryData);
 		this.projectionPath.addCallback(this, this.updateGeometryData);
@@ -90,30 +116,41 @@ class GeometryLayer extends FeatureLayer {
 		return additionalColumns;
 	}
 
+	getFillObjectFromKey(key:IQualifiedKey):Object
+	{
+		let color:number = this.fillColorColumn.getValueFromKey(key, Number);
+		let alpha: number = this.fillAlphaColumn.getValueFromKey(key, Number);
+		let imageURL: number = this.fillAlphaColumn.getValueFromKey(key, String);
+
+		return { color, alpha, imageURL };
+	}
+
+	getStrokeObjectFromKey(key:IQualifiedKey):Object
+	{
+		let color: number = this.lineColorColumn.getValueFromKey(key, Number);
+		let alpha: number = this.lineAlphaColumn.getValueFromKey(key, Number);
+		let weight: number = this.lineWeightColumn.getValueFromKey(key, Number);
+		let lineCap: number = this.lineCapColumn.getValueFromKey(key, String);
+		let lineJoin: number = this.lineJoinColumn.getValueFromKey(key, String);
+		let miterLimit: number = this.lineMiterColumn.getValueFromKey(key, Number);
+
+		return { color, alpha, weight, lineCap, lineJoin, miterLimit };
+
+	}
 
 	updateStyleData()
 	{
-		let fillEnabled = this.fillStylePath.push("enable").getState();
-		let strokeEnabled = this.lineStylePath.push("enable").getState();
+		let fillEnabled: boolean = this.fillStylePath.getObject("enable").state;
+		let strokeEnabled: boolean = this.lineStylePath.getObject("enable").state;
 
-		var styleRecords = this.layerPath.retrieveRecords({
-			fill: {
-				color: this.fillStylePath.push("color"),
-				alpha: this.fillStylePath.push("alpha"),
-				imageURL: this.fillStylePath.push("imageURL")
-			},
-			stroke: {
-				color: this.lineStylePath.push("color"),
-				alpha: this.lineStylePath.push("alpha"),
-				weight: this.lineStylePath.push("weight"),
-				lineCap: this.lineStylePath.push("caps"),
-				lineJoin: this.lineStylePath.push("joints"),
-				miterLimit: this.lineStylePath.push("miterLimit")
-			}
-		}, this.filteredKeySet);
-
-		for (let record of styleRecords)
+		for (let key of this.filteredKeySet.keys)
 		{
+			let record: any = {};
+
+			record.id = key;
+			record.fill = this.getFillObjectFromKey(key);
+			record.stroke = this.getStrokeObjectFromKey(key);
+
 			let olStroke = FeatureLayer.olStrokeFromWeaveStroke(record.stroke);
 			let olFill = FeatureLayer.olFillFromWeaveFill(record.fill);
 
