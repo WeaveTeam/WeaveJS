@@ -376,7 +376,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		this.saveState(newState);
 	}
 
-	render():void
+	render():JSX.Element
 	{
 		var children:LayoutState[] = [];
 		var newState:LayoutState = this.weave.path(LAYOUT).getState();
