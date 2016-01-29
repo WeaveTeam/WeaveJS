@@ -387,20 +387,40 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 				this.getIdPaths(child, output);
 		return output;
 	}
+	
+	generateLayoutState(paths:WeavePath[]):Object
+	{
+		// temporary solution - needs improvement
+		return this.simplifyState({
+			flex: 1,
+			direction: HORIZONTAL,
+			children: paths.map(path => { return {id: path.getPath(), flex: 1} })
+		});
+	}
 
 	render():JSX.Element
 	{
-		var children:LayoutState[] = [];
 		var newState:LayoutState = this.weave.path(LAYOUT).getState();
-
-		var paths:WeavePath[] = this.getIdPaths(newState);
+		var children:LayoutState[] = [];
+		var paths:WeavePath[];
+		var path:WeavePath;
+		
+		if (!newState)
+		{
+			newState = this.generateLayoutState(this.weave.path().getChildren().filter(path => getToolImplementation(path)));
+			//TODO - generate layout state from
+			this.weave.path(LAYOUT).state(newState); 
+		}
+		
+		paths = this.getIdPaths(newState);
+		
 		var rect:ClientRect;
 		if (this.element)
 			rect = this.element.getBoundingClientRect();
 
 		for (var i = 0; i < paths.length; i++)
 		{
-			var path:WeavePath = paths[i];
+			path = paths[i];
 			var toolName:string = path.getPath()[0];
 			var node:Element;
 			var toolRect:ClientRect;

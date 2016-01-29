@@ -27,12 +27,28 @@ const grabberStyle:CSSProperties = {
     background: "url(http://placehold.it/32x32)"
 };
 
-export function registerToolImplementation(asClassName:string, jsClass:Function) {
+export function registerToolImplementation(asClassName:string, jsClass:Function)
+{
     toolRegistry[asClassName] = jsClass;
 }
 
-export function getToolImplementation(asClassName:string):Function {
-    return toolRegistry[asClassName];
+export function getToolImplementation(param:string|WeavePath):Function
+{
+	var type:string;
+	if (typeof param === 'string')
+	{
+		type = param;
+	}
+	else
+	{
+		var path:WeavePath = param as WeavePath;
+		type = path.getType();
+        if (type === "weave.visualization.tools::ExternalTool" && path.getType("toolClass"))
+            type = path.getState("toolClass");
+        if (type === "weavejs.core.LinkableHashMap" && path.getType("class"))
+            type = path.getState("class");
+	}
+    return toolRegistry[type];
 }
 
 interface IWeaveToolProps extends React.Props<WeaveTool> {
@@ -62,18 +78,12 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
     constructor(props:IWeaveToolProps) {
         super(props);
         this.toolPath = this.props.toolPath;
-        var toolType:string = this.toolPath ? this.toolPath.getType() : this.props.toolClass;
-        if(toolType === "weave.visualization.tools::ExternalTool" && this.toolPath.getType("toolClass")) {
-            toolType = this.toolPath.getState("toolClass");
-        }
-        if(toolType === "weavejs.core.LinkableHashMap" && this.toolPath.getType("class"))
-            toolType = this.toolPath.getState("class");
-        this.ToolClass = getToolImplementation(toolType);
+        this.ToolClass = getToolImplementation(this.toolPath || this.props.toolClass);
         this.titleBarHeight = 25;
     }
 
     componentDidMount():void {
-        // if(this.toolPath) {
+        // if (this.toolPath) {
         //     this.toolPath.addCallback(this, this.forceUpdate);
         // }
     }
