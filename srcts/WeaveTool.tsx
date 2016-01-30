@@ -15,6 +15,7 @@ import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/tooltip";
 import {IToolTipProps, IToolTipState} from "./tools/tooltip";
+import {IWeaveFontProps} from "./WeaveLayoutManager";
 
 const toolRegistry:{[name:string]: Function} = {};
 
@@ -53,12 +54,13 @@ export function getToolImplementation(param:string|WeavePath):Function
 
 interface IWeaveToolProps extends React.Props<WeaveTool> {
     toolPath:WeavePath;
-    preferences?:any;
     toolClass?:string;
     style:CSSProperties;
     onDragStart:React.MouseEvent;
     onDragEnd:React.MouseEvent;
     onDragOver:React.MouseEvent;
+    toolFont:IWeaveFontProps;
+    panelFont:IWeaveFontProps;
 }
 
 interface IWeaveToolState {
@@ -104,13 +106,25 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
                                 key: "tool",
                                 ref: (c:IVisTool) => { this.tool = c; },
                                 toolPath: this.toolPath,
-                                font: this.props.preferences.font,
-                                fontSize: this.props.preferences.fontSize,
+                                font: this.props.toolFont.font,
+                                fontSize: this.props.toolFont.size,
                                 style: { height: toolHeight, width: toolWidth },
                                 toolTip: this.toolTip
                             }
                         );
         }
+
+        var toolStyle:CSSProperties = {
+            width: toolWidth,
+            height: toolHeight,
+            fontFamily: this.props.toolFont.font,
+            fontSize: this.props.toolFont.size,
+            fontWeight: this.props.toolFont.bold ? "bold" : "normal",
+            fontStyle: this.props.toolFont.italic ? "italic" : "normal",
+            textDecoration: this.props.toolFont.underline ? "underline" : "none"
+            //Todo: Add color support when it becomes important in dashboards
+            //color: StandardLib.decimalToHex(this.props.toolFont.color)
+        };
 
         return (
             <ui.VBox style={this.props.style}
@@ -122,11 +136,10 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
                           onDragStart={this.props.onDragStart}
                           titleBarHeight={this.titleBarHeight}
                           title={this.title}
-                          font={this.props.preferences.titleFont} 
-                          fontSize={this.props.preferences.titleFontSize}
+                          panelFont={this.props.panelFont}
                           />
                 {
-                    <div style={{width: toolWidth, height: toolHeight, fontFamily: this.props.preferences.font, fontSize: this.props.preferences.fontSize}}>
+                    <div style={toolStyle}>
                         <div style={{width: "100%", height: "100%", maxHeight: "100%"}}>
                             {
                                 reactTool
@@ -143,8 +156,7 @@ interface ITitleBarProps extends React.Props<TitleBar> {
     onDragStart:React.MouseEvent;
     titleBarHeight:number;
     title:string;
-    font?:string;
-    fontSize?:number;
+    panelFont:IWeaveFontProps;
 }
 
 interface ITitleBarState {
@@ -175,8 +187,13 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
             flex: 1,
             textOverflow: "ellipsis",
             paddingTop: "3",
-            fontFamily: this.props.font,
-            fontSize: this.props.fontSize
+            fontFamily: this.props.panelFont.font,
+            fontSize: this.props.panelFont.size,
+            fontWeight: this.props.panelFont.bold ? "bold" : "normal",
+            fontStyle: this.props.panelFont.italic ? "italic" : "normal",
+            textDecoration: this.props.panelFont.underline ? "underline" : "none"
+            //Todo: Add color support if title style becomes important in dashboards
+            //color: StandardLib.decimalToHex(this.props.panelFont.color)
         };
 
         var transitions:CSSProperties = {
