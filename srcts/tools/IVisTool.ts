@@ -4,6 +4,8 @@ import ToolTip from "./tooltip";
 
 export interface IVisToolProps {
     toolPath:WeavePath;
+    font?:string;
+    fontSize?:number;
     style: { width: number, height: number};
     toolTip: ToolTip
 }
