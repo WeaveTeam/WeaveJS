@@ -153,8 +153,7 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     }
 
     getCullingInterval(size:number,axisClass:string):number {
-        //TODO: Get Actual browser font with JS
-        var textHeight:number = StandardLib.getTextHeight("test", "14pt Helvetica Neue");
+        var textHeight:number = StandardLib.getTextHeight("test", this.getFontString());
         var labelsToShow:number = Math.floor(size / textHeight);
         labelsToShow = Math.max(2,labelsToShow);
 
@@ -167,5 +166,9 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
             }
         }
         return intervalForCulling;
+    }
+
+    getFontString():string {
+        return this.props.fontSize + "pt " + this.props.font;
     }
 }
