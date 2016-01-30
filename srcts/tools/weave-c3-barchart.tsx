@@ -175,7 +175,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                                     var labelHeight:number = Number(this.paths.marginBottom.getState())/Math.cos(45*(Math.PI/180));
                                     var labelString:string = (this.stringRecords[num]["xLabel"] as string);
                                     if(labelString) {
-                                        var stringSize:number = StandardLib.getTextWidth(labelString, "14pt Helvetica Neue");
+                                        var stringSize:number = StandardLib.getTextWidth(labelString, this.getFontString());
                                         var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
                                         return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
                                     }else{
