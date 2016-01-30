@@ -76,6 +76,15 @@ interface IWeaveLayoutManagerState
 
 }
 
+export interface IWeaveFontProps {
+	font:string;
+	size:number;
+	bold:boolean;
+	italic:boolean;
+	underline:boolean;
+	color:number;
+}
+
 class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeaveLayoutManagerState>
 {
 	private element:HTMLElement;
@@ -90,6 +99,8 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 	private throttledForceUpdate:() => void;
 	private throttledForceUpdateTwice:() => void;
 	private properties:WeavePath;
+	private visFontProps:IWeaveFontProps;
+	private panelFontProps:IWeaveFontProps;
 	
 	constructor(props:IWeaveLayoutManagerProps)
 	{
@@ -408,13 +419,23 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		var paths:WeavePath[];
 		var path:WeavePath;
 
-		var visFont:string = this.properties.getObject("visTextFormat","font").value;
-		var panelTitleFont:string = this.properties.getObject("panelTitleTextFormat","font").value;
-		var visFontSize:number = this.properties.getObject("visTextFormat","size").value;
-		var panelTitleFontSize:number = this.properties.getObject("panelTitleTextFormat","size").value;;
+		this.visFontProps = {
+			font: this.properties.getObject("visTextFormat","font").value,
+			size: this.properties.getObject("visTextFormat","size").value,
+			bold: this.properties.getObject("visTextFormat","bold").value,
+			italic: this.properties.getObject("visTextFormat","italic").value,
+			underline: this.properties.getObject("visTextFormat","underline").value,
+			color: this.properties.getObject("visTextFormat","color").value
+		}
 
-
-		var preferences:{} = {font: visFont, fontSize: visFontSize, titleFont: panelTitleFont, titleFontSize: panelTitleFontSize};
+		this.panelFontProps = {
+			font: this.properties.getObject("panelTitleTextFormat","font").value,
+			size: this.properties.getObject("panelTitleTextFormat","size").value,
+			bold: this.properties.getObject("panelTitleTextFormat","bold").value,
+			italic: this.properties.getObject("panelTitleTextFormat","italic").value,
+			underline: this.properties.getObject("panelTitleTextFormat","underline").value,
+			color: this.properties.getObject("panelTitleTextFormat","color").value
+		}
 
 		if (!newState)
 		{
@@ -453,7 +474,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 			}
 			children.push(
 				<WeaveTool
-					ref={toolName} key={toolName} toolPath={path} preferences={preferences} style={toolPosition}
+					ref={toolName} key={toolName} toolPath={path} toolFont={this.visFontProps} panelFont={this.panelFontProps} style={toolPosition}
 					onDragOver={this.onDragOver.bind(this, path.getPath())}
 					onDragStart={this.onDragStart.bind(this, path.getPath())}
 					onDragEnd={this.onDragEnd.bind(this)} />
@@ -461,7 +482,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		}
 
 		return (
-			<div ref={(elt) => { this.element = elt; }} style={StandardLib.merge({display: "flex", position: "relative", overflow: "hidden", fontFamily: visFont, fontSize: visFontSize}, this.props.style)}>
+			<div ref={(elt) => { this.element = elt; }} style={StandardLib.merge({display: "flex", position: "relative", overflow: "hidden"}, this.props.style)}>
 				<Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
 				{children}
 				<ToolOverlay ref={TOOLOVERLAY}/>
