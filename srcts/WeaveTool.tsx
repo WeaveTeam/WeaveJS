@@ -53,6 +53,7 @@ export function getToolImplementation(param:string|WeavePath):Function
 
 interface IWeaveToolProps extends React.Props<WeaveTool> {
     toolPath:WeavePath;
+    preferences?:any;
     toolClass?:string;
     style:CSSProperties;
     onDragStart:React.MouseEvent;
@@ -103,6 +104,8 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
                                 key: "tool",
                                 ref: (c:IVisTool) => { this.tool = c; },
                                 toolPath: this.toolPath,
+                                font: this.props.preferences.font,
+                                fontSize: this.props.preferences.fontSize,
                                 style: { height: toolHeight, width: toolWidth },
                                 toolTip: this.toolTip
                             }
@@ -119,9 +122,11 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
                           onDragStart={this.props.onDragStart}
                           titleBarHeight={this.titleBarHeight}
                           title={this.title}
+                          font={this.props.preferences.titleFont} 
+                          fontSize={this.props.preferences.titleFontSize}
                           />
                 {
-                    <div style={{width: toolWidth, height: toolHeight}}>
+                    <div style={{width: toolWidth, height: toolHeight, fontFamily: this.props.preferences.font, fontSize: this.props.preferences.fontSize}}>
                         <div style={{width: "100%", height: "100%", maxHeight: "100%"}}>
                             {
                                 reactTool
@@ -138,6 +143,8 @@ interface ITitleBarProps extends React.Props<TitleBar> {
     onDragStart:React.MouseEvent;
     titleBarHeight:number;
     title:string;
+    font?:string;
+    fontSize?:number;
 }
 
 interface ITitleBarState {
@@ -167,7 +174,9 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
             whiteSpace: "nowrap",
             flex: 1,
             textOverflow: "ellipsis",
-            paddingTop: "3"
+            paddingTop: "3",
+            fontFamily: this.props.font,
+            fontSize: this.props.fontSize
         };
 
         var transitions:CSSProperties = {
