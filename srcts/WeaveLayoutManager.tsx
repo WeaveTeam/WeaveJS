@@ -89,6 +89,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 	private prevClientHeight:number;
 	private throttledForceUpdate:() => void;
 	private throttledForceUpdateTwice:() => void;
+	private properties:WeavePath;
 	
 	constructor(props:IWeaveLayoutManagerProps)
 	{
@@ -98,6 +99,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		this.margin = 8;
 		this.throttledForceUpdate = _.throttle(() => { this.forceUpdate(); }, 30);
 		this.throttledForceUpdateTwice = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30);
+		this.properties = this.weave.path(["WeaveProperties"]);
 	}
 
 	componentDidMount():void
@@ -109,6 +111,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		this.weave.path(LAYOUT).addCallback(this, this.throttledForceUpdate, true);
 		this.weave.path(LAYOUT).state(this.simplifyState(this.weave.path(LAYOUT).getState()));
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.frameHandler, true);
+		this.properties.addCallback(this, this.throttledForceUpdate, true);
 	}
 
 	componentWillUnmount():void
@@ -405,12 +408,13 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		var paths:WeavePath[];
 		var path:WeavePath;
 
-		var visFont:string = this.weave.path(["WeaveProperties"]).getObject("visTextFormat","font").value;
-		var visTitleFont:string = this.weave.path(["WeaveProperties"]).getObject("visTitleTextFormat","font").value;
-		var visFontSize:number = this.weave.path(["WeaveProperties"]).getObject("visTextFormat","size").value;
-		var visTitleFontSize:number = this.weave.path(["WeaveProperties"]).getObject("visTitleTextFormat","size").value;;
+		var visFont:string = this.properties.getObject("visTextFormat","font").value;
+		var panelTitleFont:string = this.properties.getObject("panelTitleTextFormat","font").value;
+		var visFontSize:number = this.properties.getObject("visTextFormat","size").value;
+		var panelTitleFontSize:number = this.properties.getObject("panelTitleTextFormat","size").value;;
 
-		var preferences:{} = {font: visFont, fontSize: visFontSize, titleFont: visTitleFont, titleFontSize: visTitleFontSize};
+
+		var preferences:{} = {font: visFont, fontSize: visFontSize, titleFont: panelTitleFont, titleFontSize: panelTitleFontSize};
 
 		if (!newState)
 		{
