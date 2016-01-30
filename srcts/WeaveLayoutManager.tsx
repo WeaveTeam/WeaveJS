@@ -404,7 +404,14 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		var children:LayoutState[] = [];
 		var paths:WeavePath[];
 		var path:WeavePath;
-		
+
+		var visFont:string = this.weave.path(["WeaveProperties"]).getObject("visTextFormat","font").value;
+		var visTitleFont:string = this.weave.path(["WeaveProperties"]).getObject("visTitleTextFormat","font").value;
+		var visFontSize:number = this.weave.path(["WeaveProperties"]).getObject("visTextFormat","size").value;
+		var visTitleFontSize:number = this.weave.path(["WeaveProperties"]).getObject("visTitleTextFormat","size").value;;
+
+		var preferences:{} = {font: visFont, fontSize: visFontSize, titleFont: visTitleFont, titleFontSize: visTitleFontSize};
+
 		if (!newState)
 		{
 			newState = this.generateLayoutState(this.weave.path().getChildren().filter(path => getToolImplementation(path)));
@@ -442,7 +449,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 			}
 			children.push(
 				<WeaveTool
-					ref={toolName} key={toolName} toolPath={path} style={toolPosition}
+					ref={toolName} key={toolName} toolPath={path} preferences={preferences} style={toolPosition}
 					onDragOver={this.onDragOver.bind(this, path.getPath())}
 					onDragStart={this.onDragStart.bind(this, path.getPath())}
 					onDragEnd={this.onDragEnd.bind(this)} />
@@ -450,7 +457,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		}
 
 		return (
-			<div ref={(elt) => { this.element = elt; }} style={StandardLib.merge({display: "flex", position: "relative", overflow: "hidden"}, this.props.style)}>
+			<div ref={(elt) => { this.element = elt; }} style={StandardLib.merge({display: "flex", position: "relative", overflow: "hidden", fontFamily: visFont, fontSize: visFontSize}, this.props.style)}>
 				<Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
 				{children}
 				<ToolOverlay ref={TOOLOVERLAY}/>
