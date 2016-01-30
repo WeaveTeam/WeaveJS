@@ -161,7 +161,7 @@ class WeaveC3Histogram extends AbstractC3Tool {
                                     labelString = this.paths.binnedColumn.getObject().deriveStringFromNumber(num);
                                 }
                                 if(labelString) {
-                                    var stringSize:number = StandardLib.getTextWidth(labelString, "14pt Helvetica Neue");
+                                    var stringSize:number = StandardLib.getTextWidth(labelString, this.getFontString());
                                     var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
                                     return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
                                 }else{
