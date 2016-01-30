@@ -67,6 +67,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
     private titleFormat:Function;
     private toolTipClass:string;
     private tooltipContainerClass:string;
+    private toolTipOffset:number;
     private containerStyle:React.CSSProperties;
     private element:HTMLElement;
 
@@ -78,6 +79,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
         this.titleFormat = this.props.titleFormat || _.identity;
         this.toolTipClass = this.props.toolTipClass || "c3-tooltip";
         this.tooltipContainerClass = this.props.tooltipContainerClass || "c3-tooltip-container";
+        this.toolTipOffset = 10;
 
         this.state = {
             x: 0,
@@ -99,6 +101,31 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
         //this.element = ReactDOM.findDOMNode(this);
     }
 
+    componentDidUpdate() {
+        if(this.state.showToolTip) {
+            var container:HTMLElement = this.element.parentNode as HTMLElement;
+            if (!(container.clientHeight < this.element.clientHeight)) {
+                var bottomOverflow:number = this.element.offsetTop + this.element.offsetHeight - container.offsetHeight;
+                if (bottomOverflow > 0) {
+                    this.forceUpdate();
+                }
+            }
+            if(!(container.clientWidth < this.element.clientWidth)){
+                if(weavejs.WeaveAPI.Locale.reverseLayout){
+                    //handle left overflow
+                    if(this.element.offsetLeft < 0){
+                        this.forceUpdate();
+                    }
+                } else {
+                    var rightOverflow:number = this.element.offsetLeft + this.element.offsetWidth - container.offsetWidth;
+                    if(rightOverflow > 0){
+                        this.forceUpdate();
+                    }
+                }
+            }
+        }
+    }
+
     getToolTipHtml():string {
         return this.element.innerHTML;
     }
@@ -108,15 +135,42 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
         if(!(this.element && this.state.showToolTip)) {
             return <div ref={(c:HTMLElement) => { this.element = c }}></div>;
         } else {
+            var style:React.CSSProperties = _.clone(this.containerStyle);
             var tableRows:JSX.Element[] = [];
-            this.containerStyle.display = "block";
+            style.display = "block";
 
-            var container:any = this.element.parentNode as Element;
+            var container:HTMLElement = this.element.parentNode as HTMLElement;
             var rect:ClientRect = container.getBoundingClientRect();
             var left: number = window.pageXOffset + rect.left;
             var top: number = window.pageYOffset + rect.top;
-            this.containerStyle.left = this.state.x - left;
-            this.containerStyle.top = this.state.y - top;
+
+            var yPos:number = this.state.y - top + this.toolTipOffset;
+            var xPos:number = this.state.x - left + this.toolTipOffset;
+
+            var bottomOverflow:number = yPos + this.element.offsetHeight - container.offsetHeight;
+            style.top = yPos;
+            if(!(container.clientHeight < this.element.clientHeight)) {
+                if(bottomOverflow > 0) {
+                    style.top =  yPos - bottomOverflow;
+                } else{
+                    style.top = yPos;
+                }
+            }
+
+            style.left = xPos;
+            if(weavejs.WeaveAPI.Locale.reverseLayout) {
+                style.left = style.left - this.element.clientWidth - this.toolTipOffset*2;
+                if(style.left < 0 && (this.element.getBoundingClientRect().width != rect.width)){
+                    style.left = 0;
+                }
+            } else {
+                var rightOverflow:number = this.element.offsetLeft + this.element.offsetWidth - container.offsetWidth;
+                if(!(container.clientWidth < this.element.clientWidth)){
+                    if (rightOverflow > 0) {
+                        style.left = xPos - rightOverflow;
+                    }
+                }
+            }
 
             var columnNames:string[] = Object.keys(this.state.columnNamesToValue);
             if(columnNames.length) {
@@ -132,7 +186,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             }
 
             return (
-                <div style={this.containerStyle} ref={(c:HTMLElement) => { this.element = c }} className={this.tooltipContainerClass}>
+                <div style={style} ref={(c:HTMLElement) => { this.element = c }} className={this.tooltipContainerClass}>
                 <table className={this.toolTipClass}>
                     <tbody>
                         {
