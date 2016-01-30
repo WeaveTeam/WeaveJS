@@ -40,6 +40,10 @@ button.list-group-item:hover {
     background-color: rgba(153, 214, 255, 0.4);
 }
 
+.btn {
+    font-size: inherit;
+}
+
 .btn-default {
     width:100%;
 }
@@ -55,6 +59,10 @@ ul.dropdown-menu {
 
 .react-bs-container .table-container>table>tbody>tr>td, .react-bs-container .table-container>table>thead>tr>th, .react-bs-container .table-header>table>thead>tr>th .table-header-column {
     line-height: 14px;
+}
+
+.table {
+    font-size: inherit;
 }
 
 .table-header {
