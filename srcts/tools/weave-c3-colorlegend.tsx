@@ -175,7 +175,8 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 			borderColor: StandardLib.rgba(0, 0, 0, borderAlpha),
 			borderStyle: "solid",
 			borderWidth: 1,
-			padding: "2px"
+			padding: "2px",
+			overflow: "hidden"
 		};
 	}
 
@@ -243,12 +244,12 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 							}
 						}
 
-						if(weavejs.WeaveAPI.Locale.reverseLayout){
-							element = element.reverse();
-						}
-
 						if (this.props.style.width > this.props.style.height * 2)
 						{
+							if(weavejs.WeaveAPI.Locale.reverseLayout){
+								element = element.reverse();
+							}
+
 							elements.push(
 								<ui.HBox key={i} style={{width:"100%", flex: columnFlex}}> { element } </ui.HBox>
 							);
@@ -292,7 +293,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 															stroke: "black",
 															strokeOpacity: 0.5
 														}}>
-													<span style={ prefixerStyle }>{ textLabelFunction(i) }</span>
+													<span style={prefixerStyle}>{ textLabelFunction(i) }</span>
 												</div>
 											</ui.HBox>
 										</ui.HBox>
@@ -307,13 +308,22 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 							}
 						}
 
-						if(weavejs.WeaveAPI.Locale.reverseLayout){
-							element = element.reverse();
-						}
+						if (this.props.style.width > this.props.style.height * 2)
+						{
+							if(weavejs.WeaveAPI.Locale.reverseLayout){
+								element = element.reverse();
+							}
 
-						elements.push(
-							<ui.HBox key={i} style={{width:"100%", flex: columnFlex, padding: "5px"}}> { element } </ui.HBox>
-						);
+							elements.push(
+								<ui.HBox key={i} style={{width:"100%", flex: columnFlex, padding: "5px"}}> { element } </ui.HBox>
+							);
+						}
+						else
+						{
+							elements.push(
+								<ui.VBox key={i} style={{height:"100%", flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
+							);
+						}
 
 						finalElements[j] = elements;
 					}
