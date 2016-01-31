@@ -19,6 +19,7 @@ import * as Prefixer from "react-vendor-prefix";
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
+const SHAPE_TYPE_BOX:string = "box";
 
 class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 {
@@ -81,6 +82,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 		this.maxColumnsPath.addCallback(this, this.forceUpdate);
 		this.filteredKeySet.addCallback(this, this.forceUpdate);
 		this.plotterPath.push("shapeSize").addCallback(this, this.forceUpdate);
+		this.plotterPath.push("shapeType").addCallback(this, this.forceUpdate);
 		this.binnedColumnPath.addCallback(this, this.forceUpdate);
 		this.toolPath.selection_keyset.addCallback(this, this.forceUpdate);
 		this.toolPath.probe_keyset.addCallback(this, this.forceUpdate);
@@ -172,7 +174,8 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 			flex: 1.0,
 			borderColor: StandardLib.rgba(0, 0, 0, borderAlpha),
 			borderStyle: "solid",
-			borderWidth: 1
+			borderWidth: 1,
+			padding: "2px"
 		};
 	}
 
@@ -239,7 +242,11 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 								}
 							}
 						}
-						
+
+						if(weavejs.WeaveAPI.Locale.reverseLayout){
+							element = element.reverse();
+						}
+
 						if (this.props.style.width > this.props.style.height * 2)
 						{
 							elements.push(
@@ -261,6 +268,55 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 
 					case SHAPE_TYPE_LINE :
 						break;
+
+					case SHAPE_TYPE_BOX :
+					{
+						var element:JSX.Element[] = [];
+						var elements:JSX.Element[] = [];
+						for (var i = 0; i < this.numberOfBins + extraBins; i++)
+						{
+							if (i % maxColumns == j)
+							{
+
+								if (i < this.numberOfBins)
+								{
+									element.push(
+										<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
+											<ui.HBox style={{
+												width:"100%", flex:1.0,
+												alignItems:"center",
+												justifyContent:"center",
+												backgroundColor: StandardLib.hex2rgba(StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)),0.5)
+											}}>
+												<div style={{
+															stroke: "black",
+															strokeOpacity: 0.5
+														}}>
+													<span style={ prefixerStyle }>{ textLabelFunction(i) }</span>
+												</div>
+											</ui.HBox>
+										</ui.HBox>
+									);
+								}
+								else
+								{
+									element.push(
+										<ui.HBox key={i} style={{width:"100%", flex:1.0}}/>
+									);
+								}
+							}
+						}
+
+						if(weavejs.WeaveAPI.Locale.reverseLayout){
+							element = element.reverse();
+						}
+
+						elements.push(
+							<ui.HBox key={i} style={{width:"100%", flex: columnFlex, padding: "5px"}}> { element } </ui.HBox>
+						);
+
+						finalElements[j] = elements;
+					}
 				}
 			}
 
