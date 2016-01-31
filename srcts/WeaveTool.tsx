@@ -15,7 +15,6 @@ import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/tooltip";
 import {IToolTipProps, IToolTipState} from "./tools/tooltip";
-import {IWeaveFontProps} from "./WeaveLayoutManager";
 
 const toolRegistry:{[name:string]: Function} = {};
 
@@ -59,8 +58,6 @@ interface IWeaveToolProps extends React.Props<WeaveTool> {
     onDragStart:React.MouseEvent;
     onDragEnd:React.MouseEvent;
     onDragOver:React.MouseEvent;
-    toolFont:IWeaveFontProps;
-    panelFont:IWeaveFontProps;
 }
 
 interface IWeaveToolState {
@@ -106,8 +103,6 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
                                 key: "tool",
                                 ref: (c:IVisTool) => { this.tool = c; },
                                 toolPath: this.toolPath,
-                                font: this.props.toolFont.font,
-                                fontSize: this.props.toolFont.size,
                                 style: { height: toolHeight, width: toolWidth },
                                 toolTip: this.toolTip
                             }
@@ -116,14 +111,7 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
 
         var toolStyle:CSSProperties = {
             width: toolWidth,
-            height: toolHeight,
-            fontFamily: this.props.toolFont.font,
-            fontSize: this.props.toolFont.size,
-            fontWeight: this.props.toolFont.bold ? "bold" : "normal",
-            fontStyle: this.props.toolFont.italic ? "italic" : "normal",
-            textDecoration: this.props.toolFont.underline ? "underline" : "none"
-            //Todo: Add color support when it becomes important in dashboards
-            //color: StandardLib.decimalToHex(this.props.toolFont.color)
+            height: toolHeight
         };
 
         return (
@@ -136,10 +124,9 @@ export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
                           onDragStart={this.props.onDragStart}
                           titleBarHeight={this.titleBarHeight}
                           title={this.title}
-                          panelFont={this.props.panelFont}
                           />
                 {
-                    <div style={toolStyle}>
+                    <div style={toolStyle} className="weave-tool">
                         <div style={{width: "100%", height: "100%", maxHeight: "100%"}}>
                             {
                                 reactTool
@@ -156,7 +143,6 @@ interface ITitleBarProps extends React.Props<TitleBar> {
     onDragStart:React.MouseEvent;
     titleBarHeight:number;
     title:string;
-    panelFont:IWeaveFontProps;
 }
 
 interface ITitleBarState {
@@ -186,14 +172,7 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
             whiteSpace: "nowrap",
             flex: 1,
             textOverflow: "ellipsis",
-            paddingTop: "3",
-            fontFamily: this.props.panelFont.font,
-            fontSize: this.props.panelFont.size,
-            fontWeight: this.props.panelFont.bold ? "bold" : "normal",
-            fontStyle: this.props.panelFont.italic ? "italic" : "normal",
-            textDecoration: this.props.panelFont.underline ? "underline" : "none"
-            //Todo: Add color support if title style becomes important in dashboards
-            //color: StandardLib.decimalToHex(this.props.panelFont.color)
+            paddingTop: "3"
         };
 
         var transitions:CSSProperties = {
@@ -221,7 +200,7 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
             {/*<ui.HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
             <Glyphicon glyph="cog"/>
             </ui.HBox>*/}
-            <span style={titleStyle}>{this.props.title}</span>
+            <span style={titleStyle} className="weave-panel">{this.props.title}</span>
             {/*<ui.HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
             <div style={{marginRight: 5}}>
             <Glyphicon glyph="unchecked"/>

@@ -76,15 +76,6 @@ interface IWeaveLayoutManagerState
 
 }
 
-export interface IWeaveFontProps {
-	font:string;
-	size:number;
-	bold:boolean;
-	italic:boolean;
-	underline:boolean;
-	color:number;
-}
-
 class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeaveLayoutManagerState>
 {
 	private element:HTMLElement;
@@ -99,8 +90,6 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 	private throttledForceUpdate:() => void;
 	private throttledForceUpdateTwice:() => void;
 	private properties:WeavePath;
-	private visFontProps:IWeaveFontProps;
-	private panelFontProps:IWeaveFontProps;
 	
 	constructor(props:IWeaveLayoutManagerProps)
 	{
@@ -110,7 +99,6 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		this.margin = 8;
 		this.throttledForceUpdate = _.throttle(() => { this.forceUpdate(); }, 30);
 		this.throttledForceUpdateTwice = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30);
-		this.properties = this.weave.path(["WeaveProperties"]);
 	}
 
 	componentDidMount():void
@@ -122,7 +110,6 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		this.weave.path(LAYOUT).addCallback(this, this.throttledForceUpdate, true);
 		this.weave.path(LAYOUT).state(this.simplifyState(this.weave.path(LAYOUT).getState()));
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.frameHandler, true);
-		this.properties.addCallback(this, this.throttledForceUpdate, true);
 	}
 
 	componentWillUnmount():void
@@ -419,24 +406,6 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		var paths:WeavePath[];
 		var path:WeavePath;
 
-		this.visFontProps = {
-			font: this.properties.getObject("visTextFormat","font").value,
-			size: this.properties.getObject("visTextFormat","size").value,
-			bold: this.properties.getObject("visTextFormat","bold").value,
-			italic: this.properties.getObject("visTextFormat","italic").value,
-			underline: this.properties.getObject("visTextFormat","underline").value,
-			color: this.properties.getObject("visTextFormat","color").value
-		}
-
-		this.panelFontProps = {
-			font: this.properties.getObject("panelTitleTextFormat","font").value,
-			size: this.properties.getObject("panelTitleTextFormat","size").value,
-			bold: this.properties.getObject("panelTitleTextFormat","bold").value,
-			italic: this.properties.getObject("panelTitleTextFormat","italic").value,
-			underline: this.properties.getObject("panelTitleTextFormat","underline").value,
-			color: this.properties.getObject("panelTitleTextFormat","color").value
-		}
-
 		if (!newState)
 		{
 			newState = this.generateLayoutState(this.weave.path().getChildren().filter(path => getToolImplementation(path)));
@@ -474,7 +443,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 			}
 			children.push(
 				<WeaveTool
-					ref={toolName} key={toolName} toolPath={path} toolFont={this.visFontProps} panelFont={this.panelFontProps} style={toolPosition}
+					ref={toolName} key={toolName} toolPath={path} style={toolPosition}
 					onDragOver={this.onDragOver.bind(this, path.getPath())}
 					onDragStart={this.onDragStart.bind(this, path.getPath())}
 					onDragEnd={this.onDragEnd.bind(this)} />
