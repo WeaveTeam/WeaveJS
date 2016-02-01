@@ -1,13 +1,14 @@
 /// <reference path="../../typings/react/react.d.ts"/>
 /// <reference path="../../typings/weave/WeavePath.d.ts"/>
 /// <reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
+/// <reference path="../../typings/lodash/lodash.d.ts"/>
 
 import * as React from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import ui from "../react-ui/ui";
 import * as bs from "react-bootstrap";
 import {registerToolImplementation} from "../WeaveTool";
-
+import * as _ from "lodash";
 
 var IColumnStatistics = weavejs.api.data.IColumnStatistics;
 var LinkableString = weavejs.core.LinkableString;
@@ -15,6 +16,7 @@ var ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
 var ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
 var LinkableBoolean = weavejs.core.LinkableBoolean;
 var LinkableVariable = weavejs.core.LinkableVariable;
+var IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 interface IDataFilterPaths {
     editor:WeavePath;
@@ -124,14 +126,13 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
     public enabled:LinkableBoolean;
     public values:LinkableVariable;
 
+    private options:string[];
+
     constructor(props:DiscreteValuesDataFilterEditorProps) {
         super(props);
         //this.filter = this.props.filter.target as ColumnDataFilter;
         //this.layoutMode.addGroupedCallback(this, this.forceUpdate);
         //console.log(this.filter);
-    }
-
-    componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps) {
         this.layoutMode = this.props.editor.getObject("layoutMode");
         this.showToggle = this.props.editor.getObject("showToggle");
         this.showToggleLabel = this.props.editor.getObject("showToggleLabel");
@@ -140,42 +141,80 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
         this.enabled = this.filter.enabled;
     }
 
+    componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps) {
+        console.log("receive props");
+        this.layoutMode = this.props.editor.getObject("layoutMode");
+        this.showToggle = this.props.editor.getObject("showToggle");
+        this.showToggleLabel = this.props.editor.getObject("showToggleLabel");
+        this.filter = this.props.filter.getObject() as ColumnDataFilter;
+        this.column = this.filter.column;
+        this.enabled = this.filter.enabled;
+    }
+
+    componentDidMount() {
+        this.layoutMode.addGroupedCallback(this, this.forceUpdate);
+        this.showToggle.addGroupedCallback(this, this.forceUpdate);
+        this.showToggleLabel.addGroupedCallback(this, this.forceUpdate);
+        this.column.addGroupedCallback(this, this.columnChanged);
+        //this.enabled = this.filter.enabled;
+    }
+
+    columnChanged() {
+        this.options = _.sortBy(_.uniq(this.column.keys.map((key:IQualifiedKey) => {
+            return this.column.getValueFromKey(key, String);
+        }) as string));
+        this.forceUpdate();
+    }
+
+    onChange(selectedValues:string[]) {
+        console.log(selectedValues);
+        //this.values.state = selectedValues;
+    }
+
     protected handleMissingSessionStateProperties(newState:any)
     {
 
     }
 
-    // renderCheckBoxList():JSX.Element
-    // {
-    //     return <div>CheckBoxList</div>;
-    // }
-    //
-    // renderHSlider():JSX.Element
-    // {
-    //     return <div>HSlider</div>;
-    // }
-    //
-    // renderVSlider():JSX.Element
-    // {
-    //     return <div>VSlider</div>;
-    // }
-    //
-    // renderList():JSX.Element
-    // {
-    //     return <div>List</div>;
-    // }
-    //
-    // renderCombobox():JSX.Element
-    // {
-    //     return <div>ComboBox</div>;
-    // }
+    renderCheckBoxList():JSX.Element
+    {
+        return <div>CheckBoxList</div>;
+    }
+
+    renderHSlider():JSX.Element
+    {
+        return <div>HSlider</div>;
+    }
+
+    renderVSlider():JSX.Element
+    {
+        return <div>VSlider</div>;
+    }
+
+    renderList():JSX.Element
+    {
+        return <div>List</div>;
+    }
+
+    renderCombobox():JSX.Element
+    {
+        return <div>ComboBox</div>;
+    }
 
     render():JSX.Element {
-        // switch (this.layoutMode.value) {
-        //     case DiscreteValuesDataFilterEditor.LAYOUT_LIST:
-        //         return <ui.CheckBoxList/>
-        // }
-        return <div>Discrete Filter</div>;
+        //if(this.layout)
+        switch (this.layoutMode && this.layoutMode.value) {
+            case DiscreteValuesDataFilterEditor.LAYOUT_CHECKBOXLIST:
+                return <ui.CheckBoxList values={this.options} onChange={this.onChange.bind(this)}/>
+            case DiscreteValuesDataFilterEditor.LAYOUT_LIST:
+                return <ui.ListItem values={this.options}/>
+            case DiscreteValuesDataFilterEditor.LAYOUT_HSLIDER:
+                return <div>HSlider</div>
+            case DiscreteValuesDataFilterEditor.LAYOUT_VSLIDER:
+                return <div>VSlider</div>
+            case DiscreteValuesDataFilterEditor.LAYOUT_COMBO:
+                return <div>ComboBox</div>
+        }
     }
 }
 //Weave.registerClass("weave.editors.DiscreteValuesDataFilterEditor", {}, [weavejs.api.core.ILinkableObjectWithNewProperties]);

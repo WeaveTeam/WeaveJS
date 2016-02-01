@@ -9,13 +9,13 @@ import * as bs from "react-bootstrap";
 import * as _ from "lodash";
 import VBox from "./VBox";
 import HBox from "./Hbox";
+import StandardLib from "../utils/StandardLib";
 
 interface IListItemProps extends React.Props<ListItem> {
     values:any[];
     labels?:string[];
     onChange?:(selectedValues:string[]) => void;
     selectedValues?:string[];
-    labelPosition:string;
 }
 
 interface IListItemstate {
@@ -30,9 +30,11 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
     constructor(props:IListItemProps) {
         super(props);
         this.state = {
-            selectedValues: props.selectedValues
+            selectedValues: props.selectedValues || []
         };
-        this.lastIndexClicked = props.selectedValues.length - 1;
+        if(props.selectedValues) {
+            this.lastIndexClicked = props.selectedValues.length - 1;
+        }
     }
 
     componentWillReceiveProps(nextProps:IListItemProps) {
@@ -110,29 +112,28 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
     }
 
     render():JSX.Element {
-        var labelPosition:string = this.props.labelPosition || "right";
-
-
+        console.log(this.state.selectedValues);
+        var values:string[] = this.props.values || [];
         return (
-            <VBox style={{height: "100%", width: "100%"}}>
+            <div style={{height: "100%", width: "100%", overflow: "scroll"}}>
                 {
-                    this.props.values.map((value:string, index:number) => {
+                    values.map((value:string, index:number) => {
+                        console.log(this.state.selectedValues.indexOf(value))
                         var style:React.CSSProperties = {
                             padding: 5,
-                            borderStyle: "solid",
-                            borderWith: 1,
-                            backgroundColor: this.state.selectedValues.indexOf(value) > -1 ? "red" : "blue",
-                            width: "100%"
+                            backgroundColor: this.state.selectedValues.indexOf(value) > -1 ? "#80CCFF" : StandardLib.rgba(255, 255, 255, 0),
+                            height: 30,
+                            width: "100%",
                         };
-
+                        console.log(style);
                         return (
-                            <HBox key={index} style={style} onClick={this.handleChange.bind(this, this.props.values[index])}>
-                               <span>{this.props.labels[index]}</span>
+                            <HBox key={index} style={style} onClick={this.handleChange.bind(this, values[index])}>
+                               <span style={{width:"100%", height:"100%", userSelect: "none"}}>{this.props.labels ? this.props.labels[index] : value}</span>
                             </HBox>
                         );
                     })
                 }
-            </VBox>
+            </div>
         );
     }
 }

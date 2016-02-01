@@ -6,3 +6,4 @@ declare type ILinkableDynamicObject = any;
 declare type ColumnDataFilter = any;
 declare type LinkableBoolean = any;
 declare type LinkableVariable = any;
+declare type IQualifiedKey = any;
