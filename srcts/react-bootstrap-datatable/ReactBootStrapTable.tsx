@@ -45,9 +45,10 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     constructor(props:IReactBootstrapTableProps) {
         super(props);
         this.state = {
-            probedIds: [],
-            selectedIds: []
+            selectedIds: props.selectedIds,
+            probedIds: props.probedIds
         }
+        this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
     }
 
     onMouseOver(id:string, status:boolean) {
@@ -100,7 +101,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         // shift selection
         else if(event.shiftKey) {
             selectedIds = [];
-            if(!this.lastClicked)
+            if(this.lastClicked == null)
             {
             } else {
                 var start:number = _.findIndex(this.props.rows, (row:IRow) => {
