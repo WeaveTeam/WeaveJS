@@ -73,7 +73,7 @@ export var loadLayout = function(weave:Weave, fileName:string, targetEltId:strin
 
     function render() {
         ReactDOM.render(
-            <Layout weave={weave}/>,
+            <Layout weave={weave} style={{width: "100%", height: "100%"}}/>,
             document.getElementById(targetEltId),
             callback
         );
