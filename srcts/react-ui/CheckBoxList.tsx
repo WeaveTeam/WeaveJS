@@ -15,7 +15,7 @@ interface ICheckBoxListProps extends React.Props<CheckBoxList> {
     labels?:string[];
     onChange?:(selectedValues:string[]) => void;
     selectedValues?:string[];
-    labelPosition:string;
+    labelPosition?:string;
 }
 
 interface ICheckBoxListState {
