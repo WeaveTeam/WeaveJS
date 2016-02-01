@@ -56,7 +56,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 			overflow: "hidden",
 			whiteSpace: "nowrap",
 			textOverflow: "ellipsis",
-			paddingLeft: 5,
+			padding: 5,
 			userSelect: "none"
 		};
 	}
@@ -291,7 +291,8 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 											}}>
 												<div style={{
 															stroke: "black",
-															strokeOpacity: 0.5
+															strokeOpacity: 0.5,
+															backgroundColor: "#FFF"
 														}}>
 													<span style={prefixerStyle}>{ textLabelFunction(i) }</span>
 												</div>
