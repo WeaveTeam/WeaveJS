@@ -209,6 +209,11 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
                         return this.normalizedPointSizes[d.index];
                     }
 
+                },
+                focus: {
+                    expand: {
+                        enabled: false
+                    }
                 }
             },
             onrendered: () => {
@@ -372,7 +377,8 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
 	        .selectAll("circle")
 	        .style("opacity", 1)
             .style("stroke", "black")
-            .style("stroke-opacity", 0.0);
+            .style("stroke-opacity", 0.0)
+            .style("stroke-width",1.0);
 
         var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
         var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
@@ -391,7 +397,7 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         unselectedIndices = _.difference(unselectedIndices,probedIndices);
         if (probedIndices.length)
         {
-            this.customStyle(probedIndices, "circle", ".c3-shape", {opacity:1.0, "stroke-opacity": 0.0});
+            this.customStyle(probedIndices, "circle", ".c3-shape", {opacity:1.0, "stroke-opacity": 0.5, "stroke-width": 1.5});
         }
         if (selectedIndices.length)
         {
