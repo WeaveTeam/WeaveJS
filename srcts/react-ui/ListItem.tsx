@@ -19,58 +19,93 @@ interface IListItemProps extends React.Props<ListItem> {
 }
 
 interface IListItemstate {
-    itemStates:boolean[];
+    selectedValues:string[];
 }
 export default class ListItem extends React.Component<IListItemProps, IListItemstate> {
 
     private checkboxes:HTMLElement[];
+    private lastIndexClicked:number;
+    private selectedValues:string[];
 
     constructor(props:IListItemProps) {
         super(props);
-
-        if(this.props.selectedValues) {
-            this.state = {
-                itemStates: props.values.map((value) => {
-                    return props.selectedValues.indexOf(value) > -1;
-                })
-            }
-        } else {
-            this.state = {
-                itemStates: props.values.map((value) => {
-                    return false;
-                })
-            }
-        }
+        this.state = {
+            selectedValues: props.selectedValues
+        };
+        this.lastIndexClicked = props.selectedValues.length - 1;
     }
 
     componentWillReceiveProps(nextProps:IListItemProps) {
         if(nextProps.selectedValues) {
-            var itemStates:boolean[] = nextProps.values.map((value) => {
-                return nextProps.selectedValues.indexOf(value) > -1;
-            });
-
             this.setState({
-                itemStates
+                selectedValues: nextProps.selectedValues
             });
         }
     }
 
-    handleChange(index:number, event:React.MouseEvent) {
-        console.log("change event");
-        var itemStates:boolean[] = this.state.itemStates.splice(0);
-        itemStates[index] = !itemStates[index];
-        var selectedValues:string[] = [];
-        itemStates.forEach((itemState:boolean, index:number) => {
-            if(itemState) {
-                selectedValues.push(this.props.values[index]);
+    handleChange(value:string, event:React.MouseEvent) {
+        var selectedValues:string[] = this.state.selectedValues.splice(0);
+        // new state of the item in the list
+
+        var currentIndexClicked:number = selectedValues.indexOf(value);
+        // ctrl selection
+        if(event.ctrlKey || event.metaKey)
+        {
+            if(currentIndexClicked > -1)
+            {
+                selectedValues.splice(currentIndexClicked, 1);
             }
-        });
+            else
+            {
+                selectedValues.push(value);
+            }
+            this.lastIndexClicked = currentIndexClicked;
+        }
+        // shift selection
+        else if(event.shiftKey)
+        {
+            selectedValues = [];
+            if(this.lastIndexClicked == null)
+            {
+                // do nothing
+            } else {
+                var start:number = this.lastIndexClicked;
+                var end:number = this.props.values.indexOf(value);
+
+                if(start > end) {
+                    let temp:number = start;
+                    start = end;
+                    end = temp;
+                }
+
+                for(var i:number = start; i <= end; i++) {
+                    selectedValues.push(this.props.values[i]);
+                }
+            }
+        }
+        // single selection
+        else {
+            // if there was only one record selected
+            // and we are clicking on it again, then we want to
+            // clear the selection.
+            if(selectedValues.length == 1 && selectedValues[0] == value)
+            {
+                selectedValues = [];
+                this.lastIndexClicked = null;
+            }
+            else
+            {
+                selectedValues = [value];
+                this.lastIndexClicked = this.props.values.indexOf(value);
+            }
+        }
 
         if(this.props.onChange)
             this.props.onChange(selectedValues);
 
+
         this.setState({
-            itemStates
+          selectedValues
         });
     }
 
@@ -81,24 +116,18 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
         return (
             <VBox style={{height: "100%", width: "100%"}}>
                 {
-                    this.state.itemStates.map((itemState:boolean, index:number) => {
+                    this.props.values.map((value:string, index:number) => {
                         var style:React.CSSProperties = {
                             padding: 5,
                             borderStyle: "solid",
                             borderWith: 1,
-                            backgroundColor: itemState ? "red" : "blue",
+                            backgroundColor: this.state.selectedValues.indexOf(value) > -1 ? "red" : "blue",
                             width: "100%"
                         };
-                        var listItem:JSX.Element[] = [
-                            <HBox style={style} onClick={this.handleChange.bind(this, index)}>
-                                <span>{this.props.labels[index]}</span>
-                            </HBox>
-                        ];
+
                         return (
-                            <HBox key={index}>
-                                {
-                                    labelPosition == "right" ? listItem : listItem.reverse()
-                                }
+                            <HBox key={index} style={style} onClick={this.handleChange.bind(this, this.props.values[index])}>
+                               <span>{this.props.labels[index]}</span>
                             </HBox>
                         );
                     })
