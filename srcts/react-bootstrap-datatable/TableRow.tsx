@@ -99,6 +99,6 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
                     cells
                 }
             </tr>
-        )
+        );
     }
 }

@@ -67,12 +67,12 @@ class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> im
     //     }
     // }
 
-    handleProbe(id:string) {
-        this.toolPath.probe_keyset.setKeys(id);
+    handleProbe(ids:string[]) {
+        this.toolPath.probe_keyset.setKeys(ids);
     }
 
-    handleSelection(id:string) {
-        this.toolPath.push("selectionKeySet", null).setKeys(id);
+    handleSelection(ids:string[]) {
+        this.toolPath.push("selectionKeySet", null).setKeys(ids);
     }
 
     render() {

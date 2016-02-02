@@ -1,4 +1,11 @@
 declare var weavejs:any;
+declare type IAttributeColumn = any;
+declare type IColumnStatistics = any
+declare type LinkableString = any;
+declare type ILinkableDynamicObject = any;
+declare type ColumnDataFilter = any;
+declare type LinkableBoolean = any;
+declare type LinkableVariable = any;
 
 declare class IQualifiedKey {
 	keyType: string;
@@ -25,7 +32,7 @@ declare module weavejs_fake.api.core {
 		triggerCallbacks(): void;
 		delayCallbacks(): void;
 		resumeCallbacks(): void;
-		
+
 		callbacksAreDelayed: boolean;
 		triggerCounter: number;
 	}

@@ -114,8 +114,8 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 
         if(this.state.active) {
             style.visibility = "visible";
-            style.left = this.state.x;
-            style.top = this.state.y;
+            style.left = !isNaN(this.state.x) ? this.state.x : undefined;
+            style.top = !isNaN(this.state.y) ? this.state.y : undefined;
         } else {
             style.visibility = "hidden";
         }

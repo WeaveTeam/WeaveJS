@@ -20,6 +20,7 @@ import WeaveC3Histogram from "./tools/weave-c3-histogram";
 import SessionStateMenuTool from "./tools/weave-session-state-menu";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import WeaveReactTable from "./tools/weave-react-table";
+import DataFilterTool from "./tools/DataFilterTool";
 
 // Temporary solution
 // because typescript removes
@@ -34,7 +35,8 @@ var v1:any = [
 	WeaveC3Histogram,
 	SessionStateMenuTool,
 	WeaveOpenLayersMap,
-	WeaveReactTable
+	WeaveReactTable,
+	DataFilterTool
 ];
 ///////////////////////////////
 
@@ -90,7 +92,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 	private throttledForceUpdate:() => void;
 	private throttledForceUpdateTwice:() => void;
 	private properties:WeavePath;
-	
+
 	constructor(props:IWeaveLayoutManagerProps)
 	{
 		super(props);
@@ -104,7 +106,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 	componentDidMount():void
 	{
 		this.savePrevClientSize();
-		
+
 		window.addEventListener("resize", this.throttledForceUpdateTwice);
 		this.weave.root.childListCallbacks.addGroupedCallback(this, this.throttledForceUpdate, true);
 		this.weave.path(LAYOUT).addCallback(this, this.throttledForceUpdate, true);
@@ -121,7 +123,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 	componentDidUpdate():void
 	{
 		this.savePrevClientSize();
-		
+
 		if (Weave.detectChange(this, this.weave.getObject(LAYOUT)) || this.dirty)
 		{
 			// dirty flag to trigger render on window resize
@@ -129,7 +131,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 			this.throttledForceUpdate();
 		}
 	}
-	
+
 	frameHandler():void
 	{
 		var node:Element = ReactDOM.findDOMNode(this);
@@ -137,7 +139,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 			this.throttledForceUpdateTwice();
 		this.savePrevClientSize();
 	}
-	
+
 	savePrevClientSize():void
 	{
 		var node:Element = ReactDOM.findDOMNode(this);
@@ -376,7 +378,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		}
 		this.saveState(newState);
 	}
-	
+
 	getIdPaths(state:any, output?:WeavePath[]):WeavePath[]
 	{
 		if (!output)
@@ -388,7 +390,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 				this.getIdPaths(child, output);
 		return output;
 	}
-	
+
 	generateLayoutState(paths:WeavePath[]):Object
 	{
 		// temporary solution - needs improvement
@@ -410,11 +412,11 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		{
 			newState = this.generateLayoutState(this.weave.path().getChildren().filter(path => getToolImplementation(path)));
 			//TODO - generate layout state from
-			this.weave.path(LAYOUT).state(newState); 
+			this.weave.path(LAYOUT).state(newState);
 		}
-		
+
 		paths = this.getIdPaths(newState);
-		
+
 		var rect:ClientRect;
 		if (this.element)
 			rect = this.element.getBoundingClientRect();

@@ -17,7 +17,6 @@ export default class HBox extends React.Component<any, any> {
             }
         }
 
-        style = style || {};
         style.display = "flex";
         style.flexDirection = "row";
 

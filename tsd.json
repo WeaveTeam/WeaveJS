@@ -6,7 +6,7 @@
   "bundle": "typings/tsd.d.ts",
   "installed": {
     "jquery/jquery.d.ts": {
-      "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
+      "commit": "86dbea8fc37d9473fee465da4f0a21bea4f8cbd9"
     },
     "openlayers/openlayers.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
@@ -43,6 +43,9 @@
     },
     "jszip/jszip.d.ts": {
       "commit": "dc9dabe74a5be62613b17a3605309783a12ff28a"
+    },
+    "bootstrap-slider/bootstrap-slider.d.ts": {
+      "commit": "86dbea8fc37d9473fee465da4f0a21bea4f8cbd9"
     }
   }
 }
