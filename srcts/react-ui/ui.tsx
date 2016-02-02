@@ -1,7 +1,7 @@
 import HBox from "./HBox";
 import VBox from "./VBox";
-import HSlider from "./BootstrapSlider/HSlider";
-import VSlider from "./BootstrapSlider/VSlider";
+import HSlider from "./RCSlider/HSlider";
+import VSlider from "./RCSlider/VSlider";
 import CheckBoxList from "./CheckBoxList";
 import ListItem from "./ListItem";
 

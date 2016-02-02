@@ -57,7 +57,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
     }
 
     get title():string {
-        return "";
+       return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
     }
 
     render():JSX.Element {
@@ -165,6 +165,7 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
     }
 
     onChange(selectedValues:string[]) {
+        console.log(selectedValues);
         this.values.setSessionState(selectedValues);
     }
 
@@ -174,17 +175,15 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
     }
 
     render():JSX.Element {
-        //if(this.layout)
-        console.log("render");
         switch (this.layoutMode && this.layoutMode.value) {
             case DiscreteValuesDataFilterEditor.LAYOUT_CHECKBOXLIST:
                 return <ui.CheckBoxList values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_LIST:
                 return <ui.ListItem values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_HSLIDER:
-                return <div>HSlider</div>
+                return <ui.HSlider type="categorical" values={this.options} selectedValues={this.values.getSessionState()}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_VSLIDER:
-                return <div>VSlider</div>
+                return <ui.VSlider type="categorical" values={this.options} selectedValues={this.values.getSessionState()}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_COMBO:
                 return <div>ComboBox</div>
         }

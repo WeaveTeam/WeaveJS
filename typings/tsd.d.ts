@@ -11,4 +11,3 @@
 /// <reference path="react/react-dom.d.ts" />
 /// <reference path="swfobject/swfobject.d.ts" />
 /// <reference path="jszip/jszip.d.ts" />
-/// <reference path="bootstrap-slider/bootstrap-slider.d.ts" />
