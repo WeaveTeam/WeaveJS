@@ -79,15 +79,15 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
         var labelPosition:string = this.props.labelPosition || "right";
 
         return (
-            <VBox style={{height: "100%", width: "100%"}}>
+            <div style={{height: "100%", width: "100%", overflow: "scroll"}}>
                 {
                     this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
                         var checkboxItem:JSX.Element[] = [
                             <input type="checkbox" checked={checkBoxState} value={this.props.values[index]} onChange={this.handleChange.bind(this, index)}/>,
-                            <span>{this.props.labels[index]}</span>
+                            <span style={{paddingLeft: 5}}>{this.props.labels ? this.props.labels[index] : this.props.values[index]}</span>
                         ];
                         return (
-                            <HBox key={index}>
+                            <HBox key={index} style={{height: 30, paddingLeft: 10}}>
                                 {
                                     labelPosition == "right" ? checkboxItem : checkboxItem.reverse()
                                 }
@@ -95,7 +95,7 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
                         );
                     })
                 }
-            </VBox>
+            </div>
         );
     }
 }

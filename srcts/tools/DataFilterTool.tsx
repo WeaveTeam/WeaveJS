@@ -130,23 +130,22 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 
     constructor(props:DiscreteValuesDataFilterEditorProps) {
         super(props);
-        //this.filter = this.props.filter.target as ColumnDataFilter;
-        //this.layoutMode.addGroupedCallback(this, this.forceUpdate);
-        //console.log(this.filter);
         this.layoutMode = this.props.editor.getObject("layoutMode");
         this.showToggle = this.props.editor.getObject("showToggle");
         this.showToggleLabel = this.props.editor.getObject("showToggleLabel");
         this.filter = this.props.filter.getObject() as ColumnDataFilter;
+        this.values = this.filter.values;
         this.column = this.filter.column;
         this.enabled = this.filter.enabled;
+        this.options = [];
     }
 
     componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps) {
-        console.log("receive props");
         this.layoutMode = this.props.editor.getObject("layoutMode");
         this.showToggle = this.props.editor.getObject("showToggle");
         this.showToggleLabel = this.props.editor.getObject("showToggleLabel");
         this.filter = this.props.filter.getObject() as ColumnDataFilter;
+        this.values = this.filter.values;
         this.column = this.filter.column;
         this.enabled = this.filter.enabled;
     }
@@ -156,7 +155,6 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
         this.showToggle.addGroupedCallback(this, this.forceUpdate);
         this.showToggleLabel.addGroupedCallback(this, this.forceUpdate);
         this.column.addGroupedCallback(this, this.columnChanged);
-        //this.enabled = this.filter.enabled;
     }
 
     columnChanged() {
@@ -167,8 +165,7 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
     }
 
     onChange(selectedValues:string[]) {
-        console.log(selectedValues);
-        //this.values.state = selectedValues;
+        this.values.setSessionState(selectedValues);
     }
 
     protected handleMissingSessionStateProperties(newState:any)
@@ -176,38 +173,14 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 
     }
 
-    renderCheckBoxList():JSX.Element
-    {
-        return <div>CheckBoxList</div>;
-    }
-
-    renderHSlider():JSX.Element
-    {
-        return <div>HSlider</div>;
-    }
-
-    renderVSlider():JSX.Element
-    {
-        return <div>VSlider</div>;
-    }
-
-    renderList():JSX.Element
-    {
-        return <div>List</div>;
-    }
-
-    renderCombobox():JSX.Element
-    {
-        return <div>ComboBox</div>;
-    }
-
     render():JSX.Element {
         //if(this.layout)
+        console.log("render");
         switch (this.layoutMode && this.layoutMode.value) {
             case DiscreteValuesDataFilterEditor.LAYOUT_CHECKBOXLIST:
-                return <ui.CheckBoxList values={this.options} onChange={this.onChange.bind(this)}/>
+                return <ui.CheckBoxList values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_LIST:
-                return <ui.ListItem values={this.options}/>
+                return <ui.ListItem values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_HSLIDER:
                 return <div>HSlider</div>
             case DiscreteValuesDataFilterEditor.LAYOUT_VSLIDER:

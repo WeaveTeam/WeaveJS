@@ -2,6 +2,7 @@
 /// <reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
 /// <reference path="../../typings/react-swf/react-swf.d.ts"/>
 /// <reference path="../../typings/lodash/lodash.d.ts"/>
+/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -10,6 +11,7 @@ import * as _ from "lodash";
 import VBox from "./VBox";
 import HBox from "./Hbox";
 import StandardLib from "../utils/StandardLib";
+import * as Prefixer from "react-vendor-prefix";
 
 interface IListItemProps extends React.Props<ListItem> {
     values:any[];
@@ -19,7 +21,8 @@ interface IListItemProps extends React.Props<ListItem> {
 }
 
 interface IListItemstate {
-    selectedValues:string[];
+    selectedValues?:string[];
+    hovered?:number;
 }
 export default class ListItem extends React.Component<IListItemProps, IListItemstate> {
 
@@ -112,23 +115,48 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
     }
 
     render():JSX.Element {
-        console.log(this.state.selectedValues);
         var values:string[] = this.props.values || [];
+
+        var spanStyle:React.CSSProperties = {
+            width:"100%",
+            height:"100%",
+            userSelect: "none"
+        }
+
+        spanStyle = Prefixer.prefix({styles: spanStyle}).styles;
+
         return (
             <div style={{height: "100%", width: "100%", overflow: "scroll"}}>
                 {
                     values.map((value:string, index:number) => {
-                        console.log(this.state.selectedValues.indexOf(value))
+                        var hovered:boolean = this.state.hovered == index;
+                        var selected:boolean = this.state.selectedValues.indexOf(value) > -1;
+
                         var style:React.CSSProperties = {
                             padding: 5,
-                            backgroundColor: this.state.selectedValues.indexOf(value) > -1 ? "#80CCFF" : StandardLib.rgba(255, 255, 255, 0),
                             height: 30,
                             width: "100%",
                         };
-                        console.log(style);
+
+                        if(selected && hovered) {
+                            style["backgroundColor"] = "#99D6FF";
+                        }
+
+                        if(selected && !hovered) {
+                            style["backgroundColor"] = "#80CCFF";
+                        }
+
+                        if(!selected && hovered) {
+                            style["backgroundColor"] = StandardLib.rgba(153, 214, 255, 0.4);
+                        }
+
+                        if(!selected && !hovered) {
+                            style["backgroundColor"] = "#FFFFFF";
+                        }
+
                         return (
-                            <HBox key={index} style={style} onClick={this.handleChange.bind(this, values[index])}>
-                               <span style={{width:"100%", height:"100%", userSelect: "none"}}>{this.props.labels ? this.props.labels[index] : value}</span>
+                            <HBox key={index} style={style} onMouseOver={(event:React.MouseEvent) => { this.setState({hovered: index}) }} onClick={this.handleChange.bind(this, values[index])}>
+                               <span style={spanStyle}>{this.props.labels ? this.props.labels[index] : value}</span>
                             </HBox>
                         );
                     })
