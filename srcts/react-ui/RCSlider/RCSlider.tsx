@@ -29,6 +29,21 @@ export default class RCSlider extends React.Component<any, any> {
         super(props);
     }
 
+    onChange(value:number|number[]) {
+        if(this.props.type == RCSlider.CATEGORICAL) {
+            let selectedValues:string[] = [this.indexToValues[value as number]];
+            this.props.onChange(selectedValues);
+        }
+
+        if(this.props.type == RCSlider.NUMERIC) {
+            let selectedValues:Object[] = [{
+                min: value[0],
+                max: value[1]
+            }];
+            this.props.onChange(selectedValues);
+        }
+    }
+
     render() {
         this.options = [];
         this.indexToValues = {};
@@ -47,8 +62,8 @@ export default class RCSlider extends React.Component<any, any> {
                            max={this.options.length}
                            step={null}
                            marks={this.indexToValues}
-                           value={this.props.selectedValues[0]}
-                           onChange={this.props.onChange}
+                           value={this.valueToIndex[this.props.selectedValues[0]]}
+                           onChange={this.onChange.bind(this)}
                     />;
 
         }
@@ -58,8 +73,8 @@ export default class RCSlider extends React.Component<any, any> {
                            min={this.props.min}
                            max={this.props.max}
                            step={null}
-                           value={this.props.selectedValues}
-                           onChange={this.props.onChange}
+                           value={[this.props.selectedValues[0]["min"], this.props.selectedValues[0]["max"]]}
+                           onChange={this.onChange.bind(this)}
                     />
         }
     }
