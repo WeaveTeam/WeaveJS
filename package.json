@@ -47,7 +47,7 @@
     "jquery": "^2.1.4",
     "jquery-resizable-columns": "^0.2.3",
     "jszip": "^2.5.0",
-    "lodash": "^3.10.0",
+    "lodash": "^3.10.1",
     "openlayers": "^3.13.0",
     "radium": "^0.15.3",
     "rc-slider": "^3.3.2",

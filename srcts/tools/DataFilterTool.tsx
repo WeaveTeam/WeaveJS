@@ -85,8 +85,30 @@ interface NumericRangeDataFilterEditorState {
 
 class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilterEditorProps, NumericRangeDataFilterEditorState> {
 
+    public column:IAttributeColumn;
+    public enabled:LinkableBoolean;
+    public values:LinkableVariable;
+    public filter:ColumnDataFilter;
+    public forceDiscreteValues:LinkableBoolean;
+
+    private min:number;
+    private max:number;
+    private options:any;
+
     constructor(props:NumericRangeDataFilterEditorProps) {
         super(props);
+        this.filter = this.props.filter.getObject() as ColumnDataFilter;
+        this.values = this.filter.values;
+        this.column = this.filter.column;
+        this.forceDiscreteValues = this.props.editor.getObject("forceDiscreteValues");
+        this.options = [];
+    }
+
+    componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps) {
+        this.filter = this.props.filter.getObject() as ColumnDataFilter;
+        this.values = this.filter.values;
+        this.column = this.filter.column;
+        this.forceDiscreteValues = this.props.editor.getObject("forceDiscreteValues");
     }
 
     protected handleMissingSessionStateProperties(newState:any)
@@ -94,9 +116,36 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 
     }
 
+    componentDidMount() {
+        this.forceDiscreteValues.addGroupedCallback(this, this.columnChanged);
+        this.column.addGroupedCallback(this, this.columnChanged);
+    }
+
+    onChange(selectedValues:number[]) {
+        this.values.setSessionState(selectedValues);
+    }
+
+    columnChanged() {
+        this.options = _.sortByOrder(_.uniq(this.column.keys.map((key:IQualifiedKey) => {
+            return {
+                value: this.column.getValueFromKey(key, Number),
+                label: this.column.getValueFromKey(key, String)
+            };
+        }), "value"), ["value"], ["asc"]);
+        this.forceUpdate();
+    }
 
     render():JSX.Element {
-        return <div>Numeric Filter</div>;
+        let values:any = this.values.getSessionState();
+        if(this.forceDiscreteValues.value) {
+            return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
+                        <ui.HSlider type="numeric-discrete" values={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+                    </ui.HBox>;
+        } else {
+            return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
+                        <ui.HSlider type="numeric"  values={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+                    </ui.HBox>;
+        }
     }
 }
 //Weave.registerClass("weave.editors.NumericRangeDataFilterEditor", NumericRangeDataFilterEditor, [weavejs.api.core.ILinkableObjectWithNewProperties]);
@@ -127,7 +176,7 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
     public enabled:LinkableBoolean;
     public values:LinkableVariable;
 
-    private options:string[];
+    private options:any;
 
     constructor(props:DiscreteValuesDataFilterEditorProps) {
         super(props);
@@ -159,9 +208,13 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
     }
 
     columnChanged() {
-        this.options = _.sortBy(_.uniq(this.column.keys.map((key:IQualifiedKey) => {
-            return this.column.getValueFromKey(key, String);
-        }) as string));
+        this.options = _.sortByOrder(_.uniq(this.column.keys.map((key:IQualifiedKey) => {
+            let val:string = this.column.getValueFromKey(key, String);
+            return {
+                value: val,
+                label: val
+            };
+        }), "value"), ["value"], ["asc"]);
         this.forceUpdate();
     }
 
@@ -175,25 +228,27 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
     }
 
     render():JSX.Element {
+        let values:any = this.values.getSessionState();
+
         switch (this.layoutMode && this.layoutMode.value) {
             case DiscreteValuesDataFilterEditor.LAYOUT_CHECKBOXLIST:
-                return <ui.CheckBoxList values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
+                return <ui.CheckBoxList values={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_LIST:
-                return <ui.ListItem values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
+                return <ui.ListItem values={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_HSLIDER:
                 return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
-                            <ui.HSlider type="categorical" values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
+                            <ui.HSlider type="categorical" values={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
                         </ui.HBox>;
             case DiscreteValuesDataFilterEditor.LAYOUT_VSLIDER:
                 return <ui.VBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
-                            <ui.VSlider type="categorical" values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
+                            <ui.VSlider type="categorical" values={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
                         </ui.VBox>;
             case DiscreteValuesDataFilterEditor.LAYOUT_COMBO:
                 return <ui.VBox style={{height:"100%", flex:1.0, alignItems:"center"}}>
-                            <DropdownButton title={this.values.getSessionState()[0]} id="bs.dropdown">
+                            <DropdownButton title={values[0]} id="bs.dropdown">
                                 {
                                     this.options.map((option:string, index:number) => {
-                                        return  <MenuItem active={this.values.getSessionState().indexOf(option) > -1} key={index} onSelect={() => {this.values.setSessionState([option])}}>{option}</MenuItem>
+                                        return  <MenuItem active={values.indexOf(option) > -1} key={index} onSelect={() => {this.values.setSessionState([option])}}>{option}</MenuItem>
                                     })
                                 }
                             </DropdownButton>
