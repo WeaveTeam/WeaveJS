@@ -90,8 +90,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 	private prevClientHeight:number;
 	private throttledForceUpdate:() => void;
 	private throttledForceUpdateTwice:() => void;
-	private properties:WeavePath;
-
+	
 	constructor(props:IWeaveLayoutManagerProps)
 	{
 		super(props);
