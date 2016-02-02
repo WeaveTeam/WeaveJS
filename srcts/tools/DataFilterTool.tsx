@@ -9,6 +9,7 @@ import ui from "../react-ui/ui";
 import * as bs from "react-bootstrap";
 import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
+import {DropdownButton, MenuItem} from "react-bootstrap";
 
 var IColumnStatistics = weavejs.api.data.IColumnStatistics;
 var LinkableString = weavejs.core.LinkableString;
@@ -63,9 +64,9 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
     render():JSX.Element {
         var editorType:string = this.editor.getType();
         if(editorType == DataFilterTool.DISCRETEFILTERCLASS) {
-            return <DiscreteValuesDataFilterEditor editor={this.editor} filter={this.filter}/>;//React.createElement(this.editor.getSessionState()[0].className, {filter: this.filter.target})
+            return <DiscreteValuesDataFilterEditor editor={this.editor} filter={this.filter}/>
         } else if (editorType == DataFilterTool.RANGEFILTERCLASS){
-            return <NumericRangeDataFilterEditor editor={this.editor} filter={this.filter}/>;
+            return <NumericRangeDataFilterEditor editor={this.editor} filter={this.filter}/>
         } else {
             return <div/>;// blank tool
         }
@@ -165,7 +166,6 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
     }
 
     onChange(selectedValues:string[]) {
-        console.log(selectedValues);
         this.values.setSessionState(selectedValues);
     }
 
@@ -181,11 +181,23 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
             case DiscreteValuesDataFilterEditor.LAYOUT_LIST:
                 return <ui.ListItem values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
             case DiscreteValuesDataFilterEditor.LAYOUT_HSLIDER:
-                return <ui.HSlider type="categorical" values={this.options} selectedValues={this.values.getSessionState()}/>
+                return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
+                            <ui.HSlider type="categorical" values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
+                        </ui.HBox>;
             case DiscreteValuesDataFilterEditor.LAYOUT_VSLIDER:
-                return <ui.VSlider type="categorical" values={this.options} selectedValues={this.values.getSessionState()}/>
+                return <ui.VBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
+                            <ui.VSlider type="categorical" values={this.options} selectedValues={this.values.getSessionState()} onChange={this.onChange.bind(this)}/>
+                        </ui.VBox>;
             case DiscreteValuesDataFilterEditor.LAYOUT_COMBO:
-                return <div>ComboBox</div>
+                return <ui.VBox style={{height:"100%", flex:1.0, alignItems:"center"}}>
+                            <DropdownButton title={this.values.getSessionState()[0]} id="bs.dropdown">
+                                {
+                                    this.options.map((option:string, index:number) => {
+                                        return  <MenuItem active={this.values.getSessionState().indexOf(option) > -1} key={index} onSelect={() => {this.values.setSessionState([option])}}>{option}</MenuItem>
+                                    })
+                                }
+                            </DropdownButton>
+                        </ui.VBox>;
         }
     }
 }
