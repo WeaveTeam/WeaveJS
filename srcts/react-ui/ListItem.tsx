@@ -126,7 +126,7 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
         spanStyle = Prefixer.prefix({styles: spanStyle}).styles;
 
         return (
-            <div style={{height: "100%", width: "100%", overflow: "scroll"}}>
+            <div style={{height: "100%", width: "100%", overflow: "auto"}}>
                 {
                     values.map((value:string, index:number) => {
                         var hovered:boolean = this.state.hovered == index;
