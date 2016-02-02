@@ -50,6 +50,7 @@
     "lodash": "^3.10.0",
     "openlayers": "^3.13.0",
     "radium": "^0.15.3",
+    "rc-slider": "^3.3.2",
     "react": "^0.14.3",
     "react-bootstrap": "^0.28.1",
     "react-bootstrap-async-autocomplete": "0.0.3",
