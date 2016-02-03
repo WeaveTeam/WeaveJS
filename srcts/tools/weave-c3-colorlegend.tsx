@@ -43,7 +43,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 		super(props);
 		this.toolPath = props.toolPath;
 		this.plotterPath = this.toolPath.pushPlotter("plot");
-		this.colorColumnPath = this.plotterPath.push("dynamicColorColumn");
+		this.dynamicColorColumnPath = this.plotterPath.push("dynamicColorColumn");
 		this.binningDefinition = this.dynamicColorColumnPath.push(null, "internalDynamicColumn", null, "binningDefinition", null);
 		this.binnedColumnPath = this.dynamicColorColumnPath.push(null, "internalDynamicColumn", null);
 		this.maxColumnsPath = this.plotterPath.push("maxColumns");
