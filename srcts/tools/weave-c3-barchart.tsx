@@ -355,11 +355,10 @@ class WeaveC3Barchart extends AbstractC3Tool {
         // set axis rotation mode
         //this.chart.load({axes: { rotated: horizontalMode }});
 
-        if(this.groupingMode === "stack" || this.groupingMode === "percentStack") {
+        if (this.groupingMode === "stack" || this.groupingMode === "percentStack")
             this.c3Config.data.groups = [this.heightColumnNames];
-        } else if(this.groupingMode === "group") {
+        else //if(this.groupingMode === "group")
             this.c3Config.data.groups = [];
-        }
 
         if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
             // normalize the height columns to be percentages.
