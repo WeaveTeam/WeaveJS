@@ -6,11 +6,9 @@ import * as ol from "openlayers";
 import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 import Layer from "./Layer";
 
-declare var weavejs:any;
-declare var Weave:any;
-
-import ILinkableHashMap = weavejs_fake.api.core.ILinkableHashMap;
-import IAttributeColumn = weavejs_fake.api.data.IAttributeColumn;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
 class GeometryLayer extends FeatureLayer {
 
@@ -34,13 +32,13 @@ class GeometryLayer extends FeatureLayer {
 
 		this.geoColumnPath.addCallback(this, this.updateGeometryData);
 		this.projectionPath.addCallback(this, this.updateGeometryData);
-		this.filteredKeySet.removeCallback(this, this.updateMetaStyles);
+		Weave.getCallbacks(this.filteredKeySet).removeCallback(this, this.updateMetaStyles);
 
 		this.fillStylePath.addCallback(this, this.updateStyleData);
 		this.lineStylePath.addCallback(this, this.updateStyleData);
-		(<any>this.filteredKeySet).setColumnKeySources([this.geoColumnPath.getObject("internalDynamicColumn")]);
+		this.filteredKeySet.setColumnKeySources([this.geoColumnPath.getObject("internalDynamicColumn")]);
 
-		this.filteredKeySet.addGroupedCallback(this, this.updateGeometryData, true);
+		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateGeometryData, true);
 	}
 
 	handleMissingSessionStateProperties(newState)
@@ -82,9 +80,9 @@ class GeometryLayer extends FeatureLayer {
 		this.updateMetaStyles();
 	}
 
-	getToolTipColumns(): Array<any> /* Array<IAttributeColumn> */
+	getToolTipColumns():IAttributeColumn[]
 	{
-		let additionalColumns: Array<any> = new Array<any>();
+		let additionalColumns:IAttributeColumn[] = [];
 
 		for (let column of this.fillStylePath.getChildren().concat(this.lineStylePath.getChildren()))
 		{

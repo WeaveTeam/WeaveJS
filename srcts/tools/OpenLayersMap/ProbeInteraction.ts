@@ -9,8 +9,8 @@ import FeatureLayer from "./Layers/FeatureLayer";
 import OpenLayersMapTool from "../OpenLayersMapTool";
 import {IToolTipState} from "../tooltip";
 
-declare var Weave:any;
-declare var weavejs:any;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import KeySet = weavejs.data.key.KeySet;
 
 export default class ProbeInteraction extends ol.interaction.Pointer
 {
@@ -98,8 +98,8 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
 
 			toolTipState.showToolTip = true;
-			toolTipState.title = FeatureLayer.getToolTipTitle(key);
-			toolTipState.columnNamesToValue = FeatureLayer.getToolTipData(key, this.topLayer.getToolTipColumns());
+			toolTipState.title = this.getToolTipTitle(key);
+			toolTipState.columnNamesToValue = this.getToolTipData(key, this.topLayer.getToolTipColumns());
 			[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
 		}
 		else
@@ -124,5 +124,33 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		let toolTipState: IToolTipState = {};
 		toolTipState.showToolTip = false;
 		this.tool.props.toolTip.setState(toolTipState);
+	}
+	
+	/* TODO: Move this into WeaveTool */
+	getToolTipData(key:IQualifiedKey, additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string | number } 
+	{
+		let columnHashMap = this.tool.toolPath.weave.root.getObject("Probed Columns");
+
+		var result: { [columnName: string]: string | number } = {};
+
+		for (let child of columnHashMap.getObjects().concat(additionalColumns))
+		{
+			let title:string = child.getMetadata("title");
+			let value:string = child.getValueFromKey(key, String);
+			if (value)
+			{
+				result[title] = value;
+			}
+		}
+
+		return result;
+	}
+	
+	/* TODO: Move this into WeaveTool */
+	getToolTipTitle(key:any /* IQualifiedKey */): string
+	{
+		let titleHashMap = this.tool.toolPath.weave.root.getObject("Probe Header Columns");
+
+		return lodash.map(titleHashMap.getObjects(), (d:any) => d.getValueFromKey(key, String)).join(", ");
 	}
 }

@@ -51,7 +51,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 	centerCallbackHandle:any;
 	resolutionCallbackHandle:any;
 	private element:Element;
-	private toolPath:WeavePath;
+	public toolPath:WeavePath;
 
 	constructor(props)
 	{

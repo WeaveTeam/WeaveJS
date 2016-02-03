@@ -15,7 +15,8 @@ import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import StandardLib from "../utils/StandardLib";
-/* global Weave, weavejs */
+
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 interface IBarchartPaths extends IToolPaths {
     heightColumns: WeavePath;

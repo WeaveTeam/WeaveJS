@@ -8,7 +8,9 @@ import * as lodash from "lodash";
 import Layer from "./Layer";
 import StandardLib from "../../../utils/StandardLib";
 
-declare var weave;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import KeySet = weavejs.data.key.KeySet;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
 export abstract class FeatureLayer extends Layer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
@@ -21,7 +23,7 @@ export abstract class FeatureLayer extends Layer {
 
 	public probeKeySet:KeySet;
 
-	public filteredKeySet:KeySet;
+	public filteredKeySet:FilteredKeySet;
 
 	private selectableBoolean: any; /*LinkableBoolean*/
 
@@ -42,17 +44,16 @@ export abstract class FeatureLayer extends Layer {
 
 		this.changedItems = new Set();
 
-		this.selectionKeySet = weave.getObject("defaultSelectionKeySet")
-		this.probeKeySet = weave.getObject("defaultProbeKeySet");
+		this.selectionKeySet = this.layerPath.weave.getObject("defaultSelectionKeySet")
+		this.probeKeySet = this.layerPath.weave.getObject("defaultProbeKeySet");
 		this.filteredKeySet = this.layerPath.getObject("filteredKeySet");
 
 		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, new Set<IQualifiedKey>());
 		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, new Set<IQualifiedKey>());
 
-		this.selectionKeySet.addGroupedCallback(this, selectionKeyHandler, true);
-		this.probeKeySet.addGroupedCallback(this, probeKeyHandler, true);
-
-		this.filteredKeySet.addGroupedCallback(this, this.updateMetaStyles, true);
+		Weave.getCallbacks(this.selectionKeySet).addGroupedCallback(this, selectionKeyHandler, true);
+		Weave.getCallbacks(this.probeKeySet).addGroupedCallback(this, probeKeyHandler, true);
+		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateMetaStyles, true);
 		this.selectableBoolean = this.settingsPath.getObject("selectable");
 
 		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
@@ -84,34 +85,6 @@ export abstract class FeatureLayer extends Layer {
 	getToolTipColumns(): Array<any> /* Array<IAttributeColumn> */
 	{
 		return [];
-	}
-
-	/* TODO: Move this into WeaveTool */
-	static getToolTipData(key:any /* IQualifiedKey */, additionalColumns:Array<any> = [] /* Array<IAttributeColumn */): { [columnName: string]: string | number } 
-	{
-		let columnHashMap = weave.root.getObject("Probed Columns");
-
-		var result: { [columnName: string]: string | number } = {};
-
-		for (let child of columnHashMap.getObjects().concat(additionalColumns))
-		{
-			let title:string = child.getMetadata("title");
-			let value:string = child.getValueFromKey(key, String);
-			if (value)
-			{
-				result[title] = value;
-			}
-		}
-
-		return result;
-	}
-
-	/* TODO: Move this into WeaveTool */
-	static getToolTipTitle(key:any /* IQualifiedKey */): string
-	{
-		let titleHashMap = weave.root.getObject("Probe Header Columns");
-
-		return lodash.map(titleHashMap.getObjects(), (d:any) => d.getValueFromKey(key, String)).join(", ");
 	}
 
 	static toColorArray(color: string|number, alpha)

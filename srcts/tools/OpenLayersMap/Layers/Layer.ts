@@ -4,10 +4,6 @@
 
 import OpenLayersMapTool from "../../OpenLayersMapTool";
 import * as lodash from "lodash";
-declare var weavejs:any;
-declare var Weave:any;
-
-
 
 abstract class Layer {
 	static layerRegistry:Map<string,any>;

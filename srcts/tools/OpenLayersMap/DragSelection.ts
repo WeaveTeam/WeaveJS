@@ -9,8 +9,7 @@ import FeatureLayer from "./Layers/FeatureLayer";
 import Layer from "./Layers/Layer";
 import ProbeInteraction from "./ProbeInteraction";
 
-declare var Weave: any;
-declare var weavejs: any;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 enum DragSelectionMode {
 	SUBTRACT = -1,

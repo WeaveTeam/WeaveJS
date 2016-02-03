@@ -4,7 +4,6 @@
 /// <reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
-
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
@@ -14,6 +13,8 @@ import * as d3 from "d3";
 import * as _ from "lodash";
 import * as React from "react";
 import {ChartAPI, ChartConfiguration, generate} from "c3";
+
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 interface IPieChartPaths extends IToolPaths {
     data: WeavePath;

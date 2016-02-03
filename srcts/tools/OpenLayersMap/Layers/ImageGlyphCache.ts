@@ -2,45 +2,22 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
+import Dictionary2D = weavejs.util.Dictionary2D;
+
 import jquery from "jquery";
 
-class Map2D<K1,K2,D> {
-	private _map:Map<K1,Map<K2,D>>;
-	constructor()
-	{
-		this._map = new Map();
-	}
-
-	get(firstKey, secondKey)
-	{
-		let secondMap = this._map.get(firstKey);
-		return secondMap && secondMap.get(secondKey);
-	}
-
-	set(firstKey, secondKey, value)
-	{
-		let secondMap = this._map.get(firstKey);
-		if (!secondMap)
-		{
-			secondMap = new Map();
-			this._map.set(firstKey, secondMap);
-		}
-
-		secondMap.set(secondKey, value);
-	}
-}
 class ImageGlyphCache {
 	private baseImageElements:Map<string,HTMLImageElement>;
-	private canvasMap:Map2D<string,string,HTMLCanvasElement>;
-	private imageMap:Map2D<string,string,HTMLImageElement>;
+	private canvasMap:Dictionary2D<string,string,HTMLCanvasElement>;
+	private imageMap:Dictionary2D<string,string,HTMLImageElement>;
 	private context: any /* ILinkableObject, context for URL request */
 
 	constructor(context)
 	{
 		this.context = context;
 		this.baseImageElements = new Map();
-		this.canvasMap = new Map2D<string,string,HTMLCanvasElement>();
-		this.imageMap = new Map2D<string,string,HTMLImageElement>();
+		this.canvasMap = new Dictionary2D<string,string,HTMLCanvasElement>();
+		this.imageMap = new Dictionary2D<string,string,HTMLImageElement>();
 	}
 
 	requestBaseImageElement(url, callback)

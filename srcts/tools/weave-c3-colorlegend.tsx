@@ -5,7 +5,7 @@
 ///<reference path="../react-ui/ui.tsx"/>
 ///<reference path="../../typings/react/react-dom.d.ts"/>
 
-import ILinkableObject = weavejs_fake.api.core.ILinkableObject;
+import ILinkableObject = weavejs.api.core.ILinkableObject;
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import {registerToolImplementation} from "../WeaveTool";

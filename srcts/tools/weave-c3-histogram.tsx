@@ -4,7 +4,6 @@
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
-
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
@@ -19,6 +18,8 @@ import StandardLib from "../utils/StandardLib"
 import {MouseEvent} from "react";
 import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
+
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 interface IHistogramPaths extends IToolPaths {
     binnedColumn: WeavePath;

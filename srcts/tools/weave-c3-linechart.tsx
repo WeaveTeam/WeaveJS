@@ -19,6 +19,8 @@ import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 import StandardLib from "../utils/StandardLib";
 
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+
 interface ILineChartPaths extends IToolPaths {
     columns: WeavePath;
     lineStyle: WeavePath;

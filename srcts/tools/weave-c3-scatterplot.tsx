@@ -20,6 +20,9 @@ import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 import * as ReactDOM from "react-dom";
 import StandardLib from "../utils/StandardLib";
+
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+
 interface IColumnStats {
     min: number;
     max: number;
