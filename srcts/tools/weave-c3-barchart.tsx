@@ -280,7 +280,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
 		// the y label column is the first column in heightColumns
 		this.yLabelColumnPath = Weave.getPath(columns[0]);
-		
+
         var numericMapping:any = {
             sort: this.paths.sortColumn,
             xLabel: this.paths.labelColumn,
@@ -355,12 +355,10 @@ class WeaveC3Barchart extends AbstractC3Tool {
         // set axis rotation mode
         //this.chart.load({axes: { rotated: horizontalMode }});
 
-        if(this.groupingMode === "stack") {
-            this.chart.groups([this.heightColumnNames]);
+        if(this.groupingMode === "stack" || this.groupingMode === "percentStack") {
+            this.c3Config.data.groups = [this.heightColumnNames];
         } else if(this.groupingMode === "group") {
-            this.chart.groups([]);
-        } else if(this.groupingMode === "percentStack") {
-            this.chart.groups([this.heightColumnNames]);
+            this.c3Config.data.groups = [];
         }
 
         if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
@@ -499,7 +497,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.c3Config.bindto = this.element;
         this.validate(true);
     }
-    
+
     validate(forced:boolean = false):void
     {
         if (this.busy)
@@ -508,7 +506,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
             return;
         }
         this.dirty = false;
-        
+
         var changeDetected:boolean = false;
         var axisChange:boolean = this.detectChange('heightColumns', 'labelColumn', 'sortColumn', 'marginBottom', 'marginTop', 'marginLeft', 'marginRight');
         var axisSettingsChange:boolean = this.detectChange('xAxis', 'yAxis');
@@ -522,11 +520,11 @@ class WeaveC3Barchart extends AbstractC3Tool {
             changeDetected = true;
             var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getObject().getMetadata('title');
             var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
-    
+
             if(!this.showXAxisLabel){
                 xLabel = " ";
             }
-            
+
             if (this.heightColumnNames && this.heightColumnNames.length)
             {
                 var temp:any =  {};
@@ -551,7 +549,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                     this.c3Config.axis.x.tick.rotate = -45;
                 }
             }
-    
+
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
