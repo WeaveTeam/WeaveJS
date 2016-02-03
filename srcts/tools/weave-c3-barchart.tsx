@@ -313,7 +313,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.yLabelColumnDataType = this.yLabelColumnPath.getObject().getMetadata('dataType');
 
         this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        if(!this.numericRecords.length)
+        if (!this.numericRecords.length)
             return;
         this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
@@ -335,16 +335,14 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.indexToKey = {};
 
         this.numericRecords.forEach((record:Record, index:number) => {
-            if(record) {
-                this.keyToIndex[record.id as any] = index;
-                this.indexToKey[index] = record.id;
-            }
+            this.keyToIndex[record.id as any] = index;
+            this.indexToKey[index] = record.id;
         });
 
 
         this.stringRecords.forEach((record:Record, index:number) => {
             var numericRecord:Record = this.numericRecords[index];
-            if(numericRecord) {
+            if (numericRecord) {
                 this.yAxisValueToLabel[numericRecord["yLabel"] as number] = record["yLabel"] as string;
                 this.xAxisValueToLabel[numericRecord["xLabel"] as number] = record["xLabel"] as string;
             }
@@ -361,19 +359,15 @@ class WeaveC3Barchart extends AbstractC3Tool {
         else //if(this.groupingMode === "group")
             this.c3Config.data.groups = [];
 
-        if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
+        if (this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
             // normalize the height columns to be percentages.
             this.numericRecords.forEach((record:Record) => {
-                var heights:{[key:string]: number};
-                if (record) {
-                    heights = record['heights'] as {[key:string]: number};
-                    var sum:number = 0;
-					for (let key in heights)
-						sum += heights[key];
-					for (let key in heights)
-						heights[key] /= sum;
-                }
-				record['heights'] = heights;
+                var heights:{[key:string]: number} = record['heights'] as {[key:string]: number};
+                var sum:number = 0;
+				for (let key in heights)
+					sum += heights[key];
+				for (let key in heights)
+					heights[key] /= sum;
             });
         }
 
