@@ -336,7 +336,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
         this.numericRecords.forEach((record:Record, index:number) => {
             if(record) {
-                this.keyToIndex[record.id.toString()] = index;
+                this.keyToIndex[record.id as any] = index;
                 this.indexToKey[index] = record.id;
             }
         });
@@ -363,18 +363,15 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
         if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
             // normalize the height columns to be percentages.
-            var newValues = this.numericRecords.forEach((record:Record) => {
+            this.numericRecords.forEach((record:Record) => {
                 var heights:{[key:string]: number};
-                if(record) {
+                if (record) {
                     heights = record['heights'] as {[key:string]: number};
                     var sum:number = 0;
-                    _.keys(heights).forEach((key:string) => {
-                        sum += heights[key];
-                    });
-
-                    _.keys(heights).forEach((key:string) => {
-                        heights[key] = heights[key] / sum;
-                    });
+					for (let key in heights)
+						sum += heights[key];
+					for (let key in heights)
+						heights[key] /= sum;
                 }
 				record['heights'] = heights;
             });
