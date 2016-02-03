@@ -71,16 +71,16 @@ ul.dropdown-menu {
 }
 
 .weave-tool {
-    font-family: "Helvetica", Times, serif;
-    font-size: 11px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 12px;
     font-weight: normal;
     font-style: normal;
     text-decoration: none;
 }
 
 .weave-panel {
-    font-family: Verdana, sans-serif;
-    font-size: 10px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
     font-weight: bold;
     font-style: normal;
     text-decoration: none;
@@ -131,3 +131,4 @@ ul.dropdown-menu {
 .rc-slider {
     background-color: #D0D0D0;
 }
+

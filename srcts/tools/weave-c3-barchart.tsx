@@ -171,7 +171,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                         multiline: false,
                         format: (num:number):string => {
                             if(this.stringRecords && this.stringRecords[num]) {
-                                if(this.element && this.props.style.height > 0) {
+                                if(this.element && this.props.style.height > 0 && this.paths.marginBottom) {
                                     var labelHeight:number = Number(this.paths.marginBottom.getState())/Math.cos(45*(Math.PI/180));
                                     var labelString:string = (this.stringRecords[num]["xLabel"] as string);
                                     if(labelString) {
@@ -417,7 +417,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                 colors[name] = "#" + StandardLib.decimalToHex(color);
                 names[name] = this.heightColumnsLabels[index];
             });
-            this.c3Config.legend.show = true;
+            //this.c3Config.legend.show = true;
         }
 
 
