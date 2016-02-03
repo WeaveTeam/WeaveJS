@@ -127,6 +127,23 @@ declare module weavejs
 	
 	module data
 	{
+		module column
+		{
+			class DynamicColumn extends weavejs.api.data.IAttributeColumn
+			{
+			}
+			
+			class ExtendedDynamicColumn extends weavejs.api.data.IAttributeColumn
+			{
+				internalDynamicColumn():DynamicColumn;
+			}
+			
+			class ColorColumn extends ExtendedDynamicColumn
+			{
+				ramp: weavejs.util.ColorRamp;
+			}
+		}
+		
 		module key
 		{
 			class KeySet extends weavejs.api.data.IKeySet
@@ -151,6 +168,10 @@ declare module weavejs
 	
 	module util
 	{
+		class ColorRamp extends weavejs.core.LinkableVariable
+		{
+		}
+		
 		class Dictionary2D<K1,K2,V>
 		{
 			constructor(weak1?:boolean, weak2?:boolean, defaultType?:Function);
