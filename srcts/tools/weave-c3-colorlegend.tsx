@@ -43,9 +43,9 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 		super(props);
 		this.toolPath = props.toolPath;
 		this.plotterPath = this.toolPath.pushPlotter("plot");
-		this.dynamicColorColumnPath = this.plotterPath.push("dynamicColorColumn", null);
-		this.binningDefinition = this.dynamicColorColumnPath.push("internalDynamicColumn", null, "binningDefinition", null);
-		this.binnedColumnPath = this.dynamicColorColumnPath.push("internalDynamicColumn", null);
+		this.colorColumnPath = this.plotterPath.push("dynamicColorColumn");
+		this.binningDefinition = this.dynamicColorColumnPath.push(null, "internalDynamicColumn", null, "binningDefinition", null);
+		this.binnedColumnPath = this.dynamicColorColumnPath.push(null, "internalDynamicColumn", null);
 		this.maxColumnsPath = this.plotterPath.push("maxColumns");
 		this.filteredKeySet = this.plotterPath.push("filteredKeySet");
 		this.selectionKeySet = this.toolPath.push("selectionKeySet");
@@ -194,7 +194,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 			var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
 			var columnFlex:number = 1.0/maxColumns;
 			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
-			var ramp:any[] = this.dynamicColorColumnPath.getState("ramp");
+			var ramp:any[] = this.dynamicColorColumnPath.getState(null, "ramp");
 			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
 			var yMap:Function = (d:number):number => { return yScale(d); };
 
