@@ -2,7 +2,7 @@
 ///<reference path="../../typings/d3/d3.d.ts"/>
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
@@ -28,7 +28,7 @@ interface ILineChartPaths extends IToolPaths {
 
 class WeaveC3LineChart extends AbstractC3Tool {
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: string};
+    private indexToKey:{[index:number]: IQualifiedKey};
     private yAxisValueToLabel:{[value:number]: string};
     private colors:{[id:string]: string};
     private yLabelColumnPath:WeavePath;
@@ -302,8 +302,8 @@ class WeaveC3LineChart extends AbstractC3Tool {
         this.yAxisValueToLabel = {};
 
         this.numericRecords.forEach((record:Record, index:number) => {
-            this.keyToIndex[record["id"] as string] = index;
-            this.indexToKey[index] = record["id"] as string;
+            this.keyToIndex[record.id as any] = index;
+            this.indexToKey[index] = record.id;
         });
 
         this.stringRecords.forEach((record, index) => {
@@ -322,7 +322,7 @@ class WeaveC3LineChart extends AbstractC3Tool {
 
         this.colors = {};
         this.stringRecords.forEach((record:Record) => {
-            this.colors[record["id"] as string] = ((record["line"] as Record)["color"] as string) || "#C0CDD1";
+            this.colors[record.id as any] = ((record["line"] as Record)["color"] as string) || "#C0CDD1";
         });
 
         this.chartType= "line";

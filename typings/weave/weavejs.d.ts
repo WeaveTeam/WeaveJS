@@ -1,4 +1,6 @@
 declare var weavejs:any;
+declare var Weave:any;
+declare type Weave = any;
 declare type IAttributeColumn = any;
 declare type IColumnStatistics = any
 declare type LinkableString = any;
@@ -6,6 +8,7 @@ declare type ILinkableDynamicObject = any;
 declare type ColumnDataFilter = any;
 declare type LinkableBoolean = any;
 declare type LinkableVariable = any;
+declare type WeavePath = any;
 
 declare class IQualifiedKey {
 	keyType: string;
@@ -13,6 +16,8 @@ declare class IQualifiedKey {
 	toNumber(): number;
 	toString(): string;
 }
+
+declare type Record = {id: IQualifiedKey, [name:string]: any};
 
 declare module weavejs_fake.api.core {
 	class ILinkableObject {

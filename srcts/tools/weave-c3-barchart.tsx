@@ -2,11 +2,7 @@
 ///<reference path="../../typings/d3/d3.d.ts"/>
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/WeavePath.d.ts"/>
-///<reference path="../utils/StandardLib.ts"/>
-/// <reference path="../../typings/weave/weavejs.d.ts"/>
-/// <reference path="../../typings/weave/Weave.d.ts"/>
-
+///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
@@ -32,11 +28,10 @@ interface IBarchartPaths extends IToolPaths {
     showValueLabels: WeavePath;
 }
 
-
 class WeaveC3Barchart extends AbstractC3Tool {
 
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: string};
+    private indexToKey:{[index:number]: IQualifiedKey};
     private xAxisValueToLabel:{[value:number]: string};
     private yAxisValueToLabel:{[value:number]: string};
     private yLabelColumnDataType:string;
@@ -128,7 +123,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
                         var columnNamesToValue:{[columnName:string] : string|number } = {};
                         var columnNamesToColor:{[columnName:string] : string} = {};
                         this.heightColumnNames.forEach( (column:string, index:number) => {
-                            columnNamesToValue[this.heightColumnsLabels[index]] = this.numericRecords[d.index][column] as number;
+                            columnNamesToValue[this.heightColumnsLabels[index]] = this.numericRecords[d.index]['heights'][column] as number;
                             if(this.heightColumnNames.length > 1) {
                                 var color = StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.colorRamp);
                                 columnNamesToColor[this.heightColumnsLabels[index]] = "#" + StandardLib.decimalToHex(color);
@@ -277,13 +272,31 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.chart.flush();
     }
 
-    private updateColumns():void {
-        this.heightColumnNames = [];
-        this.heightColumnsLabels = [];
-
+    private dataChanged():void
+	{
         var lhm = this.paths.heightColumns.getObject();
         var columns = lhm.getObjects();
         var names = lhm.getNames();
+
+		// the y label column is the first column in heightColumns
+		this.yLabelColumnPath = Weave.getPath(columns[0]);
+		
+        var numericMapping:any = {
+            sort: this.paths.sortColumn,
+            xLabel: this.paths.labelColumn,
+			heights: {},
+			yLabel: this.yLabelColumnPath
+        };
+
+        var stringMapping:any = {
+            sort: this.paths.sortColumn,
+            color: this.paths.colorColumn,
+            xLabel: this.paths.labelColumn,
+			yLabel: this.yLabelColumnPath
+        };
+
+        this.heightColumnNames = [];
+        this.heightColumnsLabels = [];
 
         for (let idx in columns)
         {
@@ -293,35 +306,8 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
             this.heightColumnsLabels.push(title);
             this.heightColumnNames.push(name);
+			numericMapping.heights[name] = column;
         }
-    }
-
-    private dataChanged():void {
-        this.updateColumns();
-
-        var heightColumns:WeavePath[] = this.paths.heightColumns.getChildren();
-
-        var numericMapping:any = {
-            sort: this.paths.sortColumn,
-            xLabel: this.paths.labelColumn
-        };
-
-        var stringMapping:any = {
-            sort: this.paths.sortColumn,
-            color: this.paths.colorColumn,
-            xLabel: this.paths.labelColumn
-        };
-
-        heightColumns.forEach((column:WeavePath, idx:number) => {
-            let name:string = column.getPath().pop();
-            numericMapping[name] = column; // all height columns as numeric value for the chart
-
-            if(idx === 0) {
-                this.yLabelColumnPath = column;
-                stringMapping["yLabel"] = column; // only using the first column to label the y axis
-                numericMapping["yLabel"] = column;
-            }
-        });
 
         this.yLabelColumnDataType = this.yLabelColumnPath.getObject().getMetadata('dataType');
 
@@ -349,8 +335,8 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
         this.numericRecords.forEach((record:Record, index:number) => {
             if(record) {
-                this.keyToIndex[record["id"] as string] = index;
-                this.indexToKey[index] = record["id"] as string;
+                this.keyToIndex[record.id.toString()] = index;
+                this.indexToKey[index] = record.id;
             }
         });
 
@@ -379,10 +365,10 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
         if(this.groupingMode === "percentStack" && this.heightColumnNames.length > 1) {
             // normalize the height columns to be percentages.
-            var newValues = this.numericRecords.map((record:Record) => {
+            var newValues = this.numericRecords.forEach((record:Record) => {
                 var heights:{[key:string]: number};
                 if(record) {
-                    heights = _.pick(record, this.heightColumnNames) as {[key:string]: number};
+                    heights = record['heights'] as {[key:string]: number};
                     var sum:number = 0;
                     _.keys(heights).forEach((key:string) => {
                         sum += heights[key];
@@ -392,11 +378,8 @@ class WeaveC3Barchart extends AbstractC3Tool {
                         heights[key] = heights[key] / sum;
                     });
                 }
-
-                return heights;
+				record['heights'] = heights;
             });
-
-            this.numericRecords = newValues;
         }
 
         interface Keys {x:string, value:string[]};
@@ -407,26 +390,24 @@ class WeaveC3Barchart extends AbstractC3Tool {
         }
 
         keys.value = this.heightColumnNames;
-        var colors:{[name:string]: string} = {};
-        var names:{[name:string]: string} = {};
+        var columnColors:{[name:string]: string} = {};
+        var columnTitles:{[name:string]: string} = {};
 
         if(this.heightColumnNames.length > 1) {
             this.colorRamp = this.paths.chartColors.getState();
             this.heightColumnNames.map((name, index) => {
                 var color = StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.colorRamp);
-                colors[name] = "#" + StandardLib.decimalToHex(color);
-                names[name] = this.heightColumnsLabels[index];
+                columnColors[name] = "#" + StandardLib.decimalToHex(color);
+                columnTitles[name] = this.heightColumnsLabels[index];
             });
             //this.c3Config.legend.show = true;
         }
 
-
-
         var data = _.cloneDeep(this.c3Config.data);
-        data.json = this.numericRecords;
-        data.colors = colors;
+        data.json = _.pluck(this.numericRecords, 'heights');
+        data.colors = columnColors;
         data.keys = keys;
-        data.names = names;
+        data.names = columnTitles;
         data.unload = true;
         this.c3Config.data = data;
     }

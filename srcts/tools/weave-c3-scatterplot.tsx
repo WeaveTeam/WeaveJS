@@ -2,7 +2,7 @@
 ///<reference path="../../typings/d3/d3.d.ts"/>
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../../typings/weave/weavejs.d.ts"/>
 /// <reference path="../../typings/react/react-dom.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
@@ -40,7 +40,7 @@ interface IScatterplotPaths extends IToolPaths {
 class WeaveC3ScatterPlot extends AbstractC3Tool {
 
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: string};
+    private indexToKey:{[index:number]: IQualifiedKey};
     private xAxisValueToLabel:{[value:number]: string};
     private yAxisValueToLabel:{[value:number]: string};
     protected chart:ChartAPI;
@@ -96,10 +96,10 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
                     if(this.stringRecords && d.hasOwnProperty("index")) {
 
                         // find the corresponding index of numericRecords in stringRecords
-                        var id:string = this.indexToKey[d.index as number];
-                        var index:number = _.pluck(this.stringRecords, "id").indexOf(id);
+//                        var id:IQualifiedKey = this.indexToKey[d.index as number];
+//                        var index:number = _.pluck(this.stringRecords, "id").indexOf(id);
 
-                        var record:Record = this.stringRecords[index];
+                        var record:Record = this.stringRecords[d.index];
                         return (record && record["fill"] && (record["fill"] as Record)["color"]) ? (record["fill"] as Record)["color"] as string : "#000000";
                     }
                     return "#000000";
@@ -336,8 +336,8 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         this.xAxisValueToLabel = {};
 
         this.numericRecords.forEach((record:Record, index:number) => {
-            this.keyToIndex[record["id"] as string] = index;
-            this.indexToKey[index] = record["id"] as string;
+            this.keyToIndex[record.id as any] = index;
+            this.indexToKey[index] = record.id;
         });
 
         this.stringRecords.forEach((record:any, index:number) => {

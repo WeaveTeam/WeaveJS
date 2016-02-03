@@ -2,7 +2,7 @@
 /// <reference path="../../typings/lodash/lodash.d.ts"/>
 /// <reference path="../../typings/d3/d3.d.ts"/>
 /// <reference path="../../typings/react/react.d.ts"/>
-/// <reference path="../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 
 import {IVisToolProps} from "./IVisTool";
@@ -26,7 +26,7 @@ interface IPieChartPaths extends IToolPaths {
 export default class WeaveC3PieChart extends AbstractC3Tool {
 
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: string};
+    private indexToKey:{[index:number]: IQualifiedKey};
     protected chart:ChartAPI;
     protected c3Config:ChartConfiguration;
     protected paths:IPieChartPaths;
@@ -103,14 +103,14 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
         this.indexToKey = {};
 
         this.numericRecords.forEach( (record:Record, index:number) => {
-            this.indexToKey[index] = record["id"] as string;
-            this.keyToIndex[record["id"] as string] = index;
+            this.indexToKey[index] = record.id;
+            this.keyToIndex[record.id as any] = index;
         });
 
         var columns:[string, number][] = [];
 
         columns = this.numericRecords.map(function(record:Record) {
-            var tempArr:[string, number] = [record["id"] as string, record["data"] as number];
+            var tempArr:[string, number] = [record.id as any, record["data"] as number];
             return tempArr;
         });
 
@@ -122,7 +122,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
 
         this.colors = {}
         this.stringRecords.forEach((record:Record) => {
-            this.colors[record["id"] as string] = (record["fill"] as Record)["color"] as string || "#C0CDD1";
+            this.colors[record.id as any] = (record["fill"] as Record)["color"] as string || "#C0CDD1";
         });
 
         this.chart.load({

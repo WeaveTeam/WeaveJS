@@ -1,7 +1,7 @@
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../typings/jquery/jquery.d.ts"/>
-///<reference path="../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../../typings/weave/weavejs.d.ts"/>
 /// <reference path="../../typings/react/react.d.ts"/>
 /// <reference path="../../typings/react/react-dom.d.ts"/>
 

@@ -1,7 +1,6 @@
 /// <reference path="../typings/jszip/jszip.d.ts"/>
 /// <reference path="../typings/react/react.d.ts"/>
 /// <reference path="../typings/react/react-dom.d.ts"/>
-/// <reference path="../typings/weave/Weave.d.ts"/>
 /// <reference path="../typings/weave/weavejs.d.ts"/>
 
 import WeaveLayoutManager from "./WeaveLayoutManager";

@@ -1,6 +1,6 @@
 ///<reference path="../../../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
-///<reference path="../../../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
 import FeatureLayer from "./FeatureLayer";
 import * as lodash from "lodash";

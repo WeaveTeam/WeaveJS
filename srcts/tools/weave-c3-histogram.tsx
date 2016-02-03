@@ -2,7 +2,7 @@
 ///<reference path="../../typings/d3/d3.d.ts"/>
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/WeavePath.d.ts"/>
+///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 
 import {IVisToolProps} from "./IVisTool";
@@ -31,7 +31,7 @@ interface IHistogramPaths extends IToolPaths {
 class WeaveC3Histogram extends AbstractC3Tool {
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: string};
+    private indexToKey:{[index:number]: IQualifiedKey};
     private stringRecords:Record[];
     private numericRecords:Record[];
     private heightColumnNames:string[];
@@ -268,13 +268,13 @@ class WeaveC3Histogram extends AbstractC3Tool {
             .style("stroke-width", "1px")
             .style("stroke-opacity", 0.5);
 
-        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
-        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
+        var selectedKeys:IQualifiedKey[] = this.toolPath.selection_keyset.getKeys();
+        var probedKeys:IQualifiedKey[] = this.toolPath.probe_keyset.getKeys();
         var selectedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
-            return _.includes(selectedKeys, record["id"]);
+            return _.includes(selectedKeys, record.id);
         });
         var probedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
-            return _.includes(probedKeys, record["id"]);
+            return _.includes(probedKeys, record.id);
         });
         var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
         var probedBinIndices:number[] = _.pluck(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn');
@@ -315,9 +315,9 @@ class WeaveC3Histogram extends AbstractC3Tool {
         this.indexToKey = {};
 
         this.numericRecords.forEach((record:Record, index:number) => {
-            this.idToRecord[record["id"] as string] = record;
-            this.keyToIndex[record["id"] as string] = index;
-            this.indexToKey[index] = record["id"] as string;
+            this.idToRecord[record.id as any] = record;
+            this.keyToIndex[record.id as any] = index;
+            this.indexToKey[index] = record.id;
         });
 
         this.numberOfBins = this.paths.binnedColumn.getObject().numberOfBins;
