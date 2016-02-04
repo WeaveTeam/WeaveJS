@@ -453,7 +453,11 @@ class WeaveC3LineChart extends AbstractC3Tool {
                 this.c3Config.padding.right = Number(this.paths.marginRight.getState());
             }
 
-            this.c3Config.axis.y.max = this.paths.overrideYMax.getState();
+            if(!isNaN(this.paths.overrideYMax.getState())) {
+                this.c3Config.axis.y.max = this.paths.overrideYMax.getState();
+            } else {
+                this.c3Config.axis.y.max = null;
+            }
         }
 
         if (changeDetected || forced)
