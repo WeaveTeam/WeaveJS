@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "grunt ts && grunt babel",
     "prepublish": "npm run compile",
-    "postinstall": "npm run compile"
+    "postintall": "postinstall-build lib 'npm run compile'"
   },
   "repository": {
     "type": "git",
@@ -52,6 +52,7 @@
     "jszip": "^2.5.0",
     "lodash": "^3.10.1",
     "openlayers": "^3.13.0",
+    "postinstall-build": "^0.2.1",
     "rc-slider": "^3.3.2",
     "react-bootstrap": "^0.28.1",
     "react-vendor-prefix": "0.0.1",
