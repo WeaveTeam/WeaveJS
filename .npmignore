@@ -1,18 +1,16 @@
-outts
-src
-srcts
-typings
-.babelrc
-.eslintrc
-.project
-.eclipse-js-conventions.xml
-Gruntfile.js
-tsconfig.json
-tsd.json
-.tscache
-// typescript temp files
-*.tmp.txt
-.idea
-.project
-.webpack.config.js
-.DS_Store
+#src
+#typings
+#.babelrc
+#.eslintrc
+#.project
+#.eclipse-js-conventions.xml
+#Gruntfile.js
+#tsconfig.json
+#tsd.json
+#.tscache
+#// typescript temp files
+#*.tmp.txt
+#.idea
+#.project
+#.webpack.config.js
+#.DS_Store
