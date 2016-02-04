@@ -394,6 +394,14 @@ class WeaveC3Barchart extends AbstractC3Tool {
 
         var data = _.cloneDeep(this.c3Config.data);
         data.json = _.pluck(this.numericRecords, 'heights');
+        //need other stuff for data.json to work
+        this.numericRecords.forEach( (record,index) => {
+            for(var k in record) {
+                if(k != 'heights')
+                    data.json[index][k]=record[k];
+            }
+        });
+
         data.colors = columnColors;
         data.keys = keys;
         data.names = columnTitles;
