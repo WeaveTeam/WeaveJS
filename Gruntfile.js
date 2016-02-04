@@ -6,11 +6,30 @@ var libraries_colon = libraries.map(function (d) { return d + ":"});
 module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+        ts: {
+            default: {
+                tsconfig: true
+            }
+        },
+        babel: {
+            options: {
+                babelrc: ".babelrc"
+            },
+            dist: {
+               files: [{
+                   "expand": true,
+                   "cwd": "outts/",
+                   "src": ["**/*.jsx", "**/*.js"],
+                   "dest": "lib/",
+                   "ext": ".js"
+               }]
+           }
+        },
         browserify: {
             // default options for browserify
             options: {
                 browserifyOptions: {
-                    plugin: [['minifyify', {map: false, exclude: "**/*.jsx"}]]
+                    plugin: [['minifyify']]
                 },
                 transform: ["babelify"],
                 external: libraries,
@@ -71,15 +90,16 @@ module.exports = function (grunt) {
         },
     });
 
+    grunt.loadNpmTasks('grunt-ts');
+    grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
 
-    grunt.registerTask('default', ['browserify:dev', 'copy']);
-    grunt.registerTask('dist', ['browserify:dist', 'copy']);
-    grunt.registerTask('libs', ['browserify:libs']);
-    grunt.registerTask('devlibs', ['browserify:devlibs']);
-    grunt.registerTask('module', ['browserify:module']);
-    grunt.registerTask('all', ['clean', 'devlibs', 'default', 'module']);
+    grunt.registerTask('default', ['ts', 'babel', 'browserify:dev', 'copy']);
+    grunt.registerTask('dist', ['browserify:libs', 'browserify:dist', 'copy']);
+    grunt.registerTask('libs', ['browserify:devlibs']);
+    // grunt.registerTask('module', ['browserify:module']);
+    grunt.registerTask('all', ['clean', 'default', 'libs', 'dist']);
 };
