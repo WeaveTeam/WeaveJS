@@ -35,14 +35,17 @@ module.exports = function (grunt) {
                 external: libraries,
                 watch: true
             },
-            libs: {
+            distlibs: {
                 src: ['src/'],
                 dest: 'dist/libs.js',
                 options: {
                     alias: libraries_colon,
                     external: null,
-                    transform: null
-                }
+                    transform: null,
+                    browserifyOptions: {
+                        debug: false,
+                    }
+                },
             },
             devlibs: {
                 src: ['src/'],
@@ -53,7 +56,6 @@ module.exports = function (grunt) {
                     transform: null,
                     browserifyOptions: {
                         debug: true,
-                        plugin: []
                     }
                 }
             },
@@ -97,9 +99,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
 
+    grunt.registerTask('devlibs', ['browserify:devlibs']);
+    grunt.registerTask('distlibs', ['browserify:distlibs']);
+
     grunt.registerTask('default', ['ts', 'babel', 'browserify:dev', 'copy']);
-    grunt.registerTask('dist', ['browserify:libs', 'browserify:dist', 'copy']);
-    grunt.registerTask('libs', ['browserify:devlibs']);
-    // grunt.registerTask('module', ['browserify:module']);
-    grunt.registerTask('all', ['clean', 'default', 'libs', 'dist']);
+    grunt.registerTask('dist', ['dist', 'browserify:distlibs', 'copy']);
+    grunt.registerTask('devall', ['clean', 'default', 'devlibs', 'copy']);
+    grunt.registerTask('all', ['clean', 'default', 'distlibs', 'dist']);
 };
