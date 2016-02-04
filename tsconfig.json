@@ -6,7 +6,8 @@
     "target": "es6",
     "outDir": "outts",
     "inlineSources": true,
-    "inlineSourceMap": true
+    "inlineSourceMap": true,
+    "declaration": false
   },
   "exclude":[
     "node_modules"

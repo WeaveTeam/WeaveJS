@@ -32,6 +32,9 @@ node_modules
 #typescript outdir
 outts
 
+#babel outdir
+lib
+
 # Output directory
 dist
 

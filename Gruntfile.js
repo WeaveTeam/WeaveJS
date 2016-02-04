@@ -120,7 +120,7 @@ module.exports = function (grunt) {
         }
     });
 
-    grunt.loadNpmTasks('grunt-ts');
+    // grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-browserify');
     // grunt.loadNpmTasks('grunt-eslint');
     // grunt.loadNpmTasks('grunt-tslint');
@@ -129,9 +129,9 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
 
-    grunt.registerTask('default', ['ts', 'browserify:dev', 'copy']);
+    grunt.registerTask('default', ['browserify:dev', 'copy']);
     //grunt.registerTask('default-nolint', ['ts', 'browserify:dev', 'copy']);
-    grunt.registerTask('dist', ['ts', 'browserify:dist', 'copy']);
+    grunt.registerTask('dist', ['browserify:dist', 'copy']);
     grunt.registerTask('libs', ['browserify:libs']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);
     grunt.registerTask('module', ['browserify:module']);
