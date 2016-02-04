@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import $ from "jquery";
-import StandardLib from "../outts/utils/StandardLib.js";
 import JSZip from "jszip";
 /* eslint-disable */
-import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
-// import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
+import {Layout} from "../lib/WeaveUI.js";
+import {StandardLib} from "../lib/WeaveUI.js";
 /* eslint-enable */
 
 /*global Weave, weavejs*/
@@ -44,6 +43,6 @@ else
 
 function render() {
 	$(() => {
-		ReactDOM.render(<WeaveLayoutManager weave={weave} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
+		ReactDOM.render(<Layout weave={weave} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
 	});
 }

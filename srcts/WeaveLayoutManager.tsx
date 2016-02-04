@@ -8,7 +8,6 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import Layout from "./react-flexible-layout/Layout";
 import {LayoutState} from "./react-flexible-layout/Layout";
-import CustomSearchTool from "./CustomSearchTool";
 import WeaveC3Barchart from "./tools/weave-c3-barchart";
 import WeaveC3ScatterPlot from "./tools/weave-c3-scatterplot";
 import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend";
@@ -38,8 +37,6 @@ var v1:any = [
 	DataFilterTool
 ];
 ///////////////////////////////
-
-//import CustomSearchTool from "./outts/CustomSearchTool.jsx";
 import {WeaveTool, getToolImplementation} from "./WeaveTool";
 import ToolOverlay from "./ToolOverlay";
 import StandardLib from "./utils/StandardLib";
@@ -90,7 +87,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 	private prevClientHeight:number;
 	private throttledForceUpdate:() => void;
 	private throttledForceUpdateTwice:() => void;
-	
+
 	constructor(props:IWeaveLayoutManagerProps)
 	{
 		super(props);
