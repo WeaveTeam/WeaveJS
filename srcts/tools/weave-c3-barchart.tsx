@@ -357,8 +357,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         //this.chart.load({axes: { rotated: horizontalMode }});
 
         if (this.groupingMode === "stack" || this.groupingMode === "percentStack")
-            //this.c3Config.data.groups = [this.heightColumnNames];
-            this.chart.groups([this.heightColumnNames]);
+            this.c3Config.data.groups = [this.heightColumnNames];
         else //if(this.groupingMode === "group")
             this.c3Config.data.groups = [];
 
