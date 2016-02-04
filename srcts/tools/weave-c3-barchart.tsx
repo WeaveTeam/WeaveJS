@@ -27,6 +27,8 @@ interface IBarchartPaths extends IToolPaths {
     groupingMode: WeavePath;
     horizontalMode: WeavePath;
     showValueLabels: WeavePath;
+    overrideYMax: WeavePath;
+    overrideYMin: WeavePath;
 }
 
 class WeaveC3Barchart extends AbstractC3Tool {
@@ -355,7 +357,8 @@ class WeaveC3Barchart extends AbstractC3Tool {
         //this.chart.load({axes: { rotated: horizontalMode }});
 
         if (this.groupingMode === "stack" || this.groupingMode === "percentStack")
-            this.c3Config.data.groups = [this.heightColumnNames];
+            //this.c3Config.data.groups = [this.heightColumnNames];
+            this.chart.groups([this.heightColumnNames]);
         else //if(this.groupingMode === "group")
             this.c3Config.data.groups = [];
 
@@ -376,6 +379,9 @@ class WeaveC3Barchart extends AbstractC3Tool {
         // if label column is specified
         if(this.paths.labelColumn.getState().length) {
             keys.x = "xLabel";
+            this.c3Config.legend.show = false;
+        }else{
+            this.c3Config.legend.show = true;
         }
 
         keys.value = this.heightColumnNames;
@@ -389,7 +395,11 @@ class WeaveC3Barchart extends AbstractC3Tool {
                 columnColors[name] = "#" + StandardLib.decimalToHex(color);
                 columnTitles[name] = this.heightColumnsLabels[index];
             });
-            //this.c3Config.legend.show = true;
+            if(this.paths.labelColumn.getState().length) {
+                this.c3Config.legend.show = true;
+            }
+        }else{
+            this.c3Config.legend.show = false;
         }
 
         var data = _.cloneDeep(this.c3Config.data);
@@ -484,6 +494,8 @@ class WeaveC3Barchart extends AbstractC3Tool {
             { name: "marginLeft", path: this.plotManagerPath.push("marginLeft") },
             { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
             { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
+            { name: "overrideYMax", path: this.plotManagerPath.push("overrideYMax") },
+            { name: "overrideYMin", path: this.plotManagerPath.push("overrideYMin") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
             { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
             { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
@@ -507,7 +519,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         this.dirty = false;
 
         var changeDetected:boolean = false;
-        var axisChange:boolean = this.detectChange('heightColumns', 'labelColumn', 'sortColumn', 'marginBottom', 'marginTop', 'marginLeft', 'marginRight');
+        var axisChange:boolean = this.detectChange('heightColumns', 'labelColumn', 'sortColumn', 'marginBottom', 'marginTop', 'marginLeft', 'marginRight', 'overrideYMax', 'overrideYMin');
         var axisSettingsChange:boolean = this.detectChange('xAxis', 'yAxis');
         if (axisChange || this.detectChange('colorColumn', 'chartColors', 'groupingMode', 'filteredKeySet'))
         {
@@ -553,13 +565,30 @@ class WeaveC3Barchart extends AbstractC3Tool {
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
             this.c3Config.padding.top = Number(this.paths.marginTop.getState());
-            this.c3Config.axis.x.height = Number(this.paths.marginBottom.getState());
+            if(this.paths.labelColumn.getState().length){
+                this.c3Config.axis.x.height = Number(this.paths.marginBottom.getState());
+            } else {
+                this.c3Config.axis.x.height = null;
+            }
+
             if(weavejs.WeaveAPI.Locale.reverseLayout){
                 this.c3Config.padding.left = Number(this.paths.marginRight.getState());
                 this.c3Config.padding.right = Number(this.paths.marginLeft.getState());
-            }else{
+            } else {
                 this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
                 this.c3Config.padding.right = Number(this.paths.marginRight.getState());
+            }
+
+            if(!isNaN(this.paths.overrideYMax.getState())) {
+                this.c3Config.axis.y.max = this.paths.overrideYMax.getState();
+            }else{
+                this.c3Config.axis.y.max = null;
+            }
+
+            if(!isNaN(this.paths.overrideYMin.getState())) {
+                this.c3Config.axis.y.min = this.paths.overrideYMin.getState();
+            } else {
+                this.c3Config.axis.y.min = null;
             }
 
         }
