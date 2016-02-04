@@ -1,21 +1,13 @@
 /*global module */
 
-var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'react-bootstrap', 'openlayers', 'jszip', 'radium', 'react-vendor-prefix', 'react-date-picker', 'swfobject-amd'];
+var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'react-bootstrap', 'openlayers', 'jszip', 'react-vendor-prefix', 'swfobject-amd'];
 var libraries_colon = libraries.map(function (d) { return d + ":"});
 
 module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        server: {
-            port: 8000,
-            base: './dist'
-        },
-        ts: {
-            default: {
-                tsconfig: true
-            }
-        },
         browserify: {
+            // default options for browserify
             options: {
                 browserifyOptions: {
                     plugin: [['minifyify', {map: false, exclude: "**/*.jsx"}]]
@@ -46,22 +38,11 @@ module.exports = function (grunt) {
                     }
                 }
             },
-            module: {
-                files: [{'dist/WeaveUI.js':'outts/WeaveUI.jsx'}],
-                options: {
-                    alias: null,
-                    external: libraries,
-                    browserifyOptions: {
-                         standalone: "WeaveUI",
-                         debug: true,
-                         extensions: ['.jsx'],
-                         plugin: []
-                    }
-                },
-            },
+            // this generates a minified ouput of the app without the libs
             dist: {
-                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/pdo-app.min.js': 'src/pdo-app.js'}]
+                files: [{'dist/index.min.js': 'src/index.js'}]
             },
+            // generates a non minified output without the libs but with source maps
             dev: {
                 options: {
                     browserifyOptions: {
@@ -70,7 +51,7 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/index.js': 'src/index.js'}, {'dist/pdo-app.js': 'src/pdo-app.js'}]
+                files: [{'dist/index.js': 'src/index.js'}]
             },
         },
         copy: {
@@ -85,52 +66,17 @@ module.exports = function (grunt) {
         },
         clean: {
             ts: ["outts"],
+            babel: ["lib"],
             dist: ["dist/*.js", "dist/*.css", "dist/*.html"]
         },
-        eslint: {
-            target: ['src/**/*.js']
-        },
-        tslint: {
-            options: {
-           // can be a configuration object or a filepath to tslint.json
-           configuration: "tslint.json"
-           },
-           files: {
-           }
-        },
-        watch: {
-            options: {
-                spawn: false
-            },
-            libs: {
-                files: ['node_modules/**/package.json'],
-                tasks: ['browserify:libs'],
-                options: {
-                    'interval': 500
-                }
-            },
-            js: {
-                files: ['src/**/*.js*'],
-                tasks: ['eslint', 'browserify:dev']
-            },
-            html: {
-                files: ['src/*.html', 'src/**/*.css', 'img/*'],
-                tasks: ['copy']
-            }
-        }
     });
 
-    // grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-browserify');
-    // grunt.loadNpmTasks('grunt-eslint');
-    // grunt.loadNpmTasks('grunt-tslint');
-    grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
 
     grunt.registerTask('default', ['browserify:dev', 'copy']);
-    //grunt.registerTask('default-nolint', ['ts', 'browserify:dev', 'copy']);
     grunt.registerTask('dist', ['browserify:dist', 'copy']);
     grunt.registerTask('libs', ['browserify:libs']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);

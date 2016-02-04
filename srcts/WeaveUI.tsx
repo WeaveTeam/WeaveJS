@@ -15,6 +15,7 @@ import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import WeaveReactTable from "./tools/weave-react-table";
 import SessionStateMenuTool from "./tools/weave-session-state-menu";
 import StandardLib from "./utils/StandardLib";
+import ui from "./react-ui/ui";
 import JSZip from "jszip";
 
 import * as React from "react";
@@ -23,70 +24,35 @@ import * as ReactDOM from "react-dom";
 /*global Weave, weavejs*/
 var stub:any = React;
 weavejs.util.JS.JSZip = JSZip;
-// var WeaveUI = {
-//     Layout: WeaveLayoutManager,
-//     Barchart: WeaveC3Barchart,
-//     ScatterPlot: WeaveC3ScatterPlot,
-//     ColorLegend: WeaveC3ColorLegend,
-//     LineChart: WeaveC3LineChart,
-//     PieChart: WeaveC3PieChart,
-//     Histogram: WeaveC3Histogram,
-//     Map: WeaveOpenLayersMap,
-//     DataTable: WeaveReactTable,
-//     MenuTool: SessionStateMenuTool,
-//     getUrlParams: StandardLib.getUrlParams,
-//     loadLayout: function(weave, fileName, targetEltId, callback) {
-//
-//         function render() {
-//             ReactDOM.render(
-//                 <WeaveUI.Layout weave={weave}/>,
-//                 document.getElementById(targetEltId),
-//                 callback
-//             );
-//         }
-//
-//         weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, e => {
-//             console.error(e)
-//         });
-//
-//     }
-// };
-//
-// // namespace WeaveUI
-// export default WeaveUI;
 
-export var Layout = WeaveLayoutManager;
-export var Barchart = WeaveC3Barchart;
-export var ScatterPlot = WeaveC3ScatterPlot;
-export var ColorLegend = WeaveC3ColorLegend;
-export var BarChartLegend = WeaveC3BarChartLegend;
-export var LineChart = WeaveC3LineChart;
-export var PieChart = WeaveC3PieChart;
-export var Histogram = WeaveC3Histogram;
-export var Map = WeaveOpenLayersMap;
-export var DataTable = WeaveReactTable;
-export var MenuTool = SessionStateMenuTool;
-export var getUrlParams = StandardLib.getUrlParams;
-
-export var loadLayout = function(weave:Weave, fileName:string, targetEltId:string, callback:() => void) {
+var loadLayout = function(weave, fileName, targetEltId, callback) {
 
     function render() {
         ReactDOM.render(
-            <Layout weave={weave} style={{width: "100%", height: "100%"}}/>,
+            <WeaveLayoutManager weave={weave}/>,
             document.getElementById(targetEltId),
             callback
         );
     }
 
-    if(weave) {
-        if(!fileName) {
-            render();
-        } else {
-            weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, (e:Error) => {
-                console.error(e)
-            });
-        }
-    } else {
-        console.error("Missing Weave instance!")
-    }
+    weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, e => {
+        console.error(e)
+    });
+
+}
+
+export {
+    WeaveLayoutManager as Layout,
+    WeaveC3Barchart as Barchart,
+    WeaveC3ScatterPlot as ScatterPlot,
+    WeaveC3ColorLegend as ColorLegend,
+    WeaveC3LineChart as LineChart,
+    WeaveC3PieChart as PieChart,
+    WeaveC3Histogram as Histogram,
+    WeaveOpenLayersMap as Map,
+    WeaveReactTable as DataTable,
+    SessionStateMenuTool as MenuTool,
+    StandardLib,
+    ui,
+    loadLayout
 };

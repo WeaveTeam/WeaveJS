@@ -1,11 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import $ from "jquery";
-import StandardLib from "../lib/utils/StandardLib.js";
 import JSZip from "jszip";
 /* eslint-disable */
 import {Layout} from "../lib/WeaveUI.js";
-// import WeaveLayoutManager from "../outts/WeaveLayoutManager.jsx";
+import {StandardLib} from "../lib/WeaveUI.js";
 /* eslint-enable */
 
 /*global Weave, weavejs*/
