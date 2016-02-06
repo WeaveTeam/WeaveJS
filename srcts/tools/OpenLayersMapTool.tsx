@@ -28,10 +28,10 @@ import InteractionModeCluster from "./OpenLayersMap/InteractionModeCluster";
 import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
 import DragSelection from "./OpenLayersMap/DragSelection";
 import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
-/* global Weave, weavejs */
 
-declare var Weave:any;
-declare var weavejs:any;
+import WeavePath = weavejs.path.WeavePath;
+import ZoomBounds = weavejs.geom.ZoomBounds;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
 class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
@@ -128,7 +128,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.zoomBoundsPath = this.plotManager.push("zoomBounds");
 
 		this.plotManager.addCallback(this, this.requestDetail, true);
-		this.plottersPath.getObject().childListCallbacks.addImmediateCallback(this, this.updatePlotters_weaveToOl, true);
+		(this.plottersPath.getObject() as ILinkableHashMap).childListCallbacks.addImmediateCallback(this, this.updatePlotters_weaveToOl, true);
 		this.zoomBoundsPath.addCallback(this, this.updateZoomAndCenter_weaveToOl, true);
 	}
 
@@ -145,7 +145,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 			extent = undefined;
 		}
 
-		let projection = this.toolPath.push("projectionSRS").getState() || "EPSG:3857";
+		let projection = this.toolPath.push("projectionSRS").getState() as string || "EPSG:3857";
 		let view = new ol.View({projection, extent});
 		view.set("extent", extent);
 
@@ -161,7 +161,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.map.updateSize();
 		var viewport = this.map.getViewport();
 		var screenBounds = new weavejs.geom.Bounds2D(0, 0, viewport.clientWidth, viewport.clientHeight);
-		this.zoomBoundsPath.getObject().setScreenBounds(screenBounds, true);
+		(this.zoomBoundsPath.getObject() as ZoomBounds).setScreenBounds(screenBounds, true);
 	}
 
 	updateControlPositions():void
@@ -219,7 +219,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 	{
 		var [xCenter, yCenter] = this.map.getView().getCenter();
 
-		var zoomBounds = this.zoomBoundsPath.getObject();
+		var zoomBounds:ZoomBounds = this.zoomBoundsPath.getObject() as ZoomBounds;
 
 		var dataBounds = new weavejs.geom.Bounds2D();
 		zoomBounds.getDataBounds(dataBounds);
@@ -243,7 +243,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 			return;
 		}
 
-		var zoomBounds = this.zoomBoundsPath.getObject();
+		var zoomBounds:ZoomBounds = this.zoomBoundsPath.getObject() as ZoomBounds;
 
 		var dataBounds = new weavejs.geom.Bounds2D();
 		var screenBounds = new weavejs.geom.Bounds2D();
@@ -257,7 +257,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 	updateZoomAndCenter_weaveToOl():void
 	{
-		var zoomBounds = this.zoomBoundsPath.getObject();
+		var zoomBounds:ZoomBounds = this.zoomBoundsPath.getObject() as ZoomBounds;
 		var dataBounds = new weavejs.geom.Bounds2D();
 		zoomBounds.getDataBounds(dataBounds);
 		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
@@ -278,7 +278,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 	requestDetail():void
 	{
-		var zoomBounds = this.zoomBoundsPath.getObject();
+		var zoomBounds:ZoomBounds = this.zoomBoundsPath.getObject() as ZoomBounds;
 		for (var name of this.plottersPath.getNames())
 		{
 			var layer:Layer = this.layers.get(name);

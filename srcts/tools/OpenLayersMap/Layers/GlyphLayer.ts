@@ -6,6 +6,9 @@ import FeatureLayer from "./FeatureLayer";
 import * as lodash from "lodash";
 import * as ol from "openlayers";
 
+import WeavePathData = weavejs.path.WeavePathData;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+
 abstract class GlyphLayer extends FeatureLayer {
 
 	constructor(parent:any, layerName:any)
@@ -39,14 +42,14 @@ abstract class GlyphLayer extends FeatureLayer {
 
 	updateLocations() {
 		/* Update feature locations */
-		var records = this.layerPath.retrieveRecords(["dataX", "dataY"], this.layerPath.push("dataX"));
+		var records = (this.layerPath as WeavePathData).retrieveRecords(["dataX", "dataY"], this.layerPath.push("dataX"));
 
 		var recordIds = lodash.pluck(records, "id");
 
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
 
-		var rawProj = this.layerPath.getState("sourceProjection") || this.layerPath.getObject("dataX").getMetadata("projection") || "EPSG:4326";
-		var mapProj = this.projectionPath.getState() || "EPSG:3857";
+		var rawProj = this.layerPath.getState("sourceProjection") as string || (this.layerPath.getObject("dataX") as IAttributeColumn).getMetadata("projection") || "EPSG:4326";
+		var mapProj = this.projectionPath.getState() as string || "EPSG:3857";
 
 		for (let id of removedIds)
 		{

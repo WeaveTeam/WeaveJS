@@ -21,7 +21,11 @@ import Tooltip from "./tooltip";
 import * as ReactDOM from "react-dom";
 import StandardLib from "../utils/StandardLib";
 
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathData = weavejs.path.WeavePathData;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
 export interface IColumnStats {
     min: number;
@@ -131,17 +135,17 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool {
                         var columnNamesToValue:{[columnName:string] : string|number } = {};
                         var xValue:number = this.numericRecords[d.index]["point"]["x"];
                         if(xValue) {
-                            columnNamesToValue[this.paths.dataX.getObject().getMetadata('title')] = xValue;
+                            columnNamesToValue[(this.paths.dataX.getObject() as IAttributeColumn).getMetadata('title')] = xValue;
                         }
 
                         var yValue:number = this.numericRecords[d.index]["point"]["y"]
                         if(yValue) {
-                            columnNamesToValue[this.paths.dataY.getObject().getMetadata('title')] = yValue;
+                            columnNamesToValue[(this.paths.dataY.getObject() as IAttributeColumn).getMetadata('title')] = yValue;
                         }
 
                         var sizeByValue:number = this.numericRecords[d.index]["size"] as number;
                         if(sizeByValue) {
-                            columnNamesToValue[this.paths.sizeBy.getObject().getMetadata('title')] =  sizeByValue;
+                            columnNamesToValue[(this.paths.sizeBy.getObject() as IAttributeColumn).getMetadata('title')] =  sizeByValue;
                         }
                         this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
                         this.props.toolTip.setState({
@@ -198,10 +202,10 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool {
             tooltip: {
                 format: {
                     title: (num:number):string => {
-                        return this.paths.xAxis.getState("overrideAxisName") || this.paths.dataX.getObject().getMetadata('title');
+                        return this.paths.xAxis.getState("overrideAxisName") as string || (this.paths.dataX.getObject() as IAttributeColumn).getMetadata('title');
                     },
                     name: (name:string, ratio:number, id:string, index:number):string => {
-                        return this.paths.yAxis.getState("overrideAxisName") || this.paths.dataY.getObject().getMetadata('title');
+                        return this.paths.yAxis.getState("overrideAxisName") as string || (this.paths.dataY.getObject() as IAttributeColumn).getMetadata('title');
                     }
                 },
                 show: false
@@ -315,13 +319,13 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool {
             }
         };
 
-        this.dataXType = this.paths.dataX.getObject().getMetadata('dataType');
-        this.dataYType = this.paths.dataY.getObject().getMetadata('dataType');
+        this.dataXType = (this.paths.dataX.getObject() as IAttributeColumn).getMetadata('dataType');
+        this.dataYType = (this.paths.dataY.getObject() as IAttributeColumn).getMetadata('dataType');
 
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.numericRecords = (this.paths.plotter as WeavePathData).retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
         if(!this.numericRecords.length)
             return;
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+        this.stringRecords = (this.paths.plotter as WeavePathData).retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
@@ -452,7 +456,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool {
 
         this.initializePaths(mapping);
 
-        this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.dataX.getObject(), this.paths.dataY.getObject()]);
+        (this.paths.filteredKeySet.getObject() as FilteredKeySet).setColumnKeySources([this.paths.dataX.getObject(), this.paths.dataY.getObject()]);
 
         this.c3Config.bindto = this.element;
         this.validate(true);
@@ -478,8 +482,8 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool {
         if (axisChange)
         {
             changeDetected = true;
-            var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() || this.paths.dataX.getObject().getMetadata('title');
-            var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() || this.paths.dataY.getObject().getMetadata('title');
+            var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() as string || (this.paths.dataX.getObject() as IAttributeColumn).getMetadata('title');
+            var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() as string || (this.paths.dataY.getObject() as IAttributeColumn).getMetadata('title');
 
 
             if (this.numericRecords)

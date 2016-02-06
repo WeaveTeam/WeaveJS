@@ -5,8 +5,7 @@
 import * as ol from "openlayers";
 import Layer from "./Layer";
 
-declare var Weave:any;
-declare var weavejs:any;
+import WeavePath = weavejs.path.WeavePath;
 
 class TileLayer extends Layer {
 
@@ -32,7 +31,7 @@ class TileLayer extends Layer {
 
 	updateValidExtents()
 	{
-		var proj = ol.proj.get(this.projectionPath.getState() || "EPSG:3857");
+		var proj = ol.proj.get(this.projectionPath.getState() as string || "EPSG:3857");
 		if (proj)
 			this.olLayer.setExtent(proj.getExtent());
 		else
@@ -43,9 +42,9 @@ class TileLayer extends Layer {
 		var customWMSPath = this.servicePath;
 
 		if (customWMSPath.push("wmsURL").getType()) {
-			let url = customWMSPath.getState("wmsURL");
-			let attributions = customWMSPath.getState("creditInfo");
-			let projection = customWMSPath.getState("tileProjectionSRS");
+			let url = customWMSPath.getState("wmsURL") as string;
+			let attributions = customWMSPath.getState("creditInfo") as any;
+			let projection = customWMSPath.getState("tileProjectionSRS") as string;
 
 			return new ol.source.XYZ({
 				url, attributions, projection
@@ -107,5 +106,5 @@ class TileLayer extends Layer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Layer.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, ['ILinkableObjectWithNewProperties']);
 export default TileLayer;

@@ -2,6 +2,8 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
+import WeavePath = weavejs.path.WeavePath;
+
 import OpenLayersMapTool from "../../OpenLayersMapTool";
 import * as lodash from "lodash";
 

@@ -2,22 +2,23 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
+import WeavePath = weavejs.path.WeavePath;
 import Dictionary2D = weavejs.util.Dictionary2D;
 
 import jquery from "jquery";
 
 class ImageGlyphCache {
 	private baseImageElements:Map<string,HTMLImageElement>;
-	private canvasMap:Dictionary2D<string,string,HTMLCanvasElement>;
-	private imageMap:Dictionary2D<string,string,HTMLImageElement>;
+	private canvasMap:Dictionary2D/*<string,string,HTMLCanvasElement>*/;
+	private imageMap:Dictionary2D/*<string,string,HTMLImageElement>*/;
 	private context: any /* ILinkableObject, context for URL request */
 
 	constructor(context:any)
 	{
 		this.context = context;
 		this.baseImageElements = new Map();
-		this.canvasMap = new Dictionary2D<string,string,HTMLCanvasElement>();
-		this.imageMap = new Dictionary2D<string,string,HTMLImageElement>();
+		this.canvasMap = new Dictionary2D/*<string,string,HTMLCanvasElement>*/();
+		this.imageMap = new Dictionary2D/*<string,string,HTMLImageElement>*/();
 	}
 
 	requestBaseImageElement(url:any, callback:any)
@@ -56,7 +57,7 @@ class ImageGlyphCache {
 		return {canvas, freshCanvas};
 	}
 
-	requestDataUrl(url:any, color:any, callback:any)
+	requestDataUrl(url:string, color:any, callback:any)
 	{
 		let {canvas, freshCanvas} = this.getCachedCanvas(url, color);
 		/* If freshCanvas is true, this means that we just created the canvas and haven't rendered to it. Time to do that. */
@@ -90,8 +91,8 @@ class ImageGlyphCache {
 		if (!image)
 		{
 			image = new Image();
-			weavejs.WeaveAPI.URLRequestUtils.request(this.context, {url, responseType: "datauri", mimeType: ""}).then(
-				(dataUri:any) =>
+			weavejs.WeaveAPI.URLRequestUtils.request(this.context, {url, responseType: "datauri", mimeType: ""} as any).then(
+				(dataUri:string) =>
 				{
 					this.requestDataUrl(dataUri, color, function (dataUrl:any) {
 						image.src = dataUrl;

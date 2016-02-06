@@ -13,6 +13,12 @@ import * as ReactDOM from "react-dom";
 import {round} from "d3";
 import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootStrapTable";
 
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathData = weavejs.path.WeavePathData;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+
 export interface IDataTableState extends IVisToolState {
     data:{[key:string]: string}[]
 }
@@ -44,9 +50,9 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
         this.columnsPath.addCallback(this, this.dataChanged, true);
         this.toolPath.push("filteredKeySet").addCallback(this, this.dataChanged, true);
         this.toolPath.push("selectionKeySet").addCallback(this, this.forceUpdate, true);
-        this.toolPath.probe_keyset.addCallback(this, this.forceUpdate, true);
+        (this.toolPath as WeavePathData).probe_keyset.addCallback(this, this.forceUpdate, true);
 
-        this.toolPath.getObject("filteredKeySet").setColumnKeySources(this.toolPath.getObject("columns").getObjects());
+        (this.toolPath.getObject("filteredKeySet") as FilteredKeySet).setColumnKeySources((this.toolPath.getObject("columns") as ILinkableHashMap).getObjects());
     }
 
     componentDidUpdate() {
@@ -55,7 +61,7 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
 
     dataChanged() {
         this.setState({
-            data: this.columnsPath.retrieveRecords(this.columnsPath.getNames(), {keySet: this.toolPath.push("filteredKeySet"), dataType: "string"})
+            data: (this.columnsPath as WeavePathData).retrieveRecords(this.columnsPath.getNames(), {keySet: this.toolPath.push("filteredKeySet"), dataType: "string"})
         });
     }
 
@@ -68,11 +74,11 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
     // }
 
     handleProbe(ids:string[]) {
-        this.toolPath.probe_keyset.setKeys(ids);
+        (this.toolPath as WeavePathData).probe_keyset.setKeys(ids);
     }
 
     handleSelection(ids:string[]) {
-        this.toolPath.push("selectionKeySet", null).setKeys(ids);
+        (this.toolPath.push("selectionKeySet", null) as WeavePathData).setKeys(ids);
     }
 
     render() {
@@ -82,7 +88,7 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
         columns["id"] = "Key";
 
         this.columnsPath.getChildren().forEach((columnPath:WeavePath) => {
-            columns[columnPath.getPath().pop()] = columnPath.getObject().getMetadata('title');
+            columns[columnPath.getPath().pop()] = (columnPath.getObject() as IAttributeColumn).getMetadata('title');
         });
 
         return <ReactBootstrapTable columnTitles={columns}
@@ -93,8 +99,8 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
                                     hover={true}
                                     bordered={true}
                                     condensed={true}
-                                    selectedIds={this.toolPath.push("selectionKeySet", null).getKeys()}
-                                    probedIds={this.toolPath.probe_keyset.getKeys()}
+                                    selectedIds={(this.toolPath.push("selectionKeySet", null) as WeavePathData).getKeys()}
+                                    probedIds={(this.toolPath as WeavePathData).probe_keyset.getKeys()}
                                     onProbe={this.handleProbe.bind(this)}
                                     onSelection={this.handleSelection.bind(this)}
                                     showIdColumn={false}

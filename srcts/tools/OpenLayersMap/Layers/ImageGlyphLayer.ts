@@ -9,8 +9,7 @@ import FeatureLayer from "./FeatureLayer";
 import ImageGlyphCache from "./ImageGlyphCache";
 import Layer from "./Layer";
 
-declare var weavejs:any;
-declare var Weave:any;
+import WeavePathData = weavejs.path.WeavePathData;
 
 class ImageGlyphLayer extends GlyphLayer {
 
@@ -83,7 +82,7 @@ class ImageGlyphLayer extends GlyphLayer {
 	updateStyleData() {
 		/* Update feature styles */
 
-		var records = this.layerPath.retrieveRecords(["alpha", "color", "imageURL", "imageSize"], this.layerPath.push("dataX"));
+		var records = (this.layerPath as WeavePathData).retrieveRecords(["alpha", "color", "imageURL", "imageSize"], this.layerPath.push("dataX"));
 
 		for (let record of records)
 		{
@@ -110,5 +109,5 @@ class ImageGlyphLayer extends GlyphLayer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Layer.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, ['ILinkableObjectWithNewProperties']);
 export default ImageGlyphLayer;

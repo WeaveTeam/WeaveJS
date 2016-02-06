@@ -15,6 +15,8 @@ import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 
+import WeavePath = weavejs.path.WeavePath;
+
 //TODO: This is a hack to allow react to be imported in generated JSX. Without this, import is missing and render encounters an exception
 var stub:any = React;
 const sessionStateMenuStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column", overflow:"auto"};
@@ -51,8 +53,8 @@ class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState>
 
     render() {
         this.choices = this.toolPath.push("choices");
-        var selectedChoice:string = this.toolPath.getState("selectedChoice");
-        var layoutMode:string = this.toolPath.getState("layoutMode");
+        var selectedChoice = this.toolPath.getState("selectedChoice") as string;
+        var layoutMode = this.toolPath.getState("layoutMode") as string;
 
         var menus:JSX.Element[] = this.choices.getNames().map((choice:string, index:number) => {
             if(layoutMode === "ComboBox"){

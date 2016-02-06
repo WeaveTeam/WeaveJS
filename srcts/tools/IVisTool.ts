@@ -1,5 +1,7 @@
 /// <reference path="../../typings/react/react.d.ts"/>
 
+import WeavePath = weavejs.path.WeavePath;
+
 import ToolTip from "./tooltip";
 
 export interface IVisToolProps {

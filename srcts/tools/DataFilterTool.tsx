@@ -11,6 +11,8 @@ import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import {DropdownButton, MenuItem} from "react-bootstrap";
 
+import WeavePath = weavejs.path.WeavePath;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
@@ -100,7 +102,7 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 		this.filter = this.props.filter.getObject() as ColumnDataFilter;
 		this.values = this.filter.values;
 		this.column = this.filter.column;
-		this.forceDiscreteValues = this.props.editor.getObject("forceDiscreteValues");
+		this.forceDiscreteValues = this.props.editor.getObject("forceDiscreteValues") as LinkableBoolean;
 		this.options = [];
 	}
 
@@ -108,7 +110,7 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 		this.filter = this.props.filter.getObject() as ColumnDataFilter;
 		this.values = this.filter.values;
 		this.column = this.filter.column;
-		this.forceDiscreteValues = this.props.editor.getObject("forceDiscreteValues");
+		this.forceDiscreteValues = this.props.editor.getObject("forceDiscreteValues") as LinkableBoolean;
 	}
 
 	protected handleMissingSessionStateProperties(newState:any)
@@ -183,9 +185,9 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 
 	constructor(props:DiscreteValuesDataFilterEditorProps) {
 		super(props);
-		this.layoutMode = this.props.editor.getObject("layoutMode");
-		this.showToggle = this.props.editor.getObject("showToggle");
-		this.showToggleLabel = this.props.editor.getObject("showToggleLabel");
+		this.layoutMode = this.props.editor.getObject("layoutMode") as LinkableString;
+		this.showToggle = this.props.editor.getObject("showToggle") as LinkableBoolean;
+		this.showToggleLabel = this.props.editor.getObject("showToggleLabel") as LinkableBoolean;
 		this.filter = this.props.filter.getObject() as ColumnDataFilter;
 		this.values = this.filter.values;
 		this.column = this.filter.column;
@@ -194,9 +196,9 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 	}
 
 	componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps) {
-		this.layoutMode = this.props.editor.getObject("layoutMode");
-		this.showToggle = this.props.editor.getObject("showToggle");
-		this.showToggleLabel = this.props.editor.getObject("showToggleLabel");
+		this.layoutMode = this.props.editor.getObject("layoutMode") as LinkableString;
+		this.showToggle = this.props.editor.getObject("showToggle") as LinkableBoolean;
+		this.showToggleLabel = this.props.editor.getObject("showToggleLabel") as LinkableBoolean;
 		this.filter = this.props.filter.getObject() as ColumnDataFilter;
 		this.values = this.filter.values;
 		this.column = this.filter.column;

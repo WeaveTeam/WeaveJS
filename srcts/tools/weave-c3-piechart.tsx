@@ -14,7 +14,11 @@ import * as _ from "lodash";
 import * as React from "react";
 import {ChartAPI, ChartConfiguration, generate} from "c3";
 
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathData = weavejs.path.WeavePathData;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
 export interface IPieChartPaths extends IToolPaths {
     data: WeavePath;
@@ -97,8 +101,8 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
             label: this.paths.label
         }
 
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+        this.numericRecords = (this.paths.plotter as WeavePathData).retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = (this.paths.plotter as WeavePathData).retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.keyToIndex = {};
         this.indexToKey = {};
@@ -160,7 +164,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
 
         this.initializePaths(manifest);
 
-       	this.paths.filteredKeySet.getObject().setSingleKeySource(this.paths.data.getObject());
+       	(this.paths.filteredKeySet.getObject() as FilteredKeySet).setSingleKeySource(this.paths.data.getObject() as IAttributeColumn);
 
         this.c3Config = {
             size: {
@@ -204,7 +208,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
                 onmouseover: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
                         var columnNamesToValue:{[columnName:string] : string|number } = {};
-                        columnNamesToValue[this.paths.data.getObject().getMetadata("title")] = d.value;
+                        columnNamesToValue[(this.paths.data.getObject() as IAttributeColumn).getMetadata("title")] = d.value;
                         this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
                         this.props.toolTip.setState({
                             showToolTip: true,

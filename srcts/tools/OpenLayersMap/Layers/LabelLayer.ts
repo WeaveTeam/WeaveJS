@@ -11,31 +11,30 @@ import GlyphLayer from "./GlyphLayer";
 import Layer from "./Layer";
 import OpenLayersMapTool from "../../OpenLayersMapTool";
 
-declare var Weave: any;
-declare var weavejs: any;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
-class LabelLayer extends GlyphLayer {
-	public angle: any /*weavejs.api.data.IAttributeColumn*/;
-	public bold: any /*weavejs.api.data.IAttributeColumn*/;
-	public color: any /*weavejs.api.data.IAttributeColumn*/;
-	public font: any /*weavejs.api.data.IAttributeColumn*/;
-	public hAlign: any /*weavejs.api.data.IAttributeColumn*/;
-	public vAlign: any /*weavejs.api.data.IAttributeColumn*/;
-	public italic: any /*weavejs.api.data.IAttributeColumn*/;
-	public size: any /*weavejs.api.data.IAttributeColumn*/;
-	public text: any /*weavejs.api.data.IAttributeColumn*/;
-	public underline: any /*weavejs.api.data.IAttributeColumn*/;
+class LabelLayer extends GlyphLayer
+{
+	public angle: IAttributeColumn;
+	public bold: IAttributeColumn;
+	public color: IAttributeColumn;
+	public font: IAttributeColumn;
+	public hAlign: IAttributeColumn;
+	public vAlign: IAttributeColumn;
+	public italic: IAttributeColumn;
+	public size: IAttributeColumn;
+	public text: IAttributeColumn;
+	public underline: IAttributeColumn;
 
 	private columns: Map<string,any>;
-
 
 	constructor(parent:OpenLayersMapTool, layerName:string)
 	{
 		super(parent, layerName);
 
-		this.size = this.layerPath.getObject("size");
-		this.text = this.layerPath.getObject("text");
-		this.color = this.layerPath.getObject("color");
+		this.size = this.layerPath.getObject("size") as IAttributeColumn;
+		this.text = this.layerPath.getObject("text") as IAttributeColumn;
+		this.color = this.layerPath.getObject("color") as IAttributeColumn;
 
 		this.size.addGroupedCallback(this, this.updateStyleData)
 		this.text.addGroupedCallback(this, this.updateStyleData)
@@ -88,5 +87,5 @@ class LabelLayer extends GlyphLayer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::TextGlyphPlotter", LabelLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Layer.registerClass("weave.visualization.plotters::TextGlyphPlotter", LabelLayer, ['ILinkableObjectWithNewProperties']);
 export default LabelLayer;

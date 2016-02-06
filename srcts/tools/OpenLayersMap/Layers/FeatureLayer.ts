@@ -44,9 +44,9 @@ export abstract class FeatureLayer extends Layer {
 
 		this.changedItems = new Set();
 
-		this.selectionKeySet = this.layerPath.weave.getObject("defaultSelectionKeySet")
-		this.probeKeySet = this.layerPath.weave.getObject("defaultProbeKeySet");
-		this.filteredKeySet = this.layerPath.getObject("filteredKeySet");
+		this.selectionKeySet = this.layerPath.weave.getObject("defaultSelectionKeySet") as KeySet;
+		this.probeKeySet = this.layerPath.weave.getObject("defaultProbeKeySet") as KeySet;
+		this.filteredKeySet = this.layerPath.getObject("filteredKeySet") as FilteredKeySet;
 
 		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, new Set<IQualifiedKey>());
 		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, new Set<IQualifiedKey>());

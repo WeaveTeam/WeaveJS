@@ -10,8 +10,9 @@ import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 import GlyphLayer from "./GlyphLayer";
 import Layer from "./Layer";
 
-declare var Weave:any;
-declare var weavejs:any;
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathData = weavejs.path.WeavePathData;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 class ScatterPlotLayer extends GlyphLayer {
 
@@ -51,7 +52,7 @@ class ScatterPlotLayer extends GlyphLayer {
 				additionalColumns.push(internalColumn);
 		}
 
-		internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(this.sizeBy.getObject());
+		internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(this.sizeBy.getObject() as IColumnWrapper);
 		if (internalColumn)
 			additionalColumns.push(internalColumn);
 
@@ -64,7 +65,7 @@ class ScatterPlotLayer extends GlyphLayer {
 		let fillEnabled = this.fillStylePath.push("enable").getState();
 		let strokeEnabled = this.lineStylePath.push("enable").getState();
 
-		var styleRecords:any = this.layerPath.retrieveRecords({
+		var styleRecords:any = (this.layerPath as WeavePathData).retrieveRecords({
 			fill: {
 				color: this.fillStylePath.push("color"),
 				alpha: this.fillStylePath.push("alpha"),
@@ -82,7 +83,7 @@ class ScatterPlotLayer extends GlyphLayer {
 
 		var styleRecordsIndex = lodash.indexBy(styleRecords, "id");
 
-		var sizeByNumeric = this.layerPath.retrieveRecords({sizeBy: this.sizeBy}, {dataType: "number"});
+		var sizeByNumeric = (this.layerPath as WeavePathData).retrieveRecords({sizeBy: this.sizeBy}, {dataType: "number"});
 
 		for (let record of sizeByNumeric)
 		{
@@ -98,9 +99,9 @@ class ScatterPlotLayer extends GlyphLayer {
 		let sizeByMax = lodash.max(sizeBy);
 		let sizeByMin = lodash.min(sizeBy);
 		let absMax = Math.max(Math.abs(sizeByMax), Math.abs(sizeByMin));
-		let minScreenRadius = this.minRadiusPath.getState();
-		let maxScreenRadius = this.maxRadiusPath.getState();
-		let defaultScreenRadius = this.defaultRadiusPath.getState();
+		let minScreenRadius = this.minRadiusPath.getState() as number;
+		let maxScreenRadius = this.maxRadiusPath.getState() as number;
+		let defaultScreenRadius = this.defaultRadiusPath.getState() as number;
 
 		styleRecords = lodash.sortByOrder(styleRecords, ["sizeBy", "id"], ["desc", "asc"]);
 
@@ -189,5 +190,5 @@ class ScatterPlotLayer extends GlyphLayer {
 		}
 	}
 }
-Layer.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Layer.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, ['ILinkableObjectWithNewProperties']);
 export default ScatterPlotLayer;

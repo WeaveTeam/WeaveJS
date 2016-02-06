@@ -17,6 +17,11 @@ import {ChartConfiguration, ChartAPI} from "c3";
 import StandardLib from "../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathData = weavejs.path.WeavePathData;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
 export interface IBarchartPaths extends IToolPaths {
     heightColumns: WeavePath;
@@ -112,17 +117,17 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
                 },
                 onselected: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.selection_keyset.addKeys([this.indexToKey[d.index]]);
+                        (this.toolPath as WeavePathData).selection_keyset.addKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onunselected: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.selection_keyset.removeKeys([this.indexToKey[d.index]]);
+                        (this.toolPath as WeavePathData).selection_keyset.removeKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onmouseover: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.probe_keyset.setKeys([]);
+                        (this.toolPath as WeavePathData).probe_keyset.setKeys([]);
                         var columnNamesToValue:{[columnName:string] : string|number } = {};
                         var columnNamesToColor:{[columnName:string] : string} = {};
                         this.heightColumnNames.forEach( (column:string, index:number) => {
@@ -142,12 +147,12 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
                             columnNamesToValue: columnNamesToValue,
                             columnNamesToColor: columnNamesToColor
                         });
-                        this.toolPath.probe_keyset.setKeys([this.indexToKey[d.index]]);
+                        (this.toolPath as WeavePathData).probe_keyset.setKeys([this.indexToKey[d.index]]);
                     }
                 },
                 onmouseout: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.probe_keyset.setKeys([]);
+                        (this.toolPath as WeavePathData).probe_keyset.setKeys([]);
                         this.props.toolTip.setState({
                            showToolTip: false
                         });
@@ -260,26 +265,26 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
 	}
 
     handlePointClick(event:MouseEvent):void {
-        var probeKeys:any[] = this.toolPath.probe_keyset.getKeys();
-        var selectionKeys:any[] = this.toolPath.selection_keyset.getKeys();
+        var probeKeys:any[] = (this.toolPath as WeavePathData).probe_keyset.getKeys();
+        var selectionKeys:any[] = (this.toolPath as WeavePathData).selection_keyset.getKeys();
         if (_.isEqual(probeKeys, selectionKeys))
-            this.toolPath.selection_keyset.setKeys([]);
+            (this.toolPath as WeavePathData).selection_keyset.setKeys([]);
         else
-            this.toolPath.selection_keyset.setKeys(probeKeys);
+            (this.toolPath as WeavePathData).selection_keyset.setKeys(probeKeys);
     }
 
     handleShowValueLabels () {
         if(!this.chart)
             return;
-        this.showValueLabels = this.paths.showValueLabels.getState();
+        this.showValueLabels = this.paths.showValueLabels.getState() as boolean;
         this.chart.flush();
     }
 
     private dataChanged():void
 	{
-        var lhm = this.paths.heightColumns.getObject();
-        var columns = lhm.getObjects();
-        var names = lhm.getNames();
+        var lhm = this.paths.heightColumns.getObject() as ILinkableHashMap;
+        var columns = lhm.getObjects() as IAttributeColumn[];
+        var names = lhm.getNames() as string[];
 
 		// the y label column is the first column in heightColumns
 		this.yLabelColumnPath = Weave.getPath(columns[0]);
@@ -312,12 +317,12 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
 			numericMapping.heights[name] = column;
         }
 
-        this.yLabelColumnDataType = this.yLabelColumnPath.getObject().getMetadata('dataType');
+        this.yLabelColumnDataType = (this.yLabelColumnPath.getObject() as IAttributeColumn).getMetadata('dataType');
 
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.numericRecords = (this.paths.plotter as WeavePathData).retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
         if (!this.numericRecords.length)
             return;
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+        this.stringRecords = (this.paths.plotter as WeavePathData).retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         //this.records = _.sortByOrder(this.records, ["sort", "id"], ['asc', 'asc']);
@@ -350,8 +355,8 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
             }
         });
 
-        this.groupingMode = this.paths.groupingMode.getState();
-        //var horizontalMode = this.paths.plotter.push("horizontalMode").getState();
+        this.groupingMode = this.paths.groupingMode.getState() as string;
+        //var horizontalMode = this.paths.plotter.push("horizontalMode").getState() as boolean;
 
         // set axis rotation mode
         //this.chart.load({axes: { rotated: horizontalMode }});
@@ -376,7 +381,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
         interface Keys {x:string, value:string[]};
         var keys:Keys = {x:"", value:[]};
         // if label column is specified
-        if(this.paths.labelColumn.getState().length) {
+        if(this.paths.labelColumn.getObject(null)) {
             keys.x = "xLabel";
             this.c3Config.legend.show = false;
         }else{
@@ -388,13 +393,13 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
         var columnTitles:{[name:string]: string} = {};
 
         if(this.heightColumnNames.length > 1) {
-            this.colorRamp = this.paths.chartColors.getState();
+            this.colorRamp = this.paths.chartColors.getState() as any[];
             this.heightColumnNames.map((name, index) => {
                 var color = StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.colorRamp);
                 columnColors[name] = "#" + StandardLib.decimalToHex(color);
                 columnTitles[name] = this.heightColumnsLabels[index];
             });
-            if(this.paths.labelColumn.getState().length) {
+            if(this.paths.labelColumn.getObject(null)) {
                 this.c3Config.legend.show = true;
             }
         }else{
@@ -429,8 +434,8 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
             .style("stroke-width", "1px")
             .style("stroke-opacity", 0.5);
 
-        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
-        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
+        var selectedKeys:string[] = (this.toolPath as WeavePathData).selection_keyset.getKeys();
+        var probedKeys:string[] = (this.toolPath as WeavePathData).probe_keyset.getKeys();
         var selectedIndices:number[] = selectedKeys.map((key:string) => {
             return Number(this.keyToIndex[key]);
         });
@@ -496,13 +501,13 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
             { name: "overrideYMax", path: this.plotManagerPath.push("overrideYMax") },
             { name: "overrideYMin", path: this.plotManagerPath.push("overrideYMin") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
+            { name: "selectionKeySet", path: (this.toolPath as WeavePathData).selection_keyset, callbacks: this.updateStyle },
+            { name: "probeKeySet", path: (this.toolPath as WeavePathData).probe_keyset, callbacks: this.updateStyle }
         ];
 
         this.initializePaths(mapping);
 
-        this.paths.filteredKeySet.getObject().setColumnKeySources([this.paths.sortColumn.getObject()]);
+        (this.paths.filteredKeySet.getObject() as FilteredKeySet).setColumnKeySources([this.paths.sortColumn.getObject()]);
 
         this.c3Config.bindto = this.element;
         this.validate(true);
@@ -528,8 +533,8 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
         if (axisChange)
         {
             changeDetected = true;
-            var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() || "Sorted by " + this.paths.sortColumn.getObject().getMetadata('title');
-            var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
+            var xLabel:string = this.paths.xAxis.push("overrideAxisName").getState() as string || "Sorted by " + (this.paths.sortColumn.getObject() as IAttributeColumn).getMetadata('title');
+            var yLabel:string = this.paths.yAxis.push("overrideAxisName").getState() as string || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
 
             if(!this.showXAxisLabel){
                 xLabel = " ";
@@ -564,7 +569,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
             this.c3Config.padding.top = Number(this.paths.marginTop.getState());
-            if(this.paths.labelColumn.getState().length){
+            if(this.paths.labelColumn.getObject(null)){
                 this.c3Config.axis.x.height = Number(this.paths.marginBottom.getState());
             } else {
                 this.c3Config.axis.x.height = null;
@@ -578,14 +583,14 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
                 this.c3Config.padding.right = Number(this.paths.marginRight.getState());
             }
 
-            if(!isNaN(this.paths.overrideYMax.getState())) {
-                this.c3Config.axis.y.max = this.paths.overrideYMax.getState();
+            if(!isNaN(this.paths.overrideYMax.getState() as number)) {
+                this.c3Config.axis.y.max = this.paths.overrideYMax.getState() as number;
             }else{
                 this.c3Config.axis.y.max = null;
             }
 
-            if(!isNaN(this.paths.overrideYMin.getState())) {
-                this.c3Config.axis.y.min = this.paths.overrideYMin.getState();
+            if(!isNaN(this.paths.overrideYMin.getState() as number)) {
+                this.c3Config.axis.y.min = this.paths.overrideYMin.getState() as number;
             } else {
                 this.c3Config.axis.y.min = null;
             }
@@ -594,12 +599,12 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
         if (this.detectChange('horizontalMode'))
         {
             changeDetected = true;
-            this.c3Config.axis.rotated = this.paths.horizontalMode.getState();
+            this.c3Config.axis.rotated = this.paths.horizontalMode.getState() as boolean;
         }
         if (this.detectChange('showValueLabels'))
         {
             changeDetected = true;
-            this.showValueLabels = this.paths.showValueLabels.getState();
+            this.showValueLabels = this.paths.showValueLabels.getState() as boolean;
         }
 
         if (changeDetected || forced)

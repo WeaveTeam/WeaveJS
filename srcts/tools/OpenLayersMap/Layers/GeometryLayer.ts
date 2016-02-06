@@ -6,9 +6,13 @@ import * as ol from "openlayers";
 import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 import Layer from "./Layer";
 
+import WeavePath = weavejs.path.WeavePath;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
+import SolidFillStyle = weavejs.geom.SolidFillStyle;
+import SolidLineStyle = weavejs.geom.SolidLineStyle;
 
 class GeometryLayer extends FeatureLayer {
 
@@ -48,7 +52,7 @@ class GeometryLayer extends FeatureLayer {
 
 	get inputProjection():any
 	{
-		var projectionSpec = this.geoColumnPath.getObject("internalDynamicColumn").getMetadata('projection');
+		var projectionSpec = (this.geoColumnPath.getObject("internalDynamicColumn") as IAttributeColumn).getMetadata('projection');
 		return projectionSpec || this.outputProjection;
 	}
 
@@ -56,7 +60,7 @@ class GeometryLayer extends FeatureLayer {
 	{
 		this.source.clear();
 
-		var idc = this.geoColumnPath.getObject("internalDynamicColumn");
+		var idc = this.geoColumnPath.getObject("internalDynamicColumn") as IAttributeColumn;
 		var keys:Array<IQualifiedKey> = this.filteredKeySet.keys;
 		var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, keys);
 
@@ -96,10 +100,10 @@ class GeometryLayer extends FeatureLayer {
 
 	updateStyleData()
 	{
-		let fillEnabled: boolean = this.fillStylePath.getObject("enable").state;
-		let strokeEnabled: boolean = this.lineStylePath.getObject("enable").state;
-		let fillStyle = this.fillStylePath.getObject();
-		let strokeStyle = this.lineStylePath.getObject();
+		let fillEnabled: boolean = (this.fillStylePath.getObject("enable") as LinkableBoolean).value;
+		let strokeEnabled: boolean = (this.lineStylePath.getObject("enable") as LinkableBoolean).value;
+		let fillStyle = this.fillStylePath.getObject() as SolidFillStyle;
+		let strokeStyle = this.lineStylePath.getObject() as SolidLineStyle;
 
 		for (let key of this.filteredKeySet.keys)
 		{
@@ -148,5 +152,5 @@ class GeometryLayer extends FeatureLayer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Layer.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, ['ILinkableObjectWithNewProperties']);
 export default GeometryLayer;

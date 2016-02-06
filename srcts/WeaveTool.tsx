@@ -4,6 +4,8 @@
 ///<reference path="../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
 ///<reference path="../typings/react-bootstrap/react-bootstrap.d.ts"/>
 
+import WeavePath = weavejs.path.WeavePath;
+
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -44,9 +46,9 @@ export function getToolImplementation(param:string|WeavePath):Function
 		var path:WeavePath = param as WeavePath;
 		type = path.getType();
         if (type === "weave.visualization.tools::ExternalTool" && path.getType("toolClass"))
-            type = path.getState("toolClass");
+            type = path.getState("toolClass") as string;
         if (type === "weavejs.core.LinkableHashMap" && path.getType("class"))
-            type = path.getState("class");
+            type = path.getState("class") as string;
 	}
     return toolRegistry[type];
 }

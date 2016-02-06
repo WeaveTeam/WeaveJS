@@ -18,6 +18,13 @@ import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
 
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathData = weavejs.path.WeavePathData;
+import WeavePathUI = weavejs.path.WeavePathUI;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import BinnedColumn = weavejs.data.column.BinnedColumn;
+
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
@@ -33,7 +40,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	private filteredKeySet:WeavePath;
 	private selectionKeySet:WeavePath;
 	private probeKeySet:WeavePath;
-	protected toolPath:WeavePath;
+	protected toolPath:WeavePathData;
 	private spanStyle:CSSProperties;
 
 	private selectedBins:number[];
@@ -41,8 +48,8 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	constructor(props:IVisToolProps)
 	{
 		super(props);
-		this.toolPath = props.toolPath;
-		this.plotterPath = this.toolPath.pushPlotter("plot");
+		this.toolPath = props.toolPath as WeavePathData;
+		this.plotterPath = (this.toolPath as WeavePathUI).pushPlotter("plot");
 		this.dynamicColorColumnPath = this.plotterPath.push("dynamicColorColumn");
 		this.binningDefinition = this.dynamicColorColumnPath.push(null, "internalDynamicColumn", null, "binningDefinition", null);
 		this.binnedColumnPath = this.dynamicColorColumnPath.push(null, "internalDynamicColumn", null);
@@ -70,7 +77,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	
 	get numberOfBins():number
 	{
-		return this.binnedColumnPath.getObject().numberOfBins;
+		return (this.binnedColumnPath.getObject() as BinnedColumn).numberOfBins;
 	}
 
     protected handleMissingSessionStateProperties(newState:any)
@@ -94,8 +101,8 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	{
 		var keys = this.toolPath.selection_keyset.getKeys();
 		var selectedBins:number[] = [];
-		var binnedColumnObject = this.binnedColumnPath.getObject();
-		keys.forEach( (key:string) => {
+		var binnedColumnObject = this.binnedColumnPath.getObject() as BinnedColumn;
+		keys.forEach( (key:IQualifiedKey) => {
 			selectedBins.push(binnedColumnObject.getValueFromKey(key, Number));
 		});
 		return _.unique(selectedBins);
@@ -105,8 +112,8 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	{
 		var keys = this.toolPath.probe_keyset.getKeys();
 		var probedBins:number[] = [];
-		var binnedColumnObject = this.binnedColumnPath.getObject();
-		keys.forEach( (key:string) => {
+		var binnedColumnObject = this.binnedColumnPath.getObject() as BinnedColumn;
+		keys.forEach( (key:IQualifiedKey) => {
 			probedBins.push(binnedColumnObject.getValueFromKey(key, Number));
 		});
 		return _.unique(probedBins);
@@ -114,7 +121,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 
 	handleClick(bin:number, event:React.MouseEvent):void
 	{
-		var binnedKeys:any[] = this.binnedColumnPath.getObject()._binnedKeysArray;
+		var binnedKeys:any[] = (this.binnedColumnPath.getObject() as any)['_binnedKeysArray'];
 		//setKeys
 		if (_.contains(this.selectedBins,bin))
 		{
@@ -144,7 +151,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	{
 		if (mouseOver)
 		{
-			var binnedKeys:any[] = this.binnedColumnPath.getObject()._binnedKeysArray;
+			var binnedKeys:any[] = (this.binnedColumnPath.getObject() as any)['_binnedKeysArray'];
 			this.toolPath.probe_keyset.setKeys(binnedKeys[bin]);
 		}
 		else
@@ -187,20 +194,20 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 		if (this.numberOfBins)
 		{
 			//Binned plot case
-			var width:number = this.props.style.width;
-			var height:number = this.props.style.height;
-			var shapeSize:number = this.plotterPath.getState("shapeSize");
-			var shapeType:string = this.plotterPath.getState("shapeType");
+			var width:number = this.props.style.width as number;
+			var height:number = this.props.style.height as number;
+			var shapeSize:number = this.plotterPath.getState("shapeSize") as number;
+			var shapeType:string = this.plotterPath.getState("shapeType") as string;
 			var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
 			var columnFlex:number = 1.0/maxColumns;
 			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
-			var ramp:any[] = this.dynamicColorColumnPath.getState(null, "ramp");
+			var ramp:any[] = this.dynamicColorColumnPath.getState(null, "ramp") as any[];
 			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
 			var yMap:Function = (d:number):number => { return yScale(d); };
 
 			shapeSize = _.max([1, _.min([shapeSize, height / this.numberOfBins])]);
 			var r:number = (shapeSize / 100 * height / this.numberOfBins) / 2;
-			var bc:any = this.binnedColumnPath.getObject();
+			var bc = this.binnedColumnPath.getObject() as BinnedColumn;
 			var textLabelFunction:Function = bc.deriveStringFromNumber.bind(bc);
 			var finalElements:any[] = [];
 			var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
@@ -336,7 +343,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 			return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
 				<ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
 					<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
-						<span style={prefixerStyle}>{this.dynamicColorColumnPath.getObject().getMetadata('title')}</span>
+						<span style={prefixerStyle}>{(this.dynamicColorColumnPath.getObject() as IAttributeColumn).getMetadata('title')}</span>
 					</ui.HBox>
 					{
 						this.props.style.width > this.props.style.height * 2

@@ -19,7 +19,12 @@ import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 import StandardLib from "../utils/StandardLib";
 
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathData = weavejs.path.WeavePathData;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
 export interface ILineChartPaths extends IToolPaths {
     columns: WeavePath;
@@ -284,14 +289,14 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
 
         for (let idx in children) {
             let child = children[idx];
-            let title = child.getObject().getMetadata('title');
+            let title = (child.getObject() as IAttributeColumn).getMetadata('title');
             let name = child.getPath().pop();
             this.columnLabels.push(title);
             this.columnNames.push(name);
         }
 
-        this.numericRecords = this.paths.plotter.retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = this.paths.plotter.retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+        this.numericRecords = (this.paths.plotter as WeavePathData).retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
+        this.stringRecords = (this.paths.plotter as WeavePathData).retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
 
         this.records = _.zip(this.numericRecords, this.stringRecords);
         this.records = _.sortBy(this.records, [0, "id"]);
@@ -372,7 +377,7 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
 
         this.initializePaths(mapping);
 
-       	this.paths.filteredKeySet.getObject().setColumnKeySources(this.paths.columns.getObject().getObjects());
+       	(this.paths.filteredKeySet.getObject() as FilteredKeySet).setColumnKeySources((this.paths.columns.getObject() as ILinkableHashMap).getObjects());
 
         this.c3Config.bindto = this.element;
         this.validate(true);
@@ -453,8 +458,8 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
                 this.c3Config.padding.right = Number(this.paths.marginRight.getState());
             }
 
-            if(!isNaN(this.paths.overrideYMax.getState())) {
-                this.c3Config.axis.y.max = this.paths.overrideYMax.getState();
+            if(!isNaN(this.paths.overrideYMax.getState() as number)) {
+                this.c3Config.axis.y.max = this.paths.overrideYMax.getState() as number;
             } else {
                 this.c3Config.axis.y.max = null;
             }

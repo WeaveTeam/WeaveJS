@@ -22,7 +22,6 @@ import JSZip from "jszip";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-/*global Weave, weavejs*/
 var stub:any = React;
 weavejs.util.JS.JSZip = JSZip;
 

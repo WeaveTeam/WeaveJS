@@ -3,6 +3,8 @@
 /// <reference path="../typings/lodash/lodash.d.ts"/>
 /// <reference path="../typings/weave/weavejs.d.ts"/>
 
+import WeavePath = weavejs.path.WeavePath;
+
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
@@ -406,7 +408,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 
 		if (!newState)
 		{
-			newState = this.generateLayoutState(this.weave.path().getChildren().filter((path:WeavePath) => getToolImplementation(path)));
+			newState = this.generateLayoutState(this.weave.path().getChildren().filter(((path:WeavePath) => getToolImplementation(path)) as any));
 			//TODO - generate layout state from
 			this.weave.path(LAYOUT).state(newState);
 		}

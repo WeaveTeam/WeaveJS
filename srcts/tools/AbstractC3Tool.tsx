@@ -4,6 +4,9 @@
 ///<reference path="../../typings/d3/d3.d.ts"/>
 /// <reference path="../../typings/c3/c3.d.ts"/>
 
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathUI = weavejs.path.WeavePathUI;
+
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import {ChartAPI, ChartConfiguration} from "c3";
 
@@ -35,7 +38,7 @@ export interface PathConfig {
 
 export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
-    protected toolPath:WeavePath;
+    protected toolPath:WeavePathUI;
     protected plotManagerPath:WeavePath;
     protected element:HTMLElement;
     protected paths:IToolPaths;
@@ -50,22 +53,22 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 
     constructor(props:IVisToolProps) {
         super(props);
-        this.toolPath = props.toolPath;
+        this.toolPath = props.toolPath as WeavePathUI;
         this.plotManagerPath = this.toolPath.push(["children","visualization","plotManager"]);
         this.xAxisClass = "c3-axis-x";
         this.yAxisClass = "c3-axis-y";
         this.y2AxisClass = "c3-axis-y2";
         this.paths = {
-            plotter: {},
-            marginTop: {},
-            marginBottom: {},
-            marginLeft: {},
-            marginRight: {},
-            xAxis: {},
-            yAxis: {},
-            filteredKeySet: {},
-            selectionKeySet: {},
-            probeKeySet: {}
+            plotter: null,
+            marginTop: null,
+            marginBottom: null,
+            marginLeft: null,
+            marginRight: null,
+            xAxis: null,
+            yAxis: null,
+            filteredKeySet: null,
+            selectionKeySet: null,
+            probeKeySet: null
         };
     }
 
@@ -149,7 +152,7 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     }
 
     detectChange(...pathNames:string[]):boolean {
-        return Weave.detectChange.apply(Weave, [this].concat(pathNames.map((name:string) => this.paths[name].getObject())));
+        return Weave.detectChange.apply(Weave, [this as any].concat(pathNames.map((name:string) => this.paths[name].getObject())));
     }
 
     getCullingInterval(size:number,axisClass:string):number {

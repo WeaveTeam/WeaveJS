@@ -17,6 +17,10 @@ import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
 
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathUI = weavejs.path.WeavePathUI;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
@@ -35,7 +39,7 @@ class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState
     constructor(props:IVisToolProps) {
         super(props);
         this.toolPath = props.toolPath;
-        this.plotterPath = this.toolPath.pushPlotter("plot");
+        this.plotterPath = (this.toolPath as WeavePathUI).pushPlotter("plot");
         this.colorRampPath = this.plotterPath.push("chartColors");
         this.columnsPath = this.plotterPath.push("columns");
         this.maxColumnsPath = this.plotterPath.push("maxColumns");
@@ -114,18 +118,18 @@ class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState
     }
 
     render() {
-        var width:number = this.props.style.width;
-        var height:number = this.props.style.height;
-        var shapeSize:number = this.plotterPath.getState("shapeSize");
-        this.numberOfLabels = this.columnsPath.getState().length;
+        var width:number = this.props.style.width as number;
+        var height:number = this.props.style.height as number;
+        var shapeSize:number = this.plotterPath.getState("shapeSize") as number;
+        this.numberOfLabels = this.columnsPath.getNames().length;
         var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
         var columnFlex:number = 1.0/maxColumns;
         var extraBins:number = this.numberOfLabels%maxColumns == 0 ? 0 : maxColumns-(this.numberOfLabels%maxColumns);
-        var ramp:any[] = this.colorRampPath.getState();
+        var ramp:any[] = this.colorRampPath.getState() as any[];
 
-        var labels:string[] = this.columnsPath.getState().map( (column:any):string => {
-            var columnName:string = column.objectName;
-            return this.columnsPath.push(columnName).getObject().getMetadata('title');
+        var labels:string[] = (this.columnsPath.getState() as any[]).map( (item:any):string => {
+            var columnName:string = item.objectName;
+            return (this.columnsPath.push(columnName).getObject() as IAttributeColumn).getMetadata('title');
         });
         var finalElements:any[] = [];
         var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
