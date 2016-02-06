@@ -10,7 +10,7 @@ import TableBody from "./TableBody";
 import {IRow} from "./TableRow";
 import {IColumnTitles} from "./TableHead";
 
-interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable> {
+export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable> {
     striped?:boolean;
     bordered?:boolean;
     condensed?:boolean;
@@ -27,7 +27,7 @@ interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable> {
     showIdColumn:boolean;
 }
 
-interface IReactBootStrapTableState {
+export interface IReactBootStrapTableState {
     probedIds?:string[];
     selectedIds?:string[];
 }

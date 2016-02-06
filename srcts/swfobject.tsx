@@ -6,7 +6,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as swfobject from "swfobject-amd";
 
-interface ISwfObjectProps extends React.Props<Swfobject> {
+export interface ISwfObjectProps extends React.Props<Swfobject> {
     swfUrl:string;
     xiSwfUrlStr?:string;
     swfVersionStr?:string;

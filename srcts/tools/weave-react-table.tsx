@@ -13,11 +13,11 @@ import * as ReactDOM from "react-dom";
 import {round} from "d3";
 import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootStrapTable";
 
-interface IDataTableState extends IVisToolState {
+export interface IDataTableState extends IVisToolState {
     data:{[key:string]: string}[]
 }
 
-class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
+export default class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
 
     private toolPath:WeavePath;
     private columnsPath:WeavePath;
@@ -101,8 +101,5 @@ class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> im
                 />
     }
 }
-
-export default WeaveReactTable;
-
 registerToolImplementation("weave.visualization.tools::TableTool", WeaveReactTable);
 //Weave.registerClass("weavejs.tools.TableTool", WeaveReactTable, [weavejs.api.core.ILinkableObjectWithNewProperties]);

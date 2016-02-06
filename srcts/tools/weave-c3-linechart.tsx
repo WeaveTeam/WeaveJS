@@ -21,14 +21,14 @@ import StandardLib from "../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-interface ILineChartPaths extends IToolPaths {
+export interface ILineChartPaths extends IToolPaths {
     columns: WeavePath;
     lineStyle: WeavePath;
     curveType: WeavePath;
     overrideYMax: WeavePath;
 }
 
-class WeaveC3LineChart extends AbstractC3Tool {
+export default class WeaveC3LineChart extends AbstractC3Tool {
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
     private yAxisValueToLabel:{[value:number]: string};
@@ -475,11 +475,5 @@ class WeaveC3LineChart extends AbstractC3Tool {
         this.chart.load({columns: this.columns, colors: this.colors, type: this.chartType, unload: true});
     }
 }
-
-
-
-
-export default WeaveC3LineChart;
-
 registerToolImplementation("weave.visualization.tools::LineChartTool", WeaveC3LineChart);
 //Weave.registerClass("weavejs.tools.LineChartTool", WeaveC3LineChart, [weavejs.api.core.ILinkableObjectWithNewProperties]);

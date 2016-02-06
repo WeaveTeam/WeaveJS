@@ -6,7 +6,7 @@ export default class StandardLib
 {
 	/**
 	 * Generates an "rgba()" string for CSS.
-	 * 
+	 *
 	 * @param r   A number between 0 and 255.
 	 * @param g   A number between 0 and 255.
 	 * @param b   A number between 0 and 255.
@@ -47,10 +47,10 @@ export default class StandardLib
 
 	/**
 	 * Searches for the first nested object with matching properties
-	 * 
+	 *
 	 * @param roo The root Object.
 	 * @param match Either an Object with properties to match, or a Function that checks for a match.
-	 * 
+	 *
 	 * @returns returns an object with the matching properties
 	 */
 	static findDeep(root:any, match:any):any
@@ -88,7 +88,7 @@ export default class StandardLib
 
 	/**
 	 * Calculates an interpolated color for a normalized value.
-	 * 
+	 *
 	 * @param normValue A Number between 0 and 1.
 	 * @param colors An Array or list of colors to interpolate between. Normalized
 	 *               values of 0 and 1 will be mapped to the first and last colors.
@@ -136,7 +136,7 @@ export default class StandardLib
 
 	/**
 	 * This function converts a decimal number to a 6 digit hexadecimal string
-	 * 
+	 *
 	 * @param dec
 	 *            A decimal number
 	 * @return the hexadecimal value of the decimal number
@@ -149,7 +149,7 @@ export default class StandardLib
 	/**
 	 * This function return the normalized value between a range if no range is
 	 * provided, the default range will be 0 and 1
-	 * 
+	 *
 	 * @param value The value to be normalized
 	 * @param min the range min value
 	 * @param max the range max value
@@ -165,7 +165,7 @@ export default class StandardLib
 
 	/**
 	 * This function takes merges an object into another
-	 * 
+	 *
 	 * @param into the object to merge into
 	 * @param obj the object to merge from
 	 */
@@ -180,10 +180,10 @@ export default class StandardLib
 	/**
 	 * Temporary polyfill workaround for String.startsWith for projects that are
 	 * targetting es5
-	 * 
+	 *
 	 * determines whether a string begins with the characters of another string,
 	 * returning true or false as appropriate.
-	 * 
+	 *
 	 * @param str
 	 *            {string} the str string in which to search for in
 	 *            str.startsWith
@@ -193,9 +193,9 @@ export default class StandardLib
 	 * @param position
 	 *            {number?} Optional. The position in this string at which to
 	 *            begin searching for searchString; defaults to 0.
-	 * 
+	 *
 	 * @returns true or false
-	 * 
+	 *
 	 */
 	static startsWith(str:string, searchString:string, position?:number):boolean
 	{
@@ -228,7 +228,7 @@ export default class StandardLib
 	}
 
 	/**
-	 * 
+	 *
 	 * This function return and object whose keys are url parameters and value
 	 */
 	static getUrlParams():any
@@ -287,23 +287,23 @@ export default class StandardLib
 		return result;
 	}
 
-	static addPointClickListener(target:HTMLElement, listener:EventListener):void
+	static addPointClickListener(target:HTMLElement, listener:any):void
 	{
-		listener['onMouseDown'] = function(event:MouseEvent):void {
-			listener['mouseDownEvent'] = event;
+		listener.onMouseDown = function(event:MouseEvent):void {
+			listener.mouseDownEvent = event;
 		};
-		listener['onClick'] = function(event:MouseEvent):void {
-			var mde:MouseEvent = listener['mouseDownEvent'];
+		listener.onClick = function(event:MouseEvent):void {
+			var mde:MouseEvent = listener.mouseDownEvent;
 			if (mde.clientX === event.clientX && mde.clientY === event.clientY)
 				listener(event);
 		};
-		target.addEventListener('mousedown', listener['onMouseDown']);
-		target.addEventListener('click', listener['onClick']);
+		target.addEventListener('mousedown', listener.onMouseDown);
+		target.addEventListener('click', listener.onClick);
 	}
 
-	static removePointClickListener(target:HTMLElement, listener:EventListener):void
+	static removePointClickListener(target:HTMLElement, listener:any):void
 	{
-		target.removeEventListener('mousedown', listener['onMouseDown']);
-		target.removeEventListener('click', listener['onClick']);
+		target.removeEventListener('mousedown', listener.onMouseDown);
+		target.removeEventListener('click', listener.onClick);
 	}
 }

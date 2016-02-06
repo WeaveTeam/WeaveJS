@@ -27,7 +27,7 @@ export interface IToolPaths {
 }
 
 
-interface PathConfig {
+export interface PathConfig {
     name: string;
     path: WeavePath;
     callbacks?: Function|Function[];
@@ -137,7 +137,7 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
         });
     }
 
-    customSelectorStyle(array:Array<number>, selector, style:any) {
+    customSelectorStyle(array:Array<number>, selector:any, style:any) {
         array.forEach( (index) => {
             if (selector.length)
                 d3.select(selector[0][index]).style(style);
@@ -148,8 +148,8 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
         return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
     }
 
-    detectChange(...pathNames):boolean {
-        return Weave.detectChange.apply(Weave, [this].concat(pathNames.map(name => this.paths[name].getObject())));
+    detectChange(...pathNames:string[]):boolean {
+        return Weave.detectChange.apply(Weave, [this].concat(pathNames.map((name:string) => this.paths[name].getObject())));
     }
 
     getCullingInterval(size:number,axisClass:string):number {

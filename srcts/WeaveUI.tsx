@@ -4,6 +4,7 @@
 /// <reference path="../typings/weave/weavejs.d.ts"/>
 
 import WeaveLayoutManager from "./WeaveLayoutManager";
+import {IWeaveLayoutManagerProps, IWeaveLayoutManagerState} from "./WeaveLayoutManager";
 import WeaveC3Barchart from "./tools/weave-c3-barchart";
 import WeaveC3ScatterPlot from "./tools/weave-c3-scatterplot";
 import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend";
@@ -25,9 +26,14 @@ import * as ReactDOM from "react-dom";
 var stub:any = React;
 weavejs.util.JS.JSZip = JSZip;
 
-var loadLayout = function(weave, fileName, targetEltId, callback) {
+var loadLayout = function(weave:Weave,
+                          fileName:string,
+                          targetEltId:string,
+                          callback:(component:React.Component<IWeaveLayoutManagerProps, IWeaveLayoutManagerState>) => any)
+                 {
 
-    function render() {
+    function render():void
+    {
         ReactDOM.render(
             <WeaveLayoutManager weave={weave}/>,
             document.getElementById(targetEltId),
@@ -35,7 +41,7 @@ var loadLayout = function(weave, fileName, targetEltId, callback) {
         );
     }
 
-    weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, e => {
+    weavejs.core.WeaveArchive.loadUrl(weave, fileName).then(render, (e:Error) => {
         console.error(e)
     });
 

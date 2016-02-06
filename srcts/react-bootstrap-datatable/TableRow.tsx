@@ -14,7 +14,7 @@ export interface IRow {
     [columnId:string]: string
 };
 
-interface ITableRowProps extends React.Props<TableRow> {
+export interface ITableRowProps extends React.Props<TableRow> {
     row:IRow;
     idProperty:string;
     onMouseOver:() => void;
@@ -24,7 +24,7 @@ interface ITableRowProps extends React.Props<TableRow> {
     showIdColumn:boolean;
 }
 
-interface ITableRowState {
+export interface ITableRowState {
 }
 
 const baseStyle:CSSProperties = {

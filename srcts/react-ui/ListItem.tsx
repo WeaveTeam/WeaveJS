@@ -13,17 +13,18 @@ import HBox from "./Hbox";
 import StandardLib from "../utils/StandardLib";
 import * as Prefixer from "react-vendor-prefix";
 
-interface IListItemProps extends React.Props<ListItem> {
+export interface IListItemProps extends React.Props<ListItem> {
     values:any[];
     labels?:string[];
     onChange?:(selectedValues:string[]) => void;
     selectedValues?:string[];
 }
 
-interface IListItemstate {
+export interface IListItemstate {
     selectedValues?:string[];
     hovered?:number;
 }
+
 export default class ListItem extends React.Component<IListItemProps, IListItemstate> {
 
     private checkboxes:HTMLElement[];

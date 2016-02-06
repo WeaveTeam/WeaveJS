@@ -51,7 +51,7 @@ export function getToolImplementation(param:string|WeavePath):Function
     return toolRegistry[type];
 }
 
-interface IWeaveToolProps extends React.Props<WeaveTool> {
+export interface IWeaveToolProps extends React.Props<WeaveTool> {
     toolPath:WeavePath;
     toolClass?:string;
     style:CSSProperties;
@@ -60,11 +60,11 @@ interface IWeaveToolProps extends React.Props<WeaveTool> {
     onDragOver:React.MouseEvent;
 }
 
-interface IWeaveToolState {
+export interface IWeaveToolState {
 
 }
 
-export class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState> {
+export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState> {
 
     private toolPath:WeavePath;
     private ToolClass:any;

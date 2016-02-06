@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "jsx": "preserve",
     "removeComments": false,
     "target": "es6",
     "outDir": "outts",
     "inlineSources": true,
     "inlineSourceMap": true,
-    "declaration": false
+    "declaration": true
   },
   "exclude":[
-    "node_modules"
+    "node_modules", "outts"
   ]
 }

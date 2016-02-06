@@ -21,7 +21,7 @@ import Tooltip from "./tooltip";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-interface IHistogramPaths extends IToolPaths {
+export interface IHistogramPaths extends IToolPaths {
     binnedColumn: WeavePath;
     columnToAggregate: WeavePath;
     aggregationMethod: WeavePath;
@@ -29,7 +29,7 @@ interface IHistogramPaths extends IToolPaths {
     lineStyle: WeavePath;
 }
 
-class WeaveC3Histogram extends AbstractC3Tool {
+export default class WeaveC3Histogram extends AbstractC3Tool {
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
@@ -496,9 +496,6 @@ class WeaveC3Histogram extends AbstractC3Tool {
         this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; this.cullAxes();}});
     }
 }
-
-export default WeaveC3Histogram;
-
 registerToolImplementation("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
 registerToolImplementation("weave.visualization.tools::ColormapHistogramTool", WeaveC3Histogram);
 //Weave.registerClass("weavejs.tools.HistogramTool", WeaveC3Histogram, [weavejs.api.core.ILinkableObjectWithNewProperties]);

@@ -58,16 +58,16 @@ export default class RCSlider extends React.Component<any, any> {
 
         if(this.props.type == RCSlider.NUMERIC) {
             let selectedValues:Object[] = [{
-                min: value[0],
-                max: value[1]
+                min: (value as number[])[0],
+                max: (value as number[])[1]
             }];
             this.props.onChange(selectedValues);
         }
 
         if(this.props.type == RCSlider.NUMERIC_DISCRETE) {
             let selectedValues:Object[] = [{
-                min: this.indexToValue[value[0]],
-                max: this.indexToValue[value[1]]
+                min: this.indexToValue[(value as number[])[0]],
+                max: this.indexToValue[(value as number[])[1]]
             }];
             this.props.onChange(selectedValues);
         }
@@ -99,7 +99,7 @@ export default class RCSlider extends React.Component<any, any> {
 
         if(this.props.type == RCSlider.NUMERIC) {
             let valueToLabel:{[value:number]: string} = {};
-            this.options = this.props.values.map((option:{ value: string, label: string}) => {
+            this.options = this.props.values.map((option:{ value: number, label: string}) => {
                 valueToLabel[option.value] = option.label;
                 return option.value;
             });
@@ -107,7 +107,7 @@ export default class RCSlider extends React.Component<any, any> {
             this.min = this.options.length ? Math.min.apply(null, this.options) : 0;
             this.max = this.options.length ? Math.max.apply(null, this.options) : 0;
 
-            let marks:Object = {};
+            let marks:{[value:number]: string} = {};
             marks[this.min] = valueToLabel[this.min];
             marks[this.max] = valueToLabel[this.max];
 

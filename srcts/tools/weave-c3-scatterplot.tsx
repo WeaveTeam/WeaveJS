@@ -23,12 +23,12 @@ import StandardLib from "../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-interface IColumnStats {
+export interface IColumnStats {
     min: number;
     max: number;
 }
 
-interface IScatterplotPaths extends IToolPaths {
+export interface IScatterplotPaths extends IToolPaths {
     dataX: WeavePath;
     dataY: WeavePath;
     sizeBy: WeavePath;
@@ -40,7 +40,7 @@ interface IScatterplotPaths extends IToolPaths {
  * @param records array or records
  * @param attributes array of attributes to be normalized
  */
-class WeaveC3ScatterPlot extends AbstractC3Tool {
+export default class WeaveC3ScatterPlot extends AbstractC3Tool {
 
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
@@ -375,7 +375,7 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
     {
     	if (!this.chart || !this.dataXType)
     		return;
-    	
+
         d3.select(this.element)
 	        .selectAll("circle")
 	        .style("opacity", 1)
@@ -537,7 +537,5 @@ class WeaveC3ScatterPlot extends AbstractC3Tool {
         this.chart.internal.main.select('.c3-chart').attr('clip-path',null);
     }
 }
-export default WeaveC3ScatterPlot;
-
 registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
 //Weave.registerClass("weavejs.tools.ScatterPlotTool", WeaveC3ScatterPlot, [weavejs.api.core.ILinkableObjectWithNewProperties]);

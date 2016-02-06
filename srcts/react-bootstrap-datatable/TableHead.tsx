@@ -12,13 +12,13 @@ export interface IColumnTitles {
     [columnId: string] : string
 }
 
-interface ITableHeadProps extends React.Props<TableHead> {
+export interface ITableHeadProps extends React.Props<TableHead> {
     columnTitles:IColumnTitles;
     showIdColumn:boolean;
     idProperty:string;
 }
 
-interface ITableHeadState {
+export interface ITableHeadState {
 
 }
 

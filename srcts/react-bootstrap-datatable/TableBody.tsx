@@ -7,7 +7,7 @@ import {Table} from "react-bootstrap";
 import TableRow from "./TableRow";
 import {IRow} from "./TableRow";
 
-interface ITableBodyProps extends React.Props<TableBody> {
+export interface ITableBodyProps extends React.Props<TableBody> {
     rows:IRow[];
     idProperty:string;
     selectedIds:string[];
@@ -17,7 +17,7 @@ interface ITableBodyProps extends React.Props<TableBody> {
     showIdColumn:boolean
 }
 
-interface ITableBodyState {
+export interface ITableBodyState {
 
 }
 

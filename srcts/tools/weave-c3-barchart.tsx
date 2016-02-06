@@ -18,7 +18,7 @@ import StandardLib from "../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-interface IBarchartPaths extends IToolPaths {
+export interface IBarchartPaths extends IToolPaths {
     heightColumns: WeavePath;
     labelColumn: WeavePath;
     sortColumn: WeavePath;
@@ -31,7 +31,7 @@ interface IBarchartPaths extends IToolPaths {
     overrideYMin: WeavePath;
 }
 
-class WeaveC3Barchart extends AbstractC3Tool {
+export default class WeaveC3Barchart extends AbstractC3Tool {
 
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
@@ -404,7 +404,7 @@ class WeaveC3Barchart extends AbstractC3Tool {
         var data = _.cloneDeep(this.c3Config.data);
         data.json = _.pluck(this.numericRecords, 'heights');
         //need other stuff for data.json to work
-        this.numericRecords.forEach( (record,index) => {
+        this.numericRecords.forEach( (record:Record, index:number) => {
             for(var k in record) {
                 if(k != 'heights')
                     data.json[index][k]=record[k];
@@ -610,7 +610,5 @@ class WeaveC3Barchart extends AbstractC3Tool {
         }
     }
 }
-
-export default WeaveC3Barchart;
 registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
 //Weave.registerClass("weavejs.tools.CompoundBarChartTool", WeaveC3Barchart, [weavejs.api.core.ILinkableObjectWithNewProperties]);

@@ -19,11 +19,11 @@ export interface SliderProps extends React.Props<Slider> {
     label?:string;
 }
 
-interface sliderState {
+export interface SliderState {
     value:number;
 }
 
-export default class Slider extends React.Component<SliderProps, sliderState> {
+export default class Slider extends React.Component<SliderProps, SliderState> {
 
     constructor(props:SliderProps) {
         super(props);
@@ -40,7 +40,7 @@ export default class Slider extends React.Component<SliderProps, sliderState> {
 
     onChange(event:React.FormEvent) {
         this.setState({
-            value: event.target["value"]
+            value: (event.target as any).value
         });
         if(this.props.onChange)
             this.props.onChange(event);
@@ -56,7 +56,7 @@ export default class Slider extends React.Component<SliderProps, sliderState> {
 
         for(var key in this.props) {
             if(key !== "style") {
-                otherProps[key] = this.props[key];
+                otherProps[key] = (this.props as any)[key];
             }
         }
 

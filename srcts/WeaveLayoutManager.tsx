@@ -37,7 +37,8 @@ var v1:any = [
 	DataFilterTool
 ];
 ///////////////////////////////
-import {WeaveTool, getToolImplementation} from "./WeaveTool";
+import {getToolImplementation} from "./WeaveTool";
+import WeaveTool from "./WeaveTool";
 import ToolOverlay from "./ToolOverlay";
 import StandardLib from "./utils/StandardLib";
 const LAYOUT:string = "Layout";
@@ -63,18 +64,18 @@ declare type PolarPoint = {
 	y: number;
 };
 
-interface IWeaveLayoutManagerProps extends React.Props<WeaveLayoutManager>
+export interface IWeaveLayoutManagerProps extends React.Props<WeaveLayoutManager>
 {
 	weave: Weave,
 	style?: any
 }
 
-interface IWeaveLayoutManagerState
+export interface IWeaveLayoutManagerState
 {
 
 }
 
-class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeaveLayoutManagerState>
+export default class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeaveLayoutManagerState>
 {
 	private element:HTMLElement;
 	private weave:Weave;
@@ -405,7 +406,7 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 
 		if (!newState)
 		{
-			newState = this.generateLayoutState(this.weave.path().getChildren().filter(path => getToolImplementation(path)));
+			newState = this.generateLayoutState(this.weave.path().getChildren().filter((path:WeavePath) => getToolImplementation(path)));
 			//TODO - generate layout state from
 			this.weave.path(LAYOUT).state(newState);
 		}
@@ -456,4 +457,3 @@ class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeav
 		);
 	}
 }
-export default WeaveLayoutManager;

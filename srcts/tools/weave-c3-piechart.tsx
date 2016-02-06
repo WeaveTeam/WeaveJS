@@ -16,7 +16,7 @@ import {ChartAPI, ChartConfiguration, generate} from "c3";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-interface IPieChartPaths extends IToolPaths {
+export interface IPieChartPaths extends IToolPaths {
     data: WeavePath;
     label: WeavePath;
     fillStyle:WeavePath;

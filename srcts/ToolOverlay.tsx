@@ -20,7 +20,7 @@ export interface IToolOverlayProps extends React.Props<ToolOverlay> {
 export interface IToolOverlayState {
     style: React.CSSProperties;
 }
-class ToolOverlay extends React.Component<IToolOverlayProps, IToolOverlayState> {
+export default class ToolOverlay extends React.Component<IToolOverlayProps, IToolOverlayState> {
 
     constructor(props:IToolOverlayProps) {
         super(props);
@@ -33,5 +33,3 @@ class ToolOverlay extends React.Component<IToolOverlayProps, IToolOverlayState> 
         return <div style={this.state.style}/>;
     }
 }
-
-export default ToolOverlay;

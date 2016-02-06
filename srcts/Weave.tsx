@@ -5,19 +5,19 @@ import SwfObject from "./swfobject";
 import {ICallbackObj} from "swfobject-amd";
 import {registerToolImplementation} from "./WeaveTool";
 
-declare type WeaveObject = any;
+export declare type WeaveObject = any;
 
-interface IWeaveProps extends React.Props <Weave> {
+export interface IWeaveProps extends React.Props <Weave> {
     onWeaveReady: Function;
     height: number;
     width: number;
 }
 
-interface IWeaveState {
+export interface IWeaveState {
 
 }
 
-class Weave extends React.Component <IWeaveProps, IWeaveState> {
+export default class Weave extends React.Component <IWeaveProps, IWeaveState> {
 
     private weave:WeaveObject;
 
@@ -58,7 +58,5 @@ class Weave extends React.Component <IWeaveProps, IWeaveState> {
 
     }
 }
-
-export default Weave;
 
 registerToolImplementation("Weave", Weave);

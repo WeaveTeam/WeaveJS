@@ -10,7 +10,7 @@ import * as _ from "lodash";
 import VBox from "./VBox";
 import HBox from "./Hbox";
 
-interface ICheckBoxListProps extends React.Props<CheckBoxList> {
+export interface ICheckBoxListProps extends React.Props<CheckBoxList> {
     values:any[];
     labels?:string[];
     onChange?:(selectedValues:string[]) => void;
@@ -18,9 +18,10 @@ interface ICheckBoxListProps extends React.Props<CheckBoxList> {
     labelPosition?:string;
 }
 
-interface ICheckBoxListState {
+export interface ICheckBoxListState {
     checkboxStates:boolean[];
 }
+
 export default class CheckBoxList extends React.Component<ICheckBoxListProps, ICheckBoxListState> {
 
     private checkboxes:HTMLElement[];
@@ -55,8 +56,8 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
         }
     }
 
-    handleChange(index:number, event:Event) {
-        var checkboxState:boolean = event.target["checked"];
+    handleChange(index:number, event:React.FormEvent) {
+        var checkboxState:boolean = (event.target as any).checked;
         var checkboxStates:boolean[] = this.state.checkboxStates.splice(0);
         checkboxStates[index] = checkboxState;
 

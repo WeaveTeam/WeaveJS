@@ -3,7 +3,7 @@
 import * as React from "react";
 import RCSlider from "./RCSlider";
 
-interface VSliderProps extends React.Props<VSlider> {
+export interface VSliderProps extends React.Props<VSlider> {
     min?:number;
     max?:number;
     step?:number;
