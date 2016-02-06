@@ -15,7 +15,7 @@ declare var Weave:any;
 class ImageGlyphLayer extends GlyphLayer {
 
 	private imageGlyphCache:ImageGlyphCache;
-	constructor(parent, layerName)
+	constructor(parent:any, layerName:any)
 	{
 		super(parent, layerName);
 
@@ -27,12 +27,12 @@ class ImageGlyphLayer extends GlyphLayer {
 		this.layerPath.push("color").addCallback(this, this.updateStyleData, true);
 	}
 
-	handleMissingSessionStateProperties(newState) 
+	handleMissingSessionStateProperties(newState:any)
 	{
 
 	}
 
-	setIconStyle(feature:ol.Feature, img, iconSize: number)
+	setIconStyle(feature:ol.Feature, img:any, iconSize: number)
 	{
 		let styles:any = {};
 
@@ -57,7 +57,7 @@ class ImageGlyphLayer extends GlyphLayer {
 
 		for (let stylePrefix of ["normal", "selected", "probed", "unselected"])
 		{
-			let icon;
+			let icon:any;
 			if (stylePrefix === "probed")
 			{
 				icon = new ol.style.Icon({img, imgSize, scale: scale * 2.0});

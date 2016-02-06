@@ -2523,7 +2523,7 @@ declare module ol {
             static targetNotEditable:ol.events.ConditionType;
         }
 
-        
+
     }
 
     module extent {
@@ -2857,11 +2857,11 @@ declare module ol {
     }
 
     module geom {
-        
+
         // Type definitions
         interface GeometryLayout extends String { }
         interface GeometryType extends String { }
-        
+
         /**
          * Abstract base class; only used for creating subclasses; do not instantiate
          * in apps, as cannot be rendered.
@@ -2871,7 +2871,7 @@ declare module ol {
             /**
             * Test if the geometry and the passed extent intersect.
             * @param extent Extent
-            * @returns true if the geometry and the extent intersect. 
+            * @returns true if the geometry and the extent intersect.
             */
             intersectsExtent(extent: ol.Extent): boolean;
 
@@ -2956,7 +2956,7 @@ declare module ol {
             /**
              * Test if the geometry and the passed extent intersect.
              * @param extent Extent
-             * @returns true if the geometry and the extent intersect. 
+             * @returns true if the geometry and the extent intersect.
              */
             intersectsExtent(extent: ol.Extent): boolean;
 
@@ -2992,7 +2992,7 @@ declare module ol {
              * @returns Area (on projected plane).
              */
             getArea(): number;
-            
+
             /**
              * Return the coordinates of the linear ring.
              * @returns Coordinates.
@@ -3074,7 +3074,7 @@ declare module ol {
             /**
              * Test if the geometry and the passed extent intersect.
              * @param extent Extent
-             * @returns true if the geometry and the extent intersect. 
+             * @returns true if the geometry and the extent intersect.
              */
             intersectsExtent(extent: ol.Extent): boolean;
 
@@ -3161,7 +3161,7 @@ declare module ol {
             /**
              * Test if the geometry and the passed extent intersect.
              * @param extent Extent
-             * @returns true if the geometry and the extent intersect. 
+             * @returns true if the geometry and the extent intersect.
              */
             intersectsExtent(extent: ol.Extent): boolean;
 
@@ -3225,7 +3225,7 @@ declare module ol {
             /**
              * Test if the geometry and the passed extent intersect.
              * @param extent Extent
-             * @returns true if the geometry and the extent intersect. 
+             * @returns true if the geometry and the extent intersect.
              */
             intersectsExtent(extent: ol.Extent): boolean;
 
@@ -3236,37 +3236,37 @@ declare module ol {
              */
             setCoordinates(coordinates: Array<ol.Coordinate>, layout?: ol.geom.GeometryLayout): void;
         }
-        
+
         /**
          * Multi-polygon geometry.
          */
         class MultiPolygon extends ol.geom.SimpleGeometry {
-            
+
             /**
              * constructor
              * @param coordinates Coordinates.
              * @param layout Layout.
              */
             constructor(coordinates: Array<Array<Array<ol.Coordinate>>>, layout?: ol.geom.GeometryLayout);
-            
+
             /**
              * Append the passed polygon to this multipolygon.
              * @param polygon Polygon.
              */
             appendPolygon(polygon: ol.geom.Polygon): void;
-            
+
             /**
              * Make a complete copy of the geometry.
              * @returns Clone.
              */
             clone(): ol.geom.MultiPolygon;
-            
+
             /**
              * Return the area of the multipolygon on projected plane.
              * @returns Area (on projected plane).
              */
             getArea(): number;
-            
+
             /**
              * Get the coordinate array for this geometry.  This array has the structure
              * of a GeoJSON coordinate array for multi-polygons.
@@ -3280,36 +3280,36 @@ declare module ol {
              * @returns Coordinates.
              */
             getCoordinates(right?: boolean): Array<Array<Array<ol.Coordinate>>>;
-            
+
             /**
              * Return the interior points as {@link ol.geom.MultiPoint multipoint}.
              * @returns Interior points.
              */
             getInteriorPoints(): ol.geom.MultiPoint;
-            
+
             /**
              * Return the polygon at the specified index.
              * @param index Index.
              * @returns  Polygon.
              */
             getPolygon(index: number): ol.geom.Polygon;
-            
+
             /**
              * Return the polygons of this multipolygon.
              * @returns Polygons.
              */
             getPolygons(): Array<ol.geom.Polygon>;
-            
+
             /**
              * Get the type of this geometry.
              * @returns Geometry type
              */
             getType(): ol.geom.GeometryType;
-            
+
             /**
              * Test if the geometry and the passed extent intersect.
              * @param extent Extent
-             * @returns true if the geometry and the extent intersect. 
+             * @returns true if the geometry and the extent intersect.
              */
             intersectsExtent(extent: ol.Extent): boolean;
 
@@ -3354,7 +3354,7 @@ declare module ol {
             /**
              * Test if the geometry and the passed extent intersect.
              * @param extent Extent
-             * @returns true if the geometry and the extent intersect. 
+             * @returns true if the geometry and the extent intersect.
              */
             intersectsExtent(extent: ol.Extent): boolean;
 
@@ -3452,7 +3452,7 @@ declare module ol {
             /**
              * Test if the geometry and the passed extent intersect.
              * @param extent Extent
-             * @returns true if the geometry and the extent intersect. 
+             * @returns true if the geometry and the extent intersect.
              */
             intersectsExtent(extent: ol.Extent): boolean;
 
@@ -3494,8 +3494,8 @@ declare module ol {
              */
             getLayout(): ol.geom.GeometryLayout;
 
-            /** 
-            * Translate the geometry. This modifies the geometry coordinates in place. 
+            /**
+            * Translate the geometry. This modifies the geometry coordinates in place.
             * If instead you want a new geometry, first clone() this geometry.
             * @param deltaX Delta X
             * @param deltaY Delta Y
@@ -3547,7 +3547,7 @@ declare module ol {
         }
 
         class Interaction extends ol.Object {
-            setActive(active:boolean);
+            setActive(active:boolean):void;
             getActive():boolean;
             getMap(): ol.Map;
             setMap(map: ol.Map): void;
@@ -4135,7 +4135,7 @@ declare module ol {
 
           clear(fast?:boolean):void
 
-          forEachFeature(callback:Function, opt_this:any);
+          forEachFeature(callback:Function, opt_this:any):void;
 
           getFeatures():Array<ol.Feature>;
 

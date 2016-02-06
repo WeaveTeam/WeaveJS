@@ -401,13 +401,13 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
             this.c3Config.legend.show = false;
         }
 
-        var data = _.cloneDeep(this.c3Config.data);
+        var data:c3.Data = _.cloneDeep(this.c3Config.data);
         data.json = _.pluck(this.numericRecords, 'heights');
         //need other stuff for data.json to work
         this.numericRecords.forEach( (record:Record, index:number) => {
             for(var k in record) {
                 if(k != 'heights')
-                    data.json[index][k]=record[k];
+                    (data.json as any)[index][k] = record[k];
             }
         });
 

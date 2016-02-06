@@ -29,10 +29,10 @@ export abstract class FeatureLayer extends Layer {
 
 	source:ol.source.Vector;
 
-	constructor(parent, layerName)
+	constructor(parent:any, layerName:any)
 	{
 		super(parent, layerName);
-		
+
 		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
 		this.debounced_updateMetaStyles = lodash.debounce(this.updateMetaStyles.bind(this), 0);
 
@@ -59,12 +59,12 @@ export abstract class FeatureLayer extends Layer {
 		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
 	}
 
-	onFeatureAdd(vectorEvent)
+	onFeatureAdd(vectorEvent:any)
 	{
 		vectorEvent.feature.on("propertychange", this.onFeaturePropertyChange, this);
 	}
 
-	onFeaturePropertyChange(objectEvent)
+	onFeaturePropertyChange(objectEvent:any)
 	{
 		let propertyName = objectEvent.key;
 
@@ -87,9 +87,9 @@ export abstract class FeatureLayer extends Layer {
 		return [];
 	}
 
-	static toColorArray(color: string|number, alpha)
+	static toColorArray(color: string|number, alpha:any)
 	{
-		var colorArray;
+		var colorArray:any;
 
 		if (typeof color == "number")
 		{
@@ -97,7 +97,7 @@ export abstract class FeatureLayer extends Layer {
 		}
 		else /* if typeof color is string */
 		{
-			if (color[0] === "#") {
+			if ((color as string)[0] === "#") {
 				colorArray = ol.color.asArray(color as string);
 			}
 			else {
@@ -115,7 +115,7 @@ export abstract class FeatureLayer extends Layer {
 		return colorArray;
 	}
 
-	static toColorRGBA(colorString, alpha)
+	static toColorRGBA(colorString:any, alpha:any)
 	{
 		var colorArray = FeatureLayer.toColorArray(colorString, alpha);
 		return ol.color.asString(colorArray);
@@ -124,7 +124,7 @@ export abstract class FeatureLayer extends Layer {
 	updateSetFromKeySet(keySet:KeySet, previousContents:Set<IQualifiedKey>)
 	{
 		if (!this.source) return; //HACK
-		
+
 		let wasEmpty:boolean = previousContents.size === 0;
 		let isEmpty:boolean = keySet.keys.length === 0;
 
@@ -168,17 +168,17 @@ export abstract class FeatureLayer extends Layer {
 		this.source.forEachFeature(this.updateMetaStyle, this);
 	}
 
-	updateMetaStyle_unbound(feature)
+	updateMetaStyle_unbound(feature:any)
 	{
 		let id:IQualifiedKey = <IQualifiedKey>feature.getId();
-		let nullStyle = new ol.style.Style({});
-		let unselectedStyle = feature.get("unselectedStyle") || nullStyle;
-		let normalStyle = feature.get("normalStyle") || nullStyle;
-		let selectedStyle = feature.get("selectedStyle") || nullStyle;
-		let probedStyle = feature.get("probedStyle") || nullStyle;
-		let zOrder = feature.get("zOrder") || 0;
-		let replace = feature.get("replace");
-		let newStyle;
+		let nullStyle:any = new ol.style.Style({});
+		let unselectedStyle:any = feature.get("unselectedStyle") || nullStyle;
+		let normalStyle:any = feature.get("normalStyle") || nullStyle;
+		let selectedStyle:any = feature.get("selectedStyle") || nullStyle;
+		let probedStyle:any = feature.get("probedStyle") || nullStyle;
+		let zOrder:any = feature.get("zOrder") || 0;
+		let replace:any = feature.get("replace");
+		let newStyle:any;
 
 		if (!this.filteredKeySet.containsKey(id))
 		{
@@ -243,7 +243,7 @@ export abstract class FeatureLayer extends Layer {
 		feature.setStyle(newStyle);
 	}
 
-	static olFillFromWeaveFill(fill, fade?)
+	static olFillFromWeaveFill(fill:any, fade?:any):any
 	{
 		if (fade === undefined) fade = 1;
 
@@ -251,7 +251,7 @@ export abstract class FeatureLayer extends Layer {
 		return new ol.style.Fill({color});
 	}
 
-	static olStrokeFromWeaveStroke(stroke:any, fade?:number)
+	static olStrokeFromWeaveStroke(stroke:any, fade?:number):any
 	{
 		if (fade === undefined) fade = 1;
 
@@ -266,7 +266,7 @@ export abstract class FeatureLayer extends Layer {
 		return new ol.style.Stroke({color, lineCap, lineJoin, miterLimit, width});
 	}
 
-	static getOlProbedStyle(baseStrokeStyle)
+	static getOlProbedStyle(baseStrokeStyle:any):any
 	{
 		let width = baseStrokeStyle.getWidth();
 
@@ -288,7 +288,7 @@ export abstract class FeatureLayer extends Layer {
 		];
 	}
 
-	static getOlSelectionStyle(baseStrokeStyle)
+	static getOlSelectionStyle(baseStrokeStyle:any):any
 	{
 		let width = baseStrokeStyle.getWidth();
 		let lineCap = baseStrokeStyle.getLineCap();
@@ -311,7 +311,7 @@ export abstract class FeatureLayer extends Layer {
 		NORMAL: "normalStyle",
 		UNSELECTED: "unselectedStyle", /* For the case where a selection has been made in the layer but the element is not one of them. */
 		SELECTED: "selectedStyle",
-		PROBED: "probedStyle"	
+		PROBED: "probedStyle"
 	}
 };
 

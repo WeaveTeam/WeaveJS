@@ -69,7 +69,7 @@ export default class DragSelection extends ol.interaction.DragBox
 		}
 	}
 
-	updateSelection(extent)
+	updateSelection(extent:any)
 	{
 		let selectedFeatures: Set<IQualifiedKey> = new Set();
 		let selectFeature: Function = (feature: ol.Feature) => { selectedFeatures.add(<IQualifiedKey>feature.getId()); };
@@ -102,14 +102,14 @@ export default class DragSelection extends ol.interaction.DragBox
 
 	onBoxDrag(event:any)
 	{
-		let extent = this.getGeometry().getExtent();
+		let extent:any = this.getGeometry().getExtent();
 
 		this.debouncedUpdateSelection(extent);
 	}
 
 	onBoxEnd(event:any)
 	{
-		let extent = this.getGeometry().getExtent();
+		let extent:any = this.getGeometry().getExtent();
 
 		this.debouncedUpdateSelection(extent);
 		if (this.probeInteraction)

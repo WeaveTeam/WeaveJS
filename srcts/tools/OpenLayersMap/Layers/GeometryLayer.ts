@@ -19,7 +19,7 @@ class GeometryLayer extends FeatureLayer {
 
 	lineStylePath: WeavePath;
 
-	constructor(parent, layerName)
+	constructor(parent:any, layerName:any)
 	{
 		super(parent, layerName);
 
@@ -41,17 +41,17 @@ class GeometryLayer extends FeatureLayer {
 		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateGeometryData, true);
 	}
 
-	handleMissingSessionStateProperties(newState)
+	handleMissingSessionStateProperties(newState:any)
 	{
 
 	}
-    
-	get inputProjection()
+
+	get inputProjection():any
 	{
 		var projectionSpec = this.geoColumnPath.getObject("internalDynamicColumn").getMetadata('projection');
 		return projectionSpec || this.outputProjection;
 	}
-	
+
 	updateGeometryData()
 	{
 		this.source.clear();
@@ -65,7 +65,7 @@ class GeometryLayer extends FeatureLayer {
             let rawGeom = rawGeometries[idx];
             if (!rawGeom)
                 continue;
-            
+
 			let id = keys[idx];
 
 			let geometry = this.geoJsonParser.readGeometry(rawGeom, {dataProjection: this.inputProjection, featureProjection: this.outputProjection});
@@ -136,7 +136,7 @@ class GeometryLayer extends FeatureLayer {
 			if (feature)
 			{
 				let metaStyle:any = {};
-				
+
 				metaStyle.normalStyle = normalStyle;
 				metaStyle.unselectedStyle = unselectedStyle;
 				metaStyle.selectedStyle = selectedStyle;

@@ -28,7 +28,7 @@ abstract class Layer {
 		return null;
 	}
 
-	handleMissingSessionStateProperties(newState)
+	handleMissingSessionStateProperties(newState:any)
 	{
 
 	}
@@ -43,7 +43,7 @@ abstract class Layer {
 	_layerReadyCallbacks:Map<string,Function>;
 
 
-	constructor(parent, layerName)
+	constructor(parent:any, layerName:any)
 	{
 		this.layerPath = parent.plottersPath.push(layerName);
 		this.settingsPath = parent.layerSettingsPath.push(layerName);
@@ -59,7 +59,7 @@ abstract class Layer {
 		/* TODO max and minvisiblescale, map to min/max resolution. */
 	}
 
-	get source() {
+	get source():any {
 		return this.olLayer && this.olLayer.getSource();
 	}
 
@@ -84,16 +84,16 @@ abstract class Layer {
 		}
 	}
 
-	get olLayer() {
+	get olLayer():any {
 		return this._olLayer;
 	}
-	
-	get inputProjection()
+
+	get inputProjection():any
 	{
 		return null;
 	}
-	
-	get outputProjection()
+
+	get outputProjection():any
 	{
 		return this.projectionPath.getState() || "EPSG:3857";
 	}

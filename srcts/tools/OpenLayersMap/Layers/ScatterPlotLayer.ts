@@ -22,7 +22,7 @@ class ScatterPlotLayer extends GlyphLayer {
 	minRadiusPath:WeavePath;
 	defaultRadiusPath:WeavePath;
 
-	constructor(parent, layerName)
+	constructor(parent:any, layerName:any)
 	{
 		super(parent, layerName);
 
@@ -36,7 +36,7 @@ class ScatterPlotLayer extends GlyphLayer {
 		this.defaultRadiusPath = this.layerPath.push("defaultScreenRadius").addCallback(this, this.updateStyleData, true);
 	}
 
-	handleMissingSessionStateProperties(newState)
+	handleMissingSessionStateProperties(newState:any)
 	{
 
 	}
@@ -108,7 +108,7 @@ class ScatterPlotLayer extends GlyphLayer {
 
 		for (let record of styleRecords)
 		{
-			let screenRadius;
+			let screenRadius:any;
 
 			let normSize = StandardLib.normalize(Math.abs(record.sizeBy), 0, absMax);
 
@@ -181,7 +181,7 @@ class ScatterPlotLayer extends GlyphLayer {
 				metaStyle.unselectedStyle = unselectedStyle;
 				metaStyle.selectedStyle = selectedStyle;
 				metaStyle.probedStyle = probedStyle;
-				
+
 				feature.setProperties(metaStyle);
 			}
 

@@ -13,7 +13,7 @@ class TileLayer extends Layer {
 	servicePath:WeavePath;
 	oldProviderName:string;
 
-	constructor(parent, layerName)
+	constructor(parent:any, layerName:any)
 	{
 		super(parent, layerName);
 
@@ -25,9 +25,9 @@ class TileLayer extends Layer {
 		this.projectionPath.addCallback(this, this.updateValidExtents, true);
 	}
 
-	handleMissingSessionStateProperties(newState)
+	handleMissingSessionStateProperties(newState:any)
 	{
-		
+
 	}
 
 	updateValidExtents()
@@ -87,7 +87,7 @@ class TileLayer extends Layer {
 	updateTileSource()
 	{
 		var serviceDriverName = this.servicePath.getType();
-		var newLayer = null;
+		var newLayer:any = null;
 		switch (serviceDriverName)
 		{
 			case "weave.services.wms::ModestMapsWMS":
@@ -109,5 +109,3 @@ class TileLayer extends Layer {
 
 Layer.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default TileLayer;
-
-

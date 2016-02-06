@@ -8,7 +8,7 @@ import * as ol from "openlayers";
 
 abstract class GlyphLayer extends FeatureLayer {
 
-	constructor(parent, layerName)
+	constructor(parent:any, layerName:any)
 	{
 		super(parent, layerName);
 
@@ -25,7 +25,7 @@ abstract class GlyphLayer extends FeatureLayer {
 		return lodash.map(this.source.getFeatures(), (item:ol.Feature) => item.getId());
 	}
 
-	static _toPoint(datum, field1, field2) {
+	static _toPoint(datum:any, field1:any, field2:any) {
 		if (typeof datum === "object")
 		{
 			let firstPoly = datum[0];
@@ -56,18 +56,18 @@ abstract class GlyphLayer extends FeatureLayer {
 
 		for (let record of records)
 		{
-			let dataX, dataY;
+			let dataX:any, dataY:any;
 
 			dataX = GlyphLayer._toPoint(record.dataX, "xMin", "xMax");
 			dataY = GlyphLayer._toPoint(record.dataY, "yMin", "yMax");
 
 			let point = new ol.geom.Point([dataX, dataY]);
 			point.transform(rawProj, mapProj);
-			
+
 			var coords = point.getCoordinates();
 			if (!isFinite(coords[0]) || !isFinite(coords[1]))
 				continue;
-			
+
 			let feature = this.source.getFeatureById(record.id);
 			if (!feature)
 			{

@@ -7,7 +7,7 @@ import * as ol from "openlayers";
 import jquery from "jquery";
 
 export default class PanCluster extends ol.control.Control {
-	constructor(optOptions?) {
+	constructor(optOptions?:any) {
 		var options = optOptions || {};
 		let parent = jquery(`
 		<div style="background-color: rgba(0,0,0,0)" class="ol-unselectable ol-control panCluster">
@@ -26,7 +26,7 @@ export default class PanCluster extends ol.control.Control {
 			</table>
 		</div>`);
 
-		var directions = {
+		var directions:any = {
 			N: [0, 1],
 			E: [1, 0],
 			S: [0, -1],
@@ -38,7 +38,7 @@ export default class PanCluster extends ol.control.Control {
 
 		let self = this;
 
-		let pan = function(xSign, ySign) {
+		let pan = function(xSign:any, ySign:any) {
 			let panPercent = 0.3;
 			let map = self.getMap();
 			let view = map.getView();

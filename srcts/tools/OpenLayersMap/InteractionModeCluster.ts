@@ -7,10 +7,10 @@ import * as ol from "openlayers";
 import jquery from "jquery";
 
 export default class InteractionModeCluster extends ol.control.Control {
-	constructor(optOptions) {
-		var interactionModePath = optOptions.interactionModePath;
-		var options = optOptions || {};
-		var buttonTable = jquery(`
+	constructor(optOptions:any) {
+		var interactionModePath:any = optOptions.interactionModePath;
+		var options:any = optOptions || {};
+		var buttonTable:any = jquery(`
 			<table class="ol-unselectable ol-control iModeCluster">
 				<tr style="font-size: 80%">
 					<td><button class="iModeCluster pan fa fa-hand-grab-o"></button></td>

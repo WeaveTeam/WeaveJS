@@ -53,7 +53,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 	private element:Element;
 	public toolPath:WeavePath;
 
-	constructor(props)
+	constructor(props:IVisToolProps)
 	{
 		super(props);
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;/* Forces the inclusion of the layers. */
@@ -61,7 +61,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		this.toolPath = props.toolPath;
 	}
 
-	handleMissingSessionStateProperties(newState):void
+	handleMissingSessionStateProperties(newState:IVisToolState):void
 	{
 
 	}
@@ -134,7 +134,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 	updateViewParameters_weaveToOl():void
 	{
-		let extent = [];
+		let extent:any = [];
 
 		for (let extreme of ["Min", "Max"])
 			for (let axis of ["X", "Y"])
@@ -233,10 +233,10 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		let view = this.map.getView();
 		var resolution = view.getResolution();
 
-		/* If the resolution is being set between constrained levels, 
+		/* If the resolution is being set between constrained levels,
 		 * odds are good that this is the result of a slider manipulation.
 		 * While the user is dragging the slider, we shouldn't update the
-		 * session state, because this will trigger reconstraining the 
+		 * session state, because this will trigger reconstraining the
 		 * resolution, which will lead to it feeling "jerky" */
 		if (resolution != view.constrainResolution(resolution))
 		{
@@ -263,7 +263,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
 		var scale = zoomBounds.getXScale();
 		let view = this.map.getView();
-		
+
 		view.un("change:center", this.updateCenter_olToWeave, this);
 		view.un("change:resolution", this.updateZoom_olToWeave, this);
 
@@ -275,7 +275,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 			view.on("change:resolution", this.updateZoom_olToWeave, this);
 		});
 	}
-	
+
 	requestDetail():void
 	{
 		var zoomBounds = this.zoomBoundsPath.getObject();
@@ -303,8 +303,8 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 	updatePlotters_weaveToOl():void
 	{
-		var oldNames = Array.from(this.layers.keys());
-		var newNames = this.plottersPath.getNames();
+		var oldNames:string[] = Array.from(this.layers.keys());
+		var newNames:string[] = this.plottersPath.getNames();
 
 		var removedNames = lodash.difference(oldNames, newNames);
 		var addedNames = lodash.difference(newNames, oldNames);

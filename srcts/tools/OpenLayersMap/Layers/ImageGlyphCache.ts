@@ -12,7 +12,7 @@ class ImageGlyphCache {
 	private imageMap:Dictionary2D<string,string,HTMLImageElement>;
 	private context: any /* ILinkableObject, context for URL request */
 
-	constructor(context)
+	constructor(context:any)
 	{
 		this.context = context;
 		this.baseImageElements = new Map();
@@ -20,7 +20,7 @@ class ImageGlyphCache {
 		this.imageMap = new Dictionary2D<string,string,HTMLImageElement>();
 	}
 
-	requestBaseImageElement(url, callback)
+	requestBaseImageElement(url:any, callback:any)
 	{
 		let imageElement = this.baseImageElements.get(url);
 
@@ -41,7 +41,7 @@ class ImageGlyphCache {
 		}
 	}
 
-	getCachedCanvas(url, color)
+	getCachedCanvas(url:any, color:any)
 	{
 		let canvas = this.canvasMap.get(url, color);
 		let freshCanvas = false;
@@ -56,13 +56,13 @@ class ImageGlyphCache {
 		return {canvas, freshCanvas};
 	}
 
-	requestDataUrl(url, color, callback)
+	requestDataUrl(url:any, color:any, callback:any)
 	{
 		let {canvas, freshCanvas} = this.getCachedCanvas(url, color);
 		/* If freshCanvas is true, this means that we just created the canvas and haven't rendered to it. Time to do that. */
 		if (freshCanvas)
 		{
-			this.requestBaseImageElement(url, function (imageElement) {
+			this.requestBaseImageElement(url, function (imageElement:any) {
 				[canvas.height, canvas.width] = [imageElement.naturalHeight, imageElement.naturalWidth];
 				let ctx = canvas.getContext("2d");
 				ctx.fillStyle = color;
@@ -83,7 +83,7 @@ class ImageGlyphCache {
 		}
 	}
 
-	getImage(url, color)
+	getImage(url:any, color:any)
 	{
 		let image = this.imageMap.get(url, color);
 
@@ -91,9 +91,9 @@ class ImageGlyphCache {
 		{
 			image = new Image();
 			weavejs.WeaveAPI.URLRequestUtils.request(this.context, {url, responseType: "datauri", mimeType: ""}).then(
-				(dataUri) =>
+				(dataUri:any) =>
 				{
-					this.requestDataUrl(dataUri, color, function (dataUrl) {
+					this.requestDataUrl(dataUri, color, function (dataUrl:any) {
 						image.src = dataUrl;
 					})
 				}
