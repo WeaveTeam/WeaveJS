@@ -164,7 +164,7 @@ class WeaveC3Gauge extends AbstractC3Tool {
 
 
         var data = _.cloneDeep(this.c3Config.data);
-        if(this.paths.probeKeySet.getState()){
+        if((this.paths.probeKeySet.getState() as any[]).length){
             //sometime probe keyset is not reset when mouse leaves another tool, so for now only take
             //the first numeric record, but probe keyset not being set to empty should be addressed,
             //then the [0] below and surrounding [] can be removed
