@@ -12,6 +12,7 @@ import WeaveC3BarChartLegend from "./tools/weave-c3-barchartlegend";
 import WeaveC3LineChart from "./tools/weave-c3-linechart";
 import WeaveC3PieChart from "./tools/weave-c3-piechart";
 import WeaveC3Histogram from "./tools/weave-c3-histogram";
+import WeaveC3Gauge from "./tools/weave-c3-gauge";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import WeaveReactTable from "./tools/weave-react-table";
 import SessionStateMenuTool from "./tools/weave-session-state-menu";
@@ -54,6 +55,7 @@ export {
     WeaveC3LineChart as LineChart,
     WeaveC3PieChart as PieChart,
     WeaveC3Histogram as Histogram,
+    WeaveC3Gauge as Gauge,
     WeaveOpenLayersMap as Map,
     WeaveReactTable as DataTable,
     SessionStateMenuTool as MenuTool,
