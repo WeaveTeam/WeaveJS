@@ -1,5 +1,7 @@
 /// <reference path="../../typings/react/react.d.ts"/>
+///<reference path="../../typings/weave/weavejs.d.ts"/>
 
+import ILinkableObject = weavejs.api.core.ILinkableObject;
 import WeavePath = weavejs.path.WeavePath;
 
 import ToolTip from "./tooltip";
@@ -16,6 +18,6 @@ export interface IVisToolState {
 
 }
 
-export interface IVisTool {
+export interface IVisTool extends ILinkableObject {
     title:string;
 }

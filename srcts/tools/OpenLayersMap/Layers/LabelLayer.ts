@@ -87,5 +87,5 @@ class LabelLayer extends GlyphLayer
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::TextGlyphPlotter", LabelLayer, ['ILinkableObjectWithNewProperties']);
+Layer.registerClass("weave.visualization.plotters::TextGlyphPlotter", LabelLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default LabelLayer;

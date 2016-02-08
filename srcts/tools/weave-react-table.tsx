@@ -6,7 +6,6 @@
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
-import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -107,5 +106,8 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
                 />
     }
 }
-registerToolImplementation("weave.visualization.tools::TableTool", WeaveReactTable);
-//Weave.registerClass("weavejs.tools.TableTool", WeaveReactTable, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveReactTable); // TEMPORARY HACK - remove when class is refactored
+
+Weave.registerClass("weavejs.tool.Table", WeaveReactTable, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::TableTool", WeaveReactTable);

@@ -7,7 +7,6 @@
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
-import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
@@ -502,7 +501,9 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
         this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; this.cullAxes();}});
     }
 }
-registerToolImplementation("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
-registerToolImplementation("weave.visualization.tools::ColormapHistogramTool", WeaveC3Histogram);
-//Weave.registerClass("weavejs.tools.HistogramTool", WeaveC3Histogram, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-//Weave.registerClass("weavejs.tools.ColormapHistogramTool", WeaveC3Histogram, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3Histogram); // TEMPORARY HACK - remove when class is refactored
+
+Weave.registerClass("weavejs.tool.C3Histogram", WeaveC3Histogram, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
+Weave.registerClass("weave.visualization.tools::ColormapHistogramTool", WeaveC3Histogram);

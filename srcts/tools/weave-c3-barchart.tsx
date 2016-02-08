@@ -7,7 +7,6 @@
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
-import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
@@ -615,5 +614,8 @@ export default class WeaveC3Barchart extends AbstractC3Tool {
         }
     }
 }
-registerToolImplementation("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
-//Weave.registerClass("weavejs.tools.CompoundBarChartTool", WeaveC3Barchart, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3Barchart); // TEMPORARY HACK - remove when class is refactored
+
+Weave.registerClass("weavejs.tool.C3BarChart", WeaveC3Barchart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);

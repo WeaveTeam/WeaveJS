@@ -106,5 +106,5 @@ class TileLayer extends Layer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, ['ILinkableObjectWithNewProperties']);
+Layer.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default TileLayer;

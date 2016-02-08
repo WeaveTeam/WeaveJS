@@ -195,6 +195,9 @@ declare module __global__ {
         static isAsyncClass(type: Function): boolean;
         /**
          * Registers an ILinkableObject class for use with Weave.className() and Weave.getDefinition().
+         * @param qualifiedName
+         * @param definition
+         * @param additionalInterfaces An Array of interfaces (Class objects) that the definition implements in addition to ILinkableObject.
          */
         static registerClass(qualifiedName: string, definition: Function, additionalInterfaces?: any[]): void;
         /**
@@ -1261,18 +1264,18 @@ declare module weavejs.api.core {
         setNameOrder(newOrder: any[]): void;
         /**
          * This function returns an ordered list of names in the hash map.
-         * @param filterClass Either a Class or a String for the name of a class or interface. If specified, names of objects that are not of this type will be filtered out.
+         * @param filter If specified, names of objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return A copy of the ordered list of names of objects contained in this LinkableHashMap.
          */
-        getNames(filterClass?: Object, filterIncludesPlaceholders?: boolean): any[];
+        getNames(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
         /**
          * This function returns an ordered list of objects in the hash map.
-         * @param filterClass Either a Class or a String for the name of a class or interface. If specified, objects that are not of this type will be filtered out.
+         * @param filter If specified, objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return An ordered Array of objects that correspond to the names returned by getNames(filter).
          */
-        getObjects(filterClass?: Object, filterIncludesPlaceholders?: boolean): any[];
+        getObjects(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
         /**
          * This function gets the name of the specified object in the hash map.
          * @param object An object contained in this LinkableHashMap.
@@ -3496,8 +3499,8 @@ declare module weavejs.core {
         private _typeRestriction;
         typeRestriction: Function;
         childListCallbacks: IChildListCallbackInterface;
-        getNames(filterClass?: Object, filterIncludesPlaceholders?: boolean): any[];
-        getObjects(filterClass?: Object, filterIncludesPlaceholders?: boolean): any[];
+        getNames(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
+        getObjects(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
         private getList(listObjects, filter, filterIncludesPlaceholders);
         getObject(name: string): ILinkableObject;
         setObject(name: string, object: ILinkableObject): void;
@@ -3786,6 +3789,7 @@ declare module weavejs.core {
         constructor(typeRestriction?: Function, immediateCallback?: Function, groupedCallback?: Function);
         protected _typeRestriction: Function;
         private _target;
+        private _foundRoot;
         private _foundTarget;
         protected _targetPath: any[];
         private _pathDependencies;
@@ -9934,8 +9938,9 @@ declare module weavejs.util {
 }
 declare module weavejs.util {
     class BackwardsCompatibility {
+        static forceDeprecatedState(classDef: Function): void;
+        private static map_class_ignore;
         static updateSessionState(state: Object): Object;
-        static isDeprecatedClass(qname: string): boolean;
         static classLookup: Object;
     }
 }

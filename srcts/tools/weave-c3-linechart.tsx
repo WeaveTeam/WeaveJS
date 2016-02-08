@@ -7,7 +7,6 @@
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
-import {registerToolImplementation} from "../WeaveTool";
 import * as d3 from "d3";
 import * as _ from "lodash";
 import FormatUtils from "../utils/FormatUtils";
@@ -480,5 +479,8 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
         this.chart.load({columns: this.columns, colors: this.colors, type: this.chartType, unload: true});
     }
 }
-registerToolImplementation("weave.visualization.tools::LineChartTool", WeaveC3LineChart);
-//Weave.registerClass("weavejs.tools.LineChartTool", WeaveC3LineChart, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3LineChart); // TEMPORARY HACK - remove when class is refactored
+
+Weave.registerClass("weavejs.tool.C3LineChart", WeaveC3LineChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::LineChartTool", WeaveC3LineChart);

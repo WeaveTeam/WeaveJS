@@ -8,7 +8,6 @@
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
-import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
@@ -71,6 +70,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool {
 
     constructor(props:IVisToolProps) {
         super(props);
+		
         this.keyToIndex = {};
         this.indexToKey = {};
         this.yAxisValueToLabel = {};
@@ -541,5 +541,8 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool {
         this.chart.internal.main.select('.c3-chart').attr('clip-path',null);
     }
 }
-registerToolImplementation("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
-//Weave.registerClass("weavejs.tools.ScatterPlotTool", WeaveC3ScatterPlot, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3ScatterPlot); // TEMPORARY HACK - remove when class is refactored
+
+Weave.registerClass("weavejs.tool.C3ScatterPlot", WeaveC3ScatterPlot, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);

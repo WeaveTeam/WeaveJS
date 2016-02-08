@@ -3,7 +3,9 @@
 ///<reference path="../typings/lodash/lodash.d.ts"/>
 ///<reference path="../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
 ///<reference path="../typings/react-bootstrap/react-bootstrap.d.ts"/>
+///<reference path="../typings/weave/weavejs.d.ts"/>
 
+import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
 
 import * as _ from "lodash";
@@ -18,8 +20,6 @@ import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/tooltip";
 import {IToolTipProps, IToolTipState} from "./tools/tooltip";
 
-const toolRegistry:{[name:string]: Function} = {};
-
 declare type IToolTip = React.Component<IToolTipProps, IToolTipState>;
 
 const grabberStyle:CSSProperties = {
@@ -29,33 +29,8 @@ const grabberStyle:CSSProperties = {
     background: "url(http://placehold.it/32x32)"
 };
 
-export function registerToolImplementation(asClassName:string, jsClass:Function)
-{
-    toolRegistry[asClassName] = jsClass;
-}
-
-export function getToolImplementation(param:string|WeavePath):Function
-{
-	var type:string;
-	if (typeof param === 'string')
-	{
-		type = param;
-	}
-	else
-	{
-		var path:WeavePath = param as WeavePath;
-		type = path.getType();
-        if (type === "weave.visualization.tools::ExternalTool" && path.getType("toolClass"))
-            type = path.getState("toolClass") as string;
-        if (type === "weavejs.core.LinkableHashMap" && path.getType("class"))
-            type = path.getState("class") as string;
-	}
-    return toolRegistry[type];
-}
-
 export interface IWeaveToolProps extends React.Props<WeaveTool> {
     toolPath:WeavePath;
-    toolClass?:string;
     style:CSSProperties;
     onDragStart:React.MouseEvent;
     onDragEnd:React.MouseEvent;
@@ -80,9 +55,26 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
     constructor(props:IWeaveToolProps) {
         super(props);
         this.toolPath = this.props.toolPath;
-        this.ToolClass = getToolImplementation(this.toolPath || this.props.toolClass);
+		var placeholder = this.toolPath.getObject() as LinkablePlaceholder;
+		if (placeholder.getClass)
+	        this.ToolClass = (this.toolPath.getObject() as LinkablePlaceholder).getClass();
+		else
+			this.ToolClass = Weave.getDefinition(this.toolPath.getState('class') as string); // temporary hack
         this.titleBarHeight = 25;
+		
+		this.handleInstance = this.handleInstance.bind(this);
     }
+	
+	handleInstance(tool:IVisTool):void
+	{
+		var placeholder = this.toolPath.getObject() as LinkablePlaceholder;
+		if (placeholder.setInstance)
+			placeholder.setInstance(this.tool = tool);
+		else if (!this.tool)
+			this.tool = tool; // temporary until all classes are refactored
+		else if (tool && this.tool != tool)
+			throw new Error("Unexpected new instance of tool");
+	}
 
     componentDidMount():void {
         // if (this.toolPath) {
@@ -91,7 +83,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
     }
 
     get title():string {
-        return this.tool ? this.tool.title : this.toolPath.getPath().pop();
+        return (this.tool ? this.tool.title : '') || this.toolPath.getPath().pop();
     }
 
 	//TODO - we shouldn't have to render twice to set the tooltip of the tool
@@ -103,7 +95,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
         if (React.Component.isPrototypeOf(this.ToolClass)) {
             reactTool = React.createElement(this.ToolClass, {
                                 key: "tool",
-                                ref: (c:IVisTool) => { this.tool = c; },
+                                ref: this.handleInstance,
                                 toolPath: this.toolPath,
                                 style: { height: toolHeight, width: toolWidth },
                                 toolTip: this.toolTip

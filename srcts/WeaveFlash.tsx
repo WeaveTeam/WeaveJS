@@ -3,11 +3,10 @@
 import * as React from "react";
 import SwfObject from "./swfobject";
 import {ICallbackObj} from "swfobject-amd";
-import {registerToolImplementation} from "./WeaveTool";
 
 export declare type WeaveObject = any;
 
-export interface IWeaveProps extends React.Props <Weave> {
+export interface IWeaveProps extends React.Props <WeaveFlash> {
     onWeaveReady: Function;
     height: number;
     width: number;
@@ -17,7 +16,7 @@ export interface IWeaveState {
 
 }
 
-export default class Weave extends React.Component <IWeaveProps, IWeaveState> {
+export default class WeaveFlash extends React.Component <IWeaveProps, IWeaveState> {
 
     private weave:WeaveObject;
 
@@ -59,4 +58,4 @@ export default class Weave extends React.Component <IWeaveProps, IWeaveState> {
     }
 }
 
-registerToolImplementation("Weave", Weave);
+Weave.registerClass("WeaveFlash", Weave);

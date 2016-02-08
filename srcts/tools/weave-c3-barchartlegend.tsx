@@ -7,7 +7,6 @@
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
-import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
@@ -25,7 +24,7 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 
-class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
+export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
     private plotterPath:WeavePath;
     private colorRampPath:WeavePath;
@@ -206,10 +205,7 @@ class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState
     }
 }
 
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3BarChartLegend); // TEMPORARY HACK - remove when class is refactored
 
-
-
-export default WeaveC3BarChartLegend;
-
-registerToolImplementation("weave.visualization.tools::BarChartLegendTool", WeaveC3BarChartLegend);
-//Weave.registerClass("weavejs.tools.ColorBinLegendTool", WeaveC3ColorLegend, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.BarChartLegend", WeaveC3BarChartLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::BarChartLegendTool", WeaveC3BarChartLegend);

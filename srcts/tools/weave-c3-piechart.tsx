@@ -8,7 +8,6 @@ import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
 
-import {registerToolImplementation} from "../WeaveTool";
 import * as d3 from "d3";
 import * as _ from "lodash";
 import * as React from "react";
@@ -264,5 +263,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
     }
 }
 
-registerToolImplementation("weave.visualization.tools::PieChartTool", WeaveC3PieChart);
-//Weave.registerClass("weavejs.tools.PieChartTool", WeaveC3PieChart, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3PieChart); // TEMPORARY HACK - remove when class is refactored
+
+Weave.registerClass("weavejs.tool.C3PieChart", WeaveC3PieChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::PieChartTool", WeaveC3PieChart);

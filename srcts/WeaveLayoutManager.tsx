@@ -39,7 +39,7 @@ var v1:any = [
 	DataFilterTool
 ];
 ///////////////////////////////
-import {getToolImplementation} from "./WeaveTool";
+
 import WeaveTool from "./WeaveTool";
 import ToolOverlay from "./ToolOverlay";
 import StandardLib from "./utils/StandardLib";
@@ -408,7 +408,8 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 
 		if (!newState)
 		{
-			newState = this.generateLayoutState(this.weave.path().getChildren().filter(((path:WeavePath) => getToolImplementation(path)) as any));
+			var filteredChildren:WeavePath[] = this.weave.root.getObjects(weavejs.api.ui.IVisTool, true).map(Weave.getPath);
+			newState = this.generateLayoutState(filteredChildren);
 			//TODO - generate layout state from
 			this.weave.path(LAYOUT).state(newState);
 		}

@@ -12,7 +12,6 @@ import * as ReactDOM from "react-dom";
 import jquery from "jquery";
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
-import {registerToolImplementation} from "../WeaveTool";
 /* eslint-disable */
 import Layer from "./OpenLayersMap/Layers/Layer";
 import FeatureLayer from "./OpenLayersMap/Layers/FeatureLayer";
@@ -33,7 +32,7 @@ import WeavePath = weavejs.path.WeavePath;
 import ZoomBounds = weavejs.geom.ZoomBounds;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
-class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
+export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
 	layers:Map<string,Layer>;
 	interactionModePath:WeavePath;
@@ -343,6 +342,7 @@ class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
     }
 }
 
-export default WeaveOpenLayersMap;
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveOpenLayersMap); // TEMPORARY HACK - remove when class is refactored
 
-registerToolImplementation("weave.visualization.tools::MapTool", WeaveOpenLayersMap);
+Weave.registerClass("weavejs.tool.Map", WeaveOpenLayersMap, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::MapTool", WeaveOpenLayersMap);

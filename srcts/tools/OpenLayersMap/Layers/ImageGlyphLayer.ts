@@ -109,5 +109,5 @@ class ImageGlyphLayer extends GlyphLayer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, ['ILinkableObjectWithNewProperties']);
+Layer.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default ImageGlyphLayer;

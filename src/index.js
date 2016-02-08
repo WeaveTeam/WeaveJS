@@ -13,6 +13,8 @@ import {StandardLib} from "../lib/WeaveUI.js";
 weavejs.util.JS.JSZip = JSZip;
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
+Weave.registerAsyncClass(React.Component);
+
 var weave = window.weave;
 if (weave)
 {

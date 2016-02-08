@@ -7,7 +7,6 @@
 import {IVisToolProps, IVisToolState} from "./IVisTool";
 import {IVisTool} from "./IVisTool";
 
-import {registerToolImplementation} from "../WeaveTool";
 import * as React from "react";
 import ui from "../react-ui/ui";
 import {ListGroupItem, ListGroup, DropdownButton, MenuItem} from "react-bootstrap";
@@ -22,7 +21,7 @@ var stub:any = React;
 const sessionStateMenuStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column", overflow:"auto"};
 const sessionStateComboBoxStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column"};
 
-class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState> {
+export default class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState> {
     private choices:WeavePath;
     protected toolPath:WeavePath;
 
@@ -88,7 +87,7 @@ class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState>
     }
 }
 
-export default SessionStateMenuTool;
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(SessionStateMenuTool); // TEMPORARY HACK - remove when class is refactored
 
-registerToolImplementation("weave.ui::SessionStateMenuTool", SessionStateMenuTool);
-//Weave.registerClass("weavejs.tools.SessionStateMenuTool", SessionStateMenuTool, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.SessionStateMenu", SessionStateMenuTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.ui::SessionStateMenuTool", SessionStateMenuTool);

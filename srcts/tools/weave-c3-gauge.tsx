@@ -7,7 +7,6 @@
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool";
 import AbstractC3Tool from "./AbstractC3Tool";
-import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
@@ -31,7 +30,7 @@ export interface IGaugePaths extends IToolPaths {
     colorRamp:WeavePath;
 }
 
-class WeaveC3Gauge extends AbstractC3Tool {
+export default class WeaveC3Gauge extends AbstractC3Tool {
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
     private stringRecords:Record[];
@@ -299,6 +298,7 @@ class WeaveC3Gauge extends AbstractC3Tool {
     }
 }
 
-export default WeaveC3Gauge;
-registerToolImplementation("weave.visualization.tools::GaugeTool", WeaveC3Gauge);
-//Weave.registerClass("weavejs.tools.GaugeTool", WeaveC3Gauge, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3Gauge); // TEMPORARY HACK - remove when class is refactored
+
+Weave.registerClass("weavejs.tool.C3Gauge", WeaveC3Gauge, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::GaugeTool", WeaveC3Gauge);

@@ -8,7 +8,6 @@
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
-import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
@@ -21,44 +20,55 @@ import * as Prefixer from "react-vendor-prefix";
 import WeavePath = weavejs.path.WeavePath;
 import WeavePathData = weavejs.path.WeavePathData;
 import WeavePathUI = weavejs.path.WeavePathUI;
+import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
+import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
+import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
+import KeySet = weavejs.data.key.KeySet;
+import LinkableNumber = weavejs.core.LinkableNumber;
+import LinkableString = weavejs.core.LinkableString;
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 const SHAPE_TYPE_BOX:string = "box";
 
-class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
+export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 {
-	private plotterPath:WeavePath;
-	private dynamicColorColumnPath:WeavePath;
-	private binningDefinition:WeavePath;
-	private binnedColumnPath:WeavePath;
-	private maxColumnsPath:WeavePath;
-	private filteredKeySet:WeavePath;
-	private selectionKeySet:WeavePath;
-	private probeKeySet:WeavePath;
-	protected toolPath:WeavePathData;
+	panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
+	filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+	selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	probeFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	dynamicColorColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	maxColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
+	shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25));
+	shapeType:LinkableString = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE));
+	
+	private get colorColumn() { return this.dynamicColorColumn.target as ColorColumn; }
+	private get binnedColumn() { var cc = this.colorColumn; return cc ? cc.getInternalColumn() as BinnedColumn : null; }
+	private get binningDefinition() { var bc = this.binnedColumn ; return bc ? bc.binningDefinition.target as IBinningDefinition : null; }
+	private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
+	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
+	
 	private spanStyle:CSSProperties;
-
-	private selectedBins:number[];
 
 	constructor(props:IVisToolProps)
 	{
 		super(props);
-		this.toolPath = props.toolPath as WeavePathData;
-		this.plotterPath = (this.toolPath as WeavePathUI).pushPlotter("plot");
-		this.dynamicColorColumnPath = this.plotterPath.push("dynamicColorColumn");
-		this.binningDefinition = this.dynamicColorColumnPath.push(null, "internalDynamicColumn", null, "binningDefinition", null);
-		this.binnedColumnPath = this.dynamicColorColumnPath.push(null, "internalDynamicColumn", null);
-		this.maxColumnsPath = this.plotterPath.push("maxColumns");
-		this.filteredKeySet = this.plotterPath.push("filteredKeySet");
-		this.selectionKeySet = this.toolPath.push("selectionKeySet");
-		this.probeKeySet = this.toolPath.push("probeKeySet");
+		
+		Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
+		
+		this.filteredKeySet.setSingleKeySource(this.dynamicColorColumn);
+		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
+		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
+		this.probeFilter.targetPath = ['defaultProbeKeySet'];
+		this.dynamicColorColumn.targetPath = ['defaultColorColumn'];
+
 		this.state = {selected:[], probed:[]};
-		this.selectedBins = [];
 		this.spanStyle = {
 			textAlign: "left",
 			verticalAlign: "middle",
@@ -70,80 +80,50 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 		};
 	}
 
+    protected handleMissingSessionStateProperties(newState:any)
+	{
+		newState;
+	}
+
 	get title():string
 	{
-		return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
+		return this.panelTitle.value;
 	}
 	
 	get numberOfBins():number
 	{
-		return (this.binnedColumnPath.getObject() as BinnedColumn).numberOfBins;
+		var bc = this.binnedColumn;
+		return bc ? bc.numberOfBins : 0;
 	}
 
-    protected handleMissingSessionStateProperties(newState:any)
-	{
-
-	}
-
-	private setupCallbacks()
-	{
-		this.dynamicColorColumnPath.addCallback(this, this.forceUpdate);
-		this.maxColumnsPath.addCallback(this, this.forceUpdate);
-		this.filteredKeySet.addCallback(this, this.forceUpdate);
-		this.plotterPath.push("shapeSize").addCallback(this, this.forceUpdate);
-		this.plotterPath.push("shapeType").addCallback(this, this.forceUpdate);
-		this.binnedColumnPath.addCallback(this, this.forceUpdate);
-		this.toolPath.selection_keyset.addCallback(this, this.forceUpdate);
-		this.toolPath.probe_keyset.addCallback(this, this.forceUpdate);
-	}
 
 	getSelectedBins():number[]
 	{
-		var keys = this.toolPath.selection_keyset.getKeys();
-		var selectedBins:number[] = [];
-		var binnedColumnObject = this.binnedColumnPath.getObject() as BinnedColumn;
-		keys.forEach( (key:IQualifiedKey) => {
-			selectedBins.push(binnedColumnObject.getValueFromKey(key, Number));
-		});
-		return _.unique(selectedBins);
+		return _.unique(this.selectionKeySet.keys.map((key:IQualifiedKey) => this.binnedColumn.getValueFromKey(key, Number)));
 	}
 
 	getProbedBins():number[]
 	{
-		var keys = this.toolPath.probe_keyset.getKeys();
-		var probedBins:number[] = [];
-		var binnedColumnObject = this.binnedColumnPath.getObject() as BinnedColumn;
-		keys.forEach( (key:IQualifiedKey) => {
-			probedBins.push(binnedColumnObject.getValueFromKey(key, Number));
-		});
-		return _.unique(probedBins);
+		return _.unique(this.probeKeySet.keys.map((key:IQualifiedKey) => this.binnedColumn.getValueFromKey(key, Number)));
 	}
 
 	handleClick(bin:number, event:React.MouseEvent):void
 	{
-		var binnedKeys:any[] = (this.binnedColumnPath.getObject() as any)['_binnedKeysArray'];
-		//setKeys
-		if (_.contains(this.selectedBins,bin))
+		var selectedBins:number[] = this.getSelectedBins();
+		var _binnedKeysArray:IQualifiedKey[][] = (this.binnedColumn as any)['_binnedKeysArray'];
+		if (_.contains(selectedBins, bin))
 		{
-			var currentSelection:any[] = this.toolPath.selection_keyset.getKeys();
-			currentSelection = _.difference(currentSelection,binnedKeys[bin]);
-			this.toolPath.selection_keyset.setKeys(currentSelection);
-			_.remove(this.selectedBins, (value:number) =>{
-				return value == bin;
-			});
+			var currentSelection:IQualifiedKey[] = this.selectionKeySet.keys;
+			currentSelection = _.difference(currentSelection, _binnedKeysArray[bin]);
+			this.selectionKeySet.replaceKeys(currentSelection);
+			_.remove(selectedBins, (value:number) => value == bin);
 		}
 		else
 		{
 			if ((event.ctrlKey || event.metaKey))
-			{
-				this.toolPath.selection_keyset.addKeys(binnedKeys[bin]);
-				this.selectedBins.push(bin);
-			}
+				this.selectionKeySet.addKeys(_binnedKeysArray[bin]);
 			else
-			{
-				this.toolPath.selection_keyset.setKeys(binnedKeys[bin]);
-				this.selectedBins = [bin];
-			}
+				this.selectionKeySet.replaceKeys(_binnedKeysArray[bin]);
 		}
 	}
 
@@ -151,18 +131,17 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	{
 		if (mouseOver)
 		{
-			var binnedKeys:any[] = (this.binnedColumnPath.getObject() as any)['_binnedKeysArray'];
-			this.toolPath.probe_keyset.setKeys(binnedKeys[bin]);
+			var _binnedKeysArray:IQualifiedKey[][] = (this.binnedColumn as any)['_binnedKeysArray'];
+			this.probeKeySet.replaceKeys(_binnedKeysArray[bin]);
 		}
 		else
 		{
-			this.toolPath.probe_keyset.setKeys([]);
+			this.probeKeySet.replaceKeys([]);
 		}
 	}
 
 	componentDidMount()
 	{
-		this.setupCallbacks();
 	}
 
 	getInteractionStyle(bin:number):CSSProperties
@@ -196,19 +175,18 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 			//Binned plot case
 			var width:number = this.props.style.width as number;
 			var height:number = this.props.style.height as number;
-			var shapeSize:number = this.plotterPath.getState("shapeSize") as number;
-			var shapeType:string = this.plotterPath.getState("shapeType") as string;
-			var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
+			var shapeSize:number = this.shapeSize.value;
+			var shapeType:string = this.shapeType.value;
+			var maxColumns:number = 1;//TODO: This should really be "this.maxColumns.value" but only supporting 1 column for now
 			var columnFlex:number = 1.0/maxColumns;
 			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
-			var ramp:any[] = this.dynamicColorColumnPath.getState(null, "ramp") as any[];
+			var ramp:any[] = this.colorColumn.ramp.state as any[];
 			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
 			var yMap:Function = (d:number):number => { return yScale(d); };
 
 			shapeSize = _.max([1, _.min([shapeSize, height / this.numberOfBins])]);
 			var r:number = (shapeSize / 100 * height / this.numberOfBins) / 2;
-			var bc = this.binnedColumnPath.getObject() as BinnedColumn;
-			var textLabelFunction:Function = bc.deriveStringFromNumber.bind(bc);
+			var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
 			var finalElements:any[] = [];
 			var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
 			for (var j:number = 0; j < maxColumns; j++)
@@ -343,7 +321,7 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 			return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
 				<ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
 					<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
-						<span style={prefixerStyle}>{(this.dynamicColorColumnPath.getObject() as IAttributeColumn).getMetadata('title')}</span>
+						<span style={prefixerStyle}>{this.dynamicColorColumn.getMetadata('title')}</span>
 					</ui.HBox>
 					{
 						this.props.style.width > this.props.style.height * 2
@@ -361,8 +339,5 @@ class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
 	}
 }
 
-
-export default WeaveC3ColorLegend;
-
-registerToolImplementation("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);
-//Weave.registerClass("weavejs.tools.ColorBinLegendTool", WeaveC3ColorLegend, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.ColorLegend", WeaveC3ColorLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);

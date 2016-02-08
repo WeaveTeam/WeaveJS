@@ -7,7 +7,6 @@ import * as React from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import ui from "../react-ui/ui";
 import * as bs from "react-bootstrap";
-import {registerToolImplementation} from "../WeaveTool";
 import * as _ from "lodash";
 import {DropdownButton, MenuItem} from "react-bootstrap";
 
@@ -74,7 +73,11 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		}
 	}
 }
-registerToolImplementation("weave.ui::DataFilterTool", DataFilterTool);
+
+weavejs.util.BackwardsCompatibility.forceDeprecatedState(DataFilterTool); // TEMPORARY HACK - remove when class is refactored
+
+Weave.registerClass("weavejs.tool.DataFilter", DataFilterTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.ui::DataFilterTool", DataFilterTool);
 
 interface NumericRangeDataFilterEditorProps {
 	editor:WeavePath
