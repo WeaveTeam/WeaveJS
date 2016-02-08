@@ -1036,6 +1036,7 @@ declare module weavejs.api.core {
          */
         callbacksAreDelayed: boolean;
     }
+    var ICallbackCollection: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1064,6 +1065,7 @@ declare module weavejs.api.core {
          */
         lastNameRemoved: string;
     }
+    var IChildListCallbackInterface: Function;
 }
 declare module weavejs.api.core {
     interface IClassRegistry {
@@ -1119,6 +1121,7 @@ declare module weavejs.api.core {
          */
         getDisplayName(theImplementation: Function): string;
     }
+    var IClassRegistry: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1136,6 +1139,7 @@ declare module weavejs.api.core {
          */
         dispose(): void;
     }
+    var IDisposableObject: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1162,6 +1166,7 @@ declare module weavejs.api.core {
          */
         setSessionState(newState: any[], removeMissingDynamicObjects: boolean): void;
     }
+    var ILinkableCompositeObject: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1226,6 +1231,7 @@ declare module weavejs.api.core {
          */
         removeObject(): void;
     }
+    var ILinkableDynamicObject: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1255,18 +1261,18 @@ declare module weavejs.api.core {
         setNameOrder(newOrder: any[]): void;
         /**
          * This function returns an ordered list of names in the hash map.
-         * @param filter If specified, names of objects that are not of this type will be filtered out.
+         * @param filterClass Either a Class or a String for the name of a class or interface. If specified, names of objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return A copy of the ordered list of names of objects contained in this LinkableHashMap.
          */
-        getNames(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
+        getNames(filterClass?: Object, filterIncludesPlaceholders?: boolean): any[];
         /**
          * This function returns an ordered list of objects in the hash map.
-         * @param filter If specified, objects that are not of this type will be filtered out.
+         * @param filterClass Either a Class or a String for the name of a class or interface. If specified, objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return An ordered Array of objects that correspond to the names returned by getNames(filter).
          */
-        getObjects(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
+        getObjects(filterClass?: Object, filterIncludesPlaceholders?: boolean): any[];
         /**
          * This function gets the name of the specified object in the hash map.
          * @param object An object contained in this LinkableHashMap.
@@ -1330,6 +1336,7 @@ declare module weavejs.api.core {
          */
         generateUniqueName(baseName: string): string;
     }
+    var ILinkableHashMap: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1341,6 +1348,7 @@ declare module weavejs.api.core {
      */
     interface ILinkableObject {
     }
+    var ILinkableObject: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1357,6 +1365,7 @@ declare module weavejs.api.core {
          */
         isBusy(): boolean;
     }
+    var ILinkableObjectWithBusyStatus: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1370,6 +1379,7 @@ declare module weavejs.api.core {
          */
         handleMissingSessionStateProperties(newState: Object): void;
     }
+    var ILinkableObjectWithNewProperties: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1390,6 +1400,7 @@ declare module weavejs.api.core {
          */
         setSessionState(value: Object): void;
     }
+    var ILinkableVariable: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1408,6 +1419,7 @@ declare module weavejs.api.core {
          */
         getText(text: string): string;
     }
+    var ILocale: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1456,6 +1468,7 @@ declare module weavejs.api.core {
          */
         getNormalizedProgress(): number;
     }
+    var IProgressIndicator: Function;
 }
 declare module weavejs.api.core {
     interface IScheduler {
@@ -1558,6 +1571,7 @@ declare module weavejs.api.core {
          */
         startTask(relevantContext: Object, iterativeTask: Function, priority: number, finalCallback?: Function, description?: string): void;
     }
+    var IScheduler: Function;
 }
 declare module weavejs.api.core {
     /**
@@ -1768,6 +1782,7 @@ declare module weavejs.api.core {
          */
         getObject(root: ILinkableObject, path: any[]): ILinkableObject;
     }
+    var ISessionManager: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -1896,6 +1911,7 @@ declare module weavejs.api.data {
          */
         getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
     }
+    var IAttributeColumn: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -1914,6 +1930,7 @@ declare module weavejs.api.data {
          */
         getColumn(dataSource: IDataSource, metadata: Object): IAttributeColumn;
     }
+    var IAttributeColumnCache: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -1927,6 +1944,7 @@ declare module weavejs.api.data {
          */
         setRecords(keys: any[], data: any[]): void;
     }
+    var IBaseColumn: Function;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -1944,6 +1962,7 @@ declare module weavejs.api.data {
          */
         contains(value: any): boolean;
     }
+    var IBinClassifier: Function;
 }
 declare module weavejs.api.data {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -1985,6 +2004,7 @@ declare module weavejs.api.data {
          */
         getBinNames(): any[];
     }
+    var IBinningDefinition: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2043,6 +2063,7 @@ declare module weavejs.api.data {
          */
         convertRecordsToRows(records: any[], columnOrder?: any[], allowBlankColumns?: boolean, headerDepth?: number): any[];
     }
+    var ICSVParser: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2065,6 +2086,7 @@ declare module weavejs.api.data {
          */
         getColumnMetadata(): Object;
     }
+    var IColumnReference: Function;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2125,6 +2147,7 @@ declare module weavejs.api.data {
          */
         hack_getNumericData(): Object;
     }
+    var IColumnStatistics: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2142,6 +2165,7 @@ declare module weavejs.api.data {
          */
         getInternalColumn(): IAttributeColumn;
     }
+    var IColumnWrapper: Function;
 }
 declare module weavejs.api.data {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -2175,6 +2199,7 @@ declare module weavejs.api.data {
          */
         getAttributeColumn(metadata: Object): IAttributeColumn;
     }
+    var IDataSource: Function;
 }
 declare module weavejs.api.data {
     interface IDataSourceWithAuthentication extends IDataSource {
@@ -2199,6 +2224,7 @@ declare module weavejs.api.data {
          */
         authenticate(user: string, pass: string): void;
     }
+    var IDataSourceWithAuthentication: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2206,6 +2232,7 @@ declare module weavejs.api.data {
      */
     interface IDataSource_File extends IDataSource {
     }
+    var IDataSource_File: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2213,6 +2240,7 @@ declare module weavejs.api.data {
      */
     interface IDataSource_Service extends IDataSource {
     }
+    var IDataSource_Service: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2220,6 +2248,7 @@ declare module weavejs.api.data {
      */
     interface IDataSource_Transform extends IDataSource {
     }
+    var IDataSource_Transform: Function;
 }
 declare module weavejs.api.data {
     import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
@@ -2231,6 +2260,7 @@ declare module weavejs.api.data {
     interface IDynamicKeyFilter extends ILinkableDynamicObject {
         getInternalKeyFilter(): IKeyFilter;
     }
+    var IDynamicKeyFilter: Function;
 }
 declare module weavejs.api.data {
     import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
@@ -2242,6 +2272,7 @@ declare module weavejs.api.data {
     interface IDynamicKeySet extends ILinkableDynamicObject {
         getInternalKeySet(): IKeySet;
     }
+    var IDynamicKeySet: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2255,6 +2286,7 @@ declare module weavejs.api.data {
          */
         getURL(): string;
     }
+    var IExternalLink: Function;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2269,6 +2301,7 @@ declare module weavejs.api.data {
          */
         keyFilter: IDynamicKeyFilter;
     }
+    var IFilteredKeySet: Function;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2285,6 +2318,7 @@ declare module weavejs.api.data {
          */
         containsKey(key: IQualifiedKey): boolean;
     }
+    var IKeyFilter: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2298,6 +2332,7 @@ declare module weavejs.api.data {
          */
         keys: any[];
     }
+    var IKeySet: Function;
 }
 declare module weavejs.api.data {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -2323,6 +2358,7 @@ declare module weavejs.api.data {
          */
         keysRemoved: any[];
     }
+    var IKeySetCallbackInterface: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2337,6 +2373,7 @@ declare module weavejs.api.data {
          */
         deriveStringFromNumber(value: number): string;
     }
+    var IPrimitiveColumn: Function;
 }
 declare module weavejs.api.data {
     import Point = weavejs.geom.Point;
@@ -2353,6 +2390,7 @@ declare module weavejs.api.data {
          */
         reproject(inputAndOutput: Point): Point;
     }
+    var IProjector: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2366,6 +2404,7 @@ declare module weavejs.api.data {
         toNumber(): number;
         toString(): string;
     }
+    var IQualifiedKey: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2424,6 +2463,7 @@ declare module weavejs.api.data {
          */
         numberToQKey(qkeyNumber: number): IQualifiedKey;
     }
+    var IQualifiedKeyManager: Function;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2443,6 +2483,7 @@ declare module weavejs.api.data {
          */
         getSelectableAttributes(): any[];
     }
+    var ISelectableAttributes: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2484,6 +2525,7 @@ declare module weavejs.api.data {
          */
         setVertices(o: any[]): void;
     }
+    var ISimpleGeometry: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2499,6 +2541,7 @@ declare module weavejs.api.data {
          */
         getColumnStatistics(column: IAttributeColumn): IColumnStatistics;
     }
+    var IStatisticsCache: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2539,6 +2582,7 @@ declare module weavejs.api.data {
          */
         getChildren(): any[];
     }
+    var IWeaveTreeNode: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2560,6 +2604,7 @@ declare module weavejs.api.data {
          */
         removeChild(child: IWeaveTreeNode): boolean;
     }
+    var IWeaveTreeNodeWithEditableChildren: Function;
 }
 declare module weavejs.api.data {
     /**
@@ -2575,6 +2620,7 @@ declare module weavejs.api.data {
          */
         findPathToNode(descendant: IWeaveTreeNode): any[];
     }
+    var IWeaveTreeNodeWithPathFinding: Function;
 }
 declare module weavejs.api.net {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2594,6 +2640,7 @@ declare module weavejs.api.net {
          */
         invokeAsyncMethod(methodName: string, methodParameters?: Object): WeavePromise;
     }
+    var IAsyncService: Function;
 }
 declare module weavejs.api.net {
     import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -2630,6 +2677,7 @@ declare module weavejs.api.net {
          */
         getLocalFileNames(weaveRoot: ILinkableHashMap): any[];
     }
+    var IURLRequestUtils: Function;
 }
 declare module weavejs.api.net {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2692,6 +2740,7 @@ declare module weavejs.api.net {
          */
         getImageHeight(): number;
     }
+    var IWMSService: Function;
 }
 declare module weavejs.api.net {
     import EntityMetadata = weavejs.api.net.beans.EntityMetadata;
@@ -2738,6 +2787,7 @@ declare module weavejs.api.net {
          */
         removeChild(parentId: number, childId: number): WeavePromise;
     }
+    var IWeaveEntityManagementService: Function;
 }
 declare module weavejs.api.net {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2780,6 +2830,7 @@ declare module weavejs.api.net {
          */
         findPublicFieldValues(fieldName: string, valueSearch: string): WeavePromise;
     }
+    var IWeaveEntityService: Function;
 }
 declare module weavejs.api.net {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2799,6 +2850,7 @@ declare module weavejs.api.net {
          */
         getGeometryTiles(tileIDs: any[]): WeavePromise;
     }
+    var IWeaveGeometryTileService: Function;
 }
 declare module weavejs.api.net.beans {
     /**
@@ -2858,6 +2910,7 @@ declare module weavejs.api.ui {
          */
         getLabel(object: ILinkableObject): string;
     }
+    var IEditorManager: Function;
 }
 declare module weavejs.api.ui {
     /**
@@ -2870,6 +2923,7 @@ declare module weavejs.api.ui {
          */
         getDescription(): string;
     }
+    var IObjectWithDescription: Function;
 }
 declare module weavejs.api.ui {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2878,6 +2932,7 @@ declare module weavejs.api.ui {
      */
     interface IVisTool extends ILinkableObject {
     }
+    var IVisTool: Function;
 }
 declare module weavejs.core {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -3105,8 +3160,15 @@ declare module weavejs.core {
          */
         defaultPackages: any[];
         private static FLEXJS_CLASS_INFO;
+        private static NAMES;
+        private static NAME;
+        private static QNAME;
+        private static INTERFACES;
         /**
          * Registers a class for use with Weave.className() and Weave.getDefinition().
+         * @param qualifiedName
+         * @param definition
+         * @param interfaces An Array of Class objects that are the interfaces the class implements.
          */
         registerClass(qualifiedName: string, definition: Function, interfaces?: any[]): void;
         /**
@@ -3434,8 +3496,8 @@ declare module weavejs.core {
         private _typeRestriction;
         typeRestriction: Function;
         childListCallbacks: IChildListCallbackInterface;
-        getNames(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
-        getObjects(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
+        getNames(filterClass?: Object, filterIncludesPlaceholders?: boolean): any[];
+        getObjects(filterClass?: Object, filterIncludesPlaceholders?: boolean): any[];
         private getList(listObjects, filter, filterIncludesPlaceholders);
         getObject(name: string): ILinkableObject;
         setObject(name: string, object: ILinkableObject): void;
