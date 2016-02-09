@@ -4593,7 +4593,7 @@ declare module weavejs.data {
          * @param keyProperty The property name which should be used to store the IQualifiedKey for a record.
          * @return An array of record objects matching the structure of the format object.
          */
-        getRecords(format: Object, keys?: any[], dataType?: Function, keyProperty?: string): any[];
+        static getRecords(format: Object, keys?: any[], dataType?: Function, keyProperty?: string): any[];
         private static getColumnsFromFormat(format, output);
         /**
          * Generates a record using a custom format.
