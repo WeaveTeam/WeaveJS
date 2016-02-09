@@ -960,6 +960,20 @@ declare module weavejs.api.core {
          * It does so by adding the "bypassDiff" property to any part for which isDynamicState(part) returns true.
          */
         static alterSessionStateToBypassDiff(object: Object): void;
+        /**
+         * Converts DynamicState Arrays into Objects.
+         * @param state The state to convert
+         * @return The converted state
+         */
+        static removeTypeFromState(state: Object): Object;
+        /**
+         * Sets or gets a value in a session state.
+         * @param state The state to traverse
+         * @param path The path in the state to traverse
+         * @param newValue The new value, or undefined to retrieve the current value
+         * @return The new or existing value
+         */
+        static traverseState(state: Object, path: any[], newValue?: any): any;
     }
 }
 declare module weavejs.api.core {
@@ -9399,7 +9413,6 @@ declare module weavejs.path {
         getState(...relativePath: any[]): Object;
         getTypedState(...relativePath: any[]): Object;
         getUntypedState(...relativePath: any[]): Object;
-        private _removeTypeFromState(state);
         /**
          * Gets the changes that have occurred since previousState for the object at the current path or relative to the current path.
          * @param relativePath An optional Array (or multiple parameters) specifying descendant names relative to the current path.

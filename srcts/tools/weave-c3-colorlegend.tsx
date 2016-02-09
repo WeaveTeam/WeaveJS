@@ -82,9 +82,10 @@ export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, I
 
     protected handleMissingSessionStateProperties(newState:any)
 	{
-		newState;
+		var traverseState = weavejs.api.core.DynamicState.traverseState;
+		Weave.setState(this, traverseState(newState, ['children', 'visualization', 'plotManager', 'plotters', 'plot']));
 	}
-
+	
 	get title():string
 	{
 		return this.panelTitle.value;
