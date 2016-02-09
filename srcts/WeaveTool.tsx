@@ -56,9 +56,9 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
         super(props);
         this.toolPath = this.props.toolPath;
 		var placeholder = this.toolPath.getObject() as LinkablePlaceholder;
-		if (placeholder.getClass)
+		if (placeholder && placeholder.getClass)
 	        this.ToolClass = (this.toolPath.getObject() as LinkablePlaceholder).getClass();
-		else
+		else if (this.toolPath.getObject())
 			this.ToolClass = Weave.getDefinition(this.toolPath.getState('class') as string); // temporary hack
         this.titleBarHeight = 25;
 		
