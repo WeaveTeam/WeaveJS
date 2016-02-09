@@ -3734,6 +3734,10 @@ declare module weavejs.core {
          */
         protected _locked: boolean;
         /**
+         * If true, session states will be altered to bypass the diff calculation on DynamicState Arrays.
+         */
+        protected _bypassDiff: boolean;
+        /**
          * If a defaultValue is specified, callbacks will be triggered in a later frame unless they have already been triggered before then.
          * This behavior is desirable because it allows the initial value to be handled by the same callbacks that handles new values.
          * @param sessionStateType The type of values accepted for this sessioned property.
@@ -5017,9 +5021,9 @@ declare module weavejs.data.bin {
         private _callbacks;
         private _triggerCount;
         private _min;
-        private_max: number;
+        private _max;
         private _minInclusive;
-        private_maxInclusive: boolean;
+        private _maxInclusive;
         /**
          * contains
          * @param value A value to test.
@@ -5485,7 +5489,7 @@ declare module weavejs.data.column {
         getMetadata(propertyName: string): string;
         keys: any[];
         containsKey(key: IQualifiedKey): boolean;
-        setRecords(qkeys: any[], dateStrings: any[]): void;
+        setRecords(qkeys: any[], dates: any[]): void;
         private errorHandler(e);
         private _asyncComplete();
         private parseDate(string);
@@ -5732,13 +5736,14 @@ declare module weavejs.data.column {
     }
 }
 declare module weavejs.data.column {
+    import IBaseColumn = weavejs.api.data.IBaseColumn;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
     /**
      * The values in this column are Arrays of GeneralizedGeometry objects.
      *
      * @author adufilie
      */
-    class GeometryColumn extends AbstractAttributeColumn {
+    class GeometryColumn extends AbstractAttributeColumn implements IBaseColumn {
         constructor(metadata?: Object);
         /**
          * This object maps a key to an array of geometry objects that have that key.
@@ -5762,7 +5767,7 @@ declare module weavejs.data.column {
          * @return true if the key exists in this IKeySet.
          */
         containsKey(key: IQualifiedKey): boolean;
-        setGeometries(keys: any[], geometries: any[]): void;
+        setRecords(keys: any[], geometries: any[]): void;
         getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
     }
 }
@@ -7748,9 +7753,9 @@ declare module weavejs.geom {
          * These are the values defining the bounds.
          */
         xMin: number;
-        publicyMin: number;
-        publicxMax: number;
-        publicyMax: number;
+        yMin: number;
+        xMax: number;
+        yMax: number;
         getXMin(): number;
         getYMin(): number;
         getXMax(): number;
@@ -8265,9 +8270,9 @@ declare module weavejs.geom {
          * These constants define indices in a KDKey corresponding to the different KDTree dimensions.
          */
         private XMIN_INDEX;
-        privateYMIN_INDEX: number;
+        private YMIN_INDEX;
         private XMAX_INDEX;
-        privateYMAX_INDEX: number;
+        private YMAX_INDEX;
         private IMAX_INDEX;
         private KD_DIMENSIONALITY;
         /**
@@ -8419,7 +8424,7 @@ declare module weavejs.geom {
         private needsBalancing;
         private balanceStack;
         private LEFT_SIDE;
-        privateRIGHT_SIDE: number;
+        private RIGHT_SIDE;
         /**
          * Balance the tree so there are an (approximately) equal number of points
          * on either side of any given node. A balanced tree yields faster query
@@ -8453,7 +8458,7 @@ declare module weavejs.geom {
          * Use these values for the sortDirection parameter of queryRange().
          */
         static ASCENDING: string;
-        publicstaticDESCENDING: string;
+        static DESCENDING: string;
         /**
          * @param minKey The minimum key values allowed for results of this query
          * @param maxKey The maximum key values allowed for results of this query
@@ -10634,8 +10639,8 @@ declare module weavejs.util {
         private static Uint16Array;
         private static Uint8Array;
         buffer: any;
-        publicbufferView: any[];
-        publicrawData: any[];
+        bufferView: any[];
+        rawData: any[];
         private static Number_isInteger(nVal);
         constructor(vInput?: any, sEncoding?: string, nOffset?: number, nLength?: number);
         static loadUTF8CharCode(aChars: any[], nIdx: number): number;
