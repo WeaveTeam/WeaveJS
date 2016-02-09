@@ -8,7 +8,7 @@ import * as ReactDOM from "react-dom";
 import * as bs from "react-bootstrap";
 import * as _ from "lodash";
 import VBox from "./VBox";
-import HBox from "./Hbox";
+import HBox from "./HBox";
 
 export interface ICheckBoxListProps extends React.Props<CheckBoxList> {
     values:any[];
