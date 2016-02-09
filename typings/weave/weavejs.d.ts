@@ -4462,6 +4462,7 @@ declare module weavejs.data {
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IColumnWrapper = weavejs.api.data.IColumnWrapper;
     import IKeyFilter = weavejs.api.data.IKeyFilter;
+    import IQualifiedKey = weavejs.api.data.IQualifiedKey;
     import DynamicColumn = weavejs.data.column.DynamicColumn;
     import Bounds2D = weavejs.geom.Bounds2D;
     /**
@@ -4583,6 +4584,26 @@ declare module weavejs.data {
          * @return An Array of Arrays, the first being IQualifiedKeys and the rest being Arrays data values from the given columns that correspond to the IQualifiedKeys.
          */
         static joinColumns(columns: any[], dataType?: Object, allowMissingData?: boolean, keyFilter?: Object): any[];
+        /**
+         * Generates records using a custom format.
+         * @param format An object mapping names to IAttributeColumn objects or constant values to be included in every record.
+         *               You can nest Objects or Arrays.
+         * @param keys An Array of IQualifiedKeys
+         * @param dataType A Class specifying the dataType to retrieve from columns: String/Number/Date/Array
+         * @param keyProperty The property name which should be used to store the IQualifiedKey for a record.
+         * @return An array of record objects matching the structure of the format object.
+         */
+        getRecords(format: Object, keys?: any[], dataType?: Function, keyProperty?: string): any[];
+        private static getColumnsFromFormat(format, output);
+        /**
+         * Generates a record using a custom format.
+         * @param format An object mapping names to IAttributeColumn objects or constant values to be included in every record.
+         *               You can nest Objects or Arrays.
+         * @param key An IQualifiedKey
+         * @param dataType A Class specifying the dataType to retrieve from columns: String/Number/Date/Array
+         * @return A record object matching the structure of the format object.
+         */
+        static getRecord(format: Object, key: IQualifiedKey, dataType: Function): Object;
         /**
          * @param attrCols An array of IAttributeColumns or ILinkableHashMaps containing IAttributeColumns.
          * @return An Array of non-wrapper columns with duplicates removed.
