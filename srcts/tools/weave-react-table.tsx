@@ -17,6 +17,12 @@ import WeavePathData = weavejs.path.WeavePathData;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
+import LinkableString = weavejs.core.LinkableString;
+import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
+import ColumnUtils = weavejs.data.ColumnUtils;
+import KeySet = weavejs.data.key.KeySet;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 export interface IDataTableState extends IVisToolState {
     data:{[key:string]: string}[]
@@ -24,13 +30,26 @@ export interface IDataTableState extends IVisToolState {
 
 export default class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
 
-    private toolPath:WeavePath;
-    private columnsPath:WeavePath;
+    columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+    panelTitle:LinkableString = Weave.linkableChild(this, new LinkableString);
+    selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
+    probeFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
+    filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+
+    private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
+    private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
 
     constructor(props:IVisToolProps) {
         super(props);
-        this.toolPath = props.toolPath;
-        this.columnsPath = this.toolPath.push("columns");
+        Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
+
+        this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
+		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
+		this.probeFilter.targetPath = ['defaultProbeKeySet'];
+
+        this.columns.addGroupedCallback(this, this.dataChanged, true);
+        this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
+
         this.state = {
             data: []
         };
@@ -42,16 +61,11 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
 	}
 
     get title():string {
-       return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
+       return this.panelTitle.value;;
     }
 
     componentDidMount() {
-        this.columnsPath.addCallback(this, this.dataChanged, true);
-        this.toolPath.push("filteredKeySet").addCallback(this, this.dataChanged, true);
-        this.toolPath.push("selectionKeySet").addCallback(this, this.forceUpdate, true);
-        (this.toolPath as WeavePathData).probe_keyset.addCallback(this, this.forceUpdate, true);
 
-        (this.toolPath.getObject("filteredKeySet") as FilteredKeySet).setColumnKeySources((this.toolPath.getObject("columns") as ILinkableHashMap).getObjects());
     }
 
     componentDidUpdate() {
@@ -60,7 +74,7 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
 
     dataChanged() {
         this.setState({
-            data: (this.columnsPath as WeavePathData).retrieveRecords(this.columnsPath.getNames(), {keySet: this.toolPath.push("filteredKeySet"), dataType: "string"})
+            data: (Weave.getPath(this.columns) as WeavePathData).retrieveRecords(this.columns.getNames(), {keySet: Weave.getPath(this.filteredKeySet), dataType: "string"})
         });
     }
 
@@ -72,25 +86,25 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
     //     }
     // }
 
-    handleProbe(ids:string[]) {
-        (this.toolPath as WeavePathData).probe_keyset.setKeys(ids);
+    handleProbe(ids:IQualifiedKey[]) {
+        this.probeKeySet.replaceKeys(ids)
     }
 
-    handleSelection(ids:string[]) {
-        (this.toolPath.push("selectionKeySet", null) as WeavePathData).setKeys(ids);
+    handleSelection(ids:IQualifiedKey[]) {
+        this.selectionKeySet.replaceKeys(ids);
     }
 
     render() {
+        var columnTitles:{[columnId:string]: string} = {};
 
-        var columns:{[columnId:string]: string} = {};
+        columnTitles["id"] = "Key";
 
-        columns["id"] = "Key";
-
-        this.columnsPath.getChildren().forEach((columnPath:WeavePath) => {
-            columns[columnPath.getPath().pop()] = (columnPath.getObject() as IAttributeColumn).getMetadata('title');
+        this.columns.getObjects().forEach((column:IAttributeColumn) => {
+            var columnId:string = (Weave.getPath(column).pop() as any);
+            columnTitles[columnId] = column.getMetadata("title");
         });
 
-        return <ReactBootstrapTable columnTitles={columns}
+        return <ReactBootstrapTable columnTitles={columnTitles}
                                     rows={this.state.data}
                                     idProperty="id"
                                     height={this.props.style.height}
@@ -98,8 +112,8 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
                                     hover={true}
                                     bordered={true}
                                     condensed={true}
-                                    selectedIds={(this.toolPath.push("selectionKeySet", null) as WeavePathData).getKeys()}
-                                    probedIds={(this.toolPath as WeavePathData).probe_keyset.getKeys()}
+                                    selectedIds={this.selectionKeySet.keys}
+                                    probedIds={this.probeKeySet.keys}
                                     onProbe={this.handleProbe.bind(this)}
                                     onSelection={this.handleSelection.bind(this)}
                                     showIdColumn={false}
