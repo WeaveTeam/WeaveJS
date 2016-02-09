@@ -50,6 +50,7 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
         this.columns.addGroupedCallback(this, this.dataChanged, true);
         this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
 
+        this.filteredKeySet.setColumnKeySources(this.columns.getObjects());
         this.state = {
             data: []
         };
@@ -74,7 +75,7 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
 
     dataChanged() {
         this.setState({
-            data: (Weave.getPath(this.columns) as WeavePathData).retrieveRecords(this.columns.getNames(), {keySet: Weave.getPath(this.filteredKeySet), dataType: "string"})
+            data: ColumnUtils.getRecords(this.columns.getObjects(), this.filteredKeySet.keys, String)
         });
     }
 
@@ -96,12 +97,10 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
 
     render() {
         var columnTitles:{[columnId:string]: string} = {};
-
+        console.log(this.state.data);
         columnTitles["id"] = "Key";
-
         this.columns.getObjects().forEach((column:IAttributeColumn) => {
-            var columnId:string = (Weave.getPath(column).pop() as any);
-            columnTitles[columnId] = column.getMetadata("title");
+            columnTitles[this.columns.getName(column)] = column.getMetadata("title");
         });
 
         return <ReactBootstrapTable columnTitles={columnTitles}
@@ -112,16 +111,14 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
                                     hover={true}
                                     bordered={true}
                                     condensed={true}
-                                    selectedIds={this.selectionKeySet.keys}
-                                    probedIds={this.probeKeySet.keys}
+                                    selectedIds={this.selectionKeySet ? this.selectionKeySet.keys : []}
+                                    probedIds={this.probeKeySet ? this.probeKeySet.keys : []}
                                     onProbe={this.handleProbe.bind(this)}
                                     onSelection={this.handleSelection.bind(this)}
                                     showIdColumn={false}
                 />
     }
 }
-
-weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveReactTable); // TEMPORARY HACK - remove when class is refactored
 
 Weave.registerClass("weavejs.tool.Table", WeaveReactTable, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.visualization.tools::TableTool", WeaveReactTable);
