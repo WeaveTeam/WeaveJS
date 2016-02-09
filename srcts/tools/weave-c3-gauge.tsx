@@ -58,10 +58,10 @@ class WeaveC3Gauge extends AbstractC3Tool {
                 height: this.props.style.height
             },
             padding: {
-                top: 20,
-                bottom: 0,
-                left: 100,
-                right: 20
+                top: 10,
+                bottom: 10,
+                left: 10,
+                right: 10
             },
             data: {
                 columns: [],
@@ -161,14 +161,38 @@ class WeaveC3Gauge extends AbstractC3Tool {
         for (var i=1; i<=this.numberOfBins; i++){
             this.c3Config.color.threshold.values.push(this.c3Config.gauge.min+i*(range/this.numberOfBins));
         }
+        this.c3Config.gauge.label.show = true;
 
 
         var data = _.cloneDeep(this.c3Config.data);
-        if((this.paths.probeKeySet.getState() as any[]).length){
+        var temp:any[] = [name];
+        var meterCols:number[] = _.pluck(this.numericRecords, 'meterColumn');
+
+        var selectedKeys:any[] = this.toolPath.selection_keyset.getKeys() as any[];
+        var probedKeys:any[] = this.toolPath.probe_keyset.getKeys() as any[];
+        var valid:boolean = false;
+        if(probedKeys.length){
             //sometime probe keyset is not reset when mouse leaves another tool, so for now only take
             //the first numeric record, but probe keyset not being set to empty should be addressed,
             //then the [0] below and surrounding [] can be removed
-            data.columns = [_.union([[name]], [_.pluck(this.numericRecords, 'meterColumn')[0]])];
+            probedKeys.forEach( (key) => {
+                var i:number = this.keyToIndex[key.toString()];
+                if (meterCols[i]) {
+                    valid = true;
+                    temp.push(meterCols[i]);
+                }
+            });
+        } else if(selectedKeys.length){
+            selectedKeys.forEach( (key) => {
+                var i:number = this.keyToIndex[key.toString()];
+                if(meterCols[i]) {
+                    valid = true;
+                    temp.push(meterCols[i]);
+                }
+            });
+        }
+        if(valid){
+            data.columns = [temp];
         } else {
             data.columns = [];
         }
@@ -223,7 +247,7 @@ class WeaveC3Gauge extends AbstractC3Tool {
             { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
             { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
             { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
+            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.validate },
             { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.validate }
         ];
 
@@ -254,7 +278,7 @@ class WeaveC3Gauge extends AbstractC3Tool {
         //TODO: Need a debounced call when 'meterColumn' changes to wait for validateCache to return
         //      with column statistics and then call this.dataChanged() to set config appropriately
         var changeDetected:boolean = false;
-        if (this.detectChange('meterColumn', 'colorRamp', 'filteredKeySet', 'probeKeySet'))
+        if (this.detectChange('meterColumn', 'colorRamp', 'filteredKeySet', 'probeKeySet', 'selectionKeySet'))
         {
             changeDetected = true;
             this.dataChanged();
