@@ -65,15 +65,15 @@ export default class ScatterPlotLayer extends GlyphLayer {
 		let fillEnabled = this.fill.enable.value;
 		let strokeEnabled = this.line.enable.value;
 
-		let styleRecords: Array<any> = new Array<any>(this.dataX.keys.length);
+		let styleRecords: Array<any> = new Array<any>();
 
 		for (let key of this.dataX.keys as Array<IQualifiedKey>)
 		{
 			let record: any = {};
 			record.id = key;
 			record.fill = this.fill.getStyle(key);
-			record.line = this.line.getStyle(key);
-			styleRecords.push()
+			record.stroke = this.line.getStyle(key);
+			styleRecords.push(record);
 		}
 
 		var styleRecordsIndex = lodash.indexBy(styleRecords, "id");

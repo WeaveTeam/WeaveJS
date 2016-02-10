@@ -11,15 +11,16 @@ import Layer from "./Layer";
 
 import WeavePathData = weavejs.path.WeavePathData;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
 export default class ImageGlyphLayer extends GlyphLayer {
 
 	private imageGlyphCache:ImageGlyphCache;
 
-	imageSize: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	imageURL: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	alpha: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	color: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	imageSize: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+	imageURL: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+	alpha: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+	color: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
 
 	constructor()
 	{
@@ -93,8 +94,9 @@ export default class ImageGlyphLayer extends GlyphLayer {
 			"alpha": this.alpha, "color": this.color, "imageURL": this.imageURL, "imageSize": this.imageSize
 		}, this.dataX.keys);
 
-		for (let record of records)
+		for (let idx in records)
 		{
+			let record = records[idx];
 			let feature = this.source.getFeatureById(record.id);
 
 			if (!feature)
