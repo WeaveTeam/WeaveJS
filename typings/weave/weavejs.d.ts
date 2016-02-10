@@ -1305,9 +1305,10 @@ declare module weavejs.api.core {
         /**
          * Sets an entry in the hash map, replacing any existing object under the same name.
          * @param name The identifying name to associate with an object.
+         * @param lockObject If this is true, the object will be locked in place under the specified name.
          * @return The object to be associated with the given name.
          */
-        setObject(name: string, object: ILinkableObject): void;
+        setObject(name: string, object: ILinkableObject, lockObject?: boolean): void;
         /**
          * This function creates an object in the hash map if it doesn't already exist.
          * If there is an existing object associated with the specified name, it will be kept if it
@@ -1317,7 +1318,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, the object will be locked in place under the specified name.
          * @return The object under the requested name of the requested type, or null if an error occurred.
          */
-        requestObject(name: string, classDef: Function, lockObject: boolean): any;
+        requestObject(name: string, classDef: Function, lockObject?: boolean): any;
         /**
          * This function will copy the session state of an ILinkableObject to a new object under the given name in this LinkableHashMap.
          * @param newName A name for the object to be initialized in this LinkableHashMap.
@@ -3517,10 +3518,10 @@ declare module weavejs.core {
         getObjects(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
         private getList(listObjects, filter, filterIncludesPlaceholders);
         getObject(name: string): ILinkableObject;
-        setObject(name: string, object: ILinkableObject): void;
+        setObject(name: string, object: ILinkableObject, lockObject?: boolean): void;
         getName(object: ILinkableObject): string;
         setNameOrder(newOrder: any[]): void;
-        requestObject(name: string, classDef: Function, lockObject: boolean): any;
+        requestObject(name: string, classDef: Function, lockObject?: boolean): any;
         requestObjectCopy(name: string, objectToCopy: ILinkableObject): ILinkableObject;
         renameObject(oldName: string, newName: string): ILinkableObject;
         /**
@@ -4589,21 +4590,23 @@ declare module weavejs.data {
          * @param format An object mapping names to IAttributeColumn objects or constant values to be included in every record.
          *               You can nest Objects or Arrays.
          * @param keys An Array of IQualifiedKeys
-         * @param dataType A Class specifying the dataType to retrieve from columns: String/Number/Date/Array
+         * @param dataType A Class specifying the dataType to retrieve from columns: String/Number/Date/Array (default is Array)
+         *                 You can also specify different data types in a structure matching that of the format object.
          * @param keyProperty The property name which should be used to store the IQualifiedKey for a record.
          * @return An array of record objects matching the structure of the format object.
          */
-        static getRecords(format: Object, keys?: any[], dataType?: Function, keyProperty?: string): any[];
+        static getRecords(format: Object, keys?: any[], dataType?: Object, keyProperty?: string): any[];
         private static getColumnsFromFormat(format, output);
         /**
          * Generates a record using a custom format.
          * @param format An object mapping names to IAttributeColumn objects or constant values to be included in every record.
          *               You can nest Objects or Arrays.
          * @param key An IQualifiedKey
-         * @param dataType A Class specifying the dataType to retrieve from columns: String/Number/Date/Array
+         * @param dataType A Class specifying the dataType to retrieve from columns: String/Number/Date/Array (default is Array)
+         *                 You can also specify different data types in a structure matching that of the format object.
          * @return A record object matching the structure of the format object.
          */
-        static getRecord(format: Object, key: IQualifiedKey, dataType: Function): Object;
+        static getRecord(format: Object, key: IQualifiedKey, dataType: Object): Object;
         /**
          * @param attrCols An array of IAttributeColumns or ILinkableHashMaps containing IAttributeColumns.
          * @return An Array of non-wrapper columns with duplicates removed.
