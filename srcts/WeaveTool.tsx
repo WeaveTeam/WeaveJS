@@ -43,7 +43,10 @@ export interface IWeaveToolState {
 
 export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
 {
+	//TODO - use linkable object instead of WeavePath because we don't know when the object gets replaced
+	//       need to check new props
     private toolPath:WeavePath;
+	
     private ToolClass:any;
     private tool:IVisTool;
     private toolWidth:number;
@@ -51,15 +54,15 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
     private toolTip:IToolTip;
     private titleBarHeight: number;
     private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
-
+	
     constructor(props:IWeaveToolProps)
 	{
         super(props);
 		this.state = {};
         this.toolPath = this.props.toolPath;
 		var placeholder = this.toolPath.getObject() as LinkablePlaceholder;
-		if (placeholder && placeholder.getClass)
-	        this.ToolClass = (this.toolPath.getObject() as LinkablePlaceholder).getClass();
+		if (placeholder instanceof LinkablePlaceholder)
+	        this.ToolClass = placeholder.getClass();
 		else if (this.toolPath.getObject())
 			this.ToolClass = Weave.getDefinition(this.toolPath.getState('class') as string); // temporary hack
         this.titleBarHeight = 25;
@@ -67,15 +70,25 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		this.handleInstance = this.handleInstance.bind(this);
     }
 	
+	componentWillReceiveProps(props:IWeaveToolProps):void
+	{
+	}
+	
 	handleInstance(tool:IVisTool):void
 	{
+		if (this.tool === tool)
+			return; 
+		
 		var placeholder = this.toolPath.getObject() as LinkablePlaceholder;
-		if (placeholder.setInstance)
-			placeholder.setInstance(this.tool = tool);
-		else if (!this.tool)
-			this.tool = tool; // temporary until all classes are refactored
-		else if (tool && this.tool != tool)
-			throw new Error("Unexpected new instance of tool");
+		if (placeholder instanceof LinkablePlaceholder)
+		{
+			if (tool)
+				placeholder.setInstance(tool);
+			else
+				this.ToolClass = placeholder.getClass();
+		}
+		
+		this.tool = tool;
 		
 		// make sure title gets updated
 		if (this.tool)
