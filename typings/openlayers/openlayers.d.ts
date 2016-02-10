@@ -4031,6 +4031,7 @@ declare module ol {
         class Projection {
             constructor(options: olx.Projection);
             getExtent():ol.Extent;
+            getCode(): string;
         }
     }
 
@@ -4087,6 +4088,7 @@ declare module ol {
         }
 
         class Source extends ol.Object {
+            getProjection(): ol.proj.Projection;
         }
 
         class Stamen extends XYZ {
