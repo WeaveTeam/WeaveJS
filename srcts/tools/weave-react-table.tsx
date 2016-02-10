@@ -76,24 +76,15 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
 
     dataChanged() {
         this.filteredKeySet.setColumnKeySources(this.columns.getObjects());
+        var names:string[] = this.columns.getNames();
         var columns:IAttributeColumn[] = this.columns.getObjects();
-        var records:string[][] = ColumnUtils.getRecords(columns, this.filteredKeySet.keys, String);
-        var columnNames:string[] = this.columns.getNames();
-        var columnTitles:{[columnId:string]: string} = {};
-
-        var rows:IRow[] = records.map((record:string[]) => {
-            var row:IRow = _.zipObject(columnNames, record) as IRow;
-            row["id"] = (record as any)["id"];
-            return row;
-        });
-
-        columns.forEach((column:IAttributeColumn, index:number) => {
-            columnTitles[columnNames[index]] = column.getMetadata("title");
-        });
+        var records:IRow[] = ColumnUtils.getRecords(_.zipObject(names, columns), this.filteredKeySet.keys, String);
+		var titles:string[] = columns.map((column:IAttributeColumn) => column.getMetadata("title"));
+        var columnTitles = _.zipObject(names, titles) as { [columnId: string]: string; };
         columnTitles["id"] = "Key";
 
         this.setState({
-            data: rows,
+            data: records,
             columnTitles
         });
     }
