@@ -12,7 +12,7 @@ import Layer from "./Layer";
 import WeavePathData = weavejs.path.WeavePathData;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 
-class ImageGlyphLayer extends GlyphLayer {
+export default class ImageGlyphLayer extends GlyphLayer {
 
 	private imageGlyphCache:ImageGlyphCache;
 
@@ -119,4 +119,3 @@ class ImageGlyphLayer extends GlyphLayer {
 }
 
 Weave.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-export default ImageGlyphLayer;

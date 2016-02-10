@@ -19,8 +19,7 @@ import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-
-class ScatterPlotLayer extends GlyphLayer {
+export default class ScatterPlotLayer extends GlyphLayer {
 
 	minScreenRadius: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 	maxScreenRadius: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
@@ -186,5 +185,5 @@ class ScatterPlotLayer extends GlyphLayer {
 		}
 	}
 }
+
 Weave.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-export default ScatterPlotLayer;

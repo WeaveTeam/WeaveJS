@@ -11,7 +11,7 @@ import WeavePath = weavejs.path.WeavePath;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 
-class TileLayer extends Layer {
+export default class TileLayer extends Layer {
 
 	servicePath:WeavePath;
 	oldProviderName:string;
@@ -27,8 +27,6 @@ class TileLayer extends Layer {
 
 		this.provider.addGroupedCallback(this, this.updateTileSource);
 		this.providerOptions.addGroupedCallback(this, this.updateTileSource, true);
-
-		console.log("constructing tilelayer");
 	}
 
 	updateValidExtents()
@@ -59,16 +57,14 @@ class TileLayer extends Layer {
 	handleMissingSessionStateProperties(newState:any)
 	{
 		super.handleMissingSessionStateProperties(newState);
-		console.log("TileLayer.handleMissingSessionStateProperties");
 		var traverseState = weavejs.api.core.DynamicState.traverseState;
 
-		let serviceState: any = traverseState(newState, ["service"]);
-
-		if (lodash.has(serviceState, ["service", "providerName"]))
+		let serviceState = traverseState(newState, ["service", null]) || {};
+		if (serviceState.providerName)
 		{
-			let providerName: string = lodash.get(serviceState, ["service", "providerName"]) as string;
+			let providerName: string;
 			let params: any = {};
-			switch (providerName) {
+			switch (serviceState.providerName) {
 				case "Stamen WaterColor":
 					providerName = "stamen";
 					params.layer = "watercolor";
@@ -93,17 +89,17 @@ class TileLayer extends Layer {
 					break;
 			}
 
-			Weave.setState(this.provider, providerName);
-			Weave.setState(this.providerOptions, params);
+			this.provider.value = providerName;
+			this.providerOptions.state = params;
 		}
 		else
 		{
-			Weave.setState(this.provider, "custom");
-			Weave.setState(this.providerOptions, {
+			this.provider.value = "custom";
+			this.providerOptions.state = {
 				url: serviceState.wmsURL,
 				attributions: serviceState.attributions,
 				projection: serviceState.projection
-			});
+			};
 		}
 	}
 
@@ -152,4 +148,3 @@ class TileLayer extends Layer {
 }
 
 Weave.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-export default TileLayer;

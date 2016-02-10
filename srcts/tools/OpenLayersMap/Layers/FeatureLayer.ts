@@ -32,8 +32,8 @@ export abstract class FeatureLayer extends Layer {
 	handleMissingSessionStateProperties(newState: any) {
 		super.handleMissingSessionStateProperties(newState);
 
-		Weave.setState(this.selectionKeySet, "defaultSelectionKeySet");
-		Weave.setState(this.probeKeySet, "defaultProbeKeySet");
+		this.selectionKeySet.targetPath = ["defaultSelectionKeySet"];
+		this.probeKeySet.targetPath = ["defaultProbeKeySet"];
 	}
 
 	constructor()

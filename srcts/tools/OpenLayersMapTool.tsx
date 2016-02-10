@@ -106,7 +106,7 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 		let plotters:any = traverseState(newState, ["children", "visualization", "plotManager", "plotters"]);
 		let plotterSettings: any = traverseState(newState, ["children", "visualization", "plotManager", "layerSettings"]);
 
-		Weave.setState(this.layers, lodash.merge(plotters, plotterSettings));
+		Weave.setState(this.layers, lodash.merge(plotterSettings, plotters));
 	}
 
 	componentDidMount():void

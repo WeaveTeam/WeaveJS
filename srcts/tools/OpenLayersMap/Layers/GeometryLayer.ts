@@ -17,7 +17,7 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 
-class GeometryLayer extends FeatureLayer {
+export default class GeometryLayer extends FeatureLayer {
 
 	geoJsonParser:ol.format.GeoJSON;
 
@@ -28,7 +28,6 @@ class GeometryLayer extends FeatureLayer {
 	constructor()
 	{
 		super();
-		console.log("GeometryLayer");
 
 		this.geoJsonParser = new ol.format.GeoJSON();
 
@@ -50,6 +49,11 @@ class GeometryLayer extends FeatureLayer {
 	handleMissingSessionStateProperties(newState:any)
 	{
 		super.handleMissingSessionStateProperties(newState);
+		var traverseState = weavejs.api.core.DynamicState.traverseState;
+
+		Weave.setState(this.fill, newState.fill);
+		Weave.setState(this.line, newState.line);
+		Weave.setState(this.geometryColumn, traverseState(newState, ['geometryColumn', 'internalDynamicColumn']));
 	}
 
 	get inputProjection():any
@@ -152,4 +156,3 @@ class GeometryLayer extends FeatureLayer {
 }
 
 Weave.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-export default GeometryLayer;
