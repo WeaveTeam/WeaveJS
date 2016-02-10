@@ -12,6 +12,7 @@ import Layer from "./Layer";
 import WeavePathData = weavejs.path.WeavePathData;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
 export default class ImageGlyphLayer extends GlyphLayer {
 
@@ -37,6 +38,18 @@ export default class ImageGlyphLayer extends GlyphLayer {
 	handleMissingSessionStateProperties(newState:any)
 	{
 		super.handleMissingSessionStateProperties(newState);
+	}
+
+	getToolTipColumns(): IAttributeColumn[] {
+		let additionalColumns: IAttributeColumn[] = [];
+
+		for (let column of [this.imageSize, this.imageURL, this.alpha, this.color]) {
+			let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column);
+			if (internalColumn)
+				additionalColumns.push(internalColumn);
+		}
+
+		return additionalColumns;
 	}
 
 	setIconStyle(feature:ol.Feature, img:any, iconSize: number)
@@ -92,7 +105,7 @@ export default class ImageGlyphLayer extends GlyphLayer {
 
 		var records: Array<any> = weavejs.data.ColumnUtils.getRecords({
 			"alpha": this.alpha, "color": this.color, "imageURL": this.imageURL, "imageSize": this.imageSize
-		}, this.dataX.keys);
+		}, this.dataX.keys, {"alpha": Number, "color": Number, "imageURL": String, "imageSize": Number});
 
 		for (let idx in records)
 		{
