@@ -6,11 +6,6 @@ var libraries_colon = libraries.map(function (d) { return d + ":"});
 module.exports = function (grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        ts: {
-            default: {
-                tsconfig: true
-            }
-        },
         babel: {
             options: {
                 babelrc: ".babelrc"
@@ -99,7 +94,6 @@ module.exports = function (grunt) {
         },
     });
 
-    grunt.loadNpmTasks('grunt-ts');
     grunt.loadNpmTasks('grunt-babel');
     grunt.loadNpmTasks('grunt-browserify');
     grunt.loadNpmTasks('grunt-contrib-copy');
@@ -108,7 +102,7 @@ module.exports = function (grunt) {
 
     grunt.registerTask('devlibs', ['browserify:devlibs']);
     grunt.registerTask('distlibs', ['browserify:distlibs']);
-    grunt.registerTask('default', ['ts', 'babel', 'browserify:dev', 'copy']);
-    grunt.registerTask('all', ['clean', 'ts', 'babel', 'distlibs', 'copy']);
-    grunt.registerTask('distall', ['clean', 'ts', 'babel', 'browserify:dist', 'copy']);
+    grunt.registerTask('default', ['babel', 'browserify:dev', 'copy']);
+    grunt.registerTask('all', ['clean', 'babel', 'distlibs', 'copy']);
+    grunt.registerTask('distall', ['clean', 'babel', 'browserify:dist', 'copy']);
 };
