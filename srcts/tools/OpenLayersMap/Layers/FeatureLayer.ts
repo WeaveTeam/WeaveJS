@@ -11,6 +11,8 @@ import StandardLib from "../../../utils/StandardLib";
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import KeySet = weavejs.data.key.KeySet;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
+import DynamicKeySet = weavejs.data.key.DynamicKeySet;
+import IKeySet = weavejs.api.data.IKeySet;
 
 export abstract class FeatureLayer extends Layer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
@@ -19,19 +21,24 @@ export abstract class FeatureLayer extends Layer {
 
 	private changedItems:Set<IQualifiedKey>;
 
-	public selectionKeySet:KeySet;
+	public selectionKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
 
-	public probeKeySet:KeySet;
+	public probeKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
 
-	public filteredKeySet:FilteredKeySet;
-
-	private selectableBoolean: any; /*LinkableBoolean*/
+	public filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 
 	source:ol.source.Vector;
 
-	constructor(parent:any, layerName:any)
+	handleMissingSessionStateProperties(newState: any) {
+		super.handleMissingSessionStateProperties(newState);
+
+		Weave.setState(this.selectionKeySet, "defaultSelectionKeySet");
+		Weave.setState(this.probeKeySet, "defaultProbeKeySet");
+	}
+
+	constructor()
 	{
-		super(parent, layerName);
+		super();
 
 		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
 		this.debounced_updateMetaStyles = lodash.debounce(this.updateMetaStyles.bind(this), 0);
@@ -44,19 +51,14 @@ export abstract class FeatureLayer extends Layer {
 
 		this.changedItems = new Set();
 
-		this.selectionKeySet = this.layerPath.weave.getObject("defaultSelectionKeySet") as KeySet;
-		this.probeKeySet = this.layerPath.weave.getObject("defaultProbeKeySet") as KeySet;
-		this.filteredKeySet = this.layerPath.getObject("filteredKeySet") as FilteredKeySet;
-
 		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, new Set<IQualifiedKey>());
 		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, new Set<IQualifiedKey>());
 
 		Weave.getCallbacks(this.selectionKeySet).addGroupedCallback(this, selectionKeyHandler, true);
 		Weave.getCallbacks(this.probeKeySet).addGroupedCallback(this, probeKeyHandler, true);
 		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateMetaStyles, true);
-		this.selectableBoolean = this.settingsPath.getObject("selectable");
 
-		this.settingsPath.push("selectable").addCallback(this, this.updateMetaStyles);
+		this.selectable.addGroupedCallback(this, this.updateMetaStyles);
 	}
 
 	onFeatureAdd(vectorEvent:any)
@@ -121,15 +123,17 @@ export abstract class FeatureLayer extends Layer {
 		return ol.color.asString(colorArray);
 	}
 
-	updateSetFromKeySet(keySet:KeySet, previousContents:Set<IQualifiedKey>)
+	updateSetFromKeySet(dynamicKeySet:DynamicKeySet, previousContents:Set<IQualifiedKey>)
 	{
+		let keySet: IKeySet = dynamicKeySet.getInternalKeySet();
+		if (!keySet) return; //HACK
 		if (!this.source) return; //HACK
 
 		let wasEmpty:boolean = previousContents.size === 0;
 		let isEmpty:boolean = keySet.keys.length === 0;
 
 		/* If the selection keyset becomes empty or nonempty, we should recompute all the styles. Otherwise, only recompute the styles of the features which changed. */
-		if (keySet === this.selectionKeySet && isEmpty !== wasEmpty)
+		if (dynamicKeySet === this.selectionKeySet && isEmpty !== wasEmpty)
 		{
 			this.updateMetaStyles();
 		}
@@ -180,19 +184,25 @@ export abstract class FeatureLayer extends Layer {
 		let replace:any = feature.get("replace");
 		let newStyle:any;
 
-		if (!this.filteredKeySet.containsKey(id))
+		let isInFilter: boolean = this.filteredKeySet.containsKey(id);
+		let isSelected: boolean = this.selectionKeySet.getInternalKeySet().containsKey(id);
+		let isProbed: boolean = this.probeKeySet.getInternalKeySet().containsKey(id);
+
+		if (!isInFilter)
 		{
 			feature.setStyle(nullStyle);
 			return;
 		}
 
-		if (!this.selectableBoolean.state)
+		if (!this.selectable.state)
 		{
 			feature.setStyle(normalStyle);
 			return;
 		}
 
-		if (!this.selectionKeySet.containsKey(id) && !this.probeKeySet.containsKey(id) && this.selectionKeySet.keys.length > 0)
+		if (!isSelected &&
+			!isProbed &&
+			this.selectionKeySet.getInternalKeySet().keys.length > 0)
 		{
 			if (replace)
 			{
@@ -212,7 +222,7 @@ export abstract class FeatureLayer extends Layer {
 			newStyle[0].setZIndex(zOrder);
 		}
 
-		if (this.selectionKeySet.containsKey(id))
+		if (isSelected)
 		{
 			if (replace)
 			{
@@ -226,7 +236,7 @@ export abstract class FeatureLayer extends Layer {
 			}
 		}
 
-		if (this.probeKeySet.containsKey(id))
+		if (isProbed)
 		{
 			if (replace)
 			{

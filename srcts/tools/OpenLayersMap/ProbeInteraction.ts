@@ -43,8 +43,9 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 
 		if (zIndex > this.topZIndex)
 		{
-			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
-			this.topKeySet = weaveLayerObject.probeKeySet || this.topKeySet;
+			let weaveLayerObject: FeatureLayer = layer.get("layerObject") as FeatureLayer;
+			if (!weaveLayerObject) return;
+			this.topKeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet || this.topKeySet;
 			this.topZIndex = zIndex;
 			this.topKey = feature.getId();
 			this.topLayer = weaveLayerObject;
@@ -78,7 +79,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		{
 			if (!ProbeInteraction.layerFilter(layer)) continue;
 			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
-			let keySet: KeySet = weaveLayerObject.probeKeySet;
+			let keySet: KeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet;
 			if (keySet && keySet != this.topKeySet)
 			{
 				keySet.clearKeys();
@@ -117,7 +118,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		for (let layer of this.getMap().getLayers().getArray()) {
 			if (!ProbeInteraction.layerFilter(layer)) continue;
 			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
-			let keySet: KeySet = weaveLayerObject.probeKeySet;
+			let keySet: KeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet;
 			if (keySet) {
 				keySet.clearKeys();
 			}
@@ -131,7 +132,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 	/* TODO: Move this into WeaveTool */
 	getToolTipData(key:IQualifiedKey, additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string | number } 
 	{
-		let columnHashMap = this.tool.toolPath.weave.root.getObject("Probed Columns") as ILinkableHashMap;
+		let columnHashMap = Weave.getRoot(this.tool).getObject("Probed Columns") as ILinkableHashMap;
 
 		var result: { [columnName: string]: string | number } = {};
 
@@ -151,7 +152,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 	/* TODO: Move this into WeaveTool */
 	getToolTipTitle(key:any /* IQualifiedKey */): string
 	{
-		let titleHashMap = this.tool.toolPath.weave.root.getObject("Probe Header Columns") as ILinkableHashMap;
+		let titleHashMap = Weave.getRoot(this.tool).getObject("Probe Header Columns") as ILinkableHashMap;
 
 		return lodash.map(titleHashMap.getObjects(), (d:any) => d.getValueFromKey(key, String)).join(", ");
 	}

@@ -4117,7 +4117,7 @@ declare module ol {
         class TileVector {
         }
 
-        class TileWMS {
+        class TileWMS extends Tile {
             constructor(options: olx.source.TileWMSOptions);
         }
 

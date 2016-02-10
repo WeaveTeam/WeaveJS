@@ -3,40 +3,44 @@
 ///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
 import * as ol from "openlayers";
+import * as lodash from "lodash";
 import Layer from "./Layer";
 
+
 import WeavePath = weavejs.path.WeavePath;
+import LinkableString = weavejs.core.LinkableString;
+import LinkableVariable = weavejs.core.LinkableVariable;
 
 class TileLayer extends Layer {
 
 	servicePath:WeavePath;
 	oldProviderName:string;
 
-	constructor(parent:any, layerName:any)
+	provider: LinkableString = Weave.linkableChild(this, LinkableString);
+	providerOptions: LinkableVariable = Weave.linkableChild(this, LinkableVariable);
+
+	constructor()
 	{
-		super(parent, layerName);
+		super();
 
 		this.olLayer = new ol.layer.Tile();
-		this.servicePath = this.layerPath.push("service", null);
-		this.oldProviderName = null;
 
-		this.servicePath.addCallback(this, this.updateTileSource, true);
-		this.projectionPath.addCallback(this, this.updateValidExtents, true);
-	}
+		this.provider.addGroupedCallback(this, this.updateTileSource);
+		this.providerOptions.addGroupedCallback(this, this.updateTileSource, true);
 
-	handleMissingSessionStateProperties(newState:any)
-	{
-
+		console.log("constructing tilelayer");
 	}
 
 	updateValidExtents()
 	{
-		var proj = ol.proj.get(this.projectionPath.getState() as string || "EPSG:3857");
-		if (proj)
-			this.olLayer.setExtent(proj.getExtent());
-		else
-			console.log('invalid proj -> no extent');
+		/* TODO projection from parent blablabla */
+		// var proj = ol.proj.get(this.projectionPath.getState() as string || "EPSG:3857");
+		// if (proj)
+		// 	this.olLayer.setExtent(proj.getExtent());
+		// else
+		// 	console.log('invalid proj -> no extent');
 	}
+
 	getCustomWMSSource()
 	{
 		var customWMSPath = this.servicePath;
@@ -52,53 +56,94 @@ class TileLayer extends Layer {
 		}
 	}
 
-	getModestMapsSource()
+	handleMissingSessionStateProperties(newState:any)
 	{
-		var providerNamePath = this.servicePath.push("providerName");
+		super.handleMissingSessionStateProperties(newState);
+		console.log("TileLayer.handleMissingSessionStateProperties");
+		var traverseState = weavejs.api.core.DynamicState.traverseState;
 
-		if (providerNamePath.getType()) {
-			let providerName = providerNamePath.getState();
+		let serviceState: any = traverseState(newState, ["service"]);
 
-			if (providerName === this.oldProviderName) {
-				return undefined;
-			}
-
-			switch (providerName)
-			{
+		if (lodash.has(serviceState, ["service", "providerName"]))
+		{
+			let providerName: string = lodash.get(serviceState, ["service", "providerName"]) as string;
+			let params: any = {};
+			switch (providerName) {
 				case "Stamen WaterColor":
-					return new ol.source.Stamen({layer: "watercolor"});
+					providerName = "stamen";
+					params.layer = "watercolor";
+					break;
 				case "Stamen Toner":
-					return new ol.source.Stamen({layer: "toner"});
+					providerName = "stamen";
+					params.layer = "toner";
+					break;
 				case "Open MapQuest Aerial":
-					return new ol.source.MapQuest({layer: "sat"});
+					providerName = "mapquest";
+					params.layer = "sat";
+					break;
 				case "Open MapQuest":
-					return new ol.source.MapQuest({layer: "osm"});
-				case "Open Street Map":
-					return new ol.source.OSM({wrapX: false});
+					providerName = "mapquest";
+					params.layer = "osm";
+					break;
 				case "Blue Marble Map":
-					return new ol.source.TileWMS({url: "http://neowms.sci.gsfc.nasa.gov/wms/wms", wrapX: false});
+					providerName = "custom";
+					params.url = "http://neowms.sci.gsfc.nasa.gov/wms/wms";
 				default:
-					return null;
+					providerName = "osm";
+					break;
 			}
+
+			Weave.setState(this.provider, providerName);
+			Weave.setState(this.providerOptions, params);
+		}
+		else
+		{
+			Weave.setState(this.provider, "custom");
+			Weave.setState(this.providerOptions, {
+				url: serviceState.wmsURL,
+				attributions: serviceState.attributions,
+				projection: serviceState.projection
+			});
+		}
+	}
+
+	private static isXYZString(url:string):boolean
+	{
+		return url.indexOf("{x}") != -1 &&
+			url.indexOf("{y}") != -1 &&
+			url.indexOf("{z}") != -1;
+	}
+
+	private getSource():ol.source.Tile
+	{
+		let params:any = Weave.getState(this.providerOptions);
+		switch (this.provider.value)
+		{
+			case "stamen":
+				return new ol.source.Stamen(params);
+				break;
+			case "mapquest":
+				return new ol.source.MapQuest(params);
+				break;
+			case "osm":
+				return new ol.source.OSM(params);
+			case "custom":
+				if (params.url && TileLayer.isXYZString(params.url))
+				{
+					return new ol.source.XYZ(params);
+				}
+				else
+				{
+					return new ol.source.TileWMS(params);
+				}
+			default:
+				return null;
 		}
 	}
 
 	updateTileSource()
 	{
-		var serviceDriverName = this.servicePath.getType();
-		var newLayer:any = null;
-		switch (serviceDriverName)
-		{
-			case "weave.services.wms::ModestMapsWMS":
-				newLayer = this.getModestMapsSource();
-				break;
-			case "weave.services.wms::CustomWMS":
-				newLayer = this.getCustomWMSSource();
-				break;
-			default:
-				newLayer = null;
-		}
-
+		let newLayer: ol.source.Tile = this.getSource();
 		if (newLayer !== undefined)
 		{
 			this.source = newLayer;
@@ -106,5 +151,5 @@ class TileLayer extends Layer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default TileLayer;

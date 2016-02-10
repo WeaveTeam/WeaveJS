@@ -11,56 +11,57 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+
 import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
+
 
 class GeometryLayer extends FeatureLayer {
 
-	geoJsonParser:any; //TODO ol.format.GeoJSON
-	geoColumnPath: WeavePath;
+	geoJsonParser:ol.format.GeoJSON;
 
-	fillStylePath: WeavePath;
+	fill: SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+	line: SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+	geometryColumn: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
-	lineStylePath: WeavePath;
-
-	constructor(parent:any, layerName:any)
+	constructor()
 	{
-		super(parent, layerName);
+		super();
+		console.log("GeometryLayer");
 
 		this.geoJsonParser = new ol.format.GeoJSON();
 
-		this.geoColumnPath = this.layerPath.push("geometryColumn");
-		this.fillStylePath = this.layerPath.push("fill");
+		this.geometryColumn.addGroupedCallback(this, this.updateGeometryData);
 
-		this.lineStylePath = this.layerPath.push("line");
+		/* TODO: Register a callback on the parent's projection. */
+		// this.projectionPath.addCallback(this, this.updateGeometryData);
 
-		this.geoColumnPath.addCallback(this, this.updateGeometryData);
-		this.projectionPath.addCallback(this, this.updateGeometryData);
 		Weave.getCallbacks(this.filteredKeySet).removeCallback(this, this.updateMetaStyles);
 
-		this.fillStylePath.addCallback(this, this.updateStyleData);
-		this.lineStylePath.addCallback(this, this.updateStyleData);
-		this.filteredKeySet.setColumnKeySources([this.geoColumnPath.getObject("internalDynamicColumn")]);
+		Weave.getCallbacks(this.fill).addGroupedCallback(this, this.updateStyleData);
+		Weave.getCallbacks(this.line).addGroupedCallback(this, this.updateStyleData);
+
+		this.filteredKeySet.setColumnKeySources([this.geometryColumn]);
 
 		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateGeometryData, true);
 	}
 
 	handleMissingSessionStateProperties(newState:any)
 	{
-
+		super.handleMissingSessionStateProperties(newState);
 	}
 
 	get inputProjection():any
 	{
-		var projectionSpec = (this.geoColumnPath.getObject("internalDynamicColumn") as IAttributeColumn).getMetadata('projection');
-		return projectionSpec || this.outputProjection;
+		return this.geometryColumn.getMetadata('projection') || this.outputProjection;
 	}
 
 	updateGeometryData()
 	{
 		this.source.clear();
 
-		var idc = this.geoColumnPath.getObject("internalDynamicColumn") as IAttributeColumn;
+		var idc = this.geometryColumn;
 		var keys:Array<IQualifiedKey> = this.filteredKeySet.keys;
 		var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, keys);
 
@@ -88,7 +89,7 @@ class GeometryLayer extends FeatureLayer {
 	{
 		let additionalColumns:IAttributeColumn[] = [];
 
-		for (let column of this.fillStylePath.getChildren().concat(this.lineStylePath.getChildren()))
+		for (let column of Weave.getPath(this.fill).getChildren().concat(Weave.getPath(this.line).getChildren()))
 		{
 			let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column.getObject());
 			if (internalColumn)
@@ -100,18 +101,16 @@ class GeometryLayer extends FeatureLayer {
 
 	updateStyleData()
 	{
-		let fillEnabled: boolean = (this.fillStylePath.getObject("enable") as LinkableBoolean).value;
-		let strokeEnabled: boolean = (this.lineStylePath.getObject("enable") as LinkableBoolean).value;
-		let fillStyle = this.fillStylePath.getObject() as SolidFillStyle;
-		let strokeStyle = this.lineStylePath.getObject() as SolidLineStyle;
+		let fillEnabled: boolean = this.fill.enable.value;
+		let strokeEnabled: boolean = this.line.enable.value;
 
 		for (let key of this.filteredKeySet.keys)
 		{
 			let record: any = {};
 
 			record.id = key;
-			record.fill = fillStyle.getStyle(key);
-			record.stroke = strokeStyle.getStyle(key);
+			record.fill = this.fill.getStyle(key);
+			record.stroke = this.line.getStyle(key);
 
 			let olStroke = FeatureLayer.olStrokeFromWeaveStroke(record.stroke);
 
@@ -152,5 +151,5 @@ class GeometryLayer extends FeatureLayer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.plotters::GeometryPlotter", GeometryLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default GeometryLayer;

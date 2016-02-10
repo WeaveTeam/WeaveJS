@@ -10,25 +10,32 @@ import ImageGlyphCache from "./ImageGlyphCache";
 import Layer from "./Layer";
 
 import WeavePathData = weavejs.path.WeavePathData;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 class ImageGlyphLayer extends GlyphLayer {
 
 	private imageGlyphCache:ImageGlyphCache;
-	constructor(parent:any, layerName:any)
+
+	imageSize: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	imageURL: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	alpha: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	color: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+
+	constructor()
 	{
-		super(parent, layerName);
+		super()
 
-		this.imageGlyphCache = new ImageGlyphCache(this.layerPath.getObject());
+		this.imageGlyphCache = new ImageGlyphCache(this);
 
-		this.layerPath.push("imageSize").addCallback(this, this.updateStyleData);
-		this.layerPath.push("imageURL").addCallback(this, this.updateStyleData);
-		this.layerPath.push("alpha").addCallback(this, this.updateStyleData);
-		this.layerPath.push("color").addCallback(this, this.updateStyleData, true);
+		this.imageSize.addGroupedCallback(this, this.updateStyleData);
+		this.imageURL.addGroupedCallback(this, this.updateStyleData);
+		this.alpha.addGroupedCallback(this, this.updateStyleData);
+		this.color.addGroupedCallback(this, this.updateStyleData, true);
 	}
 
 	handleMissingSessionStateProperties(newState:any)
 	{
-
+		super.handleMissingSessionStateProperties(newState);
 	}
 
 	setIconStyle(feature:ol.Feature, img:any, iconSize: number)
@@ -82,7 +89,9 @@ class ImageGlyphLayer extends GlyphLayer {
 	updateStyleData() {
 		/* Update feature styles */
 
-		var records = (this.layerPath as WeavePathData).retrieveRecords(["alpha", "color", "imageURL", "imageSize"], this.layerPath.push("dataX"));
+		var records: Array<any> = weavejs.data.ColumnUtils.getRecords({
+			"alpha": this.alpha, "color": this.color, "imageURL": this.imageURL, "imageSize": this.imageSize
+		}, this.dataX.keys);
 
 		for (let record of records)
 		{
@@ -109,5 +118,5 @@ class ImageGlyphLayer extends GlyphLayer {
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default ImageGlyphLayer;

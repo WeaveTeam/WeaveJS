@@ -2,6 +2,7 @@
 ///<reference path="../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../typings/jquery/jquery.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
+///<reference path="../../typings/weave/weavejs.d.ts"/>
 /// <reference path="../../typings/react/react.d.ts"/>
 /// <reference path="../../typings/react/react-dom.d.ts"/>
 
@@ -32,37 +33,80 @@ import WeavePath = weavejs.path.WeavePath;
 import ZoomBounds = weavejs.geom.ZoomBounds;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
+import LinkableString = weavejs.core.LinkableString;
+import LinkableVariable = weavejs.core.LinkableVariable;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
+
+import Bounds2D = weavejs.geom.Bounds2D;
+
+interface Bounds2DAlike {
+	xMin: number;
+	xMax: number;
+	yMin: number;
+	yMax: number;
+}
+
+function isBounds2DAlike(obj:any):boolean {
+	return lodash.all(lodash.map(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj.item === "number"));
+}
+
 export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
 
-	layers:Map<string,Layer>;
-	interactionModePath:WeavePath;
 	map:ol.Map;
 	zoomButtons:ol.control.Zoom;
 	slider:ol.control.ZoomSlider;
 	zoomExtent: ol.control.ZoomToExtent;
 	pan:PanCluster;
 	mouseModeButtons:InteractionModeCluster;
-	plotManager:WeavePath;
-	plottersPath:WeavePath;
-	layerSettingsPath:WeavePath;
-	zoomBoundsPath:WeavePath;
 
 	centerCallbackHandle:any;
 	resolutionCallbackHandle:any;
 	private element:Element;
-	public toolPath:WeavePath;
+
+	zoomBounds: ZoomBounds = Weave.linkableChild(this, ZoomBounds);
+	extentOverride: LinkableVariable = Weave.linkableChild(this, new LinkableVariable(null, isBounds2DAlike, [NaN, NaN, NaN, NaN]));
+	projectionSRS: LinkableString = Weave.linkableChild(this, LinkableString);
+	showZoomControls: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+	showMouseModeControls: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+	interactionMode: LinkableString = Weave.linkableChild(this, LinkableString);
+	layers: LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(Layer));
 
 	constructor(props:IVisToolProps)
 	{
 		super(props);
-		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;/* Forces the inclusion of the layers. */
-		this.layers = new Map<string,Layer>();
-		this.toolPath = props.toolPath;
+
+		/* Force the inclusion of the layers. */
+		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
 	}
 
-	handleMissingSessionStateProperties(newState:IVisToolState):void
+	handleMissingSessionStateProperties(newState:any):void
 	{
+		var traverseState = weavejs.api.core.DynamicState.traverseState;
 
+		/* Copy zoomBounds session state from plotmanager to local */
+		Weave.setState(this.zoomBounds, traverseState(newState, ["children", "visualization", "plotManager", "zoomBounds"]));
+
+		/* Translate extent session properties to a ZoomBounds object */
+		var newExtentOverride: Bounds2DAlike = {xMin:null, xMax:null, yMin:null, yMax: null};
+
+		newExtentOverride.xMin = traverseState(newState, ["children", "visualization", "plotManager", "overrideXMin"]);
+		newExtentOverride.xMax = traverseState(newState, ["children", "visualization", "plotManager", "overrideXMax"]);
+		newExtentOverride.yMin = traverseState(newState, ["children", "visualization", "plotManager", "overrideYMin"]);
+		newExtentOverride.yMax = traverseState(newState, ["children", "visualization", "plotManager", "overrideYMax"]);
+
+		Weave.setState(this.extentOverride, newExtentOverride);
+
+		/* Copy interaction mode to local state */
+
+		Weave.setState(this.interactionMode, Weave.getWeave(this).path(["WeaveProperties", "toolInteractions", "defaultDragMode"]).getState());
+
+		/* Merge layerSettings and plotters into 'layers' HashMap */
+
+		let plotters:any = traverseState(newState, ["children", "visualization", "plotManager", "plotters"]);
+		let plotterSettings: any = traverseState(newState, ["children", "visualization", "plotManager", "layerSettings"]);
+
+		Weave.setState(this.layers, lodash.merge(plotters, plotterSettings));
 	}
 
 	componentDidMount():void
@@ -75,8 +119,6 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 
 		/* Setup custom interactions */
 
-		this.interactionModePath = this.toolPath.weave.path("WeaveProperties", "toolInteractions", "defaultDragMode");
-
 		let dragPan: ol.interaction.DragPan = new ol.interaction.DragPan();
 		let dragSelect: DragSelection = new DragSelection();
 		let probeInteraction: ProbeInteraction = new ProbeInteraction(this);
@@ -87,8 +129,8 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 		this.map.addInteraction(probeInteraction);
 		this.map.addInteraction(dragZoom);
 
-		this.interactionModePath.addCallback(this, () => {
-			let interactionMode = this.interactionModePath.getState() || "select";
+		this.interactionMode.addGroupedCallback(this, () => {
+			let interactionMode = this.interactionMode.value || "select";
 			dragPan.setActive(interactionMode === "pan");
 			dragSelect.setActive(interactionMode === "select");
 			dragZoom.setActive(interactionMode === "zoom");
@@ -105,46 +147,42 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 
 		this.map.addControl(this.zoomButtons);
 
-		this.toolPath.push("showZoomControls").addCallback(this, this.updateEnableZoomControl_weaveToOl, true);
-		this.toolPath.push("showMouseModeControls").addCallback(this, this.updateEnableMouseModeControl_weaveToOl, true);
+		this.showZoomControls.addGroupedCallback(this, this.updateEnableZoomControl_weaveToOl, true);
+		this.showMouseModeControls.addGroupedCallback(this, this.updateEnableMouseModeControl_weaveToOl, true);
 
-		this.mouseModeButtons = new InteractionModeCluster({interactionModePath: this.interactionModePath});
-
-		this.plotManager = this.toolPath.push("children", "visualization", "plotManager");
+		this.mouseModeButtons = new InteractionModeCluster({mapTool: this});
 
 		/* Todo replace override[X,Y][Min,Max] with a single overrideZoomBounds element; alternatively,
 		 * make a set of parameters on zoombounds itself. */
 
-		for (let extreme of ["Min", "Max"])
-			for (let axis of ["X", "Y"])
-				this.plotManager.push("override" + axis + extreme).addCallback(this, this.updateViewParameters_weaveToOl);
+		this.extentOverride.addGroupedCallback(this, this.updateViewParameters_weaveToOl);
 
-		this.toolPath.push("projectionSRS").addCallback(this, this.updateViewParameters_weaveToOl, true);
+		this.projectionSRS.addGroupedCallback(this, this.updateViewParameters_weaveToOl, true);
 
+		this.layers.addGroupedCallback(this, this.requestDetail, true);
 
-		this.plottersPath = this.plotManager.push("plotters");
-		this.layerSettingsPath = this.plotManager.push("layerSettings");
-		this.zoomBoundsPath = this.plotManager.push("zoomBounds");
-
-		this.plotManager.addCallback(this, this.requestDetail, true);
-		(this.plottersPath.getObject() as ILinkableHashMap).childListCallbacks.addImmediateCallback(this, this.updatePlotters_weaveToOl, true);
-		this.zoomBoundsPath.addCallback(this, this.updateZoomAndCenter_weaveToOl, true);
+		this.layers.childListCallbacks.addImmediateCallback(this, this.updatePlotters_weaveToOl, true);
+		Weave.getCallbacks(this.zoomBounds).addGroupedCallback(this, this.updateZoomAndCenter_weaveToOl, true);
 	}
 
 	updateViewParameters_weaveToOl():void
 	{
-		let extent:any = [];
+		let extent:ol.Extent = [NaN,NaN,NaN,NaN];
+		let rawExtent: Bounds2DAlike = this.extentOverride.state as Bounds2DAlike;
 
-		for (let extreme of ["Min", "Max"])
-			for (let axis of ["X", "Y"])
-				extent.push(this.plotManager.push("override" + axis + extreme).getState());
+		if (rawExtent) {
+			extent[0] = rawExtent.xMin;
+			extent[1] = rawExtent.yMin;
+			extent[2] = rawExtent.xMax;
+			extent[3] = rawExtent.yMax;
+		}
 
 		if (!lodash.every(extent, Number.isFinite))
 		{
 			extent = undefined;
 		}
 
-		let projection = this.toolPath.push("projectionSRS").getState() as string || "EPSG:3857";
+		let projection = this.projectionSRS.value as string || "EPSG:3857";
 		let view = new ol.View({projection, extent});
 		view.set("extent", extent);
 
@@ -159,13 +197,13 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 	{
 		this.map.updateSize();
 		var viewport = this.map.getViewport();
-		var screenBounds = new weavejs.geom.Bounds2D(0, 0, viewport.clientWidth, viewport.clientHeight);
-		(this.zoomBoundsPath.getObject() as ZoomBounds).setScreenBounds(screenBounds, true);
+		var screenBounds = new Bounds2D(0, 0, viewport.clientWidth, viewport.clientHeight);
+		this.zoomBounds.setScreenBounds(screenBounds, true);
 	}
 
 	updateControlPositions():void
 	{
-		if (this.toolPath.push("showZoomControls").getState())
+		if (this.showZoomControls.value)
 		{
 			jquery(this.element).find(".ol-control.panCluster").css({top: "0.5em", left: "0.5em"});
 			jquery(this.element).find(".ol-control.ol-zoom").css({top: "5.5em", left: "2.075em"});
@@ -182,9 +220,8 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 
 
 	updateEnableMouseModeControl_weaveToOl():void
-	{
-		let showMouseModeControls = this.toolPath.push("showMouseModeControls").getState();
-		if (showMouseModeControls)
+	{		
+		if (this.showMouseModeControls.value)
 		{
 			this.map.addControl(this.mouseModeButtons);
 		}
@@ -198,8 +235,7 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 
 	updateEnableZoomControl_weaveToOl():void
 	{
-		let showZoomControls = this.toolPath.push("showZoomControls").getState();
-		if (showZoomControls)
+		if (this.showZoomControls.value)
 		{
 			this.map.addControl(this.slider);
 			this.map.addControl(this.pan);
@@ -218,13 +254,11 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 	{
 		var [xCenter, yCenter] = this.map.getView().getCenter();
 
-		var zoomBounds:ZoomBounds = this.zoomBoundsPath.getObject() as ZoomBounds;
-
 		var dataBounds = new weavejs.geom.Bounds2D();
-		zoomBounds.getDataBounds(dataBounds);
+		this.zoomBounds.getDataBounds(dataBounds);
 		dataBounds.setXCenter(xCenter);
 		dataBounds.setYCenter(yCenter);
-		zoomBounds.setDataBounds(dataBounds);
+		this.zoomBounds.setDataBounds(dataBounds);
 	}
 
 	updateZoom_olToWeave():void
@@ -242,25 +276,22 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 			return;
 		}
 
-		var zoomBounds:ZoomBounds = this.zoomBoundsPath.getObject() as ZoomBounds;
-
 		var dataBounds = new weavejs.geom.Bounds2D();
 		var screenBounds = new weavejs.geom.Bounds2D();
-		zoomBounds.getDataBounds(dataBounds);
-		zoomBounds.getScreenBounds(screenBounds);
+		this.zoomBounds.getDataBounds(dataBounds);
+		this.zoomBounds.getScreenBounds(screenBounds);
 		dataBounds.setWidth(screenBounds.getWidth() * resolution);
 		dataBounds.setHeight(screenBounds.getHeight() * resolution);
 		dataBounds.makeSizePositive();
-		zoomBounds.setDataBounds(dataBounds);
+		this.zoomBounds.setDataBounds(dataBounds);
 	}
 
 	updateZoomAndCenter_weaveToOl():void
 	{
-		var zoomBounds:ZoomBounds = this.zoomBoundsPath.getObject() as ZoomBounds;
 		var dataBounds = new weavejs.geom.Bounds2D();
-		zoomBounds.getDataBounds(dataBounds);
+		this.zoomBounds.getDataBounds(dataBounds);
 		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
-		var scale = zoomBounds.getXScale();
+		var scale = this.zoomBounds.getXScale();
 		let view = this.map.getView();
 
 		view.un("change:center", this.updateCenter_olToWeave, this);
@@ -277,18 +308,17 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 
 	requestDetail():void
 	{
-		var zoomBounds:ZoomBounds = this.zoomBoundsPath.getObject() as ZoomBounds;
-		for (var name of this.plottersPath.getNames())
+		for (var name of this.layers.getNames())
 		{
-			var layer:Layer = this.layers.get(name);
+			var layer:Layer = this.layers.getObject(name) as Layer;
 			if (!layer)
 				continue;
-			for (var sgc of Weave.getDescendants(this.plottersPath.getObject(name), weavejs.data.column.StreamedGeometryColumn))
+			for (var sgc of Weave.getDescendants(this.layers.getObject(name), weavejs.data.column.StreamedGeometryColumn))
 			{
 				if (layer.inputProjection == layer.outputProjection)
 				{
 					weavejs.data.column.StreamedGeometryColumn.metadataRequestMode = 'xyz';
-					sgc.requestGeometryDetailForZoomBounds(zoomBounds);
+					sgc.requestGeometryDetailForZoomBounds(this.zoomBounds);
 				}
 				else
 				{
@@ -302,27 +332,13 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 
 	updatePlotters_weaveToOl():void
 	{
-		var oldNames:string[] = Array.from(this.layers.keys());
-		var newNames:string[] = this.plottersPath.getNames();
+		var newNames:string[] = this.layers.getNames();
 
-		var removedNames = lodash.difference(oldNames, newNames);
-		var addedNames = lodash.difference(newNames, oldNames);
-
-		removedNames.forEach(function (name) {
-			if (this.layers.get(name)) {
-				this.layers.get(name).dispose();
-			}
-			this.layers.delete(name);
-		}, this);
-
-		addedNames.forEach(function (name) {
-			let layer:Layer = Layer.newLayer(this, name);
-			this.layers.set(name, layer);
-		}, this);
-		/* */
 		for (let idx in newNames)
 		{
-			let layer:Layer = this.layers.get(newNames[idx]);
+			let layer:Layer = this.layers.getObject(newNames[idx]) as Layer;
+
+			layer.parent = this;
 
 			if (!layer || !layer.olLayer) {
 				continue;
@@ -342,7 +358,7 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
     }
 }
 
-weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveOpenLayersMap); // TEMPORARY HACK - remove when class is refactored
+//weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveOpenLayersMap); // TEMPORARY HACK - remove when class is refactored
 
 Weave.registerClass("weavejs.tool.Map", WeaveOpenLayersMap, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::MapTool", WeaveOpenLayersMap);
+Weave.registerClass("weave.visualization.tools::MapTool", WeaveOpenLayersMap, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);

@@ -10,6 +10,7 @@ import Layer from "./Layers/Layer";
 import ProbeInteraction from "./ProbeInteraction";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import KeySet = weavejs.data.key.KeySet;
 
 enum DragSelectionMode {
 	SUBTRACT = -1,
@@ -80,6 +81,7 @@ export default class DragSelection extends ol.interaction.DragBox
 
 			if (weaveLayer instanceof FeatureLayer && selectable) {
 				let source: ol.source.Vector = <ol.source.Vector>(<ol.layer.Vector>olLayer).getSource();
+				let keySet: KeySet = weaveLayer.selectionKeySet.getInternalKeySet() as KeySet;
 
 				source.forEachFeatureIntersectingExtent(extent, selectFeature);
 
@@ -87,13 +89,13 @@ export default class DragSelection extends ol.interaction.DragBox
 
 				switch (this.mode) {
 					case DragSelectionMode.SET:
-						weaveLayer.selectionKeySet.replaceKeys(keys);
+						keySet.replaceKeys(keys);
 						break;
 					case DragSelectionMode.ADD:
-						weaveLayer.selectionKeySet.addKeys(keys);
+						keySet.addKeys(keys);
 						break;
 					case DragSelectionMode.SUBTRACT:
-						weaveLayer.selectionKeySet.removeKeys(keys);
+						keySet.removeKeys(keys);
 						break;
 				}
 			}

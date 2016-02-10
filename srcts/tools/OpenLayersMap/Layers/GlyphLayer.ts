@@ -8,20 +8,35 @@ import * as ol from "openlayers";
 
 import WeavePathData = weavejs.path.WeavePathData;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
+import LinkableString = weavejs.core.LinkableString;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+
+interface LocationRecord {
+	dataX: number;
+	dataY: number;
+	id: IQualifiedKey;
+}
 
 abstract class GlyphLayer extends FeatureLayer {
 
-	constructor(parent:any, layerName:any)
+	dataX: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	dataY: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	sourceProjection: LinkableString = Weave.linkableChild(this, LinkableString);
+
+	constructor()
 	{
-		super(parent, layerName);
+		super();
 
-		this.projectionPath.addCallback(this, this.updateLocations);
-		this.layerPath.push("sourceProjection").addCallback(this, this.updateLocations);
+		/* TODO: Register a callback on the parent's projection. */
+		// this.projectionPath.addCallback(this, this.updateGeometryData);
 
-		this.layerPath.push("dataX").addCallback(this, this.updateLocations);
-		this.layerPath.push("dataY").addCallback(this, this.updateLocations, true);
+		this.sourceProjection.addGroupedCallback(this, this.updateLocations);
 
-		(<any>this.filteredKeySet).setColumnKeySources([this.layerPath.push("dataX").getObject(), this.layerPath.push("dataY").getObject()]);
+		this.dataX.addGroupedCallback(this, this.updateLocations);
+		this.dataY.addGroupedCallback(this, this.updateLocations, true);
+
+		(<any>this.filteredKeySet).setColumnKeySources([this.dataX, this.dataY]);
 	}
 
 	_getFeatureIds() {
@@ -42,14 +57,14 @@ abstract class GlyphLayer extends FeatureLayer {
 
 	updateLocations() {
 		/* Update feature locations */
-		var records = (this.layerPath as WeavePathData).retrieveRecords(["dataX", "dataY"], this.layerPath.push("dataX"));
+		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, this.dataX.keys);
 
 		var recordIds = lodash.pluck(records, "id");
 
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
 
-		var rawProj = this.layerPath.getState("sourceProjection") as string || (this.layerPath.getObject("dataX") as IAttributeColumn).getMetadata("projection") || "EPSG:4326";
-		var mapProj = this.projectionPath.getState() as string || "EPSG:3857";
+		var rawProj = this.sourceProjection.value || this.dataX.getMetadata("projection") || "EPSG:4326";
+		var mapProj = this.outputProjection;
 
 		for (let id of removedIds)
 		{

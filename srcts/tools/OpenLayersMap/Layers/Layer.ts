@@ -7,27 +7,23 @@ import WeavePath = weavejs.path.WeavePath;
 import OpenLayersMapTool from "../../OpenLayersMapTool";
 import * as lodash from "lodash";
 
-abstract class Layer {
-	static layerRegistry:Map<string,any>;
-	static registerClass(asClassName:string, jsClass:any, interfaces?:Array<any>)
+import ILinkableObject = weavejs.api.core.ILinkableObject;
+import LinkableNumber = weavejs.core.LinkableNumber;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkableVariable = weavejs.core.LinkableVariable;
+import WeaveAPI = weavejs.WeaveAPI;
+
+
+
+abstract class Layer implements ILinkableObject {
+	get parent():OpenLayersMapTool
 	{
-		if (!Layer.layerRegistry)
-		{
-			Layer.layerRegistry = new Map<string,any>();
-		}
-		Layer.layerRegistry.set(asClassName, jsClass);
+		return this._parent;
 	}
 
-	static newLayer(parent:OpenLayersMapTool, layerName:string)
+	set parent(mapTool:OpenLayersMapTool)
 	{
-		let path:WeavePath = parent.plottersPath.push(layerName);
-		let layerType:string = path.getType();
-		let LayerClass:any = Layer.layerRegistry.get(layerType);
-		if (LayerClass)
-		{
-			return new LayerClass(parent, layerName);
-		}
-		return null;
+		this._parent = mapTool;
 	}
 
 	handleMissingSessionStateProperties(newState:any)
@@ -35,54 +31,64 @@ abstract class Layer {
 
 	}
 
-	layerPath:WeavePath;
-	settingsPath:WeavePath;
-	projectionPath:WeavePath;
-	layerName:string;
-	parent:OpenLayersMapTool;
+	opacity: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+	visible: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+	selectable: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 
-	_olLayer:ol.layer.Layer;
-	_layerReadyCallbacks:Map<string,Function>;
+	private _parent:OpenLayersMapTool = null;
 
-
-	constructor(parent:any, layerName:any)
+	constructor()
 	{
-		this.layerPath = parent.plottersPath.push(layerName);
-		this.settingsPath = parent.layerSettingsPath.push(layerName);
-		this.projectionPath = parent.toolPath.push("projectionSRS");
-		this.parent = parent;
-		this.layerName = layerName;
-		this._olLayer = null;
-		this._layerReadyCallbacks = new Map<string,Function>();
-
-		this.linkProperty(this.settingsPath.push("alpha"), "opacity");
-		this.linkProperty(this.settingsPath.push("visible"), "visible");
-		this.linkProperty(this.settingsPath.push("selectable"), "selectable");
-		/* TODO max and minvisiblescale, map to min/max resolution. */
+		this.opacity.addGroupedCallback(this, this.getSetter("opacity", this.opacity), true);
+		this.visible.addGroupedCallback(this, this.getSetter("visible", this.visible), true);
+		this.selectable.addGroupedCallback(this, this.getSetter("selectable", this.selectable), true);
 	}
 
-	get source():any {
-		return this.olLayer && this.olLayer.getSource();
+	getSetter(propName:string, linkableProperty:LinkableVariable):Function
+	{
+		let setter:Function = () => {
+			if (this.olLayer) {
+				this.olLayer.set(propName, linkableProperty.state);
+			}
+			else {
+				WeaveAPI.Scheduler.callLater(this, setter);
+			}
+		};
+		return setter;
 	}
 
-	set source(value) {
+	private _source: ol.source.Source;
+
+	get source():ol.source.Source {
+		return this._source;
+	}
+
+	set source(value:ol.source.Source) {
+
+		this._source = value;
+
+		if (!this.olLayer)
+		{
+			WeaveAPI.Scheduler.callLater(this, () => { this.source = value });
+			return;
+		}
+
 		this.olLayer.setSource(value);
 	}
 
+	private _olLayer: ol.layer.Layer = null;
+
 	/* Handles initial apply of linked properties, adding/removing from map */
 	set olLayer(value) {
-		this._olLayer = value;
-
+		if (!this.parent) {
+			WeaveAPI.Scheduler.callLater(this, () => { this.olLayer = value });
+			return;
+		}
 		if (value) {
+			this._olLayer = value;
 			this.parent.map.addLayer(value);
 
 			value.set("layerObject", this); /* Need to store this backref */
-
-			if (value) {
-				for (let name of this._layerReadyCallbacks.keys()) {
-					this._layerReadyCallbacks.get(name)();
-				}
-			}
 		}
 	}
 
@@ -97,23 +103,7 @@ abstract class Layer {
 
 	get outputProjection():any
 	{
-		return this.projectionPath.getState() || "EPSG:3857";
-	}
-
-	linkProperty(propertyPath:WeavePath, propertyName:string, inTransform?:Function)
-	{
-		/* change in path modifying propertyName */
-		inTransform = inTransform || lodash.identity;
-
-		var callback = () => {
-				if (this.olLayer) {
-					this.olLayer.set(propertyName, inTransform(propertyPath.getState()));
-				}
-			};
-
-		this._layerReadyCallbacks.set(propertyName, callback);
-
-		propertyPath.addCallback(this, callback, false, false);
+		return (this.parent && this.parent.projectionSRS.value) || "EPSG:3857";
 	}
 
 	dispose()

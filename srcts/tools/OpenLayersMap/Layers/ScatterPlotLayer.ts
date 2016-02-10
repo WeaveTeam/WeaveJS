@@ -13,46 +13,47 @@ import Layer from "./Layer";
 import WeavePath = weavejs.path.WeavePath;
 import WeavePathData = weavejs.path.WeavePathData;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import LinkableNumber = weavejs.core.LinkableNumber;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
+import SolidFillStyle = weavejs.geom.SolidFillStyle;
+import SolidLineStyle = weavejs.geom.SolidLineStyle;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+
 
 class ScatterPlotLayer extends GlyphLayer {
 
-	sizeBy:WeavePath;
-	fillStylePath:WeavePath;
-	lineStylePath:WeavePath;
-	maxRadiusPath:WeavePath;
-	minRadiusPath:WeavePath;
-	defaultRadiusPath:WeavePath;
+	minScreenRadius: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+	maxScreenRadius: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+	defaultScreenRadius: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 
-	constructor(parent:any, layerName:any)
+	fill: SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+	line: SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+	sizeBy: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+
+	constructor()
 	{
-		super(parent, layerName);
+		super();
 
-		this.sizeBy = this.layerPath.push("sizeBy").addCallback(this, this.updateStyleData, true);
-
-		this.fillStylePath = this.layerPath.push("fill").addCallback(this, this.updateStyleData);
-		this.lineStylePath = this.layerPath.push("line").addCallback(this, this.updateStyleData);
-		this.maxRadiusPath = this.layerPath.push("maxScreenRadius").addCallback(this, this.updateStyleData);
-		this.minRadiusPath = this.layerPath.push("minScreenRadius").addCallback(this, this.updateStyleData);
-
-		this.defaultRadiusPath = this.layerPath.push("defaultScreenRadius").addCallback(this, this.updateStyleData, true);
-	}
-
-	handleMissingSessionStateProperties(newState:any)
-	{
-
+		Weave.getCallbacks(this.fill).addGroupedCallback(this, this.updateStyleData);
+		Weave.getCallbacks(this.line).addGroupedCallback(this, this.updateStyleData);
+		this.sizeBy.addGroupedCallback(this, this.updateStyleData);
+		
+		this.maxScreenRadius.addGroupedCallback(this, this.updateStyleData);
+		this.minScreenRadius.addGroupedCallback(this, this.updateStyleData);
+		this.defaultScreenRadius.addGroupedCallback(this, this.updateStyleData, true);
 	}
 
 	getToolTipColumns(): Array<any> /* Array<IAttributeColumn> */ {
 		let additionalColumns: Array<any> = new Array<any>();
 		let internalColumn: any;
 
-		for (let column of this.fillStylePath.getChildren().concat(this.lineStylePath.getChildren())) {
+		for (let column of Weave.getPath(this.fill).getChildren().concat(Weave.getPath(this.line).getChildren())) {
 			internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column.getObject());
 			if (internalColumn)
 				additionalColumns.push(internalColumn);
 		}
 
-		internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(this.sizeBy.getObject() as IColumnWrapper);
+		internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(this.sizeBy as IColumnWrapper);
 		if (internalColumn)
 			additionalColumns.push(internalColumn);
 
@@ -62,28 +63,23 @@ class ScatterPlotLayer extends GlyphLayer {
 	updateStyleData()
 	{
 
-		let fillEnabled = this.fillStylePath.push("enable").getState();
-		let strokeEnabled = this.lineStylePath.push("enable").getState();
+		let fillEnabled = this.fill.enable.value;
+		let strokeEnabled = this.line.enable.value;
 
-		var styleRecords:any = (this.layerPath as WeavePathData).retrieveRecords({
-			fill: {
-				color: this.fillStylePath.push("color"),
-				alpha: this.fillStylePath.push("alpha"),
-				imageURL: this.fillStylePath.push("imageURL")
-			},
-			stroke: {
-				color: this.lineStylePath.push("color"),
-				alpha: this.lineStylePath.push("alpha"),
-				weight: this.lineStylePath.push("weight"),
-				lineCap: this.lineStylePath.push("caps"),
-				lineJoin: this.lineStylePath.push("joints"),
-				miterLimit: this.lineStylePath.push("miterLimit")
-			}
-		});
+		let styleRecords: Array<any> = new Array<any>(this.dataX.keys.length);
+
+		for (let key of this.dataX.keys as Array<IQualifiedKey>)
+		{
+			let record: any = {};
+			record.id = key;
+			record.fill = this.fill.getStyle(key);
+			record.line = this.line.getStyle(key);
+			styleRecords.push()
+		}
 
 		var styleRecordsIndex = lodash.indexBy(styleRecords, "id");
 
-		var sizeByNumeric = (this.layerPath as WeavePathData).retrieveRecords({sizeBy: this.sizeBy}, {dataType: "number"});
+		var sizeByNumeric = weavejs.data.ColumnUtils.getRecords({sizeBy: this.sizeBy}, this.sizeBy.keys, Number);
 
 		for (let record of sizeByNumeric)
 		{
@@ -99,9 +95,9 @@ class ScatterPlotLayer extends GlyphLayer {
 		let sizeByMax = lodash.max(sizeBy);
 		let sizeByMin = lodash.min(sizeBy);
 		let absMax = Math.max(Math.abs(sizeByMax), Math.abs(sizeByMin));
-		let minScreenRadius = this.minRadiusPath.getState() as number;
-		let maxScreenRadius = this.maxRadiusPath.getState() as number;
-		let defaultScreenRadius = this.defaultRadiusPath.getState() as number;
+		let minScreenRadius = this.minScreenRadius.value;
+		let maxScreenRadius = this.maxScreenRadius.value;
+		let defaultScreenRadius = this.defaultScreenRadius.value;
 
 		styleRecords = lodash.sortByOrder(styleRecords, ["sizeBy", "id"], ["desc", "asc"]);
 
@@ -190,5 +186,5 @@ class ScatterPlotLayer extends GlyphLayer {
 		}
 	}
 }
-Layer.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default ScatterPlotLayer;

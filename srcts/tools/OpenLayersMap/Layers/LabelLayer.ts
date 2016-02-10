@@ -12,29 +12,17 @@ import Layer from "./Layer";
 import OpenLayersMapTool from "../../OpenLayersMapTool";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 class LabelLayer extends GlyphLayer
 {
-	public angle: IAttributeColumn;
-	public bold: IAttributeColumn;
-	public color: IAttributeColumn;
-	public font: IAttributeColumn;
-	public hAlign: IAttributeColumn;
-	public vAlign: IAttributeColumn;
-	public italic: IAttributeColumn;
-	public size: IAttributeColumn;
-	public text: IAttributeColumn;
-	public underline: IAttributeColumn;
+	public size: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	public text: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	public color: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
-	private columns: Map<string,any>;
-
-	constructor(parent:OpenLayersMapTool, layerName:string)
+	constructor()
 	{
-		super(parent, layerName);
-
-		this.size = this.layerPath.getObject("size") as IAttributeColumn;
-		this.text = this.layerPath.getObject("text") as IAttributeColumn;
-		this.color = this.layerPath.getObject("color") as IAttributeColumn;
+		super();
 
 		this.size.addGroupedCallback(this, this.updateStyleData)
 		this.text.addGroupedCallback(this, this.updateStyleData)
@@ -87,5 +75,5 @@ class LabelLayer extends GlyphLayer
 	}
 }
 
-Layer.registerClass("weave.visualization.plotters::TextGlyphPlotter", LabelLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.plotters::TextGlyphPlotter", LabelLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 export default LabelLayer;
