@@ -38,11 +38,11 @@ export interface IWeaveToolProps extends React.Props<WeaveTool> {
 }
 
 export interface IWeaveToolState {
-
+	title?:string;
 }
 
-export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState> {
-
+export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
+{
     private toolPath:WeavePath;
     private ToolClass:any;
     private tool:IVisTool;
@@ -52,8 +52,10 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
     private titleBarHeight: number;
     private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
 
-    constructor(props:IWeaveToolProps) {
+    constructor(props:IWeaveToolProps)
+	{
         super(props);
+		this.state = {};
         this.toolPath = this.props.toolPath;
 		var placeholder = this.toolPath.getObject() as LinkablePlaceholder;
 		if (placeholder && placeholder.getClass)
@@ -74,20 +76,27 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 			this.tool = tool; // temporary until all classes are refactored
 		else if (tool && this.tool != tool)
 			throw new Error("Unexpected new instance of tool");
+		
+		// make sure title gets updated
+		if (this.tool)
+			Weave.getCallbacks(this.tool).addGroupedCallback(this, this.updateTitle);
+		this.updateTitle();
 	}
 
-    componentDidMount():void {
-        // if (this.toolPath) {
-        //     this.toolPath.addCallback(this, this.forceUpdate);
-        // }
+    componentDidMount():void
+	{
+		this.updateTitle();
     }
 
-    get title():string {
-        return (this.tool ? this.tool.title : '') || this.toolPath.getPath().pop();
+	updateTitle():void
+	{
+        var title:string = (this.tool ? this.tool.title : '') || this.toolPath.getPath().pop();
+		this.setState({title});
     }
 
 	//TODO - we shouldn't have to render twice to set the tooltip of the tool
-    render() {
+    render()
+	{
         var toolHeight:number = this.props.style ? this.props.style.height - this.titleBarHeight : 320;
         var toolWidth:number = this.props.style ? this.props.style.width : 320;
 
@@ -117,7 +126,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
                 <TitleBar ref={(c:React.Component<ITitleBarProps, ITitleBarState>) => { this.titleBar = c; } }
                           onDragStart={this.props.onDragStart}
                           titleBarHeight={this.titleBarHeight}
-                          title={this.title}
+                          title={this.state.title}
                           />
                 {
                     <div style={toolStyle} className="weave-tool">
