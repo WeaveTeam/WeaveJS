@@ -11,6 +11,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {round} from "d3";
 import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootStrapTable";
+import {IRow} from "../react-bootstrap-datatable/TableRow";
 
 import WeavePath = weavejs.path.WeavePath;
 import WeavePathData = weavejs.path.WeavePathData;
@@ -25,7 +26,8 @@ import KeySet = weavejs.data.key.KeySet;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 export interface IDataTableState extends IVisToolState {
-    data:{[key:string]: string}[]
+    data:IRow[],
+    columnTitles:{[columnId:string]: string}
 }
 
 export default class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
@@ -49,10 +51,9 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
 
         this.columns.addGroupedCallback(this, this.dataChanged, true);
         this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
-
-        this.filteredKeySet.setColumnKeySources(this.columns.getObjects());
         this.state = {
-            data: []
+            data: [],
+            columnTitles: {}
         };
     }
 
@@ -74,8 +75,26 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
     }
 
     dataChanged() {
+        this.filteredKeySet.setColumnKeySources(this.columns.getObjects());
+        var columns:IAttributeColumn[] = this.columns.getObjects();
+        var records:string[][] = ColumnUtils.getRecords(columns, this.filteredKeySet.keys, String);
+        var columnNames:string[] = this.columns.getNames();
+        var columnTitles:{[columnId:string]: string} = {};
+
+        var rows:IRow[] = records.map((record:string[]) => {
+            var row:IRow = _.zipObject(columnNames, record) as IRow;
+            row["id"] = (record as any)["id"];
+            return row;
+        });
+
+        columns.forEach((column:IAttributeColumn, index:number) => {
+            columnTitles[columnNames[index]] = column.getMetadata("title");
+        });
+        columnTitles["id"] = "Key";
+
         this.setState({
-            data: ColumnUtils.getRecords(this.columns.getObjects(), this.filteredKeySet.keys, String)
+            data: rows,
+            columnTitles
         });
     }
 
@@ -96,14 +115,7 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
     }
 
     render() {
-        var columnTitles:{[columnId:string]: string} = {};
-        console.log(this.state.data);
-        columnTitles["id"] = "Key";
-        this.columns.getObjects().forEach((column:IAttributeColumn) => {
-            columnTitles[this.columns.getName(column)] = column.getMetadata("title");
-        });
-
-        return <ReactBootstrapTable columnTitles={columnTitles}
+        return <ReactBootstrapTable columnTitles={this.state.columnTitles}
                                     rows={this.state.data}
                                     idProperty="id"
                                     height={this.props.style.height}
