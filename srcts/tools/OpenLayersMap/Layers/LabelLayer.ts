@@ -13,12 +13,13 @@ import OpenLayersMapTool from "../../OpenLayersMapTool";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
 class LabelLayer extends GlyphLayer
 {
-	public size: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	public size: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
 	public text: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	public color: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	public color: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
 
 	constructor()
 	{

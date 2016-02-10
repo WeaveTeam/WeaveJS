@@ -29,29 +29,13 @@ export default class TileLayer extends Layer {
 		this.providerOptions.addGroupedCallback(this, this.updateTileSource, true);
 	}
 
-	updateValidExtents()
+	updateProjection()
 	{
-		/* TODO projection from parent blablabla */
-		// var proj = ol.proj.get(this.projectionPath.getState() as string || "EPSG:3857");
-		// if (proj)
-		// 	this.olLayer.setExtent(proj.getExtent());
-		// else
-		// 	console.log('invalid proj -> no extent');
-	}
-
-	getCustomWMSSource()
-	{
-		var customWMSPath = this.servicePath;
-
-		if (customWMSPath.push("wmsURL").getType()) {
-			let url = customWMSPath.getState("wmsURL") as string;
-			let attributions = customWMSPath.getState("creditInfo") as any;
-			let projection = customWMSPath.getState("tileProjectionSRS") as string;
-
-			return new ol.source.XYZ({
-				url, attributions, projection
-			});
-		}
+		var proj = ol.proj.get(this.outputProjection);
+		if (proj)
+			this.olLayer.setExtent(proj.getExtent());
+		else
+		 	console.log('invalid proj -> no extent');
 	}
 
 	handleMissingSessionStateProperties(newState:any)

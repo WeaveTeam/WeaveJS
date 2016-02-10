@@ -46,6 +46,11 @@ export default class GeometryLayer extends FeatureLayer {
 		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateGeometryData, true);
 	}
 
+	updateProjection():void
+	{
+		this.updateGeometryData();
+	}
+
 	handleMissingSessionStateProperties(newState:any)
 	{
 		super.handleMissingSessionStateProperties(newState);
@@ -77,7 +82,9 @@ export default class GeometryLayer extends FeatureLayer {
 
 			let id = keys[idx];
 
-			let geometry = this.geoJsonParser.readGeometry(rawGeom, {dataProjection: this.inputProjection, featureProjection: this.outputProjection});
+			let geometry = this.geoJsonParser.readGeometry(rawGeom,
+				{ dataProjection: this.geometryColumn.getMetadata('projection') || this.outputProjection,
+				featureProjection: this.outputProjection});
 
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);

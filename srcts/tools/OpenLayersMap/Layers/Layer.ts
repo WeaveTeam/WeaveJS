@@ -11,20 +11,10 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableVariable = weavejs.core.LinkableVariable;
+import LinkableString = weavejs.core.LinkableString;
 import WeaveAPI = weavejs.WeaveAPI;
 
-
-
 abstract class Layer implements ILinkableObject {
-	get parent():OpenLayersMapTool
-	{
-		return this._parent;
-	}
-
-	set parent(mapTool:OpenLayersMapTool)
-	{
-		this._parent = mapTool;
-	}
 
 	handleMissingSessionStateProperties(newState:any)
 	{
@@ -35,27 +25,38 @@ abstract class Layer implements ILinkableObject {
 	visible: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 	selectable: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 
-	private _parent:OpenLayersMapTool = null;
+	private projectionSRS: LinkableString; /* A reference to the parent's projectionSRS LinkableString */
 
 	constructor()
 	{
-		this.opacity.addGroupedCallback(this, this.getSetter("opacity", this.opacity), true);
-		this.visible.addGroupedCallback(this, this.getSetter("visible", this.visible), true);
-		this.selectable.addGroupedCallback(this, this.getSetter("selectable", this.selectable), true);
+		WeaveAPI.Scheduler.callLater(this, this.registerUpdateProjection);
 	}
 
-	getSetter(propName:string, linkableProperty:LinkableVariable):Function
+	registerUpdateProjection():void
 	{
-		let setter:Function = () => {
-			if (this.olLayer) {
-				this.olLayer.set(propName, linkableProperty.state);
-			}
-			else {
-				WeaveAPI.Scheduler.callLater(this, setter);
-			}
-		};
-		return setter;
+		let parent: OpenLayersMapTool = Weave.getAncestor(this, OpenLayersMapTool) as OpenLayersMapTool;
+		if (!parent)
+		{
+			WeaveAPI.Scheduler.callLater(this, this.registerUpdateProjection);
+			return;
+		}
+
+		this.projectionSRS = parent.projectionSRS;
+		this.projectionSRS.addGroupedCallback(this, this.updateProjection, true);
 	}
+
+	abstract updateProjection(): void;
+
+	private _parent: OpenLayersMapTool = null;
+
+	get parent(): OpenLayersMapTool {
+		return this._parent;
+	}
+
+	set parent(mapTool: OpenLayersMapTool) {
+		this._parent = mapTool;
+	}
+
 
 	private _source: ol.source.Source;
 
@@ -79,7 +80,8 @@ abstract class Layer implements ILinkableObject {
 	private _olLayer: ol.layer.Layer = null;
 
 	/* Handles initial apply of linked properties, adding/removing from map */
-	set olLayer(value) {
+
+	set olLayer(value:ol.layer.Layer) {
 		if (!this.parent) {
 			WeaveAPI.Scheduler.callLater(this, () => { this.olLayer = value });
 			return;
@@ -88,22 +90,21 @@ abstract class Layer implements ILinkableObject {
 			this._olLayer = value;
 			this.parent.map.addLayer(value);
 
+			this.opacity.addGroupedCallback(this, () => value.set("opacity", this.opacity.value), true);
+			this.visible.addGroupedCallback(this, () => value.set("visible", this.visible.value), true);
+			this.selectable.addGroupedCallback(this, () => value.set("selectable", this.selectable.value), true);
+
 			value.set("layerObject", this); /* Need to store this backref */
 		}
 	}
 
-	get olLayer():any {
+	get olLayer():ol.layer.Layer {
 		return this._olLayer;
 	}
 
-	get inputProjection():any
+	get outputProjection():string
 	{
-		return null;
-	}
-
-	get outputProjection():any
-	{
-		return (this.parent && this.parent.projectionSRS.value) || "EPSG:3857";
+		return (this.projectionSRS && this.projectionSRS.value) || (this.parent && this.parent.getDefaultProjection()) || OpenLayersMapTool.DEFAULT_PROJECTION;
 	}
 
 	dispose()

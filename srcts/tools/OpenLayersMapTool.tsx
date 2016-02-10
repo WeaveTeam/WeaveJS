@@ -48,10 +48,12 @@ interface Bounds2DAlike {
 }
 
 function isBounds2DAlike(obj:any):boolean {
-	return lodash.all(lodash.map(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj.item === "number"));
+	return lodash.every(lodash.map(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj[item] === "number"));
 }
 
-export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, IVisToolState> {
+export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> {
+
+	static DEFAULT_PROJECTION: string = "EPSG:4326";
 
 	map:ol.Map;
 	zoomButtons:ol.control.Zoom;
@@ -95,7 +97,7 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 		newExtentOverride.yMin = traverseState(newState, ["children", "visualization", "plotManager", "overrideYMin"]);
 		newExtentOverride.yMax = traverseState(newState, ["children", "visualization", "plotManager", "overrideYMax"]);
 
-		Weave.setState(this.extentOverride, newExtentOverride);
+		this.extentOverride.setSessionState(newExtentOverride);
 
 		/* Copy interaction mode to local state */
 
@@ -182,7 +184,7 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 			extent = undefined;
 		}
 
-		let projection = this.projectionSRS.value as string || "EPSG:3857";
+		let projection = this.projectionSRS.value || this.getDefaultProjection();
 		let view = new ol.View({projection, extent});
 		view.set("extent", extent);
 
@@ -306,12 +308,23 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 		});
 	}
 
+	getDefaultProjection():string
+	{
+		for (let layerName of this.layers.getNames())
+		{
+			let layer: Layer = this.layers.getObject(layerName) as Layer;
+			if (layer instanceof TileLayer)
+				return "EPSG:3857";
+		}
+		return OpenLayersMapTool.DEFAULT_PROJECTION;
+	}
+
 	requestDetail():void
 	{
 		for (var name of this.layers.getNames())
 		{
-			var layer:Layer = this.layers.getObject(name) as Layer;
-			if (!layer)
+			var layer:GeometryLayer = this.layers.getObject(name) as GeometryLayer;
+			if (!(layer instanceof GeometryLayer))
 				continue;
 			for (var sgc of Weave.getDescendants(this.layers.getObject(name), weavejs.data.column.StreamedGeometryColumn))
 			{
@@ -346,6 +359,8 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
 
 			layer.olLayer.setZIndex(idx + 2);
 		}
+		/* This may impact the default projection, so trigger callbacks on it. */
+		this.projectionSRS.triggerCallbacks();
 	}
 
 	destroy():void
@@ -358,7 +373,5 @@ export default class WeaveOpenLayersMap extends React.Component<IVisToolProps, I
     }
 }
 
-//weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveOpenLayersMap); // TEMPORARY HACK - remove when class is refactored
-
-Weave.registerClass("weavejs.tool.Map", WeaveOpenLayersMap, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::MapTool", WeaveOpenLayersMap, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.Map", OpenLayersMapTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::MapTool", OpenLayersMapTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);

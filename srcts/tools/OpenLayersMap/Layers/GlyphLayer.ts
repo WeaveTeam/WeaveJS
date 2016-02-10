@@ -55,6 +55,10 @@ abstract class GlyphLayer extends FeatureLayer {
 		}
 	}
 
+	updateProjection():void {
+		this.updateLocations();
+	}
+
 	updateLocations() {
 		/* Update feature locations */
 		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, this.dataX.keys);
