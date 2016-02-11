@@ -53,14 +53,16 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 
     onMouseOver(id:string, status:boolean) {
 
-        var probedIds:string[] = this.state.probedIds.slice(0);
+		if (!id)
+			return;
+        var probedIds:string[] = this.state.probedIds.concat();
 
         // find the selected record location
         var keyLocation:number = probedIds.indexOf(id);
-        if(!status && keyLocation > -1) {
-            probedIds.splice(keyLocation, 1);
-        } else {
+        if (status && keyLocation < 0) {
             probedIds.push(id);
+        } else if (!status && keyLocation >= 0) {
+            probedIds.splice(keyLocation, 1);
         }
 
         if(this.props.onProbe) {
@@ -72,7 +74,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     }
 
     onClick(id:string, event:React.MouseEvent) {
-        var selectedIds:string[] = this.state.selectedIds.slice(0);
+        var selectedIds:string[] = this.state.selectedIds.concat();
 
 
         // in single selection mode,
