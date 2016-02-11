@@ -10,7 +10,7 @@ import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {round} from "d3";
-import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootStrapTable";
+import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootstrapTable";
 import {IRow} from "../react-bootstrap-datatable/TableRow";
 
 import WeavePath = weavejs.path.WeavePath;

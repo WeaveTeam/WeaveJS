@@ -27,12 +27,12 @@ export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTab
     showIdColumn:boolean;
 }
 
-export interface IReactBootStrapTableState {
+export interface IReactBootstrapTableState {
     probedIds?:string[];
     selectedIds?:string[];
 }
 
-export default class ReactBootstrapTable extends React.Component<IReactBootstrapTableProps, IReactBootStrapTableState> {
+export default class ReactBootstrapTable extends React.Component<IReactBootstrapTableProps, IReactBootstrapTableState> {
 
     private tableHead:TableHead;
     private tableBody:TableBody;
