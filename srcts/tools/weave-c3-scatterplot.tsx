@@ -48,9 +48,8 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	fill: SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 	line: SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 	
-	private get radiusNorm():NormalizedColumn { return this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true); }
-	private get radiusData():DynamicColumn { return this.radiusNorm.internalDynamicColumn; }
-	private get radiusInternal():IAttributeColumn { return this.radiusNorm.getInternalColumn(); }
+	private get radiusNorm() { return this.radius.getInternalColumn() as NormalizedColumn; }
+	private get radiusData() { return this.radiusNorm.internalDynamicColumn; }
 	
 	private RECORD_FORMAT = {
 		id: IQualifiedKey,
@@ -86,6 +85,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	{
 		super(props);
 		
+		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
 		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
 		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
 		
@@ -280,23 +280,13 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 		};
 	}
 
-	get deprecatedStateMapping()
+	public get deprecatedStateMapping():Object
 	{
-		return {
+		return [this.super_deprecatedStateMapping, {
 			"children": {
 				"visualization": {
 					"plotManager": {
-						"marginBottom": this.marginBottom,
-						"marginRight": this.marginRight,
-						"marginLeft": this.marginLeft,
-						"marginTop": this.marginTop,
 						"plotters": {
-							"yAxis": {
-								"overrideAxisName": this.yAxisName
-							},
-							"xAxis": {
-								"overrideAxisName": this.xAxisName
-							},
 							"plot": {
 								"filteredKeySet": this.filteredKeySet,
 								"dataX": this.dataX,
@@ -318,7 +308,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 					}
 				}
 			}
-		};
+		}];
 	}
 
 	handleClick(event:MouseEvent):void

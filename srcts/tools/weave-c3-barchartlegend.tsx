@@ -47,10 +47,10 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
         this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
 
-    protected handleMissingSessionStateProperties(newState:any)
-    {
-
-    }
+	get deprecatedStateMapping()
+	{
+		return {};
+	}
 
     get title():string {
        return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();

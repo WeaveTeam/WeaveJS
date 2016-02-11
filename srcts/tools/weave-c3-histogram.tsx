@@ -230,10 +230,10 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
         }
     }
 
-    protected handleMissingSessionStateProperties(newState:any)
-    {
-
-    }
+	get deprecatedStateMapping()
+	{
+		return {};
+	}
 
     handleClick(event:MouseEvent) {
         if(!this.flag) {

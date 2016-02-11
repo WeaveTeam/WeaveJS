@@ -1391,11 +1391,10 @@ declare module weavejs.api.core {
      */
     interface ILinkableObjectWithNewProperties extends ILinkableObject {
         /**
-         * This function will be called by SessionManager.setSessionState() when a full session state is missing properties
-         * or a session state contains extra properties.
-         * @param newState The new session state for this object.
+         * Either a single mapping or an Array of mappings to be used with SessionManager.traverseAndSetState().
+         * @see weavejs.core.SessionManager#traverseAndSetState()
          */
-        handleMissingSessionStateProperties(newState: Object): void;
+        deprecatedStateMapping: Object;
     }
     var ILinkableObjectWithNewProperties: Function;
 }
@@ -4077,6 +4076,14 @@ declare module weavejs.core {
         private _treeCallbacks;
         copySessionState(source: ILinkableObject, destination: ILinkableObject): void;
         private applyDiffForLinkableVariable(base, diff);
+        static DEPRECATED_STATE_MAPPING: string;
+        /**
+         * Uses DynamicState.traverse() to traverse a state and copy portions of the state to ILinkableObjects.
+         * @param state A session state
+         * @param mapping A structure that defines the traversal, where the leaf nodes are ILinkableObjects or Functions to call.
+         *                Functions should have the following signature: function(state:Object, removeMissingDynamicObjects:Boolean = true):void
+         */
+        static traverseAndSetState(state: Object, mapping: Object, removeMissingDynamicObjects?: boolean): void;
         setSessionState(linkableObject: ILinkableObject, newState: Object, removeMissingDynamicObjects?: boolean): void;
         /**
          * keeps track of which objects are currently being traversed
@@ -6530,8 +6537,9 @@ declare module weavejs.data.key {
         private stringifyValue(value, ..._);
         private static isRegExp(obj);
         private static toRegExp(value);
+        deprecatedStateMapping: Object;
         private _deprecatedRangeState;
-        handleMissingSessionStateProperties(newState: Object): void;
+        private handleMissingSessionStateProperties(newState);
     }
 }
 declare module weavejs.data.key {
@@ -9999,12 +10007,6 @@ declare module weavejs.util {
 }
 declare module weavejs.util {
     class BackwardsCompatibility {
-        /**
-         * Uses DynamicState.traverse() to traverse a state and copy portions of the state to ILinkableObjects.
-         * @param state A session state
-         * @param mapping A structure that defines the traversal, where the leaf nodes are ILinkableObjects or Functions to call.
-         */
-        static traverseAndSetState(state: Object, mapping: Object): void;
         static forceDeprecatedState(classDef: Function): void;
         private static map_class_ignore;
         static updateSessionState(state: Object): Object;

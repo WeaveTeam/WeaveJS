@@ -194,9 +194,9 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
         };
     }
 
-    protected handleMissingSessionStateProperties(newState:any)
+    get deprecatedStateMapping()
 	{
-
+		return {};
 	}
 
     private updateStyle() {

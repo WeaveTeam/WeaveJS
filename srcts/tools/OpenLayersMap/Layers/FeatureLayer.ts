@@ -21,25 +21,19 @@ export abstract class FeatureLayer extends Layer {
 
 	private changedItems:Set<IQualifiedKey>;
 
+	public filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	public selectionKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
-
 	public probeKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
 
-	public filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-
 	source:ol.source.Vector;
-
-	handleMissingSessionStateProperties(newState: any) {
-		super.handleMissingSessionStateProperties(newState);
-
-		this.selectionKeySet.targetPath = ["defaultSelectionKeySet"];
-		this.probeKeySet.targetPath = ["defaultProbeKeySet"];
-	}
 
 	constructor()
 	{
 		super();
 
+		this.selectionKeySet.targetPath = ["defaultSelectionKeySet"];
+		this.probeKeySet.targetPath = ["defaultProbeKeySet"];
+	
 		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
 		this.debounced_updateMetaStyles = lodash.debounce(this.updateMetaStyles.bind(this), 0);
 

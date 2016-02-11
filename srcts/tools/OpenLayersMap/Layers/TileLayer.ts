@@ -38,9 +38,8 @@ export default class TileLayer extends Layer {
 		 	console.log('invalid proj -> no extent');
 	}
 
-	handleMissingSessionStateProperties(newState:any)
+	deprecatedStateMapping(newState:any)
 	{
-		super.handleMissingSessionStateProperties(newState);
 		var traverseState = weavejs.api.core.DynamicState.traverseState;
 
 		let serviceState = traverseState(newState, ["service", null]) || {};

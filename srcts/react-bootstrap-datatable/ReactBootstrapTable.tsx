@@ -52,9 +52,6 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     }
 
     onMouseOver(id:string, status:boolean) {
-
-		if (!id)
-			return;
         var probedIds:string[] = this.state.probedIds.concat();
 
         // find the selected record location
@@ -75,7 +72,6 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 
     onClick(id:string, event:React.MouseEvent) {
         var selectedIds:string[] = this.state.selectedIds.concat();
-
 
         // in single selection mode,
         // or ctrl/cmd selcection mode

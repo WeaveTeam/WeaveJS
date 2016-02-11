@@ -35,11 +35,6 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
         this.y2AxisClass = "c3-axis-y2";
     }
 
-	handleMissingSessionStateProperties(newState:any):void
-	{
-		console.log(newState);
-	}
-
 	selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -64,6 +59,35 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 
     private previousWidth:number;
     private previousHeight:number;
+	
+	get deprecatedStateMapping():Object
+	{
+		return this.super_deprecatedStateMapping;
+	}
+	
+	get super_deprecatedStateMapping():Object
+	{
+		return {
+			"children": {
+				"visualization": {
+					"plotManager": {
+						"marginBottom": this.marginBottom,
+						"marginRight": this.marginRight,
+						"marginLeft": this.marginLeft,
+						"marginTop": this.marginTop,
+						"plotters": {
+							"yAxis": {
+								"overrideAxisName": this.yAxisName
+							},
+							"xAxis": {
+								"overrideAxisName": this.xAxisName
+							}
+						}
+					}
+				}
+			}
+		};
+	}
 
     get title():string {
        return this.panelTitle.value;

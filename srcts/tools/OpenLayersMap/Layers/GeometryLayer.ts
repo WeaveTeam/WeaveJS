@@ -51,14 +51,13 @@ export default class GeometryLayer extends FeatureLayer {
 		this.updateGeometryData();
 	}
 
-	handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping()
 	{
-		super.handleMissingSessionStateProperties(newState);
-		var traverseState = weavejs.api.core.DynamicState.traverseState;
-
-		Weave.setState(this.fill, newState.fill);
-		Weave.setState(this.line, newState.line);
-		Weave.setState(this.geometryColumn, traverseState(newState, ['geometryColumn', 'internalDynamicColumn']));
+		return {
+			geometryColumn: {
+				internalDynamicColumn: this.geometryColumn
+			}
+		};
 	}
 
 	get inputProjection():any

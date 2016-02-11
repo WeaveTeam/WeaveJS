@@ -40,6 +40,8 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
 
     private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
     private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
+	
+	idProperty:string = ''; // won't conflict with any column name
 
     constructor(props:IVisToolProps) {
         super(props);
@@ -57,9 +59,9 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
         };
     }
 
-    protected handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping()
 	{
-
+		return {};
 	}
 
     get title():string {
@@ -78,10 +80,12 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
         this.filteredKeySet.setColumnKeySources(this.columns.getObjects());
         var names:string[] = this.columns.getNames();
         var columns:IAttributeColumn[] = this.columns.getObjects();
-        var records:IRow[] = ColumnUtils.getRecords(_.zipObject(names, columns), this.filteredKeySet.keys, String);
+		var format:any = _.zipObject(names, columns);
+		format[this.idProperty] = IQualifiedKey;
+        var records:IRow[] = ColumnUtils.getRecords(format, this.filteredKeySet.keys, String);
 		var titles:string[] = columns.map((column:IAttributeColumn) => column.getMetadata("title"));
         var columnTitles = _.zipObject(names, titles) as { [columnId: string]: string; };
-        columnTitles["id"] = "Key";
+        columnTitles[this.idProperty] = "Key";
 
         this.setState({
             data: records,
@@ -108,7 +112,7 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
     render() {
         return <ReactBootstrapTable columnTitles={this.state.columnTitles}
                                     rows={this.state.data}
-                                    idProperty="id"
+                                    idProperty={this.idProperty}
                                     height={this.props.style.height}
                                     striped={true}
                                     hover={true}

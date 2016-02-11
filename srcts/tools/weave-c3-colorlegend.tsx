@@ -37,7 +37,7 @@ const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 const SHAPE_TYPE_BOX:string = "box";
 
-export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState>
+export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties
 {
 	panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
 	filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -80,10 +80,9 @@ export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, I
 		};
 	}
 
-    protected handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping():Object
 	{
-		var traverseState = weavejs.api.core.DynamicState.traverseState;
-		Weave.setState(this, traverseState(newState, ['children', 'visualization', 'plotManager', 'plotters', 'plot']));
+		return {children: {visualization: {plotManager: {plotters: {plot: this}}}}};
 	}
 	
 	get title():string

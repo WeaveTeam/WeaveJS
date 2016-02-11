@@ -53,9 +53,9 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		this.editor.addCallback(this, this.forceUpdate);
 	}
 
-	protected handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping()
 	{
-
+		return {};
 	}
 
 	get title():string {
@@ -116,9 +116,9 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 		this.forceDiscreteValues = this.props.editor.getObject("forceDiscreteValues") as LinkableBoolean;
 	}
 
-	protected handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping()
 	{
-
+		return {};
 	}
 
 	componentDidMount() {
@@ -230,9 +230,9 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 		this.values.state = selectedValues;
 	}
 
-	protected handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping()
 	{
-
+		return {};
 	}
 
 	render():JSX.Element {

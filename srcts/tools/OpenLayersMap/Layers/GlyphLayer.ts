@@ -61,10 +61,8 @@ abstract class GlyphLayer extends FeatureLayer {
 
 	updateLocations() {
 		/* Update feature locations */
-		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, this.dataX.keys);
-
-		var recordIds = lodash.pluck(records, "id");
-
+		var recordIds = this.dataX.keys;
+		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
 
 		var rawProj = this.sourceProjection.value || this.dataX.getMetadata("projection") || "EPSG:4326";
@@ -76,8 +74,9 @@ abstract class GlyphLayer extends FeatureLayer {
 			this.source.removeFeature(feature);
 		}
 
-		for (let record of records)
+		for (let i in records)
 		{
+			let record = records[i];
 			let dataX:any, dataY:any;
 
 			dataX = GlyphLayer._toPoint(record.dataX, "xMin", "xMax");
@@ -90,11 +89,11 @@ abstract class GlyphLayer extends FeatureLayer {
 			if (!isFinite(coords[0]) || !isFinite(coords[1]))
 				continue;
 
-			let feature = this.source.getFeatureById(record.id);
+			let feature = this.source.getFeatureById(recordIds[i]);
 			if (!feature)
 			{
 				feature = new ol.Feature({});
-				feature.setId(record.id);
+				feature.setId(recordIds[i]);
 				this.source.addFeature(feature);
 			}
 			feature.setGeometry(point);

@@ -33,9 +33,9 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
         this.toolPath.push("layoutMode").addCallback(this, this.forceUpdate);
     }
 
-    protected handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping()
 	{
-
+		return {};
 	}
 
     componentDidMount() {

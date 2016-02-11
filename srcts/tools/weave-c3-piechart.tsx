@@ -45,9 +45,9 @@ export default class WeaveC3PieChart extends AbstractC3Tool_old {
         super(props);
     }
 
-    protected handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping()
 	{
-
+		return {};
 	}
 
     private selectionKeysChanged():void {

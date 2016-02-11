@@ -13,6 +13,7 @@ import WeavePathData = weavejs.path.WeavePathData;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 export default class ImageGlyphLayer extends GlyphLayer {
 
@@ -33,11 +34,6 @@ export default class ImageGlyphLayer extends GlyphLayer {
 		this.imageURL.addGroupedCallback(this, this.updateStyleData);
 		this.alpha.addGroupedCallback(this, this.updateStyleData);
 		this.color.addGroupedCallback(this, this.updateStyleData, true);
-	}
-
-	handleMissingSessionStateProperties(newState:any)
-	{
-		super.handleMissingSessionStateProperties(newState);
 	}
 
 	getToolTipColumns(): IAttributeColumn[] {
@@ -103,14 +99,23 @@ export default class ImageGlyphLayer extends GlyphLayer {
 	updateStyleData() {
 		/* Update feature styles */
 
-		var records: Array<any> = weavejs.data.ColumnUtils.getRecords({
-			"alpha": this.alpha, "color": this.color, "imageURL": this.imageURL, "imageSize": this.imageSize
-		}, this.dataX.keys, {"alpha": Number, "color": Number, "imageURL": String, "imageSize": Number});
+		var recordIds:IQualifiedKey[] = this.dataX.keys;
+		var records:any[] = weavejs.data.ColumnUtils.getRecords({
+			"alpha": this.alpha,
+			"color": this.color,
+			"imageURL": this.imageURL,
+			"imageSize": this.imageSize
+		}, recordIds, {
+			"alpha": Number,
+			"color": Number,
+			"imageURL": String,
+			"imageSize": Number
+		});
 
 		for (let idx in records)
 		{
 			let record = records[idx];
-			let feature = this.source.getFeatureById(record.id);
+			let feature = this.source.getFeatureById(recordIds[idx]);
 
 			if (!feature)
 			{
@@ -133,4 +138,4 @@ export default class ImageGlyphLayer extends GlyphLayer {
 	}
 }
 
-Weave.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer);

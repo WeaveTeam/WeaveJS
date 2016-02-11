@@ -16,11 +16,6 @@ import WeaveAPI = weavejs.WeaveAPI;
 
 abstract class Layer implements ILinkableObject {
 
-	handleMissingSessionStateProperties(newState:any)
-	{
-
-	}
-
 	opacity: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 	visible: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 	selectable: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);

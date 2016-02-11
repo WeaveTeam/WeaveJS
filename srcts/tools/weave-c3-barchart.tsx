@@ -260,9 +260,9 @@ export default class WeaveC3Barchart extends AbstractC3Tool_old {
         };
     }
 
-    protected handleMissingSessionStateProperties(newState:any)
+	get deprecatedStateMapping()
 	{
-
+		return {};
 	}
 
     handlePointClick(event:MouseEvent):void {

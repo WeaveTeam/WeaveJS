@@ -82,7 +82,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
 	}
 
-	handleMissingSessionStateProperties(newState:any):void
+	deprecatedStateMapping(newState:any):void
 	{
 		var traverseState = weavejs.api.core.DynamicState.traverseState;
 
