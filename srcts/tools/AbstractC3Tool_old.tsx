@@ -4,6 +4,9 @@
 ///<reference path="../../typings/d3/d3.d.ts"/>
 /// <reference path="../../typings/c3/c3.d.ts"/>
 
+import WeavePath = weavejs.path.WeavePath;
+import WeavePathUI = weavejs.path.WeavePathUI;
+
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import {ChartAPI, ChartConfiguration} from "c3";
 
@@ -12,50 +15,33 @@ import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import StandardLib from "../utils/StandardLib";
 
-import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-import IAttributeColumn = weavejs.api.data.IAttributeColumn;
-import KeySet = weavejs.data.key.KeySet;
-import DynamicColumn = weavejs.data.column.DynamicColumn;
-import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
-import NormalizedColumn = weavejs.data.column.NormalizedColumn;
-import SolidFillStyle = weavejs.geom.SolidFillStyle;
-import SolidLineStyle = weavejs.geom.SolidLineStyle;
-import LinkableNumber = weavejs.core.LinkableNumber;
-import LinkableString = weavejs.core.LinkableString;
-import FilteredKeySet = weavejs.data.key.FilteredKeySet;
-import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
-import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+export interface IToolPaths {
+    [name:string] : WeavePath;
+    plotter: WeavePath;
+    marginTop: WeavePath;
+    marginBottom: WeavePath;
+    marginLeft: WeavePath;
+    marginRight: WeavePath;
+    xAxis: WeavePath;
+    yAxis: WeavePath;
+    filteredKeySet: WeavePath;
+    selectionKeySet: WeavePath;
+    probeKeySet: WeavePath;
+}
 
-export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
-{
-    constructor(props:IVisToolProps) {
-        super(props);
-        this.xAxisClass = "c3-axis-x";
-        this.yAxisClass = "c3-axis-y";
-        this.y2AxisClass = "c3-axis-y2";
-    }
 
-	handleMissingSessionStateProperties(newState:any):void
-	{
-		console.log(newState);
-	}
+export interface PathConfig {
+    name: string;
+    path: WeavePath;
+    callbacks?: Function|Function[];
+}
 
-	selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	probeFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+export default class AbstractC3Tool_old extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
-	protected get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
-	protected get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
-	
-	xAxisName:LinkableString = Weave.linkableChild(this, LinkableString);
-	yAxisName:LinkableString = Weave.linkableChild(this, LinkableString);
-	marginTop:LinkableString = Weave.linkableChild(this, LinkableString);
-	marginBottom:LinkableString = Weave.linkableChild(this, LinkableString);
-	marginLeft:LinkableString = Weave.linkableChild(this, LinkableString);
-	marginRight:LinkableString = Weave.linkableChild(this, LinkableString);
-	panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
-
-	protected element:HTMLElement;
+    protected toolPath:WeavePathUI;
+    protected plotManagerPath:WeavePath;
+    protected element:HTMLElement;
+    protected paths:IToolPaths;
     protected chart:ChartAPI;
     protected c3Config:ChartConfiguration;
     private xAxisClass:string;
@@ -65,8 +51,29 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     private previousWidth:number;
     private previousHeight:number;
 
+    constructor(props:IVisToolProps) {
+        super(props);
+        this.toolPath = props.toolPath as WeavePathUI;
+        this.plotManagerPath = this.toolPath.push(["children","visualization","plotManager"]);
+        this.xAxisClass = "c3-axis-x";
+        this.yAxisClass = "c3-axis-y";
+        this.y2AxisClass = "c3-axis-y2";
+        this.paths = {
+            plotter: null,
+            marginTop: null,
+            marginBottom: null,
+            marginLeft: null,
+            marginRight: null,
+            xAxis: null,
+            yAxis: null,
+            filteredKeySet: null,
+            selectionKeySet: null,
+            probeKeySet: null
+        };
+    }
+
     get title():string {
-       return this.panelTitle.value;
+       return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
     }
 
     get internalWidth():number {
@@ -74,7 +81,7 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     }
 
     get internalHeight():number {
-        return this.props.style.height - this.c3Config.padding.top - Number(this.marginBottom.value);
+        return this.props.style.height - this.c3Config.padding.top - Number(this.paths.marginBottom.getState());
     }
 
     private cullAxis(axisSize:number, axisClass:string):void {
@@ -101,9 +108,28 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     componentDidUpdate():void {
         if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
             this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-			if (this.chart)
-	            this.chart.resize({width:this.props.style.width, height:this.props.style.height});
+            this.chart.resize({width:this.props.style.width, height:this.props.style.height});
         }
+    }
+
+    // this function accepts an arry of path configurations
+    // a path config is an object with a path object name, the weave path and an
+    // optional callback or array of callbacks
+    initializePaths(properties:PathConfig[]):void {
+        properties.forEach((pathConf:PathConfig) => {
+            this.paths[pathConf.name] = pathConf.path;
+            if(pathConf.callbacks) {
+                var callbacks:Function[] = Array.isArray(pathConf.callbacks) ? pathConf.callbacks as Function[] : [pathConf.callbacks as Function];
+                callbacks.forEach((callback:Function) => {
+                    this.paths[pathConf.name].addCallback(this, callback, true);
+                });
+            }
+        });
+    }
+
+    protected handleMissingSessionStateProperties(newState:any)
+    {
+
     }
 
     customStyle(array:Array<number>, type:string, filter:string, style:any) {
@@ -123,6 +149,10 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 
     render():JSX.Element {
         return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
+    }
+
+    detectChange(...pathNames:string[]):boolean {
+        return Weave.detectChange.apply(Weave, [this as any].concat(pathNames.map((name:string) => this.paths[name].getObject())));
     }
 
     getCullingInterval(size:number,axisClass:string):number {

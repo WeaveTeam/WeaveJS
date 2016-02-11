@@ -5,8 +5,8 @@
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
-import {IToolPaths} from "./AbstractC3Tool";
-import AbstractC3Tool from "./AbstractC3Tool";
+import {IToolPaths} from "./AbstractC3Tool_old";
+import AbstractC3Tool_old from "./AbstractC3Tool_old";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
@@ -26,6 +26,8 @@ import BinnedColumn = weavejs.data.column.BinnedColumn;
 import ColorColumn = weavejs.data.column.ColorColumn;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
+declare type Record = {id: weavejs.api.data.IQualifiedKey, [name:string]: any};
+
 export interface IHistogramPaths extends IToolPaths {
     binnedColumn: WeavePath;
     columnToAggregate: WeavePath;
@@ -34,7 +36,7 @@ export interface IHistogramPaths extends IToolPaths {
     lineStyle: WeavePath;
 }
 
-export default class WeaveC3Histogram extends AbstractC3Tool {
+export default class WeaveC3Histogram extends AbstractC3Tool_old {
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};

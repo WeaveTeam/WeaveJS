@@ -5,8 +5,8 @@
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
-import {IToolPaths} from "./AbstractC3Tool";
-import AbstractC3Tool from "./AbstractC3Tool";
+import {IToolPaths} from "./AbstractC3Tool_old";
+import AbstractC3Tool_old from "./AbstractC3Tool_old";
 
 import * as d3 from "d3";
 import * as _ from "lodash";
@@ -19,6 +19,8 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
+declare type Record = {id: weavejs.api.data.IQualifiedKey, [name:string]: any};
+
 export interface IPieChartPaths extends IToolPaths {
     data: WeavePath;
     label: WeavePath;
@@ -27,7 +29,7 @@ export interface IPieChartPaths extends IToolPaths {
     innerRadius:WeavePath;
 };
 
-export default class WeaveC3PieChart extends AbstractC3Tool {
+export default class WeaveC3PieChart extends AbstractC3Tool_old {
 
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};

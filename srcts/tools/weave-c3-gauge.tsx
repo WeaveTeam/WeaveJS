@@ -5,8 +5,8 @@
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
-import {IToolPaths} from "./AbstractC3Tool";
-import AbstractC3Tool from "./AbstractC3Tool";
+import {IToolPaths} from "./AbstractC3Tool_old";
+import AbstractC3Tool_old from "./AbstractC3Tool_old";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
@@ -24,13 +24,15 @@ import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
 import ColorRamp = weavejs.util.ColorRamp;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
+declare type Record = {id: weavejs.api.data.IQualifiedKey, [name:string]: any};
+
 export interface IGaugePaths extends IToolPaths {
     binningDefinition:WeavePath;
     meterColumn:WeavePath;
     colorRamp:WeavePath;
 }
 
-export default class WeaveC3Gauge extends AbstractC3Tool {
+export default class WeaveC3Gauge extends AbstractC3Tool_old {
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
     private stringRecords:Record[];

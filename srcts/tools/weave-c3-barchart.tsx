@@ -5,8 +5,8 @@
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
-import {IToolPaths} from "./AbstractC3Tool";
-import AbstractC3Tool from "./AbstractC3Tool";
+import {IToolPaths} from "./AbstractC3Tool_old";
+import AbstractC3Tool_old from "./AbstractC3Tool_old";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
@@ -22,6 +22,8 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
+declare type Record = {id: weavejs.api.data.IQualifiedKey, [name:string]: any};
+
 export interface IBarchartPaths extends IToolPaths {
     heightColumns: WeavePath;
     labelColumn: WeavePath;
@@ -35,7 +37,7 @@ export interface IBarchartPaths extends IToolPaths {
     overrideYMin: WeavePath;
 }
 
-export default class WeaveC3Barchart extends AbstractC3Tool {
+export default class WeaveC3Barchart extends AbstractC3Tool_old {
 
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};

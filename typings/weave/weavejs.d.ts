@@ -3664,6 +3664,7 @@ declare module weavejs.core {
     class LinkableString extends LinkableVariable {
         constructor(defaultValue?: string, verifier?: Function, defaultValueTriggersCallbacks?: boolean);
         value: string;
+        getSessionState(): Object;
         setSessionState(value: Object): void;
     }
 }
@@ -4589,18 +4590,20 @@ declare module weavejs.data {
          * Generates records using a custom format.
          * @param format An object mapping names to IAttributeColumn objects or constant values to be included in every record.
          *               You can nest Objects or Arrays.
+         *               If you want each record to include its corresponding key, include a property with a value equal to weavejs.api.data.IQualifiedKey.
          * @param keys An Array of IQualifiedKeys
          * @param dataType A Class specifying the dataType to retrieve from columns: String/Number/Date/Array (default is Array)
          *                 You can also specify different data types in a structure matching that of the format object.
          * @param keyProperty The property name which should be used to store the IQualifiedKey for a record.
          * @return An array of record objects matching the structure of the format object.
          */
-        static getRecords(format: Object, keys?: any[], dataType?: Object, keyProperty?: string): any[];
+        static getRecords(format: Object, keys?: any[], dataType?: Object): any[];
         private static getColumnsFromFormat(format, output);
         /**
          * Generates a record using a custom format.
          * @param format An object mapping names to IAttributeColumn objects or constant values to be included in every record.
          *               You can nest Objects or Arrays.
+         *               If you want the record to include its corresponding key, include include a property with a value equal to weavejs.api.data.IQualifiedKey.
          * @param key An IQualifiedKey
          * @param dataType A Class specifying the dataType to retrieve from columns: String/Number/Date/Array (default is Array)
          *                 You can also specify different data types in a structure matching that of the format object.
@@ -8687,6 +8690,14 @@ declare module weavejs.geom {
          */
         color: AlwaysDefinedColumn;
         alpha: AlwaysDefinedColumn;
+        /**
+         * For use with ColumnUtils.getRecords()
+         */
+        recordFormat: Object;
+        /**
+         * For use with ColumnUtils.getRecords()
+         */
+        recordType: Object;
         getStyle(key: IQualifiedKey): Object;
     }
 }
@@ -8711,6 +8722,14 @@ declare module weavejs.geom {
         joints: AlwaysDefinedColumn;
         miterLimit: AlwaysDefinedColumn;
         normalizedWeightColumn: NormalizedColumn;
+        /**
+         * For use with ColumnUtils.getRecords()
+         */
+        recordFormat: Object;
+        /**
+         * For use with ColumnUtils.getRecords()
+         */
+        recordType: Object;
         /**
          * IQualifiedKey -> getLineStyleParams() result
          */
@@ -9980,6 +9999,12 @@ declare module weavejs.util {
 }
 declare module weavejs.util {
     class BackwardsCompatibility {
+        /**
+         * Uses DynamicState.traverse() to traverse a state and copy portions of the state to ILinkableObjects.
+         * @param state A session state
+         * @param mapping A structure that defines the traversal, where the leaf nodes are ILinkableObjects or Functions to call.
+         */
+        static traverseAndSetState(state: Object, mapping: Object): void;
         static forceDeprecatedState(classDef: Function): void;
         private static map_class_ignore;
         static updateSessionState(state: Object): Object;
