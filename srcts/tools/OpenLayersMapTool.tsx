@@ -82,10 +82,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		/* Force the inclusion of the layers. */
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
 		
-		/* use global interaction mode as default local mode */
-		var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
-		if (defaultDragMode instanceof LinkableString)
-			this.interactionMode.value = defaultDragMode.value;
+		Weave.detectChange(this.interactionMode, this.interactionMode);
 	}
 
 	get deprecatedStateMapping():Object
@@ -112,6 +109,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	componentDidMount():void
 	{
+		if (Weave.detectChange(this.interactionMode, this.interactionMode))
+		{
+			/* use global interaction mode as default local mode */
+			var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
+			if (defaultDragMode instanceof LinkableString)
+				this.interactionMode.value = defaultDragMode.value;
+		}
+		
 		this.map = new ol.Map({
 			interactions: ol.interaction.defaults({ dragPan: false }),
 			controls: [],
