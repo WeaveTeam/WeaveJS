@@ -81,6 +81,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		/* Force the inclusion of the layers. */
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
+		
+		/* use global interaction mode as default local mode */
+		var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
+		if (defaultDragMode instanceof LinkableString)
+			this.interactionMode.value = defaultDragMode.value;
 	}
 
 	get deprecatedStateMapping():Object
@@ -103,11 +108,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				}
 			}
 		};
-		
-		/* Copy interaction mode to local state */
-		var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
-		if (defaultDragMode instanceof LinkableString)
-			this.interactionMode.value = defaultDragMode.value;
 	}
 
 	componentDidMount():void
@@ -352,17 +352,16 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 			layer.parent = this;
 
-			if (!layer || !layer.olLayer) {
+			if (!layer || !layer.olLayer)
 				continue;
-			}
 
-			layer.olLayer.setZIndex(idx + 2);
+			layer.olLayer.setZIndex(Number(idx) + 2);
 		}
 		/* This may impact the default projection, so trigger callbacks on it. */
 		this.projectionSRS.triggerCallbacks();
 	}
 
-	destroy():void
+	dispose():void
 	{
 
 	}

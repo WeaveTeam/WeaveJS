@@ -104,10 +104,8 @@ export default class TileLayer extends Layer {
 		{
 			case "stamen":
 				return new ol.source.Stamen(params);
-				break;
 			case "mapquest":
 				return new ol.source.MapQuest(params);
-				break;
 			case "osm":
 				return new ol.source.OSM(params);
 			case "custom":
