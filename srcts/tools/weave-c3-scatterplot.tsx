@@ -74,7 +74,6 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	private dataYType:string;
 	private records:Record[];
 
-	private flag:boolean;
 	private busy:boolean;
 	private dirty:boolean;
 
@@ -146,14 +145,12 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 					}
 				},
 				onselected: (d:any) => {
-					this.flag = true;
 					if(d && d.hasOwnProperty("index")) {
 						if (this.selectionKeySet)
 							this.selectionKeySet.addKeys([this.indexToKey[d.index]]);
 					}
 				},
 				onunselected: (d) => {
-					this.flag = true;
 					if(d && d.hasOwnProperty("index")) {
 						if (this.selectionKeySet)
 							this.selectionKeySet.removeKeys([this.indexToKey[d.index]]);
@@ -311,13 +308,17 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 		}];
 	}
 
-	handleClick(event:MouseEvent):void
+	handlePointClick(event:MouseEvent):void
 	{
-		if(!this.flag) {
-			if (this.selectionKeySet)
-				this.selectionKeySet.replaceKeys([]);
-		}
-		this.flag = false;
+		if (!this.selectionKeySet)
+			return;
+		
+        var probeKeys:any[] = this.probeKeySet ? this.probeKeySet.keys : [];
+        var selectionKeys:any[] = this.selectionKeySet.keys;
+        if (_.isEqual(probeKeys, selectionKeys))
+            this.selectionKeySet.replaceKeys([]);
+        else
+            this.selectionKeySet.replaceKeys(probeKeys);
 	}
 
 	updateStyle()
@@ -364,6 +365,15 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 		}
 	}
 
+	componentDidMount()
+	{
+		//super.componentDidMount();
+        StandardLib.addPointClickListener(this.element, this.handlePointClick.bind(this));
+		
+		this.c3Config.bindto = this.element;
+		this.validate(true);
+	}
+
 	componentDidUpdate()
 	{
 		var sizeChanged = this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height;
@@ -376,15 +386,6 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	{
 		//super.componentWillUnmount();
 		this.chart.destroy();
-	}
-
-	componentDidMount()
-	{
-		//super.componentDidMount();
-		this.element.addEventListener("click", this.handleClick.bind(this));
-
-		this.c3Config.bindto = this.element;
-		this.validate(true);
 	}
 
 	validate(forced:boolean = false):void
