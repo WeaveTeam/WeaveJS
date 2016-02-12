@@ -41,14 +41,14 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 import Bounds2D = weavejs.geom.Bounds2D;
 
-interface Bounds2DAlike {
+interface Bounds {
 	xMin: number;
 	xMax: number;
 	yMin: number;
 	yMax: number;
 }
 
-function isBounds2DAlike(obj:any):boolean {
+function isBounds(obj:any):boolean {
 	return lodash.every(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj[item] === "number");
 }
 
@@ -68,7 +68,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	private element:Element;
 
 	zoomBounds: ZoomBounds = Weave.linkableChild(this, ZoomBounds);
-	extentOverride: LinkableVariable = Weave.linkableChild(this, new LinkableVariable(null, isBounds2DAlike, [NaN, NaN, NaN, NaN]));
+	extentOverride: LinkableVariable = Weave.linkableChild(this, new LinkableVariable(null, isBounds, [NaN, NaN, NaN, NaN]));
 	projectionSRS: LinkableString = Weave.linkableChild(this, LinkableString);
 	showZoomControls: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 	showMouseModeControls: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
@@ -169,7 +169,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	updateViewParameters_weaveToOl():void
 	{
 		let extent:ol.Extent = [NaN,NaN,NaN,NaN];
-		let rawExtent: Bounds2DAlike = this.extentOverride.state as Bounds2DAlike;
+		let rawExtent: Bounds = this.extentOverride.state as Bounds;
 
 		if (rawExtent) {
 			extent[0] = rawExtent.xMin;
