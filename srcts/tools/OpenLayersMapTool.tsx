@@ -32,6 +32,7 @@ import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 import WeavePath = weavejs.path.WeavePath;
 import ZoomBounds = weavejs.geom.ZoomBounds;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import DynamicState = weavejs.api.core.DynamicState;
 
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -48,7 +49,7 @@ interface Bounds2DAlike {
 }
 
 function isBounds2DAlike(obj:any):boolean {
-	return lodash.every(lodash.map(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj[item] === "number"));
+	return lodash.every(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj[item] === "number");
 }
 
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> {
@@ -82,33 +83,31 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
 	}
 
-	deprecatedStateMapping(newState:any):void
+	get deprecatedStateMapping():Object
 	{
-		var traverseState = weavejs.api.core.DynamicState.traverseState;
-
-		/* Copy zoomBounds session state from plotmanager to local */
-		Weave.setState(this.zoomBounds, traverseState(newState, ["children", "visualization", "plotManager", "zoomBounds"]));
-
-		/* Translate extent session properties to a ZoomBounds object */
-		var newExtentOverride: Bounds2DAlike = {xMin:null, xMax:null, yMin:null, yMax: null};
-
-		newExtentOverride.xMin = traverseState(newState, ["children", "visualization", "plotManager", "overrideXMin"]);
-		newExtentOverride.xMax = traverseState(newState, ["children", "visualization", "plotManager", "overrideXMax"]);
-		newExtentOverride.yMin = traverseState(newState, ["children", "visualization", "plotManager", "overrideYMin"]);
-		newExtentOverride.yMax = traverseState(newState, ["children", "visualization", "plotManager", "overrideYMax"]);
-
-		this.extentOverride.setSessionState(newExtentOverride);
-
+		return {
+			children: {
+				visualization: {
+					plotManager: (pm:any, removeMissingDynamicObjects:boolean) => {
+						if (!pm)
+							return;
+						
+						if (pm.zoomBounds)
+							Weave.setState(this.zoomBounds, pm.zoomBounds);
+						
+						this.extentOverride.state = {xMin: pm.overrideXMin, yMin: pm.overrideYMin, xMax: pm.overrideXMax, yMax: pm.overrideYMax};
+						
+						Weave.setState(this.layers, pm.plotters, removeMissingDynamicObjects);
+						Weave.setState(this.layers, DynamicState.removeTypeFromState(pm.layerSettings), removeMissingDynamicObjects);
+					}
+				}
+			}
+		};
+		
 		/* Copy interaction mode to local state */
-
-		Weave.setState(this.interactionMode, Weave.getWeave(this).path(["WeaveProperties", "toolInteractions", "defaultDragMode"]).getState());
-
-		/* Merge layerSettings and plotters into 'layers' HashMap */
-
-		let plotters:any = traverseState(newState, ["children", "visualization", "plotManager", "plotters"]);
-		let plotterSettings: any = traverseState(newState, ["children", "visualization", "plotManager", "layerSettings"]);
-
-		Weave.setState(this.layers, lodash.merge(plotterSettings, plotters));
+		var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
+		if (defaultDragMode instanceof LinkableString)
+			this.interactionMode.value = defaultDragMode.value;
 	}
 
 	componentDidMount():void

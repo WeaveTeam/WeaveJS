@@ -38,52 +38,56 @@ export default class TileLayer extends Layer {
 		 	console.log('invalid proj -> no extent');
 	}
 
-	deprecatedStateMapping(newState:any)
+	get deprecatedStateMapping()
 	{
-		var traverseState = weavejs.api.core.DynamicState.traverseState;
-
-		let serviceState = traverseState(newState, ["service", null]) || {};
-		if (serviceState.providerName)
-		{
-			let providerName: string;
-			let params: any = {};
-			switch (serviceState.providerName) {
-				case "Stamen WaterColor":
-					providerName = "stamen";
-					params.layer = "watercolor";
-					break;
-				case "Stamen Toner":
-					providerName = "stamen";
-					params.layer = "toner";
-					break;
-				case "Open MapQuest Aerial":
-					providerName = "mapquest";
-					params.layer = "sat";
-					break;
-				case "Open MapQuest":
-					providerName = "mapquest";
-					params.layer = "osm";
-					break;
-				case "Blue Marble Map":
-					providerName = "custom";
-					params.url = "http://neowms.sci.gsfc.nasa.gov/wms/wms";
-				default:
-					providerName = "osm";
-					break;
+		return {
+			service: {
+				'': (serviceState:any, removeMissingDynamicObjects:boolean) => {
+					if (serviceState.providerName)
+					{
+						let providerName: string;
+						let params: any = {};
+						switch (serviceState.providerName) {
+							case "Stamen WaterColor":
+								providerName = "stamen";
+								params.layer = "watercolor";
+								break;
+							case "Stamen Toner":
+								providerName = "stamen";
+								params.layer = "toner";
+								break;
+							case "Open MapQuest Aerial":
+								providerName = "mapquest";
+								params.layer = "sat";
+								break;
+							case "Open MapQuest":
+								providerName = "mapquest";
+								params.layer = "osm";
+								break;
+							case "Blue Marble Map":
+								providerName = "custom";
+								params.url = "http://neowms.sci.gsfc.nasa.gov/wms/wms";
+							default:
+								providerName = "osm";
+								break;
+						}
+			
+						this.provider.value = providerName;
+						this.providerOptions.state = params;
+					}
+					else
+					{
+						this.provider.value = "custom";
+						let params:any = {};
+						var mapping:any = {wmsURL: 'url', attributions: 'attributions', projection: 'projection'};
+						for (var key in mapping)
+							if (serviceState[key] !== undefined)
+								params[mapping[key]] = serviceState[key];
+						Weave.setState(this.providerOptions, params, removeMissingDynamicObjects);
+					}
+				}
 			}
-
-			this.provider.value = providerName;
-			this.providerOptions.state = params;
-		}
-		else
-		{
-			this.provider.value = "custom";
-			this.providerOptions.state = {
-				url: serviceState.wmsURL,
-				attributions: serviceState.attributions,
-				projection: serviceState.projection
-			};
-		}
+		};
 	}
 
 	private static isXYZString(url:string):boolean
