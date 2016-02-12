@@ -1,7 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import $ from "jquery";
-import JSZip from "jszip";
 /* eslint-disable */
 import {Layout} from "../lib/WeaveUI.js";
 import {StandardLib} from "../lib/WeaveUI.js";
@@ -9,11 +8,7 @@ import {StandardLib} from "../lib/WeaveUI.js";
 
 /*global Weave, weavejs*/
 
-// TEMPORARY SOLUTION
-weavejs.util.JS.JSZip = JSZip;
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
-
-Weave.registerAsyncClass(React.Component);
 
 var weave = window.weave;
 if (weave)

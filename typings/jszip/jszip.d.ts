@@ -187,5 +187,5 @@ declare var JSZip: {
 }
 
 declare module "jszip" {
-    export {JSZip as default};
+    export = JSZip;
 }

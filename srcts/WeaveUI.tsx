@@ -18,13 +18,14 @@ import WeaveReactTable from "./tools/weave-react-table";
 import SessionStateMenuTool from "./tools/weave-session-state-menu";
 import StandardLib from "./utils/StandardLib";
 import ui from "./react-ui/ui";
-import JSZip from "jszip";
-
+import * as JSZip from "jszip";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 var stub:any = React;
-weavejs.util.JS.JSZip = JSZip;
+weavejs.util.JS.JSZip = (JSZip as any)['default'];
+
+Weave.registerAsyncClass(React.Component);
 
 var loadLayout = function(weave:Weave,
                           fileName:string,
