@@ -1,6 +1,9 @@
 /// <reference path="../../typings/lodash/lodash.d.ts"/>
+/// <reference path="../../typings/weave/weavejs.d.ts"/>
 
 import * as _ from "lodash";
+
+import Dictionary2D = weavejs.util.Dictionary2D;
 
 export default class StandardLib
 {
@@ -274,16 +277,24 @@ export default class StandardLib
 		return metrics.width;
 	}
 
+	static textHeightCache: Dictionary2D = new Dictionary2D();
+
 	static getTextHeight(text:string, font:string):number
 	{
+		var result = this.textHeightCache.get(text, font);
+		if (result !== undefined) return result;
+
 		var body = document.getElementsByTagName("body")[0];
 		var dummy = document.createElement("div");
 		var dummyText = document.createTextNode("M");
 		dummy.appendChild(dummyText);
 		dummy.setAttribute("style", font);
 		body.appendChild(dummy);
-		var result = dummy.offsetHeight;
+		result = dummy.offsetHeight;
 		body.removeChild(dummy);
+
+		this.textHeightCache.set(text, font, result);
+
 		return result;
 	}
 
