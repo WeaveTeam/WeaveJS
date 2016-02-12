@@ -16,78 +16,104 @@ import {CSSProperties} from "react";
 
 import WeavePath = weavejs.path.WeavePath;
 
+import LinkableHashMap = weavejs.core.LinkableHashMap;
+import LinkableVariable = weavejs.core.LinkableVariable;
+import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
+import LinkableString = weavejs.core.LinkableString;
+
 //TODO: This is a hack to allow react to be imported in generated JSX. Without this, import is missing and render encounters an exception
 var stub:any = React;
 const sessionStateMenuStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column", overflow:"auto"};
 const sessionStateComboBoxStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column"};
 
 export default class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState> {
-    private choices:WeavePath;
-    protected toolPath:WeavePath;
 
-    constructor(props:IVisToolProps) {
-        super(props);
-        this.toolPath = this.props.toolPath;
-        this.toolPath.push("choices").addCallback(this, this.forceUpdate);
-        this.toolPath.push("selectedChoice").addCallback(this, this.forceUpdate);
-        this.toolPath.push("layoutMode").addCallback(this, this.forceUpdate);
-    }
+	selectedChoice:LinkableString = Weave.linkableChild(this, LinkableString);
+	layoutMode:LinkableString = Weave.linkableChild(this, LinkableString);
+	choices:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
+	targets:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
 
-	get deprecatedStateMapping()
-	{
-		return {};
+	constructor(props:IVisToolProps) {
+		super(props);
+
+		this.choices.addGroupedCallback(this, this.choiceChanged);
+		this.selectedChoice.addGroupedCallback(this, this.choiceChanged);
+		this.targets.addGroupedCallback(this, this.choiceChanged);
+
+		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
 	}
 
-    componentDidMount() {
-    }
+	componentDidMount() {
+	}
 
-    handleItemClick(index:number, event:MouseEvent):void {
-        this.toolPath.state("selectedChoice", this.choices.getNames()[index]);
-        var targets:WeavePath = this.toolPath.push("targets");
-        var choice:any = this.choices.getState(index);
-        targets.forEach(choice, function (value:any, key:string) {
-            this.push(key, null).state(value)
-        });
-    }
+	setTargetStates(states:any):void {
+		if (!states)
+			return;
 
-    render() {
-        this.choices = this.toolPath.push("choices");
-        var selectedChoice = this.toolPath.getState("selectedChoice") as string;
-        var layoutMode = this.toolPath.getState("layoutMode") as string;
+//		this.targets.delayCallbacks();
 
-        var menus:JSX.Element[] = this.choices.getNames().map((choice:string, index:number) => {
-            if(layoutMode === "ComboBox"){
-                return choice === selectedChoice ?<MenuItem active key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>
-                    :<MenuItem key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>;
-            }else {
-                return choice === selectedChoice ?<ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
-                    :<ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
-            }
-        });
+		for (let wrapper of this.targets.getObjects() as LinkableDynamicObject[])
+		{
+			if (!wrapper.target)
+				continue;
+			let name:string = this.targets.getName(wrapper);
 
-        var container:JSX.Element;
+			if (states.hasOwnProperty(name))
+				Weave.setState(wrapper.target, states[name]);
+		}
 
-        if(layoutMode === "ComboBox"){
-            container =
-                <ui.VBox style={{height:"100%", flex:1.0, alignItems:"center"}}>
-                    <DropdownButton title={selectedChoice} id={`dropdown-${this.toolPath.getState("class")}`} >
-                        {menus}
-                    </DropdownButton>
-                </ui.VBox>
-        }else{
-            container =
-                <ListGroup>
-                    {menus}
-                </ListGroup>
-        }
+//		this.targets.resumeCallbacks();
+	}
 
-        return (<div style={layoutMode === "ComboBox" ? sessionStateComboBoxStyle : sessionStateMenuStyle}>
-            {container}
-        </div>);
-    }
+	choiceChanged()
+	{
+		let choice: LinkableVariable = this.choices.getObject(this.selectedChoice.value) as LinkableVariable;
+
+		this.setTargetStates(choice.state);
+
+		this.forceUpdate();
+	}
+
+	handleItemClick(index:number, event:MouseEvent):void {
+		this.selectedChoice.value = this.choices.getNames()[index];
+	}
+
+	render() {
+
+		let isComboBox: boolean = this.layoutMode.value === "ComboBox";
+		var menus:JSX.Element[] = this.choices.getNames().map((choice:string, index:number) => {
+			if(isComboBox) {
+				return choice === this.selectedChoice.value ? <MenuItem active key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>
+				: <MenuItem key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>;
+			} else {
+				return choice === this.selectedChoice.value ? <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
+				: <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
+			}
+		});
+
+		var container:JSX.Element;
+
+		if(isComboBox) {
+			container =
+			<ui.VBox style={{height:"100%", flex:1.0, alignItems:"center"}}>
+				<DropdownButton title={this.selectedChoice.value} id={`dropdown-${Weave.className(this)}`}>
+					{menus}
+				</DropdownButton>
+			</ui.VBox>
+		}else{
+			container =
+			<ListGroup>
+				{menus}
+			</ListGroup>
+		}
+
+		return (<div style={isComboBox ? sessionStateComboBoxStyle : sessionStateMenuStyle}>
+				{container}
+				</div>);
+	}
 }
 
-weavejs.util.BackwardsCompatibility.forceDeprecatedState(SessionStateMenuTool); // TEMPORARY HACK - remove when class is refactored
+//weavejs.util.BackwardsCompatibility.forceDeprecatedState(SessionStateMenuTool); // TEMPORARY HACK - remove when class is refactored
 
-Weave.registerClass("weavejs.tool.SessionStateMenu", SessionStateMenuTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.SessionStateMenu", SessionStateMenuTool, [weavejs.api.ui.IVisTool/*, weavejs.api.core.ILinkableObjectWithNewProperties*/]);
 Weave.registerClass("weave.ui::SessionStateMenuTool", SessionStateMenuTool);
