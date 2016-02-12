@@ -318,7 +318,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
             });
 
         }
-        var axisChanged = Weave.detectChange(this, this.xAxisName, this.yAxisName, this.marginTop, this.marginBottom, this.marginLeft, this.marginRight);
+        var axisChanged = Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin.top, this.margin.bottom, this.margin.left, this.margin.right);
 
         if(dataChanged || axisChanged) {
             this.busy = true;

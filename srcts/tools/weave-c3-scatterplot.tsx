@@ -418,7 +418,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 				this.yAxisValueToLabel[this.records[index].point.y] = this.dataY.getValueFromKey(record.id, String);
 			});
 		}
-		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.marginTop, this.marginBottom, this.marginLeft, this.marginRight);
+		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin.top, this.margin.bottom, this.margin.left, this.margin.right);
 		if (axisChanged)
 		{
 			var xLabel:string = this.xAxisName.value || this.dataX.getMetadata('title');
@@ -442,18 +442,18 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 			this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
 			this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-			this.c3Config.padding.top = Number(this.marginTop.value);
-			this.c3Config.axis.x.height = Number(this.marginBottom.value);
+			this.c3Config.padding.top = Number(this.margin.top.value);
+			this.c3Config.axis.x.height = Number(this.margin.bottom.value);
 			
 			if (weavejs.WeaveAPI.Locale.reverseLayout)
 			{
-				this.c3Config.padding.left = Number(this.marginRight.value);
-				this.c3Config.padding.right = Number(this.marginLeft.value);
+				this.c3Config.padding.left = Number(this.margin.right.value);
+				this.c3Config.padding.right = Number(this.margin.left.value);
 			}
 			else
 			{
-				this.c3Config.padding.left = Number(this.marginLeft.value);
-				this.c3Config.padding.right = Number(this.marginRight.value);
+				this.c3Config.padding.left = Number(this.margin.left.value);
+				this.c3Config.padding.right = Number(this.margin.right.value);
 			}
 		}
 		

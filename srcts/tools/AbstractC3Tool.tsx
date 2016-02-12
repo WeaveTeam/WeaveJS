@@ -26,6 +26,15 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
+export class Margin {
+    top: LinkableString = Weave.linkableChild(this, LinkableNumber);
+    bottom: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+    left: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+    right: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+}
+
+Weave.registerClass("weavejs.tool.Margin", Margin);
+
 export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
     constructor(props:IVisToolProps) {
@@ -44,10 +53,9 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 	
 	xAxisName:LinkableString = Weave.linkableChild(this, LinkableString);
 	yAxisName:LinkableString = Weave.linkableChild(this, LinkableString);
-	marginTop:LinkableString = Weave.linkableChild(this, LinkableString);
-	marginBottom:LinkableString = Weave.linkableChild(this, LinkableString);
-	marginLeft:LinkableString = Weave.linkableChild(this, LinkableString);
-	marginRight:LinkableString = Weave.linkableChild(this, LinkableString);
+
+    margin = Weave.linkableChild(this, Margin);
+
 	panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
 
 	protected element:HTMLElement;
@@ -71,10 +79,10 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 			"children": {
 				"visualization": {
 					"plotManager": {
-						"marginBottom": this.marginBottom,
-						"marginRight": this.marginRight,
-						"marginLeft": this.marginLeft,
-						"marginTop": this.marginTop,
+						"marginBottom": this.margin.bottom,
+						"marginRight": this.margin.right,
+						"marginLeft": this.margin.left,
+						"marginTop": this.margin.top,
 						"plotters": {
 							"yAxis": {
 								"overrideAxisName": this.yAxisName
@@ -98,7 +106,7 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     }
 
     get internalHeight():number {
-        return this.props.style.height - this.c3Config.padding.top - Number(this.marginBottom.value);
+        return this.props.style.height - this.c3Config.padding.top - Number(this.margin.bottom.value);
     }
 
     private cullAxis(axisSize:number, axisClass:string):void {
