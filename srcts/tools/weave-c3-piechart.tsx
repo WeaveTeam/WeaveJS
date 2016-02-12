@@ -4,6 +4,7 @@
 /// <reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
+import StandardLib from "../utils/StandardLib";
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
@@ -19,8 +20,6 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import LinkableNumber = weavejs.core.LinkableNumber;
-import StandardLib from "../../outts/utils/StandardLib";
-import stereographic = d3.geo.stereographic;
 
 declare type Record = {
     id: IQualifiedKey,
