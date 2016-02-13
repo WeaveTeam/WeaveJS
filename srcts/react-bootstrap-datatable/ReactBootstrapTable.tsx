@@ -103,11 +103,11 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
             {
             } else {
                 var start:number = _.findIndex(this.props.rows, (row:IRow) => {
-                    return row["id"] == this.lastClicked;
+                    return row[this.props.idProperty] == this.lastClicked;
                 });
 
                 var end:number = _.findIndex(this.props.rows, (row:IRow) => {
-                    return row["id"] == id;
+                    return row[this.props.idProperty] == id;
                 });
 
                 if(start > end) {
@@ -117,7 +117,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
                 }
 
                 for(var i:number = start; i <= end; i++) {
-                    selectedIds.push(this.props.rows[i]["id"]);
+                    selectedIds.push(this.props.rows[i][this.props.idProperty]);
                 }
             }
 
