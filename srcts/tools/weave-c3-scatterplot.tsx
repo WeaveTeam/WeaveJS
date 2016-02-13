@@ -3,7 +3,7 @@
 ///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
-/// <reference path="../../typings/react/react-dom.d.ts"/>
+///<reference path="../../typings/react/react-dom.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
@@ -65,8 +65,8 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 		line: { color: String }
 	};
 	
-	private keyToIndex:{[key:string]: number};
-	private indexToKey:{[index:number]: IQualifiedKey};
+	private keyToIndex: Map<IQualifiedKey, number>;
+	private indexToKey: Map<number, IQualifiedKey>;
 	private xAxisValueToLabel:{[value:number]: string};
 	private yAxisValueToLabel:{[value:number]: string};
 	protected chart:ChartAPI;
@@ -99,8 +99,8 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
-		this.keyToIndex = {};
-		this.indexToKey = {};
+		this.keyToIndex = new Map<IQualifiedKey, number>();
+		this.indexToKey = new Map<number, IQualifiedKey>();
 		this.yAxisValueToLabel = {};
 		this.xAxisValueToLabel = {};
 		this.validate = _.debounce(this.validate.bind(this), 30);
@@ -141,19 +141,19 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 					var event:MouseEvent = (this.chart.internal.d3).event as MouseEvent;
 					if(!(event.ctrlKey||event.metaKey) && d && d.hasOwnProperty("index")) {
 						if (this.selectionKeySet)
-							this.selectionKeySet.replaceKeys([this.indexToKey[d.index]]);
+							this.selectionKeySet.replaceKeys([this.indexToKey.get(d.index)]);
 					}
 				},
 				onselected: (d:any) => {
 					if(d && d.hasOwnProperty("index")) {
 						if (this.selectionKeySet)
-							this.selectionKeySet.addKeys([this.indexToKey[d.index]]);
+							this.selectionKeySet.addKeys([this.indexToKey.get(d.index)]);
 					}
 				},
 				onunselected: (d) => {
 					if(d && d.hasOwnProperty("index")) {
 						if (this.selectionKeySet)
-							this.selectionKeySet.removeKeys([this.indexToKey[d.index]]);
+							this.selectionKeySet.removeKeys([this.indexToKey.get(d.index)]);
 					}
 				},
 				onmouseover: (d) => {
@@ -176,7 +176,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 							columnNamesToValue[this.radius.getMetadata('title')] = size;
 						}
 						if (this.probeKeySet)
-							this.probeKeySet.replaceKeys([this.indexToKey[d.index]]);
+							this.probeKeySet.replaceKeys([this.indexToKey.get(d.index)]);
 						this.props.toolTip.setState({
 							x: this.chart.internal.d3.event.pageX,
 							y: this.chart.internal.d3.event.pageY,
@@ -327,24 +327,19 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 			return;
 
 		d3.select(this.element)
-			.selectAll("circle")
+			.selectAll("circle.c3-shape")
 			.style("opacity", 1)
 			.style("stroke", "black")
 			.style("stroke-opacity", 0.0)
-			.style("stroke-width",1.0);
+			.style("stroke-width", 1.0);
 
-		var selectedKeys:string[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-		var probedKeys:string[] = this.probeKeySet ? this.probeKeySet.keys : [];
-		var selectedIndices:number[] = selectedKeys.map((key:string) => {
-			return Number(this.keyToIndex[key]);
-		});
-		var probedIndices:number[] = probedKeys.map((key:string) => {
-			return Number(this.keyToIndex[key]);
-		});
-		var keys:string[] = Object.keys(this.keyToIndex);
-		var indices:number[] = keys.map((key:string) => {
-			return Number(this.keyToIndex[key]);
-		});
+		var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+		var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
+		var keyToIndex = (key: IQualifiedKey) => this.keyToIndex.get(key);
+
+		var selectedIndices:number[] = selectedKeys.map(keyToIndex);
+		var probedIndices:number[] = probedKeys.map(keyToIndex);
+		var indices:number[] = Array.from(this.keyToIndex.values()); /* wat */
 
 		var unselectedIndices:number[] = _.difference(indices, selectedIndices);
 		unselectedIndices = _.difference(unselectedIndices,probedIndices);
@@ -407,14 +402,14 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 			this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
 	
-			this.keyToIndex = {};
-			this.indexToKey = {};
+			this.keyToIndex.clear();
+			this.indexToKey.clear();
 			this.yAxisValueToLabel = {};
 			this.xAxisValueToLabel = {};
 	
 			this.records.forEach((record:Record, index:number) => {
-				this.keyToIndex[record.id as any] = index;
-				this.indexToKey[index] = record.id;
+				this.keyToIndex.set(record.id, index);
+				this.indexToKey.set(index, record.id);
 				this.xAxisValueToLabel[this.records[index].point.x] = this.dataX.getValueFromKey(record.id, String);
 				this.yAxisValueToLabel[this.records[index].point.y] = this.dataY.getValueFromKey(record.id, String);
 			});
