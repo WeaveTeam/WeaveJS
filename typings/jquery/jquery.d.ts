@@ -607,6 +607,16 @@ interface JQueryAnimationOptions {
     specialEasing?: Object;
 }
 
+interface JQueryEasingFunction {
+    ( percent: number ): number;
+}
+
+interface JQueryEasingFunctions {
+    [ name: string ]: JQueryEasingFunction;
+    linear: JQueryEasingFunction;
+    swing: JQueryEasingFunction;
+}
+
 /**
  * Static members of jQuery (those on $ and jQuery themselves)
  */
@@ -889,6 +899,9 @@ interface JQueryStatic {
     /**
      * Effects
      */
+
+    easing: JQueryEasingFunctions;
+
     fx: {
         tick: () => void;
         /**
@@ -2262,6 +2275,13 @@ interface JQuery {
      * Remove an event handler.
      *
      * @param events One or more space-separated event types and optional namespaces, or just namespaces, such as "click", "keydown.myPlugin", or ".myPlugin".
+     * @param handler A handler function previously attached for the event(s), or the special value false. Takes handler with extra args that can be attached with on().
+     */
+    off(events: string, handler: (eventObject: JQueryEventObject, ...args: any[]) => any): JQuery;
+    /**
+     * Remove an event handler.
+     *
+     * @param events One or more space-separated event types and optional namespaces, or just namespaces, such as "click", "keydown.myPlugin", or ".myPlugin".
      * @param handler A handler function previously attached for the event(s), or the special value false.
      */
     off(events: string, handler: (eventObject: JQueryEventObject) => any): JQuery;
@@ -3183,9 +3203,8 @@ interface JQuery {
      */
     queue(queueName: string, callback: Function): JQuery;
 }
+declare module "jquery" {
+    export = $;
+}
 declare var jQuery: JQueryStatic;
 declare var $: JQueryStatic;
-
-declare module "jquery" {
-    export {$ as default};
-}
