@@ -57,6 +57,8 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     margin = Weave.linkableChild(this, Margin);
 
 	panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
+    overrideYMin:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+    overrideYMax:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 
 	protected element:HTMLElement;
     protected chart:ChartAPI;
@@ -83,7 +85,9 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 						"marginRight": this.margin.right,
 						"marginLeft": this.margin.left,
 						"marginTop": this.margin.top,
-						"plotters": {
+                        "overrideYMax": this.overrideYMax,
+                        "overrideYMin": this.overrideYMin,
+                        "plotters": {
 							"yAxis": {
 								"overrideAxisName": this.yAxisName
 							},
