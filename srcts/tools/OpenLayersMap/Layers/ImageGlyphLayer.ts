@@ -10,6 +10,9 @@ import FeatureLayer from "./FeatureLayer";
 import ImageGlyphCache from "./ImageGlyphCache";
 import Layer from "./Layer";
 
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
+
 import WeavePathData = weavejs.path.WeavePathData;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
@@ -54,7 +57,7 @@ export default class ImageGlyphLayer extends GlyphLayer {
 
 		if (!img.complete || !img.src)
 		{
-			jquery(img).one("load", this.setIconStyle.bind(this, feature, img, iconSize));
+			$(img).one("load", this.setIconStyle.bind(this, feature, img, iconSize));
 			return;
 		}
 
