@@ -5,10 +5,9 @@
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
-import {IToolPaths} from "./AbstractC3Tool_old";
-import AbstractC3Tool_old from "./AbstractC3Tool_old";
-import * as d3 from "d3";
+import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
+import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
@@ -18,34 +17,47 @@ import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 import StandardLib from "../utils/StandardLib";
 
-import WeavePath = weavejs.path.WeavePath;
-import WeavePathData = weavejs.path.WeavePathData;
-import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
+import SolidLineStyle = weavejs.geom.SolidLineStyle;
+import LinkableString = weavejs.core.LinkableString;
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 
-declare type Record = {id: weavejs.api.data.IQualifiedKey, [name:string]: any};
+declare type Record = {
+    id: IQualifiedKey,
+    columns: IAttributeColumn[],
+    line: {color: string }
+};
 
-export interface ILineChartPaths extends IToolPaths {
-    columns: WeavePath;
-    lineStyle: WeavePath;
-    curveType: WeavePath;
-    overrideYMax: WeavePath;
-}
 
-export default class WeaveC3LineChart extends AbstractC3Tool_old {
+export default class WeaveC3LineChart extends AbstractC3Tool {
+
+    columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+    line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+    curveType:LinkableString = Weave.linkableChild(this, LinkableString);
+
+    private RECORD_FORMAT = {
+        id: IQualifiedKey,
+        columns: this.columns.getObjects(),
+        line: { color: this.line.color }
+    };
+
+    private RECORD_DATATYPE = {
+        columns: Number,
+        line: { color:String }
+    };
+
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
     private yAxisValueToLabel:{[value:number]: string};
-    private colors:{[id:string]: string};
-    private yLabelColumnPath:WeavePath;
-    private numericRecords:Record[];
-    private stringRecords:Record[];
-    private records:Record[][];
+
+    private records:Record[];
     private columnLabels:string[];
     private columnNames:string[];
-    private columns:any;
     private chartType:string;
 
     private flag:boolean;
@@ -56,15 +68,21 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
     protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
 
-    protected paths:ILineChartPaths;
-
     constructor(props:IVisToolProps) {
         super(props);
-        this.busy = false;
+
+        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
+        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
+
+        Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
+
+        this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
+        this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
+        this.probeFilter.targetPath = ['defaultProbeKeySet'];
+
         this.keyToIndex = {};
         this.indexToKey = {};
         this.yAxisValueToLabel = {};
-        this.columns = [];
         this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.c3ConfigYAxis = {
@@ -72,7 +90,7 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
             tick: {
                 multiline: true,
                 format: (num:number):string => {
-                    if(this.yLabelColumnPath && this.yLabelColumnPath.getValue("this.getMetadata('dataType')") !== "number") {
+                    if(this.columns.getObjects()[0] && this.columns.getObjects()[0].getMetadata('dataType') !== "number") {
                         return this.yAxisValueToLabel[num] || "";
                     } else {
                         return String(FormatUtils.defaultNumberFormatting(num));
@@ -103,34 +121,35 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
                 onclick: (d:any) => {
                     var event:MouseEvent = this.chart.internal.d3.event as MouseEvent;
                     if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
-                        this.toolPath.selection_keyset.setKeys([d.id]);
+                        this.selectionKeySet.replaceKeys([d.id]);
                     }
                 },
                 onselected: (d:any) => {
                     this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.selection_keyset.addKeys([d.id]);
+                        this.selectionKeySet.addKeys([d.id]);
                     }
                 },
                 onunselected: (d:any) => {
                     this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.selection_keyset.removeKeys([d.id]);
+                        this.selectionKeySet.removeKeys([d.id]);
                     }
                 },
                 onmouseover: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.probe_keyset.setKeys([d.id]);
+                        this.probeKeySet.replaceKeys([d.id]);
                     }
 
                     var columnNamesToValue:{[columnName:string] : string|number } = {};
-                    var lineIndex:number = _.findIndex(this.numericRecords, (record) => {
-                        return record["id"].toString() == d.id;
+                    var lineIndex:number = _.findIndex(this.records, (record:Record) => {
+                        return record.id == d.id;
                     });
 
                     this.columnLabels.forEach( (label:string,index:number,array:any[]) => {
-                        if(this.numericRecords && this.numericRecords[lineIndex]) {
-                            columnNamesToValue[label] = this.numericRecords[lineIndex]["columns"][index] as number;
+                        if(this.records && this.records[lineIndex]) {
+                            //columnNamesToValue[label] = this.records[lineIndex].columns[index].getValueFromKey(this.records[lineIndex].id);
+                            columnNamesToValue[label] = this.columns.getObjects()[index].getValueFromKey(this.records[lineIndex].id);
                         }
                     });
 
@@ -143,7 +162,7 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
                 },
                 onmouseout: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.probe_keyset.setKeys([]);
+                        this.probeKeySet.replaceKeys([]);
                         this.props.toolTip.setState({
                             showToolTip: false
                         });
@@ -196,8 +215,41 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
 
     get deprecatedStateMapping()
 	{
-		return {};
+		return [this.super_deprecatedStateMapping, {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+                                "columns": this.columns,
+                                "curveType": this.curveType,
+                                "lineStyle": this.line,
+
+                                "enableGroupBy": false,
+                                "groupKeyType": "",
+                                "normalize": false,
+                                "shapeBorderAlpha": 0.5,
+                                "shapeBorderColor": 0,
+                                "shapeBorderThickness": 1,
+                                "shapeSize": 5,
+                                "shapeToDraw": "Solid Circle",
+                                "zoomToSubset": false
+                            }
+                        }
+                    }
+                }
+            }
+        }];
 	}
+
+    handleClick(event:MouseEvent):void {
+        if(!this.flag) {
+            if(this.selectionKeySet)
+                this.selectionKeySet.replaceKeys([]);
+        }
+        this.flag = false;
+    }
 
     private updateStyle() {
         if(!this.chart)
@@ -207,8 +259,8 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
             .style("stroke", "black")
             .style("stroke-opacity", 0.0);
 
-        var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
-        var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
+        var selectedKeys:string[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+        var probedKeys:string[] = this.probeKeySet ? this.probeKeySet.keys : [];
         var selectedIndices:number[] = selectedKeys.map((key:string) => {
             return Number(this.keyToIndex[key]);
         });
@@ -264,90 +316,10 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
         }
     }
 
-    private dataChanged() {
-        this.columnLabels = [];
-        this.columnNames = [];
-
-        var children:WeavePath[] = this.paths.columns.getChildren();
-
-        this.yLabelColumnPath = children[0];
-
-        let numericMapping:any = {
-            columns: children,
-            yLabel: this.yLabelColumnPath
-        };
-
-
-        let stringMapping:any = {
-            columns: children,
-            line: {
-                //alpha: this._lineStylePath.push("alpha"),
-                color: this.paths.lineStyle.push("color")
-                //caps: this._lineStylePath.push("caps")
-            },
-            yLabel: this.yLabelColumnPath
-        };
-
-        for (let idx in children) {
-            let child = children[idx];
-            let title = (child.getObject() as IAttributeColumn).getMetadata('title');
-            let name = child.getPath().pop();
-            this.columnLabels.push(title);
-            this.columnNames.push(name);
-        }
-
-        this.numericRecords = (this.paths.plotter as WeavePathData).retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = (this.paths.plotter as WeavePathData).retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
-
-        this.records = _.zip(this.numericRecords, this.stringRecords);
-        this.records = _.sortBy(this.records, [0, "id"]);
-
-        if(this.records.length)
-            [this.numericRecords, this.stringRecords] = _.unzip(this.records);
-
-        this.keyToIndex = {};
-        this.indexToKey = {};
-        this.yAxisValueToLabel = {};
-
-        this.numericRecords.forEach((record:Record, index:number) => {
-            this.keyToIndex[record.id as any] = index;
-            this.indexToKey[index] = record.id;
-        });
-
-        this.stringRecords.forEach((record, index) => {
-            var numericRecord = this.numericRecords[index];
-            this.yAxisValueToLabel[numericRecord["yLabel"] as number] = record["yLabel"] as string;
-        });
-
-        this.columns = this.numericRecords.map(function(record:Record) {
-            var tempArr:any[] = [];
-            tempArr.push(record["id"]);
-            _.keys(record["columns"]).forEach((key:string) => {
-                tempArr.push((record["columns"] as Record)[key]);
-            });
-            return tempArr;
-        });
-
-        this.colors = {};
-        this.stringRecords.forEach((record:Record) => {
-            this.colors[record.id as any] = ((record["line"] as Record)["color"] as string) || "#C0CDD1";
-        });
-
-        this.chartType= "line";
-        if(this.paths.plotter.push("curveType").getState() === "double") {
-            this.chartType = "spline";
-        }
-
-        if(weavejs.WeaveAPI.Locale.reverseLayout){
-            this.columns.forEach( (column:any[], index:number, array:any) => {
-                var temp:any[] = [];
-                temp.push(column.shift());
-                column = column.reverse();
-                column.forEach( (item:any) => {
-                    temp.push(item);
-                });
-                array[index] = temp;
-            });
+    componentDidUpdate() {
+        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
+            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
+            this.validate(true);
         }
     }
 
@@ -360,42 +332,8 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
     componentDidMount() {
         this.element.addEventListener("click", this.handleClick.bind(this));
 
-        var plotterPath:WeavePath = this.toolPath.pushPlotter("plot");
-        var mapping = [
-            { name: "plotter", path: plotterPath, callbacks: this.validate},
-            { name: "columns", path: plotterPath.push("columns") },
-            { name: "lineStyle", path: plotterPath.push("lineStyle") },
-            { name: "curveType", path: plotterPath.push("curveType") },
-            { name: "marginBottom", path: this.plotManagerPath.push("marginBottom") },
-            { name: "marginLeft", path: this.plotManagerPath.push("marginLeft") },
-            { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
-            { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
-            { name: "overrideYMax", path: this.plotManagerPath.push("overrideYMax") },
-            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
-        ];
-
-        this.initializePaths(mapping);
-
-       	(this.paths.filteredKeySet.getObject() as FilteredKeySet).setColumnKeySources((this.paths.columns.getObject() as ILinkableHashMap).getObjects());
-
         this.c3Config.bindto = this.element;
         this.validate(true);
-    }
-
-    handleClick(event:MouseEvent):void {
-        if(!this.flag) {
-            this.toolPath.selection_keyset.setKeys([]);
-        }
-        this.flag = false;
-    }
-
-    componentDidUpdate() {
-        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
-            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-            this.validate(true);
-        }
     }
 
     validate(forced:boolean = false):void
@@ -408,11 +346,71 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
         this.dirty = false;
 
         var changeDetected:boolean = false;
-        var axisChange:boolean = this.detectChange('columns', 'overrideYMax');
-        if (axisChange || this.detectChange('plotter', 'curveType', 'lineStyle','filteredKeySet'))
+        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideYMax);
+        if (axisChange || Weave.detectChange(this, this.curveType, this.line, this.filteredKeySet))
         {
             changeDetected = true;
-            this.dataChanged();
+            this.columnLabels = [];
+            this.columnNames = [];
+
+            var children:ReferencedColumn[] = this.columns.getObjects();
+            this.RECORD_FORMAT.columns = children;
+            this.filteredKeySet.setColumnKeySources(children);
+
+            this.columnNames = this.columns.getNames();
+
+            for (let idx in children) {
+                let child = children[idx];
+                let title = child.getMetadata('title');
+                this.columnLabels.push(title);
+            }
+
+            this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+            this.records = _.sortBy(this.records, [0, "id"]);
+
+            this.keyToIndex = {};
+            this.indexToKey = {};
+            this.yAxisValueToLabel = {};
+
+            this.records.forEach((record:Record, index:number) => {
+                this.keyToIndex[record.id as any] = index;
+                this.indexToKey[index] = record.id;
+                this.yAxisValueToLabel[record.id as any] = record.id.toString();
+            });
+
+            var columns = this.records.map(function(record:Record) {
+                var tempArr:any[] = [];
+                tempArr.push(record["id"]);
+                _.keys(record.columns).forEach((key:string) => {
+                    var value = record.columns[key as any];
+                    if(value) {
+                        tempArr.push(record.columns[key as any]);
+                    }
+                });
+                return tempArr;
+            });
+
+            var colors:{[key:string]: string} = {};
+            this.records.forEach((record:Record) => {
+                colors[record.id as any] = record.line.color || "#C0CDD1";
+            });
+
+            this.chartType= "line";
+            if(this.curveType.value === "double") {
+                this.chartType = "spline";
+            }
+
+            if(weavejs.WeaveAPI.Locale.reverseLayout){
+                columns.forEach( (column:any[], index:number, array:any) => {
+                    var temp:any[] = [];
+                    temp.push(column.shift());
+                    column = column.reverse();
+                    column.forEach( (item:any) => {
+                        temp.push(item);
+                    });
+                    array[index] = temp;
+                });
+            }
         }
         if (axisChange)
         {
@@ -421,12 +419,12 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
             var yLabel:string = " ";//this.paths.yAxis.push("overrideAxisName").getState() || this.paths.dataY.getObject().getMetadata('title');
 
 
-            if (this.numericRecords)
+            if (this.records)
             {
                 var temp:any =  {};
                 if (weavejs.WeaveAPI.Locale.reverseLayout)
                 {
-                    this.stringRecords.forEach( (record) => {
+                    this.records.forEach( (record:Record) => {
                         temp[record["id"].toString()] = 'y2';
                     });
                     this.c3Config.data.axes = temp;
@@ -436,7 +434,7 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
                 }
                 else
                 {
-                    this.stringRecords.forEach( (record) => {
+                    this.records.forEach( (record:Record) => {
                         temp[record["id"].toString()] = 'y';
                     });
                     this.c3Config.data.axes = temp;
@@ -449,18 +447,18 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-            this.c3Config.padding.top = Number(this.paths.marginTop.getState());
-            this.c3Config.axis.x.height = Number(this.paths.marginBottom.getState());
+            this.c3Config.padding.top =  this.margin.top.value;
+            this.c3Config.axis.x.height =  this.margin.bottom.value;
             if(weavejs.WeaveAPI.Locale.reverseLayout){
-                this.c3Config.padding.left = Number(this.paths.marginRight.getState());
-                this.c3Config.padding.right = Number(this.paths.marginLeft.getState());
+                this.c3Config.padding.left =  this.margin.right.value;
+                this.c3Config.padding.right = this.margin.left.value;
             }else{
-                this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
-                this.c3Config.padding.right = Number(this.paths.marginRight.getState());
+                this.c3Config.padding.left = this.margin.left.value;
+                this.c3Config.padding.right = this.margin.right.value;
             }
 
-            if(!isNaN(this.paths.overrideYMax.getState() as number)) {
-                this.c3Config.axis.y.max = this.paths.overrideYMax.getState() as number;
+            if(!isNaN(this.overrideYMax.value)) {
+                this.c3Config.axis.y.max = this.overrideYMax.value;
             } else {
                 this.c3Config.axis.y.max = null;
             }
@@ -469,20 +467,19 @@ export default class WeaveC3LineChart extends AbstractC3Tool_old {
         if (changeDetected || forced)
         {
             this.busy = true;
+            if(columns){
+                this.c3Config.data.columns = columns;
+            } else {
+                this.c3Config.data.columns = [];
+            }
+            this.c3Config.data.colors = colors;
+            this.c3Config.data.type = this.chartType;
+            this.c3Config.data.unload = true;
             this.chart = c3.generate(this.c3Config);
-            this.loadData();
             this.cullAxes();
         }
     }
-
-    loadData() {
-        if(!this.chart || this.busy)
-            return StandardLib.debounce(this, 'loadData');
-        this.chart.load({columns: this.columns, colors: this.colors, type: this.chartType, unload: true});
-    }
 }
-
-weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3LineChart); // TEMPORARY HACK - remove when class is refactored
 
 Weave.registerClass("weavejs.tool.C3LineChart", WeaveC3LineChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.visualization.tools::LineChartTool", WeaveC3LineChart);
