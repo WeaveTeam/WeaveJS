@@ -181,7 +181,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 
         return (
             <div style={tableContainer}>
-                <Table key="table" ref="table" striped={this.props.striped} bordered={this.props.bordered} condensed={this.props.condensed} hover={true}>
+                <Table key="table" ref="table" striped={this.props.striped} bordered={this.props.bordered} condensed={this.props.condensed}>
                     <TableHead key="head"
                                ref={(c:TableHead) => {this.tableHead = c;}}
                                columnTitles={this.props.columnTitles}

@@ -1,10 +1,8 @@
 /// <reference path="../../typings/react/react.d.ts"/>
-/// <reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
 /// <reference path="../../typings/lodash/lodash.d.ts"/>
 /// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
 
 import * as React from "react";
-import {Table} from "react-bootstrap";
 import {CSSProperties} from "react";
 import StandardLib from "../utils/StandardLib";
 import * as Prefixer from "react-vendor-prefix";
