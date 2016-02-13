@@ -3,7 +3,7 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
-import jquery from "jquery";
+import * as jquery from "jquery";
 import * as ol from "openlayers";
 import GlyphLayer from "./GlyphLayer";
 import FeatureLayer from "./FeatureLayer";
@@ -27,8 +27,7 @@ export default class ImageGlyphLayer extends GlyphLayer {
 
 	constructor()
 	{
-		super()
-
+		super();
 		this.imageGlyphCache = new ImageGlyphCache(this);
 
 		this.imageSize.addGroupedCallback(this, this.updateStyleData);

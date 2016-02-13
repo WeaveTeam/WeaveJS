@@ -4,7 +4,10 @@
 ///<reference path="../../../typings/weave/weavejs.d.ts"/>
 
 import * as ol from "openlayers";
-import jquery from "jquery";
+import * as jquery from "jquery";
+
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
 
 export default class CustomZoomToExtent extends ol.control.Control {
 	private extent: ol.Extent;
@@ -17,15 +20,15 @@ export default class CustomZoomToExtent extends ol.control.Control {
 
 		let tipLabel: string = options.tipLabel ? options.tipLabel : 'Fit to extent';
 
-		let button = jquery("<button>").addClass(className).prop("title", tipLabel).append(label);
-		let div = jquery("<div>").addClass("ol-unselectable ol-control ol-zoom-extent").append(button);
+		let button = $("<button>").addClass(className).prop("title", tipLabel).append(label);
+		let div = $("<div>").addClass("ol-unselectable ol-control ol-zoom-extent").append(button);
 		super({ target: options.target, element: div[0] });
 
 		this.extent = options.extent ? options.extent : null;
 
 		button.click(this.handleClick.bind(this));
 
-		
+
 	}
 
 	private handleClick(event:MouseEvent) {

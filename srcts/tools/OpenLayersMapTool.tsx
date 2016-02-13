@@ -10,7 +10,10 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import jquery from "jquery";
+import * as jquery from "jquery";
+
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 /* eslint-disable */
@@ -81,7 +84,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		/* Force the inclusion of the layers. */
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
-		
+
 		Weave.detectChange(this.interactionMode, this.interactionMode);
 	}
 
@@ -93,12 +96,12 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 					plotManager: (pm:any, removeMissingDynamicObjects:boolean) => {
 						if (!pm)
 							return;
-						
+
 						if (pm.zoomBounds)
 							Weave.setState(this.zoomBounds, pm.zoomBounds);
-						
+
 						this.extentOverride.state = {xMin: pm.overrideXMin, yMin: pm.overrideYMin, xMax: pm.overrideXMax, yMax: pm.overrideYMax};
-						
+
 						Weave.setState(this.layers, pm.plotters, removeMissingDynamicObjects);
 						Weave.setState(this.layers, DynamicState.removeTypeFromState(pm.layerSettings), removeMissingDynamicObjects);
 					}
@@ -116,7 +119,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			if (defaultDragMode instanceof LinkableString)
 				this.interactionMode.value = defaultDragMode.value;
 		}
-		
+
 		this.map = new ol.Map({
 			interactions: ol.interaction.defaults({ dragPan: false }),
 			controls: [],
@@ -147,9 +150,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.zoomButtons = new ol.control.Zoom();
 		this.slider = new ol.control.ZoomSlider();
 		this.pan = new PanCluster();
-		this.zoomExtent = new CustomZoomToExtent({ label: jquery("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0]});
+		this.zoomExtent = new CustomZoomToExtent({ label: $("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0]});
 
-		jquery(this.element).find("canvas.ol-unselectable").attr("tabIndex", 1024); /* Hack to make the canvas focusable. */
+		$(this.element).find("canvas.ol-unselectable").attr("tabIndex", 1024); /* Hack to make the canvas focusable. */
 
 		this.map.addControl(this.zoomButtons);
 
@@ -211,22 +214,22 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	{
 		if (this.showZoomControls.value)
 		{
-			jquery(this.element).find(".ol-control.panCluster").css({top: "0.5em", left: "0.5em"});
-			jquery(this.element).find(".ol-control.ol-zoom").css({top: "5.5em", left: "2.075em"});
-			jquery(this.element).find(".ol-control.ol-zoomslider").css({top: "9.25em", left: "2.075em"});
-			jquery(this.element).find(".ol-control.iModeCluster").css({top: "20.75em", left: "0.6em"});
+			$(this.element).find(".ol-control.panCluster").css({top: "0.5em", left: "0.5em"});
+			$(this.element).find(".ol-control.ol-zoom").css({top: "5.5em", left: "2.075em"});
+			$(this.element).find(".ol-control.ol-zoomslider").css({top: "9.25em", left: "2.075em"});
+			$(this.element).find(".ol-control.iModeCluster").css({top: "20.75em", left: "0.6em"});
 		}
 		else
 		{
-			jquery(this.element).find(".ol-control.ol-zoom-extent").css({top: "0.5em", left: "0.5em"});
-			jquery(this.element).find(".ol-control.ol-zoom").css({ top: "2.625em", left: "0.5em" });
-			jquery(this.element).find(".ol-control.iModeCluster").css({ top: "5.6em", left: "0.5em" });
+			$(this.element).find(".ol-control.ol-zoom-extent").css({top: "0.5em", left: "0.5em"});
+			$(this.element).find(".ol-control.ol-zoom").css({ top: "2.625em", left: "0.5em" });
+			$(this.element).find(".ol-control.iModeCluster").css({ top: "5.6em", left: "0.5em" });
 		}
 	}
 
 
 	updateEnableMouseModeControl_weaveToOl():void
-	{		
+	{
 		if (this.showMouseModeControls.value)
 		{
 			this.map.addControl(this.mouseModeButtons);

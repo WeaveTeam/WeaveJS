@@ -4,15 +4,18 @@
 ///<reference path="../../../typings/weave/weavejs.d.ts"/>
 
 import * as ol from "openlayers";
-import jquery from "jquery";
+import * as jquery from "jquery";
 import OpenLayersMapTool from "../OpenLayersMapTool";
+
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
 
 export default class InteractionModeCluster extends ol.control.Control {
 	constructor(optOptions: any) {
 		var map: OpenLayersMapTool = optOptions.mapTool as OpenLayersMapTool;
 
 		var options: any = optOptions || {};
-		var buttonTable: any = jquery(`
+		var buttonTable: any = $(`
 			<table class="ol-unselectable ol-control iModeCluster">
 				<tr style="font-size: 80%">
 					<td><button class="iModeCluster pan fa fa-hand-grab-o"></button></td>

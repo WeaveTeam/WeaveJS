@@ -4,12 +4,16 @@
 ///<reference path="../../../typings/weave/weavejs.d.ts"/>
 
 import * as ol from "openlayers";
-import jquery from "jquery";
+import * as jquery from "jquery";
+
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
+
 
 export default class PanCluster extends ol.control.Control {
 	constructor(optOptions?:any) {
 		var options = optOptions || {};
-		let parent = jquery(`
+		let parent = $(`
 		<div style="background-color: rgba(0,0,0,0)" class="ol-unselectable ol-control panCluster">
 			<table style="font-size:75%">
 				<tr>

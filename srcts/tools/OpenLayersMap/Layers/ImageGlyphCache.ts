@@ -6,7 +6,10 @@
 import WeavePath = weavejs.path.WeavePath;
 import Dictionary2D = weavejs.util.Dictionary2D;
 
-import jquery from "jquery";
+import * as jquery from "jquery";
+
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
 
 class ImageGlyphCache {
 	private baseImageElements:Map<string,HTMLImageElement>;
@@ -39,7 +42,7 @@ class ImageGlyphCache {
 		}
 		else
 		{
-			jquery(imageElement).one("load", () => callback(imageElement));
+			$(imageElement).one("load", () => callback(imageElement));
 		}
 	}
 
