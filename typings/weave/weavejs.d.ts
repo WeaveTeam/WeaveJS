@@ -8770,7 +8770,7 @@ declare module weavejs.util {
          * @param key1_key2_value A function which may return true to stop iterating.
          * @param thisArg The 'this' argument for the function.
          */
-        forEach(key1_key2_value: (key1: K1, key2: K2, value: V) => void | boolean, thisArg: Object): void;
+        forEach(key1_key2_value: (key1: K1, key2: K2, value: V) => any, thisArg: Object): void;
     }
 }
 declare module weavejs.util {
