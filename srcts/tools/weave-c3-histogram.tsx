@@ -6,7 +6,7 @@
 
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool_old";
-import AbstractC3Tool_old from "./AbstractC3Tool_old";
+import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
@@ -18,41 +18,55 @@ import {MouseEvent} from "react";
 import {getTooltipContent} from "./tooltip";
 import Tooltip from "./tooltip";
 
-import WeavePath = weavejs.path.WeavePath;
-import WeavePathData = weavejs.path.WeavePathData;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import ColorColumn = weavejs.data.column.ColorColumn;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
+import LinkableString = weavejs.core.LinkableString;
+import SolidFillStyle = weavejs.geom.SolidFillStyle;
+import SolidLineStyle = weavejs.geom.SolidLineStyle;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
+import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
 
-declare type Record = {id: weavejs.api.data.IQualifiedKey, [name:string]: any};
+declare type Record = {
+    id: weavejs.api.data.IQualifiedKey,
+	binnedColumn: number,
+	columnToAggregate: number
+};
 
-export interface IHistogramPaths extends IToolPaths {
-    binnedColumn: WeavePath;
-    columnToAggregate: WeavePath;
-    aggregationMethod: WeavePath;
-    fillStyle: WeavePath;
-    lineStyle: WeavePath;
-}
+export default class WeaveC3Histogram extends AbstractC3Tool {
+	binnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn);
+	columnToAggregate:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	aggregationMethod:LinkableString = Weave.linkableChild(this, LinkableString);
+	fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
+	lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 
-export default class WeaveC3Histogram extends AbstractC3Tool_old {
+	private RECORD_FORMAT = {
+		id: IQualifiedKey,
+		binnedColumn: this.binnedColumn,
+		columnToAggregate: this.columnToAggregate
+	};
+
+	private RECORD_DATATYPE = {
+		binnedColumn: Number,
+		columnToAggregate: Number
+	};
+
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
-    private stringRecords:Record[];
-    private numericRecords:Record[];
     private heightColumnNames:string[];
     private binnedColumnDataType:string;
     private numberOfBins:number;
     private showXAxisLabel:boolean;
     private histData:{}[];
     private keys:{x?:string, value:string[]};
+	private records:Record[];
     protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
     protected chart:ChartAPI;
 
-    protected paths:IHistogramPaths;
 
     private flag:boolean;
     private busy:boolean;
@@ -60,6 +74,17 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
 
     constructor(props:IVisToolProps) {
         super(props);
+		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
+		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
+
+		Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
+
+		this.filteredKeySet.setSingleKeySource(this.fillStyle.color);
+
+		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
+		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
+		this.probeFilter.targetPath = ['defaultProbeKeySet'];
+
         this.busy = false;
         this.idToRecord = {};
         this.keyToIndex = {};
@@ -91,9 +116,9 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
                         if(weavejs.WeaveAPI.Locale.reverseLayout){
                             //handle case where labels need to be reversed for chart flip
                             var temp:number = this.histData.length-1;
-                            decColor = (this.paths.fillStyle.push("color").getObject("internalDynamicColumn", null) as ColorColumn).getColorFromDataValue(temp-d.index);
+                            decColor = (this.fillStyle.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(temp-d.index);
                         }else{
-                            decColor = (this.paths.fillStyle.push("color").getObject("internalDynamicColumn", null) as ColorColumn).getColorFromDataValue(d.index);
+                            decColor = (this.fillStyle.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(d.index);
                         }
                         return "#" + StandardLib.decimalToHex(decColor);
                     }
@@ -102,41 +127,33 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
                 onclick: (d:any) => {
                     var event:MouseEvent = this.chart.internal.d3 as MouseEvent;
                     if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
-                        var selectedIds:string[] = (this.paths.binnedColumn.getObject() as BinnedColumn).getKeysFromBinIndex(d.index).map( (qKey:{}) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.selection_keyset.setKeys(selectedIds);
+                        var selectedKeys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(d.index);
+                        this.selectionKeySet.replaceKeys(selectedKeys);
                     }
                 },
                 onselected: (d:any) => {
                     this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
-                        var selectedIds:string[] = (this.paths.binnedColumn.getObject() as BinnedColumn).getKeysFromBinIndex(d.index).map( (qKey:{}) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.selection_keyset.addKeys(selectedIds);
+                        var selectedKeys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(d.index);
+                        this.selectionKeySet.addKeys(selectedKeys);
                     }
                 },
                 onunselected: (d:any) => {
                     this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
-                        var unSelectedIds:string[] = (this.paths.binnedColumn.getObject() as BinnedColumn).getKeysFromBinIndex(d.index).map( (qKey:{}) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.selection_keyset.removeKeys(unSelectedIds);
+                        var unSelectedKeys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(d.index);
+                        this.selectionKeySet.removeKeys(unSelectedKeys);
                     }
                 },
                 onmouseover: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        var selectedIds:string[] = (this.paths.binnedColumn.getObject() as BinnedColumn).getKeysFromBinIndex(d.index).map( (qKey:{}) => {
-                            return this.toolPath.qkeyToString(qKey);
-                        });
-                        this.toolPath.probe_keyset.setKeys(selectedIds);
+                        var selectedKeys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(d.index);
+                        this.probeKeySet.replaceKeys(selectedKeys);
                     }
                 },
                 onmouseout: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this.toolPath.probe_keyset.setKeys([]);
+                        this.probeKeySet.replaceKeys([]);
                     }
                 }
             },
@@ -159,14 +176,14 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
                         multiline: false,
                         format: (num:number):string => {
                             if(this.element && this.props.style.height > 0) {
-                                var labelHeight:number = Number(this.paths.marginBottom.getState())/Math.cos(45*(Math.PI/180));
+                                var labelHeight:number = Number(this.margin.bottom)/Math.cos(45*(Math.PI/180));
                                 var labelString:string;
                                 if(weavejs.WeaveAPI.Locale.reverseLayout){
                                     //handle case where labels need to be reversed
                                     var temp:number = this.histData.length-1;
-                                    labelString = (this.paths.binnedColumn.getObject() as BinnedColumn).deriveStringFromNumber(temp-num);
+                                    labelString = this.binnedColumn.deriveStringFromNumber(temp-num);
                                 }else{
-                                    labelString = (this.paths.binnedColumn.getObject() as BinnedColumn).deriveStringFromNumber(num);
+                                    labelString = this.binnedColumn.deriveStringFromNumber(num);
                                 }
                                 if(labelString) {
                                     var stringSize:number = StandardLib.getTextWidth(labelString, this.getFontString());
@@ -176,7 +193,7 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
                                     return "";
                                 }
                             }else {
-                                return (this.paths.binnedColumn.getObject() as BinnedColumn).deriveStringFromNumber(num);
+                                return this.binnedColumn.deriveStringFromNumber(num);
                             }
                         }
                     }
@@ -186,7 +203,7 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
             tooltip: {
                 format: {
                     title: (num:number):string => {
-                        return (this.paths.binnedColumn.getObject() as BinnedColumn).deriveStringFromNumber(num);
+                        return this.binnedColumn.deriveStringFromNumber(num);
                     },
                     name: (name:string, ratio:number, id:string, index:number):string => {
                         return this.getYAxisLabel();
@@ -230,14 +247,39 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
         }
     }
 
-	get deprecatedStateMapping()
-	{
-		return {};
-	}
+    get deprecatedStateMapping()
+    {
+        return [super.deprecatedStateMapping, {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+								"binnedColumn": this.binnedColumn,
+                                "columnToAggregate": this.columnToAggregate,
+                                "aggregationMethod": this.aggregationMethod,
+								"fillStyle": this.fillStyle,
+                                "lineStyle": this.lineStyle,
+
+                                "drawPartialBins": true,
+                                "horizontalMode": false,
+								"showValueLabels": false,
+                                "valueLabelColor": 0,
+                                "valueLabelHorizontalAlign": "left",
+                                "valueLabelMaxWidth": 200,
+                                "valueLabelVerticalAlign": "middle"
+                            }
+                        }
+                    }
+                }
+            }
+        }];
+    }
 
     handleClick(event:MouseEvent) {
         if(!this.flag) {
-            this.toolPath.selection_keyset.setKeys([]);
+            this.selectionKeySet.replaceKeys([]);
         }
         this.flag = false;
     }
@@ -248,18 +290,18 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
     }
 
     private getYAxisLabel():string {
-        var overrideAxisName = this.paths.yAxis.push("overrideAxisName").getState() as string;
+        var overrideAxisName = this.yAxisName.value;
         if(overrideAxisName) {
             return overrideAxisName;
         } else {
-            if(this.paths.columnToAggregate.getObject(null)) {
-                switch(this.paths.aggregationMethod.getState() as string) {
+            if(this.columnToAggregate.getInternalColumn()) {
+                switch(this.aggregationMethod.value) {
                     case "count":
                         return "Number of records";
                     case "sum":
-                        return "Sum of " + (this.paths.columnToAggregate.getObject() as IAttributeColumn).getMetadata('title');
+                        return "Sum of " + this.columnToAggregate.getMetadata('title');
                     case "mean":
-                        return "Mean of " + (this.paths.columnToAggregate.getObject() as IAttributeColumn).getMetadata('title');
+                        return "Mean of " + this.columnToAggregate.getMetadata('title');
                 }
             } else {
                 return "Number of records";
@@ -276,17 +318,17 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
             .style("stroke-width", "1px")
             .style("stroke-opacity", 0.5);
 
-        var selectedKeys:IQualifiedKey[] = this.toolPath.selection_keyset.getKeys();
-        var probedKeys:IQualifiedKey[] = this.toolPath.probe_keyset.getKeys();
-        var selectedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
+        var selectedKeys:IQualifiedKey[] = this.selectionKeySet.keys;
+        var probedKeys:IQualifiedKey[] = this.probeKeySet.keys;
+        var selectedRecords:Record[] = _.filter(this.records, function(record:Record) {
             return _.includes(selectedKeys, record.id);
         });
-        var probedRecords:Record[] = _.filter(this.numericRecords, function(record:Record) {
+        var probedRecords:Record[] = _.filter(this.records, function(record:Record) {
             return _.includes(probedKeys, record.id);
         });
         var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
         var probedBinIndices:number[] = _.pluck(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn');
-        var binIndices:number[] = _.pluck(_.uniq(this.numericRecords, 'binnedColumn'), 'binnedColumn');
+        var binIndices:number[] = _.pluck(_.uniq(this.records, 'binnedColumn'), 'binnedColumn');
         var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
         unselectedBinIndices = _.difference(unselectedBinIndices,probedBinIndices);
 
@@ -304,45 +346,35 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
 
     private dataChanged() {
 
-        var numericMapping:any = {
-            binnedColumn: this.paths.binnedColumn,
-            columnToAggregate: this.paths.columnToAggregate
-        };
+        this.binnedColumnDataType = this.binnedColumn.getMetadata('dataType');
 
-        var stringMapping:any = {
-            binnedColumn: this.paths.binnedColumn
-        };
-
-        this.binnedColumnDataType = (this.paths.binnedColumn.getObject() as BinnedColumn).getMetadata('dataType');
-
-        this.numericRecords = (this.paths.plotter as WeavePathData).retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        this.stringRecords = (this.paths.plotter as WeavePathData).retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
+		this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
         this.idToRecord = {};
         this.keyToIndex = {};
         this.indexToKey = {};
 
-        this.numericRecords.forEach((record:Record, index:number) => {
+        this.records.forEach((record:Record, index:number) => {
             this.idToRecord[record.id as any] = record;
             this.keyToIndex[record.id as any] = index;
             this.indexToKey[index] = record.id;
         });
 
-        this.numberOfBins = (this.paths.binnedColumn.getObject() as BinnedColumn).numberOfBins;
+        this.numberOfBins = (this.binnedColumn.binningDefinition.target as SimpleBinningDefinition).numberOfBins.value;
 
         this.histData = [];
 
         // this._columnToAggregatePath.getObject().getInternalColumn();
-        var columnToAggregateNameIsDefined:boolean = !!this.paths.columnToAggregate.getObject(null);
+        var columnToAggregateNameIsDefined:boolean = !!this.columnToAggregate.getInternalColumn();
 
         for(let iBin:number = 0; iBin < this.numberOfBins; iBin++) {
 
-            let recordsInBin:Record[] = _.filter(this.numericRecords, { binnedColumn: iBin });
+            let recordsInBin:Record[] = _.filter(this.records, { binnedColumn: iBin });
 
             if(recordsInBin) {
                 var obj:any = {height:0};
                 if(columnToAggregateNameIsDefined) {
-                    obj.height = this.getAggregateValue(recordsInBin, "columnToAggregate", this.paths.aggregationMethod.getState() as string);
+                    obj.height = this.getAggregateValue(recordsInBin, "columnToAggregate", this.aggregationMethod.value);
                     this.histData.push(obj);
                 } else {
                     obj.height = this.getAggregateValue(recordsInBin, "binnedColumn", "count");
@@ -369,9 +401,9 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
             return 0;
         }
 
-        records.forEach((record) => {
+        records.forEach( (record:any) => {
             count++;
-            sum += record[columnToAggregateName] as number;
+            sum += record[columnToAggregateName as string] as number;
         });
 
         if (aggregationMethod === "mean") {
@@ -403,28 +435,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
     componentDidMount() {
         this.element.addEventListener("click", this.handleClick.bind(this));
         this.showXAxisLabel = false;
-        var plotterPath = this.toolPath.pushPlotter("plot");
-        var mapping = [
-            { name: "plotter", path: plotterPath, callbacks: this.validate},
-            { name: "binnedColumn", path: plotterPath.push("binnedColumn") },
-            { name: "columnToAggregate", path: plotterPath.push("columnToAggregate") },
-            { name: "aggregationMethod", path: plotterPath.push("aggregationMethod") },
-            { name: "fillStyle", path: plotterPath.push("fillStyle") },
-            { name: "lineStyle", path: plotterPath.push("lineStyle") },
-            { name: "xAxis", path: this.toolPath.pushPlotter("xAxis") },
-            { name: "yAxis", path: this.toolPath.pushPlotter("yAxis") },
-            { name: "marginBottom", path: this.plotManagerPath.push("marginBottom") },
-            { name: "marginLeft", path: this.plotManagerPath.push("marginLeft") },
-            { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
-            { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
-            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.updateStyle },
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.updateStyle }
-        ];
-
-        this.initializePaths(mapping);
-
-       	(this.paths.filteredKeySet.getObject() as FilteredKeySet).setSingleKeySource(this.paths.fillStyle.getObject('color', 'internalDynamicColumn') as IAttributeColumn);
 
         this.c3Config.bindto = this.element;
         this.validate(true);
@@ -440,9 +450,8 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
         this.dirty = false;
 
         var changeDetected:boolean = false;
-        var axisChange:boolean = this.detectChange('binnedColumn', 'aggregationMethod', 'marginBottom', 'marginTop', 'marginLeft', 'marginRight');
-        var axisSettingsChange:boolean = this.detectChange('xAxis', 'yAxis');
-        if (axisChange || this.detectChange('plotter', 'columnToAggregate', 'fillStyle', 'lineStyle','filteredKeySet'))
+        var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin.bottom, this.margin.top, this.margin.left, this.margin.right);
+        if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fillStyle, this.lineStyle,this.filteredKeySet))
         {
             changeDetected = true;
             this.dataChanged();
@@ -450,13 +459,13 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
         if (axisChange)
         {
             changeDetected = true;
-            var xLabel:string = this.paths.xAxis.getState("overrideAxisName") as string || (this.paths.binnedColumn.getObject() as BinnedColumn).getMetadata('title');
+            var xLabel:string = this.xAxisName.value || this.binnedColumn.getMetadata('title');
             if(!this.showXAxisLabel){
                 xLabel = " ";
             }var yLabel:string = this.getYAxisLabel.bind(this)();
 
 
-            if (this.numericRecords)
+            if (this.records)
             {
                 var temp:string = "height";
                 if (weavejs.WeaveAPI.Locale.reverseLayout)
@@ -478,14 +487,14 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-            this.c3Config.padding.top = Number(this.paths.marginTop.getState());
-            this.c3Config.axis.x.height = Number(this.paths.marginBottom.getState());
+            this.c3Config.padding.top = this.margin.top.value;
+            this.c3Config.axis.x.height = this.margin.bottom.value;
             if(weavejs.WeaveAPI.Locale.reverseLayout){
-                this.c3Config.padding.left = Number(this.paths.marginRight.getState());
-                this.c3Config.padding.right = Number(this.paths.marginLeft.getState());
+                this.c3Config.padding.left = this.margin.right.value;
+                this.c3Config.padding.right = this.margin.left.value;
             }else{
-                this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
-                this.c3Config.padding.right = Number(this.paths.marginRight.getState());
+                this.c3Config.padding.left = this.margin.left.value;
+                this.c3Config.padding.right = this.margin.right.value;
             }
         }
 
@@ -503,8 +512,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool_old {
         this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; this.cullAxes();}});
     }
 }
-
-weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3Histogram); // TEMPORARY HACK - remove when class is refactored
 
 Weave.registerClass("weavejs.tool.C3Histogram", WeaveC3Histogram, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
