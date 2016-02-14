@@ -27,10 +27,10 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 export class Margin {
-    top: LinkableString = Weave.linkableChild(this, LinkableNumber);
-    bottom: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-    left: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-    right: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+    top: LinkableString = Weave.linkableChild(this, new LinkableNumber(20));
+    bottom: LinkableNumber = Weave.linkableChild(this, new LinkableNumber(100));
+    left: LinkableNumber = Weave.linkableChild(this, new LinkableNumber(100));
+    right: LinkableNumber = Weave.linkableChild(this, new LinkableNumber(20));
 }
 
 Weave.registerClass("weavejs.tool.Margin", Margin);
