@@ -6,7 +6,7 @@
 
 import {IVisToolProps} from "./IVisTool";
 import {IToolPaths} from "./AbstractC3Tool_old";
-import AbstractC3Tool_old from "./AbstractC3Tool_old";
+import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
@@ -16,39 +16,56 @@ import {ChartConfiguration, ChartAPI} from "c3";
 import StandardLib from "../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-import WeavePath = weavejs.path.WeavePath;
-import WeavePathData = weavejs.path.WeavePathData;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
 import ColorRamp = weavejs.util.ColorRamp;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
+import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
+declare type Record = {
+    id: IQualifiedKey,
+    meterColumn: number
+};
 
-declare type Record = {id: weavejs.api.data.IQualifiedKey, [name:string]: any};
+export default class WeaveC3Gauge extends AbstractC3Tool {
+    meterColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+    binningDefinition:DynamicBinningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
+	colorRamp:ColorRamp = Weave.linkableChild(this, ColorRamp);
 
-export interface IGaugePaths extends IToolPaths {
-    binningDefinition:WeavePath;
-    meterColumn:WeavePath;
-    colorRamp:WeavePath;
-}
+    private RECORD_FORMAT = {
+        id: IQualifiedKey,
+        meterColumn: this.meterColumn
+    };
 
-export default class WeaveC3Gauge extends AbstractC3Tool_old {
+    private RECORD_DATATYPE = {
+        meterColumn: Number
+    };
+
     private keyToIndex:{[key:string]: number};
     private indexToKey:{[index:number]: IQualifiedKey};
-    private stringRecords:Record[];
-    private numericRecords:Record[];
-    private records:Record[][];
-    private colorRamp:string[];
+    private records:Record[];
     private numberOfBins:number;
     private colStats:any;
     protected c3Config:ChartConfiguration;
     protected chart:ChartAPI;
-    protected paths:IGaugePaths;
     private busy:boolean;
     private dirty:boolean;
 
     constructor(props:IVisToolProps) {
         super(props);
+
+        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
+        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
+
+        Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
+
+        this.filteredKeySet.setSingleKeySource(this.meterColumn);
+
+        this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
+        this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
+        this.probeFilter.targetPath = ['defaultProbeKeySet'];
+
         this.keyToIndex = {};
         this.indexToKey = {};
         this.validate = _.debounce(this.validate.bind(this), 30);
@@ -89,7 +106,7 @@ export default class WeaveC3Gauge extends AbstractC3Tool_old {
             gauge: {
                 label: {
                     format: function(value, ratio) {
-                        return value;
+                        return String(FormatUtils.defaultNumberFormatting(value));
                     },
                     show: false
                 },
@@ -119,114 +136,29 @@ export default class WeaveC3Gauge extends AbstractC3Tool_old {
         };
     }
 
-    private dataChanged():void {
-        var column = this.paths.meterColumn.getObject() as IAttributeColumn;
-        var name = column.getMetadata('title');
-
-        var numericMapping:any = {
-            meterColumn: this.paths.meterColumn
-        };
-
-        var stringMapping:any = {
-            meterColumn: this.paths.meterColumn
-        };
-
-
-        this.numericRecords = (this.paths.plotter as WeavePathData).retrieveRecords(numericMapping, {keySet: this.paths.filteredKeySet, dataType: "number"});
-        if (!this.numericRecords.length)
-            return;
-        this.stringRecords = (this.paths.plotter as WeavePathData).retrieveRecords(stringMapping, {keySet: this.paths.filteredKeySet, dataType: "string"});
-
-        this.records = _.zip(this.numericRecords, this.stringRecords);
-
-        this.keyToIndex = {};
-        this.indexToKey = {};
-
-        this.numericRecords.forEach((record:Record, index:number) => {
-            this.keyToIndex[record.id as any] = index;
-            this.indexToKey[index] = record.id;
-        });
-
-        this.numberOfBins = (this.paths.binningDefinition.push(null).getObject() as SimpleBinningDefinition).numberOfBins.value;
-        this.c3Config.color.pattern = [];
-        var ramp:any[] = this.paths.colorRamp.getState() as any[];
-        ramp.forEach( (color:string,index:number) => {
-            this.c3Config.color.pattern.push("#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(index, 0, this.numberOfBins - 1),color)));
-        });
-
-        this.c3Config.gauge.min = this.colStats.getMin();
-        this.c3Config.gauge.max = this.colStats.getMax();
-
-        var range = this.c3Config.gauge.max - this.c3Config.gauge.min;
-        this.c3Config.color.threshold.values = [];
-        for (var i=1; i<=this.numberOfBins; i++){
-            this.c3Config.color.threshold.values.push(this.c3Config.gauge.min+i*(range/this.numberOfBins));
-        }
-        this.c3Config.gauge.label.show = true;
-
-
-        var data = _.cloneDeep(this.c3Config.data);
-        var temp:any[] = [name];
-        var meterCols:number[] = _.pluck(this.numericRecords, 'meterColumn');
-
-        var selectedKeys:any[] = this.toolPath.selection_keyset.getKeys() as any[];
-        var probedKeys:any[] = this.toolPath.probe_keyset.getKeys() as any[];
-        var valid:boolean = false;
-        if(probedKeys.length){
-            //sometime probe keyset is not reset when mouse leaves another tool, so for now only take
-            //the first numeric record, but probe keyset not being set to empty should be addressed,
-            //then the [0] below and surrounding [] can be removed
-            probedKeys.forEach( (key) => {
-                var i:number = this.keyToIndex[key.toString()];
-                if (meterCols[i]) {
-                    valid = true;
-                    temp.push(meterCols[i]);
+    get deprecatedStateMapping()
+    {
+        return [super.deprecatedStateMapping, {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+                                "meterColumn": this.meterColumn,
+                                "colorRamp": this.colorRamp,
+                                "binningDefinition": this.binningDefinition
+                            }
+                        }
+                    }
                 }
-            });
-        } else if(selectedKeys.length){
-            selectedKeys.forEach( (key) => {
-                var i:number = this.keyToIndex[key.toString()];
-                if(meterCols[i]) {
-                    valid = true;
-                    temp.push(meterCols[i]);
-                }
-            });
-        }
-        if(valid){
-            data.columns = [temp];
-        } else {
-            data.columns = [];
-        }
-        data.unload = true;
-        this.c3Config.data = data;
+            }
+        }];
     }
 
     updateStyle() {
-        if(!this.chart || !this.paths.meterColumn)
+        if(!this.chart || !this.meterColumn)
             return;
-
-        //d3.select(this.element)
-        //    .selectAll("path")
-        //    .style("opacity", 1)
-        //    .style("stroke", "black")
-        //    .style("stroke-width", "1px")
-        //    .style("stroke-opacity", 0.5);
-        //
-        //var selectedKeys:string[] = this.toolPath.selection_keyset.getKeys();
-        //var probedKeys:string[] = this.toolPath.probe_keyset.getKeys();
-        //var selectedIndices:number[] = selectedKeys.map((key:string) => {
-        //    return Number(this.keyToIndex[key]);
-        //});
-        //var probedIndices:number[] = probedKeys.map((key:string) => {
-        //    return Number(this.keyToIndex[key]);
-        //});
-        //var keys:string[] = Object.keys(this.keyToIndex);
-        //var indices:number[] = keys.map((key:string) => {
-        //    return Number(this.keyToIndex[key]);
-        //});
-        //var unselectedIndices:number[] = _.difference(indices,selectedIndices);
-        //unselectedIndices = _.difference(unselectedIndices,probedIndices);
-
     }
 
     componentDidUpdate() {
@@ -237,28 +169,8 @@ export default class WeaveC3Gauge extends AbstractC3Tool_old {
     }
 
     componentDidMount() {
-        var plotterPath = this.toolPath.pushPlotter("plot");
-        var mapping = [
-            { name: "plotter", path: plotterPath, callbacks: this.validate },
-            { name: "binningDefinition", path: plotterPath.push("binningDefinition") },
-            { name: "meterColumn", path: plotterPath.push("meterColumn") },
-            { name: "colorRamp", path: plotterPath.push("colorRamp") },
-            { name: "marginBottom", path: this.plotManagerPath.push("marginBottom") },
-            { name: "marginLeft", path: this.plotManagerPath.push("marginLeft") },
-            { name: "marginTop", path: this.plotManagerPath.push("marginTop") },
-            { name: "marginRight", path: this.plotManagerPath.push("marginRight") },
-            { name: "filteredKeySet", path: plotterPath.push("filteredKeySet") },
-            { name: "selectionKeySet", path: this.toolPath.selection_keyset, callbacks: this.validate },
-            { name: "probeKeySet", path: this.toolPath.probe_keyset, callbacks: this.validate }
-        ];
-
-        this.initializePaths(mapping);
-
-        (this.paths.filteredKeySet.getObject() as FilteredKeySet).setColumnKeySources([this.paths.meterColumn.getObject()]);
-
-        var column = this.paths.meterColumn.getObject() as IAttributeColumn;
         //use ColumnStatistics to set gauge min/max appropriately
-        this.colStats = new weavejs.data.ColumnStatistics(column);
+        this.colStats = new weavejs.data.ColumnStatistics(this.meterColumn);
         this.colStats.validateCache();
 
         this.c3Config.bindto = this.element;
@@ -274,22 +186,84 @@ export default class WeaveC3Gauge extends AbstractC3Tool_old {
         }
         this.dirty = false;
 
-        var marginChange:boolean = this.detectChange('marginBottom', 'marginTop', 'marginLeft', 'marginRight');
+        var marginChange:boolean = Weave.detectChange(this, this.margin.bottom, this.margin.top, this.margin.left, this.margin.right);
 
         //TODO: Need a debounced call when 'meterColumn' changes to wait for validateCache to return
-        //      with column statistics and then call this.dataChanged() to set config appropriately
+        //      with column statistics and then call this.validate() to set config appropriately
         var changeDetected:boolean = false;
-        if (this.detectChange('meterColumn', 'colorRamp', 'filteredKeySet', 'probeKeySet', 'selectionKeySet'))
+        if (Weave.detectChange(this, this.meterColumn, this.colorRamp, this.filteredKeySet, this.probeKeySet, this.selectionKeySet))
         {
             changeDetected = true;
-            this.dataChanged();
+			var name = this.meterColumn.getMetadata('title');
+
+			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+			if (!this.records.length)
+				return;
+
+			this.keyToIndex = {};
+			this.indexToKey = {};
+
+			this.records.forEach( (record:Record, index:number) => {
+				this.keyToIndex[record.id as any] = index;
+				this.indexToKey[index] = record.id;
+			});
+
+			this.numberOfBins = (this.binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value;
+			this.c3Config.color.pattern = [];
+			var ramp:any[] = this.colorRamp.getColors();
+			ramp.forEach( (color:number,index:number) => {
+				this.c3Config.color.pattern.push("#" + StandardLib.decimalToHex(color));
+			});
+
+			this.c3Config.gauge.min = this.colStats.getMin();
+			this.c3Config.gauge.max = this.colStats.getMax();
+
+			var range = this.c3Config.gauge.max - this.c3Config.gauge.min;
+			this.c3Config.color.threshold.values = [];
+			for (var i=1; i<=this.numberOfBins; i++){
+				this.c3Config.color.threshold.values.push(this.c3Config.gauge.min+i*(range/this.numberOfBins));
+			}
+			this.c3Config.gauge.label.show = true;
+
+
+			var data = _.cloneDeep(this.c3Config.data);
+			var temp:any[] = [name];
+			var meterCols:number[] = _.pluck(this.records, 'meterColumn');
+
+			var selectedKeys:string[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+			var probedKeys:string[] = this.probeKeySet ? this.probeKeySet.keys : [];
+			var valid:boolean = false;
+			if(probedKeys.length){
+				probedKeys.forEach( (key) => {
+					var i:number = this.keyToIndex[key.toString()];
+					if (meterCols[i]) {
+						valid = true;
+						temp.push(meterCols[i]);
+					}
+				});
+			} else if(selectedKeys.length){
+				selectedKeys.forEach( (key) => {
+					var i:number = this.keyToIndex[key.toString()];
+					if(meterCols[i]) {
+						valid = true;
+						temp.push(meterCols[i]);
+					}
+				});
+			}
+			if(valid){
+				data.columns = [temp];
+			} else {
+				data.columns = [];
+			}
+			data.unload = true;
+			this.c3Config.data = data;
         }
         if(marginChange) {
             changeDetected = true;
-            this.c3Config.padding.top = Number(this.paths.marginTop.getState());
-            this.c3Config.padding.bottom = Number(this.paths.marginBottom.getState());
-            this.c3Config.padding.left = Number(this.paths.marginLeft.getState());
-            this.c3Config.padding.right = Number(this.paths.marginRight.getState());
+            this.c3Config.padding.top = Number(this.margin.top.value);
+            this.c3Config.padding.bottom = Number(this.margin.bottom.value);
+            this.c3Config.padding.left = Number(this.margin.left.value);
+            this.c3Config.padding.right = Number(this.margin.right.value);
         }
 
         if (changeDetected || forced)
@@ -300,7 +274,6 @@ export default class WeaveC3Gauge extends AbstractC3Tool_old {
     }
 }
 
-weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3Gauge); // TEMPORARY HACK - remove when class is refactored
 
 Weave.registerClass("weavejs.tool.C3Gauge", WeaveC3Gauge, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.visualization.tools::GaugeTool", WeaveC3Gauge);
