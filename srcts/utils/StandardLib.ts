@@ -277,7 +277,7 @@ export default class StandardLib
 		return metrics.width;
 	}
 
-	static textHeightCache: Dictionary2D = new Dictionary2D();
+	static textHeightCache: Dictionary2D<string,string,number> = new Dictionary2D<string,string,number>();
 
 	static getTextHeight(text:string, font:string):number
 	{

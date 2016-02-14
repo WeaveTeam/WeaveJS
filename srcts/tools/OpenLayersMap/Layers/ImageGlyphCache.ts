@@ -13,16 +13,16 @@ var $:JQueryStatic = (jquery as any)["default"];
 
 class ImageGlyphCache {
 	private baseImageElements:Map<string,HTMLImageElement>;
-	private canvasMap:Dictionary2D/*<string,string,HTMLCanvasElement>*/;
-	private imageMap:Dictionary2D/*<string,string,HTMLImageElement>*/;
+	private canvasMap:Dictionary2D<string,string,HTMLCanvasElement>;
+	private imageMap:Dictionary2D<string,string,HTMLImageElement>;
 	private context: any /* ILinkableObject, context for URL request */
 
 	constructor(context:any)
 	{
 		this.context = context;
 		this.baseImageElements = new Map();
-		this.canvasMap = new Dictionary2D/*<string,string,HTMLCanvasElement>*/();
-		this.imageMap = new Dictionary2D/*<string,string,HTMLImageElement>*/();
+		this.canvasMap = new Dictionary2D<string,string,HTMLCanvasElement>();
+		this.imageMap = new Dictionary2D<string,string,HTMLImageElement>();
 	}
 
 	requestBaseImageElement(url:any, callback:any)
