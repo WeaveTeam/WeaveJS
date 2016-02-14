@@ -50,7 +50,7 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 
 	protected get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
 	protected get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
-	
+
 	xAxisName:LinkableString = Weave.linkableChild(this, LinkableString);
 	yAxisName:LinkableString = Weave.linkableChild(this, LinkableString);
 
@@ -69,13 +69,8 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 
     private previousWidth:number;
     private previousHeight:number;
-	
-	get deprecatedStateMapping():Object
-	{
-		return this.super_deprecatedStateMapping;
-	}
-	
-	get super_deprecatedStateMapping():Object
+
+    get deprecatedStateMapping():Object
 	{
 		return {
 			"children": {

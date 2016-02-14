@@ -47,10 +47,10 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	radius: AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
 	fill: SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 	line: SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-	
+
 	private get radiusNorm() { return this.radius.getInternalColumn() as NormalizedColumn; }
 	private get radiusData() { return this.radiusNorm.internalDynamicColumn; }
-	
+
 	private RECORD_FORMAT = {
 		id: IQualifiedKey,
 		point: { x: this.dataX, y: this.dataY },
@@ -64,7 +64,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 		fill: { color: String },
 		line: { color: String }
 	};
-	
+
 	private keyToIndex: Map<IQualifiedKey, number>;
 	private indexToKey: Map<number, IQualifiedKey>;
 	private xAxisValueToLabel:{[value:number]: string};
@@ -83,18 +83,18 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	constructor(props:IVisToolProps)
 	{
 		super(props);
-		
+
 		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
 		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
 		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
-		
+
 		Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
-	
+
 		this.filteredKeySet.setColumnKeySources([this.dataX, this.dataY]);
 
 		this.radiusNorm.min.value = 3;
 		this.radiusNorm.max.value = 25;
-		
+
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
@@ -279,7 +279,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 
 	public get deprecatedStateMapping():Object
 	{
-		return [this.super_deprecatedStateMapping, {
+		return [super.deprecatedStateMapping, {
 			"children": {
 				"visualization": {
 					"plotManager": {
@@ -292,10 +292,10 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 								"minScreenRadius": this.radiusNorm.min,
 								"maxScreenRadius": this.radiusNorm.max,
 								"defaultScreenRadius": this.radius.defaultValue,
-								
+
 								"fill": this.fill,
 								"line": this.line,
-								
+
 								"showSquaresForMissingSize": false,
 								"colorBySize": false,
 								"colorPositive": 0x00FF00,
@@ -312,7 +312,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	{
 		if (!this.selectionKeySet)
 			return;
-		
+
         var probeKeys:any[] = this.probeKeySet ? this.probeKeySet.keys : [];
         var selectionKeys:any[] = this.selectionKeySet.keys;
         if (_.isEqual(probeKeys, selectionKeys))
@@ -364,7 +364,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	{
 		//super.componentDidMount();
         StandardLib.addPointClickListener(this.element, this.handlePointClick.bind(this));
-		
+
 		this.c3Config.bindto = this.element;
 		this.validate(true);
 	}
@@ -391,22 +391,22 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 			return;
 		}
 		this.dirty = false;
-		
+
 		var xyChanged = Weave.detectChange(this, this.dataX, this.dataY);
 		var dataChanged = xyChanged || Weave.detectChange(this, this.radius, this.fill, this.line, this.filteredKeySet);
 		if (dataChanged)
 		{
 			this.dataXType = this.dataX.getMetadata('dataType');
 			this.dataYType = this.dataY.getMetadata('dataType');
-			
+
 			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 			this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
-	
+
 			this.keyToIndex.clear();
 			this.indexToKey.clear();
 			this.yAxisValueToLabel = {};
 			this.xAxisValueToLabel = {};
-	
+
 			this.records.forEach((record:Record, index:number) => {
 				this.keyToIndex.set(record.id, index);
 				this.indexToKey.set(index, record.id);
@@ -440,7 +440,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 
 			this.c3Config.padding.top = Number(this.margin.top.value);
 			this.c3Config.axis.x.height = Number(this.margin.bottom.value);
-			
+
 			if (weavejs.WeaveAPI.Locale.reverseLayout)
 			{
 				this.c3Config.padding.left = Number(this.margin.right.value);
@@ -452,7 +452,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 				this.c3Config.padding.right = Number(this.margin.right.value);
 			}
 		}
-		
+
 		if (dataChanged || axisChanged)
 		{
 			this.busy = true;

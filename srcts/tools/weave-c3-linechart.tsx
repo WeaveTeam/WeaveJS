@@ -215,7 +215,7 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
 
     get deprecatedStateMapping()
 	{
-		return [this.super_deprecatedStateMapping, {
+		return [super.deprecatedStateMapping, {
             "children": {
                 "visualization": {
                     "plotManager": {

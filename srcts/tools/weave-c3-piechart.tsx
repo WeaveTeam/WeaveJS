@@ -191,7 +191,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
 
 	get deprecatedStateMapping()
 	{
-		return [this.super_deprecatedStateMapping, {
+		return [super.deprecatedStateMapping, {
             "children": {
                 "visualization": {
                     "plotManager": {
