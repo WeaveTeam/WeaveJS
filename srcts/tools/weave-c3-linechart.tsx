@@ -317,10 +317,10 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
     }
 
     componentDidUpdate() {
-        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
-            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
+        var sizeChanged = this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height;
+        super.componentDidUpdate();
+        if(sizeChanged)
             this.validate(true);
-        }
     }
 
     componentWillUnmount() {
@@ -467,12 +467,12 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
         if (changeDetected || forced)
         {
             this.busy = true;
-            if(columns){
+            if(columns) {
                 this.c3Config.data.columns = columns;
-            } else {
-                this.c3Config.data.columns = [];
             }
-            this.c3Config.data.colors = colors;
+			if(colors) {
+				this.c3Config.data.colors = colors;
+			}
             this.c3Config.data.type = this.chartType;
             this.c3Config.data.unload = true;
             this.chart = c3.generate(this.c3Config);
