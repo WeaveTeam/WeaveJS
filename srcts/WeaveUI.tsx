@@ -5,6 +5,7 @@
 
 import WeaveLayoutManager from "./WeaveLayoutManager";
 import {IWeaveLayoutManagerProps, IWeaveLayoutManagerState} from "./WeaveLayoutManager";
+import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 import WeaveC3Barchart from "./tools/weave-c3-barchart";
 import WeaveC3ScatterPlot from "./tools/weave-c3-scatterplot";
 import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend";
@@ -58,6 +59,7 @@ export {
     WeaveC3Histogram as Histogram,
     WeaveC3Gauge as Gauge,
     WeaveOpenLayersMap as Map,
+	DataFilterTool as DataFilter,
     WeaveReactTable as DataTable,
     SessionStateMenuTool as MenuTool,
     StandardLib,

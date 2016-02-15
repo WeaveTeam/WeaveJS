@@ -20,7 +20,7 @@ import WeaveC3Histogram from "./tools/weave-c3-histogram";
 import SessionStateMenuTool from "./tools/weave-session-state-menu";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import WeaveReactTable from "./tools/weave-react-table";
-import DataFilterTool from "./tools/DataFilterTool";
+import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 
 // Temporary solution
 // because typescript removes
