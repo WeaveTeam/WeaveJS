@@ -5,7 +5,6 @@
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
-import {IToolPaths} from "./AbstractC3Tool_old";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
 import * as d3 from "d3";
@@ -26,17 +25,15 @@ import ColorRamp = weavejs.util.ColorRamp;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 
-import WeavePath = weavejs.path.WeavePath;
-import WeavePathData = weavejs.path.WeavePathData;
-
-
 declare type Record = {
     id: IQualifiedKey,
     sort: number,
-    xLabel: number,
-    heights: {[columnName:string]: number},
+    heights: { xLabel: string } & {[columnName:string]: number},
+	xLabel: number,
     yLabel: number
 };
+
+declare type RecordHeightsFormat<T> = { xLabel: T } & {[columnName:string]: T};
 
 const GROUP:string = 'group';
 const STACK:string = 'stack';
@@ -50,7 +47,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
     labelColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
     sortColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
     colorColumn:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#C0CDD1"));
-    chartColors:ColorRamp = Weave.linkableChild(this, ColorRamp);
+    chartColors:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
     groupingMode:LinkableString = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode))
     horizontalMode:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
     showValueLabels:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
@@ -63,28 +60,24 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 	}
 
     get yLabelColumn():IAttributeColumn {
-        return this.heightColumns.getObjects()[0];
+        return this.heightColumns.getObjects()[0] || this.sortColumn;
     }
 	
-	private get _columns():IAttributeColumn[] {
-		return this.heightColumns.getObjects();
-	}
-
     private RECORD_FORMAT = {
 		id: IQualifiedKey,
 		sort: this.sortColumn,
         color: this.colorColumn.getInternalColumn(),
-        xLabel: this.labelColumn,
         yLabel: this.yLabelColumn,
-        heights: _.zipObject(this.heightColumns.getNames(), this._columns)
+		xLabel: this.labelColumn,
+        heights: {} as RecordHeightsFormat<IAttributeColumn>
 	};
 
     private RECORD_DATATYPE = {
         sort: Number,
         color: String,
-        xLabel: Number,
         yLabel: Number,
-        heights: _.zipObject(this.heightColumns.getNames(), Number)
+		xLabel: Number,
+        heights: {} as RecordHeightsFormat<new ()=>(String|Number)>
 	};
 
     private keyToIndex: Map<IQualifiedKey, number>;
@@ -95,7 +88,6 @@ export default class WeaveC3Barchart extends AbstractC3Tool
     private yLabelColumnDataType:string;
     private heightColumnNames:string[];
     private heightColumnsLabels:string[];
-    private yLabelColumnPath:WeavePath;
     protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
     private records:Record[];
@@ -156,11 +148,11 @@ export default class WeaveC3Barchart extends AbstractC3Tool
                 },
                 order: null,
                 color: (color:string, d:any):string => {
-                    if(this.colorColumn.getInternalColumn() && d && d.hasOwnProperty("index")) {
+                    if(this.heightColumnNames.length === 1 && d && d.hasOwnProperty("index")) {
 						var qKey:IQualifiedKey = this.indexToKey.get(d.index);
 						return this.colorColumn.getValueFromKey(qKey, String);
                     } else {
-                        return color || this.colorColumn.defaultValue.state as string;
+                        return color;
                     }
                 },
                 onclick: (d:any) => {
@@ -187,13 +179,13 @@ export default class WeaveC3Barchart extends AbstractC3Tool
                         
 						var qKey:IQualifiedKey = this.indexToKey.get(d.index);
 						
-						var numOfColumns:number = this._columns.length;
-						this._columns.forEach((column:IAttributeColumn) => {
+						var columns = this.heightColumns.getObjects();
+						for(var column of columns) {
 							var columnName:string = column.getMetadata("title");
-							var color = weavejs.util.StandardLib.interpolateColor(d.index / (numOfColumns - 1), this.chartColors);
-                            columnNamesToValue[columnName] = column.getValueFromKey(qKey, Number);
+							var color = this.chartColors.getColorFromNorm(d.index / (columns.length - 1));
+							columnNamesToValue[columnName] = column.getValueFromKey(qKey, Number);
 							columnNamesToColor[columnName] = "#" + weavejs.util.StandardLib.numberToBase(color, 16, 6);
-                        });
+						}
 
                         var title:string = this.labelColumn.getValueFromKey(qKey, String);
 						
@@ -297,7 +289,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
                 fit: false,
                 multiline: false,
                 format: (num:number):string => {
-                    if(this.yLabelColumnPath && this.yLabelColumnDataType !== "number") {
+                    if(this.yLabelColumnDataType !== "number") {
                         return this.yAxisValueToLabel[num] || "";
                     } else if (this.groupingMode.value === PERCENT_STACK) {
                         return d3.format(".0%")(num);
@@ -325,6 +317,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 								"chartColors": this.chartColors,
 								"horizontalMode": this.horizontalMode,
 								"showValueLabels": this.showValueLabels,
+								"groupingMode": this.groupingMode
 							}
 						}
 					}
@@ -346,19 +339,16 @@ export default class WeaveC3Barchart extends AbstractC3Tool
             this.selectionKeySet.replaceKeys(probeKeys);
     }
 
-    // handleShowValueLabels () {
-    //     if(!this.chart)
-    //         return;
-    //     this.chart.flush();
-    // }
-
     private dataChanged():void
 	{
-		this.RECORD_FORMAT.heights = _.zipObject(this.heightColumns.getNames(), this._columns);
-		this.RECORD_DATATYPE.heights = _.zipObject(this.heightColumns.getNames(), Number);
-
+		var columns = this.heightColumns.getObjects();
+		this.RECORD_FORMAT.heights = _.zipObject(this.heightColumns.getNames(), columns) as any;
+		this.RECORD_FORMAT.heights.xLabel = this.labelColumn;
+		this.RECORD_DATATYPE.heights = _.zipObject(this.heightColumns.getNames(), columns.map(() => Number)) as any;
+		this.RECORD_DATATYPE.heights.xLabel = String;
+		
         this.heightColumnNames = this.heightColumns.getNames();
-        this.heightColumnsLabels = this._columns.map((column:IAttributeColumn) => {
+        this.heightColumnsLabels = columns.map((column:IAttributeColumn) => {
             return column.getMetadata("title");
         });
 
@@ -383,11 +373,6 @@ export default class WeaveC3Barchart extends AbstractC3Tool
             this.yAxisValueToLabel[record.yLabel] = this.yLabelColumn.getValueFromKey(record.id, String);
         });
 
-        //var horizontalMode = this.paths.plotter.push("horizontalMode").getState() as boolean;
-
-        // set axis rotation mode
-        //this.chart.load({axes: { rotated: horizontalMode }});
-
         if (this.groupingMode.value === STACK || this.groupingMode.value === PERCENT_STACK)
             this.c3Config.data.groups = [this.heightColumnNames];
         else //if(this.groupingMode === "group")
@@ -395,15 +380,16 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 
         if (this.groupingMode.value === PERCENT_STACK && this.heightColumnNames.length > 1) {
             // normalize the height columns to be percentages.
-            // USE normalized column?
-            this.records.forEach((record:Record) => {
-                var heights:{[columnName:string]: number} = record.heights;
-                var sum:number = 0;
+			for(var record of this.records) {
+				var heights = record.heights;
+				var sum:number = 0;
 				for (let key in heights)
-					sum += heights[key];
+					if (typeof heights[key] == "number")
+						sum += heights[key];
 				for (let key in heights)
-					heights[key] /= sum;
-            });
+					if (typeof heights[key] == "number")
+						heights[key] /= sum;
+			}
         }
 
         var keys = {
@@ -424,9 +410,9 @@ export default class WeaveC3Barchart extends AbstractC3Tool
         var columnTitles:{[name:string]: string} = {};
 
         if(this.heightColumnNames.length > 1) {
-            this.heightColumnNames.map((name, index) => {
-                var color = weavejs.util.StandardLib.interpolateColor(index / (this.heightColumnNames.length - 1), this.chartColors);
-                columnColors[name] = "#" + StandardLib.decimalToHex(color);
+            this.heightColumnNames.forEach((name, index) => {
+                var color = this.chartColors.getColorFromNorm(index / (this.heightColumnNames.length - 1));
+                columnColors[name] = "#" + weavejs.util.StandardLib.numberToBase(color, 16, 6);;
                 columnTitles[name] = this.heightColumnsLabels[index];
             });
             if(this.labelColumn.target) {
@@ -444,12 +430,6 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 		//need other stuff for data.json to work
 		//this can potentially override column names
 		//c3 limitation
-        this.records.forEach((record:Record, index:number) => {
-            for(var k in record) {
-                if(k != 'heights')
-                    (data.json as any)[index][k] = (record as any)[k];
-            }
-        });
 
         data.colors = columnColors;
         data.keys = keys;
@@ -612,13 +592,6 @@ export default class WeaveC3Barchart extends AbstractC3Tool
             changeDetected = true;
             this.c3Config.axis.rotated = this.horizontalMode.value;
         }
-        // no longer needed because Weave we are now directly reading
-		// the LinkableBoolean
-		// if (Weave.detectChange(this, this.showValueLabels))
-        // {
-        //     changeDetected = true;
-        //     this.showValueLabels.value = this.showValueLabels.getState() as boolean;
-        // }
 
         if (changeDetected || forced)
         {
