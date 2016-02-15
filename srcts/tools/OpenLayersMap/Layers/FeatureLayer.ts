@@ -117,7 +117,7 @@ export abstract class FeatureLayer extends Layer {
 		return ol.color.asString(colorArray);
 	}
 
-	updateSetFromKeySet(dynamicKeySet:DynamicKeySet, previousContents:Set<IQualifiedKey>)
+	updateSetFromKeySet(dynamicKeySet:DynamicKeySet, previousContents:Set<IQualifiedKey>):void
 	{
 		let keySet: IKeySet = dynamicKeySet.getInternalKeySet();
 		if (!keySet) return; //HACK
@@ -159,14 +159,14 @@ export abstract class FeatureLayer extends Layer {
 		for (let key of keySet.keys) previousContents.add(key);
 	}
 
-	updateMetaStyles()
+	updateMetaStyles():void
 	{
 		if (!this.source) return; //HACK
 
 		this.source.forEachFeature(this.updateMetaStyle, this);
 	}
 
-	updateMetaStyle_unbound(feature:any)
+	updateMetaStyle_unbound(feature:any):void
 	{
 		let id:IQualifiedKey = <IQualifiedKey>feature.getId();
 		let nullStyle:any = new ol.style.Style({});
@@ -247,7 +247,7 @@ export abstract class FeatureLayer extends Layer {
 		feature.setStyle(newStyle);
 	}
 
-	static olFillFromWeaveFill(fill:any, fade?:any):any
+	static olFillFromWeaveFill(fill:any, fade?:any):ol.style.Fill
 	{
 		if (fade === undefined) fade = 1;
 
@@ -255,7 +255,7 @@ export abstract class FeatureLayer extends Layer {
 		return new ol.style.Fill({color});
 	}
 
-	static olStrokeFromWeaveStroke(stroke:any, fade?:number):any
+	static olStrokeFromWeaveStroke(stroke:any, fade?:number):ol.style.Stroke
 	{
 		if (fade === undefined) fade = 1;
 
@@ -270,7 +270,7 @@ export abstract class FeatureLayer extends Layer {
 		return new ol.style.Stroke({color, lineCap, lineJoin, miterLimit, width});
 	}
 
-	static getOlProbedStyle(baseStrokeStyle:any):any
+	static getOlProbedStyle(baseStrokeStyle:any):Array<ol.style.Style>
 	{
 		let width = baseStrokeStyle.getWidth();
 
@@ -292,7 +292,7 @@ export abstract class FeatureLayer extends Layer {
 		];
 	}
 
-	static getOlSelectionStyle(baseStrokeStyle:any):any
+	static getOlSelectionStyle(baseStrokeStyle:any):Array<ol.style.Style>
 	{
 		let width = baseStrokeStyle.getWidth();
 		let lineCap = baseStrokeStyle.getLineCap();

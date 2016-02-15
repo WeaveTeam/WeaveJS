@@ -102,7 +102,7 @@ export default class ScatterPlotLayer extends GlyphLayer {
 			let normalStyle = [new ol.style.Style({
 				image: new ol.style.Circle({
 					fill: fillEnabled ? olFill : undefined, stroke: strokeEnabled ? olStroke : undefined,
-					radius: record.radius
+					radius: record.radius,
 				})
 			})];
 
@@ -152,6 +152,7 @@ export default class ScatterPlotLayer extends GlyphLayer {
 				metaStyle.probedStyle = probedStyle;
 
 				feature.setProperties(metaStyle);
+				feature.set("zOrder", zOrder);
 			}
 
 			zOrder++;

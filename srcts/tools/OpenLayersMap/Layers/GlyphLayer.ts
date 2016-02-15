@@ -13,8 +13,8 @@ import LinkableString = weavejs.core.LinkableString;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 interface LocationRecord {
-	dataX: number;
-	dataY: number;
+	dataX: Array<any>;
+	dataY: Array<any>;
 	id: IQualifiedKey;
 }
 
@@ -43,15 +43,15 @@ abstract class GlyphLayer extends FeatureLayer {
 		return lodash.map(this.source.getFeatures(), (item:ol.Feature) => item.getId());
 	}
 
-	static _toPoint(datum:any, field1:any, field2:any) {
-		if (typeof datum === "object")
+	static _toPoint(data:Array<any>, field1:any, field2:any):any {
+		let firstDatum = data[0];
+		if (typeof firstDatum === "object")
 		{
-			let firstPoly = datum[0];
-			return (firstPoly.bounds[field1] + firstPoly.bounds[field2]) / 2;
+			return (firstDatum.bounds[field1] + firstDatum.bounds[field2]) / 2;
 		}
 		else
 		{
-			return datum;
+			return firstDatum;
 		}
 	}
 
