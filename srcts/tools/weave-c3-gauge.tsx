@@ -5,7 +5,6 @@
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
 import {IVisToolProps} from "./IVisTool";
-import {IToolPaths} from "./AbstractC3Tool_old";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
 import * as d3 from "d3";
