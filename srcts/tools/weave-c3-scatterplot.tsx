@@ -44,7 +44,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 {
 	dataX: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 	dataY: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	radius: AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
+	radius = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
 	fill: SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
 	line: SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
 

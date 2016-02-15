@@ -71,7 +71,7 @@ declare module __global__ {
          * @return A value of true if the callbacks for any of the objects have triggered since the last time this function was called
          *         with the same observer for any of the specified linkable objects.
          */
-        static detectChange(observer: Object, linkableObject: ILinkableObject, ...moreLinkableObjects: any[]): boolean;
+        static detectChange(observer: Object, linkableObject: ILinkableObject, ...moreLinkableObjects: Array<ILinkableObject>): boolean;
         /**
          * This function is used to detect if callbacks of a linkable object were triggered since the last time detectChange
          * was called with the same parameters, likely by the observer.  Note that once this function returns true, subsequent calls will
@@ -99,7 +99,7 @@ declare module __global__ {
          * @return The closest ancestor of the given type.
          * @see weave.api.core.ISessionManager#getLinkableOwner()
          */
-        static getAncestor(descendant: ILinkableObject, ancestorType: Function): ILinkableObject;
+        static getAncestor<T>(descendant: ILinkableObject, ancestorType: new (..._: any[]) => T): T & ILinkableObject;
         /**
          * Shortcut for WeaveAPI.SessionManager.getLinkableOwner()
          * @copy weave.api.core.ISessionManager#getLinkableOwner()
@@ -109,7 +109,7 @@ declare module __global__ {
          * Shortcut for WeaveAPI.SessionManager.getLinkableDescendants()
          * @copy weave.api.core.ISessionManager#getLinkableDescendants()
          */
-        static getDescendants(object: ILinkableObject, filter?: Function): any[];
+        static getDescendants<T>(object: ILinkableObject, filter?: new (..._: any[]) => T): Array<T & ILinkableObject>;
         /**
          * Shortcut for WeaveAPI.SessionManager.getSessionState()
          * @copy weave.api.core.ISessionManager#getSessionState()
@@ -156,7 +156,7 @@ declare module __global__ {
          * @see weave.api.core.ISessionManager#newLinkableChild()
          * @see weave.api.core.ISessionManager#registerLinkableChild()
          */
-        static linkableChild(linkableParent: Object, linkableChildOrType: Object, callback?: Function, useGroupedCallback?: boolean): any;
+        static linkableChild<T extends ILinkableObject>(linkableParent: Object, linkableChildOrType: (new (..._: any[]) => T) | T, callback?: Function, useGroupedCallback?: boolean): T;
         /**
          * Shortcut for WeaveAPI.SessionManager.disposeObject()
          * @copy weave.api.core.ISessionManager#disposeObject()
@@ -181,18 +181,18 @@ declare module __global__ {
          * Dynamic items in the session state that extend this class will be replaced with
          * LinkablePlaceholder objects that can be replaced with actual instances later.
          */
-        static registerAsyncClass(type: Function): void;
+        static registerAsyncClass(type: new (..._: any[]) => any): void;
         /**
          * Checks if a class is or extends one that was registered through registerAsyncClass().
          */
-        static isAsyncClass(type: Function): boolean;
+        static isAsyncClass(type: new (..._: any[]) => any): boolean;
         /**
          * Registers an ILinkableObject class for use with Weave.className() and Weave.getDefinition().
          * @param qualifiedName
          * @param definition
          * @param additionalInterfaces An Array of interfaces (Class objects) that the definition implements in addition to ILinkableObject.
          */
-        static registerClass(qualifiedName: string, definition: Function, additionalInterfaces?: any[]): void;
+        static registerClass(qualifiedName: string, definition: new (..._: any[]) => any, additionalInterfaces?: any[]): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -1029,7 +1029,7 @@ declare module weavejs.api.core {
          */
         callbacksAreDelayed: boolean;
     }
-    var ICallbackCollection: Function;
+    var ICallbackCollection: new (..._: any[]) => ICallbackCollection;
 }
 declare module weavejs.api.core {
     /**
@@ -1058,14 +1058,14 @@ declare module weavejs.api.core {
          */
         lastNameRemoved: string;
     }
-    var IChildListCallbackInterface: Function;
+    var IChildListCallbackInterface: new (..._: any[]) => IChildListCallbackInterface;
 }
 declare module weavejs.api.core {
     interface IClassRegistry {
         /**
          * Registers a class under a given qualified name and adds metadata about implementing interfaces.
          */
-        registerClass(qualifiedName: string, definition: Function, additionalInterfaces?: any[]): void;
+        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, additionalInterfaces?: any[]): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -1077,13 +1077,13 @@ declare module weavejs.api.core {
         /**
          * Registers an implementation of an interface to be used as a singleton.
          */
-        registerSingletonImplementation(theInterface: Function, theImplementation: Function): boolean;
+        registerSingletonImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any): boolean;
         /**
          * Gets the registered implementation of an interface.
          * @param theInterface An interface to a singleton class.
          * @return The registered implementation Class for the given interface Class.
          */
-        getSingletonImplementation(theInterface: Function): Function;
+        getSingletonImplementation(theInterface: new (..._: any[]) => any): new (..._: any[]) => any;
         /**
          * This function returns the singleton instance for a registered interface.
          *
@@ -1093,28 +1093,28 @@ declare module weavejs.api.core {
          * @param theInterface An interface to a singleton class.
          * @return The singleton instance that implements the specified interface.
          */
-        getSingletonInstance(theInterface: Function): any;
+        getSingletonInstance(theInterface: new (..._: any[]) => any): any;
         /**
          * This will register an implementation of an interface.
          * @param theInterface The interface class.
          * @param theImplementation An implementation of the interface.
          * @param displayName An optional display name for the implementation.
          */
-        registerImplementation(theInterface: Function, theImplementation: Function, displayName?: string): void;
+        registerImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any, displayName?: string): void;
         /**
          * This will get an Array of class definitions that were previously registered as implementations of the specified interface.
          * @param theInterface The interface class.
          * @return An Array of class definitions that were previously registered as implementations of the specified interface.
          */
-        getImplementations(theInterface: Function): any[];
+        getImplementations(theInterface: new (..._: any[]) => any): any[];
         /**
          * This will get the displayName that was specified when an implementation was registered with registerImplementation().
          * @param theImplementation An implementation that was registered with registerImplementation().
          * @return The display name for the implementation.
          */
-        getDisplayName(theImplementation: Function): string;
+        getDisplayName(theImplementation: new (..._: any[]) => any): string;
     }
-    var IClassRegistry: Function;
+    var IClassRegistry: new (..._: any[]) => IClassRegistry;
 }
 declare module weavejs.api.core {
     /**
@@ -1132,7 +1132,7 @@ declare module weavejs.api.core {
          */
         dispose(): void;
     }
-    var IDisposableObject: Function;
+    var IDisposableObject: new (..._: any[]) => IDisposableObject;
 }
 declare module weavejs.api.core {
     /**
@@ -1159,7 +1159,7 @@ declare module weavejs.api.core {
          */
         setSessionState(newState: any[], removeMissingDynamicObjects: boolean): void;
     }
-    var ILinkableCompositeObject: Function;
+    var ILinkableCompositeObject: new (..._: any[]) => ILinkableCompositeObject;
 }
 declare module weavejs.api.core {
     /**
@@ -1195,7 +1195,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The global object of the requested name and type, or null if the object could not be created.
          */
-        requestGlobalObject(name: string, objectType: Function, lockObject: boolean): any;
+        requestGlobalObject(name: string, objectType: new (..._: any[]) => any, lockObject: boolean): any;
         /**
          * This function creates a local object using the given Class definition if it doesn't already exist.
          * If this object is locked, this function does nothing.
@@ -1203,7 +1203,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The local object of the requested type, or null if the object could not be created.
          */
-        requestLocalObject(objectType: Function, lockObject: boolean): any;
+        requestLocalObject(objectType: new (..._: any[]) => any, lockObject: boolean): any;
         /**
          * This function will copy the session state of an ILinkableObject to a new local internalObject of the same type.
          * @param objectToCopy An object to copy the session state from.
@@ -1224,7 +1224,7 @@ declare module weavejs.api.core {
          */
         removeObject(): void;
     }
-    var ILinkableDynamicObject: Function;
+    var ILinkableDynamicObject: new (..._: any[]) => ILinkableDynamicObject;
 }
 declare module weavejs.api.core {
     /**
@@ -1238,7 +1238,7 @@ declare module weavejs.api.core {
         /**
          * The child type restriction, or null if there is none.
          */
-        typeRestriction: Function;
+        typeRestriction: new (..._: any[]) => any;
         /**
          * This is an interface for adding and removing callbacks that will get triggered immediately
          * when an object is added or removed.
@@ -1258,14 +1258,14 @@ declare module weavejs.api.core {
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return A copy of the ordered list of names of objects contained in this LinkableHashMap.
          */
-        getNames(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
+        getNames(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
         /**
          * This function returns an ordered list of objects in the hash map.
          * @param filter If specified, objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return An ordered Array of objects that correspond to the names returned by getNames(filter).
          */
-        getObjects(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
+        getObjects(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
         /**
          * This function gets the name of the specified object in the hash map.
          * @param object An object contained in this LinkableHashMap.
@@ -1294,7 +1294,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, the object will be locked in place under the specified name.
          * @return The object under the requested name of the requested type, or null if an error occurred.
          */
-        requestObject(name: string, classDef: Function, lockObject?: boolean): any;
+        requestObject(name: string, classDef: new (..._: any[]) => any, lockObject?: boolean): any;
         /**
          * This function will copy the session state of an ILinkableObject to a new object under the given name in this LinkableHashMap.
          * @param newName A name for the object to be initialized in this LinkableHashMap.
@@ -1330,7 +1330,7 @@ declare module weavejs.api.core {
          */
         generateUniqueName(baseName: string): string;
     }
-    var ILinkableHashMap: Function;
+    var ILinkableHashMap: new (..._: any[]) => ILinkableHashMap;
 }
 declare module weavejs.api.core {
     /**
@@ -1342,7 +1342,7 @@ declare module weavejs.api.core {
      */
     interface ILinkableObject {
     }
-    var ILinkableObject: Function;
+    var ILinkableObject: new (..._: any[]) => ILinkableObject;
 }
 declare module weavejs.api.core {
     /**
@@ -1359,7 +1359,7 @@ declare module weavejs.api.core {
          */
         isBusy(): boolean;
     }
-    var ILinkableObjectWithBusyStatus: Function;
+    var ILinkableObjectWithBusyStatus: new (..._: any[]) => ILinkableObjectWithBusyStatus;
 }
 declare module weavejs.api.core {
     /**
@@ -1372,7 +1372,7 @@ declare module weavejs.api.core {
          */
         deprecatedStateMapping: Object;
     }
-    var ILinkableObjectWithNewProperties: Function;
+    var ILinkableObjectWithNewProperties: new (..._: any[]) => ILinkableObjectWithNewProperties;
 }
 declare module weavejs.api.core {
     /**
@@ -1393,7 +1393,7 @@ declare module weavejs.api.core {
          */
         setSessionState(value: Object): void;
     }
-    var ILinkableVariable: Function;
+    var ILinkableVariable: new (..._: any[]) => ILinkableVariable;
 }
 declare module weavejs.api.core {
     /**
@@ -1412,7 +1412,7 @@ declare module weavejs.api.core {
          */
         getText(text: string): string;
     }
-    var ILocale: Function;
+    var ILocale: new (..._: any[]) => ILocale;
 }
 declare module weavejs.api.core {
     /**
@@ -1461,7 +1461,7 @@ declare module weavejs.api.core {
          */
         getNormalizedProgress(): number;
     }
-    var IProgressIndicator: Function;
+    var IProgressIndicator: new (..._: any[]) => IProgressIndicator;
 }
 declare module weavejs.api.core {
     interface IScheduler {
@@ -1564,7 +1564,7 @@ declare module weavejs.api.core {
          */
         startTask(relevantContext: Object, iterativeTask: Function, priority: number, finalCallback?: Function, description?: string): void;
     }
-    var IScheduler: Function;
+    var IScheduler: new (..._: any[]) => IScheduler;
 }
 declare module weavejs.api.core {
     /**
@@ -1598,7 +1598,7 @@ declare module weavejs.api.core {
          * @return The new child object.
          * @see #registerLinkableChild()
          */
-        newLinkableChild(linkableParent: Object, linkableChildType: Function, callback?: Function, useGroupedCallback?: boolean): any;
+        newLinkableChild<T extends ILinkableObject>(linkableParent: Object, linkableChildType: new () => T, callback?: Function, useGroupedCallback?: boolean): T;
         /**
          * This function tells the SessionManager that the session state of the specified child should appear in the
          * session state of the specified parent, and the child should be disposed when the parent is disposed.
@@ -1619,7 +1619,7 @@ declare module weavejs.api.core {
          * @return The linkableChild object that was passed to the function.
          * @see #newLinkableChild()
          */
-        registerLinkableChild(linkableParent: Object, linkableChild: ILinkableObject, callback?: Function, useGroupedCallback?: boolean): any;
+        registerLinkableChild<T extends ILinkableObject>(linkableParent: Object, linkableChild: T, callback?: Function, useGroupedCallback?: boolean): T;
         /**
          * This function will create a new instance of the specified child class and register it as a child of the parent.
          * Use this function when a child object can be disposed but you do not want to link the callbacks.
@@ -1632,7 +1632,7 @@ declare module weavejs.api.core {
          * @return The new child object.
          * @see #registerDisposableChild()
          */
-        newDisposableChild(disposableParent: Object, disposableChildType: Function): any;
+        newDisposableChild(disposableParent: Object, disposableChildType: new (..._: any[]) => any): any;
         /**
          * This will register a child of a parent and cause the child to be disposed when the parent is disposed.
          * Use this function when a child object can be disposed but you do not want to link the callbacks.
@@ -1661,7 +1661,7 @@ declare module weavejs.api.core {
          * @return An Array containing a list of descendant objects.
          * @see #getLinkableOwner()
          */
-        getLinkableDescendants(root: ILinkableObject, filter?: Function): any[];
+        getLinkableDescendants<T>(root: ILinkableObject, filter?: new (..._: any[]) => T): Array<T & ILinkableObject>;
         /**
          * This will assign an asynchronous task to a linkable object so that <code>linkableObjectIsBusy(busyObject)</code>
          * will return true until all assigned tasks are unassigned using <code>unassignBusyTask(taskToken)</code>.
@@ -1775,7 +1775,7 @@ declare module weavejs.api.core {
          */
         getObject(root: ILinkableObject, path: any[]): ILinkableObject;
     }
-    var ISessionManager: Function;
+    var ISessionManager: new (..._: any[]) => ISessionManager;
 }
 declare module weavejs.api.data {
     /**
@@ -1852,7 +1852,7 @@ declare module weavejs.api.data {
          * @return The associated Class, which can be used to pass to IAttributeColumn.getValueFromKey().
          * @see weave.api.data.IAttributeColumn#getValueFromKey()
          */
-        static getClass(dataType: string): Function;
+        static getClass(dataType: string): new (..._: any[]) => any;
         /**
          * @param data An Array of data values.
          * @return A dataType metadata value, or null if no data was found.
@@ -1902,9 +1902,9 @@ declare module weavejs.api.data {
          * @param dataType The desired value type (Examples: Number, String, Date, Array, IQualifiedKey)
          * @return The value associated with the given record key.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
-    var IAttributeColumn: Function;
+    var IAttributeColumn: new (..._: any[]) => IAttributeColumn;
 }
 declare module weavejs.api.data {
     /**
@@ -1923,7 +1923,7 @@ declare module weavejs.api.data {
          */
         getColumn(dataSource: IDataSource, metadata: Object): IAttributeColumn;
     }
-    var IAttributeColumnCache: Function;
+    var IAttributeColumnCache: new (..._: any[]) => IAttributeColumnCache;
 }
 declare module weavejs.api.data {
     /**
@@ -1937,7 +1937,7 @@ declare module weavejs.api.data {
          */
         setRecords(keys: any[], data: any[]): void;
     }
-    var IBaseColumn: Function;
+    var IBaseColumn: new (..._: any[]) => IBaseColumn;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -1955,7 +1955,7 @@ declare module weavejs.api.data {
          */
         contains(value: any): boolean;
     }
-    var IBinClassifier: Function;
+    var IBinClassifier: new (..._: any[]) => IBinClassifier;
 }
 declare module weavejs.api.data {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -1997,7 +1997,7 @@ declare module weavejs.api.data {
          */
         getBinNames(): any[];
     }
-    var IBinningDefinition: Function;
+    var IBinningDefinition: new (..._: any[]) => IBinningDefinition;
 }
 declare module weavejs.api.data {
     /**
@@ -2056,7 +2056,7 @@ declare module weavejs.api.data {
          */
         convertRecordsToRows(records: any[], columnOrder?: any[], allowBlankColumns?: boolean, headerDepth?: number): any[];
     }
-    var ICSVParser: Function;
+    var ICSVParser: new (..._: any[]) => ICSVParser;
 }
 declare module weavejs.api.data {
     /**
@@ -2079,7 +2079,7 @@ declare module weavejs.api.data {
          */
         getColumnMetadata(): Object;
     }
-    var IColumnReference: Function;
+    var IColumnReference: new (..._: any[]) => IColumnReference;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2140,7 +2140,7 @@ declare module weavejs.api.data {
          */
         hack_getNumericData(): Object;
     }
-    var IColumnStatistics: Function;
+    var IColumnStatistics: new (..._: any[]) => IColumnStatistics;
 }
 declare module weavejs.api.data {
     /**
@@ -2158,7 +2158,7 @@ declare module weavejs.api.data {
          */
         getInternalColumn(): IAttributeColumn;
     }
-    var IColumnWrapper: Function;
+    var IColumnWrapper: new (..._: any[]) => IColumnWrapper;
 }
 declare module weavejs.api.data {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -2192,7 +2192,7 @@ declare module weavejs.api.data {
          */
         getAttributeColumn(metadata: Object): IAttributeColumn;
     }
-    var IDataSource: Function;
+    var IDataSource: new (..._: any[]) => IDataSource;
 }
 declare module weavejs.api.data {
     interface IDataSourceWithAuthentication extends IDataSource {
@@ -2217,7 +2217,7 @@ declare module weavejs.api.data {
          */
         authenticate(user: string, pass: string): void;
     }
-    var IDataSourceWithAuthentication: Function;
+    var IDataSourceWithAuthentication: new (..._: any[]) => IDataSourceWithAuthentication;
 }
 declare module weavejs.api.data {
     /**
@@ -2225,7 +2225,7 @@ declare module weavejs.api.data {
      */
     interface IDataSource_File extends IDataSource {
     }
-    var IDataSource_File: Function;
+    var IDataSource_File: new (..._: any[]) => IDataSource_File;
 }
 declare module weavejs.api.data {
     /**
@@ -2233,7 +2233,7 @@ declare module weavejs.api.data {
      */
     interface IDataSource_Service extends IDataSource {
     }
-    var IDataSource_Service: Function;
+    var IDataSource_Service: new (..._: any[]) => IDataSource_Service;
 }
 declare module weavejs.api.data {
     /**
@@ -2241,7 +2241,7 @@ declare module weavejs.api.data {
      */
     interface IDataSource_Transform extends IDataSource {
     }
-    var IDataSource_Transform: Function;
+    var IDataSource_Transform: new (..._: any[]) => IDataSource_Transform;
 }
 declare module weavejs.api.data {
     import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
@@ -2253,7 +2253,7 @@ declare module weavejs.api.data {
     interface IDynamicKeyFilter extends ILinkableDynamicObject {
         getInternalKeyFilter(): IKeyFilter;
     }
-    var IDynamicKeyFilter: Function;
+    var IDynamicKeyFilter: new (..._: any[]) => IDynamicKeyFilter;
 }
 declare module weavejs.api.data {
     import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
@@ -2265,7 +2265,7 @@ declare module weavejs.api.data {
     interface IDynamicKeySet extends ILinkableDynamicObject {
         getInternalKeySet(): IKeySet;
     }
-    var IDynamicKeySet: Function;
+    var IDynamicKeySet: new (..._: any[]) => IDynamicKeySet;
 }
 declare module weavejs.api.data {
     /**
@@ -2279,7 +2279,7 @@ declare module weavejs.api.data {
          */
         getURL(): string;
     }
-    var IExternalLink: Function;
+    var IExternalLink: new (..._: any[]) => IExternalLink;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2294,7 +2294,7 @@ declare module weavejs.api.data {
          */
         keyFilter: IDynamicKeyFilter;
     }
-    var IFilteredKeySet: Function;
+    var IFilteredKeySet: new (..._: any[]) => IFilteredKeySet;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2311,7 +2311,7 @@ declare module weavejs.api.data {
          */
         containsKey(key: IQualifiedKey): boolean;
     }
-    var IKeyFilter: Function;
+    var IKeyFilter: new (..._: any[]) => IKeyFilter;
 }
 declare module weavejs.api.data {
     /**
@@ -2325,7 +2325,7 @@ declare module weavejs.api.data {
          */
         keys: any[];
     }
-    var IKeySet: Function;
+    var IKeySet: new (..._: any[]) => IKeySet;
 }
 declare module weavejs.api.data {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -2351,7 +2351,7 @@ declare module weavejs.api.data {
          */
         keysRemoved: any[];
     }
-    var IKeySetCallbackInterface: Function;
+    var IKeySetCallbackInterface: new (..._: any[]) => IKeySetCallbackInterface;
 }
 declare module weavejs.api.data {
     /**
@@ -2366,7 +2366,7 @@ declare module weavejs.api.data {
          */
         deriveStringFromNumber(value: number): string;
     }
-    var IPrimitiveColumn: Function;
+    var IPrimitiveColumn: new (..._: any[]) => IPrimitiveColumn;
 }
 declare module weavejs.api.data {
     import Point = weavejs.geom.Point;
@@ -2383,7 +2383,7 @@ declare module weavejs.api.data {
          */
         reproject(inputAndOutput: Point): Point;
     }
-    var IProjector: Function;
+    var IProjector: new (..._: any[]) => IProjector;
 }
 declare module weavejs.api.data {
     /**
@@ -2397,7 +2397,7 @@ declare module weavejs.api.data {
         toNumber(): number;
         toString(): string;
     }
-    var IQualifiedKey: Function;
+    var IQualifiedKey: new (..._: any[]) => IQualifiedKey;
 }
 declare module weavejs.api.data {
     /**
@@ -2456,7 +2456,7 @@ declare module weavejs.api.data {
          */
         numberToQKey(qkeyNumber: number): IQualifiedKey;
     }
-    var IQualifiedKeyManager: Function;
+    var IQualifiedKeyManager: new (..._: any[]) => IQualifiedKeyManager;
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2476,7 +2476,7 @@ declare module weavejs.api.data {
          */
         getSelectableAttributes(): any[];
     }
-    var ISelectableAttributes: Function;
+    var ISelectableAttributes: new (..._: any[]) => ISelectableAttributes;
 }
 declare module weavejs.api.data {
     /**
@@ -2518,7 +2518,7 @@ declare module weavejs.api.data {
          */
         setVertices(o: any[]): void;
     }
-    var ISimpleGeometry: Function;
+    var ISimpleGeometry: new (..._: any[]) => ISimpleGeometry;
 }
 declare module weavejs.api.data {
     /**
@@ -2534,7 +2534,7 @@ declare module weavejs.api.data {
          */
         getColumnStatistics(column: IAttributeColumn): IColumnStatistics;
     }
-    var IStatisticsCache: Function;
+    var IStatisticsCache: new (..._: any[]) => IStatisticsCache;
 }
 declare module weavejs.api.data {
     /**
@@ -2575,7 +2575,7 @@ declare module weavejs.api.data {
          */
         getChildren(): any[];
     }
-    var IWeaveTreeNode: Function;
+    var IWeaveTreeNode: new (..._: any[]) => IWeaveTreeNode;
 }
 declare module weavejs.api.data {
     /**
@@ -2597,7 +2597,7 @@ declare module weavejs.api.data {
          */
         removeChild(child: IWeaveTreeNode): boolean;
     }
-    var IWeaveTreeNodeWithEditableChildren: Function;
+    var IWeaveTreeNodeWithEditableChildren: new (..._: any[]) => IWeaveTreeNodeWithEditableChildren;
 }
 declare module weavejs.api.data {
     /**
@@ -2613,7 +2613,7 @@ declare module weavejs.api.data {
          */
         findPathToNode(descendant: IWeaveTreeNode): any[];
     }
-    var IWeaveTreeNodeWithPathFinding: Function;
+    var IWeaveTreeNodeWithPathFinding: new (..._: any[]) => IWeaveTreeNodeWithPathFinding;
 }
 declare module weavejs.api.net {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2633,7 +2633,7 @@ declare module weavejs.api.net {
          */
         invokeAsyncMethod(methodName: string, methodParameters?: Object): WeavePromise;
     }
-    var IAsyncService: Function;
+    var IAsyncService: new (..._: any[]) => IAsyncService;
 }
 declare module weavejs.api.net {
     import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -2670,7 +2670,7 @@ declare module weavejs.api.net {
          */
         getLocalFileNames(weaveRoot: ILinkableHashMap): any[];
     }
-    var IURLRequestUtils: Function;
+    var IURLRequestUtils: new (..._: any[]) => IURLRequestUtils;
 }
 declare module weavejs.api.net {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2733,7 +2733,7 @@ declare module weavejs.api.net {
          */
         getImageHeight(): number;
     }
-    var IWMSService: Function;
+    var IWMSService: new (..._: any[]) => IWMSService;
 }
 declare module weavejs.api.net {
     import EntityMetadata = weavejs.api.net.beans.EntityMetadata;
@@ -2780,7 +2780,7 @@ declare module weavejs.api.net {
          */
         removeChild(parentId: number, childId: number): WeavePromise;
     }
-    var IWeaveEntityManagementService: Function;
+    var IWeaveEntityManagementService: new (..._: any[]) => IWeaveEntityManagementService;
 }
 declare module weavejs.api.net {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2823,7 +2823,7 @@ declare module weavejs.api.net {
          */
         findPublicFieldValues(fieldName: string, valueSearch: string): WeavePromise;
     }
-    var IWeaveEntityService: Function;
+    var IWeaveEntityService: new (..._: any[]) => IWeaveEntityService;
 }
 declare module weavejs.api.net {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2843,7 +2843,7 @@ declare module weavejs.api.net {
          */
         getGeometryTiles(tileIDs: any[]): WeavePromise;
     }
-    var IWeaveGeometryTileService: Function;
+    var IWeaveGeometryTileService: new (..._: any[]) => IWeaveGeometryTileService;
 }
 declare module weavejs.api.net.beans {
     /**
@@ -2900,7 +2900,7 @@ declare module weavejs.api.ui {
          */
         getLabel(object: ILinkableObject): string;
     }
-    var IEditorManager: Function;
+    var IEditorManager: new (..._: any[]) => IEditorManager;
 }
 declare module weavejs.api.ui {
     /**
@@ -2913,7 +2913,7 @@ declare module weavejs.api.ui {
          */
         getDescription(): string;
     }
-    var IObjectWithDescription: Function;
+    var IObjectWithDescription: new (..._: any[]) => IObjectWithDescription;
 }
 declare module weavejs.api.ui {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -2922,7 +2922,7 @@ declare module weavejs.api.ui {
      */
     interface IVisTool extends ILinkableObject {
     }
-    var IVisTool: Function;
+    var IVisTool: new (..._: any[]) => IVisTool;
 }
 declare module weavejs.core {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -3109,7 +3109,7 @@ declare module weavejs.core {
          * @param definition
          * @param interfaces An Array of Class objects that are the interfaces the class implements.
          */
-        registerClass(qualifiedName: string, definition: Function, interfaces?: any[]): void;
+        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[]): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -3124,12 +3124,12 @@ declare module weavejs.core {
          * @param theImplementation The implementation to register.
          * @return A value of true if the implementation was successfully registered.
          */
-        registerSingletonImplementation(theInterface: Function, theImplementation: Function): boolean;
+        registerSingletonImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any): boolean;
         /**
          * Gets the registered implementation of an interface.
          * @return The registered implementation Class for the given interface Class.
          */
-        getSingletonImplementation(theInterface: Function): Function;
+        getSingletonImplementation(theInterface: new (..._: any[]) => any): new (..._: any[]) => any;
         /**
          * This function returns the singleton instance for a registered interface.
          *
@@ -3139,26 +3139,26 @@ declare module weavejs.core {
          * @param singletonInterface An interface to a singleton class.
          * @return The singleton instance that implements the specified interface.
          */
-        getSingletonInstance(theInterface: Function): any;
+        getSingletonInstance(theInterface: new (..._: any[]) => any): any;
         /**
          * This will register an implementation of an interface.
          * @param theInterface The interface class.
          * @param theImplementation An implementation of the interface.
          * @param displayName An optional display name for the implementation.
          */
-        registerImplementation(theInterface: Function, theImplementation: Function, displayName?: string): void;
+        registerImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any, displayName?: string): void;
         /**
          * This will get an Array of class definitions that were previously registered as map_interface_implementations of the specified interface.
          * @param theInterface The interface class.
          * @return An Array of class definitions that were previously registered as map_interface_implementations of the specified interface.
          */
-        getImplementations(theInterface: Function): any[];
+        getImplementations(theInterface: new (..._: any[]) => any): any[];
         /**
          * This will get the displayName that was specified when an implementation was registered with registerImplementation().
          * @param theImplementation An implementation that was registered with registerImplementation().
          * @return The display name for the implementation.
          */
-        getDisplayName(theImplementation: Function): string;
+        getDisplayName(theImplementation: new (..._: any[]) => any): string;
         /**
          * @private
          * sort by displayName
@@ -3166,7 +3166,7 @@ declare module weavejs.core {
         /**
          * Verifies that a Class implements an interface.
          */
-        verifyImplementation(theInterface: Function, theImplementation: Function): void;
+        verifyImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any): void;
     }
 }
 declare module weavejs.core {
@@ -3258,14 +3258,14 @@ declare module weavejs.core {
         /**
          * @param typeRestriction If specified, this will limit the type of objects that can be added to this LinkableHashMap.
          */
-        constructor(typeRestriction?: Function);
+        constructor(typeRestriction?: new (..._: any[]) => any);
         internalObject: ILinkableObject;
         getSessionState(): any[];
         setSessionState(newState: any[], removeMissingDynamicObjects: boolean): void;
         target: ILinkableObject;
         targetPath: any[];
-        requestLocalObject(objectType: Function, lockObject: boolean): any;
-        requestGlobalObject(name: string, objectType: Function, lockObject: boolean): any;
+        requestLocalObject(objectType: new (..._: any[]) => any, lockObject: boolean): any;
+        requestGlobalObject(name: string, objectType: new (..._: any[]) => any, lockObject: boolean): any;
         requestLocalObjectCopy(objectToCopy: ILinkableObject): void;
         /**
          * This is the name of the linked global object, or null if the internal object is local.
@@ -3373,16 +3373,16 @@ declare module weavejs.core {
          * Constructor.
          * @param typeRestriction If specified, this will limit the type of objects that can be added to this LinkableHashMap.
          */
-        constructor(typeRestriction?: Function);
-        typeRestriction: Function;
+        constructor(typeRestriction?: new (..._: any[]) => any);
+        typeRestriction: new (..._: any[]) => any;
         childListCallbacks: IChildListCallbackInterface;
-        getNames(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
-        getObjects(filter?: Function, filterIncludesPlaceholders?: boolean): any[];
+        getNames(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
+        getObjects(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
         getObject(name: string): ILinkableObject;
         setObject(name: string, object: ILinkableObject, lockObject?: boolean): void;
         getName(object: ILinkableObject): string;
         setNameOrder(newOrder: any[]): void;
-        requestObject(name: string, classDef: Function, lockObject?: boolean): any;
+        requestObject(name: string, classDef: new (..._: any[]) => any, lockObject?: boolean): any;
         requestObjectCopy(name: string, objectToCopy: ILinkableObject): ILinkableObject;
         renameObject(oldName: string, newName: string): ILinkableObject;
         /**
@@ -3434,8 +3434,8 @@ declare module weavejs.core {
      * Represents an object that must be instantiated asynchronously.
      */
     class LinkablePlaceholder extends LinkableVariable {
-        constructor(classDef?: Function);
-        getClass(): Function;
+        constructor(classDef?: new (..._: any[]) => any);
+        getClass(): new (..._: any[]) => any;
         getInstance(): ILinkableObject;
         setInstance(instance: ILinkableObject): void;
         /**
@@ -3443,7 +3443,7 @@ declare module weavejs.core {
          * @param object An object, which may be null.
          * @return The class definition, or null if the object was null.
          */
-        static getClass(object: Object): Function;
+        static getClass(object: Object): new (..._: any[]) => any;
     }
 }
 declare module weavejs.core {
@@ -3542,7 +3542,7 @@ declare module weavejs.core {
          * @param defaultValue The default value for the session state.
          * @param defaultValueTriggersCallbacks Set this to false if you do not want the callbacks to be triggered one frame later after setting the default value.
          */
-        constructor(sessionStateType?: Function, verifier?: Function, defaultValue?: any, defaultValueTriggersCallbacks?: boolean);
+        constructor(sessionStateType?: new (..._: any[]) => any, verifier?: Function, defaultValue?: any, defaultValueTriggersCallbacks?: boolean);
         /**
          * @private
          */
@@ -3554,7 +3554,7 @@ declare module weavejs.core {
         /**
          * The type restriction passed in to the constructor.
          */
-        getSessionStateType(): Function;
+        getSessionStateType(): new (..._: any[]) => any;
         getSessionState(): Object;
         setSessionState(value: Object): void;
         /**
@@ -3597,7 +3597,7 @@ declare module weavejs.core {
          * @see weave.api.core.newLinkableChild()
          * @see weave.api.core.newDisposableChild()
          */
-        constructor(typeRestriction?: Function, immediateCallback?: Function, groupedCallback?: Function);
+        constructor(typeRestriction?: new (..._: any[]) => any, immediateCallback?: Function, groupedCallback?: Function);
         /**
          * This is the linkable object currently being watched.
          * Setting this will unset the targetPath.
@@ -3751,9 +3751,9 @@ declare module weavejs.core {
      */
     class SessionManager implements ISessionManager {
         static debugUnbusy: boolean;
-        newLinkableChild(linkableParent: Object, linkableChildType: Function, callback?: Function, useGroupedCallback?: boolean): any;
+        newLinkableChild(linkableParent: Object, linkableChildType: new (..._: any[]) => any, callback?: Function, useGroupedCallback?: boolean): any;
         registerLinkableChild(linkableParent: Object, linkableChild: ILinkableObject, callback?: Function, useGroupedCallback?: boolean): any;
-        newDisposableChild(disposableParent: Object, disposableChildType: Function): any;
+        newDisposableChild(disposableParent: Object, disposableChildType: new (..._: any[]) => any): any;
         registerDisposableChild(disposableParent: Object, disposableChild: Object): any;
         /**
          * Use this function with care.  This will remove child objects from the session state of a parent and
@@ -3813,7 +3813,7 @@ declare module weavejs.core {
          * @return An Array containing the names of the sessioned properties of that object class.
          */
         getLinkablePropertyNames(linkableObject: ILinkableObject, filtered?: boolean): any[];
-        getLinkableDescendants(root: ILinkableObject, filter?: Function): any[];
+        getLinkableDescendants(root: ILinkableObject, filter?: new (..._: any[]) => any): any[];
         assignBusyTask(taskToken: Object, busyObject: ILinkableObject): void;
         unassignBusyTask(taskToken: Object): void;
         /**
@@ -4171,7 +4171,7 @@ declare module weavejs.data {
          * @return An Array of GeoJson Geometry objects corresponding to the keys.  The Array may be sparse if there are no coordinates for some of the keys.
          */
         static getGeoJsonGeometries(geometryColumn: IAttributeColumn, keys: any[], minImportance?: number, visibleBounds?: Bounds2D): any[];
-        static test_getAllValues(column: IAttributeColumn, dataType: Function): any[];
+        static test_getAllValues(column: IAttributeColumn, dataType: new (..._: any[]) => any): any[];
         /**
          * This function takes the common keys from a list of columns and generates a table of data values for each key from each specified column.
          * @param columns A list of IAttributeColumns to compute a join table from.
@@ -4216,7 +4216,7 @@ declare module weavejs.data {
          * @param dataType
          * @return A string containing a CSV-formatted table containing the attributes of the requested keys.
          */
-        static generateTableCSV(attrCols: any[], subset?: IKeyFilter, dataType?: Function): string;
+        static generateTableCSV(attrCols: any[], subset?: IKeyFilter, dataType?: new (..._: any[]) => any): string;
         /**
          * This function will compute the union of a list of IKeySets.
          * @param inputKeySets An Array of IKeySets (can be IAttributeColumns).
@@ -4379,7 +4379,7 @@ declare module weavejs.data {
         /**
          * This is a macro for IQualifiedKey that can be used in equations.
          */
-        static QKey: Function;
+        static QKey: new (..._: any[]) => any;
     }
 }
 declare module weavejs.data {
@@ -4691,7 +4691,7 @@ declare module weavejs.data.column {
         getMetadataPropertyNames(): any[];
         keys: any[];
         containsKey(key: IQualifiedKey): boolean;
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -4714,7 +4714,7 @@ declare module weavejs.data.column {
          * @param key A key of the type specified by keyType.
          * @return The value associated with the given key.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -4772,7 +4772,7 @@ declare module weavejs.data.column {
          * @param dataType The requested return type.
          * @return If the specified dataType is supported, a value of that type.  Otherwise, the default return value for the given record key.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
         /**
          * From a bin index, this function returns the name of the bin.
          * @param value A bin index
@@ -4833,7 +4833,7 @@ declare module weavejs.data.column {
         /**
          * This function returns the corresponding numeric or string value depending on the dataType parameter and the numericMode setting.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -4859,7 +4859,7 @@ declare module weavejs.data.column {
          * The format for each row in the CSV is:  keyType,localName,color
          */
         recordColors: LinkableVariable;
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -4917,7 +4917,7 @@ declare module weavejs.data.column {
          * @param key A key of the type specified by keyType.
          * @return The value associated with the given key.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -4934,7 +4934,7 @@ declare module weavejs.data.column {
         containsKey(key: IQualifiedKey): boolean;
         setRecords(qkeys: any[], dates: any[]): void;
         deriveStringFromNumber(number: number): string;
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
         static detectDateFormats(dates: any): any[];
     }
 }
@@ -4949,7 +4949,7 @@ declare module weavejs.data.column {
      * @author adufilie
      */
     class DynamicColumn extends LinkableDynamicObject implements IColumnWrapper {
-        constructor(columnTypeRestriction?: Function);
+        constructor(columnTypeRestriction?: new (..._: any[]) => any);
         /**
          * This function lets you skip the step of casting internalObject as an IAttributeColumn.
          */
@@ -4973,7 +4973,7 @@ declare module weavejs.data.column {
          * @param key A key of the type specified by keyType.
          * @return The value associated with the given key.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -5029,7 +5029,7 @@ declare module weavejs.data.column {
          * @param classDef The Class of the desired object type.
          * @return The object associated with the requested name of the requested type, or null if an error occurred.
          */
-        requestVariable(name: string, classDef: Function, lockObject?: boolean): any;
+        requestVariable(name: string, classDef: new (..._: any[]) => any, lockObject?: boolean): any;
         /**
          * @return The keys associated with this EquationColumn.
          */
@@ -5047,7 +5047,7 @@ declare module weavejs.data.column {
          * @return The result of the compiled equation evaluated at the given record key.
          * @see weave.api.data.IAttributeColumn
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
         deriveStringFromNumber(number: number): string;
     }
 }
@@ -5091,7 +5091,7 @@ declare module weavejs.data.column {
          * @param key A key of the type specified by keyType.
          * @return The value associated with the given key.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -5113,7 +5113,7 @@ declare module weavejs.data.column {
          * The filter removes certain records from the column.  This function will return false if the key is not contained in the filter.
          */
         containsKey(key: IQualifiedKey): boolean;
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -5136,7 +5136,7 @@ declare module weavejs.data.column {
          */
         containsKey(key: IQualifiedKey): boolean;
         setRecords(keys: any[], geometries: any[]): void;
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -5154,7 +5154,7 @@ declare module weavejs.data.column {
          * @param key A key of the type specified by keyType.
          * @return The value associated with the given key.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -5229,7 +5229,7 @@ declare module weavejs.data.column {
         /**
          * The functions below serve as wrappers for matching function calls on the internalAttributeColumn.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
         dispose(): void;
         /**
          * Call this function when the ProxyColumn should indicate that the requested data is unavailable.
@@ -5286,7 +5286,7 @@ declare module weavejs.data.column {
          * @param key A key of the type specified by keyType.
          * @return The value associated with the given key.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -5327,7 +5327,7 @@ declare module weavejs.data.column {
         /**
          * get data from key value
          */
-        getValueFromKey(qkey: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(qkey: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
     }
 }
 declare module weavejs.data.column {
@@ -5368,7 +5368,7 @@ declare module weavejs.data.column {
          * @param dataType A requested return type.
          * @return If dataType is not specified, returns the index of the key in the sorted list of keys.
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
         /**
          * @param index The index in the sorted keys vector.
          * @return The key at the given index value.
@@ -5401,7 +5401,7 @@ declare module weavejs.data.column {
         /**
          * @return The Array of geometries associated with the given key (if dataType not specified).
          */
-        getValueFromKey(key: IQualifiedKey, dataType?: Function): any;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
         collectiveBounds: Bounds2D;
         /**
          * This function returns true if the column is still downloading tiles.
@@ -8576,7 +8576,7 @@ declare module weavejs.util {
 }
 declare module weavejs.util {
     class BackwardsCompatibility {
-        static forceDeprecatedState(classDef: Function): void;
+        static forceDeprecatedState(classDef: new (..._: any[]) => any): void;
         static updateSessionState(state: Object): Object;
         static classLookup: Object;
     }
@@ -8727,11 +8727,11 @@ declare module weavejs.util {
      * @author adufilie
      */
     class Dictionary2D<K1, K2, V> {
-        constructor(weakPrimaryKeys?: boolean, weakSecondaryKeys?: boolean, defaultType?: Function);
+        constructor(weakPrimaryKeys?: boolean, weakSecondaryKeys?: boolean, defaultType?: new (..._: any[]) => any);
         /**
          * The primary Map object.
          */
-        map: Object;
+        map: Map<K1, Map<K2, V>>;
         /**
          * @param key1 The first map key.
          * @param key2 The second map key.
@@ -8782,7 +8782,7 @@ declare module weavejs.util {
         /**
          * This must be set externally.
          */
-        static JSZip: Function;
+        static JSZip: new (..._: any[]) => any;
         /**
          * Calls console.error()
          */
@@ -8801,27 +8801,27 @@ declare module weavejs.util {
         /**
          * AS->JS Language helper for ArrayBuffer
          */
-        static ArrayBuffer: Function;
+        static ArrayBuffer: new (..._: any[]) => any;
         /**
          * AS->JS Language helper for Uint8Array
          */
-        static Uint8Array: Function;
+        static Uint8Array: new (..._: any[]) => any;
         /**
          * AS->JS Language helper for DataView
          */
-        static DataView: Function;
+        static DataView: new (..._: any[]) => any;
         /**
          * AS->JS Language helper for Promise
          */
-        static Promise: Function;
+        static Promise: new (..._: any[]) => any;
         /**
          * AS->JS Language helper for Map
          */
-        static Map: Function;
+        static Map: new (..._: any[]) => any;
         /**
          * AS->JS Language helper for WeakMap
          */
-        static WeakMap: Function;
+        static WeakMap: new (..._: any[]) => any;
         /**
          * AS->JS Language helper for getting an Array of Map keys.
          */
@@ -9106,14 +9106,14 @@ declare module weavejs.util {
          * @param a An Array to check.
          * @return The type of all items in the Array, or null if the types differ.
          */
-        static getArrayType(a: any[]): Function;
+        static getArrayType(a: any[]): new (..._: any[]) => any;
         /**
          * Checks if all items in an Array are instances of a given type.
          * @param a An Array of items to test
          * @param type A type to check for
          * @return true if each item in the Array is an object of the given type.
          */
-        static arrayIsType(a: any[], type: Function): boolean;
+        static arrayIsType(a: any[], type: new (..._: any[]) => any): boolean;
         /**
          * This will perform a log transformation on a normalized value to produce another normalized value.
          * @param normValue A number between 0 and 1.
@@ -9239,7 +9239,7 @@ declare module weavejs.util {
          * @param WeaveTreeItem_implementation The implementation of WeaveTreeItem to use.
          * @param items Item descriptors.
          */
-        static createItems(WeaveTreeItem_implementation: Function, items: any[]): any[];
+        static createItems(WeaveTreeItem_implementation: new (..._: any[]) => any, items: any[]): any[];
         /**
          * Used for mapping an Array of params objects to an Array of WeaveTreeItem objects.
          * @param WeaveTreeItem_implementation The implementation of WeaveTreeItem to use.

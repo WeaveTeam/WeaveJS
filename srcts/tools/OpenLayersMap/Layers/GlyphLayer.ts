@@ -11,18 +11,19 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import LinkableString = weavejs.core.LinkableString;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 
 interface LocationRecord {
-	dataX: Array<any>;
-	dataY: Array<any>;
+	dataX: (number|GeneralizedGeometry)[];
+	dataY: (number|GeneralizedGeometry)[];
 	id: IQualifiedKey;
 }
 
 abstract class GlyphLayer extends FeatureLayer {
 
-	dataX: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	dataY: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	sourceProjection: LinkableString = Weave.linkableChild(this, LinkableString);
+	dataX = Weave.linkableChild(this, DynamicColumn);
+	dataY = Weave.linkableChild(this, DynamicColumn);
+	sourceProjection = Weave.linkableChild(this, LinkableString);
 
 	constructor()
 	{
@@ -41,18 +42,6 @@ abstract class GlyphLayer extends FeatureLayer {
 
 	_getFeatureIds() {
 		return lodash.map(this.source.getFeatures(), (item:ol.Feature) => item.getId());
-	}
-
-	static _toPoint(data:Array<any>, field1:any, field2:any):any {
-		let firstDatum = data[0];
-		if (typeof firstDatum === "object")
-		{
-			return (firstDatum.bounds[field1] + firstDatum.bounds[field2]) / 2;
-		}
-		else
-		{
-			return firstDatum;
-		}
 	}
 
 	updateProjection():void {
@@ -77,12 +66,24 @@ abstract class GlyphLayer extends FeatureLayer {
 		for (let i in records)
 		{
 			let record = records[i];
-			let dataX:any, dataY:any;
-
-			dataX = GlyphLayer._toPoint(record.dataX, "xMin", "xMax");
-			dataY = GlyphLayer._toPoint(record.dataY, "yMin", "yMax");
-
-			let point = new ol.geom.Point([dataX, dataY]);
+			
+			let geom:GeneralizedGeometry;
+			
+			let dataX:Object = record.dataX[0];
+			if (dataX instanceof GeneralizedGeometry)
+			{
+				geom = dataX as GeneralizedGeometry;
+				dataX = (geom.bounds.xMin + geom.bounds.xMax) / 2;
+			}
+			
+			let dataY:Object = record.dataY[0];
+			if (dataY instanceof GeneralizedGeometry)
+			{
+				geom = dataY as GeneralizedGeometry;
+				dataY = (geom.bounds.yMin + geom.bounds.yMax) / 2;
+			}
+			
+			let point = new ol.geom.Point([dataX as number, dataY as number]);
 			point.transform(rawProj, mapProj);
 
 			var coords = point.getCoordinates();

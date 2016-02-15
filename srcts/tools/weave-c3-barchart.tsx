@@ -568,7 +568,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 
             if(weavejs.WeaveAPI.Locale.reverseLayout){
                 this.c3Config.padding.left = this.margin.right.value;
-                this.c3Config.padding.right = this.margin.Left.value;
+                this.c3Config.padding.right = this.margin.left.value;
             } else {
                 this.c3Config.padding.left = this.margin.left.value;
                 this.c3Config.padding.right = this.margin.right.value;

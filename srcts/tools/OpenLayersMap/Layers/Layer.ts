@@ -14,7 +14,7 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableString = weavejs.core.LinkableString;
 import WeaveAPI = weavejs.WeaveAPI;
 
-abstract class Layer implements ILinkableObject {
+/*abstract*/ class Layer implements ILinkableObject {
 
 	opacity: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
 	visible: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
@@ -29,7 +29,7 @@ abstract class Layer implements ILinkableObject {
 
 	registerUpdateProjection():void
 	{
-		let parent: OpenLayersMapTool = Weave.getAncestor(this, OpenLayersMapTool) as OpenLayersMapTool;
+		let parent = Weave.getAncestor(this, OpenLayersMapTool);
 		if (!parent)
 		{
 			WeaveAPI.Scheduler.callLater(this, this.registerUpdateProjection);
@@ -40,7 +40,7 @@ abstract class Layer implements ILinkableObject {
 		this.projectionSRS.addGroupedCallback(this, this.updateProjection, true);
 	}
 
-	abstract updateProjection(): void;
+	/*abstract*/ updateProjection(): void {}
 
 	private _parent: OpenLayersMapTool = null;
 

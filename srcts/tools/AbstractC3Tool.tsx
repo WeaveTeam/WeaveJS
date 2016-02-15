@@ -27,10 +27,10 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
 export class Margin {
-    top: LinkableString = Weave.linkableChild(this, new LinkableNumber(20));
-    bottom: LinkableNumber = Weave.linkableChild(this, new LinkableNumber(100));
-    left: LinkableNumber = Weave.linkableChild(this, new LinkableNumber(100));
-    right: LinkableNumber = Weave.linkableChild(this, new LinkableNumber(20));
+    top = Weave.linkableChild(this, new LinkableNumber(20));
+    bottom = Weave.linkableChild(this, new LinkableNumber(100));
+    left = Weave.linkableChild(this, new LinkableNumber(100));
+    right = Weave.linkableChild(this, new LinkableNumber(20));
 }
 
 Weave.registerClass("weavejs.tool.Margin", Margin);
@@ -44,21 +44,21 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
         this.y2AxisClass = "c3-axis-y2";
     }
 
-	selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	probeFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 
 	protected get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
 	protected get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
 
-	xAxisName:LinkableString = Weave.linkableChild(this, LinkableString);
-	yAxisName:LinkableString = Weave.linkableChild(this, LinkableString);
+	xAxisName = Weave.linkableChild(this, LinkableString);
+	yAxisName = Weave.linkableChild(this, LinkableString);
 
     margin = Weave.linkableChild(this, Margin);
 
-	panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
-    overrideYMin:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-    overrideYMax:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+	panelTitle = Weave.linkableChild(this, LinkableString);
+    overrideYMin = Weave.linkableChild(this, LinkableNumber);
+    overrideYMax = Weave.linkableChild(this, LinkableNumber);
 
 	protected element:HTMLElement;
     protected chart:ChartAPI;

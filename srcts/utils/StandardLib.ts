@@ -300,16 +300,17 @@ export default class StandardLib
 
 	static addPointClickListener(target:HTMLElement, listener:(event:MouseEvent)=>void, pixelThreshold:number = 1):void
 	{
-		listener.onMouseDown = function(event:MouseEvent):void {
-			listener.mouseDownEvent = event;
+		var _listener = listener as any;
+		_listener.onMouseDown = function(event:MouseEvent):void {
+			_listener.mouseDownEvent = event;
 		};
-		listener.onClick = function(event:MouseEvent):void {
-			var mde:MouseEvent = listener.mouseDownEvent;
+		_listener.onClick = function(event:MouseEvent):void {
+			var mde:MouseEvent = _listener.mouseDownEvent;
 			if (Math.abs(mde.clientX - event.clientX) < pixelThreshold && Math.abs(mde.clientY - event.clientY) < pixelThreshold)
 				listener(event);
 		};
-		target.addEventListener('mousedown', listener.onMouseDown);
-		target.addEventListener('click', listener.onClick);
+		target.addEventListener('mousedown', _listener.onMouseDown);
+		target.addEventListener('click', _listener.onClick);
 	}
 
 	static removePointClickListener(target:HTMLElement, listener:any):void
