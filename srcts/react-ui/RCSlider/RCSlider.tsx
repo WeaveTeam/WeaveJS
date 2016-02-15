@@ -6,12 +6,17 @@ import * as React from "react";
 import Slider from "rc-slider";
 import * as ReactDOM from "react-dom";
 
+export type SliderOption = {
+	value: any,
+	label: string
+};
+
 export interface SliderProps {
     min?:number;
     max?:number;
     step?:number;
-    values?:string[] | { value: number, label: string }[];
-    selectedValues:string[];
+    options?:SliderOption[];
+    selectedValues:any[];
     onChange:Function
 }
 
@@ -25,8 +30,8 @@ export default class RCSlider extends React.Component<any, any> {
     static NUMERIC_DISCRETE:string = "numeric-discrete";
 
     private options:number[];
-    private indexToValue:{[index:number]: string};
-    private valueToIndex:{[value:string]: number};
+    private indexToValue:Map<number, any> = new Map();
+    private valueToIndex:Map<any, number> = new Map();
 
     private indexToLabel:{[index:number]: string};
 
@@ -50,24 +55,29 @@ export default class RCSlider extends React.Component<any, any> {
         }
     }
 
-    onChange(value:number|number[]) {
-        if(this.props.type == RCSlider.CATEGORICAL) {
-            let selectedValues:string[] = [this.indexToValue[value as number]];
+    onChange(value:any) {
+        if(this.props.type == RCSlider.CATEGORICAL)
+		{
+            let selectedValues:any[] = [this.indexToValue.get(value)];
             this.props.onChange(selectedValues);
         }
 
-        if(this.props.type == RCSlider.NUMERIC) {
-            let selectedValues:Object[] = [{
-                min: (value as number[])[0],
-                max: (value as number[])[1]
+        if(this.props.type == RCSlider.NUMERIC) 
+		{
+			// TODO put try catch block
+            let selectedValues:any[] = [{
+                min: value[0],
+                max: value[1]
             }];
             this.props.onChange(selectedValues);
         }
 
-        if(this.props.type == RCSlider.NUMERIC_DISCRETE) {
+        if(this.props.type == RCSlider.NUMERIC_DISCRETE)
+		{
+			// TODO put try catch block
             let selectedValues:Object[] = [{
-                min: this.indexToValue[(value as number[])[0]],
-                max: this.indexToValue[(value as number[])[1]]
+                min: this.indexToValue.get(value[0]),
+                max: this.indexToValue.get(value[1])
             }];
             this.props.onChange(selectedValues);
         }
@@ -75,11 +85,11 @@ export default class RCSlider extends React.Component<any, any> {
 
     render() {
         this.options = [];
-        this.indexToValue = {};
-        this.valueToIndex = {};
+        this.indexToValue.clear();
+        this.valueToIndex.clear();
         this.indexToLabel = {};
 
-        this.props.values.forEach((option:{ value: string, label: string}, index:number) => {
+        this.props.options.forEach((option:SliderOption, index:number) => {
             this.options.push(index);
             this.indexToValue[index] = option.value;
             this.indexToLabel[index] = option.label;
@@ -99,7 +109,7 @@ export default class RCSlider extends React.Component<any, any> {
 
         if(this.props.type == RCSlider.NUMERIC) {
             let valueToLabel:{[value:number]: string} = {};
-            this.options = this.props.values.map((option:{ value: number, label: string}) => {
+            this.options = this.props.options.map((option:SliderOption) => {
                 valueToLabel[option.value] = option.label;
                 return option.value;
             });
