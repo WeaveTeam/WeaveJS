@@ -18,7 +18,15 @@ import * as Prefixer from "react-vendor-prefix";
 
 import WeavePath = weavejs.path.WeavePath;
 import WeavePathUI = weavejs.path.WeavePathUI;
+
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import ColorRamp = weavejs.util.ColorRamp;
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
+import LinkableNumber = weavejs.core.LinkableNumber;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
+import DynamicKeySet = weavejs.data.key.DynamicKeySet;
+import LinkableString = weavejs.core.LinkableString;
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -26,49 +34,58 @@ const SHAPE_TYPE_LINE:string = "line";
 
 export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
+    private chartColors:ColorRamp = Weave.linkableChild(this, ColorRamp);
+    private columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(ReferencedColumn));
+    private maxColumns:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+    private panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
+    private shapeSize:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+
+    private filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+    private selectionKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
+    private probeKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
+
     private plotterPath:WeavePath;
-    private colorRampPath:WeavePath;
-    private columnsPath:WeavePath;
-    private maxColumnsPath:WeavePath;
-    private filteredKeySet:WeavePath;
-    private toolPath:WeavePath;
+
     private spanStyle:CSSProperties;
     private numberOfLabels:number;
 
     constructor(props:IVisToolProps) {
         super(props);
-        this.toolPath = props.toolPath;
-        this.plotterPath = (this.toolPath as WeavePathUI).pushPlotter("plot");
-        this.colorRampPath = this.plotterPath.push("chartColors");
-        this.columnsPath = this.plotterPath.push("columns");
-        this.maxColumnsPath = this.plotterPath.push("maxColumns");
-        this.filteredKeySet = this.plotterPath.push("filteredKeySet");
+
+        this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
+        this.selectionKeySet.targetPath = ['defaultSelectionKeySet'];
+        this.probeKeySet.targetPath = ['defaultProbeKeySet'];
+
+
         this.state = {selected:[], probed:[]};
         this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
 
 	get deprecatedStateMapping()
 	{
-		return {};
+		return {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+                                "chartColors": this.chartColors,
+                                "maxColumns": this.maxColumns,
+                                "columns": this.columns,
+                                "shapeSize": this.shapeSize
+                            }
+                        }
+                    }
+                }
+            },
+            "panelTitle": this.panelTitle
+        };
 	}
 
     get title():string {
-       return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
+        return this.panelTitle.value ? this.panelTitle.value : Weave.getRoot(this).getName(this);
     }
-
-    private setupCallbacks() {
-        this.maxColumnsPath.addCallback(this, this.forceUpdate);
-        this.filteredKeySet.addCallback(this, this.forceUpdate);
-        this.plotterPath.push("shapeSize").addCallback(this, this.forceUpdate);
-    }
-
-    //getSelectedBins():number[] {
-    //
-    //}
-
-    //getProbedBins():number[] {
-    //
-    //}
 
     handleClick(label:number,temp:any):void {
 
@@ -79,7 +96,9 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
     }
 
     componentDidMount() {
-        this.setupCallbacks();
+        this.maxColumns.addGroupedCallback(this, this.forceUpdate);
+        this.filteredKeySet.addGroupedCallback(this, this.forceUpdate);
+        this.shapeSize.addGroupedCallback(this, this.forceUpdate, true);
     }
 
     componentDidUpdate() {
@@ -119,17 +138,15 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
     render() {
         var width:number = this.props.style.width as number;
         var height:number = this.props.style.height as number;
-        var shapeSize:number = this.plotterPath.getState("shapeSize") as number;
-        this.numberOfLabels = this.columnsPath.getNames().length;
-        var maxColumns:number = 1;//TODO: This should really be "this.maxColumnsPath.getState();" but only supporting 1 column for now
+        var shapeSize = this.shapeSize.value;
+        this.numberOfLabels = this.columns.getObjects().length;
+        var maxColumns = 1 // = this.maxColumns.value; Only one column actually supported right now.
         var columnFlex:number = 1.0/maxColumns;
-        var extraBins:number = this.numberOfLabels%maxColumns == 0 ? 0 : maxColumns-(this.numberOfLabels%maxColumns);
-        var ramp:any[] = this.colorRampPath.getState() as any[];
+        var extraBins:number = this.numberOfLabels % maxColumns == 0 ? 0 : maxColumns-(this.numberOfLabels % maxColumns);
+        var ramp:any[] = this.chartColors.state as any[];
 
-        var labels:string[] = (this.columnsPath.getState() as any[]).map( (item:any):string => {
-            var columnName:string = item.objectName;
-            return (this.columnsPath.push(columnName).getObject() as IAttributeColumn).getMetadata('title');
-        });
+        var labels: string[] = this.columns.getObjects().map((item: ReferencedColumn) => item.getMetadata('title'));
+
         var finalElements:any[] = [];
         var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
         for(var j:number = 0; j<maxColumns; j++) {
@@ -205,7 +222,7 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
     }
 }
 
-weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3BarChartLegend); // TEMPORARY HACK - remove when class is refactored
+//weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3BarChartLegend); // TEMPORARY HACK - remove when class is refactored
 
 Weave.registerClass("weavejs.tool.BarChartLegend", WeaveC3BarChartLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.visualization.tools::BarChartLegendTool", WeaveC3BarChartLegend);
