@@ -72,6 +72,7 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	private dataXType:string;
 	private dataYType:string;
 	private records:Record[];
+	private debouncedUpdateSelection: Function;
 
 	private busy:boolean;
 	private dirty:boolean;
@@ -83,6 +84,8 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	{
 		super(props);
 
+		this.debouncedUpdateSelection = _.debounce(this.updateSelection.bind(this), 50);
+		
 		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
 		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
 		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
@@ -143,16 +146,10 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 					}
 				},
 				onselected: (d:any) => {
-					if(d && d.hasOwnProperty("index")) {
-						if (this.selectionKeySet)
-							this.selectionKeySet.addKeys([this.records[d.index].id]);
-					}
+					this.debouncedUpdateSelection();
 				},
-				onunselected: (d) => {
-					if(d && d.hasOwnProperty("index")) {
-						if (this.selectionKeySet)
-							this.selectionKeySet.removeKeys([this.records[d.index].id]);
-					}
+				onunselected: (d:any) => {
+					this.debouncedUpdateSelection();
 				},
 				onmouseover: (d) => {
 					if(d && d.hasOwnProperty("index")) {
@@ -275,6 +272,15 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 		};
 	}
 
+	public updateSelection():void
+	{
+		let selected = this.chart.selected();
+
+		let selectedKeys: Array<IQualifiedKey> = selected.map((value) => this.indexToKey.get(value.index));
+
+		this.selectionKeySet.replaceKeys(selectedKeys);
+	}
+
 	public get deprecatedStateMapping():Object
 	{
 		return [super.deprecatedStateMapping, {
@@ -319,43 +325,42 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
             this.selectionKeySet.replaceKeys(probeKeys);
 	}
 
-	updateStyle()
-	{
+	updateStyle() {
 		if (!this.chart || !this.dataXType)
 			return;
 
+		let selectionEmpty: boolean = this.selectionKeySet.keys.length === 0;
+
 		d3.select(this.element)
 			.selectAll("circle.c3-shape")
-			.style("opacity", 1)
 			.style("stroke", "black")
-			.style("stroke-opacity", 0.0)
-			.style("stroke-width", 1.0);
+			.style("opacity",
+				(d: any, i: number, oi: number): number => {
+					let key = this.indexToKey.get(i);
+					let selected = this.selectionKeySet.containsKey(key);
+					return (selectionEmpty || selected) ? 1.0 : 0.3;
+				})
+			.style("stroke-opacity",
+				(d: any, i: number, oi: number): number => {
+					let key = this.indexToKey.get(i);
+					let selected = this.selectionKeySet.containsKey(key);
+					let probed = this.probeKeySet.containsKey(key);
+					if (probed || selected)
+						return 1.0;
+					if (!selectionEmpty && !selected)
+						return 0;
+					return 0.0;
+				})
+			.style("stroke-width",
+				(d: any, i: number, oi: number): number => {
+					let key = this.indexToKey.get(i);
+					let probed = this.probeKeySet.containsKey(key);
+					return probed ? 2.0 : 1.0;
+				});
 
-		var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-		var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
 		var keyToIndex = (key: IQualifiedKey) => this.keyToIndex.get(key);
-
-		var selectedIndices:number[] = selectedKeys.map(keyToIndex);
-		var probedIndices:number[] = probedKeys.map(keyToIndex);
-		var indices:number[] = Array.from(this.keyToIndex.values()); /* wat */
-
-		var unselectedIndices:number[] = _.difference(indices, selectedIndices);
-		unselectedIndices = _.difference(unselectedIndices,probedIndices);
-		if (probedIndices.length)
-		{
-			this.customStyle(probedIndices, "circle", ".c3-shape", {opacity:1.0, "stroke-opacity": 0.5, "stroke-width": 1.5});
-		}
-		if (selectedIndices.length)
-		{
-			this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-			this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-			this.chart.select(["y"], selectedIndices, true);
-		}
-		else if (!probedIndices.length)
-		{
-			this.customStyle(indices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.0});
-			this.chart.select(["y"], [], true);
-		}
+		var selectedIndices: number[] = this.selectionKeySet.keys.map(keyToIndex);
+		this.chart.select(["y"], selectedIndices, true);
 	}
 
 	componentDidMount()

@@ -893,7 +893,7 @@ declare module c3 {
          * Get selected data points. By this API, you can get selected data points information. To use this API, data.selection.enabled needs to be set true.
          * @param targetId You can filter the result by giving target id that you want to get. If not given, all of data points will be returned.
          */
-        selected(targetId?: string): Data;
+        selected(targetId?: string): Array<any>;
         /**
          * Change the type of the chart.
          * @param type Specify the type to be transformed. The types listed in data.type can be used.
