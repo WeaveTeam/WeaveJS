@@ -298,14 +298,14 @@ export default class StandardLib
 		return result;
 	}
 
-	static addPointClickListener(target:HTMLElement, listener:any):void
+	static addPointClickListener(target:HTMLElement, listener:(event:MouseEvent)=>void, pixelThreshold:number = 1):void
 	{
 		listener.onMouseDown = function(event:MouseEvent):void {
 			listener.mouseDownEvent = event;
 		};
 		listener.onClick = function(event:MouseEvent):void {
 			var mde:MouseEvent = listener.mouseDownEvent;
-			if (mde.clientX === event.clientX && mde.clientY === event.clientY)
+			if (Math.abs(mde.clientX - event.clientX) < pixelThreshold && Math.abs(mde.clientY - event.clientY) < pixelThreshold)
 				listener(event);
 		};
 		target.addEventListener('mousedown', listener.onMouseDown);
