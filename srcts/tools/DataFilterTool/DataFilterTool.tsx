@@ -3,6 +3,8 @@
 
 import * as React from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "../IVisTool";
+import DiscreteValuesDataFilterEditor from "./DiscreteValuesDataFilterEditor";
+import NumericRangeDataFilterEditor from "./NumericRangeDataFilterEditor";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IColumnStatistics = weavejs.api.data.IColumnStatistics;
@@ -13,37 +15,35 @@ import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
 import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
+import ColumnUtils = weavejs.data.ColumnUtils;
+import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
-interface IDataFilterState extends IVisToolState {
-	columnStats:IColumnStatistics
+export interface IDataFilterState extends IVisToolState {
+	editorType:any; //React.Component<any, any>;
 }
 
 //Weave.registerClass("weave.ui.DataFilterTool", DataFilterTool, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
+export default class DataFilterTool extends React.Component<IVisToolProps, IDataFilterState> implements IVisTool, ILinkableObjectWithNewProperties {
 
-	private filter:LinkableDynamicObject;
-	private editor:LinkableDynamicObject;
+	public filter:LinkableDynamicObject = Weave.linkableChild(this,  new LinkableDynamicObject(ColumnDataFilter));
+	public editor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject());
 
-	public panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
-
-
-	static DISCRETEFILTERCLASS:string = "weave.editors::DiscreteValuesDataFilterEditor";
-	static RANGEFILTERCLASS:string = "weave.editors::NumericRangeDataFilterEditor";
+	// static DISCRETEFILTERCLASS:string = "weave.editors::DiscreteValuesDataFilterEditor";
+	// static RANGEFILTERCLASS:string = "weave.editors::NumericRangeDataFilterEditor";
 
 	constructor(props:IVisToolProps) {
 		super(props);
-		Weave.getRoot(this).getName(this);
-		'filters', WeaveAPI.globalHashMap.getName(this)];
-		
-		filter.targetPath = Weave.getRoot(this).getName("defaultSubsetKeyFilter"); 
-
-		this.filter.targetPath = 
-		this.setupCallbacks();
 	}
 
-	private setupCallbacks() {
-		this.filter.addCallback(this, this.forceUpdate);
-		this.editor.addCallback(this, this.forceUpdate);
+	componentDidMount() {
+		this.filter.targetPath = ["defaultSubsetKeyFilter", "filters", Weave.getRoot(this).getName(this)]; 
+	}
+	
+	onClick(item:any/*React.Component<any, any>*/):void
+	{
+		this.setState({
+			editorType: item
+		});
 	}
 
 	get deprecatedStateMapping()
@@ -51,22 +51,29 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		return {};
 	}
 
+	private getFilter():ColumnDataFilter
+	{
+		return this.filter.target as ColumnDataFilter;
+	}
+
+	private getFilterColumn():IAttributeColumn
+	{
+		return this.getFilter() ? this.getFilter().column as IAttributeColumn : null;
+	}
+
 	get title():string {
-		if (getFilterColumn())
-			return lang('Filter for {0}', ColumnUtils.getTitle(getFilterColumn()));
-		
-		return lang('Filter');
+		if (this.getFilterColumn())
+			return Weave.lang('Filter for {0}', ColumnUtils.getTitle(this.getFilterColumn()));
+		return Weave.lang('Filter');
     }
 
 	render():JSX.Element {
-		var editorType:string = this.editor.getType();
-		if(editorType == DataFilterTool.DISCRETEFILTERCLASS) {
-			return <DiscreteValuesDataFilterEditor ref={(editor:DiscreteValuesDataFilterEditor) => { this.editor.target = editor }} filter={this.filter}/>
-		} else if (editorType == DataFilterTool.RANGEFILTERCLASS){
-			return <NumericRangeDataFilterEditor ref={(editor:NumericRangeDataFilterEditor) => { this.editor.target = editor }} filter={this.filter}/>
-		} else {
-			return <div/>;// blank tool
-		}
+		return React.createElement(this.state.editorType, {
+			ref: (editor:any) => {
+				this.editor.target
+			},
+			filter: this.filter.target
+		});
 	}
 }
 
@@ -74,9 +81,3 @@ weavejs.util.BackwardsCompatibility.forceDeprecatedState(DataFilterTool); // TEM
 
 Weave.registerClass("weavejs.tool.DataFilter", DataFilterTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.ui::DataFilterTool", DataFilterTool);
-
-
-//Weave.registerClass("weave.editors.NumericRangeDataFilterEditor", NumericRangeDataFilterEditor, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-
-
-//Weave.registerClass("weave.editors.DiscreteValuesDataFilterEditor", {}, [weavejs.api.core.ILinkableObjectWithNewProperties]);

@@ -21,7 +21,6 @@ type FilterOption = {
 
 export interface DiscreteValuesDataFilterEditorProps {
 	filter: ColumnDataFilter;
-	column:IAttributeColumn;
 }
 
 export interface DiscreteValuesDataFilterEditorState {
@@ -37,10 +36,10 @@ export default class DiscreteValuesDataFilterEditor extends React.Component<Disc
 	private static LAYOUT_HSLIDER:string = "HSlider";
 	private static LAYOUT_CHECKBOXLIST:string = "CheckBoxList";
 
-	public layoutMode:LinkableString = Weave.linkableChild(this, new LinkableString(DiscreteValuesDataFilterEditor.LAYOUT_LIST));
-	public showPlayButton:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
-	public showToggle:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
-	public showToggleLabel:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
+	public layoutMode:LinkableString = Weave.linkableChild(this, new LinkableString(DiscreteValuesDataFilterEditor.LAYOUT_LIST), this.forceUpdate);
+	public showPlayButton:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
+	public showToggle:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true), this.forceUpdate);
+	public showToggleLabel:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
 	
 	public values:LinkableVariable;
 
@@ -50,18 +49,16 @@ export default class DiscreteValuesDataFilterEditor extends React.Component<Disc
 	constructor(props:DiscreteValuesDataFilterEditorProps) {
 		super(props);
 		this.options = [];
+		this.props.filter.column.addGroupedCallback(this, this.columnChanged);
 	}
 
 	componentDidMount() {
-		Weave.getCallbacks(this.layoutMode).addGroupedCallback(this, this.forceUpdate);
-		Weave.getCallbacks(this.showToggle).addGroupedCallback(this, this.forceUpdate);
-		Weave.getCallbacks(this.showToggleLabel).addGroupedCallback(this, this.forceUpdate);
-		Weave.getCallbacks(this.props.column).addGroupedCallback(this, this.columnChanged);
+
 	}
 
 	columnChanged() {
-		this.options = _.sortByOrder(_.uniq(this.props.column.keys.map((key:IQualifiedKey) => {
-			let val:string = this.props.column.getValueFromKey(key, String);
+		this.options = _.sortByOrder(_.uniq(this.props.filter.column.keys.map((key:IQualifiedKey) => {
+			let val:string = this.props.filter.column.getValueFromKey(key, String);
 			return {
 				value: val,
 				label: val
