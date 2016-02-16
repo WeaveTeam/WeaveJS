@@ -58,7 +58,6 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
     private chartType:string;
 
 
-    private flag:boolean;
     private busy:boolean;
     private dirty:boolean;
 
@@ -70,8 +69,6 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
 
         Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
         Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
-
-        Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
 
         this.filteredKeySet.setSingleKeySource(this.data);
 
@@ -106,10 +103,6 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
                 },
                 type: "pie",
                 onclick: (d:any) => {
-                    var event:MouseEvent = this.chart.internal.d3.event as MouseEvent;
-                    if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
-                        this.selectionKeySet.replaceKeys([this.records[d.index].id]);
-                    }
                 },
                 onselected: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
@@ -210,14 +203,6 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
         }];
 	}
 
-    handleClick(event:MouseEvent):void {
-        if(!this.flag) {
-            if(this.selectionKeySet)
-                this.selectionKeySet.replaceKeys([]);
-        }
-        this.flag = false;
-    }
-
     private updateStyle():void {
         if(!this.chart || !this.records)
             return;
@@ -254,36 +239,19 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
         }
     }
 
-    componentDidUpdate():void {
-        var sizeChanged = this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height;
-        super.componentDidUpdate();
-        if(sizeChanged)
-            this.validate(true);
-    }
-
-    componentWillUnmount():void {
-        /* Cleanup callbacks */
-        //this.teardownCallbacks();
-        this.chart.destroy();
-    }
-
-    componentDidMount() {
-        this.element.addEventListener("click", this.handleClick.bind(this));
-
-        this.c3Config.bindto = this.element;
-        this.validate(true);
-    }
-
-    validate(forced:boolean = false):void {
-        if(this.busy) {
+    validate(forced:boolean = false):void
+	{
+        if (this.busy)
+		{
             this.dirty = true;
             return;
         }
         this.dirty = false;
 
-        var dataChanged = Weave.detectChange(this, this.data, this.label, this.innerRadius,this.fill, this.line, this.filteredKeySet);
+        var dataChanged = Weave.detectChange(this, this.data, this.label, this.innerRadius, this.fill, this.line, this.filteredKeySet);
 
-        if(dataChanged) {
+        if (dataChanged)
+		{
             this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
             this.keyToIndex = {};
@@ -312,15 +280,15 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
                 colors[record.id as any] = record.fill.color as string || "#C0CDD1";
             });
 
-        }
-        var axisChanged = Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin.top, this.margin.bottom, this.margin.left, this.margin.right);
-
-        if(dataChanged || axisChanged) {
-            this.busy = true;
             this.c3Config.data.columns = columns;
             this.c3Config.data.type = chartType;
             this.c3Config.data.colors = colors;
             this.c3Config.data.unload = true;
+        }
+        var axisChanged = Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin.top, this.margin.bottom, this.margin.left, this.margin.right);
+
+        if (forced || dataChanged || axisChanged) {
+            this.busy = true;
             this.chart = c3.generate(this.c3Config);
         }
     }

@@ -56,8 +56,6 @@ export default class WeaveC3Gauge extends AbstractC3Tool {
         Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
         Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
 
-        Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
-
         this.filteredKeySet.setSingleKeySource(this.meterColumn);
 
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
@@ -158,20 +156,11 @@ export default class WeaveC3Gauge extends AbstractC3Tool {
             return;
     }
 
-    componentDidUpdate() {
-        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
-            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-            this.validate(true);
-        }
-    }
-
     componentDidMount() {
         //use ColumnStatistics to set gauge min/max appropriately
         this.colStats = new weavejs.data.ColumnStatistics(this.meterColumn);
         this.colStats.validateCache();
-
-        this.c3Config.bindto = this.element;
-        this.validate(true);
+		super.componentDidMount();
     }
 
     validate(forced:boolean = false):void

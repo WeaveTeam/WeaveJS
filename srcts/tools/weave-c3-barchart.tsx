@@ -56,8 +56,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
     groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode))
     horizontalMode = Weave.linkableChild(this, new LinkableBoolean(true));
     showValueLabels = Weave.linkableChild(this, new LinkableBoolean(true));
-
-    private showXAxisLabel:LinkableBoolean = new LinkableBoolean(false);
+    showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
 
     private verifyGroupingMode(mode:string):boolean
 	{
@@ -115,8 +114,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
         Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
         Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
 
-        Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
-
+		this.filteredKeySet.setColumnKeySources([this.sortColumn]);
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
@@ -339,19 +337,6 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 		}];
 	}
 
-    handlePointClick(event:MouseEvent):void {
-
-        if(!this.selectionKeySet)
-            return;
-
-        var probeKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
-        var selectionKeys:IQualifiedKey[] = this.selectionKeySet.keys;
-        if (_.isEqual(probeKeys, selectionKeys))
-            this.selectionKeySet.replaceKeys([]);
-        else
-            this.selectionKeySet.replaceKeys(probeKeys);
-    }
-
     private dataChanged():void
 	{
 		var columns = this.heightColumns.getObjects();
@@ -487,21 +472,6 @@ export default class WeaveC3Barchart extends AbstractC3Tool
             this.chart.select(this.heightColumnNames, [], true);
     }
 
-    componentDidUpdate() {
-        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
-            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-            this.validate(true);
-        }
-    }
-
-    componentDidMount() {
-        StandardLib.addPointClickListener(this.element, this.handlePointClick.bind(this));
-        this.showXAxisLabel.value = false;
-		this.filteredKeySet.setColumnKeySources([this.sortColumn]);
-        this.c3Config.bindto = this.element;
-        this.validate(true);
-    }
-
     validate(forced:boolean = false):void
     {
         if (this.busy)
@@ -535,7 +505,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
             var xLabel:string = this.xAxisName.value || "Sorted by " + this.sortColumn.getMetadata('title');
             var yLabel:string = this.yAxisName.value || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
 
-            if(!this.showXAxisLabel){
+            if(!this.showXAxisLabel.value){
                 xLabel = " ";
             }
 

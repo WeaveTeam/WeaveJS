@@ -59,7 +59,6 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
     private columnNames:string[];
     private chartType:string;
 
-    private flag:boolean;
     private busy:boolean;
     private dirty:boolean;
 
@@ -72,8 +71,6 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
 
         Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
         Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
-
-        Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
 
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
         this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
@@ -117,38 +114,30 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
                     draggable: true
                 },
                 onclick: (d:any) => {
-                    var event:MouseEvent = this.chart.internal.d3.event as MouseEvent;
-                    if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
-                        this.selectionKeySet.replaceKeys([d.id]);
-                    }
                 },
                 onselected: (d:any) => {
-                    this.flag = true;
-                    if(d && d.hasOwnProperty("index")) {
-                        this.selectionKeySet.addKeys([d.id]);
-                    }
+					var record = this.getRecord(d ? d.id : null);
+					if (!record)
+						return;
+					var key = record.id;
+                    this.selectionKeySet.addKeys([key]);
                 },
                 onunselected: (d:any) => {
-                    this.flag = true;
-                    if(d && d.hasOwnProperty("index")) {
-                        this.selectionKeySet.removeKeys([d.id]);
-                    }
+					var record = this.getRecord(d ? d.id : null);
+					if (!record)
+						return;
+					var key = record.id;
+                    this.selectionKeySet.removeKeys([key]);
                 },
                 onmouseover: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        this.probeKeySet.replaceKeys([d.id]);
-                    }
-
+					var record = this.getRecord(d ? d.id : null);
+					if (!record)
+						return;
+					var key = record.id;
+                    this.probeKeySet.replaceKeys([key]);
                     var columnNamesToValue:{[columnName:string] : string|number } = {};
-                    var lineIndex:number = _.findIndex(this.records, (record:Record) => {
-                        return record.id == d.id;
-                    });
-
                     this.columnLabels.forEach( (label:string,index:number,array:any[]) => {
-                        if(this.records && this.records[lineIndex]) {
-                            //columnNamesToValue[label] = this.records[lineIndex].columns[index].getValueFromKey(this.records[lineIndex].id);
-                            columnNamesToValue[label] = this.columns.getObjects()[index].getValueFromKey(this.records[lineIndex].id);
-                        }
+                        columnNamesToValue[label] = this.columns.getObjects()[index].getValueFromKey(key);
                     });
 
                     this.props.toolTip.setState({
@@ -159,12 +148,13 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
                     });
                 },
                 onmouseout: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        this.probeKeySet.replaceKeys([]);
-                        this.props.toolTip.setState({
-                            showToolTip: false
-                        });
-                    }
+					if (!d)
+						return;
+					
+                    this.probeKeySet.replaceKeys([]);
+                    this.props.toolTip.setState({
+                        showToolTip: false
+                    });
                 }
             },
             tooltip: {
@@ -210,6 +200,11 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
             }
         };
     }
+	
+	private getRecord(id:string):Record
+	{
+		return this.records[this.keyToIndex[id]];
+	}
 
     get deprecatedStateMapping()
 	{
@@ -240,14 +235,6 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
             }
         }];
 	}
-
-    handleClick(event:MouseEvent):void {
-        if(!this.flag) {
-            if(this.selectionKeySet)
-                this.selectionKeySet.replaceKeys([]);
-        }
-        this.flag = false;
-    }
 
     private updateStyle() {
         if(!this.chart)
@@ -312,26 +299,6 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
             this.customStyle(indices, "path", ".c3-shape.c3-line", {opacity: 1.0});
             this.chart.select(["y"], [], true);
         }
-    }
-
-    componentDidUpdate() {
-        var sizeChanged = this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height;
-        super.componentDidUpdate();
-        if(sizeChanged)
-            this.validate(true);
-    }
-
-    componentWillUnmount() {
-        /* Cleanup callbacks */
-        //this.teardownCallbacks();
-        this.chart.destroy();
-    }
-
-    componentDidMount() {
-        this.element.addEventListener("click", this.handleClick.bind(this));
-
-        this.c3Config.bindto = this.element;
-        this.validate(true);
     }
 
     validate(forced:boolean = false):void

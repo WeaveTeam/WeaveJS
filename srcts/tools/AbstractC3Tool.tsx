@@ -37,12 +37,28 @@ Weave.registerClass("weavejs.tool.Margin", Margin);
 
 export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
-    constructor(props:IVisToolProps) {
+    constructor(props:IVisToolProps)
+	{
         super(props);
         this.xAxisClass = "c3-axis-x";
         this.yAxisClass = "c3-axis-y";
         this.y2AxisClass = "c3-axis-y2";
+		this.handlePointClick = this.handlePointClick.bind(this);
+		Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
     }
+	
+	componentDidMount()
+	{
+		this.c3Config.bindto = this.element;
+        StandardLib.addPointClickListener(this.element, this.handlePointClick);
+		this.validate(true);
+	}
+	
+	componentWillUnmount()
+	{
+		StandardLib.removePointClickListener(this.element, this.handlePointClick);
+		this.chart.destroy();
+	}
 
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
@@ -96,6 +112,43 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 		};
 	}
 
+	handlePointClick(event:MouseEvent):void
+	{
+		if (!this.probeKeySet || !this.selectionKeySet)
+			return;
+
+        var probeKeys:IQualifiedKey[] = this.probeKeySet.keys;
+		if (!probeKeys.length)
+		{
+			this.selectionKeySet.clearKeys();
+			return;
+		}
+		
+		var isSelected = false;
+		for (var key of probeKeys)
+		{
+			if (this.selectionKeySet.containsKey(key))
+			{
+				isSelected = true;
+				break;
+			}
+		}
+		if (event.ctrlKey || event.metaKey)
+		{
+			if (isSelected)
+				this.selectionKeySet.removeKeys(probeKeys);
+			else
+				this.selectionKeySet.addKeys(probeKeys);
+		}
+		else
+		{
+			if (isSelected)
+				this.selectionKeySet.clearKeys();
+			else
+				this.selectionKeySet.replaceKeys(probeKeys);
+		}
+	}
+	
     get title():string {
        return this.panelTitle.value;
     }
@@ -129,11 +182,14 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
         }
     }
 
-    componentDidUpdate():void {
-        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
+    componentDidUpdate():void
+	{
+        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height)
+		{
             this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
 			if (this.chart)
 	            this.chart.resize({width:this.props.style.width, height:this.props.style.height});
+            this.validate(true);
         }
     }
 
@@ -154,6 +210,10 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
         });
     }
 
+	validate(forced:boolean = false):void
+	{
+	}
+	
     render():JSX.Element {
         return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
     }

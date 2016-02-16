@@ -51,6 +51,9 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
         this.selectionKeySet.targetPath = ['defaultSelectionKeySet'];
         this.probeKeySet.targetPath = ['defaultProbeKeySet'];
 
+        this.maxColumns.addGroupedCallback(this, this.forceUpdate);
+        this.filteredKeySet.addGroupedCallback(this, this.forceUpdate);
+        this.shapeSize.addGroupedCallback(this, this.forceUpdate, true);
 
         this.state = {selected:[], probed:[]};
         this.spanStyle = {textAlign:"left", verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
@@ -88,34 +91,6 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
 
     handleProbe(bin:number, mouseOver:boolean):void {
 
-    }
-
-    componentDidMount() {
-        this.maxColumns.addGroupedCallback(this, this.forceUpdate);
-        this.filteredKeySet.addGroupedCallback(this, this.forceUpdate);
-        this.shapeSize.addGroupedCallback(this, this.forceUpdate, true);
-    }
-
-    componentDidUpdate() {
-    }
-
-    drawContinuousPlot() {
-
-    }
-
-    selectionKeysChanged() {
-
-    }
-
-    probeKeysChanged() {
-
-    }
-
-    visualizationChanged() {
-
-    }
-
-    componentWillUnmount() {
     }
 
     getInteractionStyle(bin:number):CSSProperties {

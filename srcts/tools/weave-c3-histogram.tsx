@@ -57,7 +57,7 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
     private heightColumnNames:string[];
     private binnedColumnDataType:string;
     private numberOfBins:number;
-    private showXAxisLabel:boolean;
+    private showXAxisLabel:boolean = false;
     private histData:{}[];
     private keys:{x?:string, value:string[]};
 	private records:Record[];
@@ -66,7 +66,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
     protected chart:ChartAPI;
 
 
-    private flag:boolean;
     private busy:boolean;
     private dirty:boolean;
 
@@ -74,8 +73,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
         super(props);
 		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
 		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
-
-		Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
 
 		this.filteredKeySet.setSingleKeySource(this.fill.color);
 
@@ -126,19 +123,13 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
                     return "#C0CDD1";
                 },
                 onclick: (d:any) => {
-                    var event:MouseEvent = this.chart.internal.d3 as MouseEvent;
-                    if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
-                        this.selectionKeySet.replaceKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
-                    }
                 },
                 onselected: (d:any) => {
-                    this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
                         this.selectionKeySet.addKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
                 },
                 onunselected: (d:any) => {
-                    this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
                         this.selectionKeySet.removeKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
@@ -274,13 +265,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
         }];
     }
 
-    handleClick(event:MouseEvent) {
-        if(!this.flag) {
-            this.selectionKeySet.replaceKeys([]);
-        }
-        this.flag = false;
-    }
-
     rotateAxes() {
         //this.c3Config.axis.rotated = true;
         //this.forceUpdate();
@@ -412,27 +396,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
 
         // sum
         return sum;
-    }
-
-    componentDidUpdate() {
-        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height) {
-            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
-            this.validate(true);
-        }
-    }
-
-    componentWillUnmount() {
-        /* Cleanup callbacks */
-        //this.teardownCallbacks();
-        this.chart.destroy();
-    }
-
-    componentDidMount() {
-        this.element.addEventListener("click", this.handleClick.bind(this));
-        this.showXAxisLabel = false;
-
-        this.c3Config.bindto = this.element;
-        this.validate(true);
     }
 
     validate(forced:boolean = false):void
