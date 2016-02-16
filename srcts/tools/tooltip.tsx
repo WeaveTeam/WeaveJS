@@ -176,7 +176,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             if(columnNames.length) {
                 tableRows = columnNames.map((columnName:string) => {
                     var colorSpan:JSX.Element = this.state.columnNamesToColor[columnName] ? (<span style={{backgroundColor: this.state.columnNamesToColor[columnName]}}/>) : (null);
-                    var returnElements:JSX.Element[] = [];
+					var returnElements:JSX.Element[] = [];
 					if(weavejs.WeaveAPI.Locale.reverseLayout) {
 						returnElements.push(<td key={returnElements.length} className="value">{this.valueFormat(this.state.columnNamesToValue[columnName])}</td>);
 						returnElements.push(<td key={returnElements.length} className="name"><div style={{display:"inline"}}>{this.nameFormat(columnName)}</div>{colorSpan}</td>);
