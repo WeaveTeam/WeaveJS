@@ -43,7 +43,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 {
 
 
-    heightColumns:LinkableHashMap = Weave.linkableChild(this, LinkableHashMap);
+    heightColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap());
     labelColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
     sortColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
     colorColumn:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#C0CDD1"));
@@ -179,10 +179,11 @@ export default class WeaveC3Barchart extends AbstractC3Tool
                         
 						var qKey:IQualifiedKey = this.indexToKey.get(d.index);
 						
-						var columns = this.heightColumns.getObjects();
-						for(var column of columns) {
+						var columns = this.heightColumns.getObjects() as IAttributeColumn[];
+						for(var index in columns) {
+							var column:IAttributeColumn = columns[index]; 
 							var columnName:string = column.getMetadata("title");
-							var color = this.chartColors.getColorFromNorm(d.index / (columns.length - 1));
+							var color = this.chartColors.getColorFromNorm(Number(index) / (columns.length - 1));
 							columnNamesToValue[columnName] = column.getValueFromKey(qKey, Number);
 							columnNamesToColor[columnName] = "#" + weavejs.util.StandardLib.numberToBase(color, 16, 6);
 						}
