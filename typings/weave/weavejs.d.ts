@@ -8545,9 +8545,9 @@ declare module weavejs.util {
          * @param propertyChain A property name or chain of property names to index on rather than the item itself.
          * @return A reverse lookup Map.
          */
-        static createLookup<T>(array: Array<T> | {
-            [key: string]: T;
-        }, ...propertyChain: Array<string>): Map<T, string>;
+        static createLookup(array: any[] | {
+            [key: string]: any;
+        }, ...propertyChain: Array<string>): Map<any, string>;
     }
 }
 declare module weavejs.util {
