@@ -41,16 +41,14 @@ const PERCENT_STACK:string = 'percentStack';
 
 export default class WeaveC3Barchart extends AbstractC3Tool
 {
-
-
-    heightColumns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap());
-    labelColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-    sortColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-    colorColumn:AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#C0CDD1"));
-    chartColors:ColorRamp = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
-    groupingMode:LinkableString = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode))
-    horizontalMode:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
-    showValueLabels:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true));
+    heightColumns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+    labelColumn = Weave.linkableChild(this, DynamicColumn);
+    sortColumn = Weave.linkableChild(this, DynamicColumn);
+    colorColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#C0CDD1"));
+    chartColors = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
+    groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode))
+    horizontalMode = Weave.linkableChild(this, new LinkableBoolean(true));
+    showValueLabels = Weave.linkableChild(this, new LinkableBoolean(true));
 
     private showXAxisLabel:LinkableBoolean = new LinkableBoolean(false);
 
@@ -81,7 +79,6 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 	};
 
     private keyToIndex: Map<IQualifiedKey, number>;
-    private indexToKey: Map<number, IQualifiedKey>;
     private xAxisValueToLabel:{[value:number]: string};
     private yAxisValueToLabel:{[value:number]: string};
 
@@ -110,7 +107,6 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
         this.keyToIndex = new Map<IQualifiedKey, number>();
-        this.indexToKey = new Map<number, IQualifiedKey>();
         this.yAxisValueToLabel = {};
         this.xAxisValueToLabel = {};
         this.validate = _.debounce(this.validate.bind(this), 30);
@@ -149,8 +145,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
                 order: null,
                 color: (color:string, d:any):string => {
                     if(this.heightColumnNames.length === 1 && d && d.hasOwnProperty("index")) {
-						var qKey:IQualifiedKey = this.indexToKey.get(d.index);
-						return this.colorColumn.getValueFromKey(qKey, String);
+						return this.colorColumn.getValueFromKey(this.records[d.index].id, String);
                     } else {
                         return color;
                     }
@@ -160,13 +155,13 @@ export default class WeaveC3Barchart extends AbstractC3Tool
                 onselected: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
 						if(this.selectionKeySet)
-							this.selectionKeySet.addKeys([this.indexToKey.get(d.index)]);
+							this.selectionKeySet.addKeys([this.records[d.index].id]);
                     }
                 },
                 onunselected: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
                         if(this.selectionKeySet)
-							this.selectionKeySet.removeKeys([this.indexToKey.get(d.index)]);
+							this.selectionKeySet.removeKeys([this.records[d.index].id]);
                     }
                 },
                 onmouseover: (d:any) => {
@@ -177,7 +172,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
 						var columnNamesToValue:{[columnName:string] : string|number } = {};
                         var columnNamesToColor:{[columnName:string] : string} = {};
                         
-						var qKey:IQualifiedKey = this.indexToKey.get(d.index);
+						var qKey:IQualifiedKey = this.records[d.index].id;
 						
 						var columns = this.heightColumns.getObjects() as IAttributeColumn[];
 						for(var index in columns) {
@@ -191,7 +186,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
                         var title:string = this.labelColumn.getValueFromKey(qKey, String);
 						
 						if(this.probeKeySet)
-							this.probeKeySet.replaceKeys([this.indexToKey.get(d.index)]);
+							this.probeKeySet.replaceKeys([qKey]);
 						
 						if(this.props.toolTip)
 	                        this.props.toolTip.setState({
@@ -230,7 +225,7 @@ export default class WeaveC3Barchart extends AbstractC3Tool
                         },
                         multiline: false,
                         format: (num:number):string => {
-							var qKey:IQualifiedKey = this.indexToKey.get(num);
+							var qKey:IQualifiedKey = this.records[num].id;
 							if(qKey) {
 								if(this.element && this.props.style.height > 0 && this.margin.bottom) {
 									var labelHeight:number = this.margin.bottom.value/Math.cos(45*(Math.PI/180));
@@ -365,11 +360,9 @@ export default class WeaveC3Barchart extends AbstractC3Tool
         this.yAxisValueToLabel = {};
         this.xAxisValueToLabel = {};
         this.keyToIndex.clear();
-        this.indexToKey.clear();
 
         this.records.forEach((record:Record, index:number) => {
             this.keyToIndex.set(record.id, index);
-            this.indexToKey.set(index, record.id);
             this.xAxisValueToLabel[record.xLabel] = this.labelColumn.getValueFromKey(record.id, String);
             this.yAxisValueToLabel[record.yLabel] = this.yLabelColumn.getValueFromKey(record.id, String);
         });

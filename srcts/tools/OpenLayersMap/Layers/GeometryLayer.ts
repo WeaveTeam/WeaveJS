@@ -6,7 +6,6 @@ import * as ol from "openlayers";
 import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 import Layer from "./Layer";
 
-import WeavePath = weavejs.path.WeavePath;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -21,9 +20,9 @@ export default class GeometryLayer extends FeatureLayer {
 
 	geoJsonParser:ol.format.GeoJSON;
 
-	fill: SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
-	line: SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-	geometryColumn: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	fill = Weave.linkableChild(this, SolidFillStyle);
+	line = Weave.linkableChild(this, SolidLineStyle);
+	geometryColumn = Weave.linkableChild(this, DynamicColumn);
 
 	constructor()
 	{

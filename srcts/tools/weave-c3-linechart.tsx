@@ -36,9 +36,9 @@ declare type Record = {
 
 export default class WeaveC3LineChart extends AbstractC3Tool {
 
-    columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
-    line:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-    curveType:LinkableString = Weave.linkableChild(this, LinkableString);
+    columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+    line = Weave.linkableChild(this, SolidLineStyle);
+    curveType = Weave.linkableChild(this, LinkableString);
 
     private RECORD_FORMAT = {
         id: IQualifiedKey,
@@ -52,7 +52,6 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
     };
 
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: IQualifiedKey};
     private yAxisValueToLabel:{[value:number]: string};
 
     private records:Record[];
@@ -81,7 +80,6 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
         this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
         this.keyToIndex = {};
-        this.indexToKey = {};
         this.yAxisValueToLabel = {};
         this.validate = _.debounce(this.validate.bind(this), 30);
 
@@ -259,13 +257,13 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
             .style("stroke", "black")
             .style("stroke-opacity", 0.0);
 
-        var selectedKeys:string[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-        var probedKeys:string[] = this.probeKeySet ? this.probeKeySet.keys : [];
-        var selectedIndices:number[] = selectedKeys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
+        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+        var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
+        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
+            return Number(this.keyToIndex[key as any]);
         });
-        var probedIndices:number[] = probedKeys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
+        var probedIndices:number[] = probedKeys.map((key:IQualifiedKey) => {
+            return Number(this.keyToIndex[key as any]);
         });
         var keys:string[] = Object.keys(this.keyToIndex);
         var indices:number[] = keys.map((key:string) => {
@@ -369,12 +367,10 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
             this.records = _.sortBy(this.records, [0, "id"]);
 
             this.keyToIndex = {};
-            this.indexToKey = {};
             this.yAxisValueToLabel = {};
 
             this.records.forEach((record:Record, index:number) => {
                 this.keyToIndex[record.id as any] = index;
-                this.indexToKey[index] = record.id;
                 this.yAxisValueToLabel[record.id as any] = record.id.toString();
             });
 

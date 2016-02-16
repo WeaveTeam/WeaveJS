@@ -7,17 +7,15 @@ import * as lodash from "lodash";
 import Layer from "./Layer";
 
 
-import WeavePath = weavejs.path.WeavePath;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 
 export default class TileLayer extends Layer {
 
-	servicePath:WeavePath;
 	oldProviderName:string;
 
-	provider: LinkableString = Weave.linkableChild(this, LinkableString);
-	providerOptions: LinkableVariable = Weave.linkableChild(this, LinkableVariable);
+	provider = Weave.linkableChild(this, LinkableString);
+	providerOptions = Weave.linkableChild(this, LinkableVariable);
 
 	constructor()
 	{

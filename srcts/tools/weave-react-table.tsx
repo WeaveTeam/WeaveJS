@@ -13,8 +13,6 @@ import {round} from "d3";
 import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootstrapTable";
 import {IRow} from "../react-bootstrap-datatable/TableRow";
 
-import WeavePath = weavejs.path.WeavePath;
-import WeavePathData = weavejs.path.WeavePathData;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -32,11 +30,11 @@ export interface IDataTableState extends IVisToolState {
 
 export default class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
 
-    columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
-    panelTitle:LinkableString = Weave.linkableChild(this, new LinkableString);
-    selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-    probeFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-    filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+    columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+    panelTitle = Weave.linkableChild(this, new LinkableString);
+    selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
+    probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
+    filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 
     private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
     private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
@@ -118,8 +116,8 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
                                     hover={true}
                                     bordered={true}
                                     condensed={true}
-                                    selectedIds={this.selectionKeySet ? this.selectionKeySet.keys : []}
-                                    probedIds={this.probeKeySet ? this.probeKeySet.keys : []}
+                                    selectedIds={this.selectionKeySet ? this.selectionKeySet.keys as any[] as string[] : []}
+                                    probedIds={this.probeKeySet ? this.probeKeySet.keys as any[] as string[] : []}
                                     onProbe={this.handleProbe.bind(this)}
                                     onSelection={this.handleSelection.bind(this)}
                                     showIdColumn={false}

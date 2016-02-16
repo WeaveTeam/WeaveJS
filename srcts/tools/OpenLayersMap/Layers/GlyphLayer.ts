@@ -6,7 +6,6 @@ import FeatureLayer from "./FeatureLayer";
 import * as lodash from "lodash";
 import * as ol from "openlayers";
 
-import WeavePathData = weavejs.path.WeavePathData;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import LinkableString = weavejs.core.LinkableString;

@@ -3,7 +3,6 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
-import WeavePath = weavejs.path.WeavePath;
 import Dictionary2D = weavejs.util.Dictionary2D;
 
 import * as jquery from "jquery";

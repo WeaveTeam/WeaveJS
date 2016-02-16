@@ -35,11 +35,11 @@ declare type Record = {
 };
 
 export default class WeaveC3Histogram extends AbstractC3Tool {
-	binnedColumn:BinnedColumn = Weave.linkableChild(this, BinnedColumn);
-	columnToAggregate:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	aggregationMethod:LinkableString = Weave.linkableChild(this, LinkableString);
-	fillStyle:SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
-	lineStyle:SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
+	binnedColumn = Weave.linkableChild(this, BinnedColumn);
+	columnToAggregate = Weave.linkableChild(this, DynamicColumn);
+	aggregationMethod = Weave.linkableChild(this, LinkableString);
+	fill = Weave.linkableChild(this, SolidFillStyle);
+	line = Weave.linkableChild(this, SolidLineStyle);
 
 	private RECORD_FORMAT = {
 		id: IQualifiedKey,
@@ -54,7 +54,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
 
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: IQualifiedKey};
     private heightColumnNames:string[];
     private binnedColumnDataType:string;
     private numberOfBins:number;
@@ -78,7 +77,7 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
 
 		Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
 
-		this.filteredKeySet.setSingleKeySource(this.fillStyle.color);
+		this.filteredKeySet.setSingleKeySource(this.fill.color);
 
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
@@ -87,7 +86,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
         this.busy = false;
         this.idToRecord = {};
         this.keyToIndex = {};
-        this.indexToKey = {};
         this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.c3Config = {
@@ -110,14 +108,18 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
                 },
                 type: "bar",
                 color: (color:string, d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
+                    if (d && d.hasOwnProperty("index"))
+					{
                         var decColor:number;
-                        if(weavejs.WeaveAPI.Locale.reverseLayout){
+                        if (weavejs.WeaveAPI.Locale.reverseLayout)
+						{
                             //handle case where labels need to be reversed for chart flip
                             var temp:number = this.histData.length-1;
-                            decColor = (this.fillStyle.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(temp-d.index);
-                        }else{
-                            decColor = (this.fillStyle.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(d.index);
+                            decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(temp-d.index);
+                        }
+						else
+						{
+                            decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(d.index);
                         }
                         return "#" + StandardLib.decimalToHex(decColor);
                     }
@@ -126,28 +128,24 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
                 onclick: (d:any) => {
                     var event:MouseEvent = this.chart.internal.d3 as MouseEvent;
                     if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
-                        var selectedKeys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(d.index);
-                        this.selectionKeySet.replaceKeys(selectedKeys);
+                        this.selectionKeySet.replaceKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
                 },
                 onselected: (d:any) => {
                     this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
-                        var selectedKeys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(d.index);
-                        this.selectionKeySet.addKeys(selectedKeys);
+                        this.selectionKeySet.addKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
                 },
                 onunselected: (d:any) => {
                     this.flag = true;
                     if(d && d.hasOwnProperty("index")) {
-                        var unSelectedKeys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(d.index);
-                        this.selectionKeySet.removeKeys(unSelectedKeys);
+                        this.selectionKeySet.removeKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
                 },
                 onmouseover: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        var selectedKeys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(d.index);
-                        this.probeKeySet.replaceKeys(selectedKeys);
+                        this.probeKeySet.replaceKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
                 },
                 onmouseout: (d:any) => {
@@ -258,8 +256,8 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
 								"binnedColumn": this.binnedColumn,
                                 "columnToAggregate": this.columnToAggregate,
                                 "aggregationMethod": this.aggregationMethod,
-								"fillStyle": this.fillStyle,
-                                "lineStyle": this.lineStyle,
+								"fillStyle": this.fill,
+                                "lineStyle": this.line,
 
                                 "drawPartialBins": true,
                                 "horizontalMode": false,
@@ -351,12 +349,10 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
 
         this.idToRecord = {};
         this.keyToIndex = {};
-        this.indexToKey = {};
 
         this.records.forEach((record:Record, index:number) => {
             this.idToRecord[record.id as any] = record;
             this.keyToIndex[record.id as any] = index;
-            this.indexToKey[index] = record.id;
         });
 
         this.numberOfBins = (this.binnedColumn.binningDefinition.target as SimpleBinningDefinition).numberOfBins.value;
@@ -450,7 +446,7 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
 
         var changeDetected:boolean = false;
         var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin.bottom, this.margin.top, this.margin.left, this.margin.right);
-        if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fillStyle, this.lineStyle,this.filteredKeySet))
+        if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fill, this.line, this.filteredKeySet))
         {
             changeDetected = true;
             this.dataChanged();

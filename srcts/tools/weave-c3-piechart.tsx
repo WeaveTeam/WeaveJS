@@ -32,11 +32,11 @@ declare type Record = {
 
 export default class WeaveC3PieChart extends AbstractC3Tool {
 
-    data:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-    label: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-    fill: SolidFillStyle = Weave.linkableChild(this,SolidFillStyle);
-    line: SolidLineStyle = Weave.linkableChild(this,SolidLineStyle);
-    innerRadius: LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+    data = Weave.linkableChild(this, DynamicColumn);
+    label = Weave.linkableChild(this, DynamicColumn);
+    fill = Weave.linkableChild(this,SolidFillStyle);
+    line = Weave.linkableChild(this,SolidLineStyle);
+    innerRadius = Weave.linkableChild(this, LinkableNumber);
 
     private RECORD_FORMAT = {
         id: IQualifiedKey,
@@ -54,7 +54,6 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
     };
 
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: IQualifiedKey};
     private records:Record[];
     private chartType:string;
 
@@ -81,7 +80,6 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
         this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
         this.keyToIndex = {};
-        this.indexToKey = {};
         this.records = [];
         this.validate = _.debounce(this.validate.bind(this),30);
 
@@ -110,12 +108,12 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
                 onclick: (d:any) => {
                     var event:MouseEvent = this.chart.internal.d3.event as MouseEvent;
                     if(!(event.ctrlKey || event.metaKey) && d && d.hasOwnProperty("index")) {
-                        this.selectionKeySet.replaceKeys([this.indexToKey[d.index]]);
+                        this.selectionKeySet.replaceKeys([this.records[d.index].id]);
                     }
                 },
                 onselected: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        this.selectionKeySet.addKeys([this.indexToKey[d.index]]);
+                        this.selectionKeySet.addKeys([this.records[d.index].id]);
                     }
                 },
                 onunselected: (d:any) => {
@@ -131,7 +129,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
                         if(dataValue) {
                             columnNamesToValue[this.data.getMetadata("title")] = dataValue;
                         }
-                        this.probeKeySet.replaceKeys([this.indexToKey[d.index]]);
+                        this.probeKeySet.replaceKeys([this.records[d.index].id]);
                         this.props.toolTip.setState({
                             showToolTip: true,
                             x: this.chart.internal.d3.event.pageX,
@@ -224,13 +222,13 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
         if(!this.chart || !this.records)
             return;
 
-        var selectedKeys:string[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-        var probedKeys:string[] = this.probeKeySet ? this.probeKeySet.keys : [];
-        var selectedIndices:number[] = selectedKeys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
+        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+        var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
+        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
+            return Number(this.keyToIndex[key as any]);
         });
-        var probedIndices:number[] = probedKeys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
+        var probedIndices:number[] = probedKeys.map((key:IQualifiedKey) => {
+            return Number(this.keyToIndex[key as any]);
         });
         var keys:string[] = Object.keys(this.keyToIndex);
         var indices:number[] = keys.map((key:string) => {
@@ -242,12 +240,12 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
         if (probedIndices.length)
         {
             //this.customStyle(probedIndices, "circle", ".c3-shape", {opacity:1.0, "stroke-opacity": 0.5, "stroke-width": 1.5});
-            this.chart.focus(probedKeys);
+            this.chart.focus(probedKeys as any[] as string[]);
         }else if (selectedIndices.length)
         {
             //this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             //this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-            this.chart.focus(selectedKeys);
+            this.chart.focus(selectedKeys as any[] as string[]);
         }
         else if (!probedIndices.length)
         {
@@ -289,11 +287,9 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
             this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
             this.keyToIndex = {};
-            this.indexToKey = {};
 
             this.records.forEach( (record:Record, index:number) => {
                this.keyToIndex[record.id as any] = index;
-                this.indexToKey[index] = record.id;
             });
 
             var chartType:string = "pie";

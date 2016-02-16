@@ -28,9 +28,9 @@ declare type Record = {
 };
 
 export default class WeaveC3Gauge extends AbstractC3Tool {
-    meterColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-    binningDefinition:DynamicBinningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
-	colorRamp:ColorRamp = Weave.linkableChild(this, ColorRamp);
+    meterColumn = Weave.linkableChild(this, DynamicColumn);
+    binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
+	colorRamp = Weave.linkableChild(this, ColorRamp);
 
     private RECORD_FORMAT = {
         id: IQualifiedKey,
@@ -42,7 +42,6 @@ export default class WeaveC3Gauge extends AbstractC3Tool {
     };
 
     private keyToIndex:{[key:string]: number};
-    private indexToKey:{[index:number]: IQualifiedKey};
     private records:Record[];
     private numberOfBins:number;
     private colStats:any;
@@ -66,7 +65,6 @@ export default class WeaveC3Gauge extends AbstractC3Tool {
         this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
         this.keyToIndex = {};
-        this.indexToKey = {};
         this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.c3Config = {
@@ -200,11 +198,9 @@ export default class WeaveC3Gauge extends AbstractC3Tool {
 				return;
 
 			this.keyToIndex = {};
-			this.indexToKey = {};
 
 			this.records.forEach( (record:Record, index:number) => {
 				this.keyToIndex[record.id as any] = index;
-				this.indexToKey[index] = record.id;
 			});
 
 			this.numberOfBins = (this.binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value;
@@ -229,8 +225,8 @@ export default class WeaveC3Gauge extends AbstractC3Tool {
 			var temp:any[] = [name];
 			var meterCols:number[] = _.pluck(this.records, 'meterColumn');
 
-			var selectedKeys:string[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-			var probedKeys:string[] = this.probeKeySet ? this.probeKeySet.keys : [];
+			var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+			var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
 			var valid:boolean = false;
 			if(probedKeys.length){
 				probedKeys.forEach( (key) => {

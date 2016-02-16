@@ -1826,12 +1826,14 @@ declare module weavejs.api.data {
         static OVERRIDE_BINS: string;
         static MIN: string;
         static MAX: string;
-        static getAllMetadata(column: IAttributeColumn): Object;
+        static getAllMetadata(column: IAttributeColumn): {
+            [name: string]: string;
+        };
         /**
          * @param propertyName The name of a metadata property.
          * @return An Array of suggested String values for the specified metadata property.
          */
-        static getSuggestedPropertyValues(propertyName: string): any[];
+        static getSuggestedPropertyValues(propertyName: string): Array<string>;
     }
 }
 declare module weavejs.api.data {
@@ -1840,7 +1842,7 @@ declare module weavejs.api.data {
      * @see weave.api.data.ColumnMetadata
      */
     class DataType {
-        static ALL_TYPES: any[];
+        static ALL_TYPES: Array<string>;
         static NUMBER: string;
         static STRING: string;
         static DATE: string;
@@ -1862,14 +1864,14 @@ declare module weavejs.api.data {
 }
 declare module weavejs.api.data {
     class DateFormat {
-        static getSuggestions(): any[];
-        static ADDITIONAL_SUGGESTIONS: any[];
-        static FOR_AUTO_DETECT: any[];
+        static getSuggestions(): Array<string>;
+        static ADDITIONAL_SUGGESTIONS: Array<string>;
+        static FOR_AUTO_DETECT: Array<string>;
     }
 }
 declare module weavejs.api.data {
     class EntityType {
-        static ALL_TYPES: any[];
+        static ALL_TYPES: Array<string>;
         static TABLE: string;
         static COLUMN: string;
         static HIERARCHY: string;
@@ -1895,7 +1897,7 @@ declare module weavejs.api.data {
          * Retrieves all metadata property names for this column.
          * @return An Array of all available metadata property names.
          */
-        getMetadataPropertyNames(): any[];
+        getMetadataPropertyNames(): Array<string>;
         /**
          * This function gets a value associated with a record key.
          * @param key A record key.
@@ -1935,7 +1937,7 @@ declare module weavejs.api.data {
          * @param keys An Array of IQualifiedKeys
          * @param data An Array of data values corresponding to the keys.
          */
-        setRecords(keys: any[], data: any[]): void;
+        setRecords(keys: Array<IQualifiedKey>, data: any[]): void;
     }
     var IBaseColumn: new (..._: any[]) => IBaseColumn;
 }
@@ -1989,13 +1991,13 @@ declare module weavejs.api.data {
          * @return An Array of IBinClassifier objects, or null if the current task has not completed yet.
          * @see #resultCallbacks
          */
-        getBinClassifiers(): any[];
+        getBinClassifiers(): Array<IBinClassifier>;
         /**
          * This accesses the result from the asynchronous task started by generateBinClassifiersForColumn().
          * @return An Array of Strings, or null if the current task has not completed yet.
          * @see #resultCallbacks
          */
-        getBinNames(): any[];
+        getBinNames(): Array<string>;
     }
     var IBinningDefinition: new (..._: any[]) => IBinningDefinition;
 }
@@ -2009,9 +2011,9 @@ declare module weavejs.api.data {
         /**
          * This will parse a CSV String into a two-dimensional Array of String values.
          * @param csvData The CSV String to parse.
-         * @return The destination Array, or a new Array if none was specified.  The result of parsing the CSV string will be stored here.
+         * @return A 2-dimensional Array of Strings.
          */
-        parseCSV(csvData: string): any[];
+        parseCSV(csvData: string): Array<string[]>;
         /**
          * This will generate a CSV String from an Array of rows in a table.
          * @param rows A two-dimensional Array, which will be accessed like rows[rowIndex][columnIndex].
@@ -2323,7 +2325,7 @@ declare module weavejs.api.data {
         /**
          * This is a list of the IQualifiedKey objects that define the key set.
          */
-        keys: any[];
+        keys: Array<IQualifiedKey>;
     }
     var IKeySet: new (..._: any[]) => IKeySet;
 }
@@ -2343,13 +2345,13 @@ declare module weavejs.api.data {
          * This can be used as a buffer prior to calling flushKeys().
          * @see #flushKeys()
          */
-        keysAdded: any[];
+        keysAdded: Array<IQualifiedKey>;
         /**
          * The keys that were most recently removed, causing callbacks to trigger.
          * This can be used as a buffer prior to calling flushKeys().
          * @see #flushKeys()
          */
-        keysRemoved: any[];
+        keysRemoved: Array<IQualifiedKey>;
     }
     var IKeySetCallbackInterface: new (..._: any[]) => IKeySetCallbackInterface;
 }
@@ -2423,26 +2425,29 @@ declare module weavejs.api.data {
          * @param keyStrings An Array of localNames.
          * @return An array of IQualifiedKeys.
          */
-        getQKeys(keyType: string, keyStrings: any[]): any[];
+        getQKeys(keyType: string, keyStrings: Array<string>): Array<IQualifiedKey>;
         /**
          * This will replace untyped Objects in an Array with their IQualifiedKey counterparts.
          * Each object in the Array should have two properties: <code>keyType</code> and <code>localName</code>
          * @param objects An Array to modify.
          * @return The same Array that was passed in, modified.
          */
-        convertToQKeys(objects: any[]): any[];
+        convertToQKeys(objects: Array<{
+            keyType: string;
+            localName: string;
+        }>): Array<IQualifiedKey>;
         /**
          * Get a list of all previoused key types.
          *
          * @return An array of IQualifiedKeys.
          */
-        getAllKeyTypes(): any[];
+        getAllKeyTypes(): Array<string>;
         /**
          * Get a list of all referenced IQualifiedKeys for a given key type
          * @param keyType The key type.
          * @return An array of IQualifiedKeys
          */
-        getAllQKeys(keyType: string): any[];
+        getAllQKeys(keyType: string): Array<IQualifiedKey>;
         /**
          * Get a QualifiedKey from its string representation.
          * @param qkeyString A string formatted like the output of IQualifiedKey.toString().
@@ -2469,12 +2474,12 @@ declare module weavejs.api.data {
          * @return An Array of names corresponding to the objects returned by getSelectableAttributes().
          *         These names will be passed to lang() before being displayed to the user.
          */
-        getSelectableAttributeNames(): any[];
+        getSelectableAttributeNames(): Array<string>;
         /**
          * This function should be defined with override by subclasses.
          * @return An Array of DynamicColumn and/or ILinkableHashMap objects that an AttributeSelectorPanel can link to.
          */
-        getSelectableAttributes(): any[];
+        getSelectableAttributes(): Array<(IColumnWrapper & weavejs.api.core.ILinkableDynamicObject) | weavejs.api.core.ILinkableHashMap>;
     }
     var ISelectableAttributes: new (..._: any[]) => ISelectableAttributes;
 }
@@ -2510,13 +2515,19 @@ declare module weavejs.api.data {
         /**
          * Get the vertices.
          */
-        getVertices(): any[];
+        getVertices(): Array<{
+            x: number;
+            y: number;
+        }>;
         /**
          * Set the vertices.
          *
          * @param An array of objects with x and y properties.
          */
-        setVertices(o: any[]): void;
+        setVertices(o: Array<{
+            x: number;
+            y: number;
+        }>): void;
     }
     var ISimpleGeometry: new (..._: any[]) => ISimpleGeometry;
 }
@@ -2573,7 +2584,7 @@ declare module weavejs.api.data {
          * Gets children for this node.
          * @return A list of children implementing IWeaveTreeNode or null if this node has no children.
          */
-        getChildren(): any[];
+        getChildren(): Array<IWeaveTreeNode>;
     }
     var IWeaveTreeNode: new (..._: any[]) => IWeaveTreeNode;
 }
@@ -2611,7 +2622,7 @@ declare module weavejs.api.data {
          * @return An Array of IWeaveTreeNode objects which can be followed as a path from this node to the descendant, including this node and the descendant node.
          *         Returns null if the descendant is unreachable from this node.
          */
-        findPathToNode(descendant: IWeaveTreeNode): any[];
+        findPathToNode(descendant: IWeaveTreeNode): Array<IWeaveTreeNode>;
     }
     var IWeaveTreeNodeWithPathFinding: new (..._: any[]) => IWeaveTreeNodeWithPathFinding;
 }
@@ -3433,17 +3444,17 @@ declare module weavejs.core {
     /**
      * Represents an object that must be instantiated asynchronously.
      */
-    class LinkablePlaceholder extends LinkableVariable {
-        constructor(classDef?: new (..._: any[]) => any);
-        getClass(): new (..._: any[]) => any;
-        getInstance(): ILinkableObject;
-        setInstance(instance: ILinkableObject): void;
+    class LinkablePlaceholder<T extends ILinkableObject> extends LinkableVariable {
+        constructor(classDef?: new (..._: any[]) => T);
+        getClass(): new (..._: any[]) => T;
+        getInstance(): T & ILinkableObject;
+        setInstance(instance: T): void;
         /**
          * A utility function for getting the class definition from LinkablePlaceholders as well as regular objects.
          * @param object An object, which may be null.
          * @return The class definition, or null if the object was null.
          */
-        static getClass(object: Object): new (..._: any[]) => any;
+        static getClass(object: ILinkableObject | LinkablePlaceholder<ILinkableObject>): new (..._: any[]) => ILinkableObject;
     }
 }
 declare module weavejs.core {
@@ -4754,13 +4765,13 @@ declare module weavejs.data.column {
          * @param binIndex The index of the bin to get the keys from.
          * @return An Array of keys in the specified bin.
          */
-        getKeysFromBinIndex(binIndex: number): any[];
+        getKeysFromBinIndex(binIndex: number): Array<IQualifiedKey>;
         /**
          * This function gets a list of keys in a bin.
          * @param binIndex The name of the bin to get the keys from.
          * @return An Array of keys in the specified bin.
          */
-        getKeysFromBinName(binName: string): any[];
+        getKeysFromBinName(binName: string): Array<IQualifiedKey>;
         getBinIndexFromDataValue(value: any): number;
         /**
          * This function returns different results depending on the dataType.
@@ -5772,6 +5783,7 @@ declare module weavejs.data.key {
     }
 }
 declare module weavejs.data.key {
+    import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IDynamicKeyFilter = weavejs.api.data.IDynamicKeyFilter;
     import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
     import IKeySet = weavejs.api.data.IKeySet;
@@ -5795,7 +5807,7 @@ declare module weavejs.data.key {
          * @param keyInclusionLogic Passed to KeySetUnion constructor.
          * @see weave.data.KeySets.SortedKeySet#generateCompareFunction()
          */
-        setColumnKeySources(columns: any[], sortDirections?: any[], keySortCopy?: Function, keyInclusionLogic?: Function): void;
+        setColumnKeySources(columns: Array<IKeySet | IAttributeColumn>, sortDirections?: Array<number>, keySortCopy?: (keys: IQualifiedKey[]) => IQualifiedKey[], keyInclusionLogic?: (key: IQualifiedKey) => boolean): void;
         /**
          * This function sets the base IKeySet that is being filtered.
          * @param newBaseKeySet A new IKeySet to use as the base for this FilteredKeySet.
@@ -5873,13 +5885,13 @@ declare module weavejs.data.key {
         /**
          * A list of keys included in this KeySet.
          */
-        keys: any[];
+        keys: Array<IQualifiedKey>;
         /**
          * Overwrite the current set of keys.
          * @param newKeys An Array of IQualifiedKey objects.
          * @return true if the set changes as a result of calling this function.
          */
-        replaceKeys(newKeys: any[]): boolean;
+        replaceKeys(newKeys: Array<IQualifiedKey>): boolean;
         /**
          * Clear the current set of keys.
          * @return true if the set changes as a result of calling this function.
@@ -5895,13 +5907,13 @@ declare module weavejs.data.key {
          * @param additionalKeys A list of keys to add to this set.
          * @return true if the set changes as a result of calling this function.
          */
-        addKeys(additionalKeys: any[]): boolean;
+        addKeys(additionalKeys: Array<IQualifiedKey>): boolean;
         /**
          * Removes a vector of additional keys to the set.
          * @param unwantedKeys A list of keys to remove from this set.
          * @return true if the set changes as a result of calling this function.
          */
-        removeKeys(unwantedKeys: any[]): boolean;
+        removeKeys(unwantedKeys: Array<IQualifiedKey>): boolean;
         /**
          * This function sets the session state for the KeySet.
          * @param value A CSV-formatted String where each row is a keyType followed by a list of key strings of that keyType.
@@ -5937,7 +5949,7 @@ declare module weavejs.data.key {
         /**
          * @param keyInclusionLogic A function that accepts an IQualifiedKey and returns true or false.
          */
-        constructor(keyInclusionLogic?: Function);
+        constructor(keyInclusionLogic?: (key: IQualifiedKey) => boolean);
         /**
          * This will add an IKeySet as a dependency and include its keys in the union.
          * @param keySet
@@ -5985,7 +5997,7 @@ declare module weavejs.data.key {
     import WeavePromise = weavejs.util.WeavePromise;
     class QKeyGetter extends WeavePromise {
         constructor(manager?: QKeyManager, relevantContext?: Object);
-        asyncStart(keyType: string, keyStrings: any[], outputKeys?: any[]): QKeyGetter;
+        asyncStart(keyType: string, keyStrings: Array<string>, outputKeys?: Array<weavejs.api.data.IQualifiedKey>): QKeyGetter;
     }
 }
 declare module weavejs.data.key {
@@ -6007,11 +6019,11 @@ declare module weavejs.data.key {
         /**
          * Maps IQualifiedKey to keyType - faster than reading the keyType property of a QKey
          */
-        map_qkey_keyType: Object;
+        map_qkey_keyType: WeakMap<IQualifiedKey, string>;
         /**
          * Maps IQualifiedKey to localName - faster than reading the localName property of a QKey
          */
-        map_qkey_localName: Object;
+        map_qkey_localName: WeakMap<IQualifiedKey, string>;
         stringToQKey(qkeyString: string): IQualifiedKey;
         numberToQKey(qkeyNumber: number): IQualifiedKey;
         /**
@@ -6023,26 +6035,29 @@ declare module weavejs.data.key {
         /**
          * @param output An output Array for IQualifiedKeys.
          */
-        getQKeys_range(keyType: string, keyStrings: any[], iStart: number, iEnd: number, output: any): void;
+        getQKeys_range(keyType: string, keyStrings: Array<string>, iStart: number, iEnd: number, output: Array<IQualifiedKey>): void;
         /**
          * Get a list of QKey objects, all with the same key type.
          *
          * @return An array of QKeys.
          */
-        getQKeys(keyType: string, keyStrings: any[]): any[];
+        getQKeys(keyType: string, keyStrings: Array<string>): Array<IQualifiedKey>;
         /**
          * This will replace untyped Objects in an Array with their IQualifiedKey counterparts.
          * Each object in the Array should have two properties: <code>keyType</code> and <code>localName</code>
          * @param objects An Array to modify.
          * @return The same Array that was passed in, modified.
          */
-        convertToQKeys(objects: any[]): any[];
+        convertToQKeys(objects: Array<{
+            keyType: string;
+            localName: string;
+        }>): Array<IQualifiedKey>;
         /**
          * Get a list of QKey objects, all with the same key type.
          *
          * @return An array of QKeys that will be filled in asynchronously.
          */
-        getQKeysAsync(relevantContext: ILinkableObject, keyType: string, keyStrings: any[], asyncCallback: Function, outputKeys: any[]): void;
+        getQKeysAsync(relevantContext: ILinkableObject, keyType: string, keyStrings: Array<string>, asyncCallback: (keys: IQualifiedKey[]) => void, outputKeys: Array<IQualifiedKey>): void;
         /**
          * Get a list of QKey objects, all with the same key type.
          * @param relevantContext The owner of the WeavePromise. Only one WeavePromise will be generated per owner.
@@ -6050,27 +6065,28 @@ declare module weavejs.data.key {
          * @param keyStrings An Array of localName values.
          * @return A WeavePromise that produces an Array of IQualifiedKeys.
          */
-        getQKeysPromise(relevantContext: Object, keyType: string, keyStrings: any[]): WeavePromise;
+        getQKeysPromise(relevantContext: Object, keyType: string, keyStrings: Array<string>): WeavePromise;
         /**
          * Get a list of all previoused key types.
          *
          * @return An array of QKeys.
          */
-        getAllKeyTypes(): any[];
+        getAllKeyTypes(): Array<string>;
         /**
          * Get a list of all referenced QKeys for a given key type
          * @return An array of QKeys
          */
-        getAllQKeys(keyType: string): any[];
+        getAllQKeys(keyType: string): Array<IQualifiedKey>;
         /**
          * This makes a sorted copy of an Array of keys.
          * @param An Array of IQualifiedKeys.
          * @return A sorted copy of the keys.
          */
-        static keySortCopy(keys: any[]): any[];
+        static keySortCopy(keys: Array<IQualifiedKey>): Array<IQualifiedKey>;
     }
 }
 declare module weavejs.data.key {
+    import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IKeySet = weavejs.api.data.IKeySet;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
     /**
@@ -6101,7 +6117,7 @@ declare module weavejs.data.key {
          * @param sortDirections Sort directions (-1, 0, 1)
          * @return A function that returns a sorted copy of an Array of keys.
          */
-        static generateSortCopyFunction(columns: any[], sortDirections?: any[]): Function;
+        static generateSortCopyFunction(columns: Array<IAttributeColumn | ((key: IQualifiedKey) => number)>, sortDirections?: Array<number>): (keys: IQualifiedKey[]) => IQualifiedKey[];
     }
 }
 declare module weavejs.data.source {
@@ -9245,7 +9261,7 @@ declare module weavejs.util {
          * @param WeaveTreeItem_implementation The implementation of WeaveTreeItem to use.
          * @param items Item descriptors.
          */
-        static createItems(WeaveTreeItem_implementation: new (..._: any[]) => any, items: any[]): any[];
+        static createItems<T>(WeaveTreeItem_implementation: new (params?: Object) => WeaveTreeItem, items: any[]): Array<WeaveTreeItem>;
         /**
          * Used for mapping an Array of params objects to an Array of WeaveTreeItem objects.
          * @param WeaveTreeItem_implementation The implementation of WeaveTreeItem to use.

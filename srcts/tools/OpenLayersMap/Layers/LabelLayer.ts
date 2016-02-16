@@ -17,9 +17,9 @@ import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
 class LabelLayer extends GlyphLayer
 {
-	public size: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
-	public text: DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	public color: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+	size = Weave.linkableChild(this, AlwaysDefinedColumn);
+	text = Weave.linkableChild(this, DynamicColumn);
+	color = Weave.linkableChild(this, AlwaysDefinedColumn);
 
 	constructor()
 	{

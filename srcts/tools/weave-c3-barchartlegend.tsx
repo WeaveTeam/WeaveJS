@@ -16,9 +16,6 @@ import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
 
-import WeavePath = weavejs.path.WeavePath;
-import WeavePathUI = weavejs.path.WeavePathUI;
-
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ColorRamp = weavejs.util.ColorRamp;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
@@ -34,17 +31,15 @@ const SHAPE_TYPE_LINE:string = "line";
 
 export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
-    private chartColors:ColorRamp = Weave.linkableChild(this, ColorRamp);
-    private columns:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(ReferencedColumn));
-    private maxColumns:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
-    private panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
-    private shapeSize:LinkableNumber = Weave.linkableChild(this, LinkableNumber);
+    private chartColors = Weave.linkableChild(this, ColorRamp);
+    private columns = Weave.linkableChild(this, new LinkableHashMap(ReferencedColumn));
+    private maxColumns = Weave.linkableChild(this, LinkableNumber);
+    private panelTitle = Weave.linkableChild(this, LinkableString);
+    private shapeSize = Weave.linkableChild(this, LinkableNumber);
 
-    private filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-    private selectionKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
-    private probeKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
-
-    private plotterPath:WeavePath;
+    private filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+    private selectionKeySet = Weave.linkableChild(this, DynamicKeySet);
+    private probeKeySet = Weave.linkableChild(this, DynamicKeySet);
 
     private spanStyle:CSSProperties;
     private numberOfLabels:number;
@@ -58,7 +53,7 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
 
 
         this.state = {selected:[], probed:[]};
-        this.spanStyle = {textAlign:"left",verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
+        this.spanStyle = {textAlign:"left", verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
     }
 
 	get deprecatedStateMapping()
@@ -221,8 +216,6 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
         </div>);
     }
 }
-
-//weavejs.util.BackwardsCompatibility.forceDeprecatedState(WeaveC3BarChartLegend); // TEMPORARY HACK - remove when class is refactored
 
 Weave.registerClass("weavejs.tool.BarChartLegend", WeaveC3BarChartLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.visualization.tools::BarChartLegendTool", WeaveC3BarChartLegend);

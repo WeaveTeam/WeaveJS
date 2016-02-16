@@ -32,7 +32,6 @@ import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
 import DragSelection from "./OpenLayersMap/DragSelection";
 import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 
-import WeavePath = weavejs.path.WeavePath;
 import ZoomBounds = weavejs.geom.ZoomBounds;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import DynamicState = weavejs.api.core.DynamicState;
@@ -70,13 +69,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	resolutionCallbackHandle:any;
 	private element:Element;
 
-	zoomBounds: ZoomBounds = Weave.linkableChild(this, ZoomBounds);
-	extentOverride: LinkableVariable = Weave.linkableChild(this, new LinkableVariable(null, isBounds, [NaN, NaN, NaN, NaN]));
-	projectionSRS: LinkableString = Weave.linkableChild(this, LinkableString);
-	showZoomControls: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
-	showMouseModeControls: LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
-	interactionMode: LinkableString = Weave.linkableChild(this, LinkableString);
-	layers: LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(Layer));
+	zoomBounds = Weave.linkableChild(this, ZoomBounds);
+	extentOverride = Weave.linkableChild(this, new LinkableVariable(null, isBounds, [NaN, NaN, NaN, NaN]));
+	projectionSRS = Weave.linkableChild(this, LinkableString);
+	showZoomControls = Weave.linkableChild(this, LinkableBoolean);
+	showMouseModeControls = Weave.linkableChild(this, LinkableBoolean);
+	interactionMode = Weave.linkableChild(this, LinkableString);
+	layers = Weave.linkableChild(this, new LinkableHashMap(Layer));
 
 	constructor(props:IVisToolProps)
 	{
@@ -85,7 +84,18 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		/* Force the inclusion of the layers. */
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
 
-		Weave.detectChange(this.interactionMode, this.interactionMode);
+		weavejs.WeaveAPI.Scheduler.callLater(this, this.initLater);
+	}
+	
+	private initLater():void
+	{
+		if (this.interactionMode.triggerCounter == weavejs.core.CallbackCollection.DEFAULT_TRIGGER_COUNT)
+		{
+			/* use global interaction mode as default local mode */
+			var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
+			if (defaultDragMode instanceof LinkableString)
+				this.interactionMode.value = defaultDragMode.value;
+		}
 	}
 
 	get deprecatedStateMapping():Object
@@ -112,14 +122,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	componentDidMount():void
 	{
-		if (Weave.detectChange(this.interactionMode, this.interactionMode))
-		{
-			/* use global interaction mode as default local mode */
-			var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
-			if (defaultDragMode instanceof LinkableString)
-				this.interactionMode.value = defaultDragMode.value;
-		}
-
 		this.map = new ol.Map({
 			interactions: ol.interaction.defaults({ dragPan: false }),
 			controls: [],

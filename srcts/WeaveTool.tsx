@@ -5,6 +5,7 @@
 ///<reference path="../typings/react-bootstrap/react-bootstrap.d.ts"/>
 ///<reference path="../typings/weave/weavejs.d.ts"/>
 
+import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
 
@@ -60,7 +61,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
         super(props);
 		this.state = {};
         this.toolPath = this.props.toolPath;
-		var placeholder = this.toolPath.getObject() as LinkablePlaceholder;
+		var placeholder = this.toolPath.getObject() as LinkablePlaceholder<React.Component<any, any>>;
 		if (placeholder instanceof LinkablePlaceholder)
 	        this.ToolClass = placeholder.getClass();
 		else if (this.toolPath.getObject())
@@ -79,7 +80,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		if (this.tool === tool)
 			return; 
 		
-		var placeholder = this.toolPath.getObject() as LinkablePlaceholder;
+		var placeholder = this.toolPath.getObject() as LinkablePlaceholder<React.Component<any, any>>;
 		if (placeholder instanceof LinkablePlaceholder)
 		{
 			if (tool)

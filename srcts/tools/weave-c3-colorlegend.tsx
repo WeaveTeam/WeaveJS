@@ -17,9 +17,6 @@ import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
 
-import WeavePath = weavejs.path.WeavePath;
-import WeavePathData = weavejs.path.WeavePathData;
-import WeavePathUI = weavejs.path.WeavePathUI;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -39,14 +36,14 @@ const SHAPE_TYPE_BOX:string = "box";
 
 export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties
 {
-	panelTitle:LinkableString = Weave.linkableChild(this, LinkableString);
-	filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-	selectionFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	probeFilter:DynamicKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	dynamicColorColumn:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
-	maxColumns:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(1));
-	shapeSize:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(25));
-	shapeType:LinkableString = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE));
+	panelTitle = Weave.linkableChild(this, LinkableString);
+	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	dynamicColorColumn = Weave.linkableChild(this, DynamicColumn);
+	maxColumns = Weave.linkableChild(this, new LinkableNumber(1));
+	shapeSize = Weave.linkableChild(this, new LinkableNumber(25));
+	shapeType = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE));
 	
 	private get colorColumn() { return this.dynamicColorColumn.target as ColorColumn; }
 	private get binnedColumn() { var cc = this.colorColumn; return cc ? cc.getInternalColumn() as BinnedColumn : null; }

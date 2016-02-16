@@ -10,8 +10,6 @@ import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
 import GlyphLayer from "./GlyphLayer";
 import Layer from "./Layer";
 
-import WeavePath = weavejs.path.WeavePath;
-import WeavePathData = weavejs.path.WeavePathData;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -24,9 +22,9 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
 export default class ScatterPlotLayer extends GlyphLayer {
 
-	fill: SolidFillStyle = Weave.linkableChild(this, SolidFillStyle);
-	line: SolidLineStyle = Weave.linkableChild(this, SolidLineStyle);
-	radius: AlwaysDefinedColumn = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
+	fill = Weave.linkableChild(this, SolidFillStyle);
+	line = Weave.linkableChild(this, SolidLineStyle);
+	radius = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
 
 	private get radiusNorm() { return this.radius.getInternalColumn() as NormalizedColumn; }
 	private get radiusData() { return this.radiusNorm.internalDynamicColumn; }

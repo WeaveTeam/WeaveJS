@@ -14,8 +14,6 @@ import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 
-import WeavePath = weavejs.path.WeavePath;
-
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
@@ -28,10 +26,10 @@ const sessionStateComboBoxStyle:CSSProperties = {display:"flex", flex:1, height:
 
 export default class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState> {
 
-	selectedChoice:LinkableString = Weave.linkableChild(this, LinkableString);
-	layoutMode:LinkableString = Weave.linkableChild(this, LinkableString);
-	choices:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
-	targets:LinkableHashMap = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
+	selectedChoice = Weave.linkableChild(this, LinkableString);
+	layoutMode = Weave.linkableChild(this, LinkableString);
+	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
+	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
 
 	constructor(props:IVisToolProps) {
 		super(props);
@@ -112,8 +110,6 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 				</div>);
 	}
 }
-
-//weavejs.util.BackwardsCompatibility.forceDeprecatedState(SessionStateMenuTool); // TEMPORARY HACK - remove when class is refactored
 
 Weave.registerClass("weavejs.tool.SessionStateMenu", SessionStateMenuTool, [weavejs.api.ui.IVisTool/*, weavejs.api.core.ILinkableObjectWithNewProperties*/]);
 Weave.registerClass("weave.ui::SessionStateMenuTool", SessionStateMenuTool);

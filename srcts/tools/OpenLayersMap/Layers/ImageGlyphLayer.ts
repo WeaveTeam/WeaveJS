@@ -13,7 +13,6 @@ import Layer from "./Layer";
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
 
-import WeavePathData = weavejs.path.WeavePathData;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -23,10 +22,10 @@ export default class ImageGlyphLayer extends GlyphLayer {
 
 	private imageGlyphCache:ImageGlyphCache;
 
-	imageSize: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
-	imageURL: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
-	alpha: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
-	color: AlwaysDefinedColumn = Weave.linkableChild(this, AlwaysDefinedColumn);
+	imageSize = Weave.linkableChild(this, AlwaysDefinedColumn);
+	imageURL = Weave.linkableChild(this, AlwaysDefinedColumn);
+	alpha = Weave.linkableChild(this, AlwaysDefinedColumn);
+	color = Weave.linkableChild(this, AlwaysDefinedColumn);
 
 	constructor()
 	{

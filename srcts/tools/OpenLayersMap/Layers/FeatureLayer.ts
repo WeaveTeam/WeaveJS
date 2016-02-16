@@ -21,9 +21,9 @@ export abstract class FeatureLayer extends Layer {
 
 	private changedItems:Set<IQualifiedKey>;
 
-	public filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-	public selectionKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
-	public probeKeySet:DynamicKeySet = Weave.linkableChild(this, DynamicKeySet);
+	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+	selectionKeySet = Weave.linkableChild(this, DynamicKeySet);
+	probeKeySet = Weave.linkableChild(this, DynamicKeySet);
 
 	source:ol.source.Vector;
 
