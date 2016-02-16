@@ -306,7 +306,7 @@ export default class StandardLib
 		};
 		_listener.onClick = function(event:MouseEvent):void {
 			var mde:MouseEvent = _listener.mouseDownEvent;
-			if (Math.abs(mde.clientX - event.clientX) < pixelThreshold && Math.abs(mde.clientY - event.clientY) < pixelThreshold)
+			if (Math.abs(mde.clientX - event.clientX) <= pixelThreshold && Math.abs(mde.clientY - event.clientY) <= pixelThreshold)
 				listener(event);
 		};
 		target.addEventListener('mousedown', _listener.onMouseDown);
