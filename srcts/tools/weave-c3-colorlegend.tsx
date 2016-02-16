@@ -206,19 +206,24 @@ export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, I
 								{
 									element.push(
 										<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
-												<ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
-													<svg style={{position:"absolute"}}
-														 viewBox="0 0 100 100" width="100%" height="100%">
-														<circle cx="50%" cy="50%" r="45%" style={{
-															fill: "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)),
-															stroke: "black",
-															strokeOpacity: 0.5
-														}}/>
-													</svg>
-												</ui.HBox>
-												<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
-													 <span style={ prefixerStyle }>{ textLabelFunction(i) }</span>
-												</ui.HBox>
+											{weavejs.WeaveAPI.Locale.reverseLayout ?
+											<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center", justifyContent:"flex-end"}}>
+												<span style={ prefixerStyle }>{ textLabelFunction(i) }</span>
+											</ui.HBox>:""}
+											<ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
+												<svg style={{position:"absolute"}}
+													 viewBox="0 0 100 100" width="100%" height="100%">
+													<circle cx="50%" cy="50%" r="45%" style={{
+														fill: "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)),
+														stroke: "black",
+														strokeOpacity: 0.5
+													}}/>
+												</svg>
+											</ui.HBox>
+											{weavejs.WeaveAPI.Locale.reverseLayout ?
+												"":<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
+												<span style={ prefixerStyle }>{ textLabelFunction(i) }</span>
+											</ui.HBox>}
 										</ui.HBox>
 									);
 								}
