@@ -136,7 +136,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 
 		var result: { [columnName: string]: string | number } = {};
 
-		for (let child of columnHashMap.getObjects().concat(additionalColumns))
+		for (let child of (columnHashMap.getObjects() as IAttributeColumn[]).concat(additionalColumns))
 		{
 			let title:string = child.getMetadata("title");
 			let value:string = child.getValueFromKey(key, String);

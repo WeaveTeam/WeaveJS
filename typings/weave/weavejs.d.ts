@@ -156,7 +156,7 @@ declare module __global__ {
          * @see weave.api.core.ISessionManager#newLinkableChild()
          * @see weave.api.core.ISessionManager#registerLinkableChild()
          */
-        static linkableChild<T extends ILinkableObject>(linkableParent: Object, linkableChildOrType: (new (..._: any[]) => T) | T, callback?: Function, useGroupedCallback?: boolean): T;
+        static linkableChild<T extends ILinkableObject>(linkableParent: Object, linkableChildOrType: (new () => T) | T, callback?: Function, useGroupedCallback?: boolean): T;
         /**
          * Shortcut for WeaveAPI.SessionManager.disposeObject()
          * @copy weave.api.core.ISessionManager#disposeObject()
@@ -1180,7 +1180,7 @@ declare module weavejs.api.core {
         /**
          * This is the path that is currently being watched for linkable object targets.
          */
-        targetPath: any[];
+        targetPath: Array<string | number>;
         /**
          * This will set a path which should be watched for new targets.
          * Callbacks will be triggered immediately if the path points to a new target.
@@ -1195,7 +1195,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The global object of the requested name and type, or null if the object could not be created.
          */
-        requestGlobalObject(name: string, objectType: new (..._: any[]) => any, lockObject: boolean): any;
+        requestGlobalObject<T extends ILinkableObject>(name: string, objectType: new () => T, lockObject: boolean): T;
         /**
          * This function creates a local object using the given Class definition if it doesn't already exist.
          * If this object is locked, this function does nothing.
@@ -1203,7 +1203,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The local object of the requested type, or null if the object could not be created.
          */
-        requestLocalObject(objectType: new (..._: any[]) => any, lockObject: boolean): any;
+        requestLocalObject<T extends ILinkableObject>(objectType: new () => T, lockObject: boolean): T;
         /**
          * This function will copy the session state of an ILinkableObject to a new local internalObject of the same type.
          * @param objectToCopy An object to copy the session state from.
@@ -1251,21 +1251,21 @@ declare module weavejs.api.core {
          * Callbacks will be called if the new name order differs from the old order.
          * @param newOrder The new desired ordering of names.
          */
-        setNameOrder(newOrder: any[]): void;
+        setNameOrder(newOrder: Array<string>): void;
         /**
          * This function returns an ordered list of names in the hash map.
          * @param filter If specified, names of objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return A copy of the ordered list of names of objects contained in this LinkableHashMap.
          */
-        getNames(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
+        getNames(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): Array<string>;
         /**
          * This function returns an ordered list of objects in the hash map.
          * @param filter If specified, objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return An ordered Array of objects that correspond to the names returned by getNames(filter).
          */
-        getObjects(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
+        getObjects<T>(filter?: new (..._: any[]) => T, filterIncludesPlaceholders?: boolean): Array<T & ILinkableObject>;
         /**
          * This function gets the name of the specified object in the hash map.
          * @param object An object contained in this LinkableHashMap.
@@ -1294,14 +1294,14 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, the object will be locked in place under the specified name.
          * @return The object under the requested name of the requested type, or null if an error occurred.
          */
-        requestObject(name: string, classDef: new (..._: any[]) => any, lockObject?: boolean): any;
+        requestObject<T>(name: string, classDef: new () => T, lockObject?: boolean): T;
         /**
          * This function will copy the session state of an ILinkableObject to a new object under the given name in this LinkableHashMap.
          * @param newName A name for the object to be initialized in this LinkableHashMap.
          * @param objectToCopy An object to copy the session state from.
          * @return The new object of the same type, or null if an error occurred.
          */
-        requestObjectCopy(name: string, objectToCopy: ILinkableObject): ILinkableObject;
+        requestObjectCopy<T extends ILinkableObject>(name: string, objectToCopy: T): T;
         /**
          * This function will rename an object by making a copy and removing the original.
          * @param oldName The name of an object to replace.
@@ -4271,6 +4271,7 @@ declare module weavejs.data {
     }
 }
 declare module weavejs.data {
+    import ILinkableVariable = weavejs.api.core.ILinkableVariable;
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IKeySet = weavejs.api.data.IKeySet;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -4300,7 +4301,7 @@ declare module weavejs.data {
          * @param dataType Either a Class object or a String containing the qualified class name of the desired value type.
          * @return The value of the object, optionally cast to the requested dataType.
          */
-        static getValue(object: Object, dataType?: any): any;
+        static getValue(object: IAttributeColumn | ILinkableVariable, dataType?: any): any;
         /**
          * This function calls IAttributeColumn.getValueFromKey(key, dataType).
          * @param column An IAttributeColumn to get a value from.
@@ -4334,21 +4335,21 @@ declare module weavejs.data {
          * @param key A key to get the Number for.
          * @return The value of the object, cast to a Number.
          */
-        static getNumber(object: Object, key?: IQualifiedKey): number;
+        static getNumber(object: IAttributeColumn | ILinkableVariable, key?: IQualifiedKey): number;
         /**
          * This function uses currentRecordKey when retrieving a value from a column if no key is specified.
          * @param object An IAttributeColumn or an ILinkableVariable to get a value from.
          * @param key A key to get the Number for.
          * @return The value of the object, cast to a String.
          */
-        static getString(object: Object, key?: IQualifiedKey): string;
+        static getString(object: IAttributeColumn | ILinkableVariable, key?: IQualifiedKey): string;
         /**
          * This function uses currentRecordKey when retrieving a value from a column if no key is specified.
          * @param object An IAttributeColumn or an ILinkableVariable to get a value from.
          * @param key A key to get the Number for.
          * @return The value of the object, cast to a Boolean.
          */
-        static getBoolean(object: Object, key?: IQualifiedKey): boolean;
+        static getBoolean(object: IAttributeColumn | ILinkableVariable, key?: IQualifiedKey): boolean;
         /**
          * This function uses currentRecordKey when retrieving a value from a column if no key is specified.
          * @param column A column to get a value from.
@@ -4362,7 +4363,7 @@ declare module weavejs.data {
          * @param key A key to search for.
          * @return The first IKeySet that contains the key.
          */
-        static findKeySet(keySets: any[], key?: IQualifiedKey): IKeySet;
+        static findKeySet(keySets: Array<IKeySet>, key?: IQualifiedKey): IKeySet;
         static getSum(column: IAttributeColumn): number;
         static getMean(column: IAttributeColumn): number;
         static getVariance(column: IAttributeColumn): number;
@@ -4375,11 +4376,11 @@ declare module weavejs.data {
          * @param value A value to cast.
          * @param newType Either a qualifiedClassName or a Class object referring to the type to cast the value as.
          */
-        static cast(value: any, newType: any): any;
+        static cast<T>(value: any, newType: T | string): T;
         /**
          * This is a macro for IQualifiedKey that can be used in equations.
          */
-        static QKey: new (..._: any[]) => any;
+        static QKey: typeof IQualifiedKey;
     }
 }
 declare module weavejs.data {
@@ -7143,7 +7144,7 @@ declare module weavejs.geom {
      *
      * @author adufilie
      */
-    class KDNode {
+    class KDNode<T> {
         /**
          * The dimension that the splitting plane is defined on
          * This property is made public for speed concerns, though it should not be modified.
@@ -7162,23 +7163,23 @@ declare module weavejs.geom {
         /**
          * The numbers in K-Dimensions used to locate the object
          */
-        key: any[];
+        key: Array<number>;
         /**
          * The object that is associated with the key
          */
-        object: Object;
+        object: T;
         /**
          * Child node corresponding to the left side of the splitting plane
          */
-        left: KDNode;
+        left: KDNode<T>;
         /**
          * Child node corresponding to the right side of the splitting plane
          */
-        right: KDNode;
+        right: KDNode<T>;
         /**
          * An Array of additional nodes having identical keys
          */
-        siblings: any[];
+        siblings: Array<KDNode<T>>;
     }
 }
 declare module weavejs.geom {
@@ -7187,11 +7188,11 @@ declare module weavejs.geom {
      *
      * @author adufilie
      */
-    class KDTree {
+    class KDTree<T> {
         /**
          * Constructs an empty KDTree with the given dimensionality.
          *
-         * TODO: add parameter for a vector of key,object pairs and create a balanced tree from those.
+         * TODO: add parameter for an Array of key,object pairs and create a balanced tree from those.
          */
         constructor(dimensionality?: number);
         /**
@@ -7219,12 +7220,12 @@ declare module weavejs.geom {
          * @param object The object to insert in the tree.
          * @return A KDNode object that can be used as a parameter to the remove() function.
          */
-        insert(key: any[], obj: Object): KDNode;
+        insert(key: Array<number>, obj: T): KDNode<T>;
         /**
          * Remove a single node from the tree.
          * @param node The node to remove from the tree.
          */
-        remove(node: KDNode): void;
+        remove(node: KDNode<T>): void;
         /**
          * Remove all nodes from the tree.
          */
@@ -7242,7 +7243,7 @@ declare module weavejs.geom {
          * @param sortDirection Specify either ASCENDING or DESCENDING
          * @return An array of pointers to objects with K-Dimensional keys that fall between minKey and maxKey.
          */
-        queryRange(minKey: any[], maxKey: any[], boundaryInclusive?: boolean, sortDimension?: number, sortDirection?: string): any[];
+        queryRange(minKey: Array<number>, maxKey: Array<number>, boundaryInclusive?: boolean, sortDimension?: number, sortDirection?: string): Array<T>;
     }
 }
 declare module weavejs.geom {
@@ -8386,20 +8387,19 @@ declare module weavejs.util {
          * @param arrays A list of Arrays.
          * @return The union of all the unique items in the Arrays in the order they appear.
          */
-        static union(...arrays: any[]): any[];
+        static union<T>(...arrays: Array<T[]>): Array<T>;
         /**
          * Computes the intersection of the items in a list of two or more Arrays.
-         * @param arrays A list of Arrays.
          * @return The intersection of the items appearing in all Arrays, in the order that they appear in the first Array.
          */
-        static intersection(firstArray: any, secondArray: any, ...moreArrays: any[]): any[];
+        static intersection<T>(firstArray: Array<T>, secondArray: Array<T>, ...moreArrays: Array<T[]>): Array<T>;
         /**
          * Removes items from an Array.
          * @param array An Array of items.
          * @param itemsToRemove An Array of items to skip when making a copy of the array.
          * @return A new Array containing the items from the original array except those that appear in itemsToRemove.
          */
-        static subtract(array: any, itemsToRemove: any): any[];
+        static subtract<T>(array: Array<T>, itemsToRemove: Array<T>): Array<T>;
         /**
          * This function copies the contents of the source to the destination.
          * Either parameter may be either an Array.
@@ -8407,11 +8407,13 @@ declare module weavejs.util {
          * @param destination An Array.
          * @return A pointer to the destination Array
          */
-        static copy(source: any, destination?: any): any;
+        static copy<T>(source: Array<T>, destination?: Array<T>): Array<T>;
         /**
-         * Fills a hash map with the keys from an Array.
+         * Fills an Object with the keys from an Array.
          */
-        static fillKeys(output: Object, keys: any[]): void;
+        static fillKeys(output: {
+            [key: string]: boolean;
+        }, keys: Array<string>): void;
         /**
          * If there are any properties of the Object, return false; else, return true.
          * @param hashMap The Object to test for emptiness.
@@ -8445,7 +8447,7 @@ declare module weavejs.util {
          * @param lastIndex The index of the last element in the list to calculate a median from.
          * @return The index the median element.
          */
-        static getMedianIndex(list: any, compareFunction: Function, firstIndex?: number, lastIndex?: number): number;
+        static getMedianIndex(list: any[], compareFunction: Function, firstIndex?: number, lastIndex?: number): number;
         /**
          * Merges two previously-sorted arrays.
          * @param sortedInputA The first sorted array.
@@ -8453,7 +8455,7 @@ declare module weavejs.util {
          * @param mergedOutput An array to store the merged arrays.
          * @param comparator A function that takes two parameters and returns -1 if the first parameter is less than the second, 0 if equal, or 1 if the first is greater than the second.
          */
-        static mergeSorted(sortedInputA: any, sortedInputB: any, mergedOutput: any, comparator: Function): void;
+        static mergeSorted<T>(sortedInputA: Array<T>, sortedInputB: Array<T>, mergedOutput: Array<T>, comparator: (a: T, b: T) => number): void;
         /**
          * This will flatten an Array of Arrays into a flat Array.
          * Items will be appended to the destination Array.
@@ -8461,7 +8463,7 @@ declare module weavejs.util {
          * @param destination An Array to append items to.  If none specified, a new one will be created.
          * @return The destination Array with all the nested items in the source appended to it.
          */
-        static flatten(source: any, destination?: any): any;
+        static flatten<T>(source: Array<T>, destination?: Array<T>): Array<T>;
         static flattenObject(input: Object, output?: Object, prefix?: string): Object;
         /**
          * This will take an Array of Arrays of String items and produce a single list of String-joined items.
@@ -8470,7 +8472,7 @@ declare module weavejs.util {
          * @param includeEmptyItems Set this to true to include empty-strings and undefined items in the nested Arrays.
          * @return An Array of String-joined items in the same order they appear in the nested Arrays.
          */
-        static joinItems(arrayOfArrays: any[], separator: string, includeEmptyItems: boolean): any[];
+        static joinItems(arrayOfArrays: Array<string[]>, separator: string, includeEmptyItems: boolean): Array<string>;
         /**
          * Performs a binary search on a sorted array with no duplicate values.
          * @param sortedUniqueValues Array of Numbers or Strings
@@ -8478,22 +8480,24 @@ declare module weavejs.util {
          * @param exactMatchOnly If true, searches for exact match. If false, searches for insertion point.
          * @return The index of the matching value or insertion point.
          */
-        static binarySearch(sortedUniqueValues: any, item: any, exactMatchOnly: boolean, compare?: Function): number;
+        static binarySearch(sortedUniqueValues: any[], item: any, exactMatchOnly: boolean, compare?: (a: any, b: any) => number): number;
         /**
          * Creates an object from arrays of keys and values.
          * @param keys Keys corresponding to the values.
          * @param values Values corresponding to the keys.
          * @return A new Object.
          */
-        static zipObject(keys: any[], values: any[]): Object;
+        static zipObject<T>(keys: Array<string>, values: Array<T>): {
+            [key: string]: T;
+        };
         /**
          * This will get a subset of properties/items/attributes from an Object/Array/XML.
-         * @param object An Object/Array/XML containing properties/items/attributes to retrieve.
-         * @param keys A list of property names, index values, or attribute names.
+         * @param object An Object/Array containing properties/items to retrieve.
+         * @param keys A list of property names, index values.
          * @param output Optionally specifies where to store the resulting items.
          * @return An Object (or Array) containing the properties/items/attributes specified by keysOrIndices.
          */
-        static getItems(object: any, keys: any[], output?: any): any;
+        static getItems(object: Object | any[], keys: Array<string>, output?: Object | any[]): Object | any[];
         /**
          * Compares a list of properties in two objects
          * @param object1 The first object
@@ -8501,31 +8505,33 @@ declare module weavejs.util {
          * @param propertyNames A list of names of properties to compare
          * @return -1, 0, or 1
          */
-        static compareProperties(object1: Object, object2: Object, propertyNames: any[]): number;
+        static compareProperties(object1: Object, object2: Object, propertyNames: Array<string>): number;
         /**
          * Removes items from an Array.
          * @param array Array
-         * @param indices Array of indices to remove
+         * @param indices Array of numerically sorted indices to remove
          */
-        static removeByIndex(array: any, indices: any[]): void;
+        static removeByIndex(array: any[], indices: Array<number>): void;
         /**
          * Gets a list of values of a property from a list of objects.
          * @param array An Array of Objects.
          * @param property The property name to get from each object
          * @return A list of the values of the specified property for each object in the original list.
          */
-        static pluck(array: any, property: string): any;
+        static pluck(array: any[], property: string): any[];
         /**
          * Transposes a two-dimensional table.
          */
-        static transpose(table: any[]): any[];
+        static transpose<T>(table: Array<T[]>): Array<T[]>;
         /**
-         * Creates a lookup from item (or item property) to index. Does not consider duplicate items (or item property values).
+         * Creates a lookup from item (or item property) to index. Does not consider duplicate items (or duplicate item property values).
          * @param array An Array or Object
          * @param propertyChain A property name or chain of property names to index on rather than the item itself.
          * @return A reverse lookup Map.
          */
-        static createLookup(array: any, ...propertyChain: any[]): Object;
+        static createLookup<T>(array: Array<T> | {
+            [key: string]: T;
+        }, ...propertyChain: Array<string>): Map<T, string>;
     }
 }
 declare module weavejs.util {
@@ -8797,43 +8803,43 @@ declare module weavejs.util {
          * @param paramNames A list of parameter names for the generated function, so that these variable names can be used in the script.
          * @param errorHandler A function that handles errors.
          */
-        static compile(script: string, paramNames?: any[], errorHandler?: Function): Function;
+        static compile(script: string, paramNames?: Array<string>, errorHandler?: (e: Error) => void): Function;
         /**
          * AS->JS Language helper for ArrayBuffer
          */
-        static ArrayBuffer: new (..._: any[]) => any;
+        static ArrayBuffer: typeof ArrayBuffer;
         /**
          * AS->JS Language helper for Uint8Array
          */
-        static Uint8Array: new (..._: any[]) => any;
+        static Uint8Array: typeof Uint8Array;
         /**
          * AS->JS Language helper for DataView
          */
-        static DataView: new (..._: any[]) => any;
+        static DataView: typeof DataView;
         /**
          * AS->JS Language helper for Promise
          */
-        static Promise: new (..._: any[]) => any;
+        static Promise: typeof Promise;
         /**
          * AS->JS Language helper for Map
          */
-        static Map: new (..._: any[]) => any;
+        static Map: typeof Map;
         /**
          * AS->JS Language helper for WeakMap
          */
-        static WeakMap: new (..._: any[]) => any;
+        static WeakMap: typeof WeakMap;
         /**
          * AS->JS Language helper for getting an Array of Map keys.
          */
-        static mapKeys(map: Object): any[];
+        static mapKeys<K, V>(map: Map<K, V>): Array<K>;
         /**
          * AS->JS Language helper for getting an Array of Map values.
          */
-        static mapValues(map: Object): any[];
+        static mapValues<K, V>(map: Map<K, V>): Array<V>;
         /**
          * AS->JS Language helper for getting an Array of Map entries.
          */
-        static mapEntries(map: Object): any[];
+        static mapEntries<K, V>(map: Map<K, V>): Array<[K, V]>;
         /**
          * Tests if an object can be iterated over. If this returns true, then toArray()
          * can be called to get all the values from the iterator as an Array.
@@ -8848,7 +8854,7 @@ declare module weavejs.util {
         /**
          * AS->JS Language helper for Object.keys()
          */
-        static objectKeys(object: Object): any[];
+        static objectKeys(object: Object): Array<string>;
         /**
          * Tests if a value is of a primitive type.
          */
@@ -8856,7 +8862,7 @@ declare module weavejs.util {
         /**
          * Makes a deep copy of an object.
          */
-        static copyObject(object: Object): Object;
+        static copyObject<T>(object: T): T;
         /**
          * AS->JS Language helper for binding class instance functions
          */
@@ -8867,7 +8873,7 @@ declare module weavejs.util {
         /**
          * Implementation of "classDef as Class"
          */
-        static asClass(classDef: Object): any;
+        static asClass(classDef: any): new (..._: any[]) => any;
         static setTimeout(func: Function, delay: number, ...params: any[]): number;
         static clearTimeout(id: number): void;
         static setInterval(func: Function, delay: number, ...params: any[]): number;
@@ -8884,11 +8890,11 @@ declare module weavejs.util {
         /**
          * AS->JS Language helper for Object.getOwnPropertyNames()
          */
-        static getOwnPropertyNames(object: Object): any[];
+        static getOwnPropertyNames(object: Object): Array<string>;
         /**
          * Similar to Object.getOwnPropertyNames(), except it also checks prototypes.
          */
-        static getPropertyNames(object: Object, useCache: boolean): any[];
+        static getPropertyNames(object: Object, useCache: boolean): Array<string>;
     }
 }
 declare module weavejs.util {
