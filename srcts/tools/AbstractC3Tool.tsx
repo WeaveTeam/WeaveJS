@@ -208,7 +208,7 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
             this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
 			if (this.chart)
 	            this.chart.resize({width:this.props.style.width, height:this.props.style.height});
-            //this.validate(true);
+            this.cullAxes();
         }
     }
 
