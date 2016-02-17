@@ -14,8 +14,8 @@ import {ChartConfiguration, ChartAPI} from "c3";
 import FormatUtils from "../utils/FormatUtils";
 import StandardLib from "../utils/StandardLib"
 import {MouseEvent} from "react";
-import {getTooltipContent} from "./tooltip";
-import Tooltip from "./tooltip";
+import {getTooltipContent} from "./ToolTip";
+import Tooltip from "./ToolTip";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;

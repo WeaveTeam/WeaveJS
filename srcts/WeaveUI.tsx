@@ -12,7 +12,7 @@ import BarChartLegend from "./tools/BarChartLegend";
 import C3LineChart from "./tools/C3LineChart";
 import C3PieChart from "./tools/C3PieChart";
 import C3Histogram from "./tools/C3Histogram";
-import C3Gauge from "./tools/C3gauge";
+import C3Gauge from "./tools/C3Gauge";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import TableTool from "./tools/TableTool";
 import SessionStateMenuTool from "./tools/SessionStateMenuTool";

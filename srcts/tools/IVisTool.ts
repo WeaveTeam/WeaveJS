@@ -4,7 +4,7 @@
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import WeavePath = weavejs.path.WeavePath;
 
-import ToolTip from "./tooltip";
+import ToolTip from "./ToolTip";
 
 export interface IVisToolProps {
     toolPath:WeavePath;

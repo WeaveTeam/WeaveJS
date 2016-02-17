@@ -14,8 +14,8 @@ import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import {MouseEvent} from "react";
-import {getTooltipContent} from "./tooltip";
-import Tooltip from "./tooltip";
+import {getTooltipContent} from "./ToolTip";
+import Tooltip from "./ToolTip";
 import * as ReactDOM from "react-dom";
 import StandardLib from "../utils/StandardLib";
 

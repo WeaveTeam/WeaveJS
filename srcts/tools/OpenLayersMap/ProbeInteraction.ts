@@ -7,7 +7,7 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
 import OpenLayersMapTool from "../OpenLayersMapTool";
-import {IToolTipState} from "../tooltip";
+import {IToolTipState} from "../ToolTip";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;

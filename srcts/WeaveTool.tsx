@@ -18,8 +18,8 @@ import StandardLib from "./utils/StandardLib";
 import {Glyphicon} from "react-bootstrap";
 import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
-import ToolTip from "./tools/tooltip";
-import {IToolTipProps, IToolTipState} from "./tools/tooltip";
+import ToolTip from "./tools/ToolTip";
+import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
 
 declare type IToolTip = React.Component<IToolTipProps, IToolTipState>;
 
