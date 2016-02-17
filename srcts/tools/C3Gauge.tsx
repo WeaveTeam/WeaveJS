@@ -27,7 +27,7 @@ declare type Record = {
     meterColumn: number
 };
 
-export default class WeaveC3Gauge extends AbstractC3Tool {
+export default class C3Gauge extends AbstractC3Tool {
     meterColumn = Weave.linkableChild(this, DynamicColumn);
     binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
 	colorRamp = Weave.linkableChild(this, ColorRamp);
@@ -259,5 +259,5 @@ export default class WeaveC3Gauge extends AbstractC3Tool {
 }
 
 
-Weave.registerClass("weavejs.tool.C3Gauge", WeaveC3Gauge, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::GaugeTool", WeaveC3Gauge);
+Weave.registerClass("weavejs.tool.C3Gauge", C3Gauge, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::GaugeTool", C3Gauge);

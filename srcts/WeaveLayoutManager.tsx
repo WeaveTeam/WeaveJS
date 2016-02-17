@@ -10,32 +10,32 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import Layout from "./react-flexible-layout/Layout";
 import {LayoutState} from "./react-flexible-layout/Layout";
-import WeaveC3Barchart from "./tools/weave-c3-barchart";
-import WeaveC3ScatterPlot from "./tools/weave-c3-scatterplot";
-import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend";
-import WeaveC3BarChartLegend from "./tools/weave-c3-barchartlegend"
-import WeaveC3LineChart from "./tools/weave-c3-linechart";
-import WeaveC3PieChart from "./tools/weave-c3-piechart";
-import WeaveC3Histogram from "./tools/weave-c3-histogram";
-import SessionStateMenuTool from "./tools/weave-session-state-menu";
+import C3BarChart from "./tools/C3BarChart";
+import C3ScatterPlot from "./tools/C3ScatterPlot";
+import ColorLegend from "./tools/ColorLegend";
+import BarChartLegend from "./tools/BarChartLegend"
+import C3LineChart from "./tools/C3LineChart";
+import C3PieChart from "./tools/C3PieChart";
+import C3Histogram from "./tools/C3Histogram";
+import SessionStateMenuTool from "./tools/SessionStateMenuTool";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
-import WeaveReactTable from "./tools/weave-react-table";
+import TableTool from "./tools/TableTool";
 import DataFilterTool from "./tools/DataFilterTool";
 
 // Temporary solution
 // because typescript removes
 // unused imports
 var v1:any = [
-	WeaveC3Barchart,
-	WeaveC3ScatterPlot,
-	WeaveC3ColorLegend,
-	WeaveC3BarChartLegend,
-	WeaveC3LineChart,
-	WeaveC3PieChart,
-	WeaveC3Histogram,
+	C3BarChart,
+	C3ScatterPlot,
+	ColorLegend,
+	BarChartLegend,
+	C3LineChart,
+	C3PieChart,
+	C3Histogram,
 	SessionStateMenuTool,
 	WeaveOpenLayersMap,
-	WeaveReactTable,
+	TableTool,
 	DataFilterTool
 ];
 ///////////////////////////////

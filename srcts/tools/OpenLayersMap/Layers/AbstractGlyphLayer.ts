@@ -2,7 +2,7 @@
 ///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
 ///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
-import FeatureLayer from "./FeatureLayer";
+import AbstractFeatureLayer from "./AbstractFeatureLayer";
 import * as lodash from "lodash";
 import * as ol from "openlayers";
 
@@ -18,7 +18,7 @@ interface LocationRecord {
 	id: IQualifiedKey;
 }
 
-abstract class GlyphLayer extends FeatureLayer {
+abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 
 	dataX = Weave.linkableChild(this, DynamicColumn);
 	dataY = Weave.linkableChild(this, DynamicColumn);
@@ -102,5 +102,4 @@ abstract class GlyphLayer extends FeatureLayer {
 		this.updateMetaStyles();
 	}
 }
-
-export default GlyphLayer;
+export default AbstractGlyphLayer;

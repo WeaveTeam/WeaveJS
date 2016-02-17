@@ -17,8 +17,8 @@ var $:JQueryStatic = (jquery as any)["default"];
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 /* eslint-disable */
-import Layer from "./OpenLayersMap/Layers/Layer";
-import FeatureLayer from "./OpenLayersMap/Layers/FeatureLayer";
+import AbstractLayer from "./OpenLayersMap/Layers/AbstractLayer";
+import AbstractFeatureLayer from "./OpenLayersMap/Layers/AbstractFeatureLayer";
 import GeometryLayer from "./OpenLayersMap/Layers/GeometryLayer";
 import TileLayer from "./OpenLayersMap/Layers/TileLayer";
 import ImageGlyphLayer from "./OpenLayersMap/Layers/ImageGlyphLayer";
@@ -75,7 +75,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	showZoomControls = Weave.linkableChild(this, LinkableBoolean);
 	showMouseModeControls = Weave.linkableChild(this, LinkableBoolean);
 	interactionMode = Weave.linkableChild(this, LinkableString);
-	layers = Weave.linkableChild(this, new LinkableHashMap(Layer));
+	layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
 
 	constructor(props:IVisToolProps)
 	{
@@ -321,7 +321,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	{
 		for (let layerName of this.layers.getNames())
 		{
-			let layer: Layer = this.layers.getObject(layerName) as Layer;
+			let layer = this.layers.getObject(layerName) as AbstractLayer;
 			if (layer instanceof TileLayer)
 				return "EPSG:3857";
 		}
@@ -358,7 +358,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		for (let idx in newNames)
 		{
-			let layer:Layer = this.layers.getObject(newNames[idx]) as Layer;
+			let layer = this.layers.getObject(newNames[idx]) as AbstractLayer;
 
 			layer.parent = this;
 

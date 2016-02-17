@@ -30,7 +30,7 @@ declare type Record = {
     label:string
 };
 
-export default class WeaveC3PieChart extends AbstractC3Tool {
+export default class C3PieChart extends AbstractC3Tool {
 
     data = Weave.linkableChild(this, DynamicColumn);
     label = Weave.linkableChild(this, DynamicColumn);
@@ -296,5 +296,5 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
     }
 }
 
-Weave.registerClass("weavejs.tool.C3PieChart", WeaveC3PieChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::PieChartTool", WeaveC3PieChart);
+Weave.registerClass("weavejs.tool.C3PieChart", C3PieChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::PieChartTool", C3PieChart);

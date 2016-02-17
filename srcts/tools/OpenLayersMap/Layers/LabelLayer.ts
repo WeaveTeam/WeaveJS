@@ -6,16 +6,16 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 
 import StandardLib from "../../../utils/StandardLib";
-import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
-import GlyphLayer from "./GlyphLayer";
-import Layer from "./Layer";
+import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
+import AbstractGlyphLayer from "./AbstractGlyphLayer";
+import AbstractLayer from "./AbstractLayer";
 import OpenLayersMapTool from "../../OpenLayersMapTool";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
-class LabelLayer extends GlyphLayer
+class LabelLayer extends AbstractGlyphLayer
 {
 	size = Weave.linkableChild(this, AlwaysDefinedColumn);
 	text = Weave.linkableChild(this, DynamicColumn);
@@ -45,8 +45,8 @@ class LabelLayer extends GlyphLayer
 			let color: string = this.color.getValueFromKey(key, String);
 			let font: string = `${size}px sans-serif`;
 
-			let textColor: string = FeatureLayer.toColorRGBA(color, 1);
-			let fadedTextColor: string = FeatureLayer.toColorRGBA(color, 0.5);
+			let textColor: string = AbstractFeatureLayer.toColorRGBA(color, 1);
+			let fadedTextColor: string = AbstractFeatureLayer.toColorRGBA(color, 0.5);
 
 			let selectedStroke: ol.style.Stroke = new ol.style.Stroke({
 				color: "rgba(128,128,128,0.75)", width: 3

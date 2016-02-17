@@ -46,7 +46,7 @@ const GROUP:string = 'group';
 const STACK:string = 'stack';
 const PERCENT_STACK:string = 'percentStack';
 
-export default class WeaveC3Barchart extends AbstractC3Tool
+export default class C3BarChart extends AbstractC3Tool
 {
     heightColumns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
     labelColumn = Weave.linkableChild(this, DynamicColumn);
@@ -576,5 +576,5 @@ export default class WeaveC3Barchart extends AbstractC3Tool
     }
 }
 
-Weave.registerClass("weavejs.tool.C3BarChart", WeaveC3Barchart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::CompoundBarChartTool", WeaveC3Barchart);
+Weave.registerClass("weavejs.tool.C3BarChart", C3BarChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::CompoundBarChartTool", C3BarChart);

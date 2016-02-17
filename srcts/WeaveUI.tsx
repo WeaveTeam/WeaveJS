@@ -5,17 +5,17 @@
 
 import WeaveLayoutManager from "./WeaveLayoutManager";
 import {IWeaveLayoutManagerProps, IWeaveLayoutManagerState} from "./WeaveLayoutManager";
-import WeaveC3Barchart from "./tools/weave-c3-barchart";
-import WeaveC3ScatterPlot from "./tools/weave-c3-scatterplot";
-import WeaveC3ColorLegend from "./tools/weave-c3-colorlegend";
-import WeaveC3BarChartLegend from "./tools/weave-c3-barchartlegend";
-import WeaveC3LineChart from "./tools/weave-c3-linechart";
-import WeaveC3PieChart from "./tools/weave-c3-piechart";
-import WeaveC3Histogram from "./tools/weave-c3-histogram";
-import WeaveC3Gauge from "./tools/weave-c3-gauge";
+import C3BarChart from "./tools/C3BarChart";
+import C3ScatterPlot from "./tools/C3ScatterPlot";
+import ColorLegend from "./tools/ColorLegend";
+import BarChartLegend from "./tools/BarChartLegend";
+import C3LineChart from "./tools/C3LineChart";
+import C3PieChart from "./tools/C3PieChart";
+import C3Histogram from "./tools/C3Histogram";
+import C3Gauge from "./tools/C3gauge";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
-import WeaveReactTable from "./tools/weave-react-table";
-import SessionStateMenuTool from "./tools/weave-session-state-menu";
+import TableTool from "./tools/TableTool";
+import SessionStateMenuTool from "./tools/SessionStateMenuTool";
 import StandardLib from "./utils/StandardLib";
 import ui from "./react-ui/ui";
 import * as JSZip from "jszip";
@@ -50,15 +50,15 @@ var loadLayout = function(weave:Weave,
 
 export {
     WeaveLayoutManager as Layout,
-    WeaveC3Barchart as Barchart,
-    WeaveC3ScatterPlot as ScatterPlot,
-    WeaveC3ColorLegend as ColorLegend,
-    WeaveC3LineChart as LineChart,
-    WeaveC3PieChart as PieChart,
-    WeaveC3Histogram as Histogram,
-    WeaveC3Gauge as Gauge,
+    C3BarChart as Barchart,
+    C3ScatterPlot as ScatterPlot,
+    ColorLegend as ColorLegend,
+    C3LineChart as LineChart,
+    C3PieChart as PieChart,
+    C3Histogram as Histogram,
+    C3Gauge as Gauge,
     WeaveOpenLayersMap as Map,
-    WeaveReactTable as DataTable,
+    TableTool as DataTable,
     SessionStateMenuTool as MenuTool,
     StandardLib,
     ui,

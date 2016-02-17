@@ -28,7 +28,7 @@ export interface IDataTableState extends IVisToolState {
     columnTitles:{[columnId:string]: string}
 }
 
-export default class WeaveReactTable extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
+export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
 
     columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
     panelTitle = Weave.linkableChild(this, new LinkableString);
@@ -125,5 +125,5 @@ export default class WeaveReactTable extends React.Component<IVisToolProps, IDat
     }
 }
 
-Weave.registerClass("weavejs.tool.Table", WeaveReactTable, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::TableTool", WeaveReactTable);
+Weave.registerClass("weavejs.tool.Table", TableTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::TableTool", TableTool);

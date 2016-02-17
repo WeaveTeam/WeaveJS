@@ -5,7 +5,7 @@
 
 import * as ol from "openlayers";
 import * as lodash from "lodash";
-import FeatureLayer from "./Layers/FeatureLayer";
+import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
 import OpenLayersMapTool from "../OpenLayersMapTool";
 import {IToolTipState} from "../tooltip";
 
@@ -19,7 +19,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 	private topKey: IQualifiedKey;
 	private topZIndex: number;
 	private topKeySet: KeySet;
-	private topLayer: FeatureLayer;
+	private topLayer: AbstractFeatureLayer;
 	private tool: OpenLayersMapTool;
 
 	constructor(tool:OpenLayersMapTool)
@@ -43,7 +43,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 
 		if (zIndex > this.topZIndex)
 		{
-			let weaveLayerObject: FeatureLayer = layer.get("layerObject") as FeatureLayer;
+			let weaveLayerObject = layer.get("layerObject") as AbstractFeatureLayer;
 			if (!weaveLayerObject) return;
 			this.topKeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet || this.topKeySet;
 			this.topZIndex = zIndex;
@@ -78,7 +78,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		for (let layer of map.getLayers().getArray())
 		{
 			if (!ProbeInteraction.layerFilter(layer)) continue;
-			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
+			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 			let keySet: KeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet;
 			if (keySet && keySet != this.topKeySet)
 			{
@@ -117,7 +117,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 	{
 		for (let layer of this.getMap().getLayers().getArray()) {
 			if (!ProbeInteraction.layerFilter(layer)) continue;
-			let weaveLayerObject: FeatureLayer = layer.get("layerObject");
+			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 			let keySet: KeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet;
 			if (keySet) {
 				keySet.clearKeys();

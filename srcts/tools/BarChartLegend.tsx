@@ -29,7 +29,7 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 
-export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
+export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
 
     private chartColors = Weave.linkableChild(this, ColorRamp);
     private columns = Weave.linkableChild(this, new LinkableHashMap(ReferencedColumn));
@@ -192,5 +192,5 @@ export default class WeaveC3BarChartLegend extends React.Component<IVisToolProps
     }
 }
 
-Weave.registerClass("weavejs.tool.BarChartLegend", WeaveC3BarChartLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::BarChartLegendTool", WeaveC3BarChartLegend);
+Weave.registerClass("weavejs.tool.BarChartLegend", BarChartLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::BarChartLegendTool", BarChartLegend);

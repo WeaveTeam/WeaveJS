@@ -6,9 +6,9 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 
 import StandardLib from "../../../utils/StandardLib";
-import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
-import GlyphLayer from "./GlyphLayer";
-import Layer from "./Layer";
+import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
+import AbstractGlyphLayer from "./AbstractGlyphLayer";
+import AbstractLayer from "./AbstractLayer";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableNumber = weavejs.core.LinkableNumber;
@@ -20,7 +20,7 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
-export default class ScatterPlotLayer extends GlyphLayer {
+export default class ScatterPlotLayer extends AbstractGlyphLayer {
 
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
@@ -88,14 +88,14 @@ export default class ScatterPlotLayer extends GlyphLayer {
 
 		for (let record of styleRecords)
 		{
-			let olStroke = FeatureLayer.olStrokeFromWeaveStroke(record.stroke);
-			let olFill = FeatureLayer.olFillFromWeaveFill(record.fill);
+			let olStroke = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke);
+			let olFill = AbstractFeatureLayer.olFillFromWeaveFill(record.fill);
 
-			let olStrokeFaded = FeatureLayer.olStrokeFromWeaveStroke(record.stroke, 0.5);
-			let olFillFaded = FeatureLayer.olFillFromWeaveFill(record.fill, 0.5);
+			let olStrokeFaded = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke, 0.5);
+			let olFillFaded = AbstractFeatureLayer.olFillFromWeaveFill(record.fill, 0.5);
 
-			let olSelectionStyle = FeatureLayer.getOlSelectionStyle(olStroke);
-			let olProbedStyle = FeatureLayer.getOlProbedStyle(olStroke);
+			let olSelectionStyle = AbstractFeatureLayer.getOlSelectionStyle(olStroke);
+			let olProbedStyle = AbstractFeatureLayer.getOlProbedStyle(olStroke);
 
 			let normalStyle = [new ol.style.Style({
 				image: new ol.style.Circle({

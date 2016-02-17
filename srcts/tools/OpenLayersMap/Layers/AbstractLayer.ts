@@ -14,7 +14,7 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableString = weavejs.core.LinkableString;
 import WeaveAPI = weavejs.WeaveAPI;
 
-/*abstract*/ class Layer implements ILinkableObject {
+export default class AbstractLayer implements ILinkableObject {
 
 	opacity = Weave.linkableChild(this, LinkableNumber);
 	visible = Weave.linkableChild(this, LinkableBoolean);
@@ -109,4 +109,3 @@ import WeaveAPI = weavejs.WeaveAPI;
 		}
 	}
 }
-export default Layer;

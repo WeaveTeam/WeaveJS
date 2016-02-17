@@ -3,8 +3,8 @@
 ///<reference path="../../../../typings/weave/weavejs.d.ts"/>
 
 import * as ol from "openlayers";
-import {FeatureLayer, MetaStyleProperties} from "./FeatureLayer";
-import Layer from "./Layer";
+import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
+import AbstractLayer from "./AbstractLayer";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -16,7 +16,7 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 
-export default class GeometryLayer extends FeatureLayer {
+export default class GeometryLayer extends AbstractFeatureLayer {
 
 	geoJsonParser:ol.format.GeoJSON;
 
@@ -121,12 +121,12 @@ export default class GeometryLayer extends FeatureLayer {
 			record.fill = this.fill.getStyle(key);
 			record.stroke = this.line.getStyle(key);
 
-			let olStroke = FeatureLayer.olStrokeFromWeaveStroke(record.stroke);
+			let olStroke = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke);
 
-			let olFill = FeatureLayer.olFillFromWeaveFill(record.fill);
+			let olFill = AbstractFeatureLayer.olFillFromWeaveFill(record.fill);
 
-			let olStrokeFaded = FeatureLayer.olStrokeFromWeaveStroke(record.stroke, 0.5);
-			let olFillFaded = FeatureLayer.olFillFromWeaveFill(record.fill, 0.5);
+			let olStrokeFaded = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke, 0.5);
+			let olFillFaded = AbstractFeatureLayer.olFillFromWeaveFill(record.fill, 0.5);
 
 			let normalStyle = [new ol.style.Style({
 				fill: fillEnabled ? olFill : undefined,
@@ -140,8 +140,8 @@ export default class GeometryLayer extends FeatureLayer {
 				zIndex: 0
 			})];
 
-			let selectedStyle = (strokeEnabled || fillEnabled) && FeatureLayer.getOlSelectionStyle(olStroke);
-			let probedStyle = (strokeEnabled || fillEnabled) && FeatureLayer.getOlProbedStyle(olStroke);
+			let selectedStyle = (strokeEnabled || fillEnabled) && AbstractFeatureLayer.getOlSelectionStyle(olStroke);
+			let probedStyle = (strokeEnabled || fillEnabled) && AbstractFeatureLayer.getOlProbedStyle(olStroke);
 
 			let feature = this.source.getFeatureById(record.id);
 

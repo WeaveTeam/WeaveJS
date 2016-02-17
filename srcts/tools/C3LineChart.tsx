@@ -34,7 +34,7 @@ declare type Record = {
 };
 
 
-export default class WeaveC3LineChart extends AbstractC3Tool {
+export default class C3LineChart extends AbstractC3Tool {
 
     columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
     line = Weave.linkableChild(this, SolidLineStyle);
@@ -444,5 +444,5 @@ export default class WeaveC3LineChart extends AbstractC3Tool {
     }
 }
 
-Weave.registerClass("weavejs.tool.C3LineChart", WeaveC3LineChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::LineChartTool", WeaveC3LineChart);
+Weave.registerClass("weavejs.tool.C3LineChart", C3LineChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::LineChartTool", C3LineChart);

@@ -34,7 +34,7 @@ declare type Record = {
 	columnToAggregate: number
 };
 
-export default class WeaveC3Histogram extends AbstractC3Tool {
+export default class C3Histogram extends AbstractC3Tool {
 	binnedColumn = Weave.linkableChild(this, BinnedColumn);
 	columnToAggregate = Weave.linkableChild(this, DynamicColumn);
 	aggregationMethod = Weave.linkableChild(this, LinkableString);
@@ -471,6 +471,6 @@ export default class WeaveC3Histogram extends AbstractC3Tool {
     }
 }
 
-Weave.registerClass("weavejs.tool.C3Histogram", WeaveC3Histogram, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::HistogramTool", WeaveC3Histogram);
-Weave.registerClass("weave.visualization.tools::ColormapHistogramTool", WeaveC3Histogram);
+Weave.registerClass("weavejs.tool.C3Histogram", C3Histogram, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::HistogramTool", C3Histogram);
+Weave.registerClass("weave.visualization.tools::ColormapHistogramTool", C3Histogram);

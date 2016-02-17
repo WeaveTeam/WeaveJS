@@ -5,8 +5,8 @@
 
 import * as ol from "openlayers";
 import * as lodash from "lodash";
-import FeatureLayer from "./Layers/FeatureLayer";
-import Layer from "./Layers/Layer";
+import FeatureLayer from "./Layers/AbstractFeatureLayer";
+import AbstractLayer from "./Layers/AbstractLayer";
 import ProbeInteraction from "./ProbeInteraction";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -77,7 +77,7 @@ export default class DragSelection extends ol.interaction.DragBox
 
 		for (let olLayer of this.getMap().getLayers().getArray()) {
 			let selectable: boolean = <boolean>olLayer.get("selectable");
-			let weaveLayer: Layer = olLayer.get("layerObject");
+			let weaveLayer: AbstractLayer = olLayer.get("layerObject");
 
 			if (weaveLayer instanceof FeatureLayer && selectable) {
 				let source: ol.source.Vector = <ol.source.Vector>(<ol.layer.Vector>olLayer).getSource();

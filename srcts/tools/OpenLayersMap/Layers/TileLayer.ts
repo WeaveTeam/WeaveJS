@@ -4,13 +4,13 @@
 
 import * as ol from "openlayers";
 import * as lodash from "lodash";
-import Layer from "./Layer";
+import AbstractLayer from "./AbstractLayer";
 
 
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 
-export default class TileLayer extends Layer {
+export default class TileLayer extends AbstractLayer {
 
 	oldProviderName:string;
 

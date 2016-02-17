@@ -5,10 +5,10 @@
 
 import * as jquery from "jquery";
 import * as ol from "openlayers";
-import GlyphLayer from "./GlyphLayer";
-import FeatureLayer from "./FeatureLayer";
+import AbstractGlyphLayer from "./AbstractGlyphLayer";
+import AbstractFeatureLayer from "./AbstractFeatureLayer";
 import ImageGlyphCache from "./ImageGlyphCache";
-import Layer from "./Layer";
+import AbstractLayer from "./AbstractLayer";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -18,7 +18,7 @@ import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-export default class ImageGlyphLayer extends GlyphLayer {
+export default class ImageGlyphLayer extends AbstractGlyphLayer {
 
 	private imageGlyphCache:ImageGlyphCache;
 
@@ -125,7 +125,7 @@ export default class ImageGlyphLayer extends GlyphLayer {
 			}
 
 			let imageSize = Number(record.imageSize || NaN);
-			let color = FeatureLayer.toColorRGBA(record.color, record.alpha);
+			let color = AbstractFeatureLayer.toColorRGBA(record.color, record.alpha);
 
 			if (!record.imageURL)
 			{

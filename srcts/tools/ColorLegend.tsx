@@ -34,7 +34,7 @@ const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 const SHAPE_TYPE_BOX:string = "box";
 
-export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties
+export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties
 {
 	panelTitle = Weave.linkableChild(this, LinkableString);
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -341,5 +341,5 @@ export default class WeaveC3ColorLegend extends React.Component<IVisToolProps, I
 	}
 }
 
-Weave.registerClass("weavejs.tool.ColorLegend", WeaveC3ColorLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::ColorBinLegendTool", WeaveC3ColorLegend);
+Weave.registerClass("weavejs.tool.ColorLegend", ColorLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::ColorBinLegendTool", ColorLegend);

@@ -5,7 +5,7 @@
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 
-import Layer from "./Layer";
+import AbstractLayer from "./AbstractLayer";
 import StandardLib from "../../../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -14,7 +14,7 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeySet = weavejs.data.key.DynamicKeySet;
 import IKeySet = weavejs.api.data.IKeySet;
 
-export abstract class FeatureLayer extends Layer {
+export abstract class AbstractFeatureLayer extends AbstractLayer {
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
 	private updateMetaStyle:Function;
 	private debounced_updateMetaStyles:Function;
@@ -64,7 +64,7 @@ export abstract class FeatureLayer extends Layer {
 	{
 		let propertyName = objectEvent.key;
 
-		if (!lodash.contains(FeatureLayer.Styles, propertyName))
+		if (!lodash.contains(AbstractFeatureLayer.Styles, propertyName))
 		{
 			/* The property that changed isn't one of our metaStyle properties, so we don't care. */
 			return;
@@ -113,7 +113,7 @@ export abstract class FeatureLayer extends Layer {
 
 	static toColorRGBA(colorString:any, alpha:any)
 	{
-		var colorArray = FeatureLayer.toColorArray(colorString, alpha);
+		var colorArray = AbstractFeatureLayer.toColorArray(colorString, alpha);
 		return ol.color.asString(colorArray);
 	}
 
@@ -251,7 +251,7 @@ export abstract class FeatureLayer extends Layer {
 	{
 		if (fade === undefined) fade = 1;
 
-		let color = fill.color && FeatureLayer.toColorArray(fill.color, fill.alpha * fade) || [0, 0, 0, 0];
+		let color = fill.color && AbstractFeatureLayer.toColorArray(fill.color, fill.alpha * fade) || [0, 0, 0, 0];
 		return new ol.style.Fill({color});
 	}
 
@@ -259,7 +259,7 @@ export abstract class FeatureLayer extends Layer {
 	{
 		if (fade === undefined) fade = 1;
 
-		let color:Array<number> = (stroke.color !== undefined && stroke.color !== null) && FeatureLayer.toColorArray(stroke.color, stroke.alpha * fade) || [0, 0, 0, 1];
+		let color:Array<number> = (stroke.color !== undefined && stroke.color !== null) && AbstractFeatureLayer.toColorArray(stroke.color, stroke.alpha * fade) || [0, 0, 0, 1];
 
 		let lineCap:string = stroke.lineCap === "none" ? "butt" : stroke.lineCap || "round";
 		let lineJoin:string = stroke.lineJoin === null ? "round" : stroke.lineJoin || "round";
@@ -278,14 +278,14 @@ export abstract class FeatureLayer extends Layer {
 				new ol.style.Style({
 					stroke: new ol.style.Stroke({
 						color: [0, 0, 0, 1],
-						width: width + FeatureLayer.PROBE_HALO_WIDTH + FeatureLayer.PROBE_LINE_WIDTH
+						width: width + AbstractFeatureLayer.PROBE_HALO_WIDTH + AbstractFeatureLayer.PROBE_LINE_WIDTH
 					}),
 					zIndex: Number.MAX_SAFE_INTEGER - 2
 				}),
 				new ol.style.Style({
 					stroke: new ol.style.Stroke({
 						color: [255, 255, 255, 1],
-						width: width + FeatureLayer.PROBE_HALO_WIDTH
+						width: width + AbstractFeatureLayer.PROBE_HALO_WIDTH
 					}),
 					zIndex: Number.MAX_SAFE_INTEGER - 1
 				})
@@ -302,7 +302,7 @@ export abstract class FeatureLayer extends Layer {
 		return [new ol.style.Style({
 				stroke: new ol.style.Stroke({
 					color: [0, 0, 0, 0.5],
-					width: width + FeatureLayer.SELECT_WIDTH,
+					width: width + AbstractFeatureLayer.SELECT_WIDTH,
 					lineCap, lineJoin, miterLimit}),
 				zIndex: Number.MAX_SAFE_INTEGER - 4
 		})];
@@ -326,4 +326,4 @@ export interface MetaStyleProperties {
 	probedStyle: ol.style.Style|Array<ol.style.Style>;
 };
 
-export default FeatureLayer;
+export default AbstractFeatureLayer;

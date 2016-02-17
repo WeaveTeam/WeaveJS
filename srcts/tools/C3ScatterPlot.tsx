@@ -40,7 +40,7 @@ declare type Record = {
 	line: { color: string }
 };
 
-export default class WeaveC3ScatterPlot extends AbstractC3Tool
+export default class C3ScatterPlot extends AbstractC3Tool
 {
 	dataX = Weave.linkableChild(this, DynamicColumn);
 	dataY = Weave.linkableChild(this, DynamicColumn);
@@ -430,5 +430,5 @@ export default class WeaveC3ScatterPlot extends AbstractC3Tool
 	}
 }
 
-Weave.registerClass("weavejs.tool.C3ScatterPlot", WeaveC3ScatterPlot, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::ScatterPlotTool", WeaveC3ScatterPlot);
+Weave.registerClass("weavejs.tool.C3ScatterPlot", C3ScatterPlot, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.visualization.tools::ScatterPlotTool", C3ScatterPlot);
