@@ -1867,6 +1867,7 @@ declare module weavejs.api.data {
         static getSuggestions(): Array<string>;
         static ADDITIONAL_SUGGESTIONS: Array<string>;
         static FOR_AUTO_DETECT: Array<string>;
+        static convertDateFormat_c_to_moment(format: string): string;
     }
 }
 declare module weavejs.api.data {
@@ -3942,6 +3943,10 @@ declare module weavejs.core {
      * @author adufilie
      */
     class WeaveArchive {
+        /**
+         * This must be set externally.
+         */
+        static JSZip: new (..._: any[]) => any;
         /**
          * @param input A Weave file to decode.
          */
@@ -7263,6 +7268,26 @@ declare module weavejs.geom {
     }
 }
 declare module weavejs.geom {
+    import LinkableVariable = weavejs.core.LinkableVariable;
+    import Bounds2D = weavejs.geom.Bounds2D;
+    /**
+     * This is a linkable version of a Bounds2D object.
+     *
+     * @author adufilie
+     */
+    class LinkableBounds2D extends LinkableVariable {
+        constructor();
+        setSessionState(value: Object): void;
+        xMin: number;
+        yMin: number;
+        xMax: number;
+        yMax: number;
+        setBounds(xMin: number, yMin: number, xMax: number, yMax: number): void;
+        copyFrom(sourceBounds: Bounds2D): void;
+        copyTo(destinationBounds: Bounds2D): void;
+    }
+}
+declare module weavejs.geom {
     /**
      * This class defines a 1-dimensional continuous range of values by begin and end values.
      * The difference between the begin and end values can be either positive or negative.
@@ -8656,9 +8681,14 @@ declare module weavejs.util {
 }
 declare module weavejs.util {
     class DateUtils {
-        static date_parse(date: string, fmt: string, force_utc?: boolean, force_local?: boolean): any;
-        static date_format(date: Object, fmt: string): string;
-        static dates_detect(dates: any, formats: any[]): any[];
+        /**
+         * This must be set externally.
+         */
+        static moment: Object;
+        static parse(date: Object, moment_fmt: string, force_utc?: boolean, force_local?: boolean): Date;
+        static format(date: Object, moment_fmt: string): string;
+        static formatDuration(date: Object): string;
+        static detectFormats(dates: Array<string>, moment_formats: Array<string>): Array<string>;
     }
 }
 declare module weavejs.util {
@@ -8801,12 +8831,6 @@ declare module weavejs.util {
          * AS->JS Language helper to get the global scope
          */
         static global: Object;
-        /**
-         * This must be set externally.
-         */
-        static JSZip: new (..._: any[]) => any;
-
-        static moment: new (..._: any[]) => any;
         /**
          * Calls console.error()
          */

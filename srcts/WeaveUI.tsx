@@ -25,8 +25,8 @@ import * as moment from "moment";
 
 
 var stub:any = React;
-weavejs.util.JS.JSZip = (JSZip as any)['default'];
-weavejs.util.JS.moment = (moment as any)['default'];
+weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
+weavejs.util.DateUtils.moment = (moment as any)['default'];
 
 Weave.registerAsyncClass(React.Component);
 
