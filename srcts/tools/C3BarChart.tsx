@@ -182,7 +182,7 @@ export default class C3BarChart extends AbstractC3Tool
                         	this.probeKeySet.replaceKeys([]);;
                         
 						var record:Record = this.records[d.index];
-						var columnNamesToValue:{[columnName:string] : string|number } = {};
+						var columnNamesToValue:{[columnName:string] : string} = {};
                         var columnNamesToColor:{[columnName:string] : string} = {};
                         
 						var qKey:IQualifiedKey = this.records[d.index].id;
@@ -192,7 +192,7 @@ export default class C3BarChart extends AbstractC3Tool
 							var column = columns[index]; 
 							var columnName:string = column.getMetadata("title");
 							var color = this.chartColors.getColorFromNorm(Number(index) / (columns.length - 1));
-							columnNamesToValue[columnName] = column.getValueFromKey(qKey, Number);
+							columnNamesToValue[columnName] = column.getValueFromKey(qKey, String);
 							// columnNamesToColor can be done only on heightColumns change.
 							columnNamesToColor[columnName] = "#" + weavejs.util.StandardLib.numberToBase(color, 16, 6);
 						}
@@ -489,8 +489,8 @@ export default class C3BarChart extends AbstractC3Tool
 														  this.margin.top,
 														  this.margin.left,
 														  this.margin.right,
-														  this.overrideYMax,
-														  this.overrideYMin);
+														  this.overrideBounds,
+														  this.overrideBounds);
         var axisSettingsChange:boolean = Weave.detectChange(this, this.xAxisName, this.yAxisName);
         if (axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet))
         {
@@ -537,29 +537,8 @@ export default class C3BarChart extends AbstractC3Tool
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-            this.c3Config.padding.top = this.margin.top.value;
-            this.c3Config.axis.x.height = this.margin.bottom.value;
-
-            if(weavejs.WeaveAPI.Locale.reverseLayout){
-                this.c3Config.padding.left = this.margin.right.value;
-                this.c3Config.padding.right = this.margin.left.value;
-            } else {
-                this.c3Config.padding.left = this.margin.left.value;
-                this.c3Config.padding.right = this.margin.right.value;
-            }
-
-            if(!isNaN(this.overrideYMax.value)) {
-                this.c3Config.axis.y.max = this.overrideYMax.value;
-            }else{
-                this.c3Config.axis.y.max = null;
-            }
-
-            if(!isNaN(this.overrideYMin.value)) {
-                this.c3Config.axis.y.min = this.overrideYMin.value;
-            } else {
-                this.c3Config.axis.y.min = null;
-            }
-
+			this.updateConfigMargin();
+			this.updateConfigAxisY();
         }
         if (Weave.detectChange(this, this.horizontalMode))
         {

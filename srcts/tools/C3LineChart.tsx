@@ -13,8 +13,7 @@ import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import {MouseEvent} from "react";
-import {getTooltipContent} from "./ToolTip";
-import Tooltip from "./ToolTip";
+import ToolTip from "./ToolTip";
 import StandardLib from "../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -32,7 +31,6 @@ declare type Record = {
     columns: IAttributeColumn[],
     line: {color: string }
 };
-
 
 export default class C3LineChart extends AbstractC3Tool {
 
@@ -135,16 +133,11 @@ export default class C3LineChart extends AbstractC3Tool {
 						return;
 					var key = record.id;
                     this.probeKeySet.replaceKeys([key]);
-                    var columnNamesToValue:{[columnName:string] : string|number } = {};
-                    this.columnLabels.forEach( (label:string,index:number,array:any[]) => {
-                        columnNamesToValue[label] = this.columns.getObjects()[index].getValueFromKey(key);
-                    });
-
                     this.props.toolTip.setState({
                         x: this.chart.internal.d3.event.pageX,
                         y: this.chart.internal.d3.event.pageY,
                         showToolTip: true,
-                        columnNamesToValue: columnNamesToValue
+                        columnNamesToValue: ToolTip.getToolTipData(this, key, this.columns.getObjects() as IAttributeColumn[])
                     });
                 },
                 onmouseout: (d:any) => {
@@ -311,7 +304,7 @@ export default class C3LineChart extends AbstractC3Tool {
         this.dirty = false;
 
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideYMax);
+        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds);
         if (axisChange || Weave.detectChange(this, this.curveType, this.line, this.filteredKeySet))
         {
             changeDetected = true;
@@ -410,21 +403,8 @@ export default class C3LineChart extends AbstractC3Tool {
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-            this.c3Config.padding.top =  this.margin.top.value;
-            this.c3Config.axis.x.height =  this.margin.bottom.value;
-            if(weavejs.WeaveAPI.Locale.reverseLayout){
-                this.c3Config.padding.left =  this.margin.right.value;
-                this.c3Config.padding.right = this.margin.left.value;
-            }else{
-                this.c3Config.padding.left = this.margin.left.value;
-                this.c3Config.padding.right = this.margin.right.value;
-            }
-
-            if(!isNaN(this.overrideYMax.value)) {
-                this.c3Config.axis.y.max = this.overrideYMax.value;
-            } else {
-                this.c3Config.axis.y.max = null;
-            }
+			this.updateConfigMargin();
+			this.updateConfigAxisY();
         }
 
         if (changeDetected || forced)

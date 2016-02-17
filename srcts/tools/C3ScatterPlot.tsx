@@ -14,8 +14,7 @@ import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import {MouseEvent} from "react";
-import {getTooltipContent} from "./ToolTip";
-import Tooltip from "./ToolTip";
+import ToolTip from "./ToolTip";
 import * as ReactDOM from "react-dom";
 import StandardLib from "../utils/StandardLib";
 
@@ -146,28 +145,15 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				},
 				onmouseover: (d) => {
 					if(d && d.hasOwnProperty("index")) {
-						var columnNamesToValue:{[columnName:string] : string|number } = {};
-						var xValue:number = this.records[d.index].point.x;
-						if(xValue) {
-							columnNamesToValue[this.dataX.getMetadata('title')] = xValue;
-						}
-
-						var yValue:number = this.records[d.index].point.y;
-						if(yValue) {
-							columnNamesToValue[this.dataY.getMetadata('title')] = yValue;
-						}
-
-						var size:number = this.records[d.index].size;
-						if (size) {
-							columnNamesToValue[this.radius.getMetadata('title')] = size;
-						}
+						var key:IQualifiedKey = this.records[d.index].id;
 						if (this.probeKeySet)
-							this.probeKeySet.replaceKeys([this.records[d.index].id]);
+							this.probeKeySet.replaceKeys([key]);
+						var data = ToolTip.getToolTipData(this, key, [this.dataX, this.dataY, this.radiusData]);
 						this.props.toolTip.setState({
 							x: this.chart.internal.d3.event.pageX,
 							y: this.chart.internal.d3.event.pageY,
 							showToolTip: true,
-							columnNamesToValue: columnNamesToValue
+							columnNamesToValue: data
 						});
 					}
 				},
@@ -395,19 +381,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
 			this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-			this.c3Config.padding.top = Number(this.margin.top.value);
-			this.c3Config.axis.x.height = Number(this.margin.bottom.value);
-
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
-			{
-				this.c3Config.padding.left = Number(this.margin.right.value);
-				this.c3Config.padding.right = Number(this.margin.left.value);
-			}
-			else
-			{
-				this.c3Config.padding.left = Number(this.margin.left.value);
-				this.c3Config.padding.right = Number(this.margin.right.value);
-			}
+			this.updateConfigMargin();
 		}
 
 		if (forced || dataChanged || axisChanged)

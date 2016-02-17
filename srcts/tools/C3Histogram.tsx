@@ -14,8 +14,7 @@ import {ChartConfiguration, ChartAPI} from "c3";
 import FormatUtils from "../utils/FormatUtils";
 import StandardLib from "../utils/StandardLib"
 import {MouseEvent} from "react";
-import {getTooltipContent} from "./ToolTip";
-import Tooltip from "./ToolTip";
+import ToolTip from "./ToolTip";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -418,9 +417,9 @@ export default class C3Histogram extends AbstractC3Tool {
         {
             changeDetected = true;
             var xLabel:string = this.xAxisName.value || this.binnedColumn.getMetadata('title');
-            if(!this.showXAxisLabel){
+            if (!this.showXAxisLabel)
                 xLabel = " ";
-            }var yLabel:string = this.getYAxisLabel.bind(this)();
+            var yLabel:string = this.getYAxisLabel.bind(this)();
 
 
             if (this.records)
@@ -445,15 +444,7 @@ export default class C3Histogram extends AbstractC3Tool {
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-            this.c3Config.padding.top = this.margin.top.value;
-            this.c3Config.axis.x.height = this.margin.bottom.value;
-            if(weavejs.WeaveAPI.Locale.reverseLayout){
-                this.c3Config.padding.left = this.margin.right.value;
-                this.c3Config.padding.right = this.margin.left.value;
-            }else{
-                this.c3Config.padding.left = this.margin.left.value;
-                this.c3Config.padding.right = this.margin.right.value;
-            }
+			this.updateConfigMargin();
         }
 
         if (changeDetected || forced)

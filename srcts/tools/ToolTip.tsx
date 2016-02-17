@@ -6,46 +6,14 @@ import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-export function getTooltipContent(
-                                    columnNamesToValue:{[columnName:string]: string|number},
-                                    title?:string,
-                                    nameFormat?:Function,
-                                    valueFormat?:Function,
-                                    titleFormat?:Function,
-                                    toolTipClass?:string,
-                                    columnNamesToColor?:{[columnName:string]: string}
-                                ):string
-{
-    nameFormat = nameFormat || _.identity;
-    valueFormat = valueFormat || _.identity;
-    titleFormat = titleFormat || _.identity;
-    toolTipClass = toolTipClass || "c3-tooltip";
-
-    var template:string = "";
-
-    var columnNames:string[] = Object.keys(columnNamesToValue);
-    if(columnNames.length) {
-        template += "<table class='" + toolTipClass + "'>" +  titleFormat((title ? "<tr><th colspan='2'>" + title + "</th></tr>" : ""))
-
-        columnNames.forEach((columnName:string) => {
-            template += "<tr>";
-            template += "<td class='name'>";
-            if(columnNamesToColor && columnNamesToColor[columnName]){
-                template += "<span style=" + "'background-color': " + this.state.columnNamesToColor[columnName] + "/>";
-            }
-            template += "<div style='display':'inline'>" + nameFormat(columnName) + "</div></td>";
-            template += "<td class='value'>" + valueFormat(columnNamesToValue[columnName]) + "</td>";
-            template += "</tr>";
-        });
-        template += "</table>";
-    }
-
-    return template;
-}
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import ILinkableObject = weavejs.api.core.ILinkableObject;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
 export interface IToolTipProps extends React.Props<ToolTip>{
     toolTipClass?:string;
-    tooltipContainerClass?:string;
+    toolTipContainerClass?:string;
     nameFormat?:Function;
     valueFormat?:Function;
     titleFormat?:Function;
@@ -55,7 +23,7 @@ export interface IToolTipState {
     x?:number;
     y?:number;
     title?:string;
-    columnNamesToValue?:{[columnName:string]: string|number};
+    columnNamesToValue?:{[columnName:string]: string};
     columnNamesToColor?:{[columnName:string]: string};
     showToolTip?:boolean;
 }
@@ -66,7 +34,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
     private valueFormat:Function;
     private titleFormat:Function;
     private toolTipClass:string;
-    private tooltipContainerClass:string;
+    private toolTipContainerClass:string;
     private toolTipOffset:number;
     private containerStyle:React.CSSProperties;
     private element:HTMLElement;
@@ -78,7 +46,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
         this.valueFormat = this.props.valueFormat || _.identity;
         this.titleFormat = this.props.titleFormat || _.identity;
         this.toolTipClass = this.props.toolTipClass || "c3-tooltip";
-        this.tooltipContainerClass = this.props.tooltipContainerClass || "c3-tooltip-container";
+        this.toolTipContainerClass = this.props.toolTipContainerClass || "c3-tooltip-container";
         this.toolTipOffset = 10;
 
         this.state = {
@@ -189,7 +157,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             }
 
             return (
-                <div style={style} ref={(c:HTMLElement) => { this.element = c }} className={this.tooltipContainerClass}>
+                <div style={style} ref={(c:HTMLElement) => { this.element = c }} className={this.toolTipContainerClass}>
                 <table className={this.toolTipClass}>
                     <tbody>
                         {
@@ -205,4 +173,66 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
         }
     }
 
+	static getToolTipData(context:ILinkableObject, key:IQualifiedKey, additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
+	{
+		let columnHashMap = Weave.getRoot(context).getObject("Probed Columns") as ILinkableHashMap;
+
+		var result:{[columnName: string]: string} = {};
+
+		for (let child of (columnHashMap.getObjects() as IAttributeColumn[]).concat(additionalColumns))
+		{
+			let title:string = child.getMetadata("title");
+			let value:string = child.getValueFromKey(key, String);
+			if (value)
+			{
+				result[title] = value;
+			}
+		}
+
+		return result;
+	}
+	
+	static getToolTipTitle(context:ILinkableObject, key:IQualifiedKey): string
+	{
+		let titleHashMap = Weave.getRoot(context).getObject("Probe Header Columns") as ILinkableHashMap;
+
+		return _.map(titleHashMap.getObjects(), (d:any) => d.getValueFromKey(key, String)).join(", ");
+	}
+
+	static getToolTipContent(
+	                                    columnNamesToValue:{[columnName:string]: string},
+	                                    title?:string,
+	                                    nameFormat?:Function,
+	                                    valueFormat?:Function,
+	                                    titleFormat?:Function,
+	                                    toolTipClass?:string,
+	                                    columnNamesToColor?:{[columnName:string]: string}
+	                                ):string
+	{
+	    nameFormat = nameFormat || _.identity;
+	    valueFormat = valueFormat || _.identity;
+	    titleFormat = titleFormat || _.identity;
+	    toolTipClass = toolTipClass || "c3-tooltip";
+	
+	    var template:string = "";
+	
+	    var columnNames:string[] = Object.keys(columnNamesToValue);
+	    if(columnNames.length) {
+	        template += "<table class='" + toolTipClass + "'>" +  titleFormat((title ? "<tr><th colspan='2'>" + title + "</th></tr>" : ""))
+	
+	        columnNames.forEach((columnName:string) => {
+	            template += "<tr>";
+	            template += "<td class='name'>";
+	            if(columnNamesToColor && columnNamesToColor[columnName]){
+	                template += "<span style=" + "'background-color': " + columnNamesToColor[columnName] + "/>";
+	            }
+	            template += "<div style='display':'inline'>" + nameFormat(columnName) + "</div></td>";
+	            template += "<td class='value'>" + valueFormat(columnNamesToValue[columnName]) + "</td>";
+	            template += "</tr>";
+	        });
+	        template += "</table>";
+	    }
+	
+	    return template;
+	}
 }

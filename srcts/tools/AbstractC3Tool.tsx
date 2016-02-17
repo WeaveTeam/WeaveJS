@@ -2,8 +2,9 @@
 ///<reference path="../../typings/react/react-dom.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 ///<reference path="../../typings/d3/d3.d.ts"/>
-/// <reference path="../../typings/c3/c3.d.ts"/>
+///<reference path="../../typings/c3/c3.d.ts"/>
 
+import AbstractVisTool from "./AbstractVisTool";
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import {ChartAPI, ChartConfiguration} from "c3";
 
@@ -26,16 +27,9 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
-export class Margin {
-    top = Weave.linkableChild(this, new LinkableNumber(20));
-    bottom = Weave.linkableChild(this, new LinkableNumber(100));
-    left = Weave.linkableChild(this, new LinkableNumber(100));
-    right = Weave.linkableChild(this, new LinkableNumber(20));
-}
+function finiteOrNull(n:number):number { return isFinite(n) ? n : null; }
 
-Weave.registerClass("weavejs.tool.Margin", Margin);
-
-export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
+export default class AbstractC3Tool extends AbstractVisTool
 {
     constructor(props:IVisToolProps)
 	{
@@ -60,19 +54,6 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 		this.chart.destroy();
 	}
 
-	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
-
-	xAxisName = Weave.linkableChild(this, LinkableString);
-	yAxisName = Weave.linkableChild(this, LinkableString);
-
-    margin = Weave.linkableChild(this, Margin);
-
-	panelTitle = Weave.linkableChild(this, LinkableString);
-    overrideYMin = Weave.linkableChild(this, LinkableNumber);
-    overrideYMax = Weave.linkableChild(this, LinkableNumber);
-
 	protected element:HTMLElement;
     protected chart:ChartAPI;
     protected c3Config:ChartConfiguration;
@@ -82,54 +63,6 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 
     private previousWidth:number;
     private previousHeight:number;
-
-	protected get selectionKeySet()
-	{
-		var keySet = this.selectionFilter.target as KeySet;
-		return keySet instanceof KeySet ? keySet : null;
-	}
-	protected isSelected(key:IQualifiedKey):boolean
-	{
-		var keySet = this.selectionFilter.target as KeySet;
-		return keySet instanceof KeySet && keySet.containsKey(key);
-	}
-	 
-	protected get probeKeySet()
-	{
-		var keySet = this.probeFilter.target as KeySet;
-		return keySet instanceof KeySet ? keySet : null;
-	}
-	protected isProbed(key:IQualifiedKey):boolean
-	{
-		var keySet = this.probeFilter.target as KeySet;
-		return keySet instanceof KeySet && keySet.containsKey(key);
-	} 
-
-    get deprecatedStateMapping():Object
-	{
-		return {
-			"children": {
-				"visualization": {
-					"plotManager": {
-						"marginBottom": this.margin.bottom,
-						"marginRight": this.margin.right,
-						"marginLeft": this.margin.left,
-						"marginTop": this.margin.top,
-                        "overrideYMax": this.overrideYMax,
-                        "overrideYMin": this.overrideYMin,
-                        "plotters": {
-							"yAxis": {
-								"overrideAxisName": this.yAxisName
-							},
-							"xAxis": {
-								"overrideAxisName": this.xAxisName
-							}
-						}
-					}
-				}
-			}
-		};
-	}
 
 	handlePointClick(event:MouseEvent):void
 	{
@@ -168,10 +101,6 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 		}
 	}
 	
-    get title():string {
-       return this.panelTitle.value;
-    }
-
     get internalWidth():number {
         return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
     }
@@ -179,7 +108,32 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
     get internalHeight():number {
         return this.props.style.height - this.c3Config.padding.top - Number(this.margin.bottom.value);
     }
+	
+	protected updateConfigMargin()
+	{
+	    this.c3Config.padding.top = this.margin.top.value;
+	    this.c3Config.axis.x.height = this.margin.bottom.value;
+	    if(weavejs.WeaveAPI.Locale.reverseLayout){
+	        this.c3Config.padding.left = this.margin.right.value;
+	        this.c3Config.padding.right = this.margin.left.value;
+	    }else{
+	        this.c3Config.padding.left = this.margin.left.value;
+	        this.c3Config.padding.right = this.margin.right.value;
+	    }
+	}
+	
+	protected updateConfigAxisX()
+	{
+		this.c3Config.axis.x.min = finiteOrNull(this.overrideBounds.xMin.value);
+        this.c3Config.axis.x.max = finiteOrNull(this.overrideBounds.xMax.value);
+	}
 
+	protected updateConfigAxisY()
+	{
+		this.c3Config.axis.y.min = finiteOrNull(this.overrideBounds.yMin.value);
+        this.c3Config.axis.y.max = finiteOrNull(this.overrideBounds.yMax.value);
+	}
+	
     private cullAxis(axisSize:number, axisClass:string):void {
         var intervalForCulling:number = this.getCullingInterval(axisSize,axisClass);
         d3.select(this.element).selectAll('.' + axisClass + ' .tick text').each(function (e, index) {

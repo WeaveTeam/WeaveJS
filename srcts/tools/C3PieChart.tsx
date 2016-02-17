@@ -12,6 +12,7 @@ import * as d3 from "d3";
 import * as React from "react";
 import * as c3 from "c3";
 import {ChartAPI, ChartConfiguration} from "c3";
+import ToolTip from "./ToolTip";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -117,17 +118,13 @@ export default class C3PieChart extends AbstractC3Tool {
                 },
                 onmouseover: (d:any) => {
                     if(d && d.hasOwnProperty("index")) {
-                        var columnNamesToValue:{[columnName:string] : string|number } = {};
-                        var dataValue:number = this.records[d.index].data;
-                        if(dataValue) {
-                            columnNamesToValue[this.data.getMetadata("title")] = dataValue;
-                        }
-                        this.probeKeySet.replaceKeys([this.records[d.index].id]);
+						var key = this.records[d.index].id;
+                        this.probeKeySet.replaceKeys([key]);
                         this.props.toolTip.setState({
                             showToolTip: true,
                             x: this.chart.internal.d3.event.pageX,
                             y: this.chart.internal.d3.event.pageY,
-                            columnNamesToValue: columnNamesToValue
+                            columnNamesToValue: ToolTip.getToolTipData(this, key, [this.data])
                         });
                     }
                 },

@@ -8,6 +8,7 @@ import * as lodash from "lodash";
 import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
 import OpenLayersMapTool from "../OpenLayersMapTool";
 import {IToolTipState} from "../ToolTip";
+import ToolTip from "../ToolTip";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -77,7 +78,8 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		
 		for (let layer of map.getLayers().getArray())
 		{
-			if (!ProbeInteraction.layerFilter(layer)) continue;
+			if (!ProbeInteraction.layerFilter(layer))
+				continue;
 			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 			let keySet: KeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet;
 			if (keySet && keySet != this.topKeySet)
@@ -101,8 +103,8 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
 
 			toolTipState.showToolTip = true;
-			toolTipState.title = this.getToolTipTitle(key);
-			toolTipState.columnNamesToValue = this.getToolTipData(key, this.topLayer.getToolTipColumns());
+			toolTipState.title = ToolTip.getToolTipTitle(this, key);
+			toolTipState.columnNamesToValue = ToolTip.getToolTipData(this, key, this.topLayer.getToolTipColumns());
 			[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
 		}
 		else
@@ -115,45 +117,18 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 
 	handleOutEvent(event:MouseEvent)
 	{
-		for (let layer of this.getMap().getLayers().getArray()) {
-			if (!ProbeInteraction.layerFilter(layer)) continue;
+		for (let layer of this.getMap().getLayers().getArray())
+		{
+			if (!ProbeInteraction.layerFilter(layer))
+				continue;
 			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 			let keySet: KeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet;
-			if (keySet) {
+			if (keySet)
 				keySet.clearKeys();
-			}
 		}
 
 		let toolTipState: IToolTipState = {};
 		toolTipState.showToolTip = false;
 		this.tool.props.toolTip.setState(toolTipState);
-	}
-	
-	/* TODO: Move this into WeaveTool */
-	getToolTipData(key:IQualifiedKey, additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string | number } 
-	{
-		let columnHashMap = Weave.getRoot(this.tool).getObject("Probed Columns") as ILinkableHashMap;
-
-		var result: { [columnName: string]: string | number } = {};
-
-		for (let child of (columnHashMap.getObjects() as IAttributeColumn[]).concat(additionalColumns))
-		{
-			let title:string = child.getMetadata("title");
-			let value:string = child.getValueFromKey(key, String);
-			if (value)
-			{
-				result[title] = value;
-			}
-		}
-
-		return result;
-	}
-	
-	/* TODO: Move this into WeaveTool */
-	getToolTipTitle(key:any /* IQualifiedKey */): string
-	{
-		let titleHashMap = Weave.getRoot(this.tool).getObject("Probe Header Columns") as ILinkableHashMap;
-
-		return lodash.map(titleHashMap.getObjects(), (d:any) => d.getValueFromKey(key, String)).join(", ");
 	}
 }
