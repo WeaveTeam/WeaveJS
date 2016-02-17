@@ -204,7 +204,7 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
 	}
 
     private updateStyle():void {
-        if(!this.chart || !this.records)
+		if (this.busy || !this.chart || !this.records)
             return;
 
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
@@ -241,6 +241,8 @@ export default class WeaveC3PieChart extends AbstractC3Tool {
 
     validate(forced:boolean = false):void
 	{
+		if (Weave.isBusy(this))
+			return;
         if (this.busy)
 		{
             this.dirty = true;
