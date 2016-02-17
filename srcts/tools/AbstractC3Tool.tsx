@@ -60,12 +60,9 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 		this.chart.destroy();
 	}
 
+	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-
-	protected get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
-	protected get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
 
 	xAxisName = Weave.linkableChild(this, LinkableString);
 	yAxisName = Weave.linkableChild(this, LinkableString);
@@ -85,6 +82,28 @@ export default class AbstractC3Tool extends React.Component<IVisToolProps, IVisT
 
     private previousWidth:number;
     private previousHeight:number;
+
+	protected get selectionKeySet()
+	{
+		var keySet = this.selectionFilter.target as KeySet;
+		return keySet instanceof KeySet ? keySet : null;
+	}
+	protected isSelected(key:IQualifiedKey):boolean
+	{
+		var keySet = this.selectionFilter.target as KeySet;
+		return keySet instanceof KeySet && keySet.containsKey(key);
+	}
+	 
+	protected get probeKeySet()
+	{
+		var keySet = this.probeFilter.target as KeySet;
+		return keySet instanceof KeySet ? keySet : null;
+	}
+	protected isProbed(key:IQualifiedKey):boolean
+	{
+		var keySet = this.probeFilter.target as KeySet;
+		return keySet instanceof KeySet && keySet.containsKey(key);
+	} 
 
     get deprecatedStateMapping():Object
 	{
