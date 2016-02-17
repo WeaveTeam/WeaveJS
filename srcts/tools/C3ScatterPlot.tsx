@@ -315,14 +315,15 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			.style("opacity",
 				(d: any, i: number, oi: number): number => {
 					let key = this.records[i].id;
-					let selected = this.selectionKeySet && this.selectionKeySet.containsKey(key);
-					return (selectionEmpty || selected) ? 1.0 : 0.3;
+					let selected = this.isSelected(key);
+					let probed = this.isProbed(key);
+					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
 				})
 			.style("stroke-opacity",
 				(d: any, i: number, oi: number): number => {
 					let key = this.records[i].id;
-					let selected = this.selectionKeySet && this.selectionKeySet.containsKey(key);
-					let probed = this.probeKeySet && this.probeKeySet.containsKey(key);
+					let selected = this.isSelected(key);
+					let probed = this.isProbed(key);
 					if (probed || selected)
 						return 1.0;
 					if (!selectionEmpty && !selected)
@@ -332,7 +333,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			.style("stroke-width",
 				(d: any, i: number, oi: number): number => {
 					let key = this.records[i].id;
-					let probed = this.probeKeySet && this.probeKeySet.containsKey(key);
+					let probed = this.isProbed(key);
 					return probed ? 2.0 : 1.0;
 				});
 
