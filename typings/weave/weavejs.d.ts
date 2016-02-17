@@ -8805,6 +8805,8 @@ declare module weavejs.util {
          * This must be set externally.
          */
         static JSZip: new (..._: any[]) => any;
+
+        static moment: new (..._: any[]) => any;
         /**
          * Calls console.error()
          */

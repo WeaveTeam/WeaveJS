@@ -21,9 +21,12 @@ import ui from "./react-ui/ui";
 import * as JSZip from "jszip";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as moment from "moment";
+
 
 var stub:any = React;
 weavejs.util.JS.JSZip = (JSZip as any)['default'];
+weavejs.util.JS.moment = (moment as any)['default'];
 
 Weave.registerAsyncClass(React.Component);
 
