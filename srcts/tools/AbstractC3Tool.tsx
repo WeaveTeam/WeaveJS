@@ -29,14 +29,25 @@ import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNe
 
 function finiteOrNull(n:number):number { return isFinite(n) ? n : null; }
 
+declare type AxisClass = {
+	axis:string;
+	grid:string;
+};
+
+declare type CullingMetric = {
+	interval:number;
+	total:number;
+	displayed:number;
+}
+
 export default class AbstractC3Tool extends AbstractVisTool
 {
     constructor(props:IVisToolProps)
 	{
         super(props);
-        this.xAxisClass = "c3-axis-x";
-        this.yAxisClass = "c3-axis-y";
-        this.y2AxisClass = "c3-axis-y2";
+        this.xAxisClass = {axis: "c3-axis-x", grid: "c3-xgrid"};
+        this.yAxisClass = {axis: "c3-axis-y", grid: "c3-ygrid"};
+        this.y2AxisClass = {axis: "c3-axis-y2", grid: "c3-ygrid"};
 		this.handlePointClick = this.handlePointClick.bind(this);
 		Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
     }
@@ -57,9 +68,9 @@ export default class AbstractC3Tool extends AbstractVisTool
 	protected element:HTMLElement;
     protected chart:ChartAPI;
     protected c3Config:ChartConfiguration;
-    private xAxisClass:string;
-    private yAxisClass:string;
-    private y2AxisClass:string;
+    private xAxisClass:AxisClass;
+    private yAxisClass:AxisClass;
+    private y2AxisClass:AxisClass;
 
     private previousWidth:number;
     private previousHeight:number;
@@ -139,15 +150,31 @@ export default class AbstractC3Tool extends AbstractVisTool
         this.c3Config.axis.y.max = finiteOrNull(this.overrideBounds.yMax.value);
 	}
 	
-    private cullAxis(axisSize:number, axisClass:string):void
+    private cullAxis(axisSize:number, axisClass:AxisClass):void
     {
-        var intervalForCulling:number = this.getCullingInterval(axisSize,axisClass);
-        d3.select(this.element).selectAll('.' + axisClass + ' .tick text').each(function (e, index) {
+        //axis label culling
+		var cullingMetric:CullingMetric = this._getCullingMetrics(axisSize,axisClass.axis);
+        var intervalForCulling:number = cullingMetric.interval;
+        d3.select(this.element).selectAll('.' + axisClass.axis + ' .tick text').each(function (e, index) {
             if (index >= 0)
-            {
+			{
                 d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
             }
         });
+		//grid line culling
+		var gridCullingInterval:number = this.getInterval('.' + axisClass.grid,cullingMetric.displayed);
+		d3.select(this.element).selectAll('.' + axisClass.grid).each(function (e, index) {
+			if (index >= 0) {
+				d3.select(this).style('display', index % gridCullingInterval ? 'none' : 'block');
+			}
+		});
+		//tick culling
+		var tickCullingInterval:number = this.getInterval('.'+ axisClass.axis + ' .tick line',cullingMetric.displayed);
+		d3.select(this.element).selectAll('.'+ axisClass.axis + ' .tick line').each(function (e, index) {
+			if (index >= 0) {
+				d3.select(this).style('display', index % tickCullingInterval ? 'none' : 'block');
+			}
+		});
     }
 
     protected cullAxes()
@@ -200,31 +227,37 @@ export default class AbstractC3Tool extends AbstractVisTool
 	{
 	}
 	
-    render():JSX.Element 
+    render():JSX.Element
     {
         return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
     }
 
-    getCullingInterval(size:number,axisClass:string):number 
-    {
+    private _getCullingMetrics(size:number,axisClass:string):CullingMetric
+	{
         var textHeight:number = StandardLib.getTextHeight("test", this.getFontString());
         var labelsToShow:number = Math.floor(size / textHeight);
         labelsToShow = Math.max(2,labelsToShow);
 
         var tickValues:number = d3.select(this.element).selectAll('.' + axisClass + ' .tick text').size();
-        var intervalForCulling:number;
-        for (var i:number = 1; i < tickValues; i++)
-        {
-            if (tickValues / i < labelsToShow)
-            {
-                intervalForCulling = i;
-                break;
-            }
-        }
-        return intervalForCulling;
+		return {interval: this.getInterval('.' + axisClass + ' .tick text',labelsToShow), total:tickValues, displayed:labelsToShow};
     }
 
-    getFontString():string 
+	getInterval(classSelector:string, requiredValues:number)
+	{
+		var totalValues:number = d3.select(this.element).selectAll(classSelector).size();
+		var interval:number;
+		for (var i:number = 1; i < totalValues; i++)
+		{
+			if (totalValues / i < requiredValues)
+			{
+				interval = i;
+				break;
+			}
+		}
+		return interval;
+	}
+
+    getFontString():string
     {
         return this.props.fontSize + "pt " + this.props.font;
     }
