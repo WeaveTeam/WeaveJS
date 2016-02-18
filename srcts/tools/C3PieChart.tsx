@@ -24,7 +24,6 @@ import LinkableNumber = weavejs.core.LinkableNumber;
 
 declare type Record = {
     id: IQualifiedKey,
-    //Todo: Strongly type Record items
     data:number,
     line:{color:string},
     fill:{color:string},
@@ -276,7 +275,6 @@ export default class C3PieChart extends AbstractC3Tool
                 chartType = "donut"
             }
 
-
             var columns:[string, number][] = [];
 
             columns = this.records.map(function(record:Record) {
@@ -284,11 +282,9 @@ export default class C3PieChart extends AbstractC3Tool
                 return tempArr;
             });
 
-
-
             var colors:{[key:string]: string} = {};
             this.records.forEach((record:Record) => {
-                colors[record.id as any] = record.fill.color as string || "#C0CDD1";
+                colors[record.id as any] = record.fill.color as string || "#808080";
             });
 
             this.c3Config.data.columns = columns;
