@@ -14,6 +14,7 @@ import C3PieChart from "./tools/C3PieChart";
 import C3Histogram from "./tools/C3Histogram";
 import C3Gauge from "./tools/C3Gauge";
 import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
+import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import TableTool from "./tools/TableTool";
 import SessionStateMenuTool from "./tools/SessionStateMenuTool";
