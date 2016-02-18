@@ -66,6 +66,11 @@ declare module c3 {
 
         interaction?: {
             /**
+             * Indicate if the chart should brighten selected path elements.
+             * If false is set, selected path elements will not be brightened.
+             */
+            brighten?: boolean;
+            /**
              * Indicate if the chart should have interactions.
              * If false is set, all of interactions (showing/hiding tooltip, selection, mouse events, etc) will be disabled.
              */

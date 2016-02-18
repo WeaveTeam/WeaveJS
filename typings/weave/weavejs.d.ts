@@ -2664,13 +2664,13 @@ declare module weavejs.api.net {
          * @param byteArray The file content in a Uint8Array.
          * @return The URL at which the file can be accessed later via getURL(). This will be the string "local://" followed by the filename.
          */
-        saveLocalFile(weaveRoot: ILinkableHashMap, name: string, byteArray: any[]): string;
+        saveLocalFile(weaveRoot: ILinkableHashMap, name: string, byteArray: Uint8Array): string;
         /**
          * Retrieves file content previously saved via saveLocalFile().
          * @param The file name that was passed to saveLocalFile().
          * @return The file content in a Uint8Array.
          */
-        getLocalFile(weaveRoot: ILinkableHashMap, name: string): any[];
+        getLocalFile(weaveRoot: ILinkableHashMap, name: string): Uint8Array;
         /**
          * Removes a local file that was previously added via saveLocalFile().
          * @param name The file name which was passed to saveLocalFile().
@@ -3950,7 +3950,7 @@ declare module weavejs.core {
         /**
          * @param input A Weave file to decode.
          */
-        constructor(byteArray?: any[]);
+        constructor(byteArray?: Uint8Array);
         /**
          * This is a dynamic object containing all the files (ByteArray objects) in the archive.
          * The property names used in this object must be valid filenames or serialize() will fail.
@@ -3969,7 +3969,7 @@ declare module weavejs.core {
          * @param contentType A String describing the type of content contained in the objects.
          * @return A Uint8Array in the Weave file format.
          */
-        serialize(): any[];
+        serialize(): Uint8Array;
         static ARCHIVE_HISTORY_AMF: string;
         static ARCHIVE_HISTORY_JSON: string;
         static ARCHIVE_COLUMN_CACHE_AMF: string;
@@ -3981,7 +3981,7 @@ declare module weavejs.core {
         /**
          * Loads a WeaveArchive from file content.
          */
-        static loadFileContent(weave: Weave, fileContent: any[]): void;
+        static loadFileContent(weave: Weave, fileContent: Uint8Array): void;
         /**
          * This function will create an object that can be saved to a file and recalled later with loadWeaveFileContent().
          */
@@ -7806,7 +7806,7 @@ declare module weavejs.net {
          * @return The result of calling readObject() on the ByteArray, or null if the RPC returns void.
          * @throws Error if unable to read the result.
          */
-        static readAmf3Object(bytes: any[]): Object;
+        static readAmf3Object(bytes: Uint8Array): Object;
         static buildUrlWithParams(url: string, params: Object): string;
     }
 }
@@ -7848,8 +7848,8 @@ declare module weavejs.net {
     class URLRequestUtils implements IURLRequestUtils {
         request(relevantContext: Object, urlRequest: URLRequest): WeavePromise;
         static LOCAL_FILE_URL_SCHEME: string;
-        saveLocalFile(weaveRoot: ILinkableHashMap, fileName: string, byteArray: any[]): string;
-        getLocalFile(weaveRoot: ILinkableHashMap, fileName: string): any[];
+        saveLocalFile(weaveRoot: ILinkableHashMap, fileName: string, byteArray: Uint8Array): string;
+        getLocalFile(weaveRoot: ILinkableHashMap, fileName: string): Uint8Array;
         removeLocalFile(weaveRoot: ILinkableHashMap, fileName: string): void;
         getLocalFileNames(weaveRoot: ILinkableHashMap): any[];
     }
@@ -8943,8 +8943,8 @@ declare module weavejs.util {
     class JSByteArray {
         ENCODING_AMF0: number;
         ENCODING_AMF3: number;
-        data: any[];
-        dataView: Object;
+        data: Uint8Array;
+        dataView: DataView;
         length: number;
         position: number;
         littleEndian: boolean;
@@ -8959,7 +8959,7 @@ declare module weavejs.util {
          * to kick-start it, but I added optimizations and support both big and little endian.
          * @param data A Uint8Array
          */
-        constructor(data?: any[], littleEndian?: boolean);
+        constructor(data?: Uint8Array, littleEndian?: boolean);
         readByte(): number;
         readUnsignedByte(): number;
         readBoolean(): boolean;
