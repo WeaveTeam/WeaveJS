@@ -64,7 +64,7 @@ export default class C3Histogram extends AbstractC3Tool
     protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
     protected chart:ChartAPI;
-
+	private debouncedHandleC3Selection: Function;
 
     private busy:boolean;
     private dirty:boolean;
@@ -72,8 +72,11 @@ export default class C3Histogram extends AbstractC3Tool
     constructor(props:IVisToolProps)
     {
         super(props);
-		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
-		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
+		
+		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 50);
+		
+		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
+		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
 
 		this.filteredKeySet.setSingleKeySource(this.fill.color);
 
@@ -126,21 +129,19 @@ export default class C3Histogram extends AbstractC3Tool
                 onclick: (d:any) => {
                 },
                 onselected: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-                        this.selectionKeySet.addKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
-                    }
+					this.debouncedHandleC3Selection();
                 },
                 onunselected: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-                        this.selectionKeySet.removeKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
-                    }
+					this.debouncedHandleC3Selection();
                 },
                 onmouseover: (d:any) => {
                     if (d && d.hasOwnProperty("index"))
                     {
-                        this.probeKeySet.replaceKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
+						var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
+						if (!keys)
+							return;
+						console.log('probed', keys);
+                        this.probeKeySet.replaceKeys(keys);
                     }
                 },
                 onmouseout: (d:any) => {
@@ -213,6 +214,7 @@ export default class C3Histogram extends AbstractC3Tool
                 },
                 show: false
             },
+			interaction: { brighten: false },
             transition: { duration: 0 },
             grid: {
                 x: {
@@ -313,6 +315,53 @@ export default class C3Histogram extends AbstractC3Tool
         }
     }
 
+	private handleC3Selection()
+	{
+		if (!this.selectionKeySet)
+			return;
+		
+		var set_selectedKeys = new Set<IQualifiedKey>();
+		var selectedKeys:IQualifiedKey[] = [];
+		for (var d of this.chart.selected())
+		{
+			var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
+			if (!keys)
+				continue;
+			for (var key of keys)
+			{
+				if (!set_selectedKeys.has(key))
+				{
+					set_selectedKeys.add(key);
+					selectedKeys.push(key);
+				}
+			}
+		}
+		this.selectionKeySet.replaceKeys(selectedKeys);
+	}
+	
+	private handleKeyFilters()
+	{
+		if (this.records && Weave.detectChange(this, this.selectionFilter))
+		{
+			if (this.selectionKeySet)
+			{
+				var set_indices = new Set<number>();
+				for (var key of this.selectionKeySet.keys)
+				{
+					var index = this.binnedColumn.getValueFromKey(key, Number);
+					if (isFinite(index))
+						set_indices.add(index);
+				}
+				this.chart.select(["height"], weavejs.util.JS.toArray(set_indices), true);
+			}
+			else
+			{
+				this.chart.select(["height"], [], true);
+			}
+		}
+		this.updateStyle();
+	}
+
     updateStyle()
     {
     	if (!this.chart || !this.records.length)
@@ -355,11 +404,6 @@ export default class C3Histogram extends AbstractC3Tool
                     let probed = _.intersection(probedBinIndices,[i]).length;
                     return probed ? 2.0 : 1.0;
                 });
-
-       if (!probedBinIndices.length)
-        {
-            this.chart.select(this.heightColumnNames, [], true);
-        }
     }
 
     private dataChanged()
@@ -492,9 +536,9 @@ export default class C3Histogram extends AbstractC3Tool
 
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
-
-			this.updateConfigMargin();
         }
+		
+		this.updateConfigMargin();
 
         if (changeDetected || forced)
         {
