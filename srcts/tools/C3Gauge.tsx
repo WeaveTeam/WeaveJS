@@ -16,6 +16,7 @@ import StandardLib from "../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
 import ColorRamp = weavejs.util.ColorRamp;
@@ -32,6 +33,7 @@ export default class C3Gauge extends AbstractC3Tool
     meterColumn = Weave.linkableChild(this, DynamicColumn);
     binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
 	colorRamp = Weave.linkableChild(this, ColorRamp);
+    private colStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.meterColumn));
 
     private RECORD_FORMAT = {
         id: IQualifiedKey,
@@ -45,7 +47,6 @@ export default class C3Gauge extends AbstractC3Tool
     private keyToIndex:{[key:string]: number};
     private records:Record[];
     private numberOfBins:number;
-    private colStats:any;
     protected c3Config:ChartConfiguration;
     protected chart:ChartAPI;
     private busy:boolean;
@@ -54,9 +55,6 @@ export default class C3Gauge extends AbstractC3Tool
     constructor(props:IVisToolProps)
     {
         super(props);
-
-        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
-        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
 
         this.filteredKeySet.setSingleKeySource(this.meterColumn);
 
@@ -123,11 +121,11 @@ export default class C3Gauge extends AbstractC3Tool
             tooltip: {
                 show: false
             },
+			interaction: { brighten: false },
             transition: { duration: 0 },
             bindto: null,
             onrendered: () => {
                 this.busy = false;
-                this.updateStyle();
                 if (this.dirty)
                     this.validate();
             }
@@ -154,20 +152,6 @@ export default class C3Gauge extends AbstractC3Tool
         }];
     }
 
-    updateStyle()
-    {
-        if (!this.chart || !this.meterColumn)
-            return;
-    }
-
-    componentDidMount()
-    {
-        //use ColumnStatistics to set gauge min/max appropriately
-        this.colStats = new weavejs.data.ColumnStatistics(this.meterColumn);
-        this.colStats.validateCache();
-		super.componentDidMount();
-    }
-
     validate(forced:boolean = false):void
     {
         if (this.busy)
@@ -177,19 +161,15 @@ export default class C3Gauge extends AbstractC3Tool
         }
         this.dirty = false;
 
-        var marginChange:boolean = Weave.detectChange(this, this.margin.bottom, this.margin.top, this.margin.left, this.margin.right);
-
         //TODO: Need a debounced call when 'meterColumn' changes to wait for validateCache to return
         //      with column statistics and then call this.validate() to set config appropriately
         var changeDetected:boolean = false;
-        if (Weave.detectChange(this, this.meterColumn, this.colorRamp, this.filteredKeySet, this.probeKeySet, this.selectionKeySet))
+        if (Weave.detectChange(this, this.meterColumn, this.colorRamp, this.filteredKeySet, this.probeKeySet, this.selectionKeySet, this.colStats, this.binningDefinition))
         {
             changeDetected = true;
 			var name = this.meterColumn.getMetadata('title');
 
 			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
-			if (!this.records.length)
-				return;
 
 			this.keyToIndex = {};
 
@@ -199,7 +179,7 @@ export default class C3Gauge extends AbstractC3Tool
 
 			this.numberOfBins = (this.binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value;
 			this.c3Config.color.pattern = [];
-			var ramp:any[] = this.colorRamp.getColors();
+			var ramp:any[] = this.colorRamp.getColors().reverse();
 			ramp.forEach( (color:number,index:number) => {
 				this.c3Config.color.pattern.push("#" + StandardLib.decimalToHex(color));
 			});
@@ -256,14 +236,8 @@ export default class C3Gauge extends AbstractC3Tool
 			data.unload = true;
 			this.c3Config.data = data;
         }
-        if (marginChange)
-        {
-            changeDetected = true;
-            this.c3Config.padding.top = Number(this.margin.top.value);
-            this.c3Config.padding.bottom = Number(this.margin.bottom.value);
-            this.c3Config.padding.left = Number(this.margin.left.value);
-            this.c3Config.padding.right = Number(this.margin.right.value);
-        }
+		
+		this.updateConfigMargin();
 
         if (changeDetected || forced)
         {
