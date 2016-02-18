@@ -114,17 +114,17 @@ export default class C3LineChart extends AbstractC3Tool {
                 onclick: (d:any) => {
                 },
                 onselected: (d:any) => {
-					var record = this.getRecord(d ? d.id : null);
-					if (!record)
-						return;
-					var key = record.id;
+                    var record = this.getRecord(d ? d.id : null);
+                    if (!record)
+                        return;
+                    var key = record.id;
                     this.selectionKeySet.addKeys([key]);
                 },
                 onunselected: (d:any) => {
-					var record = this.getRecord(d ? d.id : null);
-					if (!record)
-						return;
-					var key = record.id;
+                    var record = this.getRecord(d ? d.id : null);
+                    if (!record)
+                        return;
+                    var key = record.id;
                     this.selectionKeySet.removeKeys([key]);
                 },
                 onmouseover: (d:any) => {
@@ -143,7 +143,7 @@ export default class C3LineChart extends AbstractC3Tool {
                 onmouseout: (d:any) => {
 					if (!d)
 						return;
-					
+
                     this.probeKeySet.replaceKeys([]);
                     this.props.toolTip.setState({
                         showToolTip: false
@@ -193,7 +193,7 @@ export default class C3LineChart extends AbstractC3Tool {
             }
         };
     }
-	
+
 	private getRecord(id:string):Record
 	{
 		return this.records[this.keyToIndex[id]];
@@ -233,12 +233,35 @@ export default class C3LineChart extends AbstractC3Tool {
         if(!this.chart)
             return;
 
-        d3.select(this.element).selectAll("circle").style("opacity", 1)
+        let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+
+        d3.select(this.element).selectAll("circle")
+            .style("opacity", 1.0)
             .style("stroke", "black")
             .style("stroke-opacity", 0.0);
 
+        d3.select(this.element)
+            .selectAll("path.c3-shape.c3-line")
+            .style("opacity",
+                (d: any, i: number, oi: number): number => {
+                    let key = this.records[i].id;
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+                    return (selectionEmpty || selected || probed) ? 1.0 : 0.1;
+                })
+            .style("stroke-width",
+                (d: any, i: number, oi: number): number => {
+                    let key = this.records[i].id;
+                    let probed = this.isProbed(key);
+                    return probed ? 2.0 : 1.0;
+                });
+
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
         var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
+
+        var selectedIDs:string[] = selectedKeys.map((key:IQualifiedKey) => {
+            return key.toString();
+        });
         var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
             return Number(this.keyToIndex[key as any]);
         });
@@ -266,10 +289,8 @@ export default class C3LineChart extends AbstractC3Tool {
                     (filtered[index][i] as HTMLElement).style.strokeOpacity = "0.0";
                 });
             });
-            this.customStyle(probedIndices, "path", ".c3-shape.c3-line", {opacity: 1.0});
         }
         if(selectedIndices.length) {
-            //unfocus all circles
             d3.select(this.element).selectAll("circle").filter(".c3-shape").style("opacity", "0.1");
 
             var filtered = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape");
@@ -283,15 +304,12 @@ export default class C3LineChart extends AbstractC3Tool {
                 });
             });
 
-            this.customStyle(unselectedIndices, "path", ".c3-shape.c3-line", {opacity: 0.1});
-            this.customStyle(selectedIndices, "path", ".c3-shape.c3-line", {opacity: 1.0});
-            this.chart.select(["y"], selectedIndices, true);
         }else if(!probedIndices.length){
             //focus all circles
-            d3.select(this.element).selectAll("circle").filter(".c3-shape").style({opacity: 1.0, "stroke-opacity": 0.0});
-            this.customStyle(indices, "path", ".c3-shape.c3-line", {opacity: 1.0});
-            this.chart.select(["y"], [], true);
+            d3.select(this.element).selectAll("circle").style("opacity", 1.0);
         }
+
+        this.chart.select(selectedIDs,null,true);
     }
 
     validate(forced:boolean = false):void
