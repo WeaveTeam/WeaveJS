@@ -13,16 +13,17 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-
+import LinkableWatcher = weavejs.core.LinkableWatcher;
 
 export default class NumericRangeDataFilterEditor extends AbstractFilterEditor {
 
-	public forceDiscreteValues:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.columnChanged);
+	public forceDiscreteValues:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.handleColumn);
 
 	private min:number;
 	private max:number;
 
-	constructor(props:FilterEditorProps) {
+	constructor(props:FilterEditorProps)
+	{
 		super(props);
 		this.options = [];
 	}
@@ -34,15 +35,18 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor {
 		}];
 	}
 
-	componentDidMount() {
+	componentDidMount()
+	{
 
 	}
 
-	onChange(selectedValues:number[]) {
+	onChange(selectedValues:number[]) 
+	{
 		this.getFilter().values.state = selectedValues;
 	}
 
-	columnChanged() {
+	handleColumn() 
+	{
 		var column:IAttributeColumn = this.getColumn();
 		this.options = _.sortByOrder(_.uniq(column.keys.map((key:IQualifiedKey) => {
 			return {
@@ -53,7 +57,8 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor {
 		this.forceUpdate();
 	}
 
-	render():JSX.Element {
+	render():JSX.Element
+	{
 		let values:any = this.getFilter().values.state;
 		if (this.forceDiscreteValues.value)
 		{

@@ -16,7 +16,8 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor {
+export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
+{
 
 	private static LAYOUT_LIST:string = "List";
 	private static LAYOUT_COMBO:string = "ComboBox";
@@ -28,16 +29,19 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 	public values:LinkableVariable = Weave.linkableChild(this, LinkableVariable);
 
 
-	constructor(props:FilterEditorProps) {
+	constructor(props:FilterEditorProps) 
+	{
 		super(props);
 		this.options = [];
 	}
 
-	componentDidMount() {
+	componentDidMount() 
+	{
 
 	}
 	
-	columnChanged() {
+	handleColumn()
+	{
 		var column:IAttributeColumn = this.getColumn();
 		this.options = _.sortByOrder(_.uniq(column.keys.map((key:IQualifiedKey) => {
 			let val:string = column.getValueFromKey(key, String);
@@ -57,7 +61,8 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 		}];
 	}
 
-	render():JSX.Element {
+	render():JSX.Element 
+	{
 		let values:any = this.getFilter().values.state;
 		
 		switch (this.layoutMode && this.layoutMode.value) {

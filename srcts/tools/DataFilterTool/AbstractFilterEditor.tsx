@@ -39,27 +39,49 @@ export default class AbstractFilterEditor extends React.Component<FilterEditorPr
 	public enabled:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
 	public values:LinkableVariable;
 	
-	public filter:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher)
-	
+	private filter:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher, this.handleFilter)
+	private columnWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher, this.handleColumn);
+
 	protected options:FilterOption[];
 
-	constructor(props:FilterEditorProps) {
+	constructor(props:FilterEditorProps) 
+	{
 		super(props);
 		this.options = [];
 	}
 	
-	getColumn():IAttributeColumn {
+	getColumn():IAttributeColumn 
+	{
 		return this.getFilter().column as IAttributeColumn;
 	}
 
-	setFilter(filter:ColumnDataFilter) {
+	setFilter(filter:ColumnDataFilter) 
+	{
 		this.filter.target = filter;
+		if (this.filter)
+		{
+			this.columnWatcher.target = filter.column;
+			//this.enabled = true;
+		}
 	}
 
-	getFilter():ColumnDataFilter {
+	getFilter():ColumnDataFilter 
+	{
 		return this.filter.target as ColumnDataFilter;
 	}
-	componentDidMount() {
+	
+	handleFilter()
+	{
+		
+	}
+
+	handleColumn()
+	{
+		
+	}
+
+	componentDidMount() 
+	{
 
 	}
 

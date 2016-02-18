@@ -23,7 +23,8 @@ import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNe
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeaveAPI = weavejs.WeaveAPI;
 
-export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties {
+export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
+{
 
 	public filter:LinkableDynamicObject = Weave.linkableChild(this,  new LinkableDynamicObject(ColumnDataFilter), this.handleFilterChange);
 	public editor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(), this.forceUpdate);
@@ -39,23 +40,28 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 			label: "Discrete values"
 		}
 	]
-	constructor(props:IVisToolProps) {
+	
+	constructor(props:IVisToolProps) 
+	{
 		super(props);
 		Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
 		this.initFilterLater();
 	}
 
-	handleEditorTypeChange(item:typeof AbstractFilterEditor[]) {
+	handleEditorTypeChange(item:typeof AbstractFilterEditor[]) 
+	{
 		//LinkablePlaceholder.setInstance(item[0]);
 	}
 	
-	handleFilterChange(filter:LinkableDynamicObject) {
+	handleFilterChange(filter:LinkableDynamicObject) 
+	{
 		var _editor = this.editor.target as AbstractFilterEditor;
 		if(_editor)
 			_editor.setFilter(filter.target as ColumnDataFilter);
 	}
 	
-	initFilterLater() {
+	initFilterLater() 
+	{
 		if(!Weave.getRoot(this)) 
 		{
 			WeaveAPI.Scheduler.callLater(this, this.initFilterLater);
@@ -64,7 +70,8 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		this.filter.targetPath = ["defaultSubsetKeyFilter", "filters", Weave.getRoot(this).getName(this)];
 	}
 	
-	initEditorLater(editor:AbstractFilterEditor) {
+	initEditorLater(editor:AbstractFilterEditor)
+	{
 		if(!Weave.getRoot(this)) 
 		{
 			WeaveAPI.Scheduler.callLater(this, this.initEditorLater);
@@ -73,34 +80,38 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		this.editor.target = editor;
 	}
 	
-	get deprecatedStateMapping(){
+	get deprecatedStateMapping()
+	{
 		return {
 			"editor": this.editor,
 			"filter": this.filter
 		};
 	}
 
-	private getFilter():ColumnDataFilter {
+	private getFilter():ColumnDataFilter
+	{
 		return this.filter.target as ColumnDataFilter;
 	}
 
-	private getFilterColumn():IAttributeColumn {
+	private getFilterColumn():IAttributeColumn
+	{
 		return this.getFilter() ? this.getFilter().column as IAttributeColumn : null;
 	}
 
-	get title():string {
+	get title():string
+	{
 		if (this.getFilterColumn())
 			return Weave.lang('Filter for {0}', ColumnUtils.getTitle(this.getFilterColumn()));
 		return Weave.lang('Filter');
     }
 
-	render():JSX.Element {
+	render():JSX.Element
+	{
 		var editorClass:(typeof AbstractFilterEditor) = LinkablePlaceholder.getClass(this.editor) as typeof AbstractFilterEditor;
-
-		// TODO fix type
-		var filterEditor:any = React.createElement(editorClass as any, {
+		
+		var filterEditor:any = editorClass ? React.createElement(editorClass as any, {
 			ref: this.initEditorLater,
-		});
+		}) : null;
 		
 		return (
 			<ui.VBox>
