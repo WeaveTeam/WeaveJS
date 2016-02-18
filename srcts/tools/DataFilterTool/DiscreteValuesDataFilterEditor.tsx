@@ -5,6 +5,8 @@
 import * as React from "react";
 import ui from "../../react-ui/ui";
 import {DropdownButton, MenuItem} from "react-bootstrap";
+import AbstractFilterEditor from "./AbstractFilterEditor";
+import {FilterEditorProps, FilterEditorState, FilterOption} from "./AbstractFilterEditor";
 
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;
@@ -14,21 +16,7 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-type FilterOption = {
-	value:string, 
-	label:string
-}
-
-export interface DiscreteValuesDataFilterEditorProps {
-	filter: ColumnDataFilter;
-}
-
-export interface DiscreteValuesDataFilterEditorState {
-
-}
-
-export default class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataFilterEditorProps, DiscreteValuesDataFilterEditorState>
- 													implements ILinkableObjectWithNewProperties {
+export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor {
 
 	private static LAYOUT_LIST:string = "List";
 	private static LAYOUT_COMBO:string = "ComboBox";
@@ -37,28 +25,22 @@ export default class DiscreteValuesDataFilterEditor extends React.Component<Disc
 	private static LAYOUT_CHECKBOXLIST:string = "CheckBoxList";
 
 	public layoutMode:LinkableString = Weave.linkableChild(this, new LinkableString(DiscreteValuesDataFilterEditor.LAYOUT_LIST), this.forceUpdate);
-	public showPlayButton:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
-	public showToggle:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true), this.forceUpdate);
-	public showToggleLabel:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
-	
-	public values:LinkableVariable;
+	public values:LinkableVariable = Weave.linkableChild(this, LinkableVariable);
 
-	
-	private options:FilterOption[];
 
-	constructor(props:DiscreteValuesDataFilterEditorProps) {
+	constructor(props:FilterEditorProps) {
 		super(props);
 		this.options = [];
-		this.props.filter.column.addGroupedCallback(this, this.columnChanged);
 	}
 
 	componentDidMount() {
 
 	}
-
+	
 	columnChanged() {
-		this.options = _.sortByOrder(_.uniq(this.props.filter.column.keys.map((key:IQualifiedKey) => {
-			let val:string = this.props.filter.column.getValueFromKey(key, String);
+		var column:IAttributeColumn = this.getColumn();
+		this.options = _.sortByOrder(_.uniq(column.keys.map((key:IQualifiedKey) => {
+			let val:string = column.getValueFromKey(key, String);
 			return {
 				value: val,
 				label: val
@@ -67,17 +49,16 @@ export default class DiscreteValuesDataFilterEditor extends React.Component<Disc
 		this.forceUpdate();
 	}
 
-	onChange(selectedValues:string[]) {
-		this.props.filter.values.state = selectedValues;
-	}
 
-	get deprecatedStateMapping()
+	get deprecatedStateMapping():Object
 	{
-		return {};
+		return [super.deprecatedStateMapping, {
+			"layoutMode": this.layoutMode
+		}];
 	}
 
 	render():JSX.Element {
-		let values:any = this.props.filter.values.state;
+		let values:any = this.getFilter().values.state;
 		
 		switch (this.layoutMode && this.layoutMode.value) {
 			case DiscreteValuesDataFilterEditor.LAYOUT_CHECKBOXLIST:
@@ -97,7 +78,8 @@ export default class DiscreteValuesDataFilterEditor extends React.Component<Disc
 							<DropdownButton title={values[0]} id="bs.dropdown">
 								{
 									this.options.map((option:FilterOption, index:number) => {
-										return  <MenuItem active={values.indexOf(option) > -1} key={index} onSelect={() => { this.props.filter.values.state = [option.value]; }}>{option.label || option.value}</MenuItem>
+										// TODO non efficient.. needs to be fixed with external bound function
+										return  <MenuItem active={values.indexOf(option) > -1} key={index} onSelect={() => { this.getFilter().values.state = [option.value]; }}>{option.label || option.value}</MenuItem>
 									})
 								}
 							</DropdownButton>
@@ -105,3 +87,7 @@ export default class DiscreteValuesDataFilterEditor extends React.Component<Disc
 		}
 	}
 }
+
+
+Weave.registerClass("weavejs.tool.DiscreteValuesDataFilterEditor", DiscreteValuesDataFilterEditor, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.editors::DiscreteValuesDataFilterEditor", DiscreteValuesDataFilterEditor);

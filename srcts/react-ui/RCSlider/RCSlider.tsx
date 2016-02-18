@@ -91,9 +91,9 @@ export default class RCSlider extends React.Component<any, any> {
 
         this.props.options.forEach((option:SliderOption, index:number) => {
             this.options.push(index);
-            this.indexToValue[index] = option.value;
+            this.indexToValue.set(index, option.value);
             this.indexToLabel[index] = option.label;
-            this.valueToIndex[option.value] = index;
+            this.valueToIndex.set(option.value, index);
         });
 
         if(this.props.type == RCSlider.CATEGORICAL) {
@@ -101,7 +101,7 @@ export default class RCSlider extends React.Component<any, any> {
                            max={this.options.length ? this.options.length - 1 : 0}
                            step={null}
                            marks={this.indexToLabel}
-                           value={this.valueToIndex[this.props.selectedValues[0]]}
+                           value={this.valueToIndex.get(this.props.selectedValues[0])}
                            onChange={this.onChange.bind(this)}
                     />;
 
@@ -137,7 +137,7 @@ export default class RCSlider extends React.Component<any, any> {
                            max={this.options.length ? this.options.length - 1 : 0}
                            step={null}
                            marks={this.indexToLabel}
-                           value={[this.valueToIndex[this.props.selectedValues[0]["min"]], this.valueToIndex[this.props.selectedValues[0]["max"]]]}
+                           value={[this.valueToIndex.get(this.props.selectedValues[0]["min"]), this.valueToIndex.get(this.props.selectedValues[0]["max"])]}
                            onChange={this.onChange.bind(this)}
                     />
         }

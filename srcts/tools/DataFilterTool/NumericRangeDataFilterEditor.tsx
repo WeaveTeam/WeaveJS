@@ -3,6 +3,8 @@
 
 import * as React from "react";
 import ui from "../../react-ui/ui";
+import AbstractFilterEditor from "./AbstractFilterEditor";
+import {FilterEditorProps, FilterEditorState, FilterOption} from "./AbstractFilterEditor";
 
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;
@@ -12,40 +14,24 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-export interface NumericRangeDataFilterEditorProps {
-	filter: ColumnDataFilter;
-}
 
-export interface NumericRangeDataFilterEditorState {
+export default class NumericRangeDataFilterEditor extends AbstractFilterEditor {
 
-}
-
-export type FilterOption = {
-	value:number, 
-	label:string
-}
-
-export default class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilterEditorProps, NumericRangeDataFilterEditorState> {
-
-	public enabled:LinkableBoolean;
 	public forceDiscreteValues:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.columnChanged);
-	public showPlayButton:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
-	public showToggle:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true), this.forceUpdate);
-	public showToggleLabel:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
 
 	private min:number;
 	private max:number;
-	private options:FilterOption[];
 
-	constructor(props:NumericRangeDataFilterEditorProps) {
+	constructor(props:FilterEditorProps) {
 		super(props);
 		this.options = [];
-		this.props.filter.column.addGroupedCallback(this, this.columnChanged);
 	}
 
-	get deprecatedStateMapping()
+	get deprecatedStateMapping():Object
 	{
-		return {};
+		return [super.deprecatedStateMapping, {
+			"forceDiscreteValues": this.forceDiscreteValues
+		}];
 	}
 
 	componentDidMount() {
@@ -53,21 +39,22 @@ export default class NumericRangeDataFilterEditor extends React.Component<Numeri
 	}
 
 	onChange(selectedValues:number[]) {
-		this.props.filter.values.state = selectedValues;
+		this.getFilter().values.state = selectedValues;
 	}
 
 	columnChanged() {
-		this.options = _.sortByOrder(_.uniq(this.props.filter.column.keys.map((key:IQualifiedKey) => {
+		var column:IAttributeColumn = this.getColumn();
+		this.options = _.sortByOrder(_.uniq(column.keys.map((key:IQualifiedKey) => {
 			return {
-				value: this.props.filter.column.getValueFromKey(key, Number) as number,
-				label: this.props.filter.column.getValueFromKey(key, String) as string
+				value: column.getValueFromKey(key, Number) as number,
+				label: column.getValueFromKey(key, String) as string
 			};
 		}), "value"), ["value"], ["asc"]);
 		this.forceUpdate();
 	}
 
 	render():JSX.Element {
-		let values:any = this.props.filter.values.state;
+		let values:any = this.getFilter().values.state;
 		if (this.forceDiscreteValues.value)
 		{
 			return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
@@ -82,3 +69,6 @@ export default class NumericRangeDataFilterEditor extends React.Component<Numeri
 		}
 	}
 }
+
+Weave.registerClass("weavejs.tool.NumericRangeDataFilterEditor", NumericRangeDataFilterEditor, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weave.editors::NumericRangeDataFilterEditor", NumericRangeDataFilterEditor);
