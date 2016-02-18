@@ -71,19 +71,19 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	private dataXType:string;
 	private dataYType:string;
 	private records:Record[];
-	private debouncedUpdateSelection: Function;
 
 	private busy:boolean;
 	private dirty:boolean;
 
 	protected c3Config:ChartConfiguration;
 	protected c3ConfigYAxis:c3.YAxisConfiguration;
+	private debouncedHandleC3Selection: Function;
 
 	constructor(props:IVisToolProps)
 	{
 		super(props);
 
-		this.debouncedUpdateSelection = _.debounce(this.updateSelection.bind(this), 50);
+		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 50);
 		
 		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
 		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
@@ -139,10 +139,10 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				onclick: (d:any) => {
 				},
 				onselected: (d:any) => {
-					this.debouncedUpdateSelection();
+					this.debouncedHandleC3Selection();
 				},
 				onunselected: (d:any) => {
-					this.debouncedUpdateSelection();
+					this.debouncedHandleC3Selection();
 				},
 				onmouseover: (d) => {
 					if (d && d.hasOwnProperty("index"))
@@ -198,6 +198,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					}
 				}
 			},
+			interaction: { brighten: false },
 			transition: { duration: 0 },
 			grid: {
 				x: {
@@ -259,7 +260,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		};
 	}
 
-	public updateSelection():void
+	public handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
 			return;
@@ -391,9 +392,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 
 			this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
 			this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
-
-			this.updateConfigMargin();
 		}
+		this.updateConfigMargin();
 
 		if (forced || dataChanged || axisChanged)
 		{
