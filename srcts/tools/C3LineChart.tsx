@@ -40,13 +40,13 @@ export default class C3LineChart extends AbstractC3Tool
 
     private RECORD_FORMAT = {
         id: IQualifiedKey,
-        columns: this.columns.getObjects(),
+        columns: [] as any[],
         line: { color: this.line.color }
     };
 
     private RECORD_DATATYPE = {
         columns: Number,
-        line: { color:String }
+        line: { color: String }
     };
 
     private keyToIndex:{[key:string]: number};
@@ -54,7 +54,6 @@ export default class C3LineChart extends AbstractC3Tool
 
     private records:Record[];
     private columnLabels:string[];
-    private columnNames:string[];
     private chartType:string;
 
     private busy:boolean;
@@ -63,13 +62,16 @@ export default class C3LineChart extends AbstractC3Tool
     protected chart:ChartAPI;
     protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
+	private debouncedHandleC3Selection: Function;
 
     constructor(props:IVisToolProps)
     {
         super(props);
 
-        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
-        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
+		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 50);
+		
+        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
+        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
 
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
         this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
@@ -118,20 +120,10 @@ export default class C3LineChart extends AbstractC3Tool
                 onclick: (d:any) => {
                 },
                 onselected: (d:any) => {
-                    var record = this.getRecord(d ? d.id : null);
-                    if (!record)
-                        return;
-                    var key = record.id;
-					console.log('selected '+key);
-                    this.selectionKeySet.addKeys([key]);
+					this.debouncedHandleC3Selection();
                 },
                 onunselected: (d:any) => {
-                    var record = this.getRecord(d ? d.id : null);
-                    if (!record)
-                        return;
-                    var key = record.id;
-					console.log('unselected '+key);
-                    this.selectionKeySet.removeKeys([key]);
+					this.debouncedHandleC3Selection();
                 },
                 onmouseover: (d:any) => {
 					var record = this.getRecord(d ? d.id : null);
@@ -237,19 +229,57 @@ export default class C3LineChart extends AbstractC3Tool
             }
         }];
 	}
+								
+	private handleC3Selection()
+	{
+		if (!this.selectionKeySet)
+			return;
+		
+		var set_selectedKeys = new Set<IQualifiedKey>();
+		var selectedKeys:IQualifiedKey[] = [];
+		for (var d of this.chart.selected())
+		{
+			var record = this.getRecord(d.id);
+			if (record && !set_selectedKeys.has(record.id))
+			{
+				set_selectedKeys.add(record.id);
+				selectedKeys.push(record.id);
+			}
+		}
+		this.selectionKeySet.replaceKeys(selectedKeys);
+	}
+	
+	private handleKeyFilters()
+	{
+		if (this.records && Weave.detectChange(this, this.selectionFilter))
+		{
+			if (this.selectionKeySet)
+				this.chart.select(this.selectionKeySet.keys.map(key => key.toString()), null, true);
+		}
+		this.updateStyle();
+	}
 
-    private updateStyle()
-    {
-        if (!this.chart)
-            return;
-
+	private updateStyle()
+	{
+		if (!this.chart)
+			return;
+		
         let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
 
         d3.select(this.element).selectAll("circle")
-            .style("opacity", 1.0)
+            .style("opacity",
+                (d: any, i: number, oi: number): number => {
+					let record = this.getRecord(d.id);
+					let key = record ? record.id : null;
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+					if (selected || probed)
+						return 1;
+					return selectionEmpty ? 1 : 0;
+                })
             .style("stroke", "black")
             .style("stroke-opacity", 0.0);
-
+		
         d3.select(this.element)
             .selectAll("path.c3-shape.c3-line")
             .style("opacity",
@@ -257,73 +287,15 @@ export default class C3LineChart extends AbstractC3Tool
                     let key = this.records[i].id;
                     let selected = this.isSelected(key);
                     let probed = this.isProbed(key);
-                    return (selectionEmpty || selected || probed) ? 1.0 : 0.1;
+                    return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
                 })
             .style("stroke-width",
                 (d: any, i: number, oi: number): number => {
                     let key = this.records[i].id;
+                    let selected = this.isSelected(key);
                     let probed = this.isProbed(key);
-                    return probed ? 2.0 : 1.0;
+                    return probed ? 3 : (selected ? 2 : 1);
                 });
-
-        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-        var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
-
-        var selectedIDs:string[] = selectedKeys.map((key:IQualifiedKey) => {
-            return key.toString();
-        });
-        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
-            return Number(this.keyToIndex[key as any]);
-        });
-        var probedIndices:number[] = probedKeys.map((key:IQualifiedKey) => {
-            return Number(this.keyToIndex[key as any]);
-        });
-        var keys:string[] = Object.keys(this.keyToIndex);
-        var indices:number[] = keys.map((key:string) => {
-            return Number(this.keyToIndex[key]);
-        });
-
-        var unselectedIndices = _.difference(indices, selectedIndices);
-        unselectedIndices = _.difference(unselectedIndices,probedIndices);
-        if (probedIndices.length)
-        {
-            //unfocus all circles
-            //d3.select(this.element).selectAll("circle").filter(".c3-shape").style({opacity: 0.1, "stroke-opacity": 0.0});
-
-            var filtered = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape");
-            probedIndices.forEach( (index:number) => {
-                //custom style for circles on probed lines
-                var circleCount:number = filtered[index] ? filtered[index].length : 0;
-                var probedCircles:number[] = _.range(0,circleCount);
-                probedCircles.forEach( (i:number) => {
-                    (filtered[index][i] as HTMLElement).style.opacity = "1.0";
-                    (filtered[index][i] as HTMLElement).style.strokeOpacity = "0.0";
-                });
-            });
-        }
-        if (selectedIndices.length)
-        {
-            d3.select(this.element).selectAll("circle").filter(".c3-shape").style("opacity", "0.1");
-
-            var filtered = d3.select(this.element).selectAll("g").filter(".c3-chart-line").selectAll("circle").filter(".c3-shape");
-            selectedIndices.forEach( (index:number) => {
-                //custom style for circles on selected lines
-                var circleCount = filtered[index] ? filtered[index].length : 0;
-                var selectedCircles = _.range(0,circleCount);
-                selectedCircles.forEach( (i:number) => {
-                    (filtered[index][i] as HTMLElement).style.opacity = "1.0";
-                    (filtered[index][i] as HTMLElement).style.strokeOpacity = "1.0";
-                });
-            });
-
-        }
-        else if (!probedIndices.length)
-        {
-            //focus all circles
-            d3.select(this.element).selectAll("circle").style("opacity", 1.0);
-        }
-
-        this.chart.select(selectedIDs,null,true);
     }
 
     validate(forced:boolean = false):void
@@ -337,21 +309,22 @@ export default class C3LineChart extends AbstractC3Tool
 
         var changeDetected:boolean = false;
         var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds);
-        if (axisChange || Weave.detectChange(this, this.curveType, this.line, this.filteredKeySet))
+		var dataChanged:boolean = axisChange || Weave.detectChange(this, this.curveType, this.line, this.filteredKeySet);
+        if (dataChanged)
         {
             changeDetected = true;
             this.columnLabels = [];
-            this.columnNames = [];
 
-            var children:ReferencedColumn[] = this.columns.getObjects();
-            this.RECORD_FORMAT.columns = children;
-            this.filteredKeySet.setColumnKeySources(children);
+            var columns:ReferencedColumn[] = this.columns.getObjects();
+            this.filteredKeySet.setColumnKeySources(columns);
+		
+            if (weavejs.WeaveAPI.Locale.reverseLayout)
+				columns.reverse();
+            this.RECORD_FORMAT.columns = [IQualifiedKey as any].concat(columns);
 
-            this.columnNames = this.columns.getNames();
-
-            for (let idx in children)
+            for (let idx in columns)
             {
-                let child = children[idx];
+                let child = columns[idx];
                 let title = child.getMetadata('title');
                 this.columnLabels.push(title);
             }
@@ -367,41 +340,15 @@ export default class C3LineChart extends AbstractC3Tool
                 this.yAxisValueToLabel[record.id as any] = record.id.toString();
             });
 
-            var columns = this.records.map(function(record:Record) {
-                var tempArr:any[] = [];
-                tempArr.push(record["id"]);
-                _.keys(record.columns).forEach((key:string) => {
-                    var value = record.columns[key as any];
-                    if (value)
-                    {
-                        tempArr.push(record.columns[key as any]);
-                    }
-                });
-                return tempArr;
-            });
-
             var colors:{[key:string]: string} = {};
             this.records.forEach((record:Record) => {
-                colors[record.id as any] = record.line.color || "#C0CDD1";
+                colors[record.id as any] = record.line.color || "#000000";
             });
 
             this.chartType= "line";
             if (this.curveType.value === "double")
             {
                 this.chartType = "spline";
-            }
-
-            if (weavejs.WeaveAPI.Locale.reverseLayout)
-            {
-                columns.forEach( (column:any[], index:number, array:any) => {
-                    var temp:any[] = [];
-                    temp.push(column.shift());
-                    column = column.reverse();
-                    column.forEach( (item:any) => {
-                        temp.push(item);
-                    });
-                    array[index] = temp;
-                });
             }
         }
         if (axisChange)
@@ -410,16 +357,15 @@ export default class C3LineChart extends AbstractC3Tool
             var xLabel:string = " ";//this.paths.xAxis.push("overrideAxisName").getState() || this.paths.dataX.getObject().getMetadata('title');
             var yLabel:string = " ";//this.paths.yAxis.push("overrideAxisName").getState() || this.paths.dataY.getObject().getMetadata('title');
 
-
             if (this.records)
             {
-                var temp:any =  {};
+                var axes:any =  {};
                 if (weavejs.WeaveAPI.Locale.reverseLayout)
                 {
                     this.records.forEach( (record:Record) => {
-                        temp[record["id"].toString()] = 'y2';
+                        axes[record.id as any] = 'y2';
                     });
-                    this.c3Config.data.axes = temp;
+                    this.c3Config.data.axes = axes;
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
                     this.c3Config.axis.x.tick.rotate = 45;
@@ -427,9 +373,9 @@ export default class C3LineChart extends AbstractC3Tool
                 else
                 {
                     this.records.forEach( (record:Record) => {
-                        temp[record["id"].toString()] = 'y';
+                        axes[record.id as any] = 'y';
                     });
-                    this.c3Config.data.axes = temp;
+                    this.c3Config.data.axes = axes;
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
                     this.c3Config.axis.x.tick.rotate = -45;
@@ -446,14 +392,13 @@ export default class C3LineChart extends AbstractC3Tool
         if (changeDetected || forced)
         {
             this.busy = true;
-            if (columns)
-            {
-                this.c3Config.data.columns = columns;
-            }
+            
+			if (dataChanged)
+                this.c3Config.data.columns = _.map(this.records, 'columns') as any;
+			
 			if (colors)
-			{
 				this.c3Config.data.colors = colors;
-			}
+			
             this.c3Config.data.type = this.chartType;
             this.c3Config.data.unload = true;
             this.chart = c3.generate(this.c3Config);
