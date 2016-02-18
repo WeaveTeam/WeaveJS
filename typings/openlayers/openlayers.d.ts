@@ -35,6 +35,11 @@ declare module olx {
          *
          */
         viewState: olx.ViewState;
+
+        /**
+         * 
+         */
+        animate: boolean;
     }
 
     interface FeatureOverlayOptions {
@@ -4046,6 +4051,11 @@ declare module ol {
         module canvas {
             class Immediate {
             }
+        }
+
+        class Box {
+            setPixels(startPixel: ol.Pixel, endPixel: ol.Pixel): void;
+            setMap(map: ol.Map):void;
         }
     }
 
