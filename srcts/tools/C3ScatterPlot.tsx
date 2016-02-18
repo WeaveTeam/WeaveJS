@@ -127,7 +127,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				},
 				color: (color:string, d:any):string => {
 					var color:string;
-					if(d.hasOwnProperty("index")) {
+					if (d.hasOwnProperty("index"))
+					{
 						var record:Record = this.records[d.index];
 						color = record ? record.fill.color : null;
 						if (color && color.charAt(0) != '#')
@@ -144,7 +145,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					this.debouncedUpdateSelection();
 				},
 				onmouseover: (d) => {
-					if(d && d.hasOwnProperty("index")) {
+					if (d && d.hasOwnProperty("index"))
+					{
 						var key:IQualifiedKey = this.records[d.index].id;
 						if (this.probeKeySet)
 							this.probeKeySet.replaceKeys([key]);
@@ -158,7 +160,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					}
 				},
 				onmouseout: (d) => {
-					if(d && d.hasOwnProperty("index")) {
+					if (d && d.hasOwnProperty("index"))
+					{
 						if (this.probeKeySet)
 							this.probeKeySet.replaceKeys([]);
 						this.props.toolTip.setState({
@@ -178,9 +181,12 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					},
 					tick: {
 						format: (num:number):string => {
-							if (this.xAxisValueToLabel && this.dataXType !== "number") {
+							if (this.xAxisValueToLabel && this.dataXType !== "number")
+							{
 								return this.xAxisValueToLabel[num] || "";
-							} else {
+							}
+							else
+							{
 								return String(FormatUtils.defaultNumberFormatting(num));
 							}
 						},
@@ -214,7 +220,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			},
 			point: {
 				r: (d:any):number => {
-					if(d.hasOwnProperty("index")) {
+					if (d.hasOwnProperty("index"))
+					{
 						return this.records[d.index].size;
 					}
 				},
@@ -239,9 +246,12 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			},
 			tick: {
 				format: (num:number):string => {
-					if(this.yAxisValueToLabel && this.dataYType !== "number") {
+					if (this.yAxisValueToLabel && this.dataYType !== "number")
+					{
 						return this.yAxisValueToLabel[num] || "";
-					} else {
+					}
+					else
+					{
 						return String(FormatUtils.defaultNumberFormatting(num));
 					}
 				}
@@ -289,7 +299,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		}];
 	}
 
-	updateStyle() {
+	updateStyle()
+	{
 		if (!this.chart || !this.dataXType)
 			return;
 
@@ -395,7 +406,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 
 	loadData()
 	{
-		if(!this.chart || this.busy)
+		if (!this.chart || this.busy)
 			return StandardLib.debounce(this, 'loadData');
 		this.chart.load({data: _.pluck(this.records, "point"), unload: true});
 		//after data is loaded we need to remove the clip-path so that points are not

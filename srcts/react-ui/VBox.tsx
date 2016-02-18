@@ -2,17 +2,21 @@
 
 import * as React from "react";
 
-export default class VBox extends React.Component<any, any> {
-
-    constructor(props:any, state:any) {
+export default class VBox extends React.Component<any, any>
+{
+    constructor(props:any, state:any)
+	{
         super(props);
     }
 
-    render() {
+    render()
+    {
         var style:any = this.props.style || {};
         var otherProps:any = {};
-        for(var key in this.props) {
-            if(key !== "style") {
+        for (var key in this.props)
+        {
+            if (key !== "style")
+            {
                 otherProps[key] = this.props[key];
             }
         }

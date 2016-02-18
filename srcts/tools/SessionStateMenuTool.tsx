@@ -24,14 +24,15 @@ var stub:any = React;
 const sessionStateMenuStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column", overflow:"auto"};
 const sessionStateComboBoxStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column"};
 
-export default class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState> {
-
+export default class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState>
+{
 	selectedChoice = Weave.linkableChild(this, LinkableString);
 	layoutMode = Weave.linkableChild(this, LinkableString);
 	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
 	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
 
-	constructor(props:IVisToolProps) {
+	constructor(props:IVisToolProps)
+	{
 		super(props);
 
 		this.choices.addGroupedCallback(this, this.choiceChanged);
@@ -41,10 +42,12 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
 	}
 
-	componentDidMount() {
+	componentDidMount()
+	{
 	}
 
-	setTargetStates(states:any):void {
+	setTargetStates(states:any):void 
+	{
 		if (!states)
 			return;
 
@@ -72,18 +75,23 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 		this.forceUpdate();
 	}
 
-	handleItemClick(index:number, event:MouseEvent):void {
+	handleItemClick(index:number, event:MouseEvent):void 
+	{
 		this.selectedChoice.value = this.choices.getNames()[index];
 	}
 
-	render() {
+	render()
+	{
 
 		let isComboBox: boolean = this.layoutMode.value === "ComboBox";
 		var menus:JSX.Element[] = this.choices.getNames().map((choice:string, index:number) => {
-			if(isComboBox) {
+			if (isComboBox)
+			{
 				return choice === this.selectedChoice.value ? <MenuItem active key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>
 				: <MenuItem key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>;
-			} else {
+			}
+			else
+			{
 				return choice === this.selectedChoice.value ? <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
 				: <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
 			}
@@ -91,14 +99,17 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 
 		var container:JSX.Element;
 
-		if(isComboBox) {
+		if (isComboBox)
+		{
 			container =
 			<ui.VBox style={{height:"100%", flex:1.0, alignItems:"center"}}>
 				<DropdownButton title={this.selectedChoice.value} id={`dropdown-${Weave.className(this)}`}>
 					{menus}
 				</DropdownButton>
 			</ui.VBox>
-		}else{
+		}
+		else
+		{
 			container =
 			<ListGroup>
 				{menus}

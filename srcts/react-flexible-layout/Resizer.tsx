@@ -31,7 +31,8 @@ resizerStyle.horizontal = {
     height: "100%"
 };
 
-export interface IResizerProps extends React.Props<Resizer> {
+export interface IResizerProps extends React.Props<Resizer>
+{
 	ref: string;
 	key: number;
 	direction: string;
@@ -39,38 +40,44 @@ export interface IResizerProps extends React.Props<Resizer> {
 	pane2: string;
 }
 
-export interface IResizerState {
+export interface IResizerState
+{
 	active?: boolean;
 }
 
-export default class Resizer extends React.Component<IResizerProps, IResizerState> {
-
+export default class Resizer extends React.Component<IResizerProps, IResizerState>
+{
 		private element:Element;
 
 		private boundMouseDown:any;
 
-		constructor(props:IResizerProps) {
+		constructor(props:IResizerProps)
+		{
 			super(props);
 			this.state = {
 				active: false
 			};
 		}
 
-		componentDidMount () {
+		componentDidMount()
+		{
 			this.element.addEventListener("mousedown", this.boundMouseDown = this.onMouseDown.bind(this));
 		}
 
-		componentWillUnmount () {
+		componentWillUnmount()
+		{
 			this.element.removeEventListener("mousedown", this.boundMouseDown);
 		}
 
-		onMouseDown () {
+		onMouseDown()
+		{
 			this.setState({
 				active:true
 			});
 		}
 
-		render() {
+		render()
+		{
 			var direction:string = this.props.direction;
 			var style:any = resizerStyle.basic;
 

@@ -12,7 +12,8 @@ import LinkableString = weavejs.core.LinkableString;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
 
-interface LocationRecord {
+interface LocationRecord
+{
 	dataX: (number|GeneralizedGeometry)[];
 	dataY: (number|GeneralizedGeometry)[];
 	id: IQualifiedKey;
@@ -39,15 +40,18 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 		(<any>this.filteredKeySet).setColumnKeySources([this.dataX, this.dataY]);
 	}
 
-	_getFeatureIds() {
+	_getFeatureIds()
+	{
 		return lodash.map(this.source.getFeatures(), (item:ol.Feature) => item.getId());
 	}
 
-	updateProjection():void {
+	updateProjection():void 
+	{
 		this.updateLocations();
 	}
 
-	updateLocations() {
+	updateLocations()
+	{
 		/* Update feature locations */
 		var recordIds = this.dataX.keys;
 		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);

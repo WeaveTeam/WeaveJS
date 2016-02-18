@@ -20,18 +20,20 @@ import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
 
-interface IDataFilterPaths {
+interface IDataFilterPaths
+{
 	editor:WeavePath;
 	filter:WeavePath;
 }
 
-interface IDataFilterState extends IVisToolState {
+interface IDataFilterState extends IVisToolState
+{
 	columnStats:IColumnStatistics
 }
 
 //Weave.registerClass("weave.ui.DataFilterTool", DataFilterTool, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
-
+export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
+{
 	private toolPath:WeavePath;
 	private paths:IDataFilterPaths;
 	private filter:WeavePath;
@@ -40,7 +42,8 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 	static DISCRETEFILTERCLASS:string = "weave.editors::DiscreteValuesDataFilterEditor";
 	static RANGEFILTERCLASS:string = "weave.editors::NumericRangeDataFilterEditor";
 
-	constructor(props:IVisToolProps) {
+	constructor(props:IVisToolProps)
+	{
 		super(props);
 		this.toolPath = this.props.toolPath;
 		this.filter = this.toolPath.push("filter", null);
@@ -48,7 +51,8 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		this.setupCallbacks();
 	}
 
-	private setupCallbacks() {
+	private setupCallbacks()
+	{
 		this.filter.addCallback(this, this.forceUpdate);
 		this.editor.addCallback(this, this.forceUpdate);
 	}
@@ -58,17 +62,24 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		return {};
 	}
 
-	get title():string {
+	get title():string
+	{
 	   return (this.toolPath.getType('panelTitle') ? this.toolPath.getState('panelTitle') : '') || this.toolPath.getPath().pop();
 	}
 
-	render():JSX.Element {
+	render():JSX.Element 
+	{
 		var editorType:string = this.editor.getType();
-		if(editorType == DataFilterTool.DISCRETEFILTERCLASS) {
+		if (editorType == DataFilterTool.DISCRETEFILTERCLASS)
+		{
 			return <DiscreteValuesDataFilterEditor editor={this.editor} filter={this.filter}/>
-		} else if (editorType == DataFilterTool.RANGEFILTERCLASS){
+		}
+		else if (editorType == DataFilterTool.RANGEFILTERCLASS)
+		{
 			return <NumericRangeDataFilterEditor editor={this.editor} filter={this.filter}/>
-		} else {
+		}
+		else
+		{
 			return <div/>;// blank tool
 		}
 	}
@@ -79,17 +90,18 @@ weavejs.util.BackwardsCompatibility.forceDeprecatedState(DataFilterTool); // TEM
 Weave.registerClass("weavejs.tool.DataFilter", DataFilterTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.ui::DataFilterTool", DataFilterTool);
 
-interface NumericRangeDataFilterEditorProps {
+interface NumericRangeDataFilterEditorProps
+{
 	editor:WeavePath
 	filter:WeavePath
 }
 
-interface NumericRangeDataFilterEditorState {
-
+interface NumericRangeDataFilterEditorState
+{
 }
 
-class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilterEditorProps, NumericRangeDataFilterEditorState> {
-
+class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilterEditorProps, NumericRangeDataFilterEditorState>
+{
 	public column:IAttributeColumn;
 	public enabled:LinkableBoolean;
 	public values:LinkableVariable;
@@ -100,7 +112,8 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 	private max:number;
 	private options:any;
 
-	constructor(props:NumericRangeDataFilterEditorProps) {
+	constructor(props:NumericRangeDataFilterEditorProps)
+	{
 		super(props);
 		this.filter = this.props.filter.getObject() as ColumnDataFilter;
 		this.values = this.filter.values;
@@ -109,7 +122,8 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 		this.options = [];
 	}
 
-	componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps) {
+	componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps)
+	{
 		this.filter = this.props.filter.getObject() as ColumnDataFilter;
 		this.values = this.filter.values;
 		this.column = this.filter.column;
@@ -121,16 +135,19 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 		return {};
 	}
 
-	componentDidMount() {
+	componentDidMount()
+	{
 		Weave.getCallbacks(this.forceDiscreteValues).addGroupedCallback(this, this.columnChanged);
 		Weave.getCallbacks(this.column).addGroupedCallback(this, this.columnChanged);
 	}
 
-	onChange(selectedValues:number[]) {
+	onChange(selectedValues:number[])
+	{
 		this.values.state = selectedValues;
 	}
 
-	columnChanged() {
+	columnChanged()
+	{
 		this.options = _.sortByOrder(_.uniq(this.column.keys.map((key:IQualifiedKey) => {
 			return {
 				value: this.column.getValueFromKey(key, Number),
@@ -140,7 +157,8 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 		this.forceUpdate();
 	}
 
-	render():JSX.Element {
+	render():JSX.Element 
+	{
 		let values:any = this.values.state;
 		if (this.forceDiscreteValues.value)
 		{
@@ -158,17 +176,18 @@ class NumericRangeDataFilterEditor extends React.Component<NumericRangeDataFilte
 }
 //Weave.registerClass("weave.editors.NumericRangeDataFilterEditor", NumericRangeDataFilterEditor, [weavejs.api.core.ILinkableObjectWithNewProperties]);
 
-interface DiscreteValuesDataFilterEditorProps {
+interface DiscreteValuesDataFilterEditorProps
+{
 	editor:WeavePath
 	filter:WeavePath
 }
 
-interface DiscreteValuesDataFilterEditorState {
-
+interface DiscreteValuesDataFilterEditorState
+{
 }
 
-class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataFilterEditorProps, DiscreteValuesDataFilterEditorState> {
-
+class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataFilterEditorProps, DiscreteValuesDataFilterEditorState>
+{
 	static LAYOUT_LIST:string = "List";
 	static LAYOUT_COMBO:string = "ComboBox";
 	static LAYOUT_VSLIDER:string = "VSlider";
@@ -186,7 +205,8 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 
 	private options:any;
 
-	constructor(props:DiscreteValuesDataFilterEditorProps) {
+	constructor(props:DiscreteValuesDataFilterEditorProps)
+	{
 		super(props);
 		this.layoutMode = this.props.editor.getObject("layoutMode") as LinkableString;
 		this.showToggle = this.props.editor.getObject("showToggle") as LinkableBoolean;
@@ -198,7 +218,8 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 		this.options = [];
 	}
 
-	componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps) {
+	componentWillReceiveProps(nextProps:DiscreteValuesDataFilterEditorProps)
+	{
 		this.layoutMode = this.props.editor.getObject("layoutMode") as LinkableString;
 		this.showToggle = this.props.editor.getObject("showToggle") as LinkableBoolean;
 		this.showToggleLabel = this.props.editor.getObject("showToggleLabel") as LinkableBoolean;
@@ -208,14 +229,16 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 		this.enabled = this.filter.enabled;
 	}
 
-	componentDidMount() {
+	componentDidMount()
+	{
 		Weave.getCallbacks(this.layoutMode).addGroupedCallback(this, this.forceUpdate);
 		Weave.getCallbacks(this.showToggle).addGroupedCallback(this, this.forceUpdate);
 		Weave.getCallbacks(this.showToggleLabel).addGroupedCallback(this, this.forceUpdate);
 		Weave.getCallbacks(this.column).addGroupedCallback(this, this.columnChanged);
 	}
 
-	columnChanged() {
+	columnChanged()
+	{
 		this.options = _.sortByOrder(_.uniq(this.column.keys.map((key:IQualifiedKey) => {
 			let val:string = this.column.getValueFromKey(key, String);
 			return {
@@ -226,7 +249,8 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 		this.forceUpdate();
 	}
 
-	onChange(selectedValues:string[]) {
+	onChange(selectedValues:string[])
+	{
 		this.values.state = selectedValues;
 	}
 
@@ -235,10 +259,12 @@ class DiscreteValuesDataFilterEditor extends React.Component<DiscreteValuesDataF
 		return {};
 	}
 
-	render():JSX.Element {
+	render():JSX.Element 
+	{
 		let values:any = this.values.state;
 
-		switch (this.layoutMode && this.layoutMode.value) {
+		switch (this.layoutMode && this.layoutMode.value)
+		{
 			case DiscreteValuesDataFilterEditor.LAYOUT_CHECKBOXLIST:
 				return <ui.CheckBoxList values={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 			case DiscreteValuesDataFilterEditor.LAYOUT_LIST:

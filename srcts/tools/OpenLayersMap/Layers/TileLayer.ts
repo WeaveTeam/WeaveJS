@@ -10,8 +10,8 @@ import AbstractLayer from "./AbstractLayer";
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 
-export default class TileLayer extends AbstractLayer {
-
+export default class TileLayer extends AbstractLayer
+{
 	oldProviderName:string;
 
 	provider = Weave.linkableChild(this, LinkableString);
@@ -45,7 +45,8 @@ export default class TileLayer extends AbstractLayer {
 					{
 						let providerName: string;
 						let params: any = {};
-						switch (serviceState.providerName) {
+						switch (serviceState.providerName)
+						{
 							case "Stamen WaterColor":
 								providerName = "stamen";
 								params.layer = "watercolor";

@@ -33,12 +33,14 @@ resizerStyle.horizontal = {
     height: "100%"
 };
 
-export interface IResizerOverlayProps extends React.Props<ResizerOverlay> {
+export interface IResizerOverlayProps extends React.Props<ResizerOverlay>
+{
     ref: string;
     direction: string
 }
 
-export interface IResizerOverlayState {
+export interface IResizerOverlayState
+{
     active?: boolean;
     range?: number[];
     x?: number;
@@ -46,15 +48,16 @@ export interface IResizerOverlayState {
 };
 
 
-export default class ResizerOverlay extends React.Component<IResizerOverlayProps, IResizerOverlayState> {
-
+export default class ResizerOverlay extends React.Component<IResizerOverlayProps, IResizerOverlayState>
+{
     private element: Element;
     public state: IResizerOverlayState;
 
     private _onMouseMove: EventListener;
     private _stopEventPropagation: EventListener;
 
-    constructor(props: IResizerOverlayProps) {
+    constructor(props: IResizerOverlayProps)
+    {
         super(props)
         this.state = {
           active: false,
@@ -64,24 +67,30 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         };
     }
 
-    componentDidMount() {
+    componentDidMount()
+    {
         document.addEventListener("mousemove", this._onMouseMove = this.onMouseMove.bind(this), true);
         mouseevents.forEach((mouseevent: string) => document.addEventListener(mouseevent, this._stopEventPropagation = this.stopEventPropagation.bind(this), true));
     }
 
-    componentWillUnmount() {
+    componentWillUnmount()
+    {
         document.removeEventListener("mousemove", this._onMouseMove)
         mouseevents.forEach((mouseevent) => document.removeEventListener(mouseevent, this._stopEventPropagation));
     }
 
-    stopEventPropagation(event: Event) {
-        if(this.state.active) {
+    stopEventPropagation(event: Event)
+	{
+        if (this.state.active)
+        {
             event.stopImmediatePropagation();
         }
     }
 
-    onMouseMove(event: MouseEvent) {
-        if(this.state.active) {
+    onMouseMove(event: MouseEvent)
+	{
+        if (this.state.active)
+        {
             event.stopImmediatePropagation();
             var container:Element = this.element.parentNode as Element;
             var rect:ClientRect = container.getBoundingClientRect();
@@ -91,12 +100,15 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 
             mousePos = Math.max(this.state.range[0], Math.min(mousePos, this.state.range[1]));
 
-            if (this.props.direction === HORIZONTAL) {
+            if (this.props.direction === HORIZONTAL)
+            {
                 this.setState({
                     x: mousePos - left,
                     y: NaN
                 });
-            } else {
+            }
+            else
+            {
                 this.setState({
                     x: NaN,
                     y: mousePos - top
@@ -105,18 +117,22 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         }
     }
 
-    render() {
+    render()
+    {
         var direction: string = this.props.direction;
         var style:React.CSSProperties = {};
 
         StandardLib.merge(style, resizerStyle.basic);
         StandardLib.merge(style, resizerStyle[direction]);
 
-        if(this.state.active) {
+        if (this.state.active)
+        {
             style.visibility = "visible";
             style.left = !isNaN(this.state.x) ? this.state.x : undefined;
             style.top = !isNaN(this.state.y) ? this.state.y : undefined;
-        } else {
+        }
+        else
+        {
             style.visibility = "hidden";
         }
 

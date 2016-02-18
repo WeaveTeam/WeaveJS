@@ -14,7 +14,8 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeySet = weavejs.data.key.DynamicKeySet;
 import IKeySet = weavejs.api.data.IKeySet;
 
-export abstract class AbstractFeatureLayer extends AbstractLayer {
+export abstract class AbstractFeatureLayer extends AbstractLayer
+{
 	/* A FeatureLayer assumes that each feature will have multiple custom style properties on each feature, which are managed based on selection. */
 	private updateMetaStyle:Function;
 	private debounced_updateMetaStyles:Function;
@@ -93,17 +94,20 @@ export abstract class AbstractFeatureLayer extends AbstractLayer {
 		}
 		else /* if typeof color is string */
 		{
-			if ((color as string)[0] === "#") {
+			if ((color as string)[0] === "#")
+			{
 				colorArray = ol.color.asArray(color as string);
 			}
-			else {
+			else
+			{
 				colorArray = ol.color.asArray("#" + StandardLib.decimalToHex(Number(color as string)));
 			}
 		}
 
 		colorArray = [].concat(colorArray); /* Should not be modified since it is cached in ol.color.asArray */
 
-		if (!colorArray) {
+		if (!colorArray)
+		{
 			return null;
 		}
 
@@ -135,12 +139,14 @@ export abstract class AbstractFeatureLayer extends AbstractLayer {
 		{
 			this.changedItems.clear();
 
-			for (let key of keySet.keys) {
+			for (let key of keySet.keys)
+			{
 				if (!previousContents.has(key))
 					this.changedItems.add(key);
 			}
 
-			for (let key of previousContents) {
+			for (let key of previousContents)
+			{
 				if (!keySet.containsKey(key))
 					this.changedItems.add(key);
 			}
@@ -319,7 +325,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer {
 	}
 };
 
-export interface MetaStyleProperties {
+export interface MetaStyleProperties
+{
 	normalStyle: ol.style.Style|Array<ol.style.Style>;
 	unselectedStyle: ol.style.Style|Array<ol.style.Style>;
 	selectedStyle: ol.style.Style|Array<ol.style.Style>;

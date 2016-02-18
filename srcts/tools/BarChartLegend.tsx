@@ -29,8 +29,8 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 
-export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool {
-
+export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
+{
     private chartColors = Weave.linkableChild(this, ColorRamp);
     private columns = Weave.linkableChild(this, new LinkableHashMap(ReferencedColumn));
     private maxColumns = Weave.linkableChild(this, LinkableNumber);
@@ -44,7 +44,8 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
     private spanStyle:CSSProperties;
     private numberOfLabels:number;
 
-    constructor(props:IVisToolProps) {
+    constructor(props:IVisToolProps)
+    {
         super(props);
 
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
@@ -81,19 +82,23 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
         };
 	}
 
-    get title():string {
+    get title():string
+    {
         return this.panelTitle.value ? this.panelTitle.value : Weave.getRoot(this).getName(this);
     }
 
-    handleClick(label:number,temp:any):void {
+    handleClick(label:number,temp:any):void 
+    {
 
     }
 
-    handleProbe(bin:number, mouseOver:boolean):void {
+    handleProbe(bin:number, mouseOver:boolean):void 
+    {
 
     }
 
-    getInteractionStyle(bin:number):CSSProperties {
+    getInteractionStyle(bin:number):CSSProperties 
+    {
         var selectedStyle:CSSProperties = {
             width:"100%",
             flex:1.0,
@@ -105,7 +110,8 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
         return selectedStyle;
     }
 
-    render() {
+    render()
+    {
         var width:number = this.props.style.width as number;
         var height:number = this.props.style.height as number;
         var shapeSize = this.shapeSize.value;
@@ -119,14 +125,18 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 
         var finalElements:any[] = [];
         var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
-        for(var j:number = 0; j<maxColumns; j++) {
+        for (var j:number = 0; j<maxColumns; j++)
+        {
 
             var element:JSX.Element[] = [];
             var elements:JSX.Element[] = [];
-            for(var i=0; i<this.numberOfLabels+extraBins; i++) {
-                if(i%maxColumns == j) {
+            for (var i=0; i<this.numberOfLabels+extraBins; i++)
+            {
+                if (i%maxColumns == j)
+                {
 
-                    if(i<this.numberOfLabels){
+                    if (i<this.numberOfLabels)
+                    {
                         element.push(
                             <ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
                                 <ui.HBox style={{width:shapeSize, position:"relative", padding:"0px 0px 0px 0px"}}>
@@ -139,7 +149,9 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
                                 </ui.HBox>
                             </ui.HBox>
                         );
-                    }else{
+                    }
+                    else
+                    {
                         element.push(
                             <ui.HBox key={i} style={{width:"100%", flex:1.0}}/>
                         );

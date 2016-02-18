@@ -63,7 +63,8 @@ export default class C3BarChart extends AbstractC3Tool
 		return [GROUP, STACK, PERCENT_STACK].indexOf(mode) >= 0;
 	}
 
-    get yLabelColumn():IAttributeColumn {
+    get yLabelColumn():IAttributeColumn
+    {
         return this.heightColumns.getObjects()[0] || this.sortColumn;
     }
 	
@@ -145,19 +146,25 @@ export default class C3BarChart extends AbstractC3Tool
                 },
                 labels: {
                     format: (v, id, i, j) => {
-                        if(this.showValueLabels.value) {
+                        if (this.showValueLabels.value)
+                        {
                             return v;
-                        } else {
+                        }
+                        else
+                        {
                             return "";
                         }
                     }
                 },
                 order: null,
                 color: (color:string, d:any):string => {
-                    if(this.heightColumnNames.length === 1 && d && d.hasOwnProperty("index")) {
+                    if (this.heightColumnNames.length === 1 && d && d.hasOwnProperty("index"))
+                    {
 						// use the color from the color column because we only have one height
 						return this.records[d.index].stringValues.color;
-                    } else {
+                    }
+                    else
+                    {
 						// use the color from the color ramp
                         return color;
                     }
@@ -165,20 +172,23 @@ export default class C3BarChart extends AbstractC3Tool
                 onclick: (d:any) => {
                 },
                 onselected: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
-						if(this.selectionKeySet)
+                    if (d && d.hasOwnProperty("index"))
+                    {
+						if (this.selectionKeySet)
 							this.selectionKeySet.addKeys([this.records[d.index].id]);
                     }
                 },
                 onunselected: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
-                        if(this.selectionKeySet)
+                    if (d && d.hasOwnProperty("index"))
+                    {
+                        if (this.selectionKeySet)
 							this.selectionKeySet.removeKeys([this.records[d.index].id]);
                     }
                 },
                 onmouseover: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
-						if(this.probeKeySet)
+                    if (d && d.hasOwnProperty("index"))
+                    {
+						if (this.probeKeySet)
                         	this.probeKeySet.replaceKeys([]);;
                         
 						var record:Record = this.records[d.index];
@@ -188,7 +198,8 @@ export default class C3BarChart extends AbstractC3Tool
 						var qKey:IQualifiedKey = this.records[d.index].id;
 						
 						var columns = this.heightColumns.getObjects() as IAttributeColumn[];
-						for(var index in columns) {
+						for (var index in columns)
+						{
 							var column = columns[index]; 
 							var columnName:string = column.getMetadata("title");
 							var color = this.chartColors.getColorFromNorm(Number(index) / (columns.length - 1));
@@ -199,10 +210,10 @@ export default class C3BarChart extends AbstractC3Tool
 
                         var title:string = record.stringValues.xLabel;
 						
-						if(this.probeKeySet)
+						if (this.probeKeySet)
 							this.probeKeySet.replaceKeys([qKey]);
 						
-						if(this.props.toolTip)
+						if (this.props.toolTip)
 	                        this.props.toolTip.setState({
 	                            x: this.chart.internal.d3.event.pageX,
 	                            y: this.chart.internal.d3.event.pageY,
@@ -214,10 +225,11 @@ export default class C3BarChart extends AbstractC3Tool
                     }
                 },
                 onmouseout: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
-						if(this.probeKeySet)
+                    if (d && d.hasOwnProperty("index"))
+                    {
+						if (this.probeKeySet)
 							this.probeKeySet.replaceKeys([]);
-						if(this.props.toolTip)
+						if (this.props.toolTip)
 	                        this.props.toolTip.setState({
 	                           showToolTip: false
 	                        });
@@ -240,21 +252,30 @@ export default class C3BarChart extends AbstractC3Tool
                         multiline: false,
                         format: (num:number):string => {
 							var record = this.records[num];
-							if(record) {
-								if(this.element && this.props.style.height > 0 && this.margin.bottom) {
+							if (record)
+							{
+								if (this.element && this.props.style.height > 0 && this.margin.bottom)
+								{
 									var labelHeight:number = this.margin.bottom.value/Math.cos(45*(Math.PI/180));
 									var labelString:string = record.stringValues.xLabel;
-									if(labelString) {
+									if (labelString)
+									{
 										var stringSize:number = StandardLib.getTextWidth(labelString, this.getFontString());
 										var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
 										return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
-									}else{
+									}
+									else
+									{
 										return "";
 									}
-								}else {
+								}
+								else
+								{
 									return record.stringValues.xLabel;
 								}
-                            } else {
+                            }
+                            else
+                            {
                                 return "";
                             }
                         }
@@ -300,11 +321,16 @@ export default class C3BarChart extends AbstractC3Tool
                 multiline: false,
                 format: (num:number):string => {
 					var record = this.records[num];
-                    if(record && this.yLabelColumnDataType !== "number") {
+                    if (record && this.yLabelColumnDataType !== "number")
+                    {
                         return record.stringValues.yLabel || "";
-                    } else if (this.groupingMode.value === PERCENT_STACK) {
+                    }
+                    else if (this.groupingMode.value === PERCENT_STACK)
+                    {
                         return d3.format(".0%")(num);
-                    } else {
+                    }
+                    else
+                    {
                         return String(FormatUtils.defaultNumberFormatting(num));
                     }
                 }
@@ -355,7 +381,8 @@ export default class C3BarChart extends AbstractC3Tool
         this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
         this.records = _.sortByOrder(this.records, ["numericValues.sort"], ["asc"]);
 
-        if(weavejs.WeaveAPI.Locale.reverseLayout) {
+        if (weavejs.WeaveAPI.Locale.reverseLayout)
+        {
             this.records = this.records.reverse();
         }
 
@@ -364,9 +391,11 @@ export default class C3BarChart extends AbstractC3Tool
         else //if(this.groupingMode === "group")
             this.c3Config.data.groups = [];
 
-        if (this.groupingMode.value === PERCENT_STACK && this.heightColumnNames.length > 1) {
+        if (this.groupingMode.value === PERCENT_STACK && this.heightColumnNames.length > 1)
+        {
             // normalize the height columns to be percentages.
-			for(var record of this.records) {
+			for (var record of this.records)
+			{
 				var heights = record.heights;
 				var sum:number = 0;
 				for (let key in heights)
@@ -384,10 +413,13 @@ export default class C3BarChart extends AbstractC3Tool
 		};
         
 		// if label column is specified
-        if(this.labelColumn.target) {
+        if (this.labelColumn.target)
+        {
             keys.x = "xLabel";
             this.c3Config.legend.show = false;
-        }else{
+        }
+        else
+        {
             this.c3Config.legend.show = true;
         }
 
@@ -395,16 +427,20 @@ export default class C3BarChart extends AbstractC3Tool
         var columnColors:{[name:string]: string} = {};
         var columnTitles:{[name:string]: string} = {};
 
-        if(this.heightColumnNames.length > 1) {
+        if (this.heightColumnNames.length > 1)
+        {
             this.heightColumnNames.forEach((name, index) => {
                 var color = this.chartColors.getColorFromNorm(index / (this.heightColumnNames.length - 1));
                 columnColors[name] = "#" + weavejs.util.StandardLib.numberToBase(color, 16, 6);;
                 columnTitles[name] = this.heightColumnsLabels[index];
             });
-            if(this.labelColumn.target) {
+            if (this.labelColumn.target)
+            {
                 this.c3Config.legend.show = true;
             }
-        }else{
+        }
+        else
+        {
             this.c3Config.legend.show = false;
         }
 
@@ -424,8 +460,9 @@ export default class C3BarChart extends AbstractC3Tool
         this.c3Config.data = data;
     }
 
-    updateStyle() {
-    	if(!this.chart || !this.heightColumnNames)
+    updateStyle()
+    {
+    	if (!this.chart || !this.heightColumnNames)
     		return;
 
 		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
@@ -465,7 +502,7 @@ export default class C3BarChart extends AbstractC3Tool
 						let probed = this.isProbed(key);
 						if (probed)
 							return 1.0;
-						if(selected)
+						if (selected)
 							return 0.7;
 						return 0.5;
 					});
@@ -523,7 +560,8 @@ export default class C3BarChart extends AbstractC3Tool
             var xLabel:string = this.xAxisName.value || "Sorted by " + this.sortColumn.getMetadata('title');
             var yLabel:string = this.yAxisName.value || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
 
-            if(!this.showXAxisLabel.value){
+            if (!this.showXAxisLabel.value)
+            {
                 xLabel = " ";
             }
 

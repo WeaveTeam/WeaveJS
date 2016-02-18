@@ -26,13 +26,15 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
-export class Margin {
+export class Margin
+{
     top = Weave.linkableChild(this, new LinkableNumber(20));
     bottom = Weave.linkableChild(this, new LinkableNumber(100));
     left = Weave.linkableChild(this, new LinkableNumber(100));
     right = Weave.linkableChild(this, new LinkableNumber(20));
 }
-export class OverrideBounds {
+export class OverrideBounds
+{
     xMin = Weave.linkableChild(this, LinkableNumber);
     yMin = Weave.linkableChild(this, LinkableNumber);
     xMax = Weave.linkableChild(this, LinkableNumber);
@@ -81,7 +83,8 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		return keySet instanceof KeySet && keySet.containsKey(key);
 	} 
 
-    get title():string {
+    get title():string
+    {
        return this.panelTitle.value;
     }
 

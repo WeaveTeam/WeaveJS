@@ -20,8 +20,8 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
-export default class ScatterPlotLayer extends AbstractGlyphLayer {
-
+export default class ScatterPlotLayer extends AbstractGlyphLayer
+{
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
 	radius = Weave.linkableChild(this, new AlwaysDefinedColumn(5));

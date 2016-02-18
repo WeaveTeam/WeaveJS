@@ -101,11 +101,13 @@ export default class AbstractC3Tool extends AbstractVisTool
 		}
 	}
 	
-    get internalWidth():number {
+    get internalWidth():number
+    {
         return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
     }
 
-    get internalHeight():number {
+    get internalHeight():number
+    {
         return this.props.style.height - this.c3Config.padding.top - Number(this.margin.bottom.value);
     }
 	
@@ -113,10 +115,13 @@ export default class AbstractC3Tool extends AbstractVisTool
 	{
 	    this.c3Config.padding.top = this.margin.top.value;
 	    this.c3Config.axis.x.height = this.margin.bottom.value;
-	    if(weavejs.WeaveAPI.Locale.reverseLayout){
+	    if (weavejs.WeaveAPI.Locale.reverseLayout)
+	    {
 	        this.c3Config.padding.left = this.margin.right.value;
 	        this.c3Config.padding.right = this.margin.left.value;
-	    }else{
+	    }
+	    else
+	    {
 	        this.c3Config.padding.left = this.margin.left.value;
 	        this.c3Config.padding.right = this.margin.right.value;
 	    }
@@ -134,30 +139,36 @@ export default class AbstractC3Tool extends AbstractVisTool
         this.c3Config.axis.y.max = finiteOrNull(this.overrideBounds.yMax.value);
 	}
 	
-    private cullAxis(axisSize:number, axisClass:string):void {
+    private cullAxis(axisSize:number, axisClass:string):void
+    {
         var intervalForCulling:number = this.getCullingInterval(axisSize,axisClass);
         d3.select(this.element).selectAll('.' + axisClass + ' .tick text').each(function (e, index) {
-            if (index >= 0) {
+            if (index >= 0)
+            {
                 d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
             }
         });
     }
 
-    protected cullAxes() {
+    protected cullAxes()
+    {
         //cull axes
         var width:number = this.internalWidth;
         var height:number = this.internalHeight;
         this.cullAxis(width, this.xAxisClass);
-        if(weavejs.WeaveAPI.Locale.reverseLayout) {
+        if (weavejs.WeaveAPI.Locale.reverseLayout)
+        {
             this.cullAxis(height, this.y2AxisClass);
-        }else{
+        }
+        else
+        {
             this.cullAxis(height, this.yAxisClass);
         }
     }
 
     componentDidUpdate():void
 	{
-        if(this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height)
+        if (this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height)
 		{
             this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
 			if (this.chart)
@@ -166,7 +177,8 @@ export default class AbstractC3Tool extends AbstractVisTool
         }
     }
 
-    customStyle(array:Array<number>, type:string, filter:string, style:any) {
+    customStyle(array:Array<number>, type:string, filter:string, style:any)
+    {
         var filtered = d3.select(this.element).selectAll(type).filter(filter);
         if (filtered.length)
         {
@@ -176,7 +188,8 @@ export default class AbstractC3Tool extends AbstractVisTool
         }
     }
 
-    customSelectorStyle(array:Array<number>, selector:any, style:any) {
+    customSelectorStyle(array:Array<number>, selector:any, style:any)
+    {
         array.forEach( (index) => {
             if (selector.length)
                 d3.select(selector[0][index]).style(style);
@@ -187,19 +200,23 @@ export default class AbstractC3Tool extends AbstractVisTool
 	{
 	}
 	
-    render():JSX.Element {
+    render():JSX.Element 
+    {
         return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
     }
 
-    getCullingInterval(size:number,axisClass:string):number {
+    getCullingInterval(size:number,axisClass:string):number 
+    {
         var textHeight:number = StandardLib.getTextHeight("test", this.getFontString());
         var labelsToShow:number = Math.floor(size / textHeight);
         labelsToShow = Math.max(2,labelsToShow);
 
         var tickValues:number = d3.select(this.element).selectAll('.' + axisClass + ' .tick text').size();
         var intervalForCulling:number;
-        for (var i:number = 1; i < tickValues; i++) {
-            if (tickValues / i < labelsToShow) {
+        for (var i:number = 1; i < tickValues; i++)
+        {
+            if (tickValues / i < labelsToShow)
+            {
                 intervalForCulling = i;
                 break;
             }
@@ -207,7 +224,8 @@ export default class AbstractC3Tool extends AbstractVisTool
         return intervalForCulling;
     }
 
-    getFontString():string {
+    getFontString():string 
+    {
         return this.props.fontSize + "pt " + this.props.font;
     }
 }

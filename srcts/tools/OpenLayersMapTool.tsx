@@ -43,19 +43,21 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 import Bounds2D = weavejs.geom.Bounds2D;
 
-interface Bounds {
+interface Bounds
+{
 	xMin: number;
 	xMax: number;
 	yMin: number;
 	yMax: number;
 }
 
-function isBounds(obj:any):boolean {
+function isBounds(obj:any):boolean
+{
 	return lodash.every(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj[item] === "number");
 }
 
-export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> {
-
+export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
+{
 	static DEFAULT_PROJECTION: string = "EPSG:4326";
 
 	map:ol.Map;
@@ -181,7 +183,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let extent:ol.Extent = [NaN,NaN,NaN,NaN];
 		let rawExtent: Bounds = this.extentOverride.state as Bounds;
 
-		if (rawExtent) {
+		if (rawExtent)
+		{
 			extent[0] = rawExtent.xMin;
 			extent[1] = rawExtent.yMin;
 			extent[2] = rawExtent.xMax;
@@ -376,7 +379,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	}
 
-	render():JSX.Element {
+	render():JSX.Element 
+	{
         return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%"}}/>;
     }
 }

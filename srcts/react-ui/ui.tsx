@@ -5,7 +5,8 @@ import VSlider from "./RCSlider/VSlider";
 import CheckBoxList from "./CheckBoxList";
 import ListItem from "./ListItem";
 
-export default {
+export default
+{
     HBox,
     VBox,
     HSlider,

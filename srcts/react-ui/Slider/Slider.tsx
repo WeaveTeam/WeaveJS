@@ -8,7 +8,8 @@ import * as Prefixer from "react-vendor-prefix";
 import HBox from "../HBox";
 import VBox from "../VBox";
 
-export interface SliderProps extends React.Props<Slider> {
+export interface SliderProps extends React.Props<Slider>
+{
     min:number;
     max:number;
     step:number;
@@ -19,48 +20,56 @@ export interface SliderProps extends React.Props<Slider> {
     label?:string;
 }
 
-export interface SliderState {
+export interface SliderState
+{
     value:number;
 }
 
-export default class Slider extends React.Component<SliderProps, SliderState> {
-
-    constructor(props:SliderProps) {
+export default class Slider extends React.Component<SliderProps, SliderState>
+{
+    constructor(props:SliderProps)
+	{
         super(props);
         this.state = {
             value: this.props.value
         };
     }
 
-    componentWillReceiveProps(nextProps:SliderProps) {
+    componentWillReceiveProps(nextProps:SliderProps)
+	{
         this.setState({
             value: nextProps.value
         });
     }
 
-    onChange(event:React.FormEvent) {
+    onChange(event:React.FormEvent)
+	{
         this.setState({
             value: (event.target as any).value
         });
-        if(this.props.onChange)
+        if (this.props.onChange)
             this.props.onChange(event);
     }
 
     static VERTICAL:string = "vertical";
     static HORIZONTAL:string ="horizontal";
 
-    render() {
+    render()
+    {
         var sliderStyle:React.CSSProperties = _.clone(this.props.style) || {};
 
         var otherProps:any = {};
 
-        for(var key in this.props) {
-            if(key !== "style") {
+        for (var key in this.props)
+        {
+            if (key !== "style")
+            {
                 otherProps[key] = (this.props as any)[key];
             }
         }
 
-        if(this.props.direction == Slider.VERTICAL) {
+        if (this.props.direction == Slider.VERTICAL)
+        {
             sliderStyle.writingMode = "bt-lr";
             sliderStyle.appearance = "slider-vertical";
         }
@@ -75,7 +84,8 @@ export default class Slider extends React.Component<SliderProps, SliderState> {
                                                                             onChange={this.onChange.bind(this)}/>
                                        ]
 
-        if(this.props.direction == Slider.VERTICAL) {
+        if (this.props.direction == Slider.VERTICAL)
+        {
             return (<HBox style={{
                                     width: this.props.style ? this.props.style.width : null,
                                     height: this.props.style ? this.props.style.height : null
@@ -85,7 +95,9 @@ export default class Slider extends React.Component<SliderProps, SliderState> {
                     sliderContent
                 }
             </HBox>);
-        } else {
+        }
+        else
+        {
             return (<VBox style={{
                                     width: this.props.style ? this.props.style.width : null,
                                     height: this.props.style ? this.props.style.height : null

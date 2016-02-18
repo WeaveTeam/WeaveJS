@@ -38,7 +38,8 @@ else
 	}
 }
 
-function render() {
+function render()
+{
 	$(() => {
 		ReactDOM.render(<Layout weave={weave} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
 	});

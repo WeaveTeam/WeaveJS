@@ -16,8 +16,8 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 
-export default class GeometryLayer extends AbstractFeatureLayer {
-
+export default class GeometryLayer extends AbstractFeatureLayer
+{
 	geoJsonParser:ol.format.GeoJSON;
 
 	fill = Weave.linkableChild(this, SolidFillStyle);

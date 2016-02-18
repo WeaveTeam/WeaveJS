@@ -6,36 +6,40 @@ import * as React from "react";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
 
-export interface IColumnTitles {
+export interface IColumnTitles
+{
     [columnId: string] : string
 }
 
-export interface ITableHeadProps extends React.Props<TableHead> {
+export interface ITableHeadProps extends React.Props<TableHead>
+{
     columnTitles:IColumnTitles;
     showIdColumn:boolean;
     idProperty:string;
 }
 
-export interface ITableHeadState {
-
+export interface ITableHeadState
+{
 }
 
 const baseStyle:CSSProperties = {
     userSelect: "none"
 };
 
-export default class TableHead extends React.Component<ITableHeadProps, ITableHeadState> {
-
-    constructor(props:ITableHeadProps) {
+export default class TableHead extends React.Component<ITableHeadProps, ITableHeadState>
+{
+    constructor(props:ITableHeadProps)
+	{
         super(props);
     }
 
-    render():JSX.Element {
-
+    render():JSX.Element
+	{
         var headers:JSX.Element[] = [];
 
         var keys:string[] = Object.keys(this.props.columnTitles);
-        if(!this.props.showIdColumn) {
+        if (!this.props.showIdColumn)
+        {
             keys.splice(keys.indexOf(this.props.idProperty), 1);
         }
         headers = keys.map((columnId:string) => {

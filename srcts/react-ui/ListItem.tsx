@@ -13,51 +13,58 @@ import HBox from "./HBox";
 import StandardLib from "../utils/StandardLib";
 import * as Prefixer from "react-vendor-prefix";
 
-export interface IListItemProps extends React.Props<ListItem> {
+export interface IListItemProps extends React.Props<ListItem>
+{
     values:any[];
     labels?:string[];
     onChange?:(selectedValues:string[]) => void;
     selectedValues?:string[];
 }
 
-export interface IListItemstate {
+export interface IListItemstate
+{
     selectedValues?:string[];
     hovered?:number;
 }
 
-export default class ListItem extends React.Component<IListItemProps, IListItemstate> {
-
+export default class ListItem extends React.Component<IListItemProps, IListItemstate>
+{
     private checkboxes:HTMLElement[];
     private lastIndexClicked:number;
     private selectedValues:string[];
 
-    constructor(props:IListItemProps) {
+    constructor(props:IListItemProps)
+	{
         super(props);
         this.state = {
             selectedValues: props.selectedValues || []
         };
-        if(props.selectedValues) {
+        if (props.selectedValues)
+        {
             this.lastIndexClicked = props.selectedValues.length - 1;
         }
     }
 
-    componentWillReceiveProps(nextProps:IListItemProps) {
-        if(nextProps.selectedValues) {
+    componentWillReceiveProps(nextProps:IListItemProps)
+	{
+        if (nextProps.selectedValues)
+        {
             this.setState({
                 selectedValues: nextProps.selectedValues
             });
         }
     }
 
-    handleChange(value:string, event:React.MouseEvent) {
+    handleChange(value:string, event:React.MouseEvent)
+	{
         var selectedValues:string[] = this.state.selectedValues.splice(0);
         // new state of the item in the list
 
         var currentIndexClicked:number = selectedValues.indexOf(value);
         // ctrl selection
-        if(event.ctrlKey || event.metaKey)
+        if (event.ctrlKey || event.metaKey)
         {
-            if(currentIndexClicked > -1)
+            if (currentIndexClicked > -1)
             {
                 selectedValues.splice(currentIndexClicked, 1);
             }
@@ -68,33 +75,38 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
             this.lastIndexClicked = currentIndexClicked;
         }
         // shift selection
-        else if(event.shiftKey)
+        else if (event.shiftKey)
         {
             selectedValues = [];
-            if(this.lastIndexClicked == null)
+            if (this.lastIndexClicked == null)
             {
                 // do nothing
-            } else {
+            }
+            else
+            {
                 var start:number = this.lastIndexClicked;
                 var end:number = this.props.values.indexOf(value);
 
-                if(start > end) {
+                if (start > end)
+                {
                     let temp:number = start;
                     start = end;
                     end = temp;
                 }
 
-                for(var i:number = start; i <= end; i++) {
+                for (var i:number = start; i <= end; i++)
+                {
                     selectedValues.push(this.props.values[i]);
                 }
             }
         }
         // single selection
-        else {
+        else
+        {
             // if there was only one record selected
             // and we are clicking on it again, then we want to
             // clear the selection.
-            if(selectedValues.length == 1 && selectedValues[0] == value)
+            if (selectedValues.length == 1 && selectedValues[0] == value)
             {
                 selectedValues = [];
                 this.lastIndexClicked = null;
@@ -106,7 +118,7 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
             }
         }
 
-        if(this.props.onChange)
+        if (this.props.onChange)
             this.props.onChange(selectedValues);
 
 
@@ -115,7 +127,8 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
         });
     }
 
-    render():JSX.Element {
+    render():JSX.Element
+	{
         var values:string[] = this.props.values || [];
 
         var spanStyle:React.CSSProperties = {
@@ -139,19 +152,23 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
                             width: "100%",
                         };
 
-                        if(selected && hovered) {
+                        if (selected && hovered)
+                        {
                             style["backgroundColor"] = "#99D6FF";
                         }
 
-                        if(selected && !hovered) {
+                        if (selected && !hovered)
+                        {
                             style["backgroundColor"] = "#80CCFF";
                         }
 
-                        if(!selected && hovered) {
+                        if (!selected && hovered)
+                        {
                             style["backgroundColor"] = StandardLib.rgba(153, 214, 255, 0.4);
                         }
 
-                        if(!selected && !hovered) {
+                        if (!selected && !hovered)
+                        {
                             style["backgroundColor"] = "#FFFFFF";
                         }
 

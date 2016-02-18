@@ -23,13 +23,14 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import KeySet = weavejs.data.key.KeySet;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-export interface IDataTableState extends IVisToolState {
+export interface IDataTableState extends IVisToolState
+{
     data:IRow[],
     columnTitles:{[columnId:string]: string}
 }
 
-export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool {
-
+export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool
+{
     columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
     panelTitle = Weave.linkableChild(this, new LinkableString);
     selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
@@ -41,7 +42,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	
 	idProperty:string = ''; // won't conflict with any column name
 
-    constructor(props:IVisToolProps) {
+    constructor(props:IVisToolProps)
+    {
         super(props);
         Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
 
@@ -62,19 +64,23 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		return {};
 	}
 
-    get title():string {
+    get title():string
+    {
        return this.panelTitle.value;;
     }
 
-    componentDidMount() {
+    componentDidMount()
+    {
 
     }
 
-    componentDidUpdate() {
+    componentDidUpdate()
+    {
 
     }
 
-    dataChanged() {
+    dataChanged()
+    {
         this.filteredKeySet.setColumnKeySources(this.columns.getObjects());
         var names:string[] = this.columns.getNames();
         var columns:IAttributeColumn[] = this.columns.getObjects();
@@ -91,23 +97,26 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
         });
     }
 
-    // customFormat(cell, row) {
-    //     if(typeof cell === "number") {
+    // customFormat(cell, row)
+	// {
+    //     if (typeof cell === "number")
     //         return round(cell, 2)
-    //     } else {
+    //     else
     //         return cell;
-    //     }
     // }
 
-    handleProbe(ids:IQualifiedKey[]) {
+    handleProbe(ids:IQualifiedKey[])
+    {
         this.probeKeySet.replaceKeys(ids)
     }
 
-    handleSelection(ids:IQualifiedKey[]) {
+    handleSelection(ids:IQualifiedKey[])
+    {
         this.selectionKeySet.replaceKeys(ids);
     }
 
-    render() {
+    render()
+    {
         return <ReactBootstrapTable columnTitles={this.state.columnTitles}
                                     rows={this.state.data}
                                     idProperty={this.idProperty}

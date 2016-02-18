@@ -18,8 +18,8 @@ import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
-export default class ImageGlyphLayer extends AbstractGlyphLayer {
-
+export default class ImageGlyphLayer extends AbstractGlyphLayer
+{
 	private imageGlyphCache:ImageGlyphCache;
 
 	imageSize = Weave.linkableChild(this, AlwaysDefinedColumn);
@@ -38,10 +38,12 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer {
 		this.color.addGroupedCallback(this, this.updateStyleData, true);
 	}
 
-	getToolTipColumns(): IAttributeColumn[] {
+	getToolTipColumns(): IAttributeColumn[] 
+	{
 		let additionalColumns: IAttributeColumn[] = [];
 
-		for (let column of [this.imageSize, this.imageURL, this.alpha, this.color]) {
+		for (let column of [this.imageSize, this.imageURL, this.alpha, this.color])
+		{
 			let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column);
 			if (internalColumn)
 				additionalColumns.push(internalColumn);
@@ -98,7 +100,8 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer {
 		feature.setProperties(styles);
 	}
 
-	updateStyleData() {
+	updateStyleData()
+	{
 		/* Update feature styles */
 
 		var recordIds:IQualifiedKey[] = this.dataX.keys;

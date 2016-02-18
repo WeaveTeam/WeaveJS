@@ -99,7 +99,8 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		let key:any /*IQualifiedKey*/ = this.pixelToKey(event.pixel);
 		let toolTipState: IToolTipState = {};
 
-		if (key) {
+		if (key)
+		{
 			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
 
 			toolTipState.showToolTip = true;

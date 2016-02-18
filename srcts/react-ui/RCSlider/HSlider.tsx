@@ -3,7 +3,8 @@
 import * as React from "react";
 import RCSlider from "./RCSlider";
 
-export interface HSliderProps extends React.Props<HSlider> {
+export interface HSliderProps extends React.Props<HSlider>
+{
     min?:number;
     max?:number;
     step?:number;
@@ -14,13 +15,15 @@ export interface HSliderProps extends React.Props<HSlider> {
     onChange?:React.EventHandler<React.FormEvent>;
 }
 
-export default class HSlider extends React.Component<HSliderProps, any> {
-
-    constructor(props:HSliderProps) {
+export default class HSlider extends React.Component<HSliderProps, any>
+{
+    constructor(props:HSliderProps)
+    {
         super(props);
     }
 
-    render() {
+    render()
+    {
         return <RCSlider {...this.props}/>;
     }
 }

@@ -1,14 +1,16 @@
 import React from "react";
 
 
-export default class Test extends React.Component {
-
-	constructor(props) {
+export default class Test extends React.Component
+{
+	constructor(props)
+	{
 		super(props);
 		window.test = this;
 	}
 
-	render() {
+	render()
+	{
 		return <div>
 					{JSON.stringify(this.state)}
 				</div>;

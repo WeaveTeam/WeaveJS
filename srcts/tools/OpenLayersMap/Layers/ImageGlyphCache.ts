@@ -10,7 +10,8 @@ import * as jquery from "jquery";
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
 
-class ImageGlyphCache {
+class ImageGlyphCache
+{
 	private baseImageElements:Map<string,HTMLImageElement>;
 	private canvasMap:Dictionary2D<string,string,HTMLCanvasElement>;
 	private imageMap:Dictionary2D<string,string,HTMLImageElement>;

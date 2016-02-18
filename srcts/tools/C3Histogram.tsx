@@ -33,7 +33,8 @@ declare type Record = {
 	columnToAggregate: number
 };
 
-export default class C3Histogram extends AbstractC3Tool {
+export default class C3Histogram extends AbstractC3Tool
+{
 	binnedColumn = Weave.linkableChild(this, BinnedColumn);
 	columnToAggregate = Weave.linkableChild(this, DynamicColumn);
 	aggregationMethod = Weave.linkableChild(this, LinkableString);
@@ -68,7 +69,8 @@ export default class C3Histogram extends AbstractC3Tool {
     private busy:boolean;
     private dirty:boolean;
 
-    constructor(props:IVisToolProps) {
+    constructor(props:IVisToolProps)
+    {
         super(props);
 		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
 		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
@@ -113,8 +115,8 @@ export default class C3Histogram extends AbstractC3Tool {
                             var temp:number = this.histData.length-1;
                             decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(temp-d.index);
                         }
-						else
-						{
+                        else
+                        {
                             decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(d.index);
                         }
                         return "#" + StandardLib.decimalToHex(decColor);
@@ -124,22 +126,26 @@ export default class C3Histogram extends AbstractC3Tool {
                 onclick: (d:any) => {
                 },
                 onselected: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
+                    if (d && d.hasOwnProperty("index"))
+                    {
                         this.selectionKeySet.addKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
                 },
                 onunselected: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
+                    if (d && d.hasOwnProperty("index"))
+                    {
                         this.selectionKeySet.removeKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
                 },
                 onmouseover: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
+                    if (d && d.hasOwnProperty("index"))
+                    {
                         this.probeKeySet.replaceKeys(this.binnedColumn.getKeysFromBinIndex(d.index));
                     }
                 },
                 onmouseout: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
+                    if (d && d.hasOwnProperty("index"))
+                    {
                         this.probeKeySet.replaceKeys([]);
                     }
                 }
@@ -162,24 +168,33 @@ export default class C3Histogram extends AbstractC3Tool {
                         },
                         multiline: false,
                         format: (num:number):string => {
-                            if(this.element && this.props.style.height > 0) {
+                            if (this.element && this.props.style.height > 0)
+                            {
                                 var labelHeight:number = Number(this.margin.bottom)/Math.cos(45*(Math.PI/180));
                                 var labelString:string;
-                                if(weavejs.WeaveAPI.Locale.reverseLayout){
+                                if (weavejs.WeaveAPI.Locale.reverseLayout)
+                                {
                                     //handle case where labels need to be reversed
                                     var temp:number = this.histData.length-1;
                                     labelString = this.binnedColumn.deriveStringFromNumber(temp-num);
-                                }else{
+                                }
+                                else
+                                {
                                     labelString = this.binnedColumn.deriveStringFromNumber(num);
                                 }
-                                if(labelString) {
+                                if (labelString)
+                                {
                                     var stringSize:number = StandardLib.getTextWidth(labelString, this.getFontString());
                                     var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
                                     return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
-                                }else{
+                                }
+                                else
+                                {
                                     return "";
                                 }
-                            }else {
+                            }
+                            else
+                            {
                                 return this.binnedColumn.deriveStringFromNumber(num);
                             }
                         }
@@ -264,18 +279,25 @@ export default class C3Histogram extends AbstractC3Tool {
         }];
     }
 
-    rotateAxes() {
+    rotateAxes()
+    {
         //this.c3Config.axis.rotated = true;
         //this.forceUpdate();
     }
 
-    private getYAxisLabel():string {
+    private getYAxisLabel():string
+    {
         var overrideAxisName = this.yAxisName.value;
-        if(overrideAxisName) {
+        if (overrideAxisName)
+        {
             return overrideAxisName;
-        } else {
-            if(this.columnToAggregate.getInternalColumn()) {
-                switch(this.aggregationMethod.value) {
+        }
+        else
+        {
+            if (this.columnToAggregate.getInternalColumn())
+            {
+                switch(this.aggregationMethod.value)
+                {
                     case "count":
                         return "Number of records";
                     case "sum":
@@ -283,13 +305,16 @@ export default class C3Histogram extends AbstractC3Tool {
                     case "mean":
                         return "Mean of " + this.columnToAggregate.getMetadata('title');
                 }
-            } else {
+            }
+            else
+            {
                 return "Number of records";
             }
         }
     }
 
-    updateStyle() {
+    updateStyle()
+    {
     	if (!this.chart || !this.records.length)
     		return;
 
@@ -331,13 +356,14 @@ export default class C3Histogram extends AbstractC3Tool {
                     return probed ? 2.0 : 1.0;
                 });
 
-       if(!probedBinIndices.length)
+       if (!probedBinIndices.length)
         {
             this.chart.select(this.heightColumnNames, [], true);
         }
     }
 
-    private dataChanged() {
+    private dataChanged()
+    {
 
         this.binnedColumnDataType = this.binnedColumn.getMetadata('dataType');
 
@@ -358,16 +384,21 @@ export default class C3Histogram extends AbstractC3Tool {
         // this._columnToAggregatePath.getObject().getInternalColumn();
         var columnToAggregateNameIsDefined:boolean = !!this.columnToAggregate.getInternalColumn();
 
-        for(let iBin:number = 0; iBin < this.numberOfBins; iBin++) {
+        for (let iBin:number = 0; iBin < this.numberOfBins; iBin++)
+        {
 
             let recordsInBin:Record[] = _.filter(this.records, { binnedColumn: iBin });
 
-            if(recordsInBin) {
+            if (recordsInBin)
+            {
                 var obj:any = {height:0};
-                if(columnToAggregateNameIsDefined) {
+                if (columnToAggregateNameIsDefined)
+                {
                     obj.height = this.getAggregateValue(recordsInBin, "columnToAggregate", this.aggregationMethod.value);
                     this.histData.push(obj);
-                } else {
+                }
+                else
+                {
                     obj.height = this.getAggregateValue(recordsInBin, "binnedColumn", "count");
                     this.histData.push(obj);
                 }
@@ -375,7 +406,8 @@ export default class C3Histogram extends AbstractC3Tool {
         }
 
         this.keys = { value: ["height"] };
-        if(weavejs.WeaveAPI.Locale.reverseLayout){
+        if (weavejs.WeaveAPI.Locale.reverseLayout)
+        {
             this.histData = this.histData.reverse();
         }
 
@@ -383,12 +415,14 @@ export default class C3Histogram extends AbstractC3Tool {
         this.c3Config.data.keys = this.keys;
       }
 
-    private getAggregateValue(records:Record[], columnToAggregateName:string, aggregationMethod:string):number {
+    private getAggregateValue(records:Record[], columnToAggregateName:string, aggregationMethod:string):number
+    {
 
         var count:number = 0;
         var sum:number = 0;
 
-        if(!Array.isArray(records)) {
+        if (!Array.isArray(records))
+        {
             return 0;
         }
 
@@ -397,11 +431,13 @@ export default class C3Histogram extends AbstractC3Tool {
             sum += record[columnToAggregateName as string] as number;
         });
 
-        if (aggregationMethod === "mean") {
+        if (aggregationMethod === "mean")
+        {
             return sum / count; // convert sum to mean
         }
 
-        if (aggregationMethod === "count") {
+        if (aggregationMethod === "count")
+        {
 
             return count; // use count of finite values
         }
@@ -468,8 +504,9 @@ export default class C3Histogram extends AbstractC3Tool {
         }
     }
 
-    loadData() {
-        if(!this.chart || this.busy)
+    loadData()
+    {
+        if (!this.chart || this.busy)
             return StandardLib.debounce(this, 'loadData');
         this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; this.cullAxes();}});
     }

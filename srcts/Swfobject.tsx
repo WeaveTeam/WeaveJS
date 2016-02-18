@@ -6,7 +6,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as swfobject from "swfobject-amd";
 
-export interface ISwfObjectProps extends React.Props<Swfobject> {
+export interface ISwfObjectProps extends React.Props<Swfobject>
+{
     swfUrl:string;
     xiSwfUrlStr?:string;
     swfVersionStr?:string;
@@ -27,8 +28,8 @@ export interface ISwfObjectProps extends React.Props<Swfobject> {
     onLoad?: (callbackObj: swfobject.ICallbackObj) => void
 }
 
-export default class Swfobject extends React.Component<ISwfObjectProps, any> {
-
+export default class Swfobject extends React.Component<ISwfObjectProps, any>
+{
     static defaultProps:ISwfObjectProps = {
         swfUrl: "",
         xiSwfUrlStr: "playerProductInstall.swf",
@@ -50,11 +51,13 @@ export default class Swfobject extends React.Component<ISwfObjectProps, any> {
         }
     }
 
-    constructor(props:ISwfObjectProps) {
+    constructor(props:ISwfObjectProps)
+    {
         super(props);
     }
 
-    componentDidMount() {
+    componentDidMount()
+    {
 
         swfobject.embedSWF(
             this.props.swfUrl, ReactDOM.findDOMNode(this.refs["swfobject"]),
@@ -63,7 +66,8 @@ export default class Swfobject extends React.Component<ISwfObjectProps, any> {
             this.props.flashvars, this.props.params, this.props.attributes, this.props.onLoad);
     }
 
-    render() {
+    render()
+    {
         return (
             <div style={this.props.style}>
                 <div ref="swfobject">

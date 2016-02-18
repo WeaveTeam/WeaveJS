@@ -4,7 +4,8 @@ import * as React from "react";
 import Slider from "./Slider";
 import {SliderProps} from "./Slider";
 
-export interface HSliderProps extends React.Props<HSlider> {
+export interface HSliderProps extends React.Props<HSlider>
+{
     min:number;
     max:number;
     step:number;
@@ -14,13 +15,15 @@ export interface HSliderProps extends React.Props<HSlider> {
     label?:string;
 }
 
-export default class HSlider extends React.Component<HSliderProps, any> {
-
-    constructor(props:HSliderProps) {
+export default class HSlider extends React.Component<HSliderProps, any>
+{
+    constructor(props:HSliderProps)
+    {
         super(props);
     }
 
-    render():JSX.Element {
+    render():JSX.Element 
+    {
         return <Slider direction={Slider.HORIZONTAL} {...this.props}/>;
     }
 }

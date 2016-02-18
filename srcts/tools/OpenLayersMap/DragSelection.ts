@@ -36,9 +36,12 @@ export default class DragSelection extends ol.interaction.DragBox
 
 	private get probeInteraction():ProbeInteraction
 	{
-		if (!this._probeInteraction) {
-			for (let interaction of this.getMap().getInteractions().getArray()) {
-				if (interaction instanceof ProbeInteraction) {
+		if (!this._probeInteraction)
+		{
+			for (let interaction of this.getMap().getInteractions().getArray())
+			{
+				if (interaction instanceof ProbeInteraction)
+				{
 					this._probeInteraction = interaction;
 					break;
 				}
@@ -48,7 +51,8 @@ export default class DragSelection extends ol.interaction.DragBox
 		return this._probeInteraction;
 	}
 
-	onBoxStart(event: any) {
+	onBoxStart(event: any)
+	{
 		if (this.probeInteraction)
 			this.probeInteraction.setActive(false);
 
@@ -75,11 +79,13 @@ export default class DragSelection extends ol.interaction.DragBox
 		let selectedFeatures: Set<IQualifiedKey> = new Set();
 		let selectFeature: Function = (feature: ol.Feature) => { selectedFeatures.add(<IQualifiedKey>feature.getId()); };
 
-		for (let olLayer of this.getMap().getLayers().getArray()) {
+		for (let olLayer of this.getMap().getLayers().getArray())
+		{
 			let selectable: boolean = <boolean>olLayer.get("selectable");
 			let weaveLayer: AbstractLayer = olLayer.get("layerObject");
 
-			if (weaveLayer instanceof FeatureLayer && selectable) {
+			if (weaveLayer instanceof FeatureLayer && selectable)
+			{
 				let source: ol.source.Vector = <ol.source.Vector>(<ol.layer.Vector>olLayer).getSource();
 				let keySet: KeySet = weaveLayer.selectionKeySet.getInternalKeySet() as KeySet;
 
@@ -87,7 +93,8 @@ export default class DragSelection extends ol.interaction.DragBox
 
 				let keys:Array<IQualifiedKey> = Array.from(selectedFeatures);
 
-				switch (this.mode) {
+				switch (this.mode)
+				{
 					case DragSelectionMode.SET:
 						keySet.replaceKeys(keys);
 						break;

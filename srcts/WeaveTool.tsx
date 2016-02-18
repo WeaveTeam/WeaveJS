@@ -30,7 +30,8 @@ const grabberStyle:CSSProperties = {
     background: "url(http://placehold.it/32x32)"
 };
 
-export interface IWeaveToolProps extends React.Props<WeaveTool> {
+export interface IWeaveToolProps extends React.Props<WeaveTool>
+{
     toolPath:WeavePath;
     style:CSSProperties;
     onDragStart:React.MouseEvent;
@@ -38,7 +39,8 @@ export interface IWeaveToolProps extends React.Props<WeaveTool> {
     onDragOver:React.MouseEvent;
 }
 
-export interface IWeaveToolState {
+export interface IWeaveToolState
+{
 	title?:string;
 }
 
@@ -115,7 +117,8 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
         var toolWidth:number = this.props.style ? this.props.style.width : 320;
 
         var reactTool:any;
-        if (React.Component.isPrototypeOf(this.ToolClass)) {
+        if (React.Component.isPrototypeOf(this.ToolClass))
+        {
             reactTool = React.createElement(this.ToolClass, {
                                 key: "tool",
                                 ref: this.handleInstance,
@@ -156,25 +159,29 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
     }
 }
 
-interface ITitleBarProps extends React.Props<TitleBar> {
+interface ITitleBarProps extends React.Props<TitleBar>
+{
     onDragStart:React.MouseEvent;
     titleBarHeight:number;
     title:string;
 }
 
-interface ITitleBarState {
+interface ITitleBarState
+{
     showControls: boolean;
 }
 
-class TitleBar extends React.Component<ITitleBarProps, ITitleBarState> {
-
-    constructor(props:ITitleBarProps) {
+class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
+{
+    constructor(props:ITitleBarProps)
+    {
         super(props);
         this.state = {
             showControls: false
         };
     }
-    render() {
+    render()
+    {
         var windowBar:CSSProperties = {
             width: "100%",
             height: this.props.titleBarHeight,

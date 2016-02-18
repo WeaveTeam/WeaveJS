@@ -51,7 +51,8 @@ var loadLayout = function(weave:Weave,
 
 }
 
-export {
+export
+{
     WeaveLayoutManager as Layout,
     C3BarChart as Barchart,
     C3ScatterPlot as ScatterPlot,

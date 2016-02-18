@@ -10,8 +10,10 @@ import * as jquery from "jquery";
 var $:JQueryStatic = (jquery as any)["default"];
 
 
-export default class PanCluster extends ol.control.Control {
-	constructor(optOptions?:any) {
+export default class PanCluster extends ol.control.Control
+{
+	constructor(optOptions?:any)
+	{
 		var options = optOptions || {};
 		let parent = $(`
 		<div style="background-color: rgba(0,0,0,0)" class="ol-unselectable ol-control panCluster">
@@ -67,16 +69,19 @@ export default class PanCluster extends ol.control.Control {
 			view.fit(extent, size);
 		};
 
-		for (let direction in directions) {
+		for (let direction in directions)
+		{
 			let xSign = directions[direction][0];
 			let ySign = directions[direction][1];
 
 			let button = parent.find(".panCluster." + direction);
 
-			if (xSign !== null) {
+			if (xSign !== null)
+			{
 				button.click(pan.bind(this, xSign, ySign));
 			}
-			else {
+			else
+			{
 				button.click(zoomExtent.bind(this));
 			}
 		}

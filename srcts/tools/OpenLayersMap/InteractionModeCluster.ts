@@ -10,8 +10,10 @@ import OpenLayersMapTool from "../OpenLayersMapTool";
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
 
-export default class InteractionModeCluster extends ol.control.Control {
-	constructor(optOptions: any) {
+export default class InteractionModeCluster extends ol.control.Control
+{
+	constructor(optOptions: any)
+	{
 		var map: OpenLayersMapTool = optOptions.mapTool as OpenLayersMapTool;
 
 		var options: any = optOptions || {};

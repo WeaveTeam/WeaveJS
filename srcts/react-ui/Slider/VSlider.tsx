@@ -5,7 +5,8 @@ import Slider from "./Slider";
 import {SliderProps} from "./Slider";
 import * as _ from "lodash";
 
-export interface VSliderProps extends React.Props<VSlider> {
+export interface VSliderProps extends React.Props<VSlider>
+{
     min:number;
     max:number;
     step:number;
@@ -15,13 +16,15 @@ export interface VSliderProps extends React.Props<VSlider> {
     label?:string;
 }
 
-export default class VSlider extends React.Component<VSliderProps, any> {
-
-    constructor(props:VSliderProps) {
+export default class VSlider extends React.Component<VSliderProps, any>
+{
+    constructor(props:VSliderProps)
+	{
         super(props);
     }
 
-    render():JSX.Element {
+    render():JSX.Element
+	{
         return <Slider direction={Slider.VERTICAL} {...this.props}/>;
     }
 }

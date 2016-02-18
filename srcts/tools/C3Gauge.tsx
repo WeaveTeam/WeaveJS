@@ -27,7 +27,8 @@ declare type Record = {
     meterColumn: number
 };
 
-export default class C3Gauge extends AbstractC3Tool {
+export default class C3Gauge extends AbstractC3Tool
+{
     meterColumn = Weave.linkableChild(this, DynamicColumn);
     binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
 	colorRamp = Weave.linkableChild(this, ColorRamp);
@@ -50,7 +51,8 @@ export default class C3Gauge extends AbstractC3Tool {
     private busy:boolean;
     private dirty:boolean;
 
-    constructor(props:IVisToolProps) {
+    constructor(props:IVisToolProps)
+    {
         super(props);
 
         Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
@@ -100,7 +102,8 @@ export default class C3Gauge extends AbstractC3Tool {
             },
             gauge: {
                 label: {
-                    format: function(value, ratio) {
+                    format: function(value, ratio)
+                    {
                         return String(FormatUtils.defaultNumberFormatting(value));
                     },
                     show: false
@@ -151,12 +154,14 @@ export default class C3Gauge extends AbstractC3Tool {
         }];
     }
 
-    updateStyle() {
-        if(!this.chart || !this.meterColumn)
+    updateStyle()
+    {
+        if (!this.chart || !this.meterColumn)
             return;
     }
 
-    componentDidMount() {
+    componentDidMount()
+    {
         //use ColumnStatistics to set gauge min/max appropriately
         this.colStats = new weavejs.data.ColumnStatistics(this.meterColumn);
         this.colStats.validateCache();
@@ -204,7 +209,8 @@ export default class C3Gauge extends AbstractC3Tool {
 
 			var range = this.c3Config.gauge.max - this.c3Config.gauge.min;
 			this.c3Config.color.threshold.values = [];
-			for (var i=1; i<=this.numberOfBins; i++){
+			for (var i=1; i<=this.numberOfBins; i++)
+			{
 				this.c3Config.color.threshold.values.push(this.c3Config.gauge.min+i*(range/this.numberOfBins));
 			}
 			this.c3Config.gauge.label.show = true;
@@ -217,32 +223,41 @@ export default class C3Gauge extends AbstractC3Tool {
 			var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
 			var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
 			var valid:boolean = false;
-			if(probedKeys.length){
+			if (probedKeys.length)
+			{
 				probedKeys.forEach( (key) => {
 					var i:number = this.keyToIndex[key.toString()];
-					if (meterCols[i]) {
-						valid = true;
-						temp.push(meterCols[i]);
-					}
-				});
-			} else if(selectedKeys.length){
-				selectedKeys.forEach( (key) => {
-					var i:number = this.keyToIndex[key.toString()];
-					if(meterCols[i]) {
+					if (meterCols[i])
+					{
 						valid = true;
 						temp.push(meterCols[i]);
 					}
 				});
 			}
-			if(valid){
+			else if (selectedKeys.length)
+			{
+				selectedKeys.forEach( (key) => {
+					var i:number = this.keyToIndex[key.toString()];
+					if (meterCols[i])
+					{
+						valid = true;
+						temp.push(meterCols[i]);
+					}
+				});
+			}
+			if (valid)
+			{
 				data.columns = [temp];
-			} else {
+			}
+			else
+			{
 				data.columns = [];
 			}
 			data.unload = true;
 			this.c3Config.data = data;
         }
-        if(marginChange) {
+        if (marginChange)
+        {
             changeDetected = true;
             this.c3Config.padding.top = Number(this.margin.top.value);
             this.c3Config.padding.bottom = Number(this.margin.bottom.value);

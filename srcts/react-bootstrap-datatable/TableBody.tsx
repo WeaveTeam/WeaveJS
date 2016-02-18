@@ -5,7 +5,8 @@ import * as React from "react";
 import TableRow from "./TableRow";
 import {IRow} from "./TableRow";
 
-export interface ITableBodyProps extends React.Props<TableBody> {
+export interface ITableBodyProps extends React.Props<TableBody>
+{
     rows:IRow[];
     idProperty:string;
     selectedIds:string[];
@@ -15,24 +16,27 @@ export interface ITableBodyProps extends React.Props<TableBody> {
     showIdColumn:boolean
 }
 
-export interface ITableBodyState {
-
+export interface ITableBodyState
+{
 }
 
-export default class TableBody extends React.Component<ITableBodyProps, ITableBodyState> {
-
+export default class TableBody extends React.Component<ITableBodyProps, ITableBodyState>
+{
     private tableRows:{[id:string]: TableRow};
 
-    constructor(props:ITableBodyProps) {
+    constructor(props:ITableBodyProps)
+	{
         super(props);
 
         this.tableRows = {};
     }
 
-    componentDidUpdate() {
+    componentDidUpdate()
+	{
     }
 
-    render():JSX.Element {
+    render():JSX.Element
+	{
         return (
             <tbody>
                 {

@@ -9,9 +9,11 @@ import * as jquery from "jquery";
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
 
-export default class CustomZoomToExtent extends ol.control.Control {
+export default class CustomZoomToExtent extends ol.control.Control
+{
 	private extent: ol.Extent;
-	constructor(opt_options?: olx.control.ZoomToExtentOptions) {
+	constructor(opt_options?: olx.control.ZoomToExtentOptions)
+	{
 		let options: olx.control.ZoomToExtentOptions = opt_options ? opt_options : {};
 
 		let className: string = options.className ? options.className : 'ol-zoom-extent';
@@ -31,12 +33,14 @@ export default class CustomZoomToExtent extends ol.control.Control {
 
 	}
 
-	private handleClick(event:MouseEvent) {
+	private handleClick(event:MouseEvent)
+	{
 		event.preventDefault();
 		this.handleZoomToExtent();
 	}
 
-	private handleZoomToExtent() {
+	private handleZoomToExtent()
+	{
 		let map: ol.Map = this.getMap();
 		let view: ol.View = map.getView();
 		let extent: ol.Extent = this.extent || view.get("extent") || view.getProjection().getExtent();

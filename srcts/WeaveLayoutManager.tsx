@@ -74,7 +74,6 @@ export interface IWeaveLayoutManagerProps extends React.Props<WeaveLayoutManager
 
 export interface IWeaveLayoutManagerState
 {
-
 }
 
 export default class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeaveLayoutManagerState>

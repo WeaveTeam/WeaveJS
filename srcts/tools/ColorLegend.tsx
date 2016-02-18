@@ -235,7 +235,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 						if (this.props.style.width > this.props.style.height * 2)
 						{
-							if(weavejs.WeaveAPI.Locale.reverseLayout){
+							if (weavejs.WeaveAPI.Locale.reverseLayout)
+							{
 								element = element.reverse();
 							}
 
@@ -300,7 +301,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 						if (this.props.style.width > this.props.style.height * 2)
 						{
-							if(weavejs.WeaveAPI.Locale.reverseLayout){
+							if (weavejs.WeaveAPI.Locale.reverseLayout)
+							{
 								element = element.reverse();
 							}
 

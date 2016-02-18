@@ -6,7 +6,8 @@ import WeavePath = weavejs.path.WeavePath;
 
 import ToolTip from "./ToolTip";
 
-export interface IVisToolProps {
+export interface IVisToolProps
+{
     toolPath:WeavePath;
     font?:string;
     fontSize?:number;
@@ -14,10 +15,11 @@ export interface IVisToolProps {
     toolTip: ToolTip
 }
 
-export interface IVisToolState {
-
+export interface IVisToolState
+{
 }
 
-export interface IVisTool extends ILinkableObject {
+export interface IVisTool extends ILinkableObject
+{
     title:string;
 }

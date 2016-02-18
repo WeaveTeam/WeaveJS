@@ -14,8 +14,8 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableString = weavejs.core.LinkableString;
 import WeaveAPI = weavejs.WeaveAPI;
 
-export default class AbstractLayer implements ILinkableObject {
-
+export default class AbstractLayer implements ILinkableObject
+{
 	opacity = Weave.linkableChild(this, LinkableNumber);
 	visible = Weave.linkableChild(this, LinkableBoolean);
 	selectable = Weave.linkableChild(this, LinkableBoolean);
@@ -44,22 +44,26 @@ export default class AbstractLayer implements ILinkableObject {
 
 	private _parent: OpenLayersMapTool = null;
 
-	get parent(): OpenLayersMapTool {
+	get parent(): OpenLayersMapTool
+	{
 		return this._parent;
 	}
 
-	set parent(mapTool: OpenLayersMapTool) {
+	set parent(mapTool: OpenLayersMapTool)
+	{
 		this._parent = mapTool;
 	}
 
 
 	private _source: ol.source.Source;
 
-	get source():ol.source.Source {
+	get source():ol.source.Source
+	{
 		return this._source;
 	}
 
-	set source(value:ol.source.Source) {
+	set source(value:ol.source.Source)
+	{
 
 		this._source = value;
 
@@ -76,12 +80,15 @@ export default class AbstractLayer implements ILinkableObject {
 
 	/* Handles initial apply of linked properties, adding/removing from map */
 
-	set olLayer(value:ol.layer.Layer) {
-		if (!this.parent) {
+	set olLayer(value:ol.layer.Layer)
+	{
+		if (!this.parent)
+		{
 			WeaveAPI.Scheduler.callLater(this, () => { this.olLayer = value });
 			return;
 		}
-		if (value) {
+		if (value)
+		{
 			this._olLayer = value;
 			this.parent.map.addLayer(value);
 
@@ -93,7 +100,8 @@ export default class AbstractLayer implements ILinkableObject {
 		}
 	}
 
-	get olLayer():ol.layer.Layer {
+	get olLayer():ol.layer.Layer
+	{
 		return this._olLayer;
 	}
 
@@ -104,7 +112,8 @@ export default class AbstractLayer implements ILinkableObject {
 
 	dispose()
 	{
-		if (this._olLayer != null) {
+		if (this._olLayer != null)
+		{
 			this.parent.map.removeLayer(this._olLayer);
 		}
 	}

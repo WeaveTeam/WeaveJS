@@ -6,34 +6,39 @@ import {ICallbackObj} from "swfobject-amd";
 
 export declare type WeaveObject = any;
 
-export interface IWeaveProps extends React.Props <WeaveFlash> {
+export interface IWeaveProps extends React.Props <WeaveFlash>
+{
     onWeaveReady: Function;
     height: number;
     width: number;
 }
 
-export interface IWeaveState {
-
+export interface IWeaveState
+{
 }
 
-export default class WeaveFlash extends React.Component <IWeaveProps, IWeaveState> {
-
+export default class WeaveFlash extends React.Component <IWeaveProps, IWeaveState>
+{
     private weave:WeaveObject;
 
-    constructor(props:IWeaveProps) {
+    constructor(props:IWeaveProps)
+    {
         super(props);
     }
 
-    onSwfLoaded (event:ICallbackObj) {
+    onSwfLoaded (event:ICallbackObj)
+    {
         (event.ref as any).weaveReady = this.weaveReady.bind(this);
     }
 
-    weaveReady (weave:WeaveObject) {
+    weaveReady (weave:WeaveObject)
+    {
         this.weave = weave;
         this.props.onWeaveReady(weave);
     }
 
-    render() {
+    render()
+    {
         return (<SwfObject swfUrl="../weave.swf" attributes={{id: "weave"}} onLoad={this.onSwfLoaded.bind(this)} style={{height: this.props.height, maxHeight: this.props.height, width: this.props.width}}/>);
     }
 

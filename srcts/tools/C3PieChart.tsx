@@ -31,8 +31,8 @@ declare type Record = {
     label:string
 };
 
-export default class C3PieChart extends AbstractC3Tool {
-
+export default class C3PieChart extends AbstractC3Tool
+{
     data = Weave.linkableChild(this, DynamicColumn);
     label = Weave.linkableChild(this, DynamicColumn);
     fill = Weave.linkableChild(this,SolidFillStyle);
@@ -65,7 +65,8 @@ export default class C3PieChart extends AbstractC3Tool {
     protected chart:ChartAPI;
     protected c3Config:ChartConfiguration;
 
-    constructor(props:IVisToolProps) {
+    constructor(props:IVisToolProps)
+    {
         super(props);
 
         Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
@@ -106,18 +107,21 @@ export default class C3PieChart extends AbstractC3Tool {
                 onclick: (d:any) => {
                 },
                 onselected: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
+                    if (d && d.hasOwnProperty("index"))
+                    {
                         this.selectionKeySet.addKeys([this.records[d.index].id]);
                     }
                 },
                 onunselected: (d:any) => {
-                    if(d && d.hasOwnProperty("data")) {
+                    if (d && d.hasOwnProperty("data"))
+                    {
                         // d has a different structure than "onselected" argument
                         this.selectionKeySet.replaceKeys([]);
                     }
                 },
                 onmouseover: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
+                    if (d && d.hasOwnProperty("index"))
+                    {
 						var key = this.records[d.index].id;
                         this.probeKeySet.replaceKeys([key]);
                         this.props.toolTip.setState({
@@ -129,7 +133,8 @@ export default class C3PieChart extends AbstractC3Tool {
                     }
                 },
                 onmouseout: (d:any) => {
-                    if(d && d.hasOwnProperty("index")) {
+                    if (d && d.hasOwnProperty("index"))
+                    {
                         this.probeKeySet.replaceKeys([]);
                         this.props.toolTip.setState({
                             showToolTip: false
@@ -141,9 +146,11 @@ export default class C3PieChart extends AbstractC3Tool {
                 label: {
                     show: true,
                     format: (value:number, ratio:number, id:string):string => {
-                        if(this.records && this.records.length) {
+                        if (this.records && this.records.length)
+                        {
                             var record:Record = this.records[this.keyToIndex[id]];
-                            if(record && record.label) {
+                            if (record && record.label)
+                            {
                                 return record.label as string;
                             }
                             return String(value);
@@ -155,9 +162,11 @@ export default class C3PieChart extends AbstractC3Tool {
                 label: {
                     show: true,
                     format: (value:number, ratio:number, id:string):string => {
-                        if(this.records && this.records.length) {
+                        if (this.records && this.records.length)
+                        {
                             var record = this.records[this.keyToIndex[id]];
-                            if(record && record.label) {
+                            if (record && record.label)
+                            {
                                 return record.label as string;
                             }
                             return String(value);
@@ -200,7 +209,8 @@ export default class C3PieChart extends AbstractC3Tool {
         }];
 	}
 
-    private updateStyle():void {
+    private updateStyle():void
+    {
 		if (this.busy || !this.chart || !this.records)
             return;
 
@@ -223,7 +233,8 @@ export default class C3PieChart extends AbstractC3Tool {
         {
             //this.customStyle(probedIndices, "circle", ".c3-shape", {opacity:1.0, "stroke-opacity": 0.5, "stroke-width": 1.5});
             this.chart.focus(probedKeys as any[] as string[]);
-        }else if (selectedIndices.length)
+        }
+        else if (selectedIndices.length)
         {
             //this.customStyle(unselectedIndices, "circle", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
             //this.customStyle(selectedIndices, "circle", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
@@ -260,7 +271,8 @@ export default class C3PieChart extends AbstractC3Tool {
             });
 
             var chartType:string = "pie";
-            if(this.innerRadius.value > 0) {
+            if (this.innerRadius.value > 0)
+            {
                 chartType = "donut"
             }
 
@@ -286,7 +298,8 @@ export default class C3PieChart extends AbstractC3Tool {
         }
         var axisChanged = Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin.top, this.margin.bottom, this.margin.left, this.margin.right);
 
-        if (forced || dataChanged || axisChanged) {
+        if (forced || dataChanged || axisChanged)
+        {
             this.busy = true;
             this.chart = c3.generate(this.c3Config);
         }

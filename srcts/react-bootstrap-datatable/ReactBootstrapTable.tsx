@@ -10,7 +10,8 @@ import TableBody from "./TableBody";
 import {IRow} from "./TableRow";
 import {IColumnTitles} from "./TableHead";
 
-export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable> {
+export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable>
+{
     striped?:boolean;
     bordered?:boolean;
     condensed?:boolean;
@@ -27,13 +28,14 @@ export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTab
     showIdColumn:boolean;
 }
 
-export interface IReactBootstrapTableState {
+export interface IReactBootstrapTableState
+{
     probedIds?:string[];
     selectedIds?:string[];
 }
 
-export default class ReactBootstrapTable extends React.Component<IReactBootstrapTableProps, IReactBootstrapTableState> {
-
+export default class ReactBootstrapTable extends React.Component<IReactBootstrapTableProps, IReactBootstrapTableState>
+{
     private tableHead:TableHead;
     private tableBody:TableBody;
     private keyDown:boolean;
@@ -42,7 +44,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     private secondIndex:number;
     private lastClicked:string;
 
-    constructor(props:IReactBootstrapTableProps) {
+    constructor(props:IReactBootstrapTableProps)
+	{
         super(props);
         this.state = {
             selectedIds: props.selectedIds,
@@ -51,18 +54,23 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
     }
 
-    onMouseOver(id:string, status:boolean) {
+    onMouseOver(id:string, status:boolean)
+	{
         var probedIds:string[] = this.state.probedIds.concat();
 
         // find the selected record location
         var keyLocation:number = probedIds.indexOf(id);
-        if (status && keyLocation < 0) {
+        if (status && keyLocation < 0)
+        {
             probedIds.push(id);
-        } else if (!status && keyLocation >= 0) {
+        }
+        else if (!status && keyLocation >= 0)
+        {
             probedIds.splice(keyLocation, 1);
         }
 
-        if(this.props.onProbe) {
+        if (this.props.onProbe)
+        {
             this.props.onProbe(probedIds);
         }
         this.setState({
@@ -70,7 +78,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         });
     }
 
-    onClick(id:string, event:React.MouseEvent) {
+    onClick(id:string, event:React.MouseEvent)
+	{
         var selectedIds:string[] = this.state.selectedIds.concat();
 
         // in single selection mode,
@@ -81,11 +90,11 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         var keyLocation:number = selectedIds.indexOf(id);
 
         // multiple selection
-        if((event.ctrlKey || event.metaKey))
+        if ((event.ctrlKey || event.metaKey))
         {
             // if the record is already in the selection
             // we remove it
-            if(keyLocation > -1)
+            if (keyLocation > -1)
             {
                 selectedIds.splice(keyLocation, 1);
             }
@@ -97,11 +106,14 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         }
 
         // shift selection
-        else if(event.shiftKey) {
+        else if (event.shiftKey)
+        {
             selectedIds = [];
-            if(this.lastClicked == null)
+            if (this.lastClicked == null)
             {
-            } else {
+            }
+            else
+            {
                 var start:number = _.findIndex(this.props.rows, (row:IRow) => {
                     return row[this.props.idProperty] == this.lastClicked;
                 });
@@ -110,13 +122,15 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
                     return row[this.props.idProperty] == id;
                 });
 
-                if(start > end) {
+                if (start > end)
+                {
                     let temp:number = start;
                     start = end;
                     end = temp;
                 }
 
-                for(var i:number = start; i <= end; i++) {
+                for (var i:number = start; i <= end; i++)
+                {
                     selectedIds.push(this.props.rows[i][this.props.idProperty]);
                 }
             }
@@ -129,7 +143,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
             // if there was only one record selected
             // and we are clicking on it again, then we want to
             // clear the selection.
-            if(selectedIds.length == 1 && selectedIds[0] == id)
+            if (selectedIds.length == 1 && selectedIds[0] == id)
             {
                 selectedIds = [];
                 this.lastClicked = null;
@@ -141,7 +155,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
             }
         }
 
-        if(this.props.onSelection) {
+        if (this.props.onSelection)
+        {
             this.props.onSelection(selectedIds);
         }
 
@@ -150,15 +165,16 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         });
     }
 
-    componentWillReceiveProps(nextProps:IReactBootstrapTableProps) {
+    componentWillReceiveProps(nextProps:IReactBootstrapTableProps)
+	{
         this.setState({
             selectedIds: nextProps.selectedIds,
             probedIds: nextProps.probedIds
         });
     }
 
-    render() {
-
+    render()
+	{
         var tableContainer:React.CSSProperties = {
                 overflow: "auto",
                 height: this.props.height
@@ -167,17 +183,15 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         var selectedIds:string[];
         var probedIds:string[];
 
-        // if(this.props.selectedIds) {
+        // if (this.props.selectedIds)
         //     selectedIds = this.props.selectedIds;
-        // } else {
+		// else
         //     selectedIds = this.state.selectedIds;
-        // }
         //
-        // if(this.props.probedIds) {
+        // if (this.props.probedIds)
         //     probedIds = this.props.probedIds;
-        // } else {
+		// else
         //     probedIds = this.state.probedIds;
-        // }
 
         return (
             <div style={tableContainer}>
