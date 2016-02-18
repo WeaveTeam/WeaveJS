@@ -26,6 +26,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	selectionKeySet = Weave.linkableChild(this, DynamicKeySet);
 	probeKeySet = Weave.linkableChild(this, DynamicKeySet);
 
+	styleResolutionDependent: boolean = false;
+
 	source:ol.source.Vector;
 
 	constructor()

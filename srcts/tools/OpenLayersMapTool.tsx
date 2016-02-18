@@ -275,6 +275,22 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.zoomBounds.setDataBounds(dataBounds);
 	}
 
+	updateResolutionDependentStyles(event:ol.MapEvent):void
+	{
+		if (event.frameState.animate) return;
+
+		this.map.un("postrender", this.updateResolutionDependentStyles, this);
+
+		for (let obj of this.layers.getObjects()) {
+			let layer: AbstractFeatureLayer = obj as AbstractFeatureLayer;
+			if (layer && layer.styleResolutionDependent) {
+				layer.updateStyleData();
+			}
+		}
+
+
+	}
+
 	updateZoom_olToWeave():void
 	{
 		let view = this.map.getView();
@@ -298,6 +314,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		dataBounds.setHeight(screenBounds.getHeight() * resolution);
 		dataBounds.makeSizePositive();
 		this.zoomBounds.setDataBounds(dataBounds);
+
+		this.map.on("postrender", this.updateResolutionDependentStyles, this);
 	}
 
 	updateZoomAndCenter_weaveToOl():void
