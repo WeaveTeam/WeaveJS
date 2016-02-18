@@ -284,6 +284,7 @@ export default class C3BarChart extends AbstractC3Tool
                 rotated: false
             },
 			tooltip: {show: false },
+			interaction: { brighten: false },
             transition: { duration: 0 },
             grid: {
                 x: {
@@ -523,8 +524,10 @@ export default class C3BarChart extends AbstractC3Tool
 					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
 				});
         });
-
-		this.chart.select(this.heightColumnNames, selectedIndices, true);
+		if (selectedIndices.length)
+			this.chart.select(this.heightColumnNames, selectedIndices, true);
+		else if(!this.probeKeySet.keys.length)
+			this.chart.select(this.heightColumnNames, [], true);
     }
 
     validate(forced:boolean = false):void
@@ -593,9 +596,11 @@ export default class C3BarChart extends AbstractC3Tool
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-			this.updateConfigMargin();
-			this.updateConfigAxisY();
         }
+		
+		this.updateConfigMargin();
+		this.updateConfigAxisY();
+		
         if (Weave.detectChange(this, this.horizontalMode))
         {
             changeDetected = true;
