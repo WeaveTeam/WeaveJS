@@ -434,7 +434,7 @@ export default class C3BarChart extends AbstractC3Tool
         	.selectAll("path")
         	.style("opacity", 1)
             .style("stroke", "black")
-            .style("stroke-width", "1px")
+            .style("stroke-width", 1.0)
             .style("stroke-opacity", 0.5);
 
 		d3.select(this.element)
@@ -468,13 +468,14 @@ export default class C3BarChart extends AbstractC3Tool
 						if(selected)
 							return 0.7;
 						return 0.5;
-					})
-				.style("stroke-width",
-					(d: any, i: number, oi: number): number => {
-						let key = this.records[i].id;
-						let probed = this.isProbed(key);
-						return probed ? 1.5 : 1.0;
 					});
+				//Todo: find better probed style to differentiate bars
+				//.style("stroke-width",
+				//	(d: any, i: number, oi: number): number => {
+				//		let key = this.records[i].id;
+				//		let probed = this.isProbed(key);
+				//		return probed ? 1.5 : 1.0;
+				//	});
 
 			d3.select(this.element).selectAll("g").filter(".c3-texts-"+item).selectAll("text")
 				.style("fill-opacity",
