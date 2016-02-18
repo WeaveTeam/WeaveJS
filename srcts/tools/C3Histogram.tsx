@@ -290,13 +290,10 @@ export default class C3Histogram extends AbstractC3Tool {
     }
 
     updateStyle() {
-    	if (!this.chart)
+    	if (!this.chart || !this.records.length)
     		return;
 
-        d3.select(this.element).selectAll("path").style("opacity", 1)
-            .style("stroke", "black")
-            .style("stroke-width", "1px")
-            .style("stroke-opacity", 0.5);
+        let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
 
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet.keys;
         var probedKeys:IQualifiedKey[] = this.probeKeySet.keys;
@@ -308,18 +305,34 @@ export default class C3Histogram extends AbstractC3Tool {
         });
         var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
         var probedBinIndices:number[] = _.pluck(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn');
-        var binIndices:number[] = _.pluck(_.uniq(this.records, 'binnedColumn'), 'binnedColumn');
-        var unselectedBinIndices:number[] = _.difference(binIndices,selectedBinIndices);
-        unselectedBinIndices = _.difference(unselectedBinIndices,probedBinIndices);
 
-        if(selectedBinIndices.length)
+
+        d3.select(this.element).selectAll("path.c3-shape")
+            .style("stroke", "black")
+            .style("opacity",
+                (d: any, i: number, oi: number): number => {
+                    let selected = _.intersection(selectedBinIndices,[i]).length;
+                    let probed = _.intersection(probedBinIndices,[i]).length;
+                    return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
+                })
+            .style("stroke-opacity",
+                (d: any, i: number, oi: number): number => {
+                    let selected = _.intersection(selectedBinIndices,[i]).length;
+                    let probed = _.intersection(probedBinIndices,[i]).length;
+                    if (probed || selected)
+                        return 1.0;
+                    if (!selectionEmpty && !selected)
+                        return 0;
+                    return 0.0;
+                })
+            .style("stroke-width",
+                (d: any, i: number, oi: number): number => {
+                    let probed = _.intersection(probedBinIndices,[i]).length;
+                    return probed ? 2.0 : 1.0;
+                });
+
+       if(!probedBinIndices.length)
         {
-            this.customStyle(unselectedBinIndices, "path", ".c3-shape", {opacity: 0.3, "stroke-opacity": 0.0});
-            this.customStyle(selectedBinIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 1.0});
-        }
-        else if(!probedBinIndices.length)
-        {
-            this.customStyle(binIndices, "path", ".c3-shape", {opacity: 1.0, "stroke-opacity": 0.5});
             this.chart.select(this.heightColumnNames, [], true);
         }
     }
