@@ -428,6 +428,8 @@ export default class C3BarChart extends AbstractC3Tool
     	if(!this.chart || !this.heightColumnNames)
     		return;
 
+		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+
         d3.select(this.element)
         	.selectAll("path")
         	.style("opacity", 1)
@@ -435,41 +437,56 @@ export default class C3BarChart extends AbstractC3Tool
             .style("stroke-width", "1px")
             .style("stroke-opacity", 0.5);
 
+		d3.select(this.element)
+			.selectAll("g")
+			.selectAll("text")
+			.style("fill-opacity", 1.0);
+
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet.keys;
-        var probedKeys:IQualifiedKey[] = this.probeKeySet.keys;
-		var allKeys:IQualifiedKey[] = _.pluck(this.records, "id");
 		var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
 
         var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
 			return Number(keyToIndex.get(key));
         });
-        var probedIndices:number[] = probedKeys.map((key:IQualifiedKey) => {
-           return Number(keyToIndex.get(key));
+
+        this.heightColumnNames.forEach((item:string) => {
+			d3.select(this.element).selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path")
+				.style("opacity",
+				(d: any, i: number, oi: number): number => {
+					let key = this.records[i].id;
+					let selected = this.isSelected(key);
+					let probed = this.isProbed(key);
+					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
+				})
+				.style("stroke-opacity",
+					(d: any, i: number, oi: number): number => {
+						let key = this.records[i].id;
+						let selected = this.isSelected(key);
+						let probed = this.isProbed(key);
+						if (probed)
+							return 1.0;
+						if(selected)
+							return 0.7;
+						return 0.5;
+					})
+				.style("stroke-width",
+					(d: any, i: number, oi: number): number => {
+						let key = this.records[i].id;
+						let probed = this.isProbed(key);
+						return probed ? 1.5 : 1.0;
+					});
+
+			d3.select(this.element).selectAll("g").filter(".c3-texts-"+item).selectAll("text")
+				.style("fill-opacity",
+				(d: any, i: number, oi: number): number => {
+					let key = this.records[i].id;
+					let selected = this.isSelected(key);
+					let probed = this.isProbed(key);
+					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
+				});
         });
 
-        var indices:number[] = weavejs.util.JS.mapValues(keyToIndex).map(Number) as number[];
-		var unselectedIndices:number[] = _.difference(indices, selectedIndices);
-        unselectedIndices = _.difference(unselectedIndices, probedIndices);
-        this.heightColumnNames.forEach((item:string) => {
-        	var paths = d3.selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path");
-        	var texts = d3.selectAll("g").filter(".c3-texts-"+item).selectAll("text");
-            if(selectedIndices.length)
-            {
-                this.customSelectorStyle(unselectedIndices, paths, {opacity: 0.3, "stroke-opacity": 0.0});
-                this.customSelectorStyle(selectedIndices, paths, {opacity: 1.0, "stroke-opacity": 1.0});
-                this.customSelectorStyle(unselectedIndices, texts, {"fill-opacity":0.3});
-                this.customSelectorStyle(selectedIndices, texts, {"fill-opacity":1.0});
-            }
-            else if(!probedIndices.length)
-            {
-                this.customSelectorStyle(indices, paths, {opacity: 1.0, "stroke-opacity": 0.5});
-                this.customSelectorStyle(indices, texts, {"fill-opacity":1.0});
-            }
-        });
-        if (selectedIndices.length)
-            this.chart.select(this.heightColumnNames, selectedIndices, true);
-        else if(!probedIndices.length)
-            this.chart.select(this.heightColumnNames, [], true);
+		this.chart.select(this.heightColumnNames, selectedIndices, true);
     }
 
     validate(forced:boolean = false):void
