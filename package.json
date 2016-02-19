@@ -36,7 +36,6 @@
     "grunt-minifyify": "^3.2.1",
     "grunt-ts": "^5.3.2",
     "minifyify": "^7.1.0",
-    "moment": "^2.11.2",
     "tsd": "^0.6.5"
   },
   "peerDependencies": {
@@ -52,6 +51,7 @@
     "font-awesome": "^4.4.0",
     "jquery": "^2.1.4",
     "jszip": "^2.5.0",
+    "moment": "^2.11.2",
     "lodash": "^3.10.1",
     "openlayers": "^3.13.0",
     "rc-slider": "^3.3.2",
