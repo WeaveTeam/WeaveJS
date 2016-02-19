@@ -50,7 +50,6 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	//       need to check new props
     private toolPath:WeavePath;
 	
-    private ToolClass:any;
     private tool:IVisTool;
     private toolWidth:number;
     private toolHeight:number;
@@ -63,11 +62,6 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
         super(props);
 		this.state = {};
         this.toolPath = this.props.toolPath;
-		var placeholder = this.toolPath.getObject() as LinkablePlaceholder<React.Component<any, any>>;
-		if (placeholder instanceof LinkablePlaceholder)
-	        this.ToolClass = placeholder.getClass();
-		else if (this.toolPath.getObject())
-			this.ToolClass = Weave.getDefinition(this.toolPath.getState('class') as string); // temporary hack
         this.titleBarHeight = 25;
 		
 		this.handleInstance = this.handleInstance.bind(this);
@@ -82,16 +76,10 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		if (this.tool === tool)
 			return; 
 		
-		var placeholder = this.toolPath.getObject() as LinkablePlaceholder<React.Component<any, any>>;
-		if (placeholder instanceof LinkablePlaceholder)
-		{
-			if (tool)
-				placeholder.setInstance(tool);
-			else
-				this.ToolClass = placeholder.getClass();
-		}
-		
 		this.tool = tool;
+		
+		if (this.tool)
+			LinkablePlaceholder.setInstance(this.toolPath.getObject(), this.tool);
 		
 		// make sure title gets updated
 		if (this.tool)
@@ -116,10 +104,11 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
         var toolHeight:number = this.props.style ? this.props.style.height - this.titleBarHeight : 320;
         var toolWidth:number = this.props.style ? this.props.style.width : 320;
 
-        var reactTool:any;
-        if (React.Component.isPrototypeOf(this.ToolClass))
+        var reactTool:any = null;
+		var ToolClass = LinkablePlaceholder.getClass(this.toolPath.getObject()) as typeof React.Component;
+        if (React.Component.isPrototypeOf(ToolClass))
         {
-            reactTool = React.createElement(this.ToolClass, {
+            reactTool = React.createElement(ToolClass, {
                                 key: "tool",
                                 ref: this.handleInstance,
                                 toolPath: this.toolPath,
