@@ -148,7 +148,7 @@ export default class C3BarChart extends AbstractC3Tool
                     format: (v, id, i, j) => {
                         if (this.showValueLabels.value)
                         {
-                            return v;
+                            return FormatUtils.defaultNumberFormatting(v);
                         }
                         else
                         {
