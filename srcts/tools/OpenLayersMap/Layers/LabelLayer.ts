@@ -17,7 +17,8 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 
-interface LabelRecord {
+interface LabelRecord
+{
 	feature: ol.Feature;
 	text: string;
 	color: string;
