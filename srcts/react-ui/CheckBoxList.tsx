@@ -95,8 +95,10 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
                 {
                     this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
                         var checkboxItem:JSX.Element[] = [
-                            <input type="checkbox" checked={checkBoxState} value={this.props.values[index]} onChange={this.handleChange.bind(this, index)}/>,
-                            <span style={{paddingLeft: 5}}>{this.props.labels ? this.props.labels[index] : this.props.values[index]}</span>
+                            <input key="input" type="checkbox" checked={checkBoxState} value={this.props.values[index]} onChange={this.handleChange.bind(this, index)}/>,
+                            <span key="span" style={{paddingLeft: 5}}>
+								{ this.props.labels ? this.props.labels[index] : this.props.values[index] }
+							</span>
                         ];
                         return (
                             <HBox key={index} style={{height: 30, paddingLeft: 10}}>

@@ -1,6 +1,3 @@
-/// <reference path="../../../typings/react/react.d.ts"/>
-///<reference path="../../../typings/weave/weavejs.d.ts"/>
-
 import * as React from "react";
 import ui from "../../react-ui/ui";
 import {IVisTool, IVisToolProps, IVisToolState} from "../IVisTool";
@@ -10,6 +7,7 @@ import DiscreteValuesDataFilterEditor from "./DiscreteValuesDataFilterEditor";
 import {FilterEditorProps, FilterEditorState} from "./AbstractFilterEditor";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableDynamicObject = weavejs.api.core.ILinkableDynamicObject;
@@ -25,11 +23,11 @@ import WeaveAPI = weavejs.WeaveAPI;
 
 export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
-	public filter:LinkableDynamicObject = Weave.linkableChild(this,  new LinkableDynamicObject(ColumnDataFilter), this.handleFilterChange);
-	public editor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(), this.forceUpdate);
+	public filter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(ColumnDataFilter));
+	public editor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(AbstractFilterEditor));
 	public editorType:typeof AbstractFilterEditor;
 
-	private listItemOptions = [
+	private listItemOptions:{value:new(..._:any[])=>AbstractFilterEditor, label:string}[] = [
 		{
 			value: NumericRangeDataFilterEditor,
 			label: "Continuous range"
@@ -44,39 +42,19 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 	{
 		super(props);
 		Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
-		this.initFilterLater();
+		WeaveAPI.Scheduler.callLater(this, this.initLater);
 	}
 
-	handleEditorTypeChange(item:typeof AbstractFilterEditor[]) 
+	handleEditorTypeChange(item:(typeof AbstractFilterEditor)[]) 
 	{
-		//LinkablePlaceholder.setInstance(item[0]);
+		this.editor.requestLocalObject(item[0], false);
 	}
 	
-	handleFilterChange(filter:LinkableDynamicObject) 
+	initLater() 
 	{
-		var _editor = this.editor.target as AbstractFilterEditor;
-		if (_editor)
-			_editor.setFilter(filter.target as ColumnDataFilter);
-	}
-	
-	initFilterLater() 
-	{
-		if (!Weave.getRoot(this)) 
-		{
-			WeaveAPI.Scheduler.callLater(this, this.initFilterLater);
-			return;
-		}
-		this.filter.targetPath = ["defaultSubsetKeyFilter", "filters", Weave.getRoot(this).getName(this)];
-	}
-	
-	initEditorLater(editor:AbstractFilterEditor)
-	{
-		if (!Weave.getRoot(this)) 
-		{
-			WeaveAPI.Scheduler.callLater(this, this.initEditorLater);
-			return;
-		}
-		this.editor.target = editor;
+		// only set default path if session state hasn't been set yet
+		if (this.filter.triggerCounter == weavejs.core.CallbackCollection.DEFAULT_TRIGGER_COUNT)
+			this.filter.targetPath = ["defaultSubsetKeyFilter", "filters", Weave.getRoot(this).getName(this)];
 	}
 	
 	get deprecatedStateMapping()
@@ -92,31 +70,41 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		return this.filter.target as ColumnDataFilter;
 	}
 
-	private getFilterColumn():IAttributeColumn
+	private getFilterColumn():DynamicColumn
 	{
-		return this.getFilter() ? this.getFilter().column as IAttributeColumn : null;
+		return this.getFilter() ? this.getFilter().column : null;
 	}
 
 	get title():string
 	{
-		if (this.getFilterColumn())
-			return Weave.lang('Filter for {0}', ColumnUtils.getTitle(this.getFilterColumn()));
+		var column = this.getFilterColumn();
+		if (column)
+			return Weave.lang('Filter for {0}', ColumnUtils.getTitle(column));
 		return Weave.lang('Filter');
     }
 
 	render():JSX.Element
 	{
-		var editorClass:(typeof AbstractFilterEditor) = LinkablePlaceholder.getClass(this.editor) as typeof AbstractFilterEditor;
+		var editorClass = LinkablePlaceholder.getClass(this.editor.target) as typeof AbstractFilterEditor;
 		
-		var filterEditor:any = editorClass ? React.createElement(editorClass as any, {
-			ref: this.initEditorLater,
-		}) : null;
+		var editor:any = null;
+		if (editorClass)
+			editor = React.createElement(
+				editorClass as any,
+				{
+					ref: (editor:AbstractFilterEditor) => {
+						if (editor)
+							LinkablePlaceholder.setInstance(this.editor.target, editor);
+					},
+					filter: this.getFilter()
+				}
+			);
 		
+		//<ui.ListItem options={this.listItemOptions} onChange={this.handleEditorTypeChange.bind(this)} selectedValues={[editorClass]}/>
 		return (
 			<ui.VBox>
-				<ui.ListItem options={this.listItemOptions} onChange={this.handleEditorTypeChange.bind(this)} selectedValues={[editorClass]}/>
 				{
-					filterEditor
+					editor
 				}
 			</ui.VBox>
 		)

@@ -1,4 +1,5 @@
 /// <reference path="../typings/jszip/jszip.d.ts"/>
+/// <reference path="../typings/moment/moment.d.ts"/>
 /// <reference path="../typings/react/react.d.ts"/>
 /// <reference path="../typings/react/react-dom.d.ts"/>
 /// <reference path="../typings/weave/weavejs.d.ts"/>

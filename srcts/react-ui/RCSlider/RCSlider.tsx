@@ -52,6 +52,7 @@ export default class RCSlider extends React.Component<any, any>
     {
         this.element = ReactDOM.findDOMNode(this);
     }
+	
     componentWillUpdate()
     {
         if (this.props.type == RCSlider.NUMERIC && this.element && this.element.clientWidth && this.max && this.min)
@@ -115,6 +116,8 @@ export default class RCSlider extends React.Component<any, any>
 
         }
 
+		var value:{ min:number, max:number } = Object(this.props.selectedValues[0]);
+		
         if (this.props.type == RCSlider.NUMERIC)
         {
             let valueToLabel:{[value:number]: string} = {};
@@ -130,24 +133,37 @@ export default class RCSlider extends React.Component<any, any>
             marks[this.min] = valueToLabel[this.min];
             marks[this.max] = valueToLabel[this.max];
 
+			if (isNaN(value.min))
+				value.min = this.min;
+			if (isNaN(value.max))
+				value.max = this.max;
+			
             return  <Slider range={true}
-                            step={this.step}
+                            step={(this.max-this.min)/1024}
                             min={this.min}
                             max={this.max}
                             marks={marks}
-                            value={[this.props.selectedValues[0]["min"], this.props.selectedValues[0]["max"]]}
+                            value={[value.min, value.max]}
                             onChange={this.onChange.bind(this)}
                     />
         }
 
         if (this.props.type == RCSlider.NUMERIC_DISCRETE)
         {
+			var min:number = 0;
+			var max:number = Math.max(0, this.options.length - 1);
+			
+			if (isNaN(value.min))
+				value.min = min;
+			if (isNaN(value.max))
+				value.max = max;
+			
             return <Slider range={true}
-                           min={0}
-                           max={this.options.length ? this.options.length - 1 : 0}
+                           min={min}
+                           max={max}
                            step={null}
                            marks={this.indexToLabel}
-                           value={[this.valueToIndex.get(this.props.selectedValues[0]["min"]), this.valueToIndex.get(this.props.selectedValues[0]["max"])]}
+                           value={[this.valueToIndex.get(value.min), this.valueToIndex.get(value.max)]}
                            onChange={this.onChange.bind(this)}
                     />
         }

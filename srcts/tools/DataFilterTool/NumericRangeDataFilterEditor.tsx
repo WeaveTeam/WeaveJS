@@ -1,7 +1,5 @@
-/// <reference path="../../../typings/react/react.d.ts"/>
-/// <reference path="../../../typings/weave/weavejs.d.ts"/>
-
 import * as React from "react";
+import * as _ from "lodash";
 import ui from "../../react-ui/ui";
 import AbstractFilterEditor from "./AbstractFilterEditor";
 import {FilterEditorProps, FilterEditorState, FilterOption} from "./AbstractFilterEditor";
@@ -19,9 +17,6 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 {
 	public forceDiscreteValues:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.handleColumn);
 
-	private min:number;
-	private max:number;
-
 	constructor(props:FilterEditorProps)
 	{
 		super(props);
@@ -35,31 +30,25 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 		}];
 	}
 
-	componentDidMount()
-	{
-
-	}
-
 	onChange(selectedValues:number[]) 
 	{
-		this.getFilter().values.state = selectedValues;
-	}
-
-	handleColumn() 
-	{
-		var column:IAttributeColumn = this.getColumn();
-		this.options = _.sortByOrder(_.uniq(column.keys.map((key:IQualifiedKey) => {
-			return {
-				value: column.getValueFromKey(key, Number) as number,
-				label: column.getValueFromKey(key, String) as string
-			};
-		}), "value"), ["value"], ["asc"]);
-		this.forceUpdate();
+		this.filter.values.state = selectedValues;
 	}
 
 	render():JSX.Element
 	{
-		let values:any = this.getFilter().values.state;
+		if (Weave.detectChange(this, this.column))
+		{
+			this.options = weavejs.data.ColumnUtils.getRecords(
+				{ value: this.column, label: this.column },
+				this.column.keys,
+				{ value: Number, label: String }
+			);
+			this.options = _.sortByOrder(_.uniq(this.options, "value"), ["value"], ["asc"]);
+		}
+		
+		let values:any = this.filter ? this.filter.values.state : [];
+		
 		if (this.forceDiscreteValues.value)
 		{
 			return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>

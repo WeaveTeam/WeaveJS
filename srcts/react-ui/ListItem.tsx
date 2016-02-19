@@ -66,7 +66,7 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
         }
     }
 
-    handleChange(value:string, event:React.MouseEvent)
+    handleChange(value:any, event:React.MouseEvent)
     {
         var selectedValues:any[] = this.state.selectedValues.concat();
         // new state of the item in the list

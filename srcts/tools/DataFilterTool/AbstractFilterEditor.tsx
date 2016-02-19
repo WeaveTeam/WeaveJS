@@ -1,7 +1,3 @@
-/// <reference path="../../../typings/react/react.d.ts"/>
-/// <reference path="../../../typings/weave/weavejs.d.ts"/>
-/// <reference path="../../../typings/react-bootstrap/react-bootstrap.d.ts"/>
-
 import * as React from "react";
 import ui from "../../react-ui/ui";
 import {DropdownButton, MenuItem} from "react-bootstrap";
@@ -9,10 +5,12 @@ import {DropdownButton, MenuItem} from "react-bootstrap";
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;
 import ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 
@@ -23,24 +21,23 @@ export type FilterOption = {
 
 export interface FilterEditorProps
 {
+	filter:ColumnDataFilter
 }
 
 export interface FilterEditorState
 {
 }
 
-export default class AbstractFilterEditor extends React.Component<FilterEditorProps, FilterEditorState>
- 													implements ILinkableObjectWithNewProperties {
-
-	public showPlayButton:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
-	public showToggle:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(true), this.forceUpdate);
-	public showToggleLabel:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
+export default class AbstractFilterEditor
+	extends React.Component<FilterEditorProps, FilterEditorState>
+	implements ILinkableObjectWithNewProperties
+{
+	public showPlayButton = Weave.linkableChild(this, new LinkableBoolean(false));
+	public showToggle = Weave.linkableChild(this, new LinkableBoolean(true));
+	public showToggleLabel = Weave.linkableChild(this, new LinkableBoolean(false));
 	
-	public enabled:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
-	public values:LinkableVariable;
-	
-	private filter:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher, this.handleFilter)
-	private columnWatcher:LinkableWatcher = Weave.linkableChild(this, LinkableWatcher, this.handleColumn);
+	private filterWatcher = Weave.linkableChild(this, new LinkableWatcher(ColumnDataFilter), this.handleFilter);
+	private statsWatcher = Weave.linkableChild(this, new LinkableWatcher(IColumnStatistics), this.handleColumn);
 
 	protected options:FilterOption[];
 
@@ -48,28 +45,31 @@ export default class AbstractFilterEditor extends React.Component<FilterEditorPr
 	{
 		super(props);
 		this.options = [];
+		Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
 	}
 	
-	getColumn():IAttributeColumn 
+	componentWillReceiveProps(props:FilterEditorProps):void
 	{
-		return this.getFilter().column as IAttributeColumn;
-	}
-
-	setFilter(filter:ColumnDataFilter) 
-	{
-		this.filter.target = filter;
-		if (this.filter)
-		{
-			this.columnWatcher.target = filter.column;
-			//this.enabled = true;
-		}
-	}
-
-	getFilter():ColumnDataFilter 
-	{
-		return this.filter.target as ColumnDataFilter;
+		this.filterWatcher.target = props.filter;
+		this.statsWatcher.target = this.column ? weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.column) : null;
 	}
 	
+	get filter():ColumnDataFilter 
+	{
+		return this.filterWatcher.target as ColumnDataFilter;
+	}
+	
+	get column():DynamicColumn
+	{
+		var filter = this.filter;
+		return filter ? filter.column : null;
+	}
+
+	get stats():IColumnStatistics
+	{
+		return this.statsWatcher.target as IColumnStatistics;
+	}
+
 	handleFilter()
 	{
 		
@@ -87,7 +87,7 @@ export default class AbstractFilterEditor extends React.Component<FilterEditorPr
 
 	onChange(selectedValues:Object)
 	{
-		this.getFilter().values.state = selectedValues;
+		this.filter.values.state = selectedValues;
 	}
 
 	get deprecatedStateMapping():Object
@@ -95,8 +95,7 @@ export default class AbstractFilterEditor extends React.Component<FilterEditorPr
 		return {
 			"showPlayButton": this.showPlayButton,
 			"showToggle": this.showToggle,
-			"showToggleLabel": this.showToggleLabel,
-			"enabled": this.enabled
+			"showToggleLabel": this.showToggleLabel
 		};
 	}
 }
