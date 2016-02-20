@@ -120,10 +120,12 @@ export default class C3LineChart extends AbstractC3Tool
                 onclick: (d:any) => {
                 },
                 onselected: (d:any) => {
-					this.debouncedHandleC3Selection();
+					if (this.chart.internal.dragging)
+						this.debouncedHandleC3Selection();
                 },
                 onunselected: (d:any) => {
-					this.debouncedHandleC3Selection();
+					if (this.chart.internal.dragging)
+						this.debouncedHandleC3Selection();
                 },
                 onmouseover: (d:any) => {
 					var record = this.getRecord(d ? d.id : null);

@@ -86,8 +86,9 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 50);
 		
 		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
-		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
-		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
+		
+        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
+        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
 
 		this.filteredKeySet.setColumnKeySources([this.dataX, this.dataY]);
 
@@ -139,10 +140,12 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				onclick: (d:any) => {
 				},
 				onselected: (d:any) => {
-					this.debouncedHandleC3Selection();
+					if (this.chart.internal.dragging)
+						this.debouncedHandleC3Selection();
 				},
 				onunselected: (d:any) => {
-					this.debouncedHandleC3Selection();
+					if (this.chart.internal.dragging)
+						this.debouncedHandleC3Selection();
 				},
 				onmouseover: (d) => {
 					if (d && d.hasOwnProperty("index"))
@@ -260,15 +263,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		};
 	}
 
-	public handleC3Selection():void
-	{
-		if (!this.selectionKeySet)
-			return;
-		let selectedIndices = this.chart.selected();
-		let selectedKeys = selectedIndices.map((value) => this.records[value.index].id);
-		this.selectionKeySet.replaceKeys(selectedKeys);
-	}
-
 	public get deprecatedStateMapping():Object
 	{
 		return [super.deprecatedStateMapping, {
@@ -298,6 +292,26 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				}
 			}
 		}];
+	}
+
+	public handleC3Selection():void
+	{
+		if (!this.selectionKeySet)
+			return;
+		let selectedIndices = this.chart.selected();
+		let selectedKeys = selectedIndices.map((value) => this.records[value.index].id);
+		this.selectionKeySet.replaceKeys(selectedKeys);
+	}
+	
+	private handleKeyFilters()
+	{
+		if (this.records && Weave.detectChange(this, this.selectionFilter))
+		{
+			var keyToIndex = (key: IQualifiedKey) => this.keyToIndex.get(key);
+			var selectedIndices: number[] = this.selectionKeySet ? this.selectionKeySet.keys.map(keyToIndex) : [];
+			this.chart.select(["y"], selectedIndices, true);
+		}
+		this.updateStyle();
 	}
 
 	updateStyle()
@@ -334,10 +348,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					let probed = this.isProbed(key);
 					return probed ? 2.0 : 1.0;
 				});
-
-		var keyToIndex = (key: IQualifiedKey) => this.keyToIndex.get(key);
-		var selectedIndices: number[] = this.selectionKeySet ? this.selectionKeySet.keys.map(keyToIndex) : [];
-		this.chart.select(["y"], selectedIndices, true);
 	}
 
 	validate(forced:boolean = false):void

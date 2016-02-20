@@ -64,7 +64,7 @@ export default class C3Histogram extends AbstractC3Tool
     protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
     protected chart:ChartAPI;
-	private debouncedHandleC3Selection: Function;
+	private debouncedHandleC3Selection:Function;
 
     private busy:boolean;
     private dirty:boolean;
@@ -129,10 +129,14 @@ export default class C3Histogram extends AbstractC3Tool
                 onclick: (d:any) => {
                 },
                 onselected: (d:any) => {
-					this.debouncedHandleC3Selection();
+					// only handle user interaction or we get erratic selection behavior
+					if (this.chart.internal.dragging)
+						this.debouncedHandleC3Selection();
                 },
                 onunselected: (d:any) => {
-					this.debouncedHandleC3Selection();
+					// only handle user interaction or we get erratic selection behavior
+					if (this.chart.internal.dragging)
+						this.debouncedHandleC3Selection();
                 },
                 onmouseover: (d:any) => {
                     if (d && d.hasOwnProperty("index"))
