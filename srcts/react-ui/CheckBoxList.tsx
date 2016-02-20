@@ -10,9 +10,14 @@ import * as _ from "lodash";
 import VBox from "./VBox";
 import HBox from "./HBox";
 
+export type CheckBoxOption = {
+	value:any, 
+	label:string
+}
+
 export interface ICheckBoxListProps extends React.Props<CheckBoxList>
 {
-    values:any[];
+    options:CheckBoxOption[];
     labels?:string[];
     onChange?:(selectedValues:string[]) => void;
     selectedValues?:string[];
@@ -27,6 +32,9 @@ export interface ICheckBoxListState
 export default class CheckBoxList extends React.Component<ICheckBoxListProps, ICheckBoxListState>
 {
     private checkboxes:HTMLElement[];
+	
+	private values:any[] = [];
+	private labels:string[] = [];
 
     constructor(props:ICheckBoxListProps)
 	{
@@ -35,15 +43,15 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
         if (this.props.selectedValues)
         {
             this.state = {
-                checkboxStates: props.values.map((value) => {
-                    return props.selectedValues.indexOf(value) > -1;
+                checkboxStates: props.options.map((option) => {
+                    return props.selectedValues.indexOf(option.value) >= 0;
                 })
             }
         }
         else
         {
             this.state = {
-                checkboxStates: props.values.map((value) => {
+                checkboxStates: props.options.map(() => {
                     return false;
                 })
             }
@@ -52,10 +60,13 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
 
     componentWillReceiveProps(nextProps:ICheckBoxListProps)
 	{
+		this.values = _.pluck(this.props.options, "value");
+		this.labels = _.pluck(this.props.options, "label");
+		
         if (nextProps.selectedValues)
         {
-            var checkboxStates:boolean[] = nextProps.values.map((value) => {
-                return nextProps.selectedValues.indexOf(value) > -1;
+            var checkboxStates:boolean[] = nextProps.options.map((option) => {
+                return nextProps.selectedValues.indexOf(option.value) > -1;
             });
 
             this.setState({
@@ -74,7 +85,7 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
         checkboxStates.forEach((checkboxState:boolean, index:number) => {
             if (checkboxState)
             {
-                selectedValues.push(this.props.values[index]);
+                selectedValues.push(this.props.options[index].value);
             }
         });
 
@@ -95,9 +106,9 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
                 {
                     this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
                         var checkboxItem:JSX.Element[] = [
-                            <input key="input" type="checkbox" checked={checkBoxState} value={this.props.values[index]} onChange={this.handleChange.bind(this, index)}/>,
+                            <input key="input" type="checkbox" checked={checkBoxState} value={this.values[index]} onChange={this.handleChange.bind(this, index)}/>,
                             <span key="span" style={{paddingLeft: 5}}>
-								{ this.props.labels ? this.props.labels[index] : this.props.values[index] }
+								{ this.labels[index] }
 							</span>
                         ];
                         return (
