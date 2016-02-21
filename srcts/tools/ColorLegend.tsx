@@ -177,7 +177,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			var maxColumns:number = 1;//TODO: This should really be "this.maxColumns.value" but only supporting 1 column for now
 			var columnFlex:number = 1.0/maxColumns;
 			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
-			var ramp:any[] = this.colorColumn.ramp.state as any[];
+			var ramp:any[] = this.colorColumn.ramp.getColors() as any[];
 			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
 			var yMap:Function = (d:number):number => { return yScale(d); };
 
@@ -211,7 +211,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 												<svg style={{position:"absolute"}}
 													 viewBox="0 0 100 100" width="100%" height="100%">
 													<circle cx="50%" cy="50%" r="45%" style={{
-														fill: "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)),
+														fill: "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins), ramp)),
 														stroke: "black",
 														strokeOpacity: 0.5
 													}}/>
@@ -277,7 +277,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 												width:"100%", flex:1.0,
 												alignItems:"center",
 												justifyContent:"center",
-												backgroundColor: StandardLib.hex2rgba(StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins - 1), ramp)),0.5)
+												backgroundColor: StandardLib.hex2rgba(StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins), ramp)),1.0)
 											}}>
 												<div style={{
 															stroke: "black",
