@@ -21,6 +21,7 @@ import SessionStateMenuTool from "./tools/SessionStateMenuTool";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import TableTool from "./tools/TableTool";
 import DataFilterTool from "./tools/DataFilterTool";
+import TextTool from "./tools/TextTool";
 
 // Temporary solution
 // because typescript removes
@@ -36,7 +37,8 @@ var v1:any = [
 	SessionStateMenuTool,
 	WeaveOpenLayersMap,
 	TableTool,
-	DataFilterTool
+	DataFilterTool,
+	TextTool
 ];
 ///////////////////////////////
 
