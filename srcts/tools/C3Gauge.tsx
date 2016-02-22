@@ -67,11 +67,7 @@ export default class C3Gauge extends AbstractC3Tool
         this.keyToIndex = {};
         this.validate = _.debounce(this.validate.bind(this), 30);
 
-        this.c3Config = {
-            size: {
-                width: this.props.style.width,
-                height: this.props.style.height
-            },
+        this.mergeConfig({
             padding: {
                 top: 10,
                 bottom: 10,
@@ -82,23 +78,7 @@ export default class C3Gauge extends AbstractC3Tool
                 columns: [],
                 type: "gauge",
                 xSort: false,
-                names: {},
-                selection: {
-                    enabled: true,
-                    multiple: true,
-                    draggable: true
-
-                },
-                onclick: (d:any) => {
-                },
-                onselected: (d:any) => {
-                },
-                onunselected: (d:any) => {
-                },
-                onmouseover: (d:any) => {
-                },
-                onmouseout: (d:any) => {
-                }
+                names: {}
             },
             gauge: {
                 label: {
@@ -122,37 +102,16 @@ export default class C3Gauge extends AbstractC3Tool
             },
             tooltip: {
                 show: false
-            },
-			interaction: { brighten: false },
-            transition: { duration: 0 },
-            bindto: null,
-            onrendered: () => {
-                this.busy = false;
-                if (this.dirty)
-                    this.validate();
             }
-        };
+        });
     }
 
-    get deprecatedStateMapping()
-    {
-        return [super.deprecatedStateMapping, {
-            "children": {
-                "visualization": {
-                    "plotManager": {
-                        "plotters": {
-                            "plot": {
-                                "filteredKeySet": this.filteredKeySet,
-                                "meterColumn": this.meterColumn,
-                                "colorRamp": this.colorRamp,
-                                "binningDefinition": this.binningDefinition
-                            }
-                        }
-                    }
-                }
-            }
-        }];
-    }
+	protected handleC3Render():void
+	{
+        this.busy = false;
+        if (this.dirty)
+            this.validate();
+	}
 
     validate(forced:boolean = false):void
     {
@@ -240,8 +199,28 @@ export default class C3Gauge extends AbstractC3Tool
         if (changeDetected || forced)
         {
             this.busy = true;
-            this.chart = c3.generate(this.c3Config);
+            c3.generate(this.c3Config);
         }
+    }
+
+    get deprecatedStateMapping()
+    {
+        return [super.deprecatedStateMapping, {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+                                "meterColumn": this.meterColumn,
+                                "colorRamp": this.colorRamp,
+                                "binningDefinition": this.binningDefinition
+                            }
+                        }
+                    }
+                }
+            }
+        }];
     }
 }
 

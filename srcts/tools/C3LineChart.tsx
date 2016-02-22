@@ -58,17 +58,12 @@ export default class C3LineChart extends AbstractC3Tool
     private busy:boolean;
     private dirty:boolean;
 
-    protected chart:ChartAPI;
-    protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
-	private debouncedHandleC3Selection: Function;
 
     constructor(props:IVisToolProps)
     {
         super(props);
 
-		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 50);
-		
         Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
         Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
 
@@ -97,17 +92,7 @@ export default class C3LineChart extends AbstractC3Tool
             }
         }
 
-        this.c3Config = {
-            size: {
-                width: this.props.style.width,
-                height: this.props.style.height
-            },
-            padding: {
-                top: 20,
-                bottom: 0,
-                left:100,
-                right:20
-            },
+        this.mergeConfig({
             data: {
                 columns: [],
                 xSort: false,
@@ -115,16 +100,6 @@ export default class C3LineChart extends AbstractC3Tool
                     enabled: true,
                     multiple: true,
                     draggable: true
-                },
-                onclick: (d:any) => {
-                },
-                onselected: (d:any) => {
-					if (this.chart.internal.dragging)
-						this.debouncedHandleC3Selection();
-                },
-                onunselected: (d:any) => {
-					if (this.chart.internal.dragging)
-						this.debouncedHandleC3Selection();
                 },
                 onmouseover: (d:any) => {
 					var record = this.getRecord(d ? d.id : null);
@@ -183,17 +158,10 @@ export default class C3LineChart extends AbstractC3Tool
                     }
                 }
             },
-            bindto: null,
             legend: {
                 show: false
-            },
-            onrendered: () => {
-                this.busy = false;
-                this.updateStyle();
-                if (this.dirty)
-                    this.validate();
             }
-        };
+        });
     }
 
 	private getRecord(id:string):Record
@@ -201,37 +169,15 @@ export default class C3LineChart extends AbstractC3Tool
 		return this.records[this.keyToIndex[id]];
 	}
 
-    get deprecatedStateMapping()
+	protected handleC3Render():void
 	{
-		return [super.deprecatedStateMapping, {
-            "children": {
-                "visualization": {
-                    "plotManager": {
-                        "plotters": {
-                            "plot": {
-                                "filteredKeySet": this.filteredKeySet,
-                                "columns": this.columns,
-                                "curveType": this.curveType,
-                                "lineStyle": this.line,
-
-                                "enableGroupBy": false,
-                                "groupKeyType": "",
-                                "normalize": false,
-                                "shapeBorderAlpha": 0.5,
-                                "shapeBorderColor": 0,
-                                "shapeBorderThickness": 1,
-                                "shapeSize": 5,
-                                "shapeToDraw": "Solid Circle",
-                                "zoomToSubset": false
-                            }
-                        }
-                    }
-                }
-            }
-        }];
+        this.busy = false;
+        this.handleKeyFilters();
+        if (this.dirty)
+            this.validate();
 	}
 								
-	private handleC3Selection()
+	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
 			return;
@@ -252,7 +198,7 @@ export default class C3LineChart extends AbstractC3Tool
 	
 	private handleKeyFilters()
 	{
-		if (this.records && Weave.detectChange(this, this.selectionFilter))
+		if (this.chart && Weave.detectChange(this, this.selectionFilter))
 		{
 			if (this.selectionKeySet)
 				this.chart.select(this.selectionKeySet.keys.map(key => key.toString()), null, true);
@@ -402,10 +348,40 @@ export default class C3LineChart extends AbstractC3Tool
 			
             this.c3Config.data.type = this.chartType;
             this.c3Config.data.unload = true;
-            this.chart = c3.generate(this.c3Config);
+            c3.generate(this.c3Config);
             this.cullAxes();
         }
     }
+
+    get deprecatedStateMapping()
+	{
+		return [super.deprecatedStateMapping, {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+                                "columns": this.columns,
+                                "curveType": this.curveType,
+                                "lineStyle": this.line,
+
+                                "enableGroupBy": false,
+                                "groupKeyType": "",
+                                "normalize": false,
+                                "shapeBorderAlpha": 0.5,
+                                "shapeBorderColor": 0,
+                                "shapeBorderThickness": 1,
+                                "shapeSize": 5,
+                                "shapeToDraw": "Solid Circle",
+                                "zoomToSubset": false
+                            }
+                        }
+                    }
+                }
+            }
+        }];
+	}
 }
 
 Weave.registerClass("weavejs.tool.C3LineChart", C3LineChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);

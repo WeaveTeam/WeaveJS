@@ -62,10 +62,7 @@ export default class C3Histogram extends AbstractC3Tool
     private histData:{}[];
     private keys:{x?:string, value:string[]};
 	private records:Record[];
-    protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
-    protected chart:ChartAPI;
-	private debouncedHandleC3Selection:Function;
 
     private busy:boolean;
     private dirty:boolean;
@@ -73,8 +70,6 @@ export default class C3Histogram extends AbstractC3Tool
     constructor(props:IVisToolProps)
     {
         super(props);
-		
-		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 50);
 		
 		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
 		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
@@ -90,26 +85,11 @@ export default class C3Histogram extends AbstractC3Tool
         this.keyToIndex = {};
         this.validate = _.debounce(this.validate.bind(this), 30);
 
-        this.c3Config = {
-            size: {
-                width: this.props.style.width,
-                height: this.props.style.height
-            },
-            padding: {
-                top: 20,
-                bottom: 0,
-                left:100,
-                right:20
-            },
+        this.mergeConfig({
             data: {
                 columns: [],
-                selection: {
-                    enabled: true,
-                    multiple: true,
-                    draggable: true
-                },
                 type: "bar",
-                color: (color:string, d:any) => {
+                color: (color:string, d:any):string => {
                     if (d && d.hasOwnProperty("index"))
 					{
                         var decColor:number;
@@ -127,25 +107,12 @@ export default class C3Histogram extends AbstractC3Tool
                     }
                     return "#808080";
                 },
-                onclick: (d:any) => {
-                },
-                onselected: (d:any) => {
-					// only handle user interaction or we get erratic selection behavior
-					if (this.chart.internal.dragging)
-						this.debouncedHandleC3Selection();
-                },
-                onunselected: (d:any) => {
-					// only handle user interaction or we get erratic selection behavior
-					if (this.chart.internal.dragging)
-						this.debouncedHandleC3Selection();
-                },
                 onmouseover: (d:any) => {
                     if (d && d.hasOwnProperty("index"))
                     {
 						var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
 						if (!keys)
 							return;
-						console.log('probed', keys);
                         this.probeKeySet.replaceKeys(keys);
                     }
                 },
@@ -156,7 +123,6 @@ export default class C3Histogram extends AbstractC3Tool
                     }
                 }
             },
-            bindto: null,
             legend: {
                 show: false
             },
@@ -219,8 +185,6 @@ export default class C3Histogram extends AbstractC3Tool
                 },
                 show: false
             },
-			interaction: { brighten: false },
-            transition: { duration: 0 },
             grid: {
                 x: {
                     show: true
@@ -233,14 +197,8 @@ export default class C3Histogram extends AbstractC3Tool
                 width: {
                     ratio: 0.95
                 }
-            },
-            onrendered: () => {
-                this.busy = false;
-                this.updateStyle();
-                if (this.dirty)
-                    this.validate();
             }
-        };
+        });
         this.c3ConfigYAxis = {
             show: true,
             label: {
@@ -254,36 +212,6 @@ export default class C3Histogram extends AbstractC3Tool
                 }
             }
         }
-    }
-
-    get deprecatedStateMapping()
-    {
-        return [super.deprecatedStateMapping, {
-            "children": {
-                "visualization": {
-                    "plotManager": {
-                        "plotters": {
-                            "plot": {
-                                "filteredKeySet": this.filteredKeySet,
-								"binnedColumn": this.binnedColumn,
-                                "columnToAggregate": this.columnToAggregate,
-                                "aggregationMethod": this.aggregationMethod,
-								"fillStyle": this.fill,
-                                "lineStyle": this.line,
-
-                                "drawPartialBins": true,
-                                "horizontalMode": false,
-								"showValueLabels": false,
-                                "valueLabelColor": 0,
-                                "valueLabelHorizontalAlign": "left",
-                                "valueLabelMaxWidth": 200,
-                                "valueLabelVerticalAlign": "middle"
-                            }
-                        }
-                    }
-                }
-            }
-        }];
     }
 
     rotateAxes()
@@ -320,7 +248,15 @@ export default class C3Histogram extends AbstractC3Tool
         }
     }
 
-	private handleC3Selection()
+	protected handleC3Render():void
+	{
+        this.busy = false;
+        this.handleKeyFilters();
+        if (this.dirty)
+            this.validate();
+	}
+
+	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
 			return;
@@ -346,7 +282,7 @@ export default class C3Histogram extends AbstractC3Tool
 	
 	private handleKeyFilters()
 	{
-		if (this.records && Weave.detectChange(this, this.selectionFilter))
+		if (this.chart && Weave.detectChange(this, this.selectionFilter))
 		{
 			if (this.selectionKeySet)
 			{
@@ -548,7 +484,7 @@ export default class C3Histogram extends AbstractC3Tool
         if (changeDetected || forced)
         {
             this.busy = true;
-            this.chart = c3.generate(this.c3Config);
+            c3.generate(this.c3Config);
             this.loadData();
         }
     }
@@ -558,6 +494,36 @@ export default class C3Histogram extends AbstractC3Tool
         if (!this.chart || this.busy)
             return MiscUtils.debounce(this, 'loadData');
         this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; this.cullAxes();}});
+    }
+
+    get deprecatedStateMapping()
+    {
+        return [super.deprecatedStateMapping, {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+								"binnedColumn": this.binnedColumn,
+                                "columnToAggregate": this.columnToAggregate,
+                                "aggregationMethod": this.aggregationMethod,
+								"fillStyle": this.fill,
+                                "lineStyle": this.line,
+
+                                "drawPartialBins": true,
+                                "horizontalMode": false,
+								"showValueLabels": false,
+                                "valueLabelColor": 0,
+                                "valueLabelHorizontalAlign": "left",
+                                "valueLabelMaxWidth": 200,
+                                "valueLabelVerticalAlign": "middle"
+                            }
+                        }
+                    }
+                }
+            }
+        }];
     }
 }
 

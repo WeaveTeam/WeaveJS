@@ -68,7 +68,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	private keyToIndex: Map<IQualifiedKey, number>;
 	private xAxisValueToLabel:{[value:number]: string};
 	private yAxisValueToLabel:{[value:number]: string};
-	protected chart:ChartAPI;
 	private dataXType:string;
 	private dataYType:string;
 	private records:Record[];
@@ -76,16 +75,12 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	private busy:boolean;
 	private dirty:boolean;
 
-	protected c3Config:ChartConfiguration;
 	protected c3ConfigYAxis:c3.YAxisConfiguration;
-	private debouncedHandleC3Selection: Function;
 
 	constructor(props:IVisToolProps)
 	{
 		super(props);
 
-		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 50);
-		
 		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
 		
         Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
@@ -105,28 +100,12 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		this.xAxisValueToLabel = {};
 		this.validate = _.debounce(this.validate.bind(this), 30);
 
-		this.c3Config = {
-			size: {
-				height: this.props.style.height,
-				width: this.props.style.width
-			},
-			bindto: null,
-			padding: {
-				top: 20,
-				bottom: 0,
-				left:100,
-				right:20
-			},
+        this.mergeConfig({
 			data: {
 				rows: [],
 				x: "x",
 				xSort: false,
 				type: "scatter",
-				selection: {
-					enabled: true,
-					multiple: true,
-					draggable: true
-				},
 				color: (color:string, d:any):string => {
 					var color:string;
 					if (d.hasOwnProperty("index"))
@@ -137,41 +116,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 							color = '#' + StandardLib.numberToBase(Number(color), 16, 6);
 					}
 					return color || "#000000";
-				},
-				onclick: (d:any) => {
-				},
-				onselected: (d:any) => {
-					if (this.chart.internal.dragging)
-						this.debouncedHandleC3Selection();
-				},
-				onunselected: (d:any) => {
-					if (this.chart.internal.dragging)
-						this.debouncedHandleC3Selection();
-				},
-				onmouseover: (d) => {
-					if (d && d.hasOwnProperty("index"))
-					{
-						var key:IQualifiedKey = this.records[d.index].id;
-						if (this.probeKeySet)
-							this.probeKeySet.replaceKeys([key]);
-						var data = ToolTip.getToolTipData(this, [key], [this.dataX, this.dataY, this.radiusData]);
-						this.props.toolTip.setState({
-							x: this.chart.internal.d3.event.pageX,
-							y: this.chart.internal.d3.event.pageY,
-							showToolTip: true,
-							columnNamesToValue: data
-						});
-					}
-				},
-				onmouseout: (d) => {
-					if (d && d.hasOwnProperty("index"))
-					{
-						if (this.probeKeySet)
-							this.probeKeySet.replaceKeys([]);
-						this.props.toolTip.setState({
-							showToolTip: false
-						});
-					}
 				}
 			},
 			legend: {
@@ -202,8 +146,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					}
 				}
 			},
-			interaction: { brighten: false },
-			transition: { duration: 0 },
 			grid: {
 				x: {
 					show: true
@@ -235,14 +177,9 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						enabled: false
 					}
 				}
-			},
-			onrendered: () => {
-				this.busy = false;
-				this.updateStyle();
-				if (this.dirty)
-					this.validate();
 			}
-		};
+		});
+		
 		this.c3ConfigYAxis = {
 			show: true,
 			label: {
@@ -264,38 +201,38 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		};
 	}
 
-	public get deprecatedStateMapping():Object
+	protected handleC3Render():void
 	{
-		return [super.deprecatedStateMapping, {
-			"children": {
-				"visualization": {
-					"plotManager": {
-						"plotters": {
-							"plot": {
-								"filteredKeySet": this.filteredKeySet,
-								"dataX": this.dataX,
-								"dataY": this.dataY,
-								"sizeBy": this.radiusData,
-								"minScreenRadius": this.radiusNorm.min,
-								"maxScreenRadius": this.radiusNorm.max,
-								"defaultScreenRadius": this.radius.defaultValue,
-
-								"fill": this.fill,
-								"line": this.line,
-
-								"showSquaresForMissingSize": false,
-								"colorBySize": false,
-								"colorPositive": 0x00FF00,
-								"colorNegative": 0xFF0000
-							}
-						}
-					}
-				}
-			}
-		}];
+		this.busy = false;
+		this.handleKeyFilters();
+		if (this.dirty)
+			this.validate();
+	}
+	
+	protected handleC3MouseOver(d:any):void
+	{
+		var key:IQualifiedKey = this.records[d.index].id;
+		if (this.probeKeySet)
+			this.probeKeySet.replaceKeys([key]);
+		var data = ToolTip.getToolTipData(this, [key], [this.dataX, this.dataY, this.radiusData]);
+		this.props.toolTip.setState({
+			x: this.chart.internal.d3.event.pageX,
+			y: this.chart.internal.d3.event.pageY,
+			showToolTip: true,
+			columnNamesToValue: data
+		});
+	}
+	
+	protected handleC3MouseOut(d:any):void
+	{
+		if (this.probeKeySet)
+			this.probeKeySet.replaceKeys([]);
+		this.props.toolTip.setState({
+			showToolTip: false
+		});
 	}
 
-	public handleC3Selection():void
+	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
 			return;
@@ -306,7 +243,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	
 	private handleKeyFilters()
 	{
-		if (this.records && Weave.detectChange(this, this.selectionFilter))
+		if (this.chart && Weave.detectChange(this, this.selectionFilter))
 		{
 			var keyToIndex = (key: IQualifiedKey) => this.keyToIndex.get(key);
 			var selectedIndices: number[] = this.selectionKeySet ? this.selectionKeySet.keys.map(keyToIndex) : [];
@@ -409,7 +346,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		if (forced || dataChanged || axisChanged)
 		{
 			this.busy = true;
-			this.chart = c3.generate(this.c3Config);
+			c3.generate(this.c3Config);
 			this.loadData();
 			this.cullAxes();
 		}
@@ -424,6 +361,37 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		// clipped when rendered near edge of chart
 		//TODO: determine if adding padding to axes range will further improve aesthetics of chart
 		this.chart.internal.main.select('.c3-chart').attr('clip-path',null);
+	}
+
+	public get deprecatedStateMapping():Object
+	{
+		return [super.deprecatedStateMapping, {
+			"children": {
+				"visualization": {
+					"plotManager": {
+						"plotters": {
+							"plot": {
+								"filteredKeySet": this.filteredKeySet,
+								"dataX": this.dataX,
+								"dataY": this.dataY,
+								"sizeBy": this.radiusData,
+								"minScreenRadius": this.radiusNorm.min,
+								"maxScreenRadius": this.radiusNorm.max,
+								"defaultScreenRadius": this.radius.defaultValue,
+
+								"fill": this.fill,
+								"line": this.line,
+
+								"showSquaresForMissingSize": false,
+								"colorBySize": false,
+								"colorPositive": 0x00FF00,
+								"colorNegative": 0xFF0000
+							}
+						}
+					}
+				}
+			}
+		}];
 	}
 }
 

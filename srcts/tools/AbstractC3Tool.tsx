@@ -6,11 +6,12 @@
 
 import AbstractVisTool from "./AbstractVisTool";
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
-import {ChartAPI, ChartConfiguration} from "c3";
 
+import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
+import * as c3 from "c3";
 import MiscUtils from "../utils/MiscUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -45,12 +46,61 @@ export default class AbstractC3Tool extends AbstractVisTool
     constructor(props:IVisToolProps)
 	{
         super(props);
+		
+		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 0);
+		
+		var self = this;
+		this.c3Config = {
+			bindto: null,
+			size: {},
+			padding: {
+				top: 0,
+				bottom: 0,
+				left: 0,
+				right: 0
+			},
+			interaction: { brighten: false },
+			transition: { duration: 0 },
+			data: {
+				selection: {
+					enabled: true,
+					multiple: true,
+					draggable: true
+				},
+				onselected: (d:any) => {
+					if (this.chart.internal.dragging)
+						this.debouncedHandleC3Selection();
+				},
+				onunselected: (d:any) => {
+					if (this.chart.internal.dragging)
+						this.debouncedHandleC3Selection();
+				},
+				onmouseover: (d) => {
+					if (d && d.hasOwnProperty("index"))
+						this.handleC3MouseOver(d);
+				},
+				onmouseout: (d) => {
+					if (d && d.hasOwnProperty("index"))
+						this.handleC3MouseOut(d);
+				}
+			},
+            onrendered: function() {
+				self.chart = this.api;
+				self.handleC3Render();
+			}
+		};
+		
         this.xAxisClass = {axis: "c3-axis-x", grid: "c3-xgrid"};
         this.yAxisClass = {axis: "c3-axis-y", grid: "c3-ygrid"};
         this.y2AxisClass = {axis: "c3-axis-y2", grid: "c3-ygrid"};
 		this.handlePointClick = this.handlePointClick.bind(this);
 		Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
     }
+	
+	protected mergeConfig(c3Config:c3.ChartConfiguration):void
+	{
+		_.merge(this.c3Config, c3Config);
+	}
 	
 	componentDidMount()
 	{
@@ -66,8 +116,8 @@ export default class AbstractC3Tool extends AbstractVisTool
 	}
 
 	protected element:HTMLElement;
-    protected chart:ChartAPI;
-    protected c3Config:ChartConfiguration;
+    protected chart:c3.ChartAPI;
+    protected c3Config:c3.ChartConfiguration;
     private xAxisClass:AxisClass;
     private yAxisClass:AxisClass;
     private y2AxisClass:AxisClass;
@@ -75,6 +125,12 @@ export default class AbstractC3Tool extends AbstractVisTool
     private previousWidth:number;
     private previousHeight:number;
 
+	private debouncedHandleC3Selection:Function;
+	protected handleC3MouseOver(d:any):void { }
+	protected handleC3MouseOut(d:any):void { }
+	protected handleC3Selection():void { }
+	protected handleC3Render():void { }
+	
 	handlePointClick(event:MouseEvent):void
 	{
 		if (!this.probeKeySet || !this.selectionKeySet)
@@ -197,9 +253,9 @@ export default class AbstractC3Tool extends AbstractVisTool
 	{
         if (this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height)
 		{
-            this.c3Config.size = {width: this.props.style.width, height: this.props.style.height};
+            this.c3Config.size = { width: this.props.style.width, height: this.props.style.height };
 			if (this.chart)
-	            this.chart.resize({width:this.props.style.width, height:this.props.style.height});
+	            this.chart.resize({ width: this.props.style.width, height: this.props.style.height });
             this.cullAxes();
         }
     }

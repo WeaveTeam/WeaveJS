@@ -56,19 +56,15 @@ export default class C3PieChart extends AbstractC3Tool
     private records:Record[];
     private chartType:string;
 
-
     private busy:boolean;
     private dirty:boolean;
-
-    protected chart:ChartAPI;
-    protected c3Config:ChartConfiguration;
 
     constructor(props:IVisToolProps)
     {
         super(props);
 
-        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
-        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
+        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
+        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
 
         this.filteredKeySet.setSingleKeySource(this.data);
 
@@ -78,45 +74,15 @@ export default class C3PieChart extends AbstractC3Tool
 
         this.keyToIndex = {};
         this.records = [];
-        this.validate = _.debounce(this.validate.bind(this),30);
+        this.validate = _.debounce(this.validate.bind(this), 30);
 
-        this.c3Config = {
-            size: {
-                width: this.props.style.width,
-                height: this.props.style.height
-            },
-            bindto: this.element,
-            padding: {
-                top: 20,
-                bottom: 20,
-                right: 30
-            },
+        this.mergeConfig({
             tooltip: {
                 show: false
             },
             data: {
                 columns: [],
-                selection: {
-                    enabled: true,
-                    multiple: true,
-                    draggable: true
-                },
                 type: "pie",
-                onclick: (d:any) => {
-                },
-                onselected: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-                        this.selectionKeySet.addKeys([this.records[d.index].id]);
-                    }
-                },
-                onunselected: (d:any) => {
-                    if (d && d.hasOwnProperty("data"))
-                    {
-                        // d has a different structure than "onselected" argument
-                        this.selectionKeySet.replaceKeys([]);
-                    }
-                },
                 onmouseover: (d:any) => {
                     if (d && d.hasOwnProperty("index"))
                     {
@@ -174,39 +140,41 @@ export default class C3PieChart extends AbstractC3Tool
             },
             legend: {
                 show: false
-            },
-            onrendered: () => {
-                this.busy = false;
-                this.updateStyle();
-                if (this.dirty)
-                    this.validate();
             }
-        };
+        });
     }
 
-	get deprecatedStateMapping()
+	protected handleC3Render():void
 	{
-		return [super.deprecatedStateMapping, {
-            "children": {
-                "visualization": {
-                    "plotManager": {
-                        "plotters": {
-                            "plot": {
-                                "filteredKeySet": this.filteredKeySet,
-                                "data": this.data,
-                                "fill": this.fill,
-                                "innerRadius": this.innerRadius,
-                                "label": this.label,
-                                "line": this.line,
-                                "labelAngleRatio": 0
-                            }
-                        }
-                    }
-                }
-            }
-        }];
+        this.busy = false;
+        this.handleKeyFilters();
+        if (this.dirty)
+            this.validate();
 	}
 
+	protected handleC3Selection():void
+	{
+		if (!this.selectionKeySet)
+			return;
+		let selectedIndices = this.chart.selected();
+		let selectedKeys = selectedIndices.map((value) => this.records[value.index].id);
+		this.selectionKeySet.replaceKeys(selectedKeys);
+	}
+	
+	private handleKeyFilters()
+	{
+		if (this.chart && Weave.detectChange(this, this.selectionFilter))
+		{
+	        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+			var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
+	        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
+				return Number(keyToIndex.get(key));
+	        });
+			this.chart.select(null, selectedIndices, true);
+		}
+		this.updateStyle();
+	}
+	
     private updateStyle():void
     {
 		if (this.busy || !this.chart || !this.records)
@@ -296,9 +264,32 @@ export default class C3PieChart extends AbstractC3Tool
         if (forced || dataChanged || axisChanged)
         {
             this.busy = true;
-            this.chart = c3.generate(this.c3Config);
+            c3.generate(this.c3Config);
         }
     }
+
+	get deprecatedStateMapping()
+	{
+		return [super.deprecatedStateMapping, {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+                                "data": this.data,
+                                "fill": this.fill,
+                                "innerRadius": this.innerRadius,
+                                "label": this.label,
+                                "line": this.line,
+                                "labelAngleRatio": 0
+                            }
+                        }
+                    }
+                }
+            }
+        }];
+	}
 }
 
 Weave.registerClass("weavejs.tool.C3PieChart", C3PieChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
