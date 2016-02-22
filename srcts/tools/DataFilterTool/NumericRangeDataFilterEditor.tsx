@@ -46,9 +46,7 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 			);
 			this.options = _.sortByOrder(_.uniq(this.options, "value"), ["value"], ["asc"]);
 		}
-		
 		let values:any = this.filter ? this.filter.values.state : [];
-		
 		if (this.forceDiscreteValues.value)
 		{
 			return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>

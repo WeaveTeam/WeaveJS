@@ -13,6 +13,8 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import DataType = weavejs.api.data.DataType;
+import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 
 export const LAYOUT_LIST:string = "List";
 export const LAYOUT_COMBO:string = "ComboBox";
@@ -49,19 +51,24 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 			"layoutMode": this.layoutMode
 		}];
 	}
+	
+	getChoices():FilterOption[]
+	{
+		var dataType = DataType.getClass(this.column.getMetadata(ColumnMetadata.DATA_TYPE));
+		this.options = weavejs.data.ColumnUtils.getRecords(
+			{ value: this.column, label: this.column },
+			this.column.keys,
+			{ value: dataType, label: String }
+		);
+		return _.sortByOrder(_.uniq(this.options, "value"), ["value"], ["asc"]);
+	}
 
 	render():JSX.Element 
 	{
 		if (Weave.detectChange(this, this.column))
 		{
-			this.options = weavejs.data.ColumnUtils.getRecords(
-				{ value: this.column, label: this.column },
-				this.column.keys,
-				{ value: String, label: String }
-			);
-			this.options = _.sortByOrder(_.uniq(this.options, "value"), ["value"], ["asc"]);
+			this.options = this.getChoices();
 		}
-		
 		let values:any = this.filter ? this.filter.values.state : [];
 		
 		switch (this.layoutMode.value)
@@ -83,19 +90,19 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 						</ui.VBox>;
 				
 			case LAYOUT_COMBO:
-				return <ui.VBox style={{height:"100%", flex:1.0, alignItems:"center"}}>
-							<DropdownButton title={values[0]} id="bs.dropdown">
+				return <ui.VBox style={{height:"100%", alignItems:"center"}}>
+							<select style={{width:"100%", flex:1, padding: 5}} value={values && values.length ? values[0] : ""} onChange={(event:React.FormEvent) => { this.onChange([(event.target as any).value]) }} placeholder="Selected filter value...">
 								{
 									this.options.map((option:FilterOption, index:number) => {
 										// TODO non efficient.. needs to be fixed with external bound function
-										return  <MenuItem active={values.indexOf(option) > -1} key={index} onSelect={() => { this.filter.values.state = [option.value]; }}>
+										return  <option value={option.value as string} key={index}>
 											{
 												option.label || option.value
 											}
-										</MenuItem>;
+										</option>;
 									})
 								}
-							</DropdownButton>
+							</select>
 						</ui.VBox>;
 		}
 	}
