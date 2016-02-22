@@ -101,10 +101,8 @@ export default class C3BarChart extends AbstractC3Tool
     private yLabelColumnDataType:string;
     private heightColumnNames:string[];
     private heightColumnsLabels:string[];
-    protected c3Config:ChartConfiguration;
     protected c3ConfigYAxis:c3.YAxisConfiguration;
     private records:Record[];
-    protected chart:ChartAPI;
 
     private busy:boolean;
     private dirty:boolean;
@@ -123,28 +121,12 @@ export default class C3BarChart extends AbstractC3Tool
 
         this.validate = _.debounce(this.validate.bind(this), 30);
 
-        this.c3Config = {
-            size: {
-                width: this.props.style.width,
-                height: this.props.style.height
-            },
-            padding: {
-                top: this.margin.top.value,
-                bottom: 0, // use axis.x.height instead
-                left: this.margin.left.value,
-                right: this.margin.right.value
-            },
+        this.mergeConfig({
             data: {
                 json: [],
                 type: "bar",
                 xSort: false,
                 names: {},
-                selection: {
-                    enabled: true,
-                    multiple: true,
-                    draggable: true
-
-                },
                 labels: {
                     format: (v, id, i, j) => {
                         if (this.showValueLabels.value)
@@ -168,22 +150,6 @@ export default class C3BarChart extends AbstractC3Tool
                     {
 						// use the color from the color ramp
                         return color;
-                    }
-                },
-                onclick: (d:any) => {
-                },
-                onselected: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-						if (this.selectionKeySet)
-							this.selectionKeySet.addKeys([this.records[d.index].id]);
-                    }
-                },
-                onunselected: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-                        if (this.selectionKeySet)
-							this.selectionKeySet.removeKeys([this.records[d.index].id]);
                     }
                 },
                 onmouseover: (d:any) => {
@@ -283,8 +249,6 @@ export default class C3BarChart extends AbstractC3Tool
                 rotated: false
             },
 			tooltip: {show: false },
-			interaction: { brighten: false },
-            transition: { duration: 0 },
             grid: {
                 x: {
                     show: true
@@ -293,7 +257,6 @@ export default class C3BarChart extends AbstractC3Tool
                     show: true
                 }
             },
-            bindto: null,
             bar: {
                 width: {
                     ratio: 0.8
@@ -302,14 +265,9 @@ export default class C3BarChart extends AbstractC3Tool
             legend: {
                 show: false,
                 position: "bottom"
-            },
-            onrendered: () => {
-                this.busy = false;
-                this.updateStyle();
-                if (this.dirty)
-                    this.validate();
             }
-        };
+        });
+
         this.c3ConfigYAxis = {
             show: true,
             label: {
@@ -338,29 +296,35 @@ export default class C3BarChart extends AbstractC3Tool
         };
     }
 
-	public get deprecatedStateMapping():Object
+	protected handleC3Render():void
 	{
-		return [super.deprecatedStateMapping, {
-			"children": {
-				"visualization": {
-					"plotManager": {
-						"plotters": {
-							"plot": {
-								"filteredKeySet": this.filteredKeySet,
-								"heightColumns": this.heightColumns,
-								"labelColumn": this.labelColumn,
-								"sortColumn": this.sortColumn,
-								"colorColumn": this.colorColumn,
-								"chartColors": this.chartColors,
-								"horizontalMode": this.horizontalMode,
-								"showValueLabels": this.showValueLabels,
-								"groupingMode": this.groupingMode
-							}
-						}
-					}
-				}
-			}
-		}];
+        this.busy = false;
+        this.handleKeyFilters();
+        if (this.dirty)
+            this.validate();
+	}
+
+	protected handleC3Selection():void
+	{
+		if (!this.selectionKeySet)
+			return;
+		let selectedIndices = this.chart.selected();
+		let selectedKeys = selectedIndices.map((value) => this.records[value.index].id);
+		this.selectionKeySet.replaceKeys(selectedKeys);
+	}
+
+	private handleKeyFilters()
+	{
+		if (this.chart && Weave.detectChange(this, this.selectionFilter))
+		{
+	        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+			var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
+	        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
+				return Number(keyToIndex.get(key));
+	        });
+			this.chart.select(this.heightColumnNames, selectedIndices, true);
+		}
+		this.updateStyle();
 	}
 
     private dataChanged():void
@@ -464,68 +428,53 @@ export default class C3BarChart extends AbstractC3Tool
     	if (!this.chart || !this.heightColumnNames)
     		return;
 
-		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
-
-        d3.select(this.element)
-        	.selectAll("path")
-        	.style("opacity", 1)
-            .style("stroke", "black")
-            .style("stroke-width", 1.0)
-            .style("stroke-opacity", 0.5);
-
-		d3.select(this.element)
-			.selectAll("g")
-			.selectAll("text")
-			.style("fill-opacity", 1.0);
-
+		let selectionEmpty:boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+		let thinBars:boolean = this.chart.internal.width <= this.records.length;
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet.keys;
-		var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
-
-        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
-			return Number(keyToIndex.get(key));
-        });
-
+	
         this.heightColumnNames.forEach((item:string) => {
-			d3.select(this.element).selectAll("g").filter(".c3-shapes-"+item+".c3-bars").selectAll("path")
-				.style("opacity",
-				(d: any, i: number, oi: number): number => {
+			d3.select(this.element)
+				.selectAll("g")
+				.filter(".c3-shapes-"+item+".c3-bars")
+				.selectAll("path")
+				.style("opacity", (d: any, i: number, oi: number): number => {
 					let key = this.records[i].id;
 					let selected = this.isSelected(key);
 					let probed = this.isProbed(key);
 					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
 				})
-				.style("stroke-opacity",
-					(d: any, i: number, oi: number): number => {
-						let key = this.records[i].id;
-						let selected = this.isSelected(key);
-						let probed = this.isProbed(key);
-						if (probed)
-							return 1.0;
-						if (selected)
-							return 0.7;
-						return 0.5;
-					});
+	            .style("stroke", "black")
+	            .style("stroke-width", 1.0)
+				.style("stroke-opacity", (d: any, i: number, oi: number): number => {
+					if (thinBars)
+						return 0;
+					let key = this.records[i].id;
+					let selected = this.isSelected(key);
+					let probed = this.isProbed(key);
+					if (probed)
+						return 1.0;
+					if (selected)
+						return 0.7;
+					return 0.5;
+				});
 				//Todo: find better probed style to differentiate bars
-				//.style("stroke-width",
-				//	(d: any, i: number, oi: number): number => {
-				//		let key = this.records[i].id;
-				//		let probed = this.isProbed(key);
-				//		return probed ? 1.5 : 1.0;
-				//	});
+				//.style("stroke-width", (d: any, i: number, oi: number): number => {
+				//	let key = this.records[i].id;
+				//	let probed = this.isProbed(key);
+				//	return probed ? 1.5 : 1.0;
+				//});
 
-			d3.select(this.element).selectAll("g").filter(".c3-texts-"+item).selectAll("text")
-				.style("fill-opacity",
-				(d: any, i: number, oi: number): number => {
+			d3.select(this.element)
+				.selectAll("g")
+				.filter(".c3-texts-"+item)
+				.selectAll("text")
+				.style("fill-opacity", (d: any, i: number, oi: number): number => {
 					let key = this.records[i].id;
 					let selected = this.isSelected(key);
 					let probed = this.isProbed(key);
 					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
 				});
         });
-		if (selectedIndices.length)
-			this.chart.select(this.heightColumnNames, selectedIndices, true);
-		else if (!this.probeKeySet.keys.length)
-			this.chart.select(this.heightColumnNames, [], true);
     }
 
     validate(forced:boolean = false):void
@@ -608,10 +557,35 @@ export default class C3BarChart extends AbstractC3Tool
         if (changeDetected || forced)
         {
             this.busy = true;
-            this.chart = c3.generate(this.c3Config);
+            c3.generate(this.c3Config);
             this.cullAxes();
         }
     }
+
+	public get deprecatedStateMapping():Object
+	{
+		return [super.deprecatedStateMapping, {
+			"children": {
+				"visualization": {
+					"plotManager": {
+						"plotters": {
+							"plot": {
+								"filteredKeySet": this.filteredKeySet,
+								"heightColumns": this.heightColumns,
+								"labelColumn": this.labelColumn,
+								"sortColumn": this.sortColumn,
+								"colorColumn": this.colorColumn,
+								"chartColors": this.chartColors,
+								"horizontalMode": this.horizontalMode,
+								"showValueLabels": this.showValueLabels,
+								"groupingMode": this.groupingMode
+							}
+						}
+					}
+				}
+			}
+		}];
+	}
 }
 
 Weave.registerClass("weavejs.tool.C3BarChart", C3BarChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
