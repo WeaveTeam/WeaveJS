@@ -13,6 +13,7 @@ import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import MiscUtils from "../utils/MiscUtils";
+import ToolTip from "./ToolTip";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -192,11 +193,10 @@ export default class C3BarChart extends AbstractC3Tool
                         	this.probeKeySet.replaceKeys([]);;
                         
 						var record:Record = this.records[d.index];
-						var columnNamesToValue:{[columnName:string] : string} = {};
-                        var columnNamesToColor:{[columnName:string] : string} = {};
-                        
 						var qKey:IQualifiedKey = this.records[d.index].id;
-						
+
+						var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, [qKey]);
+						var columnNamesToColor:{[columnName:string] : string} = {};
 						var columns = this.heightColumns.getObjects() as IAttributeColumn[];
 						for (var index in columns)
 						{
