@@ -23,6 +23,8 @@ export interface IListItemProps extends React.Props<ListItem>
     options:ListOption[];
     onChange?:(selectedValues:any[]) => void;
     selectedValues?:any[];
+	allowClear?:boolean;
+	multiple?:boolean;
 }
 
 export interface IListItemstate
@@ -49,15 +51,31 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
         {
             this.lastIndexClicked = props.selectedValues.length - 1;
         }
-		this.values = this.props.options.map((option:ListOption) => option.value);
-		this.labels = this.props.options.map((option:ListOption) => option.label);
+		if(this.props.options && this.props.options.length)
+		{
+			this.values = this.props.options.map((option:ListOption) => option.value);
+			this.labels = this.props.options.map((option:ListOption) => option.label);
+		}
+		else
+		{
+			this.values = [];
+			this.labels = [];
+		}
     }
+	
+	static defaultProps():IListItemProps
+	{
+		return {
+			options: [],
+			multiple: true,
+			allowClear: true
+		};
+	}
 
     componentWillReceiveProps(nextProps:IListItemProps)
     {
 		this.values = this.props.options.map((option:ListOption) => option.value);
 		this.labels = this.props.options.map((option:ListOption) => option.label);
-
         if (nextProps.selectedValues)
         {
             this.setState({
@@ -69,9 +87,9 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
     handleChange(value:any, event:React.MouseEvent)
     {
         var selectedValues:any[] = this.state.selectedValues.concat();
-        // new state of the item in the list
-
+		// new state of the item in the list
         var currentIndexClicked:number = selectedValues.indexOf(value);
+		
         // ctrl selection
         if (event.ctrlKey || event.metaKey)
         {
@@ -85,8 +103,8 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
             }
             this.lastIndexClicked = currentIndexClicked;
         }
-        // shift selection
-        else if (event.shiftKey)
+        // multiple selection
+        else if (event.shiftKey && this.props.multiple)
         {
             selectedValues = [];
             if (this.lastIndexClicked == null)
@@ -116,8 +134,8 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
 		{
             // if there was only one record selected
             // and we are clicking on it again, then we want to
-            // clear the selection.
-            if (selectedValues.length == 1 && selectedValues[0] == value)
+            // clear the selection unless allowClear is not enabled.
+            if (selectedValues.length == 1 && selectedValues[0] == value && this.props.allowClear)
             {
                 selectedValues = [];
                 this.lastIndexClicked = null;
