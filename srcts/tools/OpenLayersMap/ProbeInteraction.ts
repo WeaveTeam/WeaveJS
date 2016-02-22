@@ -105,7 +105,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 
 			toolTipState.showToolTip = true;
 			toolTipState.title = ToolTip.getToolTipTitle(this.tool, key);
-			toolTipState.columnNamesToValue = ToolTip.getToolTipData(this.tool, key, this.topLayer.getToolTipColumns());
+			toolTipState.columnNamesToValue = ToolTip.getToolTipData(this.tool, [key], this.topLayer.getToolTipColumns());
 			[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
 		}
 		else

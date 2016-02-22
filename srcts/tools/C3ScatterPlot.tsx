@@ -154,7 +154,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						var key:IQualifiedKey = this.records[d.index].id;
 						if (this.probeKeySet)
 							this.probeKeySet.replaceKeys([key]);
-						var data = ToolTip.getToolTipData(this, key, [this.dataX, this.dataY, this.radiusData]);
+						var data = ToolTip.getToolTipData(this, [key], [this.dataX, this.dataY, this.radiusData]);
 						this.props.toolTip.setState({
 							x: this.chart.internal.d3.event.pageX,
 							y: this.chart.internal.d3.event.pageY,

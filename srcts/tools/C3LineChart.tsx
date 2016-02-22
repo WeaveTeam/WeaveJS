@@ -136,7 +136,7 @@ export default class C3LineChart extends AbstractC3Tool
                         x: this.chart.internal.d3.event.pageX,
                         y: this.chart.internal.d3.event.pageY,
                         showToolTip: true,
-                        columnNamesToValue: ToolTip.getToolTipData(this, key, this.columns.getObjects() as IAttributeColumn[])
+                        columnNamesToValue: ToolTip.getToolTipData(this, [key], this.columns.getObjects() as IAttributeColumn[])
                     });
                 },
                 onmouseout: (d:any) => {

@@ -126,7 +126,7 @@ export default class C3PieChart extends AbstractC3Tool
                             showToolTip: true,
                             x: this.chart.internal.d3.event.pageX,
                             y: this.chart.internal.d3.event.pageY,
-                            columnNamesToValue: ToolTip.getToolTipData(this, key, [this.data])
+                            columnNamesToValue: ToolTip.getToolTipData(this, [key], [this.data])
                         });
                     }
                 },

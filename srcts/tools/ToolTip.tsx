@@ -205,7 +205,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
         }
     }
 
-	static getToolTipData(context:ILinkableObject, key:IQualifiedKey, additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
+	static getToolTipData(context:ILinkableObject, keys:IQualifiedKey[], additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
 	{
 		let columnHashMap = Weave.getRoot(context).getObject("Probed Columns") as ILinkableHashMap;
 
@@ -214,12 +214,16 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 		for (let child of (columnHashMap.getObjects() as IAttributeColumn[]).concat(additionalColumns))
 		{
 			let title:string = child.getMetadata("title");
-			let value:string = child.getValueFromKey(key, String);
+			let value:string = child.getValueFromKey(keys[0], String);
 			if (value)
 			{
 				result[title] = value;
 			}
 		}
+
+		//handle remaining keys
+		if(keys.length > 1)
+			result["("+ keys.length + " records total, 1 shown)"] = null;
 
 		return result;
 	}
@@ -261,7 +265,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 	                template += "<span style=" + "'background-color': " + columnNamesToColor[columnName] + "/>";
 	            }
 	            template += "<div style='display':'inline'>" + nameFormat(columnName) + "</div></td>";
-	            template += "<td class='value'>" + valueFormat(columnNamesToValue[columnName]) + "</td>";
+	            template += valueFormat(columnNamesToValue[columnName]) === null ? "<td class='value'>" + valueFormat(columnNamesToValue[columnName]) + "</td>" : "";
 	            template += "</tr>";
 	        });
 	        template += "</table>";
