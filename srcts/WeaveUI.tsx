@@ -1,4 +1,5 @@
 /// <reference path="../typings/jszip/jszip.d.ts"/>
+/// <reference path="../typings/moment/moment.d.ts"/>
 /// <reference path="../typings/react/react.d.ts"/>
 /// <reference path="../typings/react/react-dom.d.ts"/>
 /// <reference path="../typings/weave/weavejs.d.ts"/>
@@ -13,6 +14,7 @@ import C3LineChart from "./tools/C3LineChart";
 import C3PieChart from "./tools/C3PieChart";
 import C3Histogram from "./tools/C3Histogram";
 import C3Gauge from "./tools/C3Gauge";
+import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import TableTool from "./tools/TableTool";
 import SessionStateMenuTool from "./tools/SessionStateMenuTool";
@@ -22,7 +24,6 @@ import * as JSZip from "jszip";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as moment from "moment";
-
 
 var stub:any = React;
 weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
@@ -63,6 +64,7 @@ export
     C3Gauge as Gauge,
     WeaveOpenLayersMap as Map,
     TableTool as DataTable,
+	DataFilterTool as DataFilter,
     SessionStateMenuTool as MenuTool,
     MiscUtils,
     ui,

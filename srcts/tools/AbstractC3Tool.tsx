@@ -164,14 +164,16 @@ export default class AbstractC3Tool extends AbstractVisTool
 		//grid line culling
 		var gridCullingInterval:number = this.getInterval('.' + axisClass.grid,cullingMetric.displayed);
 		d3.select(this.element).selectAll('.' + axisClass.grid).each(function (e, index) {
-			if (index >= 0) {
+			if (index >= 0)
+			{
 				d3.select(this).style('display', index % gridCullingInterval ? 'none' : 'block');
 			}
 		});
 		//tick culling
 		var tickCullingInterval:number = this.getInterval('.'+ axisClass.axis + ' .tick line',cullingMetric.displayed);
 		d3.select(this.element).selectAll('.'+ axisClass.axis + ' .tick line').each(function (e, index) {
-			if (index >= 0) {
+			if (index >= 0)
+			{
 				d3.select(this).style('display', index % tickCullingInterval ? 'none' : 'block');
 			}
 		});

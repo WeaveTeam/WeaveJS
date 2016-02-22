@@ -281,9 +281,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		this.map.un("postrender", this.updateResolutionDependentStyles, this);
 
-		for (let obj of this.layers.getObjects()) {
+		for (let obj of this.layers.getObjects())
+		{
 			let layer: AbstractFeatureLayer = obj as AbstractFeatureLayer;
-			if (layer && layer.styleResolutionDependent) {
+			if (layer && layer.styleResolutionDependent)
+			{
 				layer.updateStyleData();
 			}
 		}

@@ -2,14 +2,15 @@
 
 import * as React from "react";
 import RCSlider from "./RCSlider";
+import {SliderOption} from "./RCSlider";
 
 export interface VSliderProps extends React.Props<VSlider>
 {
-    min?:number;
+	min?:number;
     max?:number;
     step?:number;
-    values?:string[];
-    selectedValues?:string[];
+    options?:SliderOption[];
+	selectedValues?:string[];
     type:string;
     reversed?:boolean;
     onChange?:React.EventHandler<React.FormEvent>;

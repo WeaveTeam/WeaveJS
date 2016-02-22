@@ -21,8 +21,8 @@ import C3Histogram from "./tools/C3Histogram";
 import SessionStateMenuTool from "./tools/SessionStateMenuTool";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import TableTool from "./tools/TableTool";
-import DataFilterTool from "./tools/DataFilterTool";
 import TextTool from "./tools/TextTool";
+import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 
 // Temporary solution
 // because typescript removes

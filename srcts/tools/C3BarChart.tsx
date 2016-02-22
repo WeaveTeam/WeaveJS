@@ -388,7 +388,7 @@ export default class C3BarChart extends AbstractC3Tool
 
         if (this.groupingMode.value === STACK || this.groupingMode.value === PERCENT_STACK)
             this.c3Config.data.groups = [this.heightColumnNames];
-        else //if(this.groupingMode === "group")
+        else //if (this.groupingMode === "group")
             this.c3Config.data.groups = [];
 
         if (this.groupingMode.value === PERCENT_STACK && this.heightColumnNames.length > 1)
@@ -524,7 +524,7 @@ export default class C3BarChart extends AbstractC3Tool
         });
 		if (selectedIndices.length)
 			this.chart.select(this.heightColumnNames, selectedIndices, true);
-		else if(!this.probeKeySet.keys.length)
+		else if (!this.probeKeySet.keys.length)
 			this.chart.select(this.heightColumnNames, [], true);
     }
 
