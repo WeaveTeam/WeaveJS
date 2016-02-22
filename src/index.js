@@ -3,6 +3,7 @@ import ReactDOM from "react-dom";
 import $ from "jquery";
 /* eslint-disable */
 import {Layout} from "../lib/WeaveUI.js";
+import {ui} from "../lib/WeaveUI.js";
 import {MiscUtils} from "../lib/WeaveUI.js";
 /* eslint-enable */
 
@@ -41,6 +42,25 @@ else
 function render()
 {
 	$(() => {
-		ReactDOM.render(<Layout weave={weave} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
+		var accordionContent = [
+			{
+				title: "First section",
+				content: "Lorem Ipsum"
+			},
+			{
+				title: "Second section",
+				content: <div>
+							JSX here
+							<input type="button" value="button"/>
+						</div>
+			}
+		];
+
+		ReactDOM.render(
+			<ui.HBox style={{width: "100%", height: "100%"}}>
+				<ui.Accordion title="Accordion test" contents={accordionContent}/>
+				<Layout weave={weave} style={{width: "100%", height: "100%"}}/>
+			</ui.HBox>
+		, document.getElementById("weaveElt"));
 	});
 }

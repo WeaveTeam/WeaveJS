@@ -4,6 +4,7 @@ import HSlider from "./RCSlider/HSlider";
 import VSlider from "./RCSlider/VSlider";
 import CheckBoxList from "./CheckBoxList";
 import ListItem from "./ListItem";
+import Accordion from "./Accordion/Accordion";
 
 export default
 {
@@ -12,5 +13,6 @@ export default
     HSlider,
     VSlider,
     CheckBoxList,
-    ListItem
+    ListItem,
+	Accordion
 }
