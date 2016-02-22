@@ -38,10 +38,12 @@ class LabelLayer extends AbstractGlyphLayer
 	{
 		super();
 
+		this.styleResolutionDependent = true;
+
 		this.size.addGroupedCallback(this, this.updateStyleData)
 		this.text.addGroupedCallback(this, this.updateStyleData)
-		this.color.addGroupedCallback(this, this.updateStyleData, true);
-		this.styleResolutionDependent = true;
+		this.color.addGroupedCallback(this, this.updateStyleData);
+		this.hideOverlappingText.addGroupedCallback(this, this.updateStyleData, true);
 	}
 
 	updateStyleData():void 
@@ -71,9 +73,6 @@ class LabelLayer extends AbstractGlyphLayer
 
 			let point = feature.getGeometry() as ol.geom.Point;
 			let pixel = map.getPixelFromCoordinate(point.getCoordinates());
-			
-			if (!pixel)
-				continue;
 
 			let bounds: Bounds2D = feature.get("Bounds2D") as Bounds2D;
 			if (!bounds)
@@ -82,9 +81,18 @@ class LabelLayer extends AbstractGlyphLayer
 				feature.set("Bounds2D", bounds);
 			}
 
-			bounds.setCenter(pixel[0], pixel[1]);
-			bounds.setWidth(width);
-			bounds.setHeight(height);
+			if (pixel) 
+			{
+				bounds.setCenter(pixel[0], pixel[1]);
+				bounds.setWidth(width);
+				bounds.setHeight(height);
+			}
+			else
+			{
+				bounds.setCenter(NaN, NaN);
+				bounds.setWidth(0);
+				bounds.setHeight(0);
+			}
 
 			/* Debug */
 			// let box: ol.render.Box;
