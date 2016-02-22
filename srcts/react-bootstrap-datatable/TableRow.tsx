@@ -4,7 +4,7 @@
 
 import * as React from "react";
 import {CSSProperties} from "react";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 import * as Prefixer from "react-vendor-prefix";
 import * as _ from "lodash";
 
@@ -81,7 +81,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         if (!selected && !probed)
             style = this.clear;
 
-        StandardLib.merge(style, baseStyle);
+        MiscUtils.merge(style, baseStyle);
 
         var cells:JSX.Element[] = [];
 

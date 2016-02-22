@@ -4,7 +4,6 @@
 /// <reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 
-import StandardLib from "../utils/StandardLib";
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";

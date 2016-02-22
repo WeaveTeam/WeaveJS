@@ -6,8 +6,8 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 
 import AbstractLayer from "./AbstractLayer";
-import StandardLib from "../../../utils/StandardLib";
 
+import StandardLib = weavejs.util.StandardLib;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import KeySet = weavejs.data.key.KeySet;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
@@ -92,7 +92,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		if (typeof color == "number")
 		{
-			colorArray = ol.color.asArray("#" + StandardLib.decimalToHex(color as number));
+			colorArray = ol.color.asArray("#" + StandardLib.numberToBase(color as number, 16, 6));
 		}
 		else /* if typeof color is string */
 		{
@@ -102,7 +102,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 			}
 			else
 			{
-				colorArray = ol.color.asArray("#" + StandardLib.decimalToHex(Number(color as string)));
+				colorArray = ol.color.asArray("#" + StandardLib.numberToBase(Number(color as string), 16, 6));
 			}
 		}
 

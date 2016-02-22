@@ -10,7 +10,6 @@ import {ChartAPI, ChartConfiguration} from "c3";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
-import StandardLib from "../utils/StandardLib";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;

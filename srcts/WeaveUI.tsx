@@ -16,7 +16,7 @@ import C3Gauge from "./tools/C3Gauge";
 import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import TableTool from "./tools/TableTool";
 import SessionStateMenuTool from "./tools/SessionStateMenuTool";
-import StandardLib from "./utils/StandardLib";
+import MiscUtils from "./utils/MiscUtils";
 import ui from "./react-ui/ui";
 import * as JSZip from "jszip";
 import * as React from "react";
@@ -64,7 +64,7 @@ export
     WeaveOpenLayersMap as Map,
     TableTool as DataTable,
     SessionStateMenuTool as MenuTool,
-    StandardLib,
+    MiscUtils,
     ui,
     loadLayout
 };

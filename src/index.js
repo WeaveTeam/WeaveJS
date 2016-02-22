@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import $ from "jquery";
 /* eslint-disable */
 import {Layout} from "../lib/WeaveUI.js";
-import {StandardLib} from "../lib/WeaveUI.js";
+import {MiscUtils} from "../lib/WeaveUI.js";
 /* eslint-enable */
 
 /*global Weave, weavejs*/
@@ -18,7 +18,7 @@ if (weave)
 else
 {
 	window.weave = weave = new Weave();
-	var urlParams = StandardLib.getUrlParams();
+	var urlParams = MiscUtils.getUrlParams();
 	var weaveExternalTools = window.opener && window.opener.WeaveExternalTools;
 	if (urlParams.file)
 	{

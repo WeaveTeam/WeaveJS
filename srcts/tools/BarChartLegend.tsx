@@ -11,7 +11,6 @@ import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
 import ui from "../react-ui/ui";
-import StandardLib from "../utils/StandardLib";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
@@ -119,7 +118,6 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
         var maxColumns = 1 // = this.maxColumns.value; Only one column actually supported right now.
         var columnFlex:number = 1.0/maxColumns;
         var extraBins:number = this.numberOfLabels % maxColumns == 0 ? 0 : maxColumns-(this.numberOfLabels % maxColumns);
-        var ramp:any[] = this.chartColors.state as any[];
 
         var labels: string[] = this.columns.getObjects().map((item: ReferencedColumn) => item.getMetadata('title'));
 
@@ -141,7 +139,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
                             <ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
                                 <ui.HBox style={{width:shapeSize, position:"relative", padding:"0px 0px 0px 0px"}}>
                                     <svg style={{position:"absolute"}} width="100%" height="100%">
-                                        <rect x={0} y={10} height="80%" width={shapeSize} style={{fill:"#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfLabels - 1), ramp)), stroke:"black", strokeOpacity:0.5}}></rect>
+                                        <rect x={0} y={10} height="80%" width={shapeSize} style={{fill: this.chartColors.getHexColor(i, 0, this.numberOfLabels - 1), stroke:"black", strokeOpacity:0.5}}></rect>
                                     </svg>
                                 </ui.HBox>
                                 <ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>

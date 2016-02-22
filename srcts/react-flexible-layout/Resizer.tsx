@@ -5,7 +5,7 @@
 import * as VendorPrefix from "react-vendor-prefix";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 
 const HORIZONTAL: string = "horizontal";
 
@@ -81,7 +81,7 @@ export default class Resizer extends React.Component<IResizerProps, IResizerStat
 			var direction:string = this.props.direction;
 			var style:any = resizerStyle.basic;
 
-			StandardLib.merge(style, resizerStyle[direction]);
+			MiscUtils.merge(style, resizerStyle[direction]);
 
 			var prefixed = VendorPrefix.prefix({styles: style});
 			return <span ref={(elt:Element) => { this.element = elt }} style={prefixed.styles}/>;

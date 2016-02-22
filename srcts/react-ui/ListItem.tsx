@@ -10,7 +10,7 @@ import * as bs from "react-bootstrap";
 import * as _ from "lodash";
 import VBox from "./VBox";
 import HBox from "./HBox";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 import * as Prefixer from "react-vendor-prefix";
 
 export interface IListItemProps extends React.Props<ListItem>
@@ -164,7 +164,7 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
 
                         if (!selected && hovered)
                         {
-                            style["backgroundColor"] = StandardLib.rgba(153, 214, 255, 0.4);
+                            style["backgroundColor"] = MiscUtils.rgba(153, 214, 255, 0.4);
                         }
 
                         if (!selected && !hovered)

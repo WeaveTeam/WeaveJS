@@ -16,7 +16,7 @@ import {ChartConfiguration, ChartAPI} from "c3";
 import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 import * as ReactDOM from "react-dom";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -30,6 +30,7 @@ import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableString = weavejs.core.LinkableString;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
+import StandardLib = weavejs.util.StandardLib;
 
 declare type Record = {
 	id: IQualifiedKey,
@@ -133,7 +134,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						var record:Record = this.records[d.index];
 						color = record ? record.fill.color : null;
 						if (color && color.charAt(0) != '#')
-							color = '#' + weavejs.util.StandardLib.numberToBase(Number(color), 16, 6);
+							color = '#' + StandardLib.numberToBase(Number(color), 16, 6);
 					}
 					return color || "#000000";
 				},
@@ -417,7 +418,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	loadData()
 	{
 		if (!this.chart || this.busy)
-			return StandardLib.debounce(this, 'loadData');
+			return MiscUtils.debounce(this, 'loadData');
 		this.chart.load({data: _.pluck(this.records, "point"), unload: true});
 		//after data is loaded we need to remove the clip-path so that points are not
 		// clipped when rendered near edge of chart

@@ -14,7 +14,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ui from "./react-ui/ui";
 import * as VendorPrefix from "react-vendor-prefix";
-import StandardLib from "./utils/StandardLib";
+import MiscUtils from "./utils/MiscUtils";
 import {Glyphicon} from "react-bootstrap";
 import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
@@ -216,8 +216,8 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
             width: 38
         };
 
-        StandardLib.merge(leftControls, transitions);
-        StandardLib.merge(rightControls, transitions);
+        MiscUtils.merge(leftControls, transitions);
+        MiscUtils.merge(rightControls, transitions);
 
         return(
             <ui.HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>

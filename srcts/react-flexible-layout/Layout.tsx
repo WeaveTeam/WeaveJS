@@ -7,7 +7,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import * as VendorPrefix from "react-vendor-prefix";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 import Resizer from "./Resizer";
 import ResizerOverlay from "./ResizerOverlay";
 
@@ -67,7 +67,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 	componentWillReceiveProps(nextProps:LayoutProps):void
 	{
-		this.setState(StandardLib.includeMissingPropertyPlaceholders(this.state, nextProps.state));
+		this.setState(MiscUtils.includeMissingPropertyPlaceholders(this.state, nextProps.state));
 	}
 
 	compoenentWillUnmount():void

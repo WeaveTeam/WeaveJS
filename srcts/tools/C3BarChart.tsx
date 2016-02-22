@@ -12,7 +12,7 @@ import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -51,7 +51,7 @@ export default class C3BarChart extends AbstractC3Tool
     heightColumns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
     labelColumn = Weave.linkableChild(this, DynamicColumn);
     sortColumn = Weave.linkableChild(this, DynamicColumn);
-    colorColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#C0CDD1"));
+    colorColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#808080"));
     chartColors = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
     groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode))
     horizontalMode = Weave.linkableChild(this, new LinkableBoolean(true));
@@ -202,10 +202,9 @@ export default class C3BarChart extends AbstractC3Tool
 						{
 							var column = columns[index]; 
 							var columnName:string = column.getMetadata("title");
-							var color = this.chartColors.getColorFromNorm(Number(index) / (columns.length - 1));
 							columnNamesToValue[columnName] = column.getValueFromKey(qKey, String);
 							// columnNamesToColor can be done only on heightColumns change.
-							columnNamesToColor[columnName] = "#" + weavejs.util.StandardLib.numberToBase(color, 16, 6);
+							columnNamesToColor[columnName] = this.chartColors.getHexColor(Number(index), 0, columns.length - 1);
 						}
 
                         var title:string = record.stringValues.xLabel;
@@ -260,7 +259,7 @@ export default class C3BarChart extends AbstractC3Tool
 									var labelString:string = record.stringValues.xLabel;
 									if (labelString)
 									{
-										var stringSize:number = StandardLib.getTextWidth(labelString, this.getFontString());
+										var stringSize:number = MiscUtils.getTextWidth(labelString, this.getFontString());
 										var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
 										return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
 									}
@@ -431,9 +430,8 @@ export default class C3BarChart extends AbstractC3Tool
         if (this.heightColumnNames.length > 1)
         {
             this.heightColumnNames.forEach((name, index) => {
-                var color = this.chartColors.getColorFromNorm(index / (this.heightColumnNames.length - 1));
-                columnColors[name] = "#" + weavejs.util.StandardLib.numberToBase(color, 16, 6);;
                 columnTitles[name] = this.heightColumnsLabels[index];
+                columnColors[name] = this.chartColors.getHexColor(index, 0, this.heightColumnNames.length - 1);
             });
             if (this.labelColumn.target)
             {

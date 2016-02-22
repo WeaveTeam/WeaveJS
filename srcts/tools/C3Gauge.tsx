@@ -12,7 +12,7 @@ import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -23,6 +23,8 @@ import ColorRamp = weavejs.util.ColorRamp;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
+import StandardLib = weavejs.util.StandardLib;
+
 declare type Record = {
     id: IQualifiedKey,
     meterColumn: number
@@ -178,20 +180,16 @@ export default class C3Gauge extends AbstractC3Tool
 			});
 
 			this.numberOfBins = (this.binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value;
-			this.c3Config.color.pattern = [];
-			var ramp:any[] = this.colorRamp.getColors().reverse();
-			ramp.forEach( (color:number,index:number) => {
-				this.c3Config.color.pattern.push("#" + StandardLib.decimalToHex(color));
-			});
+			this.c3Config.color.pattern = this.colorRamp.getColors().reverse().map(color => '#' + StandardLib.numberToBase(color, 16, 6));
 
 			this.c3Config.gauge.min = this.colStats.getMin();
 			this.c3Config.gauge.max = this.colStats.getMax();
 
 			var range = this.c3Config.gauge.max - this.c3Config.gauge.min;
 			this.c3Config.color.threshold.values = [];
-			for (var i=1; i<=this.numberOfBins; i++)
+			for (var i = 1; i <= this.numberOfBins; i++)
 			{
-				this.c3Config.color.threshold.values.push(this.c3Config.gauge.min+i*(range/this.numberOfBins));
+				this.c3Config.color.threshold.values.push(this.c3Config.gauge.min + i * (range / this.numberOfBins));
 			}
 			this.c3Config.gauge.label.show = true;
 

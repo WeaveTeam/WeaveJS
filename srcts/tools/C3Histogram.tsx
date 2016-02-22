@@ -12,7 +12,7 @@ import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import FormatUtils from "../utils/FormatUtils";
-import StandardLib from "../utils/StandardLib"
+import MiscUtils from "../utils/MiscUtils"
 import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 
@@ -26,6 +26,7 @@ import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
+import StandardLib = weavejs.util.StandardLib;
 
 declare type Record = {
     id: weavejs.api.data.IQualifiedKey,
@@ -115,16 +116,16 @@ export default class C3Histogram extends AbstractC3Tool
                         if (weavejs.WeaveAPI.Locale.reverseLayout)
 						{
                             //handle case where labels need to be reversed for chart flip
-                            var temp:number = this.histData.length-1;
-                            decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(temp-d.index);
+                            var temp:number = this.histData.length - 1;
+                            decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(temp - d.index);
                         }
                         else
                         {
                             decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(d.index);
                         }
-                        return "#" + StandardLib.decimalToHex(decColor);
+                        return "#" + StandardLib.numberToBase(decColor, 16, 6);
                     }
-                    return "#C0CDD1";
+                    return "#808080";
                 },
                 onclick: (d:any) => {
                 },
@@ -189,7 +190,7 @@ export default class C3Histogram extends AbstractC3Tool
                                 }
                                 if (labelString)
                                 {
-                                    var stringSize:number = StandardLib.getTextWidth(labelString, this.getFontString());
+                                    var stringSize:number = MiscUtils.getTextWidth(labelString, this.getFontString());
                                     var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
                                     return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
                                 }
@@ -555,7 +556,7 @@ export default class C3Histogram extends AbstractC3Tool
     loadData()
     {
         if (!this.chart || this.busy)
-            return StandardLib.debounce(this, 'loadData');
+            return MiscUtils.debounce(this, 'loadData');
         this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; this.cullAxes();}});
     }
 }

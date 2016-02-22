@@ -5,7 +5,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as VendorPrefix from "react-vendor-prefix";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 const HORIZONTAL: string = "horizontal";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
@@ -122,8 +122,8 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         var direction: string = this.props.direction;
         var style:React.CSSProperties = {};
 
-        StandardLib.merge(style, resizerStyle.basic);
-        StandardLib.merge(style, resizerStyle[direction]);
+        MiscUtils.merge(style, resizerStyle.basic);
+        MiscUtils.merge(style, resizerStyle[direction]);
 
         if (this.state.active)
         {

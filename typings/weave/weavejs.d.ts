@@ -1195,7 +1195,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The global object of the requested name and type, or null if the object could not be created.
          */
-        requestGlobalObject<T extends ILinkableObject>(name: string, objectType: new () => T, lockObject: boolean): T;
+        requestGlobalObject<T extends ILinkableObject>(name: string, objectType: new () => T, lockObject?: boolean): T;
         /**
          * This function creates a local object using the given Class definition if it doesn't already exist.
          * If this object is locked, this function does nothing.
@@ -1203,7 +1203,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The local object of the requested type, or null if the object could not be created.
          */
-        requestLocalObject<T extends ILinkableObject>(objectType: new () => T, lockObject: boolean): T;
+        requestLocalObject<T extends ILinkableObject>(objectType: new () => T, lockObject?: boolean): T;
         /**
          * This function will copy the session state of an ILinkableObject to a new local internalObject of the same type.
          * @param objectToCopy An object to copy the session state from.
@@ -3276,8 +3276,8 @@ declare module weavejs.core {
         setSessionState(newState: any[], removeMissingDynamicObjects: boolean): void;
         target: ILinkableObject;
         targetPath: any[];
-        requestLocalObject(objectType: new (..._: any[]) => any, lockObject: boolean): any;
-        requestGlobalObject(name: string, objectType: new (..._: any[]) => any, lockObject: boolean): any;
+        requestLocalObject(objectType: new (..._: any[]) => any, lockObject?: boolean): any;
+        requestGlobalObject(name: string, objectType: new (..._: any[]) => any, lockObject?: boolean): any;
         requestLocalObjectCopy(objectToCopy: ILinkableObject): void;
         /**
          * This is the name of the linked global object, or null if the internal object is local.
@@ -3456,6 +3456,12 @@ declare module weavejs.core {
          * @return The class definition, or null if the object was null.
          */
         static getClass(object: ILinkableObject | LinkablePlaceholder<ILinkableObject>): new (..._: any[]) => ILinkableObject;
+        /**
+         * Replaces a LinkablePlaceholder with an instance of the expected type.
+         * @param possiblePlaceholder A LinkablePlaceholder or the instance object if it has already been placed.
+         * @param instance An instance of the type of object that the placeholder is expecting.
+         */
+        static setInstance(possiblePlaceholder: ILinkableObject, instance: ILinkableObject): void;
     }
 }
 declare module weavejs.core {
@@ -7268,26 +7274,6 @@ declare module weavejs.geom {
     }
 }
 declare module weavejs.geom {
-    import LinkableVariable = weavejs.core.LinkableVariable;
-    import Bounds2D = weavejs.geom.Bounds2D;
-    /**
-     * This is a linkable version of a Bounds2D object.
-     *
-     * @author adufilie
-     */
-    class LinkableBounds2D extends LinkableVariable {
-        constructor();
-        setSessionState(value: Object): void;
-        xMin: number;
-        yMin: number;
-        xMax: number;
-        yMax: number;
-        setBounds(xMin: number, yMin: number, xMax: number, yMax: number): void;
-        copyFrom(sourceBounds: Bounds2D): void;
-        copyTo(destinationBounds: Bounds2D): void;
-    }
-}
-declare module weavejs.geom {
     /**
      * This class defines a 1-dimensional continuous range of values by begin and end values.
      * The difference between the begin and end values can be either positive or negative.
@@ -8665,6 +8651,22 @@ declare module weavejs.util {
          * @return A color.
          */
         getColorFromNorm(normValue: number): number;
+        /**
+         * Normalizes a value between min and max and returns an RGB hex color.
+         * @param value A numeric value
+         * @param min The min value used for normalization
+         * @param max The max value used for normalization
+         * @return A color represented as a Number between 0x000000 and 0xFFFFFF
+         */
+        getColor(value: number, min?: number, max?: number): number;
+        /**
+         * Normalizes a value between min and max and returns an RGB hex color.
+         * @param value A numeric value
+         * @param min The min value used for normalization
+         * @param max The max value used for normalization
+         * @return A 6-digit hex color String like #FFFFFF
+         */
+        getHexColor(value: number, min?: number, max?: number): string;
         /************************
          * begin static section *
          ************************/

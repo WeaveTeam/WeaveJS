@@ -4,6 +4,7 @@
 /// <reference path="../typings/weave/weavejs.d.ts"/>
 
 import WeavePath = weavejs.path.WeavePath;
+import StandardLib = weavejs.util.StandardLib;
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -44,7 +45,7 @@ var v1:any = [
 
 import WeaveTool from "./WeaveTool";
 import ToolOverlay from "./ToolOverlay";
-import StandardLib from "./utils/StandardLib";
+import MiscUtils from "./utils/MiscUtils";
 const LAYOUT:string = "Layout";
 
 const LEFT:string = "left";
@@ -330,8 +331,8 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 			return;
 
 		var newState:LayoutState = _.cloneDeep(this.weave.path(LAYOUT).getState());
-		var src:LayoutState = StandardLib.findDeep(newState, {id: toolDragged});
-		var dest:LayoutState = StandardLib.findDeep(newState, {id: toolDroppedOn});
+		var src:LayoutState = MiscUtils.findDeep(newState, {id: toolDragged});
+		var dest:LayoutState = MiscUtils.findDeep(newState, {id: toolDroppedOn});
 		if (_.isEqual(src.id, dest.id))
 			return;
 
@@ -351,7 +352,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 					dropZone = LEFT;
 			}
 
-			var srcParentArray:LayoutState[] = StandardLib.findDeep(newState, (obj:LayoutState) => {
+			var srcParentArray:LayoutState[] = MiscUtils.findDeep(newState, (obj:LayoutState) => {
 				return Array.isArray(obj) && obj.indexOf(src) >= 0;
 			});
 
@@ -453,7 +454,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		}
 
 		return (
-			<div ref={(elt) => { this.element = elt; }} style={StandardLib.merge({display: "flex", position: "relative", overflow: "hidden"}, this.props.style)}>
+			<div ref={(elt) => { this.element = elt; }} style={MiscUtils.merge({display: "flex", position: "relative", overflow: "hidden"}, this.props.style)}>
 				<Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
 				{children}
 				<ToolOverlay ref={TOOLOVERLAY}/>

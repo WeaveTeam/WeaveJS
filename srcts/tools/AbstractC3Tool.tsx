@@ -11,7 +11,7 @@ import {ChartAPI, ChartConfiguration} from "c3";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -55,13 +55,13 @@ export default class AbstractC3Tool extends AbstractVisTool
 	componentDidMount()
 	{
 		this.c3Config.bindto = this.element;
-        StandardLib.addPointClickListener(this.element, this.handlePointClick);
+        MiscUtils.addPointClickListener(this.element, this.handlePointClick);
 		this.validate(true);
 	}
 	
 	componentWillUnmount()
 	{
-		StandardLib.removePointClickListener(this.element, this.handlePointClick);
+		MiscUtils.removePointClickListener(this.element, this.handlePointClick);
 		this.chart.destroy();
 	}
 
@@ -234,7 +234,7 @@ export default class AbstractC3Tool extends AbstractVisTool
 
     private _getCullingMetrics(size:number,axisClass:string):CullingMetric
 	{
-        var textHeight:number = StandardLib.getTextHeight("test", this.getFontString());
+        var textHeight:number = MiscUtils.getTextHeight("test", this.getFontString());
         var labelsToShow:number = Math.floor(size / textHeight);
         labelsToShow = Math.max(2,labelsToShow);
 

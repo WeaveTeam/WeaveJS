@@ -3,7 +3,6 @@
 ///<reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 ///<reference path="../../typings/jquery/jquery.d.ts"/>
-///<reference path="../utils/StandardLib.ts"/>
 
 import {IVisToolProps, IVisToolState} from "./IVisTool";
 import {IVisTool} from "./IVisTool";
@@ -13,12 +12,12 @@ import ui from "../react-ui/ui";
 import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
-import StandardLib from "../utils/StandardLib";
 import * as jquery from "jquery";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
 
+import StandardLib = weavejs.util.StandardLib;
 import LinkableString = weavejs.core.LinkableString
 import LinkableNumber = weavejs.core.LinkableNumber;
 
@@ -66,7 +65,7 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 
 	render()
 	{
-		let bgColor:string = this.panelBackgroundColor.value ? "#" + StandardLib.decimalToHex(this.panelBackgroundColor.value) : "#FFFFFF";
+		let bgColor:string = this.panelBackgroundColor.value ? "#" + StandardLib.numberToBase(this.panelBackgroundColor.value, 16, 6) : "#FFFFFF";
 		return (<div style={{width:"100%", height:"100%", padding:this.padding.value, backgroundColor:bgColor, overflow:"auto"}}
 					 ref={(c:HTMLElement) => { this.element = c }}
 					 className={this.textToolContainerClass}></div>);

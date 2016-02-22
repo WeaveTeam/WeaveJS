@@ -1,5 +1,5 @@
-// <reference path="../../typings/d3/d3.d.ts"/>
-/// <reference path="../../typings/lodash/lodash.d.ts"/>
+///<reference path="../../typings/d3/d3.d.ts"/>
+///<reference path="../../typings/lodash/lodash.d.ts"/>
 ///<reference path="../../typings/react/react.d.ts"/>
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 ///<reference path="../react-ui/ui.tsx"/>
@@ -12,7 +12,7 @@ import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
 import ui from "../react-ui/ui";
-import StandardLib from "../utils/StandardLib";
+import MiscUtils from "../utils/MiscUtils";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
@@ -157,7 +157,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		return {
 			width: "100%",
 			flex: 1.0,
-			borderColor: StandardLib.rgba(0, 0, 0, borderAlpha),
+			borderColor: MiscUtils.rgba(0, 0, 0, borderAlpha),
 			borderStyle: "solid",
 			borderWidth: 1,
 			padding: "2px",
@@ -177,7 +177,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			var maxColumns:number = 1;//TODO: This should really be "this.maxColumns.value" but only supporting 1 column for now
 			var columnFlex:number = 1.0/maxColumns;
 			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
-			var ramp:any[] = this.colorColumn.ramp.getColors() as any[];
 			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
 			var yMap:Function = (d:number):number => { return yScale(d); };
 
@@ -211,7 +210,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 												<svg style={{position:"absolute"}}
 													 viewBox="0 0 100 100" width="100%" height="100%">
 													<circle cx="50%" cy="50%" r="45%" style={{
-														fill: "#" + StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins), ramp)),
+														fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
 														stroke: "black",
 														strokeOpacity: 0.5
 													}}/>
@@ -277,7 +276,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 												width:"100%", flex:1.0,
 												alignItems:"center",
 												justifyContent:"center",
-												backgroundColor: StandardLib.hex2rgba(StandardLib.decimalToHex(StandardLib.interpolateColor(StandardLib.normalize(i, 0, this.numberOfBins), ramp)),1.0)
+												backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 0.5)
 											}}>
 												<div style={{
 															stroke: "black",

@@ -5,7 +5,7 @@
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 
-import StandardLib from "../../../utils/StandardLib";
+import MiscUtils from "../../../utils/MiscUtils";
 import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
 import AbstractGlyphLayer from "./AbstractGlyphLayer";
 import AbstractLayer from "./AbstractLayer";
@@ -66,11 +66,14 @@ class LabelLayer extends AbstractGlyphLayer
 			let sort: number = this.sortColumn.getValueFromKey(key, Number);
 			let font: string = `${size}px sans-serif`;
 
-			let width: number = StandardLib.getTextWidth(text, font);
-			let height: number = StandardLib.getTextHeight(text, font);
+			let width: number = MiscUtils.getTextWidth(text, font);
+			let height: number = MiscUtils.getTextHeight(text, font);
 
 			let point = feature.getGeometry() as ol.geom.Point;
 			let pixel = map.getPixelFromCoordinate(point.getCoordinates());
+			
+			if (!pixel)
+				continue;
 
 			let bounds: Bounds2D = feature.get("Bounds2D") as Bounds2D;
 			if (!bounds)
