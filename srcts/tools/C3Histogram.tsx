@@ -59,7 +59,7 @@ export default class C3Histogram extends AbstractC3Tool
     private binnedColumnDataType:string;
     private numberOfBins:number;
     private showXAxisLabel:boolean = false;
-    private histData:{}[];
+    private histData:{[key:string]: number}[];
     private keys:{x?:string, value:string[]};
 	private records:Record[];
     protected c3ConfigYAxis:c3.YAxisConfiguration;
@@ -110,27 +110,39 @@ export default class C3Histogram extends AbstractC3Tool
                 onmouseover: (d:any) => {
                     if (d && d.hasOwnProperty("index"))
                     {
-						var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
-						if (!keys)
-							return;
-                        var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, keys);
+                        var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
+                        if (!keys)
+                            return;
+                        var columnNamesToValue:{[columnName:string] : string} = {};
+                        var toolTipData:{[columnName:string]: string} = ToolTip.getToolTipData(this, keys);
+                        let binTitle:string = this.getLabelString(d.index);
+                        let binValue:string = FormatUtils.defaultNumberFormatting(this.histData[d.index]["height"]) as string;
+                        if(Object.keys(toolTipData).length) {
+                            columnNamesToValue[binTitle] = binValue;
+                            columnNamesToValue = _.merge(columnNamesToValue, toolTipData) as {[columnName:string]: string};
+                        } else {
+                            columnNamesToValue[String(keys.length) + " Records"] = this.aggregationMethod.value;
+                            columnNamesToValue[binTitle] = binValue;
+                        }
                         this.probeKeySet.replaceKeys(keys);
-                            this.props.toolTip.setState({
-                                x: this.chart.internal.d3.event.pageX,
-                                y: this.chart.internal.d3.event.pageY,
-                                showToolTip: true,
-                                title: this.panelTitle.value,
-                                columnNamesToValue: columnNamesToValue
-                            });
+                        if (this.props.toolTip)
+                        this.props.toolTip.setState({
+                            x: this.chart.internal.d3.event.pageX,
+                            y: this.chart.internal.d3.event.pageY,
+                            showToolTip: true,
+                            title: this.columnToAggregate.getMetadata('title'),
+                            columnNamesToValue: columnNamesToValue
+                        });
                     }
                 },
                 onmouseout: (d:any) => {
                     if (d && d.hasOwnProperty("index"))
                     {
                         this.probeKeySet.replaceKeys([]);
-                        this.props.toolTip.setState({
-                            showToolTip: false
-                        });
+                        if (this.props.toolTip)
+                            this.props.toolTip.setState({
+                                showToolTip: false
+                            });
                     }
                 }
             },
@@ -154,17 +166,7 @@ export default class C3Histogram extends AbstractC3Tool
                             if (this.element && this.props.style.height > 0)
                             {
                                 var labelHeight:number = Number(this.margin.bottom)/Math.cos(45*(Math.PI/180));
-                                var labelString:string;
-                                if (weavejs.WeaveAPI.Locale.reverseLayout)
-                                {
-                                    //handle case where labels need to be reversed
-                                    var temp:number = this.histData.length-1;
-                                    labelString = this.binnedColumn.deriveStringFromNumber(temp-num);
-                                }
-                                else
-                                {
-                                    labelString = this.binnedColumn.deriveStringFromNumber(num);
-                                }
+                                var labelString:string = this.getLabelString(num);
                                 if (labelString)
                                 {
                                     var stringSize:number = MiscUtils.getTextWidth(labelString, this.getFontString());
@@ -223,6 +225,18 @@ export default class C3Histogram extends AbstractC3Tool
                 }
             }
         }
+    }
+
+    private getLabelString(num:number):string
+    {
+        if (weavejs.WeaveAPI.Locale.reverseLayout)
+        {
+            //handle case where labels need to be reversed
+            var temp:number = this.histData.length-1;
+            return this.binnedColumn.deriveStringFromNumber(temp-num);
+        }
+        else
+            return this.binnedColumn.deriveStringFromNumber(num);
     }
 
     rotateAxes()
