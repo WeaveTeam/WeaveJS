@@ -49,7 +49,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 		this.selectionKeySet.targetPath = ['defaultSelectionKeySet'];
 		this.probeKeySet.targetPath = ['defaultProbeKeySet'];
 
-		this.maxColumns.addGroupedCallback(this, this.forceUpdate);
+		//this.maxColumns.addGroupedCallback(this, this.forceUpdate);
 		this.filteredKeySet.addGroupedCallback(this, this.forceUpdate);
 		this.shapeSize.addGroupedCallback(this, this.forceUpdate, true);
 
