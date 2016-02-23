@@ -4,6 +4,7 @@
 ///<reference path="../../../typings/weave/weavejs.d.ts"/>
 
 import * as ol from "openlayers";
+import * as lodash from "lodash";
 import * as jquery from "jquery";
 import OpenLayersMapTool from "../OpenLayersMapTool";
 
@@ -15,27 +16,59 @@ export default class InteractionModeCluster extends ol.control.Control
 	constructor(optOptions: any)
 	{
 		var map: OpenLayersMapTool = optOptions.mapTool as OpenLayersMapTool;
+		var iconMapping: {[mode: string]: string} = {
+			"pan": "fa-hand-grab-o",
+			"select": "fa-mouse-pointer",
+			"zoom": "fa-search-plus"
+		};
 
 		var options: any = optOptions || {};
-		var buttonTable: any = $(`
-			<table class="ol-unselectable ol-control iModeCluster">
-				<tr style="font-size: 80%">
-					<td><button class="iModeCluster pan fa fa-hand-grab-o"></button></td>
-					<td><button class="iModeCluster select fa fa-mouse-pointer"></button></td>
-					<td><button class="iModeCluster zoom fa fa-search-plus"></button></td>
-				</tr>
-			</table>
+		var div = $(`
+			<div class="iModeCluster ol-control ol-unselectable">
+				<div class="activeInteractionMode">
+					<button style="font-weight: normal" class="activeInteractionMode fa"></button>
+				</div>
+				<div class="iModeCluster">
+					<button class="pan fa"></button>
+					<button class="select fa"></button>
+					<button class="zoom fa"></button>
+				</div>
+			</div>
 		`);
 
-		buttonTable.find("button.iModeCluster.pan").click(() => { map.interactionMode.value = "pan"; }).css({ "font-weight": "normal" });
-		buttonTable.find("button.iModeCluster.select").click(() => { map.interactionMode.value = "select"; }).css({ "font-weight": "normal" });
-		buttonTable.find("button.iModeCluster.zoom").click(() => { map.interactionMode.value = "zoom"; }).css({"font-weight": "normal"});
+		let activeDiv: JQuery = div.find("div.activeInteractionMode");
+		let clusterDiv: JQuery = div.find("div.iModeCluster");
 
-		super({ element: buttonTable[0], target: options.target });
+		function toggleMenuOpen(isOpen:boolean)
+		{
+			activeDiv.css({ "display": isOpen ? "none" : "inline"});
+			clusterDiv.css({ "display": isOpen ? "inline" : "none"});
+		}
+
+		activeDiv.find("button").click(toggleMenuOpen.bind(null, true));
+		toggleMenuOpen(false);
+
+		function setupButton(mode:string)
+		{
+			clusterDiv.find("button." + mode)
+				.css({ "font-weight": "normal", "display": "inline" })
+				.addClass(iconMapping[mode])
+				.click(() => { map.interactionMode.value = mode; toggleMenuOpen(false); });
+			console.log(mode, iconMapping[mode]);
+		}
+
+		for (let key in iconMapping) setupButton(key);
+
+		super({ element: div[0], target: options.target });
 
 		map.interactionMode.addGroupedCallback(map, () => {
-			buttonTable.find("button.iModeCluster").removeClass("active");
-			buttonTable.find("button.iModeCluster." + map.interactionMode.value).addClass("active");
+			let mode = map.interactionMode.value;
+
+			clusterDiv.find("button").removeClass("active");
+			clusterDiv.find("button." + mode).addClass("active");
+
+			activeDiv.find("button").removeClass(lodash.values(iconMapping).join(" "));
+			activeDiv.find("button").addClass(iconMapping[mode]);
 		}, true);
 	}
 }

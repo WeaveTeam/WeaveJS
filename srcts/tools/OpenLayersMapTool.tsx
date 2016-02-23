@@ -74,9 +74,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	zoomBounds = Weave.linkableChild(this, ZoomBounds);
 	extentOverride = Weave.linkableChild(this, new LinkableVariable(null, isBounds, [NaN, NaN, NaN, NaN]));
 	projectionSRS = Weave.linkableChild(this, LinkableString);
-	showZoomControls = Weave.linkableChild(this, LinkableBoolean);
+	showZoomSlider = Weave.linkableChild(this, LinkableBoolean);
 	showMouseModeControls = Weave.linkableChild(this, LinkableBoolean);
 	interactionMode = Weave.linkableChild(this, LinkableString);
+
 	layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
@@ -109,6 +110,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	get deprecatedStateMapping():Object
 	{
 		return {
+			showZoomControls: this.showZoomSlider,
 			children: {
 				visualization: {
 					plotManager: (pm:any, removeMissingDynamicObjects:boolean) => {
@@ -166,7 +168,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		this.map.addControl(this.zoomButtons);
 
-		this.showZoomControls.addGroupedCallback(this, this.updateEnableZoomControl_weaveToOl, true);
+		this.showZoomSlider.addGroupedCallback(this, this.updateEnableZoomControl_weaveToOl, true);
 		this.showMouseModeControls.addGroupedCallback(this, this.updateEnableMouseModeControl_weaveToOl, true);
 
 		this.mouseModeButtons = new InteractionModeCluster({mapTool: this});
@@ -223,18 +225,18 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	updateControlPositions():void
 	{
-		if (this.showZoomControls.value)
+		if (this.showZoomSlider.value)
 		{
 			$(this.element).find(".ol-control.panCluster").css({top: "0.5em", left: "0.5em"});
 			$(this.element).find(".ol-control.ol-zoom").css({top: "5.5em", left: "2.075em"});
 			$(this.element).find(".ol-control.ol-zoomslider").css({top: "9.25em", left: "2.075em"});
-			$(this.element).find(".ol-control.iModeCluster").css({top: "20.75em", left: "0.6em"});
+			$(this.element).find("div.ol-control.iModeCluster").css({top: "26em", left: "0.6em"});
 		}
 		else
 		{
 			$(this.element).find(".ol-control.ol-zoom-extent").css({top: "0.5em", left: "0.5em"});
 			$(this.element).find(".ol-control.ol-zoom").css({ top: "2.625em", left: "0.5em" });
-			$(this.element).find(".ol-control.iModeCluster").css({ top: "5.6em", left: "0.5em" });
+			$(this.element).find("div.ol-control.iModeCluster").css({ top: "6.5em", left: "0.5em" });
 		}
 	}
 
@@ -255,7 +257,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	updateEnableZoomControl_weaveToOl():void
 	{
-		if (this.showZoomControls.value)
+		if (this.showZoomSlider.value)
 		{
 			this.map.addControl(this.slider);
 			this.map.addControl(this.pan);
