@@ -79,6 +79,12 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	interactionMode = Weave.linkableChild(this, LinkableString);
 	layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
 
+	panelTitle = Weave.linkableChild(this, LinkableString);
+
+	get title(): string {
+		return this.panelTitle.value;
+	}
+
 	constructor(props:IVisToolProps)
 	{
 		super(props);

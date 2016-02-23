@@ -30,6 +30,12 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
 	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
 
+	panelTitle = Weave.linkableChild(this, LinkableString);
+
+	get title(): string {
+		return this.panelTitle.value;
+	}
+
 	constructor(props:IVisToolProps)
 	{
 		super(props);

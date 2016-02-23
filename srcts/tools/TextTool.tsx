@@ -45,6 +45,12 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 
 	}
 
+	panelTitle = Weave.linkableChild(this, LinkableString);
+
+	get title(): string {
+		return this.panelTitle.value;
+	}
+
 	componentDidMount()
 	{
 
