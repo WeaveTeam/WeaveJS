@@ -45,10 +45,12 @@ function render()
 		var accordionContent = [
 			{
 				title: "First section",
-				content: "Lorem Ipsum"
+				content: "Lorem Ipsum",
+				open: false
 			},
 			{
 				title: "Second section",
+				open: true,
 				content: <div>
 							JSX here
 							<input type="button" value="button"/>
@@ -58,7 +60,7 @@ function render()
 
 		ReactDOM.render(
 			<ui.HBox style={{width: "100%", height: "100%"}}>
-				<ui.Accordion title="Accordion test" contents={accordionContent}/>
+				<ui.Accordion title="Accordion test" closeOthers={true} config={accordionContent}/>
 				<Layout weave={weave} style={{width: "100%", height: "100%"}}/>
 			</ui.HBox>
 		, document.getElementById("weaveElt"));

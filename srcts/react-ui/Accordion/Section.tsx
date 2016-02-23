@@ -8,38 +8,24 @@ import HBox from "../HBox";
 export interface SectionProps extends React.Props<Section> 
 {
 	title: string,
-	onClick: Function,
+	onChange: Function,
 	content: string | React.ReactElement<any>,
 	open: boolean
 }
 
-export interface SectionState 
-{
-	open:boolean,
-}
-
-export default class Section extends React.Component<SectionProps, SectionState>
+export default class Section extends React.Component<SectionProps, any>
 {
 	
 	constructor(props:SectionProps) 
 	{
 		super(props);
-		this.state = {
-			open: false
-		};
 	}
 	
-	componentWillReceiveProps(nextProps:SectionProps) {
-		this.setState({
-			open: nextProps.open
-		});
-	}
-
 	render():JSX.Element
 	{
 		var bodyStyle:React.CSSProperties = {};
 	
-		if(this.state.open)
+		if(this.props.open)
 		{
 			bodyStyle.flex = 1;
 			bodyStyle.display = "block";
@@ -50,7 +36,7 @@ export default class Section extends React.Component<SectionProps, SectionState>
 
 		return (
 			<VBox className="section">
-				<HBox style={{height: 30}} onClick={() => { this.setState({ open: !this.state.open }) }} className="section-header">
+				<HBox style={{height: 30}} onClick={this.props.onChange} className="section-header">
 					{
 						this.props.title
 					}
