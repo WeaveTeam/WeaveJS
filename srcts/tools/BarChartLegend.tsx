@@ -29,15 +29,15 @@ const SHAPE_TYPE_LINE:string = "line";
 
 export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 {
-	private chartColors = Weave.linkableChild(this, ColorRamp);
-	private columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
-	//private maxColumns = Weave.linkableChild(this, LinkableNumber);
-	private panelTitle = Weave.linkableChild(this, LinkableString);
-	private shapeSize = Weave.linkableChild(this, LinkableNumber);
+	chartColors = Weave.linkableChild(this, ColorRamp);
+	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+	//maxColumns = Weave.linkableChild(this, LinkableNumber);
+	panelTitle = Weave.linkableChild(this, LinkableString);
+	shapeSize = Weave.linkableChild(this, LinkableNumber);
 
-	private filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-	private selectionKeySet = Weave.linkableChild(this, DynamicKeySet);
-	private probeKeySet = Weave.linkableChild(this, DynamicKeySet);
+	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+	selectionKeySet = Weave.linkableChild(this, DynamicKeySet);
+	probeKeySet = Weave.linkableChild(this, DynamicKeySet);
 
 	private spanStyle:CSSProperties;
 
