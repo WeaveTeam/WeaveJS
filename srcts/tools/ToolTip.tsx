@@ -208,10 +208,11 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 	static getToolTipData(context:ILinkableObject, keys:IQualifiedKey[], additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
 	{
 		let columnHashMap = Weave.getRoot(context).getObject("Probed Columns") as ILinkableHashMap;
-
+		let hashMapObjects = columnHashMap.getObjects() as IAttributeColumn[];
+		let probedColumnsLength = hashMapObjects.length;
 		var result:{[columnName: string]: string} = {};
 
-		for (let child of (columnHashMap.getObjects() as IAttributeColumn[]).concat(additionalColumns))
+		for (let child of hashMapObjects.concat(additionalColumns))
 		{
 			let title:string = child.getMetadata("title");
 			let value:string = child.getValueFromKey(keys[0], String);
@@ -222,9 +223,8 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 		}
 
 		//handle remaining keys
-		if(keys.length > 1)
+		if(keys.length > 1 && probedColumnsLength > 0)
 			result["("+ keys.length + " records total, 1 shown)"] = null;
-
 		return result;
 	}
 	
