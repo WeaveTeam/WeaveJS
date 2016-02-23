@@ -113,13 +113,24 @@ export default class C3Histogram extends AbstractC3Tool
 						var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
 						if (!keys)
 							return;
+                        var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, keys);
                         this.probeKeySet.replaceKeys(keys);
+                            this.props.toolTip.setState({
+                                x: this.chart.internal.d3.event.pageX,
+                                y: this.chart.internal.d3.event.pageY,
+                                showToolTip: true,
+                                title: this.panelTitle.value,
+                                columnNamesToValue: columnNamesToValue
+                            });
                     }
                 },
                 onmouseout: (d:any) => {
                     if (d && d.hasOwnProperty("index"))
                     {
                         this.probeKeySet.replaceKeys([]);
+                        this.props.toolTip.setState({
+                            showToolTip: false
+                        });
                     }
                 }
             },
