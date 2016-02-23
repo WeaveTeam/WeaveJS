@@ -6,8 +6,8 @@ import {SectionProps} from "./Section";
 
 export interface AccordionProps extends React.Props<Accordion> {
 	title:string;
-	config: SectionProps[];
 	closeOthers?:boolean;
+	children:React.ReactElement<SectionProps>[]
 }
 
 export interface AccordionState {
@@ -19,10 +19,8 @@ export default class Accordion extends React.Component<AccordionProps, Accordion
 	constructor(props:AccordionProps) 
 	{
 		super(props);
-		console.log(props.config);
-		console.log(_.pluck(props.config, "open"));
 		this.state = {
-			statuses: _.pluck(props.config, "open") || []
+			statuses: props.children.map((child) => { return child.props.open; }) || []
 		}
 	}
 	
@@ -48,17 +46,16 @@ export default class Accordion extends React.Component<AccordionProps, Accordion
 	componentWillReceiveProps(nextProps:AccordionProps)
 	{
 		this.setState({
-			statuses: _.pluck(nextProps.config, "open")
+			statuses: nextProps.children.map((child) => { return child.props.open; }) || []
 		});
-		
 	}
 	
 	static defaultProps():AccordionProps
 	{
 		return {
 			title: "",
-			config: [],
-			closeOthers: true
+			closeOthers: true,
+			children: []
 		}
 	}
 	
@@ -68,13 +65,17 @@ export default class Accordion extends React.Component<AccordionProps, Accordion
 			<VBox style={{width: "100%"}} className="accordion">
 				<div className="accordion-header">{this.props.title}</div>
 				{
-					this.props.config.map((sectionConfig:SectionProps, index:number) => {
-						return <Section key={index}
-										onChange={this.onChange.bind(this, index)} 
-										title={sectionConfig.title}
-										open={this.state.statuses[index]}
-										content={sectionConfig.content}>
-							   </Section>
+					this.props.children.map((child, index) => {
+						var newProps:SectionProps = {
+							title: child.props.title,
+							open: this.state.statuses[index],
+							onChange: this.onChange.bind(this, index),
+							key: child.key ? child.key : index,
+							ref: child.ref
+						};
+						newProps.onChange = this.onChange.bind(this, index)
+						var newChild = React.cloneElement(child, newProps)
+						return newChild;
 					})
 				}
 			</VBox>

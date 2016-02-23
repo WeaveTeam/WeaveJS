@@ -8,9 +8,8 @@ import HBox from "../HBox";
 export interface SectionProps extends React.Props<Section> 
 {
 	title: string,
-	onChange: Function,
-	content: string | React.ReactElement<any>,
 	open: boolean
+	onChange?: Function,
 }
 
 export default class Section extends React.Component<SectionProps, any>
@@ -43,7 +42,7 @@ export default class Section extends React.Component<SectionProps, any>
 				</HBox>
 				<div style={bodyStyle} className="section-body">
 					{
-						this.props.content
+						this.props.children
 					}
 				</div>
 			</VBox>

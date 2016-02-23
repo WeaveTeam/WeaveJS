@@ -5,6 +5,7 @@ import VSlider from "./RCSlider/VSlider";
 import CheckBoxList from "./CheckBoxList";
 import ListItem from "./ListItem";
 import Accordion from "./Accordion/Accordion";
+import AccordionSection from "./Accordion/Section";
 
 export default
 {
@@ -14,5 +15,6 @@ export default
     VSlider,
     CheckBoxList,
     ListItem,
-	Accordion
+	Accordion,
+	AccordionSection
 }

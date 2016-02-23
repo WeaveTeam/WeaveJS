@@ -60,7 +60,17 @@ function render()
 
 		ReactDOM.render(
 			<ui.HBox style={{width: "100%", height: "100%"}}>
-				<ui.Accordion title="Accordion test" closeOthers={true} config={accordionContent}/>
+				<ui.Accordion title="Accordion test" closeOthers={true} config={accordionContent}>
+					<ui.AccordionSection title="First Section" open={false} key={1} ref={1}>
+							Lorem Ipsum
+					</ui.AccordionSection>
+					<ui.AccordionSection title="First Section" open={false} key={2} ref={2}>
+							<div>
+								JSX here
+								<input type="button" value="button"/>
+							</div>
+					</ui.AccordionSection>
+				</ui.Accordion>
 				<Layout weave={weave} style={{width: "100%", height: "100%"}}/>
 			</ui.HBox>
 		, document.getElementById("weaveElt"));
