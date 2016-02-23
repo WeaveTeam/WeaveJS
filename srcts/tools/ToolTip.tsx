@@ -208,7 +208,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 	static getToolTipData(context:ILinkableObject, keys:IQualifiedKey[], additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
 	{
 		let columnHashMap = Weave.getRoot(context).getObject("Probed Columns") as ILinkableHashMap;
-		let hashMapObjects = columnHashMap.getObjects() as IAttributeColumn[];
+		let hashMapObjects = columnHashMap.getObjects(IAttributeColumn);
 		let probedColumnsLength = hashMapObjects.length;
 		var result:{[columnName: string]: string} = {};
 
