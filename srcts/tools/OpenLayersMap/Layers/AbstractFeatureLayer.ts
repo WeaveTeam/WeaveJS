@@ -126,8 +126,10 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	updateSetFromKeySet(dynamicKeySet:DynamicKeySet, previousContents:Set<IQualifiedKey>):void
 	{
 		let keySet: IKeySet = dynamicKeySet.getInternalKeySet();
-		if (!keySet) return; //HACK
-		if (!this.source) return; //HACK
+		if (!keySet)
+			return; //HACK
+		if (!this.source)
+			return; //HACK
 
 		let wasEmpty:boolean = previousContents.size === 0;
 		let isEmpty:boolean = keySet.keys.length === 0;
@@ -169,7 +171,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 	updateMetaStyles():void
 	{
-		if (!this.source) return; //HACK
+		if (!this.source)
+			return; //HACK
 
 		this.source.forEachFeature(this.updateMetaStyle, this);
 	}

@@ -45,7 +45,8 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		if (zIndex > this.topZIndex)
 		{
 			let weaveLayerObject = layer.get("layerObject") as AbstractFeatureLayer;
-			if (!weaveLayerObject) return;
+			if (!weaveLayerObject)
+				return;
 			this.topKeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet || this.topKeySet;
 			this.topZIndex = zIndex;
 			this.topKey = feature.getId();

@@ -218,7 +218,8 @@ export default class MiscUtils
 	static getTextHeight(text:string, font:string):number
 	{
 		var result = this.textHeightCache.get(text, font);
-		if (result !== undefined) return result;
+		if (result !== undefined)
+			return result;
 
 		var body = document.getElementsByTagName("body")[0];
 		var dummy = document.createElement("div");

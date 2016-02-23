@@ -277,20 +277,18 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	updateResolutionDependentStyles(event:ol.MapEvent):void
 	{
-		if (event.frameState.animate) return;
+		if (event.frameState.animate)
+			return;
 
 		this.map.un("postrender", this.updateResolutionDependentStyles, this);
 
-		for (let obj of this.layers.getObjects())
+		for (let layer of this.layers.getObjects(AbstractFeatureLayer))
 		{
-			let layer: AbstractFeatureLayer = obj as AbstractFeatureLayer;
 			if (layer && layer.styleResolutionDependent)
 			{
 				layer.updateStyleData();
 			}
 		}
-
-
 	}
 
 	updateZoom_olToWeave():void

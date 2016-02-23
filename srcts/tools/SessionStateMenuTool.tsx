@@ -52,7 +52,7 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 
 //		this.targets.delayCallbacks();
 
-		for (let wrapper of this.targets.getObjects() as LinkableDynamicObject[])
+		for (let wrapper of this.targets.getObjects(LinkableDynamicObject))
 		{
 			if (!wrapper.target)
 				continue;

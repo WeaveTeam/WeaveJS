@@ -208,11 +208,10 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 	static getToolTipData(context:ILinkableObject, keys:IQualifiedKey[], additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
 	{
 		let columnHashMap = Weave.getRoot(context).getObject("Probed Columns") as ILinkableHashMap;
-		let hashMapObjects = columnHashMap.getObjects(IAttributeColumn);
-		let probedColumnsLength = hashMapObjects.length;
+		let columns = columnHashMap.getObjects(IAttributeColumn);
 		var result:{[columnName: string]: string} = {};
 
-		for (let child of hashMapObjects.concat(additionalColumns))
+		for (let child of columns.concat(additionalColumns))
 		{
 			let title:string = child.getMetadata("title");
 			let value:string = child.getValueFromKey(keys[0], String);
@@ -223,27 +222,27 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 		}
 
 		//handle remaining keys
-		if(keys.length > 1 && probedColumnsLength > 0)
+		if(keys.length > 1 && columns.length > 0)
 			result["("+ keys.length + " records total, 1 shown)"] = null;
 		return result;
 	}
 	
-	static getToolTipTitle(context:ILinkableObject, key:IQualifiedKey): string
+	static getToolTipTitle(context:ILinkableObject, key:IQualifiedKey):string
 	{
 		let titleHashMap = Weave.getRoot(context).getObject("Probe Header Columns") as ILinkableHashMap;
 
-		return _.map(titleHashMap.getObjects(), (d:any) => d.getValueFromKey(key, String)).join(", ");
+		return _.map(titleHashMap.getObjects(IAttributeColumn), column => column.getValueFromKey(key, String)).join(", ");
 	}
 
 	static getToolTipContent(
-	                                    columnNamesToValue:{[columnName:string]: string},
-	                                    title?:string,
-	                                    nameFormat?:Function,
-	                                    valueFormat?:Function,
-	                                    titleFormat?:Function,
-	                                    toolTipClass?:string,
-	                                    columnNamesToColor?:{[columnName:string]: string}
-	                                ):string
+            columnNamesToValue:{[columnName:string]: string},
+            title?:string,
+            nameFormat?:Function,
+            valueFormat?:Function,
+            titleFormat?:Function,
+            toolTipClass?:string,
+            columnNamesToColor?:{[columnName:string]: string}
+        ):string
 	{
 	    nameFormat = nameFormat || _.identity;
 	    valueFormat = valueFormat || _.identity;

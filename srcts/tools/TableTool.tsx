@@ -81,15 +81,16 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
     dataChanged()
     {
-        this.filteredKeySet.setColumnKeySources(this.columns.getObjects());
+        var columns = this.columns.getObjects(IAttributeColumn);
         var names:string[] = this.columns.getNames();
-        var columns:IAttributeColumn[] = this.columns.getObjects();
 		var format:any = _.zipObject(names, columns);
 		format[this.idProperty] = IQualifiedKey;
         var records:IRow[] = ColumnUtils.getRecords(format, this.filteredKeySet.keys, String);
-		var titles:string[] = columns.map((column:IAttributeColumn) => column.getMetadata("title"));
+		var titles:string[] = columns.map(column => column.getMetadata("title"));
         var columnTitles = _.zipObject(names, titles) as { [columnId: string]: string; };
         columnTitles[this.idProperty] = "Key";
+		
+        this.filteredKeySet.setColumnKeySources(columns);
 
         this.setState({
             data: records,

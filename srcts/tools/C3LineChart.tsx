@@ -22,7 +22,6 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import LinkableString = weavejs.core.LinkableString;
-import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 declare type Record = {
@@ -80,7 +79,8 @@ export default class C3LineChart extends AbstractC3Tool
             tick: {
                 multiline: true,
                 format: (num:number):string => {
-                    if (this.columns.getObjects()[0] && this.columns.getObjects()[0].getMetadata('dataType') !== "number")
+					var columns = this.columns.getObjects(IAttributeColumn);
+                    if (columns[0] && columns[0].getMetadata('dataType') !== "number")
                     {
                         return this.yAxisValueToLabel[num] || "";
                     }
@@ -111,7 +111,7 @@ export default class C3LineChart extends AbstractC3Tool
                         x: this.chart.internal.d3.event.pageX,
                         y: this.chart.internal.d3.event.pageY,
                         showToolTip: true,
-                        columnNamesToValue: ToolTip.getToolTipData(this, [key], this.columns.getObjects() as IAttributeColumn[])
+                        columnNamesToValue: ToolTip.getToolTipData(this, [key], this.columns.getObjects(IAttributeColumn))
                     });
                 },
                 onmouseout: (d:any) => {
@@ -262,7 +262,7 @@ export default class C3LineChart extends AbstractC3Tool
             changeDetected = true;
             this.columnLabels = [];
 
-            var columns:ReferencedColumn[] = this.columns.getObjects();
+            var columns = this.columns.getObjects(IAttributeColumn);
             this.filteredKeySet.setColumnKeySources(columns);
 		
             if (weavejs.WeaveAPI.Locale.reverseLayout)

@@ -66,7 +66,7 @@ export default class C3BarChart extends AbstractC3Tool
 
     get yLabelColumn():IAttributeColumn
     {
-        return this.heightColumns.getObjects()[0] || this.sortColumn;
+        return this.heightColumns.getObjects(IAttributeColumn)[0] || this.sortColumn;
     }
 	
     private RECORD_FORMAT = {
@@ -163,7 +163,7 @@ export default class C3BarChart extends AbstractC3Tool
 
 						var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, [qKey]);
 						var columnNamesToColor:{[columnName:string] : string} = {};
-						var columns = this.heightColumns.getObjects() as IAttributeColumn[];
+						var columns = this.heightColumns.getObjects(IAttributeColumn);
 						for (var index in columns)
 						{
 							var column = columns[index]; 
@@ -329,16 +329,14 @@ export default class C3BarChart extends AbstractC3Tool
 
     private dataChanged():void
 	{
-		var columns = this.heightColumns.getObjects();
+		var columns = this.heightColumns.getObjects(IAttributeColumn);
 		this.RECORD_FORMAT.heights = _.zipObject(this.heightColumns.getNames(), columns) as any;
 		this.RECORD_FORMAT.heights.xLabel = this.labelColumn;
 		this.RECORD_DATATYPE.heights = _.zipObject(this.heightColumns.getNames(), columns.map(() => Number)) as any;
 		this.RECORD_DATATYPE.heights.xLabel = String;
 		
         this.heightColumnNames = this.heightColumns.getNames();
-        this.heightColumnsLabels = columns.map((column:IAttributeColumn) => {
-            return column.getMetadata("title");
-        });
+        this.heightColumnsLabels = columns.map(column => column.getMetadata("title"));
 
         this.yLabelColumnDataType = this.yLabelColumn.getMetadata("dataType");
 
