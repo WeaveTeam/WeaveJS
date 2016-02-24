@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import $ from "jquery";
 /* eslint-disable */
-import {Layout} from "../lib/WeaveUI.js";
+import WeaveApp from "../lib/WeaveApp.js";
 import {MiscUtils} from "../lib/WeaveUI.js";
 /* eslint-enable */
 
@@ -44,6 +44,6 @@ function render()
 {
 	$(() => {
 		var layout = weave.root.requestObject(layoutName, Weave.getDefinition("FlexibleLayout"));
-		ReactDOM.render(<Layout layout={layout} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
+		ReactDOM.render(<WeaveApp layout={layout} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
 	});
 }

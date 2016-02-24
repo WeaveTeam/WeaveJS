@@ -12,7 +12,7 @@
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
     },
     "react/react.d.ts": {
-      "commit": "5e960679e6f9ae6ce905b1db0ad36fc189cd2eca"
+      "commit": "dade4414712ce84e3c63393f1aae407e9e7e6af7"
     },
     "lodash/lodash.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
@@ -46,6 +46,9 @@
     },
     "bootstrap-slider/bootstrap-slider.d.ts": {
       "commit": "86dbea8fc37d9473fee465da4f0a21bea4f8cbd9"
+    },
+    "material-ui/material-ui.d.ts": {
+      "commit": "dade4414712ce84e3c63393f1aae407e9e7e6af7"
     }
   }
 }

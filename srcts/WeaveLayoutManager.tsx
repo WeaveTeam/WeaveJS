@@ -24,7 +24,7 @@ import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
 import TableTool from "./tools/TableTool";
 import TextTool from "./tools/TextTool";
 import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
-
+import ContextMenu from "./ContextMenu";
 // Temporary solution
 // because typescript removes
 // unused imports
