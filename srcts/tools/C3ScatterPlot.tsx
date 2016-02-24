@@ -72,9 +72,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	private dataYType:string;
 	private records:Record[];
 
-	private busy:boolean;
-	private dirty:boolean;
-
 	protected c3ConfigYAxis:c3.YAxisConfiguration;
 
 	constructor(props:IVisToolProps)
@@ -82,9 +79,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		super(props);
 
 		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
-		
-        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
-        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
 
 		this.filteredKeySet.setColumnKeySources([this.dataX, this.dataY]);
 
@@ -98,7 +92,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		this.keyToIndex = new Map<IQualifiedKey, number>();
 		this.yAxisValueToLabel = {};
 		this.xAxisValueToLabel = {};
-		this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.mergeConfig({
 			data: {
@@ -162,8 +155,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					name: (name:string, ratio:number, id:string, index:number):string => {
 						return this.yAxisName.value || this.dataY.getMetadata('title');
 					}
-				},
-				show: false
+				}
 			},
 			point: {
 				r: (d:any):number => {
@@ -200,14 +192,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			}
 		};
 	}
-
-	protected handleC3Render():void
-	{
-		this.busy = false;
-		this.handleKeyFilters();
-		if (this.dirty)
-			this.validate();
-	}
 	
 	protected handleC3MouseOver(d:any):void
 	{
@@ -223,15 +207,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		});
 	}
 	
-	protected handleC3MouseOut(d:any):void
-	{
-		if (this.probeKeySet)
-			this.probeKeySet.replaceKeys([]);
-		this.props.toolTip.setState({
-			showToolTip: false
-		});
-	}
-
 	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
@@ -240,25 +215,72 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		let selectedKeys = selectedIndices.map((value) => this.records[value.index].id);
 		this.selectionKeySet.replaceKeys(selectedKeys);
 	}
-	
-	private handleKeyFilters()
+
+	protected validate(forced:boolean = false):boolean
 	{
-		if (this.chart && Weave.detectChange(this, this.selectionFilter))
+		var xyChanged = Weave.detectChange(this, this.dataX, this.dataY);
+		var dataChanged = xyChanged || Weave.detectChange(this, this.radius, this.fill, this.line, this.filteredKeySet);
+		if (dataChanged)
 		{
-			var keyToIndex = (key: IQualifiedKey) => this.keyToIndex.get(key);
-			var selectedIndices: number[] = this.selectionKeySet ? this.selectionKeySet.keys.map(keyToIndex) : [];
-			this.chart.select(["y"], selectedIndices, true);
+			this.dataXType = this.dataX.getMetadata('dataType');
+			this.dataYType = this.dataY.getMetadata('dataType');
+
+			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+			this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
+
+			this.keyToIndex.clear();
+			this.yAxisValueToLabel = {};
+			this.xAxisValueToLabel = {};
+
+			this.records.forEach((record:Record, index:number) => {
+				this.keyToIndex.set(record.id, index);
+				this.xAxisValueToLabel[this.records[index].point.x] = this.dataX.getValueFromKey(record.id, String);
+				this.yAxisValueToLabel[this.records[index].point.y] = this.dataY.getValueFromKey(record.id, String);
+			});
+			
+			this.c3Config.data.json = {x: _.map(this.records, 'point.x'), y: _.map(this.records, 'point.y')};
 		}
-		this.updateStyle();
-	}
+		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin);
+		if (axisChanged)
+		{
+			var xLabel:string = this.xAxisName.value || this.dataX.getMetadata('title');
+			var yLabel:string = this.yAxisName.value || this.dataY.getMetadata('title');
 
-	updateStyle()
-	{
-		if (!this.chart || !this.dataXType)
-			return;
+			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			{
+				this.c3Config.data.axes = {'y': 'y2'};
+				this.c3Config.axis.y2 = this.c3ConfigYAxis;
+				this.c3Config.axis.y = {show: false};
+				this.c3Config.axis.x.tick.rotate = 45;
+			}
+			else
+			{
+				this.c3Config.data.axes = {'y': 'y'};
+				this.c3Config.axis.y = this.c3ConfigYAxis;
+				delete this.c3Config.axis.y2;
+				this.c3Config.axis.x.tick.rotate = -45;
+			}
 
+			this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
+			this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
+			this.updateConfigMargin();
+		}
+
+		if (forced || dataChanged || axisChanged)
+			return true;
+		
+		//after data is loaded we need to remove the clip-path so that points are not
+		// clipped when rendered near edge of chart
+		//TODO: determine if adding padding to axes range will further improve aesthetics of chart
+		this.chart.internal.main.select('.c3-chart').attr('clip-path',null);
+		
+		// update c3 selection
+		var keyToIndex = (key: IQualifiedKey) => this.keyToIndex.get(key);
+		var selectedIndices: number[] = this.selectionKeySet ? this.selectionKeySet.keys.map(keyToIndex) : [];
+		this.chart.select(["y"], selectedIndices, true);
+		
+		// update style
 		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
-
 		d3.select(this.element)
 			.selectAll("circle.c3-shape")
 			.style("stroke", "black")
@@ -286,81 +308,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					let probed = this.isProbed(key);
 					return probed ? 2.0 : 1.0;
 				});
-	}
-
-	validate(forced:boolean = false):void
-	{
-		if (this.busy)
-		{
-			this.dirty = true;
-			return;
-		}
-		this.dirty = false;
-
-		var xyChanged = Weave.detectChange(this, this.dataX, this.dataY);
-		var dataChanged = xyChanged || Weave.detectChange(this, this.radius, this.fill, this.line, this.filteredKeySet);
-		if (dataChanged)
-		{
-			this.dataXType = this.dataX.getMetadata('dataType');
-			this.dataYType = this.dataY.getMetadata('dataType');
-
-			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
-			this.records = _.sortByOrder(this.records, ["size", "id"], ["desc", "asc"]);
-
-			this.keyToIndex.clear();
-			this.yAxisValueToLabel = {};
-			this.xAxisValueToLabel = {};
-
-			this.records.forEach((record:Record, index:number) => {
-				this.keyToIndex.set(record.id, index);
-				this.xAxisValueToLabel[this.records[index].point.x] = this.dataX.getValueFromKey(record.id, String);
-				this.yAxisValueToLabel[this.records[index].point.y] = this.dataY.getValueFromKey(record.id, String);
-			});
-		}
-		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin.top, this.margin.bottom, this.margin.left, this.margin.right);
-		if (axisChanged)
-		{
-			var xLabel:string = this.xAxisName.value || this.dataX.getMetadata('title');
-			var yLabel:string = this.yAxisName.value || this.dataY.getMetadata('title');
-
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
-			{
-				this.c3Config.data.axes = {'y': 'y2'};
-				this.c3Config.axis.y2 = this.c3ConfigYAxis;
-				this.c3Config.axis.y = {show: false};
-				this.c3Config.axis.x.tick.rotate = 45;
-			}
-			else
-			{
-				this.c3Config.data.axes = {'y': 'y'};
-				this.c3Config.axis.y = this.c3ConfigYAxis;
-				delete this.c3Config.axis.y2;
-				this.c3Config.axis.x.tick.rotate = -45;
-			}
-
-			this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
-			this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
-		}
-		this.updateConfigMargin();
-
-		if (forced || dataChanged || axisChanged)
-		{
-			this.busy = true;
-			c3.generate(this.c3Config);
-			this.loadData();
-			this.cullAxes();
-		}
-	}
-
-	loadData()
-	{
-		if (!this.chart || this.busy)
-			return MiscUtils.debounce(this, 'loadData');
-		this.chart.load({data: _.pluck(this.records, "point"), unload: true});
-		//after data is loaded we need to remove the clip-path so that points are not
-		// clipped when rendered near edge of chart
-		//TODO: determine if adding padding to axes range will further improve aesthetics of chart
-		this.chart.internal.main.select('.c3-chart').attr('clip-path',null);
+		
+		return false;
 	}
 
 	public get deprecatedStateMapping():Object

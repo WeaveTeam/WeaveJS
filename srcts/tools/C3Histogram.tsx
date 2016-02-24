@@ -57,33 +57,24 @@ export default class C3Histogram extends AbstractC3Tool
     private keyToIndex:{[key:string]: number};
     private heightColumnNames:string[];
     private binnedColumnDataType:string;
-    private numberOfBins:number;
     private showXAxisLabel:boolean = false;
     private histData:{[key:string]: number}[];
     private keys:{x?:string, value:string[]};
 	private records:Record[];
     protected c3ConfigYAxis:c3.YAxisConfiguration;
 
-    private busy:boolean;
-    private dirty:boolean;
-
     constructor(props:IVisToolProps)
     {
         super(props);
 		
-		Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
-		Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
-
 		this.filteredKeySet.setSingleKeySource(this.fill.color);
 
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
-        this.busy = false;
         this.idToRecord = {};
         this.keyToIndex = {};
-        this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.mergeConfig({
             data: {
@@ -133,16 +124,6 @@ export default class C3Histogram extends AbstractC3Tool
                             title: this.columnToAggregate.getMetadata('title'),
                             columnNamesToValue: columnNamesToValue
                         });
-                    }
-                },
-                onmouseout: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-                        this.probeKeySet.replaceKeys([]);
-                        if (this.props.toolTip)
-                            this.props.toolTip.setState({
-                                showToolTip: false
-                            });
                     }
                 }
             },
@@ -195,8 +176,7 @@ export default class C3Histogram extends AbstractC3Tool
                     name: (name:string, ratio:number, id:string, index:number):string => {
                         return this.getYAxisLabel();
                     }
-                },
-                show: false
+                }
             },
             grid: {
                 x: {
@@ -273,14 +253,6 @@ export default class C3Histogram extends AbstractC3Tool
         }
     }
 
-	protected handleC3Render():void
-	{
-        this.busy = false;
-        this.handleKeyFilters();
-        if (this.dirty)
-            this.validate();
-	}
-
 	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
@@ -305,47 +277,20 @@ export default class C3Histogram extends AbstractC3Tool
 		this.selectionKeySet.replaceKeys(selectedKeys);
 	}
 	
-	private handleKeyFilters()
-	{
-		if (this.chart && Weave.detectChange(this, this.selectionFilter))
-		{
-			if (this.selectionKeySet)
-			{
-				var set_indices = new Set<number>();
-				for (var key of this.selectionKeySet.keys)
-				{
-					var index = this.binnedColumn.getValueFromKey(key, Number);
-					if (isFinite(index))
-						set_indices.add(index);
-				}
-				this.chart.select(["height"], weavejs.util.JS.toArray(set_indices), true);
-			}
-			else
-			{
-				this.chart.select(["height"], [], true);
-			}
-		}
-		this.updateStyle();
-	}
-
     updateStyle()
     {
-    	if (!this.chart || !this.records.length)
-    		return;
-
         let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
 
-        var selectedKeys:IQualifiedKey[] = this.selectionKeySet.keys;
-        var probedKeys:IQualifiedKey[] = this.probeKeySet.keys;
+        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+        var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
         var selectedRecords:Record[] = _.filter(this.records, function(record:Record) {
             return _.includes(selectedKeys, record.id);
         });
         var probedRecords:Record[] = _.filter(this.records, function(record:Record) {
             return _.includes(probedKeys, record.id);
         });
-        var selectedBinIndices:number[] = _.pluck(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn');
-        var probedBinIndices:number[] = _.pluck(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn');
-
+        var selectedBinIndices:number[] = _.map(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn') as number[];
+        var probedBinIndices:number[] = _.map(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn') as number[];
 
         d3.select(this.element).selectAll("path.c3-shape")
             .style("stroke", "black")
@@ -374,7 +319,6 @@ export default class C3Histogram extends AbstractC3Tool
 
     private dataChanged()
     {
-
         this.binnedColumnDataType = this.binnedColumn.getMetadata('dataType');
 
 		this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
@@ -387,14 +331,13 @@ export default class C3Histogram extends AbstractC3Tool
             this.keyToIndex[record.id as any] = index;
         });
 
-        this.numberOfBins = (this.binnedColumn.binningDefinition.target as SimpleBinningDefinition).numberOfBins.value;
-
         this.histData = [];
 
         // this._columnToAggregatePath.getObject().getInternalColumn();
         var columnToAggregateNameIsDefined:boolean = !!this.columnToAggregate.getInternalColumn();
 
-        for (let iBin:number = 0; iBin < this.numberOfBins; iBin++)
+        var numberOfBins = this.binnedColumn.numberOfBins;
+        for (let iBin:number = 0; iBin < numberOfBins; iBin++)
         {
 
             let recordsInBin:Record[] = _.filter(this.records, { binnedColumn: iBin });
@@ -423,50 +366,32 @@ export default class C3Histogram extends AbstractC3Tool
 
         this.c3Config.data.json = this.histData;
         this.c3Config.data.keys = this.keys;
-      }
+	}
 
     private getAggregateValue(records:Record[], columnToAggregateName:string, aggregationMethod:string):number
     {
-
         var count:number = 0;
         var sum:number = 0;
 
-        if (!Array.isArray(records))
-        {
-            return 0;
-        }
-
-        records.forEach( (record:any) => {
+        records.forEach((record:any) => {
             count++;
             sum += record[columnToAggregateName as string] as number;
         });
 
         if (aggregationMethod === "mean")
-        {
             return sum / count; // convert sum to mean
-        }
 
         if (aggregationMethod === "count")
-        {
-
             return count; // use count of finite values
-        }
 
         // sum
         return sum;
     }
 
-    validate(forced:boolean = false):void
+    protected validate(forced:boolean = false):boolean
     {
-        if (this.busy)
-        {
-            this.dirty = true;
-            return;
-        }
-        this.dirty = false;
-
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin.bottom, this.margin.top, this.margin.left, this.margin.right);
+        var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin);
         if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fill, this.line, this.filteredKeySet))
         {
             changeDetected = true;
@@ -479,7 +404,6 @@ export default class C3Histogram extends AbstractC3Tool
             if (!this.showXAxisLabel)
                 xLabel = " ";
             var yLabel:string = this.getYAxisLabel.bind(this)();
-
 
             if (this.records)
             {
@@ -502,23 +426,33 @@ export default class C3Histogram extends AbstractC3Tool
 
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
-        }
+			
+			this.updateConfigMargin();
+    	}
+
+    	if (changeDetected || forced)
+			return true;
 		
-		this.updateConfigMargin();
-
-        if (changeDetected || forced)
-        {
-            this.busy = true;
-            c3.generate(this.c3Config);
-            this.loadData();
-        }
-    }
-
-    loadData()
-    {
-        if (!this.chart || this.busy)
-            return MiscUtils.debounce(this, 'loadData');
-        this.chart.load({json: this.histData, keys:this.keys, unload: true, done: () => { this.busy = false; this.cullAxes();}});
+		// update c3 selection
+		if (this.selectionKeySet)
+		{
+			var set_indices = new Set<number>();
+			for (var key of this.selectionKeySet.keys)
+			{
+				var index = this.binnedColumn.getValueFromKey(key, Number);
+				if (isFinite(index))
+					set_indices.add(index);
+			}
+			this.chart.select(["height"], weavejs.util.JS.toArray(set_indices), true);
+		}
+		else
+		{
+			this.chart.select(["height"], [], true);
+		}
+		
+		this.updateStyle();
+		
+		return false;
     }
 
     get deprecatedStateMapping()

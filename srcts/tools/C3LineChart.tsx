@@ -54,17 +54,11 @@ export default class C3LineChart extends AbstractC3Tool
     private columnLabels:string[];
     private chartType:string;
 
-    private busy:boolean;
-    private dirty:boolean;
-
     protected c3ConfigYAxis:c3.YAxisConfiguration;
 
     constructor(props:IVisToolProps)
     {
         super(props);
-
-        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
-        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
 
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
         this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
@@ -72,7 +66,6 @@ export default class C3LineChart extends AbstractC3Tool
 
         this.keyToIndex = {};
         this.yAxisValueToLabel = {};
-        this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.c3ConfigYAxis = {
             show: true,
@@ -100,32 +93,7 @@ export default class C3LineChart extends AbstractC3Tool
                     enabled: true,
                     multiple: true,
                     draggable: true
-                },
-                onmouseover: (d:any) => {
-					var record = this.getRecord(d ? d.id : null);
-					if (!record)
-						return;
-					var key = record.id;
-                    this.probeKeySet.replaceKeys([key]);
-                    this.props.toolTip.setState({
-                        x: this.chart.internal.d3.event.pageX,
-                        y: this.chart.internal.d3.event.pageY,
-                        showToolTip: true,
-                        columnNamesToValue: ToolTip.getToolTipData(this, [key], this.columns.getObjects(IAttributeColumn))
-                    });
-                },
-                onmouseout: (d:any) => {
-					if (!d)
-						return;
-
-                    this.probeKeySet.replaceKeys([]);
-                    this.props.toolTip.setState({
-                        showToolTip: false
-                    });
                 }
-            },
-            tooltip: {
-                show: false
             },
             grid: {
                 x: {
@@ -164,19 +132,26 @@ export default class C3LineChart extends AbstractC3Tool
         });
     }
 
-	private getRecord(id:string):Record
+	private getQKey(datum:any):IQualifiedKey
 	{
-		return this.records[this.keyToIndex[id]];
+		if (!datum)
+			return null;
+		var record = this.records[this.keyToIndex[datum.id]];
+		return record ? record.id : null;
 	}
 
-	protected handleC3Render():void
+	protected handleC3MouseOver(d:any):void
 	{
-        this.busy = false;
-        this.handleKeyFilters();
-        if (this.dirty)
-            this.validate();
+		var key = this.getQKey(d);
+        this.probeKeySet.replaceKeys([key]);
+        this.props.toolTip.setState({
+            x: this.chart.internal.d3.event.pageX,
+            y: this.chart.internal.d3.event.pageY,
+            showToolTip: true,
+            columnNamesToValue: ToolTip.getToolTipData(this, [key], this.columns.getObjects(IAttributeColumn))
+        });
 	}
-								
+	
 	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
@@ -186,76 +161,20 @@ export default class C3LineChart extends AbstractC3Tool
 		var selectedKeys:IQualifiedKey[] = [];
 		for (var d of this.chart.selected())
 		{
-			var record = this.getRecord(d.id);
-			if (record && !set_selectedKeys.has(record.id))
+			var key = this.getQKey(d);
+			if (key && !set_selectedKeys.has(key))
 			{
-				set_selectedKeys.add(record.id);
-				selectedKeys.push(record.id);
+				set_selectedKeys.add(key);
+				selectedKeys.push(key);
 			}
 		}
 		this.selectionKeySet.replaceKeys(selectedKeys);
 	}
-	
-	private handleKeyFilters()
-	{
-		if (this.chart && Weave.detectChange(this, this.selectionFilter))
-		{
-			if (this.selectionKeySet)
-				this.chart.select(this.selectionKeySet.keys.map(key => key.toString()), null, true);
-		}
-		this.updateStyle();
-	}
 
-	private updateStyle()
-	{
-		if (!this.chart)
-			return;
-		
-        let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
-
-        d3.select(this.element).selectAll("circle")
-            .style("opacity",
-                (d: any, i: number, oi: number): number => {
-					let record = this.getRecord(d.id);
-					let key = record ? record.id : null;
-                    let selected = this.isSelected(key);
-                    let probed = this.isProbed(key);
-					if (selected || probed)
-						return 1;
-					return selectionEmpty ? 1 : 0;
-                })
-            .style("stroke", "black")
-            .style("stroke-opacity", 0.0);
-		
-        d3.select(this.element)
-            .selectAll("path.c3-shape.c3-line")
-            .style("opacity",
-                (d: any, i: number, oi: number): number => {
-                    let key = this.records[i].id;
-                    let selected = this.isSelected(key);
-                    let probed = this.isProbed(key);
-                    return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
-                })
-            .style("stroke-width",
-                (d: any, i: number, oi: number): number => {
-                    let key = this.records[i].id;
-                    let selected = this.isSelected(key);
-                    let probed = this.isProbed(key);
-                    return probed ? 3 : (selected ? 2 : 1);
-                });
-    }
-
-    validate(forced:boolean = false):void
+    protected validate(forced:boolean = false):boolean
     {
-        if (this.busy)
-        {
-            this.dirty = true;
-            return;
-        }
-        this.dirty = false;
-
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds);
+        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds, this.margin);
 		var dataChanged:boolean = axisChange || Weave.detectChange(this, this.curveType, this.line, this.filteredKeySet);
         if (dataChanged)
         {
@@ -292,17 +211,15 @@ export default class C3LineChart extends AbstractC3Tool
                 colors[record.id as any] = record.line.color || "#000000";
             });
 
-            this.chartType= "line";
-            if (this.curveType.value === "double")
-            {
-                this.chartType = "spline";
-            }
+            this.c3Config.data.type = this.curveType.value === "double" ? "spline" : "line";
+            this.c3Config.data.columns = _.map(this.records, 'columns') as any;
+			this.c3Config.data.colors = colors;
         }
         if (axisChange)
         {
             changeDetected = true;
-            var xLabel:string = " ";//this.paths.xAxis.push("overrideAxisName").getState() || this.paths.dataX.getObject().getMetadata('title');
-            var yLabel:string = " ";//this.paths.yAxis.push("overrideAxisName").getState() || this.paths.dataY.getObject().getMetadata('title');
+            var xLabel:string = " ";//this.xAxisName.value || this.dataX.getMetadata('title');
+            var yLabel:string = " ";//this.yAxisName.value || this.dataY.getMetadata('title');
 
             if (this.records)
             {
@@ -337,20 +254,44 @@ export default class C3LineChart extends AbstractC3Tool
         }
 
         if (changeDetected || forced)
-        {
-            this.busy = true;
-            
-			if (dataChanged)
-                this.c3Config.data.columns = _.map(this.records, 'columns') as any;
-			
-			if (colors)
-				this.c3Config.data.colors = colors;
-			
-            this.c3Config.data.type = this.chartType;
-            this.c3Config.data.unload = true;
-            c3.generate(this.c3Config);
-            this.cullAxes();
-        }
+			return true;
+		
+		// update c3 selection
+		if (this.selectionKeySet)
+			this.chart.select(this.selectionKeySet.keys.map(key => key.toString()), null, true);
+		
+		// update style
+        let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+        d3.select(this.element).selectAll("circle")
+            .style("opacity",
+                (d: any, i: number, oi: number): number => {
+					let key = this.getQKey(d);
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+					if (selected || probed)
+						return 1;
+					return selectionEmpty ? 1 : 0;
+                })
+            .style("stroke", "black")
+            .style("stroke-opacity", 0.0);
+        d3.select(this.element)
+            .selectAll("path.c3-shape.c3-line")
+            .style("opacity",
+                (d: any, i: number, oi: number): number => {
+                    let key = this.records[i].id;
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+                    return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
+                })
+            .style("stroke-width",
+                (d: any, i: number, oi: number): number => {
+                    let key = this.records[i].id;
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+                    return probed ? 3 : (selected ? 2 : 1);
+                });
+		
+		return false;
     }
 
     get deprecatedStateMapping()

@@ -48,11 +48,6 @@ export default class C3Gauge extends AbstractC3Tool
 
     private keyToIndex:{[key:string]: number};
     private records:Record[];
-    private numberOfBins:number;
-    protected c3Config:ChartConfiguration;
-    protected chart:ChartAPI;
-    private busy:boolean;
-    private dirty:boolean;
 
     constructor(props:IVisToolProps)
     {
@@ -65,7 +60,6 @@ export default class C3Gauge extends AbstractC3Tool
         this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
         this.keyToIndex = {};
-        this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.mergeConfig({
             padding: {
@@ -99,31 +93,12 @@ export default class C3Gauge extends AbstractC3Tool
                     //max: 200, // should be set by data max using column stats
                     //values: [30, 60, 90, 100] //should be set in even range using the color ramp
                 }
-            },
-            tooltip: {
-                show: false
             }
         });
     }
 
-	protected handleC3Render():void
-	{
-        this.busy = false;
-        if (this.dirty)
-            this.validate();
-	}
-
-    validate(forced:boolean = false):void
+    protected validate(forced:boolean = false):boolean
     {
-        if (this.busy)
-        {
-            this.dirty = true;
-            return;
-        }
-        this.dirty = false;
-
-        //TODO: Need a debounced call when 'meterColumn' changes to wait for validateCache to return
-        //      with column statistics and then call this.validate() to set config appropriately
         var changeDetected:boolean = false;
         if (Weave.detectChange(this, this.meterColumn, this.colorRamp, this.filteredKeySet, this.probeKeySet, this.selectionKeySet, this.colStats, this.binningDefinition))
         {
@@ -138,7 +113,7 @@ export default class C3Gauge extends AbstractC3Tool
 				this.keyToIndex[record.id as any] = index;
 			});
 
-			this.numberOfBins = (this.binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value;
+			var numberOfBins = this.binningDefinition.getBinNames().length;
 			this.c3Config.color.pattern = this.colorRamp.getColors().reverse().map(color => '#' + StandardLib.numberToBase(color, 16, 6));
 
 			this.c3Config.gauge.min = this.colStats.getMin();
@@ -146,9 +121,9 @@ export default class C3Gauge extends AbstractC3Tool
 
 			var range = this.c3Config.gauge.max - this.c3Config.gauge.min;
 			this.c3Config.color.threshold.values = [];
-			for (var i = 1; i <= this.numberOfBins; i++)
+			for (var i = 1; i <= numberOfBins; i++)
 			{
-				this.c3Config.color.threshold.values.push(this.c3Config.gauge.min + i * (range / this.numberOfBins));
+				this.c3Config.color.threshold.values.push(this.c3Config.gauge.min + i * (range / numberOfBins));
 			}
 			this.c3Config.gauge.label.show = true;
 
@@ -196,11 +171,7 @@ export default class C3Gauge extends AbstractC3Tool
 		
 		this.updateConfigMargin();
 
-        if (changeDetected || forced)
-        {
-            this.busy = true;
-            c3.generate(this.c3Config);
-        }
+        return changeDetected || forced;
     }
 
     get deprecatedStateMapping()
@@ -223,7 +194,6 @@ export default class C3Gauge extends AbstractC3Tool
         }];
     }
 }
-
 
 Weave.registerClass("weavejs.tool.C3Gauge", C3Gauge, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.visualization.tools::GaugeTool", C3Gauge);

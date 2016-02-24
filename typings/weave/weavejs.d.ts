@@ -49,12 +49,12 @@ declare module __global__ {
          * Shortcut for WeaveAPI.SessionManager.getPath()
          * @copy weave.api.core.ISessionManager#getPath()
          */
-        static findPath(root: ILinkableObject, descendant: ILinkableObject): any[];
+        static findPath(root: ILinkableObject, descendant: ILinkableObject): Array<string>;
         /**
          * Shortcut for WeaveAPI.SessionManager.getObject()
          * @copy weave.api.core.ISessionManager#getObject()
          */
-        static followPath(root: ILinkableObject, path: any[]): ILinkableObject;
+        static followPath(root: ILinkableObject, path: Array<string | number>): ILinkableObject;
         /**
          * Shortcut for WeaveAPI.SessionManager.getCallbackCollection()
          * @copy weave.api.core.ISessionManager#getCallbackCollection()
@@ -192,7 +192,7 @@ declare module __global__ {
          * @param definition
          * @param additionalInterfaces An Array of interfaces (Class objects) that the definition implements in addition to ILinkableObject.
          */
-        static registerClass(qualifiedName: string, definition: new (..._: any[]) => any, additionalInterfaces?: any[]): void;
+        static registerClass(qualifiedName: string, definition: new (..._: any[]) => any, additionalInterfaces?: Array<new () => any>): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */

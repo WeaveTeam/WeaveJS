@@ -47,7 +47,7 @@ export default class C3PieChart extends AbstractC3Tool
 
     private RECORD_DATATYPE = {
         data: Number,
-        line: { color: String},
+        line: {color: String},
         fill: {color: String},
         label: String
     };
@@ -56,15 +56,9 @@ export default class C3PieChart extends AbstractC3Tool
     private records:Record[];
     private chartType:string;
 
-    private busy:boolean;
-    private dirty:boolean;
-
     constructor(props:IVisToolProps)
     {
         super(props);
-
-        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.handleKeyFilters);
-        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.handleKeyFilters);
 
         this.filteredKeySet.setSingleKeySource(this.data);
 
@@ -74,51 +68,20 @@ export default class C3PieChart extends AbstractC3Tool
 
         this.keyToIndex = {};
         this.records = [];
-        this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.mergeConfig({
-            tooltip: {
-                show: false
-            },
             data: {
                 columns: [],
-                type: "pie",
-                onmouseover: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-						var key = this.records[d.index].id;
-                        this.probeKeySet.replaceKeys([key]);
-                        this.props.toolTip.setState({
-                            showToolTip: true,
-                            x: this.chart.internal.d3.event.pageX,
-                            y: this.chart.internal.d3.event.pageY,
-                            columnNamesToValue: ToolTip.getToolTipData(this, [key], [this.data])
-                        });
-                    }
-                },
-                onmouseout: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-                        this.probeKeySet.replaceKeys([]);
-                        this.props.toolTip.setState({
-                            showToolTip: false
-                        });
-                    }
-                }
+                type: "pie"
             },
             pie: {
                 label: {
                     show: true,
                     format: (value:number, ratio:number, id:string):string => {
-                        if (this.records && this.records.length)
-                        {
-                            var record:Record = this.records[this.keyToIndex[id]];
-                            if (record && record.label)
-                            {
-                                return record.label as string;
-                            }
-                            return String(value);
-                        }
+                        var record:Record = this.records[this.keyToIndex[id]];
+                        if (record && record.label)
+                            return record.label as string;
+                        return String(value);
                     }
                 }
             },
@@ -126,15 +89,10 @@ export default class C3PieChart extends AbstractC3Tool
                 label: {
                     show: true,
                     format: (value:number, ratio:number, id:string):string => {
-                        if (this.records && this.records.length)
-                        {
-                            var record = this.records[this.keyToIndex[id]];
-                            if (record && record.label)
-                            {
-                                return record.label as string;
-                            }
-                            return String(value);
-                        }
+                        var record = this.records[this.keyToIndex[id]];
+                        if (record && record.label)
+                            return record.label as string;
+                        return String(value);
                     }
                 }
             },
@@ -144,42 +102,29 @@ export default class C3PieChart extends AbstractC3Tool
         });
     }
 
-	protected handleC3Render():void
+	protected handleC3MouseOver(d:any):void
 	{
-        this.busy = false;
-        this.handleKeyFilters();
-        if (this.dirty)
-            this.validate();
+		var key = this.records[d.index].id;
+        this.probeKeySet.replaceKeys([key]);
+        this.props.toolTip.setState({
+            showToolTip: true,
+            x: this.chart.internal.d3.event.pageX,
+            y: this.chart.internal.d3.event.pageY,
+            columnNamesToValue: ToolTip.getToolTipData(this, [key], [this.data])
+        });
 	}
-
+	
 	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
 			return;
 		let selectedIndices = this.chart.selected();
-		let selectedKeys = selectedIndices.map((value) => this.records[value.index].id);
+		let selectedKeys = selectedIndices.map(value => this.records[value.index].id);
 		this.selectionKeySet.replaceKeys(selectedKeys);
-	}
-	
-	private handleKeyFilters()
-	{
-		if (this.chart && Weave.detectChange(this, this.selectionFilter))
-		{
-	        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-			var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
-	        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
-				return Number(keyToIndex.get(key));
-	        });
-			this.chart.select(null, selectedIndices, true);
-		}
-		this.updateStyle();
 	}
 	
     private updateStyle():void
     {
-		if (this.busy || !this.chart || !this.records)
-            return;
-
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
         var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
         var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
@@ -213,19 +158,12 @@ export default class C3PieChart extends AbstractC3Tool
         }
     }
 
-    validate(forced:boolean = false):void
+    protected validate(forced:boolean = false):boolean
 	{
 		if (Weave.isBusy(this))
 			return;
-        if (this.busy)
-		{
-            this.dirty = true;
-            return;
-        }
-        this.dirty = false;
 
         var dataChanged = Weave.detectChange(this, this.data, this.label, this.innerRadius, this.fill, this.line, this.filteredKeySet);
-
         if (dataChanged)
 		{
             this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
@@ -236,36 +174,34 @@ export default class C3PieChart extends AbstractC3Tool
                this.keyToIndex[record.id as any] = index;
             });
 
-            var chartType:string = "pie";
-            if (this.innerRadius.value > 0)
-            {
-                chartType = "donut"
-            }
-
-            var columns:[string, number][] = [];
-
-            columns = this.records.map(function(record:Record) {
-                var tempArr:[string, number] = [record.id as any, record.data];
-                return tempArr;
+            var columns = this.records.map(function(record:Record) {
+                return [record.id as any, record.data] as [string, number];
             });
 
             var colors:{[key:string]: string} = {};
             this.records.forEach((record:Record) => {
-                colors[record.id as any] = record.fill.color as string || "#808080";
+                colors[record.id as any] = record.fill.color || "#808080";
             });
 
             this.c3Config.data.columns = columns;
-            this.c3Config.data.type = chartType;
+            this.c3Config.data.type = this.innerRadius.value > 0 ? "donut" : "pie";
             this.c3Config.data.colors = colors;
             this.c3Config.data.unload = true;
         }
-        var axisChanged = Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin.top, this.margin.bottom, this.margin.left, this.margin.right);
+        var axisChanged = Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin);
 
         if (forced || dataChanged || axisChanged)
-        {
-            this.busy = true;
-            c3.generate(this.c3Config);
-        }
+			return true;
+		
+		// update c3 selection
+        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+		var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
+        var selectedIndices:number[] = selectedKeys.map(key => Number(keyToIndex.get(key)));
+		this.chart.select(null, selectedIndices, true);
+		
+		this.updateStyle();
+		
+		return false;
     }
 
 	get deprecatedStateMapping()

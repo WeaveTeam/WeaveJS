@@ -104,22 +104,14 @@ export default class C3BarChart extends AbstractC3Tool
     protected c3ConfigYAxis:c3.YAxisConfiguration;
     private records:Record[];
 
-    private busy:boolean;
-    private dirty:boolean;
-
     constructor(props:IVisToolProps)
     {
         super(props);
-
-        Weave.getCallbacks(this.selectionFilter).addGroupedCallback(this, this.updateStyle);
-        Weave.getCallbacks(this.probeFilter).addGroupedCallback(this, this.updateStyle);
 
 		this.filteredKeySet.setColumnKeySources([this.sortColumn]);
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
-
-        this.validate = _.debounce(this.validate.bind(this), 30);
 
         this.mergeConfig({
             data: {
@@ -150,54 +142,6 @@ export default class C3BarChart extends AbstractC3Tool
                     {
 						// use the color from the color ramp
                         return color;
-                    }
-                },
-                onmouseover: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-						if (this.probeKeySet)
-                        	this.probeKeySet.replaceKeys([]);;
-                        
-						var record:Record = this.records[d.index];
-						var qKey:IQualifiedKey = this.records[d.index].id;
-
-						var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, [qKey]);
-						var columnNamesToColor:{[columnName:string] : string} = {};
-						var columns = this.heightColumns.getObjects(IAttributeColumn);
-						for (var index in columns)
-						{
-							var column = columns[index]; 
-							var columnName:string = column.getMetadata("title");
-							columnNamesToValue[columnName] = column.getValueFromKey(qKey, String);
-							// columnNamesToColor can be done only on heightColumns change.
-							columnNamesToColor[columnName] = this.chartColors.getHexColor(Number(index), 0, columns.length - 1);
-						}
-
-                        var title:string = record.stringValues.xLabel;
-						
-						if (this.probeKeySet)
-							this.probeKeySet.replaceKeys([qKey]);
-						
-						if (this.props.toolTip)
-	                        this.props.toolTip.setState({
-	                            x: this.chart.internal.d3.event.pageX,
-	                            y: this.chart.internal.d3.event.pageY,
-	                            showToolTip: true,
-	                            title: title,
-	                            columnNamesToValue: columnNamesToValue,
-	                            columnNamesToColor: columnNamesToColor
-	                        });
-                    }
-                },
-                onmouseout: (d:any) => {
-                    if (d && d.hasOwnProperty("index"))
-                    {
-						if (this.probeKeySet)
-							this.probeKeySet.replaceKeys([]);
-						if (this.props.toolTip)
-	                        this.props.toolTip.setState({
-	                           showToolTip: false
-	                        });
                     }
                 }
             },
@@ -248,7 +192,6 @@ export default class C3BarChart extends AbstractC3Tool
                 },
                 rotated: false
             },
-			tooltip: {show: false },
             grid: {
                 x: {
                     show: true
@@ -295,15 +238,7 @@ export default class C3BarChart extends AbstractC3Tool
             }
         };
     }
-
-	protected handleC3Render():void
-	{
-        this.busy = false;
-        this.handleKeyFilters();
-        if (this.dirty)
-            this.validate();
-	}
-
+	
 	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
@@ -313,18 +248,37 @@ export default class C3BarChart extends AbstractC3Tool
 		this.selectionKeySet.replaceKeys(selectedKeys);
 	}
 
-	private handleKeyFilters()
+	protected handleC3MouseOver(d:any):void
 	{
-		if (this.chart && Weave.detectChange(this, this.selectionFilter))
+		var record:Record = this.records[d.index];
+		var qKey:IQualifiedKey = this.records[d.index].id;
+
+		var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, [qKey]);
+		var columnNamesToColor:{[columnName:string] : string} = {};
+		var columns = this.heightColumns.getObjects(IAttributeColumn);
+		for (var index in columns)
 		{
-	        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-			var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
-	        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
-				return Number(keyToIndex.get(key));
-	        });
-			this.chart.select(this.heightColumnNames, selectedIndices, true);
+			var column = columns[index]; 
+			var columnName:string = column.getMetadata("title");
+			columnNamesToValue[columnName] = column.getValueFromKey(qKey, String);
+			// columnNamesToColor can be done only on heightColumns change.
+			columnNamesToColor[columnName] = this.chartColors.getHexColor(Number(index), 0, columns.length - 1);
 		}
-		this.updateStyle();
+
+        var title:string = record.stringValues.xLabel;
+		
+		if (this.probeKeySet)
+			this.probeKeySet.replaceKeys([qKey]);
+		
+		if (this.props.toolTip)
+            this.props.toolTip.setState({
+                x: this.chart.internal.d3.event.pageX,
+                y: this.chart.internal.d3.event.pageY,
+                showToolTip: true,
+                title: title,
+                columnNamesToValue: columnNamesToValue,
+                columnNamesToColor: columnNamesToColor
+            });
 	}
 
     private dataChanged():void
@@ -428,7 +382,6 @@ export default class C3BarChart extends AbstractC3Tool
 
 		let selectionEmpty:boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
 		let thinBars:boolean = this.chart.internal.width <= this.records.length;
-        var selectedKeys:IQualifiedKey[] = this.selectionKeySet.keys;
 	
         this.heightColumnNames.forEach((item:string) => {
 			d3.select(this.element)
@@ -475,27 +428,18 @@ export default class C3BarChart extends AbstractC3Tool
         });
     }
 
-    validate(forced:boolean = false):void
+    protected validate(forced:boolean = false):boolean
     {
-        if (this.busy)
-        {
-            this.dirty = true;
-            return;
-        }
-        this.dirty = false;
-
         var changeDetected:boolean = false;
         var axisChange:boolean = Weave.detectChange(this, this.heightColumns,
 														  this.labelColumn,
 														  this.sortColumn,
-														  this.margin.bottom,
-														  this.margin.top,
-														  this.margin.left,
-														  this.margin.right,
+														  this.margin,
 														  this.overrideBounds,
-														  this.overrideBounds);
-        var axisSettingsChange:boolean = Weave.detectChange(this, this.xAxisName, this.yAxisName);
-        if (axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet))
+														  this.xAxisName,
+														  this.yAxisName);
+		var dataChange = axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet);
+		if (dataChange)
         {
             changeDetected = true;
             this.dataChanged();
@@ -515,13 +459,13 @@ export default class C3BarChart extends AbstractC3Tool
 
             if (this.heightColumnNames && this.heightColumnNames.length)
             {
-                var temp:any =  {};
+                var axes:any = {};
                 if (weavejs.WeaveAPI.Locale.reverseLayout)
                 {
                     this.heightColumnNames.forEach( (name) => {
-                        temp[name] = 'y2';
+                        axes[name] = 'y2';
                     });
-                    this.c3Config.data.axes = temp;
+                    this.c3Config.data.axes = axes;
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
                     this.c3Config.axis.x.tick.rotate = 45;
@@ -529,9 +473,9 @@ export default class C3BarChart extends AbstractC3Tool
                 else
                 {
                     this.heightColumnNames.forEach( (name) => {
-                        temp[name] = 'y';
+                        axes[name] = 'y';
                     });
-                    this.c3Config.data.axes = temp;
+                    this.c3Config.data.axes = axes;
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
                     this.c3Config.axis.x.tick.rotate = -45;
@@ -541,10 +485,9 @@ export default class C3BarChart extends AbstractC3Tool
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
+			this.updateConfigMargin();
+			this.updateConfigAxisY();
         }
-		
-		this.updateConfigMargin();
-		this.updateConfigAxisY();
 		
         if (Weave.detectChange(this, this.horizontalMode))
         {
@@ -553,11 +496,19 @@ export default class C3BarChart extends AbstractC3Tool
         }
 
         if (changeDetected || forced)
-        {
-            this.busy = true;
-            c3.generate(this.c3Config);
-            this.cullAxes();
-        }
+			return true;
+		
+		// update C3 selection and style on already-rendered chart
+        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+		var keyToIndex = weavejs.util.ArrayUtils.createLookup(this.records, "id");
+        var selectedIndices:number[] = selectedKeys.map((key:IQualifiedKey) => {
+			return Number(keyToIndex.get(key));
+        });
+		this.chart.select(this.heightColumnNames, selectedIndices, true);
+		
+		this.updateStyle();
+		
+		return false;
     }
 
 	public get deprecatedStateMapping():Object

@@ -48,6 +48,7 @@ export default class AbstractC3Tool extends AbstractVisTool
         super(props);
 		
 		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 0);
+		this.debouncedHandleChange = _.debounce(this.handleChange.bind(this), 30);
 		
 		var self = this;
 		this.c3Config = {
@@ -61,6 +62,7 @@ export default class AbstractC3Tool extends AbstractVisTool
 			},
 			interaction: { brighten: false },
 			transition: { duration: 0 },
+            tooltip: { show: false },
 			data: {
 				selection: {
 					enabled: true,
@@ -94,19 +96,14 @@ export default class AbstractC3Tool extends AbstractVisTool
         this.yAxisClass = {axis: "c3-axis-y", grid: "c3-ygrid"};
         this.y2AxisClass = {axis: "c3-axis-y2", grid: "c3-ygrid"};
 		this.handlePointClick = this.handlePointClick.bind(this);
-		Weave.getCallbacks(this).addGroupedCallback(this, this.validate, true);
+		Weave.getCallbacks(this).addGroupedCallback(this, this.debouncedHandleChange, true);
     }
-	
-	protected mergeConfig(c3Config:c3.ChartConfiguration):void
-	{
-		_.merge(this.c3Config, c3Config);
-	}
 	
 	componentDidMount()
 	{
 		this.c3Config.bindto = this.element;
         MiscUtils.addPointClickListener(this.element, this.handlePointClick);
-		this.validate(true);
+		this.handleChange();
 	}
 	
 	componentWillUnmount()
@@ -115,21 +112,80 @@ export default class AbstractC3Tool extends AbstractVisTool
 		this.chart.destroy();
 	}
 
+    componentDidUpdate():void
+	{
+        if (this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height)
+		{
+            this.c3Config.size = { width: this.props.style.width, height: this.props.style.height };
+			if (this.chart)
+	            this.chart.resize({ width: this.props.style.width, height: this.props.style.height });
+            this.cullAxes();
+        }
+    }
+	
+    render():JSX.Element
+    {
+        return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
+    }
+
 	protected element:HTMLElement;
     protected chart:c3.ChartAPI;
     protected c3Config:c3.ChartConfiguration;
     private xAxisClass:AxisClass;
     private yAxisClass:AxisClass;
     private y2AxisClass:AxisClass;
-
-    private previousWidth:number;
-    private previousHeight:number;
+    private busy:boolean;
 
 	private debouncedHandleC3Selection:Function;
-	protected handleC3MouseOver(d:any):void { }
-	protected handleC3MouseOut(d:any):void { }
-	protected handleC3Selection():void { }
-	protected handleC3Render():void { }
+	private debouncedHandleChange:Function;
+
+	protected mergeConfig(c3Config:c3.ChartConfiguration):void
+	{
+		_.merge(this.c3Config, c3Config);
+	}
+	
+	private handleChange():void
+	{
+		if (!Weave.isBusy(this) && !this.busy && this.validate())
+		{
+            this.busy = true;
+            c3.generate(this.c3Config);
+		}
+	}
+
+	protected handleC3Render():void
+	{
+		this.busy = false;
+		this.handleChange();
+		if (!this.busy)
+			this.cullAxes();
+	}
+
+	protected handleC3Selection():void
+	{
+	}
+
+	protected handleC3MouseOver(d:any):void
+	{
+	}
+
+	protected handleC3MouseOut(d:any):void
+	{
+		if (this.probeKeySet)
+			this.probeKeySet.replaceKeys([]);
+		this.props.toolTip.setState({
+			showToolTip: false
+		});
+	}
+
+	/**
+	 * @param forced true if chart generation should be forced 
+	 * @return true if the chart should be (re)generated
+	 */
+	protected validate(forced:boolean = false):boolean
+	{
+		return forced;
+	}
 	
 	handlePointClick(event:MouseEvent):void
 	{
@@ -175,14 +231,19 @@ export default class AbstractC3Tool extends AbstractVisTool
 
     get internalHeight():number
     {
-        return this.props.style.height - this.c3Config.padding.top - Number(this.margin.bottom.value);
+        return this.props.style.height - this.c3Config.padding.top - this.margin.bottom.value;
     }
 	
 	protected updateConfigMargin()
 	{
 	    this.c3Config.padding.top = this.margin.top.value;
-	    this.c3Config.axis.x.height = this.margin.bottom.value;
-	    if (weavejs.WeaveAPI.Locale.reverseLayout)
+		
+		if (this.c3Config.axis && this.c3Config.axis.x)
+		    this.c3Config.axis.x.height = this.margin.bottom.value;
+		else
+			this.c3Config.padding.bottom = this.margin.bottom.value;
+	    
+		if (weavejs.WeaveAPI.Locale.reverseLayout)
 	    {
 	        this.c3Config.padding.left = this.margin.right.value;
 	        this.c3Config.padding.right = this.margin.left.value;
@@ -202,8 +263,18 @@ export default class AbstractC3Tool extends AbstractVisTool
 
 	protected updateConfigAxisY()
 	{
-		this.c3Config.axis.y.min = finiteOrNull(this.overrideBounds.yMin.value);
-        this.c3Config.axis.y.max = finiteOrNull(this.overrideBounds.yMax.value);
+		var yMin = finiteOrNull(this.overrideBounds.yMin.value);
+		var yMax = finiteOrNull(this.overrideBounds.yMax.value);
+		if (this.c3Config.axis.y)
+		{
+			this.c3Config.axis.y.min = yMin;
+        	this.c3Config.axis.y.max = yMax;
+		}
+		if (this.c3Config.axis.y2)
+		{
+			this.c3Config.axis.y2.min = yMin;
+        	this.c3Config.axis.y2.max = yMax;
+		}
 	}
 	
     private cullAxis(axisSize:number, axisClass:AxisClass):void
@@ -251,17 +322,6 @@ export default class AbstractC3Tool extends AbstractVisTool
         }
     }
 
-    componentDidUpdate():void
-	{
-        if (this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height)
-		{
-            this.c3Config.size = { width: this.props.style.width, height: this.props.style.height };
-			if (this.chart)
-	            this.chart.resize({ width: this.props.style.width, height: this.props.style.height });
-            this.cullAxes();
-        }
-    }
-
     customStyle(array:Array<number>, type:string, filter:string, style:any)
     {
         var filtered = d3.select(this.element).selectAll(type).filter(filter);
@@ -280,16 +340,7 @@ export default class AbstractC3Tool extends AbstractVisTool
                 d3.select(selector[0][index]).style(style);
         });
     }
-
-	validate(forced:boolean = false):void
-	{
-	}
 	
-    render():JSX.Element
-    {
-        return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
-    }
-
     private _getCullingMetrics(size:number,axisClass:string):CullingMetric
 	{
         var textHeight:number = MiscUtils.getTextHeight("test", this.getFontString());
