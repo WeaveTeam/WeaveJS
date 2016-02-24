@@ -59,6 +59,12 @@ export default class C3Gauge extends AbstractC3Tool
         this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
         this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
+		//initializes the binning definition which defines a number of evenly spaced bins
+		this.binningDefinition.requestLocalObject(SimpleBinningDefinition, false);
+		(this.binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value = 3;
+		this.binningDefinition.generateBinClassifiersForColumn(this.meterColumn);
+		Weave.linkableChild(this, this.binningDefinition.asyncResultCallbacks);
+
         this.keyToIndex = {};
 
         this.mergeConfig({
@@ -100,7 +106,7 @@ export default class C3Gauge extends AbstractC3Tool
     protected validate(forced:boolean = false):boolean
     {
         var changeDetected:boolean = false;
-        if (Weave.detectChange(this, this.meterColumn, this.colorRamp, this.filteredKeySet, this.probeKeySet, this.selectionKeySet, this.colStats, this.binningDefinition))
+        if (Weave.detectChange(this, this.meterColumn, this.colorRamp, this.filteredKeySet, this.probeKeySet, this.selectionKeySet, this.colStats, this.binningDefinition, this.margin))
         {
             changeDetected = true;
 			var name = this.meterColumn.getMetadata('title');
@@ -127,49 +133,21 @@ export default class C3Gauge extends AbstractC3Tool
 			}
 			this.c3Config.gauge.label.show = true;
 
-
-			var data = _.cloneDeep(this.c3Config.data);
-			var temp:any[] = [name];
-			var meterCols:number[] = _.pluck(this.records, 'meterColumn');
-
+			var column:any[] = [name];
 			var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
 			var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
-			var valid:boolean = false;
 			if (probedKeys.length)
-			{
-				probedKeys.forEach( (key) => {
-					var i:number = this.keyToIndex[key.toString()];
-					if (meterCols[i])
-					{
-						valid = true;
-						temp.push(meterCols[i]);
-					}
-				});
-			}
+				probedKeys.forEach(key => column.push(this.meterColumn.getValueFromKey(key, Number)));
 			else if (selectedKeys.length)
-			{
-				selectedKeys.forEach( (key) => {
-					var i:number = this.keyToIndex[key.toString()];
-					if (meterCols[i])
-					{
-						valid = true;
-						temp.push(meterCols[i]);
-					}
-				});
-			}
-			if (valid)
-			{
-				data.columns = [temp];
-			}
+				selectedKeys.forEach(key => column.push(this.meterColumn.getValueFromKey(key, Number)));
+			
+			if (column.length == 2)
+				this.c3Config.data.columns = [column];
 			else
-			{
-				data.columns = [];
-			}
-			data.unload = true;
-			this.c3Config.data = data;
+				this.c3Config.data.columns = [];
+			
+			this.updateConfigMargin();
         }
-		
-		this.updateConfigMargin();
 
         return changeDetected || forced;
     }
