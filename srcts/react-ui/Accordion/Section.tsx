@@ -4,8 +4,9 @@
 import * as React from "react";
 import VBox from "../VBox";
 import HBox from "../HBox";
+import * as Prefixer from "react-vendor-prefix";
 
-export interface SectionProps extends React.Props<Section> 
+export interface SectionProps extends React.Props<Section>
 {
 	title: string,
 	open: boolean
@@ -22,22 +23,25 @@ export default class Section extends React.Component<SectionProps, any>
 	
 	render():JSX.Element
 	{
-		var bodyStyle:React.CSSProperties = {};
-	
+		var bodyStyle:React.CSSProperties = {transition: "max-height 300ms"};
+
+		var sectionStyle:React.CSSProperties = {};
+
 		if(this.props.open)
 		{
-			bodyStyle.flex = 1;
-			bodyStyle.display = "block";
+			bodyStyle.maxHeight = "100%";
 		} else {
-			bodyStyle.height = 0;
-			bodyStyle.display = "none";
+			bodyStyle.maxHeight = 0;
 		}
 
+		bodyStyle = Prefixer.prefix({styles: bodyStyle}).styles;
+
 		return (
-			<VBox className="section">
-				<HBox style={{height: 30}} onClick={this.props.onChange} className="section-header">
+			<VBox className="section" style={sectionStyle}>
+				<HBox style={{height: 30, justifyContent: "space-between", padding: 5}} onClick={this.props.onChange} className="section-header">
+					<span style={{width:"100%", textAlign:"center", textOverflow:"ellipsis", fontWeight:700}}>{this.props.title}</span>
 					{
-						this.props.title
+						this.props.open ? <i className="fa fa-times"/> : <i className="fa fa-chevron-down"/>
 					}
 				</HBox>
 				<div style={bodyStyle} className="section-body">

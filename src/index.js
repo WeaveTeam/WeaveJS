@@ -45,7 +45,7 @@ function render()
 		var accordionContent = [
 			{
 				title: "First section",
-				content: "Lorem Ipsum",
+				content: "Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet nemo harum voluptas aliquid rem possimus nostrum excepturi!",
 				open: false
 			},
 			{
