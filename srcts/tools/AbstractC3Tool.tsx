@@ -146,7 +146,7 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
 	private handleChange():void
 	{
-		if (!Weave.isBusy(this) && !this.busy && this.validate())
+		if (!Weave.wasDisposed(this) && !Weave.isBusy(this) && !this.busy && this.validate())
 		{
             this.busy = true;
             c3.generate(this.c3Config);
