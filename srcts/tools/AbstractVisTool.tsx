@@ -10,6 +10,8 @@ import {ChartAPI, ChartConfiguration} from "c3";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
+import {MenuItemProps} from "../react-ui/Menu/MenuItem";
+import {IGetContextMenuItems} from "../ContextMenu";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -24,6 +26,7 @@ import LinkableString = weavejs.core.LinkableString;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+import WeaveMenuItem = weavejs.util.WeaveMenuItem;
 
 export class Margin
 {
@@ -40,10 +43,17 @@ export class OverrideBounds
     yMax = Weave.linkableChild(this, LinkableNumber);
 }
 
+export interface VisToolGroup 
+{
+	filteredKeySet:FilteredKeySet,
+	selectionFilter:DynamicKeyFilter,
+	probeFilter:DynamicKeyFilter
+}
+
 Weave.registerClass("weavejs.tool.Margin", Margin);
 Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 
-export default class AbstractVisTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
+export default class AbstractVisTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties, IGetContextMenuItems
 {
     constructor(props:IVisToolProps)
 	{
@@ -87,6 +97,42 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
        return this.panelTitle.value;
     }
 
+	static getContextMenuItems(target:VisToolGroup):MenuItemProps[]
+	{
+		return [
+			{
+				label: "Create subset from selected record(s)",
+				click: () => {
+					//
+				}
+			},
+			{
+				label: "Remove selected records(s) from subset",
+				click: () => {
+					
+				}
+			},
+			{
+				label: "Show All Records",
+				click: () => {
+				
+				}
+			},
+			{},
+			{
+				label: "Print/Export Application Image",
+				click: () => {
+					
+				}
+			}
+		]
+	}
+
+	getContextMenuItems():MenuItemProps[]
+	{
+		return AbstractVisTool.getContextMenuItems(this);
+	}
+	
     get deprecatedStateMapping():Object
 	{
 		return {

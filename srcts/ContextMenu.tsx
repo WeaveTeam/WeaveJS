@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import Menu from "./react-ui/Menu/Menu";
 import MenuItem from "./react-ui/Menu/MenuItem";
 import {MenuItemProps} from "./react-ui/Menu/MenuItem";
@@ -6,6 +7,7 @@ import Divider from "./react-ui/Menu/Divider";
 
 export interface ContextMenuProps extends React.Props<ContextMenu>
 {
+	config:MenuItemProps[]
 	xPos: number;
 	yPos: number;
 }
@@ -15,52 +17,37 @@ export interface ContextMenuState
 	
 }
 
+export const REACT_COMPONENT = "reactComponent";
+export const GET_CONTEXT_MENU_ITEMS = "getContextMenuItems";
+
+export interface IGetContextMenuItems
+{
+	getContextMenuItems():MenuItemProps[];
+}
+
 export default class ContextMenu extends React.Component<ContextMenuProps, ContextMenuState>
 {
-	contextMenuConfig:MenuItemProps[]
 	constructor(props:ContextMenuProps)
 	{
 		super(props);
-		this.contextMenuConfig = [
-			{
-				primaryText: "Create subset from selected record(s)",
-				onClick: this.createSubsetFromSelectedRecords.bind(this)
-			},
-			{
-				primaryText: "Remove selected records(s) from subset",
-				onClick: this.removeSelectedRecordsFromSubet.bind(this)
-			},
-			{
-				primaryText: "Show All Records",
-				onClick: this.showAllRecords.bind(this)
-			},
-			{
-				
-			},
-			{
-				primaryText: "Print/Export Application Image",
-				onClick: this.printExport.bind(this)
-			}
-		]
 	}	
 	
-	createSubsetFromSelectedRecords()
+	static getMenuItems(element:HTMLElement):MenuItemProps[]
 	{
-		
-	}
-	removeSelectedRecordsFromSubet()
-	{
-		
-	}
-	
-	showAllRecords()
-	{
-		
-	}
-	
-	printExport()
-	{
-		
+		//var elt = element as any;
+		while(element != null)
+		{
+			let elt = element as any;
+			if(elt[REACT_COMPONENT] && elt[REACT_COMPONENT][GET_CONTEXT_MENU_ITEMS])
+			{
+				return elt[REACT_COMPONENT][GET_CONTEXT_MENU_ITEMS]() as MenuItemProps[];
+			}
+			else
+			{
+				element = element.parentElement;
+			}
+		}
+		return [];
 	}
 
 	render():JSX.Element 
@@ -68,11 +55,13 @@ export default class ContextMenu extends React.Component<ContextMenuProps, Conte
 		return (
 			<Menu xPos={this.props.xPos} yPos={this.props.yPos}>
 				{
-					this.contextMenuConfig.map((menuItemProps, index) => {
-							if(menuItemProps.primaryText)
-								return <MenuItem key={index} {...menuItemProps}/>
-							else
+					this.props.config.map((menuItem, index) => {
+							if(_.isEqual(menuItem, {}))
 								return <Divider/>
+							else
+							{
+								return <MenuItem key={index} {...menuItem}/>
+							}
 					})
 				}
 			</Menu>

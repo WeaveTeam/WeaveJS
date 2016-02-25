@@ -7,18 +7,17 @@ import {DividerProps} from "./Divider";
 
 export interface MenuItemProps extends React.Props<MenuItem>
 {
-	primaryText?:string;
+	label?:string;
 	leftIcon?:React.ReactElement<any>;
 	rightIcon?:React.ReactElement<any>;
-	secondaryText?:string;
-	onClick?:Function;
-	menuItems?:React.ReactElement<MenuItemProps>|React.ReactElement<DividerProps>
+	secondaryLabel?:string;
+	click?:Function;
+	childItems?:React.ReactElement<MenuItemProps>|React.ReactElement<DividerProps>
 }
 
 export interface MenuItemState
 {
 	hovered?:boolean;
-	mouseIsDown?:boolean;
 	extendedMenuPos?: {xPos: number, yPos: number}
 }
 
@@ -55,14 +54,13 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 
 	onMouseOut(event:React.MouseEvent)
 	{
-		var elt = event.relatedTarget;
-
-		while( elt != null)
+		var elt = event.currentTarget;
+		var subMenuElement = ReactDOM.findDOMNode(this.subMenu);
+		console.log(subMenuElement);
+		if( elt == subMenuElement)
 		{
-			if(elt == this.element) {
-				return;
-			}
-			elt = (elt as HTMLElement).parentNode;
+			console.log("here");
+			return;
 		}
 
 		this.setState({
@@ -71,19 +69,12 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 
 	}
 	
-	onClick()
+	click()
 	{
-		if(!this.props.menuItems && this.props.onClick)
-			this.props.onClick()
+		if(!this.props.childItems && this.props.click)
+			this.props.click()
 	}
 	
-	onMouseDown()
-	{
-		this.setState({
-			mouseIsDown: true
-		});		
-	}
-
 	render():JSX.Element
 	{
 		
@@ -94,28 +85,25 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 			justifyContent: "space-between"
 		};
 		
-		if(this.state.mouseIsDown)
-			menuItemStyle.backgroundColor = "#80CCFF";
-		
-		var primaryTextStyle:React.CSSProperties = {
+		var labelStyle:React.CSSProperties = {
 			paddingLeft: this.props.leftIcon ? 5 : 0,
 			paddingRight: this.props.rightIcon ? 5 : 0,
 		}
 
-		var secondaryTextStyle = {
+		var secondaryLabelStyle = {
 		}
 
 		return (
-			<HBox style={menuItemStyle} onMouseDown={this.onMouseDown.bind(this)} onClick={this.onClick.bind(this)} onMouseOver={this.onMouseOver.bind(this)} onMouseOut={this.onMouseOut.bind(this)}>
+			<HBox style={menuItemStyle} onClick={this.click.bind(this)} onMouseOver={this.onMouseOver.bind(this)} onMouseOut={this.onMouseOut.bind(this)}>
 				<HBox>
 					<div>{this.props.leftIcon}</div>
-					<span style={primaryTextStyle}>{this.props.primaryText}</span>
+					<span style={labelStyle}>{this.props.label}</span>
 					<div>{this.props.rightIcon}</div>
 				</HBox>
-				<span style={secondaryTextStyle}>{this.props.secondaryText}</span>
+				<span style={secondaryLabelStyle}>{this.props.secondaryLabel}</span>
 				{
-					this.props.menuItems && this.state.hovered ? 
-					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} width="100%">{this.props.menuItems}</Menu> 
+					this.props.childItems && this.state.hovered ? 
+					<Menu xPos={this.element.clientWidth} ref={(c:Menu) => { console.log(c); this.subMenu = c}} yPos={this.element.offsetTop} width="100%">{this.props.childItems}</Menu> 
 					: null
 				}
 			</HBox>

@@ -20,6 +20,7 @@ import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/ToolTip";
 import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
+import {REACT_COMPONENT} from "./ContextMenu";
 
 declare type IToolTip = React.Component<IToolTipProps, IToolTipState>;
 
@@ -37,6 +38,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
     onDragStart:React.MouseEvent;
     onDragEnd:React.MouseEvent;
     onDragOver:React.MouseEvent;
+	onContextMenu?:(event:React.MouseEvent) => void;
 }
 
 export interface IWeaveToolState
@@ -84,6 +86,8 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		// make sure title gets updated
 		if (this.tool)
 			Weave.getCallbacks(this.tool).addGroupedCallback(this, this.updateTitle);
+		
+		(ReactDOM.findDOMNode(tool as any) as any)[REACT_COMPONENT] = tool;
 		this.updateTitle();
 	}
 

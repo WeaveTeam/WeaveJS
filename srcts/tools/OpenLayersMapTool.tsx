@@ -32,6 +32,8 @@ import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
 import DragSelection from "./OpenLayersMap/DragSelection";
 import CustomDragZoom from "./OpenLayersMap/CustomDragZoom";
 import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
+import {MenuItemProps} from "../react-ui/Menu/MenuItem";
+import AbstractVisTool from "./AbstractVisTool";
 
 import ZoomBounds = weavejs.geom.ZoomBounds;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -467,6 +469,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 		/* This may impact the default projection, so trigger callbacks on it. */
 		this.projectionSRS.triggerCallbacks();
+	}
+
+	getContextMenuItems():MenuItemProps[]
+	{
+		return []; //AbstractVisTool.getContextMenuItems(this);
 	}
 
 	dispose():void
