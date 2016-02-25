@@ -2390,7 +2390,10 @@ declare module ol {
         class Control extends ol.Object {
             constructor(options?: olx.control.ControlOptions);
 
-            getMap():ol.Map;
+            getMap(): ol.Map;
+            setMap(map:ol.Map): void;
+
+            element: HTMLElement; /* Technically protected, but still accessible. */
         }
 
         class FullScreen {
