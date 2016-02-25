@@ -18,6 +18,7 @@ export interface MenuItemProps extends React.Props<MenuItem>
 export interface MenuItemState
 {
 	hovered?:boolean;
+	mouseIsDown?:boolean;
 	extendedMenuPos?: {xPos: number, yPos: number}
 }
 
@@ -54,18 +55,20 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 
 	onMouseOut(event:React.MouseEvent)
 	{
-		var elt = event.currentTarget;
-		var subMenuElement = ReactDOM.findDOMNode(this.subMenu);
-		console.log(subMenuElement);
-		if( elt == subMenuElement)
+		var elt = event.relatedTarget;
+
+		while( elt != null)
 		{
-			console.log("here");
-			return;
+			if(elt == this.element) {
+				return;
+			}
+			elt = (elt as HTMLElement).parentNode;
 		}
 
 		this.setState({
 			hovered:false
 		});
+
 
 	}
 	
@@ -73,6 +76,13 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 	{
 		if(!this.props.childItems && this.props.click)
 			this.props.click()
+	}
+	
+	onMouseDown()
+	{
+		this.setState({
+			mouseIsDown: true
+		});		
 	}
 	
 	render():JSX.Element
@@ -85,6 +95,9 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 			justifyContent: "space-between"
 		};
 		
+		if(this.state.mouseIsDown)
+			//menuItemStyle.backgroundColor = "#80CCFF";
+			
 		var labelStyle:React.CSSProperties = {
 			paddingLeft: this.props.leftIcon ? 5 : 0,
 			paddingRight: this.props.rightIcon ? 5 : 0,
@@ -103,7 +116,7 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 				<span style={secondaryLabelStyle}>{this.props.secondaryLabel}</span>
 				{
 					this.props.childItems && this.state.hovered ? 
-					<Menu xPos={this.element.clientWidth} ref={(c:Menu) => { console.log(c); this.subMenu = c}} yPos={this.element.offsetTop} width="100%">{this.props.childItems}</Menu> 
+					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} width="100%">{this.props.childItems}</Menu> 
 					: null
 				}
 			</HBox>

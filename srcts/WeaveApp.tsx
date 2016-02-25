@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as _ from "lodash";
+import WeaveMenuBar from "./WeaveMenuBar";
 import ContextMenu from "./ContextMenu";
 import {REACT_COMPONENT} from "./ContextMenu";
-//import MenuBar from "./MenuBar";
 import LayoutManager from "./WeaveLayoutManager";
 import {MenuItemProps} from "./react-ui/Menu/MenuItem";
 
@@ -69,6 +69,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		return (
 			<div style={{width: "100%", height: "100%"}} onClick={this.hideContextMenu.bind(this)} onContextMenu={this.showContextMenu.bind(this)}>
+				<WeaveMenuBar/>
 				<LayoutManager layout={this.props.layout}/>
 				{
 					this.state.showContextMenu ? 
