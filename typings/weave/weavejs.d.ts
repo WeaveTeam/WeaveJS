@@ -181,7 +181,7 @@ declare module __global__ {
          * Dynamic items in the session state that extend this class will be replaced with
          * LinkablePlaceholder objects that can be replaced with actual instances later.
          */
-        static registerAsyncClass<T>(type: new (..._: any[]) => T, instanceHandler: Function): (instance: T) => void;
+        static registerAsyncClass<T>(type: new (..._: any[]) => T, instanceHandler: (instance: T) => void): void;
         /**
          * Checks if a class is or extends one that was registered through registerAsyncClass().
          */

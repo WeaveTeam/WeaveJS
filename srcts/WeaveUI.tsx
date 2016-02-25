@@ -29,14 +29,15 @@ var stub:any = React;
 weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 
-function handleReactComponent(component:React.ComponentLifecycle<any,any>):void
+function handleReactComponent(component:React.Component<any, any>):void
 {
+	var c = component as React.ComponentLifecycle<any, any>;
 	// add listener to replace instance with placeholder when it is unmounted
-	var superWillUnmount = component.componentWillUnmount;
-	component.componentWillUnmount = function() {
+	var superWillUnmount = c.componentWillUnmount;
+	c.componentWillUnmount = function() {
 		if (superWillUnmount)
-			superWillUnmount.call(component);
-		weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(component);
+			superWillUnmount.call(c);
+		weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(c);
 	};
 }
 
