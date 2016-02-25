@@ -57,7 +57,7 @@ export default class ContextMenu extends React.Component<ContextMenuProps, Conte
 				{
 					this.props.config.map((menuItem, index) => {
 							if(_.isEqual(menuItem, {}))
-								return <Divider/>
+								return <Divider key={index}/>
 							else
 							{
 								return <MenuItem key={index} {...menuItem}/>
