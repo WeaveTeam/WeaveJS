@@ -109,7 +109,11 @@ export default class AbstractC3Tool extends AbstractVisTool
 	componentWillUnmount()
 	{
 		MiscUtils.removePointClickListener(this.element, this.handlePointClick);
-		this.chart.destroy();
+		if (this.chart)
+		{
+			this.chart.destroy();
+			this.chart = null;
+		}
 	}
 
     componentDidUpdate():void
@@ -146,7 +150,7 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
 	private handleChange():void
 	{
-		if (!Weave.wasDisposed(this) && !Weave.isBusy(this) && !this.busy && this.validate())
+		if (!Weave.wasDisposed(this) && !Weave.isBusy(this) && !this.busy && this.validate(!this.chart))
 		{
             this.busy = true;
             c3.generate(this.c3Config);

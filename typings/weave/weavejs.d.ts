@@ -181,11 +181,15 @@ declare module __global__ {
          * Dynamic items in the session state that extend this class will be replaced with
          * LinkablePlaceholder objects that can be replaced with actual instances later.
          */
-        static registerAsyncClass(type: new (..._: any[]) => any): void;
+        static registerAsyncClass<T>(type: new (..._: any[]) => T, instanceHandler: Function): (instance: T) => void;
         /**
          * Checks if a class is or extends one that was registered through registerAsyncClass().
          */
         static isAsyncClass(type: new (..._: any[]) => any): boolean;
+        /**
+         * Gets the function that was passed in to registerAsyncClass() for a given type.
+         */
+        static getAsyncInstanceHandler(type: new (..._: any[]) => any): Function;
         /**
          * Registers an ILinkableObject class for use with Weave.className() and Weave.getDefinition().
          * @param qualifiedName
@@ -3451,6 +3455,9 @@ declare module weavejs.core {
         getInstance(): T & ILinkableObject;
         setInstance(instance: T): void;
         /**
+         * @return success flag
+         */
+        /**
          * A utility function for getting the class definition from LinkablePlaceholders as well as regular objects.
          * @param object An object, which may be null.
          * @return The class definition, or null if the object was null.
@@ -3462,6 +3469,7 @@ declare module weavejs.core {
          * @param instance An instance of the type of object that the placeholder is expecting.
          */
         static setInstance(possiblePlaceholder: ILinkableObject, instance: ILinkableObject): void;
+        static replaceInstanceWithPlaceholder(instance: ILinkableObject): void;
     }
 }
 declare module weavejs.core {
