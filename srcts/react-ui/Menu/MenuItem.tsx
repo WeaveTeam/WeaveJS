@@ -18,6 +18,7 @@ export interface MenuItemProps extends React.Props<MenuItem>
 export interface MenuItemState
 {
 	hovered?:boolean;
+	mouseIsDown?:boolean;
 	extendedMenuPos?: {xPos: number, yPos: number}
 }
 
@@ -76,6 +77,13 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 			this.props.onClick()
 	}
 	
+	onMouseDown()
+	{
+		this.setState({
+			mouseIsDown: true
+		});		
+	}
+
 	render():JSX.Element
 	{
 		
@@ -86,6 +94,9 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 			justifyContent: "space-between"
 		};
 		
+		if(this.state.mouseIsDown)
+			menuItemStyle.backgroundColor = "#80CCFF";
+		
 		var primaryTextStyle:React.CSSProperties = {
 			paddingLeft: this.props.leftIcon ? 5 : 0,
 			paddingRight: this.props.rightIcon ? 5 : 0,
@@ -95,7 +106,7 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 		}
 
 		return (
-			<HBox style={menuItemStyle} onClick={this.onClick.bind(this)} onMouseOver={this.onMouseOver.bind(this)} onMouseOut={this.onMouseOut.bind(this)}>
+			<HBox style={menuItemStyle} onMouseDown={this.onMouseDown.bind(this)} onClick={this.onClick.bind(this)} onMouseOver={this.onMouseOver.bind(this)} onMouseOut={this.onMouseOut.bind(this)}>
 				<HBox>
 					<div>{this.props.leftIcon}</div>
 					<span style={primaryTextStyle}>{this.props.primaryText}</span>
