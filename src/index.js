@@ -10,6 +10,8 @@ import {MiscUtils} from "../lib/WeaveUI.js";
 
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
+var urlParams = MiscUtils.getUrlParams();
+var layoutName = urlParams.layout || 'Layout';
 var weave = window.weave;
 if (weave)
 {
@@ -18,10 +20,10 @@ if (weave)
 else
 {
 	window.weave = weave = new Weave();
-	var urlParams = MiscUtils.getUrlParams();
 	var weaveExternalTools = window.opener && window.opener.WeaveExternalTools;
 	if (urlParams.file)
 	{
+		// read from url
 		weavejs.core.WeaveArchive.loadUrl(weave, urlParams.file).then(render);
 	}
 	else if (weaveExternalTools && weaveExternalTools[window.name])
@@ -41,6 +43,7 @@ else
 function render()
 {
 	$(() => {
-		ReactDOM.render(<Layout weave={weave} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
+		var layout = weave.root.requestObject(layoutName, Weave.getDefinition("FlexibleLayout"));
+		ReactDOM.render(<App layout={layout} />, document.getElementById("weaveElt"));
 	});
 }

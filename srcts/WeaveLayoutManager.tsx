@@ -5,6 +5,7 @@
 
 import WeavePath = weavejs.path.WeavePath;
 import StandardLib = weavejs.util.StandardLib;
+import LinkableVariable = weavejs.core.LinkableVariable;
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -46,7 +47,6 @@ var v1:any = [
 import WeaveTool from "./WeaveTool";
 import ToolOverlay from "./ToolOverlay";
 import MiscUtils from "./utils/MiscUtils";
-const LAYOUT:string = "Layout";
 
 const LEFT:string = "left";
 const RIGHT:string = "right";
@@ -71,7 +71,7 @@ declare type PolarPoint = {
 
 export interface IWeaveLayoutManagerProps extends React.Props<WeaveLayoutManager>
 {
-	weave: Weave,
+	layout: LinkableVariable,
 	style?: any
 }
 
@@ -83,6 +83,8 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 {
 	private element:HTMLElement;
 	private weave:Weave;
+	private layout:LinkableVariable;
+	private reactLayout:Layout;
 	private margin:number;
 	private dirty:boolean;
 	private toolDragged:string[];
@@ -96,11 +98,25 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	constructor(props:IWeaveLayoutManagerProps)
 	{
 		super(props);
-		this.weave = this.props.weave || new Weave();
-		this.weave.path(LAYOUT).request("FlexibleLayout");
+		this.componentWillReceiveProps(props);
 		this.margin = 8;
 		this.throttledForceUpdate = _.throttle(() => { this.forceUpdate(); }, 30);
 		this.throttledForceUpdateTwice = _.throttle(() => { this.dirty = true; this.forceUpdate(); }, 30);
+	}
+	
+	componentWillReceiveProps(props:IWeaveLayoutManagerProps):void
+	{
+		if (!props.layout)
+			throw new Error("layout is a required prop");
+		
+		if (this.layout && props.layout != this.layout)
+			throw new Error("Can't change layout prop");
+		
+		this.layout = props.layout;
+		this.weave = Weave.getWeave(this.layout);
+		
+		if (!this.weave)
+			throw new Error("layout is not registered with an instance of Weave");
 	}
 
 	componentDidMount():void
@@ -109,8 +125,8 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 
 		window.addEventListener("resize", this.throttledForceUpdateTwice);
 		this.weave.root.childListCallbacks.addGroupedCallback(this, this.throttledForceUpdate, true);
-		this.weave.path(LAYOUT).addCallback(this, this.throttledForceUpdate, true);
-		this.weave.path(LAYOUT).state(this.simplifyState(this.weave.path(LAYOUT).getState()));
+		this.layout.addGroupedCallback(this, this.throttledForceUpdate, true);
+		this.layout.state = this.simplifyState(this.layout.state);
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.frameHandler, true);
 	}
 
@@ -124,7 +140,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	{
 		this.savePrevClientSize();
 
-		if (Weave.detectChange(this, this.weave.getObject(LAYOUT)) || this.dirty)
+		if (Weave.detectChange(this, this.layout) || this.dirty)
 		{
 			// dirty flag to trigger render on window resize
 			this.dirty = false;
@@ -151,7 +167,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	{
 		newState = this.simplifyState(newState);
 		newState.flex = 1;
-		this.weave.path(LAYOUT).state(newState);
+		this.layout.state = newState;
 	}
 
 	onDragStart(id:string[], event:React.MouseEvent):void
@@ -200,7 +216,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 			return;
 		}
 
-		var toolNode = (this.refs[LAYOUT] as Layout).getDOMNodeFromId(toolOver);
+		var toolNode = this.reactLayout.getDOMNodeFromId(toolOver);
 		var toolNodePosition = toolNode.getBoundingClientRect();
 
 		var toolOverlayStyle = _.clone((this.refs[TOOLOVERLAY] as ToolOverlay).state.style);
@@ -247,7 +263,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		{
 			if (!_.isEqual(this.toolDragged, id))
 			{
-				var toolNode = (this.refs[LAYOUT] as Layout).getDOMNodeFromId(id);
+				var toolNode = this.reactLayout.getDOMNodeFromId(id);
 				var toolNodePosition = toolNode.getBoundingClientRect();
 
 				var center:Point = {
@@ -330,7 +346,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		if (!this.toolDragged || !this.toolOver || !this.dropZone)
 			return;
 
-		var newState:LayoutState = _.cloneDeep(this.weave.path(LAYOUT).getState());
+		var newState:LayoutState = _.cloneDeep(this.layout.state);
 		var src:LayoutState = MiscUtils.findDeep(newState, {id: toolDragged});
 		var dest:LayoutState = MiscUtils.findDeep(newState, {id: toolDroppedOn});
 		if (_.isEqual(src.id, dest.id))
@@ -403,7 +419,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 
 	render():JSX.Element
 	{
-		var newState:LayoutState = this.weave.path(LAYOUT).getState();
+		var newState:LayoutState = this.layout.state;
 		var children:LayoutState[] = [];
 		var paths:WeavePath[];
 		var path:WeavePath;
@@ -413,7 +429,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 			var filteredChildren:WeavePath[] = this.weave.root.getObjects(weavejs.api.ui.IVisTool, true).map(Weave.getPath);
 			newState = this.generateLayoutState(filteredChildren);
 			//TODO - generate layout state from
-			this.weave.path(LAYOUT).state(newState);
+			this.layout.state = newState;
 		}
 
 		paths = this.getIdPaths(newState);
@@ -429,9 +445,9 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 			var node:Element;
 			var toolRect:ClientRect;
 			var toolPosition:React.CSSProperties;
-			if (this.refs[LAYOUT] && rect)
+			if (this.reactLayout && rect)
 			{
-				node = (this.refs[LAYOUT] as Layout).getDOMNodeFromId(path.getPath());
+				node = this.reactLayout.getDOMNodeFromId(path.getPath());
 				if (node)
 				{
 					toolRect = node.getBoundingClientRect();
@@ -455,7 +471,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 
 		return (
 			<div ref={(elt) => { this.element = elt; }} style={MiscUtils.merge({display: "flex", position: "relative", overflow: "hidden"}, this.props.style)}>
-				<Layout key={LAYOUT} ref={LAYOUT} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
+				<Layout ref={(layout:Layout) => { this.reactLayout = layout; }} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
 				{children}
 				<ToolOverlay ref={TOOLOVERLAY}/>
 			</div>
