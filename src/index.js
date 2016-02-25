@@ -44,6 +44,6 @@ function render()
 {
 	$(() => {
 		var layout = weave.root.requestObject(layoutName, Weave.getDefinition("FlexibleLayout"));
-		ReactDOM.render(<App layout={layout} />, document.getElementById("weaveElt"));
+		ReactDOM.render(<Layout layout={layout} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
 	});
 }
