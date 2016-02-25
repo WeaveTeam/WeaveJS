@@ -54,13 +54,14 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 
 	onMouseOut(event:React.MouseEvent)
 	{
-		var elt = event.currentTarget;
-		var subMenuElement = ReactDOM.findDOMNode(this.subMenu);
-		console.log(subMenuElement);
-		if( elt == subMenuElement)
+		var elt = event.relatedTarget;
+
+		while( elt != null)
 		{
-			console.log("here");
-			return;
+			if(elt == this.element) {
+				return;
+			}
+			elt = (elt as HTMLElement).parentNode;
 		}
 
 		this.setState({
@@ -103,7 +104,7 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 				<span style={secondaryTextStyle}>{this.props.secondaryText}</span>
 				{
 					this.props.menuItems && this.state.hovered ? 
-					<Menu xPos={this.element.clientWidth} ref={(c:Menu) => { console.log(c); this.subMenu = c}} yPos={this.element.offsetTop} width="100%">{this.props.menuItems}</Menu> 
+					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} width="100%">{this.props.menuItems}</Menu> 
 					: null
 				}
 			</HBox>

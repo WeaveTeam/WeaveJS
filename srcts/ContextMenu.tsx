@@ -23,7 +23,7 @@ export default class ContextMenu extends React.Component<ContextMenuProps, Conte
 	
 	onClick()
 	{
-		console.log("Clicked on create subset");
+
 	}
 
 	render():JSX.Element 
