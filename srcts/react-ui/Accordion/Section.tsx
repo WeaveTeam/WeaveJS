@@ -23,15 +23,19 @@ export default class Section extends React.Component<SectionProps, any>
 	
 	render():JSX.Element
 	{
-		var bodyStyle:React.CSSProperties = {transition: "max-height 300ms"};
+		var bodyStyle:React.CSSProperties = {transition: "max-height ease-in 300ms, border ease-in 300ms"};
 
 		var sectionStyle:React.CSSProperties = {};
 
 		if(this.props.open)
 		{
 			bodyStyle.maxHeight = "100%";
+			bodyStyle.border = "1px solid #C2CBCE";
+			bodyStyle.borderTopWidth = "0px";
 		} else {
 			bodyStyle.maxHeight = 0;
+			delete bodyStyle.border;
+			delete bodyStyle.borderTopWidth;
 		}
 
 		bodyStyle = Prefixer.prefix({styles: bodyStyle}).styles;
@@ -41,7 +45,7 @@ export default class Section extends React.Component<SectionProps, any>
 				<HBox style={{height: 30, justifyContent: "space-between", padding: 5}} onClick={this.props.onChange} className="section-header">
 					<span style={{width:"100%", textAlign:"center", textOverflow:"ellipsis", fontWeight:700}}>{this.props.title}</span>
 					{
-						this.props.open ? <i className="fa fa-times"/> : <i className="fa fa-chevron-down"/>
+						this.props.open ? <i className="fa fa-times fa-fw"/> : <i className="fa fa-chevron-down fa-fw"/>
 					}
 				</HBox>
 				<div style={bodyStyle} className="section-body">
