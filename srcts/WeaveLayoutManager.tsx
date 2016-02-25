@@ -470,7 +470,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		}
 
 		return (
-			<div ref={(elt) => { this.element = elt; }} style={MiscUtils.merge({display: "flex", position: "relative", overflow: "hidden"}, this.props.style)}>
+			<div ref={(elt) => { this.element = elt; }} style={MiscUtils.merge({display: "flex", position: "relative", overflow: "hidden", width: "100%", height: "100%"}, this.props.style)}>
 				<Layout ref={(layout:Layout) => { this.reactLayout = layout; }} state={_.cloneDeep(newState)} onStateChange={this.saveState.bind(this)}/>
 				{children}
 				<ToolOverlay ref={TOOLOVERLAY}/>
