@@ -11,7 +11,7 @@ import StandardLib = weavejs.util.StandardLib;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import KeySet = weavejs.data.key.KeySet;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
-import DynamicKeySet = weavejs.data.key.DynamicKeySet;
+import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import IKeySet = weavejs.api.data.IKeySet;
 
 export abstract class AbstractFeatureLayer extends AbstractLayer
@@ -23,8 +23,20 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	private changedItems:Set<IQualifiedKey>;
 
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-	selectionKeySet = Weave.linkableChild(this, DynamicKeySet);
-	probeKeySet = Weave.linkableChild(this, DynamicKeySet);
+	selectionKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	probeKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
+
+	get selectionKeySet():KeySet
+	{
+		let keySet = this.selectionKeyFilter.target as KeySet;
+		return keySet instanceof KeySet ? keySet : null;
+	}
+
+	get probeKeySet():KeySet
+	{
+		let keySet = this.probeKeyFilter.target as KeySet;
+		return keySet instanceof KeySet ? keySet : null;
+	}
 
 	styleResolutionDependent: boolean = false;
 
@@ -34,8 +46,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	{
 		super();
 
-		this.selectionKeySet.targetPath = ["defaultSelectionKeySet"];
-		this.probeKeySet.targetPath = ["defaultProbeKeySet"];
+		this.selectionKeyFilter.targetPath = ["defaultSelectionKeySet"];
+		this.probeKeyFilter.targetPath = ["defaultProbeKeySet"];
 	
 		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
 		this.debounced_updateMetaStyles = lodash.debounce(this.updateMetaStyles.bind(this), 0);
@@ -48,11 +60,11 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		this.changedItems = new Set();
 
-		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeySet, new Set<IQualifiedKey>());
-		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeySet, new Set<IQualifiedKey>());
+		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeyFilter, new Set<IQualifiedKey>());
+		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeyFilter, new Set<IQualifiedKey>());
 
-		Weave.getCallbacks(this.selectionKeySet).addGroupedCallback(this, selectionKeyHandler, true);
-		Weave.getCallbacks(this.probeKeySet).addGroupedCallback(this, probeKeyHandler, true);
+		Weave.getCallbacks(this.selectionKeyFilter).addGroupedCallback(this, selectionKeyHandler, true);
+		Weave.getCallbacks(this.probeKeyFilter).addGroupedCallback(this, probeKeyHandler, true);
 		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateMetaStyles, true);
 
 		this.selectable.addGroupedCallback(this, this.updateMetaStyles);
@@ -123,9 +135,9 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		return ol.color.asString(colorArray);
 	}
 
-	updateSetFromKeySet(dynamicKeySet:DynamicKeySet, previousContents:Set<IQualifiedKey>):void
+	updateSetFromKeySet(keyFilter:DynamicKeyFilter, previousContents:Set<IQualifiedKey>):void
 	{
-		let keySet: IKeySet = dynamicKeySet.getInternalKeySet();
+		let keySet: KeySet = keyFilter.getInternalKeyFilter() as KeySet;
 		if (!keySet)
 			return; //HACK
 		if (!this.source)
@@ -135,7 +147,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		let isEmpty:boolean = keySet.keys.length === 0;
 
 		/* If the selection keyset becomes empty or nonempty, we should recompute all the styles. Otherwise, only recompute the styles of the features which changed. */
-		if (dynamicKeySet === this.selectionKeySet && isEmpty !== wasEmpty)
+		if (keyFilter === this.selectionKeyFilter && isEmpty !== wasEmpty)
 		{
 			this.updateMetaStyles();
 		}
@@ -190,8 +202,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		let newStyle:any;
 
 		let isInFilter: boolean = this.filteredKeySet.containsKey(id);
-		let isSelected: boolean = this.selectionKeySet.getInternalKeySet().containsKey(id);
-		let isProbed: boolean = this.probeKeySet.getInternalKeySet().containsKey(id);
+		let isSelected: boolean = this.selectionKeySet.containsKey(id);
+		let isProbed: boolean = this.probeKeySet.containsKey(id);
 
 		if (!isInFilter)
 		{
@@ -207,7 +219,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		if (!isSelected &&
 			!isProbed &&
-			this.selectionKeySet.getInternalKeySet().keys.length > 0)
+			this.selectionKeySet.keys.length > 0)
 		{
 			if (replace)
 			{

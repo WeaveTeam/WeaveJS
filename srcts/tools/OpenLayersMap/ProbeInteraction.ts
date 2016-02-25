@@ -47,7 +47,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 			let weaveLayerObject = layer.get("layerObject") as AbstractFeatureLayer;
 			if (!weaveLayerObject)
 				return;
-			this.topKeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet || this.topKeySet;
+			this.topKeySet = weaveLayerObject.probeKeySet || this.topKeySet;
 			this.topZIndex = zIndex;
 			this.topKey = feature.getId();
 			this.topLayer = weaveLayerObject;
@@ -82,7 +82,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 			if (!ProbeInteraction.layerFilter(layer))
 				continue;
 			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
-			let keySet: KeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet;
+			let keySet: KeySet = weaveLayerObject.probeKeySet;
 			if (keySet && keySet != this.topKeySet)
 			{
 				keySet.clearKeys();
@@ -124,7 +124,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 			if (!ProbeInteraction.layerFilter(layer))
 				continue;
 			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
-			let keySet: KeySet = weaveLayerObject.probeKeySet.getInternalKeySet() as KeySet;
+			let keySet: KeySet = weaveLayerObject.probeKeySet;
 			if (keySet)
 				keySet.clearKeys();
 		}

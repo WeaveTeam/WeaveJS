@@ -87,7 +87,7 @@ export default class DragSelection extends ol.interaction.DragBox
 			if (weaveLayer instanceof FeatureLayer && selectable)
 			{
 				let source: ol.source.Vector = <ol.source.Vector>(<ol.layer.Vector>olLayer).getSource();
-				let keySet: KeySet = weaveLayer.selectionKeySet.getInternalKeySet() as KeySet;
+				let keySet: KeySet = weaveLayer.selectionKeySet;
 
 				source.forEachFeatureIntersectingExtent(extent, selectFeature);
 
