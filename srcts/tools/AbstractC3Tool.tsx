@@ -13,6 +13,10 @@ import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import * as c3 from "c3";
 import MiscUtils from "../utils/MiscUtils";
+import * as jquery from "jquery";
+
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -163,6 +167,13 @@ export default class AbstractC3Tool extends AbstractVisTool
 		this.handleChange();
 		if (!this.busy)
 			this.cullAxes();
+		if(this.element && this.chart) {
+			$(this.element).find(".c3-chart").each( (i,e) => {
+				e.addEventListener("mouseout", (event) => {
+					this.handleC3MouseOut(event);
+				});
+			});
+		}
 	}
 
 	protected handleC3Selection():void
