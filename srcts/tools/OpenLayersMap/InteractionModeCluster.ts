@@ -7,6 +7,7 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 import * as jquery from "jquery";
 import OpenLayersMapTool from "../OpenLayersMapTool";
+import LinkableString = weavejs.core.LinkableString;
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -15,7 +16,6 @@ export default class InteractionModeCluster extends ol.control.Control
 {
 	constructor(optOptions: any)
 	{
-		var map: OpenLayersMapTool = optOptions.mapTool as OpenLayersMapTool;
 		var iconMapping: {[mode: string]: string} = {
 			"pan": "fa-hand-grab-o",
 			"select": "fa-mouse-pointer",
@@ -48,27 +48,43 @@ export default class InteractionModeCluster extends ol.control.Control
 		activeDiv.find("button").click(toggleMenuOpen.bind(null, true));
 		toggleMenuOpen(false);
 
+
+		super({ element: div[0], target: options.target });
+
+		let self = this;
 		function setupButton(mode:string)
 		{
 			clusterDiv.find("button." + mode)
 				.css({ "font-weight": "normal", "display": "inline" })
 				.addClass(iconMapping[mode])
-				.click(() => { map.interactionMode.value = mode; toggleMenuOpen(false); });
-			console.log(mode, iconMapping[mode]);
+				.click(() => { if (self.interactionMode) self.interactionMode.value = mode; toggleMenuOpen(false); });
 		}
 
 		for (let key in iconMapping) setupButton(key);
 
-		super({ element: div[0], target: options.target });
-
-		map.interactionMode.addGroupedCallback(map, () => {
-			let mode = map.interactionMode.value;
+		this.updateInteractionMode_weaveToControl = (() => {
+			let mode = self.interactionMode.value;
 
 			clusterDiv.find("button").removeClass("active");
 			clusterDiv.find("button." + mode).addClass("active");
 
 			activeDiv.find("button").removeClass(lodash.values(iconMapping).join(" "));
 			activeDiv.find("button").addClass(iconMapping[mode]);
-		}, true);
+		});
+	}
+
+	private interactionMode: LinkableString;
+	private updateInteractionMode_weaveToControl: Function;
+
+	setMap(map:ol.Map):void
+	{
+		super.setMap(map)
+
+		if (!map) return;
+
+		let mapTool: OpenLayersMapTool = map.get("mapTool") as OpenLayersMapTool;
+		this.interactionMode = mapTool.interactionMode;
+
+		this.interactionMode.addGroupedCallback(mapTool, this.updateInteractionMode_weaveToControl, true);
 	}
 }

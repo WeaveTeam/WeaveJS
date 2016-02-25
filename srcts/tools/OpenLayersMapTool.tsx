@@ -40,6 +40,7 @@ import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import LinkableNumber = weavejs.core.LinkableNumber;
 
 import Bounds2D = weavejs.geom.Bounds2D;
 
@@ -56,16 +57,22 @@ function isBounds(obj:any):boolean
 	return lodash.every(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj[item] === "number");
 }
 
+interface Alignment
+{
+	vertical: number;
+	horizontal: number;
+}
+
+function isAlignment(obj:any):boolean
+{
+	return (obj.vertical == "top" || obj.vertical == "bottom") && (obj.horizontal == "left" || obj.horizontal == "right");
+}
+
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
 {
 	static DEFAULT_PROJECTION: string = "EPSG:4326";
 
 	map:ol.Map;
-	zoomButtons:ol.control.Zoom;
-	slider:ol.control.ZoomSlider;
-	zoomExtent: ol.control.ZoomToExtent;
-	pan:PanCluster;
-	mouseModeButtons:InteractionModeCluster;
 
 	centerCallbackHandle:any;
 	resolutionCallbackHandle:any;
@@ -74,13 +81,28 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	zoomBounds = Weave.linkableChild(this, ZoomBounds);
 	extentOverride = Weave.linkableChild(this, new LinkableVariable(null, isBounds, [NaN, NaN, NaN, NaN]));
 	projectionSRS = Weave.linkableChild(this, LinkableString);
-	showZoomSlider = Weave.linkableChild(this, LinkableBoolean);
-	showMouseModeControls = Weave.linkableChild(this, LinkableBoolean);
 	interactionMode = Weave.linkableChild(this, LinkableString);
 
 	layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
+
+	/* Control elements */
+	zoomExtent = new CustomZoomToExtent({ label: $("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0] });
+	zoomButtons = new ol.control.Zoom();
+	zoomSlider = new ol.control.ZoomSlider();
+	panButtons = new PanCluster();
+	mouseModeButtons = new InteractionModeCluster({});
+
+	/* Control element config properties */
+	showZoomButtons = Weave.linkableChild(this, new LinkableBoolean(true));
+	showZoomSlider = Weave.linkableChild(this, LinkableBoolean);
+	showPanButtons = Weave.linkableChild(this, new LinkableBoolean(false));
+	showZoomExtentButton = Weave.linkableChild(this, new LinkableBoolean(true));
+	showMouseModeControls = Weave.linkableChild(this, new LinkableBoolean(true));
+	toolPadding = Weave.linkableChild(this, new LinkableNumber(10));
+
+	controlLocation = Weave.linkableChild(this, new LinkableVariable(null, isAlignment, {vertical: "top", horizontal: "left"}));
 
 	get title(): string {
 		return this.panelTitle.value;
@@ -110,6 +132,30 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	get deprecatedStateMapping():Object
 	{
 		return {
+			zoomControlsLocation: (zcl:string) => {
+				let vertical: string;
+				let horizontal: string;
+
+				if (zcl.startsWith("Bottom"))
+				{
+					vertical = "bottom";
+				}
+				else
+				{
+					vertical = "top";
+				}
+
+				if (zcl.endsWith("right"))
+				{
+					horizontal = "right";
+				}
+				else
+				{
+					horizontal = "left";
+				}
+
+				this.controlLocation.state = { vertical, horizontal };
+			},
 			showZoomControls: this.showZoomSlider,
 			children: {
 				visualization: {
@@ -138,6 +184,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			target: this.element
 		});
 
+		this.map.set("mapTool", this);
+
 		/* Setup custom interactions */
 
 		let dragPan: ol.interaction.DragPan = new ol.interaction.DragPan();
@@ -159,19 +207,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		/* Setup custom controls */
 
-		this.zoomButtons = new ol.control.Zoom();
-		this.slider = new ol.control.ZoomSlider();
-		this.pan = new PanCluster();
-		this.zoomExtent = new CustomZoomToExtent({ label: $("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0]});
-
 		$(this.element).find("canvas.ol-unselectable").attr("tabIndex", 1024); /* Hack to make the canvas focusable. */
 
-		this.map.addControl(this.zoomButtons);
-
-		this.showZoomSlider.addGroupedCallback(this, this.updateEnableZoomControl_weaveToOl, true);
-		this.showMouseModeControls.addGroupedCallback(this, this.updateEnableMouseModeControl_weaveToOl, true);
-
-		this.mouseModeButtons = new InteractionModeCluster({mapTool: this});
+		this.controlLocation.addGroupedCallback(this, this.updateControlPositions);
+		[this.showZoomSlider, this.showMouseModeControls, this.showPanButtons, this.showZoomExtentButton, this.showZoomButtons].forEach(
+			(value: LinkableBoolean) => { value.addGroupedCallback(this, this.updateControls_weaveToOl) }
+		);
+		this.updateControls_weaveToOl();
 
 		/* Todo replace override[X,Y][Min,Max] with a single overrideZoomBounds element; alternatively,
 		 * make a set of parameters on zoombounds itself. */
@@ -223,53 +265,77 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.zoomBounds.setScreenBounds(screenBounds, true);
 	}
 
-	updateControlPositions():void
+	private updateControl(lbool:LinkableBoolean, control:ol.control.Control):void
 	{
-		if (this.showZoomSlider.value)
+		if (lbool.value)
 		{
-			$(this.element).find(".ol-control.panCluster").css({top: "0.5em", left: "0.5em"});
-			$(this.element).find(".ol-control.ol-zoom").css({top: "5.5em", left: "2.075em"});
-			$(this.element).find(".ol-control.ol-zoomslider").css({top: "9.25em", left: "2.075em"});
-			$(this.element).find("div.ol-control.iModeCluster").css({top: "26em", left: "0.6em"});
+			if (!lodash.contains(this.map.getControls().getArray(), control))
+				this.map.addControl(control);
 		}
 		else
 		{
-			$(this.element).find(".ol-control.ol-zoom-extent").css({top: "0.5em", left: "0.5em"});
-			$(this.element).find(".ol-control.ol-zoom").css({ top: "2.625em", left: "0.5em" });
-			$(this.element).find("div.ol-control.iModeCluster").css({ top: "6.5em", left: "0.5em" });
+			this.map.removeControl(control);
 		}
 	}
 
-
-	updateEnableMouseModeControl_weaveToOl():void
+	private updateControls_weaveToOl():void
 	{
-		if (this.showMouseModeControls.value)
-		{
-			this.map.addControl(this.mouseModeButtons);
-		}
-		else
-		{
-			this.map.removeControl(this.mouseModeButtons);
-		}
+		this.updateControl(this.showPanButtons, this.panButtons);
+		this.updateControl(this.showZoomButtons, this.zoomButtons);
+		this.updateControl(this.showMouseModeControls, this.mouseModeButtons);
+		this.updateControl(this.showZoomSlider, this.zoomSlider);
+		this.updateControl(this.showZoomExtentButton, this.zoomExtent);
 		this.updateControlPositions();
 	}
 
+	private static controlOrder: Array<Function> = [
+		PanCluster,
+		CustomZoomToExtent,
+		ol.control.Zoom,
+		ol.control.ZoomSlider,
+		InteractionModeCluster
+	];
 
-	updateEnableZoomControl_weaveToOl():void
+	private static controlIndex: Map<Function,number> = (():Map<Function,number> => {
+		let controlIndex: Map<Function, number> = new Map<Function, number>();
+		for (let idx in OpenLayersMapTool.controlOrder)
+		{
+			controlIndex.set(OpenLayersMapTool.controlOrder[idx], Number(idx));
+		}
+		return controlIndex;
+	})();
+
+	private updateControlPositions():void
 	{
-		if (this.showZoomSlider.value)
+		let controls = lodash.sortBy(this.map.getControls().getArray(), item => OpenLayersMapTool.controlIndex.get(item.constructor));
+		let maxWidth = lodash.max(controls, (control) => control.element.scrollWidth).element.scrollWidth;
+
+		let mapWidth = this.map.getSize()[0];
+		let mapHeight = this.map.getSize()[1];
+		let padding = 5;
+		let controlLocation: any = this.controlLocation.state as any;
+
+		let verticalDirection: number, verticalStart: number, verticalOffsetMultiplier: number;
+		let horizontalDirection: number, horizontalStart: number, horizontalOffsetMultiplier: number;
+
+		[verticalDirection, verticalOffsetMultiplier, verticalStart] =
+			controlLocation.vertical == "top" ? [+1, 0, 0] : [-1, +1, mapHeight];
+		[horizontalDirection, horizontalOffsetMultiplier, horizontalStart] =
+			controlLocation.horizontal == "left" ? [+1, 0, 0] : [-1, +1, mapWidth];
+
+		if (controlLocation.vertical == "bottom") controls.reverse();
+
+		for (let control of controls)
 		{
-			this.map.addControl(this.slider);
-			this.map.addControl(this.pan);
-			this.map.removeControl(this.zoomExtent);
+			let height = control.element.scrollHeight;
+			let width = control.element.scrollWidth;
+			let centerOffset = (maxWidth - width) / 2;
+
+			$(control.element).css({top: (verticalDirection * height * verticalOffsetMultiplier) + verticalStart + (padding * verticalDirection)});
+			$(control.element).css({left: (horizontalDirection * width * horizontalOffsetMultiplier) + horizontalStart + ((centerOffset + padding) * horizontalDirection)});
+
+			verticalStart += verticalDirection * (height + padding);
 		}
-		else
-		{
-			this.map.removeControl(this.slider);
-			this.map.removeControl(this.pan);
-			this.map.addControl(this.zoomExtent);
-		}
-		this.updateControlPositions();
 	}
 
 	updateCenter_olToWeave():void
