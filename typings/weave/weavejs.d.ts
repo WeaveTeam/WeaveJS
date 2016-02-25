@@ -9241,6 +9241,76 @@ declare module weavejs.util {
     }
 }
 declare module weavejs.util {
+    /**
+     * Dynamic menu item for use with Flex Menus.
+     *
+     * Flex's DefaultDataDescriptor checks the following properties:
+     *     label, children, enabled, toggled, type, groupName
+     */
+    class WeaveMenuItem extends WeaveTreeItem {
+        /**
+         * Initializes an Array of WeaveMenuItems using an Array of objects to pass to the constructor.
+         * Any Arrays passed in will be flattened and surrounded by separators.
+         * @param items An Array of item descriptors.
+         */
+        static createMenuItems(items: any[]): any[];
+        /**
+         * Makes sure a non-empty output array ends in a non-redundant separator.
+         */
+        static TYPE_SEPARATOR: string;
+        static TYPE_CHECK: string;
+        static TYPE_RADIO: string;
+        /**
+         * Constructs a new WeaveMenuItem.
+         * @param params An Object containing property values to set on the WeaveMenuItem.
+         *               If this is a String equal to "separator" (TYPE_SEPARATOR), a new separator will be created.
+         */
+        constructor(params?: Object);
+        /**
+         * This can be either a Function or an ILinkableVariable to be treated as a boolean setting.
+         * The Function signature can be like function():void or function(item:WeaveMenuItem):void.
+         * Instead of reading this property directly, call runClickFunction().
+         * @see #runClickFunction()
+         */
+        click: any;
+        /**
+         * This property is checked by Flex's default data descriptor.
+         */
+        type: string;
+        /**
+         * This property is checked by Flex's default data descriptor.
+         */
+        groupName: string;
+        label: any;
+        /**
+         * This property is checked by Flex's default data descriptor.
+         */
+        toggled: any;
+        /**
+         * This can be set to either a Boolean, a Function, or an ILinkableVariable.
+         * This property is checked by Flex's default data descriptor.
+         */
+        enabled: any;
+        /**
+         * Specifies whether or not this item should be shown.
+         * This can be set to either a Boolean, a Function, an ILinkableVariable, or an Array of ILinkableVariables.
+         */
+        shown: any;
+        /**
+         * Gets a filtered copy of the child menu items.
+         * When this property is accessed, refresh() will be called except if refresh() is already being called.
+         * This property is checked by Flex's default data descriptor.
+         */
+        children: any;
+        /**
+         * If the click property is set to a Function, it will be called like click.call(this)
+         *   or click.call(this, this) if the former produces an ArgumentError.
+         * If the click property is set to an ILinkableVariable, it will be toggled as a boolean.
+         */
+        runClickFunction(): void;
+    }
+}
+declare module weavejs.util {
     import IDisposableObject = weavejs.api.core.IDisposableObject;
     /**
      * Use this when you need a Promise chain to depend on ILinkableObjects and resolve multiple times.
