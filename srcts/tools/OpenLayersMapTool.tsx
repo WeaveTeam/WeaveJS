@@ -30,6 +30,7 @@ import PanCluster from "./OpenLayersMap/PanCluster";
 import InteractionModeCluster from "./OpenLayersMap/InteractionModeCluster";
 import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
 import DragSelection from "./OpenLayersMap/DragSelection";
+import CustomDragZoom from "./OpenLayersMap/CustomDragZoom";
 import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 
 import ZoomBounds = weavejs.geom.ZoomBounds;
@@ -125,7 +126,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			/* use global interaction mode as default local mode */
 			var defaultDragMode = Weave.getWeave(this).getObject("WeaveProperties", "toolInteractions", "defaultDragMode") as LinkableString;
 			if (defaultDragMode instanceof LinkableString)
-				this.interactionMode.value = defaultDragMode.value;
+				this.interactionMode.value = defaultDragMode.value || "select";
+			else
+				this.interactionMode.value = "select";
 		}
 	}
 
@@ -191,7 +194,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let dragPan: ol.interaction.DragPan = new ol.interaction.DragPan();
 		let dragSelect: DragSelection = new DragSelection();
 		let probeInteraction: ProbeInteraction = new ProbeInteraction(this);
-		let dragZoom: ol.interaction.DragZoom = new ol.interaction.DragZoom({ condition: ol.events.condition.always });
+		let dragZoom = new CustomDragZoom();
 
 		this.map.addInteraction(dragPan);
 		this.map.addInteraction(dragSelect);
