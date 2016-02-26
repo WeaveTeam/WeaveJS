@@ -26,6 +26,7 @@ import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
+import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import KeySet = weavejs.data.key.KeySet;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableString = weavejs.core.LinkableString;
@@ -44,7 +45,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	dynamicColorColumn = Weave.linkableChild(this, DynamicColumn);
 	maxColumns = Weave.linkableChild(this, new LinkableNumber(1));
 	shapeSize = Weave.linkableChild(this, new LinkableNumber(25));
-	shapeType = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE));
+	shapeType = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_BOX));
+	//lineStyle = Weave.linkableChild(this, SolidLineStyle);
 	
 	private get colorColumn() { return this.dynamicColorColumn.target as ColorColumn; }
 	private get binnedColumn() { var cc = this.colorColumn; return cc ? cc.getInternalColumn() as BinnedColumn : null; }
@@ -188,9 +190,10 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			var height:number = this.props.style.height as number;
 			var shapeSize:number = this.shapeSize.value;
 			var shapeType:string = this.shapeType.value;
-			var maxColumns:number = 1;//TODO: This should really be "this.maxColumns.value" but only supporting 1 column for now
+			var maxColumns:number = this.maxColumns.value;
 			var columnFlex:number = 1.0/maxColumns;
 			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
+			var totalBins:number = this.numberOfBins + extraBins;
 			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
 			var yMap:Function = (d:number):number => { return yScale(d); };
 
@@ -199,21 +202,52 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
 			var finalElements:any[] = [];
 			var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
+
 			for (var j:number = 0; j < maxColumns; j++)
 			{
+				var elements:JSX.Element[] = [];
 				switch (shapeType)
 				{
+					//handle circle/square/line in same switch logic
 					case SHAPE_TYPE_CIRCLE :
+					case SHAPE_TYPE_SQUARE :
+					case SHAPE_TYPE_LINE :
 					{
 						var element:JSX.Element[] = [];
-						var elements:JSX.Element[] = [];
-						for (var i = 0; i < this.numberOfBins + extraBins; i++)
+						for (var i = 0; i < totalBins; i++)
 						{
 							if (i % maxColumns == j)
 							{
 
 								if (i < this.numberOfBins)
 								{
+									//get shape Element
+									var shapeElement:JSX.Element;
+									//handle different cases for circle/square/line
+									switch (shapeType)
+									{
+										case SHAPE_TYPE_CIRCLE :
+											shapeElement = <circle cx="50%" cy="50%" r="45%" style={{
+														fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
+														stroke: "black",
+														strokeOpacity: 0.5
+													}}/>;
+											break;
+										case SHAPE_TYPE_SQUARE :
+											shapeElement = <rect x="5%" y="5%" width="90%" height="90%" style={{
+														fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
+														stroke: "black",
+														strokeOpacity: 0.5
+													}}/>;
+											break;
+										case SHAPE_TYPE_LINE :
+											shapeElement = <line x1="5%" y1="50%" x2="95%" y2="50%" style={{
+														stroke: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
+														strokeWidth: 5
+													}}/>;
+											break;
+									}
+
 									element.push(
 										<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
@@ -223,11 +257,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 											<ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
 												<svg style={{position:"absolute"}}
 													 viewBox="0 0 100 100" width="100%" height="100%">
-													<circle cx="50%" cy="50%" r="45%" style={{
-														fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
-														stroke: "black",
-														strokeOpacity: 0.5
-													}}/>
+													{
+														shapeElement
+													}
 												</svg>
 											</ui.HBox>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
@@ -246,33 +278,13 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 							}
 						}
 
-						if (this.props.style.width > this.props.style.height * 2)
-						{
-							if (weavejs.WeaveAPI.Locale.reverseLayout)
-							{
-								element = element.reverse();
-							}
-
-							elements.push(
-								<ui.HBox key={i} style={{width:"100%", flex: columnFlex}}> { element } </ui.HBox>
-							);
-						}
-						else
-						{
-							elements.push(
-								<ui.VBox key={i} style={{height:"100%", flex: columnFlex}}> { element } </ui.VBox>
-							);
-						}
+						elements.push(
+							<ui.VBox key={i} style={{flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
+						);
 
 						finalElements[j] = elements;
 					}
 						break;
-					case SHAPE_TYPE_SQUARE :
-						break;
-
-					case SHAPE_TYPE_LINE :
-						break;
-
 					case SHAPE_TYPE_BOX :
 					{
 						var element:JSX.Element[] = [];
@@ -290,7 +302,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 												width:"100%", flex:1.0,
 												alignItems:"center",
 												justifyContent:"center",
-												backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 0.5)
+												backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 1.0)
 											}}>
 												<div style={{
 															stroke: "black",
@@ -312,23 +324,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 							}
 						}
 
-						if (this.props.style.width > this.props.style.height * 2)
-						{
-							if (weavejs.WeaveAPI.Locale.reverseLayout)
-							{
-								element = element.reverse();
-							}
-
-							elements.push(
-								<ui.HBox key={i} style={{width:"100%", flex: columnFlex, padding: "5px"}}> { element } </ui.HBox>
-							);
-						}
-						else
-						{
-							elements.push(
-								<ui.VBox key={i} style={{height:"100%", flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
-							);
-						}
+						elements.push(
+							<ui.VBox key={i} style={{flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
+						);
 
 						finalElements[j] = elements;
 					}
@@ -340,11 +338,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
 						<span style={prefixerStyle}>{this.dynamicColorColumn.getMetadata('title')}</span>
 					</ui.HBox>
-					{
-						this.props.style.width > this.props.style.height * 2
-						? <ui.HBox style={{width:"100%", flex: 0.9}}> { finalElements } </ui.HBox>
-						: <ui.VBox style={{height:"100%", flex: 0.9}}> { finalElements } </ui.VBox>
-				   	}
+					<ui.HBox style={{width:"100%", flex: 0.9}}> { finalElements } </ui.HBox>
 				</ui.VBox>
 			</div>);
 		}
