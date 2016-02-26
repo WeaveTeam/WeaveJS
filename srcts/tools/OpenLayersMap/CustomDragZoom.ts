@@ -13,7 +13,7 @@ export default class CustomDragZoom extends ol.interaction.DragBox
 {
 	constructor()
 	{
-		super({ boxEndCondition: () => true });
+		super({});
 		this.on('boxstart', CustomDragZoom.prototype.onBoxStart, this);
 		this.on('boxend', CustomDragZoom.prototype.onBoxEnd, this);
 	}
@@ -47,7 +47,6 @@ export default class CustomDragZoom extends ol.interaction.DragBox
 		let extent: ol.Extent = this.getGeometry().getExtent();
 		let view: ol.View = this.getMap().getView();
 		let size: ol.Size = this.getMap().getSize();
-		view.getResolution
-		view.fit(this.getGeometry(), size);
+		view.fit(this.getGeometry(), size, {constrainResolution: false});
 	}
 }

@@ -26,6 +26,7 @@ import ScatterPlotLayer from "./OpenLayersMap/Layers/ScatterPlotLayer";
 import LabelLayer from "./OpenLayersMap/Layers/LabelLayer";
 /* eslint-enable */
 
+import CustomView from "./OpenLayersMap/CustomView";
 import PanCluster from "./OpenLayersMap/PanCluster";
 import InteractionModeCluster from "./OpenLayersMap/InteractionModeCluster";
 import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
@@ -89,6 +90,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
+
+	snapZoomToBaseMap = Weave.linkableChild(this, LinkableBoolean);
 
 	/* Control elements */
 	zoomExtent = new CustomZoomToExtent({ label: $("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0] });
@@ -161,6 +164,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 				this.controlLocation.state = { vertical, horizontal };
 			},
+			zoomToBaseMap: this.snapZoomToBaseMap,
 			showZoomControls: this.showZoomSlider,
 			children: {
 				visualization: {
@@ -220,6 +224,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		);
 		this.updateControls_weaveToOl();
 
+		this.snapZoomToBaseMap.addGroupedCallback(this, this.updateResolutionSnapping);
+
 		/* Todo replace override[X,Y][Min,Max] with a single overrideZoomBounds element; alternatively,
 		 * make a set of parameters on zoombounds itself. */
 
@@ -252,12 +258,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 
 		let projection = this.projectionSRS.value || this.getDefaultProjection();
-		let view = new ol.View({projection, extent});
+		let view = new CustomView({projection, extent});
 		view.set("extent", extent);
 
 		this.centerCallbackHandle = view.on("change:center", this.updateCenter_olToWeave, this);
 		this.resolutionCallbackHandle = view.on("change:resolution", this.updateZoom_olToWeave, this);
 		this.map.setView(view);
+
+		this.updateResolutionSnapping();
 
 		this.updateZoomAndCenter_weaveToOl();
 	}
@@ -375,16 +383,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let view = this.map.getView();
 		var resolution = view.getResolution();
 
-		/* If the resolution is being set between constrained levels,
-		 * odds are good that this is the result of a slider manipulation.
-		 * While the user is dragging the slider, we shouldn't update the
-		 * session state, because this will trigger reconstraining the
-		 * resolution, which will lead to it feeling "jerky" */
-		if (resolution != view.constrainResolution(resolution))
-		{
-			return;
-		}
-
 		var dataBounds = new weavejs.geom.Bounds2D();
 		var screenBounds = new weavejs.geom.Bounds2D();
 		this.zoomBounds.getDataBounds(dataBounds);
@@ -409,7 +407,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		view.un("change:resolution", this.updateZoom_olToWeave, this);
 
 		view.setCenter(center);
-		view.setResolution(view.constrainResolution(1 / scale));
+		let resolution = 1 / scale;
+		
+		view.setResolution(view.constrainResolution(resolution));
 
 		lodash.defer(() => {
 			view.on("change:center", this.updateCenter_olToWeave, this);
@@ -452,6 +452,16 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
+	updateResolutionSnapping():void
+	{
+		let view = this.map.getView() as CustomView;
+		if (!view) return;
+		if (this.layers.getObjects(TileLayer).length && this.snapZoomToBaseMap.value)
+			view.enableResolutionConstraint = true;
+		else
+			view.enableResolutionConstraint = false;
+	}
+
 	updatePlotters_weaveToOl():void
 	{
 		var newNames:string[] = this.layers.getNames();
@@ -467,6 +477,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 			layer.olLayer.setZIndex(Number(idx) + 2);
 		}
+		this.updateResolutionSnapping();
 		/* This may impact the default projection, so trigger callbacks on it. */
 		this.projectionSRS.triggerCallbacks();
 	}
