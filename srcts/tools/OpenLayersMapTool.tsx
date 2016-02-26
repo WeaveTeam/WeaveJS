@@ -484,7 +484,15 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	getContextMenuItems():MenuItemProps[]
 	{
-		return []; //AbstractVisTool.getContextMenuItems(this);
+		for (let layer of this.layers.getObjects() as Array<AbstractLayer>)
+		{
+			if (layer instanceof AbstractFeatureLayer)
+			{
+				let menuItems = AbstractVisTool.getContextMenuItems(layer);
+				return menuItems;
+			}
+		}
+		return [];
 	}
 
 	dispose():void
