@@ -27,6 +27,7 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import WeaveMenuItem = weavejs.util.WeaveMenuItem;
+import KeyFilter = weavejs.data.key.KeyFilter;
 
 export class Margin
 {
@@ -97,35 +98,72 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
        return this.panelTitle.value;
     }
 
+    private static createFromSetToSubset(set: KeySet, filter:KeyFilter):void
+    {
+		filter.replaceKeys(false, true, set.keys, null);
+		set.clearKeys();
+    }
+    private static removeFromSetToSubset(set: KeySet, filter: KeyFilter):void
+    {
+		filter.excludeKeys(set.keys);
+    }
+    private static clearSubset(filter:KeyFilter):void
+    {
+		filter.replaceKeys(true, true);
+    }
+
+    private static localProbeKeySet: KeySet = new weavejs.data.key.KeySet();
 	static getContextMenuItems(target:VisToolGroup):MenuItemProps[]
 	{
-		return [
+		let menuItems:Array<any> = [];
+		let selectionKeySet = target.selectionFilter.target as KeySet;
+		let probeKeySet = target.probeFilter.target as KeySet;
+		let subset = target.filteredKeySet.keyFilter.getInternalKeyFilter() as KeyFilter;
+
+		Weave.copyState(probeKeySet, this.localProbeKeySet);
+
+		let usingIncludedKeys: boolean = subset.included.keys.length > 0;
+		let usingExcludedKeys: boolean = subset.excluded.keys.length > 0;
+		let includeMissingKeys: boolean = subset.includeMissingKeys.value;
+		let usingSubset: boolean = includeMissingKeys ? usingExcludedKeys : true;
+		let usingProbe: boolean = this.localProbeKeySet.keys.length > 0;
+		let usingSelection: boolean = selectionKeySet.keys.length > 0;
+
+		if (usingSelection || usingProbe)
+		{
+			if (usingSelection)
 			{
-				label: "Create subset from selected record(s)",
-				click: () => {
-					//
-				}
-			},
-			{
-				label: "Remove selected records(s) from subset",
-				click: () => {
-					
-				}
-			},
-			{
-				label: "Show All Records",
-				click: () => {
-				
-				}
-			},
-			{},
-			{
-				label: "Print/Export Application Image",
-				click: () => {
-					
-				}
+				menuItems.push({
+					label: Weave.lang("Create subset from selected records"),
+					click: this.createFromSetToSubset.bind(null, selectionKeySet, subset)
+				});
+				menuItems.push({
+					label: Weave.lang("Remove selected records from subset"),
+					click: this.removeFromSetToSubset.bind(null, selectionKeySet, subset)
+				});
 			}
-		]
+			else
+			{
+				menuItems.push({
+					label: Weave.lang("Create subset from highlighted record"),
+					click: this.createFromSetToSubset.bind(null, this.localProbeKeySet, subset)
+				});
+				menuItems.push({
+					label: Weave.lang("Remove highlighted record from subset"),
+					click: this.removeFromSetToSubset.bind(null, this.localProbeKeySet, subset)
+				});
+			}
+		}
+
+		if (usingSubset)
+		{
+			menuItems.push({
+				label: Weave.lang("Show all records"),
+				click: this.clearSubset.bind(null, subset)
+			});
+		}
+
+		return menuItems;
 	}
 
 	getContextMenuItems():MenuItemProps[]
