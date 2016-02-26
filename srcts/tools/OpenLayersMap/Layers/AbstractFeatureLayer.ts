@@ -23,18 +23,18 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	private changedItems:Set<IQualifiedKey>;
 
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-	selectionKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	probeKeyFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
 
 	get selectionKeySet():KeySet
 	{
-		let keySet = this.selectionKeyFilter.target as KeySet;
+		let keySet = this.selectionFilter.target as KeySet;
 		return keySet instanceof KeySet ? keySet : null;
 	}
 
 	get probeKeySet():KeySet
 	{
-		let keySet = this.probeKeyFilter.target as KeySet;
+		let keySet = this.probeFilter.target as KeySet;
 		return keySet instanceof KeySet ? keySet : null;
 	}
 
@@ -46,8 +46,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	{
 		super();
 
-		this.selectionKeyFilter.targetPath = ["defaultSelectionKeySet"];
-		this.probeKeyFilter.targetPath = ["defaultProbeKeySet"];
+		this.selectionFilter.targetPath = ["defaultSelectionKeySet"];
+		this.probeFilter.targetPath = ["defaultProbeKeySet"];
 	
 		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
 		this.debounced_updateMetaStyles = lodash.debounce(this.updateMetaStyles.bind(this), 0);
@@ -60,11 +60,11 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		this.changedItems = new Set();
 
-		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionKeyFilter, new Set<IQualifiedKey>());
-		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeKeyFilter, new Set<IQualifiedKey>());
+		let selectionKeyHandler = this.updateSetFromKeySet.bind(this, this.selectionFilter, new Set<IQualifiedKey>());
+		let probeKeyHandler = this.updateSetFromKeySet.bind(this, this.probeFilter, new Set<IQualifiedKey>());
 
-		Weave.getCallbacks(this.selectionKeyFilter).addGroupedCallback(this, selectionKeyHandler, true);
-		Weave.getCallbacks(this.probeKeyFilter).addGroupedCallback(this, probeKeyHandler, true);
+		this.selectionFilter.addGroupedCallback(this, selectionKeyHandler, true);
+		this.probeFilter.addGroupedCallback(this, probeKeyHandler, true);
 		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateMetaStyles, true);
 
 		this.selectable.addGroupedCallback(this, this.updateMetaStyles);
@@ -147,7 +147,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		let isEmpty:boolean = keySet.keys.length === 0;
 
 		/* If the selection keyset becomes empty or nonempty, we should recompute all the styles. Otherwise, only recompute the styles of the features which changed. */
-		if (keyFilter === this.selectionKeyFilter && isEmpty !== wasEmpty)
+		if (keyFilter === this.selectionFilter && isEmpty !== wasEmpty)
 		{
 			this.updateMetaStyles();
 		}
