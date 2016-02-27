@@ -70,11 +70,11 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		this.setState(MiscUtils.includeMissingPropertyPlaceholders(this.state, nextProps.state));
 	}
 
-	compoenentWillUnmount():void
+	componentWillUnmount():void
 	{
-		document.removeEventListener("mousedown", this.boundMouseDown);
 		document.removeEventListener("mouseup", this.boundMouseUp);
-		document.removeEventListener("mouseMove", this.boundMouseMove);
+		document.removeEventListener("mousedown", this.boundMouseDown);
+		document.removeEventListener("mousemove", this.boundMouseMove);
 	}
 
 	shouldComponentUpdate(nextProps:LayoutProps, nextState:LayoutState):boolean
