@@ -85,9 +85,11 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		
 		// make sure title gets updated
 		if (this.tool)
+		{
 			Weave.getCallbacks(this.tool).addGroupedCallback(this, this.updateTitle);
+			(ReactDOM.findDOMNode(tool as any) as any)[REACT_COMPONENT] = tool;
+		}
 		
-		(ReactDOM.findDOMNode(tool as any) as any)[REACT_COMPONENT] = tool;
 		this.updateTitle();
 	}
 
