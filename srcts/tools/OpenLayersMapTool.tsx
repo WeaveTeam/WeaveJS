@@ -58,7 +58,7 @@ interface Bounds
 
 function isBounds(obj:any):boolean
 {
-	return lodash.every(["xMin", "xMax", "yMin", "yMax"], (item) => typeof obj[item] === "number");
+	return lodash.every(["xMin", "xMax", "yMin", "yMax"], (item) => obj && typeof obj[item] === "number");
 }
 
 interface Alignment
@@ -69,7 +69,7 @@ interface Alignment
 
 function isAlignment(obj:any):boolean
 {
-	return (obj.vertical == "top" || obj.vertical == "bottom") && (obj.horizontal == "left" || obj.horizontal == "right");
+	return obj && (obj.vertical == "top" || obj.vertical == "bottom") && (obj.horizontal == "left" || obj.horizontal == "right");
 }
 
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
