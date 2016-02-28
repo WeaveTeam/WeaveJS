@@ -122,8 +122,8 @@ export default class C3Gauge extends AbstractC3Tool
 			var numberOfBins = this.binningDefinition.getBinNames().length;
 			this.c3Config.color.pattern = this.colorRamp.getColors().reverse().map(color => '#' + StandardLib.numberToBase(color, 16, 6));
 
-			this.c3Config.gauge.min = this.colStats.getMin();
-			this.c3Config.gauge.max = this.colStats.getMax();
+			this.c3Config.gauge.min = isNaN((this.binningDefinition.internalObject as SimpleBinningDefinition).overrideInputMin.value) ? this.colStats.getMin() : (this.binningDefinition.internalObject as SimpleBinningDefinition).overrideInputMin.value;
+			this.c3Config.gauge.max = isNaN((this.binningDefinition.internalObject as SimpleBinningDefinition).overrideInputMax.value) ? this.colStats.getMax() : (this.binningDefinition.internalObject as SimpleBinningDefinition).overrideInputMax.value;
 
 			var range = this.c3Config.gauge.max - this.c3Config.gauge.min;
 			this.c3Config.color.threshold.values = [];
