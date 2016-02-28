@@ -283,7 +283,16 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
 		d3.select(this.element)
 			.selectAll("circle.c3-shape")
-			.style("stroke", "black")
+			.style("stroke",
+				(d: any, i:number, oi:number): string => {
+					let key = this.records[i].id;
+					let selected = this.isSelected(key);
+					let probed = this.isProbed(key);
+					if(probed && selected)
+						return "white";
+					else
+						return "black";
+				})
 			.style("opacity",
 				(d: any, i: number, oi: number): number => {
 					let key = this.records[i].id;
@@ -296,8 +305,10 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					let key = this.records[i].id;
 					let selected = this.isSelected(key);
 					let probed = this.isProbed(key);
-					if (probed || selected)
+					if (probed)
 						return 1.0;
+					if(selected)
+						return 0.5;
 					if (!selectionEmpty && !selected)
 						return 0;
 					return 0.0;
@@ -305,10 +316,37 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			.style("stroke-width",
 				(d: any, i: number, oi: number): number => {
 					let key = this.records[i].id;
+					let selected = this.isSelected(key);
 					let probed = this.isProbed(key);
+					if (probed && selected)
+						return 1.0;
 					return probed ? 2.0 : 1.0;
 				});
-		
+
+		//handle selected circles
+		d3.select(this.element)
+			.selectAll("circle.c3-selected-circle")
+			.attr("r", (d:any, i:number, oi:number): number => {
+				if (d.hasOwnProperty("index"))
+				{
+					return this.records[d.index].size+1;
+				}
+			})
+			.style("stroke", "black")
+			.style("stroke-opacity",
+				(d: any, i: number, oi: number): number => {
+					if (d.hasOwnProperty("index")) {
+						let key = this.records[d.index].id;
+						let selected = this.isSelected(key);
+						let probed = this.isProbed(key);
+						if (probed && selected)
+							return 1.0;
+						else
+							return 0.0;
+					}
+				})
+			.style("stroke-width", "1px");
+
 		return false;
 	}
 
