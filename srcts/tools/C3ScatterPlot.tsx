@@ -168,6 +168,11 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					expand: {
 						enabled: false
 					}
+				},
+				select:
+				{
+					//Todo: need to extend to take a function based on point size
+					r: 5
 				}
 			}
 		});
