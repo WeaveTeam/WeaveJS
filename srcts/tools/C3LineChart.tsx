@@ -103,6 +103,16 @@ export default class C3LineChart extends AbstractC3Tool
                     show: true
                 }
             },
+            point: {
+                focus: {
+                    expand: {
+                        enabled: false
+                    }
+                },
+                select: {
+                    r: 3.5
+                }
+            },
             axis: {
                 x: {
                     tick: {
@@ -262,18 +272,48 @@ export default class C3LineChart extends AbstractC3Tool
 		
 		// update style
         let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
-        d3.select(this.element).selectAll("circle")
-            .style("opacity",
-                (d: any, i: number, oi: number): number => {
-					let key = this.getQKey(d);
+        d3.select(this.element)
+            .selectAll("circle.c3-shape")
+            .style("stroke",
+                (d: any, i:number, oi:number): string => {
+                    let key = this.getQKey(d);
                     let selected = this.isSelected(key);
                     let probed = this.isProbed(key);
-					if (selected || probed)
-						return 1;
-					return selectionEmpty ? 1 : 0;
+                    if(probed && selected)
+                        return "white";
+                    else
+                        return "black";
                 })
-            .style("stroke", "black")
-            .style("stroke-opacity", 0.0);
+            .style("opacity",
+                (d: any, i: number, oi: number): number => {
+                    let key = this.getQKey(d);
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+                    return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
+                })
+            .style("stroke-opacity",
+                (d: any, i: number, oi: number): number => {
+                    let key = this.getQKey(d);
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+                    if (probed)
+                        return 1.0;
+                    if(selected)
+                        return 0.5;
+                    if (!selectionEmpty && !selected)
+                        return 0;
+                    return 0.0;
+                })
+            .style("stroke-width",
+                (d: any, i: number, oi: number): number => {
+                    let key = this.getQKey(d);
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+                    if (probed && selected)
+                        return 1.0;
+                    return probed ? 2.0 : 1.0;
+                });
+
         d3.select(this.element)
             .selectAll("path.c3-shape.c3-line")
             .style("opacity",
@@ -290,6 +330,26 @@ export default class C3LineChart extends AbstractC3Tool
                     let probed = this.isProbed(key);
                     return probed ? 3 : (selected ? 2 : 1);
                 });
+
+        //handle selected circles
+        d3.select(this.element)
+            .selectAll("circle.c3-selected-circle")
+            .attr("r", (d:any, i:number, oi:number): number => {
+                //we don't set a radius in the config, so this is the default c3 r value + 1.
+                return 3.5;
+            })
+            .style("stroke", "black")
+            .style("stroke-opacity",
+                (d: any, i: number, oi: number): number => {
+                    let key = this.getQKey(d);
+                    let selected = this.isSelected(key);
+                    let probed = this.isProbed(key);
+                    if (probed && selected)
+                        return 1.0;
+                    else
+                        return 0.0;
+                })
+            .style("stroke-width", "1px");
 		
 		return false;
     }
