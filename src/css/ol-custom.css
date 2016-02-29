@@ -8,5 +8,5 @@
 }
 
 .ol-control:hover {
-	background-color: none;
+	background-color: rgba(128,128,128,0.4);
 }
