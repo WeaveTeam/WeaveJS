@@ -483,13 +483,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.projectionSRS.triggerCallbacks();
 	}
 
-	getContextMenuItems():MenuItemProps[]
+	getMenuItems():MenuItemProps[]
 	{
 		for (let layer of this.layers.getObjects() as Array<AbstractLayer>)
 		{
 			if (layer instanceof AbstractFeatureLayer)
 			{
-				let menuItems = AbstractVisTool.getContextMenuItems(layer);
+				let menuItems = AbstractVisTool.getMenuItems(layer);
 				return menuItems;
 			}
 		}
