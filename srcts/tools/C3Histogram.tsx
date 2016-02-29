@@ -293,7 +293,15 @@ export default class C3Histogram extends AbstractC3Tool
         var probedBinIndices:number[] = _.map(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn') as number[];
 
         d3.select(this.element).selectAll("path.c3-shape")
-            .style("stroke", "black")
+            .style("stroke",
+                (d: any, i:number, oi:number): string => {
+                    let selected = _.intersection(selectedBinIndices,[i]).length;
+                    let probed = _.intersection(probedBinIndices,[i]).length;
+                    if(probed && selected)
+                        return "white";
+                    else
+                        return "black";
+                })
             .style("opacity",
                 (d: any, i: number, oi: number): number => {
                     let selected = _.intersection(selectedBinIndices,[i]).length;
@@ -304,17 +312,36 @@ export default class C3Histogram extends AbstractC3Tool
                 (d: any, i: number, oi: number): number => {
                     let selected = _.intersection(selectedBinIndices,[i]).length;
                     let probed = _.intersection(probedBinIndices,[i]).length;
-                    if (probed || selected)
+                    if (probed)
                         return 1.0;
-                    if (!selectionEmpty && !selected)
-                        return 0;
-                    return 0.0;
+                    if (selected)
+                        return 0.5;
+                    return 0.3;
                 })
             .style("stroke-width",
                 (d: any, i: number, oi: number): number => {
+                    let selected = _.intersection(selectedBinIndices,[i]).length;
                     let probed = _.intersection(probedBinIndices,[i]).length;
-                    return probed ? 2.0 : 1.0;
+                    if (probed && selected)
+                        return 2.5;
+                    return probed ? 1.7 : 1.0;
                 });
+
+        //handle selected paths
+        d3.select(this.element)
+            .selectAll("path._selection_surround").remove();
+        d3.select(this.element)
+            .selectAll("g.c3-shapes")
+            .selectAll("path._selected_").each( function(d: any, i:number, oi:number) {
+                console.log(d,this.parentNode);
+                d3.select(this.parentNode)
+                    .append("path")
+                    .classed("_selection_surround",true)
+                    .attr("d",this.getAttribute("d"))
+                    .style("stroke", "black")
+                    .style("stroke-width", 1.5)
+                ;
+        });
     }
 
     private dataChanged()
