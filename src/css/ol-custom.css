@@ -6,3 +6,7 @@
     border-style: solid;
     border-width: 2;
 }
+
+.ol-control:hover {
+	background-color: none;
+}
