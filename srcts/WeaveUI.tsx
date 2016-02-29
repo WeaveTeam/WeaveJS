@@ -25,7 +25,6 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as moment from "moment";
 
-var stub:any = React;
 weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 
@@ -37,8 +36,7 @@ function handleReactComponent(component:React.Component<any, any>):void
 	c.componentWillUnmount = function() {
 		if (superWillUnmount)
 			superWillUnmount.call(c);
-		if (!Weave.wasDisposed(c))
-			weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(c);
+		weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(c);
 	};
 }
 
