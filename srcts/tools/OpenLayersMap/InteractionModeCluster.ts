@@ -45,7 +45,8 @@ export default class InteractionModeCluster extends ol.control.Control
 			clusterDiv.css({ "display": isOpen ? "inline" : "none"});
 		}
 
-		activeDiv.find("button").click(toggleMenuOpen.bind(null, true));
+		div.mouseenter(toggleMenuOpen.bind(null, true))
+			.mouseleave(toggleMenuOpen.bind(null, false));
 		toggleMenuOpen(false);
 
 
