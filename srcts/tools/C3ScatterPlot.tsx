@@ -100,7 +100,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				xSort: false,
 				type: "scatter",
 				color: (color:string, d:any):string => {
-					var color:string;
 					if (d.hasOwnProperty("index"))
 					{
 						var record:Record = this.records[d.index];
