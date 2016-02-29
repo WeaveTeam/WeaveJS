@@ -11,7 +11,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import {MenuItemProps} from "../react-ui/Menu/MenuItem";
-import {IGetContextMenuItems} from "../ContextMenu";
+import {IGetMenuItems} from "../react-ui/Menu/Menu";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -54,7 +54,7 @@ export interface VisToolGroup
 Weave.registerClass("weavejs.tool.Margin", Margin);
 Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 
-export default class AbstractVisTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties, IGetContextMenuItems
+export default class AbstractVisTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
     constructor(props:IVisToolProps)
 	{
@@ -113,7 +113,8 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
     }
 
     private static localProbeKeySet: KeySet = new weavejs.data.key.KeySet();
-	static getContextMenuItems(target:VisToolGroup):MenuItemProps[]
+	
+	static getMenuItems(target:VisToolGroup):MenuItemProps[]
 	{
 		let menuItems:Array<any> = [];
 		let selectionKeySet = target.selectionFilter.target as KeySet;
@@ -166,9 +167,9 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		return menuItems;
 	}
 
-	getContextMenuItems():MenuItemProps[]
+	getMenuItems():MenuItemProps[]
 	{
-		return AbstractVisTool.getContextMenuItems(this);
+		return AbstractVisTool.getMenuItems(this);
 	}
 	
     get deprecatedStateMapping():Object

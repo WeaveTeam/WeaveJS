@@ -20,7 +20,7 @@ import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/ToolTip";
 import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
-import {REACT_COMPONENT} from "./ContextMenu";
+import {REACT_COMPONENT} from "./react-ui/Menu/Menu";
 
 declare type IToolTip = React.Component<IToolTipProps, IToolTipState>;
 
