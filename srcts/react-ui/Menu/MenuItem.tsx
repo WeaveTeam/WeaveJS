@@ -99,6 +99,7 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 			//menuItemStyle.backgroundColor = "#80CCFF";
 			
 		var labelStyle:React.CSSProperties = {
+			whiteSpace: "nowrap",
 			paddingLeft: this.props.leftIcon ? 5 : 0,
 			paddingRight: this.props.rightIcon ? 5 : 0,
 		}
@@ -110,13 +111,13 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 			<HBox style={menuItemStyle} onClick={this.click.bind(this)} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
 				<HBox>
 					<div>{this.props.leftIcon}</div>
-					<span style={labelStyle}>{this.props.label}</span>
+					<HBox style={labelStyle}>{this.props.label}</HBox>
 					<div>{this.props.rightIcon}</div>
 				</HBox>
 				<span style={secondaryLabelStyle}>{this.props.secondaryLabel}</span>
 				{
 					this.props.menu && this.state.hovered ? 
-					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} width="100%" menu={this.props.menu}/>
+					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} menu={this.props.menu}/>
 					: null
 				}
 			</HBox>

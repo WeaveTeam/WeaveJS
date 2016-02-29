@@ -9,7 +9,6 @@ export interface MenuProps extends React.Props<Menu>
 {
 	xPos: number;
 	yPos: number;
-	width?: string;
 	menu:MenuItemProps[]
 }
 
@@ -66,7 +65,6 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			userSelect: "none",
 			cursor: "pointer",
 			zIndex: 2147483647, // max z-index value
-			width: this.props.width
 		};
 	
 		return (
