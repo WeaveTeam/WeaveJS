@@ -483,17 +483,29 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.projectionSRS.triggerCallbacks();
 	}
 
+	hasNonEmptySelection(): boolean {
+		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>) {
+			if (layer.selectionKeySet && layer.selectionKeySet.keys.length) return true;
+		}
+		return false;
+	}
+
 	getMenuItems():MenuItemProps[]
 	{
-		for (let layer of this.layers.getObjects() as Array<AbstractLayer>)
-		{
-			if (layer instanceof AbstractFeatureLayer)
-			{
-				let menuItems = AbstractVisTool.getMenuItems(layer);
-				return menuItems;
+		let menuItems: Array<any> = [];
+
+		if (this.hasNonEmptySelection()) {
+			menuItems.push({
+				label: Weave.lang("Zoom to selected records"),
+				click: () => this.zoomToSelection()
+			});
+		}
+		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>) {
+			if (layer instanceof AbstractFeatureLayer) {
+				menuItems = menuItems.concat(AbstractVisTool.getMenuItems(layer));
 			}
 		}
-		return [];
+		return menuItems;
 	}
 
 	dispose():void
