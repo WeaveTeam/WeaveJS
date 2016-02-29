@@ -12,8 +12,54 @@ export interface WeaveMenuBarState {
 
 const WeaveMenuBarConfig = [
 	{
+		label: "Weave",
+		bold: true,
+		menu: [
+			{
+				label: "Preferences...",
+				click: () => {}
+			},
+			{
+				label: "Edit Session State",
+				click: () => {},
+				menu: [
+					{
+						label: "Nested",
+						click: () => { console.log("I'm a child") }
+					}
+				]
+			},
+			{
+			},
+			{
+				label: "Report a problem",
+				click: () => {}
+			},
+			{
+				label: "Visit iWeave.com",
+				click: () => {}
+			},
+			{
+				label: "Visit Weave Wiki",
+				click: () => {}
+			},
+			{
+			},
+			{
+				label: "Version: 2.0",
+				click: () => {}
+			}, 
+			{
+			},
+			{
+				label: "Restart",
+				click: () => {}
+			}
+		]
+	},
+	{
 		label: "File",
-		menuItems: [
+		menu: [
 			{
 				label: "Open a file...",
 				click: () => { console.log("clicked on open a file") }
@@ -30,7 +76,7 @@ const WeaveMenuBarConfig = [
 	},
 	{
 		label: "Data",
-		menuItems: [
+		menu: [
 			{
 				label: "Manage or browse data",
 				click: () => { console.log("Manage or browse data") }
@@ -42,7 +88,7 @@ const WeaveMenuBarConfig = [
 				click: () => { console.log("Add CSV DataSource") }
 			}
 		]
-	}
+	},
 ]
 
 export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
@@ -55,10 +101,10 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	render():JSX.Element
 	{
 		return (
-			<MenuBar style={{height: 50, width: "100%"}} >
+			<MenuBar className="weave-menubar" style={{width: "100%"}} >
 				{
 					WeaveMenuBarConfig.map((menuBarItemConfig, index) => {
-						return <MenuBarItem key={index} {...menuBarItemConfig}/>
+						return <MenuBarItem className="weave-menubar-item" key={index} {...menuBarItemConfig}/>
 					})
 				}
 			</MenuBar>

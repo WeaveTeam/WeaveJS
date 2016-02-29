@@ -12,7 +12,7 @@ export interface MenuItemProps extends React.Props<MenuItem>
 	rightIcon?:React.ReactElement<any>;
 	secondaryLabel?:string;
 	click?:Function;
-	childItems?:React.ReactElement<MenuItemProps>|React.ReactElement<DividerProps>
+	menu?:MenuItemProps[]
 }
 
 export interface MenuItemState
@@ -46,14 +46,14 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
 	}
 	
-	onMouseOver()
+	onMouseEnter()
 	{
 		this.setState({
 			hovered:true
 		});
 	}
 
-	onMouseOut(event:React.MouseEvent)
+	onMouseLeave(event:React.MouseEvent)
 	{
 		var elt = event.relatedTarget;
 
@@ -74,7 +74,7 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 	
 	click()
 	{
-		if(!this.props.childItems && this.props.click)
+		if(!this.props.menu && this.props.click)
 			this.props.click()
 	}
 	
@@ -107,7 +107,7 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 		}
 
 		return (
-			<HBox style={menuItemStyle} onClick={this.click.bind(this)} onMouseOver={this.onMouseOver.bind(this)} onMouseOut={this.onMouseOut.bind(this)}>
+			<HBox style={menuItemStyle} onClick={this.click.bind(this)} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
 				<HBox>
 					<div>{this.props.leftIcon}</div>
 					<span style={labelStyle}>{this.props.label}</span>
@@ -115,8 +115,8 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 				</HBox>
 				<span style={secondaryLabelStyle}>{this.props.secondaryLabel}</span>
 				{
-					this.props.childItems && this.state.hovered ? 
-					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} width="100%">{this.props.childItems}</Menu> 
+					this.props.menu && this.state.hovered ? 
+					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} width="100%" menu={this.props.menu}/>
 					: null
 				}
 			</HBox>

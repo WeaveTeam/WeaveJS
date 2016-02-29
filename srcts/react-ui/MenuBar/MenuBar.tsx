@@ -5,7 +5,7 @@ import HBox from "../HBox";
 import MenuBarItem from "./MenuBarItem";
 import {MenuBarItemProps} from "./MenuBarItem";
 import {MenuItemProps} from "../Menu/MenuItem";
-import ContextMenu from "../../ContextMenu";
+import Menu from "../Menu/Menu";
 
 
 export interface MenuBarState
@@ -13,10 +13,10 @@ export interface MenuBarState
 	xPos?:number;
 	yPos?:number;
 	showContextMenu?:boolean;
-	menuItems?:MenuItemProps[]
+	menu?:MenuItemProps[]
 }
 
-export default class MenuBar extends React.Component<any, MenuBarState>
+export default class MenuBar extends React.Component<React.HTMLProps<MenuBar>, MenuBarState>
 {
 	element:Element;
 	constructor(props:any)
@@ -46,13 +46,13 @@ export default class MenuBar extends React.Component<any, MenuBarState>
 	hideContextMenu(event:MouseEvent)
 	{
 		var elt = event.target;
-		while( elt != null)
-		{
-			if(elt == this.element) {
-				return;
-			}
-			elt = (elt as HTMLElement).parentNode;
-		}
+		// while( elt != null)
+		// {
+		// 	if(elt == this.element) {
+		// 		return;
+		// 	}
+		// 	elt = (elt as HTMLElement).parentNode;
+		// }
 		// this.setState({
 		// 	showContextMenu:false
 		// })
@@ -63,9 +63,9 @@ export default class MenuBar extends React.Component<any, MenuBarState>
 		var menuBarItemElt = ReactDOM.findDOMNode(this.refs[index]) as HTMLElement;
 		this.setState({
 			showContextMenu:true,
-			xPos: menuBarItemElt.clientLeft,
-			yPos: menuBarItemElt.offsetTop,
-			menuItems: (this.refs[index] as MenuBarItem).props.menuItems
+			xPos: menuBarItemElt.offsetLeft,
+			yPos: menuBarItemElt.offsetTop + menuBarItemElt.clientHeight,
+			menu: (this.refs[index] as MenuBarItem).props.menu
 		});
 	}
 
@@ -76,8 +76,8 @@ export default class MenuBar extends React.Component<any, MenuBarState>
 				{
 					(this.props.children as React.ReactElement<MenuBarItemProps>[]).map((child, index) => {
 						var props = _.cloneDeep(child.props);
-						props.key = child.key ? child.key : index;
-						props.ref = child.ref || index as any;
+						props.key = index;
+						props.ref = index as any;
 						props.onClick = this.onClick.bind(this, index)
 						return React.cloneElement(
 							child,
@@ -87,7 +87,7 @@ export default class MenuBar extends React.Component<any, MenuBarState>
 				}
 				{
 					this.state.showContextMenu ?
-					<ContextMenu config={this.state.menuItems} xPos={this.state.xPos} yPos={this.state.yPos}/>
+					<Menu menu={this.state.menu} xPos={this.state.xPos} yPos={this.state.yPos}/>
 					:
 					null
 				}

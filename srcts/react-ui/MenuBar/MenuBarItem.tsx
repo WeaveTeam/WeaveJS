@@ -1,13 +1,12 @@
 import * as React from "react";
 import {MenuItemProps} from "../Menu/MenuItem";
 
-export interface MenuBarItemProps extends React.Props<MenuBarItem>
+export interface MenuBarItemProps extends React.HTMLProps<MenuBarItem>
 {
-	label: string|JSX.Element;
-	menuItems: MenuItemProps[];
-	key?:any;
-	ref?:any;
-	onClick?:(event:MouseEvent)=>void;
+	label: string;
+	menu: MenuItemProps[];
+	bold?: boolean;
+	onClick?:React.EventHandler<React.MouseEvent>;
 }
 
 
@@ -26,7 +25,7 @@ export default class MenuBarItem extends React.Component<MenuBarItemProps, MenuB
 	render():JSX.Element
 	{
 		return (
-			<div onClick={this.props.onClick.bind(this)} {...this.props as any}>
+			<div style={{fontWeight: this.props.bold ? "bold" : "normal"}} onClick={this.props.onClick.bind(this)} {...this.props as any}>
 				{
 					this.props.label
 				}

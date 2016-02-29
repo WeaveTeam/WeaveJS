@@ -1,8 +1,8 @@
 import * as React from "react";
 import * as _ from "lodash";
 import WeaveMenuBar from "./WeaveMenuBar";
-import ContextMenu from "./ContextMenu";
-import {REACT_COMPONENT} from "./ContextMenu";
+import Menu from "./react-ui/Menu/Menu";
+import {REACT_COMPONENT} from "./react-ui/Menu/Menu";
 import LayoutManager from "./WeaveLayoutManager";
 import {MenuItemProps} from "./react-ui/Menu/MenuItem";
 
@@ -37,7 +37,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	showContextMenu(event:React.MouseEvent)
 	{
 		// if context menu already showing do nothing
-		var contextMenuItems = ContextMenu.getMenuItems(event.target as HTMLElement);
+		var contextMenuItems = Menu.getMenuItems(event.target as HTMLElement);
 		this.setState({
 			showContextMenu: true,
 			contextMenuItems,
@@ -74,7 +74,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{
 					this.state.showContextMenu ? 
 					<div onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
-						{<ContextMenu xPos={this.state.contextMenuXPos} yPos={this.state.contextMenuYPos} config={this.state.contextMenuItems}/>}
+						{<Menu xPos={this.state.contextMenuXPos} yPos={this.state.contextMenuYPos} menu={this.state.contextMenuItems}/>}
 					</div>
 					: null
 				}
