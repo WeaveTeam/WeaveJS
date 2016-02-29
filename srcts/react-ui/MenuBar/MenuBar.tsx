@@ -62,13 +62,22 @@ export default class MenuBar extends React.Component<React.HTMLProps<MenuBar>, M
 	
 	onClick(index:number, event:React.MouseEvent)
 	{
-		var menuBarItemElt = ReactDOM.findDOMNode(this.refs[index]) as HTMLElement;
-		this.setState({
-			showMenu:true,
-			xPos: menuBarItemElt.offsetLeft,
-			yPos: menuBarItemElt.offsetTop + menuBarItemElt.clientHeight,
-			menu: (this.refs[index] as MenuBarItem).props.menu
-		});
+		if(this.state.showMenu) 
+		{
+			this.setState({
+				showMenu: false
+			});
+		}
+		else
+		{
+			var menuBarItemElt = ReactDOM.findDOMNode(this.refs[index]) as HTMLElement;
+			this.setState({
+				showMenu:true,
+				xPos: menuBarItemElt.offsetLeft,
+				yPos: menuBarItemElt.offsetTop + menuBarItemElt.clientHeight,
+				menu: (this.refs[index] as MenuBarItem).props.menu
+			});
+		}
 	}
 	
 	onMouseEnter(index:number, event:React.MouseEvent)
