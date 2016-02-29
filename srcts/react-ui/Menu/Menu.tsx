@@ -64,7 +64,8 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			left: this.props.xPos,
 			userSelect: "none",
 			cursor: "pointer",
-			zIndex: 2147483647, // max z-index value
+			overflow: "hidden",
+			zIndex: 2147483647 // max z-index value
 		};
 	
 		return (

@@ -95,17 +95,17 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 			justifyContent: "space-between"
 		};
 		
-		if(this.state.mouseIsDown)
+			// if(this.state.mouseIsDown)
 			//menuItemStyle.backgroundColor = "#80CCFF";
 			
 		var labelStyle:React.CSSProperties = {
 			whiteSpace: "nowrap",
 			paddingLeft: this.props.leftIcon ? 5 : 0,
 			paddingRight: this.props.rightIcon ? 5 : 0,
-		}
+		};
 
 		var secondaryLabelStyle = {
-		}
+		};
 
 		return (
 			<HBox style={menuItemStyle} onClick={this.click.bind(this)} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
