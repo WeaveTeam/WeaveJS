@@ -36,6 +36,7 @@ import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 import {MenuItemProps} from "../react-ui/Menu/MenuItem";
 import AbstractVisTool from "./AbstractVisTool";
 
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ZoomBounds = weavejs.geom.ZoomBounds;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import DynamicState = weavejs.api.core.DynamicState;
@@ -502,8 +503,47 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	render():JSX.Element 
 	{
-        return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%"}}/>;
-    }
+		return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%"}}/>;
+	}
+
+	zoomToSelection(inputKeys:Array<IQualifiedKey> = null, zoomMarginPercent:number = 0.2):void
+	{
+		let setOfKeys = new Set<IQualifiedKey>();
+		let keyBounds = new Bounds2D();
+		let tmpBounds = new Bounds2D();
+		let useProbe = false;
+		let extent: ol.Extent = new Array<number>(4);
+
+		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>)
+		{
+			let keys = inputKeys;
+			if (!keys)
+				keys = layer.selectionKeySet ? layer.selectionKeySet.keys : [];
+
+			for (let key of keys)
+			{
+				let feature = layer.source.getFeatureById(key);
+				if (!feature) continue;
+				let geometry = feature.getGeometry();
+				if (!geometry) continue;
+				geometry.getExtent(extent);
+				tmpBounds.setBounds(extent[0], extent[1], extent[2], extent[3]);
+				keyBounds.includeBounds(tmpBounds);
+			}
+		}
+
+		let scale = 1 / (1 - zoomMarginPercent);
+
+		keyBounds.setWidth(keyBounds.getWidth() * scale);
+		keyBounds.setHeight(keyBounds.getHeight() * scale);
+
+		if (!keyBounds.isEmpty()) {
+			this.map.getView().fit([keyBounds.getXMin(), keyBounds.getYMin(), keyBounds.getXMax(), keyBounds.getYMax()], this.map.getSize());
+		}
+		else {
+			this.map.getView().setCenter([keyBounds.getXCenter(), keyBounds.getYCenter()]);
+		}
+	}
 }
 
 Weave.registerClass("weavejs.tool.Map", OpenLayersMapTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
