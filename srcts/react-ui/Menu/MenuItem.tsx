@@ -7,7 +7,7 @@ import {DividerProps} from "./Divider";
 
 export interface MenuItemProps extends React.Props<MenuItem>
 {
-	label?:string;
+	label?:string|JSX.Element;
 	leftIcon?:React.ReactElement<any>;
 	rightIcon?:React.ReactElement<any>;
 	secondaryLabel?:string;
