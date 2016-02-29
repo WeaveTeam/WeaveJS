@@ -37,7 +37,8 @@ function handleReactComponent(component:React.Component<any, any>):void
 	c.componentWillUnmount = function() {
 		if (superWillUnmount)
 			superWillUnmount.call(c);
-		weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(c);
+		if (!Weave.wasDisposed(c))
+			weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(c);
 	};
 }
 
