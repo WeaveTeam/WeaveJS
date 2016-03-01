@@ -46,6 +46,9 @@
     },
     "bootstrap-slider/bootstrap-slider.d.ts": {
       "commit": "86dbea8fc37d9473fee465da4f0a21bea4f8cbd9"
+    },
+    "classnames/classnames.d.ts": {
+      "commit": "55c750ace821f85e6643bbdb249dbd0b15a3df78"
     }
   }
 }

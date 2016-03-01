@@ -3,15 +3,16 @@ import MenuBar from "./react-ui/MenuBar/MenuBar";
 import MenuBarItem from "./react-ui/MenuBar/MenuBarItem";
 
 export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar> {
-	
+	weave:Weave
 }
 
 export interface WeaveMenuBarState {
 	
 }
 
-const WeaveMenuBarConfig = [
-	{
+function weaveMenu(weave:Weave)
+{
+    return {
 		label: "Weave",
 		bold: true,
 		menu: [
@@ -56,25 +57,59 @@ const WeaveMenuBarConfig = [
 				click: () => {}
 			}
 		]
-	},
+	};
+}
+
+function fileMenu(weave:Weave)
+{
+
+    function openFile(e:any) {
+        // const selectedfile:File = e.target.files[0];
+        // new Promise(function (resolve:any, reject:any) {
+        //         let reader:FileReader = new FileReader();
+        //         reader.onload = function (event:Event) {
+        //             resolve([event, selectedfile]);
+        //         };
+        //         reader.readAsArrayBuffer(selectedfile);
+        //     })
+        //     .then(function (zippedResults:any) {
+        //         var e:any = zippedResults[0];
+        //         var result:any = e.target.result;
+        //         weavejs.core.WeaveArchive.loadFileContent(weave,result);
+        //     });
+    }
+    
+    function saveFile()
 	{
+        // var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
+        // var uint8Array:any = archive.serialize();
+        // var arrayBuffer:any  = uint8Array.buffer;
+        // window.saveAs(new Blob([arrayBuffer]), "test.weave");
+  	}
+
+    return {
 		label: "File",
+		onClick: "",
 		menu: [
 			{
-				label: "Open a file...",
-				click: () => { console.log("clicked on open a file") }
+				label: <input type="file" onChange={openFile}/>,
+                click: () => {}
 			},
 			{
-				label: "Save as...",
-				click: () => { console.log("clicked onSave as..") }
+				label: Weave.lang("Save as..."),
+				click: () => {}
 			},
 			{
 				label: "Export CSV",
 				click: () => { console.log("clicked on Export CSV") }
 			}
 		]
-	},
-	{
+	};
+}
+
+function dataMenu(weave:Weave) 
+{
+	return {
 		label: "Data",
 		menu: [
 			{
@@ -88,8 +123,8 @@ const WeaveMenuBarConfig = [
 				click: () => { console.log("Add CSV DataSource") }
 			}
 		]
-	},
-]
+	};
+}
 
 export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
 {
@@ -97,18 +132,22 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	{
 		super(props);
 	}
+    
+    
 	
 	render():JSX.Element
 	{
+        var weave = this.props.weave;
 		return (
-			<MenuBar className="weave-menubar" style={{width: "100%"}} >
+			<MenuBar style={{width: "100%"}}>
 				{
-					WeaveMenuBarConfig.map((menuBarItemConfig, index) => {
-						return <MenuBarItem className="weave-menubar-item" key={index} {...menuBarItemConfig}/>
+					[weaveMenu(weave),
+					fileMenu(weave),
+					dataMenu(weave)].map((config, index) => {
+						return <MenuBarItem key={index} {...config}/>
 					})
 				}
 			</MenuBar>
 		)
 	}
-	
 }

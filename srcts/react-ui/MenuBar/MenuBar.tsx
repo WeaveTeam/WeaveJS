@@ -7,6 +7,10 @@ import {MenuBarItemProps} from "./MenuBarItem";
 import {MenuItemProps} from "../Menu/MenuItem";
 import Menu from "../Menu/Menu";
 
+export interface MenuBarProps extends React.HTMLProps<MenuBar>
+{
+	config?:MenuBarItemProps[]
+}
 
 export interface MenuBarState
 {
@@ -16,7 +20,7 @@ export interface MenuBarState
 	menu?:MenuItemProps[]
 }
 
-export default class MenuBar extends React.Component<React.HTMLProps<MenuBar>, MenuBarState>
+export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 {
 	element:Element;
 	constructor(props:any)
@@ -96,21 +100,19 @@ export default class MenuBar extends React.Component<React.HTMLProps<MenuBar>, M
 	render():JSX.Element
 	{
 		return (
-			<HBox {...this.props}>
+			<HBox className="weave-menubar" {...this.props}>
 				{
-					/*<MenuBarItem>*/
-					(this.props.children as React.ReactElement<MenuBarItemProps>[]).map((child, index) => {
-						var props = _.cloneDeep(child.props);
-						props.key = index;
-						props.ref = index as any;
-						props.onClick = this.onClick.bind(this, index);
-						props.onMouseEnter = this.onMouseEnter.bind(this, index);
-						return React.cloneElement(
-							child,
-							props
-						);
-					})
-					/*</MenuBarItem>*/
+					this.props.config ?
+					
+						this.props.config.map((cf, index) => {
+							return <MenuBarItem ref={index as any} key={index} {...cf} onClick={this.onClick.bind(this, index)} onMouseEnter={this.onMouseEnter.bind(this, index)}/>
+						})
+					
+					:
+						(this.props.children as React.ReactElement<MenuBarItemProps>[]).map((child, index) => {
+							// using React.cloneElement breaks jsx label in menu
+							return <MenuBarItem ref={index as any} key={index} {...child.props} onClick={this.onClick.bind(this, index)} onMouseEnter={this.onMouseEnter.bind(this, index)}/>
+						})
 				}
 				{
 					this.state.showMenu ?

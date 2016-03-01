@@ -1,7 +1,7 @@
 import * as ReactDOM from "react-dom";
 import * as React from "react";
+import classNames from "../../modules/classnames";
 import HBox from "../HBox";
-import MiscUtils from "../../utils/MiscUtils";
 import Menu from "./Menu";
 import {DividerProps} from "./Divider";
 
@@ -18,8 +18,6 @@ export interface MenuItemProps extends React.Props<MenuItem>
 export interface MenuItemState
 {
 	hovered?:boolean;
-	mouseIsDown?:boolean;
-	extendedMenuPos?: {xPos: number, yPos: number}
 }
 
 export default class MenuItem extends React.Component<MenuItemProps, MenuItemState>
@@ -34,10 +32,6 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 
 		this.state = {
 			hovered: false,
-			extendedMenuPos: {
-				xPos: 0,
-				yPos: 0
-			}
 		}
 	}
 	
@@ -78,43 +72,23 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 			this.props.click()
 	}
 	
-	onMouseDown()
-	{
-		this.setState({
-			mouseIsDown: true
-		});		
-	}
-	
 	render():JSX.Element
 	{
 		
-		var menuItemStyle:React.CSSProperties = {
-			paddingLeft: 20,
-			paddingRight: 20,
-			backgroundColor: this.state.hovered ? MiscUtils.rgba(153, 214, 255, 0.4) : MiscUtils.rgba(255, 255, 255, 1),
-			justifyContent: "space-between"
-		};
-		
-			// if(this.state.mouseIsDown)
-			//menuItemStyle.backgroundColor = "#80CCFF";
-			
-		var labelStyle:React.CSSProperties = {
-			whiteSpace: "nowrap",
-			paddingLeft: this.props.leftIcon ? 5 : 0,
-			paddingRight: this.props.rightIcon ? 5 : 0,
-		};
-
-		var secondaryLabelStyle = {
-		};
+		var labelClass = classNames({
+			'weave-menuitem-label': true,
+			'weave-menuitem-label-padding-left': !!this.props.leftIcon,
+			'weave-menuitem-label-padding-right': !!this.props.rightIcon
+		})
 
 		return (
-			<HBox style={menuItemStyle} onClick={this.click.bind(this)} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
+			<HBox className="weave-menuitem" onClick={this.click.bind(this)} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
 				<HBox>
 					<div>{this.props.leftIcon}</div>
-					<HBox style={labelStyle}>{this.props.label}</HBox>
+					<HBox className={labelClass}>{this.props.label}</HBox>
 					<div>{this.props.rightIcon}</div>
 				</HBox>
-				<span style={secondaryLabelStyle}>{this.props.secondaryLabel}</span>
+				<span>{this.props.secondaryLabel}</span>
 				{
 					this.props.menu && this.state.hovered ? 
 					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} menu={this.props.menu}/>
