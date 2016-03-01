@@ -1,5 +1,6 @@
 import * as React from "react";
 import {MenuItemProps} from "../Menu/MenuItem";
+import classNames from "../../modules/classnames";
 
 export interface MenuBarItemProps extends React.HTMLProps<MenuBarItem>
 {
@@ -19,8 +20,13 @@ export default class MenuBarItem extends React.Component<MenuBarItemProps, any>
 	
 	render():JSX.Element
 	{
+		var menuBarClass = classNames({
+			"weave-menubar-item": true,
+			"weave-menubar-item-bold": !!this.props.bold
+		});
+
 		return (
-			<div className="weave-menubar-item" style={{fontWeight: this.props.bold ? "bold" : "normal"}} onClick={this.props.onClick.bind(this)} {...this.props as any}>
+			<div className={menuBarClass} onClick={this.props.onClick.bind(this)} {...this.props as any}>
 				{
 					this.props.label
 				}

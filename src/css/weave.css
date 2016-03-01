@@ -99,7 +99,6 @@ ul.dropdown-menu {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	cursor: pointer;
-	overflow: hidden;
 	z-index: 2147483647; /* max z-index value */
 }
 
@@ -124,6 +123,10 @@ ul.dropdown-menu {
 	padding-bottom: 2;
 	padding-left: 10;
 	padding-right: 10;
+}
+
+.weave-menubar-item-bold {
+	font-weight: bold;
 }
 
 .weave-menubar-item:hover {

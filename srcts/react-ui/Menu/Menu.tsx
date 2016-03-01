@@ -4,6 +4,7 @@ import VBox from "../VBox";
 import MenuItem from "./MenuItem";
 import {MenuItemProps} from "./MenuItem";
 import Divider from "./Divider";
+import MiscUtils from "../../utils/MiscUtils";
 
 export interface MenuProps extends React.HTMLProps<Menu>
 {
@@ -52,14 +53,24 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 
 	render():JSX.Element 
 	{
+		var menuStyle = this.props.style;
+        var otherProps:any = {};
+
+        for (var key in this.props)
+        {
+            if (key !== "style")
+            {
+                otherProps[key] = (this.props as any)[key];
+            }
+        }
 		
-		var menuStyle:React.CSSProperties = {
+		var menuStyle:React.CSSProperties = MiscUtils.merge({
 			top: this.props.yPos,
 			left: this.props.xPos,
-		};
+		}, menuStyle);
 	
 		return (
-			<VBox className="weave-menu" style={menuStyle}>
+			<VBox className="weave-menu" style={MiscUtils.merge(menuStyle, this.props.style)} {...otherProps}>
 				{
 					this.props.menu ? this.props.menu.map((menuItem, index) => {
 							if(_.isEqual(menuItem, {}))
