@@ -5,6 +5,7 @@ import Menu from "./react-ui/Menu/Menu";
 import {REACT_COMPONENT} from "./react-ui/Menu/Menu";
 import LayoutManager from "./WeaveLayoutManager";
 import {MenuItemProps} from "./react-ui/Menu/MenuItem";
+import VBox from "./react-ui/VBox";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 
@@ -68,9 +69,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	render():JSX.Element
 	{
 		return (
-			<div style={{width: "100%", height: "100%"}} onClick={this.hideContextMenu.bind(this)} onContextMenu={this.showContextMenu.bind(this)}>
+			<VBox style={{width: "100%", height: "100%"}} onClick={this.hideContextMenu.bind(this)} onContextMenu={this.showContextMenu.bind(this)}>
 				<WeaveMenuBar/>
-				<LayoutManager layout={this.props.layout}/>
+				<LayoutManager layout={this.props.layout} style={{flex: 1}}/>
 				{
 					this.state.showContextMenu ? 
 					<div onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
@@ -78,7 +79,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					</div>
 					: null
 				}
-			</div>
+			</VBox>
 		);
 	}
 	
