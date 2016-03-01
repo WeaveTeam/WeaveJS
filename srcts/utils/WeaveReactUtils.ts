@@ -1,57 +1,101 @@
 import * as React from "react";
 import * as lodash from "lodash";
+import update from "react-addons-update";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
+import ILinkableObject = weavejs.api.core.ILinkableObject;
+import IDisposableObject = weavejs.api.core.IDisposableObject;
 
-export function linkReactState(linkableVariable: LinkableVariable, reactObject: React.Component<any, any>, statePath: Array<string>, delay?: number) {
-	delay = delay !== undefined ? delay : 500;
+let WEAVEUPDATECONFIG = "weaveUpdateConfig";
 
-	let updateState = function(nextState: any) {
-		if (statePath && statePath.length) {
-			let leafKey: string = statePath[statePath.length - 1];
-			let obj: any = nextState;
-			for (let idx = 0; idx < statePath.length - 1; idx++) {
-				obj = obj[statePath[idx]];
-			}
-			linkableVariable.state = obj[leafKey];
+export class WeaveReactSynchronizer
+{	
+	private statePath: Array<string>;
+	private linkableVariable: LinkableVariable;
+	private context: ILinkableObject;
+	private reactObject: React.Component<any, any>;
+
+	constructor(context:ILinkableObject, linkableVariable: LinkableVariable, reactObject: React.Component<any, any>, statePath: Array<string>, delay?: number)
+	{
+		delay = delay !== undefined ? delay : 500;
+
+		let reactObjectAny = reactObject as any;
+
+		if (!reactObjectAny[WEAVEUPDATECONFIG])
+		{
+			reactObjectAny.oldShouldComponentUpdate = (reactObject as any).shouldComponentUpdate;
+			reactObjectAny[WEAVEUPDATECONFIG] = {};
+			reactObjectAny.shouldComponentUpdate =
+				function(nextProps: any, nextState: any) {
+					let pathStack = new Array<Array<string>>();
+					pathStack.push([]);
+
+					let config:any = reactObjectAny[WEAVEUPDATECONFIG];
+
+					while (pathStack.length)
+					{
+						let path = pathStack.pop();
+						let item = lodash.get(config, path) || config;
+
+						if (item instanceof Function)
+						{
+							item(nextState);
+						}
+						else if (lodash.isPlainObject(item))
+						{
+							for (let pathElement of Object.keys(item))
+							{
+								pathStack.push(path.concat([pathElement]));
+							}
+						}
+					}
+					if (this.oldShouldComponentUpdate)
+						return this.oldShouldComponentUpdate(nextProps, nextState);
+					return true;
+				};
 		}
-		else {
-			linkableVariable.state = nextState;
+
+		this.debouncedReactToWeave = lodash.debounce(this.reactToWeave, delay, { leading: false });
+
+		if (statePath == null)
+		{
+			reactObjectAny[WEAVEUPDATECONFIG] = this.debouncedReactToWeave;
 		}
-	};
-
-	let updateStateDebounced = lodash.debounce(updateState, delay, { leading: false });
-
-	let oldShouldComponentUpdate = (reactObject as any).shouldComponentUpdate;
-	(reactObject as any).shouldComponentUpdate =
-		function(nextProps: any, nextState: any) {
-			updateStateDebounced(nextState);
-
-			if (oldShouldComponentUpdate) {
-				return oldShouldComponentUpdate.call(this, nextProps, nextState);
-			}
-			else {
-				return true;
-			}
-		};
-
-	linkableVariable.addGroupedCallback(null,
-		function() {
-			if (statePath && statePath.length) {
-				let obj: any = {};
-				let leafKey: string = statePath[statePath.length - 1];
-				for (let idx = 0; idx < statePath.length - 1; idx++) {
-					obj[statePath[idx]] = {};
-					obj = obj[statePath[idx]];
-				}
-				obj[leafKey] = linkableVariable.state;
-				reactObject.setState(obj);
-			}
-			else {
-				reactObject.setState(linkableVariable.state);
-			}
+		else
+		{
+			lodash.set(reactObjectAny[WEAVEUPDATECONFIG], statePath, this.debouncedReactToWeave);
 		}
-		, true);
 
-	return;
+		this.linkableVariable = linkableVariable;
+		this.statePath = statePath;
+		this.context = context;
+		this.reactObject = reactObject;
+		this.linkableVariable.addGroupedCallback(this, this.weaveToReact);
+	}
+
+	debouncedReactToWeave: Function;
+
+	reactToWeave=(nextState:any):void=>
+	{
+		this.linkableVariable.state = lodash.get(nextState, this.statePath);
+	}
+
+	weaveToReact=():void=>
+	{
+		var mergeObj = {};
+		
+		lodash.set(mergeObj, this.statePath, this.linkableVariable.state);
+
+		var newObj = update(this.reactObject.state, { $merge: mergeObj });
+
+		this.reactObject.setState(newObj);
+	}
+
+	dispose():void
+	{
+		if (lodash.get((this.reactObject as any)[WEAVEUPDATECONFIG] , this.statePath) === this.debouncedReactToWeave)
+			lodash.set((this.reactObject as any)[WEAVEUPDATECONFIG], this.statePath, undefined);
+
+		this.linkableVariable.removeCallback(this.context, this.weaveToReact);
+	}
 }
