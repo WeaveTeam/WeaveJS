@@ -2,7 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import $ from "jquery";
 /* eslint-disable */
-import WeaveApp from "../lib/WeaveApp.js";
+import WeaveApp from "../lib/WeaveApp";
 import {MiscUtils} from "../lib/WeaveUI.js";
 /* eslint-enable */
 

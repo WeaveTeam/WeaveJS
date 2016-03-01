@@ -89,6 +89,7 @@ function fileMenu(weave:Weave)
 
     return {
 		label: "File",
+		onClick: "",
 		menu: [
 			{
 				label: <input type="file" onChange={openFile}/>,
@@ -138,13 +139,15 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	{
         var weave = this.props.weave;
 		return (
-			<MenuBar className="weave-menubar" style={{width: "100%"}} config={[
-				weaveMenu(weave),
-				fileMenu(weave),
-				dataMenu(weave)
-			]}>
+			<MenuBar style={{width: "100%"}}>
+				{
+					[weaveMenu(weave),
+					fileMenu(weave),
+					dataMenu(weave)].map((config, index) => {
+						return <MenuBarItem key={index} {...config}/>
+					})
+				}
 			</MenuBar>
 		)
 	}
-	
 }

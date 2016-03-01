@@ -68,7 +68,7 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/index.min.js': 'src/index.js'}, {'dist/test.min.js': 'src/test.js'}]
+                files: [{'dist/index.min.js': 'src/index.js'}/*, {'dist/test.min.js': 'src/test.js'}*/]
             },
             // generates a non minified output without the libs but with source maps
             dev: {
@@ -79,7 +79,7 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/index.js': 'src/index.js'}, {'dist/test.js': 'src/test.js'}]
+                files: [{'dist/index.js': 'src/index.js'}/*, {'dist/test.js': 'src/test.js'}*/]
             },
         },
         copy: {

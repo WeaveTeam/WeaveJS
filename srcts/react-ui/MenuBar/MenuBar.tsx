@@ -9,7 +9,7 @@ import Menu from "../Menu/Menu";
 
 export interface MenuBarProps extends React.HTMLProps<MenuBar>
 {
-	config:MenuBarItemProps[]
+	config?:MenuBarItemProps[]
 }
 
 export interface MenuBarState
@@ -100,7 +100,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	render():JSX.Element
 	{
 		return (
-			<HBox {...this.props}>
+			<HBox className="weave-menubar" {...this.props}>
 				{
 					this.props.config ?
 					
@@ -110,15 +110,8 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 					
 					:
 						(this.props.children as React.ReactElement<MenuBarItemProps>[]).map((child, index) => {
-							var props = _.cloneDeep(child.props);
-							props.key = index;
-							props.ref = index as any;
-							props.onClick = this.onClick.bind(this, index);
-							props.onMouseEnter = this.onMouseEnter.bind(this, index);
-							return React.cloneElement(
-								child,
-								props
-							);
+							// using React.cloneElement breaks jsx label in menu
+							return <MenuBarItem ref={index as any} key={index} {...child.props} onClick={this.onClick.bind(this, index)} onMouseEnter={this.onMouseEnter.bind(this, index)}/>
 						})
 				}
 				{

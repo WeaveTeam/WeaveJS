@@ -71,7 +71,7 @@ ul.dropdown-menu {
 }
 
 .weave-tool {
-    font-family: 'Roboto', sans-serif;
+    font-family: Roboto, sans-serif;
     font-size: 12px;
     font-weight: normal;
     font-style: normal;
@@ -79,7 +79,7 @@ ul.dropdown-menu {
 }
 
 .weave-panel {
-    font-family: 'Roboto', sans-serif;
+    font-family: Roboto, sans-serif;
     font-size: 16px;
     font-weight: bold;
     font-style: normal;
@@ -92,14 +92,14 @@ ul.dropdown-menu {
 	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
 	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
 	border-radius: 2;
-	background-color: "#FFFFFF";
+	background-color: #FFFFFF;
 	padding-top: 5;
 	padding-bottom: 5;
 	user-select: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
-	cursor: "pointer";
-	overflow: "hidden";
+	cursor: pointer;
+	overflow: hidden;
 	z-index: 2147483647; /* max z-index value */
 }
 
@@ -124,6 +124,40 @@ ul.dropdown-menu {
 	padding-bottom: 2;
 	padding-left: 10;
 	padding-right: 10;
+}
+
+.weave-menubar-item:hover {
+	background-color: rgba(255, 255, 255, 1);
+}
+
+.weave-menubar-item:active {
+	background-color: #80CCFF;
+}
+
+.weave-menuitem {
+	padding-left: 20;
+	padding-right: 20;
+	background-color: rgba(255, 255, 255, 1);
+	justify-content: space-between
+}
+
+.weave-menuitem:hover {
+	background-color: rgba(153, 214, 255, 0.4)
+}
+
+.weave-menuitem:active {
+	background-color: #80CCFF
+}
+
+.weave-menuitem-label {
+	white-space: nowrap
+}
+
+.weave-menuitem-label-padding-left {
+	padding-left: 5
+}
+.weave-menuitem-label-padding-right {
+	padding-right: 5
 }
 
 .weave-menubar-item:hover {
