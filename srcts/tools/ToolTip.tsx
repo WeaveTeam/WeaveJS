@@ -124,7 +124,6 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             var style:React.CSSProperties = _.clone(this.containerStyle);
             var tableRows:JSX.Element[] = [];
             style.display = "block";
-
             var container:HTMLElement = this.element.parentNode as HTMLElement;
             var rect:ClientRect = container.getBoundingClientRect();
             var left: number = window.pageXOffset + rect.left;

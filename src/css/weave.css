@@ -52,6 +52,14 @@ button.list-group-item:hover {
     width: 100%;
 }
 
+.c3-tooltip td.value {
+	white-space: nowrap;
+}
+
+.c3-tooltip td.name {
+	white-space: nowrap;
+}
+
 ul.dropdown-menu {
     width:100%;
     overflow:auto;
@@ -165,6 +173,17 @@ ul.dropdown-menu {
 
 .weave-menubar-item:hover {
 	background-color: rgba(153, 214, 255, 0.4);
+}
+
+.weave-dialog {
+	box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0 0 32px 8px rgba(0, 0, 0, 0.2)
+}
+
+.weave-dialog-overlay {
+	background: #ccc;
+    opacity: .5,
 }
 
 .rc-slider {
