@@ -49,6 +49,7 @@
     "c3": "https://github.com/WeaveTeam/c3.git",
     "classnames": "^2.2.3",
     "d3": "^3.5.9",
+    "filesaver.js": "^0.2.0",
     "font-awesome": "^4.4.0",
     "jquery": "^2.1.4",
     "jszip": "^2.5.0",

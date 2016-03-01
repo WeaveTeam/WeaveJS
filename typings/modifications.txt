@@ -5,3 +5,4 @@ rc-slider.d.ts
 react-bootstrap-custom.d.ts
 react-date-picker.d.ts
 react-vendor-prefix.d.ts
+filesaver.d.ts

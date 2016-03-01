@@ -22,10 +22,7 @@
     },
     "d3/d3.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
-    },
-    "c3/c3.d.ts": {
-      "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
-    },
+	},
     "react-bootstrap/react-bootstrap.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
     },

@@ -1,6 +1,8 @@
 import * as React from "react";
 import MenuBar from "./react-ui/MenuBar/MenuBar";
 import MenuBarItem from "./react-ui/MenuBar/MenuBarItem";
+import * as FileSaver from "filesaver.js";
+import FileInput from "./react-ui/FileInput";
 
 export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar> {
 	weave:Weave
@@ -64,27 +66,27 @@ function fileMenu(weave:Weave)
 {
 
     function openFile(e:any) {
-        // const selectedfile:File = e.target.files[0];
-        // new Promise(function (resolve:any, reject:any) {
-        //         let reader:FileReader = new FileReader();
-        //         reader.onload = function (event:Event) {
-        //             resolve([event, selectedfile]);
-        //         };
-        //         reader.readAsArrayBuffer(selectedfile);
-        //     })
-        //     .then(function (zippedResults:any) {
-        //         var e:any = zippedResults[0];
-        //         var result:any = e.target.result;
-        //         weavejs.core.WeaveArchive.loadFileContent(weave,result);
-        //     });
+        const selectedfile:File = e.target.files[0];
+        new Promise(function (resolve:any, reject:any) {
+                let reader:FileReader = new FileReader();
+                reader.onload = function (event:Event) {
+                    resolve([event, selectedfile]);
+                };
+                reader.readAsArrayBuffer(selectedfile);
+            })
+            .then(function (zippedResults:any) {
+                var e:any = zippedResults[0];
+                var result:any = e.target.result;
+                weavejs.core.WeaveArchive.loadFileContent(weave,result);
+            });
     }
     
     function saveFile()
 	{
-        // var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
-        // var uint8Array:any = archive.serialize();
-        // var arrayBuffer:any  = uint8Array.buffer;
-        // window.saveAs(new Blob([arrayBuffer]), "test.weave");
+        var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
+        var uint8Array:any = archive.serialize();
+        var arrayBuffer:any  = uint8Array.buffer;
+		FileSaver.saveAs(new Blob([arrayBuffer]), "test.weave");
   	}
 
     return {
@@ -92,12 +94,11 @@ function fileMenu(weave:Weave)
 		onClick: "",
 		menu: [
 			{
-				label: <input type="file" onChange={openFile}/>,
-                click: () => {}
+				label: <FileInput onChange={openFile}>Open a file...</FileInput>,
 			},
 			{
 				label: Weave.lang("Save as..."),
-				click: () => {}
+				click: saveFile
 			},
 			{
 				label: "Export CSV",
@@ -132,8 +133,6 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	{
 		super(props);
 	}
-    
-    
 	
 	render():JSX.Element
 	{
