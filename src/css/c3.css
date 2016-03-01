@@ -56,7 +56,7 @@
   stroke-width: 0; }
 
 .c3-bar._expanded_ {
-  fill-opacity: 0.75; }
+  fill-opacity: 1.0; }
 
 /*-- Focus --*/
 .c3-target.c3-focused {
