@@ -333,6 +333,7 @@ export default class C3Histogram extends AbstractC3Tool
         d3.select(this.element)
             .selectAll("g.c3-shapes")
             .selectAll("path._selected_").each( function(d: any, i:number, oi:number) {
+                console.log(d,this.parentNode);
                 d3.select(this.parentNode)
                     .append("path")
                     .classed("_selection_surround",true)
