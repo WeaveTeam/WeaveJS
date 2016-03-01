@@ -5,7 +5,7 @@ import MenuItem from "./MenuItem";
 import {MenuItemProps} from "./MenuItem";
 import Divider from "./Divider";
 
-export interface MenuProps extends React.Props<Menu>
+export interface MenuProps extends React.HTMLProps<Menu>
 {
 	xPos: number;
 	yPos: number;
@@ -54,22 +54,12 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	{
 		
 		var menuStyle:React.CSSProperties = {
-			position: "absolute",
-			boxShadow: "rgba(0, 0, 0, 0.117647) 0px 1px 6px, rgba(0, 0, 0, 0.117647) 0px 1px 4px",
-			borderRadius: 2,
-			backgroundColor: "#FFFFFF",
-			paddingTop: 5,
-			paddingBottom: 5,
 			top: this.props.yPos,
 			left: this.props.xPos,
-			userSelect: "none",
-			cursor: "pointer",
-			overflow: "hidden",
-			zIndex: 2147483647 // max z-index value
 		};
 	
 		return (
-			<VBox style={menuStyle}>
+			<VBox className="weave-menu" style={menuStyle}>
 				{
 					this.props.menu ? this.props.menu.map((menuItem, index) => {
 							if(_.isEqual(menuItem, {}))

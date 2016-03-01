@@ -60,30 +60,32 @@ function weaveMenu(weave:Weave)
 	};
 }
 
-function fileMenu(weave:Weave){
+function fileMenu(weave:Weave)
+{
 
     function openFile(e:any) {
-        const selectedfile:File = e.target.files[0];
-        new Promise(function (resolve:any, reject:any) {
-                let reader:FileReader = new FileReader();
-                reader.onload = function (event:Event) {
-                    resolve([event, selectedfile]);
-                };
-                reader.readAsArrayBuffer(selectedfile);
-            })
-            .then(function (zippedResults:any) {
-                var e:any = zippedResults[0];
-                var result:any = e.target.result;
-                weavejs.core.WeaveArchive.loadFileContent(weave,result);
-            });
+        // const selectedfile:File = e.target.files[0];
+        // new Promise(function (resolve:any, reject:any) {
+        //         let reader:FileReader = new FileReader();
+        //         reader.onload = function (event:Event) {
+        //             resolve([event, selectedfile]);
+        //         };
+        //         reader.readAsArrayBuffer(selectedfile);
+        //     })
+        //     .then(function (zippedResults:any) {
+        //         var e:any = zippedResults[0];
+        //         var result:any = e.target.result;
+        //         weavejs.core.WeaveArchive.loadFileContent(weave,result);
+        //     });
     }
     
-    saveFile(){
-        var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
-        var uint8Array:any = archive.serialize();
-        var arrayBuffer:any  = uint8Array.buffer;
-        window.saveAs(new Blob([arrayBuffer]), "test.weave");
-  }
+    function saveFile()
+	{
+        // var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
+        // var uint8Array:any = archive.serialize();
+        // var arrayBuffer:any  = uint8Array.buffer;
+        // window.saveAs(new Blob([arrayBuffer]), "test.weave");
+  	}
 
     return {
 		label: "File",
@@ -104,7 +106,8 @@ function fileMenu(weave:Weave){
 	};
 }
 
-function dataMenu(weave:Weave) {
+function dataMenu(weave:Weave) 
+{
 	return {
 		label: "Data",
 		menu: [
@@ -135,16 +138,11 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	{
         var weave = this.props.weave;
 		return (
-			<MenuBar className="weave-menubar" style={{width: "100%"}} >
-				{
-					[
-                        weaveMenu(weave),
-                        fileMenu(weave),
-                        dataMenu(weave)
-                    ].map((menuBarItemConfig, index) => {
-						return <MenuBarItem className="weave-menubar-item" key={index} {...menuBarItemConfig}/>
-					})
-				}
+			<MenuBar className="weave-menubar" style={{width: "100%"}} config={[
+				weaveMenu(weave),
+				fileMenu(weave),
+				dataMenu(weave)
+			]}>
 			</MenuBar>
 		)
 	}

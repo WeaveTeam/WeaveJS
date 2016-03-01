@@ -106,7 +106,7 @@ export default class MenuItem extends React.Component<MenuItemProps, MenuItemSta
 
 		var secondaryLabelStyle = {
 		};
-
+		
 		return (
 			<HBox style={menuItemStyle} onClick={this.click.bind(this)} onMouseEnter={this.onMouseEnter.bind(this)} onMouseLeave={this.onMouseLeave.bind(this)}>
 				<HBox>

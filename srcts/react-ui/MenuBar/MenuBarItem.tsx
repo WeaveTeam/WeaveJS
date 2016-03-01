@@ -5,8 +5,8 @@ export interface MenuBarItemProps extends React.HTMLProps<MenuBarItem>
 {
 	label: string;
 	menu: MenuItemProps[];
-	bold?: boolean;
 	onClick?:React.EventHandler<React.MouseEvent>;
+	bold?: boolean;
 }
 
 
@@ -21,7 +21,7 @@ export default class MenuBarItem extends React.Component<MenuBarItemProps, MenuB
 	{
 		super(props);
 	}
-
+	
 	render():JSX.Element
 	{
 		return (

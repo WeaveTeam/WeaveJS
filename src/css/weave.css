@@ -86,6 +86,23 @@ ul.dropdown-menu {
     text-decoration: none;
 }
 
+.weave-menu {
+	position: absolute;
+	box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+	border-radius: 2;
+	background-color: "#FFFFFF";
+	padding-top: 5;
+	padding-bottom: 5;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	cursor: "pointer";
+	overflow: "hidden";
+	z-index: 2147483647; /* max z-index value */
+}
+
 .weave-menubar {
 	border-bottom-style: solid;
 	user-select: none;
