@@ -384,37 +384,18 @@ export default class C3BarChart extends AbstractC3Tool
 		let thinBars:boolean = this.chart.internal.width <= this.records.length;
 	
         this.heightColumnNames.forEach((item:string) => {
-
-
 			d3.select(this.element)
 				.selectAll("g")
 				.filter(".c3-shapes-"+item+".c3-bars")
-				.selectAll("path.c3-shape")
+				.selectAll("path")
 				.style("opacity", (d: any, i: number, oi: number): number => {
 					let key = this.records[i].id;
 					let selected = this.isSelected(key);
 					let probed = this.isProbed(key);
 					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
 				})
-				.style("stroke",
-					(d: any, i:number, oi:number): string => {
-						let key = this.records[i].id;
-						let selected = this.isSelected(key);
-						let probed = this.isProbed(key);
-						if(probed && selected)
-							return "white";
-						else
-							return "black";
-				})
-	            .style("stroke-width",
-					(d: any, i: number, oi: number): number => {
-						let key = this.records[i].id;
-						let selected = this.isSelected(key);
-						let probed = this.isProbed(key);
-						if (probed && selected)
-							return 1.5;
-						return probed ? 0.7 : 0.5;
-				})
+	            .style("stroke", "black")
+	            .style("stroke-width", 1.0)
 				.style("stroke-opacity", (d: any, i: number, oi: number): number => {
 					if (thinBars)
 						return 0;
@@ -424,11 +405,16 @@ export default class C3BarChart extends AbstractC3Tool
 					if (probed)
 						return 1.0;
 					if (selected)
-						return 0.5;
-					return 0.3;
+						return 0.7;
+					return 0.5;
 				});
+				//Todo: find better probed style to differentiate bars
+				//.style("stroke-width", (d: any, i: number, oi: number): number => {
+				//	let key = this.records[i].id;
+				//	let probed = this.isProbed(key);
+				//	return probed ? 1.5 : 1.0;
+				//});
 
-			//handle bar texts
 			d3.select(this.element)
 				.selectAll("g")
 				.filter(".c3-texts-"+item)
@@ -438,22 +424,6 @@ export default class C3BarChart extends AbstractC3Tool
 					let selected = this.isSelected(key);
 					let probed = this.isProbed(key);
 					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
-				});
-
-			//handle selected paths
-			d3.select(this.element)
-				.selectAll("path._selection_surround").remove();
-			d3.select(this.element)
-				.selectAll("g")
-				.filter(".c3-shapes-"+item+".c3-bars")
-				.selectAll("path._selected_").each( function(d: any, i:number, oi:number) {
-					d3.select(this.parentNode)
-						.append("path")
-						.classed("_selection_surround",true)
-						.attr("d",this.getAttribute("d"))
-						.style("stroke", "black")
-						.style("stroke-width", 0.5)
-					;
 				});
         });
     }
