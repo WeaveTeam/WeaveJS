@@ -10,39 +10,9 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
+import * as WeaveUI from "./WeaveUI";
 import Layout from "./react-flexible-layout/Layout";
 import {LayoutState} from "./react-flexible-layout/Layout";
-import C3BarChart from "./tools/C3BarChart";
-import C3ScatterPlot from "./tools/C3ScatterPlot";
-import ColorLegend from "./tools/ColorLegend";
-import BarChartLegend from "./tools/BarChartLegend"
-import C3LineChart from "./tools/C3LineChart";
-import C3PieChart from "./tools/C3PieChart";
-import C3Histogram from "./tools/C3Histogram";
-import SessionStateMenuTool from "./tools/SessionStateMenuTool";
-import WeaveOpenLayersMap from "./tools/OpenLayersMapTool";
-import TableTool from "./tools/TableTool";
-import TextTool from "./tools/TextTool";
-import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
-
-// Temporary solution
-// because typescript removes
-// unused imports
-var v1:any = [
-	C3BarChart,
-	C3ScatterPlot,
-	ColorLegend,
-	BarChartLegend,
-	C3LineChart,
-	C3PieChart,
-	C3Histogram,
-	SessionStateMenuTool,
-	WeaveOpenLayersMap,
-	TableTool,
-	DataFilterTool,
-	TextTool
-];
-///////////////////////////////
 
 import WeaveTool from "./WeaveTool";
 import ToolOverlay from "./ToolOverlay";
