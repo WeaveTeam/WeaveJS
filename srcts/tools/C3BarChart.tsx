@@ -442,8 +442,6 @@ export default class C3BarChart extends AbstractC3Tool
 
 			//handle selected paths
 			d3.select(this.element)
-				.selectAll("g")
-				.filter(".c3-shapes-"+item+".c3-bars")
 				.selectAll("path._selection_surround").remove();
 			d3.select(this.element)
 				.selectAll("g")
