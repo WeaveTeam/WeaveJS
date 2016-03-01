@@ -24,6 +24,8 @@ export interface WeaveAppState
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
+	contextMenu:HTMLElement;
+	
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
@@ -56,6 +58,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	
 	hideContextMenu(event:React.MouseEvent)
 	{
+		if (this.contextMenu && this.contextMenu.contains(event.target as HTMLElement))
+			return;
 		this.setState({
 			showContextMenu:false
 		});
@@ -74,7 +78,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				<LayoutManager layout={this.props.layout} style={{flex: 1}}/>
 				{
 					this.state.showContextMenu ? 
-					<div onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
+					<div ref={(element:HTMLElement) => this.contextMenu = element} onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
 						{<Menu xPos={this.state.contextMenuXPos} yPos={this.state.contextMenuYPos} menu={this.state.contextMenuItems}/>}
 					</div>
 					: null
