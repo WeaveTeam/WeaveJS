@@ -452,11 +452,7 @@ export default class C3BarChart extends AbstractC3Tool
 						.classed("_selection_surround",true)
 						.attr("d",this.getAttribute("d"))
 						.style("stroke", "black")
-						.style("stroke-width", function(d: any, i:number, oi:number) {
-							if(thinBars)
-								return 0.1;
-							return 0.5;
-						})
+						.style("stroke-width", 0.5)
 					;
 				});
         });
