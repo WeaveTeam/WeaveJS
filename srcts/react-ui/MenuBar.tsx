@@ -38,22 +38,22 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 			showMenu: false,
 			menu: []
 		};
-		this.hideMenu = this.hideMenu.bind(this);
+		this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
 	}
 	
 	componentDidMount()
 	{
-		document.addEventListener("mousedown", this.hideMenu);
+		document.addEventListener("mousedown", this.onDocumentMouseDown);
 		// TODO Add touch events for mobile
 		this.element = ReactDOM.findDOMNode(this);
 	}
 	
 	componentWillUnmount()
 	{
-		document.removeEventListener("mousedown", this.hideMenu);
+		document.removeEventListener("mousedown", this.onDocumentMouseDown);
 	}
 	
-	hideMenu(event:MouseEvent)
+	onDocumentMouseDown(event:MouseEvent)
 	{
 		var elt = event.target;
 		
@@ -64,19 +64,28 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 			}
 			elt = (elt as HTMLElement).parentNode;
 		}
-		
-		this.setState({
-			showMenu: false
-		})
+		this.hideMenu();
 	}
 	
-	onMenuClick()
+	hideMenu()
 	{
 		this.setState({
 			showMenu: false
 		})
 	}
 	
+	showMenu(index:number)
+	{
+		var parent = this.refs[index] as HTMLElement;
+		var menuConfig = this.props.config[index].menu;
+		this.setState({
+			showMenu: true,
+			xPos: parent.offsetLeft,
+			yPos: parent.offsetTop + parent.clientHeight,
+			menu: menuConfig
+		});
+	}
+
 	onClick(index:number, event:React.MouseEvent)
 	{
 		if(this.state.showMenu) 
@@ -88,13 +97,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		}
 		else
 		{
-			var menuBarItemElt = this.refs[index] as HTMLElement;
-			this.setState({
-				showMenu: true,
-				xPos: menuBarItemElt.offsetLeft,
-				yPos: menuBarItemElt.offsetTop + menuBarItemElt.clientHeight,
-				menu: this.props.config[index].menu
-			});
+			this.showMenu(index);
 		}
 	}
 	
@@ -102,13 +105,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	{
 		if(this.state.showMenu)
 		{
-			var menuBarItemElt = this.refs[index] as HTMLElement;
-			this.setState({
-				showMenu: true,
-				xPos: menuBarItemElt.offsetLeft,
-				yPos: menuBarItemElt.offsetTop + menuBarItemElt.clientHeight,
-				menu: this.props.config[index].menu
-			});
+			this.showMenu(index);
 		}
 	}
 	
@@ -139,7 +136,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 				}
 				{
 					this.state.showMenu ?
-					<Menu menu={this.state.menu} xPos={this.state.xPos} yPos={this.state.yPos} onClick={this.onMenuClick.bind(this)}/>
+					<Menu menu={this.state.menu} xPos={this.state.xPos} yPos={this.state.yPos} onClick={this.hideMenu.bind(this)}/>
 					:
 					null
 				}

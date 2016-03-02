@@ -150,8 +150,9 @@ export default class Menu extends React.Component<MenuProps, MenuState>
         }
 		
 		var menuStyle:React.CSSProperties = MiscUtils.merge({
+			position: "absolute",
 			top: this.props.yPos,
-			left: this.props.xPos,
+			left: this.props.xPos
 		}, menuStyle);
 	
 		return (
