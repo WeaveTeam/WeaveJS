@@ -33,7 +33,7 @@ import ProbeInteraction from "./OpenLayersMap/ProbeInteraction";
 import DragSelection from "./OpenLayersMap/DragSelection";
 import CustomDragZoom from "./OpenLayersMap/CustomDragZoom";
 import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
-import {MenuItemProps} from "../react-ui/Menu/MenuItem";
+import {MenuItemProps} from "../react-ui/Menu";
 import AbstractVisTool from "./AbstractVisTool";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;

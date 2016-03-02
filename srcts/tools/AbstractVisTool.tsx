@@ -10,8 +10,7 @@ import {ChartAPI, ChartConfiguration} from "c3";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
-import {MenuItemProps} from "../react-ui/Menu/MenuItem";
-import {IGetMenuItems} from "../react-ui/Menu/Menu";
+import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;

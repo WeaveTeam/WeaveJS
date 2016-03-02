@@ -138,7 +138,7 @@ ul.dropdown-menu {
 }
 
 .weave-menubar-item:hover {
-	background-color: rgba(255, 255, 255, 1);
+	background-color: rgba(153, 214, 255, 0.4);
 }
 
 .weave-menubar-item:active {
@@ -160,6 +160,14 @@ ul.dropdown-menu {
 	background-color: #80CCFF
 }
 
+.weave-menuitem-disabled {
+	color: #C1C1C1;
+}
+
+.weave-menuitem-disabled:hover {
+	background-color: #FFFFFF;
+}
+
 .weave-menuitem-label {
 	white-space: nowrap
 }
@@ -171,8 +179,15 @@ ul.dropdown-menu {
 	padding-right: 5
 }
 
-.weave-menubar-item:hover {
-	background-color: rgba(153, 214, 255, 0.4);
+.weave-menu-divider {
+	margin-top: 7;
+	margin-right: 0;
+	margin-bottom: 8;
+	margin-left: 0;
+	height: 1;
+	border: "none";
+	opacity: 1;
+	background-color: rgb(224, 224, 224)
 }
 
 .weave-dialog {

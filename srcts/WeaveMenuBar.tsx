@@ -1,6 +1,6 @@
 import * as React from "react";
-import MenuBar from "./react-ui/MenuBar/MenuBar";
-import MenuBarItem from "./react-ui/MenuBar/MenuBarItem";
+import MenuBar from "./react-ui/MenuBar";
+import MiscUtils from "./utils/MiscUtils";
 import * as FileSaver from "filesaver.js";
 import FileInput from "./react-ui/FileInput";
 
@@ -36,7 +36,8 @@ function weaveMenu(weave:Weave)
 			},
 			{
 				label: "Report a problem",
-				click: () => {}
+				click: () => {},
+				disabled: true
 			},
 			{
 				label: "Visit iWeave.com",
@@ -94,7 +95,7 @@ function fileMenu(weave:Weave)
 		onClick: "",
 		menu: [
 			{
-				label: <FileInput onChange={openFile}>Open a file...</FileInput>,
+				label: <FileInput onChange={openFile}>Open a file...</FileInput>
 			},
 			{
 				label: Weave.lang("Save as..."),
@@ -138,15 +139,7 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	{
         var weave = this.props.weave;
 		return (
-			<MenuBar style={{width: "100%"}}>
-				{
-					[weaveMenu(weave),
-					fileMenu(weave),
-					dataMenu(weave)].map((config, index) => {
-						return <MenuBarItem key={index} {...config}/>
-					})
-				}
-			</MenuBar>
+			<MenuBar style={{width: "100%"}} config={[weaveMenu(weave), fileMenu(weave), dataMenu(weave)]}/>
 		)
 	}
 }

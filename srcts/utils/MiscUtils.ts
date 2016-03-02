@@ -255,4 +255,18 @@ export default class MiscUtils
 		target.removeEventListener('mousedown', listener.onMouseDown);
 		target.removeEventListener('click', listener.onClick);
 	}
+	
+	static eventFire(el:HTMLElement|Document, etype:string):void {
+		var elt:any = el as any;
+		if (elt.fireEvent)
+		{
+			elt.fireEvent('on' + etype);
+		}
+		else
+		{
+			var evObj:Event = document.createEvent('Events');
+			evObj.initEvent(etype, true, false);
+			el.dispatchEvent(evObj);
+		}
+	}
 }

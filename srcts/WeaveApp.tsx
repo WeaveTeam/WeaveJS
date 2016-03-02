@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as _ from "lodash";
 import WeaveMenuBar from "./WeaveMenuBar";
-import Menu from "./react-ui/Menu/Menu";
-import {REACT_COMPONENT} from "./react-ui/Menu/Menu";
+import Menu from "./react-ui/Menu";
+import {REACT_COMPONENT} from "./react-ui/Menu";
+import {MenuItemProps} from "./react-ui/Menu";
 import LayoutManager from "./WeaveLayoutManager";
-import {MenuItemProps} from "./react-ui/Menu/MenuItem";
 import VBox from "./react-ui/VBox";
 
 import LinkableVariable = weavejs.core.LinkableVariable;

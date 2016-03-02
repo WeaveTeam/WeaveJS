@@ -1,11 +1,17 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import HBox from "../HBox";
-import MenuBarItem from "./MenuBarItem";
-import {MenuBarItemProps} from "./MenuBarItem";
-import {MenuItemProps} from "../Menu/MenuItem";
-import Menu from "../Menu/Menu";
+import HBox from "./HBox";
+import {MenuItemProps} from "./Menu";
+import Menu from "./Menu";
+import classNames from "../modules/classnames";
+
+export interface MenuBarItemProps
+{
+	label: string;
+	menu: MenuItemProps[];
+	bold?: boolean;
+}
 
 export interface MenuBarProps extends React.HTMLProps<MenuBar>
 {
@@ -29,22 +35,22 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		this.state = {
 			xPos: 0,
 			yPos: 0,
-			showMenu: false
-			
+			showMenu: false,
+			menu: []
 		};
 		this.hideMenu = this.hideMenu.bind(this);
 	}
 	
 	componentDidMount()
 	{
-		document.addEventListener("click", this.hideMenu);
+		document.addEventListener("mousedown", this.hideMenu);
 		// TODO Add touch events for mobile
 		this.element = ReactDOM.findDOMNode(this);
 	}
 	
 	componentWillUnmount()
 	{
-		document.removeEventListener("click", this.hideMenu);
+		document.removeEventListener("mousedown", this.hideMenu);
 	}
 	
 	hideMenu(event:MouseEvent)
@@ -60,7 +66,14 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		}
 		
 		this.setState({
-			showMenu:false
+			showMenu: false
+		})
+	}
+	
+	onMenuClick()
+	{
+		this.setState({
+			showMenu: false
 		})
 	}
 	
@@ -68,18 +81,19 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	{
 		if(this.state.showMenu) 
 		{
+			// hide menu if click on menubaritem and the menu was already visible
 			this.setState({
 				showMenu: false
 			});
 		}
 		else
 		{
-			var menuBarItemElt = ReactDOM.findDOMNode(this.refs[index]) as HTMLElement;
+			var menuBarItemElt = this.refs[index] as HTMLElement;
 			this.setState({
-				showMenu:true,
+				showMenu: true,
 				xPos: menuBarItemElt.offsetLeft,
 				yPos: menuBarItemElt.offsetTop + menuBarItemElt.clientHeight,
-				menu: (this.refs[index] as MenuBarItem).props.menu
+				menu: this.props.config[index].menu
 			});
 		}
 	}
@@ -88,13 +102,30 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	{
 		if(this.state.showMenu)
 		{
-			var menuBarItemElt = ReactDOM.findDOMNode(this.refs[index]) as HTMLElement;
+			var menuBarItemElt = this.refs[index] as HTMLElement;
 			this.setState({
+				showMenu: true,
 				xPos: menuBarItemElt.offsetLeft,
 				yPos: menuBarItemElt.offsetTop + menuBarItemElt.clientHeight,
-				menu: (this.refs[index] as MenuBarItem).props.menu
+				menu: this.props.config[index].menu
 			});
 		}
+	}
+	
+	renderMenuBarItem(index:number, props:MenuBarItemProps):JSX.Element
+	{
+		var menuBarClass = classNames({
+			"weave-menubar-item": true,
+			"weave-menubar-item-bold": !!props.bold
+		});
+
+		return (
+			<div ref={index as any} key={index} className={menuBarClass} {...props as any} onMouseDown={this.onClick.bind(this, index)} onMouseEnter={this.onMouseEnter.bind(this, index)}>
+				{
+					props.label
+				}
+			</div>
+		)
 	}
 
 	render():JSX.Element
@@ -102,21 +133,13 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		return (
 			<HBox className="weave-menubar" {...this.props}>
 				{
-					this.props.config ?
-					
-						this.props.config.map((cf, index) => {
-							return <MenuBarItem ref={index as any} key={index} {...cf} onClick={this.onClick.bind(this, index)} onMouseEnter={this.onMouseEnter.bind(this, index)}/>
-						})
-					
-					:
-						(this.props.children as React.ReactElement<MenuBarItemProps>[]).map((child, index) => {
-							// using React.cloneElement breaks jsx label in menu
-							return <MenuBarItem ref={index as any} key={index} {...child.props} onClick={this.onClick.bind(this, index)} onMouseEnter={this.onMouseEnter.bind(this, index)}/>
-						})
+					this.props.config.map((menuBarItemProps, index) => {
+						return this.renderMenuBarItem(index, menuBarItemProps)
+					})
 				}
 				{
 					this.state.showMenu ?
-					<Menu menu={this.state.menu} xPos={this.state.xPos} yPos={this.state.yPos}/>
+					<Menu menu={this.state.menu} xPos={this.state.xPos} yPos={this.state.yPos} onClick={this.onMenuClick.bind(this)}/>
 					:
 					null
 				}
