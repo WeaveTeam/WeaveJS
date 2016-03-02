@@ -1,101 +1,64 @@
 import * as React from "react";
-import * as lodash from "lodash";
-import update from "react-addons-update";
+import * as _ from "lodash";
+import reactUpdate from "react-addons-update";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IDisposableObject = weavejs.api.core.IDisposableObject;
 
-let WEAVEUPDATECONFIG = "weaveUpdateConfig";
+export declare type ReactStateLinkObject = { [prop: string]: ReactStateLinkObject | ILinkableObject };
 
-export class WeaveReactSynchronizer
-{	
-	private statePath: Array<string>;
-	private linkableVariable: LinkableVariable;
-	private context: ILinkableObject;
-	private reactObject: React.Component<any, any>;
+var SCU = "shouldComponentUpdate";
+var UNLINK = "unlinkReactState";
 
-	constructor(context:ILinkableObject, linkableVariable: LinkableVariable, reactObject: React.Component<any, any>, statePath: Array<string>, delay?: number)
-	{
-		delay = delay !== undefined ? delay : 500;
+export function unlinkReactState(_component:React.Component<any,any>)
+{
+	let component: any = _component as any;
+	if (component && component[SCU] && component[SCU][UNLINK])
+		component[SCU][UNLINK]();
+}
 
-		let reactObjectAny = reactObject as any;
+export function linkReactState(context: ILinkableObject, _component: React.Component<any, any>, mapping: ReactStateLinkObject, _delay?:number) {
+	let delay: number = _delay !== undefined ? _delay : 500;
+	let component = _component as any;
 
-		if (!reactObjectAny[WEAVEUPDATECONFIG])
-		{
-			reactObjectAny.oldShouldComponentUpdate = (reactObject as any).shouldComponentUpdate;
-			reactObjectAny[WEAVEUPDATECONFIG] = {};
-			reactObjectAny.shouldComponentUpdate =
-				function(nextProps: any, nextState: any) {
-					let pathStack = new Array<Array<string>>();
-					pathStack.push([]);
+	if (component === null) return;
+	
+	unlinkReactState(component);
 
-					let config:any = reactObjectAny[WEAVEUPDATECONFIG];
+	let scu = component[SCU] as Function;
 
-					while (pathStack.length)
-					{
-						let path = pathStack.pop();
-						let item = lodash.get(config, path) || config;
-
-						if (item instanceof Function)
-						{
-							item(nextState);
-						}
-						else if (lodash.isPlainObject(item))
-						{
-							for (let pathElement of Object.keys(item))
-							{
-								pathStack.push(path.concat([pathElement]));
-							}
-						}
-					}
-					if (this.oldShouldComponentUpdate)
-						return this.oldShouldComponentUpdate(nextProps, nextState);
-					return true;
-				};
-		}
-
-		this.debouncedReactToWeave = lodash.debounce(this.reactToWeave, delay, { leading: false });
-
-		if (statePath == null)
-		{
-			reactObjectAny[WEAVEUPDATECONFIG] = this.debouncedReactToWeave;
-		}
+	function setWeaveState(nextProps:any, nextState:any) {
+		if (Weave.wasDisposed(context))
+			unlinkReactState(component);
 		else
+			weavejs.core.SessionManager.traverseAndSetState(nextState, mapping);
+	};
+
+	let setWeaveStateDebounced = _.debounce(setWeaveState, delay, { leading: false });
+
+	component[SCU] = function(nextProps: any, nextState: any)
+	{
+		setWeaveStateDebounced(nextProps, nextState);
+		return scu ? scu.call(component, nextProps, nextState) : true;
+	}
+
+	Weave.disposableChild(context, component[SCU]);
+
+	component[SCU][UNLINK] = () => { component[SCU] = scu };
+
+	let updateObj:any;
+	let weaveCallback = () => component.setState(reactUpdate(component.state, updateObj));
+
+	let mapValue = (value:any):any => {
+		if (Weave.isLinkable(value))
 		{
-			lodash.set(reactObjectAny[WEAVEUPDATECONFIG], statePath, this.debouncedReactToWeave);
+			Weave.getCallbacks(value).addGroupedCallback(component[SCU], weaveCallback);
+			return { $apply: Weave.getState.bind(Weave, value) };
 		}
-
-		this.linkableVariable = linkableVariable;
-		this.statePath = statePath;
-		this.context = context;
-		this.reactObject = reactObject;
-		this.linkableVariable.addGroupedCallback(this, this.weaveToReact);
-	}
-
-	debouncedReactToWeave: Function;
-
-	reactToWeave=(nextState:any):void=>
-	{
-		this.linkableVariable.state = lodash.get(nextState, this.statePath);
-	}
-
-	weaveToReact=():void=>
-	{
-		var mergeObj = {};
-		
-		lodash.set(mergeObj, this.statePath, this.linkableVariable.state);
-
-		var newObj = update(this.reactObject.state, { $merge: mergeObj });
-
-		this.reactObject.setState(newObj);
-	}
-
-	dispose():void
-	{
-		if (lodash.get((this.reactObject as any)[WEAVEUPDATECONFIG] , this.statePath) === this.debouncedReactToWeave)
-			lodash.set((this.reactObject as any)[WEAVEUPDATECONFIG], this.statePath, undefined);
-
-		this.linkableVariable.removeCallback(this.context, this.weaveToReact);
-	}
+		return weavejs.util.JS.isPrimitive(value) ? value : _.mapValues(value, mapValue);
+	};
+	
+	updateObj = mapValue(mapping);
+	weaveCallback();
 }
