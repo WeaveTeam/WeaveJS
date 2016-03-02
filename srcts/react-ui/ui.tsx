@@ -4,6 +4,9 @@ import HSlider from "./RCSlider/HSlider";
 import VSlider from "./RCSlider/VSlider";
 import CheckBoxList from "./CheckBoxList";
 import ListItem from "./ListItem";
+import Menu from "./Menu";
+import MenuBar from "./MenuBar";
+import PopupWindow from "./PopupWindow";
 
 export default
 {
@@ -12,5 +15,8 @@ export default
     HSlider,
     VSlider,
     CheckBoxList,
-    ListItem
+    ListItem,
+	Menu,
+	MenuBar,
+	PopupWindow
 }

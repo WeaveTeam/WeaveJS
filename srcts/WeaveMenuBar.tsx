@@ -3,6 +3,7 @@ import MenuBar from "./react-ui/MenuBar";
 import MiscUtils from "./utils/MiscUtils";
 import * as FileSaver from "filesaver.js";
 import FileInput from "./react-ui/FileInput";
+import PopupWindow from "./react-ui/PopupWindow";
 
 export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar> {
 	weave:Weave
@@ -84,10 +85,15 @@ function fileMenu(weave:Weave)
     
     function saveFile()
 	{
-        var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
-        var uint8Array:any = archive.serialize();
-        var arrayBuffer:any  = uint8Array.buffer;
-		FileSaver.saveAs(new Blob([arrayBuffer]), "test.weave");
+		PopupWindow.open({
+			title: "Save file dialog",
+			content: <div>I am a save file dialog</div>,
+			dialog: true
+		});
+        // var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
+        // var uint8Array:any = archive.serialize();
+        // var arrayBuffer:any  = uint8Array.buffer;
+		// FileSaver.saveAs(new Blob([arrayBuffer]), "test.weave");
   	}
 
     return {

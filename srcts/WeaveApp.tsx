@@ -6,6 +6,7 @@ import {REACT_COMPONENT} from "./react-ui/Menu";
 import {MenuItemProps} from "./react-ui/Menu";
 import LayoutManager from "./WeaveLayoutManager";
 import VBox from "./react-ui/VBox";
+import PopupWindow from "./react-ui/PopupWindow";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 
