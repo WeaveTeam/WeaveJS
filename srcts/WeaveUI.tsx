@@ -4,6 +4,7 @@
 /// <reference path="../typings/react/react-dom.d.ts"/>
 /// <reference path="../typings/weave/weavejs.d.ts"/>
 
+// Tools
 import C3BarChart from "./tools/C3BarChart";
 import C3ScatterPlot from "./tools/C3ScatterPlot";
 import ColorLegend from "./tools/ColorLegend";
@@ -17,6 +18,9 @@ import TableTool from "./tools/TableTool";
 import TextTool from "./tools/TextTool";
 import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 import C3Gauge from "./tools/C3Gauge";
+
+// Editors
+import WeaveDataSourceEditor from "./editors/WeaveDataSourceEditor";
 
 import WeaveLayoutManager from "./WeaveLayoutManager";
 import {IWeaveLayoutManagerProps, IWeaveLayoutManagerState} from "./WeaveLayoutManager";
@@ -58,6 +62,7 @@ export
     TableTool,
 	DataFilterTool,
     SessionStateMenuTool,
+    WeaveDataSourceEditor,
     MiscUtils,
     ui
 };
