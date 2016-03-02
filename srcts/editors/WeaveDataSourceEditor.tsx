@@ -2,7 +2,7 @@ import * as React from "react";
 import * as lodash from "lodash";
 import ui from "../react-ui/ui";
 import LinkableTextField from "../ui/LinkableTextField";
-import {linkReactState, unlinkReactState} from "../utils/WeaveReactUtils";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
@@ -39,11 +39,11 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 						<LinkableTextField style={margins}/>
 					</label>
 					<label>{Weave.lang("Service URL")}
-						<LinkableTextField ref={ (c:LinkableTextField) => linkReactState(this, c, {content: dataSource.url}) }
+						<LinkableTextField ref={linkReactStateRef(this, {content: dataSource.url}) }
 							style={margins} placeholder={weavejs.net.WeaveDataServlet.DEFAULT_URL}/>
 					</label>
 					<label>{Weave.lang("Root hierarchy ID")}
-						<LinkableTextField ref={ (c: LinkableTextField) => linkReactState(this, c, { content: dataSource.rootId }) }
+						<LinkableTextField ref={linkReactStateRef(this, { content: dataSource.rootId }) }
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
 						<button type="button">{Weave.lang("Choose")}</button>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>

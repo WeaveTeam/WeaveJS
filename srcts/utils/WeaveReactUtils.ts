@@ -18,8 +18,14 @@ export function unlinkReactState(_component:React.Component<any,any>)
 		component[SCU][UNLINK]();
 }
 
-export function linkReactState(context: ILinkableObject, _component: React.Component<any, any>, mapping: ReactStateLinkObject, _delay?:number) {
-	let delay: number = _delay !== undefined ? _delay : 500;
+export function linkReactStateRef(context: ILinkableObject, mapping: ReactStateLinkObject, delay:number = 500)
+{
+	return (c: React.Component<any, any>) => {
+		linkReactState(context, c, mapping, delay);
+	};
+}
+
+export function linkReactState(context: ILinkableObject, _component: React.Component<any, any>, mapping: ReactStateLinkObject, delay:number = 500) {
 	let component = _component as any;
 
 	if (component === null) return;
