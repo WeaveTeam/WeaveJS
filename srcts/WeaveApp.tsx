@@ -73,7 +73,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	render():JSX.Element
 	{
 		return (
-			<VBox style={{width: "100%", height: "100%"}} onMouseDown={this.hideContextMenu.bind(this)} onContextMenu={this.showContextMenu.bind(this)}>
+			<VBox style={{width: "100%", height: "100%"}} onMouseDown={this.hideContextMenu.bind(this)} onClick={()=>this.setState({showContextMenu: false})} onContextMenu={this.showContextMenu.bind(this)}>
 				<WeaveMenuBar weave={Weave.getWeave(this.props.layout)}/>
 				<LayoutManager layout={this.props.layout} style={{flex: 1}}/>
 				{
