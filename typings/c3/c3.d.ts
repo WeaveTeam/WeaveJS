@@ -786,7 +786,7 @@ declare module c3 {
             /**
              * The radius size of each point on selected.
              */
-            r?: number;
+            r?: number | ((d: any) => number);
         };
     }
 
