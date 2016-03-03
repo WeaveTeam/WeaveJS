@@ -6223,6 +6223,45 @@ declare module weavejs.data.source {
     }
 }
 declare module weavejs.data.source {
+    import IDataSource = weavejs.api.data.IDataSource;
+    import IDataSource_Service = weavejs.api.data.IDataSource_Service;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+    import LinkableBoolean = weavejs.core.LinkableBoolean;
+    import LinkableNumber = weavejs.core.LinkableNumber;
+    import LinkableString = weavejs.core.LinkableString;
+    class CKANDataSource extends AbstractDataSource implements IDataSource_Service {
+        constructor();
+        url: LinkableString;
+        apiVersion: LinkableNumber;
+        useHttpPost: LinkableBoolean;
+        showPackages: LinkableBoolean;
+        showGroups: LinkableBoolean;
+        showTags: LinkableBoolean;
+        useDataStore: LinkableBoolean;
+        /**
+         * This gets called when callbacks are triggered.
+         */
+        /**
+         * Gets the root node of the attribute hierarchy.
+         */
+        getHierarchyRoot(): IWeaveTreeNode;
+        /**
+         * @inheritDoc
+         */
+        static PARAMS_CKAN_ID: string;
+        static PARAMS_CKAN_URL: string;
+        static PARAMS_CKAN_FORMAT: string;
+        static PARAMS_CKAN_FIELD: string;
+        static DATASTORE_FORMAT: string;
+        getBaseURL(): string;
+        getFullURL(relativeURL: string): string;
+        /**
+         * @private
+         */
+        getChildDataSource(params: Object): IDataSource;
+    }
+}
+declare module weavejs.data.source {
     import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IDataSource_File = weavejs.api.data.IDataSource_File;
