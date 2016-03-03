@@ -262,72 +262,114 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		var keyToIndex = (key: IQualifiedKey) => this.keyToIndex.get(key);
 		var selectedIndices: number[] = this.selectionKeySet ? this.selectionKeySet.keys.map(keyToIndex) : [];
 		this.chart.select(["y"], selectedIndices, true);
-		
-		// update style
-		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
-		d3.select(this.element)
-			.selectAll("circle.c3-shape")
-			.style("stroke",
-				(d: any, i:number, oi:number): string => {
-					let key = this.records[i].id;
-					let selected = this.isSelected(key);
-					let probed = this.isProbed(key);
-					if(probed && selected)
-						return "white";
-					else
-						return "black";
-				})
-			.style("opacity",
-				(d: any, i: number, oi: number): number => {
-					let key = this.records[i].id;
-					let selected = this.isSelected(key);
-					let probed = this.isProbed(key);
-					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
-				})
-			.style("stroke-opacity",
-				(d: any, i: number, oi: number): number => {
-					let key = this.records[i].id;
-					let selected = this.isSelected(key);
-					let probed = this.isProbed(key);
-					if (probed)
-						return 1.0;
-					return 0.5;
-				})
-			.style("stroke-width",
-				(d: any, i: number, oi: number): number => {
-					let key = this.records[i].id;
-					let selected = this.isSelected(key);
-					let probed = this.isProbed(key);
-					if (probed && selected)
-						return 1.0;
-					return probed ? 2.0 : 1.0;
-				});
 
-		//handle selected circles
-		d3.select(this.element)
-			.selectAll("circle.c3-selected-circle")
-			.attr("r", (d:any, i:number, oi:number): number => {
-				if (d.hasOwnProperty("index"))
-				{
-					return this.records[d.index].size+1;
-				}
-			})
-			.style("stroke", "black")
-			.style("stroke-opacity",
-				(d: any, i: number, oi: number): number => {
-					if (d.hasOwnProperty("index")) {
-						let key = this.records[d.index].id;
-						let selected = this.isSelected(key);
-						let probed = this.isProbed(key);
-						if (probed && selected)
-							return 1.0;
-						else
-							return 0.0;
-					}
-				})
-			.style("stroke-width", "1px");
+		//call weave layering function
+		this.weaveLayering();
 
 		return false;
+	}
+
+	protected weaveLayering():void {
+		super.weaveLayering();
+
+		//copy items to point_layer, selection_layer, and probe_layer
+		var scatterplot = this;
+		d3.select(scatterplot.element).selectAll("g.c3-shapes.c3-circles").selectAll("circle.c3-shape").each( function(d: any, i:number, oi:number) {
+			let key = scatterplot.records[i].id;
+			let selected = scatterplot.isSelected(key);
+			let probed = scatterplot.isProbed(key);
+			d3.select(scatterplot.element)
+				.select("g.point_layer")
+				.node()
+				.appendChild(this.cloneNode(true));
+			if(selected) {
+				d3.select(scatterplot.element)
+					.select("g.selection_layer")
+					.node()
+					.appendChild(this.cloneNode(true));
+			}
+			if(probed) {
+				d3.select(scatterplot.element)
+					.select("g.probe_layer")
+					.node()
+					.appendChild(this.cloneNode(true));
+			}
+		});
+
+		//style point_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+		d3.select(scatterplot.element)
+			.select("g.point_layer")
+			.selectAll("circle")
+			.attr("class","weave_point_layer_circle")
+			.style("opacity",null);
+
+		//draw selection_style_layer
+		d3.select(scatterplot.element)
+			.selectAll("g.c3-shapes.c3-circles")
+			.selectAll("circle.c3-shape").each( function(d: any, i:number, oi:number) {
+				if (d.hasOwnProperty("index")) {
+					let key = scatterplot.records[d.index].id;
+					let selected = scatterplot.isSelected(key);
+					if (selected) {
+						d3.select(scatterplot.element)
+							.selectAll("g.selection_style_layer")
+							.append("circle")
+							.classed("_selection_circle", true)
+							.attr("cx", this.getAttribute("cx"))
+							.attr("cy", this.getAttribute("cy"))
+							.attr("r", this.getAttribute("r"))
+							.style("stroke", "black")
+							.style("stroke-width", 2)
+							.style("stroke-opacity", 0.5)
+					}
+				}
+		});
+
+		//style selection_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+		d3.select(scatterplot.element)
+			.select("g.selection_layer")
+			.selectAll("circle")
+			.attr("class","weave_selection_layer_circle")
+			.style("opacity", null);
+
+		//draw probe_style_layer
+		d3.select(scatterplot.element)
+			.selectAll("g.c3-shapes.c3-circles")
+			.selectAll("circle.c3-shape").each( function(d: any, i:number, oi:number) {
+			if (d.hasOwnProperty("index")) {
+				let key = scatterplot.records[d.index].id;
+				let probed = scatterplot.isProbed(key);
+				if (probed) {
+					let groupElement = d3.select(scatterplot.element)
+						.selectAll("g.probe_style_layer")
+						.append("g")
+						.classed("_probe_style_group", true);
+					groupElement.append("circle")
+						.classed("_probe_outer_circle", true)
+						.attr("cx", this.getAttribute("cx"))
+						.attr("cy", this.getAttribute("cy"))
+						.attr("r", String(Number(this.getAttribute("r"))+3))
+						.style("stroke", "black")
+						.style("stroke-width", 1)
+						.style("fill", "white");
+					groupElement.append("circle")
+						.classed("_probe_inner_circle", true)
+						.attr("cx", this.getAttribute("cx"))
+						.attr("cy", this.getAttribute("cy"))
+						.attr("r", this.getAttribute("r"))
+						.style("stroke", "black")
+						.style("stroke-width", 1)
+						.style("fill", "black");
+				}
+			}
+		});
+
+		//style probe_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+		d3.select(scatterplot.element)
+			.select("g.probe_layer")
+			.selectAll("circle")
+			.attr("class","weave_probe_layer_circle")
+			.style("opacity", null);
 	}
 
 	get selectableAttributes()
