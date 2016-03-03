@@ -485,10 +485,10 @@ export default class C3BarChart extends AbstractC3Tool
 		var barchart = this;
 		this.heightColumnNames.forEach((item:string) => {
 			//copy items to point_layer, selection_layer, and probe_layer
-			d3.select(this.element)
-				.selectAll("g.point_layer")
-				.append("g")
-				.classed(item + "-bars",true);
+			//d3.select(this.element)
+			//	.selectAll("g.point_layer")
+			//	.append("g")
+			//	.classed(item + "-bars",true);
 			d3.select(this.element)
 				.selectAll("g.selection_layer")
 				.append("g")
@@ -501,11 +501,11 @@ export default class C3BarChart extends AbstractC3Tool
 				let key = barchart.records[i].id;
 				let selected = barchart.isSelected(key);
 				let probed = barchart.isProbed(key);
-				d3.select(barchart.element)
-					.select("g.point_layer")
-					.select("g."+ item + "-bars")
-					.node()
-					.appendChild(this.cloneNode(true));
+				//d3.select(barchart.element)
+				//	.select("g.point_layer")
+				//	.select("g."+ item + "-bars")
+				//	.node()
+				//	.appendChild(this.cloneNode(true));
 				if (selected) {
 					d3.select(barchart.element)
 						.select("g.selection_layer")
