@@ -258,17 +258,15 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 
 	protected weaveLayering():void
 	{
-		//Weave Interaction Layering Group
-
 		//style c3 layer
 		this.styleC3ShapeGroups();
 
 		//remove existing weave layering, if present
 		d3.select(this.element).selectAll("g.weave_layering_group").remove();
 
-		//create layering group and layers
-		var layerGroup:any = d3.select(this.element)
-			.select("g.c3-chart-line")
+		//create layering group and layers, append to last child of c3-chart-lines to render on top
+		var layerGroup:any = d3.select(d3.select(this.element)
+			.select("g.c3-chart-line").node().parentNode.lastChild)
 			.append("g")
 			.classed("weave_layering_group",true);
 		layerGroup.append("g")
