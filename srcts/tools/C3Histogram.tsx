@@ -328,72 +328,6 @@ export default class C3Histogram extends AbstractC3Tool
 		}
 		this.selectionKeySet.replaceKeys(selectedKeys);
 	}
-	
-    updateStyle()
-    {
-        let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
-
-        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-        var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
-        var selectedRecords:Record[] = _.filter(this.records, function(record:Record) {
-            return _.includes(selectedKeys, record.id);
-        });
-        var probedRecords:Record[] = _.filter(this.records, function(record:Record) {
-            return _.includes(probedKeys, record.id);
-        });
-        var selectedBinIndices:number[] = _.map(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn') as number[];
-        var probedBinIndices:number[] = _.map(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn') as number[];
-
-        d3.select(this.element).selectAll("path.c3-shape")
-            .style("stroke",
-                (d: any, i:number, oi:number): string => {
-                    let selected = _.intersection(selectedBinIndices,[i]).length;
-                    let probed = _.intersection(probedBinIndices,[i]).length;
-                    if (probed && selected)
-                        return "white";
-                    else
-                        return "black";
-                })
-            .style("opacity",
-                (d: any, i: number, oi: number): number => {
-                    let selected = _.intersection(selectedBinIndices,[i]).length;
-                    let probed = _.intersection(probedBinIndices,[i]).length;
-                    return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
-                })
-            .style("stroke-opacity",
-                (d: any, i: number, oi: number): number => {
-                    let selected = _.intersection(selectedBinIndices,[i]).length;
-                    let probed = _.intersection(probedBinIndices,[i]).length;
-                    if (probed)
-                        return 1.0;
-                    if (selected)
-                        return 0.5;
-                    return 0.3;
-                })
-            .style("stroke-width",
-                (d: any, i: number, oi: number): number => {
-                    let selected = _.intersection(selectedBinIndices,[i]).length;
-                    let probed = _.intersection(probedBinIndices,[i]).length;
-                    if (probed && selected)
-                        return 2.5;
-                    return probed ? 1.7 : 1.0;
-                });
-
-        //handle selected paths
-        d3.select(this.element)
-            .selectAll("path._selection_surround").remove();
-        d3.select(this.element)
-            .selectAll("g.c3-shapes")
-            .selectAll("path._selected_").each( function(d: any, i:number, oi:number) {
-                d3.select(this.parentNode)
-                    .append("path")
-                    .classed("_selection_surround",true)
-                    .attr("d",this.getAttribute("d"))
-                    .style("stroke", "black")
-                    .style("stroke-width", 1.5)
-                ;
-        });
-    }
 
     private dataChanged()
     {
@@ -534,8 +468,9 @@ export default class C3Histogram extends AbstractC3Tool
 		{
 			this.chart.select(["height"], [], true);
 		}
-		
-		this.updateStyle();
+
+        //call weave layering function
+        this.weaveLayering();
 		
 		return false;
     }
@@ -632,6 +567,119 @@ export default class C3Histogram extends AbstractC3Tool
 			[Weave.lang("Margins"), this.getMarginEditor()]
 		);
 	}
+
+    protected weaveLayering():void {
+        super.weaveLayering();
+
+        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+        var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
+        var selectedRecords:Record[] = _.filter(this.records, function(record:Record) {
+            return _.includes(selectedKeys, record.id);
+        });
+        var probedRecords:Record[] = _.filter(this.records, function(record:Record) {
+            return _.includes(probedKeys, record.id);
+        });
+        var selectedBinIndices:number[] = _.map(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn') as number[];
+        var probedBinIndices:number[] = _.map(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn') as number[];
+
+        var histogram = this;
+        //copy items to point_layer, selection_layer, and probe_layer
+        d3.select(this.element).selectAll("g").filter(".c3-shapes.c3-bars-height").selectAll("path").each(function (d:any, i:number, oi:number) {
+            let selected = _.intersection(selectedBinIndices,[i]).length;
+            let probed = _.intersection(probedBinIndices,[i]).length;
+            d3.select(histogram.element)
+                .select("g.point_layer")
+                .node()
+                .appendChild(this.cloneNode(true));
+            if (selected) {
+                d3.select(histogram.element)
+                    .select("g.selection_layer")
+                    .node()
+                    .appendChild(this.cloneNode(true));
+            }
+            if (probed) {
+                d3.select(histogram.element)
+                    .select("g.probe_layer")
+                    .node()
+                    .appendChild(this.cloneNode(true));
+            }
+        });
+
+        //style point_layer (need to set opacity to null, group opacity will then determine opacity of all paths)
+        d3.select(histogram.element)
+            .select("g.point_layer")
+            .selectAll("path")
+            .attr("class","weave_point_layer_path")
+            .style("opacity",null);
+
+        //draw selection_style_layer
+        d3.select(histogram.element)
+            .selectAll("g.c3-shapes.c3-bars-height")
+            .selectAll("path").each( function(d: any, i:number, oi:number) {
+            if (d.hasOwnProperty("index")) {
+                let selected = _.intersection(selectedBinIndices,[i]).length;
+                if (selected) {
+                    d3.select(histogram.element)
+                        .selectAll("g.selection_style_layer")
+                        .append("path")
+                        .classed("_selection_path", true)
+                        .attr("d", this.getAttribute("d"))
+                        .style("stroke", "black")
+                        .style("stroke-width", 2)
+                        .style("stroke-opacity", 0.5)
+                }
+            }
+        });
+
+        //style selection_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+        d3.select(histogram.element)
+            .select("g.selection_layer")
+            .selectAll("path")
+            .attr("class","weave_point_layer_path")
+            .style("opacity",null);
+
+        //draw probe_style_layer
+        d3.select(histogram.element)
+            .selectAll("g.c3-shapes.c3-bars-height")
+            .selectAll("path").each( function(d: any, i:number, oi:number) {
+            if (d.hasOwnProperty("index")) {
+                let probed = _.intersection(probedBinIndices,[i]).length;
+                if (probed) {
+                    var pathBBox = this.getBBox();
+                    var borderThickness = 3;
+                    let groupElement = d3.select(histogram.element)
+                        .selectAll("g.probe_style_layer")
+                        .append("g")
+                        .classed("_probe_style_group", true);
+                    groupElement.append("rect")
+                        .classed("_probe_outer_path", true)
+                        .attr("x",pathBBox.x-borderThickness)
+                        .attr("y",pathBBox.y-borderThickness)
+                        .attr("width",pathBBox.width+2*borderThickness)
+                        .attr("height",pathBBox.height+2*borderThickness)
+                        .style("stroke", "black")
+                        .style("stroke-width", 1)
+                        .style("fill", "white");
+                    groupElement.append("rect")
+                        .classed("_probe_inner_path", true)
+                        .attr("x",pathBBox.x)
+                        .attr("y",pathBBox.y)
+                        .attr("width",pathBBox.width)
+                        .attr("height",pathBBox.height)
+                        .style("stroke", "black")
+                        .style("stroke-width", 1)
+                        .style("fill", "black");
+                }
+            }
+        });
+
+        //style probe_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+        d3.select(histogram.element)
+            .select("g.probe_layer")
+            .selectAll("path")
+            .attr("class","weave_point_layer_path")
+            .style("opacity",null);
+    }
 
     get deprecatedStateMapping()
     {
