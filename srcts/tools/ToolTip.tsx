@@ -207,7 +207,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 	static getToolTipData(context:ILinkableObject, keys:IQualifiedKey[], additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
 	{
 		let columnHashMap = Weave.getRoot(context).getObject("Probed Columns") as ILinkableHashMap;
-		let columns = columnHashMap.getObjects(IAttributeColumn);
+		let columns = columnHashMap? columnHashMap.getObjects(IAttributeColumn) : [] as IAttributeColumn[];
 		var result:{[columnName: string]: string} = {};
 
 		for (let child of columns.concat(additionalColumns))
@@ -229,8 +229,9 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 	static getToolTipTitle(context:ILinkableObject, key:IQualifiedKey):string
 	{
 		let titleHashMap = Weave.getRoot(context).getObject("Probe Header Columns") as ILinkableHashMap;
+		let columns = titleHashMap ? titleHashMap.getObjects(IAttributeColumn) : [] as IAttributeColumn[];
 
-		return _.map(titleHashMap.getObjects(IAttributeColumn), column => column.getValueFromKey(key, String)).join(", ");
+		return _.map(columns, column => column.getValueFromKey(key, String)).join(", ");
 	}
 
 	static getToolTipContent(
