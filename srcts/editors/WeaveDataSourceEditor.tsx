@@ -3,6 +3,7 @@ import * as lodash from "lodash";
 import ui from "../react-ui/ui";
 import LinkableTextField from "../ui/LinkableTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import Tree from "../ui/Tree";
 
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
@@ -14,8 +15,6 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 	{
 		super(props);
 	}
-
-
 
 	state:IDataSourceEditorState = {dataSource: null};
 
@@ -47,6 +46,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
 						<button type="button">{Weave.lang("Choose")}</button>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
+						<Tree root={this.state.dataSource.getHierarchyRoot()}/>
 					</label>
 			</ui.VBox>;
 	}
