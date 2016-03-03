@@ -11,10 +11,10 @@ import {WeaveLayoutManager} from "../lib/WeaveUI.js";
 
 
 
-var weave1 = new Weave();
-var weave2 = new Weave();
-weavejs.core.WeaveArchive.loadUrl(weave1, "TN_EDU.weave").then(function(){
-    weavejs.core.WeaveArchive.loadUrl(weave2, "TN_FluVaccinations.weave").then(render)
+window.weave1 = new Weave();
+window.weave2 = new Weave();
+weavejs.core.WeaveArchive.loadUrl(weave1, "/tncp/TN_EDU.weave").then(function(){
+    weavejs.core.WeaveArchive.loadUrl(weave2, "/tncp/TN_FluVaccinations.weave").then(render)
 });
 
 var weaveInsts = [weave1,weave2]
