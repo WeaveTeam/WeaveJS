@@ -292,10 +292,10 @@ export default class C3LineChart extends AbstractC3Tool
             let key = linechart.getQKey(d);
             let selected = linechart.isSelected(key);
             let probed = linechart.isProbed(key);
-            d3.select(linechart.element)
-                .select("g.point_layer")
-                .node()
-                .appendChild(this.cloneNode(true));
+            //d3.select(linechart.element)
+            //    .select("g.point_layer")
+            //    .node()
+            //    .appendChild(this.cloneNode(true));
             if(selected) {
                 d3.select(linechart.element)
                     .select("g.selection_layer")
@@ -313,10 +313,10 @@ export default class C3LineChart extends AbstractC3Tool
             let key = linechart.getQKey(d);
             let selected = linechart.isSelected(key);
             let probed = linechart.isProbed(key);
-            d3.select(linechart.element)
-                .select("g.point_layer")
-                .node()
-                .appendChild(this.cloneNode(true));
+            //d3.select(linechart.element)
+            //    .select("g.point_layer")
+            //    .node()
+            //    .appendChild(this.cloneNode(true));
             if(selected) {
                 d3.select(linechart.element)
                     .select("g.selection_layer")

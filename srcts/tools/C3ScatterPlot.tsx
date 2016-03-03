@@ -283,10 +283,10 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			let key = scatterplot.records[i].id;
 			let selected = scatterplot.isSelected(key);
 			let probed = scatterplot.isProbed(key);
-			d3.select(scatterplot.element)
-				.select("g.point_layer")
-				.node()
-				.appendChild(this.cloneNode(true));
+			//d3.select(scatterplot.element)
+			//	.select("g.point_layer")
+			//	.node()
+			//	.appendChild(this.cloneNode(true));
 			if(selected) {
 				d3.select(scatterplot.element)
 					.select("g.selection_layer")
@@ -302,11 +302,11 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		});
 
 		//style point_layer (need to set opacity to null, group opacity will then determine opacity of all points)
-		d3.select(scatterplot.element)
-			.select("g.point_layer")
-			.selectAll("circle")
-			.attr("class","weave_point_layer_circle")
-			.style("opacity",null);
+		//d3.select(scatterplot.element)
+		//	.select("g.point_layer")
+		//	.selectAll("circle")
+		//	.attr("class","weave_point_layer_circle")
+		//	.style("opacity",null);
 
 		//draw selection_style_layer
 		d3.select(scatterplot.element)

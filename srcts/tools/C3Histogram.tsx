@@ -610,10 +610,10 @@ export default class C3Histogram extends AbstractC3Tool
         d3.select(this.element).selectAll("g").filter(".c3-shapes.c3-bars-height").selectAll("path").each(function (d:any, i:number, oi:number) {
             let selected = _.intersection(selectedBinIndices,[i]).length;
             let probed = _.intersection(probedBinIndices,[i]).length;
-            d3.select(histogram.element)
-                .select("g.point_layer")
-                .node()
-                .appendChild(this.cloneNode(true));
+            //d3.select(histogram.element)
+            //    .select("g.point_layer")
+            //    .node()
+            //    .appendChild(this.cloneNode(true));
             if (selected) {
                 d3.select(histogram.element)
                     .select("g.selection_layer")
