@@ -193,12 +193,13 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([key]);
 		var data = ToolTip.getToolTipData(this, [key], [this.dataX, this.dataY, this.radiusData]);
-		this.props.toolTip.setState({
-			x: this.chart.internal.d3.event.pageX,
-			y: this.chart.internal.d3.event.pageY,
-			showToolTip: true,
-			columnNamesToValue: data
-		});
+		if (this.props.toolTip)
+			this.props.toolTip.setState({
+				x: this.chart.internal.d3.event.pageX,
+				y: this.chart.internal.d3.event.pageY,
+				showToolTip: true,
+				columnNamesToValue: data
+			});
 	}
 	
 	protected handleC3Selection():void

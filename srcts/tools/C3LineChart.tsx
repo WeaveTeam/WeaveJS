@@ -154,12 +154,13 @@ export default class C3LineChart extends AbstractC3Tool
 	{
 		var key = this.getQKey(d);
         this.probeKeySet.replaceKeys([key]);
-        this.props.toolTip.setState({
-            x: this.chart.internal.d3.event.pageX,
-            y: this.chart.internal.d3.event.pageY,
-            showToolTip: true,
-            columnNamesToValue: ToolTip.getToolTipData(this, [key], this.columns.getObjects(IAttributeColumn))
-        });
+		if (this.props.toolTip)
+	        this.props.toolTip.setState({
+	            x: this.chart.internal.d3.event.pageX,
+	            y: this.chart.internal.d3.event.pageY,
+	            showToolTip: true,
+	            columnNamesToValue: ToolTip.getToolTipData(this, [key], this.columns.getObjects(IAttributeColumn))
+	        });
 	}
 	
 	protected handleC3Selection():void

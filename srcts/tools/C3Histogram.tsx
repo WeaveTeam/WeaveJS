@@ -117,13 +117,13 @@ export default class C3Histogram extends AbstractC3Tool
                         }
                         this.probeKeySet.replaceKeys(keys);
                         if (this.props.toolTip)
-                        this.props.toolTip.setState({
-                            x: this.chart.internal.d3.event.pageX,
-                            y: this.chart.internal.d3.event.pageY,
-                            showToolTip: true,
-                            title: this.columnToAggregate.getMetadata('title'),
-                            columnNamesToValue: columnNamesToValue
-                        });
+	                        this.props.toolTip.setState({
+	                            x: this.chart.internal.d3.event.pageX,
+	                            y: this.chart.internal.d3.event.pageY,
+	                            showToolTip: true,
+	                            title: this.columnToAggregate.getMetadata('title'),
+	                            columnNamesToValue: columnNamesToValue
+	                        });
                     }
                 }
             },
