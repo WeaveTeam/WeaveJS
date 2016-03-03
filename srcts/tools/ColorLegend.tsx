@@ -211,7 +211,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					//handle circle/square/line in same switch logic
 					case SHAPE_TYPE_CIRCLE :
 					case SHAPE_TYPE_SQUARE :
-					case SHAPE_TYPE_LINE :
+					case SHAPE_TYPE_LINE:
 					{
 						var element:JSX.Element[] = [];
 						for (var i = 0; i < totalBins; i++)
@@ -252,7 +252,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 										<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
 											<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center", justifyContent:"flex-end"}}>
-												<span style={ prefixerStyle }>{ textLabelFunction(i) }</span>
+												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
 											</ui.HBox>:""}
 											<ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
 												<svg style={{position:"absolute"}}
@@ -264,7 +264,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 											</ui.HBox>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
 												"":<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
-												<span style={ prefixerStyle }>{ textLabelFunction(i) }</span>
+												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
 											</ui.HBox>}
 										</ui.HBox>
 									);
@@ -309,7 +309,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 															strokeOpacity: 0.5,
 															backgroundColor: "#FFF"
 														}}>
-													<span style={prefixerStyle}>{ textLabelFunction(i) }</span>
+													<span style={prefixerStyle}>{ Weave.lang(textLabelFunction(i)) }</span>
 												</div>
 											</ui.HBox>
 										</ui.HBox>
@@ -336,7 +336,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
 				<ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
 					<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
-						<span style={prefixerStyle}>{this.dynamicColorColumn.getMetadata('title')}</span>
+						<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
 					</ui.HBox>
 					<ui.HBox style={{width:"100%", flex: 0.9}}> { finalElements } </ui.HBox>
 				</ui.VBox>

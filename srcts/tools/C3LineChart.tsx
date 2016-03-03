@@ -75,7 +75,7 @@ export default class C3LineChart extends AbstractC3Tool
 					var columns = this.columns.getObjects(IAttributeColumn);
                     if (columns[0] && columns[0].getMetadata('dataType') !== "number")
                     {
-                        return this.yAxisValueToLabel[num] || "";
+                        return Weave.lang(this.yAxisValueToLabel[num]) || "";
                     }
                     else
                     {
@@ -126,11 +126,11 @@ export default class C3LineChart extends AbstractC3Tool
                             {
                                 //handle case where labels need to be reversed
                                 var temp:number = this.columnLabels.length-1;
-                                return this.columnLabels[temp-d];
+                                return Weave.lang(this.columnLabels[temp-d]);
                             }
                             else
                             {
-                                return this.columnLabels[d];
+                                return Weave.lang(this.columnLabels[d]);
                             }
                         }
                     }

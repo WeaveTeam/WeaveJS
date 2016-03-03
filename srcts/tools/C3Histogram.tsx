@@ -147,7 +147,7 @@ export default class C3Histogram extends AbstractC3Tool
                             if (this.element && this.props.style.height > 0)
                             {
                                 var labelHeight:number = Number(this.margin.bottom)/Math.cos(45*(Math.PI/180));
-                                var labelString:string = this.getLabelString(num);
+                                var labelString:string = Weave.lang(this.getLabelString(num));
                                 if (labelString)
                                 {
                                     var stringSize:number = MiscUtils.getTextWidth(labelString, this.getFontString());
@@ -161,22 +161,12 @@ export default class C3Histogram extends AbstractC3Tool
                             }
                             else
                             {
-                                return this.binnedColumn.deriveStringFromNumber(num);
+                                return Weave.lang(this.binnedColumn.deriveStringFromNumber(num));
                             }
                         }
                     }
                 },
                 rotated: false
-            },
-            tooltip: {
-                format: {
-                    title: (num:number):string => {
-                        return this.binnedColumn.deriveStringFromNumber(num);
-                    },
-                    name: (name:string, ratio:number, id:string, index:number):string => {
-                        return this.getYAxisLabel();
-                    }
-                }
             },
             grid: {
                 x: {
@@ -201,7 +191,7 @@ export default class C3Histogram extends AbstractC3Tool
             tick: {
                 fit: false,
                 format: (num:number):string => {
-                    return String(FormatUtils.defaultNumberFormatting(num));
+                    return Weave.lang(String(FormatUtils.defaultNumberFormatting(num)));
                 }
             }
         }
@@ -213,10 +203,10 @@ export default class C3Histogram extends AbstractC3Tool
         {
             //handle case where labels need to be reversed
             var temp:number = this.histData.length-1;
-            return this.binnedColumn.deriveStringFromNumber(temp-num);
+            return Weave.lang(this.binnedColumn.deriveStringFromNumber(temp-num));
         }
         else
-            return this.binnedColumn.deriveStringFromNumber(num);
+            return Weave.lang(this.binnedColumn.deriveStringFromNumber(num));
     }
 
     rotateAxes()
@@ -239,16 +229,16 @@ export default class C3Histogram extends AbstractC3Tool
                 switch(this.aggregationMethod.value)
                 {
                     case "count":
-                        return "Number of records";
+                        return Weave.lang("Number of records");
                     case "sum":
-                        return "Sum of " + this.columnToAggregate.getMetadata('title');
+                        return Weave.lang("Sum of {0}", Weave.lang(this.columnToAggregate.getMetadata('title')));
                     case "mean":
-                        return "Mean of " + this.columnToAggregate.getMetadata('title');
+                        return Weave.lang("Mean of {0}", Weave.lang(this.columnToAggregate.getMetadata('title')));
                 }
             }
             else
             {
-                return "Number of records";
+                return Weave.lang("Number of records");
             }
         }
     }
@@ -426,10 +416,10 @@ export default class C3Histogram extends AbstractC3Tool
         if (axisChange)
         {
             changeDetected = true;
-            var xLabel:string = this.xAxisName.value || this.binnedColumn.getMetadata('title');
+            var xLabel:string = Weave.lang(this.xAxisName.value || this.binnedColumn.getMetadata('title'));
             if (!this.showXAxisLabel)
                 xLabel = " ";
-            var yLabel:string = this.getYAxisLabel.bind(this)();
+            var yLabel:string = Weave.lang(this.getYAxisLabel.bind(this)());
 
             if (this.records)
             {
@@ -450,8 +440,8 @@ export default class C3Histogram extends AbstractC3Tool
                 }
             }
 
-            this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
-            this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
+            this.c3Config.axis.x.label = {text: xLabel, position:"outer-center"};
+            this.c3ConfigYAxis.label = {text: yLabel, position:"outer-middle"};
 			
 			this.updateConfigMargin();
     	}

@@ -138,7 +138,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 									</svg>
 								</ui.HBox>
 								<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
-									<span style={prefixerStyle}>{labels[i]}</span>
+									<span style={prefixerStyle}>{Weave.lang(labels[i])}</span>
 								</ui.HBox>
 							</ui.HBox>
 						);

@@ -175,13 +175,13 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 					var returnElements:JSX.Element[] = [];
 					if (weavejs.WeaveAPI.Locale.reverseLayout)
 					{
-						returnElements.push(<td key={returnElements.length} className="value">{this.valueFormat(this.state.columnNamesToValue[columnName])}</td>);
-						returnElements.push(<td key={returnElements.length} className="name"><div style={{display:"inline"}}>{this.nameFormat(columnName)}</div>{colorSpan}</td>);
+						returnElements.push(<td key={returnElements.length} className="value">{this.valueFormat(Weave.lang(this.state.columnNamesToValue[columnName]))}</td>);
+						returnElements.push(<td key={returnElements.length} className="name"><div style={{display:"inline"}}>{this.nameFormat(Weave.lang(columnName))}</div>{colorSpan}</td>);
 					}
 					else
 					{
-						returnElements.push(<td key={returnElements.length} className="name">{colorSpan}<div style={{display:"inline"}}>{this.nameFormat(columnName)}</div></td>);
-						returnElements.push(<td key={returnElements.length} className="value">{this.valueFormat(this.state.columnNamesToValue[columnName])}</td>);
+						returnElements.push(<td key={returnElements.length} className="name">{colorSpan}<div style={{display:"inline"}}>{Weave.lang(this.nameFormat(columnName))}</div></td>);
+						returnElements.push(<td key={returnElements.length} className="value">{this.valueFormat(Weave.lang(this.state.columnNamesToValue[columnName]))}</td>);
 					}
 					return ( <tr key={columnName}>{returnElements}</tr>);
                 });
@@ -192,7 +192,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
                 <table className={this.toolTipClass}>
                     <tbody>
                         {
-                            <tr><th colSpan={2}>{this.state.title ? this.titleFormat(this.state.title): ""}</th></tr>
+                            <tr><th colSpan={2}>{this.state.title ? this.titleFormat(Weave.lang(this.state.title)): ""}</th></tr>
                         }
                         {
                             tableRows
@@ -232,44 +232,5 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 		let columns = titleHashMap ? titleHashMap.getObjects(IAttributeColumn) : [] as IAttributeColumn[];
 
 		return _.map(columns, column => column.getValueFromKey(key, String)).join(", ");
-	}
-
-	static getToolTipContent(
-            columnNamesToValue:{[columnName:string]: string},
-            title?:string,
-            nameFormat?:Function,
-            valueFormat?:Function,
-            titleFormat?:Function,
-            toolTipClass?:string,
-            columnNamesToColor?:{[columnName:string]: string}
-        ):string
-	{
-	    nameFormat = nameFormat || _.identity;
-	    valueFormat = valueFormat || _.identity;
-	    titleFormat = titleFormat || _.identity;
-	    toolTipClass = toolTipClass || "c3-tooltip";
-	
-	    var template:string = "";
-	
-	    var columnNames:string[] = Object.keys(columnNamesToValue);
-	    if (columnNames.length)
-	    {
-	        template += "<table class='" + toolTipClass + "'>" +  titleFormat((title ? "<tr><th colspan='2'>" + title + "</th></tr>" : ""))
-	
-	        columnNames.forEach((columnName:string) => {
-	            template += "<tr>";
-	            template += "<td class='name'>";
-	            if (columnNamesToColor && columnNamesToColor[columnName])
-	            {
-	                template += "<span style=" + "'background-color': " + columnNamesToColor[columnName] + "/>";
-	            }
-	            template += "<div style='display':'inline'>" + nameFormat(columnName) + "</div></td>";
-	            template += valueFormat(columnNamesToValue[columnName]) === null ? "<td class='value'>" + valueFormat(columnNamesToValue[columnName]) + "</td>" : "";
-	            template += "</tr>";
-	        });
-	        template += "</table>";
-	    }
-	
-	    return template;
 	}
 }

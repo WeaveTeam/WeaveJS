@@ -166,7 +166,7 @@ export default class C3BarChart extends AbstractC3Tool
 								if (this.element && this.props.style.height > 0 && this.margin.bottom)
 								{
 									var labelHeight:number = this.margin.bottom.value/Math.cos(45*(Math.PI/180));
-									var labelString:string = record.stringValues.xLabel;
+									var labelString:string = Weave.lang(record.stringValues.xLabel);
 									if (labelString)
 									{
 										var stringSize:number = MiscUtils.getTextWidth(labelString, this.getFontString());
@@ -180,7 +180,7 @@ export default class C3BarChart extends AbstractC3Tool
 								}
 								else
 								{
-									return record.stringValues.xLabel;
+									return Weave.lang(record.stringValues.xLabel);
 								}
                             }
                             else
@@ -224,7 +224,7 @@ export default class C3BarChart extends AbstractC3Tool
 					var record = this.records[num];
                     if (record && this.yLabelColumnDataType !== "number")
                     {
-                        return record.stringValues.yLabel || "";
+                        return Weave.lang(record.stringValues.yLabel) || "";
                     }
                     else if (this.groupingMode.value === PERCENT_STACK)
                     {
@@ -449,8 +449,8 @@ export default class C3BarChart extends AbstractC3Tool
         {
             changeDetected = true;
 			
-            var xLabel:string = this.xAxisName.value || "Sorted by " + this.sortColumn.getMetadata('title');
-            var yLabel:string = this.yAxisName.value || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : "");
+            var xLabel:string = Weave.lang(this.xAxisName.value || "Sorted by " + this.sortColumn.getMetadata('title'));
+            var yLabel:string = Weave.lang(this.yAxisName.value || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : ""));
 
             if (!this.showXAxisLabel.value)
             {

@@ -123,7 +123,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						format: (num:number):string => {
 							if (this.xAxisValueToLabel && this.dataXType !== "number")
 							{
-								return this.xAxisValueToLabel[num] || "";
+								return Weave.lang(this.xAxisValueToLabel[num]) || "";
 							}
 							else
 							{
@@ -144,16 +144,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				},
 				y: {
 					show: true
-				}
-			},
-			tooltip: {
-				format: {
-					title: (num:number):string => {
-						return this.xAxisName.value || this.dataX.getMetadata('title');
-					},
-					name: (name:string, ratio:number, id:string, index:number):string => {
-						return this.yAxisName.value || this.dataY.getMetadata('title');
-					}
 				}
 			},
 			point: {
@@ -186,7 +176,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				format: (num:number):string => {
 					if (this.yAxisValueToLabel && this.dataYType !== "number")
 					{
-						return this.yAxisValueToLabel[num] || "";
+						return Weave.lang(this.yAxisValueToLabel[num]) || "";
 					}
 					else
 					{
@@ -247,8 +237,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin);
 		if (axisChanged)
 		{
-			var xLabel:string = this.xAxisName.value || this.dataX.getMetadata('title');
-			var yLabel:string = this.yAxisName.value || this.dataY.getMetadata('title');
+			var xLabel:string = Weave.lang(this.xAxisName.value || this.dataX.getMetadata('title'));
+			var yLabel:string = Weave.lang(this.yAxisName.value || this.dataY.getMetadata('title'));
 
 			if (weavejs.WeaveAPI.Locale.reverseLayout)
 			{

@@ -138,7 +138,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
                 <TitleBar ref={(c:React.Component<ITitleBarProps, ITitleBarState>) => { this.titleBar = c; } }
                           onDragStart={this.props.onDragStart}
                           titleBarHeight={this.titleBarHeight}
-                          title={this.state.title}
+                          title={Weave.lang(this.state.title)}
                           />
                 {
                     <div style={toolStyle} className="weave-tool">

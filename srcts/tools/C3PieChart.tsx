@@ -80,7 +80,7 @@ export default class C3PieChart extends AbstractC3Tool
                     format: (value:number, ratio:number, id:string):string => {
                         var record:Record = this.records[this.keyToIndex[id]];
                         if (record && record.label)
-                            return record.label as string;
+                            return Weave.lang(record.label);
                         return String(value);
                     }
                 }
@@ -91,7 +91,7 @@ export default class C3PieChart extends AbstractC3Tool
                     format: (value:number, ratio:number, id:string):string => {
                         var record = this.records[this.keyToIndex[id]];
                         if (record && record.label)
-                            return record.label as string;
+                            return Weave.lang(record.label);
                         return String(value);
                     }
                 }
