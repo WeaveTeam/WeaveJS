@@ -109,8 +109,6 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 
 	render()
 	{
-		var width:number = this.props.style.width as number;
-		var height:number = this.props.style.height as number;
 		var shapeSize = this.shapeSize.value;
 		var labels:string[] = this.columns.getObjects(IAttributeColumn).map(item => item.getMetadata('title'));
 		var maxColumns = 1; // = this.maxColumns.value; Only one column actually supported right now.
@@ -152,13 +150,13 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 				}
 			}
 
-			if (this.props.style.width > this.props.style.height * 2)
-				elements.push(
-					<ui.HBox key={i} style={{width: "100%", flex: columnFlex}}>
-						{ element }
-					</ui.HBox>
-				)
-			else
+//			if (this.props.style.width > this.props.style.height * 2)
+//				elements.push(
+//					<ui.HBox key={i} style={{width: "100%", flex: columnFlex}}>
+//						{ element }
+//					</ui.HBox>
+//				)
+//			else
 				elements.push(
 					<ui.VBox key={i} style={{height: "100%", flex: columnFlex}}>
 						{ element }
@@ -174,16 +172,15 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 					<span style={prefixerStyle}>Bar color</span>
 				</ui.HBox>
 				{
-					this.props.style.width > this.props.style.height * 2
-					?
-						<ui.HBox style={{width:"100%", flex: 0.9}}>
-							{ finalElements }
-						</ui.HBox>
-					:
+//					this.props.style.width > this.props.style.height * 2
+//					?
+//						<ui.HBox style={{width:"100%", flex: 0.9}}>
+//							{ finalElements }
+//						</ui.HBox>
+//					:
 						<ui.VBox style={{height:"100%", flex: 0.9}}>
 							{ finalElements }
 						</ui.VBox>
-
 					}
 			</ui.VBox>
 		</div>);

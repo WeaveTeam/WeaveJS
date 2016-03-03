@@ -17,6 +17,7 @@ import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
 import ToolTip from "./ToolTip";
+import {HBox, VBox} from "../react-ui/FlexBox";
 
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -50,6 +51,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	showLegendName = Weave.linkableChild(this, new LinkableBoolean(true));
 	//lineStyle = Weave.linkableChild(this, SolidLineStyle);
 	
+	element:HTMLElement;
+	
 	private get colorColumn() { return this.dynamicColorColumn.target as ColorColumn; }
 	private get binnedColumn() { var cc = this.colorColumn; return cc ? cc.getInternalColumn() as BinnedColumn : null; }
 	private get binningDefinition() { var bc = this.binnedColumn ; return bc ? bc.binningDefinition.target as IBinningDefinition : null; }
@@ -79,22 +82,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			textOverflow: "ellipsis",
 			padding: 5,
 			userSelect: "none"
-		};
-	}
-
-	get deprecatedStateMapping():Object
-	{
-		return {
-			children: {
-				visualization: {
-					plotManager: {
-						marginTop: this.showLegendName,
-						plotters: {
-							plot: this
-						}
-					}
-				}
-			}
 		};
 	}
 	
@@ -199,8 +186,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		if (this.numberOfBins)
 		{
 			//Binned plot case
-			var width:number = this.props.style.width as number;
-			var height:number = this.props.style.height as number;
+			var width:number = this.element ? this.element.clientWidth : 200;
+			var height:number = this.element ? this.element.clientHeight : 300;
 			var shapeSize:number = this.shapeSize.value;
 			var shapeType:string = this.shapeType.value;
 			var maxColumns:number = this.maxColumns.value;
@@ -346,8 +333,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				}
 			}
 
-			return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
-				<ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
+			return (
+				<ui.VBox style={{flex: 1, padding: "0px 5px 0px 5px", overflow: "hidden"}} ref={(vbox:VBox) => this.element = ReactDOM.findDOMNode(vbox) as HTMLElement}>
 					{this.showLegendName.value ?
 						<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
 							<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
@@ -356,13 +343,29 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					}
 					<ui.HBox style={{width:"100%", flex: 0.9}}> { finalElements } </ui.HBox>
 				</ui.VBox>
-			</div>);
+			);
 		}
 		else
 		{
 			//Continuous plot case
-			return (<svg></svg>);
+			return (<div/>);
 		}
+	}
+
+	get deprecatedStateMapping():Object
+	{
+		return {
+			children: {
+				visualization: {
+					plotManager: {
+						marginTop: this.showLegendName,
+						plotters: {
+							plot: this
+						}
+					}
+				}
+			}
+		};
 	}
 }
 

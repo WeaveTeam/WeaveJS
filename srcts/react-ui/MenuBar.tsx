@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import HBox from "./HBox";
+import {HBox, VBox} from "./FlexBox";
 import {MenuItemProps} from "./Menu";
 import Menu from "./Menu";
 import classNames from "../modules/classnames";
@@ -128,7 +128,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	render():JSX.Element
 	{
 		return (
-			<HBox className="weave-menubar" {...this.props}>
+			<HBox className="weave-menubar" {...this.props as React.HTMLAttributes}>
 				{
 					this.props.config.map((menuBarItemProps, index) => {
 						return this.renderMenuBarItem(index, menuBarItemProps)

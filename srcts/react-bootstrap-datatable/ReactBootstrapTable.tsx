@@ -18,7 +18,6 @@ export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTab
     hover?:boolean;
     rows:IRow[];
     columnTitles:IColumnTitles;
-    height:number|string;
     sortable?:boolean;
     idProperty:string;
     selectedIds:string[];
@@ -177,7 +176,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 	{
         var tableContainer:React.CSSProperties = {
                 overflow: "auto",
-                height: this.props.height
+                flex: 1
         };
 
         var selectedIds:string[];

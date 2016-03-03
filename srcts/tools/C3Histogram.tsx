@@ -144,7 +144,7 @@ export default class C3Histogram extends AbstractC3Tool
                         },
                         multiline: false,
                         format: (num:number):string => {
-                            if (this.element && this.props.style.height > 0)
+                            if (this.element)
                             {
                                 var labelHeight:number = Number(this.margin.bottom)/Math.cos(45*(Math.PI/180));
                                 var labelString:string = Weave.lang(this.getLabelString(num));

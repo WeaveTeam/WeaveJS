@@ -108,11 +108,11 @@ export default class MiscUtils
 	 * @param into the object to merge into
 	 * @param obj the object to merge from
 	 */
-	static merge(into:any, obj:any):any
+	static merge(into:any, ...objects:any[]):any
 	{
-		var attr:string;
-		for (attr in obj)
-			into[attr] = obj[attr];
+		for (let obj of objects)
+			for (let attr in obj)
+				into[attr] = obj[attr];
 		return into;
 	}
 

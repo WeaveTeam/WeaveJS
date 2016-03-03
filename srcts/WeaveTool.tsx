@@ -8,11 +8,12 @@
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
+import Layout from "./react-flexible-layout/Layout";
 
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import ui from "./react-ui/ui";
+import {HBox, VBox} from "./react-ui/FlexBox";
 import * as VendorPrefix from "react-vendor-prefix";
 import MiscUtils from "./utils/MiscUtils";
 import {Glyphicon} from "react-bootstrap";
@@ -25,55 +26,61 @@ import {REACT_COMPONENT} from "./react-ui/Menu";
 declare type IToolTip = React.Component<IToolTipProps, IToolTipState>;
 
 const grabberStyle:CSSProperties = {
-    width: "16",
-    height: "16",
-    cursor: "move",
-    background: "url(http://placehold.it/32x32)"
+	width: "16",
+	height: "16",
+	cursor: "move",
+	background: "url(http://placehold.it/32x32)"
 };
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
-    toolPath:WeavePath;
-    style:CSSProperties;
-    onDragStart:React.MouseEvent;
-    onDragEnd:React.MouseEvent;
-    onDragOver:React.MouseEvent;
-	onContextMenu?:(event:React.MouseEvent) => void;
+	layout:Layout;
+	toolPath:WeavePath;
+	onDragStart:React.DragEventHandler;
+	onDragEnd:React.DragEventHandler;
+	onDragOver:React.DragEventHandler;
+	onContextMenu?:React.MouseEventHandler;
 }
 
 export interface IWeaveToolState
 {
-	title?:string;
+	title?: string;
+	style?: CSSProperties;
 }
 
 export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
 {
-	//TODO - use linkable object instead of WeavePath because we don't know when the object gets replaced
-	//       need to check new props
-    private toolPath:WeavePath;
+	private toolPath:WeavePath;
 	
-    private tool:IVisTool;
-    private toolWidth:number;
-    private toolHeight:number;
-    private toolTip:IToolTip;
-    private titleBarHeight: number;
-    private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
+	private tool:IVisTool;
+	private toolTip:IToolTip;
+	private titleBarHeight: number;
+	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
 	
-    constructor(props:IWeaveToolProps)
+	constructor(props:IWeaveToolProps)
 	{
-        super(props);
+		super(props);
 		this.state = {};
-        this.toolPath = this.props.toolPath;
-        this.titleBarHeight = 25;
-		
-		this.handleInstance = this.handleInstance.bind(this);
-    }
+		this.toolPath = this.props.toolPath;
+		this.titleBarHeight = 25;
+	}
 	
-	componentWillReceiveProps(props:IWeaveToolProps):void
+	componentWillUnmount():void
 	{
 	}
 	
-	handleInstance(tool:IVisTool):void
+	componentWillReceiveProps(props:IWeaveToolProps):void
+	{
+		//TODO
+	}
+	
+	shouldComponentUpdate(nextProps:IWeaveToolProps, nextState:IWeaveToolState):boolean
+	{
+		return !_.isEqual(this.state, nextState)
+			|| !_.isEqual(this.props, nextProps);
+	}
+	
+	handleInstance=(tool:IVisTool):void=>
 	{
 		if (this.tool === tool)
 			return; 
@@ -93,142 +100,132 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		this.updateTitle();
 	}
 
-    componentDidMount():void
+	componentDidMount():void
 	{
 		this.updateTitle();
-    }
+	}
 
 	updateTitle():void
 	{
-        var title:string = (this.tool ? this.tool.title : '') || this.toolPath.getPath().pop();
+		var title:string = (this.tool ? this.tool.title : '') || this.toolPath.getPath().pop();
 		this.setState({title});
-    }
+	}
 
 	//TODO - we shouldn't have to render twice to set the tooltip of the tool
-    render()
+	render():JSX.Element
 	{
-        var toolHeight:number = this.props.style ? this.props.style.height - this.titleBarHeight : 320;
-        var toolWidth:number = this.props.style ? this.props.style.width : 320;
+		if (!this.state.style)
+			return <VBox/>;
+		
+		let reactTool:JSX.Element = null;
+		let ToolClass = LinkablePlaceholder.getClass(this.toolPath.getObject()) as typeof React.Component;
+		if (React.Component.isPrototypeOf(ToolClass))
+		{
+			reactTool = React.createElement(ToolClass, {
+				key: "tool",
+				ref: this.handleInstance,
+				toolTip: this.toolTip
+			});
+		}
 
-        var reactTool:any = null;
-		var ToolClass = LinkablePlaceholder.getClass(this.toolPath.getObject()) as typeof React.Component;
-        if (React.Component.isPrototypeOf(ToolClass))
-        {
-            reactTool = React.createElement(ToolClass, {
-                                key: "tool",
-                                ref: this.handleInstance,
-                                toolPath: this.toolPath,
-                                style: { height: toolHeight, width: toolWidth },
-                                toolTip: this.toolTip
-                            }
-                        );
-        }
-
-        var toolStyle:CSSProperties = {
-            width: toolWidth,
-            height: toolHeight
-        };
-
-        return (
-            <ui.VBox style={this.props.style}
-                    onMouseEnter={() => { this.titleBar.setState({ showControls: true }); }}
-                    onMouseLeave={() => { this.titleBar.setState({ showControls: false }); this.toolTip.setState({ showToolTip: false }); }}
-                    onDragOver={this.props.onDragOver}
-                    onDragEnd={this.props.onDragEnd}>
-                <TitleBar ref={(c:React.Component<ITitleBarProps, ITitleBarState>) => { this.titleBar = c; } }
-                          onDragStart={this.props.onDragStart}
-                          titleBarHeight={this.titleBarHeight}
-                          title={Weave.lang(this.state.title)}
-                          />
-                {
-                    <div style={toolStyle} className="weave-tool">
-                        <div style={{width: "100%", height: "100%", maxHeight: "100%"}}>
-                            {
-                                reactTool
-                            }
-                        </div>
-                    </div>
-                }
-                <ToolTip ref={(c:React.Component<IToolTipProps, IToolTipState>) => { this.toolTip = c }}/>
-            </ui.VBox>);
-    }
+		return (
+			<VBox style={this.state.style} className="weave-tool"
+					onMouseEnter={() => {
+						this.titleBar.setState({ showControls: true });
+					}}
+					onMouseLeave={() => {
+						this.titleBar.setState({ showControls: false });
+						this.toolTip.setState({ showToolTip: false });
+					}}
+					onDragOver={this.props.onDragOver}
+					onDragEnd={this.props.onDragEnd}>
+				<TitleBar ref={(c:TitleBar) => this.titleBar = c }
+						  onDragStart={this.props.onDragStart}
+						  titleBarHeight={this.titleBarHeight}
+						  title={Weave.lang(this.state.title)}
+						  />
+					{ reactTool }
+				<ToolTip ref={(c:ToolTip) => this.toolTip = c}/>
+			</VBox>
+		);
+	}
 }
 
 interface ITitleBarProps extends React.Props<TitleBar>
 {
-    onDragStart:React.MouseEvent;
-    titleBarHeight:number;
-    title:string;
+	onDragStart:React.DragEventHandler;
+	titleBarHeight:number;
+	title:string;
 }
 
 interface ITitleBarState
 {
-    showControls: boolean;
+	showControls: boolean;
 }
 
 class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 {
-    constructor(props:ITitleBarProps)
-    {
-        super(props);
-        this.state = {
-            showControls: false
-        };
-    }
-    render()
-    {
-        var windowBar:CSSProperties = {
-            width: "100%",
-            height: this.props.titleBarHeight,
-            backgroundColor: this.state.showControls ? "#f8f8f8": ""
-        };
+	constructor(props:ITitleBarProps)
+	{
+		super(props);
+		this.state = {
+			showControls: false
+		};
+	}
+	render()
+	{
+		var windowBar:CSSProperties = {
+			width: "100%",
+			height: this.props.titleBarHeight,
+			backgroundColor: this.state.showControls ? "#f8f8f8": ""
+		};
 
-        var titleStyle:CSSProperties = {
-            cursor: "move",
-            height: this.props.titleBarHeight,
-            textAlign: "center",
-            overflow: "hidden",
-            whiteSpace: "nowrap",
-            flex: 1,
-            textOverflow: "ellipsis",
-            paddingTop: "3"
-        };
+		var titleStyle:CSSProperties = {
+			cursor: "move",
+			height: this.props.titleBarHeight,
+			textAlign: "center",
+			overflow: "hidden",
+			whiteSpace: "nowrap",
+			flex: 1,
+			textOverflow: "ellipsis",
+			paddingTop: "3"
+		};
 
-        var transitions:CSSProperties = {
-            visibility: this.state.showControls ? "visible" : "hidden",
-            opacity: this.state.showControls ? 0.7 : 0,
-            transition: this.state.showControls ? "visibiliy 0s 0.1s, opacity 0.1s linear" : "visibility 0s 0.1s, opacity 0.1s linear"
-        };
+		var transitions:CSSProperties = {
+			visibility: this.state.showControls ? "visible" : "hidden",
+			opacity: this.state.showControls ? 0.7 : 0,
+			transition: this.state.showControls ? "visibiliy 0s 0.1s, opacity 0.1s linear" : "visibility 0s 0.1s, opacity 0.1s linear"
+		};
 
-        var leftControls:CSSProperties = {
-            marginLeft: 5,
-            marginTop: 2,
-            width: 20
-        };
+		var leftControls:CSSProperties = {
+			marginLeft: 5,
+			marginTop: 2,
+			width: 20
+		};
 
-        var rightControls:CSSProperties = {
-            marginTop: 2,
-            width: 38
-        };
+		var rightControls:CSSProperties = {
+			marginTop: 2,
+			width: 38
+		};
 
-        MiscUtils.merge(leftControls, transitions);
-        MiscUtils.merge(rightControls, transitions);
+		_.merge(leftControls, transitions);
+		_.merge(rightControls, transitions);
 
-        return(
-            <ui.HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
-            {/*<ui.HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
-            <Glyphicon glyph="cog"/>
-            </ui.HBox>*/}
-            <span style={titleStyle} className="weave-panel">{this.props.title}</span>
-            {/*<ui.HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
-            <div style={{marginRight: 5}}>
-            <Glyphicon glyph="unchecked"/>
-            </div>
-            <div style={{marginRight: 5}}>
-            <Glyphicon glyph="remove"/>
-            </div>
-            </ui.HBox>*/}
-            </ui.HBox>
-        );
-    }
+		return(
+			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
+			{/*<HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
+			<Glyphicon glyph="cog"/>
+			</HBox>*/}
+			<span style={titleStyle} className="weave-panel">{this.props.title}</span>
+			{/*<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
+			<div style={{marginRight: 5}}>
+			<Glyphicon glyph="unchecked"/>
+			</div>
+			<div style={{marginRight: 5}}>
+			<Glyphicon glyph="remove"/>
+			</div>
+			</HBox>*/}
+			</HBox>
+		);
+	}
 }

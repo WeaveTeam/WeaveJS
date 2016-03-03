@@ -3,15 +3,12 @@
 /// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
 
 import * as VendorPrefix from "react-vendor-prefix";
+import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import MiscUtils from "../utils/MiscUtils";
+import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 
-const HORIZONTAL: string = "horizontal";
-
-var resizerStyle: any = {};
-
-resizerStyle.basic = {
+const STYLE_BASE = {
 	background: "#000",
     opacity: .1,
     zIndex: 1,
@@ -19,25 +16,21 @@ resizerStyle.basic = {
     backgroundClip: "padding"
 };
 
-resizerStyle.vertical = {
-    height: "4px",
-    cursor: "row-resize",
-    width: "100%"
-};
-
-resizerStyle.horizontal = {
+const STYLE_HORIZONTAL = _.merge({
     width: "4px",
     cursor: "col-resize",
     height: "100%"
-};
+}, STYLE_BASE);
+
+const STYLE_VERTICAL = _.merge({
+    height: "4px",
+    cursor: "row-resize",
+    width: "100%"
+}, STYLE_BASE);
 
 export interface IResizerProps extends React.Props<Resizer>
 {
-	ref: string;
-	key: number;
-	direction: string;
-	pane1: string;
-	pane2: string;
+	direction: Direction;
 }
 
 export interface IResizerState
@@ -47,43 +40,34 @@ export interface IResizerState
 
 export default class Resizer extends React.Component<IResizerProps, IResizerState>
 {
-		private element:Element;
+	constructor(props:IResizerProps)
+	{
+		super(props);
+		this.state = {
+			active: false
+		};
+	}
 
-		private boundMouseDown:any;
+	componentDidMount()
+	{
+		ReactDOM.findDOMNode(this).addEventListener("mousedown", this.onMouseDown);
+	}
 
-		constructor(props:IResizerProps)
-		{
-			super(props);
-			this.state = {
-				active: false
-			};
-		}
+	componentWillUnmount()
+	{
+		ReactDOM.findDOMNode(this).removeEventListener("mousedown", this.onMouseDown);
+	}
 
-		componentDidMount()
-		{
-			this.element.addEventListener("mousedown", this.boundMouseDown = this.onMouseDown.bind(this));
-		}
+	onMouseDown=(event:MouseEvent)=>
+	{
+		this.setState({
+			active: true
+		});
+	}
 
-		componentWillUnmount()
-		{
-			this.element.removeEventListener("mousedown", this.boundMouseDown);
-		}
-
-		onMouseDown()
-		{
-			this.setState({
-				active:true
-			});
-		}
-
-		render()
-		{
-			var direction:string = this.props.direction;
-			var style:any = resizerStyle.basic;
-
-			MiscUtils.merge(style, resizerStyle[direction]);
-
-			var prefixed = VendorPrefix.prefix({styles: style});
-			return <span ref={(elt:Element) => { this.element = elt }} style={prefixed.styles}/>;
-		}
+	render():JSX.Element
+	{
+		var style = this.props.direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL;
+		return <span style={VendorPrefix.prefix({styles: style}).styles}/>;
+	}
 }

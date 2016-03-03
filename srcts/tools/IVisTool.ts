@@ -8,11 +8,9 @@ import ToolTip from "./ToolTip";
 
 export interface IVisToolProps
 {
-    toolPath:WeavePath;
     font?:string;
     fontSize?:number;
-    style: { width: number, height: number};
-    toolTip: ToolTip
+    toolTip: ToolTip;
 }
 
 export interface IVisToolState

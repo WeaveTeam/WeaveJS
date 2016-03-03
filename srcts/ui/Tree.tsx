@@ -1,5 +1,5 @@
 import * as React from "react";
-import VBox from "../react-ui/VBox";
+import {HBox, VBox} from "../react-ui/FlexBox";
 import MiscUtils from "../utils/MiscUtils";
 
 export interface ITreeState {

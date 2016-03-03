@@ -1,6 +1,5 @@
 import * as React from "react";
-import HBox from "../react-ui/HBox";
-import VBox from "../react-ui/VBox";
+import {HBox, VBox} from "../react-ui/FlexBox";
 import PopupWindow from "../react-ui/PopupWindow";
 import {MenuBarItemProps} from "../react-ui/MenuBar";
 import {MenuItemProps} from "../react-ui/Menu";

@@ -121,7 +121,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
         return <ReactBootstrapTable columnTitles={this.state.columnTitles}
                                     rows={this.state.data}
                                     idProperty={this.idProperty}
-                                    height={this.props.style.height}
                                     striped={true}
                                     hover={true}
                                     bordered={true}

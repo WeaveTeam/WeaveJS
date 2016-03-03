@@ -12,6 +12,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import * as c3 from "c3";
+import {HBox, VBox} from "../react-ui/FlexBox";
 import MiscUtils from "../utils/MiscUtils";
 import * as jquery from "jquery";
 
@@ -101,12 +102,14 @@ export default class AbstractC3Tool extends AbstractVisTool
         this.y2AxisClass = {axis: "c3-axis-y2", grid: "c3-ygrid"};
 		this.handlePointClick = this.handlePointClick.bind(this);
 		Weave.getCallbacks(this).addGroupedCallback(this, this.debouncedHandleChange, true);
+		
+		weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.validateSize);
     }
 	
 	componentDidMount()
 	{
-		this.c3Config.bindto = this.element;
         MiscUtils.addPointClickListener(this.element, this.handlePointClick);
+		this.validateSize();
 		this.handleChange();
 	}
 	
@@ -122,18 +125,25 @@ export default class AbstractC3Tool extends AbstractVisTool
 
     componentDidUpdate():void
 	{
-        if (this.c3Config.size.width != this.props.style.width || this.c3Config.size.height != this.props.style.height)
+		this.validateSize();
+	}
+	
+	validateSize()
+	{
+        if (this.c3Config.size.width != this.element.clientWidth || this.c3Config.size.height != this.element.clientHeight)
 		{
-            this.c3Config.size = { width: this.props.style.width, height: this.props.style.height };
+            this.c3Config.size = { width: this.element.clientWidth, height: this.element.clientHeight };
 			if (this.chart)
-	            this.chart.resize({ width: this.props.style.width, height: this.props.style.height });
+	            this.chart.resize({ width: this.element.clientWidth, height: this.element.clientHeight });
             this.cullAxes();
         }
     }
 	
     render():JSX.Element
     {
-        return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%", maxHeight: "100%"}}/>;
+        return <div ref={(c:HTMLElement) => { this.element = c;}} style={{flex: 1, overflow: "hidden"}}>
+			<div ref={(c:HTMLElement) => { this.c3Config.bindto = c;}}/>
+		</div>;
     }
 
 	protected element:HTMLElement;
@@ -242,12 +252,12 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
     get internalWidth():number
     {
-        return this.props.style.width - this.c3Config.padding.left - this.c3Config.padding.right;
+        return this.c3Config.size.width - this.c3Config.padding.left - this.c3Config.padding.right;
     }
 
     get internalHeight():number
     {
-        return this.props.style.height - this.c3Config.padding.top - this.margin.bottom.value;
+        return this.c3Config.size.height - this.c3Config.padding.top - this.margin.bottom.value;
     }
 	
 	protected updateConfigMargin()
@@ -324,18 +334,8 @@ export default class AbstractC3Tool extends AbstractVisTool
 
     protected cullAxes()
     {
-        //cull axes
-        var width:number = this.internalWidth;
-        var height:number = this.internalHeight;
-        this.cullAxis(width, this.xAxisClass);
-        if (weavejs.WeaveAPI.Locale.reverseLayout)
-        {
-            this.cullAxis(height, this.y2AxisClass);
-        }
-        else
-        {
-            this.cullAxis(height, this.yAxisClass);
-        }
+        this.cullAxis(this.internalWidth, this.xAxisClass);
+        this.cullAxis(this.internalHeight, weavejs.WeaveAPI.Locale.reverseLayout ? this.y2AxisClass : this.yAxisClass);
     }
 
     customStyle(array:Array<number>, type:string, filter:string, style:any)

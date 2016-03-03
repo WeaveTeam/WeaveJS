@@ -115,6 +115,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
 
 		weavejs.WeaveAPI.Scheduler.callLater(this, this.initLater);
+		
+		weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
 	}
 	
 	private initLater():void
@@ -271,12 +273,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.updateZoomAndCenter_weaveToOl();
 	}
 
-	componentDidUpdate():void
+	handleFrame():void
 	{
 		this.map.updateSize();
 		var viewport = this.map.getViewport();
 		var screenBounds = new Bounds2D(0, 0, viewport.clientWidth, viewport.clientHeight);
 		this.zoomBounds.setScreenBounds(screenBounds, true);
+		this.map.render();
 	}
 
 	private updateControl(lbool:LinkableBoolean, control:ol.control.Control):void
@@ -513,7 +516,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	render():JSX.Element 
 	{
-		return <div ref={(c:HTMLElement) => {this.element = c;}} style={{width: "100%", height: "100%"}}/>;
+		return <div ref={(c:HTMLElement) => {this.element = c;}} style={{flex: 1, overflow: "hidden"}}/>;
 	}
 
 	zoomToSelection(inputKeys:Array<IQualifiedKey> = null, zoomMarginPercent:number = 0.2):void

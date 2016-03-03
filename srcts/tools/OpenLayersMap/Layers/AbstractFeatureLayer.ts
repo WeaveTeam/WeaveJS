@@ -26,17 +26,27 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
 
-	get selectionKeySet():KeySet
+	get selectionKeySet()
 	{
-		let keySet = this.selectionFilter.target as KeySet;
+		var keySet = this.selectionFilter.target as KeySet;
 		return keySet instanceof KeySet ? keySet : null;
 	}
-
-	get probeKeySet():KeySet
+	isSelected(key:IQualifiedKey):boolean
 	{
-		let keySet = this.probeFilter.target as KeySet;
+		var keySet = this.selectionFilter.target as KeySet;
+		return keySet instanceof KeySet && keySet.containsKey(key);
+	}
+	 
+	get probeKeySet()
+	{
+		var keySet = this.probeFilter.target as KeySet;
 		return keySet instanceof KeySet ? keySet : null;
 	}
+	isProbed(key:IQualifiedKey):boolean
+	{
+		var keySet = this.probeFilter.target as KeySet;
+		return keySet instanceof KeySet && keySet.containsKey(key);
+	} 
 
 	styleResolutionDependent: boolean = false;
 
@@ -202,8 +212,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		let newStyle:any;
 
 		let isInFilter: boolean = this.filteredKeySet.containsKey(id);
-		let isSelected: boolean = this.selectionKeySet.containsKey(id);
-		let isProbed: boolean = this.probeKeySet.containsKey(id);
+		let isSelected: boolean = this.isSelected(id);
+		let isProbed: boolean = this.isProbed(id);
 
 		if (!isInFilter)
 		{

@@ -11,58 +11,49 @@ import MiscUtils from "../utils/MiscUtils";
 import Resizer from "./Resizer";
 import ResizerOverlay from "./ResizerOverlay";
 
-const RESIZEROVERLAY:string = "resizer";
-const HORIZONTAL:string = "horizontal";
+export const VERTICAL:"vertical" = "vertical";
+export const HORIZONTAL:"horizontal" = "horizontal";
+export type Direction = typeof HORIZONTAL | typeof VERTICAL;
 
-export interface LayoutState
-{
-	id?: string[];
-	children?: LayoutState[];
-	direction?: string;
-	flex?: number
-}
+export type LayoutState = {
+	flex?: number,
+	id?: string[],
+	direction?: Direction,
+	children?: LayoutState[]
+};
 
 export interface LayoutProps extends React.Props<Layout>
 {
 	state: LayoutState;
 	onStateChange: Function;
-	pane1?: string;
-	pane2?: string;
-	weave?: any
 }
 
 export default class Layout extends React.Component<LayoutProps, LayoutState>
 {
-	public state:LayoutState;
+	public children:Layout[];
+	private resizers:Resizer[];
 
 	private minSize:number;
 	private dragging:boolean;
 
-	private boundMouseUp:any;
-	private boundMouseDown:any;
-	private boundMouseMove:any;
-
 	private panelDragging:boolean = false;
 
-	private element:Element;
-
-	private childNames:string[];
-	private resizerNames:string[];
+	private overlay:ResizerOverlay;
 
 	constructor(props:LayoutProps, state:LayoutState)
 	{
 		super(props, state);
 		var ps = props.state || {};
-		this.state = {id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex};
+		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex };
 		this.minSize = 16;
 		this.dragging = false;
 	}
 
 	componentDidMount():void
 	{
-		document.addEventListener("mouseup", this.boundMouseUp = this.onMouseUp.bind(this));
-		document.addEventListener("mousedown", this.boundMouseDown = this.onMouseDown.bind(this));
-		document.addEventListener("mousemove", this.boundMouseMove = this.onMouseMove.bind(this));
+		document.addEventListener("mouseup", this.onMouseUp);
+		document.addEventListener("mousedown", this.onMouseDown);
+		document.addEventListener("mousemove", this.onMouseMove);
 	}
 
 	componentWillReceiveProps(nextProps:LayoutProps):void
@@ -72,14 +63,16 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 	componentWillUnmount():void
 	{
-		document.removeEventListener("mouseup", this.boundMouseUp);
-		document.removeEventListener("mousedown", this.boundMouseDown);
-		document.removeEventListener("mousemove", this.boundMouseMove);
+		document.removeEventListener("mouseup", this.onMouseUp);
+		document.removeEventListener("mousedown", this.onMouseDown);
+		document.removeEventListener("mousemove", this.onMouseMove);
 	}
 
 	shouldComponentUpdate(nextProps:LayoutProps, nextState:LayoutState):boolean
 	{
-		return !_.isEqual(this.state, nextState) || !_.isEqual(this.state, nextProps.state);
+		return !_.isEqual(this.state, nextState)
+			|| !_.isEqual(this.state, nextProps.state)
+			|| !_.isEqual(this.props, nextProps);
 	}
 
 	componentDidUpdate():void
@@ -88,14 +81,13 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 			this.props.onStateChange(this.state);
 	}
 
-	public getDOMNodeFromId(id:string[]):Element
+	public getElementFromId(id:string[]):Element
 	{
 		var component = this.getComponentFromId(id);
-		if (component)
-			return component.element;
+		return component ? ReactDOM.findDOMNode(component) : null;
 	}
 
-	private getComponentFromId(id:string[]):Layout
+	public getComponentFromId(id:string[]):Layout
 	{
 		if (this.state.id && _.isEqual(this.state.id, id))
 		{
@@ -103,124 +95,78 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		}
 		else
 		{
-			for (var i:number = 0; i < this.childNames.length; i++)
+			for (let child of this.children)
 			{
-				var component:Layout = (this.refs[this.childNames[i]] as Layout).getComponentFromId(id);
+				let component = child && child.getComponentFromId(id);
 				if (component)
 					return component;
 			}
 		}
+		return null;
 	}
 
-	private onMouseDown(event:MouseEvent):void
+	private onMouseDown=(event:MouseEvent):void=>
 	{
-		this.resizerNames.forEach((resizerName:string) => {
-			var resizer:Resizer = this.refs[resizerName] as Resizer;
-			if (resizer && resizer.state && resizer.state.active)
+		this.resizers.forEach((resizer, index) => {
+			if (resizer.state && resizer.state.active)
 			{
-				var overlayRange:number[] = this.getResizerRange(resizer);
+				var overlayRange:number[] = this.getResizerRange(index);
 				overlayRange[0] += this.minSize;
 				overlayRange[1] -= this.minSize;
-				(this.refs[RESIZEROVERLAY] as ResizerOverlay).setState({
+				this.overlay.setState({
 					active: true,
 					range: overlayRange
 				});
 			}
-		})
+		});
 	}
 
-	onMouseMove(event:MouseEvent):void
+	private onMouseMove=(event:MouseEvent):void=>
 	{
 
 	}
 
-	getResizerRange(resizer:Resizer):number[]
+	getResizerRange(resizerIndex:number):[number, number]
 	{
-		var direction:string = resizer.props.direction;
-		var pane1:Layout = this.refs[resizer.props.pane1] as Layout;
-		var pane2:Layout = this.refs[resizer.props.pane2] as Layout;
+		var element1 = ReactDOM.findDOMNode(this.children[resizerIndex]) as HTMLElement
+		var element2 = ReactDOM.findDOMNode(this.children[resizerIndex + 1]) as HTMLElement;
 		
-		var element1:HTMLElement = ReactDOM.findDOMNode(pane1) as HTMLElement;
-		var element2:HTMLElement = ReactDOM.findDOMNode(pane2) as HTMLElement;
-		
-		var rect:ClientRect = this.element.getBoundingClientRect();
+		var rect:ClientRect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 		var pageLeft:number = window.pageXOffset + rect.left;
 		var pageTop:number = window.pageYOffset + rect.top;
 		
-		if (direction === HORIZONTAL)
+		if (this.state.direction === HORIZONTAL)
 			return [element1.offsetLeft + pageLeft, element2.offsetLeft + element2.clientWidth + pageLeft];
 		else
 			return [element1.offsetTop + pageTop, element2.offsetTop + element2.clientHeight + pageTop];
 	}
 
-	onMouseUp(event:MouseEvent):void
+	private onMouseUp=(event:MouseEvent):void=>
 	{
 		var newState:LayoutState = _.cloneDeep(this.state);
 
-		this.resizerNames.forEach(resizerName => {
-			var resizer:Resizer = this.refs[resizerName] as Resizer;
-			var resizerOverlay:ResizerOverlay = this.refs[RESIZEROVERLAY] as ResizerOverlay;
-
-			if (resizer && resizer.state && resizer.state.active)
+		var element = ReactDOM.findDOMNode(this);
+		this.resizers.forEach((resizer, index) => {
+			if (resizer.state && resizer.state.active)
 			{
-				var range:number[] = this.getResizerRange(resizer);
-				var begin:number = range[0];
-				var end:number = range[1];
-				var mousePos:number = this.state.direction === HORIZONTAL ? event.pageX : event.pageY;
-				var size:number = this.state.direction === HORIZONTAL ? this.element.clientWidth : this.element.clientHeight;
+				var [begin, end] = this.getResizerRange(index);
+				var pos:number = this.state.direction === HORIZONTAL ? event.pageX : event.pageY;
+				var size:number = this.state.direction === HORIZONTAL ? element.clientWidth : element.clientHeight;
 
-				mousePos = Math.max(begin + this.minSize, Math.min(mousePos, end - this.minSize));
+				pos = Math.max(begin + this.minSize, Math.min(pos, end - this.minSize));
+				newState.children[index].flex = (pos - begin) / size;
+				newState.children[index + 1].flex = (end - pos) / size;
 
-				var ref1:string = resizer.props.pane1;
-				var ref2:string = resizer.props.pane2;
-
-				var pane1:Layout = this.refs[ref1] as Layout;
-				var pane2:Layout = this.refs[ref2] as Layout;
-
-
-				var index1:number = this.childNames.indexOf(ref1);
-				var index2:number = this.childNames.indexOf(ref2);
-
-				var flex1:number = (mousePos - begin) / size;
-				var flex2:number = (end - mousePos) / size;
-
-				newState.children[index1].flex = flex1;
-				newState.children[index2].flex = flex2;
-
-				pane1.setState({
-					flex: flex1
-				});
-
-				pane2.setState({
-					flex: flex2
-				});
-
-				resizer.setState({
-					active: false
-				});
-
-				resizerOverlay.setState({
-					active: false
-				});
+				resizer.setState({ active: false });
+				this.overlay.setState({ active: false });
 				this.setState(newState);
 			}
 		});
 		this.panelDragging = false;
 	}
 
-	handleStateChange(childRef:string, newState:LayoutState):void
+	private generateStyle()
 	{
-		var stateCopy:LayoutState = _.cloneDeep(this.state);
-		var index = this.childNames.indexOf(childRef);
-
-		stateCopy.children[index] = newState;
-		this.setState(stateCopy);
-	}
-
-	render():JSX.Element
-	{
-		this.childNames = [];
-		this.resizerNames = [];
 		var style:any = {
 			display: "flex",
 			flex: this.state.flex,
@@ -230,42 +176,96 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 			userSelect: "none",
 			flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
 		};
-
 		if (this.state.direction === HORIZONTAL)
 			style.height = "100%";
 		else
 			style.width = "100%";
+		return VendorPrefix.prefix({styles: style}).styles;
+	}
 
-		if (this.state.children && this.state.children.length > 0)
+	render():JSX.Element
+	{
+		return (
+			<div style={this.generateStyle()}>
+				{ this.props.children }
+				{
+					Array.isArray(this.props.children)
+					? <ResizerOverlay ref={(overlay:ResizerOverlay) => this.overlay = overlay} direction={this.state.direction}/>
+					: null
+				}
+			</div>
+		);
+	}
+
+	static renderLayout(params:{
+			key: string,
+			ref: (layout:Layout)=>void,
+			state: LayoutState,
+			onStateChange: (state:LayoutState)=>void
+		}):JSX.Element
+	{
+		var {key, ref, state, onStateChange} = params;
+
+		var parentLayout:Layout;
+
+		var elements:JSX.Element[] = [];
+		var children:Layout[] = [];
+		var resizers:Resizer[] = [];
+		if (state.children && state.children.length > 0)
 		{
-			var newChildren:JSX.Element[] = new Array(this.state.children.length * 2 - 1);
+			let onChildStateChange = (childIndex:number, childState:LayoutState) => {
+				if (!parentLayout)
+					return;
+				let stateCopy:LayoutState = _.cloneDeep(parentLayout.state);
+				stateCopy.children[childIndex] = childState;
+				parentLayout.setState(stateCopy);
+			};
 
-			this.state.children.forEach((childState:LayoutState, i:number) => {
-				var ref:string = "child" + i;
-				this.childNames[i] = ref;
-				newChildren[i * 2] = <Layout onStateChange={this.handleStateChange.bind(this, ref)} ref={ref} state={childState} key={i * 2}/>;
+			let saveChild = (i:number, child:Layout) => children[i] = child;
+			let saveResizer = (i:number, resizer:Resizer) => resizers[i] = resizer;
+
+			state.children.forEach((childState, i) => {
+				if (i > 0)
+					elements.push(
+						<Resizer
+							key={`${key}.resizers[${i - 1}]`}
+							ref={saveResizer.bind(null, i - 1)}
+							direction={state.direction}
+						/>
+					);
+				elements.push(
+					Layout.renderLayout({
+						key: `${key}.children[${i}]`,
+						ref: saveChild.bind(null, i),
+						state: childState,
+						onStateChange: onChildStateChange.bind(null, i)
+					})
+				);
 			});
 			
-			if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout)
-				newChildren.reverse();
-
-			var i:number;
-			for (i = 1; i < newChildren.length - 1; i += 2)
-			{
-				var resizerName:string = "resizer" + (i / 2);
-				this.resizerNames.push(resizerName);
-				var resizer:JSX.Element = <Resizer ref={resizerName} key={i} direction={this.state.direction} pane1={newChildren[i - 1].ref as string} pane2={newChildren[i + 1].ref as string}/>;
-				newChildren[i] = resizer;
-			}
+			if (state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout)
+				elements.reverse();
 		}
 
-		var prefixed:any = VendorPrefix.prefix({styles: style});
-
+		var refCallback = function(layout:Layout) {
+			parentLayout = layout;
+			if (layout)
+			{
+				layout.children = children;
+				layout.resizers = resizers;
+			}
+			if (ref)
+				ref(layout);
+		};
 		return (
-			<div ref={(elt:Element) => { this.element = elt; }} style={prefixed.styles}>
-				{newChildren}
-				<ResizerOverlay ref={RESIZEROVERLAY} key={RESIZEROVERLAY} direction={this.state.direction}/>
-			</div>
+			<Layout
+				key={key}
+				ref={refCallback}
+				children={elements}
+
+				state={_.cloneDeep(state)}
+				onStateChange={onStateChange}
+			/>
 		);
 	}
 }

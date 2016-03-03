@@ -1,8 +1,7 @@
 import * as ReactDOM from "react-dom";
 import * as React from "react";
 import * as _ from "lodash";
-import HBox from "./HBox";
-import VBox from "./VBox";
+import {HBox, VBox} from "./FlexBox";
 import MiscUtils from "../utils/MiscUtils";
 import classNames from "../modules/classnames";
 

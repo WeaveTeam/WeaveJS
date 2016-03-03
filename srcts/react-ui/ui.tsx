@@ -1,5 +1,4 @@
-import HBox from "./HBox";
-import VBox from "./VBox";
+import {HBox, VBox} from "./FlexBox";
 import HSlider from "./RCSlider/HSlider";
 import VSlider from "./RCSlider/VSlider";
 import CheckBoxList from "./CheckBoxList";

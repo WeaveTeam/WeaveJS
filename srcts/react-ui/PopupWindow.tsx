@@ -1,7 +1,6 @@
 import * as ReactDOM from "react-dom";
 import * as React from "react";
-import HBox from "./HBox";
-import VBox from "./VBox";
+import {HBox, VBox} from "./FlexBox";
 import * as Prefixer from "react-vendor-prefix";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
@@ -33,7 +32,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 	private minWidth:number = 320;
 	private minHeight:number = 240;
 	private element:HTMLElement;
-	private popupWindow:PopupWindow;
+	private container:VBox;
 	private oldMousePos: {
 		x: number,
 		y: number
@@ -73,7 +72,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 	
 	componentDidMount()
 	{
-		this.element = ReactDOM.findDOMNode(this.popupWindow) as HTMLElement;
+		this.element = ReactDOM.findDOMNode(this.container) as HTMLElement;
 		this.setState({
 			top: this.props.top || 1/2*window.innerHeight - 1/2*this.element.clientHeight,
 			left: this.props.left || 1/2*window.innerWidth - 1/2*this.element.clientWidth,
@@ -163,7 +162,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 		windowStyle.zIndex = 50;
 
 		var popupWindow = (
-			<VBox className="weave-window" ref={(c:PopupWindow) => this.popupWindow = c} style={windowStyle}>
+			<VBox className="weave-window" ref={(c:VBox) => this.container = c} style={windowStyle}>
 				<HBox className="weave-window-header" onMouseDown={this.onDragStart.bind(this)}>
 					<div style={{flex: 1}}>
 					{
@@ -173,7 +172,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 					{
 						!this.props.modal ? 
 							<div onClick={() => PopupWindow.close(this)}>
-							×
+							{ "\u00d7" }
 							</div>
 						: null
 					}

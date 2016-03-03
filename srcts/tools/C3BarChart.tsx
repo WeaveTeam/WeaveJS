@@ -163,7 +163,7 @@ export default class C3BarChart extends AbstractC3Tool
 							var record = this.records[num];
 							if (record)
 							{
-								if (this.element && this.props.style.height > 0 && this.margin.bottom)
+								if (this.element && this.margin.bottom)
 								{
 									var labelHeight:number = this.margin.bottom.value/Math.cos(45*(Math.PI/180));
 									var labelString:string = Weave.lang(record.stringValues.xLabel);

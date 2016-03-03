@@ -4,15 +4,13 @@
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as _ from "lodash";
 import * as VendorPrefix from "react-vendor-prefix";
-import MiscUtils from "../utils/MiscUtils";
-const HORIZONTAL: string = "horizontal";
+import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 
-var resizerStyle:any = {};
-
-resizerStyle.basic = {
+const STYLE_BASE = {
     background: "#000",
     opacity: .3,
     zIndex: 1,
@@ -21,22 +19,21 @@ resizerStyle.basic = {
     position: "absolute"
 };
 
-resizerStyle.vertical = {
-    height: "4px",
-    cursor: "row-resize",
-    width: "100%"
-};
-
-resizerStyle.horizontal = {
+const STYLE_HORIZONTAL = _.merge({
     width: "4px",
     cursor: "col-resize",
     height: "100%"
-};
+}, STYLE_BASE);
+
+const STYLE_VERTICAL = _.merge({
+    height: "4px",
+    cursor: "row-resize",
+    width: "100%"
+}, STYLE_BASE);
 
 export interface IResizerOverlayProps extends React.Props<ResizerOverlay>
 {
-    ref: string;
-    direction: string
+    direction: Direction
 }
 
 export interface IResizerOverlayState
@@ -50,12 +47,6 @@ export interface IResizerOverlayState
 
 export default class ResizerOverlay extends React.Component<IResizerOverlayProps, IResizerOverlayState>
 {
-    private element: Element;
-    public state: IResizerOverlayState;
-
-    private _onMouseMove: EventListener;
-    private _stopEventPropagation: EventListener;
-
     constructor(props: IResizerOverlayProps)
     {
         super(props)
@@ -67,19 +58,19 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         };
     }
 
-    componentDidMount()
+    componentDidMount():void
     {
         document.addEventListener("mousemove", this.onMouseMove, true);
-        mouseevents.forEach((mouseevent: string) => document.addEventListener(mouseevent, this.stopEventPropagation, true));
+        mouseevents.forEach(mouseevent => document.addEventListener(mouseevent, this.stopEventPropagation, true));
     }
 
-    componentWillUnmount()
+    componentWillUnmount():void
     {
-        document.removeEventListener("mousemove", this._onMouseMove)
-        mouseevents.forEach((mouseevent) => document.removeEventListener(mouseevent, this.stopEventPropagation));
+        document.removeEventListener("mousemove", this.onMouseMove)
+        mouseevents.forEach(mouseevent => document.removeEventListener(mouseevent, this.stopEventPropagation));
     }
 
-    stopEventPropagation=(event: Event)=>
+    stopEventPropagation=(event:Event):void=>
 	{
         if (this.state.active)
         {
@@ -87,12 +78,12 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         }
     }
 
-    onMouseMove=(event: MouseEvent)=>
+    onMouseMove=(event:MouseEvent):void=>
 	{
         if (this.state.active)
         {
             event.stopImmediatePropagation();
-            var container:Element = this.element.parentNode as Element;
+            var container:Element = ReactDOM.findDOMNode(this).parentNode as Element;
             var rect:ClientRect = container.getBoundingClientRect();
             var left: number = window.pageXOffset + rect.left;
             var top: number = window.pageYOffset + rect.top;
@@ -117,13 +108,10 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         }
     }
 
-    render()
+    render():JSX.Element
     {
         var direction: string = this.props.direction;
-        var style:React.CSSProperties = {};
-
-        MiscUtils.merge(style, resizerStyle.basic);
-        MiscUtils.merge(style, resizerStyle[direction]);
+        var style:React.CSSProperties = _.merge({}, direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL);
 
         if (this.state.active)
         {
@@ -138,8 +126,6 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 
         style = VendorPrefix.prefix({ styles: style }).styles;
 
-        return (
-            <span ref={(elt:Element) => { this.element = elt; }} style={style}/>
-        );
+        return <span style={style}/>;
     }
 }

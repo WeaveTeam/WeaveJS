@@ -78,6 +78,12 @@ ul.dropdown-menu {
     color: -webkit-text;
 }
 
+.weave-app {
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
 .weave-tool {
     font-family: Roboto, sans-serif;
     font-size: 12px;

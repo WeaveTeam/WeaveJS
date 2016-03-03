@@ -5,8 +5,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import * as Prefixer from "react-vendor-prefix";
-import HBox from "../HBox";
-import VBox from "../VBox";
+import {HBox, VBox} from "../FlexBox";
 
 export interface SliderProps extends React.Props<Slider>
 {
