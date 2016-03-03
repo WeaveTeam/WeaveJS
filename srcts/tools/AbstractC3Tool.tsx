@@ -212,44 +212,67 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 			});
 		}
 
-		//Todo: move to another function HideC3
-		//hide c3 displayed points
-		d3.select(this.element)
-			.selectAll("g.c3-shapes.c3-circles")
-			.style("display","none");
--
 		//hide c3 selected circles
 		d3.select(this.element)
 			.selectAll("g.c3-selected-circles")
 			.style("display", "none");
 
-		//hide c3 paths
+		this.styleC3ShapeGroups();
+
+		//initial c3 styling on rendered shapes
+		d3.select(this.element)
+			.selectAll("g.c3-shapes.c3-circles")
+			.selectAll("circle")
+			.style("opacity",null)
+			.style("stroke","black")
+			.style("stroke-width","1px");
+
 		d3.select(this.element)
 			.selectAll("g.c3-bars")
-			.style("display", "none");
+			.selectAll("path")
+			.style("opacity",null);
 
-		//hide c3 lines
 		d3.select(this.element)
 			.selectAll("g.c3-shapes.c3-lines")
-			.style("display", "none");
+			.selectAll("path")
+			.style("opacity",null);
+	}
+
+	protected styleC3ShapeGroups():void
+	{
+		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+
+		//c3 displayed layer handling points
+		var basePoints = d3.select(this.element)
+			.selectAll("g.c3-shapes.c3-circles");
+		basePoints.attr("opacity", selectionEmpty ? "1.0" : "0.5");
+
+		//c3 displayed layer handling paths
+		var basePaths = d3.select(this.element)
+			.selectAll("g.c3-bars");
+		basePaths.attr("opacity", selectionEmpty ? "1.0" : "0.5");
+
+		//c3 displayed layer handling lines
+		var baseLines = d3.select(this.element)
+			.selectAll("g.c3-shapes.c3-lines");
+		baseLines.attr("opacity", selectionEmpty ? "1.0" : "0.5");
 	}
 
 	protected weaveLayering():void
 	{
-		//Weave Layering Group
-		//remove existing if there
-		d3.select(this.element).selectAll("g.weave_layering_group").remove();
+		//Weave Interaction Layering Group
 
-		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+		//style c3 layer
+		this.styleC3ShapeGroups();
+
+		//remove existing weave layering, if present
+		d3.select(this.element).selectAll("g.weave_layering_group").remove();
 
 		//create layering group and layers
 		var layerGroup:any = d3.select(this.element)
 			.select("g.c3-chart-line")
 			.append("g")
 			.classed("weave_layering_group",true);
-		layerGroup.append("g")
-			.classed("point_layer",true)
-			.attr("opacity", selectionEmpty ? "1.0" : "0.5");
 		layerGroup.append("g")
 			.classed("selection_style_layer",true)
 			.attr("opacity", 1.0);
