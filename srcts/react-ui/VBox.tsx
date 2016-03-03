@@ -1,6 +1,7 @@
 /// <reference path="../../typings/react/react.d.ts"/>
 
 import * as React from "react";
+import * as _ from "lodash";
 
 export default class VBox extends React.Component<any, any>
 {
@@ -11,7 +12,11 @@ export default class VBox extends React.Component<any, any>
 
     render()
     {
-        var style:any = this.props.style || {};
+        var style:any = _.merge({
+			display: "flex",
+			flexDirection: "column"
+		}, this.props.style);
+	
         var otherProps:any = {};
         for (var key in this.props)
         {
@@ -20,9 +25,6 @@ export default class VBox extends React.Component<any, any>
                 otherProps[key] = this.props[key];
             }
         }
-
-        style.display = "flex";
-        style.flexDirection = "column";
 
         return (
             <div style={style} {...otherProps}>
