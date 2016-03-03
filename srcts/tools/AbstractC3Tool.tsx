@@ -209,6 +209,57 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 				});
 			});
 		}
+
+		//Todo: move to another function HideC3
+		//hide c3 displayed points
+		d3.select(this.element)
+			.selectAll("g.c3-shapes.c3-circles")
+			.style("display","none");
+-
+		//hide c3 selected circles
+		d3.select(this.element)
+			.selectAll("g.c3-selected-circles")
+			.style("display", "none");
+
+		//hide c3 paths
+		d3.select(this.element)
+			.selectAll("g.c3-bars")
+			.style("display", "none");
+
+		//hide c3 lines
+		d3.select(this.element)
+			.selectAll("g.c3-shapes.c3-lines")
+			.style("display", "none");
+	}
+
+	protected weaveLayering():void
+	{
+		//Weave Layering Group
+		//remove existing if there
+		d3.select(this.element).selectAll("g.weave_layering_group").remove();
+
+		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+
+		//create layering group and layers
+		var layerGroup:any = d3.select(this.element)
+			.select("g.c3-chart-line")
+			.append("g")
+			.classed("weave_layering_group",true);
+		layerGroup.append("g")
+			.classed("point_layer",true)
+			.attr("opacity", selectionEmpty ? "1.0" : "0.5");
+		layerGroup.append("g")
+			.classed("selection_style_layer",true)
+			.attr("opacity", 1.0);
+		layerGroup.append("g")
+			.classed("selection_layer",true)
+			.attr("opacity", 1.0);
+		layerGroup.append("g")
+			.classed("probe_style_layer",true)
+			.attr("opacity", 1.0);
+		layerGroup.append("g")
+			.classed("probe_layer",true)
+			.attr("opacity", 1.0);
 	}
 
 	protected handleC3Selection():void
