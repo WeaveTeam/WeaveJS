@@ -606,14 +606,10 @@ export default class C3Histogram extends AbstractC3Tool
         var probedBinIndices:number[] = _.map(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn') as number[];
 
         var histogram = this;
-        //copy items to point_layer, selection_layer, and probe_layer
+        //copy items to selection_layer and probe_layer
         d3.select(this.element).selectAll("g").filter(".c3-shapes.c3-bars-height").selectAll("path").each(function (d:any, i:number, oi:number) {
             let selected = _.intersection(selectedBinIndices,[i]).length;
             let probed = _.intersection(probedBinIndices,[i]).length;
-            //d3.select(histogram.element)
-            //    .select("g.point_layer")
-            //    .node()
-            //    .appendChild(this.cloneNode(true));
             if (selected) {
                 d3.select(histogram.element)
                     .select("g.selection_layer")
@@ -627,13 +623,6 @@ export default class C3Histogram extends AbstractC3Tool
                     .appendChild(this.cloneNode(true));
             }
         });
-
-        //style point_layer (need to set opacity to null, group opacity will then determine opacity of all paths)
-        d3.select(histogram.element)
-            .select("g.point_layer")
-            .selectAll("path")
-            .attr("class","weave_point_layer_path")
-            .style("opacity",null);
 
         //draw selection_style_layer
         d3.select(histogram.element)

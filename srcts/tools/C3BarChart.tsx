@@ -488,11 +488,6 @@ export default class C3BarChart extends AbstractC3Tool
 
 		var barchart = this;
 		this.heightColumnNames.forEach((item:string) => {
-			//copy items to point_layer, selection_layer, and probe_layer
-			//d3.select(this.element)
-			//	.selectAll("g.point_layer")
-			//	.append("g")
-			//	.classed(item + "-bars",true);
 			d3.select(this.element)
 				.selectAll("g.selection_layer")
 				.append("g")
@@ -505,11 +500,6 @@ export default class C3BarChart extends AbstractC3Tool
 				let key = barchart.records[i].id;
 				let selected = barchart.isSelected(key);
 				let probed = barchart.isProbed(key);
-				//d3.select(barchart.element)
-				//	.select("g.point_layer")
-				//	.select("g."+ item + "-bars")
-				//	.node()
-				//	.appendChild(this.cloneNode(true));
 				if (selected) {
 					d3.select(barchart.element)
 						.select("g.selection_layer")
@@ -525,18 +515,6 @@ export default class C3BarChart extends AbstractC3Tool
 						.appendChild(this.cloneNode(true));
 				}
 			});
-
-			//style point_layer (need to set opacity to null, group opacity will then determine opacity of all paths)
-			d3.select(barchart.element)
-				.select("g.point_layer")
-				.selectAll("g."+ item + "-bars")
-				.selectAll("path")
-				.attr("class","weave_point_layer_path")
-				.style("stroke-opacity", (d: any, i: number, oi: number): number => {
-					if (thinBars)
-						return 0;
-				})
-				.style("opacity",null);
 
 			//draw selection_style_layer
 			d3.select(barchart.element)
