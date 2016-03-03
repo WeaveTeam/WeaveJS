@@ -280,16 +280,12 @@ export default class C3LineChart extends AbstractC3Tool
     protected weaveLayering():void {
         super.weaveLayering();
 
-        //copy items to point_layer, selection_layer, and probe_layer
+        //copy items to selection_layer and probe_layer
         var linechart = this;
         d3.select(linechart.element).selectAll("g.c3-shapes.c3-circles").selectAll("circle.c3-shape").each( function(d: any, i:number, oi:number) {
             let key = linechart.getQKey(d);
             let selected = linechart.isSelected(key);
             let probed = linechart.isProbed(key);
-            //d3.select(linechart.element)
-            //    .select("g.point_layer")
-            //    .node()
-            //    .appendChild(this.cloneNode(true));
             if(selected) {
                 d3.select(linechart.element)
                     .select("g.selection_layer")
@@ -307,10 +303,6 @@ export default class C3LineChart extends AbstractC3Tool
             let key = linechart.getQKey(d);
             let selected = linechart.isSelected(key);
             let probed = linechart.isProbed(key);
-            //d3.select(linechart.element)
-            //    .select("g.point_layer")
-            //    .node()
-            //    .appendChild(this.cloneNode(true));
             if(selected) {
                 d3.select(linechart.element)
                     .select("g.selection_layer")
@@ -324,18 +316,6 @@ export default class C3LineChart extends AbstractC3Tool
                     .appendChild(this.cloneNode(true));
             }
         });
-
-        //style point_layer (need to set opacity to null, group opacity will then determine opacity of all points)
-        d3.select(linechart.element)
-            .select("g.point_layer")
-            .selectAll("circle")
-            .attr("class","weave_point_layer_circle")
-            .style("opacity",null);
-        d3.select(this.element)
-            .selectAll("g.point_layer")
-            .selectAll("path")
-            .attr("class","weave_point_layer_line")
-            .style("opacity",null);
 
         //draw selection_style_layer
         d3.select(linechart.element)
@@ -365,7 +345,7 @@ export default class C3LineChart extends AbstractC3Tool
             .selectAll("circle")
             .attr("class","weave_selection_layer_circle")
             .style("opacity", null);
-        d3.select(this.element)
+        d3.select(linechart.element)
             .selectAll("g.selection_layer")
             .selectAll("path")
             .attr("class","weave_point_layer_line")
@@ -433,7 +413,7 @@ export default class C3LineChart extends AbstractC3Tool
             .selectAll("circle")
             .attr("class","weave_probe_layer_circle")
             .style("opacity", null);
-        d3.select(this.element)
+        d3.select(linechart.element)
             .selectAll("g.probe_layer")
             .selectAll("path")
             .attr("class","weave_point_layer_line")
