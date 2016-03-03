@@ -69,17 +69,17 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 
     componentDidMount()
     {
-        document.addEventListener("mousemove", this._onMouseMove = this.onMouseMove.bind(this), true);
-        mouseevents.forEach((mouseevent: string) => document.addEventListener(mouseevent, this._stopEventPropagation = this.stopEventPropagation.bind(this), true));
+        document.addEventListener("mousemove", this.onMouseMove, true);
+        mouseevents.forEach((mouseevent: string) => document.addEventListener(mouseevent, this.stopEventPropagation, true));
     }
 
     componentWillUnmount()
     {
         document.removeEventListener("mousemove", this._onMouseMove)
-        mouseevents.forEach((mouseevent) => document.removeEventListener(mouseevent, this._stopEventPropagation));
+        mouseevents.forEach((mouseevent) => document.removeEventListener(mouseevent, this.stopEventPropagation));
     }
 
-    stopEventPropagation(event: Event)
+    stopEventPropagation=(event: Event)=>
 	{
         if (this.state.active)
         {
@@ -87,7 +87,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         }
     }
 
-    onMouseMove(event: MouseEvent)
+    onMouseMove=(event: MouseEvent)=>
 	{
         if (this.state.active)
         {
