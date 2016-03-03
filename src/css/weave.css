@@ -116,7 +116,7 @@ ul.dropdown-menu {
 	-moz-user-select: none;
 	cursor: default;
 	z-index: 40; /* max z-index */
-	border-bottom-width: 1px;
+	border-bottom-width: 2px;
 	border-bottom-color: #E6E6E6;
 	background-color: #F8F8F8;
 	/*box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
