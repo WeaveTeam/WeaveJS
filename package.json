@@ -36,7 +36,6 @@
     "grunt-minifyify": "^3.2.1",
     "grunt-ts": "^5.3.2",
     "minifyify": "^7.1.0",
-    "react-addons-update": "^0.14.7",
     "tsd": "^0.6.5"
   },
   "peerDependencies": {
@@ -58,6 +57,7 @@
     "moment": "^2.11.2",
     "openlayers": "^3.13.0",
     "rc-slider": "^3.3.2",
+	"react-addons-update": "^0.14.7",
     "react-bootstrap": "^0.28.1",
     "react-vendor-prefix": "0.0.1",
     "swfobject-amd": "^2.3.1",
