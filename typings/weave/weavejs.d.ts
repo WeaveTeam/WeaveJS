@@ -6764,6 +6764,14 @@ declare module weavejs.geom {
          */
         setBounds(xMin: number, yMin: number, xMax: number, yMax: number): void;
         /**
+         * @param xMin_yMin_xMax_yMax An Array of four Numbers like [xMin, yMin, xMax, yMax]
+         */
+        setCoords(xMin_yMin_xMax_yMax: [number, number, number, number]): void;
+        /**
+         * @return [xMin, yMin, xMax, yMax]
+         */
+        getCoords(): [number, number, number, number];
+        /**
          * This function sets the bounds coordinates using x, y, width and height values.
          * @param x The new xMin value.
          * @param y The new yMin value.

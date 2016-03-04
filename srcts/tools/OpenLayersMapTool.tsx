@@ -35,6 +35,7 @@ import CustomDragZoom from "./OpenLayersMap/CustomDragZoom";
 import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 import {MenuItemProps} from "../react-ui/Menu";
 import AbstractVisTool from "./AbstractVisTool";
+import {OverrideBounds} from "./AbstractVisTool";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ZoomBounds = weavejs.geom.ZoomBounds;
@@ -49,23 +50,10 @@ import LinkableNumber = weavejs.core.LinkableNumber;
 
 import Bounds2D = weavejs.geom.Bounds2D;
 
-interface Bounds
-{
-	xMin: number;
-	xMax: number;
-	yMin: number;
-	yMax: number;
-}
-
-function isBounds(obj:any):boolean
-{
-	return lodash.every(["xMin", "xMax", "yMin", "yMax"], (item) => obj && typeof obj[item] === "number");
-}
-
 interface Alignment
 {
-	vertical: number;
-	horizontal: number;
+	vertical: "top" | "bottom";
+	horizontal: "left" | "right";
 }
 
 function isAlignment(obj:any):boolean
@@ -75,7 +63,7 @@ function isAlignment(obj:any):boolean
 
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
 {
-	static DEFAULT_PROJECTION: string = "EPSG:4326";
+	static DEFAULT_PROJECTION:string = "EPSG:4326";
 
 	map:ol.Map;
 
@@ -84,7 +72,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	private element:Element;
 
 	zoomBounds = Weave.linkableChild(this, ZoomBounds);
-	extentOverride = Weave.linkableChild(this, new LinkableVariable(null, isBounds, [NaN, NaN, NaN, NaN]));
+	extentOverride = Weave.linkableChild(this, OverrideBounds);
 	projectionSRS = Weave.linkableChild(this, LinkableString);
 	interactionMode = Weave.linkableChild(this, LinkableString);
 
@@ -111,7 +99,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	controlLocation = Weave.linkableChild(this, new LinkableVariable(null, isAlignment, {vertical: "top", horizontal: "left"}));
 
-	get title(): string {
+	get title():string
+	{
 		return this.panelTitle.value;
 	}
 
@@ -142,8 +131,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	{
 		return {
 			zoomControlsLocation: (zcl:string) => {
-				let vertical: string;
-				let horizontal: string;
+				let vertical:string;
+				let horizontal:string;
 
 				if (zcl.startsWith("Bottom"))
 				{
@@ -169,18 +158,22 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			showZoomControls: this.showZoomSlider,
 			children: {
 				visualization: {
-					plotManager: (pm:any, removeMissingDynamicObjects:boolean) => {
-						if (!pm)
-							return;
-
-						if (pm.zoomBounds)
-							Weave.setState(this.zoomBounds, pm.zoomBounds);
-
-						this.extentOverride.state = {xMin: pm.overrideXMin, yMin: pm.overrideYMin, xMax: pm.overrideXMax, yMax: pm.overrideYMax};
-
-						Weave.setState(this.layers, pm.plotters, removeMissingDynamicObjects);
-						Weave.setState(this.layers, DynamicState.removeTypeFromState(pm.layerSettings), removeMissingDynamicObjects);
-					}
+					plotManager: [
+						(pm:any, removeMissingDynamicObjects:boolean) => {
+							if (!pm)
+								return;
+							
+							Weave.setState(this.layers, pm.plotters, removeMissingDynamicObjects);
+							Weave.setState(this.layers, DynamicState.removeTypeFromState(pm.layerSettings), removeMissingDynamicObjects);
+						},
+						{
+							zoomBounds: this.zoomBounds,
+							overrideXMin: this.extentOverride.xMin,
+							overrideYMin: this.extentOverride.yMin,
+							overrideXMax: this.extentOverride.xMax,
+							overrideYMax: this.extentOverride.yMax
+						}
+					]
 				}
 			}
 		};
@@ -198,9 +191,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		/* Setup custom interactions */
 
-		let dragPan: ol.interaction.DragPan = new ol.interaction.DragPan();
-		let dragSelect: DragSelection = new DragSelection();
-		let probeInteraction: ProbeInteraction = new ProbeInteraction(this);
+		let dragPan = new ol.interaction.DragPan();
+		let dragSelect = new DragSelection();
+		let probeInteraction = new ProbeInteraction(this);
 		let dragZoom = new CustomDragZoom();
 
 		this.map.addInteraction(dragPan);
@@ -220,9 +213,16 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		$(this.element).find("canvas.ol-unselectable").attr("tabIndex", 1024); /* Hack to make the canvas focusable. */
 
 		this.controlLocation.addGroupedCallback(this, this.updateControlPositions);
-		[this.showZoomSlider, this.showMouseModeControls, this.showPanButtons, this.showZoomExtentButton, this.showZoomButtons].forEach(
-			(value: LinkableBoolean) => { value.addGroupedCallback(this, this.updateControls_weaveToOl) }
-		);
+		for (let lb of [
+				this.showZoomSlider,
+				this.showMouseModeControls,
+				this.showPanButtons,
+				this.showZoomExtentButton,
+				this.showZoomButtons
+			])
+		{
+			lb.addGroupedCallback(this, this.updateControls_weaveToOl);
+		}
 		this.updateControls_weaveToOl();
 
 		this.snapZoomToBaseMap.addGroupedCallback(this, this.updateResolutionSnapping);
@@ -230,7 +230,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		/* Todo replace override[X,Y][Min,Max] with a single overrideZoomBounds element; alternatively,
 		 * make a set of parameters on zoombounds itself. */
 
-		this.extentOverride.addGroupedCallback(this, this.updateViewParameters_weaveToOl);
+		Weave.getCallbacks(this.extentOverride).addGroupedCallback(this, this.updateViewParameters_weaveToOl);
 
 		this.projectionSRS.addGroupedCallback(this, this.updateViewParameters_weaveToOl, true);
 
@@ -242,21 +242,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	updateViewParameters_weaveToOl():void
 	{
-		let extent:ol.Extent = [NaN,NaN,NaN,NaN];
-		let rawExtent: Bounds = this.extentOverride.state as Bounds;
-
-		if (rawExtent)
-		{
-			extent[0] = rawExtent.xMin;
-			extent[1] = rawExtent.yMin;
-			extent[2] = rawExtent.xMax;
-			extent[3] = rawExtent.yMax;
-		}
-
+		let extent:ol.Extent = [
+			this.extentOverride.xMin.value,
+			this.extentOverride.yMin.value,
+			this.extentOverride.xMax.value,
+			this.extentOverride.yMax.value
+		];
 		if (!lodash.every(extent, Number.isFinite))
-		{
 			extent = undefined;
-		}
 
 		let projection = this.projectionSRS.value || this.getDefaultProjection();
 		let view = new CustomView({projection, extent});
@@ -302,22 +295,12 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.updateControlPositions();
 	}
 
-	private static controlOrder: Array<Function> = [
-		PanCluster,
-		CustomZoomToExtent,
-		ol.control.Zoom,
-		ol.control.ZoomSlider,
-		InteractionModeCluster
-	];
-
-	private static controlIndex: Map<Function,number> = (():Map<Function,number> => {
-		let controlIndex: Map<Function, number> = new Map<Function, number>();
-		for (let idx in OpenLayersMapTool.controlOrder)
-		{
-			controlIndex.set(OpenLayersMapTool.controlOrder[idx], Number(idx));
-		}
-		return controlIndex;
-	})();
+	private static controlIndex = new Map<Function,number>()
+		.set(PanCluster, 0)
+		.set(CustomZoomToExtent, 1)
+		.set(ol.control.Zoom, 2)
+		.set(ol.control.ZoomSlider, 3)
+		.set(InteractionModeCluster, 4);
 
 	private updateControlPositions():void
 	{
@@ -327,7 +310,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let mapWidth = this.map.getSize()[0];
 		let mapHeight = this.map.getSize()[1];
 		let padding = 5;
-		let controlLocation: any = this.controlLocation.state as any;
+		let controlLocation:Alignment = this.controlLocation.state as Alignment;
 
 		let verticalDirection: number, verticalStart: number, verticalOffsetMultiplier: number;
 		let horizontalDirection: number, horizontalStart: number, horizontalOffsetMultiplier: number;
@@ -337,7 +320,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		[horizontalDirection, horizontalOffsetMultiplier, horizontalStart] =
 			controlLocation.horizontal == "left" ? [+1, 0, 0] : [-1, +1, mapWidth];
 
-		if (controlLocation.vertical == "bottom") controls.reverse();
+		if (controlLocation.vertical == "bottom")
+			controls.reverse();
 
 		for (let control of controls)
 		{
@@ -456,7 +440,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	updateResolutionSnapping():void
 	{
 		let view = this.map.getView() as CustomView;
-		if (!view) return;
+		if (!view)
+			return;
 		if (this.layers.getObjects(TileLayer).length && this.snapZoomToBaseMap.value)
 			view.enableResolutionConstraint = true;
 		else
@@ -483,25 +468,31 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.projectionSRS.triggerCallbacks();
 	}
 
-	hasNonEmptySelection(): boolean {
-		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>) {
-			if (layer.selectionKeySet && layer.selectionKeySet.keys.length) return true;
+	hasNonEmptySelection():boolean
+	{
+		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>)
+		{
+			if (layer.selectionKeySet && layer.selectionKeySet.keys.length)
+				return true;
 		}
 		return false;
 	}
 
 	getMenuItems():MenuItemProps[]
 	{
-		let menuItems: Array<any> = [];
+		let menuItems:MenuItemProps[] = [];
 
-		if (this.hasNonEmptySelection()) {
+		if (this.hasNonEmptySelection())
+		{
 			menuItems.push({
 				label: Weave.lang("Zoom to selected records"),
 				click: () => this.zoomToSelection()
 			});
 		}
-		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>) {
-			if (layer instanceof AbstractFeatureLayer) {
+		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>)
+		{
+			if (layer instanceof AbstractFeatureLayer)
+			{
 				menuItems = menuItems.concat(AbstractVisTool.getMenuItems(layer));
 			}
 		}
@@ -524,7 +515,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let keyBounds = new Bounds2D();
 		let tmpBounds = new Bounds2D();
 		let useProbe = false;
-		let extent: ol.Extent = new Array<number>(4);
+		let extent:ol.Extent = [NaN, NaN, NaN, NaN];
 
 		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>)
 		{
@@ -535,11 +526,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			for (let key of keys)
 			{
 				let feature = layer.source.getFeatureById(key);
-				if (!feature) continue;
+				if (!feature)
+					continue;
 				let geometry = feature.getGeometry();
-				if (!geometry) continue;
+				if (!geometry)
+					continue;
 				geometry.getExtent(extent);
-				tmpBounds.setBounds(extent[0], extent[1], extent[2], extent[3]);
+				tmpBounds.setCoords(extent);
 				keyBounds.includeBounds(tmpBounds);
 			}
 		}
@@ -549,10 +542,12 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		keyBounds.setWidth(keyBounds.getWidth() * scale);
 		keyBounds.setHeight(keyBounds.getHeight() * scale);
 
-		if (!keyBounds.isEmpty()) {
-			this.map.getView().fit([keyBounds.getXMin(), keyBounds.getYMin(), keyBounds.getXMax(), keyBounds.getYMax()], this.map.getSize());
+		if (!keyBounds.isEmpty())
+		{
+			this.map.getView().fit(keyBounds.getCoords(), this.map.getSize());
 		}
-		else {
+		else
+		{
 			this.map.getView().setCenter([keyBounds.getXCenter(), keyBounds.getYCenter()]);
 		}
 	}

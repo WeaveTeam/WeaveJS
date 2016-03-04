@@ -4489,7 +4489,7 @@ declare module ol {
     /**
      * An array of numbers representing an extent: [minx, miny, maxx, maxy].
      */
-    interface Extent extends Array<number> { }
+    type Extent = [number, number, number, number];
 
     /**
      * Overlay position: 'bottom-left', 'bottom-center', 'bottom-right', 'center-left', 'center-center', 'center-right', 'top-left', 'top-center', 'top-right'
