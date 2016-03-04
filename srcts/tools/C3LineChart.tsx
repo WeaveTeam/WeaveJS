@@ -229,8 +229,8 @@ export default class C3LineChart extends AbstractC3Tool
         if (axisChange)
         {
             changeDetected = true;
-            var xLabel:string = " ";//this.xAxisName.value || this.dataX.getMetadata('title');
-            var yLabel:string = " ";//this.yAxisName.value || this.dataY.getMetadata('title');
+            var xLabel:string = this.xAxisName.value;
+            var yLabel:string = this.yAxisName.value;
 
             if (this.records)
             {
