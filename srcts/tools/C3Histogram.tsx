@@ -592,7 +592,9 @@ export default class C3Histogram extends AbstractC3Tool
 	}
 
     protected weaveLayering():void {
-        super.weaveLayering();
+        var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet);
+        var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet);
+        super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
 
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
         var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
@@ -607,130 +609,121 @@ export default class C3Histogram extends AbstractC3Tool
 
         var histogram = this;
         //copy items to selection_layer and probe_layer
-        d3.select(this.element).selectAll("g").filter(".c3-shapes.c3-bars-height").selectAll("path").each(function (d:any, i:number, oi:number) {
-            let selected = _.intersection(selectedBinIndices,[i]).length;
-            let probed = _.intersection(probedBinIndices,[i]).length;
-            if (selected) {
-                let recordsInBin:Record[] = _.filter(selectedRecords, { binnedColumn: i });
-                let columnToAggregateNameIsDefined:boolean = !!histogram.columnToAggregate.getInternalColumn();
-                let height:number = 0;
-                if (columnToAggregateNameIsDefined)
-                {
-                    height = histogram.getAggregateValue(recordsInBin, "columnToAggregate", histogram.aggregationMethod.value);
-                }
-                else
-                {
-                    height = histogram.getAggregateValue(recordsInBin, "binnedColumn", "count");
-                }
-                let heightRatio = height/histogram.histData[i]["height"];
-                var pathBBox = this.getBBox();
-                pathBBox.y = pathBBox.y+pathBBox.height - pathBBox.height*heightRatio;
-                pathBBox.height = pathBBox.height*heightRatio;
-                d3.select(histogram.element)
-                    .select("g.selection_layer")
-                    .append("rect")
-                    .classed("_selection_rect", true)
-                    .attr("x", pathBBox.x)
-                    .attr("y", pathBBox.y)
-                    .attr("width", pathBBox.width)
-                    .attr("height", pathBBox.height)
-                    .attr("style", this.getAttribute("style"))
-                    .style("stroke", "black")
-                    .style("stroke-width", 1)
-                    .style("stroke-opacity", 0.5);
-            }
-            if (probed) {
-                let recordsInBin:Record[] = _.filter(probedRecords, { binnedColumn: i });
-                let columnToAggregateNameIsDefined:boolean = !!histogram.columnToAggregate.getInternalColumn();
-                let height:number = 0;
-                if (columnToAggregateNameIsDefined)
-                {
-                    height = histogram.getAggregateValue(recordsInBin, "columnToAggregate", histogram.aggregationMethod.value);
-                }
-                else
-                {
-                    height = histogram.getAggregateValue(recordsInBin, "binnedColumn", "count");
-                }
-                let heightRatio = height/histogram.histData[i]["height"];
-                var pathBBox = this.getBBox();
-                pathBBox.y = pathBBox.y+pathBBox.height - pathBBox.height*heightRatio;
-                pathBBox.height = pathBBox.height*heightRatio;
-                d3.select(histogram.element)
-                    .select("g.probe_layer")
-                    .append("rect")
-                    .classed("_probe_rect", true)
-                    .attr("x", pathBBox.x)
-                    .attr("y", pathBBox.y)
-                    .attr("width", pathBBox.width)
-                    .attr("height", pathBBox.height)
-                    .attr("style", this.getAttribute("style"))
-                    .style("stroke", "black")
-                    .style("stroke-width", 1)
-                    .style("stroke-opacity", 1);
-            }
-        });
-
-        //draw selection_style_layer
-        d3.select(histogram.element)
-            .selectAll("g.selection_layer")
-            .selectAll("rect").each( function(d: any, i:number, oi:number) {
+        if(selectionKeySetChanged || probeKeySetChanged) {
+            d3.select(this.element).selectAll("g").filter(".c3-shapes.c3-bars-height").selectAll("path").each(function (d:any, i:number, oi:number) {
+                let selected = _.intersection(selectedBinIndices, [i]).length;
+                let probed = _.intersection(probedBinIndices, [i]).length;
+                if (selected && selectionKeySetChanged) {
+                    let recordsInBin:Record[] = _.filter(selectedRecords, {binnedColumn: i});
+                    let columnToAggregateNameIsDefined:boolean = !!histogram.columnToAggregate.getInternalColumn();
+                    let height:number = 0;
+                    if (columnToAggregateNameIsDefined) {
+                        height = histogram.getAggregateValue(recordsInBin, "columnToAggregate", histogram.aggregationMethod.value);
+                    }
+                    else {
+                        height = histogram.getAggregateValue(recordsInBin, "binnedColumn", "count");
+                    }
+                    let heightRatio = height / histogram.histData[i]["height"];
+                    var pathBBox = this.getBBox();
+                    pathBBox.y = pathBBox.y + pathBBox.height - pathBBox.height * heightRatio;
+                    pathBBox.height = pathBBox.height * heightRatio;
                     d3.select(histogram.element)
-                        .selectAll("g.selection_style_layer")
+                        .select("g.selection_layer")
                         .append("rect")
-                        .classed("_selection_path", true)
-                        .attr("x", this.getAttribute("x"))
-                        .attr("y", this.getAttribute("y"))
-                        .attr("width", this.getAttribute("width"))
-                        .attr("height", this.getAttribute("height"))
+                        .classed("_selection_rect", true)
+                        .attr("x", pathBBox.x)
+                        .attr("y", pathBBox.y)
+                        .attr("width", pathBBox.width)
+                        .attr("height", pathBBox.height)
                         .attr("style", this.getAttribute("style"))
                         .style("stroke", "black")
                         .style("stroke-width", 1)
                         .style("stroke-opacity", 0.5);
-        });
+                }
+                if (probed && probeKeySetChanged) {
+                    let recordsInBin:Record[] = _.filter(probedRecords, {binnedColumn: i});
+                    let columnToAggregateNameIsDefined:boolean = !!histogram.columnToAggregate.getInternalColumn();
+                    let height:number = 0;
+                    if (columnToAggregateNameIsDefined) {
+                        height = histogram.getAggregateValue(recordsInBin, "columnToAggregate", histogram.aggregationMethod.value);
+                    }
+                    else {
+                        height = histogram.getAggregateValue(recordsInBin, "binnedColumn", "count");
+                    }
+                    let heightRatio = height / histogram.histData[i]["height"];
+                    var pathBBox = this.getBBox();
+                    pathBBox.y = pathBBox.y + pathBBox.height - pathBBox.height * heightRatio;
+                    pathBBox.height = pathBBox.height * heightRatio;
+                    d3.select(histogram.element)
+                        .select("g.probe_layer")
+                        .append("rect")
+                        .classed("_probe_rect", true)
+                        .attr("x", pathBBox.x)
+                        .attr("y", pathBBox.y)
+                        .attr("width", pathBBox.width)
+                        .attr("height", pathBBox.height)
+                        .attr("style", this.getAttribute("style"))
+                        .style("stroke", "black")
+                        .style("stroke-width", 1)
+                        .style("stroke-opacity", 1);
+                }
+            });
+        }
 
-        //style selection_layer (need to set opacity to null, group opacity will then determine opacity of all points)
-        d3.select(histogram.element)
-            .select("g.selection_layer")
-            .selectAll("path")
-            .attr("class","weave_point_layer_path")
-            .style("opacity",null);
+        //redraw selection_style_layer if changed
+        if(selectionKeySetChanged) {
+            d3.select(histogram.element)
+                .selectAll("g.selection_layer")
+                .selectAll("rect").each(function (d:any, i:number, oi:number) {
+                d3.select(histogram.element)
+                    .selectAll("g.selection_style_layer")
+                    .append("rect")
+                    .classed("_selection_path", true)
+                    .attr("x", this.getAttribute("x"))
+                    .attr("y", this.getAttribute("y"))
+                    .attr("width", this.getAttribute("width"))
+                    .attr("height", this.getAttribute("height"))
+                    .attr("style", this.getAttribute("style"))
+                    .style("stroke", "black")
+                    .style("stroke-width", 1)
+                    .style("stroke-opacity", 0.5);
+            });
 
-        //draw probe_style_layer
-        d3.select(histogram.element)
-            .selectAll("g.probe_layer")
-            .selectAll("rect").each( function(d: any, i:number, oi:number) {
+            //style selection_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+            d3.select(histogram.element)
+                .select("g.selection_layer")
+                .selectAll("path")
+                .attr("class","weave_point_layer_path")
+                .style("opacity",null);
+        }
+
+        if(probeKeySetChanged) {
+            //draw probe_style_layer
+            d3.select(histogram.element)
+                .selectAll("g.probe_layer")
+                .selectAll("rect").each(function (d:any, i:number, oi:number) {
                 var pathBBox = this.getBBox();
                 var borderThickness = 3;
-                let groupElement = d3.select(histogram.element)
+                d3.select(histogram.element)
                     .selectAll("g.probe_style_layer")
-                    .append("g")
-                    .classed("_probe_style_group", true);
-                groupElement.append("rect")
-                    .classed("_probe_outer_rect", true)
-                    .attr("x",pathBBox.x-borderThickness)
-                    .attr("y",pathBBox.y-borderThickness)
-                    .attr("width",pathBBox.width+2*borderThickness)
-                    .attr("height",pathBBox.height+2*borderThickness)
+                    .append("rect")
+                    .classed("_probe_rect", true)
+                    .attr("x", pathBBox.x - borderThickness)
+                    .attr("y", pathBBox.y - borderThickness)
+                    .attr("width", pathBBox.width + 2 * borderThickness)
+                    .attr("height", pathBBox.height + 2 * borderThickness)
                     .style("stroke", "black")
                     .style("stroke-width", 1)
                     .style("fill", "white");
-                groupElement.append("rect")
-                    .classed("_probe_inner_rect", true)
-                    .attr("x",this.getAttribute("x"))
-                    .attr("y",this.getAttribute("y"))
-                    .attr("width",this.getAttribute("width"))
-                    .attr("height",this.getAttribute("height"))
-                    .style("stroke", "black")
-                    .style("stroke-width", 1)
-                    .style("fill", "black");
-        });
+            });
 
-        //style probe_layer (need to set opacity to null, group opacity will then determine opacity of all points)
-        d3.select(histogram.element)
-            .select("g.probe_layer")
-            .selectAll("path")
-            .attr("class","weave_point_layer_path")
-            .style("opacity",null);
+            //style probe_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+            d3.select(histogram.element)
+                .select("g.probe_layer")
+                .selectAll("path")
+                .attr("class", "weave_point_layer_path")
+                .style("opacity", null);
+        }
     }
 
     get deprecatedStateMapping()
