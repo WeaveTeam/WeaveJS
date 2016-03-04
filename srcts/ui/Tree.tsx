@@ -1,5 +1,6 @@
 import * as React from "react";
 import VBox from "../react-ui/VBox";
+import MiscUtils from "../utils/MiscUtils";
 
 export interface ITreeState {
 	selectedItems: Array<IWeaveTreeNode>;
@@ -23,49 +24,6 @@ interface ITreeNode {
 	getSelected(node: IWeaveTreeNode): boolean;
 	setOpen(node: IWeaveTreeNode, isOpen: boolean):void;
 	setSelected(node: IWeaveTreeNode, isSelected: boolean):void;
-}
-
-class TreeNode extends React.Component<ITreeNodeProps, any>
-{
-	constructor(props:ITreeNodeProps)
-	{
-		super(props);
-	}
-
-	get open():boolean
-	{
-		return this.props.root.getOpen(this.props.node);
-	}
-	set open(value:boolean)
-	{
-		this.props.root.setOpen(this.props.node, value);
-	}
-
-	get selected():boolean
-	{
-		return this.props.root.getSelected(this.props.node);
-	}
-	set selected(value:boolean)
-	{
-		this.props.root.setSelected(this.props.node, value);
-	}
-
-	render(): JSX.Element
-	{
-		let children: Array<JSX.Element> = [];
-		if (this.props.node.isBranch() && this.open)
-		{
-			children = this.props.node.getChildren().map( (value,index) => {
-				return <li key={index}><TreeNode node={value} root={this.props.root}/></li>;
-			});
-		}
-		return <span>
-			<span onClick={() => {this.open = !this.open} }>{this.props.node.getLabel()}</span>
-			<ul>
-				{children}
-			</ul>
-		</span>;
-	}
 }
 
 export default class Tree extends React.Component<ITreeProps, ITreeState>
@@ -92,9 +50,12 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 
 	componentDidUpdate()
 	{
-		console.log("");
+		console.log("open:", this.state.openItems);
+		console.log("selected:", this.state.selectedItems);
 		return;
 	}
+
+
 
 	setOpen(node: IWeaveTreeNode, value: boolean)
 	{
@@ -113,24 +74,113 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 		this.setState({ openItems, selectedItems });
 	}
 
-	setSelected(node: IWeaveTreeNode, value:boolean)
+	setSelected(node: IWeaveTreeNode, value:boolean, keepSelection:boolean = false)
 	{
 		let isSelected = this.getSelected(node);
 		let openItems = this.state.openItems;
 		let selectedItems = this.state.selectedItems;
-		if (value && !isSelected) {
+
+		if (!keepSelection && value && !isSelected) {
+			selectedItems = [node];
+		} else if (value && !isSelected) {
 			selectedItems = selectedItems.concat([node]);
 		}
 		else if (!value && isSelected) {
 			selectedItems = selectedItems.filter((other) => !node.equals(other));
 		}
+
+
 		this.setState({ openItems, selectedItems });
 	}
 
+	static PX_TO_EM = 16;
+	isVisible(top: number):boolean
+	{
+		if (!this.container) return true;
+
+		let topPx = this.container.scrollTop;
+		let bottomPx = (this.container.clientHeight) + topPx;
+		return (top >= topPx && top <= bottomPx);
+	}
+	private rowHeight: number
+
+	handleItemClick=(node:IWeaveTreeNode, e:React.MouseEvent)=>
+	{
+			this.setSelected(node, !this.getSelected(node), e.ctrlKey);
+	}
+
+	renderRecursive(node:IWeaveTreeNode, top:number, depth:number): [JSX.Element[], number]
+	{
+		let resultElements:JSX.Element[] = []
+		let childElements: JSX.Element[];
+
+		let className = Tree.CLASSNAME;
+		let iconClassName = Tree.LEAF_ICON_CLASSNAME;
+		let iconClickFunc: React.MouseEventHandler = null;
+
+		let isOpen = this.getOpen(node);
+		let isSelected = this.getSelected(node);
+
+		if (node.isBranch())
+		{
+			iconClassName = isOpen ? Tree.OPEN_BRANCH_ICON_CLASSNAME : Tree.BRANCH_ICON_CLASSNAME;
+			iconClickFunc = (e: React.MouseEvent):void => {
+				this.setOpen(node, !this.getOpen(node)); e.preventDefault();
+			};
+		}
+		if (this.getSelected(node))
+		{
+			className += " " + Tree.SELECTED_CLASSNAME;
+		}
+
+		if (this.isVisible(top)) {
+			resultElements.push(<span className={className} key={top}
+				onClick={ this.handleItemClick.bind(this, node) }
+				onDoubleClick={ iconClickFunc } style={{ position: "absolute", top: top, width: "100%"}}>
+				<span style={{ marginLeft: depth * this.rowHeight, whiteSpace: "pre"}}>
+					<i onMouseDown={ iconClickFunc } className={iconClassName}/>
+					{ " "+node.getLabel() }
+				</span></span>);
+		}
+
+		if (this.getOpen(node)) {
+			for (let child of node.getChildren() || []) {
+				top += this.rowHeight;
+				[childElements, top] = this.renderRecursive(child, top, depth + 1);
+				for (let ele of childElements) {
+					resultElements.push(ele);
+				}
+			}
+		}
+		return [resultElements, top];
+	}
+
+	private container: HTMLElement;
+
+	updateScroll():void
+	{
+		if (this.container)
+		{
+			this.forceUpdate();
+		}
+	}
+
+	static CLASSNAME = "weave-tree-view";
+	static SELECTED_CLASSNAME = "selected";
+	
+	static BRANCH_ICON_CLASSNAME = "fa fa-folder-o fa-fw";
+	static LEAF_ICON_CLASSNAME = "fa fa-file-text-o fa-fw";
+	static OPEN_BRANCH_ICON_CLASSNAME = "fa fa-folder-open-o fa-fw";
+
 	render(): JSX.Element
 	{
-		return <VBox>
-			<TreeNode node={this.props.root} root={this}/>
-		</VBox>;
+		this.rowHeight = MiscUtils.getTextHeightForClasses("M", Tree.CLASSNAME);
+
+		let [children, totalHeight] = this.renderRecursive(this.props.root, 0, 0);
+		return <div className={Tree.CLASSNAME} onScroll={this.updateScroll.bind(this)} ref={ (c:HTMLElement) => {this.container = c;}} style={{height: "100%", width: "100%", overflow: "scroll", position: "relative"}}>
+			<div style={{ height: totalHeight + "px" }}>
+				{children}
+			</div>
+		</div>;
 	}
 }

@@ -213,7 +213,29 @@ export default class MiscUtils
 		return metrics.width;
 	}
 
-	static textHeightCache: Dictionary2D<string,string,number> = new Dictionary2D<string,string,number>();
+	static textHeightCache = new Dictionary2D<string,string,number>();
+
+	static textHeightForClassCache = new Dictionary2D<string, string, number>();
+
+	static getTextHeightForClasses(text:string, classNames:string)
+	{
+		var result = this.textHeightForClassCache.get(text, classNames);
+		if (result !== undefined)
+			return result;
+
+		var body = document.getElementsByTagName("body")[0];
+		var dummy = document.createElement("div");
+		var dummyText = document.createTextNode("M");
+		dummy.appendChild(dummyText);
+		dummy.setAttribute("class", classNames);
+		body.appendChild(dummy);
+		result = dummy.offsetHeight;
+		body.removeChild(dummy);
+
+		this.textHeightForClassCache.set(text, classNames, result);
+
+		return result;
+	}
 
 	static getTextHeight(text:string, font:string):number
 	{

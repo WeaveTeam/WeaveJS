@@ -285,3 +285,20 @@ ul.dropdown-menu {
 .rc-slider {
     background-color: #D0D0D0;
 }
+
+.weave-tree-view {
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+span.weave-tree-view.selected {
+	background-color: #ADD8E6;
+}
+
+span.weave-tree-view.open {
+	
+}
+/* The pane for the weave-tree-view */
+div.weave-tree-view {
+
+}
