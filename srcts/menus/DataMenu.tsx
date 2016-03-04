@@ -22,7 +22,7 @@ export default class DataMenu implements MenuBarItemProps
 		},
 		{
 			label: Weave.lang("CSV file / Delimited text"),
-			leftIcon: <i />
+			leftIcon: <i/>,
 			click: this.saveFile.bind(this)
 		},
 		{
@@ -87,10 +87,10 @@ export default class DataMenu implements MenuBarItemProps
 			{
 				option.call(this);
 			}
-			var archive:WeaveArchive  = weavejs.core.WeaveArchive.createArchive(this.weave)
-			var uint8Array:Uint8Array = archive.serialize();
-			var arrayBuffer:ArrayBuffer  = uint8Array.buffer;
-			FileSaver.saveAs(new Blob([arrayBuffer]), filenameInput.value || "defaults.weave");
+			// var archive:WeaveArchive  = weavejs.core.WeaveArchive.createArchive(this.weave)
+			// var uint8Array:Uint8Array = archive.serialize();
+			// var arrayBuffer:ArrayBuffer  = uint8Array.buffer;
+			// FileSaver.saveAs(new Blob([arrayBuffer]), filenameInput.value || "defaults.weave");
 		}
 		
 		PopupWindow.open({
