@@ -478,116 +478,126 @@ export default class C3BarChart extends AbstractC3Tool
     }
 
 	protected weaveLayering():void {
-		super.weaveLayering();
+		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet);
+		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet);
+		super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
 
 		let thinBars:boolean = this.chart.internal.width <= this.records.length;
 
-		var barchart = this;
-		this.heightColumnNames.forEach((item:string) => {
-			d3.select(this.element)
-				.selectAll("g.selection_layer")
-				.append("g")
-				.classed(item + "-bars",true);
-			d3.select(this.element)
-				.selectAll("g.probe_layer")
-				.append("g")
-				.classed(item + "-bars",true);
-			d3.select(this.element).selectAll("g").filter(".c3-shapes-" + item + ".c3-bars").selectAll("path").each(function (d:any, i:number, oi:number) {
-				let key = barchart.records[i].id;
-				let selected = barchart.isSelected(key);
-				let probed = barchart.isProbed(key);
-				if (selected) {
+		var barchart = this;//copy items to selection_layer and probe_layer
+		if(selectionKeySetChanged || probeKeySetChanged) {
+			this.heightColumnNames.forEach((item:string) => {
+				if(selectionKeySetChanged)
+					d3.select(this.element)
+						.selectAll("g.selection_layer")
+						.append("g")
+						.classed(item + "-bars", true);
+				if(probeKeySetChanged)
+					d3.select(this.element)
+						.selectAll("g.probe_layer")
+						.append("g")
+						.classed(item + "-bars", true);
+				d3.select(this.element).selectAll("g").filter(".c3-shapes-" + item + ".c3-bars").selectAll("path").each(function (d:any, i:number, oi:number) {
+					let key = barchart.records[i].id;
+					let selected = barchart.isSelected(key);
+					let probed = barchart.isProbed(key);
+					if (selected && selectionKeySetChanged) {
+						d3.select(barchart.element)
+							.select("g.selection_layer")
+							.select("g." + item + "-bars")
+							.node()
+							.appendChild(this.cloneNode(true));
+					}
+					if (probed && probeKeySetChanged) {
+						d3.select(barchart.element)
+							.select("g.probe_layer")
+							.select("g." + item + "-bars")
+							.node()
+							.appendChild(this.cloneNode(true));
+					}
+				});
+
+				//draw selection_style_layer
+				if(selectionKeySetChanged) {
+					d3.select(barchart.element)
+						.selectAll("g.c3-shapes-" + item + ".c3-bars")
+						.selectAll("path").each(function (d:any, i:number, oi:number) {
+						if (d.hasOwnProperty("index")) {
+							let key = barchart.records[d.index].id;
+							let selected = barchart.isSelected(key);
+							if (selected) {
+								d3.select(barchart.element)
+									.selectAll("g.selection_style_layer")
+									.append("path")
+									.classed("_selection_path", true)
+									.attr("d", this.getAttribute("d"))
+									.style("stroke", "black")
+									.style("stroke-width", 1)
+									.style("stroke-opacity", (d:any, i:number, oi:number):number => {
+										if (thinBars)
+											return 0;
+										return 0.5;
+									})
+							}
+						}
+					});
+
+					//style selection_layer (need to set opacity to null, group opacity will then determine opacity of all points)
 					d3.select(barchart.element)
 						.select("g.selection_layer")
-						.select("g."+ item + "-bars")
-						.node()
-						.appendChild(this.cloneNode(true));
+						.selectAll("g." + item + "-bars")
+						.selectAll("path")
+						.attr("class", "weave_point_layer_path")
+						.style("opacity", null);
 				}
-				if (probed) {
+
+				//draw probe_style_layer
+				if(probeKeySetChanged) {
+					d3.select(barchart.element)
+						.selectAll("g.c3-shapes-" + item + ".c3-bars")
+						.selectAll("path").each(function (d:any, i:number, oi:number) {
+						if (d.hasOwnProperty("index")) {
+							let key = barchart.records[d.index].id;
+							let probed = barchart.isProbed(key);
+							if (probed) {
+								var pathBBox = this.getBBox();
+								var borderThickness = 3;
+								let groupElement = d3.select(barchart.element)
+									.selectAll("g.probe_style_layer")
+									.append("g")
+									.classed("_probe_style_group", true);
+								groupElement.append("rect")
+									.classed("_probe_outer_path", true)
+									.attr("x", pathBBox.x - borderThickness)
+									.attr("y", pathBBox.y - borderThickness)
+									.attr("width", pathBBox.width + 2 * borderThickness)
+									.attr("height", pathBBox.height + 2 * borderThickness)
+									.style("stroke", "black")
+									.style("stroke-width", 1)
+									.style("fill", "white");
+								groupElement.append("rect")
+									.classed("_probe_inner_path", true)
+									.attr("x", pathBBox.x)
+									.attr("y", pathBBox.y)
+									.attr("width", pathBBox.width)
+									.attr("height", pathBBox.height)
+									.style("stroke", "black")
+									.style("stroke-width", 1)
+									.style("fill", "black");
+							}
+						}
+					});
+
+					//style probe_layer (need to set opacity to null, group opacity will then determine opacity of all points)
 					d3.select(barchart.element)
 						.select("g.probe_layer")
-						.select("g."+ item + "-bars")
-						.node()
-						.appendChild(this.cloneNode(true));
+						.selectAll("g." + item + "-bars")
+						.selectAll("path")
+						.attr("class", "weave_point_layer_path")
+						.style("opacity", null);
 				}
 			});
-
-			//draw selection_style_layer
-			d3.select(barchart.element)
-				.selectAll("g.c3-shapes-" + item + ".c3-bars")
-				.selectAll("path").each( function(d: any, i:number, oi:number) {
-				if (d.hasOwnProperty("index")) {
-					let key = barchart.records[d.index].id;
-					let selected = barchart.isSelected(key);
-					if (selected) {
-						d3.select(barchart.element)
-							.selectAll("g.selection_style_layer")
-							.append("path")
-							.classed("_selection_path", true)
-							.attr("d", this.getAttribute("d"))
-							.style("stroke", "black")
-							.style("stroke-width", 1)
-							.style("stroke-opacity", (d: any, i: number, oi: number): number => {
-								if (thinBars)
-									return 0;
-								return 0.5;
-							})
-					}
-				}
-			});
-
-			//style selection_layer (need to set opacity to null, group opacity will then determine opacity of all points)
-			d3.select(barchart.element)
-				.select("g.selection_layer")
-				.selectAll("g."+ item + "-bars")
-				.selectAll("path")
-				.attr("class","weave_point_layer_path")
-				.style("opacity",null);
-
-			//draw probe_style_layer
-			d3.select(barchart.element)
-				.selectAll("g.c3-shapes-" + item + ".c3-bars")
-				.selectAll("path").each( function(d: any, i:number, oi:number) {
-				if (d.hasOwnProperty("index")) {
-					let key = barchart.records[d.index].id;
-					let probed = barchart.isProbed(key);
-					if (probed) {
-						var pathBBox = this.getBBox();
-						var borderThickness = 3;
-						let groupElement = d3.select(barchart.element)
-							.selectAll("g.probe_style_layer")
-							.append("g")
-							.classed("_probe_style_group", true);
-						groupElement.append("rect")
-							.classed("_probe_outer_path", true)
-							.attr("x",pathBBox.x-borderThickness)
-							.attr("y",pathBBox.y-borderThickness)
-							.attr("width",pathBBox.width+2*borderThickness)
-							.attr("height",pathBBox.height+2*borderThickness)
-							.style("stroke", "black")
-							.style("stroke-width", 1)
-							.style("fill", "white");
-						groupElement.append("rect")
-							.classed("_probe_inner_path", true)
-							.attr("x",pathBBox.x)
-							.attr("y",pathBBox.y)
-							.attr("width",pathBBox.width)
-							.attr("height",pathBBox.height)
-							.style("stroke", "black")
-							.style("stroke-width", 1)
-							.style("fill", "black");
-					}
-				}
-			});
-
-			//style probe_layer (need to set opacity to null, group opacity will then determine opacity of all points)
-			d3.select(barchart.element)
-				.select("g.probe_layer")
-				.selectAll("g."+ item + "-bars")
-				.selectAll("path")
-				.attr("class","weave_point_layer_path")
-				.style("opacity",null);
-		});
+		}
 	}
 
 	updateStyle()
