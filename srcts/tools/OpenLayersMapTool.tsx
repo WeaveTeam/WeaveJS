@@ -82,6 +82,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	snapZoomToBaseMap = Weave.linkableChild(this, LinkableBoolean);
 
+	maxZoomLevel = Weave.linkableChild(this, new LinkableNumber(18));
+	minZoomLevel = Weave.linkableChild(this, new LinkableNumber(0));
+
 	/* Control elements */
 	zoomExtent = new CustomZoomToExtent({ label: $("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0] });
 	zoomButtons = new ol.control.Zoom();
@@ -171,7 +174,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 							overrideXMin: this.extentOverride.xMin,
 							overrideYMin: this.extentOverride.yMin,
 							overrideXMax: this.extentOverride.xMax,
-							overrideYMax: this.extentOverride.yMax
+							overrideYMax: this.extentOverride.yMax,
+							minZoomLevel: this.minZoomLevel,
+							maxZoomLevel: this.maxZoomLevel
 						}
 					]
 				}
@@ -231,6 +236,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		 * make a set of parameters on zoombounds itself. */
 
 		Weave.getCallbacks(this.extentOverride).addGroupedCallback(this, this.updateViewParameters_weaveToOl);
+		this.maxZoomLevel.addGroupedCallback(this, this.updateViewParameters_weaveToOl);
+		this.minZoomLevel.addGroupedCallback(this, this.updateViewParameters_weaveToOl);
 
 		this.projectionSRS.addGroupedCallback(this, this.updateViewParameters_weaveToOl, true);
 
@@ -252,7 +259,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			extent = undefined;
 
 		let projection = this.projectionSRS.value || this.getDefaultProjection();
-		let view = new CustomView({projection, extent});
+		let view = new CustomView({minZoom: this.minZoomLevel.value, maxZoom: this.maxZoomLevel.value, projection, extent});
 		view.set("extent", extent);
 
 		this.centerCallbackHandle = view.on("change:center", this.updateCenter_olToWeave, this);
