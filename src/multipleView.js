@@ -21,7 +21,7 @@ var weaveInsts = [weave1,weave2]
 function render()
 {
 	$(() => {
-		ReactDOM.render(<MultipleView weaveInstances={weaveInsts} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
+		ReactDOM.render(<MultipleView weaveInstances={weaveInsts} style={{width: "50%", height: "50%"}}/>, document.getElementById("weaveElt"));
 	});
 }
 
@@ -30,14 +30,23 @@ class MultipleView extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            toggleIndex:0
+            toggleIndex:0,
+            addView: false
         }
         this.toggleView = this.toggleView.bind(this);
+        this.addView = this.addView.bind(this);
     }
 
     toggleView(){
         this.setState({
-            toggleIndex: this.state.toggleIndex == 0 ?1:0
+            toggleIndex: this.state.toggleIndex == 0 ?1:0,
+            addView:false
+        });
+    }
+
+    addView(){
+        this.setState({
+            addView:!this.state.addView
         });
     }
 
@@ -47,16 +56,38 @@ class MultipleView extends React.Component {
         var weaveUI = this.props.weaveInstances.map(function(weaveInst,index){
             var layout = weaveInst.root.requestObject("Layout", Weave.getDefinition("FlexibleLayout"));
             var styleObject = {
+                border:"2px solid black",
                 display:"none"
             }
-            if(this.state.toggleIndex == index)styleObject.display = "block";
+            if(this.state.toggleIndex == index)
+                styleObject.display = "block";
             return <div key={index} style={styleObject}><WeaveLayoutManager  layout={layout} style={{flex: 1,width: "100%"}}/></div>
         },this)
 
+        var singleViewLabel = "Add Single Tool View For Active Weave";
+        if(this.state.addView){
+            var weaveInst = this.props.weaveInstances[this.state.toggleIndex];
+            var layout = weaveInst.root.requestObject("SingleToolLayout", Weave.getDefinition("FlexibleLayout"));
+            layout.state = {
+                  "direction": "horizontal",
+                  "flex": 1,
+                  "id": [
+                    "MapTool"
+                  ]
+                }
+            var keyIndex = weaveUI.length;
+            singleViewLabel = "Remove Single Tool View"
+            var singleToolView =  <div key={keyIndex} style={{border:"2px solid blue"}} ><WeaveLayoutManager  layout={layout} style={{flex: 1,width: "100%"}}/></div>
+            weaveUI.push(singleToolView);
+        }
 
 
         return <div style={this.props.style}>
-                    <div onClick={this.toggleView}> Toggle Weave </div>
+                    <div>
+                        <span onClick={this.toggleView}> Toggle Weave </span> |
+                        <span onClick={this.addView}> {singleViewLabel} </span>
+                        <br/>
+                    </div>
                     {weaveUI}
                 </div>
     }
