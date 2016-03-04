@@ -30,6 +30,7 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import KeySet = weavejs.data.key.KeySet;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableString = weavejs.core.LinkableString;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -46,6 +47,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	maxColumns = Weave.linkableChild(this, new LinkableNumber(1));
 	shapeSize = Weave.linkableChild(this, new LinkableNumber(25));
 	shapeType = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_BOX));
+	showLegendName = Weave.linkableChild(this, new LinkableBoolean(true));
 	//lineStyle = Weave.linkableChild(this, SolidLineStyle);
 	
 	private get colorColumn() { return this.dynamicColorColumn.target as ColorColumn; }
@@ -335,9 +337,12 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 			return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
 				<ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
-					<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
-						<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
-					</ui.HBox>
+					{this.showLegendName.value ?
+						<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
+							<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
+						</ui.HBox>
+						: null
+					}
 					<ui.HBox style={{width:"100%", flex: 0.9}}> { finalElements } </ui.HBox>
 				</ui.VBox>
 			</div>);
