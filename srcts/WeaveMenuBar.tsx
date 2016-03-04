@@ -88,13 +88,26 @@ function fileMenu(weave:Weave)
 		PopupWindow.open({
 			title: "Save file dialog",
 			content: <div>I am a save file dialog</div>,
-			dialog: true
+			modal: true
 		});
         // var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
         // var uint8Array:any = archive.serialize();
         // var arrayBuffer:any  = uint8Array.buffer;
 		// FileSaver.saveAs(new Blob([arrayBuffer]), "test.weave");
   	}
+
+	function exoprtCSV()
+	{
+		PopupWindow.open({
+			title: "Export CSV",
+			content: <div style={{width: 300, height: 300}}>I am a save file dialog</div>,
+			modal: false
+		});
+		// var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
+		// var uint8Array:any = archive.serialize();
+		// var arrayBuffer:any  = uint8Array.buffer;
+		// FileSaver.saveAs(new Blob([arrayBuffer]), "test.weave");
+	}
 
     return {
 		label: "File",
@@ -109,7 +122,7 @@ function fileMenu(weave:Weave)
 			},
 			{
 				label: "Export CSV",
-				click: () => { console.log("clicked on Export CSV") }
+				click: exoprtCSV
 			}
 		]
 	};
