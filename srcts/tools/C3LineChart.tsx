@@ -278,146 +278,144 @@ export default class C3LineChart extends AbstractC3Tool
     }
 
     protected weaveLayering():void {
-        super.weaveLayering();
+        var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet);
+        var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet);
+        super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
 
-        //copy items to selection_layer and probe_layer
         var linechart = this;
-        d3.select(linechart.element).selectAll("g.c3-shapes.c3-circles").selectAll("circle.c3-shape").each( function(d: any, i:number, oi:number) {
-            let key = linechart.getQKey(d);
-            let selected = linechart.isSelected(key);
-            let probed = linechart.isProbed(key);
-            if(selected) {
-                d3.select(linechart.element)
-                    .select("g.selection_layer")
-                    .node()
-                    .appendChild(this.cloneNode(true));
-            }
-            if(probed) {
-                d3.select(linechart.element)
-                    .select("g.probe_layer")
-                    .node()
-                    .appendChild(this.cloneNode(true));
-            }
-        });
-        d3.select(linechart.element).selectAll("g.c3-shapes.c3-lines").selectAll("path.c3-shape.c3-line").each( function(d: any, i:number, oi:number) {
-            let key = linechart.getQKey(d);
-            let selected = linechart.isSelected(key);
-            let probed = linechart.isProbed(key);
-            if(selected) {
-                d3.select(linechart.element)
-                    .select("g.selection_layer")
-                    .node()
-                    .appendChild(this.cloneNode(true));
-            }
-            if(probed) {
-                d3.select(linechart.element)
-                    .select("g.probe_layer")
-                    .node()
-                    .appendChild(this.cloneNode(true));
-            }
-        });
-
-        //draw selection_style_layer
-        d3.select(linechart.element)
-            .selectAll("g.c3-shapes.c3-circles")
-            .selectAll("circle.c3-shape").each( function(d: any, i:number, oi:number) {
-            if (d.hasOwnProperty("index")) {
+        //copy items to selection_layer and probe_layer
+        if(selectionKeySetChanged || probeKeySetChanged) {
+            d3.select(linechart.element).selectAll("g.c3-shapes.c3-circles").selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
                 let key = linechart.getQKey(d);
                 let selected = linechart.isSelected(key);
-                if (selected) {
+                let probed = linechart.isProbed(key);
+                if (selected && selectionKeySetChanged) {
                     d3.select(linechart.element)
-                        .selectAll("g.selection_style_layer")
-                        .append("circle")
-                        .classed("_selection_circle", true)
-                        .attr("cx", this.getAttribute("cx"))
-                        .attr("cy", this.getAttribute("cy"))
-                        .attr("r", this.getAttribute("r"))
-                        .style("stroke", "black")
-                        .style("stroke-width", 2)
-                        .style("stroke-opacity", 0.5)
+                        .select("g.selection_layer")
+                        .node()
+                        .appendChild(this.cloneNode(true));
                 }
-            }
-        });
+                if (probed && probeKeySetChanged) {
+                    d3.select(linechart.element)
+                        .select("g.probe_layer")
+                        .node()
+                        .appendChild(this.cloneNode(true));
+                }
+            });
+            d3.select(linechart.element).selectAll("g.c3-shapes.c3-lines").selectAll("path.c3-shape.c3-line").each(function (d:any, i:number, oi:number) {
+                let key = linechart.getQKey(d);
+                let selected = linechart.isSelected(key);
+                let probed = linechart.isProbed(key);
+                if (selected && selectionKeySetChanged) {
+                    d3.select(linechart.element)
+                        .select("g.selection_layer")
+                        .node()
+                        .appendChild(this.cloneNode(true));
+                }
+                if (probed && probeKeySetChanged) {
+                    d3.select(linechart.element)
+                        .select("g.probe_layer")
+                        .node()
+                        .appendChild(this.cloneNode(true));
+                }
+            });
+        }
 
-        //style selection_layer (need to set opacity to null, group opacity will then determine opacity of all points)
-        d3.select(linechart.element)
-            .select("g.selection_layer")
-            .selectAll("circle")
-            .attr("class","weave_selection_layer_circle")
-            .style("opacity", null);
-        d3.select(linechart.element)
-            .selectAll("g.selection_layer")
-            .selectAll("path")
-            .attr("class","weave_point_layer_line")
-            .style("opacity",null);
+        //draw selection_style_layer
+        if(selectionKeySetChanged) {
+            d3.select(linechart.element)
+                .selectAll("g.c3-shapes.c3-circles")
+                .selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
+                if (d.hasOwnProperty("index")) {
+                    let key = linechart.getQKey(d);
+                    let selected = linechart.isSelected(key);
+                    if (selected) {
+                        d3.select(linechart.element)
+                            .selectAll("g.selection_style_layer")
+                            .append("circle")
+                            .classed("_selection_circle", true)
+                            .attr("cx", this.getAttribute("cx"))
+                            .attr("cy", this.getAttribute("cy"))
+                            .attr("r", this.getAttribute("r"))
+                            .style("stroke", "black")
+                            .style("stroke-width", 2)
+                            .style("stroke-opacity", 0.5)
+                    }
+                }
+            });
+
+            //style selection_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+            d3.select(linechart.element)
+                .select("g.selection_layer")
+                .selectAll("circle")
+                .attr("class", "weave_selection_layer_circle")
+                .style("opacity", null);
+            d3.select(linechart.element)
+                .selectAll("g.selection_layer")
+                .selectAll("path")
+                .attr("class", "weave_point_layer_line")
+                .style("opacity", null);
+        }
 
         //draw probe_style_layer
-        d3.select(linechart.element)
-            .selectAll("g.c3-shapes.c3-circles")
-            .selectAll("circle.c3-shape").each( function(d: any, i:number, oi:number) {
-            if (d.hasOwnProperty("index")) {
-                let key = linechart.getQKey(d);
-                let probed = linechart.isProbed(key);
-                if (probed) {
-                    let groupElement = d3.select(linechart.element)
-                        .selectAll("g.probe_style_layer")
-                        .append("g")
-                        .classed("_probe_style_group", true);
-                    groupElement.append("circle")
-                        .classed("_probe_outer_circle", true)
-                        .attr("cx", this.getAttribute("cx"))
-                        .attr("cy", this.getAttribute("cy"))
-                        .attr("r", String(Number(this.getAttribute("r"))+3))
-                        .style("stroke", "black")
-                        .style("stroke-width", 1)
-                        .style("fill", "white");
-                    groupElement.append("circle")
-                        .classed("_probe_inner_circle", true)
-                        .attr("cx", this.getAttribute("cx"))
-                        .attr("cy", this.getAttribute("cy"))
-                        .attr("r", this.getAttribute("r"))
-                        .style("stroke", "black")
-                        .style("stroke-width", 1)
-                        .style("fill", "black");
+        if(probeKeySetChanged) {
+            d3.select(linechart.element)
+                .selectAll("g.c3-shapes.c3-circles")
+                .selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
+                if (d.hasOwnProperty("index")) {
+                    let key = linechart.getQKey(d);
+                    let probed = linechart.isProbed(key);
+                    if (probed) {
+                        d3.select(linechart.element)
+                            .selectAll("g.probe_style_layer")
+                            .append("circle")
+                            .classed("_probe_outer_circle", true)
+                            .attr("cx", this.getAttribute("cx"))
+                            .attr("cy", this.getAttribute("cy"))
+                            .attr("r", String(Number(this.getAttribute("r")) + 3))
+                            .style("stroke", "black")
+                            .style("stroke-width", 1)
+                            .style("fill", "white");
+                    }
                 }
-            }
-        });
-        d3.select(linechart.element)
-            .selectAll("g.c3-shapes.c3-lines")
-            .selectAll("path.c3-shape.c3-line").each( function(d: any, i:number, oi:number) {
+            });
+            d3.select(linechart.element)
+                .selectAll("g.c3-shapes.c3-lines")
+                .selectAll("path.c3-shape.c3-line").each(function (d:any, i:number, oi:number) {
                 let key = linechart.getQKey(d);
                 let probed = linechart.isProbed(key);
                 if (probed) {
-                    let selector = d3.select(linechart.element)
-                        .selectAll("g.probe_style_layer")
-                        .append("g")
-                        .classed("_probe_style_line_group", true);
-                    selector.append("path")
+                    var probeLayer = d3.select(linechart.element)
+                        .selectAll("g.probe_style_layer");
+                    probeLayer.append("path")
                         .classed("_probe_path", true)
                         .attr("d", this.getAttribute("d"))
                         .style("stroke", "black")
                         .style("stroke-width", 6)
                         .style("stroke-opacity", 1.0);
-                    selector.append("path")
+                    probeLayer.append("path")
                         .classed("_probe_path", true)
                         .attr("d", this.getAttribute("d"))
                         .style("stroke", "white")
                         .style("stroke-width", 5)
                         .style("stroke-opacity", 1.0);
                 }
-        });
+            });
 
-        //style probe_layer (need to set opacity to null, group opacity will then determine opacity of all points)
-        d3.select(linechart.element)
-            .select("g.probe_layer")
-            .selectAll("circle")
-            .attr("class","weave_probe_layer_circle")
-            .style("opacity", null);
-        d3.select(linechart.element)
-            .selectAll("g.probe_layer")
-            .selectAll("path")
-            .attr("class","weave_point_layer_line")
-            .style("opacity",null);
+            //style probe_layer (need to set opacity to null, group opacity will then determine opacity of all points)
+            d3.select(linechart.element)
+                .select("g.probe_layer")
+                .selectAll("circle")
+                .attr("class", "weave_probe_layer_circle")
+                .style("opacity", null)
+                .style("stroke", "black")
+                .style("stroke-width", 1);
+            d3.select(linechart.element)
+                .selectAll("g.probe_layer")
+                .selectAll("path")
+                .attr("class", "weave_point_layer_line")
+                .style("opacity", null);
+        }
     }
 
     get selectableAttributes()
