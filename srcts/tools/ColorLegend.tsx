@@ -84,7 +84,18 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 	get deprecatedStateMapping():Object
 	{
-		return {children: {visualization: {plotManager: {plotters: {plot: this}}}}};
+		return {
+			children: {
+				visualization: {
+					plotManager: {
+						marginTop: this.showLegendName,
+						plotters: {
+							plot: this
+						}
+					}
+				}
+			}
+		};
 	}
 	
 	get title():string
