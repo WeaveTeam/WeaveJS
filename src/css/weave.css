@@ -94,6 +94,17 @@ ul.dropdown-menu {
     text-decoration: none;
 }
 
+input[type="text"] {
+  padding: 10px;
+  border: solid 1px #dcdcdc;
+  transition: box-shadow 0.3s, border 0.3s;
+}
+
+input[type="text"]:focus {
+  border: solid 1px rgba(153, 214, 255, 0.4);
+  box-shadow: 0 0 5px 1px rgba(153, 214, 255, 0.4);
+}
+
 .weave-menu {
 	box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
 	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;

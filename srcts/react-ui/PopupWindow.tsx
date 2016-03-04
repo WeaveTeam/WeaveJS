@@ -30,8 +30,8 @@ export interface PopupWindowState
 
 export default class PopupWindow extends React.Component<PopupWindowProps, PopupWindowState>
 {
-	private minWidth:number = 100;
-	private minHeight:number = 100;
+	private minWidth:number = 320;
+	private minHeight:number = 240;
 	private element:HTMLElement;
 	private popupWindow:PopupWindow;
 	private oldMousePos: {
@@ -77,8 +77,8 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 		this.setState({
 			top: this.props.top || 1/2*window.innerHeight - 1/2*this.element.clientHeight,
 			left: this.props.left || 1/2*window.innerWidth - 1/2*this.element.clientWidth,
-			height: this.element.clientHeight,
-			width: this.element.clientWidth
+			height: Math.max(this.minHeight, this.element.clientHeight),
+			width: Math.max(this.minWidth, this.element.clientWidth)
 		});
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
@@ -114,13 +114,10 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 
 	private onDragStart(event:React.MouseEvent)
 	{
-		if(!this.props.modal)
-		{
-			this.dragging = true;
-			this.oldMousePos = {
-				x: event.clientX,
-				y: event.clientY
-			}
+		this.dragging = true;
+		this.oldMousePos = {
+			x: event.clientX,
+			y: event.clientY
 		}
 	}
 	
@@ -174,7 +171,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 					}
 					</div>
 					{
-						this.props.modal ? 
+						!this.props.modal ? 
 							<div onClick={() => PopupWindow.close(this)}>
 							×
 							</div>

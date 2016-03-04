@@ -4,6 +4,9 @@ import MiscUtils from "./utils/MiscUtils";
 import * as FileSaver from "filesaver.js";
 import FileInput from "./react-ui/FileInput";
 import PopupWindow from "./react-ui/PopupWindow";
+import HBox from "./react-ui/HBox";
+import VBox from "./react-ui/VBox";
+import FileMenu from "./menus/FileMenu";
 
 export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar> {
 	weave:Weave
@@ -64,70 +67,6 @@ function weaveMenu(weave:Weave)
 	};
 }
 
-function fileMenu(weave:Weave)
-{
-
-    function openFile(e:any) {
-        const selectedfile:File = e.target.files[0];
-        new Promise(function (resolve:any, reject:any) {
-                let reader:FileReader = new FileReader();
-                reader.onload = function (event:Event) {
-                    resolve([event, selectedfile]);
-                };
-                reader.readAsArrayBuffer(selectedfile);
-            })
-            .then(function (zippedResults:any) {
-                var e:any = zippedResults[0];
-                var result:any = e.target.result;
-                weavejs.core.WeaveArchive.loadFileContent(weave,result);
-            });
-    }
-    
-    function saveFile()
-	{
-		PopupWindow.open({
-			title: "Save file dialog",
-			content: <div>I am a save file dialog</div>,
-			modal: true
-		});
-        // var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
-        // var uint8Array:any = archive.serialize();
-        // var arrayBuffer:any  = uint8Array.buffer;
-		// FileSaver.saveAs(new Blob([arrayBuffer]), "test.weave");
-  	}
-
-	function exoprtCSV()
-	{
-		PopupWindow.open({
-			title: "Export CSV",
-			content: <div style={{width: 300, height: 300}}>I am a save file dialog</div>,
-			modal: false
-		});
-		// var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
-		// var uint8Array:any = archive.serialize();
-		// var arrayBuffer:any  = uint8Array.buffer;
-		// FileSaver.saveAs(new Blob([arrayBuffer]), "test.weave");
-	}
-
-    return {
-		label: "File",
-		onClick: "",
-		menu: [
-			{
-				label: <FileInput onChange={openFile}>Open a file...</FileInput>
-			},
-			{
-				label: Weave.lang("Save as..."),
-				click: saveFile
-			},
-			{
-				label: "Export CSV",
-				click: exoprtCSV
-			}
-		]
-	};
-}
-
 function dataMenu(weave:Weave) 
 {
 	return {
@@ -149,16 +88,18 @@ function dataMenu(weave:Weave)
 
 export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
 {
+	fileMenu:FileMenu;
 	constructor(props:WeaveMenuBarProps)
 	{
 		super(props);
+		this.fileMenu = new FileMenu(props.weave);
 	}
 	
 	render():JSX.Element
 	{
         var weave = this.props.weave;
 		return (
-			<MenuBar style={{width: "100%"}} config={[weaveMenu(weave), fileMenu(weave), dataMenu(weave)]}/>
+			<MenuBar style={{width: "100%"}} config={[weaveMenu(weave), this.fileMenu, dataMenu(weave)]}/>
 		)
 	}
 }

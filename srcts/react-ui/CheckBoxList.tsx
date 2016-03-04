@@ -18,8 +18,7 @@ export type CheckBoxOption = {
 export interface ICheckBoxListProps extends React.Props<CheckBoxList>
 {
     options:CheckBoxOption[];
-    labels?:string[];
-    onChange?:(selectedValues:string[]) => void;
+    onChange?:(selectedValues:any[]) => void;
     selectedValues?:any[];
     labelPosition?:string;
 }
@@ -65,6 +64,8 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
 				}
 			}
 		}
+		this.values = _.pluck(this.props.options, "value");
+		this.labels = _.pluck(this.props.options, "label");
     }
 
     componentWillReceiveProps(nextProps:ICheckBoxListProps)
@@ -119,12 +120,12 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
         var labelPosition:string = this.props.labelPosition || "right";
 
         return (
-            <div style={{height: "100%", width: "100%", alignItems: "center", overflow: "scroll"}}>
+            <div style={{height: "100%", width: "100%", alignItems: "center", overflow: "auto"}}>
                 {
                     this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
                         var checkboxItem:JSX.Element[] = [
                             <input key="input" type="checkbox" checked={checkBoxState} value={this.values[index]} onChange={this.handleChange.bind(this, index)}/>,
-                            <span key="span" style={{paddingLeft: 5, textAlign: "center"}}>
+                            <span key="span" style={{paddingLeft: 5, textAlign: "center", whiteSpace: "nowrap"}}>
 								{ this.labels[index] }
 							</span>
                         ];
