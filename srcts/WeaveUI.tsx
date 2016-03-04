@@ -62,6 +62,7 @@ export
     TableTool,
 	DataFilterTool,
     SessionStateMenuTool,
+	TextTool,
     WeaveDataSourceEditor,
     MiscUtils,
     ui

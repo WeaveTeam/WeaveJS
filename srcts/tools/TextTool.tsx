@@ -4,8 +4,7 @@
 ///<reference path="../../typings/weave/weavejs.d.ts"/>
 ///<reference path="../../typings/jquery/jquery.d.ts"/>
 
-import {IVisToolProps, IVisToolState} from "./IVisTool";
-import {IVisTool} from "./IVisTool";
+import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
 import * as React from "react";
 import ui from "../react-ui/ui";
@@ -21,7 +20,7 @@ import StandardLib = weavejs.util.StandardLib;
 import LinkableString = weavejs.core.LinkableString
 import LinkableNumber = weavejs.core.LinkableNumber;
 
-export default class TextTool extends React.Component<IVisToolProps, IVisToolState>
+export default class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 {
 
 	htmlText = Weave.linkableChild(this, new LinkableString(""));
@@ -56,6 +55,16 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 
 	}
 
+	get deprecatedStateMapping()
+	{
+		return {
+			"htmlText": this.htmlText,
+			"padding": this.padding,
+			"panelBackgroundColor": this.panelBackgroundColor,
+			"panelBorderColor": this.panelBorderColor
+		};
+	}
+
 	componentDidUpdate()
 	{
 		$(this.element).empty();
@@ -79,5 +88,5 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 
 
 }
-Weave.registerClass("weavejs.tool.Text", TextTool, [weavejs.api.ui.IVisTool/*, weavejs.api.core.ILinkableObjectWithNewProperties*/]);
+Weave.registerClass("weavejs.tool.Text", TextTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.ui::TextTool", TextTool);
