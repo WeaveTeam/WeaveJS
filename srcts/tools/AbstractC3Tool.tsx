@@ -258,31 +258,54 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		baseLines.attr("opacity", selectionEmpty ? "1.0" : "0.5");
 	}
 
-	protected weaveLayering():void
+	protected weaveLayering(selectionChanged:boolean, probeChanged:boolean):void
 	{
 		//style c3 layer
 		this.styleC3ShapeGroups();
 
 		//remove existing weave layering, if present
-		d3.select(this.element).selectAll("g.weave_layering_group").remove();
-
-		//create layering group and layers, append to last child of c3-chart-lines to render on top
-		var layerGroup:any = d3.select(d3.select(this.element)
-			.select("g.c3-chart-line").node().parentNode.lastChild)
-			.append("g")
-			.classed("weave_layering_group",true);
-		layerGroup.append("g")
-			.classed("selection_style_layer",true)
-			.attr("opacity", 1.0);
-		layerGroup.append("g")
-			.classed("selection_layer",true)
-			.attr("opacity", 1.0);
-		layerGroup.append("g")
-			.classed("probe_style_layer",true)
-			.attr("opacity", 1.0);
-		layerGroup.append("g")
-			.classed("probe_layer",true)
-			.attr("opacity", 1.0);
+		var layerGroup = d3.select(this.element).selectAll("g.weave_layering_group");
+		if(layerGroup.size()) {
+			//clear old layer groups if necessary
+			if(selectionChanged) {
+				layerGroup.select("g.selection_style_layer").remove();
+				layerGroup.select("g.selection_layer").remove();
+				layerGroup.insert("g", "g.probe_style_layer")
+					.classed("selection_style_layer",true)
+					.attr("opacity", 1.0);
+				layerGroup.insert("g", "g.probe_style_layer")
+					.classed("selection_layer",true)
+					.attr("opacity", 1.0);
+			}
+			if(probeChanged) {
+				layerGroup.select("g.probe_style_layer").remove();
+				layerGroup.select("g.probe_layer").remove();
+				layerGroup.append("g")
+					.classed("probe_style_layer",true)
+					.attr("opacity", 1.0);
+				layerGroup.append("g")
+					.classed("probe_layer",true)
+					.attr("opacity", 1.0);
+			}
+		} else {
+			//create layering group, append to last child of c3-chart-lines to render on top
+			layerGroup = d3.select(d3.select(this.element)
+				.select("g.c3-chart-line").node().parentNode.lastChild)
+				.append("g")
+				.classed("weave_layering_group",true);
+			layerGroup.append("g")
+				.classed("selection_style_layer",true)
+				.attr("opacity", 1.0);
+			layerGroup.append("g")
+				.classed("selection_layer",true)
+				.attr("opacity", 1.0);
+			layerGroup.append("g")
+				.classed("probe_style_layer",true)
+				.attr("opacity", 1.0);
+			layerGroup.append("g")
+				.classed("probe_layer",true)
+				.attr("opacity", 1.0);
+		}
 	}
 
 	protected handleC3Selection():void
