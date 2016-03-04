@@ -77,27 +77,30 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
         if (this.state.showToolTip)
         {
             var container:HTMLElement = this.element.parentNode as HTMLElement;
-            if (!(container.clientHeight < this.element.clientHeight))
+            var rect:ClientRect = container.getBoundingClientRect();
+            var left: number = Math.round(window.pageXOffset + rect.left);
+            var top: number = Math.round(window.pageYOffset + rect.top);
+            if (!(window.innerHeight < this.element.clientHeight))
             {
-                var bottomOverflow:number = this.element.offsetTop + this.element.offsetHeight - container.offsetHeight;
+                var bottomOverflow:number = top + this.element.offsetTop + this.element.offsetHeight - window.innerHeight;
                 if (bottomOverflow > 0)
                 {
                     this.forceUpdate();
                 }
             }
-            if (!(container.clientWidth < this.element.clientWidth))
+            if (!(window.innerWidth < this.element.clientWidth))
             {
                 if (weavejs.WeaveAPI.Locale.reverseLayout)
                 {
                     //handle left overflow
-                    if (this.element.offsetLeft < 0)
+                    if (left + this.element.offsetLeft < 0)
                     {
                         this.forceUpdate();
                     }
                 }
                 else
                 {
-                    var rightOverflow:number = this.element.offsetLeft + this.element.offsetWidth - container.offsetWidth;
+                    var rightOverflow:number = left + this.element.offsetLeft + this.element.offsetWidth - window.innerWidth;
                     if (rightOverflow > 0)
                     {
                         this.forceUpdate();
@@ -126,23 +129,19 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             style.display = "block";
             var container:HTMLElement = this.element.parentNode as HTMLElement;
             var rect:ClientRect = container.getBoundingClientRect();
-            var left: number = window.pageXOffset + rect.left;
-            var top: number = window.pageYOffset + rect.top;
+            var left: number = Math.round(window.pageXOffset + rect.left);
+            var top: number = Math.round(window.pageYOffset + rect.top);
 
             var yPos:number = this.state.y - top + this.toolTipOffset;
             var xPos:number = this.state.x - left + this.toolTipOffset;
 
-            var bottomOverflow:number = yPos + this.element.offsetHeight - container.offsetHeight;
+            var bottomOverflow:number = this.state.y + this.toolTipOffset + this.element.offsetHeight - window.innerHeight;
             style.top = yPos;
-            if (!(container.clientHeight < this.element.clientHeight))
+            if (!((top + container.clientHeight) < this.element.clientHeight))
             {
                 if (bottomOverflow > 0)
                 {
-                    style.top =  yPos - bottomOverflow;
-                }
-                else
-                {
-                    style.top = yPos;
+                    style.top =  style.top - this.element.clientHeight - this.toolTipOffset*2;
                 }
             }
 
@@ -150,19 +149,19 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             if (weavejs.WeaveAPI.Locale.reverseLayout)
             {
                 style.left = style.left - this.element.clientWidth - this.toolTipOffset*2;
-                if (style.left < 0 && (this.element.getBoundingClientRect().width != rect.width))
+                if ((left + style.left) < 0 && (this.element.getBoundingClientRect().width != rect.width))
                 {
-                    style.left = 0;
+                    style.left = xPos;
                 }
             }
             else
             {
-                var rightOverflow:number = this.element.offsetLeft + this.element.offsetWidth - container.offsetWidth;
-                if (!(container.clientWidth < this.element.clientWidth))
+                var rightOverflow:number = this.state.x + this.toolTipOffset + this.element.offsetWidth - window.innerWidth;
+                if (!((left + container.clientWidth) < this.element.clientWidth))
                 {
                     if (rightOverflow > 0)
                     {
-                        style.left = xPos - rightOverflow;
+                        style.left = style.left - this.element.clientWidth - this.toolTipOffset*2;
                     }
                 }
             }
