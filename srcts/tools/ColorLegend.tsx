@@ -358,7 +358,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			children: {
 				visualization: {
 					plotManager: {
-						marginTop: this.showLegendName,
+						marginTop: (str:string) => this.showLegendName.value = str != '0',
 						plotters: {
 							plot: this
 						}
