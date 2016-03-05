@@ -52,7 +52,6 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	private reactLayout:Layout;
 	private layoutRect:ClientRect;
 	private overlay:ToolOverlay;
-	private dirty:boolean;
 	private toolDragged:WeavePath;
 	private toolOver:WeavePath;
 	private dropZone:string;
