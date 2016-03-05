@@ -1,6 +1,7 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import MiscUtils from "../utils/MiscUtils";
+import ListView from "./ListView";
 
 export interface ITreeState {
 	selectedItems: Array<IWeaveTreeNode>;
@@ -17,6 +18,10 @@ export interface ITreeProps {
 interface ITreeNodeProps {
 	node: IWeaveTreeNode;
 	root: Tree;
+}
+
+export interface ExtendedIWeaveTreeNode extends IWeaveTreeNode {
+	depth: number;
 }
 
 interface ITreeNode {
@@ -93,23 +98,19 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 		this.setState({ openItems, selectedItems });
 	}
 
-	static PX_TO_EM = 16;
-	isVisible(top: number):boolean
-	{
-		if (!this.container) return true;
-
-		let topPx = this.container.scrollTop;
-		let bottomPx = (this.container.clientHeight) + topPx;
-		return (top >= topPx && top <= bottomPx);
-	}
-	private rowHeight: number
-
 	handleItemClick=(node:IWeaveTreeNode, e:React.MouseEvent)=>
 	{
 			this.setSelected(node, !this.getSelected(node), e.ctrlKey);
 	}
 
-	renderRecursive(node:IWeaveTreeNode, top:number, depth:number): [JSX.Element[], number]
+	static CLASSNAME = "weave-tree-view";
+	static SELECTED_CLASSNAME = "selected";
+	
+	static BRANCH_ICON_CLASSNAME = "fa fa-folder-o fa-fw";
+	static LEAF_ICON_CLASSNAME = "fa fa-file-text-o fa-fw";
+	static OPEN_BRANCH_ICON_CLASSNAME = "fa fa-folder-open-o fa-fw";
+
+	renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
 	{
 		let resultElements:JSX.Element[] = []
 		let childElements: JSX.Element[];
@@ -133,54 +134,44 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 			className += " " + Tree.SELECTED_CLASSNAME;
 		}
 
-		if (this.isVisible(top)) {
-			resultElements.push(<span className={className} key={top}
-				onClick={ this.handleItemClick.bind(this, node) }
-				onDoubleClick={ iconClickFunc } style={{ position: "absolute", top: top, width: "100%"}}>
-				<span style={{ marginLeft: depth * this.rowHeight, whiteSpace: "pre"}}>
-					<i onMouseDown={ iconClickFunc } className={iconClassName}/>
-					{ " "+node.getLabel() }
-				</span></span>);
-		}
+		return <span key={index} className={className}
+			onClick={ this.handleItemClick.bind(this, node) }
+			onDoubleClick={ iconClickFunc } style={{ position: "absolute", top: index * this.rowHeight, width: "100%"}}>
+			<span style={{ marginLeft: node.depth * 16, whiteSpace: "pre"}}>
+				<i onMouseDown={ iconClickFunc } className={iconClassName}/>
+				{ " "+node.getLabel() }
+			</span></span>;
+	}
 
-		if (this.getOpen(node)) {
-			for (let child of node.getChildren() || []) {
-				top += this.rowHeight;
-				[childElements, top] = this.renderRecursive(child, top, depth + 1);
-				for (let ele of childElements) {
-					resultElements.push(ele);
+	enumerateItems=(_node:IWeaveTreeNode):Array<IWeaveTreeNode>=>
+	{
+		let node = _node as ExtendedIWeaveTreeNode;
+		let resultArray = [node as ExtendedIWeaveTreeNode];
+		
+		if (node.depth === undefined) node.depth = 0;
+
+		if (node.isBranch() && this.getOpen(node))
+		{
+			for (let child of node.getChildren()||[])
+			{
+				(child as ExtendedIWeaveTreeNode).depth = node.depth + 1; 
+				for (let resultItem of this.enumerateItems(child))
+				{
+					resultArray.push(resultItem as ExtendedIWeaveTreeNode);
 				}
 			}
 		}
-		return [resultElements, top];
+
+		return resultArray;
 	}
 
-	private container: HTMLElement;
-
-	updateScroll():void
-	{
-		if (this.container)
-		{
-			this.forceUpdate();
-		}
-	}
-
-	static CLASSNAME = "weave-tree-view";
-	static SELECTED_CLASSNAME = "selected";
-	
-	static BRANCH_ICON_CLASSNAME = "fa fa-folder-o fa-fw";
-	static LEAF_ICON_CLASSNAME = "fa fa-file-text-o fa-fw";
-	static OPEN_BRANCH_ICON_CLASSNAME = "fa fa-folder-open-o fa-fw";
+	rowHeight: number;
 
 	render(): JSX.Element
 	{
 		this.rowHeight = MiscUtils.getTextHeightForClasses("M", Tree.CLASSNAME);
-
-		let [children, totalHeight] = this.renderRecursive(this.props.root, 0, 0);
-		return <div className={Tree.CLASSNAME} onScroll={this.updateScroll.bind(this)} ref={ (c:HTMLElement) => {this.container = c;}} style={{height: "100%", width: "100%", overflow: "scroll", position: "relative"}}>
-			<div style={{ height: totalHeight + "px" }}>
-				{children}
-			</div>
-		</div>;
+		return <ListView items={this.enumerateItems(this.props.root)}
+				itemRender={this.renderItem}
+				itemHeight={this.rowHeight}/>;
 	}
 }
