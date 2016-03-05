@@ -85,8 +85,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		if (this.tool === tool)
 			return; 
 		
-		if (tool)
-			this.tool = tool;
+		this.tool = tool;
 		
 		if (this.tool)
 			LinkablePlaceholder.setInstance(this.toolPath.getObject(), this.tool);
@@ -119,31 +118,14 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 			return <VBox/>;
 		
 		let reactTool:JSX.Element = null;
-		var instance:ILinkableObject = this.toolPath.getObject();
-		// prevents rendering multiple instances of the ToolClass component
-		if (instance instanceof LinkablePlaceholder || instance === this.tool)
+		let ToolClass = LinkablePlaceholder.getClass(this.toolPath.getObject()) as typeof React.Component;
+		if (React.Component.isPrototypeOf(ToolClass))
 		{
-			let ToolClass = LinkablePlaceholder.getClass(instance) as typeof React.Component;
-			if (React.Component.isPrototypeOf(ToolClass))
-			{
-				reactTool = React.createElement(ToolClass, {
-					key: "tool",
-					ref: this.handleInstance,
-					toolTip: this.toolTip
-				});
-			}
-		}
-		else
-		{
-			reactTool = (
-				<VBox style={{flex: 1}}>
-					<div style={{flex: 1}}/>
-					<div style={{margin: "auto"}}>
-						{ "This tool was already mounted elsewhere in the DOM." }
-					</div>
-					<div style={{flex: 1}}/>
-				</VBox>
-			);
+			reactTool = React.createElement(ToolClass, {
+				key: "tool",
+				ref: this.handleInstance,
+				toolTip: this.toolTip
+			});
 		}
 
 		return (
@@ -162,7 +144,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 						  titleBarHeight={this.titleBarHeight}
 						  title={Weave.lang(this.state.title)}
 						  />
-				{ reactTool }
+					{ reactTool }
 				<ToolTip ref={(c:ToolTip) => this.toolTip = c}/>
 			</VBox>
 		);
