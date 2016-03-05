@@ -18,6 +18,8 @@ import ToolTip from "./ToolTip";
 import * as ReactDOM from "react-dom";
 import MiscUtils from "../utils/MiscUtils";
 
+import {HBox, VBox} from "../react-ui/FlexBox";
+
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import KeySet = weavejs.data.key.KeySet;

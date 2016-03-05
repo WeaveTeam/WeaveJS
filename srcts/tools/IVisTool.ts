@@ -20,4 +20,5 @@ export interface IVisToolState
 export interface IVisTool extends ILinkableObject
 {
     title:string;
+	getEditor?():JSX.Element
 }
