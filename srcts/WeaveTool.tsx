@@ -114,9 +114,6 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	//TODO - we shouldn't have to render twice to set the tooltip of the tool
 	render():JSX.Element
 	{
-		if (!this.state.style)
-			return <VBox/>;
-		
 		let reactTool:JSX.Element = null;
 		let ToolClass = LinkablePlaceholder.getClass(this.toolPath.getObject()) as typeof React.Component;
 		if (React.Component.isPrototypeOf(ToolClass))
