@@ -53,6 +53,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	private toolPath:WeavePath;
 	
 	private tool:IVisTool;
+	private prevTool:IVisTool;
 	private toolTip:IToolTip;
 	private titleBarHeight: number;
 	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
@@ -85,8 +86,8 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		if (this.tool === tool)
 			return; 
 		
-		if (tool)
-			this.tool = tool;
+		this.prevTool = this.tool;
+		this.tool = tool;
 		
 		if (this.tool)
 			LinkablePlaceholder.setInstance(this.toolPath.getObject(), this.tool);
@@ -121,7 +122,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		let reactTool:JSX.Element = null;
 		var instance:ILinkableObject = this.toolPath.getObject();
 		// prevents rendering multiple instances of the ToolClass component
-		if (instance instanceof LinkablePlaceholder || instance === this.tool)
+		if (instance instanceof LinkablePlaceholder || instance === this.prevTool)
 		{
 			let ToolClass = LinkablePlaceholder.getClass(instance) as typeof React.Component;
 			if (React.Component.isPrototypeOf(ToolClass))
