@@ -1,5 +1,4 @@
 import * as React from "react";
-import VBox from "../react-ui/VBox";
 
 export interface IListViewState {
 	scrollTopPx: number;
