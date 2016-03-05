@@ -47,7 +47,6 @@ export interface IWeaveLayoutManagerState
 
 export default class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeaveLayoutManagerState>
 {
-	private toolLookup:{[jsonPath:string]: WeaveTool};
 	private weave:Weave;
 	private layout:LinkableVariable;
 	private reactLayout:Layout;
