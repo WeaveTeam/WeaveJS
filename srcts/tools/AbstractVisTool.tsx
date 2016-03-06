@@ -105,6 +105,7 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
     private static removeFromSetToSubset(set: KeySet, filter: KeyFilter):void
     {
 		filter.excludeKeys(set.keys);
+		set.clearKeys();
     }
     private static clearSubset(filter:KeyFilter):void
     {
@@ -129,39 +130,36 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		let usingProbe: boolean = this.localProbeKeySet.keys.length > 0;
 		let usingSelection: boolean = selectionKeySet.keys.length > 0;
 
-		if (usingSelection || usingProbe)
-		{
-			if (usingSelection)
-			{
-				menuItems.push({
-					label: Weave.lang("Create subset from selected records"),
-					click: this.createFromSetToSubset.bind(null, selectionKeySet, subset)
-				});
-				menuItems.push({
-					label: Weave.lang("Remove selected records from subset"),
-					click: this.removeFromSetToSubset.bind(null, selectionKeySet, subset)
-				});
-			}
-			else
-			{
-				menuItems.push({
-					label: Weave.lang("Create subset from highlighted record"),
-					click: this.createFromSetToSubset.bind(null, this.localProbeKeySet, subset)
-				});
-				menuItems.push({
-					label: Weave.lang("Remove highlighted record from subset"),
-					click: this.removeFromSetToSubset.bind(null, this.localProbeKeySet, subset)
-				});
-			}
-		}
-
-		if (usingSubset)
+		if (!usingSelection && usingProbe)
 		{
 			menuItems.push({
-				label: Weave.lang("Show all records"),
-				click: this.clearSubset.bind(null, subset)
+				label: Weave.lang("Create subset from highlighted record(s)"),
+				click: this.createFromSetToSubset.bind(null, this.localProbeKeySet, subset)
+			});
+			menuItems.push({
+				label: Weave.lang("Remove highlighted record(s) from subset"),
+				click: this.removeFromSetToSubset.bind(null, this.localProbeKeySet, subset)
 			});
 		}
+		else
+		{
+			menuItems.push({
+				enabled: usingSelection,
+				label: Weave.lang("Create subset from selected record(s)"),
+				click: this.createFromSetToSubset.bind(null, selectionKeySet, subset)
+			});
+			menuItems.push({
+				enabled: usingSelection,
+				label: Weave.lang("Remove selected record(s) from subset"),
+				click: this.removeFromSetToSubset.bind(null, selectionKeySet, subset)
+			});
+		}
+
+		menuItems.push({
+			enabled: usingSubset,
+			label: Weave.lang("Show all records"),
+			click: this.clearSubset.bind(null, subset)
+		});
 
 		return menuItems;
 	}
