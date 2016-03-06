@@ -76,6 +76,8 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
+		if(this.element.style.visibility == "hidden")
+			this.forceUpdate();
 	}
 
 	onMouseEnter(index:number)
@@ -118,7 +120,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		var click = () => {
 			if(!props.menu && props.click && enabled)
 				props.click()
-		}
+		};
 
 		return (
 			<HBox key={index} className={menuItemClass} onClick={click} onMouseEnter={this.onMouseEnter.bind(this, index)} onMouseLeave={this.onMouseLeave.bind(this, index)}>
@@ -149,13 +151,35 @@ export default class Menu extends React.Component<MenuProps, MenuState>
                 otherProps[key] = (this.props as any)[key];
             }
         }
-		
+
 		var menuStyle:React.CSSProperties = MiscUtils.merge({
 			position: "absolute",
 			top: this.props.yPos,
-			left: this.props.xPos
+			left: this.props.xPos,
+			visibility: "hidden"
 		}, menuStyle);
-	
+
+		if(this.element) {
+			menuStyle.visibility = null;
+			var bottomOverflow:number = this.props.yPos + this.element.clientHeight - window.innerHeight;
+			if (bottomOverflow > 0) {
+				menuStyle.top = menuStyle.top - this.element.clientHeight;
+			}
+
+			if (weavejs.WeaveAPI.Locale.reverseLayout) {
+				menuStyle.left = menuStyle.left - this.element.clientWidth;
+				if (menuStyle.left < 0) {
+					menuStyle.left = this.props.xPos;
+				}
+			}
+			else {
+				var rightOverflow:number = this.props.xPos + this.element.clientWidth - window.innerWidth;
+				if (rightOverflow > 0) {
+					menuStyle.left = menuStyle.left - this.element.clientWidth;
+				}
+			}
+		}
+
 		return (
 			<VBox className="weave-menu" style={MiscUtils.merge(menuStyle, this.props.style)} onMouseEnter={() => this.setState({hovered: -1})} {...otherProps}>
 				{
