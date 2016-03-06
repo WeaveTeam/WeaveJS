@@ -269,25 +269,26 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		return false;
 	}
 
-	protected weaveLayering():void {
-		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet) || (this.selectionKeySet.keys.length != d3.select(this.element).select("g.selection_style_layer").selectAll("circle").size());
-		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet) || (this.probeKeySet.keys.length != d3.select(this.element).select("g.probe_style_layer").selectAll("circle").size());
-		super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
+	protected weaveLayering():boolean {
+		var filteredKeySetChanged:boolean = Weave.detectChange(this, this.filteredKeySet);
+		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet) || filteredKeySetChanged || (this.selectionKeySet.keys.length != d3.select(this.element).select("g.selection_layer").selectAll("circle").size());
+		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet) || filteredKeySetChanged || (this.probeKeySet.keys.length != d3.select(this.element).select("g.probe_layer").selectAll("circle").size());
+		var forced:boolean = super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
 
 		var scatterplot = this;
 		//copy items to selection_layer and probe_layer
-		if(selectionKeySetChanged || probeKeySetChanged) {
+		if(forced || selectionKeySetChanged || probeKeySetChanged) {
 			d3.select(scatterplot.element).selectAll("g.c3-shapes.c3-circles").selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
 				let key = scatterplot.records[i].id;
 				let selected = scatterplot.isSelected(key);
 				let probed = scatterplot.isProbed(key);
-				if (selected && selectionKeySetChanged) {
+				if (selected && (forced || selectionKeySetChanged)) {
 					d3.select(scatterplot.element)
 						.select("g.selection_layer")
 						.node()
 						.appendChild(this.cloneNode(true));
 				}
-				if (probed && probeKeySetChanged) {
+				if (probed && (forced || probeKeySetChanged)) {
 					d3.select(scatterplot.element)
 						.select("g.probe_layer")
 						.node()
@@ -297,7 +298,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		}
 
 		//draw selection_style_layer
-		if(selectionKeySetChanged) {
+		if(forced || selectionKeySetChanged) {
 			d3.select(scatterplot.element)
 				.selectAll("g.c3-shapes.c3-circles")
 				.selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
@@ -330,7 +331,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		}
 
 		//draw probe_style_layer
-		if(probeKeySetChanged) {
+		if(forced || probeKeySetChanged) {
 			d3.select(scatterplot.element)
 				.selectAll("g.c3-shapes.c3-circles")
 				.selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
@@ -363,6 +364,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				.style("stroke", "black")
 				.style("stroke-width", 1);
 		}
+		return false;
 	}
 
 	get selectableAttributes()
