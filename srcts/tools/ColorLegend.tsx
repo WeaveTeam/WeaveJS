@@ -60,6 +60,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
 	
 	private spanStyle:CSSProperties;
+	private textStyle:CSSProperties;
 
 	constructor(props:IVisToolProps)
 	{
@@ -75,14 +76,20 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 		this.state = {selected:[], probed:[]};
 		this.spanStyle = {
-			textAlign: "left",
-			verticalAlign: "middle",
-			overflow: "hidden",
-			whiteSpace: "nowrap",
-			textOverflow: "ellipsis",
 			padding: 5,
-			userSelect: "none"
+			userSelect: "none",
+			textOverflow: "ellipsis",
+			overflow: "hidden",
+			whiteSpace: "nowrap"
 		};
+		this.textStyle = {
+			width:"100%",
+			flex:0.8,
+			alignItems:"center",
+			justifyContent:"flex-start",
+			overflow: "hidden"
+		}
+
 	}
 	
 	get title():string
@@ -192,6 +199,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			var shapeType:string = this.shapeType.value;
 			var maxColumns:number = this.maxColumns.value;
 			var columnFlex:number = 1.0/maxColumns;
+			var columnFlexPercent:string = String(columnFlex*100)+"%";
 			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
 			var totalBins:number = this.numberOfBins + extraBins;
 			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
@@ -251,19 +259,18 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 									element.push(
 										<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
-											<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center", justifyContent:"flex-end"}}>
+											<ui.HBox style={this.textStyle}>
 												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
-											</ui.HBox>:""}
-											<ui.HBox style={{width:"100%", flex:0.2,minWidth:10, position:"relative", padding:"0px 0px 0px 0px"}}>
-												<svg style={{position:"absolute"}}
-													 viewBox="0 0 100 100" width="100%" height="100%">
+											</ui.HBox>:null}
+											<ui.HBox style={{width:"100%", flex:0.2, minWidth:10, padding:"0px 0px 0px 0px"}}>
+												<svg viewBox="0 0 100 100" width="100%">
 													{
 														shapeElement
 													}
 												</svg>
 											</ui.HBox>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
-												"":<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
+												null:<ui.HBox style={this.textStyle}>
 												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
 											</ui.HBox>}
 										</ui.HBox>
@@ -272,14 +279,14 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 								else
 								{
 									element.push(
-										<ui.HBox key={i} style={{width:"100%", flex:1.0}}/>
+										<ui.HBox key={i} style={this.getInteractionStyle(i)}/>
 									);
 								}
 							}
 						}
 
 						elements.push(
-							<ui.VBox key={i} style={{flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
+							<ui.VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
 						);
 
 						finalElements[j] = elements;
@@ -318,14 +325,14 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 								else
 								{
 									element.push(
-										<ui.HBox key={i} style={{width:"100%", flex:1.0}}/>
+										<ui.HBox key={i} style={this.getInteractionStyle(i)}/>
 									);
 								}
 							}
 						}
 
 						elements.push(
-							<ui.VBox key={i} style={{flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
+							<ui.VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
 						);
 
 						finalElements[j] = elements;
