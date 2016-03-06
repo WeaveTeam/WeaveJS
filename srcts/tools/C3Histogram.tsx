@@ -80,6 +80,8 @@ export default class C3Histogram extends AbstractC3Tool
             data: {
                 columns: [],
                 type: "bar",
+                xSort: false,
+                names: {},
                 color: (color:string, d:any):string => {
                     if (d && d.hasOwnProperty("index"))
 					{
