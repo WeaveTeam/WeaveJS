@@ -277,25 +277,26 @@ export default class C3LineChart extends AbstractC3Tool
 		return false;
     }
 
-    protected weaveLayering():void {
-        var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet);
-        var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet);
-        super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
+    protected weaveLayering():boolean {
+        var filteredKeySetChanged:boolean = Weave.detectChange(this, this.filteredKeySet);
+        var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet) || filteredKeySetChanged || (this.selectionKeySet.keys.length != d3.select(this.element).select("g.selection_layer").selectAll("path").size());
+        var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet) || filteredKeySetChanged || (this.probeKeySet.keys.length != d3.select(this.element).select("g.probe_layer").selectAll("path").size()*2);
+        var forced:boolean = super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
 
         var linechart = this;
         //copy items to selection_layer and probe_layer
-        if(selectionKeySetChanged || probeKeySetChanged) {
+        if(forced || selectionKeySetChanged || probeKeySetChanged) {
             d3.select(linechart.element).selectAll("g.c3-shapes.c3-circles").selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
                 let key = linechart.getQKey(d);
                 let selected = linechart.isSelected(key);
                 let probed = linechart.isProbed(key);
-                if (selected && selectionKeySetChanged) {
+                if (selected && (forced || selectionKeySetChanged)) {
                     d3.select(linechart.element)
                         .select("g.selection_layer")
                         .node()
                         .appendChild(this.cloneNode(true));
                 }
-                if (probed && probeKeySetChanged) {
+                if (probed && (forced || probeKeySetChanged)) {
                     d3.select(linechart.element)
                         .select("g.probe_layer")
                         .node()
@@ -306,13 +307,13 @@ export default class C3LineChart extends AbstractC3Tool
                 let key = linechart.getQKey(d);
                 let selected = linechart.isSelected(key);
                 let probed = linechart.isProbed(key);
-                if (selected && selectionKeySetChanged) {
+                if (selected && (forced || selectionKeySetChanged)) {
                     d3.select(linechart.element)
                         .select("g.selection_layer")
                         .node()
                         .appendChild(this.cloneNode(true));
                 }
-                if (probed && probeKeySetChanged) {
+                if (probed && (forced || probeKeySetChanged)) {
                     d3.select(linechart.element)
                         .select("g.probe_layer")
                         .node()
@@ -322,7 +323,7 @@ export default class C3LineChart extends AbstractC3Tool
         }
 
         //draw selection_style_layer
-        if(selectionKeySetChanged) {
+        if(forced || selectionKeySetChanged) {
             d3.select(linechart.element)
                 .selectAll("g.c3-shapes.c3-circles")
                 .selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
@@ -358,7 +359,7 @@ export default class C3LineChart extends AbstractC3Tool
         }
 
         //draw probe_style_layer
-        if(probeKeySetChanged) {
+        if(forced || probeKeySetChanged) {
             d3.select(linechart.element)
                 .selectAll("g.c3-shapes.c3-circles")
                 .selectAll("circle.c3-shape").each(function (d:any, i:number, oi:number) {
@@ -416,6 +417,7 @@ export default class C3LineChart extends AbstractC3Tool
                 .attr("class", "weave_point_layer_line")
                 .style("opacity", null);
         }
+        return false;
     }
 
     get selectableAttributes()
