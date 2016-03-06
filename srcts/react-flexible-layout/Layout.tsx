@@ -117,6 +117,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 					active: true,
 					range: overlayRange
 				});
+				this.overlay.onMouseMove(event);
 			}
 		});
 	}

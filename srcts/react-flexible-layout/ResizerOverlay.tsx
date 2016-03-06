@@ -19,14 +19,16 @@ const STYLE_BASE = {
     position: "absolute"
 };
 
+const THICKNESS = 4;
+
 const STYLE_HORIZONTAL = _.merge({
-    width: "4px",
+    width: THICKNESS + "px",
     cursor: "col-resize",
     height: "100%"
 }, STYLE_BASE);
 
 const STYLE_VERTICAL = _.merge({
-    height: "4px",
+    height: THICKNESS + "px",
     cursor: "row-resize",
     width: "100%"
 }, STYLE_BASE);
@@ -94,7 +96,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
             if (this.props.direction === HORIZONTAL)
             {
                 this.setState({
-                    x: mousePos - left,
+                    x: mousePos - left - THICKNESS / 2,
                     y: NaN
                 });
             }
@@ -102,7 +104,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
             {
                 this.setState({
                     x: NaN,
-                    y: mousePos - top
+                    y: mousePos - top - THICKNESS / 2
                 });
             }
         }
