@@ -12,7 +12,7 @@ export interface MenuItemProps
 	rightIcon?:React.ReactElement<any>;
 	secondaryLabel?:string;
 	click?:Function;
-	disabled?:boolean;
+	enabled?:boolean;
 	menu?:MenuItemProps[]
 }
 
@@ -102,6 +102,8 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	
 	renderMenuItem(index:number, props:MenuItemProps):JSX.Element
 	{
+		var enabled = props.enabled != false; // default undefined -> true
+		
 		var labelClass = classNames({
 			'weave-menuitem-label': true,
 			'weave-menuitem-label-padding-left': !!props.leftIcon,
@@ -110,11 +112,11 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 
 		var menuItemClass = classNames({
 			'weave-menuitem': true,
-			'weave-menuitem-disabled': props.disabled
+			'weave-menuitem-disabled': !enabled
 		});
 		
 		var click = () => {
-			if(!props.menu && props.click && !props.disabled)
+			if(!props.menu && props.click && enabled)
 				props.click()
 		}
 

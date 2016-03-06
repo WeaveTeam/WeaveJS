@@ -40,7 +40,7 @@ function weaveMenu(weave:Weave)
 			{
 				label: "Report a problem",
 				click: () => {},
-				disabled: true
+				enabled: false
 			},
 			{
 				label: "Visit iWeave.com",
