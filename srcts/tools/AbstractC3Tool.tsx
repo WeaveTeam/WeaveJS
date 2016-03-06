@@ -243,7 +243,8 @@ export default class AbstractC3Tool extends AbstractVisTool
 		}
 		else
 		{
-			if (isSelected)
+			//Todo: needs to be more efficient check
+			if (_.isEqual(this.selectionKeySet.keys.sort(), probeKeys.sort()))
 				this.selectionKeySet.clearKeys();
 			else
 				this.selectionKeySet.replaceKeys(probeKeys);
