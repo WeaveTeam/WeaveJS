@@ -202,7 +202,7 @@ export default class C3BarChart extends AbstractC3Tool
             },
             bar: {
                 width: {
-                    ratio: 0.8
+                    ratio: 1.0
                 }
             },
             legend: {
