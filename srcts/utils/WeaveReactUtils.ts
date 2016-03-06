@@ -8,50 +8,53 @@ import IDisposableObject = weavejs.api.core.IDisposableObject;
 
 export declare type ReactStateLinkObject = { [prop: string]: ReactStateLinkObject | ILinkableObject };
 
-var SCU = "shouldComponentUpdate";
-var UNLINK = "unlinkReactState";
+const UNLINK = "unlinkReactState";
+export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
 
-export function unlinkReactState(_component:React.Component<any,any>)
+export function unlinkReactState(component:ReactComponent)
 {
-	let component: any = _component as any;
-	if (component && component[SCU] && component[SCU][UNLINK])
-		component[SCU][UNLINK]();
+	if (component && component.shouldComponentUpdate && (component.shouldComponentUpdate as any)[UNLINK])
+		(component.shouldComponentUpdate as any)[UNLINK]();
 }
 
-export function linkReactStateRef(context: ILinkableObject, mapping: ReactStateLinkObject, delay:number = 500)
+export function linkReactStateRef(context:ILinkableObject, mapping:ReactStateLinkObject, delay:number = 500)
 {
 	return (c: React.Component<any, any>) => {
 		linkReactState(context, c, mapping, delay);
 	};
 }
 
-export function linkReactState(context: ILinkableObject, _component: React.Component<any, any>, mapping: ReactStateLinkObject, delay:number = 500) {
-	let component = _component as any;
-
-	if (component === null) return;
+export function linkReactState(context:ILinkableObject, component:ReactComponent, mapping:ReactStateLinkObject, delay:number = 500)
+{
+	if (component === null)
+		return;
 	
 	unlinkReactState(component);
 
-	let scu = component[SCU] as Function;
+	let scu = component.shouldComponentUpdate;
 
-	function setWeaveState(nextProps:any, nextState:any) {
+	function setWeaveState(state:any):void {
 		if (Weave.wasDisposed(context))
 			unlinkReactState(component);
 		else
-			weavejs.core.SessionManager.traverseAndSetState(nextState, mapping);
+			weavejs.core.SessionManager.traverseAndSetState(state, mapping);
 	};
 
 	let setWeaveStateDebounced = _.debounce(setWeaveState, delay, { leading: false });
 
-	component[SCU] = function(nextProps: any, nextState: any)
+	component.shouldComponentUpdate = function(nextProps:any, nextState:any, nextContext:any):boolean
 	{
-		setWeaveStateDebounced(nextProps, nextState);
-		return scu ? scu.call(component, nextProps, nextState) : true;
+		setWeaveStateDebounced(nextState);
+		return scu ? scu.call(component, nextProps, nextState, nextContext) : true;
 	}
 
-	Weave.disposableChild(context, component[SCU]);
+	Weave.disposableChild(context, component.shouldComponentUpdate);
 
-	component[SCU][UNLINK] = () => { component[SCU] = scu };
+	(component.shouldComponentUpdate as any)[UNLINK] = () => {
+		var temp = component.shouldComponentUpdate;
+		component.shouldComponentUpdate = scu;
+		Weave.dispose(temp);
+	};
 
 	let updateObj:any;
 	let weaveCallback = () => component.setState(reactUpdate(component.state, updateObj));
@@ -59,7 +62,7 @@ export function linkReactState(context: ILinkableObject, _component: React.Compo
 	let mapValue = (value:any):any => {
 		if (Weave.isLinkable(value))
 		{
-			Weave.getCallbacks(value).addGroupedCallback(component[SCU], weaveCallback);
+			Weave.getCallbacks(value).addGroupedCallback(component.shouldComponentUpdate, weaveCallback);
 			return { $apply: Weave.getState.bind(Weave, value) };
 		}
 		return weavejs.util.JS.isPrimitive(value) ? value : _.mapValues(value, mapValue);
