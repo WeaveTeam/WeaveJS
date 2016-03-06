@@ -68,7 +68,11 @@ class MultipleView extends React.Component {
         var weaveInst = this.props.weaveInstances[this.state.toggleIndex];
         var layout = weaveInst.root.requestObject("Layout", Weave.getDefinition("FlexibleLayout"));
 
-        var weaveUI = <div  style={styleObject}><WeaveLayoutManager  layout={layout} style={{flex: "1"}}/></div>;
+        var weaveUI = [
+        	<div style={styleObject}>
+        		<WeaveLayoutManager  layout={layout} style={{flex: "1"}}/>
+       		</div>
+        ];
 
        /* var weaveUI = this.props.weaveInstances.map(function(weaveInst,index){
             var layout = weaveInst.root.requestObject("Layout", Weave.getDefinition("FlexibleLayout"));
