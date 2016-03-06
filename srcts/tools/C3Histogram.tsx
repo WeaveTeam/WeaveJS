@@ -568,11 +568,7 @@ export default class C3Histogram extends AbstractC3Tool
 		);
 	}
 
-    protected weaveLayering():void {
-        var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet);
-        var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet);
-        super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
-
+    protected weaveLayering():boolean {
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
         var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
         var selectedRecords:Record[] = _.filter(this.records, function(record:Record) {
@@ -584,13 +580,18 @@ export default class C3Histogram extends AbstractC3Tool
         var selectedBinIndices:number[] = _.map(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn') as number[];
         var probedBinIndices:number[] = _.map(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn') as number[];
 
+        var filteredKeySetChanged:boolean = Weave.detectChange(this, this.filteredKeySet);
+        var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet) || filteredKeySetChanged || (selectedBinIndices.length != d3.select(this.element).select("g.selection_layer").selectAll("rect").size());
+        var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet) || filteredKeySetChanged || (probedBinIndices.length != d3.select(this.element).select("g.probe_layer").selectAll("rect").size());
+        var forced:boolean = super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
+
         var histogram = this;
         //copy items to selection_layer and probe_layer
-        if(selectionKeySetChanged || probeKeySetChanged) {
+        if(forced || selectionKeySetChanged || probeKeySetChanged) {
             d3.select(this.element).selectAll("g").filter(".c3-shapes.c3-bars-height").selectAll("path").each(function (d:any, i:number, oi:number) {
                 let selected = _.intersection(selectedBinIndices, [i]).length;
                 let probed = _.intersection(probedBinIndices, [i]).length;
-                if (selected && selectionKeySetChanged) {
+                if (selected && (selectionKeySetChanged || forced)) {
                     let recordsInBin:Record[] = _.filter(selectedRecords, {binnedColumn: i});
                     let columnToAggregateNameIsDefined:boolean = !!histogram.columnToAggregate.getInternalColumn();
                     let height:number = 0;
@@ -617,7 +618,7 @@ export default class C3Histogram extends AbstractC3Tool
                         .style("stroke-width", 1)
                         .style("stroke-opacity", 0.5);
                 }
-                if (probed && probeKeySetChanged) {
+                if (probed && (probeKeySetChanged || forced)) {
                     let recordsInBin:Record[] = _.filter(probedRecords, {binnedColumn: i});
                     let columnToAggregateNameIsDefined:boolean = !!histogram.columnToAggregate.getInternalColumn();
                     let height:number = 0;
@@ -648,7 +649,7 @@ export default class C3Histogram extends AbstractC3Tool
         }
 
         //redraw selection_style_layer if changed
-        if(selectionKeySetChanged) {
+        if(forced || selectionKeySetChanged) {
             d3.select(histogram.element)
                 .selectAll("g.selection_layer")
                 .selectAll("rect").each(function (d:any, i:number, oi:number) {
@@ -674,7 +675,7 @@ export default class C3Histogram extends AbstractC3Tool
                 .style("opacity",null);
         }
 
-        if(probeKeySetChanged) {
+        if(forced || probeKeySetChanged) {
             //draw probe_style_layer
             d3.select(histogram.element)
                 .selectAll("g.probe_layer")
@@ -701,6 +702,7 @@ export default class C3Histogram extends AbstractC3Tool
                 .attr("class", "weave_point_layer_path")
                 .style("opacity", null);
         }
+        return false;
     }
 
     get deprecatedStateMapping()
