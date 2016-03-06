@@ -477,22 +477,23 @@ export default class C3BarChart extends AbstractC3Tool
 		return false;
     }
 
-	protected weaveLayering():void {
-		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet) || (this.selectionKeySet.keys.length != d3.select(this.element).select("g.selection_style_layer").selectAll("rect").size());
-		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet) || (this.probeKeySet.keys.length != d3.select(this.element).select("g.probe_style_layer").selectAll("rect").size());
-		super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
+	protected weaveLayering():boolean {
+		var filteredKeySetChanged:boolean = Weave.detectChange(this, this.filteredKeySet);
+		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet) || filteredKeySetChanged || (this.selectionKeySet.keys.length != d3.select(this.element).select("g.selection_layer").selectAll("rect").size());
+		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet) || filteredKeySetChanged || (this.probeKeySet.keys.length != d3.select(this.element).select("g.probe_layer").selectAll("rect").size());
+		var forced:boolean = super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
 
 		let thinBars:boolean = this.chart.internal.width <= this.records.length;
 
 		var barchart = this;//copy items to selection_layer and probe_layer
-		if(selectionKeySetChanged || probeKeySetChanged) {
+		if(forced || selectionKeySetChanged || probeKeySetChanged) {
 			this.heightColumnNames.forEach((item:string) => {
-				if(selectionKeySetChanged)
+				if(forced || selectionKeySetChanged)
 					d3.select(this.element)
 						.selectAll("g.selection_layer")
 						.append("g")
 						.classed(item + "-bars", true);
-				if(probeKeySetChanged)
+				if(forced || probeKeySetChanged)
 					d3.select(this.element)
 						.selectAll("g.probe_layer")
 						.append("g")
@@ -501,14 +502,14 @@ export default class C3BarChart extends AbstractC3Tool
 					let key = barchart.records[i].id;
 					let selected = barchart.isSelected(key);
 					let probed = barchart.isProbed(key);
-					if (selected && selectionKeySetChanged) {
+					if (selected && (forced || selectionKeySetChanged)) {
 						d3.select(barchart.element)
 							.select("g.selection_layer")
 							.select("g." + item + "-bars")
 							.node()
 							.appendChild(this.cloneNode(true));
 					}
-					if (probed && probeKeySetChanged) {
+					if (probed && (forced || probeKeySetChanged)) {
 						d3.select(barchart.element)
 							.select("g.probe_layer")
 							.select("g." + item + "-bars")
@@ -518,7 +519,7 @@ export default class C3BarChart extends AbstractC3Tool
 				});
 
 				//draw selection_style_layer
-				if(selectionKeySetChanged) {
+				if(forced || selectionKeySetChanged) {
 					d3.select(barchart.element)
 						.selectAll("g.c3-shapes-" + item + ".c3-bars")
 						.selectAll("path").each(function (d:any, i:number, oi:number) {
@@ -552,7 +553,7 @@ export default class C3BarChart extends AbstractC3Tool
 				}
 
 				//draw probe_style_layer
-				if(probeKeySetChanged) {
+				if(forced || probeKeySetChanged) {
 					d3.select(barchart.element)
 						.selectAll("g.c3-shapes-" + item + ".c3-bars")
 						.selectAll("path").each(function (d:any, i:number, oi:number) {
@@ -598,6 +599,7 @@ export default class C3BarChart extends AbstractC3Tool
 				}
 			});
 		}
+		return false;
 	}
 
 	updateStyle()
