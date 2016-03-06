@@ -53,6 +53,7 @@ export interface IAbstractC3ToolProps extends IVisToolProps
 
 export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps, IVisToolState>
 {
+	private boundingRect:ClientRect;
     constructor(props:IVisToolProps)
 	{
         super(props);
@@ -258,16 +259,20 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		baseLines.attr("opacity", selectionEmpty ? "1.0" : "0.5");
 	}
 
-	protected weaveLayering(selectionChanged:boolean, probeChanged:boolean):void
+	protected weaveLayering(selectionChanged:boolean, probeChanged:boolean):boolean
 	{
 		//style c3 layer
 		this.styleC3ShapeGroups();
+
+		var boundingRect:ClientRect = this.element.getBoundingClientRect();
+		var forced:boolean = !this.boundingRect || (this.boundingRect.width != boundingRect.width) || (this.boundingRect.height != boundingRect.height);
+		this.boundingRect = boundingRect;
 
 		//remove existing weave layering, if present
 		var layerGroup = d3.select(this.element).selectAll("g.weave_layering_group");
 		if(layerGroup.size()) {
 			//clear old layer groups if necessary
-			if(selectionChanged) {
+			if(selectionChanged || forced) {
 				layerGroup.select("g.selection_style_layer").remove();
 				layerGroup.select("g.selection_layer").remove();
 				layerGroup.insert("g", "g.probe_style_layer")
@@ -277,7 +282,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 					.classed("selection_layer",true)
 					.attr("opacity", 1.0);
 			}
-			if(probeChanged) {
+			if(probeChanged || forced) {
 				layerGroup.select("g.probe_style_layer").remove();
 				layerGroup.select("g.probe_layer").remove();
 				layerGroup.append("g")
@@ -306,6 +311,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 				.classed("probe_layer",true)
 				.attr("opacity", 1.0);
 		}
+		return forced;
 	}
 
 	protected handleC3Selection():void
