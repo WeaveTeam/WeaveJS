@@ -71,8 +71,14 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		if (!props.layout)
 			throw new Error("layout is a required prop");
 		
-		if (this.layout && props.layout != this.layout)
-			throw new Error("Can't change layout prop");
+		if (props.layout == this.layout)
+			return;
+		
+		if (this.layout)
+		{
+			this.layout.removeCallback(this, this.forceUpdate);
+			this.weave.root.childListCallbacks.removeCallback(this, this.forceUpdate);
+		}
 		
 		this.layout = props.layout;
 		this.weave = Weave.getWeave(this.layout);
