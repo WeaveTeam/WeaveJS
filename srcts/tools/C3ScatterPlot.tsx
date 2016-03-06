@@ -270,8 +270,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	}
 
 	protected weaveLayering():void {
-		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet);
-		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet);
+		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet) || (this.selectionKeySet.keys.length != d3.select(this.element).select("g.selection_style_layer").selectAll("circle").size());
+		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet) || (this.probeKeySet.keys.length != d3.select(this.element).select("g.probe_style_layer").selectAll("circle").size());
 		super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
 
 		var scatterplot = this;

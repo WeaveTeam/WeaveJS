@@ -478,8 +478,8 @@ export default class C3BarChart extends AbstractC3Tool
     }
 
 	protected weaveLayering():void {
-		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet);
-		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet);
+		var selectionKeySetChanged:boolean = Weave.detectChange(this, this.selectionKeySet) || (this.selectionKeySet.keys.length != d3.select(this.element).select("g.selection_style_layer").selectAll("rect").size());
+		var probeKeySetChanged:boolean = Weave.detectChange(this, this.probeKeySet) || (this.probeKeySet.keys.length != d3.select(this.element).select("g.probe_style_layer").selectAll("rect").size());
 		super.weaveLayering(selectionKeySetChanged,probeKeySetChanged);
 
 		let thinBars:boolean = this.chart.internal.width <= this.records.length;
