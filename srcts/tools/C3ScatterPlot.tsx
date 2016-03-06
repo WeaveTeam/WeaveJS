@@ -150,7 +150,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				r: (d:any):number => {
 					if (d.hasOwnProperty("index"))
 					{
-						return this.records[d.index].size;
+						return Math.round(this.records[d.index].size);
 					}
 				},
 				focus: {
@@ -158,10 +158,12 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						enabled: false
 					}
 				},
-				select:
-				{
-					//Todo: need to extend to take a function based on point size
-					r: 5
+				select: {
+					r: (d:any):number => {
+						if (d.hasOwnProperty("index"))
+							return Math.round(this.records[d.index].size);
+						return 0;
+					}
 				}
 			}
 		});
