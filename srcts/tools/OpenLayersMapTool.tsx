@@ -16,15 +16,8 @@ import * as jquery from "jquery";
 var $:JQueryStatic = (jquery as any)["default"];
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
-/* eslint-disable */
 import AbstractLayer from "./OpenLayersMap/Layers/AbstractLayer";
 import AbstractFeatureLayer from "./OpenLayersMap/Layers/AbstractFeatureLayer";
-import GeometryLayer from "./OpenLayersMap/Layers/GeometryLayer";
-import TileLayer from "./OpenLayersMap/Layers/TileLayer";
-import ImageGlyphLayer from "./OpenLayersMap/Layers/ImageGlyphLayer";
-import ScatterPlotLayer from "./OpenLayersMap/Layers/ScatterPlotLayer";
-import LabelLayer from "./OpenLayersMap/Layers/LabelLayer";
-/* eslint-enable */
 
 import CustomView from "./OpenLayersMap/CustomView";
 import PanCluster from "./OpenLayersMap/PanCluster";
@@ -36,6 +29,7 @@ import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 import {MenuItemProps} from "../react-ui/Menu";
 import AbstractVisTool from "./AbstractVisTool";
 import {OverrideBounds} from "./AbstractVisTool";
+import ResizingDiv from "../ui/ResizingDiv";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ZoomBounds = weavejs.geom.ZoomBounds;
@@ -111,12 +105,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	{
 		super(props);
 
-		/* Force the inclusion of the layers. */
-		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
-
 		weavejs.WeaveAPI.Scheduler.callLater(this, this.initLater);
-		
-		weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
 	}
 	
 	private initLater():void
@@ -247,6 +236,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		this.layers.childListCallbacks.addImmediateCallback(this, this.updatePlotters_weaveToOl, true);
 		Weave.getCallbacks(this.zoomBounds).addGroupedCallback(this, this.updateZoomAndCenter_weaveToOl, true);
+		
+		weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
 	}
 
 	updateViewParameters_weaveToOl():void
@@ -276,8 +267,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	handleFrame():void
 	{
 		this.map.updateSize();
-		var viewport = this.map.getViewport();
-		var screenBounds = new Bounds2D(0, 0, viewport.clientWidth, viewport.clientHeight);
+		var viewport = this.map.getViewport() as HTMLElement;
+		var screenBounds = new Bounds2D(0, 0, viewport.offsetWidth, viewport.offsetHeight);
 		this.zoomBounds.setScreenBounds(screenBounds, true);
 		this.map.render();
 	}
@@ -516,7 +507,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	render():JSX.Element 
 	{
-		return <div ref={(c:HTMLElement) => {this.element = c;}} style={{flex: 1, overflow: "hidden"}}/>;
+		return (
+			<ResizingDiv>
+				<div ref={(c:HTMLElement) => {this.element = c;}}/>
+			</ResizingDiv>
+		);
 	}
 
 	zoomToSelection(inputKeys:Array<IQualifiedKey> = null, zoomMarginPercent:number = 0.2):void

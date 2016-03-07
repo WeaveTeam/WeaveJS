@@ -1,12 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import $ from "jquery";
-/* eslint-disable */
 import WeaveApp from "../lib/WeaveApp";
 import {MiscUtils} from "../lib/WeaveUI.js";
-/* eslint-enable */
-
-/*global Weave, weavejs*/
 
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
