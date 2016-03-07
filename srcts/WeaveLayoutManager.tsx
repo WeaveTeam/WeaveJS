@@ -371,17 +371,12 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	
 	getLayoutPosition(layout:Layout):ClientRect
 	{
-		var rect = MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, ReactDOM.findDOMNode(layout) as HTMLElement);
-		if (layout.state.id)
-			console.log(JSON.stringify(rect), layout.state.id+'');
-		return rect;
+		return MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, ReactDOM.findDOMNode(layout) as HTMLElement);
 	}
 	
 	getToolPosition(toolPath:WeavePath):ClientRect
 	{
-		var rect = MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, this.getElementFromToolPath(toolPath) as HTMLElement);
-		console.log(JSON.stringify(rect), toolPath+'');
-		return rect;
+		return MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, this.getElementFromToolPath(toolPath) as HTMLElement);
 	}
 	
 	repositionTools=(layout:Layout = null):void=>
