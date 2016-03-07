@@ -36,6 +36,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
     selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
     probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
     filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+    hack = Weave.linkableChild(this, new weavejs.core.LinkableBoolean(false));
 
     private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
     private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
@@ -130,6 +131,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
                                     onProbe={this.handleProbe.bind(this)}
                                     onSelection={this.handleSelection.bind(this)}
                                     showIdColumn={false}
+                                    hack={this.hack.value}
                 />
     }
 }

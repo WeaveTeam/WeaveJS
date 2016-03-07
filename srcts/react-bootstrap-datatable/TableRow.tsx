@@ -23,6 +23,7 @@ export interface ITableRowProps extends React.Props<TableRow>
     probed:boolean;
     selected:boolean;
     showIdColumn:boolean;
+    hack:boolean;
 }
 
 export interface ITableRowState
@@ -62,6 +63,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         //todo: remove, HACK for demo to create heatmap
         this.colorRamp = new weavejs.util.ColorRamp();
         this.colorRamp.state = ["0x00FF00", "0xFFFF00", "0xFF0000"];
+        this.colorRamp.reverse();
     }
 
     shouldComponentUpdate(nextProps:ITableRowProps, nextState:ITableRowState)
@@ -95,7 +97,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         if (!this.props.showIdColumn)
             keys.splice(keys.indexOf(this.props.idProperty), 1);
         cells = keys.map((key:string) => {
-            var color:string = this.colorRamp.getHexColor(Number(this.props.row[key]),0,100);
+            var color:string = this.props.hack ? this.colorRamp.getHexColor(Number(this.props.row[key]),0,100):"";
             return <td key={key} style={{background:color}}>{this.props.row[key]}</td>;
         });
 

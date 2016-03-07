@@ -25,6 +25,7 @@ export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTab
     onProbe?:(id:string[]) => void;
     onSelection?:(id:string[]) => void;
     showIdColumn:boolean;
+    hack:boolean;
 }
 
 export interface IReactBootstrapTableState
@@ -207,7 +208,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
                                rows={this.props.rows}
                                selectedIds={this.state.selectedIds}
                                probedIds={this.state.probedIds}
-                               showIdColumn={this.props.showIdColumn}/>
+                               showIdColumn={this.props.showIdColumn}
+                                hack={this.props.hack}/>
                 </Table>
             </div>
         );

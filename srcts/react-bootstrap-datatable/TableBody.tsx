@@ -13,7 +13,8 @@ export interface ITableBodyProps extends React.Props<TableBody>
     probedIds:string[];
     onMouseOver:(id:string, status:boolean) => void;
     onClick:(id:string) => void;
-    showIdColumn:boolean
+    showIdColumn:boolean;
+    hack:boolean;
 }
 
 export interface ITableBodyState
@@ -51,6 +52,7 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
                                      probed={this.props.probedIds.indexOf(row[this.props.idProperty]) > -1}
                                      selected={this.props.selectedIds.indexOf(row[this.props.idProperty]) > -1}
                                      showIdColumn={this.props.showIdColumn}
+                                     hack={this.props.hack}
                                 />;
                     })
                 }
