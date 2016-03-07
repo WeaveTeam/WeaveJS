@@ -36,7 +36,18 @@ import * as moment from "moment";
 weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 
-Weave.registerAsyncClass(React.Component, component => ReactUtils.onUnmount(component, weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder));
+Weave.registerAsyncClass(
+	React.Component,
+	component => {
+		ReactUtils.onUnmount(
+			component,
+			component => {
+				if (Weave.getOwner(component))
+					weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(component);
+			}
+		);
+	}
+);
 
 export
 {
