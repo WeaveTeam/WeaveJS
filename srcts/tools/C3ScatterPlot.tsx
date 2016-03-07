@@ -18,6 +18,8 @@ import ToolTip from "./ToolTip";
 import * as ReactDOM from "react-dom";
 import MiscUtils from "../utils/MiscUtils";
 
+import LinkableTextField from "../ui/LinkableTextField";
+
 import HBox from "../react-ui/HBox";
 import VBox from "../react-ui/VBox";
 
@@ -346,6 +348,47 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			.style("stroke-width", "1px");
 
 		return false;
+	}
+	
+	renderEditor():JSX.Element
+	{
+		return (
+			<VBox>
+				<HBox>
+					<label>
+						{Weave.lang("X")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Y")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Radius")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Fill")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Line")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				{
+					super.renderEditor()
+				}
+			</VBox>
+		)
 	}
 
 	public get deprecatedStateMapping():Object
