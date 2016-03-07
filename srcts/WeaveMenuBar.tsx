@@ -4,6 +4,7 @@ import MiscUtils from "./utils/MiscUtils";
 import * as FileSaver from "filesaver.js";
 import FileInput from "./react-ui/FileInput";
 import PopupWindow from "./react-ui/PopupWindow";
+import {HBox, VBox} from "./react-ui/FlexBox";
 import FileMenu from "./menus/FileMenu";
 
 export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar> {
@@ -39,7 +40,7 @@ function weaveMenu(weave:Weave)
 			{
 				label: "Report a problem",
 				click: () => {},
-				disabled: true
+				enabled: false
 			},
 			{
 				label: "Visit iWeave.com",
@@ -98,6 +99,6 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
         var weave = this.props.weave;
 		return (
 			<MenuBar style={{width: "100%"}} config={[weaveMenu(weave), this.fileMenu, dataMenu(weave)]}/>
-		)
+		);
 	}
 }
