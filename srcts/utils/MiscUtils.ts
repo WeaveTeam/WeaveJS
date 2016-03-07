@@ -291,4 +291,31 @@ export default class MiscUtils
 			el.dispatchEvent(evObj);
 		}
 	}
+	
+	static getOffsetRect(ancestor:HTMLElement, descendant:HTMLElement):ClientRect
+	{
+		var rect:ClientRect = { left: 0, top: 0, width: descendant.offsetWidth, height: descendant.offsetHeight, bottom: NaN, right: NaN };
+		while (descendant)
+		{
+			if (descendant == ancestor)
+			{
+				rect.right = rect.left + rect.width;
+				rect.bottom = rect.top + rect.height;
+				return rect;
+			}
+			rect.left += descendant.offsetLeft;
+			rect.top += descendant.offsetTop;
+			descendant = descendant.offsetParent as HTMLElement;
+		}
+		return null;
+	}
+	
+	static getOffsetPoint(relativeTo:HTMLElement, event:MouseEvent):{x:number, y:number}
+	{
+		var rect = relativeTo.getBoundingClientRect();
+		return {
+			x: (event.clientX - rect.left) * (relativeTo.offsetWidth / rect.width),
+			y: (event.clientY - rect.top) * (relativeTo.offsetHeight / rect.height)
+		};
+	}
 }

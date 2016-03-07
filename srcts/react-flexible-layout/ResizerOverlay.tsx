@@ -7,6 +7,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import * as VendorPrefix from "react-vendor-prefix";
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
+import MiscUtils from "../utils/MiscUtils";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 
@@ -85,18 +86,16 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         if (this.state.active)
         {
             event.stopImmediatePropagation();
-            var container:Element = ReactDOM.findDOMNode(this).parentNode as Element;
-            var rect:ClientRect = container.getBoundingClientRect();
-            var left: number = window.pageXOffset + rect.left;
-            var top: number = window.pageYOffset + rect.top;
-            var mousePos: number = this.props.direction === HORIZONTAL ? event.pageX : event.pageY;
+            var container:HTMLElement = ReactDOM.findDOMNode(this).parentNode as HTMLElement;
+			var offsetPoint = MiscUtils.getOffsetPoint(container, event);
+            var mousePos: number = this.props.direction === HORIZONTAL ? offsetPoint.x : offsetPoint.y;
 
             mousePos = Math.max(this.state.range[0], Math.min(mousePos, this.state.range[1]));
 
             if (this.props.direction === HORIZONTAL)
             {
                 this.setState({
-                    x: mousePos - left - THICKNESS / 2,
+                    x: mousePos - THICKNESS / 2,
                     y: NaN
                 });
             }
@@ -104,7 +103,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
             {
                 this.setState({
                     x: NaN,
-                    y: mousePos - top - THICKNESS / 2
+                    y: mousePos - THICKNESS / 2
                 });
             }
         }

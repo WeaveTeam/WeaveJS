@@ -110,12 +110,9 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		this.resizers.forEach((resizer, index) => {
 			if (resizer.state && resizer.state.active)
 			{
-				var overlayRange:number[] = this.getResizerRange(index);
-				overlayRange[0] += this.minSize;
-				overlayRange[1] -= this.minSize;
 				this.overlay.setState({
 					active: true,
-					range: overlayRange
+					range: this.getResizerRange(index)
 				});
 				this.overlay.onMouseMove(event);
 			}
@@ -131,28 +128,24 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		var element1 = ReactDOM.findDOMNode(this.children[resizerIndex]) as HTMLElement
 		var element2 = ReactDOM.findDOMNode(this.children[resizerIndex + 1]) as HTMLElement;
-		
-		var rect:ClientRect = ReactDOM.findDOMNode(this).getBoundingClientRect();
-		var pageLeft:number = window.pageXOffset + rect.left;
-		var pageTop:number = window.pageYOffset + rect.top;
-		
 		if (this.state.direction === HORIZONTAL)
-			return [element1.offsetLeft + pageLeft, element2.offsetLeft + element2.clientWidth + pageLeft];
+			return [element1.offsetLeft + this.minSize, element2.offsetLeft + element2.offsetWidth - this.minSize];
 		else
-			return [element1.offsetTop + pageTop, element2.offsetTop + element2.clientHeight + pageTop];
+			return [element1.offsetTop + this.minSize, element2.offsetTop + element2.offsetHeight - this.minSize];
 	}
 
 	private onMouseUp=(event:MouseEvent):void=>
 	{
 		var newState:LayoutState = _.cloneDeep(this.state);
 
-		var element = ReactDOM.findDOMNode(this);
+		var element = ReactDOM.findDOMNode(this) as HTMLElement;
+		var offsetPoint = MiscUtils.getOffsetPoint(element, event);
 		this.resizers.forEach((resizer, index) => {
 			if (resizer.state && resizer.state.active)
 			{
 				var [begin, end] = this.getResizerRange(index);
-				var pos:number = this.state.direction === HORIZONTAL ? event.pageX : event.pageY;
-				var size:number = this.state.direction === HORIZONTAL ? element.clientWidth : element.clientHeight;
+				var pos:number = this.state.direction === HORIZONTAL ? offsetPoint.x : offsetPoint.y;
+				var size:number = this.state.direction === HORIZONTAL ? element.offsetWidth : element.offsetHeight;
 
 				pos = Math.max(begin + this.minSize, Math.min(pos, end - this.minSize));
 				newState.children[index].flex = (pos - begin) / size;

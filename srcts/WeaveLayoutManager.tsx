@@ -117,7 +117,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	frameHandler():void
 	{
 		// reposition on resize
-		var rect:ClientRect = ReactDOM.findDOMNode(this.reactLayout).getBoundingClientRect();
+		var rect:ClientRect = this.getLayoutPosition(this.reactLayout);
 		if (this.layoutRect.width != rect.width || this.layoutRect.height != rect.height)
 			this.repositionTools();
 	}
@@ -184,8 +184,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 
 		this.dropZone = dropZone;
 		
-		var toolNode = this.getElementFromToolPath(toolOver);
-		var toolNodePosition = toolNode.getBoundingClientRect();
+		var toolNodePosition = this.getToolPosition(toolOver);
 		var toolOverlayStyle = _.clone(this.overlay.state.style);
 		toolOverlayStyle.left = toolNodePosition.left;
 		toolOverlayStyle.top = toolNodePosition.top;
@@ -370,6 +369,21 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		});
 	}
 	
+	getLayoutPosition(layout:Layout):ClientRect
+	{
+		var rect = MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, ReactDOM.findDOMNode(layout) as HTMLElement);
+		if (layout.state.id)
+			console.log(JSON.stringify(rect), layout.state.id+'');
+		return rect;
+	}
+	
+	getToolPosition(toolPath:WeavePath):ClientRect
+	{
+		var rect = MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, this.getElementFromToolPath(toolPath) as HTMLElement);
+		console.log(JSON.stringify(rect), toolPath+'');
+		return rect;
+	}
+	
 	repositionTools=(layout:Layout = null):void=>
 	{
 		if (!layout)
@@ -377,19 +391,19 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		if (!layout)
 			return;
 		
-		var rect:ClientRect = ReactDOM.findDOMNode(layout).getBoundingClientRect();
 		if (layout == this.reactLayout)
-			this.layoutRect = rect;
+			this.layoutRect = this.getLayoutPosition(layout);
 		
 		var tool:WeaveTool = this.refs[JSON.stringify(layout.state.id)] as WeaveTool;
 		if (tool instanceof WeaveTool)
 		{
+			var rect = this.getLayoutPosition(layout);
 			tool.setState({
 				style: {
-					top: rect.top - this.layoutRect.top,
-					left: rect.left - this.layoutRect.left,
-					width: rect.right - rect.left,
-					height: rect.bottom - rect.top,
+					top: rect.top,
+					left: rect.left,
+					width: rect.width,
+					height: rect.height,
 					position: "absolute"
 				}
 			});
