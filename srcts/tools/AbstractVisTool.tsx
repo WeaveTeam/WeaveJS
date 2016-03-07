@@ -11,6 +11,9 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
+import {VBox, HBox} from "../react-ui/FlexBox";
+import LinkableTextField from "../ui/LinkableTextField";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -167,6 +170,36 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 	getMenuItems():MenuItemProps[]
 	{
 		return AbstractVisTool.getMenuItems(this);
+	}
+	
+	renderEditor():JSX.Element
+	{
+		return (
+			<VBox>
+				<HBox>
+					<span>{Weave.lang("Visualization Title")}</span>
+					<LinkableTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>
+				</HBox>
+				<HBox>
+					<span>{Weave.lang("X Axis Title")}</span>
+					<LinkableTextField ref={linkReactStateRef(this, {content: this.xAxisName})}/>
+				</HBox>
+				<HBox>
+					<span>{Weave.lang("Y Axis Title")}</span>
+					<LinkableTextField ref={linkReactStateRef(this, {content: this.yAxisName})}/>
+				</HBox>
+
+				<HBox>
+					<span>{Weave.lang("Margins:")}</span>
+					<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.left})}/>
+					<VBox>
+						<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.top})}/>
+						<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.bottom})}/>
+					</VBox>
+					<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.right})}/>
+				</HBox>
+			</VBox>
+		);
 	}
 	
     get deprecatedStateMapping():Object
