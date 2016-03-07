@@ -17,6 +17,8 @@ import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 import * as ReactDOM from "react-dom";
 import MiscUtils from "../utils/MiscUtils";
+import {HBox, VBox} from "../react-ui/FlexBox";
+import LinkableTextField from "../ui/LinkableTextField";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -345,6 +347,47 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			.style("stroke-width", "1px");
 
 		return false;
+	}
+	
+	renderEditor():JSX.Element
+	{
+		return (
+			<VBox>
+				<HBox>
+					<label>
+						{Weave.lang("X")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Y")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Radius")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Fill")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Line")}
+						<input type="text"/>
+					</label>
+				</HBox>
+				{
+					super.renderEditor()
+				}
+			</VBox>
+		)
 	}
 
 	public get deprecatedStateMapping():Object

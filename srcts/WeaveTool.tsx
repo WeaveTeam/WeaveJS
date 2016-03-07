@@ -22,6 +22,7 @@ import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/ToolTip";
 import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
 import {REACT_COMPONENT} from "./react-ui/Menu";
+import PopupWindow from "./react-ui/PopupWindow";
 
 declare type IToolTip = React.Component<IToolTipProps, IToolTipState>;
 
@@ -103,6 +104,15 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	componentDidMount():void
 	{
 		this.updateTitle();
+    }
+	
+	showEditor()
+	{
+		PopupWindow.open({
+			title: Weave.lang("Settings for {0}", this.state.title),
+			modal: false,
+			content: this.tool.renderEditor()
+		})
 	}
 
 	updateTitle():void
@@ -140,6 +150,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 						  onDragStart={this.props.onDragStart}
 						  titleBarHeight={this.titleBarHeight}
 						  title={Weave.lang(this.state.title)}
+						  onGearClick={this.showEditor.bind(this)}
 						  />
 					{ reactTool }
 				<ToolTip ref={(c:ToolTip) => this.toolTip = c}/>
@@ -153,6 +164,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	onDragStart:React.DragEventHandler;
 	titleBarHeight:number;
 	title:string;
+	onGearClick:React.MouseEventHandler
 }
 
 interface ITitleBarState
@@ -210,9 +222,11 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 
 		return(
 			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
-			{/*<HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
-			<Glyphicon glyph="cog"/>
-			</HBox>*/}
+            {<HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
+            	<div onClick={this.props.onGearClick}>
+					<Glyphicon glyph="cog"/>
+				</div>
+            </HBox>}
 			<span style={titleStyle} className="weave-panel">{this.props.title}</span>
 			{/*<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
 			<div style={{marginRight: 5}}>
