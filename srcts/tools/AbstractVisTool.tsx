@@ -172,7 +172,7 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		return AbstractVisTool.getMenuItems(this);
 	}
 	
-	getEditor():JSX.Element
+	renderEditor():JSX.Element
 	{
 		return (
 			<VBox>

@@ -111,7 +111,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		PopupWindow.open({
 			title: Weave.lang("Settings for {0}", this.state.title),
 			modal: false,
-			content: this.tool.getEditor()
+			content: this.tool.renderEditor()
 		})
 	}
 
