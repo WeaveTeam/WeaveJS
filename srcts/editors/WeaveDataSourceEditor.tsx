@@ -8,6 +8,9 @@ import Tree from "../ui/Tree";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
+import EntityNode = weavejs.data.hierarchy.EntityNode;
+import EntityType = weavejs.api.data.EntityType;
+import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
 export default class WeaveDataSourceEditor extends React.Component<IDataSourceEditorProps,IDataSourceEditorState>
 {
@@ -21,10 +24,14 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 	render():JSX.Element
 	{
 		let dataSource: WeaveDataSource;
+		let root: IWeaveTreeNode;
 		if (this.state.dataSource)
 		{
 			Weave.getCallbacks(this.state.dataSource).addGroupedCallback(this, this.forceUpdate, false);
 			dataSource = this.state.dataSource as WeaveDataSource;
+
+			let cache = (this.state.dataSource as WeaveDataSource).entityCache;
+			root = new EntityNode(cache, EntityType.HIERARCHY);
 		}
 		else
 		{
@@ -46,7 +53,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
 						<button type="button">{Weave.lang("Choose")}</button>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
-						<Tree root={this.state.dataSource.getHierarchyRoot()}/>
+						<Tree hideRoot={true} root={root}/>
 					</label>
 			</ui.VBox>;
 	}

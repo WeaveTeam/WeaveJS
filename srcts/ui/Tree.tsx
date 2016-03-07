@@ -3,32 +3,22 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import ListView from "./ListView";
 
+import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+
 export interface ITreeState {
 	selectedItems: Array<IWeaveTreeNode>;
 	openItems: Array<IWeaveTreeNode>;
 }
 
-import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-
 export interface ITreeProps {
 	root:IWeaveTreeNode
 	style?: any;
+	hideRoot?: boolean;
+	multipleSelection?: boolean;
 };
 
-interface ITreeNodeProps {
-	node: IWeaveTreeNode;
-	root: Tree;
-}
-
-export interface ExtendedIWeaveTreeNode extends IWeaveTreeNode {
+interface ExtendedIWeaveTreeNode extends IWeaveTreeNode {
 	depth: number;
-}
-
-interface ITreeNode {
-	getOpen(node:IWeaveTreeNode): boolean;
-	getSelected(node: IWeaveTreeNode): boolean;
-	setOpen(node: IWeaveTreeNode, isOpen: boolean):void;
-	setSelected(node: IWeaveTreeNode, isSelected: boolean):void;
 }
 
 export default class Tree extends React.Component<ITreeProps, ITreeState>
@@ -45,7 +35,14 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 
 	getOpen(node: IWeaveTreeNode): boolean
 	{
-		return !!this.state.openItems.find((otherNode) => otherNode.equals(node));
+		if (node === this.props.root && this.props.hideRoot)
+		{
+			return true;
+		}
+		else
+		{
+			return !!this.state.openItems.find((otherNode) => otherNode.equals(node));
+		}
 	}
 
 	getSelected(node: IWeaveTreeNode): boolean
@@ -110,7 +107,7 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 	static LEAF_ICON_CLASSNAME = "fa fa-file-text-o fa-fw";
 	static OPEN_BRANCH_ICON_CLASSNAME = "fa fa-folder-open-o fa-fw";
 
-	renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
+	private renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
 	{
 		let resultElements:JSX.Element[] = []
 		let childElements: JSX.Element[];
@@ -143,26 +140,26 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 			</span></span>;
 	}
 
-	enumerateItems=(_node:IWeaveTreeNode):Array<IWeaveTreeNode>=>
+	enumerateItems=(_node:IWeaveTreeNode, result:Array<IWeaveTreeNode> = [], depth:number = 0):Array<IWeaveTreeNode>=>
 	{
 		let node = _node as ExtendedIWeaveTreeNode;
-		let resultArray = [node as ExtendedIWeaveTreeNode];
-		
-		if (node.depth === undefined) node.depth = 0;
+
+		if (node !== this.props.root || !this.props.hideRoot)
+		{
+			node.depth = depth;
+			result.push(node);
+			depth++;
+		}
 
 		if (node.isBranch() && this.getOpen(node))
 		{
-			for (let child of node.getChildren()||[])
+			for (let child of node.getChildren())
 			{
-				(child as ExtendedIWeaveTreeNode).depth = node.depth + 1; 
-				for (let resultItem of this.enumerateItems(child))
-				{
-					resultArray.push(resultItem as ExtendedIWeaveTreeNode);
-				}
+				this.enumerateItems(child, result, depth);
 			}
 		}
 
-		return resultArray;
+		return result;
 	}
 
 	rowHeight: number;
