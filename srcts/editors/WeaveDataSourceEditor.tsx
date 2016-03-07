@@ -3,6 +3,7 @@ import * as lodash from "lodash";
 import ui from "../react-ui/ui";
 import LinkableTextField from "../ui/LinkableTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import ReactUtils from "../utils/ReactUtils";
 import Tree from "../ui/Tree";
 
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
@@ -20,6 +21,15 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 	}
 
 	state:IDataSourceEditorState = {dataSource: null};
+
+	onHierarchySelected=(tree:Tree):void=>{
+		let item = tree.state.selectedItems[0] as EntityNode;
+
+		if (this.state.dataSource && item instanceof EntityNode)
+		{
+			(this.state.dataSource as WeaveDataSource).rootId.state = item.getEntity().id;
+		}
+	}
 
 	render():JSX.Element
 	{
@@ -51,9 +61,8 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 					<label>{Weave.lang("Root hierarchy ID")}
 						<LinkableTextField ref={linkReactStateRef(this, { content: dataSource.rootId }) }
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
-						<button type="button">{Weave.lang("Choose")}</button>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
-						<Tree hideRoot={true} root={root}/>
+						<Tree hideRoot={true} root={root} ref={(c: Tree) => ReactUtils.onComponentDidUpdate(c, this.onHierarchySelected)}/>
 					</label>
 			</ui.VBox>;
 	}

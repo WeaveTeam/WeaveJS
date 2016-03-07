@@ -25,4 +25,15 @@ export default class ReactUtils
 			callback(component);
 		};
 	}
+
+	static onComponentDidUpdate<T extends React.Component<any, any> & React.ComponentLifecycle<any, any>>(component: T, callback: (component: T) => void): void
+	{
+		if (!component) return;
+		var superComponentDidUpdate = component.componentDidUpdate;
+		component.componentDidUpdate = function(prevProps: any, prevState: any, prevContext: any) {
+			if (superComponentDidUpdate)
+				superComponentDidUpdate.call(component, prevProps, prevState, prevContext);
+			callback(component);
+		};
+	}
 }
