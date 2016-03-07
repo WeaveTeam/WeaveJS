@@ -24,29 +24,29 @@ export default class InteractionModeCluster extends ol.control.Control
 
 		var options: any = optOptions || {};
 		var div = $(`
-			<div class="iModeCluster ol-control ol-unselectable">
-				<div class="activeInteractionMode">
-					<button style="font-weight: normal" class="activeInteractionMode fa"></button>
-				</div>
-				<div class="iModeCluster">
-					<button class="pan fa"></button>
-					<button class="select fa"></button>
-					<button class="zoom fa"></button>
-				</div>
+			<div style="display: flex; flexDirection: column" class="iModeCluster ol-control ol-unselectable">
+				<button class="activeInteractionMode fa"></button>
+				<span style="width: 1px; border-left: 1px solid white; margin-left: 0.25em; margin-right: 0.25em;" class="modeButton"></span>
+				<button class="modeButton pan fa"></button>
+				<button class="modeButton select fa"></button>
+				<button class="modeButton zoom fa"></button>
 			</div>
 		`);
 
-		let activeDiv: JQuery = div.find("div.activeInteractionMode");
-		let clusterDiv: JQuery = div.find("div.iModeCluster");
+		let activeButton: JQuery = div.find("button.activeInteractionMode");
+		let clusterButtons: JQuery = div.find("button.modeButton");
+		let divider: JQuery = div.find("span.modeButton");
 
+		let oldPosition: JQueryCoordinates;
 		function toggleMenuOpen(isOpen:boolean)
 		{
-			activeDiv.css({ "display": isOpen ? "none" : "inline"});
-			clusterDiv.css({ "display": isOpen ? "inline" : "none"});
+			activeButton.off("click");
+			activeButton.click(toggleMenuOpen.bind(null, !isOpen));
+			activeButton.css({ "display": isOpen ? "inline" : "inline"});
+			clusterButtons.css({ "display": isOpen ? "inline" : "none"});
+			divider.css({ "display": isOpen ? "inline" : "none" });
 		}
 
-		div.mouseenter(toggleMenuOpen.bind(null, true))
-			.mouseleave(toggleMenuOpen.bind(null, false));
 		toggleMenuOpen(false);
 
 
@@ -55,8 +55,7 @@ export default class InteractionModeCluster extends ol.control.Control
 		let self = this;
 		function setupButton(mode:string)
 		{
-			clusterDiv.find("button." + mode)
-				.css({ "font-weight": "normal", "display": "inline" })
+			div.find("button." + mode)
 				.addClass(iconMapping[mode])
 				.click(() => { if (self.interactionMode) self.interactionMode.value = mode; toggleMenuOpen(false); });
 		}
@@ -66,11 +65,11 @@ export default class InteractionModeCluster extends ol.control.Control
 		this.updateInteractionMode_weaveToControl = (() => {
 			let mode = self.interactionMode.value;
 
-			clusterDiv.find("button").removeClass("active");
-			clusterDiv.find("button." + mode).addClass("active");
+			div.find("button.modeButton").removeClass("active");
+			div.find("button.modeButton." + mode).addClass("active");
 
-			activeDiv.find("button").removeClass(lodash.values(iconMapping).join(" "));
-			activeDiv.find("button").addClass(iconMapping[mode]);
+			activeButton.removeClass(lodash.values(iconMapping).join(" "));
+			activeButton.addClass(iconMapping[mode]);
 		});
 	}
 

@@ -86,7 +86,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	/* Control elements */
 	zoomExtent = new CustomZoomToExtent({ label: $("<span>").addClass("fa fa-arrows-alt").css({ "font-weight": "normal" })[0] });
-	zoomButtons = new ol.control.Zoom();
+	zoomButtons = new ol.control.Zoom({ zoomInLabel: $("<span>").addClass("fa fa-plus")[0], zoomOutLabel: $("<span>").addClass("fa fa-minus")[0] });
 	zoomSlider = new ol.control.ZoomSlider();
 	panButtons = new PanCluster();
 	mouseModeButtons = new InteractionModeCluster({});

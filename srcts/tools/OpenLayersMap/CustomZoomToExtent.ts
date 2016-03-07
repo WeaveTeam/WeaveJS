@@ -29,8 +29,6 @@ export default class CustomZoomToExtent extends ol.control.Control
 		this.extent = options.extent ? options.extent : null;
 
 		button.click(this.handleClick.bind(this));
-
-
 	}
 
 	private handleClick(event:MouseEvent)
