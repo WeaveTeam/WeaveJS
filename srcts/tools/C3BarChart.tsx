@@ -12,7 +12,7 @@ import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
-import MiscUtils from "../utils/MiscUtils";
+import DOMUtils from "../utils/DOMUtils";
 import ToolTip from "./ToolTip";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -169,7 +169,7 @@ export default class C3BarChart extends AbstractC3Tool
 									var labelString:string = Weave.lang(record.stringValues.xLabel);
 									if (labelString)
 									{
-										var stringSize:number = MiscUtils.getTextWidth(labelString, this.getFontString());
+										var stringSize:number = DOMUtils.getTextWidth(labelString, this.getFontString());
 										var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
 										return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
 									}

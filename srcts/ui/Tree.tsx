@@ -1,6 +1,6 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import MiscUtils from "../utils/MiscUtils";
+import DOMUtils from "../utils/DOMUtils";
 import ListView from "./ListView";
 
 export interface ITreeState {
@@ -169,7 +169,7 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 
 	render(): JSX.Element
 	{
-		this.rowHeight = MiscUtils.getTextHeightForClasses("M", Tree.CLASSNAME);
+		this.rowHeight = DOMUtils.getTextHeightForClasses("M", Tree.CLASSNAME);
 		return <ListView items={this.enumerateItems(this.props.root)}
 				itemRender={this.renderItem}
 				itemHeight={this.rowHeight}/>;

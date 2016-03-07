@@ -17,6 +17,7 @@ import {HORIZONTAL, VERTICAL, LayoutState} from "./react-flexible-layout/Layout"
 import WeaveTool from "./WeaveTool";
 import ToolOverlay from "./ToolOverlay";
 import MiscUtils from "./utils/MiscUtils";
+import DOMUtils from "./utils/DOMUtils";
 
 const LEFT:string = "left";
 const RIGHT:string = "right";
@@ -371,12 +372,12 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	
 	getLayoutPosition(layout:Layout):ClientRect
 	{
-		return MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, ReactDOM.findDOMNode(layout) as HTMLElement);
+		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, ReactDOM.findDOMNode(layout) as HTMLElement);
 	}
 	
 	getToolPosition(toolPath:WeavePath):ClientRect
 	{
-		return MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, this.getElementFromToolPath(toolPath) as HTMLElement);
+		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, this.getElementFromToolPath(toolPath) as HTMLElement);
 	}
 	
 	repositionTools=(layout:Layout = null):void=>

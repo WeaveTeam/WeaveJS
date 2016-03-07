@@ -16,7 +16,6 @@ import {ChartConfiguration, ChartAPI} from "c3";
 import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 import * as ReactDOM from "react-dom";
-import MiscUtils from "../utils/MiscUtils";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import LinkableTextField from "../ui/LinkableTextField";
 

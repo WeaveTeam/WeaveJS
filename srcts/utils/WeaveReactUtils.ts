@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import reactUpdate from "react-addons-update";
+import ReactUtils from "./ReactUtils";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -48,6 +49,7 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 		return scu ? scu.call(component, nextProps, nextState, nextContext) : true;
 	}
 
+	ReactUtils.onUnmount(component, unlinkReactState);
 	Weave.disposableChild(context, component.shouldComponentUpdate);
 
 	(component.shouldComponentUpdate as any)[UNLINK] = () => {

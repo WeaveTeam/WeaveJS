@@ -7,7 +7,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import * as VendorPrefix from "react-vendor-prefix";
-import MiscUtils from "../utils/MiscUtils";
+import ReactUtils from "../utils/ReactUtils";
+import DOMUtils from "../utils/DOMUtils";
 import Resizer from "./Resizer";
 import ResizerOverlay from "./ResizerOverlay";
 
@@ -58,7 +59,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 	componentWillReceiveProps(nextProps:LayoutProps):void
 	{
-		this.setState(MiscUtils.includeMissingPropertyPlaceholders(this.state, nextProps.state));
+		this.setState(ReactUtils.includeMissingPropertyPlaceholders(this.state, nextProps.state));
 	}
 
 	componentWillUnmount():void
@@ -139,7 +140,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		var newState:LayoutState = _.cloneDeep(this.state);
 
 		var element = ReactDOM.findDOMNode(this) as HTMLElement;
-		var offsetPoint = MiscUtils.getOffsetPoint(element, event);
+		var offsetPoint = DOMUtils.getOffsetPoint(element, event);
 		this.resizers.forEach((resizer, index) => {
 			if (resizer.state && resizer.state.active)
 			{

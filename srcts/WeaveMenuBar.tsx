@@ -1,6 +1,5 @@
 import * as React from "react";
 import MenuBar from "./react-ui/MenuBar";
-import MiscUtils from "./utils/MiscUtils";
 import * as FileSaver from "filesaver.js";
 import FileInput from "./react-ui/FileInput";
 import PopupWindow from "./react-ui/PopupWindow";

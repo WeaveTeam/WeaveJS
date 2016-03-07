@@ -25,6 +25,8 @@ import WeaveDataSourceEditor from "./editors/WeaveDataSourceEditor";
 import WeaveLayoutManager from "./WeaveLayoutManager";
 import {IWeaveLayoutManagerProps, IWeaveLayoutManagerState} from "./WeaveLayoutManager";
 import MiscUtils from "./utils/MiscUtils";
+import DOMUtils from "./utils/DOMUtils";
+import ReactUtils from "./utils/ReactUtils";
 import ui from "./react-ui/ui";
 import * as JSZip from "jszip";
 import * as React from "react";
@@ -34,19 +36,7 @@ import * as moment from "moment";
 weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 
-function handleReactComponent(component:React.Component<any, any>):void
-{
-	var c = component as React.ComponentLifecycle<any, any>;
-	// add listener to replace instance with placeholder when it is unmounted
-	var superWillUnmount = c.componentWillUnmount;
-	c.componentWillUnmount = function() {
-		if (superWillUnmount)
-			superWillUnmount.call(c);
-		weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(c);
-	};
-}
-
-Weave.registerAsyncClass(React.Component, handleReactComponent);
+Weave.registerAsyncClass(React.Component, component => ReactUtils.onUnmount(component, weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder));
 
 export
 {
@@ -65,5 +55,7 @@ export
 	TextTool,
     WeaveDataSourceEditor,
     MiscUtils,
+    DOMUtils,
+	ReactUtils,
     ui
 };

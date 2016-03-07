@@ -7,7 +7,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import * as VendorPrefix from "react-vendor-prefix";
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
-import MiscUtils from "../utils/MiscUtils";
+import DOMUtils from "../utils/DOMUtils";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 
@@ -87,7 +87,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         {
             event.stopImmediatePropagation();
             var container:HTMLElement = ReactDOM.findDOMNode(this).parentNode as HTMLElement;
-			var offsetPoint = MiscUtils.getOffsetPoint(container, event);
+			var offsetPoint = DOMUtils.getOffsetPoint(container, event);
             var mousePos: number = this.props.direction === HORIZONTAL ? offsetPoint.x : offsetPoint.y;
 
             mousePos = Math.max(this.state.range[0], Math.min(mousePos, this.state.range[1]));

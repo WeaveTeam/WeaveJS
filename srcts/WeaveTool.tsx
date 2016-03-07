@@ -15,7 +15,6 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import * as VendorPrefix from "react-vendor-prefix";
-import MiscUtils from "./utils/MiscUtils";
 import {Glyphicon} from "react-bootstrap";
 import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
