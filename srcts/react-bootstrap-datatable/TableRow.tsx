@@ -7,6 +7,7 @@ import {CSSProperties} from "react";
 import MiscUtils from "../utils/MiscUtils";
 import * as Prefixer from "react-vendor-prefix";
 import * as _ from "lodash";
+import ColorRamp = weavejs.util.ColorRamp;
 
 export interface IRow
 {
@@ -38,6 +39,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
     private clear:CSSProperties;
     private probedStyle:CSSProperties;
     private probedAndSelected:CSSProperties;
+    private colorRamp:ColorRamp;
 
     constructor(props:ITableRowProps)
 	{
@@ -56,6 +58,10 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         this.probedStyle = {
             backgroundColor: "rgba(153, 214, 255, 0.4)"
         }
+
+        //todo: remove, HACK for demo to create heatmap
+        this.colorRamp = new weavejs.util.ColorRamp();
+        this.colorRamp.state = ["0x00FF00", "0xFFFF00", "0xFF0000"];
     }
 
     shouldComponentUpdate(nextProps:ITableRowProps, nextState:ITableRowState)
@@ -89,7 +95,8 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         if (!this.props.showIdColumn)
             keys.splice(keys.indexOf(this.props.idProperty), 1);
         cells = keys.map((key:string) => {
-            return <td key={key}>{this.props.row[key]}</td>;
+            var color:string = this.colorRamp.getHexColor(Number(this.props.row[key]),0,100);
+            return <td key={key} style={{background:color}}>{this.props.row[key]}</td>;
         });
 
         return (
