@@ -18,6 +18,11 @@ var $:JQueryStatic = (jquery as any)["default"];
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import AbstractLayer from "./OpenLayersMap/Layers/AbstractLayer";
 import AbstractFeatureLayer from "./OpenLayersMap/Layers/AbstractFeatureLayer";
+import GeometryLayer from "./OpenLayersMap/Layers/GeometryLayer";
+import TileLayer from "./OpenLayersMap/Layers/TileLayer";
+import ImageGlyphLayer from "./OpenLayersMap/Layers/ImageGlyphLayer";
+import ScatterPlotLayer from "./OpenLayersMap/Layers/ScatterPlotLayer";
+import LabelLayer from "./OpenLayersMap/Layers/LabelLayer";
 
 import CustomView from "./OpenLayersMap/CustomView";
 import PanCluster from "./OpenLayersMap/PanCluster";
@@ -104,6 +109,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	constructor(props:IVisToolProps)
 	{
 		super(props);
+
+		/* Force the inclusion of the layers. */
+		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
 
 		weavejs.WeaveAPI.Scheduler.callLater(this, this.initLater);
 	}
