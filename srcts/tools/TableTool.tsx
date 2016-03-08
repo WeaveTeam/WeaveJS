@@ -84,6 +84,14 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
     {
         var columns = this.columns.getObjects(IAttributeColumn);
         var names:string[] = this.columns.getNames();
+        this.filteredKeySet.setColumnKeySources(columns);
+		
+		if (weavejs.WeaveAPI.Locale.reverseLayout)
+		{
+			columns.reverse();
+			names.reverse();
+		}
+		
 		var format:any = _.zipObject(names, columns);
 		format[this.idProperty] = IQualifiedKey;
         var records:IRow[] = ColumnUtils.getRecords(format, this.filteredKeySet.keys, String);
@@ -91,7 +99,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
         var columnTitles = _.zipObject(names, titles) as { [columnId: string]: string; };
         columnTitles[this.idProperty] = Weave.lang("Key");
 		
-        this.filteredKeySet.setColumnKeySources(columns);
 
         this.setState({
             data: records,
