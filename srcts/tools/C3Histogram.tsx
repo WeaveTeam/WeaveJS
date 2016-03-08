@@ -96,7 +96,7 @@ export default class C3Histogram extends AbstractC3Tool
                         {
                             decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(d.index);
                         }
-                        return "#" + StandardLib.numberToBase(decColor, 16, 6);
+                        return StandardLib.getHexColor(decColor);
                     }
                     return "#808080";
                 },

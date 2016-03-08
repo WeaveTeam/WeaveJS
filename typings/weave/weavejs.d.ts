@@ -233,6 +233,10 @@ declare module __global__ {
          * For testing purposes.
          */
         triggerAll(filter: any): void;
+        /**
+         * For testing purposes.
+         */
+        populateColumns(): void;
     }
 }
 import Weave = __global__.Weave;
@@ -8700,7 +8704,8 @@ declare module weavejs.util {
         static POSITION: string;
         constructor(sessionState?: Object);
         reverse(): void;
-        getColors(): any[];
+        getColors(): Array<number>;
+        getHexColors(): Array<string>;
         /**
          * @param normValue A value between 0 and 1.
          * @return A color.
@@ -8728,12 +8733,24 @@ declare module weavejs.util {
         /**
          * @return An Object with "name", "tags", and "colors" properties.
          */
-        static getColorRampByName(rampName: string): Object;
+        static getColorRampByName(rampName: string): {
+            name: string;
+            tags: string;
+            colors: number[];
+        };
         /**
          * @return An Object with "name", "tags", and "colors" properties.
          */
-        static findMatchingColorRamp(ramp: ColorRamp): Object;
-        static allColorRamps: any[];
+        static findMatchingColorRamp(ramp: ColorRamp): {
+            name: string;
+            tags: string;
+            colors: number[];
+        };
+        static allColorRamps: Array<{
+            name: string;
+            tags: string;
+            colors: number[];
+        }>;
     }
 }
 declare module weavejs.util {
@@ -9173,6 +9190,11 @@ declare module weavejs.util {
          * ITU-R 601
          */
         static getColorLuma(color: number): number;
+        /**
+         * @param color A numeric color value
+         * @return A hex color string like #FFFFFF
+         */
+        static getHexColor(color: number): string;
         /**
          * Code from Graphics Gems Volume 1
          */

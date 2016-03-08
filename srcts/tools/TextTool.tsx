@@ -80,7 +80,7 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 
 	render()
 	{
-		let bgColor:string = this.panelBackgroundColor.value ? "#" + StandardLib.numberToBase(this.panelBackgroundColor.value, 16, 6) : "#FFFFFF";
+		let bgColor:string = this.panelBackgroundColor.value ? StandardLib.getHexColor(this.panelBackgroundColor.value) : "#FFFFFF";
 		return (<div style={{width:"100%", height:"100%", padding:this.padding.value, backgroundColor:bgColor, overflow:"auto"}}
 					 ref={(c:HTMLElement) => { this.element = c }}
 					 className={this.textToolContainerClass}></div>);

@@ -106,7 +106,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						var record:Record = this.records[d.index];
 						color = record ? record.fill.color : null;
 						if (color && color.charAt(0) != '#')
-							color = '#' + StandardLib.numberToBase(Number(color), 16, 6);
+							color = StandardLib.getHexColor(Number(color));
 					}
 					return color || "#000000";
 				}
