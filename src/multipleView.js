@@ -7,15 +7,18 @@ import {WeaveLayoutManager} from "../lib/WeaveUI.js";
 
 window.weave1 = new Weave();
 window.weave2 = new Weave();
-weavejs.core.WeaveArchive.loadUrl(weave1, "/tncp/TN_EDU.weave").then(function(){
-	weavejs.core.WeaveArchive.loadUrl(weave2, "/tncp/TN_FluVaccinations.weave").then(render)
+window.weave3 = new Weave();
+weavejs.core.WeaveArchive.loadUrl(weave1, "/elm/Indicator_Toggle_View.weave").then(function(){
+	weavejs.core.WeaveArchive.loadUrl(weave2, "/elm/KSA_Health_Trends.weave").then(function(){
+		weavejs.core.WeaveArchive.loadUrl(weave3, "/elm/REMI_Saudi_Arabia_Trade_Inflow_Outflow.weave").then(render);
+	})
 });
 
 var weaveInsts = [weave1, weave2];
 function render()
 {
 	$(() => {
-		ReactDOM.render(<MultipleView weaveInstances={weaveInsts} style={{width: "50%", height: "50%"}}/>, document.getElementById("weaveElt"));
+		ReactDOM.render(<MultipleView weaveInstances={weaveInsts} style={{width: "90%", height: "90%"}}/>, document.getElementById("weaveElt"));
 	});
 }
 
