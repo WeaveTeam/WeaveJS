@@ -201,7 +201,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 						{this.renderNumberEditor(this.margin.top)}
 						{this.renderNumberEditor(this.margin.bottom)}
 					</VBox>
-					{this.renderNumberEditor(this.margin.bottom)}
+					{this.renderNumberEditor(this.margin.right)}
 				</HBox>
 			</VBox>
 		);

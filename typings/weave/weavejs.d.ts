@@ -6869,6 +6869,8 @@ declare module weavejs.geom {
          */
         constrainBounds(boundsToConstrain: Bounds2D, preserveSize?: boolean): void;
         offset(xOffset: number, yOffset: number): void;
+        getXRange(): [number, number];
+        getYRange(): [number, number];
         setXRange(xMin: number, xMax: number): void;
         setYRange(yMin: number, yMax: number): void;
         setCenteredXRange(xCenter: number, width: number): void;

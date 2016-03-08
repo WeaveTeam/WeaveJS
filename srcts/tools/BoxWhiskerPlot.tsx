@@ -44,15 +44,9 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
     // probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
     // filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	
-	dataBounds:Bounds2D;
-	screenBounds:Bounds2D;
+	dataBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
+	screenBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
 
-	xDomain:[number, number];
-	xRange:[number, number];
-	
-	yDomain:[number, number];
-	yRange:[number, number];
-	
 	xScale:Function;
 	yScale:Function;
 
@@ -78,32 +72,25 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		};
 	}
 
-	getScreenXMinPosition():number
-	{
-		// TODO return position based on locale
-		return this.margin.left.value;
-	}
-	
-	getScreenYMinPosition():number
-	{
-		return this.margin.bottom.value;
-	}
-	
-	getScreenXMaxPosition():number
-	{
-		// TODO return position based on locale
-		return (this.state.width - this.margin.left.value - this.margin.right.value) || 0;
-	}
-
-	getScreenYMaxPosition():number
-	{
-		// TODO return position based on locale
-		return (this.state.height - this.margin.top.value - this.margin.bottom.value) || 0;
-	}
-
 	updateSVGSize=(resizingDiv:ResizingDiv)=>
 	{
 		this.setState(resizingDiv.state);
+	}
+	
+	componentWillUpdate(props:BoxWhiskerPlotProps, state:BoxWhiskerPlotState)
+	{
+		this.screenBounds.setBounds(
+			this.margin.left.value,
+			this.state.height - this.margin.bottom.value,
+			this.state.width - this.margin.right.value,
+			this.margin.top.value
+		);
+		this.dataBounds.setBounds(
+			this.dataXStats.getMin(),
+			this.dataYStats.getMin(),
+			this.dataXStats.getMax(),
+			this.dataYStats.getMax()
+		);
 	}
 
 	renderScatterPlot():JSX.Element
@@ -128,20 +115,14 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	
 	render():JSX.Element
 	{
-		this.xRange = [this.getScreenXMinPosition(), this.getScreenXMaxPosition()];
-		this.yRange = [this.getScreenYMaxPosition(), this.getScreenYMinPosition()];
-		
-		this.xDomain = [this.dataXStats.getMin(), this.dataXStats.getMax()];
-		this.yDomain = [this.dataYStats.getMin(), this.dataYStats.getMax()];
-
-		this.xScale = d3.scale.linear().range(this.xRange).domain(this.xDomain);
-		this.yScale = d3.scale.linear().range(this.yRange).domain(this.yDomain);
+		this.xScale = d3.scale.linear().domain(this.dataBounds.getXRange()).range(this.screenBounds.getXRange());
+		this.yScale = d3.scale.linear().domain(this.dataBounds.getYRange()).range(this.screenBounds.getYRange());
 
 		return (
 			<ResizingDiv ref={ReactUtils.onUpdateRef(this.updateSVGSize)}>
 				<svg width={this.state.width} height={this.state.height}>
-					<XAxis x={0} y={this.state.height - this.margin.bottom.value} scale={this.xScale}/>
-					<YAxis x={this.margin.left.value} y={0} scale={this.yScale}/>
+					<XAxis x={0} y={this.screenBounds.yMin} scale={this.xScale}/>
+					<YAxis x={this.screenBounds.xMin} y={0} scale={this.yScale}/>
 					{
 						this.renderScatterPlot()
 					}
