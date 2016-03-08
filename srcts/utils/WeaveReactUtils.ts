@@ -34,19 +34,21 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 
 	let scu = component.shouldComponentUpdate;
 
-	function setWeaveState(state:any):void {
+	function setWeaveState():void {
 		if (Weave.wasDisposed(context))
 			unlinkReactState(component);
 		else
-			weavejs.core.SessionManager.traverseAndSetState(state, mapping);
+			weavejs.core.SessionManager.traverseAndSetState(component.state, mapping);
 	};
 
 	let setWeaveStateDebounced = _.debounce(setWeaveState, delay, { leading: false });
 
 	component.shouldComponentUpdate = function(nextProps:any, nextState:any, nextContext:any):boolean
 	{
-		setWeaveStateDebounced(nextState);
-		return scu ? scu.call(component, nextProps, nextState, nextContext) : true;
+		var should = scu ? scu.call(component, nextProps, nextState, nextContext) : true;
+		if (should)
+			setWeaveStateDebounced();
+		return should;
 	}
 
 	ReactUtils.onUnmount(component, unlinkReactState);
