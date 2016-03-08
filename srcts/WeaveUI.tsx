@@ -18,6 +18,7 @@ import TableTool from "./tools/TableTool";
 import TextTool from "./tools/TextTool";
 import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 import C3Gauge from "./tools/C3Gauge";
+import BoxWhiskerPlot from "./tools/BoxWhiskerPlot";
 
 // Editors
 import WeaveDataSourceEditor from "./editors/WeaveDataSourceEditor";
@@ -59,6 +60,7 @@ export
     C3PieChart,
     C3Histogram,
     C3Gauge,
+	BoxWhiskerPlot,
     OpenLayersMapTool,
     TableTool,
 	DataFilterTool,
