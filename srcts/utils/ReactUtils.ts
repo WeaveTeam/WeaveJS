@@ -55,6 +55,7 @@ export default class ReactUtils
 			else if (prevComponent)
 			{
 				prevComponent.componentDidUpdate = prevCDU;
+				prevCDU = null;
 			}
 			prevComponent = component;
 		};
