@@ -5,30 +5,32 @@ import ListView from "./ListView";
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
-export interface ITreeState {
+export interface IWeaveTreeState {
 	selectedItems: Array<IWeaveTreeNode>;
 	openItems: Array<IWeaveTreeNode>;
 }
 
-export interface ITreeProps {
+export interface IWeaveTreeProps {
 	root:IWeaveTreeNode
 	style?: any;
 	hideRoot?: boolean;
 	multipleSelection?: boolean;
+	onSelect?: (selectedItems: Array<IWeaveTreeNode>) => void;
+	onExpand?: (openItems: Array<IWeaveTreeNode>) => void;
 };
 
 interface ExtendedIWeaveTreeNode extends IWeaveTreeNode {
 	depth: number;
 }
 
-export default class Tree extends React.Component<ITreeProps, ITreeState>
+export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTreeState>
 {
-	constructor(props:ITreeProps)
+	constructor(props:IWeaveTreeProps)
 	{
 		super(props);
 	}
 
-	state: ITreeState = {
+	state: IWeaveTreeState = {
 		selectedItems: [],
 		openItems: []
 	};
@@ -50,8 +52,32 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 		return !!this.state.selectedItems.find((otherNode) => otherNode.equals(node));
 	}
 
-	componentDidUpdate()
+	setSelected(newSelectedItems:Array<IWeaveTreeNode>):void
 	{
+		this.setState({
+			selectedItems: newSelectedItems,
+			openItems: this.state.openItems
+		});
+	}
+
+	static arrayChanged<T>(arrayA:Array<T>, arrayB:Array<T>, itemEqFunc:(a:T,b:T)=>boolean):boolean
+	{
+		return (arrayA.length != arrayB.length) || !arrayA.every((d, i, a) => itemEqFunc(d, arrayB[i]));
+	}
+
+	componentDidUpdate(prevProps:IWeaveTreeProps, prevState:IWeaveTreeState)
+	{
+		let nodeComp = (a:IWeaveTreeNode, b:IWeaveTreeNode) => a.equals(b);
+		if (this.props.onSelect && WeaveTree.arrayChanged(prevState.selectedItems, this.state.selectedItems, nodeComp))
+		{
+			this.props.onSelect(this.state.selectedItems);
+		}
+
+		if (this.props.onExpand && WeaveTree.arrayChanged(prevState.openItems, this.state.openItems, nodeComp))
+		{
+			this.props.onExpand(this.state.openItems);
+		}
+
 		console.log("open:", this.state.openItems);
 		console.log("selected:", this.state.selectedItems);
 		return;
@@ -59,7 +85,7 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 
 
 
-	setOpen(node: IWeaveTreeNode, value: boolean)
+	private internalSetOpen(node: IWeaveTreeNode, value: boolean)
 	{
 		let isOpen = this.getOpen(node);
 		let openItems = this.state.openItems;
@@ -76,7 +102,7 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 		this.setState({ openItems, selectedItems });
 	}
 
-	setSelected(node: IWeaveTreeNode, value:boolean, keepSelection:boolean = false)
+	private internalSetSelected(node: IWeaveTreeNode, value:boolean, keepSelection:boolean = false)
 	{
 		let isSelected = this.getSelected(node);
 		let openItems = this.state.openItems;
@@ -97,7 +123,7 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 
 	handleItemClick=(node:IWeaveTreeNode, e:React.MouseEvent)=>
 	{
-			this.setSelected(node, !this.getSelected(node), e.ctrlKey);
+			this.internalSetSelected(node, !this.getSelected(node), e.ctrlKey);
 	}
 
 	static CLASSNAME = "weave-tree-view";
@@ -112,8 +138,8 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 		let resultElements:JSX.Element[] = []
 		let childElements: JSX.Element[];
 
-		let className = Tree.CLASSNAME;
-		let iconClassName = Tree.LEAF_ICON_CLASSNAME;
+		let className = WeaveTree.CLASSNAME;
+		let iconClassName = WeaveTree.LEAF_ICON_CLASSNAME;
 		let iconClickFunc: React.MouseEventHandler = null;
 
 		let isOpen = this.getOpen(node);
@@ -121,14 +147,14 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 
 		if (node.isBranch())
 		{
-			iconClassName = isOpen ? Tree.OPEN_BRANCH_ICON_CLASSNAME : Tree.BRANCH_ICON_CLASSNAME;
+			iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
 			iconClickFunc = (e: React.MouseEvent):void => {
-				this.setOpen(node, !this.getOpen(node)); e.preventDefault();
+				this.internalSetOpen(node, !this.getOpen(node)); e.preventDefault();
 			};
 		}
 		if (this.getSelected(node))
 		{
-			className += " " + Tree.SELECTED_CLASSNAME;
+			className += " " + WeaveTree.SELECTED_CLASSNAME;
 		}
 
 		return <span key={index} className={className}
@@ -166,7 +192,7 @@ export default class Tree extends React.Component<ITreeProps, ITreeState>
 
 	render(): JSX.Element
 	{
-		this.rowHeight = DOMUtils.getTextHeightForClasses("M", Tree.CLASSNAME);
+		this.rowHeight = DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME);
 		return <ListView items={this.enumerateItems(this.props.root)}
 				itemRender={this.renderItem}
 				itemHeight={this.rowHeight}/>;

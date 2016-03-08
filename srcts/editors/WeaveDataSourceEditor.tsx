@@ -4,7 +4,7 @@ import ui from "../react-ui/ui";
 import LinkableTextField from "../ui/LinkableTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
-import Tree from "../ui/Tree";
+import WeaveTree from "../ui/WeaveTree";
 
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
@@ -22,12 +22,28 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 
 	state:IDataSourceEditorState = {dataSource: null};
 
-	onHierarchySelected=(tree:Tree):void=>{
-		let item = tree.state.selectedItems[0] as EntityNode;
-
+	onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
+		let item = selectedItems[0] as EntityNode;
 		if (this.state.dataSource && item instanceof EntityNode)
 		{
 			(this.state.dataSource as WeaveDataSource).rootId.state = item.getEntity().id;
+		}
+	}
+
+	private tree: WeaveTree;
+	setHierarchySelection=():void=>{
+		if (this.tree && this.state.dataSource)
+		{
+			let id:number = (this.state.dataSource as WeaveDataSource).rootId.state as number;
+			let node: IWeaveTreeNode = this.state.dataSource.findHierarchyNode(id);
+			if (node != null)
+			{
+				this.tree.setSelected([node]);	
+			}
+			else
+			{
+				this.tree.setSelected([]);
+			}
 		}
 	}
 
@@ -42,6 +58,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 
 			let cache = (this.state.dataSource as WeaveDataSource).entityCache;
 			root = new EntityNode(cache, EntityType.HIERARCHY);
+			(this.state.dataSource as WeaveDataSource).rootId.addGroupedCallback(this, this.setHierarchySelection, true);
 		}
 		else
 		{
@@ -62,7 +79,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 						<LinkableTextField ref={linkReactStateRef(this, { content: dataSource.rootId }) }
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
-						<Tree hideRoot={true} root={root} ref={ReactUtils.onUpdateRef(this.onHierarchySelected)}/>
+						<WeaveTree hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>
 					</label>
 			</ui.VBox>;
 	}
