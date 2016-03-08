@@ -366,7 +366,8 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		return this.simplifyState({
 			flex: 1,
 			direction: HORIZONTAL,
-			children: paths.map(path => { return {id: path.getPath(), flex: 1} })
+			children: paths.map(path => { return {id: path.getPath(), flex: 1} }),
+			spacing: 4
 		});
 	}
 	

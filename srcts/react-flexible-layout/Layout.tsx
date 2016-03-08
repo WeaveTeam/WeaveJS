@@ -20,7 +20,8 @@ export type LayoutState = {
 	flex?: number,
 	id?: string[],
 	direction?: Direction,
-	children?: LayoutState[]
+	children?: LayoutState[],
+	spacing?:number
 };
 
 export interface LayoutProps extends React.Props<Layout>
@@ -45,7 +46,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		super(props, state);
 		var ps = props.state || {};
-		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex };
+		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex, spacing: ps.spacing };
 		this.minSize = 16;
 		this.dragging = false;
 	}
@@ -226,6 +227,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 							key={`${key}.resizers[${i - 1}]`}
 							ref={saveResizer.bind(null, i - 1)}
 							direction={state.direction}
+							spacing={state.spacing}
 						/>
 					);
 				elements.push(
