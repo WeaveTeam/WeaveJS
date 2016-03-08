@@ -63,6 +63,7 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
             <tbody>
                 {
                     this.props.rows.map((row:IRow, index:number) => {
+                        if(row)
                         return <TableRow
                                      ref={(tableRow:TableRow) => { this.tableRows[row[this.props.idProperty]] = tableRow }}
                                      key={index}
@@ -75,6 +76,7 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
                                      showIdColumn={this.props.showIdColumn}
                                      hack={this.props.hack}
                                 />;
+                        return "";
                     })
                 }
             </tbody>
