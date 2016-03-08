@@ -474,6 +474,17 @@ declare module olx {
             target?:Element|string;
         }
 
+        interface ZoomOptions {
+            duration?: number;
+            className?: string;
+            zoomInLabel?: HTMLElement | string;
+            zoomOutLabel?: HTMLElement | string;
+            zoomInTipLabel?: string;
+            zoomOutTipLabel?: string;
+            delta?: number;
+            target?: HTMLElement;
+        }
+
         interface ZoomToExtentOptions {
             className?: string;
             target?: HTMLElement;
@@ -2412,6 +2423,7 @@ declare module ol {
         }
 
         class Zoom extends Control {
+            constructor(options?: olx.control.ZoomOptions);
         }
 
         class ZoomSlider extends Control {

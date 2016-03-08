@@ -8,6 +8,8 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 
+const RESIZER_DEFAULT = 4;
+
 const STYLE_BASE = {
 	background: "#000",
     opacity: .1,
@@ -17,20 +19,19 @@ const STYLE_BASE = {
 };
 
 const STYLE_HORIZONTAL = _.merge({
-    width: "4px",
     cursor: "col-resize",
     height: "100%"
 }, STYLE_BASE);
 
 const STYLE_VERTICAL = _.merge({
-    height: "4px",
     cursor: "row-resize",
-    width: "100%"
+    width: "100%",
 }, STYLE_BASE);
 
 export interface IResizerProps extends React.Props<Resizer>
 {
 	direction: Direction;
+	spacing?: number;
 }
 
 export interface IResizerState
@@ -67,7 +68,13 @@ export default class Resizer extends React.Component<IResizerProps, IResizerStat
 
 	render():JSX.Element
 	{
-		var style = this.props.direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL;
+		var style:React.CSSProperties = this.props.direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL;
+		if(this.props.direction === HORIZONTAL){
+			style.width = this.props.spacing || RESIZER_DEFAULT;
+		} else {
+			style.height = this.props.spacing || RESIZER_DEFAULT;
+		}
+
 		return <span style={VendorPrefix.prefix({styles: style}).styles}/>;
 	}
 }

@@ -1,6 +1,8 @@
 import * as React from "react";
 import * as _ from "lodash";
 import reactUpdate from "react-addons-update";
+import ReactUtils from "./ReactUtils";
+import {ReactComponent} from "./ReactUtils";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -9,7 +11,6 @@ import IDisposableObject = weavejs.api.core.IDisposableObject;
 export declare type ReactStateLinkObject = { [prop: string]: ReactStateLinkObject | ILinkableObject };
 
 const UNLINK = "unlinkReactState";
-export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
 
 export function unlinkReactState(component:ReactComponent)
 {
@@ -33,21 +34,24 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 
 	let scu = component.shouldComponentUpdate;
 
-	function setWeaveState(state:any):void {
+	function setWeaveState():void {
 		if (Weave.wasDisposed(context))
 			unlinkReactState(component);
 		else
-			weavejs.core.SessionManager.traverseAndSetState(state, mapping);
+			weavejs.core.SessionManager.traverseAndSetState(component.state, mapping);
 	};
 
 	let setWeaveStateDebounced = _.debounce(setWeaveState, delay, { leading: false });
 
 	component.shouldComponentUpdate = function(nextProps:any, nextState:any, nextContext:any):boolean
 	{
-		setWeaveStateDebounced(nextState);
-		return scu ? scu.call(component, nextProps, nextState, nextContext) : true;
+		var should = scu ? scu.call(component, nextProps, nextState, nextContext) : true;
+		if (should)
+			setWeaveStateDebounced();
+		return should;
 	}
 
+	ReactUtils.onUnmount(component, unlinkReactState);
 	Weave.disposableChild(context, component.shouldComponentUpdate);
 
 	(component.shouldComponentUpdate as any)[UNLINK] = () => {

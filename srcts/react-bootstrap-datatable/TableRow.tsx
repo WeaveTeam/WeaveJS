@@ -4,7 +4,6 @@
 
 import * as React from "react";
 import {CSSProperties} from "react";
-import MiscUtils from "../utils/MiscUtils";
 import * as Prefixer from "react-vendor-prefix";
 import * as _ from "lodash";
 import ColorRamp = weavejs.util.ColorRamp;
@@ -89,7 +88,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         if (!selected && !probed)
             style = this.clear;
 
-        MiscUtils.merge(style, baseStyle);
+        _.merge(style, baseStyle);
 
         var cells:JSX.Element[] = [];
 

@@ -17,6 +17,7 @@ import {HORIZONTAL, VERTICAL, LayoutState} from "./react-flexible-layout/Layout"
 import WeaveTool from "./WeaveTool";
 import ToolOverlay from "./ToolOverlay";
 import MiscUtils from "./utils/MiscUtils";
+import DOMUtils from "./utils/DOMUtils";
 
 const LEFT:string = "left";
 const RIGHT:string = "right";
@@ -365,18 +366,19 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 		return this.simplifyState({
 			flex: 1,
 			direction: HORIZONTAL,
-			children: paths.map(path => { return {id: path.getPath(), flex: 1} })
+			children: paths.map(path => { return {id: path.getPath(), flex: 1} }),
+			spacing: 4
 		});
 	}
 	
 	getLayoutPosition(layout:Layout):ClientRect
 	{
-		return MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, ReactDOM.findDOMNode(layout) as HTMLElement);
+		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, ReactDOM.findDOMNode(layout) as HTMLElement);
 	}
 	
 	getToolPosition(toolPath:WeavePath):ClientRect
 	{
-		return MiscUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, this.getElementFromToolPath(toolPath) as HTMLElement);
+		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, this.getElementFromToolPath(toolPath) as HTMLElement);
 	}
 	
 	repositionTools=(layout:Layout = null):void=>
@@ -411,7 +413,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	render():JSX.Element
 	{
 		var newState:LayoutState = this.layout.state;
-		if (!newState)
+		if (!newState || _.isEqual(newState, {}))
 		{
 			var filteredChildren:WeavePath[] = this.weave.root.getObjects(weavejs.api.ui.IVisTool, true).map(Weave.getPath);
 			newState = this.generateLayoutState(filteredChildren);

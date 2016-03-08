@@ -3,8 +3,28 @@
 }
 
 .ol-control button.active {
-    border-style: solid;
-    border-width: 2;
+    background-color: black;
+    color: white;
+}
+
+.ol-control button {
+	font-weight: normal;
+	background-color: white;
+	color: black;
+}
+
+.ol-control button:hover {
+	background-color: rgba(240,240,240,1.0);
+}
+
+.ol-control button.active:hover {
+	background-color: rgba(40,40,40,1.0);
+	color: white;
+}
+
+.ol-control button:focus {
+	background-color: initial;
+	color: initial;
 }
 
 .ol-control:hover {

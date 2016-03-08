@@ -1,7 +1,6 @@
 #src
 #typings
 #.babelrc
-#.eslintrc
 #.project
 #.eclipse-js-conventions.xml
 #Gruntfile.js

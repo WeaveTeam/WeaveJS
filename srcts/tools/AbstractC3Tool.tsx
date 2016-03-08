@@ -13,7 +13,7 @@ import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import MiscUtils from "../utils/MiscUtils";
+import DOMUtils from "../utils/DOMUtils";
 import * as jquery from "jquery";
 
 // loads jquery from the es6 default module.
@@ -108,14 +108,14 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
 	componentDidMount()
 	{
-        MiscUtils.addPointClickListener(this.element, this.handlePointClick);
+        DOMUtils.addPointClickListener(this.element, this.handlePointClick);
 		this.validateSize();
 		this.handleChange();
 	}
 	
 	componentWillUnmount()
 	{
-		MiscUtils.removePointClickListener(this.element, this.handlePointClick);
+		DOMUtils.removePointClickListener(this.element, this.handlePointClick);
 		if (this.chart)
 		{
 			this.chart.destroy();
@@ -360,7 +360,7 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
     private _getCullingMetrics(size:number,axisClass:string):CullingMetric
 	{
-        var textHeight:number = MiscUtils.getTextHeight("test", this.getFontString());
+        var textHeight:number = DOMUtils.getTextHeight("test", this.getFontString());
         var labelsToShow:number = Math.floor(size / textHeight);
         labelsToShow = Math.max(2,labelsToShow);
 

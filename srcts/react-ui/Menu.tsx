@@ -2,7 +2,6 @@ import * as ReactDOM from "react-dom";
 import * as React from "react";
 import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
-import MiscUtils from "../utils/MiscUtils";
 import classNames from "../modules/classnames";
 
 export interface MenuItemProps
@@ -152,7 +151,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
             }
         }
 
-		var menuStyle:React.CSSProperties = MiscUtils.merge({
+		var menuStyle:React.CSSProperties = _.merge({
 			position: "absolute",
 			top: this.props.yPos,
 			left: this.props.xPos,
@@ -181,7 +180,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		}
 
 		return (
-			<VBox className="weave-menu" style={MiscUtils.merge(menuStyle, this.props.style)} onMouseEnter={() => this.setState({hovered: -1})} {...otherProps}>
+			<VBox className="weave-menu" style={_.merge(menuStyle, this.props.style)} onMouseEnter={() => this.setState({hovered: -1})} {...otherProps}>
 				{
 					this.props.menu.map((menuItem, index) => {
 							if(_.isEqual(menuItem, {}))
