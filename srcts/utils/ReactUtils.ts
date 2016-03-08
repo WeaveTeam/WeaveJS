@@ -38,11 +38,16 @@ export default class ReactUtils
 		};
 	}
 
+	static map_callback_onUpdateRef = new WeakMap();
 	static onUpdateRef<T extends ReactComponent>(callback:(component:T)=>void):(component:T)=>void
 	{
+		if (map_callback_onUpdateRef.has(callback))
+			return map_callback_onUpdateRef.get(callback);
+		
+		var localSerial = ReactUtils.serial++;
 		var prevCDU:(prevProps:any, prevState:any, prevContext:any)=>void;
 		var prevComponent:T;
-		return function(component:T):void {
+		var ref = function(component:T):void {
 			if (component)
 			{
 				prevCDU = component.componentDidUpdate;
@@ -59,5 +64,7 @@ export default class ReactUtils
 			}
 			prevComponent = component;
 		};
+		map_callback_onUpdateRef.set(callback, ref);
+		return ref;
 	}
 }
