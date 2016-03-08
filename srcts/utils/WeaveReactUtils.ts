@@ -2,6 +2,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import reactUpdate from "react-addons-update";
 import ReactUtils from "./ReactUtils";
+import {ReactComponent} from "./ReactUtils";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -10,7 +11,6 @@ import IDisposableObject = weavejs.api.core.IDisposableObject;
 export declare type ReactStateLinkObject = { [prop: string]: ReactStateLinkObject | ILinkableObject };
 
 const UNLINK = "unlinkReactState";
-export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
 
 export function unlinkReactState(component:ReactComponent)
 {

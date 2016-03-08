@@ -62,7 +62,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 						<LinkableTextField ref={linkReactStateRef(this, { content: dataSource.rootId }) }
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
-						<Tree hideRoot={true} root={root} ref={(c: Tree) => ReactUtils.onComponentDidUpdate(c, this.onHierarchySelected)}/>
+						<Tree hideRoot={true} root={root} ref={ReactUtils.onUpdateRef(this.onHierarchySelected)}/>
 					</label>
 			</ui.VBox>;
 	}
