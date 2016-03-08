@@ -412,7 +412,7 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	render():JSX.Element
 	{
 		var newState:LayoutState = this.layout.state;
-		if (!newState)
+		if (!newState || _.isEqual(newState, {}))
 		{
 			var filteredChildren:WeavePath[] = this.weave.root.getObjects(weavejs.api.ui.IVisTool, true).map(Weave.getPath);
 			newState = this.generateLayoutState(filteredChildren);
