@@ -46,7 +46,7 @@ declare type CullingMetric = {
 	displayed:number;
 }
 
-export default class AbstractC3Tool extends AbstractVisTool
+export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisToolState>
 {
     constructor(props:IVisToolProps)
 	{

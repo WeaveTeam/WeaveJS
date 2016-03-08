@@ -14,9 +14,8 @@ const TOP = "top";
 export interface AxisProps extends React.Props<AbstractAxis>
 {
 	y:number;
-	x:number
-	range:[number, number];
-	domain:[number, number];
+	x:number;
+	scale:Function
 	// will be used later for now we are going to use 'linear'
 	scalingMethod?:string;
 }
@@ -36,15 +35,12 @@ export class AbstractAxis extends React.Component<AxisProps, AxisState>
 	constructor(props:AxisProps)
 	{
 		super(props)
-		this.state = {
-			scale: d3.scale.linear().range(props.range).domain(props.domain)
-		}
 	}
 	
-	componentDidMount()
+	componentDidUpdate()
 	{
-		this.axis = d3.svg.axis().scale(this.state.scale).orient(this.orient);
-		d3.select(this.element).call(this.axis);
+		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient);
+		d3.select(this.element).call(axis);
 	}
 }
 

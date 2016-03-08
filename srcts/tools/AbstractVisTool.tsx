@@ -56,9 +56,9 @@ export interface VisToolGroup
 Weave.registerClass("weavejs.tool.Margin", Margin);
 Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 
-export default class AbstractVisTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
+export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
-    constructor(props:IVisToolProps)
+    constructor(props:P)
 	{
         super(props);
     }
