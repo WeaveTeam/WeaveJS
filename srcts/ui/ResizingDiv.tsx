@@ -3,6 +3,7 @@ import * as _ from "lodash";
 
 export interface ResizingDivProps extends React.HTMLProps<ResizingDiv>
 {
+	onResize?:(state:ResizingDivState)=>void;
 }
 
 export interface ResizingDivState
@@ -30,6 +31,12 @@ export default class ResizingDiv extends React.Component<ResizingDivProps, Resiz
 			width: this.outerDiv.offsetWidth,
 			height: this.outerDiv.offsetHeight
 		});
+	}
+	
+	componentDidUpdate()
+	{
+		if (this.props.onResize)
+			this.props.onResize(this.state);
 	}
 
 	componentWillUnmount()
