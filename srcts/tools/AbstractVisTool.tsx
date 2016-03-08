@@ -172,6 +172,11 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		return AbstractVisTool.getMenuItems(this);
 	}
 	
+	renderNumberEditor(linkableNumber:LinkableNumber):JSX.Element
+	{
+		return <LinkableTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+	}
+	
 	renderEditor():JSX.Element
 	{
 		return (
@@ -191,12 +196,12 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 
 				<HBox>
 					<span>{Weave.lang("Margins:")}</span>
-					<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.left})}/>
+					{this.renderNumberEditor(this.margin.left)}
 					<VBox>
-						<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.top})}/>
-						<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.bottom})}/>
+						{this.renderNumberEditor(this.margin.top)}
+						{this.renderNumberEditor(this.margin.bottom)}
 					</VBox>
-					<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.right})}/>
+					{this.renderNumberEditor(this.margin.bottom)}
 				</HBox>
 			</VBox>
 		);
