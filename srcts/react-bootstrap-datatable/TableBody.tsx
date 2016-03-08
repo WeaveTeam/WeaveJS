@@ -56,7 +56,9 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
                 }
             });
             if (riyadhIndex >= 1) {
-                this.props.rows.splice(0, 0, this.props.rows.splice(riyadhIndex, 1)[0]);
+                var temp = this.props.rows[0];
+                this.props.rows[0] = this.props.rows[riyadhIndex];
+                this.props.rows[riyadhIndex] = temp;
             }
         }
 
