@@ -66,13 +66,13 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         this.colorRamp.reverse();
     }
 
-    shouldComponentUpdate(nextProps:ITableRowProps, nextState:ITableRowState)
-	{
-        // only update the row if the key has changed
-        return (this.props.selected != nextProps.selected) ||
-               (this.props.probed != nextProps.probed) ||
-               (!_.isEqual(this.props.row, nextProps.row)) || this.props.hack != nextProps.hack;
-    }
+    //shouldComponentUpdate(nextProps:ITableRowProps, nextState:ITableRowState)
+	//{
+    //    // only update the row if the key has changed
+    //    return (this.props.selected != nextProps.selected) ||
+    //           (this.props.probed != nextProps.probed) ||
+    //           (!_.isEqual(this.props.row, nextProps.row)) || this.props.hack != nextProps.hack;
+    //}
 
     render():JSX.Element
 	{

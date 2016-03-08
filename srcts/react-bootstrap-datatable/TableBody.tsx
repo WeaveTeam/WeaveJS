@@ -4,6 +4,7 @@
 import * as React from "react";
 import TableRow from "./TableRow";
 import {IRow} from "./TableRow";
+import * as _ from "lodash";
 
 export interface ITableBodyProps extends React.Props<TableBody>
 {
@@ -34,6 +35,14 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
 
     componentDidUpdate()
 	{
+    }
+
+    shouldComponentUpdate(nextProps:ITableBodyProps, nextState:ITableBodyState)
+    {
+        // only update the row if the key has changed
+        return (this.props.selectedIds != nextProps.selectedIds) ||
+            (this.props.probedIds != nextProps.probedIds) ||
+            (!_.isEqual(this.props.rows, nextProps.rows)) || this.props.hack != nextProps.hack;
     }
 
     render():JSX.Element
