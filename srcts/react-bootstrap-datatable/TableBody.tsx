@@ -38,6 +38,18 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
 
     render():JSX.Element
 	{
+
+        if(this.props.hack){
+            var riyadhIndex:number = 0;
+            this.props.rows.forEach( (row,index) => {
+                if((row["ReferencedColumn13"] == "Riyadh") || (row["ReferencedColumn13"] == "الرياض")){
+                    riyadhIndex = index;
+                }
+            });
+
+            this.props.rows.splice(0, 0, this.props.rows.splice(riyadhIndex, 1)[0]);
+        }
+
         return (
             <tbody>
                 {

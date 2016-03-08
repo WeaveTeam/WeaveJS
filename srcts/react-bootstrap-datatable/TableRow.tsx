@@ -97,7 +97,12 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         if (!this.props.showIdColumn)
             keys.splice(keys.indexOf(this.props.idProperty), 1);
         cells = keys.map((key:string) => {
-            var color:string = this.props.hack ? this.colorRamp.getHexColor(Number(this.props.row[key]),0,100):"";
+            var value = Number(this.props.row[key]);
+            if(value < 53)
+                value = 53;
+            if(value > 87)
+                value = 87;
+            var color:string = this.props.hack ? this.colorRamp.getHexColor(value,53,87):"";
             return <td key={key} style={{background:color}}>{this.props.row[key]}</td>;
         });
 
