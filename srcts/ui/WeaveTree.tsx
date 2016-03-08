@@ -78,8 +78,6 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			this.props.onExpand(this.state.openItems);
 		}
 
-		console.log("open:", this.state.openItems);
-		console.log("selected:", this.state.selectedItems);
 		return;
 	}
 
@@ -129,9 +127,9 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	static CLASSNAME = "weave-tree-view";
 	static SELECTED_CLASSNAME = "selected";
 	
-	static BRANCH_ICON_CLASSNAME = "fa fa-folder-o fa-fw";
+	static BRANCH_ICON_CLASSNAME = "fa fa-plus-square-o fa-fw";
 	static LEAF_ICON_CLASSNAME = "fa fa-file-text-o fa-fw";
-	static OPEN_BRANCH_ICON_CLASSNAME = "fa fa-folder-open-o fa-fw";
+	static OPEN_BRANCH_ICON_CLASSNAME = "fa fa-minus-square-o fa-fw";
 
 	private renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
 	{
@@ -159,7 +157,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 		return <span key={index} className={className}
 			onClick={ this.handleItemClick.bind(this, node) }
-			onDoubleClick={ iconClickFunc } style={{ position: "absolute", top: index * this.rowHeight, width: "100%"}}>
+			onDoubleClick={ iconClickFunc } style={{ verticalAlign: "middle", fontSize: "16px", position: "absolute", top: index * this.rowHeight, width: "100%"}}>
 			<span style={{ marginLeft: node.depth * 16, whiteSpace: "pre"}}>
 				<i onMouseDown={ iconClickFunc } className={iconClassName}/>
 				{ " "+node.getLabel() }
@@ -192,7 +190,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	render(): JSX.Element
 	{
-		this.rowHeight = DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME);
+		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22);
 		return <ListView items={this.enumerateItems(this.props.root)}
 				itemRender={this.renderItem}
 				itemHeight={this.rowHeight}/>;

@@ -28,6 +28,10 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 		{
 			(this.state.dataSource as WeaveDataSource).rootId.state = item.getEntity().id;
 		}
+		else
+		{
+			(this.state.dataSource as WeaveDataSource).rootId.state = null;
+		}
 	}
 
 	private tree: WeaveTree;
@@ -35,8 +39,8 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 		if (this.tree && this.state.dataSource)
 		{
 			let id:number = (this.state.dataSource as WeaveDataSource).rootId.state as number;
-			let node: IWeaveTreeNode = this.state.dataSource.findHierarchyNode(id);
-			if (node != null)
+			let node = this.state.dataSource.findHierarchyNode(id) as EntityNode;
+			if (node != null && node.id > -1)
 			{
 				this.tree.setSelected([node]);	
 			}
@@ -58,7 +62,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 
 			let cache = (this.state.dataSource as WeaveDataSource).entityCache;
 			root = new EntityNode(cache, EntityType.HIERARCHY);
-			(this.state.dataSource as WeaveDataSource).rootId.addGroupedCallback(this, this.setHierarchySelection, true);
+			(this.state.dataSource as WeaveDataSource).rootId.addGroupedCallback(this, this.setHierarchySelection, false);
 		}
 		else
 		{
@@ -79,8 +83,8 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 						<LinkableTextField ref={linkReactStateRef(this, { content: dataSource.rootId }) }
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
-						<WeaveTree hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>
 					</label>
+					<WeaveTree hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>
 			</ui.VBox>;
 	}
 }
