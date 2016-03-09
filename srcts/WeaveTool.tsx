@@ -137,10 +137,10 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		return (
 			<VBox style={this.state.style} className="weave-tool"
 					onMouseEnter={() => {
-						this.titleBar.setState({ showControls: true });
+						this.titleBar.setState({ showControls: true, notification:this.titleBar.state.notification });
 					}}
 					onMouseLeave={() => {
-						this.titleBar.setState({ showControls: false });
+						this.titleBar.setState({ showControls: false, notification:this.titleBar.state.notification });
 						this.toolTip.setState({ showToolTip: false });
 					}}
 					onDragOver={this.props.onDragOver}
@@ -169,24 +169,34 @@ interface ITitleBarProps extends React.Props<TitleBar>
 interface ITitleBarState
 {
 	showControls: boolean;
+	notification: boolean;
 }
 
 class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 {
+	private windowBar:CSSProperties;
+
 	constructor(props:ITitleBarProps)
 	{
 		super(props);
 		this.state = {
-			showControls: false
+			showControls: false,
+			notification: false
 		};
 	}
 	render()
 	{
-		var windowBar:CSSProperties = {
+		this.windowBar = {
 			width: "100%",
 			height: this.props.titleBarHeight,
 			backgroundColor: this.state.showControls ? "#f8f8f8": ""
 		};
+
+		if(this.state.notification) {
+
+			this.windowBar.color = "white";
+			this.windowBar.backgroundColor = "red";
+		}
 
 		var titleStyle:CSSProperties = {
 			cursor: "move",
@@ -220,22 +230,26 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 		_.merge(rightControls, transitions);
 
 		return(
-			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
+			<HBox ref="header" style={this.windowBar} draggable={true} onDragStart={this.props.onDragStart}>
             {<HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
             	<div onClick={this.props.onGearClick}>
 					<Glyphicon glyph="cog"/>
 				</div>
             </HBox>}
 			<span style={titleStyle} className="weave-panel">{this.props.title}</span>
-			{/*<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
-			<div style={{marginRight: 5}}>
-			<Glyphicon glyph="unchecked"/>
-			</div>
-			<div style={{marginRight: 5}}>
-			<Glyphicon glyph="remove"/>
-			</div>
-			</HBox>*/}
+			{<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
+				<div style={{marginRight: 5}}>
+					<i className="fa fa-bell-o" onClick={this.notificationStyleUpdate.bind(this)}></i>
+				</div>
+				<div style={{marginRight: 5}}>
+				</div>
+			</HBox>}
 			</HBox>
 		);
+	}
+
+	notificationStyleUpdate() {
+		this.state.notification = !this.state.notification;
+		this.forceUpdate();
 	}
 }
