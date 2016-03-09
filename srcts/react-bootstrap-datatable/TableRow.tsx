@@ -62,10 +62,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         //todo: remove, HACK for demo to create heatmap
         this.colorRamp = new weavejs.util.ColorRamp();
         this.colorRamp.state = [
-            "0xFD0629",
-            "0xFB8000",
-            "0x85C76C",
-            "0x52A544"
+            "0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"
         ];
     }
 
@@ -105,7 +102,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
                 value = 53;
             if(value > 87)
                 value = 87;
-            var color:string = this.props.hack ? this.colorRamp.getHexColor(value,53,87):"";
+            var color:string = this.props.hack ? this.colorRamp.getHexColor(value,65,90):"";
             return <td key={key} style={{background:color}}>{this.props.row[key]}</td>;
         });
 
