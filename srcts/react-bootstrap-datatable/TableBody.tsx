@@ -51,7 +51,7 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
         if(this.props.hack) {
             var riyadhIndex:number = -1;
             this.props.rows.forEach((row, index) => {
-                if ((row["ReferencedColumn13"] == "Riyadh") || (row["ReferencedColumn13"] == "الرياض")) {
+                if ((row["ReferencedColumn9"] == "Riyadh") || (row["ReferencedColumn9"] == "الرياض")) {
                     riyadhIndex = index;
                 }
             });
