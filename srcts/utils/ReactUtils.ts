@@ -1,9 +1,15 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 
 export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
 
 export default class ReactUtils
 {
+	static hasFocus(component:ReactComponent):boolean
+	{
+		return ReactDOM.findDOMNode(component).contains(document.activeElement);
+	}
+	
 	/**
 	 * Adds undefined values to new state for properties in current state not
 	 * found in new state.
