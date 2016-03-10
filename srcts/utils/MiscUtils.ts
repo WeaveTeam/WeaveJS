@@ -131,29 +131,46 @@ export default class MiscUtils
 	 *
 	 * This function return and object whose keys are url parameters and value
 	 */
+	
+	static makeUrlParams(queryParams:any):string
+	{
+		let queryParamString: string = "";
+		let queryParamArray: string[] = [];
+		for (let key of Object.keys(queryParams))
+		{
+			let value:string = queryParams[key] as string;
+			queryParamArray.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
+		}
+		return queryParamArray.join("&");
+	}
+
 	static getUrlParams():any
 	{
+		return MiscUtils.getParams(window.location.search.substring(1));
+	}
+
+	static getHashParams(): any {
+		return MiscUtils.getParams(window.location.hash.substring(1));
+	}
+
+	private static getParams(query:string):any
+	{
 		var queryParams: any = {};
-		var query:string = window.location.search.substring(1);
 		if (!query)
 			return {};
-		var vars:string[] = query.split("&");
-		for (var i:number = 0; i < vars.length; i++)
-		{
-			var pair:string[] = vars[i].split("=");
-			if (typeof queryParams[pair[0]] === "undefined")
-			{
+		var vars: string[] = query.split("&");
+		for (var i: number = 0; i < vars.length; i++) {
+			var pair: string[] = vars[i].split("=");
+			if (typeof queryParams[pair[0]] === "undefined") {
 				queryParams[pair[0]] = decodeURIComponent(pair[1]);
 				// If second entry with this name
 			}
-			else if (typeof queryParams[pair[0]] === "string")
-			{
-				var arr:string[] = [queryParams[pair[0]], decodeURIComponent(pair[1])];
+			else if (typeof queryParams[pair[0]] === "string") {
+				var arr: string[] = [queryParams[pair[0]], decodeURIComponent(pair[1])];
 				queryParams[pair[0]] = arr;
 				// If third or later entry with this name
 			}
-			else
-			{
+			else {
 				queryParams[pair[0]].push(decodeURIComponent(pair[1]));
 			}
 		}
