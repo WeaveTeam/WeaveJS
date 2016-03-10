@@ -76,11 +76,11 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 						<LinkableTextField style={margins}/>
 					</label>
 					<label>{Weave.lang("Service URL")}
-						<LinkableTextField ref={linkReactStateRef(this, {content: dataSource.url}) }
+						<LinkableTextField ref={linkReactStateRef(this, {content: dataSource.url}, 500) }
 							style={margins} placeholder={weavejs.net.WeaveDataServlet.DEFAULT_URL}/>
 					</label>
 					<label>{Weave.lang("Root hierarchy ID")}
-						<LinkableTextField ref={linkReactStateRef(this, { content: dataSource.rootId }) }
+						<LinkableTextField ref={linkReactStateRef(this, { content: dataSource.rootId }, 500) }
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
 					</label>
