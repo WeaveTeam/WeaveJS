@@ -28,6 +28,7 @@ import {IWeaveLayoutManagerProps, IWeaveLayoutManagerState} from "./WeaveLayoutM
 import MiscUtils from "./utils/MiscUtils";
 import DOMUtils from "./utils/DOMUtils";
 import ReactUtils from "./utils/ReactUtils";
+import WeaveReactUtils from "./utils/WeaveReactUtils";
 import ui from "./react-ui/ui";
 import * as JSZip from "jszip";
 import * as React from "react";
@@ -36,19 +37,6 @@ import * as moment from "moment";
 
 weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
 weavejs.util.DateUtils.moment = (moment as any)['default'];
-
-Weave.registerAsyncClass(
-	React.Component,
-	component => {
-		ReactUtils.onUnmount(
-			component,
-			component => {
-				if (Weave.getOwner(component))
-					weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(component);
-			}
-		);
-	}
-);
 
 export
 {
@@ -70,5 +58,6 @@ export
     MiscUtils,
     DOMUtils,
 	ReactUtils,
+	WeaveReactUtils,
     ui
 };

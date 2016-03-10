@@ -8,6 +8,21 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IDisposableObject = weavejs.api.core.IDisposableObject;
 
+// This makes Weave handle linkable React classes appropriately.
+Weave.registerAsyncClass(
+	React.Component,
+	component => {
+		ReactUtils.onUnmount(
+			component,
+			component => {
+				if (Weave.getOwner(component))
+					weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(component);
+				Weave.dispose(component);
+			}
+		);
+	}
+);
+
 export declare type LinkReactStateMapping = { [prop: string]: LinkReactStateMapping | ILinkableObject };
 
 const UNLINK = "unlinkReactState";
@@ -31,7 +46,6 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 		return;
 	
 	unlinkReactState(component);
-	ReactUtils.onUnmount(component, unlinkReactState);
 	
 	let localContext = Weave.disposableChild(context, {});
 	let reactState = component.state != null ? component.state : {};
@@ -119,5 +133,7 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 	};
 	component.componentWillUpdate = newComponentWillUpdate;
 
+	ReactUtils.onUnmount(component, unlinkReactState);
+	
 	authority();
 }
