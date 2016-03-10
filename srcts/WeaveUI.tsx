@@ -28,7 +28,7 @@ import {IWeaveLayoutManagerProps, IWeaveLayoutManagerState} from "./WeaveLayoutM
 import MiscUtils from "./utils/MiscUtils";
 import DOMUtils from "./utils/DOMUtils";
 import ReactUtils from "./utils/ReactUtils";
-import WeaveReactUtils from "./utils/WeaveReactUtils";
+import * as WeaveReactUtils from "./utils/WeaveReactUtils";
 import ui from "./react-ui/ui";
 import * as JSZip from "jszip";
 import * as React from "react";
