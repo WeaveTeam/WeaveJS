@@ -831,6 +831,10 @@ declare module weavejs {
          */
         static debugAsyncStack: boolean;
         /**
+         * Set to true to clearly see where Locale is being used.
+         */
+        static debugLocale: boolean;
+        /**
          * For use with StageUtils.startTask(); this priority is used for things that MUST be done before anything else.
          * Tasks having this priority will take over the scheduler and prevent any other asynchronous task from running until it is completed.
          */
@@ -3652,7 +3656,6 @@ declare module weavejs.core {
     import ILocale = weavejs.api.core.ILocale;
     import WeavePromise = weavejs.util.WeavePromise;
     class Locale implements ILocale {
-        locale: string;
         reverseLayout: boolean;
         loadFromUrl(jsonUrl: string): WeavePromise;
         data: Object;
@@ -5172,6 +5175,17 @@ declare module weavejs.data.column {
         containsKey(key: IQualifiedKey): boolean;
         setRecords(keys: any[], geometries: any[]): void;
         getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
+    }
+}
+declare module weavejs.data.column {
+    import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+    import LinkableString = weavejs.core.LinkableString;
+    class KeyColumn extends AbstractAttributeColumn {
+        constructor(metadata?: Object);
+        getMetadata(propertyName: string): string;
+        keyType: LinkableString;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
+        keys: any[];
     }
 }
 declare module weavejs.data.column {
@@ -7996,6 +8010,34 @@ declare module weavejs.net.beans {
 }
 declare module weavejs.path {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
+    import LinkableHashMap = weavejs.core.LinkableHashMap;
+    class ExternalTool extends LinkableHashMap {
+        /**
+         * The name of the global JavaScript variable which is a mapping from a popup's
+         * window.name to an object containing "path" and "window" properties.
+         */
+        static WEAVE_EXTERNAL_TOOLS: string;
+        /**
+         * The popup's window.name
+         */
+        windowName: string;
+        constructor();
+        launch(): boolean;
+        static generateWindowName(): string;
+        static launch(owner: ILinkableObject, url: string, windowName?: string, features?: string): boolean;
+        dispose(): void;
+        /**
+         * @inheritDoc
+         */
+        getSelectableAttributeNames(): any[];
+        /**
+         * @inheritDoc
+         */
+        getSelectableAttributes(): any[];
+    }
+}
+declare module weavejs.path {
+    import ILinkableObject = weavejs.api.core.ILinkableObject;
     class WeavePath {
         /**
          * A pointer to the Weave instance.
@@ -9284,6 +9326,10 @@ declare module weavejs.util {
          * @see mx.utils.ObjectUtil#dateCompare()
          */
         static dateCompare(a: Date, b: Date): number;
+        /**
+         * @see https://github.com/bestiejs/punycode.js
+         */
+        static guid(): string;
     }
 }
 declare module weavejs.util {
