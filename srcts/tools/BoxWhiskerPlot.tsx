@@ -44,10 +44,10 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
     // selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
     // probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
     // filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+	container:HTMLElement;
 	
 	dataBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
 	screenBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
-
 	xScale:Function;
 	yScale:Function;
 
@@ -78,12 +78,32 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		this.setState(resizingDiv.state);
 	}
 	
-	shouldComponentUpdate(nextProps:BoxWhiskerPlotProps, nextState:BoxWhiskerPlotState)
+	componentDidMount()
 	{
-		console.log(_.isEqual(this.state, nextState));
-		return false;
+		this.container = ReactDOM.findDOMNode(this) as HTMLElement;
+		this.setState({
+			width: this.container.offsetWidth,
+			height: this.container.offsetHeight
+		});
+	}
+	
+	componentDidUpdate()
+	{
+		if(!_.isEqual(this.state.width, this.container.offsetWidth) || !_.isEqual(this.state.height, this.container.offsetHeight))
+		{
+			
+			this.setState({
+				width: this.container.offsetWidth,
+				height: this.container.offsetHeight
+			});
+		}
 	}
 
+	// shouldComponentUpdate(nextProps:BoxWhiskerPlotProps, nextState:BoxWhiskerPlotState):boolean
+	// {
+	// 	return !_.isEqual(this.state.width, this.container.offsetWidth) || !_.isEqual(this.state.height, this.container.offsetHeight);
+	// }
+	
 	componentWillUpdate(props:BoxWhiskerPlotProps, state:BoxWhiskerPlotState)
 	{
 		this.screenBounds.setBounds(
@@ -111,8 +131,8 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 							return <g key={index}/>;
 						return <circle key={index} 
 									className="circle" 
-									cx={this.xScale(record.x)} 
-									cy={this.yScale(record.y)} r={record.r}
+									cx={this.xScale(record.x) || 0} 
+									cy={this.yScale(record.y) || 0} r={5}
 									fill="black"
 									stroke="black"
 									strokeOpacity={0.5}/>
@@ -127,7 +147,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		return null;
 	}
 
-	renderBoxWhiskers():JSX.Element[]
+	renderBoxWhiskers():JSX.Element
 	{
 		var getQ = (values: number[], q: number) => {
 			var n = q/4 * (values.length - 1);
@@ -145,7 +165,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		var lineAlpha = 0.5;
 		var fillColor = 0xe0e0e0;
 		var fillAlpha = 1.0;
-		var radius = 2;
+		var radius = 10;
 		
 		var glyphStyle:React.CSSProperties = {
 			stroke: lineColor,
@@ -154,68 +174,65 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 			fillOpacity: fillAlpha
 		}
 
-		return records.map((record, index) => {
-			var key = record.id;
-			var x = this.xScale(record.x);
-			var yValues = getValues(key);
-
-			var min = this.yScale(getQ(yValues, 0));
-			var q1 = this.yScale(getQ(yValues, 1));
-			var median = this.yScale(getQ(yValues, 2));
-			var q3 = this.yScale(getQ(yValues, 3));
-			var max = this.yScale(getQ(yValues, 4));
-			radius = this.yScale(radius);
-
-			if (isNaN(x+median+q1+q3+min+max))
-				return <g key={index}/>;
-
-			// draw whiskers
-			var whisker:JSX.Element = (
-				<g style={glyphStyle}>
-					<line x1={x} y1={median} x2={x} y2={min}/>
-					<line x1={x-radius} y1={min} x2={x+radius} y2={min}/>
-					<line x1={x} y1={median} x2={x} y2={max}/>
-					<line x1={x-radius} y1={max} x2={x+radius} y2={max}/>
-				</g>
-			)
-			
-			// draw box
-			var box:JSX.Element = (
-				<g style={glyphStyle}>
-					<line x1={x+radius} y1={q1} x2={x-radius} y2={q1}/>
-					<line x1={x-radius} y1={q1} x2={x-radius} y2={q3}/>
-					<line x1={x-radius} y1={q3} x2={x+radius} y2={q3}/>
-					<line x1={x+radius} y1={q3} x2={x+radius} y2={q1}/>
-					{/*median line*/}
-					<line x1={x-radius} y1={median} x2={x+radius} y2={median}/>
-				</g>
-			)
-			return (
-				<g key={index}>
-					{box}
-					{whisker}
-				</g>
-			)
-		});
+		return (
+			<g>
+				{
+					records.map((record, index) => {
+						var key = record.id;
+						var x = this.xScale(record.x);
+						var yValues = getValues(key);
+						
+						var min = this.yScale(getQ(yValues, 0)) || 0;
+						var q1 = this.yScale(getQ(yValues, 1)) || 0;
+						var median = this.yScale(getQ(yValues, 2)) || 0;
+						var q3 = this.yScale(getQ(yValues, 3)) || 0;
+						var max = this.yScale(getQ(yValues, 4)) || 0;
+						
+						// draw whiskers
+						var whisker:JSX.Element = (
+							<g key="whisker" style={glyphStyle}>
+								<line x1={x} y1={median} x2={x} y2={min}/>
+								<line x1={x-radius} y1={min} x2={x+radius} y2={min}/>
+								<line x1={x} y1={median} x2={x} y2={max}/>
+								<line x1={x-radius} y1={max} x2={x+radius} y2={max}/>
+							</g>
+						)
+						
+						// draw box
+						var box:JSX.Element = (
+							<g key="box" style={glyphStyle}>
+								<line x1={x+radius} y1={q1} x2={x-radius} y2={q1}/>
+								<line x1={x-radius} y1={q1} x2={x-radius} y2={q3}/>
+								<line x1={x-radius} y1={q3} x2={x+radius} y2={q3}/>
+								<line x1={x+radius} y1={q3} x2={x+radius} y2={q1}/>
+							{/*median line*/}
+							<line x1={x-radius} y1={median} x2={x+radius} y2={median}/>
+							</g>
+						)
+						return [box, whisker];
+					})
+				}
+			</g>
+		);
 	}
 	
 	render():JSX.Element
 	{
 		this.xScale = d3.scale.linear().domain(this.dataBounds.getXRange()).range(this.screenBounds.getXRange());
 		this.yScale = d3.scale.linear().domain(this.dataBounds.getYRange()).range(this.screenBounds.getYRange());
+		
 		return (
-			<ResizingDiv ref={ReactUtils.onUpdateRef(this.updateSVGSize)}>
+			/*<ResizingDiv ref={ReactUtils.onUpdateRef(this.updateSVGSize)}>*/
+			<VBox style={{flex: 1}}>
 				<svg width={this.state.width} height={this.state.height}>
 					<XAxis x={0} y={this.screenBounds.yMin} scale={this.xScale}/>
 					<YAxis x={this.screenBounds.xMin} y={0} scale={this.yScale}/>
 					{
-						this.renderScatterPlot()
-					}
-					{
 						this.renderBoxWhiskers()
 					}
 				</svg>
-			</ResizingDiv>
+			</VBox>
+			/*</ResizingDiv>*/
 		);
 	}
 }
