@@ -40,14 +40,19 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 
 	function updateReactState(callingLater:boolean = false):void
 	{
+		//console.log('updateReactState(callingLater = ' + callingLater + ')', 'authority', !callingLater || authority == updateReactState, 'hasFocus', ReactUtils.hasFocus(component));
 		if (callingLater && authority != updateReactState)
 			return;
-		authority = updateReactState;
 
 		// delay while component has focus because we don't want to overwrite something the user is actively typing
 		if (ReactUtils.hasFocus(component))
-			return weavejs.WeaveAPI.Scheduler.callLater(localContext, updateReactState, [true]);
+		{
+			authority = updateReactState;
+			weavejs.WeaveAPI.Scheduler.callLater(localContext, updateReactState, [true]);
+			return;
+		}
 
+		authority = null;
 		var updatedReactState = reactUpdate(reactState, reactUpdateSpec);
 		if (!_.isEqual(reactState, updatedReactState))
 			component.setState(reactState = updatedReactState);
@@ -55,10 +60,11 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 
 	function updateWeaveState(callingLater:boolean = false):void
 	{
+		//console.log('updateWeaveState(callingLater = ' + callingLater + ')', 'authority', !callingLater || authority == updateWeaveState);
 		if (callingLater && authority != updateWeaveState)
 			return;
-		authority = updateWeaveState;
-
+		
+		authority = null;
 		weavejs.core.SessionManager.traverseAndSetState(reactState, mapping);
 
 		// Always update react state after setting weave state because
@@ -98,8 +104,10 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 		// set weave state now before render
 		if (Weave.wasDisposed(context))
 			unlinkReactState(component);
-		else
+		else if (ReactUtils.hasFocus(component))
 			delayedUpdateWeaveState();
+		else
+			updateWeaveState();
 		
 		// call original function with possibly-updated reactState
 		if (superComponentWillUpdate)
