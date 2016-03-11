@@ -97,10 +97,8 @@ export default class ReactUtils
 				component.componentWillUpdate = function(nextProps:P, nextState:S, nextContext:any):void {
 					if (oldMethod)
 						oldMethod.call(component, nextProps, nextState, nextContext);
-					console.log('onWillUpdate later');
 					callback(component, nextProps, nextState, nextContext);
 				};
-				console.log('onWillUpdate immediate');
 				callback(component, component.props, component.state, component.context);
 			}
 			else if (prevComponent)
