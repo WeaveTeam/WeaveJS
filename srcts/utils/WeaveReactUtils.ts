@@ -33,14 +33,14 @@ export function unlinkReactState(component:ReactComponent):void
 		(component.componentWillUpdate as any)[UNLINK]();
 }
 
-export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(c:ReactComponent)=>void
+export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 500):(c:ReactComponent)=>void
 {
 	return (c:ReactComponent) => {
 		linkReactState(context, c, mapping, delay);
 	};
 }
 
-export function linkReactState(context:ILinkableObject, component:ReactComponent, mapping:LinkReactStateMapping, delay:number = 0)
+export function linkReactState(context:ILinkableObject, component:ReactComponent, mapping:LinkReactStateMapping, delay:number = 500)
 {
 	if (!component)
 		return;
@@ -72,12 +72,29 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 			component.setState(reactState = updatedReactState);
 	}
 
+	let delayedUpdateWeaveState:Function;
 	function updateWeaveState(callingLater:boolean = false):void
 	{
 		//console.log('updateWeaveState(callingLater = ' + callingLater + ')', 'authority', !callingLater || authority == updateWeaveState);
 		if (callingLater && authority != updateWeaveState)
 			return;
 		
+		// stop if context was disposed
+		if (Weave.wasDisposed(context))
+		{
+			unlinkReactState(component);
+			return;
+		}
+		
+		// delay while component has focus
+		if (!callingLater && delay > 0 && ReactUtils.hasFocus(component))
+		{
+			authority = updateWeaveState;
+			delayedUpdateWeaveState();
+			return;
+		}
+
+		// update weave state
 		authority = null;
 		weavejs.core.SessionManager.traverseAndSetState(reactState, mapping);
 
@@ -86,6 +103,8 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 		// and we want to make sure the react value matches the weave value.
 		updateReactState();
 	}
+	if (delay > 0)
+		delayedUpdateWeaveState = _.debounce(updateWeaveState.bind(null, true), delay, {leading: false});
 
 	let mapValue = (value:any):any => {
 		if (Weave.isLinkable(value))
@@ -105,8 +124,6 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 		return weavejs.util.JS.isPrimitive(value) ? value : _.mapValues(value, mapValue);
 	};
 	reactUpdateSpec = mapValue(mapping);
-	
-	let delayedUpdateWeaveState = delay ? _.debounce(updateWeaveState.bind(null, true), delay, {leading: false}) : updateWeaveState;
 
 	let superComponentWillUpdate = component.componentWillUpdate;
 	function newComponentWillUpdate(nextProps:any, nextState:any, nextContext:any):void
@@ -114,14 +131,8 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 		// store nextState so it can be accessed and modified inside Weave callbacks
 		reactState = nextState;
 		
-		authority = updateWeaveState;
 		// set weave state now before render
-		if (Weave.wasDisposed(context))
-			unlinkReactState(component);
-		else if (ReactUtils.hasFocus(component))
-			delayedUpdateWeaveState();
-		else
-			updateWeaveState();
+		updateWeaveState();
 		
 		// call original function with possibly-updated reactState
 		if (superComponentWillUpdate)
