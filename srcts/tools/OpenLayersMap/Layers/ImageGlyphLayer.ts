@@ -31,11 +31,12 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 	{
 		super();
 		this.imageGlyphCache = new ImageGlyphCache(this);
-
+		this.alpha.defaultValue.state = 1.0;
 		this.imageSize.addGroupedCallback(this, this.updateStyleData);
 		this.imageURL.addGroupedCallback(this, this.updateStyleData);
 		this.alpha.addGroupedCallback(this, this.updateStyleData);
 		this.color.addGroupedCallback(this, this.updateStyleData, true);
+
 	}
 
 	getToolTipColumns(): IAttributeColumn[] 
@@ -128,6 +129,7 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 			}
 
 			let imageSize = Number(record.imageSize || NaN);
+			if (isNaN(record.alpha)) record.alpha = 0;
 			let color = AbstractFeatureLayer.toColorRGBA(record.color, record.alpha);
 
 			if (!record.imageURL)
