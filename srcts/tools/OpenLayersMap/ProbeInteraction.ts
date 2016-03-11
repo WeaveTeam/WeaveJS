@@ -54,11 +54,6 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		}
 	}
 
-	private static layerFilter(layer:ol.layer.Base):boolean
-	{
-		return layer.get("selectable");
-	}
-
 	private pixelToKey(pixel:ol.Pixel):IQualifiedKey
 	{
 		let map: ol.Map = this.getMap();
@@ -68,7 +63,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		this.topLayer = null;
 		this.topKey = null;
 		
-		map.forEachFeatureAtPixel(pixel, this.onFeatureAtPixel, this, ProbeInteraction.layerFilter);
+		map.forEachFeatureAtPixel(pixel, this.onFeatureAtPixel, this, OpenLayersMapTool.selectableLayerFilter);
 
 
 
@@ -79,7 +74,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		
 		for (let layer of map.getLayers().getArray())
 		{
-			if (!ProbeInteraction.layerFilter(layer))
+			if (!OpenLayersMapTool.selectableLayerFilter(layer))
 				continue;
 			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 			let keySet: KeySet = weaveLayerObject.probeKeySet;
@@ -113,7 +108,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 	{
 		for (let layer of this.getMap().getLayers().getArray())
 		{
-			if (!ProbeInteraction.layerFilter(layer))
+			if (!OpenLayersMapTool.selectableLayerFilter(layer))
 				continue;
 			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 			let keySet: KeySet = weaveLayerObject.probeKeySet;

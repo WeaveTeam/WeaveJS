@@ -564,6 +564,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			this.map.getView().setCenter([keyBounds.getXCenter(), keyBounds.getYCenter()]);
 		}
 	}
+
+	public static selectableLayerFilter(layer: ol.layer.Base): boolean {
+		return layer.get("selectable");
+	}
 }
 
 Weave.registerClass("weavejs.tool.Map", OpenLayersMapTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
