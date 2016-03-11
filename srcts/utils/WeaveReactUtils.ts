@@ -33,14 +33,14 @@ export function unlinkReactState(component:ReactComponent):void
 		(component.componentWillUpdate as any)[UNLINK]();
 }
 
-export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 500):(c:ReactComponent)=>void
+export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(c:ReactComponent)=>void
 {
 	return (c:ReactComponent) => {
 		linkReactState(context, c, mapping, delay);
 	};
 }
 
-export function linkReactState(context:ILinkableObject, component:ReactComponent, mapping:LinkReactStateMapping, delay:number = 500)
+export function linkReactState(context:ILinkableObject, component:ReactComponent, mapping:LinkReactStateMapping, delay:number = 0)
 {
 	if (!component)
 		return;
