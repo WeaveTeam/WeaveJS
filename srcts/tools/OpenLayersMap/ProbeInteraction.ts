@@ -59,7 +59,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		return layer.get("selectable");
 	}
 
-	private pixelToKey(pixel:ol.Pixel):any
+	private pixelToKey(pixel:ol.Pixel):IQualifiedKey
 	{
 		let map: ol.Map = this.getMap();
 
@@ -97,24 +97,16 @@ export default class ProbeInteraction extends ol.interaction.Pointer
         if (!this.tool.props.toolTip)
             return;
         
-		let key:any /*IQualifiedKey*/ = this.pixelToKey(event.pixel);
-		let toolTipState: IToolTipState = {};
-
+		let key:IQualifiedKey = this.pixelToKey(event.pixel);
 		if (key)
 		{
 			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
-
-			toolTipState.showToolTip = true;
-			toolTipState.title = ToolTip.getToolTipTitle(this.tool, key);
-			toolTipState.columnNamesToValue = ToolTip.getToolTipData(this.tool, [key], this.topLayer.getToolTipColumns());
-			[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
+			this.tool.props.toolTip.show(this, browserEvent, [key], this.topLayer.getToolTipColumns());
 		}
 		else
 		{
-			toolTipState.showToolTip = false;
+			this.tool.props.toolTip.hide();
 		}
-
-		this.tool.props.toolTip.setState(toolTipState);
 	}
 
 	handleOutEvent(event:MouseEvent)
@@ -129,8 +121,6 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 				keySet.clearKeys();
 		}
 
-		let toolTipState: IToolTipState = {};
-		toolTipState.showToolTip = false;
-		this.tool.props.toolTip.setState(toolTipState);
+		this.tool.props.toolTip.hide();
 	}
 }

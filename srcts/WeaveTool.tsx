@@ -23,8 +23,6 @@ import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
 import {REACT_COMPONENT} from "./react-ui/Menu";
 import PopupWindow from "./react-ui/PopupWindow";
 
-declare type IToolTip = React.Component<IToolTipProps, IToolTipState>;
-
 const grabberStyle:CSSProperties = {
 	width: "16",
 	height: "16",
@@ -53,7 +51,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	private toolPath:WeavePath;
 	
 	private tool:IVisTool;
-	private toolTip:IToolTip;
+	private toolTip:ToolTip;
 	private titleBarHeight: number;
 	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
 	
@@ -141,7 +139,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 					}}
 					onMouseLeave={() => {
 						this.titleBar.setState({ showControls: false });
-						this.toolTip.setState({ showToolTip: false });
+						this.toolTip.hide();
 					}}
 					onDragOver={this.props.onDragOver}
 					onDragEnd={this.props.onDragEnd}>

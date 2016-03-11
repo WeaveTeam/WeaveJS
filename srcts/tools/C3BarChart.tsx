@@ -253,32 +253,25 @@ export default class C3BarChart extends AbstractC3Tool
 		var record:Record = this.records[d.index];
 		var qKey:IQualifiedKey = this.records[d.index].id;
 
-		var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, [qKey]);
 		var columnNamesToColor:{[columnName:string] : string} = {};
 		var columns = this.heightColumns.getObjects(IAttributeColumn);
 		for (var index in columns)
 		{
 			var column = columns[index]; 
 			var columnName:string = column.getMetadata("title");
-			columnNamesToValue[columnName] = column.getValueFromKey(qKey, String);
-			// columnNamesToColor can be done only on heightColumns change.
 			columnNamesToColor[columnName] = this.chartColors.getHexColor(Number(index), 0, columns.length - 1);
 		}
 
-        var title:string = record.stringValues.xLabel;
-		
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([qKey]);
 		
 		if (this.props.toolTip)
-            this.props.toolTip.setState({
-                x: this.chart.internal.d3.event.pageX,
-                y: this.chart.internal.d3.event.pageY,
-                showToolTip: true,
-                title: title,
-                columnNamesToValue: columnNamesToValue,
-                columnNamesToColor: columnNamesToColor
-            });
+		{
+			var heightColumns = this.heightColumns.getObjects(IAttributeColumn);
+            this.props.toolTip.show(this, this.chart.internal.d3.event, [qKey], heightColumns);
+			if (heightColumns.length > 1)
+				this.props.toolTip.setState({columnNamesToColor});
+		}
 	}
 
     private dataChanged():void

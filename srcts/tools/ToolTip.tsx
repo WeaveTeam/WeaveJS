@@ -199,37 +199,60 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 	                    </tbody>
 	                </table>
                 </div>
-            )
+            );
         }
     }
 
-	static getToolTipData(context:ILinkableObject, keys:IQualifiedKey[], additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
+	show(context:ILinkableObject, event:MouseEvent, keys:IQualifiedKey[], additionalColumns:IAttributeColumn[]):void
 	{
-		let columnHashMap = Weave.getRoot(context).getObject("Probed Columns") as ILinkableHashMap;
-		let columns = columnHashMap? columnHashMap.getObjects(IAttributeColumn) : [] as IAttributeColumn[];
-		var result:{[columnName: string]: string} = {};
-
-		for (let child of columns.concat(additionalColumns))
-		{
-			let title:string = child.getMetadata("title");
-			let value:string = child.getValueFromKey(keys[0], String);
-			if (value)
-			{
-				result[title] = value;
-			}
-		}
-
-		//handle remaining keys
-		if(keys.length > 1 && columns.length > 0)
-			result["("+ keys.length + " records total, 1 shown)"] = null;
-		return result;
+		if (keys.length == 0)
+			return this.hide();
+		
+		this.setState({
+			x: event.clientX,
+			y: event.clientY,
+			showToolTip: true,
+			title: ToolTip.getToolTipTitle(context, keys),
+			columnNamesToValue: ToolTip.getToolTipData(context, keys, additionalColumns),
+			columnNamesToColor: {}
+		});
 	}
-	
-	static getToolTipTitle(context:ILinkableObject, key:IQualifiedKey):string
+
+	hide():void
+	{
+		this.setState({ showToolTip: false });
+	}
+
+	private static getToolTipTitle(context:ILinkableObject, keys:IQualifiedKey[]):string
 	{
 		let titleHashMap = Weave.getRoot(context).getObject("Probe Header Columns") as ILinkableHashMap;
 		let columns = titleHashMap ? titleHashMap.getObjects(IAttributeColumn) : [] as IAttributeColumn[];
 
-		return _.map(columns, column => column.getValueFromKey(key, String)).join(", ");
+		return _.map(columns, column => column.getValueFromKey(keys[0], String)).filter(str => !!str).join(", ");
+	}
+
+	private static getToolTipData(context:ILinkableObject, keys:IQualifiedKey[], additionalColumns:IAttributeColumn[] = []): { [columnName: string]: string }
+	{
+		let columnHashMap = Weave.getRoot(context).getObject("Probed Columns") as ILinkableHashMap;
+		let columns = columnHashMap ? columnHashMap.getObjects(IAttributeColumn).concat(additionalColumns) : additionalColumns;
+		var result:{[columnName: string]: string} = {};
+
+		for (let child of columns)
+		{
+			let title:string = child.getMetadata("title");
+			let value:string = child.getValueFromKey(keys[0], String);
+			if (value)
+				result[title] = value;
+		}
+
+		//handle remaining keys
+		if (keys.length > 1)
+		{
+			let str = keys.length + " records total";
+			if (columns.length > 0)
+				str += ", 1 shown";
+			result["(" + str + ")"] = null;
+		}
+		return result;
 	}
 }

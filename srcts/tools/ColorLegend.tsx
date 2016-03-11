@@ -133,30 +133,21 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		}
 	}
 
-	handleProbe(bin:number, mouseOver:boolean, event:React.MouseEvent):void
+	handleProbe(bin:number, mouseOver:boolean, event:MouseEvent):void
 	{
 		if (mouseOver)
 		{
-			var _binnedKeysArray:IQualifiedKey[][] = (this.binnedColumn as any)['_binnedKeysArray'];
-			var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, _binnedKeysArray[bin]);
-			this.probeKeySet.replaceKeys(_binnedKeysArray[bin]);
-			if (this.props.toolTip && !this.props.toolTip.state.showToolTip && _binnedKeysArray[bin].length)
-				this.props.toolTip.setState({
-					x: event.pageX,
-					y: event.pageY,
-					showToolTip: true,
-					title: this.panelTitle.value,
-					columnNamesToValue: columnNamesToValue
-				});
+			var keys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(bin);
+			if (!keys)
+				return;
+			this.probeKeySet.replaceKeys(keys);
 		}
 		else
 		{
 			this.probeKeySet.replaceKeys([]);
-			if (this.props.toolTip && this.props.toolTip.state.showToolTip)
-				this.props.toolTip.setState({
-					showToolTip: false
-				});
 		}
+		if (this.props.toolTip)
+			this.props.toolTip.show(this, event, this.probeKeySet.keys, [this.binnedColumn.internalDynamicColumn]);
 	}
 
 	componentDidMount()

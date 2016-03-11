@@ -106,26 +106,9 @@ export default class C3Histogram extends AbstractC3Tool
                         var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
                         if (!keys)
                             return;
-                        var columnNamesToValue:{[columnName:string] : string} = {};
-                        var toolTipData:{[columnName:string]: string} = ToolTip.getToolTipData(this, keys);
-                        let binTitle:string = this.getLabelString(d.index);
-                        let binValue:string = FormatUtils.defaultNumberFormatting(this.histData[d.index]["height"]) as string;
-                        if(Object.keys(toolTipData).length) {
-                            columnNamesToValue[binTitle] = binValue;
-                            columnNamesToValue = _.merge(columnNamesToValue, toolTipData) as {[columnName:string]: string};
-                        } else {
-                            columnNamesToValue[String(keys.length) + " Records"] = this.aggregationMethod.value;
-                            columnNamesToValue[binTitle] = binValue;
-                        }
                         this.probeKeySet.replaceKeys(keys);
                         if (this.props.toolTip)
-	                        this.props.toolTip.setState({
-	                            x: this.chart.internal.d3.event.pageX,
-	                            y: this.chart.internal.d3.event.pageY,
-	                            showToolTip: true,
-	                            title: this.columnToAggregate.getMetadata('title'),
-	                            columnNamesToValue: columnNamesToValue
-	                        });
+	                        this.props.toolTip.show(this, this.chart.internal.d3.event, keys, [this.binnedColumn, this.columnToAggregate]);
                     }
                 }
             },

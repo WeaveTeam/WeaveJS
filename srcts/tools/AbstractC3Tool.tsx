@@ -199,9 +199,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisT
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([]);
 		if (this.props.toolTip)
-			this.props.toolTip.setState({
-				showToolTip: false
-			});
+			this.props.toolTip.hide();
 	}
 
 	/**
