@@ -44,6 +44,7 @@ export
     C3BarChart,
     C3ScatterPlot,
     ColorLegend,
+	BarChartLegend,
     C3LineChart,
     C3PieChart,
     C3Histogram,
