@@ -5,6 +5,7 @@ import FileInput from "./react-ui/FileInput";
 import PopupWindow from "./react-ui/PopupWindow";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import FileMenu from "./menus/FileMenu";
+import DataMenu from './menus/DataMenu';
 
 export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar> {
 	weave:Weave
@@ -65,7 +66,7 @@ function weaveMenu(weave:Weave)
 	};
 }
 
-function dataMenu(weave:Weave) 
+/*function dataMenu(weave:Weave)
 {
 	return {
 		label: "Data",
@@ -82,22 +83,24 @@ function dataMenu(weave:Weave)
 			}
 		]
 	};
-}
+}*/
 
 export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
 {
 	fileMenu:FileMenu;
+	dataMenu:DataMenu;
 	constructor(props:WeaveMenuBarProps)
 	{
 		super(props);
 		this.fileMenu = new FileMenu(props.weave);
+		this.dataMenu = new DataMenu(props.weave);
 	}
 	
 	render():JSX.Element
 	{
         var weave = this.props.weave;
 		return (
-			<MenuBar config={[weaveMenu(weave), this.fileMenu, dataMenu(weave)]}/>
+			<MenuBar config={[weaveMenu(weave), this.fileMenu, this.dataMenu]}/>
 		);
 	}
 }
