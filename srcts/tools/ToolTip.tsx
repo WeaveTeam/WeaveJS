@@ -80,7 +80,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             var rect:ClientRect = container.getBoundingClientRect();
             var left: number = Math.round(window.pageXOffset + rect.left);
             var top: number = Math.round(window.pageYOffset + rect.top);
-            if (!(window.innerHeight < this.element.clientHeight))
+            if (window.innerHeight > this.element.clientHeight)
             {
                 var bottomOverflow:number = top + this.element.offsetTop + this.element.offsetHeight - window.innerHeight;
                 if (bottomOverflow > 0)
@@ -88,7 +88,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
                     this.forceUpdate();
                 }
             }
-            if (!(window.innerWidth < this.element.clientWidth))
+            if (window.innerWidth > this.element.clientWidth)
             {
                 if (weavejs.WeaveAPI.Locale.reverseLayout)
                 {
@@ -120,7 +120,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 
         if (!(this.element && this.state.showToolTip))
         {
-            return <div ref={(c:HTMLElement) => { this.element = c }}></div>;
+            return <div ref={(c:HTMLElement) => { this.element = c }} style={{width: 0, height: 0}}></div>;
         }
         else
         {
@@ -137,7 +137,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 
             var bottomOverflow:number = this.state.y + this.toolTipOffset + this.element.offsetHeight - window.innerHeight;
             style.top = yPos;
-            if (!((top + container.clientHeight) < this.element.clientHeight))
+            if (top + container.clientHeight > this.element.clientHeight)
             {
                 if (bottomOverflow > 0)
                 {
@@ -157,7 +157,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
             else
             {
                 var rightOverflow:number = this.state.x + this.toolTipOffset + this.element.offsetWidth - window.innerWidth;
-                if (!((left + container.clientWidth) < this.element.clientWidth))
+                if (left + container.clientWidth > this.element.clientWidth)
                 {
                     if (rightOverflow > 0)
                     {
@@ -188,16 +188,16 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 
             return (
                 <div style={style} ref={(c:HTMLElement) => { this.element = c }} className={this.toolTipContainerClass}>
-                <table className={this.toolTipClass}>
-                    <tbody>
-                        {
-                            <tr><th colSpan={2}>{this.state.title ? this.titleFormat(Weave.lang(this.state.title)): ""}</th></tr>
-                        }
-                        {
-                            tableRows
-                        }
-                    </tbody>
-                </table>
+	                <table className={this.toolTipClass}>
+	                    <tbody>
+	                        {
+	                            <tr><th colSpan={2}>{this.state.title ? this.titleFormat(Weave.lang(this.state.title)): ""}</th></tr>
+	                        }
+	                        {
+	                            tableRows
+	                        }
+	                    </tbody>
+	                </table>
                 </div>
             )
         }
