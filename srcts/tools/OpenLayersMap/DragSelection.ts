@@ -55,7 +55,7 @@ export default class DragSelection extends ol.interaction.DragBox
 				AbstractVisTool.handlePointClick(probeLayer, event);
 				return false;
 			}
-			else if (event.ctrlKey )
+			else if (this.mode === DragSelectionMode.SET)
 			{
 				/* Clear all the selection keysets */
 				for (let weaveLayer of tool.layers.getObjects() as AbstractFeatureLayer[])
