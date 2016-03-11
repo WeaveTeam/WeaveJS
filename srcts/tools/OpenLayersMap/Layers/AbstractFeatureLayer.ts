@@ -145,6 +145,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	static toColorRGBA(colorString:any, alpha:any)
 	{
 		var colorArray = AbstractFeatureLayer.toColorArray(colorString, alpha);
+		if (!colorArray)
+			colorArray = [0, 0, 0, 0];
 		return ol.color.asString(colorArray);
 	}
 
