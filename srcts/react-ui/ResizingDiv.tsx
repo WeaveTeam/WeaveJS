@@ -1,5 +1,7 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
+import ReactUtils from "../utils/ReactUtils";
 
 export interface ResizingDivProps extends React.HTMLProps<ResizingDiv>
 {
@@ -22,12 +24,13 @@ export default class ResizingDiv extends React.Component<ResizingDivProps, Resiz
 
 	componentDidMount()
 	{
+		this.outerDiv = ReactDOM.findDOMNode(this) as HTMLDivElement;
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
 	}
 
 	handleFrame()
 	{
-		this.setState({
+		ReactUtils.updateState(this, {
 			width: this.outerDiv.offsetWidth,
 			height: this.outerDiv.offsetHeight
 		});
@@ -46,10 +49,11 @@ export default class ResizingDiv extends React.Component<ResizingDivProps, Resiz
 	
 	render()
 	{
-		var style:Object = _.merge({flex: 1}, this.props.style, {overflow: 'hidden'})
+		var outerStyle:React.CSSProperties = _.merge({flex: 1}, this.props.style, {overflow: 'hidden'});
+		var innerStyle:React.CSSProperties = this.state;
 		return (
-			<div ref={(div:HTMLDivElement) => this.outerDiv = div as any} {...this.props as any} style={style}>
-				<div style={{width: this.state.width, height: this.state.height}}>
+			<div {...this.props as any} style={outerStyle}>
+				<div style={innerStyle}>
 					{ this.props.children }
 				</div>
 			</div>

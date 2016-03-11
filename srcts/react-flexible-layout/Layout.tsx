@@ -60,7 +60,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 	componentWillReceiveProps(nextProps:LayoutProps):void
 	{
-		this.setState(ReactUtils.includeMissingPropertyPlaceholders(this.state, nextProps.state));
+		ReactUtils.replaceState(this, nextProps.state);
 	}
 
 	componentWillUnmount():void
