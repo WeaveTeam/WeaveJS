@@ -101,7 +101,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		if (key)
 		{
 			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
-			this.tool.props.toolTip.show(this, browserEvent, [key], this.topLayer.getToolTipColumns());
+			this.tool.props.toolTip.show(this.tool, browserEvent, [key], this.topLayer.getToolTipColumns());
 		}
 		else
 		{
