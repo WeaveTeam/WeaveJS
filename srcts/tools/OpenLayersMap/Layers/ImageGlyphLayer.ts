@@ -80,11 +80,11 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 			let icon:any;
 			if (stylePrefix === "probed")
 			{
-				icon = new ol.style.Icon({img, imgSize, scale: scale * 2.0});
+				icon = new ol.style.Icon({snapToPixel: true, img, imgSize, scale: scale * 2.0});
 			}
 			else
 			{
-				icon = new ol.style.Icon({img, imgSize, scale});
+				icon = new ol.style.Icon({snapToPixel: true, img, imgSize, scale});
 			}
 
 			if (stylePrefix === "unselected")
