@@ -10,6 +10,7 @@ import {ChartAPI, ChartConfiguration} from "c3";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
+import * as _ from "lodash";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import LinkableTextField from "../ui/LinkableTextField";
@@ -233,5 +234,41 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 				}
 			}
 		};
+	}
+
+	static handlePointClick(toolGroup: VisToolGroup, event: MouseEvent): void {
+
+		let probeKeySet = toolGroup.probeFilter.target as KeySet;
+		let selectionKeySet = toolGroup.selectionFilter.target as KeySet;
+
+		if (!(probeKeySet instanceof KeySet) || !(selectionKeySet instanceof KeySet))
+			return;
+
+        var probeKeys: IQualifiedKey[] = probeKeySet.keys;
+		if (!probeKeys.length) {
+			selectionKeySet.clearKeys();
+			return;
+		}
+
+		var isSelected = false;
+		for (var key of probeKeys) {
+			if (selectionKeySet.containsKey(key)) {
+				isSelected = true;
+				break;
+			}
+		}
+		if (event.ctrlKey || event.metaKey) {
+			if (isSelected)
+				selectionKeySet.removeKeys(probeKeys);
+			else
+				selectionKeySet.addKeys(probeKeys);
+		}
+		else {
+			//Todo: needs to be more efficient check
+			if (_.isEqual(selectionKeySet.keys.sort(), probeKeys.sort()))
+				selectionKeySet.clearKeys();
+			else
+				selectionKeySet.replaceKeys(probeKeys);
+		}
 	}
 }

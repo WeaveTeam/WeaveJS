@@ -211,44 +211,6 @@ export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisT
 		return forced;
 	}
 	
-	handlePointClick(event:MouseEvent):void
-	{
-		if (!this.probeKeySet || !this.selectionKeySet)
-			return;
-
-        var probeKeys:IQualifiedKey[] = this.probeKeySet.keys;
-		if (!probeKeys.length)
-		{
-			this.selectionKeySet.clearKeys();
-			return;
-		}
-		
-		var isSelected = false;
-		for (var key of probeKeys)
-		{
-			if (this.selectionKeySet.containsKey(key))
-			{
-				isSelected = true;
-				break;
-			}
-		}
-		if (event.ctrlKey || event.metaKey)
-		{
-			if (isSelected)
-				this.selectionKeySet.removeKeys(probeKeys);
-			else
-				this.selectionKeySet.addKeys(probeKeys);
-		}
-		else
-		{
-			//Todo: needs to be more efficient check
-			if (_.isEqual(this.selectionKeySet.keys.sort(), probeKeys.sort()))
-				this.selectionKeySet.clearKeys();
-			else
-				this.selectionKeySet.replaceKeys(probeKeys);
-		}
-	}
-	
     get internalWidth():number
     {
         return this.c3Config.size.width - this.c3Config.padding.left - this.c3Config.padding.right;
@@ -300,6 +262,11 @@ export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisT
 			this.c3Config.axis.y2.min = yMin;
         	this.c3Config.axis.y2.max = yMax;
 		}
+	}
+
+	protected handlePointClick(event:MouseEvent)
+	{
+		AbstractVisTool.handlePointClick(this, event);
 	}
 	
     private cullAxis(axisSize:number, axisClass:AxisClass):void
