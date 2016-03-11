@@ -43,7 +43,7 @@ else
 			client_id: CLIENT_ID,
 			state: urlParams.driveFileId,
 			redirect_uri: window.location.protocol+"//"+window.location.hostname+window.location.pathname,
-			scope: "https://www.googleapis.com/auth/drive.readonly"
+			scope: "https://www.googleapis.com/auth/drive.readonly https://www.googleapis.com/auth/plus.me"
 		});
 
 		window.location.replace("https://accounts.google.com/o/oauth2/v2/auth?" + params);
@@ -65,6 +65,20 @@ else
 		}
 
 		req.send();
+
+		window.location.hash = "";
+		var nreq = new XMLHttpRequest();
+		nreq.open("GET", "https://www.googleapis.com/plus/v1/people/me");
+		nreq.setRequestHeader("Authorization", hashParams.token_type + " " + hashParams.access_token);
+
+		nreq.onreadystatechange = function() {
+			if (nreq.readyState == XMLHttpRequest.DONE)
+			{
+				console.log(JSON.parse(nreq.response));
+			}
+		}
+
+		nreq.send();
 	}
 	else
 	{
