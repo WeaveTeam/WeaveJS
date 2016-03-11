@@ -513,6 +513,10 @@ declare module olx {
             zoomDuration?: number;
         }
 
+        interface InteractionOptions {
+            handleEvent: (event: ol.MapBrowserEvent) => boolean;
+        }
+
         interface PointerOptions {
             handleDownEvent?:Function;
             handleDragEvent?:Function;
@@ -1695,7 +1699,7 @@ declare module ol {
          * @param ref2 Value to use as this when executing layerFilter.
          * @returns Callback result, i.e. the return value of last callback execution, or the first truthy callback return value.
          */
-        forEachLayerAtPixel(pixel: ol.Pixel, callback: (layer: ol.layer.Layer) => any, ref?: any, layerFilter?: (layerCandidate: ol.layer.Layer) => boolean, ref2?: any): void;
+        forEachLayerAtPixel(pixel: ol.Pixel, callback: (layer: ol.layer.Layer) => any, ref?: any, layerFilter?: (layerCandidate: ol.layer.Layer) => boolean, ref2?: any): any;
 
         /**
          * Get the map controls. Modifying this collection changes the controls associated with the map.
@@ -3567,6 +3571,7 @@ declare module ol {
         }
 
         class Interaction extends ol.Object {
+            constructor(opt_options?: olx.interaction.InteractionOptions);
             setActive(active:boolean):void;
             getActive():boolean;
             getMap(): ol.Map;
