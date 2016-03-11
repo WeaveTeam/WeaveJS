@@ -172,10 +172,6 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 			userSelect: "none",
 			flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
 		};
-		if (this.state.direction === HORIZONTAL)
-			style.height = "100%";
-		else
-			style.width = "100%";
 		return VendorPrefix.prefix({styles: style}).styles;
 	}
 

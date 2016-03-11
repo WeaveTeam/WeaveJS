@@ -83,7 +83,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			whiteSpace: "nowrap"
 		};
 		this.textStyle = {
-			width:"100%",
 			flex:0.8,
 			alignItems:"center",
 			justifyContent:"flex-start",
@@ -178,7 +177,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			borderAlpha = 0;
 		
 		return {
-			width: "100%",
 			flex: 1.0,
 			borderColor: MiscUtils.rgba(0, 0, 0, borderAlpha),
 			borderStyle: "solid",
@@ -262,7 +260,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 											<ui.HBox style={this.textStyle}>
 												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
 											</ui.HBox>:null}
-											<ui.HBox style={{width:"100%", flex:0.2, minWidth:10, padding:"0px 0px 0px 0px"}}>
+											<ui.HBox style={{flex:0.2, minWidth:10, padding:"0px 0px 0px 0px"}}>
 												<svg viewBox="0 0 100 100" width="100%">
 													{
 														shapeElement
@@ -306,7 +304,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 									element.push(
 										<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
 											<ui.HBox style={{
-												width:"100%", flex:1.0,
+												flex:1.0,
 												alignItems:"center",
 												justifyContent:"center",
 												backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 1.0)
@@ -343,12 +341,12 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			return (
 				<ui.VBox style={{flex: 1, padding: "0px 5px 0px 5px", overflow: "hidden"}} ref={(vbox:VBox) => this.element = ReactDOM.findDOMNode(vbox) as HTMLElement}>
 					{this.showLegendName.value ?
-						<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
+						<ui.HBox style={{flex: 0.1, alignItems:"center"}}>
 							<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
 						</ui.HBox>
 						: null
 					}
-					<ui.HBox style={{width:"100%", flex: 0.9}}> { finalElements } </ui.HBox>
+					<ui.HBox style={{flex: 0.9}}> { finalElements } </ui.HBox>
 				</ui.VBox>
 			);
 		}

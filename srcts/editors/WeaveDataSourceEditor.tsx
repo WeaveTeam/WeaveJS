@@ -71,7 +71,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 
 		let margins: React.CSSProperties = { marginLeft: "0.5em", marginRight: "0.5em" };
 
-		return <ui.VBox style={{ width: "100%", height: "100%" }}>
+		return <ui.VBox style={{ flex: 1 }}>
 					<label>{Weave.lang("Source display name") }
 						<LinkableTextField style={margins}/>
 					</label>

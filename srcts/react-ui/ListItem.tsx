@@ -157,16 +157,8 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
 
     render():JSX.Element
     {
-        var spanStyle:React.CSSProperties = {
-            width:"100%",
-            height:"100%",
-            userSelect: "none"
-        }
-
-        spanStyle = Prefixer.prefix({styles: spanStyle}).styles;
-
         return (
-            <div style={{height: "100%", width: "100%", overflow: "auto"}}>
+            <div style={{flex: 1, overflow: "auto"}}>
                 {
                     this.values.map((value:any, index:number) => {
                         var hovered:boolean = this.state.hovered == index;
@@ -194,7 +186,7 @@ export default class ListItem extends React.Component<IListItemProps, IListItems
 
                         return (
                             <HBox key={index} style={style} onMouseOver={(event:React.MouseEvent) => { this.setState({hovered: index}) }} onClick={this.handleChange.bind(this, value)}>
-                               <span style={spanStyle}>{this.labels[index] || value}</span>
+                               <span style={{flex: 1}}>{this.labels[index] || value}</span>
                             </HBox>
                         );
                     })

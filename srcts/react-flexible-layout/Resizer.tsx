@@ -19,13 +19,11 @@ const STYLE_BASE = {
 };
 
 const STYLE_HORIZONTAL = _.merge({
-    cursor: "col-resize",
-    height: "100%"
+    cursor: "col-resize"
 }, STYLE_BASE);
 
 const STYLE_VERTICAL = _.merge({
-    cursor: "row-resize",
-    width: "100%",
+    cursor: "row-resize"
 }, STYLE_BASE);
 
 export interface IResizerProps extends React.Props<Resizer>

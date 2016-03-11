@@ -80,18 +80,18 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 				return <ui.ListItem options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 				
 			case LAYOUT_HSLIDER:
-				return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
+				return <ui.HBox style={{flex: 1, alignItems:"center", padding: 10}}>
 							<ui.HSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 						</ui.HBox>;
 			
 			case LAYOUT_VSLIDER:
-				return <ui.VBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
+				return <ui.VBox style={{flex: 1, alignItems:"center", padding: 10}}>
 							<ui.VSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 						</ui.VBox>;
 				
 			case LAYOUT_COMBO:
-				return <ui.VBox style={{height:"100%", alignItems:"center"}}>
-							<select style={{width:"100%", flex:1, padding: 5}} value={values && values.length ? values[0] : ""} onChange={(event:React.FormEvent) => { this.onChange([(event.target as any).value]) }} placeholder="Selected filter value...">
+				return <ui.VBox style={{flex: 1, alignItems:"center"}}>
+							<select style={{flex:1, padding: 5}} value={values && values.length ? values[0] : ""} onChange={(event:React.FormEvent) => { this.onChange([(event.target as any).value]) }} placeholder="Selected filter value...">
 								{
 									this.options.map((option:FilterOption, index:number) => {
 										// TODO non efficient.. needs to be fixed with external bound function

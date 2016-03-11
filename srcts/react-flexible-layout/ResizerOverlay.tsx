@@ -24,14 +24,12 @@ const THICKNESS = 4;
 
 const STYLE_HORIZONTAL = _.merge({
     width: THICKNESS + "px",
-    cursor: "col-resize",
-    height: "100%"
+    cursor: "col-resize"
 }, STYLE_BASE);
 
 const STYLE_VERTICAL = _.merge({
     height: THICKNESS + "px",
-    cursor: "row-resize",
-    width: "100%"
+    cursor: "row-resize"
 }, STYLE_BASE);
 
 export interface IResizerOverlayProps extends React.Props<ResizerOverlay>

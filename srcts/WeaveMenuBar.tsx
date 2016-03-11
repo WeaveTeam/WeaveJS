@@ -97,7 +97,7 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	{
         var weave = this.props.weave;
 		return (
-			<MenuBar style={{width: "100%"}} config={[weaveMenu(weave), this.fileMenu, dataMenu(weave)]}/>
+			<MenuBar config={[weaveMenu(weave), this.fileMenu, dataMenu(weave)]}/>
 		);
 	}
 }

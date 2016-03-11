@@ -119,7 +119,7 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
         var labelPosition:string = this.props.labelPosition || "right";
 
         return (
-            <div style={{height: "100%", width: "100%", alignItems: "center", overflow: "auto"}}>
+            <div style={{flex: 1, alignItems: "center", overflow: "auto"}}>
                 {
                     this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
                         var checkboxItem:JSX.Element[] = [

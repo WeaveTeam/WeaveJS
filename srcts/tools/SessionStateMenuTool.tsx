@@ -12,16 +12,12 @@ import {ListGroupItem, ListGroup, DropdownButton, MenuItem} from "react-bootstra
 import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
+import ResizingDiv from "../react-ui/ResizingDiv";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableString = weavejs.core.LinkableString;
-
-//TODO: This is a hack to allow react to be imported in generated JSX. Without this, import is missing and render encounters an exception
-var stub:any = React;
-const sessionStateMenuStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column", overflow:"auto"};
-const sessionStateComboBoxStyle:CSSProperties = {display:"flex", flex:1, height:"100%", flexDirection:"column"};
 
 export default class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState>
 {
@@ -56,7 +52,7 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 		if (!states)
 			return;
 
-//		this.targets.delayCallbacks();
+		this.targets.delayCallbacks();
 
 		for (let wrapper of this.targets.getObjects(LinkableDynamicObject))
 		{
@@ -68,7 +64,7 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 				Weave.setState(wrapper.target, states[name]);
 		}
 
-//		this.targets.resumeCallbacks();
+		this.targets.resumeCallbacks();
 	}
 
 	choiceChanged()
@@ -87,43 +83,38 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 
 	render()
 	{
-
-		let isComboBox: boolean = this.layoutMode.value === "ComboBox";
-		var menus:JSX.Element[] = this.choices.getNames().map((choice:string, index:number) => {
-			if (isComboBox)
-			{
-				return choice === this.selectedChoice.value ? <MenuItem active key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>
-				: <MenuItem key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>;
-			}
-			else
-			{
-				return choice === this.selectedChoice.value ? <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>
-				: <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
-			}
-		});
-
-		var container:JSX.Element;
-
-		if (isComboBox)
+		if (this.layoutMode.value === "ComboBox")
 		{
-			container =
-			<ui.VBox style={{height:"100%", flex:1.0, alignItems:"center"}}>
-				<DropdownButton title={this.selectedChoice.value} id={`dropdown-${Weave.className(this)}`}>
-					{menus}
-				</DropdownButton>
-			</ui.VBox>
+			return (
+				<ui.VBox style={{flex:1.0, alignItems: "center"}}>
+					<DropdownButton title={this.selectedChoice.value} id={`dropdown-${Weave.className(this)}`}>
+						{
+							this.choices.getNames().map((choice:string, index:number) => {
+								if (choice === this.selectedChoice.value)
+									return <MenuItem active key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>;
+								return <MenuItem key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>;
+							})
+						}
+					</DropdownButton>
+				</ui.VBox>
+			);
 		}
 		else
 		{
-			container =
-			<ListGroup>
-				{menus}
-			</ListGroup>
+			return (
+				<ResizingDiv>
+					<ListGroup>
+						{
+							this.choices.getNames().map((choice:string, index:number) => {
+								if (choice === this.selectedChoice.value)
+									return <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
+								return <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
+							})
+						}
+					</ListGroup>
+				</ResizingDiv>
+			);
 		}
-
-		return (<div style={isComboBox ? sessionStateComboBoxStyle : sessionStateMenuStyle}>
-				{container}
-				</div>);
 	}
 }
 

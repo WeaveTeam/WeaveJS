@@ -183,7 +183,6 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 	render()
 	{
 		var windowBar:CSSProperties = {
-			width: "100%",
 			height: this.props.titleBarHeight,
 			backgroundColor: this.state.showControls ? "#f8f8f8": ""
 		};

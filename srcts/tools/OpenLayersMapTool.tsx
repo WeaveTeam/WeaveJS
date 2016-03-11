@@ -34,7 +34,7 @@ import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 import {MenuItemProps} from "../react-ui/Menu";
 import AbstractVisTool from "./AbstractVisTool";
 import {OverrideBounds} from "./AbstractVisTool";
-import ResizingDiv from "../ui/ResizingDiv";
+import ResizingDiv from "../react-ui/ResizingDiv";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ZoomBounds = weavejs.geom.ZoomBounds;

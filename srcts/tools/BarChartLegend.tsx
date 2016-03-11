@@ -27,7 +27,7 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 
-export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
+export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties
 {
 	chartColors = Weave.linkableChild(this, ColorRamp);
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
@@ -57,28 +57,6 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 		this.spanStyle = {textAlign:"left", verticalAlign:"middle", overflow:"hidden", whiteSpace:"nowrap", textOverflow:"ellipsis", paddingLeft:5, userSelect:"none"};
 	}
 
-	get deprecatedStateMapping()
-	{
-		return {
-			"children": {
-				"visualization": {
-					"plotManager": {
-						"plotters": {
-							"plot": {
-								"filteredKeySet": this.filteredKeySet,
-								"chartColors": this.chartColors,
-								//"maxColumns": this.maxColumns,
-								"columns": this.columns,
-								"shapeSize": this.shapeSize
-							}
-						}
-					}
-				}
-			},
-			"panelTitle": this.panelTitle
-		};
-	}
-
 	get title():string
 	{
 		return this.panelTitle.value ? this.panelTitle.value : Weave.getRoot(this).getName(this);
@@ -97,7 +75,6 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 	getInteractionStyle(bin:number):CSSProperties 
 	{
 		var selectedStyle:CSSProperties = {
-			width:"100%",
 			flex:1.0,
 			borderWidth:0,
 			borderColor:"black",
@@ -135,7 +112,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 										<rect x={0} y={10} height="80%" width={shapeSize} style={{fill: this.chartColors.getHexColor(i, 0, labels.length - 1), stroke:"black", strokeOpacity:0.5}}></rect>
 									</svg>
 								</ui.HBox>
-								<ui.HBox style={{width:"100%", flex:0.8, alignItems:"center"}}>
+								<ui.HBox style={{flex:0.8, alignItems:"center"}}>
 									<span style={prefixerStyle}>{Weave.lang(labels[i])}</span>
 								</ui.HBox>
 							</ui.HBox>
@@ -144,7 +121,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 					else
 					{
 						element.push(
-							<ui.HBox key={i} style={{width: "100%", flex: 1.0}}/>
+							<ui.HBox key={i} style={{flex: 1.0}}/>
 						);
 					}
 				}
@@ -152,13 +129,13 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 
 //			if (this.props.style.width > this.props.style.height * 2)
 //				elements.push(
-//					<ui.HBox key={i} style={{width: "100%", flex: columnFlex}}>
+//					<ui.HBox key={i} style={{flex: columnFlex}}>
 //						{ element }
 //					</ui.HBox>
 //				)
 //			else
 				elements.push(
-					<ui.VBox key={i} style={{height: "100%", flex: columnFlex}}>
+					<ui.VBox key={i} style={{flex: columnFlex}}>
 						{ element }
 					</ui.VBox>
 				);
@@ -166,24 +143,46 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 			finalElements[j] = elements;
 		}
 
-		return (<div style={{width:"100%", height:"100%", padding:"0px 5px 0px 5px"}}>
-			<ui.VBox style={{height:"100%",flex: 1.0, overflow:"hidden"}}>
-				<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
+		return (<div style={{flex: 1, padding:"0px 5px 0px 5px"}}>
+			<ui.VBox style={{flex: 1.0, overflow:"hidden"}}>
+				<ui.HBox style={{flex: 0.1, alignItems:"center"}}>
 					<span style={prefixerStyle}>Bar color</span>
 				</ui.HBox>
 				{
 //					this.props.style.width > this.props.style.height * 2
 //					?
-//						<ui.HBox style={{width:"100%", flex: 0.9}}>
+//						<ui.HBox style={{flex: 0.9}}>
 //							{ finalElements }
 //						</ui.HBox>
 //					:
-						<ui.VBox style={{height:"100%", flex: 0.9}}>
+						<ui.VBox style={{flex: 0.9}}>
 							{ finalElements }
 						</ui.VBox>
 					}
 			</ui.VBox>
 		</div>);
+	}
+
+	get deprecatedStateMapping()
+	{
+		return {
+			"children": {
+				"visualization": {
+					"plotManager": {
+						"plotters": {
+							"plot": {
+								"filteredKeySet": this.filteredKeySet,
+								"chartColors": this.chartColors,
+								//"maxColumns": this.maxColumns,
+								"columns": this.columns,
+								"shapeSize": this.shapeSize
+							}
+						}
+					}
+				}
+			},
+			"panelTitle": this.panelTitle
+		};
 	}
 }
 

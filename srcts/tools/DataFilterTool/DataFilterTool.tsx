@@ -102,7 +102,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		
 		//<ui.ListItem options={this.listItemOptions} onChange={this.handleEditorTypeChange.bind(this)} selectedValues={[editorClass]}/>
 		return (
-			<ui.VBox style={{width: "100%", height: "100%"}}>
+			<ui.VBox style={{flex: 1}}>
 				{
 					editor
 				}
