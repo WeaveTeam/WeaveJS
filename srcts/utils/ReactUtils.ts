@@ -25,9 +25,6 @@ export default class ReactUtils
 	
 	static onUnmount<T extends ReactComponent>(component:T, callback:(component:T)=>void):void
 	{
-		if (ReactDOM.findDOMNode(component) == null)
-			return callback(component);
-		
 		// add listener to replace instance with placeholder when it is unmounted
 		var superWillUnmount = component.componentWillUnmount;
 		component.componentWillUnmount = function() {
