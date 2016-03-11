@@ -119,13 +119,13 @@ export default class RCSlider extends React.Component<any, any>
                            max={this.options.length ? this.options.length - 1 : 0}
                            step={null}
                            marks={this.indexToLabel}
-                           value={this.valueToIndex.get(this.props.selectedValues[0])}
+                           value={this.valueToIndex.get((this.props.selectedValues || [])[0])}
                            onChange={this.onChange}
                     />;
 
         }
 
-		var value:{ min:number, max:number } = Object(this.props.selectedValues[0]);
+		var value:{ min:number, max:number } = Object((this.props.selectedValues || [])[0]);
 		
         if (this.props.type == RCSlider.NUMERIC)
         {
