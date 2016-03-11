@@ -33,17 +33,26 @@ export function unlinkReactState(component:ReactComponent):void
 		(component.componentWillUpdate as any)[UNLINK]();
 }
 
-export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(c:ReactComponent)=>void
+export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(component:ReactComponent)=>void
 {
-	return (c:ReactComponent) => {
-		linkReactState(context, c, mapping, delay);
+	var prevComponent:ReactComponent;
+	return function(component:ReactComponent):void {
+		if (component)
+		{
+			linkReactState(context, component, mapping, delay);
+		}
+		else if (prevComponent)
+		{
+			unlinkReactState(prevComponent);
+		}
+		prevComponent = component;
 	};
 }
 
 export function linkReactState(context:ILinkableObject, component:ReactComponent, mapping:LinkReactStateMapping, delay:number = 0)
 {
 	if (!component)
-		return;
+		throw new Error("linkReactState(): component cannot be null");
 	
 	unlinkReactState(component);
 	
