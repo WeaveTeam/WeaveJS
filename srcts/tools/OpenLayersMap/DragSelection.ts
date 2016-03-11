@@ -22,13 +22,11 @@ export default class DragSelection extends ol.interaction.DragBox
 {
 	private mode: DragSelectionMode;
 	private _probeInteraction: ProbeInteraction;
-	private debouncedUpdateSelection: Function;
 
 	constructor()
 	{
 		super({ boxEndCondition: () => true });
 
-		this.debouncedUpdateSelection = lodash.debounce(DragSelection.prototype.updateSelection, 25);
 		this.on('boxstart', DragSelection.prototype.onBoxStart, this);
 		this.on('boxdrag', DragSelection.prototype.onBoxDrag, this);
 		this.on('boxend', DragSelection.prototype.onBoxEnd, this);
@@ -113,14 +111,14 @@ export default class DragSelection extends ol.interaction.DragBox
 	{
 		let extent:any = this.getGeometry().getExtent();
 
-		this.debouncedUpdateSelection(extent);
+		this.updateSelection(extent);
 	}
 
 	onBoxEnd(event:any)
 	{
 		let extent:any = this.getGeometry().getExtent();
 
-		this.debouncedUpdateSelection(extent);
+		this.updateSelection(extent);
 		if (this.probeInteraction)
 			this.probeInteraction.setActive(true);
 	}
