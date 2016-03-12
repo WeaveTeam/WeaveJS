@@ -7,6 +7,25 @@ export type ReactComponent = React.Component<any, any> & React.ComponentLifecycl
 
 export default class ReactUtils
 {
+	private static map_popup_element = new WeakMap<React.ReactInstance, Element>();
+	
+	static openPopup(jsx:JSX.Element):React.ReactInstance
+	{
+		var element = document.body.appendChild(document.createElement("div")) as Element;
+		var popup = ReactDOM.render(jsx, element);
+		ReactUtils.map_popup_element.set(popup, element);
+		return popup;
+	}
+	
+	static closePopup(popup:React.ReactInstance):void
+	{
+		var element = ReactUtils.map_popup_element.get(popup);
+		if (!element)
+			throw new Error("closePopup() can only be called for popups created by openPopup()");
+		ReactDOM.unmountComponentAtNode(element);
+		document.body.removeChild(element);
+	}
+	
 	/**
 	 * Checks if a component has focus.
 	 */
