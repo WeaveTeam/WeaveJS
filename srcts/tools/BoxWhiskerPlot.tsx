@@ -134,14 +134,6 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 			return _.sortBy((this.dataY.getValueFromKey(key, Array)||[]).concat()) as number[] //.sort(Array.NUMERIC);
 		}
 		
-		var getYColumnMin = () => {
-			return _.min(_.flatten(ColumnUtils.getRecords(this.dataY, null, Array)));
-		}
-		
-		var getYColumnMax = () => {
-			return _.max(_.flatten(ColumnUtils.getRecords(this.dataY, null, Array)));
-		}
-		
 		var records = ColumnUtils.getRecords(this.RECORD_FORMAT, null, Number);
 		// box properties
 		var lineColor = 0x000000;
@@ -200,7 +192,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	
 	render():JSX.Element
 	{
-		var recordsY = _.flatten(_.pluck(ColumnUtils.getRecords({y:this.dataY}, null, Array), "y"));
+		var recordsY = _.flatten(ColumnUtils.getRecords(this.dataY, null, Array));
 		var dataYRange = [_.min(recordsY), _.max(recordsY)];
 
 		this.xScale = d3.scale.linear().domain(this.dataBounds.getXRange()).range(this.screenBounds.getXRange());
