@@ -170,6 +170,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	
 	render():JSX.Element
 	{
+		// set screen bounds
 		this.screenBounds.setBounds(
 			this.margin.left.value,
 			this.state.height - this.margin.bottom.value,
@@ -180,15 +181,16 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 			this.screenBounds.setWidth(0);
 		if (this.screenBounds.getHeight() > 0)
 			this.screenBounds.setHeight(0);
-		this.dataBounds.reset();
-		this.dataBounds.includeCoords(this.dataXStats.getMin(), this.dataYStats.getMin());
-		this.dataBounds.includeCoords(this.dataXStats.getMax(), this.dataYStats.getMax());
 		
+		// set data bounds
+		this.dataBounds.reset();
 		var recordsY = _.flatten(ColumnUtils.getRecords(this.dataY, null, Array));
-		var dataYRange = [_.min(recordsY), _.max(recordsY)];
+		this.dataBounds.includeCoords(this.dataXStats.getMin(), _.min(recordsY));
+		this.dataBounds.includeCoords(this.dataXStats.getMax(), _.max(recordsY));
 
+		// create scales from dataBounds and screenBounds
 		this.xScale = d3.scale.linear().domain(this.dataBounds.getXRange()).range(this.screenBounds.getXRange());
-		this.yScale = d3.scale.linear().domain(dataYRange).range(this.screenBounds.getYRange());
+		this.yScale = d3.scale.linear().domain(this.dataBounds.getYRange()).range(this.screenBounds.getYRange());
 
 		return (
 			<ResizingDiv ref={ReactUtils.onWillUpdateRef(this.updateSVGSize)}>
