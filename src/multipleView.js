@@ -118,7 +118,7 @@ class MultipleView extends React.Component {
 		}
 
 		return (
-			<div style={this.props.style}>
+			<div style={this.props.style} className="weave-app">
 				<div>
 					<span onClick={this.toggleView}> Toggle Weave </span> |
 					<span onClick={this.addView}> {singleViewLabel} </span>|
