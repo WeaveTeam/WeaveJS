@@ -6823,6 +6823,16 @@ declare module weavejs.geom {
          */
         includeCoords(newX: number, newY: number): void;
         /**
+         * This function will expand this Bounds2D to include an X value.
+         * @param newX The X coordinate to include in this Bounds2D.
+         */
+        includeX(newX: number): void;
+        /**
+         * This function will expand this Bounds2D to include a Y value.
+         * @param newY The Y coordinate to include in this Bounds2D.
+         */
+        includeY(newY: number): void;
+        /**
          * This function will expand this Bounds2D to include another Bounds2D.
          * @param otherBounds Another Bounds2D object to include within this Bounds2D.
          */
