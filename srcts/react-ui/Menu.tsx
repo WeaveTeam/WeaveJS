@@ -108,7 +108,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	
 	renderMenuItem(index:number, props:MenuItemProps):JSX.Element
 	{
-		var enabled = props.enabled != false; // default undefined -> true
+		var enabled = props.hasOwnProperty('enabled') ? !!props.enabled : true; // default true
 		
 		var labelClass = classNames({
 			'weave-menuitem-label': true,
