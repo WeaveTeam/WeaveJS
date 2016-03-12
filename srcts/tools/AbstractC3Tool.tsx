@@ -1,9 +1,3 @@
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/react/react-dom.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-///<reference path="../../typings/d3/d3.d.ts"/>
-///<reference path="../../typings/c3/c3.d.ts"/>
-
 import AbstractVisTool from "./AbstractVisTool";
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 

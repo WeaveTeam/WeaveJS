@@ -1,8 +1,3 @@
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-
 import {IVisToolProps, IVisToolState} from "./IVisTool";
 import {IVisTool} from "./IVisTool";
 

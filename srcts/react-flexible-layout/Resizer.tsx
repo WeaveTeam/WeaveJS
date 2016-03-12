@@ -1,7 +1,3 @@
-/// <reference path="../../typings/react/react.d.ts" />
-/// <reference path="../../typings/react/react-dom.d.ts"/>
-/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-
 import * as VendorPrefix from "react-vendor-prefix";
 import * as _ from "lodash";
 import * as React from "react";

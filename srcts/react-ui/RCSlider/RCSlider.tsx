@@ -1,7 +1,3 @@
-/// <reference path="../../../typings/react/react.d.ts"/>
-/// <reference path="../../../typings/rc-slider/rc-slider.d.ts"/>
-/// <reference path="../../../typings/react/react-dom.d.ts"/>
-
 import * as React from "react";
 import Slider from "rc-slider";
 import * as ReactDOM from "react-dom";

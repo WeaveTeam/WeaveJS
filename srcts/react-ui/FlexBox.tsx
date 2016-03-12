@@ -1,8 +1,5 @@
-/// <reference path="../../typings/react/react.d.ts"/>
-
 import * as React from "react";
 import * as _ from "lodash";
-
 
 export class HBox extends React.Component<React.HTMLProps<HBox>, {}>
 {
@@ -11,7 +8,8 @@ export class HBox extends React.Component<React.HTMLProps<HBox>, {}>
 	 * @param style A style object.
 	 * @return A new style object.
 	 */
-	private static style(style:React.CSSProperties):React.CSSProperties {
+	private static style(style:React.CSSProperties):React.CSSProperties
+	{
 		return _.merge({}, style, { display: "flex", flexDirection: "row" });
 	}
 
@@ -28,7 +26,8 @@ export class VBox extends React.Component<React.HTMLProps<VBox>, {}>
 	 * @param style A style object.
 	 * @return A new style object.
 	 */
-	private static style(style:React.CSSProperties):React.CSSProperties {
+	private static style(style:React.CSSProperties):React.CSSProperties
+	{
 		return _.merge({}, style, { display: "flex", flexDirection: "column" });
 	}
 

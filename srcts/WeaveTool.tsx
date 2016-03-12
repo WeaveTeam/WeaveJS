@@ -1,10 +1,3 @@
-///<reference path="../typings/react/react.d.ts"/>
-///<reference path="../typings/react/react-dom.d.ts"/>
-///<reference path="../typings/lodash/lodash.d.ts"/>
-///<reference path="../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-///<reference path="../typings/react-bootstrap/react-bootstrap.d.ts"/>
-///<reference path="../typings/weave/weavejs.d.ts"/>
-
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
@@ -52,7 +45,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	
 	private tool:IVisTool;
 	private toolTip:ToolTip;
-	private titleBarHeight: number;
+	private titleBarHeight:number = 25;
 	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
 	
 	constructor(props:IWeaveToolProps)
@@ -60,22 +53,13 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		super(props);
 		this.state = {};
 		this.toolPath = this.props.toolPath;
-		this.titleBarHeight = 25;
 	}
 	
-	componentWillUnmount():void
-	{
-	}
-	
-	componentWillReceiveProps(props:IWeaveToolProps):void
-	{
-		//TODO
-	}
-	
-	shouldComponentUpdate(nextProps:IWeaveToolProps, nextState:IWeaveToolState):boolean
+	shouldComponentUpdate(nextProps:IWeaveToolProps, nextState:IWeaveToolState, nextContext:any):boolean
 	{
 		return !_.isEqual(this.state, nextState)
-			|| !_.isEqual(this.props, nextProps);
+			|| !_.isEqual(this.props, nextProps)
+			|| !_.isEqual(this.context, nextContext);
 	}
 	
 	handleInstance=(tool:IVisTool):void=>

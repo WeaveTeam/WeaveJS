@@ -1,7 +1,3 @@
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-/// <reference path="../../typings/lodash/lodash.d.ts"/>
-/// <reference path="../../typings/react/react.d.ts"/>
-
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";

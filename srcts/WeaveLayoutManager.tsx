@@ -1,8 +1,3 @@
-/// <reference path="../typings/react/react.d.ts"/>
-/// <reference path="../typings/react/react-dom.d.ts"/>
-/// <reference path="../typings/lodash/lodash.d.ts"/>
-/// <reference path="../typings/weave/weavejs.d.ts"/>
-
 import WeavePath = weavejs.path.WeavePath;
 import StandardLib = weavejs.util.StandardLib;
 import LinkableVariable = weavejs.core.LinkableVariable;

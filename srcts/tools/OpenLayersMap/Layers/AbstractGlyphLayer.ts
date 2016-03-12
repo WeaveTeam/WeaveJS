@@ -1,7 +1,3 @@
-///<reference path="../../../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
-///<reference path="../../../../typings/weave/weavejs.d.ts"/>
-
 import AbstractFeatureLayer from "./AbstractFeatureLayer";
 import * as lodash from "lodash";
 import * as ol from "openlayers";

@@ -1,5 +1,3 @@
-/// <reference path="../../typings/d3/d3.d.ts"/>
-
 import * as d3 from "d3";
 
 export default class FormatUtils

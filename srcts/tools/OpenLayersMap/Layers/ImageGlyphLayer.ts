@@ -1,8 +1,3 @@
-///<reference path="../../../../typings/jquery/jquery.d.ts"/>
-///<reference path="../../../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
-///<reference path="../../../../typings/weave/weavejs.d.ts"/>
-
 import * as jquery from "jquery";
 import * as ol from "openlayers";
 import AbstractGlyphLayer from "./AbstractGlyphLayer";
