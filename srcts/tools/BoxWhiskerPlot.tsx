@@ -44,7 +44,6 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
     // selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
     // probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
     // filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-	container:HTMLElement;
 	
 	dataBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
 	screenBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
@@ -73,36 +72,10 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		};
 	}
 
-	updateSVGSize=(resizingDiv:ResizingDiv)=>
+	updateSVGSize=(resizingDiv:ResizingDiv, props:any, state:any, context:any)=>
 	{
-		this.setState(resizingDiv.state);
+		ReactUtils.updateState(this, state);
 	}
-	
-	componentDidMount()
-	{
-		this.container = ReactDOM.findDOMNode(this) as HTMLElement;
-		this.setState({
-			width: this.container.offsetWidth,
-			height: this.container.offsetHeight
-		});
-	}
-	
-	componentDidUpdate()
-	{
-		if(!_.isEqual(this.state.width, this.container.offsetWidth) || !_.isEqual(this.state.height, this.container.offsetHeight))
-		{
-			
-			this.setState({
-				width: this.container.offsetWidth,
-				height: this.container.offsetHeight
-			});
-		}
-	}
-
-	// shouldComponentUpdate(nextProps:BoxWhiskerPlotProps, nextState:BoxWhiskerPlotState):boolean
-	// {
-	// 	return !_.isEqual(this.state.width, this.container.offsetWidth) || !_.isEqual(this.state.height, this.container.offsetHeight);
-	// }
 	
 	componentWillUpdate(props:BoxWhiskerPlotProps, state:BoxWhiskerPlotState)
 	{
@@ -182,6 +155,9 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 						var x = this.xScale(record.x);
 						var yValues = getValues(key);
 						
+						if (!isFinite(x) || yValues.some(v => !isFinite(v)))
+							return [];
+						
 						var min = this.yScale(getQ(yValues, 0)) || 0;
 						var q1 = this.yScale(getQ(yValues, 1)) || 0;
 						var median = this.yScale(getQ(yValues, 2)) || 0;
@@ -222,8 +198,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		this.yScale = d3.scale.linear().domain(this.dataBounds.getYRange()).range(this.screenBounds.getYRange());
 		
 		return (
-			/*<ResizingDiv ref={ReactUtils.onUpdateRef(this.updateSVGSize)}>*/
-			<VBox style={{flex: 1}}>
+			<ResizingDiv ref={ReactUtils.onWillUpdateRef(this.updateSVGSize)}>
 				<svg width={this.state.width} height={this.state.height}>
 					<XAxis x={0} y={this.screenBounds.yMin} scale={this.xScale}/>
 					<YAxis x={this.screenBounds.xMin} y={0} scale={this.yScale}/>
@@ -231,8 +206,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 						this.renderBoxWhiskers()
 					}
 				</svg>
-			</VBox>
-			/*</ResizingDiv>*/
+			</ResizingDiv>
 		);
 	}
 }
