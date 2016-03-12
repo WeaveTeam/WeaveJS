@@ -180,12 +180,9 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 			this.screenBounds.setWidth(0);
 		if (this.screenBounds.getHeight() > 0)
 			this.screenBounds.setHeight(0);
-		this.dataBounds.setBounds(
-			this.dataXStats.getMin(),
-			this.dataYStats.getMin(),
-			this.dataXStats.getMax(),
-			this.dataYStats.getMax()
-		);
+		this.dataBounds.reset();
+		this.dataBounds.includeCoords(this.dataXStats.getMin(), this.dataYStats.getMin());
+		this.dataBounds.includeCoords(this.dataXStats.getMax(), this.dataYStats.getMax());
 		
 		var recordsY = _.flatten(ColumnUtils.getRecords(this.dataY, null, Array));
 		var dataYRange = [_.min(recordsY), _.max(recordsY)];
