@@ -6,6 +6,9 @@ import * as ReactDOM from "react-dom";
 import {round} from "d3";
 import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootstrapTable";
 import {IRow} from "../react-bootstrap-datatable/TableRow";
+import AbstractVisTool from "./AbstractVisTool";
+import Menu from "../react-ui/Menu";
+import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -69,17 +72,22 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
     {
        return this.panelTitle.value;;
     }
-
-    componentDidMount()
-    {
-
-    }
+	
+	componentDidMount()
+	{
+		Menu.registerMenuSource(this);
+	}
 
     componentDidUpdate()
     {
 
     }
 
+	getMenuItems():MenuItemProps[]
+	{
+		return AbstractVisTool.getMenuItems(this);
+	}
+	
     dataChanged()
     {
         var columns = this.columns.getObjects(IAttributeColumn);

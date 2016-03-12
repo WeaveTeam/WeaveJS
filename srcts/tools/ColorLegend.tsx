@@ -10,7 +10,10 @@ import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
 import ToolTip from "./ToolTip";
+import AbstractVisTool from "./AbstractVisTool";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import Menu from "../react-ui/Menu";
+import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -145,6 +148,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 	componentDidMount()
 	{
+		Menu.registerMenuSource(this);
 		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
 	}
 	
@@ -153,6 +157,11 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		ReactUtils.closePopup(this.toolTip);
 	}
 
+	getMenuItems()
+	{
+		return AbstractVisTool.getMenuItems(this);
+	}
+	
 	getInteractionStyle(bin:number):CSSProperties
 	{
 		var probed:boolean = this.getProbedBins().indexOf(bin) >= 0;
