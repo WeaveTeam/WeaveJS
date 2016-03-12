@@ -77,7 +77,7 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 				return <ui.CheckBoxList options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 				
 			case LAYOUT_LIST:
-				return <ui.ListItem options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+				return <ui.List options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 				
 			case LAYOUT_HSLIDER:
 				return <ui.HBox style={{flex: 1, alignItems:"center", padding: 10}}>
