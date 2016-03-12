@@ -77,22 +77,6 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		ReactUtils.updateState(this, state);
 	}
 	
-	componentWillUpdate(props:BoxWhiskerPlotProps, state:BoxWhiskerPlotState)
-	{
-		this.screenBounds.setBounds(
-			this.margin.left.value,
-			this.state.height - this.margin.bottom.value,
-			this.state.width - this.margin.right.value,
-			this.margin.top.value
-		);
-		this.dataBounds.setBounds(
-			this.dataXStats.getMin(),
-			this.dataYStats.getMin(),
-			this.dataXStats.getMax(),
-			this.dataYStats.getMax()
-		);
-	}
-
 	renderScatterPlot():JSX.Element
 	{
 		var records = ColumnUtils.getRecords(this.RECORD_FORMAT, null, Number);
@@ -120,20 +104,19 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		return null;
 	}
 
+	getQ(values:number[], q:number):number
+	{
+		var n = q / 4 * (values.length - 1);
+		return values[Math.round(n)];
+	}
+	
+	getYValues(key:IQualifiedKey):number[]
+	{
+		return _.sortBy((this.dataY.getValueFromKey(key, Array)||[]).concat()) as number[];
+	}
+	
 	renderBoxWhiskers():JSX.Element
 	{
-		var getQ = (values: number[], q: number) => {
-			var n = q/4 * (values.length);
-			return values[Math.round(n)];
-			// var lower = values[Math.floor(n)],
-			// 	upper = values[Math.ceil(n)];
-			// return (1-n%1) * lower + (n%1) * upper;
-		};
-		
-		var getValues = (key:IQualifiedKey):number[] => {
-			return _.sortBy((this.dataY.getValueFromKey(key, Array)||[]).concat()) as number[] //.sort(Array.NUMERIC);
-		}
-		
 		var records = ColumnUtils.getRecords(this.RECORD_FORMAT, null, Number);
 		// box properties
 		var lineColor = 0x000000;
@@ -153,17 +136,12 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 			<g>
 				{
 					records.map((record, index) => {
-						var key = record.id;
 						var x = this.xScale(record.x);
-						var yValues = getValues(key);
+						var yValues = this.getYValues(record.id);
 
 						if (!isFinite(x) || yValues.some(v => !isFinite(v)))
 							return [];
-						var min = this.yScale(getQ(yValues, 0));
-						var q1 = this.yScale(getQ(yValues, 1));
-						var median = this.yScale(getQ(yValues, 2));
-						var q3 = this.yScale(getQ(yValues, 3));
-						var max = this.yScale(getQ(yValues, 4));
+						var [min, q1, median, q3, max] = [0,1,2,3,4].map(q => this.yScale(this.getQ(yValues, q)));
 						
 						// draw whiskers
 						var whisker:JSX.Element = (
@@ -192,6 +170,23 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	
 	render():JSX.Element
 	{
+		this.screenBounds.setBounds(
+			this.margin.left.value,
+			this.state.height - this.margin.bottom.value,
+			this.state.width - this.margin.right.value,
+			this.margin.top.value
+		);
+		if (this.screenBounds.getWidth() < 0)
+			this.screenBounds.setWidth(0);
+		if (this.screenBounds.getHeight() > 0)
+			this.screenBounds.setHeight(0);
+		this.dataBounds.setBounds(
+			this.dataXStats.getMin(),
+			this.dataYStats.getMin(),
+			this.dataXStats.getMax(),
+			this.dataYStats.getMax()
+		);
+		
 		var recordsY = _.flatten(ColumnUtils.getRecords(this.dataY, null, Array));
 		var dataYRange = [_.min(recordsY), _.max(recordsY)];
 
