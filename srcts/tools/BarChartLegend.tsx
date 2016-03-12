@@ -1,19 +1,12 @@
-// <reference path="../../typings/d3/d3.d.ts"/>
-/// <reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-///<reference path="../react-ui/ui.tsx"/>
-///<reference path="../../typings/react/react-dom.d.ts"/>
-
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
-import ui from "../react-ui/ui";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
+import {HBox, VBox} from "../react-ui/FlexBox";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ColorRamp = weavejs.util.ColorRamp;
@@ -106,22 +99,22 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 					if (i < labels.length)
 					{
 						element.push(
-							<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
-								<ui.HBox style={{width:shapeSize, position:"relative", padding:"0px 0px 0px 0px"}}>
+							<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
+								<HBox style={{width:shapeSize, position:"relative", padding:"0px 0px 0px 0px"}}>
 									<svg style={{position:"absolute"}} width="100%" height="100%">
 										<rect x={0} y={10} height="80%" width={shapeSize} style={{fill: this.chartColors.getHexColor(i, 0, labels.length - 1), stroke:"black", strokeOpacity:0.5}}></rect>
 									</svg>
-								</ui.HBox>
-								<ui.HBox style={{flex:0.8, alignItems:"center"}}>
+								</HBox>
+								<HBox style={{flex:0.8, alignItems:"center"}}>
 									<span style={prefixerStyle}>{Weave.lang(labels[i])}</span>
-								</ui.HBox>
-							</ui.HBox>
+								</HBox>
+							</HBox>
 						);
 					}
 					else
 					{
 						element.push(
-							<ui.HBox key={i} style={{flex: 1.0}}/>
+							<HBox key={i} style={{flex: 1.0}}/>
 						);
 					}
 				}
@@ -129,37 +122,37 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 
 //			if (this.props.style.width > this.props.style.height * 2)
 //				elements.push(
-//					<ui.HBox key={i} style={{flex: columnFlex}}>
+//					<HBox key={i} style={{flex: columnFlex}}>
 //						{ element }
-//					</ui.HBox>
+//					</HBox>
 //				)
 //			else
 				elements.push(
-					<ui.VBox key={i} style={{flex: columnFlex}}>
+					<VBox key={i} style={{flex: columnFlex}}>
 						{ element }
-					</ui.VBox>
+					</VBox>
 				);
 
 			finalElements[j] = elements;
 		}
 
 		return (<div style={{flex: 1, padding:"0px 5px 0px 5px"}}>
-			<ui.VBox style={{flex: 1.0, overflow:"hidden"}}>
-				<ui.HBox style={{flex: 0.1, alignItems:"center"}}>
+			<VBox style={{flex: 1.0, overflow:"hidden"}}>
+				<HBox style={{flex: 0.1, alignItems:"center"}}>
 					<span style={prefixerStyle}>Bar color</span>
-				</ui.HBox>
+				</HBox>
 				{
 //					this.props.style.width > this.props.style.height * 2
 //					?
-//						<ui.HBox style={{flex: 0.9}}>
+//						<HBox style={{flex: 0.9}}>
 //							{ finalElements }
-//						</ui.HBox>
+//						</HBox>
 //					:
-						<ui.VBox style={{flex: 0.9}}>
+						<VBox style={{flex: 0.9}}>
 							{ finalElements }
-						</ui.VBox>
+						</VBox>
 					}
-			</ui.VBox>
+			</VBox>
 		</div>);
 	}
 

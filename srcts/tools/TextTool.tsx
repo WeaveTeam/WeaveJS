@@ -7,7 +7,6 @@
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
 import * as React from "react";
-import ui from "../react-ui/ui";
 import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";

@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as lodash from "lodash";
-import ui from "../react-ui/ui";
 import LinkableTextField from "../ui/LinkableTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
+import {HBox, VBox} from "../react-ui/FlexBox";
 
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
@@ -66,12 +66,12 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 		}
 		else
 		{
-			return <ui.VBox/>;
+			return <VBox/>;
 		}
 
 		let margins: React.CSSProperties = { marginLeft: "0.5em", marginRight: "0.5em" };
 
-		return <ui.VBox style={{ flex: 1 }}>
+		return <VBox style={{ flex: 1 }}>
 					<label>{Weave.lang("Source display name") }
 						<LinkableTextField style={margins}/>
 					</label>
@@ -85,7 +85,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
 					</label>
 					<WeaveTree hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>
-			</ui.VBox>;
+			</VBox>;
 	}
 }
 

@@ -1,10 +1,10 @@
 import * as React from "react";
-import ui from "../../react-ui/ui";
 import {IVisTool, IVisToolProps, IVisToolState} from "../IVisTool";
 import AbstractFilterEditor from "./AbstractFilterEditor";
 import NumericRangeDataFilterEditor from "./NumericRangeDataFilterEditor";
 import DiscreteValuesDataFilterEditor from "./DiscreteValuesDataFilterEditor";
 import {FilterEditorProps, FilterEditorState} from "./AbstractFilterEditor";
+import {HBox, VBox} from "../../react-ui/FlexBox";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -100,13 +100,13 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 				}
 			);
 		
-		//<ui.ListItem options={this.listItemOptions} onChange={this.handleEditorTypeChange.bind(this)} selectedValues={[editorClass]}/>
+		//<ListItem options={this.listItemOptions} onChange={this.handleEditorTypeChange.bind(this)} selectedValues={[editorClass]}/>
 		return (
-			<ui.VBox style={{flex: 1}}>
+			<VBox style={{flex: 1}}>
 				{
 					editor
 				}
-			</ui.VBox>
+			</VBox>
 		)
 	}
 }

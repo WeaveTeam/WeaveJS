@@ -7,7 +7,7 @@ import {IVisToolProps, IVisToolState} from "./IVisTool";
 import {IVisTool} from "./IVisTool";
 
 import * as React from "react";
-import ui from "../react-ui/ui";
+import {HBox, VBox} from "../react-ui/FlexBox";
 import {ListGroupItem, ListGroup, DropdownButton, MenuItem} from "react-bootstrap";
 import * as _ from "lodash";
 import {MouseEvent} from "react";
@@ -86,7 +86,7 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 		if (this.layoutMode.value === "ComboBox")
 		{
 			return (
-				<ui.VBox style={{flex:1.0, alignItems: "center"}}>
+				<VBox style={{flex:1.0, alignItems: "center"}}>
 					<DropdownButton title={this.selectedChoice.value} id={`dropdown-${Weave.className(this)}`}>
 						{
 							this.choices.getNames().map((choice:string, index:number) => {
@@ -96,7 +96,7 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 							})
 						}
 					</DropdownButton>
-				</ui.VBox>
+				</VBox>
 			);
 		}
 		else
