@@ -24,22 +24,22 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 
 	onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
 		let item = selectedItems[0] as EntityNode;
-		if (this.state.dataSource && item instanceof EntityNode)
+		if (this.props.dataSource && item instanceof EntityNode)
 		{
-			(this.state.dataSource as WeaveDataSource).rootId.state = item.getEntity().id;
+			(this.props.dataSource as WeaveDataSource).rootId.state = item.getEntity().id;
 		}
 		else
 		{
-			(this.state.dataSource as WeaveDataSource).rootId.state = null;
+			(this.props.dataSource as WeaveDataSource).rootId.state = null;
 		}
 	}
 
 	private tree: WeaveTree;
 	setHierarchySelection=():void=>{
-		if (this.tree && this.state.dataSource)
+		if (this.tree && this.props.dataSource)
 		{
-			let id:number = (this.state.dataSource as WeaveDataSource).rootId.state as number;
-			let node = this.state.dataSource.findHierarchyNode(id) as EntityNode;
+			let id:number = (this.props.dataSource as WeaveDataSource).rootId.state as number;
+			let node = this.props.dataSource.findHierarchyNode(id) as EntityNode;
 			if (node != null && node.id > -1)
 			{
 				this.tree.setSelected([node]);	
@@ -55,14 +55,14 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 	{
 		let dataSource: WeaveDataSource;
 		let root: IWeaveTreeNode;
-		if (this.state.dataSource)
+		if (this.props.dataSource)
 		{
-			Weave.getCallbacks(this.state.dataSource).addGroupedCallback(this, this.forceUpdate, false);
-			dataSource = this.state.dataSource as WeaveDataSource;
+			Weave.getCallbacks(this.props.dataSource).addGroupedCallback(this, this.forceUpdate, false);
+			dataSource = this.props.dataSource as WeaveDataSource;
 
-			let cache = (this.state.dataSource as WeaveDataSource).entityCache;
+			let cache = (dataSource as WeaveDataSource).entityCache;
 			root = new EntityNode(cache, EntityType.HIERARCHY);
-			(this.state.dataSource as WeaveDataSource).rootId.addGroupedCallback(this, this.setHierarchySelection, false);
+			dataSource.rootId.addGroupedCallback(this, this.setHierarchySelection, false);
 		}
 		else
 		{
