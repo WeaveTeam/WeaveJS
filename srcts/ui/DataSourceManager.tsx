@@ -3,73 +3,48 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
 import List from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
-import {IDataSourceEditorState} from "../editors/DataSourceEditor";
 import {IDataSourceEditorProps} from "../editors/DataSourceEditor";
 
-
-
 import IDataSource = weavejs.api.data.IDataSource;
-import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 /* Import editors and their data sources */
-import AbstractDataSource = weavejs.data.source.AbstractDataSource;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import WeaveDataSourceEditor from "../editors/WeaveDataSourceEditor";
 
-export interface IDataSourceManagerProps {
-	weave: Weave;
+export interface IDataSourceManagerProps
+{
+	weave:Weave;
 }
 
-export interface IDataSourceManagerState {
+export interface IDataSourceManagerState
+{
+	selectedDataSource?:IDataSource;
 }
 
 export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
 {
-	static editorRegistry = new Map<typeof IDataSource, any>()
+	static editorRegistry = new Map<typeof IDataSource, React.ComponentClass<IDataSourceEditorProps>>()
+		//.set(CachedDataSource, CachedDataSourceEditor)
+		//.set(CSVDataSource, CSVDataSourceEditor)
 		.set(WeaveDataSource, WeaveDataSourceEditor);
 
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
-		this.props.weave.getObject();
+		this.props.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
 
-	componentDidMount()
+	state:IDataSourceManagerState = {};
+
+	render():JSX.Element
 	{
-		let rootHashMap = this.props.weave.getObject() as LinkableHashMap;
-		rootHashMap.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
-	}
+		let root = this.props.weave.root;
+		let listOptions:ListOption[] = root.getObjects(IDataSource).map(value => { return {label: root.getName(value), value}; });
 
-	list: List;
-	state: IDataSourceManagerState = {};
-
-	render(): JSX.Element
-	{
-		let listOptions: ListOption[] = [];
-
-		let rootHashMap = this.props.weave.getObject() as LinkableHashMap;
-
-		for (let value of rootHashMap.getObjects(IDataSource) as IDataSource[])
+		let editorJsx:JSX.Element;
+		let dataSource = this.state.selectedDataSource;
+		if (dataSource)
 		{
-			let label = rootHashMap.getName(value);
-			listOptions.push({ label, value });
-		}
-
-		let selectedValues:any[] = [];
-		if (this.list && this.list.state && this.list.state.selectedValues)
-		{
-			selectedValues = this.list.state.selectedValues;
-		}
-
-		let editorJsx: JSX.Element;
-		let selection: IDataSource;
-		if (selectedValues.length > 0)
-		{
-			selection = this.list.state.selectedValues[0] as IDataSource;
-		}
-		if (selection !== undefined)
-		{
-			let dataSource = selection;
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
 				editorJsx = <EditorClass dataSource={dataSource}/>;
@@ -78,24 +53,25 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 		else
 		{
-			editorJsx = <div/>;
+			editorJsx = <div>Select a data source on the left.</div>;
 		}
 
-		
-
-		return <HBox style = {{ width: 700, height: 400 }}>
-			<VBox style = {{ width: "25%" }}>Select a datasource
-				<List onChange={ (selectedValues:any[]) => { this.forceUpdate() } } options = {listOptions} ref={(c:List) => {this.list = c}}/>
-			</VBox>
-			<VBox style = {{ width: "75%" }}>Browse or Configure
-				{editorJsx}
-			</VBox>
-		</HBox>;
+		return (
+			<HBox style={{ flex: 1, minWidth: 700, minHeight: 400 }}>
+				<VBox style={{ flex: .25 }}>
+					<List options={listOptions} onChange={ (selectedValues:IDataSource[]) => this.setState({ selectedDataSource: selectedValues[0] }) }/>
+				</VBox>
+				<div style={{ backgroundColor: '#f0f0f0', width: 4 }}/>
+				<VBox style={{ flex: .75 }}>
+					{editorJsx}
+				</VBox>
+			</HBox>
+		);
 	}
 
-	static openInstance(weave:Weave)
+	static openInstance(weave:Weave):PopupWindow
 	{
-		PopupWindow.open({
+		return PopupWindow.open({
 			title: "Manage data sources",
 			content: (<DataSourceManager weave={weave}/>),
 			modal: false
