@@ -123,16 +123,26 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	renderBoxWhiskers():JSX.Element
 	{
 		var getQ = (values: number[], q: number) => {
-			var n = q/4 * (values.length - 1);
+			var n = q/4 * (values.length);
 			return values[Math.round(n)];
 			// var lower = values[Math.floor(n)],
 			// 	upper = values[Math.ceil(n)];
 			// return (1-n%1) * lower + (n%1) * upper;
 		};
 		
-		var getValues = (key:IQualifiedKey):number[] => _.sortBy((this.dataY.getValueFromKey(key, Array)||[]).concat()) as number[] //.sort(Array.NUMERIC);
-		var records = ColumnUtils.getRecords(this.RECORD_FORMAT, null, Number);
+		var getValues = (key:IQualifiedKey):number[] => {
+			return _.sortBy((this.dataY.getValueFromKey(key, Array)||[]).concat()) as number[] //.sort(Array.NUMERIC);
+		}
 		
+		var getYColumnMin = () => {
+			return _.min(_.flatten(ColumnUtils.getRecords(this.dataY, null, Array)));
+		}
+		
+		var getYColumnMax = () => {
+			return _.max(_.flatten(ColumnUtils.getRecords(this.dataY, null, Array)));
+		}
+		
+		var records = ColumnUtils.getRecords(this.RECORD_FORMAT, null, Number);
 		// box properties
 		var lineColor = 0x000000;
 		var lineAlpha = 0.5;
@@ -141,7 +151,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		var radius = 10;
 		
 		var glyphStyle:React.CSSProperties = {
-			stroke: lineColor,
+			stroke: "#000000",
 			strokeOpacity: lineAlpha,
 			fill: fillColor,
 			fillOpacity: fillAlpha
@@ -154,35 +164,31 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 						var key = record.id;
 						var x = this.xScale(record.x);
 						var yValues = getValues(key);
-						
+
 						if (!isFinite(x) || yValues.some(v => !isFinite(v)))
 							return [];
-						
-						var min = this.yScale(getQ(yValues, 0)) || 0;
-						var q1 = this.yScale(getQ(yValues, 1)) || 0;
-						var median = this.yScale(getQ(yValues, 2)) || 0;
-						var q3 = this.yScale(getQ(yValues, 3)) || 0;
-						var max = this.yScale(getQ(yValues, 4)) || 0;
+						var min = this.yScale(getQ(yValues, 0));
+						var q1 = this.yScale(getQ(yValues, 1));
+						var median = this.yScale(getQ(yValues, 2));
+						var q3 = this.yScale(getQ(yValues, 3));
+						var max = this.yScale(getQ(yValues, 4));
 						
 						// draw whiskers
 						var whisker:JSX.Element = (
 							<g key="whisker" style={glyphStyle}>
-								<line x1={x} y1={median} x2={x} y2={min}/>
+								<line x1={x} y1={min} x2={x} y2={q1}/>
 								<line x1={x-radius} y1={min} x2={x+radius} y2={min}/>
-								<line x1={x} y1={median} x2={x} y2={max}/>
+								<line x1={x} y1={q3} x2={x} y2={max}/>
 								<line x1={x-radius} y1={max} x2={x+radius} y2={max}/>
 							</g>
 						)
-						
+
 						// draw box
 						var box:JSX.Element = (
 							<g key="box" style={glyphStyle}>
-								<line x1={x+radius} y1={q1} x2={x-radius} y2={q1}/>
-								<line x1={x-radius} y1={q1} x2={x-radius} y2={q3}/>
-								<line x1={x-radius} y1={q3} x2={x+radius} y2={q3}/>
-								<line x1={x+radius} y1={q3} x2={x+radius} y2={q1}/>
-							{/*median line*/}
-							<line x1={x-radius} y1={median} x2={x+radius} y2={median}/>
+								<rect style={{fill: "#FFFFFF", stroke: "#000000"}} x={x-radius} y={q3} width={2*radius} height={q1-q3}/>
+								{/*median line*/}
+								<line x1={x-radius} y1={median} x2={x+radius} y2={median}/>
 							</g>
 						)
 						return [box, whisker];
@@ -194,9 +200,12 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	
 	render():JSX.Element
 	{
+		var recordsY = _.flatten(_.pluck(ColumnUtils.getRecords({y:this.dataY}, null, Array), "y"));
+		var dataYRange = [_.min(recordsY), _.max(recordsY)];
+
 		this.xScale = d3.scale.linear().domain(this.dataBounds.getXRange()).range(this.screenBounds.getXRange());
-		this.yScale = d3.scale.linear().domain(this.dataBounds.getYRange()).range(this.screenBounds.getYRange());
-		
+		this.yScale = d3.scale.linear().domain(dataYRange).range(this.screenBounds.getYRange());
+
 		return (
 			<ResizingDiv ref={ReactUtils.onWillUpdateRef(this.updateSVGSize)}>
 				<svg width={this.state.width} height={this.state.height}>
