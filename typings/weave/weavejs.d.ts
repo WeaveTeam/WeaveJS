@@ -34,11 +34,11 @@ declare module __global__ {
          */
         getObject(...path: any[]): ILinkableObject;
         /**
-         * Finds the Weave instance for a given ILinkableObject.
-         * @param object An ILinkableObject.
-         * @return The Weave instance.
+         * Finds the Weave instance for a given Object.
+         * @param object An Object.
+         * @return The Weave instance, or null if the object was not registered as an ancestor of any instance of Weave.
          */
-        static getWeave(object: ILinkableObject): Weave;
+        static getWeave(object: Object): Weave;
         /**
          * Gets a WeavePath from an ILinkableObject.
          * @param object An ILinkableObject.
@@ -1659,9 +1659,15 @@ declare module weavejs.api.core {
          */
         registerDisposableChild(disposableParent: Object, disposableChild: Object): any;
         /**
+         * This function gets the owner of an object.  The owner of an object is defined as its first registered parent.
+         * @param child An Object that was registered as a child of another Object.
+         * @return The owner of the child object (the first parent that was registered with the child), or null if the child has no owner.
+         */
+        getOwner(child: Object): Object;
+        /**
          * This function gets the owner of a linkable object.  The owner of an object is defined as its first registered parent.
          * @param child An ILinkableObject that was registered as a child of another ILinkableObject.
-         * @return The owner of the child object (the first parent that was registered with the child), or null if the child has no owner.
+         * @return The owner of the child object (the first parent that was registered with the child), or null if the child has no linkable owner.
          * @see #getLinkableDescendants()
          */
         getLinkableOwner(child: ILinkableObject): ILinkableObject;
@@ -3811,6 +3817,7 @@ declare module weavejs.core {
          * @return An Array containing a list of linkable objects that have been registered as children of the specified parent.
          *         This list includes all children that have been registered, even those that do not appear in the session state.
          */
+        getOwner(child: Object): Object;
         getLinkableOwner(child: ILinkableObject): ILinkableObject;
         /**
          * @param root The linkable object to be placed at the root node of the tree.

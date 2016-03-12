@@ -116,6 +116,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 				keySet.clearKeys();
 		}
 
-		this.tool.props.toolTip.hide();
+		if (this.tool.props.toolTip)
+			this.tool.props.toolTip.hide();
 	}
 }

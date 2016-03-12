@@ -72,14 +72,14 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 			
 			let geom:GeneralizedGeometry;
 			
-			let dataX:Object = record.dataX[0];
+			let dataX:Object = record.dataX && record.dataX[0];
 			if (dataX instanceof GeneralizedGeometry)
 			{
 				geom = dataX as GeneralizedGeometry;
 				dataX = (geom.bounds.xMin + geom.bounds.xMax) / 2;
 			}
 			
-			let dataY:Object = record.dataY[0];
+			let dataY:Object = record.dataY && record.dataY[0];
 			if (dataY instanceof GeneralizedGeometry)
 			{
 				geom = dataY as GeneralizedGeometry;
