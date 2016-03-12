@@ -11,37 +11,37 @@ import ReactUtils from "./utils/ReactUtils";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 
-export interface ILinkableComponentRendererProps extends React.HTMLProps<LinkableComponentRenderer>
+export interface IWeaveComponentRendererProps extends React.HTMLProps<WeaveComponentRenderer>
 {
 	weave:Weave,
 	path:(number|string)[]
 }
 
-export interface ILinkableComponentRendererState
+export interface IWeaveComponentRendererState
 {
 	type?:React.ComponentClass<any>;
 	target?:ILinkableObject;
 }
 
-export default class LinkableComponentRenderer extends React.Component<ILinkableComponentRendererProps, ILinkableComponentRendererState>
+export default class WeaveComponentRenderer extends React.Component<IWeaveComponentRendererProps, IWeaveComponentRendererState>
 {
 	watcher:LinkableWatcher;
 	
-	constructor(props:ILinkableComponentRendererProps)
+	constructor(props:IWeaveComponentRendererProps)
 	{
 		super(props);
 		this.state = {};
 		this.componentWillReceiveProps(props);
 	}
 	
-	shouldComponentUpdate(nextProps:ILinkableComponentRendererProps, nextState:ILinkableComponentRendererState, nextContext:any):boolean
+	shouldComponentUpdate(nextProps:IWeaveComponentRendererProps, nextState:IWeaveComponentRendererState, nextContext:any):boolean
 	{
 		return !_.isEqual(this.state, nextState)
 			|| !_.isEqual(this.props, nextProps)
 			|| !_.isEqual(this.context, nextContext);
 	}
 	
-	componentWillReceiveProps(props:ILinkableComponentRendererProps):void
+	componentWillReceiveProps(props:IWeaveComponentRendererProps):void
 	{
 		if (this.props.weave != props.weave || !this.watcher)
 		{

@@ -1,6 +1,6 @@
 import WeaveApp from "./WeaveApp";
 import WeaveLayoutManager from "./WeaveLayoutManager";
-import LinkableComponentRenderer from "./LinkableComponentRenderer";
+import WeaveComponentRenderer from "./WeaveComponentRenderer";
 
 import WeaveDataSourceEditor from "./editors/WeaveDataSourceEditor";
 
@@ -50,7 +50,7 @@ export
 {
 	WeaveApp,
 	WeaveLayoutManager,
-	LinkableComponentRenderer,
+	WeaveComponentRenderer,
 	
 	WeaveDataSourceEditor,
 	
