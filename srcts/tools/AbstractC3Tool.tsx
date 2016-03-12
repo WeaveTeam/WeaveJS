@@ -7,8 +7,10 @@ import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import DOMUtils from "../utils/DOMUtils";
 import * as jquery from "jquery";
+import DOMUtils from "../utils/DOMUtils";
+import ReactUtils from "../utils/ReactUtils";
+import ToolTip from "./ToolTip";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -40,7 +42,13 @@ declare type CullingMetric = {
 	displayed:number;
 }
 
-export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisToolState>
+export interface IAbstractC3ToolProps extends IVisToolProps
+{
+    font?:string;
+    fontSize?:number;
+}
+
+export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps, IVisToolState>
 {
     constructor(props:IVisToolProps)
 	{
@@ -102,6 +110,9 @@ export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisT
 	
 	componentDidMount()
 	{
+		super.componentDidMount();
+		
+		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
         DOMUtils.addPointClickListener(this.element, this.handlePointClick);
 		this.validateSize();
 		this.handleChange();
@@ -109,6 +120,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisT
 	
 	componentWillUnmount()
 	{
+		ReactUtils.closePopup(this.toolTip);
 		DOMUtils.removePointClickListener(this.element, this.handlePointClick);
 		if (this.chart)
 		{
@@ -135,11 +147,12 @@ export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisT
 	
     render():JSX.Element
     {
-        return <div ref={(c:HTMLElement) => { this.element = c;}} style={{flex: 1, overflow: "hidden"}}>
+        return <div ref={(c:HTMLElement) => { this.element = c;}} style={{flex: 1, overflow: "hidden"}} onMouseLeave={ () => this.toolTip.hide() }>
 			<div ref={(c:HTMLElement) => { this.c3Config.bindto = c;}}/>
 		</div>;
     }
 
+	protected toolTip:ToolTip;
 	protected element:HTMLElement;
     protected chart:c3.ChartAPI;
     protected c3Config:c3.ChartConfiguration;
@@ -192,8 +205,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IVisToolProps, IVisT
 	{
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([]);
-		if (this.props.toolTip)
-			this.props.toolTip.hide();
+		this.toolTip.hide();
 	}
 
 	/**

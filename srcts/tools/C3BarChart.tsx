@@ -259,13 +259,10 @@ export default class C3BarChart extends AbstractC3Tool
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([qKey]);
 		
-		if (this.props.toolTip)
-		{
-			var heightColumns = this.heightColumns.getObjects(IAttributeColumn);
-            this.props.toolTip.show(this, this.chart.internal.d3.event, [qKey], heightColumns);
-			if (heightColumns.length > 1)
-				this.props.toolTip.setState({columnNamesToColor});
-		}
+		var heightColumns = this.heightColumns.getObjects(IAttributeColumn);
+        this.toolTip.show(this, this.chart.internal.d3.event, [qKey], heightColumns);
+		if (heightColumns.length > 1)
+			this.toolTip.setState({columnNamesToColor});
 	}
 
     private dataChanged():void

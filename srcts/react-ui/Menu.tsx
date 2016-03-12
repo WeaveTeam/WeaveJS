@@ -27,8 +27,8 @@ export interface MenuState
 	hovered: number;
 }
 
-export const REACT_COMPONENT = "reactComponent";
-export const GET_MENU_ITEMS = "getMenuItems";
+const REACT_COMPONENT = "reactComponent";
+const GET_MENU_ITEMS = "getMenuItems";
 
 export interface IGetMenuItems
 {
@@ -52,7 +52,12 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		this.state = {
 			hovered: -1,
 		};
-	}	
+	}
+	
+	static registerMenuSource(component:React.Component<any, any>)
+	{
+		(ReactDOM.findDOMNode(component) as any)[REACT_COMPONENT] = component;
+	}
 	
 	static getMenuItems(element:HTMLElement):MenuItemProps[]
 	{

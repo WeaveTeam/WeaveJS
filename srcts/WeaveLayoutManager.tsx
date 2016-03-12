@@ -423,8 +423,8 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 					<WeaveTool
 						key={key}
 						ref={key}
-						layout={this.reactLayout}
-						toolPath={path}
+						weave={path.weave}
+						path={path.getPath()}
 						onDragOver={this.onDragOver.bind(this, path)}
 						onDragStart={this.onDragStart.bind(this, path)}
 						onDragEnd={this.onDragEnd.bind(this)}

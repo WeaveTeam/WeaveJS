@@ -2,7 +2,6 @@ import * as React from "react";
 import * as _ from "lodash";
 import WeaveMenuBar from "./WeaveMenuBar";
 import Menu from "./react-ui/Menu";
-import {REACT_COMPONENT} from "./react-ui/Menu";
 import {MenuItemProps} from "./react-ui/Menu";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import WeaveLayoutManager from "./WeaveLayoutManager";

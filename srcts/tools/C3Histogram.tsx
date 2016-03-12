@@ -101,8 +101,7 @@ export default class C3Histogram extends AbstractC3Tool
                         if (!keys)
                             return;
                         this.probeKeySet.replaceKeys(keys);
-                        if (this.props.toolTip)
-	                        this.props.toolTip.show(this, this.chart.internal.d3.event, keys, [this.binnedColumn, this.columnToAggregate]);
+                        this.toolTip.show(this, this.chart.internal.d3.event, keys, [this.binnedColumn, this.columnToAggregate]);
                     }
                 }
             },

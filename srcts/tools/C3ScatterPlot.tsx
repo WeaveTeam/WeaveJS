@@ -188,8 +188,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		var key:IQualifiedKey = this.records[d.index].id;
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([key]);
-		if (this.props.toolTip)
-			this.props.toolTip.show(this, this.chart.internal.d3.event, [key], [this.dataX, this.dataY, this.radiusData]);
+		this.toolTip.show(this, this.chart.internal.d3.event, [key], [this.dataX, this.dataY, this.radiusData]);
 	}
 	
 	protected handleC3Selection():void

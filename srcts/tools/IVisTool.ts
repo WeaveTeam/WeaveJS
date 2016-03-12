@@ -5,9 +5,6 @@ import ToolTip from "./ToolTip";
 
 export interface IVisToolProps
 {
-    font?:string;
-    fontSize?:number;
-    toolTip: ToolTip;
 }
 
 export interface IVisToolState

@@ -24,6 +24,7 @@ import DragSelection from "./OpenLayersMap/DragSelection";
 import CustomDragZoom from "./OpenLayersMap/CustomDragZoom";
 import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 import {MenuItemProps} from "../react-ui/Menu";
+import Menu from "../react-ui/Menu";
 import AbstractVisTool from "./AbstractVisTool";
 import {OverrideBounds} from "./AbstractVisTool";
 import ResizingDiv from "../react-ui/ResizingDiv";
@@ -177,6 +178,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	componentDidMount():void
 	{
+		Menu.registerMenuSource(this);
+		
 		this.map = new ol.Map({
 			interactions: ol.interaction.defaults({ dragPan: false }),
 			controls: [],

@@ -6,6 +6,7 @@ import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import * as _ from "lodash";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
+import Menu from "../react-ui/Menu";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import LinkableTextField from "../ui/LinkableTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
@@ -57,6 +58,11 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
         super(props);
     }
+	
+	componentDidMount()
+	{
+		Menu.registerMenuSource(this);
+	}
 	
 	panelTitle = Weave.linkableChild(this, LinkableString);
 	xAxisName = Weave.linkableChild(this, LinkableString);

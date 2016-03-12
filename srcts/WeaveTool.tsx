@@ -1,7 +1,6 @@
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
-import WeavePath = weavejs.path.WeavePath;
-import Layout from "./react-flexible-layout/Layout";
+import LinkableWatcher = weavejs.core.LinkableWatcher;
 
 import * as _ from "lodash";
 import * as React from "react";
@@ -13,8 +12,9 @@ import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/ToolTip";
 import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
-import {REACT_COMPONENT} from "./react-ui/Menu";
 import PopupWindow from "./react-ui/PopupWindow";
+import ReactUtils from "./utils/ReactUtils";
+import WeaveComponentRenderer from "./WeaveComponentRenderer";
 
 const grabberStyle:CSSProperties = {
 	width: "16",
@@ -25,8 +25,8 @@ const grabberStyle:CSSProperties = {
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
-	layout:Layout;
-	toolPath:WeavePath;
+	weave:Weave;
+	path:string[];
 	onDragStart:React.DragEventHandler;
 	onDragEnd:React.DragEventHandler;
 	onDragOver:React.DragEventHandler;
@@ -41,18 +41,14 @@ export interface IWeaveToolState
 
 export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
 {
-	private toolPath:WeavePath;
-	
-	private tool:IVisTool;
-	private toolTip:ToolTip;
 	private titleBarHeight:number = 25;
 	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
+	private watcher:LinkableWatcher;
 	
 	constructor(props:IWeaveToolProps)
 	{
 		super(props);
 		this.state = {};
-		this.toolPath = this.props.toolPath;
 	}
 	
 	shouldComponentUpdate(nextProps:IWeaveToolProps, nextState:IWeaveToolState, nextContext:any):boolean
@@ -62,22 +58,15 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 			|| !_.isEqual(this.context, nextContext);
 	}
 	
-	handleInstance=(tool:IVisTool):void=>
+	handleTool=(wcr:WeaveComponentRenderer):void=>
 	{
-		if (this.tool === tool)
-			return; 
+		if (this.watcher == wcr.watcher)
+			return;
 		
-		this.tool = tool;
+		this.watcher = wcr.watcher;
 		
-		if (this.tool)
-			LinkablePlaceholder.setInstance(this.toolPath.getObject(), this.tool);
-		
-		// make sure title gets updated
-		if (this.tool)
-		{
-			Weave.getCallbacks(this.tool).addGroupedCallback(this, this.updateTitle);
-			(ReactDOM.findDOMNode(tool as any) as any)[REACT_COMPONENT] = tool;
-		}
+		if (this.watcher)
+			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.updateTitle);
 		
 		this.updateTitle();
 	}
@@ -89,33 +78,23 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	
 	showEditor()
 	{
-		PopupWindow.open({
-			title: Weave.lang("Settings for {0}", this.state.title),
-			modal: false,
-			content: this.tool.renderEditor()
-		})
+		if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
+			PopupWindow.open({
+				title: Weave.lang("Settings for {0}", this.state.title),
+				modal: false,
+				content: (this.watcher.target as any).renderEditor()
+			});
 	}
 
 	updateTitle():void
 	{
-		var title:string = (this.tool ? this.tool.title : '') || this.toolPath.getPath().pop();
-		this.setState({title});
+		var title:string = (this.watcher && this.watcher.target ? (this.watcher.target as IVisTool).title : '') || this.props.path[this.props.path.length - 1];
+		if (this.state.title != title)
+			this.setState({title});
 	}
 
-	//TODO - we shouldn't have to render twice to set the tooltip of the tool
 	render():JSX.Element
 	{
-		let reactTool:JSX.Element = null;
-		let ToolClass = LinkablePlaceholder.getClass(this.toolPath.getObject()) as typeof React.Component;
-		if (React.Component.isPrototypeOf(ToolClass))
-		{
-			reactTool = React.createElement(ToolClass, {
-				key: "tool",
-				ref: this.handleInstance,
-				toolTip: this.toolTip
-			});
-		}
-
 		return (
 			<VBox style={this.state.style} className="weave-tool"
 					onMouseEnter={() => {
@@ -123,7 +102,6 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 					}}
 					onMouseLeave={() => {
 						this.titleBar.setState({ showControls: false });
-						this.toolTip.hide();
 					}}
 					onDragOver={this.props.onDragOver}
 					onDragEnd={this.props.onDragEnd}>
@@ -133,10 +111,13 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 						  title={Weave.lang(this.state.title)}
 						  onGearClick={this.showEditor.bind(this)}
 						  />
-					{ reactTool }
-				<ToolTip ref={(c:ToolTip) => this.toolTip = c}/>
+				<WeaveComponentRenderer weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
 		);
+	}
+
+	componentWillUnmount():void
+	{
 	}
 }
 

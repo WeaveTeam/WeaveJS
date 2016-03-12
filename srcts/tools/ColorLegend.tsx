@@ -5,6 +5,7 @@ import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
 import MiscUtils from "../utils/MiscUtils";
+import ReactUtils from "../utils/ReactUtils";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
@@ -53,6 +54,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	
 	private spanStyle:CSSProperties;
 	private textStyle:CSSProperties;
+	private toolTip:ToolTip;
 
 	constructor(props:IVisToolProps)
 	{
@@ -138,12 +140,17 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		{
 			this.probeKeySet.replaceKeys([]);
 		}
-		if (this.props.toolTip)
-			this.props.toolTip.show(this, event, this.probeKeySet.keys, [this.binnedColumn.internalDynamicColumn]);
+		this.toolTip.show(this, event, this.probeKeySet.keys, [this.binnedColumn.internalDynamicColumn]);
 	}
 
 	componentDidMount()
 	{
+		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
+	}
+	
+	componentWillUnmount()
+	{
+		ReactUtils.closePopup(this.toolTip);
 	}
 
 	getInteractionStyle(bin:number):CSSProperties

@@ -14,7 +14,7 @@ import LinkableWatcher = weavejs.core.LinkableWatcher;
 export interface IWeaveComponentRendererProps extends React.HTMLProps<WeaveComponentRenderer>
 {
 	weave:Weave,
-	path:(number|string)[]
+	path:typeof LinkableWatcher.prototype.targetPath
 }
 
 export interface IWeaveComponentRendererState
@@ -63,15 +63,9 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 			this.watcher.targetPath = props.path;
 	}
 
-	get objectAtPath():ILinkableObject
-	{
-		return this.props.weave && this.props.weave.getObject(this.watcher.targetPath);
-	}
-
 	handleWatcher():void
 	{
-		// can't use this.watcher.target because it won't give you a LinkablePlaceholder
-		var ComponentClass = LinkablePlaceholder.getClass(this.objectAtPath) as React.ComponentClass<any> & typeof ILinkableObject;
+		var ComponentClass = LinkablePlaceholder.getClass(this.watcher.target) as React.ComponentClass<any> & typeof ILinkableObject;
 		if (!React.Component.isPrototypeOf(ComponentClass))
 			ComponentClass = null;
 		
@@ -98,15 +92,14 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 	handleInstance=(component:React.Component<any, any>):void=>
 	{
 		if (component)
-			LinkablePlaceholder.setInstance(this.objectAtPath, component);
+			LinkablePlaceholder.setInstance(this.watcher.target, component);
 		
 		ReactUtils.updateState(this, {target: component});
 	}
 	
 	componentWillUnmount():void
 	{
-		if (this.watcher)
-			Weave.dispose(this.watcher);
+		Weave.dispose(this.watcher);
 		this.watcher = null;
 	}
 }

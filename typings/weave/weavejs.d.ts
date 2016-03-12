@@ -3293,7 +3293,7 @@ declare module weavejs.core {
         getSessionState(): any[];
         setSessionState(newState: any[], removeMissingDynamicObjects: boolean): void;
         target: ILinkableObject;
-        targetPath: any[];
+        targetPath: Array<string | number>;
         requestLocalObject(objectType: new (..._: any[]) => any, lockObject?: boolean): any;
         requestGlobalObject(name: string, objectType: new (..._: any[]) => any, lockObject?: boolean): any;
         requestLocalObjectCopy(objectToCopy: ILinkableObject): void;
@@ -3654,7 +3654,7 @@ declare module weavejs.core {
          * This will set a path which should be watched for new targets.
          * Callbacks will be triggered immediately if the path changes or points to a new target.
          */
-        targetPath: any[];
+        targetPath: Array<string | number>;
         dispose(): void;
     }
 }

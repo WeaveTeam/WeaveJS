@@ -1,9 +1,11 @@
+import * as React from "react";
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
 import OpenLayersMapTool from "../OpenLayersMapTool";
 import {IToolTipState} from "../ToolTip";
 import ToolTip from "../ToolTip";
+import ReactUtils from "../../utils/ReactUtils";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -17,11 +19,14 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 	private topKeySet: KeySet;
 	private topLayer: AbstractFeatureLayer;
 	private tool: OpenLayersMapTool;
+	private toolTip: ToolTip;
 
 	constructor(tool:OpenLayersMapTool)
 	{
 		super({handleMoveEvent: ProbeInteraction.prototype.handleMoveEvent});
 		this.tool = tool;
+		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
+		ReactUtils.onUnmount(this.tool, () => ReactUtils.closePopup(this.toolTip));
 	}
 
 	setMap(map:ol.Map)
@@ -84,18 +89,15 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 
 	private handleMoveEvent(event:ol.MapBrowserEvent)
 	{
-        if (!this.tool.props.toolTip)
-            return;
-        
 		let key:IQualifiedKey = this.pixelToKey(event.pixel);
 		if (key)
 		{
-			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
-			this.tool.props.toolTip.show(this.tool, browserEvent, [key], this.topLayer.getToolTipColumns());
+			let browserEvent = event.originalEvent as MouseEvent;
+			this.toolTip.show(this.tool, browserEvent, [key], this.topLayer.getToolTipColumns());
 		}
 		else
 		{
-			this.tool.props.toolTip.hide();
+			this.toolTip.hide();
 		}
 	}
 
@@ -111,7 +113,6 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 				keySet.clearKeys();
 		}
 
-		if (this.tool.props.toolTip)
-			this.tool.props.toolTip.hide();
+		this.toolTip.hide();
 	}
 }
