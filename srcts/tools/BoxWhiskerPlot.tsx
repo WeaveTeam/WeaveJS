@@ -16,6 +16,7 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import Bounds2D = weavejs.geom.Bounds2D;
+import StandardLib = weavejs.util.StandardLib;
 
 export declare type ScatterPlotRecord = {
 	id: IQualifiedKey,
@@ -41,7 +42,7 @@ export declare type LinePlotRecord = {
 
 export interface BoxWhiskerPlotProps extends IVisToolProps, React.Props<BoxWhiskerPlot>
 {
-	
+
 }
 
 
@@ -59,7 +60,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	scatterX = Weave.linkableChild(this, DynamicColumn);
 	scatterY = Weave.linkableChild(this, DynamicColumn);
 	scatterRadius = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
-	scatterColor = Weave.linkableChild(this, DynamicColumn);
+	scatterColor = Weave.linkableChild(this, new AlwaysDefinedColumn("#000000"));
 
 
 	lineX = Weave.linkableChild(this, DynamicColumn);
@@ -70,39 +71,39 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 
 	private boxWhiskerXStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.boxwhiskerX));
 	private boxWhiskerYStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.boxwhiskerY));
-	
+
 	private scatterXStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.scatterX));
 	private scatterYStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.scatterY));
-	
+
 	private lineXStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.lineX));
 	private lineYStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.lineY));
     // selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
     // probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
     // filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
-	
+
 	dataBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
 	screenBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
 	xScale:Function;
 	yScale:Function;
-	
+
 	get title()
 	{
 		return "Box and Whisker Plot"
 	}
-	
+
 	private BOXWHISKER_RECORD_FORMAT = {
 		id: IQualifiedKey,
 		x: this.boxwhiskerX,
 		y: this.boxwhiskerY,
 	};
-	
+
 	private LINE_RECORD_FORMAT = {
 		id: IQualifiedKey,
 		x: this.lineX,
 		y: this.lineY,
 		grouBy: this.lineGrouBy
 	};
-	
+
 	private SCATTER_RECORD_FORMAT = {
 		id: IQualifiedKey,
 		x: this.scatterX,
@@ -125,28 +126,31 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	{
 		ReactUtils.updateState(this, state);
 	}
-	
+
 	renderScatterPlot(records:ScatterPlotRecord[]):JSX.Element
 	{
 		return (
 			<g>
 				{
 					records.map((record, index) => {
-						if(isNaN(record.x + record.y))
+						var hexColor = StandardLib.getHexColor(Number(record.color));
+
+						if(isNaN(record.x + record.y + record.r))
 							return <g key={index}/>;
-						return <circle key={index} 
-									className="circle" 
-									cx={this.xScale(record.x)} 
+
+						return <circle key={index}
+									className="circle"
+									cx={this.xScale(record.x)}
 									cy={this.yScale(record.y)} r={record.r}
-									fill={record.color}
-									stroke="black"
+									fill={hexColor}
+									stroke={hexColor}
 									strokeOpacity={0.5}/>
 					})
 				}
 			</g>
 		);
 	}
-	
+
 	renderLinePlot(records:LinePlotRecord[]):JSX.Element
 	{
 		return null;
@@ -157,22 +161,22 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		var n = q / 4 * (values.length - 1);
 		return values[Math.round(n)];
 	}
-	
+
 	getYValues(key:IQualifiedKey):number[]
 	{
 		return _.sortBy((this.boxwhiskerY.getValueFromKey(key, Array)||[]).concat()) as number[];
 	}
-	
+
 	renderBoxWhiskerPlot(records:BoxWhiskerRecord[]):JSX.Element
 	{
-		
+
 		// box properties
 		var lineColor = 0x000000;
 		var lineAlpha = 0.5;
 		var fillColor = 0xe0e0e0;
 		var fillAlpha = 1.0;
 		var radius = 10;
-		
+
 		var glyphStyle:React.CSSProperties = {
 			stroke: "#000000",
 			strokeOpacity: lineAlpha,
@@ -190,7 +194,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 						if (!isFinite(x) || yValues.some(v => !isFinite(v)))
 							return [];
 						var [min, q1, median, q3, max] = [0,1,2,3,4].map(q => this.yScale(this.getQ(yValues, q)));
-						
+
 						// draw whiskers
 						var whisker:JSX.Element = (
 							<g key="whisker" style={glyphStyle}>
@@ -215,7 +219,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 			</g>
 		);
 	}
-	
+
 	render():JSX.Element
 	{
 		// this should be in separate callbacks that call forceUpdate
@@ -242,16 +246,16 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		// set data bounds
 		this.dataBounds.reset();
 		var recordsY = _.flatten(ColumnUtils.getRecords(this.boxwhiskerY, null, Array));
-		
+
 		this.dataBounds.includeCoords(this.boxWhiskerXStats.getMin(), _.min(recordsY));
-		this.dataBounds.includeCoords(this.boxWhiskerYStats.getMax(), _.max(recordsY));
-		
+		this.dataBounds.includeCoords(this.boxWhiskerXStats.getMax(), _.max(recordsY));
+
 		this.dataBounds.includeCoords(this.scatterXStats.getMin(), this.scatterYStats.getMin());
 		this.dataBounds.includeCoords(this.scatterXStats.getMax(), this.scatterYStats.getMax());
 
-		// this.dataBounds.includeCoords(this.scatterXStats.getMin(), this.scatterYStats.getMin());
-		// this.dataBounds.includeCoords(this.scatterXStats.getMin(), this.scatterYStats.getMax());
-		
+		// this.dataBounds.includeCoords(this.lineXStats.getMin(), this.lineYStats.getMin());
+		// this.dataBounds.includeCoords(this.lineXStats.getMax(), this.lineYStats.getMax());
+
 		// create scales from dataBounds and screenBounds
 		this.xScale = d3.scale.linear().domain(this.dataBounds.getXRange()).range(this.screenBounds.getXRange());
 		this.yScale = d3.scale.linear().domain(this.dataBounds.getYRange()).range(this.screenBounds.getYRange());
@@ -270,7 +274,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 					{/*
 						this.renderLinePlot(lineRecords)
 					*/}
-					
+
 				</svg>
 			</ResizingDiv>
 		);
