@@ -254,7 +254,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 									}
 
 									element.push(
-										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
+										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
 											<HBox style={this.textStyle}>
 												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
@@ -301,7 +301,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 								if (i < this.numberOfBins)
 								{
 									element.push(
-										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
+										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
 											<HBox style={{
 												flex:1.0,
 												alignItems:"center",
