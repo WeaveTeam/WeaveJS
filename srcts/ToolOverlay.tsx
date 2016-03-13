@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 
 const toolOverlayStyle:React.CSSProperties = {
     background: "#000",
@@ -25,7 +26,7 @@ export default class ToolOverlay extends React.Component<IToolOverlayProps, IToo
     {
         super(props);
         this.state = {
-            style: toolOverlayStyle
+            style: _.clone(toolOverlayStyle)
         };
     }
 
