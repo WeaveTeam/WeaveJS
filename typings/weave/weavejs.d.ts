@@ -26,13 +26,13 @@ declare module __global__ {
          * @return A WeavePath object.
          * @see WeavePath
          */
-        path(...basePath: any[]): WeavePath;
+        path(...basePath: (string | number | (string | number)[])[]): WeavePath;
         /**
          * Gets the ILinkableObject at a specified path.
          * @param path An Array (or multiple parameters) specifying the path to an object in the session state.
          *             A child index number may be used in place of a name in the path when its parent object is a LinkableHashMap.
          */
-        getObject(...path: any[]): ILinkableObject;
+        getObject(...path: (string | number | (string | number)[])[]): ILinkableObject;
         /**
          * Finds the Weave instance for a given Object.
          * @param object An Object.
