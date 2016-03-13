@@ -13,7 +13,7 @@ export type Direction = typeof HORIZONTAL | typeof VERTICAL;
 
 export type LayoutState = {
 	flex?: number,
-	id?: string[],
+	id?: Object,
 	direction?: Direction,
 	children?: LayoutState[],
 	spacing?:number
@@ -78,13 +78,13 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 			this.props.onStateChange(this.state);
 	}
 
-	public getElementFromId(id:string[]):Element
+	public getElementFromId(id:Object):Element
 	{
 		var component = this.getComponentFromId(id);
 		return component ? ReactDOM.findDOMNode(component) : null;
 	}
 
-	public getComponentFromId(id:string[]):Layout
+	public getComponentFromId(id:Object):Layout
 	{
 		if (this.state.id && _.isEqual(this.state.id, id))
 		{
