@@ -90,7 +90,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	
 	get title():string
 	{
-		return this.panelTitle.value;
+       return this.panelTitle.value && weavejs.util.JS.compile('`' + this.panelTitle.value + '`').call(this);
 	}
 	
 	get numberOfBins():number
