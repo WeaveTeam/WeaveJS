@@ -97,8 +97,7 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 		
 		var style:React.CSSProperties = _.clone(this.containerStyle);
 		style.display = "block";
-		if (!this.secondRender)
-			style.opacity = 0;
+		style.visibility = this.secondRender ? "visible" : "hidden";
 		style.top = this.state.y + this.toolTipOffset;
 		style.left = this.state.x + this.toolTipOffset;
 		
