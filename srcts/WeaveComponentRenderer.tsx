@@ -78,8 +78,7 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 	render():JSX.Element
 	{
 		var props = _.clone(this.props);
-		props.style = _.clone(props.style) || {};
-		props.style.flex = 1;
+		props.style = _.merge({flex: 1}, props.style);
 		delete props.weave;
 		delete props.path;
 		return (
