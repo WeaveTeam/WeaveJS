@@ -1,5 +1,5 @@
 import WeaveApp from "./WeaveApp";
-import WeaveLayoutManager from "./WeaveLayoutManager";
+import FlexibleLayout from "./FlexibleLayout";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 
 import WeaveDataSourceEditor from "./editors/WeaveDataSourceEditor";
@@ -49,7 +49,7 @@ weavejs.util.DateUtils.moment = (moment as any)['default'];
 export
 {
 	WeaveApp,
-	WeaveLayoutManager,
+	FlexibleLayout,
 	WeaveComponentRenderer,
 	
 	WeaveDataSourceEditor,

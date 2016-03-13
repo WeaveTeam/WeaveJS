@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import $ from "jquery";
-import {WeaveLayoutManager} from "../lib/WeaveUI.js";
+import {FlexibleLayout} from "../lib/WeaveUI.js";
 
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
@@ -71,7 +71,7 @@ class MultipleView extends React.Component {
 
 		var weaveUI = [
 			<div key="0" style={styleObject}>
-				<WeaveLayoutManager layout={layout} style={{width: "100%", height: "100%"}}/>
+				<FlexibleLayout layout={layout} style={{width: "100%", height: "100%"}}/>
 	   		</div>
 		];
 		
@@ -91,7 +91,7 @@ class MultipleView extends React.Component {
 
 			return (
 				<div key={index} style={styleObject}>
-					<WeaveLayoutManager layout={layout} style={{width: "100%", height: "100%"}}/>
+					<FlexibleLayout layout={layout} style={{width: "100%", height: "100%"}}/>
 				</div>
 			);
 		});
@@ -112,7 +112,7 @@ class MultipleView extends React.Component {
 
 			weaveUI.push(
 				<div key={keyIndex} style={{border: "2px solid blue"}}>
-					<WeaveLayoutManager layout={layout} style={{width: "100%", height: "100%"}}/>
+					<FlexibleLayout layout={layout} style={{width: "100%", height: "100%"}}/>
 				</div>
 			);
 		}

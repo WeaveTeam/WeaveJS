@@ -31,17 +31,17 @@ declare type PolarPoint = {
 	y: number;
 };
 
-export interface IWeaveLayoutManagerProps extends React.Props<WeaveLayoutManager>
+export interface IFlexibleLayoutProps extends React.Props<FlexibleLayout>
 {
 	layout: LinkableVariable,
 	style?: any
 }
 
-export interface IWeaveLayoutManagerState
+export interface IFlexibleLayoutState
 {
 }
 
-export default class WeaveLayoutManager extends React.Component<IWeaveLayoutManagerProps, IWeaveLayoutManagerState>
+export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps, IFlexibleLayoutState>
 {
 	private weave:Weave;
 	private layout:LinkableVariable;
@@ -56,13 +56,13 @@ export default class WeaveLayoutManager extends React.Component<IWeaveLayoutMana
 	private throttledForceUpdate:() => void;
 	private throttledForceUpdateTwice:() => void;
 
-	constructor(props:IWeaveLayoutManagerProps)
+	constructor(props:IFlexibleLayoutProps)
 	{
 		super(props);
 		this.componentWillReceiveProps(props);
 	}
 	
-	componentWillReceiveProps(props:IWeaveLayoutManagerProps):void
+	componentWillReceiveProps(props:IFlexibleLayoutProps):void
 	{
 		if (!props.layout)
 			throw new Error("layout is a required prop");

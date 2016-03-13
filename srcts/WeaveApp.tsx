@@ -4,7 +4,7 @@ import WeaveMenuBar from "./WeaveMenuBar";
 import Menu from "./react-ui/Menu";
 import {MenuItemProps} from "./react-ui/Menu";
 import {HBox, VBox} from "./react-ui/FlexBox";
-import WeaveLayoutManager from "./WeaveLayoutManager";
+import FlexibleLayout from "./FlexibleLayout";
 import PopupWindow from "./react-ui/PopupWindow";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -86,7 +86,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onContextMenu={this.showContextMenu.bind(this)}
 			>
 				<WeaveMenuBar weave={weave}/>
-				<WeaveLayoutManager layout={this.props.layout} style={{flex: 1}}/>
+				<FlexibleLayout layout={this.props.layout} style={{flex: 1}}/>
 				{
 					this.state.showContextMenu ? 
 					<div ref={(element:HTMLElement) => this.contextMenu = element} onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
