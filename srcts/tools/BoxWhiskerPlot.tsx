@@ -8,6 +8,7 @@ import {XAxis, YAxis} from "./Axis";
 import {VBox} from "../react-ui/FlexBox";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
+import FormatUtils from "../utils/FormatUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -67,8 +68,6 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	lineY = Weave.linkableChild(this, DynamicColumn);
 	lineGrouBy = Weave.linkableChild(this, DynamicColumn);
 
-	radius = Weave.linkableChild(this, DynamicColumn);
-
 	private boxWhiskerXStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.boxwhiskerX));
 	private boxWhiskerYStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.boxwhiskerY));
 
@@ -85,6 +84,9 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	screenBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
 	xScale:Function;
 	yScale:Function;
+
+	private xAxisDataType:string;
+	private yAxisDataType:string;
 
 	get title()
 	{
@@ -219,6 +221,28 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 			</g>
 		);
 	}
+	
+	xAxisFormat=(num: any):string => {
+		if (this.xAxisDataType !== "number")
+		{
+			return ColumnUtils.deriveStringFromNumber(this.scatterX, num) || "";
+		}
+		else
+		{
+			return String(FormatUtils.defaultNumberFormatting(num));
+		}
+	}
+	
+	yAxisFormat=(num:any):string => {
+		if (this.yAxisDataType !== "number")
+		{
+			return ColumnUtils.deriveStringFromNumber(this.scatterY, num) || "";
+		}
+		else
+		{
+			return String(FormatUtils.defaultNumberFormatting(num));
+		}
+	}
 
 	render():JSX.Element
 	{
@@ -231,6 +255,9 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		var scatterPlotRecords = ColumnUtils.getRecords(this.SCATTER_RECORD_FORMAT, null, Number);
 		var lineRecords = ColumnUtils.getRecords(this.LINE_RECORD_FORMAT, null, Number);
 
+		this.xAxisDataType = this.scatterX.getMetadata('dataType');
+		this.yAxisDataType = this.scatterY.getMetadata('dataType');
+
 		// set screen bounds
 		this.screenBounds.setBounds(
 			this.margin.left.value,
@@ -238,6 +265,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 			this.state.width - this.margin.right.value,
 			this.margin.top.value
 		);
+
 		if (this.screenBounds.getWidth() < 0)
 			this.screenBounds.setWidth(0);
 		if (this.screenBounds.getHeight() > 0)
@@ -263,8 +291,8 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		return (
 			<ResizingDiv ref={ReactUtils.onWillUpdateRef(this.updateSVGSize)}>
 				<svg width={this.state.width} height={this.state.height}>
-					<XAxis x={0} y={this.screenBounds.yMin} scale={this.xScale}/>
-					<YAxis x={this.screenBounds.xMin} y={0} scale={this.yScale}/>
+					<XAxis x={0} y={this.screenBounds.yMin} scale={this.xScale} format={this.xAxisFormat}/>
+					<YAxis x={this.screenBounds.xMin} y={0} scale={this.yScale} format={this.yAxisFormat}/>
 					{
 						this.renderScatterPlot(scatterPlotRecords)
 					}

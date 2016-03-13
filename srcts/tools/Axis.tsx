@@ -18,6 +18,7 @@ export interface AxisProps extends React.Props<AbstractAxis>
 	scale:Function
 	// will be used later for now we are going to use 'linear'
 	scalingMethod?:string;
+	format:(num:any) => string;
 }
 
 export interface AxisState
@@ -39,7 +40,7 @@ export class AbstractAxis extends React.Component<AxisProps, AxisState>
 	
 	componentDidUpdate()
 	{
-		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient);
+		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient).tickFormat(this.props.format);
 		d3.select(this.element).call(axis);
 	}
 }
@@ -50,6 +51,15 @@ export class XAxis extends AbstractAxis
 	{
 		super(props);
 		this.orient = BOTTOM;
+	}
+
+	componentDidUpdate()
+	{
+		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient).tickFormat(this.props.format);
+		d3.select(this.element).call(axis).selectAll("text")  // select all the text elements for the xaxis
+          .attr("transform", function(d) {
+             return "translate(" + this.getBBox().height*-2 + "," + (this.getBBox().height+7) + ")rotate(-45)";
+         });
 	}
 
 	render()
