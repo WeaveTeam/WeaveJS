@@ -136,6 +136,8 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	
 	validateSize()
 	{
+		if (!this.element)
+			return;
         if (this.c3Config.size.width != this.element.clientWidth || this.c3Config.size.height != this.element.clientHeight)
 		{
             this.c3Config.size = { width: this.element.clientWidth, height: this.element.clientHeight };

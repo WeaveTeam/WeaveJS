@@ -19,6 +19,10 @@ declare module __global__ {
          */
         history: SessionStateLog;
         /**
+         * For backwards compatibility, may be temporary solution
+         */
+        macro(name: string, ...params: any[]): any;
+        /**
          * Creates a WeavePath object.  WeavePath objects are immutable after they are created.
          * This is a shortcut for "new WeavePath(weave, basePath)".
          * @param basePath An optional Array (or multiple parameters) specifying the path to an object in the session state.
