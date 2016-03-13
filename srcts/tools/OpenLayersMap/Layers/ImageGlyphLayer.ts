@@ -19,7 +19,7 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 	imageSize = Weave.linkableChild(this, AlwaysDefinedColumn);
 	imageURL = Weave.linkableChild(this, AlwaysDefinedColumn);
-	alpha = Weave.linkableChild(this, AlwaysDefinedColumn);
+	alpha = Weave.linkableChild(this, new AlwaysDefinedColumn(1.0));
 	color = Weave.linkableChild(this, AlwaysDefinedColumn);
 
 	constructor()
@@ -48,13 +48,13 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 		return additionalColumns;
 	}
 
-	setIconStyle(feature:ol.Feature, img:any, iconSize: number)
+	setIconStyle(feature:ol.Feature, img:any, iconSize: number, alpha:number)
 	{
 		let styles:any = {};
 
 		if (!img.complete || !img.src)
 		{
-			$(img).one("load", this.setIconStyle.bind(this, feature, img, iconSize));
+			$(img).one("load", this.setIconStyle.bind(this, feature, img, iconSize, alpha));
 			return;
 		}
 
@@ -85,7 +85,11 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 			if (stylePrefix === "unselected")
 			{
-				icon.setOpacity(1 / 3);
+				icon.setOpacity(alpha / 3);
+			}
+			else
+			{
+				icon.setOpacity(alpha);
 			}
 
 			styles[stylePrefix + "Style"] = new ol.style.Style({image: icon});
@@ -124,8 +128,8 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 			}
 
 			let imageSize = Number(record.imageSize || NaN);
-			if (isNaN(record.alpha)) record.alpha = 0;
-			let color = AbstractFeatureLayer.toColorRGBA(record.color, record.alpha);
+			if (isNaN(record.alpha)) record.alpha = 1;
+			let color = AbstractFeatureLayer.toColorRGBA(record.color, 1);
 
 			if (!record.imageURL)
 			{
@@ -135,7 +139,7 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 			let img = this.imageGlyphCache.getImage(record.imageURL, color);
 
-			this.setIconStyle(feature, img, imageSize);
+			this.setIconStyle(feature, img, imageSize, record.alpha);
 		}
 	}
 }
