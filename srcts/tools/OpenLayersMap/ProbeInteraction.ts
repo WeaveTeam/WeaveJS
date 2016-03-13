@@ -25,7 +25,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 	{
 		super({handleMoveEvent: ProbeInteraction.prototype.handleMoveEvent});
 		this.tool = tool;
-		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
+		this.toolTip = ReactUtils.openPopup(React.createElement(ToolTip)) as ToolTip;
 		ReactUtils.onUnmount(this.tool, () => ReactUtils.closePopup(this.toolTip));
 	}
 
