@@ -15,14 +15,14 @@ export type LayoutState = {
 	flex?: number,
 	id?: Object,
 	direction?: Direction,
-	children?: LayoutState[],
-	spacing?:number
+	children?: LayoutState[]
 };
 
 export interface LayoutProps extends React.Props<Layout>
 {
-	state: LayoutState;
-	onStateChange: Function;
+	state:LayoutState;
+	onStateChange:Function;
+	spacing?:number;
 }
 
 export default class Layout extends React.Component<LayoutProps, LayoutState>
@@ -41,7 +41,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		super(props, state);
 		var ps = props.state || {};
-		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex, spacing: ps.spacing };
+		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex };
 		this.minSize = 16;
 		this.dragging = false;
 	}
@@ -184,14 +184,10 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		);
 	}
 
-	static renderLayout(params:{
-			key: string,
-			ref: (layout:Layout)=>void,
-			state: LayoutState,
-			onStateChange: (state:LayoutState)=>void
-		}):JSX.Element
+	static renderLayout(props:LayoutProps):JSX.Element
 	{
-		var {key, ref, state, onStateChange} = params;
+		var {key, state, onStateChange, spacing} = props;
+		var ref = props.ref as (layout:Layout)=>any;
 
 		var parentLayout:Layout;
 
@@ -218,7 +214,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 							key={`${key}.resizers[${i - 1}]`}
 							ref={saveResizer.bind(null, i - 1)}
 							direction={state.direction}
-							spacing={state.spacing}
+							spacing={spacing}
 						/>
 					);
 				elements.push(
@@ -226,7 +222,8 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 						key: `${key}.children[${i}]`,
 						ref: saveChild.bind(null, i),
 						state: childState,
-						onStateChange: onChildStateChange.bind(null, i)
+						onStateChange: onChildStateChange.bind(null, i),
+						spacing: spacing
 					})
 				);
 			});
@@ -253,6 +250,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 				state={_.cloneDeep(state)}
 				onStateChange={onStateChange}
+				spacing={spacing}
 			/>
 		);
 	}

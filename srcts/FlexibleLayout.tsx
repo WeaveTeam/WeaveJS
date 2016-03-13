@@ -361,8 +361,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		return this.simplifyState({
 			flex: 1,
 			direction: HORIZONTAL,
-			children: paths.map(path => { return {id: path.getPath(), flex: 1} }),
-			spacing: 4
+			children: paths.map(path => { return {id: path.getPath(), flex: 1} })
 		});
 	}
 	
