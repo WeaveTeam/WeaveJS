@@ -1,6 +1,7 @@
 import WeaveApp from "./WeaveApp";
-import FlexibleLayout from "./FlexibleLayout";
+import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
+import FlexibleLayout from "./FlexibleLayout";
 
 import WeaveDataSourceEditor from "./editors/WeaveDataSourceEditor";
 
@@ -13,11 +14,12 @@ import C3Histogram from "./tools/C3Histogram";
 import C3LineChart from "./tools/C3LineChart";
 import C3ScatterPlot from "./tools/C3ScatterPlot";
 import C3PieChart from "./tools/C3PieChart";
+import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 import OpenLayersMapTool from "./tools/OpenLayersMapTool";
 import SessionStateMenuTool from "./tools/SessionStateMenuTool";
 import TableTool from "./tools/TableTool";
 import TextTool from "./tools/TextTool";
-import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
+import ToolTip from "./tools/ToolTip";
 
 import HSlider from "./react-ui/RCSlider/HSlider";
 import VSlider from "./react-ui/RCSlider/VSlider";
@@ -49,8 +51,9 @@ weavejs.util.DateUtils.moment = (moment as any)['default'];
 export
 {
 	WeaveApp,
-	FlexibleLayout,
+	WeaveMenuBar,
 	WeaveComponentRenderer,
+	FlexibleLayout,
 	
 	WeaveDataSourceEditor,
 	
@@ -63,11 +66,12 @@ export
 	C3LineChart,
 	C3ScatterPlot,
 	C3PieChart,
+	DataFilterTool,
 	OpenLayersMapTool,
 	SessionStateMenuTool,
 	TableTool,
 	TextTool,
-	DataFilterTool,
+	ToolTip,
 	
 	HSlider,
 	VSlider,
