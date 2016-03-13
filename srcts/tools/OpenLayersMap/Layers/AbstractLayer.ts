@@ -91,6 +91,8 @@ export default class AbstractLayer implements ILinkableObject
 			this.opacity.addGroupedCallback(this, () => value.set("opacity", this.opacity.value), true);
 			this.visible.addGroupedCallback(this, () => value.set("visible", this.visible.value), true);
 			this.selectable.addGroupedCallback(this, () => value.set("selectable", this.selectable.value), true);
+			let index = this.parent.layers.getObjects().indexOf(this);
+			value.setZIndex(index + 2);
 
 			value.set("layerObject", this); /* Need to store this backref */
 		}
