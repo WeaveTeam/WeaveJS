@@ -63,12 +63,16 @@ export default class Resizer extends React.Component<IResizerProps, IResizerStat
 	render():JSX.Element
 	{
 		var style:React.CSSProperties = this.props.direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL;
-		if(this.props.direction === HORIZONTAL){
-			style.width = this.props.spacing || RESIZER_DEFAULT;
-		} else {
-			style.height = this.props.spacing || RESIZER_DEFAULT;
-		}
+		
+		// makes a copy
+		style = VendorPrefix.prefix({styles: style}).styles;
+		
+		var spacing = this.props.spacing || RESIZER_DEFAULT;
+		if (this.props.direction === HORIZONTAL)
+			style.width = spacing;
+		else
+			style.height = spacing;
 
-		return <span style={VendorPrefix.prefix({styles: style}).styles}/>;
+		return <span style={style}/>;
 	}
 }
