@@ -1,17 +1,19 @@
 import * as React from "react";
 import * as _ from "lodash";
-import WeaveMenuBar from "./WeaveMenuBar";
 import Menu from "./react-ui/Menu";
 import {MenuItemProps} from "./react-ui/Menu";
 import {HBox, VBox} from "./react-ui/FlexBox";
-import FlexibleLayout from "./FlexibleLayout";
 import PopupWindow from "./react-ui/PopupWindow";
+import WeaveMenuBar from "./WeaveMenuBar";
+import WeaveComponentRenderer from "./WeaveComponentRenderer";
+import FlexibleLayout from "./FlexibleLayout";
 
-import LinkableVariable = weavejs.core.LinkableVariable;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export interface WeaveAppProps extends React.Props<WeaveApp>
 {
-	layout:LinkableVariable
+	weave:Weave;
+	renderPath:string[];
 }
 
 export interface WeaveAppState
@@ -72,10 +74,27 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	
 	render():JSX.Element
 	{
-		var weave = Weave.getWeave(this.props.layout);
-
-		if(!weave)
-			return <VBox/>;
+		var weave = this.props.weave;
+		var renderPath = this.props.renderPath || ['Layout'];
+		
+		if (!weave)
+			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
+		
+		if (!weave.getObject(renderPath))
+		{
+			try
+			{
+				var parentPath = renderPath.concat();
+				var childName = parentPath.pop();
+				var parent = weave.getObject(parentPath);
+				if (parent instanceof LinkableHashMap)
+					(parent as LinkableHashMap).requestObject(childName, FlexibleLayout);
+			}
+			catch (e)
+			{
+				// ignore
+			}
+		}
 
 		return (
 			<VBox
@@ -86,7 +105,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onContextMenu={this.showContextMenu.bind(this)}
 			>
 				<WeaveMenuBar weave={weave}/>
-				<FlexibleLayout layout={this.props.layout} style={{flex: 1}}/>
+				<WeaveComponentRenderer weave={weave} path={renderPath}/>
 				{
 					this.state.showContextMenu ? 
 					<div ref={(element:HTMLElement) => this.contextMenu = element} onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>

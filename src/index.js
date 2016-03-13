@@ -7,7 +7,6 @@ import {MiscUtils} from "../lib/WeaveUI.js";
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
 var urlParams = MiscUtils.getUrlParams();
-var layoutName = urlParams.layout || 'Layout';
 var weave = window.weave;
 if (weave)
 {
@@ -39,7 +38,13 @@ else
 function render()
 {
 	$(() => {
-		var layout = weave.root.requestObject(layoutName, Weave.getDefinition("FlexibleLayout"));
-		ReactDOM.render(<WeaveApp layout={layout} style={{width: "100%", height: "100%"}}/>, document.getElementById("weaveElt"));
+		ReactDOM.render(
+			<WeaveApp
+				weave={weave}
+				renderPath={weavejs.WeaveAPI.CSVParser.parseCSVRow(urlParams.layout)}
+				style={{width: "100%", height: "100%"}}
+			/>,
+			document.getElementById("weaveElt")
+		);
 	});
 }

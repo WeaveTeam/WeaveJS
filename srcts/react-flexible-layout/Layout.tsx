@@ -11,18 +11,19 @@ export const VERTICAL:"vertical" = "vertical";
 export const HORIZONTAL:"horizontal" = "horizontal";
 export type Direction = typeof HORIZONTAL | typeof VERTICAL;
 
-export type LayoutState = {
-	flex?: number,
-	id?: Object,
-	direction?: Direction,
-	children?: LayoutState[]
+export interface LayoutState
+{
+	flex?: number;
+	id?: Object;
+	direction?: Direction;
+	children?: LayoutState[];
 };
 
 export interface LayoutProps extends React.Props<Layout>
 {
-	state:LayoutState;
-	onStateChange:Function;
-	spacing?:number;
+	state: LayoutState;
+	onStateChange: Function;
+	spacing?: number;
 }
 
 export default class Layout extends React.Component<LayoutProps, LayoutState>
@@ -41,7 +42,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		super(props, state);
 		var ps = props.state || {};
-		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex };
+		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex || 1 };
 		this.minSize = 16;
 		this.dragging = false;
 	}
@@ -160,7 +161,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		var style:any = {
 			display: "flex",
-			flex: this.state.flex,
+			flex: this.state.flex || 1,
 			position: "relative",
 			outline: "none",
 			overflow: "hidden",
@@ -194,7 +195,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		var elements:JSX.Element[] = [];
 		var children:Layout[] = [];
 		var resizers:Resizer[] = [];
-		if (state.children && state.children.length > 0)
+		if (state && state.children && state.children.length > 0)
 		{
 			let onChildStateChange = (childIndex:number, childState:LayoutState) => {
 				if (!parentLayout)
@@ -248,7 +249,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 				ref={refCallback}
 				children={elements}
 
-				state={_.cloneDeep(state)}
+				state={_.cloneDeep(Object(state))}
 				onStateChange={onStateChange}
 				spacing={spacing}
 			/>
