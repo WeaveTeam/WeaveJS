@@ -19,18 +19,18 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 	imageSize = Weave.linkableChild(this, AlwaysDefinedColumn);
 	imageURL = Weave.linkableChild(this, AlwaysDefinedColumn);
-	alpha = Weave.linkableChild(this, new AlwaysDefinedColumn(1.0));
-	color = Weave.linkableChild(this, AlwaysDefinedColumn);
+	dataAlpha = Weave.linkableChild(this, new AlwaysDefinedColumn(1.0));
+	dataColor = Weave.linkableChild(this, AlwaysDefinedColumn);
 
 	constructor()
 	{
 		super();
 		this.imageGlyphCache = new ImageGlyphCache(this);
-		this.alpha.defaultValue.state = 1.0;
+		this.dataAlpha.defaultValue.state = 1.0;
 		this.imageSize.addGroupedCallback(this, this.updateStyleData);
 		this.imageURL.addGroupedCallback(this, this.updateStyleData);
-		this.alpha.addGroupedCallback(this, this.updateStyleData);
-		this.color.addGroupedCallback(this, this.updateStyleData, true);
+		this.dataAlpha.addGroupedCallback(this, this.updateStyleData);
+		this.dataColor.addGroupedCallback(this, this.updateStyleData, true);
 
 	}
 
@@ -38,7 +38,7 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 	{
 		let additionalColumns: IAttributeColumn[] = [];
 
-		for (let column of [this.imageSize, this.imageURL, this.alpha, this.color])
+		for (let column of [this.imageSize, this.imageURL, this.dataAlpha, this.dataColor])
 		{
 			let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column);
 			if (internalColumn)
@@ -106,8 +106,8 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 		var recordIds:IQualifiedKey[] = this.dataX.keys;
 		var records:any[] = weavejs.data.ColumnUtils.getRecords({
-			"alpha": this.alpha,
-			"color": this.color,
+			"alpha": this.dataAlpha,
+			"color": this.dataColor,
 			"imageURL": this.imageURL,
 			"imageSize": this.imageSize
 		}, recordIds, {
@@ -141,6 +141,14 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 			this.setIconStyle(feature, img, imageSize, record.alpha);
 		}
+	}
+
+	get deprecatedStateMapping()
+	{
+		return {
+			alpha: (state:any) => Weave.setState(typeof state === 'number' ? this.opacity : this.dataAlpha, state),
+			color: this.dataColor
+		};
 	}
 }
 
