@@ -353,7 +353,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	updateResolutionDependentStyles(event:ol.MapEvent):void
 	{
-		if (event.frameState && event.frameState.animate)
+		if (event.frameState.animate)
 			return;
 
 		this.map.un("postrender", this.updateResolutionDependentStyles, this);
