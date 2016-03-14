@@ -155,7 +155,19 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 
 	renderLinePlot(records:LinePlotRecord[]):JSX.Element
 	{
-		return null;
+		
+		var lineStyle:React.SVGAttributes = {
+			fill: "#FFFFFF",
+			stroke: "#000000",
+			strokeOpacity: 0.5,
+			fillOpacity: 0
+		}
+
+		var path:string = "";
+		var pathArray = records
+			.filter((record) => isFinite(record.x + record.y))
+			.map((record) => this.xScale(record.x) + " " + this.yScale(record.y));
+		return <path d={"M " + pathArray.join(" L ")} {...lineStyle}/>;
 	}
 
 	getQ(values:number[], q:number):number
@@ -177,7 +189,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		var lineAlpha = 0.5;
 		var fillColor = 0xe0e0e0;
 		var fillAlpha = 1.0;
-		var radius = 10;
+		var radius = 5;
 
 		var glyphStyle:React.CSSProperties = {
 			stroke: "#000000",
@@ -281,9 +293,11 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		this.dataBounds.includeCoords(this.scatterXStats.getMin(), this.scatterYStats.getMin());
 		this.dataBounds.includeCoords(this.scatterXStats.getMax(), this.scatterYStats.getMax());
 
-		// this.dataBounds.includeCoords(this.lineXStats.getMin(), this.lineYStats.getMin());
-		// this.dataBounds.includeCoords(this.lineXStats.getMax(), this.lineYStats.getMax());
-
+		this.dataBounds.includeCoords(this.lineXStats.getMin(), this.lineYStats.getMin());
+		this.dataBounds.includeCoords(this.lineXStats.getMax(), this.lineYStats.getMax());
+		
+		if (this.dataBounds.isUndefined())
+			this.dataBounds.setBounds(0, 0, 0, 0);
 		// create scales from dataBounds and screenBounds
 		this.xScale = d3.scale.linear().domain(this.dataBounds.getXRange()).range(this.screenBounds.getXRange());
 		this.yScale = d3.scale.linear().domain(this.dataBounds.getYRange()).range(this.screenBounds.getYRange());
@@ -291,18 +305,17 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		return (
 			<ResizingDiv ref={ReactUtils.onWillUpdateRef(this.updateSVGSize)}>
 				<svg width={this.state.width} height={this.state.height}>
-					<XAxis x={0} y={this.screenBounds.yMin} scale={this.xScale} format={this.xAxisFormat}/>
-					<YAxis x={this.screenBounds.xMin} y={0} scale={this.yScale} format={this.yAxisFormat}/>
+					<XAxis x={0} y={this.screenBounds.yMin} length={this.screenBounds.yMin - this.screenBounds.yMax} scale={this.xScale} format={this.xAxisFormat}/>
+					<YAxis x={this.screenBounds.xMin} y={0} length={this.screenBounds.xMax - this.screenBounds.xMin} scale={this.yScale} format={this.yAxisFormat}/>
+					{
+						this.renderLinePlot(lineRecords)
+					}
 					{
 						this.renderScatterPlot(scatterPlotRecords)
 					}
 					{
 						this.renderBoxWhiskerPlot(boxWhiskerRecords)
 					}
-					{/*
-						this.renderLinePlot(lineRecords)
-					*/}
-
 				</svg>
 			</ResizingDiv>
 		);

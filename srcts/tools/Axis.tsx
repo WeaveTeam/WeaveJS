@@ -19,6 +19,7 @@ export interface AxisProps extends React.Props<AbstractAxis>
 	// will be used later for now we are going to use 'linear'
 	scalingMethod?:string;
 	format:(num:any) => string;
+	length:number; // the length of the axis for the grid lines
 }
 
 export interface AxisState
@@ -35,12 +36,12 @@ export class AbstractAxis extends React.Component<AxisProps, AxisState>
 
 	constructor(props:AxisProps)
 	{
-		super(props)
+		super(props);
 	}
 	
 	componentDidUpdate()
 	{
-		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient).tickFormat(this.props.format);
+		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient).tickFormat(this.props.format).tickSize(-1*this.props.length);
 		d3.select(this.element).call(axis);
 	}
 }
@@ -52,10 +53,10 @@ export class XAxis extends AbstractAxis
 		super(props);
 		this.orient = BOTTOM;
 	}
-
+	
 	componentDidUpdate()
 	{
-		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient).tickFormat(this.props.format);
+		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient).tickFormat(this.props.format).tickSize(-1*this.props.length);
 		d3.select(this.element).call(axis).selectAll("text")  // select all the text elements for the xaxis
           .attr("transform", function(d) {
              return "translate(" + this.getBBox().height*-2 + "," + (this.getBBox().height+7) + ")rotate(-45)";
@@ -77,7 +78,7 @@ export class YAxis extends AbstractAxis
 		super(props);
 		this.orient = weavejs.WeaveAPI.Locale.reverseLayout ? RIGHT : LEFT;
 	}
-
+	
 	render()
 	{
 		return (
