@@ -164,11 +164,11 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		}
 
 		var path:string = "";
-		var points = records.map(record => {x: this.xScale(record.x), y: this.yScale(record.y)});
-		return <path d={getPathStr(points)} {...lineStyle}/>;
+		var points = records.map(record => ({x: this.xScale(record.x), y: this.yScale(record.y)}));
+		return <path d={this.getPathStr(points)} {...lineStyle}/>;
 	}
 	
-	getPathStr(points:{x:number, y:number}[]):String
+	getPathStr(points:{x:number, y:number}[]):string
 	{
 		if (!points.length)
 			return null;
