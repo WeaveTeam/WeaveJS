@@ -208,7 +208,7 @@ declare module __global__ {
         /**
          * Looks up a static definition by name.
          */
-        static getDefinition(name: string): any;
+        static getDefinition(name: string, throwIfNotFound?: boolean): any;
         /**
          * Generates a deterministic JSON-like representation of an object, meaning object keys appear in sorted order.
          * @param value The object to stringify.
@@ -1211,7 +1211,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The global object of the requested name and type, or null if the object could not be created.
          */
-        requestGlobalObject<T extends ILinkableObject>(name: string, objectType: new () => T, lockObject?: boolean): T;
+        requestGlobalObject<T extends ILinkableObject>(name: string, objectType: new (..._: any[]) => T | string, lockObject?: boolean): T;
         /**
          * This function creates a local object using the given Class definition if it doesn't already exist.
          * If this object is locked, this function does nothing.
@@ -1219,7 +1219,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The local object of the requested type, or null if the object could not be created.
          */
-        requestLocalObject<T extends ILinkableObject>(objectType: new () => T, lockObject?: boolean): T;
+        requestLocalObject<T extends ILinkableObject>(objectType: new (..._: any[]) => T | string, lockObject?: boolean): T;
         /**
          * This function will copy the session state of an ILinkableObject to a new local internalObject of the same type.
          * @param objectToCopy An object to copy the session state from.
@@ -1274,14 +1274,14 @@ declare module weavejs.api.core {
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return A copy of the ordered list of names of objects contained in this LinkableHashMap.
          */
-        getNames(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): Array<string>;
+        getNames(filter?: new (..._: any[]) => any | string, filterIncludesPlaceholders?: boolean): Array<string>;
         /**
          * This function returns an ordered list of objects in the hash map.
          * @param filter If specified, objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return An ordered Array of objects that correspond to the names returned by getNames(filter).
          */
-        getObjects<T>(filter?: new (..._: any[]) => T, filterIncludesPlaceholders?: boolean): Array<T & ILinkableObject>;
+        getObjects<T>(filter?: new (..._: any[]) => T | string, filterIncludesPlaceholders?: boolean): Array<T & ILinkableObject>;
         /**
          * This function gets the name of the specified object in the hash map.
          * @param object An object contained in this LinkableHashMap.
@@ -1310,7 +1310,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, the object will be locked in place under the specified name.
          * @return The object under the requested name of the requested type, or null if an error occurred.
          */
-        requestObject<T>(name: string, classDef: new () => T, lockObject?: boolean): T;
+        requestObject<T>(name: string, classDef: new (..._: any[]) => T | string, lockObject?: boolean): T;
         /**
          * This function will copy the session state of an ILinkableObject to a new object under the given name in this LinkableHashMap.
          * @param newName A name for the object to be initialized in this LinkableHashMap.
@@ -3274,6 +3274,7 @@ declare module weavejs.core {
         variables: LinkableHashMap;
         script: LinkableString;
         delayWhileBusy: LinkableBoolean;
+        delayWhilePlaceholders: LinkableBoolean;
         groupedCallback: LinkableBoolean;
         get(variableName: string): ILinkableObject;
     }
@@ -3371,10 +3372,6 @@ declare module weavejs.core {
          * This will attempt to compile the function.  An Error will be thrown if this fails.
          */
         validate(): void;
-        /**
-         * This gets the length property of the generated Function.
-         */
-        length: number;
         /**
          * This will evaluate the function with the specified parameters.
          * @param thisArg The value of 'this' to be used when evaluating the function.
@@ -9143,7 +9140,7 @@ declare module weavejs.util {
         /**
          * Tests if a value is undefined, null, or NaN.
          */
-        static isUndefined(value: any): boolean;
+        static isUndefined(value: any, orEmptyString?: boolean): boolean;
         /**
          * Pads a string on the left.
          */

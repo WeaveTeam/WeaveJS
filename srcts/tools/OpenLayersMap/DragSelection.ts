@@ -40,13 +40,14 @@ export default class DragSelection extends ol.interaction.DragBox
 		{
 			let probeLayer: AbstractFeatureLayer = mapBrowserEvent.map.forEachLayerAtPixel(mapBrowserEvent.pixel, (layer) => {
 				let weaveLayer = layer.get("layerObject") as AbstractFeatureLayer;
-				if (!(weaveLayer instanceof AbstractFeatureLayer)) return false;
-				if (weaveLayer.probeKeySet && weaveLayer.probeKeySet.keys.length) {
+				if (!(weaveLayer instanceof AbstractFeatureLayer))
+					return false;
+				if (weaveLayer.probeKeySet && weaveLayer.probeKeySet.keys.length)
 					return weaveLayer;
-				}
 			}, this, OpenLayersMapTool.selectableLayerFilter) as AbstractFeatureLayer;
 
-			if (probeLayer instanceof AbstractFeatureLayer) {
+			if (probeLayer instanceof AbstractFeatureLayer)
+			{
 				AbstractVisTool.handlePointClick(probeLayer, event);
 				return false;
 			}
@@ -126,13 +127,13 @@ export default class DragSelection extends ol.interaction.DragBox
 				switch (this.mode)
 				{
 					case DragSelectionMode.SET:
-						keySet.replaceKeys(keys);
+						keySet && keySet.replaceKeys(keys);
 						break;
 					case DragSelectionMode.ADD:
-						keySet.addKeys(keys);
+						keySet && keySet.addKeys(keys);
 						break;
 					case DragSelectionMode.SUBTRACT:
-						keySet.removeKeys(keys);
+						keySet && keySet.removeKeys(keys);
 						break;
 				}
 			}

@@ -47,7 +47,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 
 	handleEditorTypeChange(item:(typeof AbstractFilterEditor)[]) 
 	{
-		this.editor.requestLocalObject(item[0], false);
+		this.editor.requestLocalObject(item[0] as any, false);
 	}
 	
 	initLater() 

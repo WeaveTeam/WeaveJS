@@ -230,6 +230,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		if (!isSelected &&
 			!isProbed &&
+			this.selectionKeySet &&
 			this.selectionKeySet.keys.length > 0)
 		{
 			if (replace)
