@@ -56,10 +56,6 @@ button.list-group-item:hover {
     font-size: inherit;
 }
 
-.btn-default {
-    width:100%;
-}
-
 .btn-group, .btn-group-vertical {
     width: 100%;
 }
