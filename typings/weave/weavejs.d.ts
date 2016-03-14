@@ -103,7 +103,7 @@ declare module __global__ {
          * @return The closest ancestor of the given type.
          * @see weave.api.core.ISessionManager#getLinkableOwner()
          */
-        static getAncestor<T>(descendant: ILinkableObject, ancestorType: new (..._: any[]) => T): T & ILinkableObject;
+        static getAncestor<T>(descendant: ILinkableObject, ancestorType: new (..._: any[]) => T | string): T & ILinkableObject;
         /**
          * Shortcut for WeaveAPI.SessionManager.getLinkableOwner()
          * @copy weave.api.core.ISessionManager#getLinkableOwner()
@@ -113,7 +113,7 @@ declare module __global__ {
          * Shortcut for WeaveAPI.SessionManager.getLinkableDescendants()
          * @copy weave.api.core.ISessionManager#getLinkableDescendants()
          */
-        static getDescendants<T>(object: ILinkableObject, filter?: new (..._: any[]) => T): Array<T & ILinkableObject>;
+        static getDescendants<T>(object: ILinkableObject, filter?: new (..._: any[]) => T | string): Array<T & ILinkableObject>;
         /**
          * Shortcut for WeaveAPI.SessionManager.getSessionState()
          * @copy weave.api.core.ISessionManager#getSessionState()
