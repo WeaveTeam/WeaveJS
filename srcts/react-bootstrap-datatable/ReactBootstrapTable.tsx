@@ -172,7 +172,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 	{
         var tableContainer:React.CSSProperties = {
                 overflow: "auto",
-                flex: 1
+                flex: 1,
+                whiteSpace: "nowrap"
         };
 
         var selectedIds:string[];
