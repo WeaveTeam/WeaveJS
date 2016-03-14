@@ -56,10 +56,6 @@ button.list-group-item:hover {
     font-size: inherit;
 }
 
-.btn-group, .btn-group-vertical {
-    width: 100%;
-}
-
 .c3-tooltip td.value {
 	white-space: nowrap;
 }
