@@ -9,8 +9,9 @@ import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
 
-export interface WeaveAppProps extends React.Props<WeaveApp>
+export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
 	weave:Weave;
 	renderPath:string[];
@@ -95,16 +96,24 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				// ignore
 			}
 		}
+		
+		// backwards compatibility
+		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
 
 		return (
 			<VBox
 				className="weave-app"
-				style={{width: "100%", height: "100%"}}
+				{...this.props as React.HTMLAttributes}
+				style={_.merge({flex: 1}, this.props.style)}
 				onMouseDown={this.hideContextMenu.bind(this)}
 				onClick={()=>this.setState({showContextMenu: false})}
 				onContextMenu={this.showContextMenu.bind(this)}
 			>
-				<WeaveMenuBar weave={weave}/>
+				{
+					enableMenuBar && enableMenuBar.value
+					?	<WeaveMenuBar weave={weave}/>
+					:	''
+				}
 				<WeaveComponentRenderer weave={weave} path={renderPath}/>
 				{
 					this.state.showContextMenu ? 
