@@ -172,7 +172,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 	{
 		if (!points.length)
 			return null;
-		return 'M ' + points.filter(p => isFinite(p.x + p.y)).map(p => p.x + ' ' + p.x).join(' L ');
+		return 'M ' + points.filter(p => isFinite(p.x + p.y)).map(p => p.x + ' ' + p.y).join(' L ');
 	}
 
 	getQ(values:number[], q:number):number
