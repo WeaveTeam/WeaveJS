@@ -111,7 +111,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 						  title={Weave.lang(this.state.title)}
 						  onGearClick={this.showEditor.bind(this)}
 						  />
-				<WeaveComponentRenderer weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
+				<WeaveComponentRenderer style={{overflow: 'auto'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
 		);
 	}
