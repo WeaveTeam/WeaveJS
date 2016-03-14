@@ -75,6 +75,7 @@ ul.dropdown-menu {
 
 .table {
     font-size: inherit;
+	white-space: nowrap;
 }
 
 .table-header {
