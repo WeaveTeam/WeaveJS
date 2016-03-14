@@ -98,7 +98,14 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
     get title():string
     {
-       return this.panelTitle.value && weavejs.util.JS.compile('`' + this.panelTitle.value + '`').call(this);
+		try
+		{
+			return weavejs.util.JS.compile('`' + this.panelTitle.value + '`').call(this);
+		}
+		catch (e)
+		{
+			return this.panelTitle.value;
+		}
     }
 
     private static createFromSetToSubset(set: KeySet, filter:KeyFilter):void
