@@ -10,6 +10,7 @@ import Menu from "../react-ui/Menu";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import LinkableTextField from "../ui/LinkableTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import MiscUtils from "../utils/MiscUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -95,18 +96,11 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		var keySet = this.probeFilter.target as KeySet;
 		return keySet instanceof KeySet && keySet.containsKey(key);
 	} 
-
-    get title():string
-    {
-		try
-		{
-			return weavejs.util.JS.compile('`' + this.panelTitle.value + '`').call(this);
-		}
-		catch (e)
-		{
-			return this.panelTitle.value;
-		}
-    }
+	
+	get title():string
+	{
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+	}
 
     private static createFromSetToSubset(set: KeySet, filter:KeyFilter):void
     {

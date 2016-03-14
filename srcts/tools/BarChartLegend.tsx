@@ -7,6 +7,7 @@ import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
 import * as Prefixer from "react-vendor-prefix";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import MiscUtils from "../utils/MiscUtils";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ColorRamp = weavejs.util.ColorRamp;
@@ -52,7 +53,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 
 	get title():string
 	{
-		return this.panelTitle.value ? this.panelTitle.value : Weave.getRoot(this).getName(this);
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || Weave.getRoot(this).getName(this);
 	}
 
 	handleClick(label:number,temp:any):void 

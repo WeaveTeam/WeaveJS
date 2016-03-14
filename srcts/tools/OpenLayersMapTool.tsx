@@ -28,6 +28,7 @@ import Menu from "../react-ui/Menu";
 import AbstractVisTool from "./AbstractVisTool";
 import {OverrideBounds} from "./AbstractVisTool";
 import ResizingDiv from "../react-ui/ResizingDiv";
+import MiscUtils from "../utils/MiscUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ZoomBounds = weavejs.geom.ZoomBounds;
@@ -96,7 +97,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	get title():string
 	{
-		return this.panelTitle.value;
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
 	}
 
 	constructor(props:IVisToolProps)

@@ -9,6 +9,7 @@ import {IRow} from "../react-bootstrap-datatable/TableRow";
 import AbstractVisTool from "./AbstractVisTool";
 import Menu from "../react-ui/Menu";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
+import MiscUtils from "../utils/MiscUtils";
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -68,10 +69,10 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		return {};
 	}
 
-    get title():string
-    {
-       return this.panelTitle.value;;
-    }
+	get title():string
+	{
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+	}
 	
 	componentDidMount()
 	{

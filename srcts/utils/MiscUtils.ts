@@ -176,4 +176,16 @@ export default class MiscUtils
 		}
 		return queryParams;
 	}
+	
+	public static stringWithMacros(str:string, thisArg:any = null):string
+	{
+		try
+		{
+			return str && weavejs.util.JS.compile('`' + str + '`').call(thisArg);
+		}
+		catch (e)
+		{
+			return str;
+		}
+	}
 }

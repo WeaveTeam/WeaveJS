@@ -9,6 +9,7 @@ import {VBox} from "../react-ui/FlexBox";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
 import FormatUtils from "../utils/FormatUtils";
+import MiscUtils from "../utils/MiscUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -90,7 +91,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 
 	get title()
 	{
-		return "Box and Whisker Plot"
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || Weave.getRoot(this).getName(this);
 	}
 
 	private BOXWHISKER_RECORD_FORMAT = {

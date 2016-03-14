@@ -8,6 +8,7 @@ import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 import ResizingDiv from "../react-ui/ResizingDiv";
+import MiscUtils from "../utils/MiscUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -23,8 +24,9 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
-	get title(): string {
-		return this.panelTitle.value;
+	get title():string
+	{
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
 	}
 
 	constructor(props:IVisToolProps)
