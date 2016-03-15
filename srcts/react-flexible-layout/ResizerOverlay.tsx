@@ -16,21 +16,10 @@ const STYLE_BASE = {
     position: "absolute"
 };
 
-const THICKNESS = 4;
-
-const STYLE_HORIZONTAL = _.merge({
-    width: THICKNESS + "px",
-    cursor: "col-resize"
-}, STYLE_BASE);
-
-const STYLE_VERTICAL = _.merge({
-    height: THICKNESS + "px",
-    cursor: "row-resize"
-}, STYLE_BASE);
-
 export interface IResizerOverlayProps extends React.Props<ResizerOverlay>
 {
-    direction: Direction
+    direction: Direction;
+	thickness?: number;
 }
 
 export interface IResizerOverlayState
@@ -40,7 +29,6 @@ export interface IResizerOverlayState
     x?: number;
     y?: number;
 };
-
 
 export default class ResizerOverlay extends React.Component<IResizerOverlayProps, IResizerOverlayState>
 {
@@ -74,6 +62,11 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
             event.stopImmediatePropagation();
         }
     }
+	
+	get thickness()
+	{
+		return this.props.thickness || 4;
+	}
 
     onMouseMove=(event:MouseEvent):void=>
 	{
@@ -89,15 +82,15 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
             if (this.props.direction === HORIZONTAL)
             {
                 this.setState({
-                    x: mousePos - THICKNESS / 2,
-                    y: NaN
+                    x: mousePos - this.thickness / 2,
+                    y: 0
                 });
             }
             else
             {
                 this.setState({
-                    x: NaN,
-                    y: mousePos - THICKNESS / 2
+                    x: 0,
+                    y: mousePos - this.thickness / 2
                 });
             }
         }
@@ -105,20 +98,26 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 
     render():JSX.Element
     {
-        var direction: string = this.props.direction;
-        var style:React.CSSProperties = _.merge({}, direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL);
-
-        if (this.state.active)
-        {
-            style.visibility = "visible";
-            style.left = !isNaN(this.state.x) ? this.state.x : undefined;
-            style.top = !isNaN(this.state.y) ? this.state.y : undefined;
-        }
-        else
-        {
-            style.visibility = "hidden";
-        }
-
+        var style:React.CSSProperties = _.merge(
+			{
+				left: this.state.x,
+				top: this.state.y,
+				visibility: this.state.active ? "visible" : "hidden"
+			},
+			STYLE_BASE
+		);
+		if (this.props.direction == HORIZONTAL)
+		{
+			(style as any).cursor = "col-resize";
+			style.width = this.thickness;
+			style.height = "100%";
+		}
+		else
+		{
+			(style as any).cursor = "col-resize";
+			style.width = "100%";
+			style.height = this.thickness;
+		}
         style = VendorPrefix.prefix({ styles: style }).styles;
 
         return <span style={style}/>;
