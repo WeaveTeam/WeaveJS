@@ -110,7 +110,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onContextMenu={this.showContextMenu.bind(this)}
 			>
 				{
-					enableMenuBar && enableMenuBar.value
+					!enableMenuBar || enableMenuBar.value
 					?	<WeaveMenuBar weave={weave}/>
 					:	''
 				}
