@@ -38,8 +38,8 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         this.state = {
           active: false,
           range: [],
-          x: NaN,
-          y: NaN
+          x: 0,
+          y: 0
         };
     }
 
