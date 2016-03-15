@@ -178,7 +178,11 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 				{ this.props.children }
 				{
 					Array.isArray(this.props.children) && (this.props.children as any[]).length
-					?	<ResizerOverlay ref={(overlay:ResizerOverlay) => this.overlay = overlay} direction={this.state.direction}/>
+					?	<ResizerOverlay
+							ref={(overlay:ResizerOverlay) => this.overlay = overlay}
+							direction={this.state.direction}
+							thickness={this.props.spacing}
+						/>
 					:	null
 				}
 			</div>

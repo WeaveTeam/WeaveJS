@@ -4,8 +4,6 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 
-const RESIZER_DEFAULT = 4;
-
 const STYLE_BASE = {
 	background: "#000",
     opacity: .1,
@@ -35,6 +33,8 @@ export interface IResizerState
 
 export default class Resizer extends React.Component<IResizerProps, IResizerState>
 {
+	static DEFAULT_SPACING = 4;
+	
 	constructor(props:IResizerProps)
 	{
 		super(props);
@@ -67,7 +67,7 @@ export default class Resizer extends React.Component<IResizerProps, IResizerStat
 		// makes a copy
 		style = prefixer(style);
 		
-		var spacing = this.props.spacing || RESIZER_DEFAULT;
+		var spacing = this.props.spacing || Resizer.DEFAULT_SPACING;
 		if (this.props.direction === HORIZONTAL)
 			style.width = spacing;
 		else

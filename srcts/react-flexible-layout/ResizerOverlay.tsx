@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import prefixer from "../react-ui/VendorPrefixer";
+import Resizer from "./Resizer"
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 import DOMUtils from "../utils/DOMUtils";
 
@@ -109,17 +110,15 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 		if (this.props.direction == HORIZONTAL)
 		{
 			(style as any).cursor = "col-resize";
-			style.width = this.thickness;
+			style.width = this.thickness || Resizer.DEFAULT_SPACING;
 			style.height = "100%";
 		}
 		else
 		{
 			(style as any).cursor = "col-resize";
 			style.width = "100%";
-			style.height = this.thickness;
+			style.height = this.thickness || Resizer.DEFAULT_SPACING;
 		}
-		style = prefixer(style);
-
-        return <span style={style}/>;
+        return <span style={prefixer(style)}/>;
     }
 }
