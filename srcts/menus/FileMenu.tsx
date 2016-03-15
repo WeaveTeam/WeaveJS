@@ -17,7 +17,7 @@ export default class FileMenu implements MenuBarItemProps
 	weave:Weave;
 	menu: MenuItemProps[] = [
 		{
-			label: <FileInput onChange={this.openFile}>{Weave.lang("Open a file...")}</FileInput> as any
+			label: <FileInput onChange={this.openFile.bind(this)}>{Weave.lang("Open a file...")}</FileInput> as any
 		},
 		{
 			label: Weave.lang("Save as..."),
@@ -98,7 +98,7 @@ export default class FileMenu implements MenuBarItemProps
 					<span>{Weave.lang("Enter a file name")}</span>
 					<input style={{marginTop: 5}} type="text" placeholder="defaults.weave" ref={(c:HTMLInputElement) => filenameInput = c}/>
 					<span style={{marginTop: 5}}>{Weave.lang("Export options")}</span>
-					<VBox style={{marginLeft: 20, marginTop: 5}}>
+					<VBox style={{marginLeft: 20, marginTop: 5, flex: 1}}>
 						<CheckBoxList options={checkboxListOptions}
 									  selectedValues={selectedOptions}
 									  labelPosition="right"
