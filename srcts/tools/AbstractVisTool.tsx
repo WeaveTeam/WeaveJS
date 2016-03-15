@@ -11,6 +11,8 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import LinkableTextField from "../ui/LinkableTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import MiscUtils from "../utils/MiscUtils";
+import {OverlayTrigger,Popover} from "react-bootstrap";
+import AttributeSelector from "../ui/AttributeSelector";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -27,6 +29,8 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import WeaveMenuItem = weavejs.util.WeaveMenuItem;
 import KeyFilter = weavejs.data.key.KeyFilter;
+import EntityNode = weavejs.data.hierarchy.EntityNode;
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 
 export class Margin
 {
@@ -55,6 +59,7 @@ Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 
 export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
+	selectableAttributes:{[label:string]:DynamicColumn};
     constructor(props:P)
 	{
         super(props);
@@ -186,6 +191,20 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
 		return (
 			<VBox>
+				{Object.keys(this.selectableAttributes).map( (label:string, index:number) => {
+					var attribute:DynamicColumn = this.selectableAttributes[label];
+					return (
+						<HBox>
+							<label>
+								{Weave.lang(label)}
+								<OverlayTrigger trigger="click" placement = "bottom"
+												overlay={<Popover id = "AttributeSelector" title="Attribute Selector"><AttributeSelector column={attribute}/></Popover>}>
+									<input type="text" />
+								</OverlayTrigger>
+							</label>
+						</HBox>
+					)
+				})}
 				<HBox>
 					<span>{Weave.lang("Visualization Title")}</span>
 					<LinkableTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>

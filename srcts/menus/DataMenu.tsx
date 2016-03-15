@@ -35,11 +35,4 @@ export default class DataMenu implements MenuBarItemProps{
 		console.log("adding a csv datasource");
 	}
 
-	//this function wraps up the list of datasources into list items
-	createDataSourceItems(dataSources : ColumnTreeNode[]){
-		for(var d:number=0; d < dataSources.length; d++){
-			let listItem :ListOption = {label:dataSources[d].getLabel(), value :dataSources[d]};
-			this.dataSourceListItems.push(listItem);
-		}
-	}
 }

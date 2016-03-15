@@ -324,3 +324,7 @@ span.weave-tree-view.open {
 div.weave-tree-view {
 
 }
+.popover{
+    max-width: 100%;
+    max-height: 75%;
+}
