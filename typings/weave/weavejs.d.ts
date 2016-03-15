@@ -3998,7 +3998,7 @@ declare module weavejs.core {
          * @param contentType A String describing the type of content contained in the objects.
          * @return A Uint8Array in the Weave file format.
          */
-        serialize(): Uint8Array;
+        serialize(readableJSON?: boolean): Uint8Array;
         static ARCHIVE_HISTORY_AMF: string;
         static ARCHIVE_HISTORY_JSON: string;
         static ARCHIVE_COLUMN_CACHE_AMF: string;
