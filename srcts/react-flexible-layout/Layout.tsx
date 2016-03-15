@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import * as VendorPrefix from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import ReactUtils from "../utils/ReactUtils";
 import DOMUtils from "../utils/DOMUtils";
 import Resizer from "./Resizer";
@@ -168,7 +168,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 			userSelect: "none",
 			flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
 		};
-		return VendorPrefix.prefix({styles: style}).styles;
+		return prefixer(style);
 	}
 
 	render():JSX.Element

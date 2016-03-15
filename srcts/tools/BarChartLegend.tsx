@@ -5,7 +5,7 @@ import * as d3 from "d3";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
-import * as Prefixer from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import MiscUtils from "../utils/MiscUtils";
 
@@ -88,7 +88,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 
 
 		var finalElements:any[] = [];
-		var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
+		var prefixerStyle:{} = prefixer(this.spanStyle);
 		for (var j:number = 0; j<maxColumns; j++)
 		{
 			var element:JSX.Element[] = [];

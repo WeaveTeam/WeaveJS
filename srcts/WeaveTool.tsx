@@ -6,7 +6,7 @@ import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "./react-ui/FlexBox";
-import * as VendorPrefix from "react-vendor-prefix";
+import prefixer from "./react-ui/VendorPrefixer";
 import {Glyphicon} from "react-bootstrap";
 import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
@@ -183,7 +183,7 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 
 		return(
 			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
-            {<HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
+            {<HBox style={prefixer(leftControls)}>
             	<div onClick={this.props.onGearClick}>
 					<Glyphicon glyph="cog"/>
 				</div>

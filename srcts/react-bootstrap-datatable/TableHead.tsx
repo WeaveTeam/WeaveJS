@@ -1,6 +1,6 @@
 import * as React from "react";
 import {CSSProperties} from "react";
-import * as Prefixer from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 
 export interface IColumnTitles
 {
@@ -43,7 +43,7 @@ export default class TableHead extends React.Component<ITableHeadProps, ITableHe
         });
 
         return (
-            <thead className="table-header" style={Prefixer.prefix({styles: baseStyle}).styles} >
+            <thead className="table-header" style={prefixer(baseStyle)} >
                 <tr>
                     {
                         headers

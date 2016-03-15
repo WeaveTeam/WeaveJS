@@ -4,7 +4,6 @@ import * as bs from "react-bootstrap";
 import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
 import MiscUtils from "../utils/MiscUtils";
-import * as Prefixer from "react-vendor-prefix";
 
 export type ListOption = {
     value: any,

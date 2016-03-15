@@ -1,4 +1,4 @@
-import * as VendorPrefix from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
@@ -65,7 +65,7 @@ export default class Resizer extends React.Component<IResizerProps, IResizerStat
 		var style:React.CSSProperties = this.props.direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL;
 		
 		// makes a copy
-		style = VendorPrefix.prefix({styles: style}).styles;
+		style = prefixer(style);
 		
 		var spacing = this.props.spacing || RESIZER_DEFAULT;
 		if (this.props.direction === HORIZONTAL)

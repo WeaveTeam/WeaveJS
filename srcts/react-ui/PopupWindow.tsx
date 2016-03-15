@@ -2,7 +2,7 @@ import * as ReactDOM from "react-dom";
 import * as React from "react";
 import {HBox, VBox} from "./FlexBox";
 import ReactUtils from "../utils/ReactUtils";
-import * as Prefixer from "react-vendor-prefix";
+import prefixer from "./VendorPrefixer";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 
@@ -176,7 +176,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 							?
 								this.props.footerContent
 							:
-								<HBox style={Prefixer.prefix({style: {flex: 1, justifyContent: "flex-end"}}).style}>
+								<HBox style={prefixer({flex: 1, justifyContent: "flex-end"})}>
 									<input className="weave-window-footer-input" type="button" value="Ok" onClick={this.onOk.bind(this)}/>
 									<input className="weave-window-footer-input" type="button" value="Cancel" onClick={this.onCancel.bind(this)}/>
 								</HBox>

@@ -8,7 +8,7 @@ import MiscUtils from "../utils/MiscUtils";
 import ReactUtils from "../utils/ReactUtils";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
-import * as Prefixer from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import ToolTip from "./ToolTip";
 import AbstractVisTool from "./AbstractVisTool";
 import {HBox, VBox} from "../react-ui/FlexBox";
@@ -206,7 +206,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			var r:number = (shapeSize / 100 * height / this.numberOfBins) / 2;
 			var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
 			var finalElements:any[] = [];
-			var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
+			var prefixerStyle:{} = prefixer(this.spanStyle);
 
 			for (var j:number = 0; j < maxColumns; j++)
 			{

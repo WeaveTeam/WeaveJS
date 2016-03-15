@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import * as VendorPrefix from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 import DOMUtils from "../utils/DOMUtils";
 
@@ -118,7 +118,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 			style.width = "100%";
 			style.height = this.thickness;
 		}
-        style = VendorPrefix.prefix({ styles: style }).styles;
+		style = prefixer(style);
 
         return <span style={style}/>;
     }
