@@ -7,14 +7,19 @@ import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
+import MiscUtils from "./utils/MiscUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import WeavePath = weavejs.path.WeavePath;
+
+const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
-	weave:Weave;
-	renderPath:string[];
+	weave?:Weave;
+	renderPath?:string[];
+	readUrlParams?:boolean;
 }
 
 export interface WeaveAppState
@@ -28,7 +33,8 @@ export interface WeaveAppState
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
 	contextMenu:HTMLElement;
-	
+	menuBar:WeaveMenuBar;
+
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
@@ -40,6 +46,35 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		};
 	}
 
+	componentDidMount()
+	{
+		if(this.props.readUrlParams)
+		{
+			var urlParams = MiscUtils.getUrlParams();
+			var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
+			
+			if (urlParams.file)
+			{
+				// read from url
+				this.menuBar.fileMenu.loadUrl(urlParams).then(this.forceUpdate.bind(this));
+			}
+
+			else if (weaveExternalTools && weaveExternalTools[window.name])
+			{
+				// read content from flash
+				var ownerPath:WeavePath = weaveExternalTools[window.name].path;
+				var content:Uint8Array = atob(ownerPath.getValue('btoa(Weave.createWeaveFileContent())') as string) as any;
+				weavejs.core.WeaveArchive.loadFileContent(this.props.weave, content);
+				this.forceUpdate();
+			}
+		}
+	}
+	
+	static defaultProps:WeaveAppProps = {
+		weave: new Weave(),
+		readUrlParams: false
+	}
+	
 	showContextMenu(event:React.MouseEvent)
 	{
 		// if context menu already showing do nothing
@@ -68,26 +103,20 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		});
 	}
 	
-	componentDidMount()
-	{
-		
-	}
-	
 	render():JSX.Element
 	{
-		var weave = this.props.weave;
-		var renderPath = this.props.renderPath || ['Layout'];
+		var renderPath = this.props.renderPath || ["Layout"];
 		
-		if (!weave)
+		if (!this.props.weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 		
-		if (!weave.getObject(renderPath))
+		if (!this.props.weave.getObject(renderPath))
 		{
 			try
 			{
 				var parentPath = renderPath.concat();
 				var childName = parentPath.pop();
-				var parent = weave.getObject(parentPath);
+				var parent = this.props.weave.getObject(parentPath);
 				if (parent instanceof LinkableHashMap)
 					(parent as LinkableHashMap).requestObject(childName, FlexibleLayout);
 			}
@@ -98,7 +127,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 		
 		// backwards compatibility
-		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+		var enableMenuBar = this.props.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
 
 		return (
 			<VBox
@@ -111,10 +140,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			>
 				{
 					!enableMenuBar || enableMenuBar.value
-					?	<WeaveMenuBar weave={weave}/>
-					:	''
+					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c}/>
+					:	null
 				}
-				<WeaveComponentRenderer weave={weave} path={renderPath}/>
+				<WeaveComponentRenderer weave={this.props.weave} path={renderPath}/>
 				{
 					this.state.showContextMenu ? 
 					<div ref={(element:HTMLElement) => this.contextMenu = element} onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
