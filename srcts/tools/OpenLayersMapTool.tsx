@@ -268,13 +268,20 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.updateZoomAndCenter_weaveToOl();
 	}
 
+	private _lastSize: ol.Size;
+
 	handleFrame():void
 	{
-		this.map.updateSize();
-		var viewport = this.map.getViewport() as HTMLElement;
-		var screenBounds = new Bounds2D(0, 0, viewport.offsetWidth, viewport.offsetHeight);
+		var element = this.map.getTargetElement() as HTMLElement;
+		var newSize = [element.offsetWidth, element.offsetHeight];
+
+		if (lodash.isEqual(this._lastSize, newSize)) return;
+		this._lastSize = newSize;
+
+		var screenBounds = new Bounds2D(0, 0, newSize[0], newSize[1]);
 		this.zoomBounds.setScreenBounds(screenBounds, true);
-		this.map.render();
+		this.map.updateSize();
+		this.updateControlPositions();
 	}
 
 	private updateControl(lbool:LinkableBoolean, control:ol.control.Control):void
