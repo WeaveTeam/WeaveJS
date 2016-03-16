@@ -10,6 +10,7 @@ import * as FileSaver from "filesaver.js";
 import LinkableTextField from "../ui/LinkableTextField";
 
 import WeaveArchive = weavejs.core.WeaveArchive;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 export default class FileMenu implements MenuBarItemProps
 {
@@ -17,16 +18,22 @@ export default class FileMenu implements MenuBarItemProps
 	weave:Weave;
 	menu: MenuItemProps[] = [
 		{
-			label: <FileInput onChange={this.openFile.bind(this)}>{Weave.lang("Open a file...")}</FileInput> as any
+			label: <FileInput onChange={this.openFile.bind(this)}>{Weave.lang("Open a File...")}</FileInput> as any
 		},
 		{
-			label: Weave.lang("Save as..."),
+			label: Weave.lang("Save As..."),
 			click: this.saveFile.bind(this)
 		},
+		{},
 		{
 			label: Weave.lang("Export CSV"),
 			click: this.exportCSV.bind(this)
+		},
+		{
+			label: Weave.lang("Convert to Cached Data Sources"),
+			// click: this.convertToChachedDataSources.bind(this)
 		}
+
 	];
 
 	fileName:string;
@@ -55,6 +62,11 @@ export default class FileMenu implements MenuBarItemProps
             });
     }
 	
+	convertToChachedDataSources = () =>
+	{
+		
+	}
+	
 	loadUrl(urlParams:any)
 	{
 		this.fileName = urlParams.file
@@ -67,7 +79,8 @@ export default class FileMenu implements MenuBarItemProps
 
 		var setShowTopMenuBar = () =>
 		{
-			console.log("show top menu bar called");
+			var enableMenuBar = this.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+			enableMenuBar.value = true;
 		}
 		
 		var setSaveHistory = () =>

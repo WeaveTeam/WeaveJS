@@ -8,6 +8,7 @@ import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
 import MiscUtils from "./utils/MiscUtils";
+import SessionHistorySlider from "./editors/SessionHistorySlider";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -142,6 +143,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					!enableMenuBar || enableMenuBar.value
 					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c}/>
 					:	null
+				}
+				{
+					<SessionHistorySlider stateLog={this.props.weave.history}/>
 				}
 				<WeaveComponentRenderer weave={this.props.weave} path={renderPath}/>
 				{
