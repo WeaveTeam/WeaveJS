@@ -115,7 +115,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 		}
 		else
 		{
-			(style as any).cursor = "col-resize";
+			(style as any).cursor = "row-resize";
 			style.width = "100%";
 			style.height = this.thickness || Resizer.DEFAULT_SPACING;
 		}
