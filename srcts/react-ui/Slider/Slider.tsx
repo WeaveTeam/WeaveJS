@@ -1,10 +1,6 @@
-/// <reference path="../../../typings/react/react.d.ts"/>
-/// <reference path="../../../typings/lodash/lodash.d.ts"/>
-/// <reference path="../../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-
 import * as React from "react";
 import * as _ from "lodash";
-import * as Prefixer from "react-vendor-prefix";
+import prefixer from "../VendorPrefixer";
 import {HBox, VBox} from "../FlexBox";
 
 export interface SliderProps extends React.Props<Slider>
@@ -73,7 +69,7 @@ export default class Slider extends React.Component<SliderProps, SliderState>
             sliderStyle.appearance = "slider-vertical";
         }
 
-        sliderStyle = Prefixer.prefix({styles: sliderStyle}).styles;
+        sliderStyle = prefixer(sliderStyle);
 
         var sliderContent:JSX.Element[] = [<span key="span">{this.props.label}</span>,
                                            <input key="slider" type="range" min={this.props.min}

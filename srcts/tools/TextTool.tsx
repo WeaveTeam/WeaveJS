@@ -1,17 +1,11 @@
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-///<reference path="../../typings/jquery/jquery.d.ts"/>
-
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
 import * as React from "react";
-import ui from "../react-ui/ui";
 import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 import * as jquery from "jquery";
+import MiscUtils from "../utils/MiscUtils";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -46,13 +40,9 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
-	get title(): string {
-		return this.panelTitle.value;
-	}
-
-	componentDidMount()
+	get title():string
 	{
-
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
 	}
 
 	get deprecatedStateMapping()
@@ -80,13 +70,12 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 
 	render()
 	{
-		let bgColor:string = this.panelBackgroundColor.value ? "#" + StandardLib.numberToBase(this.panelBackgroundColor.value, 16, 6) : "#FFFFFF";
+		let bgColor:string = this.panelBackgroundColor.value ? StandardLib.getHexColor(this.panelBackgroundColor.value) : "#FFFFFF";
 		return (<div style={{flex: 1, padding:this.padding.value, backgroundColor:bgColor, overflow:"auto"}}
 					 ref={(c:HTMLElement) => { this.element = c }}
 					 className={this.textToolContainerClass}></div>);
 	}
-
-
 }
+
 Weave.registerClass("weavejs.tool.Text", TextTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
 Weave.registerClass("weave.ui::TextTool", TextTool);

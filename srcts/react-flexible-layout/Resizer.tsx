@@ -1,14 +1,8 @@
-/// <reference path="../../typings/react/react.d.ts" />
-/// <reference path="../../typings/react/react-dom.d.ts"/>
-/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-
-import * as VendorPrefix from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
-
-const RESIZER_DEFAULT = 4;
 
 const STYLE_BASE = {
 	background: "#000",
@@ -19,13 +13,11 @@ const STYLE_BASE = {
 };
 
 const STYLE_HORIZONTAL = _.merge({
-    cursor: "col-resize",
-    height: "100%"
+    cursor: "col-resize"
 }, STYLE_BASE);
 
 const STYLE_VERTICAL = _.merge({
-    cursor: "row-resize",
-    width: "100%",
+    cursor: "row-resize"
 }, STYLE_BASE);
 
 export interface IResizerProps extends React.Props<Resizer>
@@ -41,6 +33,8 @@ export interface IResizerState
 
 export default class Resizer extends React.Component<IResizerProps, IResizerState>
 {
+	static DEFAULT_SPACING = 4;
+	
 	constructor(props:IResizerProps)
 	{
 		super(props);
@@ -69,12 +63,16 @@ export default class Resizer extends React.Component<IResizerProps, IResizerStat
 	render():JSX.Element
 	{
 		var style:React.CSSProperties = this.props.direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL;
-		if(this.props.direction === HORIZONTAL){
-			style.width = this.props.spacing || RESIZER_DEFAULT;
-		} else {
-			style.height = this.props.spacing || RESIZER_DEFAULT;
-		}
+		
+		// makes a copy
+		style = prefixer(style);
+		
+		var spacing = this.props.spacing || Resizer.DEFAULT_SPACING;
+		if (this.props.direction === HORIZONTAL)
+			style.width = spacing;
+		else
+			style.height = spacing;
 
-		return <span style={VendorPrefix.prefix({styles: style}).styles}/>;
+		return <span style={style}/>;
 	}
 }

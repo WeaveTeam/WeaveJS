@@ -1,10 +1,3 @@
-///<reference path="../../typings/c3/c3.d.ts"/>
-///<reference path="../../typings/d3/d3.d.ts"/>
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-///<reference path="../../typings/react/react-dom.d.ts"/>
-
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
@@ -18,6 +11,8 @@ import ToolTip from "./ToolTip";
 import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import LinkableTextField from "../ui/LinkableTextField";
+import AttributeSelector from "../ui/AttributeSelector";
+import {OverlayTrigger,Popover} from "react-bootstrap";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -32,6 +27,10 @@ import LinkableString = weavejs.core.LinkableString;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import StandardLib = weavejs.util.StandardLib;
+import EntityNode = weavejs.data.hierarchy.EntityNode;
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import ListOption from "../react-ui/List";
+import ListItem from "../react-ui/List";
 
 declare type Record = {
 	id: IQualifiedKey,
@@ -106,7 +105,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						var record:Record = this.records[d.index];
 						color = record ? record.fill.color : null;
 						if (color && color.charAt(0) != '#')
-							color = '#' + StandardLib.numberToBase(Number(color), 16, 6);
+							color = StandardLib.getHexColor(Number(color));
 					}
 					return color || "#000000";
 				}
@@ -195,14 +194,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		var key:IQualifiedKey = this.records[d.index].id;
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([key]);
-		var data = ToolTip.getToolTipData(this, [key], [this.dataX, this.dataY, this.radiusData]);
-		if (this.props.toolTip)
-			this.props.toolTip.setState({
-				x: this.chart.internal.d3.event.pageX,
-				y: this.chart.internal.d3.event.pageY,
-				showToolTip: true,
-				columnNamesToValue: data
-			});
+		this.toolTip.show(this, this.chart.internal.d3.event, [key], [this.dataX, this.dataY, this.radiusData]);
 	}
 	
 	protected handleC3Selection():void
@@ -347,29 +339,17 @@ export default class C3ScatterPlot extends AbstractC3Tool
 
 		return false;
 	}
+
+	selectableAttributes:{[label:string]:DynamicColumn} = {
+			X:this.dataX,
+			Y:this.dataY,
+			Radius:this.radius.internalDynamicColumn
+	};//TODO handle remaining attributes
 	
 	renderEditor():JSX.Element
 	{
 		return (
 			<VBox>
-				<HBox>
-					<label>
-						{Weave.lang("X")}
-						<input type="text"/>
-					</label>
-				</HBox>
-				<HBox>
-					<label>
-						{Weave.lang("Y")}
-						<input type="text"/>
-					</label>
-				</HBox>
-				<HBox>
-					<label>
-						{Weave.lang("Radius")}
-						<input type="text"/>
-					</label>
-				</HBox>
 				<HBox>
 					<label>
 						{Weave.lang("Fill")}

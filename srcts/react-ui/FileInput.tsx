@@ -1,4 +1,6 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
+import DOMUtils from "../utils/DOMUtils";
 
 export interface FileInputProps extends React.HTMLProps<FileInput>
 {
@@ -12,13 +14,27 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 		super(props);
 	}
 	
+	onChange=(e:React.FormEvent)=>
+	{
+		if(this.props.onChange)
+			this.props.onChange(e)
+		// simulate the click event we previously stopped
+		DOMUtils.eventFire(ReactDOM.findDOMNode(this) as HTMLElement, "click");
+	}
+	
+	handleClick(e:React.MouseEvent)
+	{
+		e.stopPropagation(); // prevent the click event from running on the menubar
+							 // which causes the file menu to be unmounted
+	}
+
 	render()
 	{
 		var style = this.props.style || {};
 		style.position = "relative";
 		return (
 			<span style={{position: "relative"}} className={this.props.className}>
-				<input type="file" onChange={this.props.onChange} style={{position:"absolute", width: "100%", height: "100%", opacity: 0, overflow: "hidden"}}/> 
+				<input type="file" onClick={this.handleClick.bind(this)} onChange={this.onChange} style={{position:"absolute", width: "100%", height: "100%", opacity: 0, overflow: "hidden"}}/> 
 				{
 					this.props.children
 				}

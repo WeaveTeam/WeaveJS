@@ -1,7 +1,3 @@
-/// <reference path="../../typings/react/react.d.ts"/>
-/// <reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
-/// <reference path="../../typings/lodash/lodash.d.ts"/>
-
 import * as React from "react";
 import {Table} from "react-bootstrap";
 import * as _ from "lodash";
@@ -177,7 +173,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 	{
         var tableContainer:React.CSSProperties = {
                 overflow: "auto",
-                flex: 1
+                flex: 1,
+                whiteSpace: "nowrap"
         };
 
         var selectedIds:string[];

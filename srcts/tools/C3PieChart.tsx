@@ -1,9 +1,3 @@
-/// <reference path="../../typings/c3/c3.d.ts"/>
-/// <reference path="../../typings/lodash/lodash.d.ts"/>
-/// <reference path="../../typings/d3/d3.d.ts"/>
-/// <reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
@@ -106,13 +100,7 @@ export default class C3PieChart extends AbstractC3Tool
 	{
 		var key = this.records[d.index].id;
         this.probeKeySet.replaceKeys([key]);
-		if (this.props.toolTip)
-	        this.props.toolTip.setState({
-	            showToolTip: true,
-	            x: this.chart.internal.d3.event.pageX,
-	            y: this.chart.internal.d3.event.pageY,
-	            columnNamesToValue: ToolTip.getToolTipData(this, [key], [this.data])
-	        });
+        this.toolTip.show(this, this.chart.internal.d3.event, [key], [this.data]);
 	}
 	
 	protected handleC3Selection():void

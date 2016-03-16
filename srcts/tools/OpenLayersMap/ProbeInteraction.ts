@@ -1,14 +1,11 @@
-///<reference path="../../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../../typings/openlayers/openlayers.d.ts"/>
-///<reference path="../../../typings/jquery/jquery.d.ts"/>
-///<reference path="../../../typings/weave/weavejs.d.ts"/>
-
+import * as React from "react";
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
 import OpenLayersMapTool from "../OpenLayersMapTool";
 import {IToolTipState} from "../ToolTip";
 import ToolTip from "../ToolTip";
+import ReactUtils from "../../utils/ReactUtils";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -22,11 +19,14 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 	private topKeySet: KeySet;
 	private topLayer: AbstractFeatureLayer;
 	private tool: OpenLayersMapTool;
+	private toolTip: ToolTip;
 
 	constructor(tool:OpenLayersMapTool)
 	{
 		super({handleMoveEvent: ProbeInteraction.prototype.handleMoveEvent});
 		this.tool = tool;
+		this.toolTip = ReactUtils.openPopup(React.createElement(ToolTip)) as ToolTip;
+		ReactUtils.onUnmount(this.tool, () => ReactUtils.closePopup(this.toolTip));
 	}
 
 	setMap(map:ol.Map)
@@ -54,12 +54,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		}
 	}
 
-	private static layerFilter(layer:ol.layer.Base):boolean
-	{
-		return layer.get("selectable");
-	}
-
-	private pixelToKey(pixel:ol.Pixel):any
+	private pixelToKey(pixel:ol.Pixel):IQualifiedKey
 	{
 		let map: ol.Map = this.getMap();
 
@@ -68,7 +63,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		this.topLayer = null;
 		this.topKey = null;
 		
-		map.forEachFeatureAtPixel(pixel, this.onFeatureAtPixel, this, ProbeInteraction.layerFilter);
+		map.forEachFeatureAtPixel(pixel, this.onFeatureAtPixel, this, OpenLayersMapTool.selectableLayerFilter);
 
 
 
@@ -79,7 +74,7 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 		
 		for (let layer of map.getLayers().getArray())
 		{
-			if (!ProbeInteraction.layerFilter(layer))
+			if (!OpenLayersMapTool.selectableLayerFilter(layer))
 				continue;
 			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 			let keySet: KeySet = weaveLayerObject.probeKeySet;
@@ -94,34 +89,23 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 
 	private handleMoveEvent(event:ol.MapBrowserEvent)
 	{
-        if (!this.tool.props.toolTip)
-            return;
-        
-		let key:any /*IQualifiedKey*/ = this.pixelToKey(event.pixel);
-		let toolTipState: IToolTipState = {};
-
+		let key:IQualifiedKey = this.pixelToKey(event.pixel);
 		if (key)
 		{
-			let browserEvent: MouseEvent = <MouseEvent>(event.originalEvent);
-
-			toolTipState.showToolTip = true;
-			toolTipState.title = ToolTip.getToolTipTitle(this.tool, key);
-			toolTipState.columnNamesToValue = ToolTip.getToolTipData(this.tool, [key], this.topLayer.getToolTipColumns());
-			[toolTipState.x, toolTipState.y] = [browserEvent.clientX, browserEvent.clientY];
+			let browserEvent = event.originalEvent as MouseEvent;
+			this.toolTip.show(this.tool, browserEvent, [key], this.topLayer.getToolTipColumns());
 		}
 		else
 		{
-			toolTipState.showToolTip = false;
+			this.toolTip.hide();
 		}
-
-		this.tool.props.toolTip.setState(toolTipState);
 	}
 
 	handleOutEvent(event:MouseEvent)
 	{
 		for (let layer of this.getMap().getLayers().getArray())
 		{
-			if (!ProbeInteraction.layerFilter(layer))
+			if (!OpenLayersMapTool.selectableLayerFilter(layer))
 				continue;
 			let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 			let keySet: KeySet = weaveLayerObject.probeKeySet;
@@ -129,8 +113,6 @@ export default class ProbeInteraction extends ol.interaction.Pointer
 				keySet.clearKeys();
 		}
 
-		let toolTipState: IToolTipState = {};
-		toolTipState.showToolTip = false;
-		this.tool.props.toolTip.setState(toolTipState);
+		this.toolTip.hide();
 	}
 }

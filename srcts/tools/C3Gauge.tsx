@@ -1,9 +1,3 @@
-///<reference path="../../typings/c3/c3.d.ts"/>
-///<reference path="../../typings/d3/d3.d.ts"/>
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
@@ -119,7 +113,7 @@ export default class C3Gauge extends AbstractC3Tool
 			});
 
 			var numberOfBins = this.binningDefinition.getBinNames().length;
-			this.c3Config.color.pattern = this.colorRamp.getColors().reverse().map(color => '#' + StandardLib.numberToBase(color, 16, 6));
+			this.c3Config.color.pattern = this.colorRamp.getHexColors().reverse();
 
 			let binningDefinitionObject = (this.binningDefinition.internalObject as SimpleBinningDefinition);
 			this.c3Config.gauge.min = isNaN(binningDefinitionObject.overrideInputMin.value) ? this.colStats.getMin() : binningDefinitionObject.overrideInputMin.value;

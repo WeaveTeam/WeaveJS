@@ -1,11 +1,3 @@
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/openlayers/openlayers.d.ts"/>
-///<reference path="../../typings/jquery/jquery.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-/// <reference path="../../typings/react/react.d.ts"/>
-/// <reference path="../../typings/react/react-dom.d.ts"/>
-
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 import * as React from "react";
@@ -32,9 +24,11 @@ import DragSelection from "./OpenLayersMap/DragSelection";
 import CustomDragZoom from "./OpenLayersMap/CustomDragZoom";
 import CustomZoomToExtent from "./OpenLayersMap/CustomZoomToExtent";
 import {MenuItemProps} from "../react-ui/Menu";
+import Menu from "../react-ui/Menu";
 import AbstractVisTool from "./AbstractVisTool";
 import {OverrideBounds} from "./AbstractVisTool";
-import ResizingDiv from "../ui/ResizingDiv";
+import ResizingDiv from "../react-ui/ResizingDiv";
+import MiscUtils from "../utils/MiscUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ZoomBounds = weavejs.geom.ZoomBounds;
@@ -103,7 +97,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	get title():string
 	{
-		return this.panelTitle.value;
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
 	}
 
 	constructor(props:IVisToolProps)
@@ -185,6 +179,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	componentDidMount():void
 	{
+		Menu.registerMenuSource(this);
+		
 		this.map = new ol.Map({
 			interactions: ol.interaction.defaults({ dragPan: false }),
 			controls: [],
@@ -272,13 +268,20 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.updateZoomAndCenter_weaveToOl();
 	}
 
+	private _lastSize: ol.Size;
+
 	handleFrame():void
 	{
-		this.map.updateSize();
-		var viewport = this.map.getViewport() as HTMLElement;
-		var screenBounds = new Bounds2D(0, 0, viewport.offsetWidth, viewport.offsetHeight);
+		var element = this.map.getTargetElement() as HTMLElement;
+		var newSize = [element.offsetWidth, element.offsetHeight];
+
+		if (lodash.isEqual(this._lastSize, newSize)) return;
+		this._lastSize = newSize;
+
+		var screenBounds = new Bounds2D(0, 0, newSize[0], newSize[1]);
 		this.zoomBounds.setScreenBounds(screenBounds, true);
-		this.map.render();
+		this.map.updateSize();
+		this.updateControlPositions();
 	}
 
 	private updateControl(lbool:LinkableBoolean, control:ol.control.Control):void
@@ -563,6 +566,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		{
 			this.map.getView().setCenter([keyBounds.getXCenter(), keyBounds.getYCenter()]);
 		}
+	}
+
+	public static selectableLayerFilter(layer: ol.layer.Base): boolean {
+		return layer.get("selectable");
 	}
 }
 

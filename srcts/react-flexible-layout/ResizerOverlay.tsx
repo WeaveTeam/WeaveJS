@@ -1,11 +1,8 @@
-/// <reference path="../../typings/react/react.d.ts" />
-/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-/// <reference path="../../typings/react/react-dom.d.ts"/>
-
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import * as VendorPrefix from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
+import Resizer from "./Resizer"
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 import DOMUtils from "../utils/DOMUtils";
 
@@ -20,23 +17,10 @@ const STYLE_BASE = {
     position: "absolute"
 };
 
-const THICKNESS = 4;
-
-const STYLE_HORIZONTAL = _.merge({
-    width: THICKNESS + "px",
-    cursor: "col-resize",
-    height: "100%"
-}, STYLE_BASE);
-
-const STYLE_VERTICAL = _.merge({
-    height: THICKNESS + "px",
-    cursor: "row-resize",
-    width: "100%"
-}, STYLE_BASE);
-
 export interface IResizerOverlayProps extends React.Props<ResizerOverlay>
 {
-    direction: Direction
+    direction: Direction;
+	thickness?: number;
 }
 
 export interface IResizerOverlayState
@@ -47,7 +31,6 @@ export interface IResizerOverlayState
     y?: number;
 };
 
-
 export default class ResizerOverlay extends React.Component<IResizerOverlayProps, IResizerOverlayState>
 {
     constructor(props: IResizerOverlayProps)
@@ -56,8 +39,8 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
         this.state = {
           active: false,
           range: [],
-          x: NaN,
-          y: NaN
+          x: 0,
+          y: 0
         };
     }
 
@@ -80,6 +63,11 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
             event.stopImmediatePropagation();
         }
     }
+	
+	get thickness()
+	{
+		return this.props.thickness || 4;
+	}
 
     onMouseMove=(event:MouseEvent):void=>
 	{
@@ -95,15 +83,15 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
             if (this.props.direction === HORIZONTAL)
             {
                 this.setState({
-                    x: mousePos - THICKNESS / 2,
-                    y: NaN
+                    x: mousePos - this.thickness / 2,
+                    y: 0
                 });
             }
             else
             {
                 this.setState({
-                    x: NaN,
-                    y: mousePos - THICKNESS / 2
+                    x: 0,
+                    y: mousePos - this.thickness / 2
                 });
             }
         }
@@ -111,22 +99,26 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 
     render():JSX.Element
     {
-        var direction: string = this.props.direction;
-        var style:React.CSSProperties = _.merge({}, direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL);
-
-        if (this.state.active)
-        {
-            style.visibility = "visible";
-            style.left = !isNaN(this.state.x) ? this.state.x : undefined;
-            style.top = !isNaN(this.state.y) ? this.state.y : undefined;
-        }
-        else
-        {
-            style.visibility = "hidden";
-        }
-
-        style = VendorPrefix.prefix({ styles: style }).styles;
-
-        return <span style={style}/>;
+        var style:React.CSSProperties = _.merge(
+			{
+				left: this.state.x,
+				top: this.state.y,
+				visibility: this.state.active ? "visible" : "hidden"
+			},
+			STYLE_BASE
+		);
+		if (this.props.direction == HORIZONTAL)
+		{
+			(style as any).cursor = "col-resize";
+			style.width = this.thickness || Resizer.DEFAULT_SPACING;
+			style.height = "100%";
+		}
+		else
+		{
+			(style as any).cursor = "row-resize";
+			style.width = "100%";
+			style.height = this.thickness || Resizer.DEFAULT_SPACING;
+		}
+        return <span style={prefixer(style)}/>;
     }
 }

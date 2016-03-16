@@ -1,19 +1,18 @@
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/react/react-dom.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-///<reference path="../../typings/d3/d3.d.ts"/>
-/// <reference path="../../typings/c3/c3.d.ts"/>
-
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import {ChartAPI, ChartConfiguration} from "c3";
 
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
+import * as _ from "lodash";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
+import Menu from "../react-ui/Menu";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import LinkableTextField from "../ui/LinkableTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import MiscUtils from "../utils/MiscUtils";
+import {OverlayTrigger,Popover} from "react-bootstrap";
+import AttributeSelector from "../ui/AttributeSelector";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -30,6 +29,8 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import WeaveMenuItem = weavejs.util.WeaveMenuItem;
 import KeyFilter = weavejs.data.key.KeyFilter;
+import EntityNode = weavejs.data.hierarchy.EntityNode;
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 
 export class Margin
 {
@@ -56,12 +57,18 @@ export interface VisToolGroup
 Weave.registerClass("weavejs.tool.Margin", Margin);
 Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 
-export default class AbstractVisTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
+export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
-    constructor(props:IVisToolProps)
+	selectableAttributes:{[label:string]:DynamicColumn};
+    constructor(props:P)
 	{
         super(props);
     }
+	
+	componentDidMount()
+	{
+		Menu.registerMenuSource(this);
+	}
 	
 	panelTitle = Weave.linkableChild(this, LinkableString);
 	xAxisName = Weave.linkableChild(this, LinkableString);
@@ -94,11 +101,11 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		var keySet = this.probeFilter.target as KeySet;
 		return keySet instanceof KeySet && keySet.containsKey(key);
 	} 
-
-    get title():string
-    {
-       return this.panelTitle.value;
-    }
+	
+	get title():string
+	{
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+	}
 
     private static createFromSetToSubset(set: KeySet, filter:KeyFilter):void
     {
@@ -115,7 +122,7 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		filter.replaceKeys(true, true);
     }
 
-    private static localProbeKeySet: KeySet = new weavejs.data.key.KeySet();
+    private static localProbeKeySet = new weavejs.data.key.KeySet();
 	
 	static getMenuItems(target:VisToolGroup):MenuItemProps[]
 	{
@@ -123,17 +130,20 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		let selectionKeySet = target.selectionFilter.target as KeySet;
 		let probeKeySet = target.probeFilter.target as KeySet;
 		let subset = target.filteredKeySet.keyFilter.getInternalKeyFilter() as KeyFilter;
+		
+		if (probeKeySet)
+			Weave.copyState(probeKeySet, this.localProbeKeySet);
+		else
+			this.localProbeKeySet.clearKeys();
 
-		Weave.copyState(probeKeySet, this.localProbeKeySet);
-
-		let usingIncludedKeys: boolean = subset.included.keys.length > 0;
-		let usingExcludedKeys: boolean = subset.excluded.keys.length > 0;
-		let includeMissingKeys: boolean = subset.includeMissingKeys.value;
+		let usingIncludedKeys: boolean = subset && subset.included.keys.length > 0;
+		let usingExcludedKeys: boolean = subset && subset.excluded.keys.length > 0;
+		let includeMissingKeys: boolean = subset && subset.includeMissingKeys.value;
 		let usingSubset: boolean = includeMissingKeys ? usingExcludedKeys : true;
 		let usingProbe: boolean = this.localProbeKeySet.keys.length > 0;
-		let usingSelection: boolean = selectionKeySet.keys.length > 0;
+		let usingSelection: boolean = selectionKeySet && selectionKeySet.keys.length > 0;
 
-		if (!usingSelection && usingProbe)
+		if (!usingSelection && usingProbe && subset)
 		{
 			menuItems.push({
 				label: Weave.lang("Create subset from highlighted record(s)"),
@@ -147,19 +157,19 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		else
 		{
 			menuItems.push({
-				enabled: usingSelection,
+				enabled: usingSelection && subset,
 				label: Weave.lang("Create subset from selected record(s)"),
 				click: this.createFromSetToSubset.bind(null, selectionKeySet, subset)
 			});
 			menuItems.push({
-				enabled: usingSelection,
+				enabled: usingSelection && subset,
 				label: Weave.lang("Remove selected record(s) from subset"),
 				click: this.removeFromSetToSubset.bind(null, selectionKeySet, subset)
 			});
 		}
 
 		menuItems.push({
-			enabled: usingSubset,
+			enabled: usingSubset && subset,
 			label: Weave.lang("Show all records"),
 			click: this.clearSubset.bind(null, subset)
 		});
@@ -172,10 +182,29 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 		return AbstractVisTool.getMenuItems(this);
 	}
 	
+	renderNumberEditor(linkableNumber:LinkableNumber):JSX.Element
+	{
+		return <LinkableTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+	}
+	
 	renderEditor():JSX.Element
 	{
 		return (
 			<VBox>
+				{Object.keys(this.selectableAttributes).map( (label:string, index:number) => {
+					var attribute:DynamicColumn = this.selectableAttributes[label];
+					return (
+						<HBox>
+							<label>
+								{Weave.lang(label)}
+								<OverlayTrigger trigger="click" placement = "bottom"
+												overlay={<Popover id = "AttributeSelector" title="Attribute Selector"><AttributeSelector column={attribute}/></Popover>}>
+									<input type="text" />
+								</OverlayTrigger>
+							</label>
+						</HBox>
+					)
+				})}
 				<HBox>
 					<span>{Weave.lang("Visualization Title")}</span>
 					<LinkableTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>
@@ -191,12 +220,12 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 
 				<HBox>
 					<span>{Weave.lang("Margins:")}</span>
-					<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.left})}/>
+					{this.renderNumberEditor(this.margin.left)}
 					<VBox>
-						<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.top})}/>
-						<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.bottom})}/>
+						{this.renderNumberEditor(this.margin.top)}
+						{this.renderNumberEditor(this.margin.bottom)}
 					</VBox>
-					<LinkableTextField style={{width: 30}} ref={linkReactStateRef(this, {content: this.margin.right})}/>
+					{this.renderNumberEditor(this.margin.right)}
 				</HBox>
 			</VBox>
 		);
@@ -228,5 +257,41 @@ export default class AbstractVisTool extends React.Component<IVisToolProps, IVis
 				}
 			}
 		};
+	}
+
+	static handlePointClick(toolGroup: VisToolGroup, event: MouseEvent): void {
+
+		let probeKeySet = toolGroup.probeFilter.target as KeySet;
+		let selectionKeySet = toolGroup.selectionFilter.target as KeySet;
+
+		if (!(probeKeySet instanceof KeySet) || !(selectionKeySet instanceof KeySet))
+			return;
+
+        var probeKeys: IQualifiedKey[] = probeKeySet.keys;
+		if (!probeKeys.length) {
+			selectionKeySet.clearKeys();
+			return;
+		}
+
+		var isSelected = false;
+		for (var key of probeKeys) {
+			if (selectionKeySet.containsKey(key)) {
+				isSelected = true;
+				break;
+			}
+		}
+		if (event.ctrlKey || event.metaKey) {
+			if (isSelected)
+				selectionKeySet.removeKeys(probeKeys);
+			else
+				selectionKeySet.addKeys(probeKeys);
+		}
+		else {
+			//Todo: needs to be more efficient check
+			if (_.isEqual(selectionKeySet.keys.sort(), probeKeys.sort()))
+				selectionKeySet.clearKeys();
+			else
+				selectionKeySet.replaceKeys(probeKeys);
+		}
 	}
 }

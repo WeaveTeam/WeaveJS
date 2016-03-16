@@ -1,8 +1,3 @@
-/// <reference path="../../typings/react/react.d.ts"/>
-/// <reference path="../../typings/react-bootstrap/react-bootstrap.d.ts"/>
-/// <reference path="../../typings/react-swf/react-swf.d.ts"/>
-/// <reference path="../../typings/lodash/lodash.d.ts"/>
-
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as bs from "react-bootstrap";
@@ -119,7 +114,7 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
         var labelPosition:string = this.props.labelPosition || "right";
 
         return (
-            <div style={{height: "100%", width: "100%", alignItems: "center", overflow: "auto"}}>
+            <div style={{flex: 1, alignItems: "center", overflow: "auto"}}>
                 {
                     this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
                         var checkboxItem:JSX.Element[] = [

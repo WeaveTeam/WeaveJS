@@ -1,6 +1,5 @@
-/// <reference path="../typings/react/react.d.ts"/>
-
 import * as React from "react";
+import * as _ from "lodash";
 
 const toolOverlayStyle:React.CSSProperties = {
     background: "#000",
@@ -8,7 +7,7 @@ const toolOverlayStyle:React.CSSProperties = {
     zIndex: 3,
     boxSizing: "border-box",
     backgroundClip: "padding",
-    position: "fixed",
+    position: "absolute",
     visibility: "hidden",
     pointerEvents: "none"
 };
@@ -27,7 +26,7 @@ export default class ToolOverlay extends React.Component<IToolOverlayProps, IToo
     {
         super(props);
         this.state = {
-            style: toolOverlayStyle
+            style: _.clone(toolOverlayStyle)
         };
     }
 

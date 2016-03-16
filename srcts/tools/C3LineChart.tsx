@@ -1,9 +1,3 @@
-///<reference path="../../typings/c3/c3.d.ts"/>
-///<reference path="../../typings/d3/d3.d.ts"/>
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
@@ -154,13 +148,7 @@ export default class C3LineChart extends AbstractC3Tool
 	{
 		var key = this.getQKey(d);
         this.probeKeySet.replaceKeys([key]);
-		if (this.props.toolTip)
-	        this.props.toolTip.setState({
-	            x: this.chart.internal.d3.event.pageX,
-	            y: this.chart.internal.d3.event.pageY,
-	            showToolTip: true,
-	            columnNamesToValue: ToolTip.getToolTipData(this, [key], this.columns.getObjects(IAttributeColumn))
-	        });
+	    this.toolTip.show(this, this.chart.internal.d3.event, [key], this.columns.getObjects(IAttributeColumn));
 	}
 	
 	protected handleC3Selection():void

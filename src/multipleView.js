@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import $ from "jquery";
-import {WeaveLayoutManager} from "../lib/WeaveUI.js";
+import {WeaveComponentRenderer} from "../lib/WeaveUI.js";
 
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
@@ -71,7 +71,7 @@ class MultipleView extends React.Component {
 
 		var weaveUI = [
 			<div key="0" style={styleObject}>
-				<WeaveLayoutManager layout={layout} style={{width: "100%", height: "100%"}}/>
+				<WeaveComponentRenderer weave={weaveInst} path={['Layout']} style={{width: "100%", height: "100%"}}/>
 	   		</div>
 		];
 		
@@ -91,7 +91,7 @@ class MultipleView extends React.Component {
 
 			return (
 				<div key={index} style={styleObject}>
-					<WeaveLayoutManager layout={layout} style={{width: "100%", height: "100%"}}/>
+					<FlexibleLayout layout={layout} style={{width: "100%", height: "100%"}}/>
 				</div>
 			);
 		});
@@ -101,24 +101,18 @@ class MultipleView extends React.Component {
 		if (this.state.addView)
 		{
 			var weaveInst = this.props.weaveInstances[this.state.toggleIndex];
-			var layout = weaveInst.root.requestObject("SingleToolLayout", Weave.getDefinition("FlexibleLayout"));
-			layout.state = {
-				  "direction": "horizontal",
-				  "flex": 1,
-				  "id": ["MapTool"]
-				}
 			var keyIndex = weaveUI.length;
 			singleViewLabel = "Remove Single Tool View"
 
 			weaveUI.push(
 				<div key={keyIndex} style={{border: "2px solid blue"}}>
-					<WeaveLayoutManager layout={layout} style={{width: "100%", height: "100%"}}/>
+					<WeaveComponentRenderer weave={weaveInst} path={['MapTool']} style={{width: "100%", height: "100%"}}/>
 				</div>
 			);
 		}
 
 		return (
-			<div style={this.props.style}>
+			<div style={this.props.style} className="weave-app">
 				<div>
 					<span onClick={this.toggleView}> Toggle Weave </span> |
 					<span onClick={this.addView}> {singleViewLabel} </span>|

@@ -1,10 +1,6 @@
-/// <reference path="../../typings/react/react.d.ts"/>
-/// <reference path="../../typings/lodash/lodash.d.ts"/>
-/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-
 import * as React from "react";
 import {CSSProperties} from "react";
-import * as Prefixer from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import * as _ from "lodash";
 import ColorRamp = weavejs.util.ColorRamp;
 
@@ -107,7 +103,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         });
 
         return (
-            <tr style={Prefixer.prefix({styles: style}).styles} onMouseOver={this.props.onMouseOver.bind(this, true)} onMouseOut={this.props.onMouseOver.bind(this, false)} onClick={this.props.onClick.bind(this)}>
+            <tr style={prefixer(style)} onMouseOver={this.props.onMouseOver.bind(this, true)} onMouseOut={this.props.onMouseOver.bind(this, false)} onClick={this.props.onClick.bind(this)}>
                 {
                     cells
                 }

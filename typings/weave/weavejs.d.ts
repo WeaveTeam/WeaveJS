@@ -19,6 +19,10 @@ declare module __global__ {
          */
         history: SessionStateLog;
         /**
+         * For backwards compatibility, may be temporary solution
+         */
+        macro(name: string, ...params: any[]): any;
+        /**
          * Creates a WeavePath object.  WeavePath objects are immutable after they are created.
          * This is a shortcut for "new WeavePath(weave, basePath)".
          * @param basePath An optional Array (or multiple parameters) specifying the path to an object in the session state.
@@ -26,19 +30,19 @@ declare module __global__ {
          * @return A WeavePath object.
          * @see WeavePath
          */
-        path(...basePath: any[]): WeavePath;
+        path(...basePath: (string | number | (string | number)[])[]): WeavePath;
         /**
          * Gets the ILinkableObject at a specified path.
          * @param path An Array (or multiple parameters) specifying the path to an object in the session state.
          *             A child index number may be used in place of a name in the path when its parent object is a LinkableHashMap.
          */
-        getObject(...path: any[]): ILinkableObject;
+        getObject(...path: (string | number | (string | number)[])[]): ILinkableObject;
         /**
-         * Finds the Weave instance for a given ILinkableObject.
-         * @param object An ILinkableObject.
-         * @return The Weave instance.
+         * Finds the Weave instance for a given Object.
+         * @param object An Object.
+         * @return The Weave instance, or null if the object was not registered as an ancestor of any instance of Weave.
          */
-        static getWeave(object: ILinkableObject): Weave;
+        static getWeave(object: Object): Weave;
         /**
          * Gets a WeavePath from an ILinkableObject.
          * @param object An ILinkableObject.
@@ -99,7 +103,7 @@ declare module __global__ {
          * @return The closest ancestor of the given type.
          * @see weave.api.core.ISessionManager#getLinkableOwner()
          */
-        static getAncestor<T>(descendant: ILinkableObject, ancestorType: new (..._: any[]) => T): T & ILinkableObject;
+        static getAncestor<T>(descendant: ILinkableObject, ancestorType: new (..._: any[]) => T | string): T & ILinkableObject;
         /**
          * Shortcut for WeaveAPI.SessionManager.getLinkableOwner()
          * @copy weave.api.core.ISessionManager#getLinkableOwner()
@@ -109,7 +113,7 @@ declare module __global__ {
          * Shortcut for WeaveAPI.SessionManager.getLinkableDescendants()
          * @copy weave.api.core.ISessionManager#getLinkableDescendants()
          */
-        static getDescendants<T>(object: ILinkableObject, filter?: new (..._: any[]) => T): Array<T & ILinkableObject>;
+        static getDescendants<T>(object: ILinkableObject, filter?: new (..._: any[]) => T | string): Array<T & ILinkableObject>;
         /**
          * Shortcut for WeaveAPI.SessionManager.getSessionState()
          * @copy weave.api.core.ISessionManager#getSessionState()
@@ -204,7 +208,7 @@ declare module __global__ {
         /**
          * Looks up a static definition by name.
          */
-        static getDefinition(name: string): any;
+        static getDefinition(name: string, throwIfNotFound?: boolean): any;
         /**
          * Generates a deterministic JSON-like representation of an object, meaning object keys appear in sorted order.
          * @param value The object to stringify.
@@ -233,6 +237,10 @@ declare module __global__ {
          * For testing purposes.
          */
         triggerAll(filter: any): void;
+        /**
+         * For testing purposes.
+         */
+        populateColumns(): void;
     }
 }
 import Weave = __global__.Weave;
@@ -827,6 +835,10 @@ declare module weavejs {
          */
         static debugAsyncStack: boolean;
         /**
+         * Set to true to clearly see where Locale is being used.
+         */
+        static debugLocale: boolean;
+        /**
          * For use with StageUtils.startTask(); this priority is used for things that MUST be done before anything else.
          * Tasks having this priority will take over the scheduler and prevent any other asynchronous task from running until it is completed.
          */
@@ -1199,7 +1211,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The global object of the requested name and type, or null if the object could not be created.
          */
-        requestGlobalObject<T extends ILinkableObject>(name: string, objectType: new () => T, lockObject?: boolean): T;
+        requestGlobalObject<T extends ILinkableObject>(name: string, objectType: new (..._: any[]) => T | string, lockObject?: boolean): T;
         /**
          * This function creates a local object using the given Class definition if it doesn't already exist.
          * If this object is locked, this function does nothing.
@@ -1207,7 +1219,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, this object will be locked so the internal object cannot be removed or replaced.
          * @return The local object of the requested type, or null if the object could not be created.
          */
-        requestLocalObject<T extends ILinkableObject>(objectType: new () => T, lockObject?: boolean): T;
+        requestLocalObject<T extends ILinkableObject>(objectType: new (..._: any[]) => T | string, lockObject?: boolean): T;
         /**
          * This function will copy the session state of an ILinkableObject to a new local internalObject of the same type.
          * @param objectToCopy An object to copy the session state from.
@@ -1262,14 +1274,14 @@ declare module weavejs.api.core {
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return A copy of the ordered list of names of objects contained in this LinkableHashMap.
          */
-        getNames(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): Array<string>;
+        getNames(filter?: new (..._: any[]) => any | string, filterIncludesPlaceholders?: boolean): Array<string>;
         /**
          * This function returns an ordered list of objects in the hash map.
          * @param filter If specified, objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return An ordered Array of objects that correspond to the names returned by getNames(filter).
          */
-        getObjects<T>(filter?: new (..._: any[]) => T, filterIncludesPlaceholders?: boolean): Array<T & ILinkableObject>;
+        getObjects<T>(filter?: new (..._: any[]) => T | string, filterIncludesPlaceholders?: boolean): Array<T & ILinkableObject>;
         /**
          * This function gets the name of the specified object in the hash map.
          * @param object An object contained in this LinkableHashMap.
@@ -1298,7 +1310,7 @@ declare module weavejs.api.core {
          * @param lockObject If this is true, the object will be locked in place under the specified name.
          * @return The object under the requested name of the requested type, or null if an error occurred.
          */
-        requestObject<T>(name: string, classDef: new () => T, lockObject?: boolean): T;
+        requestObject<T>(name: string, classDef: new (..._: any[]) => T | string, lockObject?: boolean): T;
         /**
          * This function will copy the session state of an ILinkableObject to a new object under the given name in this LinkableHashMap.
          * @param newName A name for the object to be initialized in this LinkableHashMap.
@@ -1651,9 +1663,15 @@ declare module weavejs.api.core {
          */
         registerDisposableChild(disposableParent: Object, disposableChild: Object): any;
         /**
+         * This function gets the owner of an object.  The owner of an object is defined as its first registered parent.
+         * @param child An Object that was registered as a child of another Object.
+         * @return The owner of the child object (the first parent that was registered with the child), or null if the child has no owner.
+         */
+        getOwner(child: Object): Object;
+        /**
          * This function gets the owner of a linkable object.  The owner of an object is defined as its first registered parent.
          * @param child An ILinkableObject that was registered as a child of another ILinkableObject.
-         * @return The owner of the child object (the first parent that was registered with the child), or null if the child has no owner.
+         * @return The owner of the child object (the first parent that was registered with the child), or null if the child has no linkable owner.
          * @see #getLinkableDescendants()
          */
         getLinkableOwner(child: ILinkableObject): ILinkableObject;
@@ -3256,6 +3274,7 @@ declare module weavejs.core {
         variables: LinkableHashMap;
         script: LinkableString;
         delayWhileBusy: LinkableBoolean;
+        delayWhilePlaceholders: LinkableBoolean;
         groupedCallback: LinkableBoolean;
         get(variableName: string): ILinkableObject;
     }
@@ -3279,7 +3298,7 @@ declare module weavejs.core {
         getSessionState(): any[];
         setSessionState(newState: any[], removeMissingDynamicObjects: boolean): void;
         target: ILinkableObject;
-        targetPath: any[];
+        targetPath: Array<string | number>;
         requestLocalObject(objectType: new (..._: any[]) => any, lockObject?: boolean): any;
         requestGlobalObject(name: string, objectType: new (..._: any[]) => any, lockObject?: boolean): any;
         requestLocalObjectCopy(objectToCopy: ILinkableObject): void;
@@ -3353,10 +3372,6 @@ declare module weavejs.core {
          * This will attempt to compile the function.  An Error will be thrown if this fails.
          */
         validate(): void;
-        /**
-         * This gets the length property of the generated Function.
-         */
-        length: number;
         /**
          * This will evaluate the function with the specified parameters.
          * @param thisArg The value of 'this' to be used when evaluating the function.
@@ -3640,7 +3655,7 @@ declare module weavejs.core {
          * This will set a path which should be watched for new targets.
          * Callbacks will be triggered immediately if the path changes or points to a new target.
          */
-        targetPath: any[];
+        targetPath: Array<string | number>;
         dispose(): void;
     }
 }
@@ -3648,7 +3663,6 @@ declare module weavejs.core {
     import ILocale = weavejs.api.core.ILocale;
     import WeavePromise = weavejs.util.WeavePromise;
     class Locale implements ILocale {
-        locale: string;
         reverseLayout: boolean;
         loadFromUrl(jsonUrl: string): WeavePromise;
         data: Object;
@@ -3804,6 +3818,7 @@ declare module weavejs.core {
          * @return An Array containing a list of linkable objects that have been registered as children of the specified parent.
          *         This list includes all children that have been registered, even those that do not appear in the session state.
          */
+        getOwner(child: Object): Object;
         getLinkableOwner(child: ILinkableObject): ILinkableObject;
         /**
          * @param root The linkable object to be placed at the root node of the tree.
@@ -3983,7 +3998,7 @@ declare module weavejs.core {
          * @param contentType A String describing the type of content contained in the objects.
          * @return A Uint8Array in the Weave file format.
          */
-        serialize(): Uint8Array;
+        serialize(readableJSON?: boolean): Uint8Array;
         static ARCHIVE_HISTORY_AMF: string;
         static ARCHIVE_HISTORY_JSON: string;
         static ARCHIVE_COLUMN_CACHE_AMF: string;
@@ -5168,6 +5183,17 @@ declare module weavejs.data.column {
         containsKey(key: IQualifiedKey): boolean;
         setRecords(keys: any[], geometries: any[]): void;
         getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
+    }
+}
+declare module weavejs.data.column {
+    import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+    import LinkableString = weavejs.core.LinkableString;
+    class KeyColumn extends AbstractAttributeColumn {
+        constructor(metadata?: Object);
+        getMetadata(propertyName: string): string;
+        keyType: LinkableString;
+        getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
+        keys: any[];
     }
 }
 declare module weavejs.data.column {
@@ -6798,6 +6824,16 @@ declare module weavejs.geom {
          */
         includeCoords(newX: number, newY: number): void;
         /**
+         * This function will expand this Bounds2D to include an X value.
+         * @param newX The X coordinate to include in this Bounds2D.
+         */
+        includeX(newX: number): void;
+        /**
+         * This function will expand this Bounds2D to include a Y value.
+         * @param newY The Y coordinate to include in this Bounds2D.
+         */
+        includeY(newY: number): void;
+        /**
          * This function will expand this Bounds2D to include another Bounds2D.
          * @param otherBounds Another Bounds2D object to include within this Bounds2D.
          */
@@ -6865,6 +6901,8 @@ declare module weavejs.geom {
          */
         constrainBounds(boundsToConstrain: Bounds2D, preserveSize?: boolean): void;
         offset(xOffset: number, yOffset: number): void;
+        getXRange(): [number, number];
+        getYRange(): [number, number];
         setXRange(xMin: number, xMax: number): void;
         setYRange(yMin: number, yMax: number): void;
         setCenteredXRange(xCenter: number, width: number): void;
@@ -7990,6 +8028,34 @@ declare module weavejs.net.beans {
 }
 declare module weavejs.path {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
+    import LinkableHashMap = weavejs.core.LinkableHashMap;
+    class ExternalTool extends LinkableHashMap {
+        /**
+         * The name of the global JavaScript variable which is a mapping from a popup's
+         * window.name to an object containing "path" and "window" properties.
+         */
+        static WEAVE_EXTERNAL_TOOLS: string;
+        /**
+         * The popup's window.name
+         */
+        windowName: string;
+        constructor();
+        launch(): boolean;
+        static generateWindowName(): string;
+        static launch(owner: ILinkableObject, url: string, windowName?: string, features?: string): boolean;
+        dispose(): void;
+        /**
+         * @inheritDoc
+         */
+        getSelectableAttributeNames(): any[];
+        /**
+         * @inheritDoc
+         */
+        getSelectableAttributes(): any[];
+    }
+}
+declare module weavejs.path {
+    import ILinkableObject = weavejs.api.core.ILinkableObject;
     class WeavePath {
         /**
          * A pointer to the Weave instance.
@@ -8700,7 +8766,8 @@ declare module weavejs.util {
         static POSITION: string;
         constructor(sessionState?: Object);
         reverse(): void;
-        getColors(): any[];
+        getColors(): Array<number>;
+        getHexColors(): Array<string>;
         /**
          * @param normValue A value between 0 and 1.
          * @return A color.
@@ -8728,12 +8795,24 @@ declare module weavejs.util {
         /**
          * @return An Object with "name", "tags", and "colors" properties.
          */
-        static getColorRampByName(rampName: string): Object;
+        static getColorRampByName(rampName: string): {
+            name: string;
+            tags: string;
+            colors: number[];
+        };
         /**
          * @return An Object with "name", "tags", and "colors" properties.
          */
-        static findMatchingColorRamp(ramp: ColorRamp): Object;
-        static allColorRamps: any[];
+        static findMatchingColorRamp(ramp: ColorRamp): {
+            name: string;
+            tags: string;
+            colors: number[];
+        };
+        static allColorRamps: Array<{
+            name: string;
+            tags: string;
+            colors: number[];
+        }>;
     }
 }
 declare module weavejs.util {
@@ -9061,7 +9140,7 @@ declare module weavejs.util {
         /**
          * Tests if a value is undefined, null, or NaN.
          */
-        static isUndefined(value: any): boolean;
+        static isUndefined(value: any, orEmptyString?: boolean): boolean;
         /**
          * Pads a string on the left.
          */
@@ -9174,6 +9253,11 @@ declare module weavejs.util {
          */
         static getColorLuma(color: number): number;
         /**
+         * @param color A numeric color value
+         * @return A hex color string like #FFFFFF
+         */
+        static getHexColor(color: number): string;
+        /**
          * Code from Graphics Gems Volume 1
          */
         static getNiceNumber(x: number, round: boolean): number;
@@ -9260,6 +9344,10 @@ declare module weavejs.util {
          * @see mx.utils.ObjectUtil#dateCompare()
          */
         static dateCompare(a: Date, b: Date): number;
+        /**
+         * @see https://github.com/bestiejs/punycode.js
+         */
+        static guid(): string;
     }
 }
 declare module weavejs.util {

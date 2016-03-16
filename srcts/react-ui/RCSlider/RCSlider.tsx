@@ -1,7 +1,3 @@
-/// <reference path="../../../typings/react/react.d.ts"/>
-/// <reference path="../../../typings/rc-slider/rc-slider.d.ts"/>
-/// <reference path="../../../typings/react/react-dom.d.ts"/>
-
 import * as React from "react";
 import Slider from "rc-slider";
 import * as ReactDOM from "react-dom";
@@ -119,13 +115,13 @@ export default class RCSlider extends React.Component<any, any>
                            max={this.options.length ? this.options.length - 1 : 0}
                            step={null}
                            marks={this.indexToLabel}
-                           value={this.valueToIndex.get(this.props.selectedValues[0])}
+                           value={this.valueToIndex.get((this.props.selectedValues || [])[0])}
                            onChange={this.onChange}
                     />;
 
         }
 
-		var value:{ min:number, max:number } = Object(this.props.selectedValues[0]);
+		var value:{ min:number, max:number } = Object((this.props.selectedValues || [])[0]);
 		
         if (this.props.type == RCSlider.NUMERIC)
         {

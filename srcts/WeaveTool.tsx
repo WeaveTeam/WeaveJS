@@ -1,29 +1,20 @@
-///<reference path="../typings/react/react.d.ts"/>
-///<reference path="../typings/react/react-dom.d.ts"/>
-///<reference path="../typings/lodash/lodash.d.ts"/>
-///<reference path="../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-///<reference path="../typings/react-bootstrap/react-bootstrap.d.ts"/>
-///<reference path="../typings/weave/weavejs.d.ts"/>
-
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
-import WeavePath = weavejs.path.WeavePath;
-import Layout from "./react-flexible-layout/Layout";
+import LinkableWatcher = weavejs.core.LinkableWatcher;
 
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "./react-ui/FlexBox";
-import * as VendorPrefix from "react-vendor-prefix";
+import prefixer from "./react-ui/VendorPrefixer";
 import {Glyphicon} from "react-bootstrap";
 import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/ToolTip";
 import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
-import {REACT_COMPONENT} from "./react-ui/Menu";
 import PopupWindow from "./react-ui/PopupWindow";
-
-declare type IToolTip = React.Component<IToolTipProps, IToolTipState>;
+import ReactUtils from "./utils/ReactUtils";
+import WeaveComponentRenderer from "./WeaveComponentRenderer";
 
 const grabberStyle:CSSProperties = {
 	width: "16",
@@ -34,8 +25,8 @@ const grabberStyle:CSSProperties = {
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
-	layout:Layout;
-	toolPath:WeavePath;
+	weave:Weave;
+	path:string[];
 	onDragStart:React.DragEventHandler;
 	onDragEnd:React.DragEventHandler;
 	onDragOver:React.DragEventHandler;
@@ -50,52 +41,32 @@ export interface IWeaveToolState
 
 export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
 {
-	private toolPath:WeavePath;
-	
-	private tool:IVisTool;
-	private toolTip:IToolTip;
-	private titleBarHeight: number;
+	private titleBarHeight:number = 25;
 	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
+	private watcher:LinkableWatcher;
 	
 	constructor(props:IWeaveToolProps)
 	{
 		super(props);
 		this.state = {};
-		this.toolPath = this.props.toolPath;
-		this.titleBarHeight = 25;
 	}
 	
-	componentWillUnmount():void
-	{
-	}
-	
-	componentWillReceiveProps(props:IWeaveToolProps):void
-	{
-		//TODO
-	}
-	
-	shouldComponentUpdate(nextProps:IWeaveToolProps, nextState:IWeaveToolState):boolean
+	shouldComponentUpdate(nextProps:IWeaveToolProps, nextState:IWeaveToolState, nextContext:any):boolean
 	{
 		return !_.isEqual(this.state, nextState)
-			|| !_.isEqual(this.props, nextProps);
+			|| !_.isEqual(this.props, nextProps)
+			|| !_.isEqual(this.context, nextContext);
 	}
 	
-	handleInstance=(tool:IVisTool):void=>
+	handleTool=(wcr:WeaveComponentRenderer):void=>
 	{
-		if (this.tool === tool)
-			return; 
+		if (this.watcher == wcr.watcher)
+			return;
 		
-		this.tool = tool;
+		this.watcher = wcr.watcher;
 		
-		if (this.tool)
-			LinkablePlaceholder.setInstance(this.toolPath.getObject(), this.tool);
-		
-		// make sure title gets updated
-		if (this.tool)
-		{
-			Weave.getCallbacks(this.tool).addGroupedCallback(this, this.updateTitle);
-			(ReactDOM.findDOMNode(tool as any) as any)[REACT_COMPONENT] = tool;
-		}
+		if (this.watcher)
+			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.updateTitle);
 		
 		this.updateTitle();
 	}
@@ -107,54 +78,45 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	
 	showEditor()
 	{
-		PopupWindow.open({
-			title: Weave.lang("Settings for {0}", this.state.title),
-			modal: false,
-			content: this.tool.renderEditor()
-		})
+		if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
+			PopupWindow.open({
+				title: Weave.lang("Settings for {0}", this.state.title),
+				modal: false,
+				content: (this.watcher.target as any).renderEditor()
+			});
 	}
 
 	updateTitle():void
 	{
-		var title:string = (this.tool ? this.tool.title : '') || this.toolPath.getPath().pop();
-		this.setState({title});
+		var title:string = (this.watcher && this.watcher.target ? (this.watcher.target as IVisTool).title : '') || this.props.path[this.props.path.length - 1];
+		if (this.state.title != title)
+			this.setState({title});
 	}
 
-	//TODO - we shouldn't have to render twice to set the tooltip of the tool
 	render():JSX.Element
 	{
-		let reactTool:JSX.Element = null;
-		let ToolClass = LinkablePlaceholder.getClass(this.toolPath.getObject()) as typeof React.Component;
-		if (React.Component.isPrototypeOf(ToolClass))
-		{
-			reactTool = React.createElement(ToolClass, {
-				key: "tool",
-				ref: this.handleInstance,
-				toolTip: this.toolTip
-			});
-		}
-
 		return (
 			<VBox style={this.state.style} className="weave-tool"
-					onMouseEnter={() => {
-						this.titleBar.setState({ showControls: true, notification:this.titleBar.state.notification });
+				  onMouseEnter={() => {
+						this.titleBar.setState({ showControls: true });
 					}}
-					onMouseLeave={() => {
-						this.titleBar.setState({ showControls: false, notification:this.titleBar.state.notification });
-						this.toolTip.setState({ showToolTip: false });
+				  onMouseLeave={() => {
+						this.titleBar.setState({ showControls: false });
 					}}
-					onDragOver={this.props.onDragOver}
-					onDragEnd={this.props.onDragEnd}>
+				  onDragOver={this.props.onDragOver}
+				  onDragEnd={this.props.onDragEnd}>
 				<TitleBar ref={(c:TitleBar) => this.titleBar = c }
 						  onDragStart={this.props.onDragStart}
 						  titleBarHeight={this.titleBarHeight}
 						  title={Weave.lang(this.state.title)}
 						  onGearClick={this.showEditor.bind(this)}
-						  />
-					{ reactTool }
-				<ToolTip ref={(c:ToolTip) => this.toolTip = c}/>
+				/>
+				<WeaveComponentRenderer style={{overflow: 'auto'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
 		);
+	}
+	componentWillUnmount():void
+	{
 	}
 }
 
@@ -174,29 +136,19 @@ interface ITitleBarState
 
 class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 {
-	private windowBar:CSSProperties;
-
 	constructor(props:ITitleBarProps)
 	{
 		super(props);
 		this.state = {
-			showControls: false,
-			notification: false
+			showControls: false
 		};
 	}
 	render()
 	{
-		this.windowBar = {
-			width: "100%",
+		var windowBar:CSSProperties = {
 			height: this.props.titleBarHeight,
 			backgroundColor: this.state.showControls ? "#f8f8f8": ""
 		};
-
-		if(this.state.notification) {
-
-			this.windowBar.color = "white";
-			this.windowBar.backgroundColor = "red";
-		}
 
 		var titleStyle:CSSProperties = {
 			cursor: "move",
@@ -230,26 +182,22 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 		_.merge(rightControls, transitions);
 
 		return(
-			<HBox ref="header" style={this.windowBar} draggable={true} onDragStart={this.props.onDragStart}>
-            {<HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
-            	<div onClick={this.props.onGearClick}>
-					<Glyphicon glyph="cog"/>
-				</div>
-            </HBox>}
-			<span style={titleStyle} className="weave-panel">{this.props.title}</span>
-			{<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
-				<div style={{marginRight: 5}}>
-					<i className="fa fa-bell-o" onClick={this.notificationStyleUpdate.bind(this)}></i>
-				</div>
-				<div style={{marginRight: 5}}>
-				</div>
-			</HBox>}
+			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
+				{<HBox style={prefixer(leftControls)}>
+					<div onClick={this.props.onGearClick}>
+						<Glyphicon glyph="cog"/>
+					</div>
+				</HBox>}
+				<span style={titleStyle} className="weave-panel">{this.props.title}</span>
+				{/*<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
+				 <div style={{marginRight: 5}}>
+				 <Glyphicon glyph="unchecked"/>
+				 </div>
+				 <div style={{marginRight: 5}}>
+				 <Glyphicon glyph="remove"/>
+				 </div>
+				 </HBox>*/}
 			</HBox>
 		);
-	}
-
-	notificationStyleUpdate() {
-		this.state.notification = !this.state.notification;
-		this.forceUpdate();
 	}
 }

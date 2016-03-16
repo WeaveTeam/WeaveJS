@@ -1,8 +1,10 @@
 import * as React from "react";
 import * as _ from "lodash";
-import ui from "../../react-ui/ui";
 import AbstractFilterEditor from "./AbstractFilterEditor";
 import {FilterEditorProps, FilterEditorState, FilterOption} from "./AbstractFilterEditor";
+import HSlider from "../../react-ui/RCSlider/HSlider";
+import VSlider from "../../react-ui/RCSlider/VSlider";
+import {HBox, VBox} from "../../react-ui/FlexBox";
 
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;
@@ -49,15 +51,15 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 		let values:any = this.filter ? this.filter.values.state : [];
 		if (this.forceDiscreteValues.value)
 		{
-			return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
-					<ui.HSlider type="numeric-discrete" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-				</ui.HBox>;
+			return <HBox style={{flex: 1, alignItems: "center", padding: 10}}>
+					<HSlider type="numeric-discrete" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+				</HBox>;
 		}
 		else
 		{
-			return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
-					<ui.HSlider type="numeric" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-				</ui.HBox>;
+			return <HBox style={{flex: 1, alignItems: "center", padding: 10}}>
+					<HSlider type="numeric" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+				</HBox>;
 		}
 	}
 }

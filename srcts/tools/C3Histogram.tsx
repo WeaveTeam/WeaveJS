@@ -1,9 +1,3 @@
-///<reference path="../../typings/c3/c3.d.ts"/>
-///<reference path="../../typings/d3/d3.d.ts"/>
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
@@ -96,7 +90,7 @@ export default class C3Histogram extends AbstractC3Tool
                         {
                             decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(d.index);
                         }
-                        return "#" + StandardLib.numberToBase(decColor, 16, 6);
+                        return StandardLib.getHexColor(decColor);
                     }
                     return "#808080";
                 },
@@ -106,26 +100,8 @@ export default class C3Histogram extends AbstractC3Tool
                         var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
                         if (!keys)
                             return;
-                        var columnNamesToValue:{[columnName:string] : string} = {};
-                        var toolTipData:{[columnName:string]: string} = ToolTip.getToolTipData(this, keys);
-                        let binTitle:string = this.getLabelString(d.index);
-                        let binValue:string = FormatUtils.defaultNumberFormatting(this.histData[d.index]["height"]) as string;
-                        if(Object.keys(toolTipData).length) {
-                            columnNamesToValue[binTitle] = binValue;
-                            columnNamesToValue = _.merge(columnNamesToValue, toolTipData) as {[columnName:string]: string};
-                        } else {
-                            columnNamesToValue[String(keys.length) + " Records"] = this.aggregationMethod.value;
-                            columnNamesToValue[binTitle] = binValue;
-                        }
                         this.probeKeySet.replaceKeys(keys);
-                        if (this.props.toolTip)
-	                        this.props.toolTip.setState({
-	                            x: this.chart.internal.d3.event.pageX,
-	                            y: this.chart.internal.d3.event.pageY,
-	                            showToolTip: true,
-	                            title: this.columnToAggregate.getMetadata('title'),
-	                            columnNamesToValue: columnNamesToValue
-	                        });
+                        this.toolTip.show(this, this.chart.internal.d3.event, keys, [this.binnedColumn, this.columnToAggregate]);
                     }
                 }
             },

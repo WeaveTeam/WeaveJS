@@ -1,16 +1,12 @@
-/// <reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import WeavePath = weavejs.path.WeavePath;
 
 import ToolTip from "./ToolTip";
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 export interface IVisToolProps
 {
-    font?:string;
-    fontSize?:number;
-    toolTip: ToolTip;
 }
 
 export interface IVisToolState
@@ -20,5 +16,6 @@ export interface IVisToolState
 export interface IVisTool extends ILinkableObject
 {
     title:string;
-	renderEditor?():JSX.Element
+	renderEditor?():JSX.Element;
+    selectableAttributes?:{[label:string]:DynamicColumn};//TODO should it be only Dynamic Column?
 }

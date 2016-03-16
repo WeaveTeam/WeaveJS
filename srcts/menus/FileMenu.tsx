@@ -10,6 +10,7 @@ import * as FileSaver from "filesaver.js";
 import LinkableTextField from "../ui/LinkableTextField";
 
 import WeaveArchive = weavejs.core.WeaveArchive;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 export default class FileMenu implements MenuBarItemProps
 {
@@ -17,18 +18,25 @@ export default class FileMenu implements MenuBarItemProps
 	weave:Weave;
 	menu: MenuItemProps[] = [
 		{
-			label: <FileInput onChange={this.openFile}>{Weave.lang("Open a file...")}</FileInput> as any
+			label: <FileInput onChange={this.openFile.bind(this)}>{Weave.lang("Open a File...")}</FileInput> as any
 		},
 		{
-			label: Weave.lang("Save as..."),
+			label: Weave.lang("Save As..."),
 			click: this.saveFile.bind(this)
 		},
+		{},
 		{
 			label: Weave.lang("Export CSV"),
 			click: this.exportCSV.bind(this)
+		},
+		{
+			label: Weave.lang("Convert to Cached Data Sources"),
+			// click: this.convertToChachedDataSources.bind(this)
 		}
+
 	];
 
+	fileName:string;
 	bold: boolean = false;
 	
 	constructor(weave:Weave)
@@ -38,13 +46,14 @@ export default class FileMenu implements MenuBarItemProps
 
     openFile(e:any) 
 	{
-        const selectedfile:File = e.target.files[0];
+        const selectedFile:File = e.target.files[0];
+		this.fileName = selectedFile.name;
         new Promise((resolve:any, reject:any) => {
                 let reader:FileReader = new FileReader();
                 reader.onload = (event:Event) => {
-                    resolve([event, selectedfile]);
+                    resolve([event, selectedFile]);
                 };
-                reader.readAsArrayBuffer(selectedfile);
+                reader.readAsArrayBuffer(selectedFile);
             })
             .then((zippedResults:any) => {
                 var e:any = zippedResults[0];
@@ -52,14 +61,26 @@ export default class FileMenu implements MenuBarItemProps
                 weavejs.core.WeaveArchive.loadFileContent(this.weave, result);
             });
     }
-	    
+	
+	convertToChachedDataSources = () =>
+	{
+		
+	}
+	
+	loadUrl(urlParams:any)
+	{
+		this.fileName = urlParams.file
+		return weavejs.core.WeaveArchive.loadUrl(this.weave, urlParams.file);
+	}
+
     saveFile()
 	{
 		var filenameInput:HTMLInputElement;
 
 		var setShowTopMenuBar = () =>
 		{
-			console.log("show top menu bar called");
+			var enableMenuBar = this.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+			enableMenuBar.value = true;
 		}
 		
 		var setSaveHistory = () =>
@@ -96,9 +117,9 @@ export default class FileMenu implements MenuBarItemProps
 			content: (
 				<VBox style={{width: 400, height: 300, padding: 20}}>
 					<span>{Weave.lang("Enter a file name")}</span>
-					<input style={{marginTop: 5}} type="text" placeholder="defaults.weave" ref={(c:HTMLInputElement) => filenameInput = c}/>
+					<input style={{marginTop: 5}} type="text" placeholder="defaults.weave" defaultValue={this.fileName} ref={(c:HTMLInputElement) => filenameInput = c}/>
 					<span style={{marginTop: 5}}>{Weave.lang("Export options")}</span>
-					<VBox style={{marginLeft: 20, marginTop: 5}}>
+					<VBox style={{marginLeft: 20, marginTop: 5, flex: 1}}>
 						<CheckBoxList options={checkboxListOptions}
 									  selectedValues={selectedOptions}
 									  labelPosition="right"

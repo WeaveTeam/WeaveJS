@@ -1,8 +1,3 @@
-///<reference path="../../../../typings/jquery/jquery.d.ts"/>
-///<reference path="../../../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
-///<reference path="../../../../typings/weave/weavejs.d.ts"/>
-
 import Dictionary2D = weavejs.util.Dictionary2D;
 
 import * as jquery from "jquery";

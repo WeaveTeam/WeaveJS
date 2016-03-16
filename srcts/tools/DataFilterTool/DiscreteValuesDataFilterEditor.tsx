@@ -1,7 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import ui from "../../react-ui/ui";
+import {HBox, VBox} from "../../react-ui/FlexBox";
+import CheckBoxList from "../../react-ui/CheckBoxList";
+import List from "../../react-ui/List";
+import HSlider from "../../react-ui/RCSlider/HSlider";
+import VSlider from "../../react-ui/RCSlider/VSlider";
 import {DropdownButton, MenuItem} from "react-bootstrap";
 import AbstractFilterEditor from "./AbstractFilterEditor";
 import {FilterEditorProps, FilterEditorState, FilterOption} from "./AbstractFilterEditor";
@@ -74,24 +78,24 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 		switch (this.layoutMode.value)
 		{
 			case LAYOUT_CHECKBOXLIST:
-				return <ui.CheckBoxList options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+				return <CheckBoxList options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 				
 			case LAYOUT_LIST:
-				return <ui.ListItem options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+				return <List options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 				
 			case LAYOUT_HSLIDER:
-				return <ui.HBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
-							<ui.HSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-						</ui.HBox>;
+				return <HBox style={{flex: 1, alignItems:"center", padding: 10}}>
+							<HSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+						</HBox>;
 			
 			case LAYOUT_VSLIDER:
-				return <ui.VBox style={{width:"100%", height:"100%", alignItems:"center", padding: 10}}>
-							<ui.VSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-						</ui.VBox>;
+				return <VBox style={{flex: 1, alignItems:"center", padding: 10}}>
+							<VSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+						</VBox>;
 				
 			case LAYOUT_COMBO:
-				return <ui.VBox style={{height:"100%", alignItems:"center"}}>
-							<select style={{width:"100%", flex:1, padding: 5}} value={values && values.length ? values[0] : ""} onChange={(event:React.FormEvent) => { this.onChange([(event.target as any).value]) }} placeholder="Selected filter value...">
+				return <VBox style={{flex: 1, alignItems:"center"}}>
+							<select style={{flex:1, padding: 5}} value={values && values.length ? values[0] : ""} onChange={(event:React.FormEvent) => { this.onChange([(event.target as any).value]) }} placeholder="Selected filter value...">
 								{
 									this.options.map((option:FilterOption, index:number) => {
 										// TODO non efficient.. needs to be fixed with external bound function
@@ -103,7 +107,7 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 									})
 								}
 							</select>
-						</ui.VBox>;
+						</VBox>;
 		}
 	}
 }

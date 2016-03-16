@@ -1,5 +1,3 @@
-///<reference path="../../../typings/openlayers/openlayers.d.ts"/>
-
 import * as ol from "openlayers"
 
 export default class CustomView extends ol.View

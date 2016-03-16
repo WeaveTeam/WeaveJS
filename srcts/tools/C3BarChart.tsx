@@ -1,9 +1,3 @@
-///<reference path="../../typings/c3/c3.d.ts"/>
-///<reference path="../../typings/d3/d3.d.ts"/>
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import * as _ from "lodash";
@@ -253,32 +247,22 @@ export default class C3BarChart extends AbstractC3Tool
 		var record:Record = this.records[d.index];
 		var qKey:IQualifiedKey = this.records[d.index].id;
 
-		var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, [qKey]);
 		var columnNamesToColor:{[columnName:string] : string} = {};
 		var columns = this.heightColumns.getObjects(IAttributeColumn);
 		for (var index in columns)
 		{
 			var column = columns[index]; 
 			var columnName:string = column.getMetadata("title");
-			columnNamesToValue[columnName] = column.getValueFromKey(qKey, String);
-			// columnNamesToColor can be done only on heightColumns change.
 			columnNamesToColor[columnName] = this.chartColors.getHexColor(Number(index), 0, columns.length - 1);
 		}
 
-        var title:string = record.stringValues.xLabel;
-		
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([qKey]);
 		
-		if (this.props.toolTip)
-            this.props.toolTip.setState({
-                x: this.chart.internal.d3.event.pageX,
-                y: this.chart.internal.d3.event.pageY,
-                showToolTip: true,
-                title: title,
-                columnNamesToValue: columnNamesToValue,
-                columnNamesToColor: columnNamesToColor
-            });
+		var heightColumns = this.heightColumns.getObjects(IAttributeColumn);
+        this.toolTip.show(this, this.chart.internal.d3.event, [qKey], heightColumns);
+		if (heightColumns.length > 1)
+			this.toolTip.setState({columnNamesToColor});
 	}
 
     private dataChanged():void

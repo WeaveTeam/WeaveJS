@@ -1,12 +1,7 @@
-/// <reference path="../../typings/react/react.d.ts" />
-/// <reference path="../../typings/react/react-dom.d.ts"/>
-/// <reference path="../../typings/lodash/lodash.d.ts"/>
-/// <reference path="../../typings/react-vendor-prefix/react-vendor-prefix.d.ts"/>
-
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import * as VendorPrefix from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import ReactUtils from "../utils/ReactUtils";
 import DOMUtils from "../utils/DOMUtils";
 import Resizer from "./Resizer";
@@ -16,18 +11,19 @@ export const VERTICAL:"vertical" = "vertical";
 export const HORIZONTAL:"horizontal" = "horizontal";
 export type Direction = typeof HORIZONTAL | typeof VERTICAL;
 
-export type LayoutState = {
-	flex?: number,
-	id?: string[],
-	direction?: Direction,
-	children?: LayoutState[],
-	spacing?:number
+export interface LayoutState
+{
+	flex?: number;
+	id?: Object;
+	direction?: Direction;
+	children?: LayoutState[];
 };
 
 export interface LayoutProps extends React.Props<Layout>
 {
 	state: LayoutState;
 	onStateChange: Function;
+	spacing?: number;
 }
 
 export default class Layout extends React.Component<LayoutProps, LayoutState>
@@ -46,7 +42,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		super(props, state);
 		var ps = props.state || {};
-		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex, spacing: ps.spacing };
+		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex || 1 };
 		this.minSize = 16;
 		this.dragging = false;
 	}
@@ -60,7 +56,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 	componentWillReceiveProps(nextProps:LayoutProps):void
 	{
-		this.setState(ReactUtils.includeMissingPropertyPlaceholders(this.state, nextProps.state));
+		ReactUtils.replaceState(this, nextProps.state);
 	}
 
 	componentWillUnmount():void
@@ -83,13 +79,13 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 			this.props.onStateChange(this.state);
 	}
 
-	public getElementFromId(id:string[]):Element
+	public getElementFromId(id:Object):Element
 	{
 		var component = this.getComponentFromId(id);
 		return component ? ReactDOM.findDOMNode(component) : null;
 	}
 
-	public getComponentFromId(id:string[]):Layout
+	public getComponentFromId(id:Object):Layout
 	{
 		if (this.state.id && _.isEqual(this.state.id, id))
 		{
@@ -165,18 +161,14 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		var style:any = {
 			display: "flex",
-			flex: this.state.flex,
+			flex: this.state.flex || 1,
 			position: "relative",
 			outline: "none",
 			overflow: "hidden",
 			userSelect: "none",
 			flexDirection: this.state.direction === HORIZONTAL ? "row" : "column"
 		};
-		if (this.state.direction === HORIZONTAL)
-			style.height = "100%";
-		else
-			style.width = "100%";
-		return VendorPrefix.prefix({styles: style}).styles;
+		return prefixer(style);
 	}
 
 	render():JSX.Element
@@ -185,29 +177,29 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 			<div style={this.generateStyle()}>
 				{ this.props.children }
 				{
-					Array.isArray(this.props.children)
-					? <ResizerOverlay ref={(overlay:ResizerOverlay) => this.overlay = overlay} direction={this.state.direction}/>
-					: null
+					Array.isArray(this.props.children) && (this.props.children as any[]).length
+					?	<ResizerOverlay
+							ref={(overlay:ResizerOverlay) => this.overlay = overlay}
+							direction={this.state.direction}
+							thickness={this.props.spacing}
+						/>
+					:	null
 				}
 			</div>
 		);
 	}
 
-	static renderLayout(params:{
-			key: string,
-			ref: (layout:Layout)=>void,
-			state: LayoutState,
-			onStateChange: (state:LayoutState)=>void
-		}):JSX.Element
+	static renderLayout(props:LayoutProps):JSX.Element
 	{
-		var {key, ref, state, onStateChange} = params;
+		var {key, state, onStateChange, spacing} = props;
+		var ref = props.ref as (layout:Layout)=>any;
 
 		var parentLayout:Layout;
 
 		var elements:JSX.Element[] = [];
 		var children:Layout[] = [];
 		var resizers:Resizer[] = [];
-		if (state.children && state.children.length > 0)
+		if (state && state.children && state.children.length > 0)
 		{
 			let onChildStateChange = (childIndex:number, childState:LayoutState) => {
 				if (!parentLayout)
@@ -227,7 +219,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 							key={`${key}.resizers[${i - 1}]`}
 							ref={saveResizer.bind(null, i - 1)}
 							direction={state.direction}
-							spacing={state.spacing}
+							spacing={spacing}
 						/>
 					);
 				elements.push(
@@ -235,7 +227,8 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 						key: `${key}.children[${i}]`,
 						ref: saveChild.bind(null, i),
 						state: childState,
-						onStateChange: onChildStateChange.bind(null, i)
+						onStateChange: onChildStateChange.bind(null, i),
+						spacing: spacing
 					})
 				);
 			});
@@ -260,8 +253,9 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 				ref={refCallback}
 				children={elements}
 
-				state={_.cloneDeep(state)}
+				state={_.cloneDeep(Object(state))}
 				onStateChange={onStateChange}
+				spacing={spacing}
 			/>
 		);
 	}

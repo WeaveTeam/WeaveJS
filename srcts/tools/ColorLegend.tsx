@@ -1,23 +1,19 @@
-///<reference path="../../typings/d3/d3.d.ts"/>
-///<reference path="../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-///<reference path="../react-ui/ui.tsx"/>
-///<reference path="../../typings/react/react-dom.d.ts"/>
-
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
-import ui from "../react-ui/ui";
 import MiscUtils from "../utils/MiscUtils";
+import ReactUtils from "../utils/ReactUtils";
 import * as ReactDOM from "react-dom";
 import {CSSProperties} from "react";
-import * as Prefixer from "react-vendor-prefix";
+import prefixer from "../react-ui/VendorPrefixer";
 import ToolTip from "./ToolTip";
+import AbstractVisTool from "./AbstractVisTool";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import Menu from "../react-ui/Menu";
+import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -61,6 +57,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	
 	private spanStyle:CSSProperties;
 	private textStyle:CSSProperties;
+	private toolTip:ToolTip;
 
 	constructor(props:IVisToolProps)
 	{
@@ -83,7 +80,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			whiteSpace: "nowrap"
 		};
 		this.textStyle = {
-			width:"100%",
 			flex:0.8,
 			alignItems:"center",
 			justifyContent:"flex-start",
@@ -94,7 +90,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	
 	get title():string
 	{
-		return this.panelTitle.value;
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
 	}
 	
 	get numberOfBins():number
@@ -134,36 +130,38 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		}
 	}
 
-	handleProbe(bin:number, mouseOver:boolean, event:React.MouseEvent):void
+	handleProbe(bin:number, mouseOver:boolean, event:MouseEvent):void
 	{
 		if (mouseOver)
 		{
-			var _binnedKeysArray:IQualifiedKey[][] = (this.binnedColumn as any)['_binnedKeysArray'];
-			var columnNamesToValue:{[columnName:string] : string} = ToolTip.getToolTipData(this, _binnedKeysArray[bin]);
-			this.probeKeySet.replaceKeys(_binnedKeysArray[bin]);
-			if (this.props.toolTip && !this.props.toolTip.state.showToolTip && _binnedKeysArray[bin].length)
-				this.props.toolTip.setState({
-					x: event.pageX,
-					y: event.pageY,
-					showToolTip: true,
-					title: this.panelTitle.value,
-					columnNamesToValue: columnNamesToValue
-				});
+			var keys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(bin);
+			if (!keys)
+				return;
+			this.probeKeySet.replaceKeys(keys);
 		}
 		else
 		{
 			this.probeKeySet.replaceKeys([]);
-			if (this.props.toolTip && this.props.toolTip.state.showToolTip)
-				this.props.toolTip.setState({
-					showToolTip: false
-				});
 		}
+		this.toolTip.show(this, event, this.probeKeySet.keys, [this.binnedColumn.internalDynamicColumn]);
 	}
 
 	componentDidMount()
 	{
+		Menu.registerMenuSource(this);
+		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
+	}
+	
+	componentWillUnmount()
+	{
+		ReactUtils.closePopup(this.toolTip);
 	}
 
+	getMenuItems()
+	{
+		return AbstractVisTool.getMenuItems(this);
+	}
+	
 	getInteractionStyle(bin:number):CSSProperties
 	{
 		var probed:boolean = this.getProbedBins().indexOf(bin) >= 0;
@@ -178,7 +176,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			borderAlpha = 0;
 		
 		return {
-			width: "100%",
 			flex: 1.0,
 			borderColor: MiscUtils.rgba(0, 0, 0, borderAlpha),
 			borderStyle: "solid",
@@ -209,7 +206,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			var r:number = (shapeSize / 100 * height / this.numberOfBins) / 2;
 			var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
 			var finalElements:any[] = [];
-			var prefixerStyle:{} = Prefixer.prefix({styles: this.spanStyle}).styles;
+			var prefixerStyle:{} = prefixer(this.spanStyle);
 
 			for (var j:number = 0; j < maxColumns; j++)
 			{
@@ -257,36 +254,36 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 									}
 
 									element.push(
-										<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
+										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
-											<ui.HBox style={this.textStyle}>
+											<HBox style={this.textStyle}>
 												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
-											</ui.HBox>:null}
-											<ui.HBox style={{width:"100%", flex:0.2, minWidth:10, padding:"0px 0px 0px 0px"}}>
+											</HBox>:null}
+											<HBox style={{flex:0.2, minWidth:10, padding:"0px 0px 0px 0px"}}>
 												<svg viewBox="0 0 100 100" width="100%">
 													{
 														shapeElement
 													}
 												</svg>
-											</ui.HBox>
+											</HBox>
 											{weavejs.WeaveAPI.Locale.reverseLayout ?
-												null:<ui.HBox style={this.textStyle}>
+												null:<HBox style={this.textStyle}>
 												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
-											</ui.HBox>}
-										</ui.HBox>
+											</HBox>}
+										</HBox>
 									);
 								}
 								else
 								{
 									element.push(
-										<ui.HBox key={i} style={this.getInteractionStyle(i)}/>
+										<HBox key={i} style={this.getInteractionStyle(i)}/>
 									);
 								}
 							}
 						}
 
 						elements.push(
-							<ui.VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
+							<VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </VBox>
 						);
 
 						finalElements[j] = elements;
@@ -304,9 +301,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 								if (i < this.numberOfBins)
 								{
 									element.push(
-										<ui.HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseOver={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
-											<ui.HBox style={{
-												width:"100%", flex:1.0,
+										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
+											<HBox style={{
+												flex:1.0,
 												alignItems:"center",
 												justifyContent:"center",
 												backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 1.0)
@@ -318,21 +315,21 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 														}}>
 													<span style={prefixerStyle}>{ Weave.lang(textLabelFunction(i)) }</span>
 												</div>
-											</ui.HBox>
-										</ui.HBox>
+											</HBox>
+										</HBox>
 									);
 								}
 								else
 								{
 									element.push(
-										<ui.HBox key={i} style={this.getInteractionStyle(i)}/>
+										<HBox key={i} style={this.getInteractionStyle(i)}/>
 									);
 								}
 							}
 						}
 
 						elements.push(
-							<ui.VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </ui.VBox>
+							<VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </VBox>
 						);
 
 						finalElements[j] = elements;
@@ -341,15 +338,15 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			}
 
 			return (
-				<ui.VBox style={{flex: 1, padding: "0px 5px 0px 5px", overflow: "hidden"}} ref={(vbox:VBox) => this.element = ReactDOM.findDOMNode(vbox) as HTMLElement}>
+				<VBox style={{flex: 1, padding: "0px 5px 0px 5px", overflow: "hidden"}} ref={(vbox:VBox) => this.element = ReactDOM.findDOMNode(vbox) as HTMLElement}>
 					{this.showLegendName.value ?
-						<ui.HBox style={{width:"100%", flex: 0.1, alignItems:"center"}}>
+						<HBox style={{flex: 0.1, alignItems:"center"}}>
 							<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
-						</ui.HBox>
+						</HBox>
 						: null
 					}
-					<ui.HBox style={{width:"100%", flex: 0.9}}> { finalElements } </ui.HBox>
-				</ui.VBox>
+					<HBox style={{flex: 0.9}}> { finalElements } </HBox>
+				</VBox>
 			);
 		}
 		else

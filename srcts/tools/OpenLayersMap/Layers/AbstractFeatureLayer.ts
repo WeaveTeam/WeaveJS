@@ -1,7 +1,3 @@
-///<reference path="../../../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
-///<reference path="../../../../typings/weave/weavejs.d.ts"/>
-
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 
@@ -114,7 +110,10 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		if (typeof color == "number")
 		{
-			colorArray = ol.color.asArray("#" + StandardLib.numberToBase(color as number, 16, 6));
+			var hexColor = StandardLib.getHexColor(color as number);
+			if (!hexColor)
+				return null;
+			colorArray = ol.color.asArray(hexColor);
 		}
 		else /* if typeof color is string */
 		{
@@ -124,7 +123,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 			}
 			else
 			{
-				colorArray = ol.color.asArray("#" + StandardLib.numberToBase(Number(color as string), 16, 6));
+				colorArray = ol.color.asArray(StandardLib.getHexColor(Number(color)));
 			}
 		}
 
@@ -142,6 +141,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	static toColorRGBA(colorString:any, alpha:any)
 	{
 		var colorArray = AbstractFeatureLayer.toColorArray(colorString, alpha);
+		if (!colorArray)
+			colorArray = [0, 0, 0, 0];
 		return ol.color.asString(colorArray);
 	}
 
@@ -229,6 +230,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		if (!isSelected &&
 			!isProbed &&
+			this.selectionKeySet &&
 			this.selectionKeySet.keys.length > 0)
 		{
 			if (replace)

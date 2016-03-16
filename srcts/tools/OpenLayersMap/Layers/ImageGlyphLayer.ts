@@ -1,8 +1,3 @@
-///<reference path="../../../../typings/jquery/jquery.d.ts"/>
-///<reference path="../../../../typings/lodash/lodash.d.ts"/>
-///<reference path="../../../../typings/openlayers/openlayers.d.ts"/>
-///<reference path="../../../../typings/weave/weavejs.d.ts"/>
-
 import * as jquery from "jquery";
 import * as ol from "openlayers";
 import AbstractGlyphLayer from "./AbstractGlyphLayer";
@@ -24,25 +19,26 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 	imageSize = Weave.linkableChild(this, AlwaysDefinedColumn);
 	imageURL = Weave.linkableChild(this, AlwaysDefinedColumn);
-	alpha = Weave.linkableChild(this, AlwaysDefinedColumn);
-	color = Weave.linkableChild(this, AlwaysDefinedColumn);
+	dataAlpha = Weave.linkableChild(this, new AlwaysDefinedColumn(1.0));
+	dataColor = Weave.linkableChild(this, AlwaysDefinedColumn);
 
 	constructor()
 	{
 		super();
 		this.imageGlyphCache = new ImageGlyphCache(this);
-
+		this.dataAlpha.defaultValue.state = 1.0;
 		this.imageSize.addGroupedCallback(this, this.updateStyleData);
 		this.imageURL.addGroupedCallback(this, this.updateStyleData);
-		this.alpha.addGroupedCallback(this, this.updateStyleData);
-		this.color.addGroupedCallback(this, this.updateStyleData, true);
+		this.dataAlpha.addGroupedCallback(this, this.updateStyleData);
+		this.dataColor.addGroupedCallback(this, this.updateStyleData, true);
+
 	}
 
 	getToolTipColumns(): IAttributeColumn[] 
 	{
 		let additionalColumns: IAttributeColumn[] = [];
 
-		for (let column of [this.imageSize, this.imageURL, this.alpha, this.color])
+		for (let column of [this.imageSize, this.imageURL, this.dataAlpha, this.dataColor])
 		{
 			let internalColumn = weavejs.data.ColumnUtils.hack_findInternalDynamicColumn(column);
 			if (internalColumn)
@@ -52,13 +48,13 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 		return additionalColumns;
 	}
 
-	setIconStyle(feature:ol.Feature, img:any, iconSize: number)
+	setIconStyle(feature:ol.Feature, img:any, iconSize: number, alpha:number)
 	{
 		let styles:any = {};
 
 		if (!img.complete || !img.src)
 		{
-			$(img).one("load", this.setIconStyle.bind(this, feature, img, iconSize));
+			$(img).one("load", this.setIconStyle.bind(this, feature, img, iconSize, alpha));
 			return;
 		}
 
@@ -80,16 +76,20 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 			let icon:any;
 			if (stylePrefix === "probed")
 			{
-				icon = new ol.style.Icon({img, imgSize, scale: scale * 2.0});
+				icon = new ol.style.Icon({snapToPixel: true, img, imgSize, scale: scale * 2.0});
 			}
 			else
 			{
-				icon = new ol.style.Icon({img, imgSize, scale});
+				icon = new ol.style.Icon({snapToPixel: true, img, imgSize, scale});
 			}
 
 			if (stylePrefix === "unselected")
 			{
-				icon.setOpacity(1 / 3);
+				icon.setOpacity(alpha / 3);
+			}
+			else
+			{
+				icon.setOpacity(alpha);
 			}
 
 			styles[stylePrefix + "Style"] = new ol.style.Style({image: icon});
@@ -106,8 +106,8 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 		var recordIds:IQualifiedKey[] = this.dataX.keys;
 		var records:any[] = weavejs.data.ColumnUtils.getRecords({
-			"alpha": this.alpha,
-			"color": this.color,
+			"alpha": this.dataAlpha,
+			"color": this.dataColor,
 			"imageURL": this.imageURL,
 			"imageSize": this.imageSize
 		}, recordIds, {
@@ -128,7 +128,8 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 			}
 
 			let imageSize = Number(record.imageSize || NaN);
-			let color = AbstractFeatureLayer.toColorRGBA(record.color, record.alpha);
+			if (isNaN(record.alpha)) record.alpha = 1;
+			let color = AbstractFeatureLayer.toColorRGBA(record.color, 1);
 
 			if (!record.imageURL)
 			{
@@ -138,8 +139,16 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 			let img = this.imageGlyphCache.getImage(record.imageURL, color);
 
-			this.setIconStyle(feature, img, imageSize);
+			this.setIconStyle(feature, img, imageSize, record.alpha);
 		}
+	}
+
+	get deprecatedStateMapping()
+	{
+		return {
+			alpha: (state:any) => Weave.setState(typeof state === 'number' ? this.opacity : this.dataAlpha, state),
+			color: this.dataColor
+		};
 	}
 }
 

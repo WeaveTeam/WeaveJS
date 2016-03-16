@@ -1,9 +1,3 @@
-///<reference path="../../typings/react/react.d.ts"/>
-///<reference path="../../typings/react/react-dom.d.ts"/>
-///<reference path="../../typings/weave/weavejs.d.ts"/>
-///<reference path="../../typings/d3/d3.d.ts"/>
-///<reference path="../../typings/c3/c3.d.ts"/>
-
 import AbstractVisTool from "./AbstractVisTool";
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
@@ -13,8 +7,10 @@ import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import DOMUtils from "../utils/DOMUtils";
 import * as jquery from "jquery";
+import DOMUtils from "../utils/DOMUtils";
+import ReactUtils from "../utils/ReactUtils";
+import ToolTip from "./ToolTip";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -46,7 +42,13 @@ declare type CullingMetric = {
 	displayed:number;
 }
 
-export default class AbstractC3Tool extends AbstractVisTool
+export interface IAbstractC3ToolProps extends IVisToolProps
+{
+    font?:string;
+    fontSize?:number;
+}
+
+export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps, IVisToolState>
 {
     constructor(props:IVisToolProps)
 	{
@@ -108,6 +110,9 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
 	componentDidMount()
 	{
+		super.componentDidMount();
+		
+		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
         DOMUtils.addPointClickListener(this.element, this.handlePointClick);
 		this.validateSize();
 		this.handleChange();
@@ -115,6 +120,7 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
 	componentWillUnmount()
 	{
+		ReactUtils.closePopup(this.toolTip);
 		DOMUtils.removePointClickListener(this.element, this.handlePointClick);
 		if (this.chart)
 		{
@@ -130,6 +136,8 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
 	validateSize()
 	{
+		if (!this.element)
+			return;
         if (this.c3Config.size.width != this.element.clientWidth || this.c3Config.size.height != this.element.clientHeight)
 		{
             this.c3Config.size = { width: this.element.clientWidth, height: this.element.clientHeight };
@@ -141,11 +149,12 @@ export default class AbstractC3Tool extends AbstractVisTool
 	
     render():JSX.Element
     {
-        return <div ref={(c:HTMLElement) => { this.element = c;}} style={{flex: 1, overflow: "hidden"}}>
+        return <div ref={(c:HTMLElement) => { this.element = c;}} style={{flex: 1, overflow: "hidden"}} onMouseLeave={ () => this.toolTip.hide() }>
 			<div ref={(c:HTMLElement) => { this.c3Config.bindto = c;}}/>
 		</div>;
     }
 
+	protected toolTip:ToolTip;
 	protected element:HTMLElement;
     protected chart:c3.ChartAPI;
     protected c3Config:c3.ChartConfiguration;
@@ -198,10 +207,7 @@ export default class AbstractC3Tool extends AbstractVisTool
 	{
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([]);
-		if (this.props.toolTip)
-			this.props.toolTip.setState({
-				showToolTip: false
-			});
+		this.toolTip.hide();
 	}
 
 	/**
@@ -211,44 +217,6 @@ export default class AbstractC3Tool extends AbstractVisTool
 	protected validate(forced:boolean = false):boolean
 	{
 		return forced;
-	}
-	
-	handlePointClick(event:MouseEvent):void
-	{
-		if (!this.probeKeySet || !this.selectionKeySet)
-			return;
-
-        var probeKeys:IQualifiedKey[] = this.probeKeySet.keys;
-		if (!probeKeys.length)
-		{
-			this.selectionKeySet.clearKeys();
-			return;
-		}
-		
-		var isSelected = false;
-		for (var key of probeKeys)
-		{
-			if (this.selectionKeySet.containsKey(key))
-			{
-				isSelected = true;
-				break;
-			}
-		}
-		if (event.ctrlKey || event.metaKey)
-		{
-			if (isSelected)
-				this.selectionKeySet.removeKeys(probeKeys);
-			else
-				this.selectionKeySet.addKeys(probeKeys);
-		}
-		else
-		{
-			//Todo: needs to be more efficient check
-			if (_.isEqual(this.selectionKeySet.keys.sort(), probeKeys.sort()))
-				this.selectionKeySet.clearKeys();
-			else
-				this.selectionKeySet.replaceKeys(probeKeys);
-		}
 	}
 	
     get internalWidth():number
@@ -302,6 +270,11 @@ export default class AbstractC3Tool extends AbstractVisTool
 			this.c3Config.axis.y2.min = yMin;
         	this.c3Config.axis.y2.max = yMax;
 		}
+	}
+
+	protected handlePointClick(event:MouseEvent)
+	{
+		AbstractVisTool.handlePointClick(this, event);
 	}
 	
     private cullAxis(axisSize:number, axisClass:AxisClass):void

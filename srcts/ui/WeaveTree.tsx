@@ -14,6 +14,7 @@ export interface IWeaveTreeProps {
 	root:IWeaveTreeNode
 	style?: any;
 	hideRoot?: boolean;
+	hideLeaves? : boolean;
 	multipleSelection?: boolean;
 	onSelect?: (selectedItems: Array<IWeaveTreeNode>) => void;
 	onExpand?: (openItems: Array<IWeaveTreeNode>) => void;
@@ -170,9 +171,11 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 		if (node !== this.props.root || !this.props.hideRoot)
 		{
-			node.depth = depth;
-			result.push(node);
-			depth++;
+			if(node.isBranch() || node == this.props.root || !this.props.hideLeaves){
+				node.depth = depth;
+				result.push(node);
+				depth++;
+			}
 		}
 
 		if (node.isBranch() && this.getOpen(node))
