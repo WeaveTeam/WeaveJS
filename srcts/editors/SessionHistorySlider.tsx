@@ -90,18 +90,25 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	render():JSX.Element
 	{
 //				<button ref={(c) => this.playButton = c} label={this.getPlayLabel(this._playSpeed, "")} title={Weave.lang('Replay session history')} onClick={() => {if(this.playButton.value) this.play()}}>Replay</button>
+		//className="fa fa-undo fa-flip-horizontal"
 		return (
-			<HBox style={{flex: 1, alignItems: "center"}}>
-				<span
-					title={Weave.lang('Undo')}
-					className={classNames('weave-menubar-item', 'fa', 'fa-undo', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}
-					onClick={() => this._stateLog.undo()}
-				/>
-				<span
-					title={Weave.lang('Redo')}
-					className={classNames('weave-menubar-item', 'fa', 'fa-undo', 'fa-flip-horizontal', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}
-					onClick={() => this._stateLog.redo()}
-				/>
+			<HBox style={{flex: 1, alignItems: "center", alignSelf: "stretch"}}>
+				<span style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}>
+					<i
+						style={{alignSelf: "center"}}
+						title={Weave.lang('Undo')}
+						className="fa fa-undo"
+						onClick={() => this._stateLog.undo()}
+					/>
+				</span>
+				<span style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}>
+					<i
+						style={{alignSelf: "center"}}
+						title={Weave.lang('Undo')}
+						className="fa fa-undo fa-flip-horizontal"
+						onClick={() => this._stateLog.redo()}
+					/>
+				</span>
 				<div style={{alignContent: "center", paddingLeft: 10, paddingRight: 10, flex: 1}}>
 					<HSlider min={0} max={this.state.sliderMax} step={1} onChange={this.handleSlider} type={RCSlider.CATEGORICAL}/>
 				</div>
