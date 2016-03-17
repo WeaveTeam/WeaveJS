@@ -7,7 +7,6 @@ import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
 import MiscUtils from "./utils/MiscUtils";
-import SessionHistorySlider from "./editors/SessionHistorySlider";
 import WeaveTool from "./WeaveTool";
 import {WeavePathArray, PanelProps} from "./FlexibleLayout";
 import DataSourceManager from "./ui/DataSourceManager";
@@ -17,6 +16,7 @@ import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import WeavePath = weavejs.path.WeavePath;
+let is = Weave.IS;
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -93,7 +93,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var name = this.props.weave.root.generateUniqueName(baseName);
 		var instance = this.props.weave.root.requestObject(name, type);
 		
-		if (Weave.IS(instance, IDataSource))
+		if (is(instance, IDataSource))
 		{
 			DataSourceManager.openInstance(this.props.weave, instance);
 		}
@@ -160,7 +160,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
 					:	null
 				}
-				<SessionHistorySlider stateLog={this.props.weave.history}/>
 				<WeaveComponentRenderer weave={this.props.weave} path={renderPath} props={{itemRenderer: this.renderTool}}/>
 			</VBox>
 		);

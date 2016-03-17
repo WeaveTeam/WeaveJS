@@ -7,6 +7,7 @@ import {HBox, VBox} from "./react-ui/FlexBox";
 import FileMenu from "./menus/FileMenu";
 import DataMenu from './menus/DataMenu';
 import ToolsMenu from './menus/ToolsMenu';
+import SessionHistorySlider from "./editors/SessionHistorySlider";
 
 export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar>
 {
@@ -85,15 +86,15 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	
 	render():JSX.Element
 	{
-        var weave = this.props.weave;
 		return (
 			<MenuBar
 				config={[
-					weaveMenu(weave),
+					weaveMenu(this.props.weave),
 					this.fileMenu,
 					this.dataMenu,
 					this.toolsMenu
 				]}
+				children={<SessionHistorySlider stateLog={this.props.weave.history}/>}
 			/>
 		);
 	}

@@ -127,8 +127,9 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	render():JSX.Element
 	{
+		var style = _.merge({alignItems: 'center'}, this.props.style);
 		return (
-			<HBox className="weave-menubar" {...this.props as React.HTMLAttributes}>
+			<HBox className="weave-menubar" {...this.props as React.HTMLAttributes} style={style}>
 				{
 					this.props.config.map((menuBarItemProps, index) => {
 						return this.renderMenuBarItem(index, menuBarItemProps)
@@ -140,6 +141,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 					:
 					null
 				}
+				{this.props.children}
 			</HBox>
 		)
 	}
