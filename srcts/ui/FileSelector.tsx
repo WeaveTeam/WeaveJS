@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as lodash from "lodash";
 import LinkableTextField from "../ui/LinkableTextField";
+import FileInput from "../react-ui/FileInput";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
@@ -26,12 +27,10 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 	{
 		super(props);
 	}
-
-	private fileElement: HTMLInputElement;
-
+	
 	handleFileChange=(event:React.FormEvent)=>
 	{
-		let file = this.fileElement && this.fileElement.files[0];
+		let file = (event.target as HTMLInputElement).files[0] as File;
 
 		let reader = new FileReader();
 
@@ -45,19 +44,13 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 		reader.readAsArrayBuffer(file);
 	}
 
-	handleClick=(event:React.MouseEvent):void =>
-	{
-		this.fileElement && this.fileElement.click();
-	}
 	render():JSX.Element
 	{
 		return <HBox>
 			<LinkableTextField ref={linkReactStateRef(this, {content: this.props.target}, 500)}/>
-			<input type="button" value={Weave.lang("Add file")} onClick={this.handleClick}/>
-			<input type="file" onChange={this.handleFileChange} 
-				accept={ this.props.accept } 
-				ref={(c) => { this.fileElement = c } } 
-				style={{ display: "none" }}/>
+			<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
+				<input type="button" value={Weave.lang("Add file")}/>
+			</FileInput>
 		</HBox>
 	}
 }
