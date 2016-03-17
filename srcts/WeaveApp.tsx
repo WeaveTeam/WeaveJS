@@ -33,7 +33,6 @@ export interface WeaveAppState
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
-	contextMenu:HTMLElement;
 	menuBar:WeaveMenuBar;
 
 	static defaultProps:WeaveAppProps = {

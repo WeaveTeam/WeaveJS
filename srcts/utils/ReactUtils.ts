@@ -20,7 +20,7 @@ export default class ReactUtils
 			document.addEventListener("mousedown", mousedownHandler = (event:MouseEvent) => {
 				if (element.contains(event.target as HTMLElement))
 					return;
-				ReactUtils.closePopup.bind(popup)
+				ReactUtils.closePopup(popup);
 			});
 		}
 		
