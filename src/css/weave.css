@@ -109,11 +109,17 @@ input[type="text"] {
   padding: 10px;
   border: solid 1px #dcdcdc;
   transition: box-shadow 0.3s, border 0.3s;
+  margin :5px 5px 5px 5px;
+  flex-grow: 1;
+  height:30px
 }
 
 input[type="text"]:focus {
   border: solid 1px rgba(153, 214, 255, 0.4);
   box-shadow: 0 0 5px 1px rgba(153, 214, 255, 0.4);
+  margin : 5px 5px 5px 5px;
+  flex-grow: 1;
+  height:30px
 }
 
 .weave-menu {
@@ -250,7 +256,7 @@ input[type="text"]:focus {
 }
 
 .weave-window-content {
-	padding: 5
+	padding: 5px 5px 5px 5px;
 }
 
 .weave-window-footer {
