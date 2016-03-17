@@ -189,6 +189,10 @@ declare module __global__ {
          */
         static isLinkable(objectOrClass: Object): boolean;
         /**
+         * @return (object is type)
+         */
+        static IS(object: Object, type: new (..._: any[]) => any): boolean;
+        /**
          * Registers a class that must be instantiated asynchronously.
          * Dynamic items in the session state that extend this class will be replaced with
          * LinkablePlaceholder objects that can be replaced with actual instances later.

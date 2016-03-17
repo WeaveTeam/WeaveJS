@@ -11,7 +11,9 @@ import MiscUtils from "./utils/MiscUtils";
 import SessionHistorySlider from "./editors/SessionHistorySlider";
 import WeaveTool from "./WeaveTool";
 import {WeavePathArray, PanelProps} from "./FlexibleLayout";
+import DataSourceManager from "./ui/DataSourceManager";
 
+import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import WeavePath = weavejs.path.WeavePath;
@@ -39,6 +41,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	menuBar:WeaveMenuBar;
 
 	static defaultProps:WeaveAppProps = {
+		weave: null,
+		renderPath: ['Layout'],
 		readUrlParams: false
 	}
 
@@ -53,6 +57,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		};
 	}
 	
+	getRenderPath():string[]
+	{
+		return this.props.renderPath || WeaveApp.defaultProps.renderPath;
+	}
+	
 	componentDidMount()
 	{
 		if (this.props.readUrlParams)
@@ -62,10 +71,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			
 			if (urlParams.file)
 			{
-				// read from url
-				this.menuBar.fileMenu.loadUrl(urlParams.file).then(this.forceUpdate.bind(this));
+				// read content from url
+				this.menuBar.fileMenu.loadUrl(urlParams.file);
 			}
-
 			else if (weaveExternalTools && weaveExternalTools[window.name])
 			{
 				// read content from flash
@@ -117,10 +125,36 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			/>
 		);
 	}
+
+	createObject=(type:new(..._:any[])=>any):void=>
+	{
+		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
+		var name = this.props.weave.root.generateUniqueName(baseName);
+		var instance = this.props.weave.root.requestObject(name, type);
+		
+		if (Weave.IS(instance, IDataSource))
+		{
+			DataSourceManager.openInstance(this.props.weave, instance);
+		}
+		
+		if (instance instanceof React.Component)
+		{
+			var layout = this.props.weave.getObject(this.getRenderPath()) as FlexibleLayout;
+			if (layout instanceof FlexibleLayout)
+			{
+				var state = layout.getSessionState();
+				state = {
+					children: [state, {id: [name]}],
+					direction: state.direction == 'horizontal' ? 'vertical' : 'horizontal'
+				};
+				layout.setSessionState(state);
+			}
+		}
+	}
 	
 	render():JSX.Element
 	{
-		var renderPath = this.props.renderPath || ["Layout"];
+		var renderPath = this.getRenderPath();
 		
 		if (!this.props.weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
@@ -164,7 +198,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			>
 				{
 					!enableMenuBar || enableMenuBar.value
-					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c}/>
+					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
 					:	null
 				}
 				<SessionHistorySlider stateLog={this.props.weave.history}/>

@@ -6,12 +6,16 @@ import PopupWindow from "./react-ui/PopupWindow";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import FileMenu from "./menus/FileMenu";
 import DataMenu from './menus/DataMenu';
+import ToolsMenu from './menus/ToolsMenu';
 
-export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar> {
-	weave:Weave
+export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar>
+{
+	weave:Weave,
+	createObject:(type:new(..._:any[])=>any)=>void
 }
 
-export interface WeaveMenuBarState {
+export interface WeaveMenuBarState
+{
 	
 }
 
@@ -66,41 +70,31 @@ function weaveMenu(weave:Weave)
 	};
 }
 
-/*function dataMenu(weave:Weave)
-{
-	return {
-		label: "Data",
-		menu: [
-			{
-				label: "Manage or browse data",
-				click: () => { console.log("Manage or browse data") }
-			},
-			{
-			},
-			{
-				label: "Add CSV DataSource",
-				click: () => { console.log("Add CSV DataSource") }
-			}
-		]
-	};
-}*/
-
 export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
 {
 	fileMenu:FileMenu;
 	dataMenu:DataMenu;
+	toolsMenu:ToolsMenu;
 	constructor(props:WeaveMenuBarProps)
 	{
 		super(props);
 		this.fileMenu = new FileMenu(props.weave);
-		this.dataMenu = new DataMenu(props.weave);
+		this.dataMenu = new DataMenu(props.weave, props.createObject);
+		this.toolsMenu = new ToolsMenu(props.weave, props.createObject);
 	}
 	
 	render():JSX.Element
 	{
         var weave = this.props.weave;
 		return (
-			<MenuBar config={[weaveMenu(weave), this.fileMenu, this.dataMenu]}/>
+			<MenuBar
+				config={[
+					weaveMenu(weave),
+					this.fileMenu,
+					this.dataMenu,
+					this.toolsMenu
+				]}
+			/>
 		);
 	}
 }
