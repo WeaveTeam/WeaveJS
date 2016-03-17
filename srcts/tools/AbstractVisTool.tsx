@@ -189,22 +189,23 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	
 	renderEditor():JSX.Element
 	{
+		var ui = Object.keys(this.selectableAttributes).map( (label:string, index:number) => {
+			var attribute:DynamicColumn = this.selectableAttributes[label];
+			return (
+				<HBox>
+					<label>
+						{Weave.lang(label)}
+						<OverlayTrigger trigger="click" placement = "bottom"
+										overlay={<Popover id = "AttributeSelector" title="Attribute Selector"><AttributeSelector column={attribute}/></Popover>}>
+							<input type="text" />
+						</OverlayTrigger>
+					</label>
+				</HBox>
+			)
+		});
 		return (
 			<VBox>
-				{Object.keys(this.selectableAttributes).map( (label:string, index:number) => {
-					var attribute:DynamicColumn = this.selectableAttributes[label];
-					return (
-						<HBox>
-							<label>
-								{Weave.lang(label)}
-								<OverlayTrigger trigger="click" placement = "bottom"
-												overlay={<Popover id = "AttributeSelector" title="Attribute Selector"><AttributeSelector column={attribute}/></Popover>}>
-									<input type="text" />
-								</OverlayTrigger>
-							</label>
-						</HBox>
-					)
-				})}
+				{ui}
 				<HBox>
 					<span>{Weave.lang("Visualization Title")}</span>
 					<LinkableTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>
