@@ -20,7 +20,7 @@ const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
-	weave?:Weave;
+	weave:Weave;
 	renderPath?:string[];
 	readUrlParams?:boolean;
 }
@@ -38,6 +38,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	contextMenu:HTMLElement;
 	menuBar:WeaveMenuBar;
 
+	static defaultProps:WeaveAppProps = {
+		readUrlParams: false
+	}
+
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
@@ -48,7 +52,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			contextMenuItems: []
 		};
 	}
-
+	
 	componentDidMount()
 	{
 		if (this.props.readUrlParams)
@@ -71,11 +75,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				this.forceUpdate();
 			}
 		}
-	}
-	
-	static defaultProps:WeaveAppProps = {
-		weave: new Weave(),
-		readUrlParams: false
 	}
 	
 	showContextMenu(event:React.MouseEvent)
