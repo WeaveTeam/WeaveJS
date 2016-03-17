@@ -20,7 +20,7 @@ export interface SessionHistorySliderState
 
 export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 {
-	private _stateLogWatcher:LinkableWatcher;
+	private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog), this.handleStateLogChange, true);
 
 	constructor(props:SessionHistorySliderProps)
 	{
@@ -30,7 +30,6 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 			sliderValue: 0,
 			sliderMax: 0
 		}
-		this._stateLogWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog), this.handleStateLogChange, true);
 		this._stateLogWatcher.target = props.stateLog;
 	}
 	
@@ -45,7 +44,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	}
 
 	// called when state log changes
-	private handleStateLogChange=()=>
+	private handleStateLogChange()
 	{
 		// if (objectWasDisposed(_stateLog))
 		// 	return;
