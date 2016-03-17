@@ -154,6 +154,14 @@ input[type="text"]:focus {
 	padding-right: 10;
 }
 
+.weave-menubar-item:hover {
+	background-color: rgba(153, 214, 255, 0.4);
+}
+
+.weave-menubar-item:active {
+	background-color: #80CCFF;
+}
+
 .weave-menubar-item-disabled {
 	opacity: 0.5;
 }
@@ -164,14 +172,6 @@ input[type="text"]:focus {
 
 .weave-menubar-item-bold {
 	font-weight: bold;
-}
-
-.weave-menubar-item:hover {
-	background-color: rgba(153, 214, 255, 0.4);
-}
-
-.weave-menubar-item:active {
-	background-color: #80CCFF;
 }
 
 .weave-menuitem {
