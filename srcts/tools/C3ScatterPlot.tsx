@@ -10,7 +10,7 @@ import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import LinkableTextField from "../ui/LinkableTextField";
+import StatefulTextField from "../ui/StatefulTextField";
 import AttributeSelector from "../ui/AttributeSelector";
 import {OverlayTrigger,Popover} from "react-bootstrap";
 

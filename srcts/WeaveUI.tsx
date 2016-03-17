@@ -31,7 +31,7 @@ import MenuBar from "./react-ui/MenuBar";
 import PopupWindow from "./react-ui/PopupWindow";
 
 import DataSourceManager from "./ui/DataSourceManager";
-import LinkableTextField from "./ui/LinkableTextField";
+import StatefulTextField from "./ui/StatefulTextField";
 import ListView from "./ui/ListView";
 import WeaveTree from "./ui/WeaveTree";
 
@@ -84,7 +84,7 @@ export
 	PopupWindow,
 	
 	DataSourceManager,
-	LinkableTextField,
+	StatefulTextField,
 	ListView,
 	WeaveTree,
 	

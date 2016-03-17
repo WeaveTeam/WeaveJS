@@ -7,7 +7,6 @@ import FileInput from "../react-ui/FileInput";
 import {ICheckBoxListProps} from "../react-ui/CheckBoxList";
 import CheckBoxList from "../react-ui/CheckBoxList";
 import * as FileSaver from "filesaver.js";
-import LinkableTextField from "../ui/LinkableTextField";
 
 import WeaveArchive = weavejs.core.WeaveArchive;
 import LinkableBoolean = weavejs.core.LinkableBoolean;

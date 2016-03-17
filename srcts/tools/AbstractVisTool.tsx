@@ -8,7 +8,7 @@ import * as _ from "lodash";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import Menu from "../react-ui/Menu";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import LinkableTextField from "../ui/LinkableTextField";
+import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import MiscUtils from "../utils/MiscUtils";
 import {OverlayTrigger,Popover} from "react-bootstrap";
@@ -184,7 +184,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	
 	renderNumberEditor(linkableNumber:LinkableNumber):JSX.Element
 	{
-		return <LinkableTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+		return <StatefulTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
 	}
 	
 	renderEditor():JSX.Element
@@ -196,15 +196,15 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			<VBox>
 				<HBox style = {boxStyle}>
 					<span style = {labelStyle}>{Weave.lang("Visualization Title")}</span>
-					<LinkableTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>
+					<StatefulTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>
 				</HBox>
 				<HBox style = {boxStyle}>
 					<span style = {labelStyle}>{Weave.lang("X Axis Title")}</span>
-					<LinkableTextField ref={linkReactStateRef(this, {content: this.xAxisName})}/>
+					<StatefulTextField ref={linkReactStateRef(this, {content: this.xAxisName})}/>
 				</HBox>
 				<HBox style = {boxStyle}>
 					<span style = {labelStyle}>{Weave.lang("Y Axis Title")}</span>
-					<LinkableTextField ref={linkReactStateRef(this, {content: this.yAxisName})}/>
+					<StatefulTextField ref={linkReactStateRef(this, {content: this.yAxisName})}/>
 				</HBox>
 
 				{Object.keys(this.selectableAttributes).map( (label:string, index:number) => {

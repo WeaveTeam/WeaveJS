@@ -1,6 +1,5 @@
 import * as React from "react";
-import * as lodash from "lodash";
-import LinkableTextField from "../ui/LinkableTextField";
+import StatefulTextField from "../ui/StatefulTextField";
 import FileInput from "../react-ui/FileInput";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
@@ -47,7 +46,7 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 	render():JSX.Element
 	{
 		return <HBox>
-			<LinkableTextField ref={linkReactStateRef(this, {content: this.props.target}, 500)}/>
+			<StatefulTextField ref={linkReactStateRef(this, {content: this.props.target}, 500)}/>
 			<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
 				<input type="button" value={Weave.lang("Add file")}/>
 			</FileInput>
