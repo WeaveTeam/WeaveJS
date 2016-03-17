@@ -98,10 +98,10 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		return (
 			<VBox style={this.state.style} className="weave-tool"
 				  onMouseEnter={() => {
-						this.titleBar.setState({ showControls: true });
+						this.titleBar.setState({ showControls: true, notification: this.titleBar.state.notification });
 					}}
 				  onMouseLeave={() => {
-						this.titleBar.setState({ showControls: false });
+						this.titleBar.setState({ showControls: false, notification: this.titleBar.state.notification });
 					}}
 				  onDragOver={this.props.onDragOver}
 				  onDragEnd={this.props.onDragEnd}>
@@ -140,7 +140,8 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 	{
 		super(props);
 		this.state = {
-			showControls: false
+			showControls: false,
+			notification: false
 		};
 	}
 	render()
@@ -149,6 +150,12 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 			height: this.props.titleBarHeight,
 			backgroundColor: this.state.showControls ? "#f8f8f8": ""
 		};
+
+		if(this.state.notification) {
+
+			windowBar.color = "white";
+			windowBar.backgroundColor = "red";
+		}
 
 		var titleStyle:CSSProperties = {
 			cursor: "move",
@@ -170,7 +177,8 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 		var leftControls:CSSProperties = {
 			marginLeft: 5,
 			marginTop: 2,
-			width: 20
+			width: 20,
+
 		};
 
 		var rightControls:CSSProperties = {
@@ -189,15 +197,22 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 					</div>
 				</HBox>}
 				<span style={titleStyle} className="weave-panel">{this.props.title}</span>
-				{/*<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
-				 <div style={{marginRight: 5}}>
-				 <Glyphicon glyph="unchecked"/>
-				 </div>
-				 <div style={{marginRight: 5}}>
-				 <Glyphicon glyph="remove"/>
-				 </div>
-				 </HBox>*/}
+				{<HBox style={prefixer(rightControls)}>
+					<div style={{marginRight: 5}}>
+						<i className="fa fa-bell-o" onClick={this.notificationStyleUpdate.bind(this)}></i>
+					</div>
+					<div style={{marginRight: 5}}>
+					</div>
+				</HBox>}
 			</HBox>
 		);
+	}
+
+	notificationStyleUpdate() {
+		var state = _.cloneDeep(this.state);
+		this.setState({
+			showControls: state.showControls,
+			notification: !state.notification
+		});
 	}
 }
