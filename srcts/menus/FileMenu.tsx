@@ -67,10 +67,10 @@ export default class FileMenu implements MenuBarItemProps
 		
 	}
 	
-	loadUrl(urlParams:any)
+	loadUrl(url:string)
 	{
-		this.fileName = urlParams.file
-		return weavejs.core.WeaveArchive.loadUrl(this.weave, urlParams.file);
+		this.fileName = String(url).split('/').pop();
+		return weavejs.core.WeaveArchive.loadUrl(this.weave, this.fileName);
 	}
 
     saveFile()

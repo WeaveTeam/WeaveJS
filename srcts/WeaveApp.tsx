@@ -9,6 +9,8 @@ import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
 import MiscUtils from "./utils/MiscUtils";
 import SessionHistorySlider from "./editors/SessionHistorySlider";
+import WeaveTool from "./WeaveTool";
+import {WeavePathArray, PanelProps} from "./FlexibleLayout";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -49,7 +51,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	componentDidMount()
 	{
-		if(this.props.readUrlParams)
+		if (this.props.readUrlParams)
 		{
 			var urlParams = MiscUtils.getUrlParams();
 			var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
@@ -57,7 +59,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (urlParams.file)
 			{
 				// read from url
-				this.menuBar.fileMenu.loadUrl(urlParams).then(this.forceUpdate.bind(this));
+				this.menuBar.fileMenu.loadUrl(urlParams.file).then(this.forceUpdate.bind(this));
 			}
 
 			else if (weaveExternalTools && weaveExternalTools[window.name])
@@ -104,6 +106,19 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		});
 	}
 	
+	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
+	{
+		//onGearClick={this.blah}
+		return (
+			<WeaveTool
+				weave={this.props.weave}
+				path={path}
+				style={{width: "100%", height: "100%"}}
+				{...panelProps}
+			/>
+		);
+	}
+	
 	render():JSX.Element
 	{
 		var renderPath = this.props.renderPath || ["Layout"];
@@ -130,6 +145,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		// backwards compatibility
 		var enableMenuBar = this.props.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
 
+		// correct way to scale & add a side-bar
+		/*
+		<ResizingDiv style={{flex: 1, position: "relative"}}>
+			<WeaveComponentRenderer weave={weave} path={renderPath}
+				style={{position: "absolute", width: "100%", height: "100%", transform: `scale(${scaleValue})`, transformOrigin: "right"}}/>
+			<div style={{position: "absolute", width: "20%", backgroundColor: "#FF00FF"}}/>
+		</ResizingDiv>
+		*/
+		
 		return (
 			<VBox
 				className="weave-app"
@@ -144,19 +168,16 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c}/>
 					:	null
 				}
+				<SessionHistorySlider stateLog={this.props.weave.history}/>
+				<WeaveComponentRenderer weave={this.props.weave} path={renderPath} props={{itemRenderer: this.renderTool}}/>
 				{
-					<SessionHistorySlider stateLog={this.props.weave.history}/>
-				}
-				<WeaveComponentRenderer weave={this.props.weave} path={renderPath}/>
-				{
-					this.state.showContextMenu ? 
-					<div ref={(element:HTMLElement) => this.contextMenu = element} onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
-						{<Menu xPos={this.state.contextMenuXPos} yPos={this.state.contextMenuYPos} menu={this.state.contextMenuItems}/>}
-					</div>
-					: null
+					this.state.showContextMenu
+					?	<div ref={(element:HTMLElement) => this.contextMenu = element} onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
+							{<Menu xPos={this.state.contextMenuXPos} yPos={this.state.contextMenuYPos} menu={this.state.contextMenuItems}/>}
+						</div>
+					:	null
 				}
 			</VBox>
 		);
 	}
-	
 }
