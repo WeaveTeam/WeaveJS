@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
-import Menu from "./react-ui/Menu";
-import {IVisTool} from "./tools/IVisTool";
+
 import {MenuItemProps} from "./react-ui/Menu";
 import SideBar from "./react-ui/SideBar";
 import {HBox, VBox} from "./react-ui/FlexBox";
@@ -10,18 +9,18 @@ import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
 import MiscUtils from "./utils/MiscUtils";
-import ResizingDiv from "./react-ui/ResizingDiv";
-import SessionHistorySlider from "./editors/SessionHistorySlider";
 import WeaveTool from "./WeaveTool";
 import {WeavePathArray, PanelProps} from "./FlexibleLayout";
 import DataSourceManager from "./ui/DataSourceManager";
+import ContextMenu from "./menus/ContextMenu";
+import ResizingDiv from "./react-ui/ResizingDiv";
+import {IVisTool} from "./tools/IVisTool";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import WeavePath = weavejs.path.WeavePath;
-import DynamicColumn = weavejs.data.column.DynamicColumn;
-import AbstractVisTool from "./tools/AbstractVisTool";
+let is = Weave.IS;
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -34,19 +33,13 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 
 export interface WeaveAppState
 {
-	showContextMenu?: boolean;
-	showSideBar?: boolean;
-	contextMenuXPos?: number;
-	contextMenuYPos?: number;
-	contextMenuItems?: MenuItemProps[];
+	showSideBar:boolean;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
-	contextMenu:HTMLElement;
 	menuBar:WeaveMenuBar;
 	toolEditor:JSX.Element;
-	toolName:string;
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
@@ -58,12 +51,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		super(props);
 		this.state = {
-			showContextMenu: false,
-			showSideBar: false,
-			contextMenuXPos: 0,
-			contextMenuYPos: 0,
-			contextMenuItems: []
-		};
+			showSideBar: false
+		}
 	}
 	
 	getRenderPath():string[]
@@ -93,34 +82,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 		}
 	}
-	
-	showContextMenu(event:React.MouseEvent)
-	{
-		// if context menu already showing do nothing
-		var contextMenuItems = Menu.getMenuItems(event.target as HTMLElement);
-		this.setState({
-			showContextMenu: true,
-			contextMenuItems,
-			contextMenuXPos: event.clientX,
-			contextMenuYPos: event.clientY
-		});
-		event.preventDefault();
-	}
-	
-	handleRightClickOnContextMenu(event:React.MouseEvent)
-	{
-		event.stopPropagation();
-		event.preventDefault();
-	}
-	
-	hideContextMenu(event:React.MouseEvent)
-	{
-		if (this.contextMenu && this.contextMenu.contains(event.target as HTMLElement))
-			return;
-		this.setState({
-			showContextMenu:false
-		});
-	}
 
 	showSideBarForTool=(tool:IVisTool, content:JSX.Element):void=>{
 		this.toolEditor = content;
@@ -130,11 +91,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	}
 
 	sideBarCloseHandler=(sideBarState:boolean):void=>{
-		console.log("closeHandler " ,sideBarState);
 		this.setState({
 			showSideBar: sideBarState
 		});
 	}
+	
+
 
 	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
 	{
@@ -156,7 +118,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var name = this.props.weave.root.generateUniqueName(baseName);
 		var instance = this.props.weave.root.requestObject(name, type);
 		
-		if (Weave.IS(instance, IDataSource))
+		if (is(instance, IDataSource))
 		{
 			DataSourceManager.openInstance(this.props.weave, instance);
 		}
@@ -220,16 +182,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				className="weave-app"
 				{...this.props as React.HTMLAttributes}
 				style={_.merge({flex: 1}, this.props.style)}
-				onMouseDown={this.hideContextMenu.bind(this)}
-				onClick={()=>this.setState({showContextMenu: false})}
-				onContextMenu={this.showContextMenu.bind(this)}
+				onContextMenu={ContextMenu.open}
 			>
 				{
 					!enableMenuBar || enableMenuBar.value
 					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
 					:	null
 				}
-				<SessionHistorySlider stateLog={this.props.weave.history}/>
 				<ResizingDiv style={{flex: 1, position: "relative"}}>
 					<WeaveComponentRenderer weave={this.props.weave} path={renderPath} props={{itemRenderer: this.renderTool}}
 											style={{position: "absolute", width: "100%", height: "100%", transform: `scale(${scaleValue})`, transformOrigin:weaveUIOrigin}}/>
@@ -238,13 +197,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						{this.toolEditor}
 					</SideBar>
 				</ResizingDiv>
-				{
-					this.state.showContextMenu
-					?	<div ref={(element:HTMLElement) => this.contextMenu = element} onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
-							{<Menu xPos={this.state.contextMenuXPos} yPos={this.state.contextMenuYPos} menu={this.state.contextMenuItems}/>}
-						</div>
-					:	null
-				}
 			</VBox>
 		);
 	}

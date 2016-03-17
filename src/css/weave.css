@@ -154,6 +154,14 @@ input[type="text"]:focus {
 	padding-right: 10;
 }
 
+.weave-menubar-item-disabled {
+	opacity: 0.5;
+}
+
+.weave-menubar-item-disabled:hover {
+	background-color: rgba(0,0,0,0);
+}
+
 .weave-menubar-item-bold {
 	font-weight: bold;
 }
@@ -206,7 +214,7 @@ input[type="text"]:focus {
 	margin-bottom: 8;
 	margin-left: 0;
 	height: 1;
-	border: "none";
+	border: none;
 	opacity: 1;
 	background-color: rgb(224, 224, 224)
 }

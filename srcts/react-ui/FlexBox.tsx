@@ -15,7 +15,7 @@ export class HBox extends React.Component<React.HTMLProps<HBox>, {}>
 
 	render()
 	{
-		return <div {...this.props as React.HTMLAttributes} style={HBox.style(this.props.style)}>{ this.props.children }</div>;
+		return <div {...this.props as React.HTMLAttributes} style={HBox.style(this.props.style)}/>;
 	}
 }
 
@@ -33,6 +33,6 @@ export class VBox extends React.Component<React.HTMLProps<VBox>, {}>
 
 	render()
 	{
-		return <div {...this.props as React.HTMLAttributes} style={VBox.style(this.props.style)}>{ this.props.children }</div>;
+		return <div {...this.props as React.HTMLAttributes} style={VBox.style(this.props.style)}/>;
 	}
 }

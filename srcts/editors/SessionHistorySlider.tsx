@@ -2,6 +2,7 @@ import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import HSlider from "../react-ui/RCSlider/HSlider";
 import RCSlider from "../react-ui/RCSlider/RCSlider";
+import classNames from "../modules/classnames";
 
 import SessionStateLog = weavejs.core.SessionStateLog;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -20,7 +21,7 @@ export interface SessionHistorySliderState
 
 export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 {
-	private _stateLogWatcher:LinkableWatcher;
+	private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog), this.handleStateLogChange, true);
 
 	constructor(props:SessionHistorySliderProps)
 	{
@@ -30,7 +31,6 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 			sliderValue: 0,
 			sliderMax: 0
 		}
-		this._stateLogWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog), this.handleStateLogChange, true);
 		this._stateLogWatcher.target = props.stateLog;
 	}
 	
@@ -45,7 +45,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	}
 
 	// called when state log changes
-	private handleStateLogChange=()=>
+	private handleStateLogChange()
 	{
 		// if (objectWasDisposed(_stateLog))
 		// 	return;
@@ -86,16 +86,22 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		
 	}
 	private _playSpeed:number;
-	playButton:HTMLButtonElement;
-	undoButton:HTMLButtonElement;
 
 	render():JSX.Element
 	{
 //				<button ref={(c) => this.playButton = c} label={this.getPlayLabel(this._playSpeed, "")} title={Weave.lang('Replay session history')} onClick={() => {if(this.playButton.value) this.play()}}>Replay</button>
 		return (
-			<HBox style={{alignItems: "center", paddingTop: 5, paddingLeft: 5, paddingRight: 5, paddingBottom: 5}}>
-				<button ref={(c) => this.undoButton = c} onClick={() => this._stateLog.undo()} title={Weave.lang('Undo')}>Undo</button>
-				<button ref={(c) => this.undoButton = c} onClick={() => this._stateLog.redo()} title={Weave.lang('Redo')}>Redo</button>
+			<HBox style={{flex: 1, alignItems: "center"}}>
+				<span
+					title={Weave.lang('Undo')}
+					className={classNames('weave-menubar-item', 'fa', 'fa-undo', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}
+					onClick={() => this._stateLog.undo()}
+				/>
+				<span
+					title={Weave.lang('Redo')}
+					className={classNames('weave-menubar-item', 'fa', 'fa-undo', 'fa-flip-horizontal', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}
+					onClick={() => this._stateLog.redo()}
+				/>
 				<div style={{alignContent: "center", paddingLeft: 10, paddingRight: 10, flex: 1}}>
 					<HSlider min={0} max={this.state.sliderMax} step={1} onChange={this.handleSlider} type={RCSlider.CATEGORICAL}/>
 				</div>

@@ -7,21 +7,34 @@ export type ReactComponent = React.Component<any, any> & React.ComponentLifecycl
 
 export default class ReactUtils
 {
-	private static map_popup_element = new WeakMap<React.ReactInstance, Element>();
+	private static map_popup_element = new WeakMap<React.ReactInstance, [Element, EventListener]>();
 	
-	static openPopup(jsx:JSX.Element):React.ReactInstance
+	static openPopup(jsx:JSX.Element, closeOnMouseDown:boolean = false):React.ReactInstance
 	{
 		var element = document.body.appendChild(document.createElement("div")) as Element;
 		var popup = ReactDOM.render(jsx, element);
-		ReactUtils.map_popup_element.set(popup, element);
+		var mousedownHandler:EventListener = null;
+		
+		if(closeOnMouseDown) 
+		{
+			document.addEventListener("mousedown", mousedownHandler = (event:MouseEvent) => {
+				if (element.contains(event.target as HTMLElement))
+					return;
+				ReactUtils.closePopup(popup);
+			});
+		}
+		
+		ReactUtils.map_popup_element.set(popup, [element, mousedownHandler]);
 		return popup;
 	}
-	
+
 	static closePopup(popup:React.ReactInstance):void
 	{
-		var element = ReactUtils.map_popup_element.get(popup);
+		var [element, handler] = ReactUtils.map_popup_element.get(popup) || [null, null];
 		if (!element)
 			throw new Error("closePopup() can only be called for popups created by openPopup()");
+		if(handler)
+			document.removeEventListener("mousedown", handler);
 		ReactDOM.unmountComponentAtNode(element);
 		document.body.removeChild(element);
 	}

@@ -50,7 +50,6 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
         var defaultStyle:React.CSSProperties = {
             position: "absolute",
             display:"flex",
-            border:"1px solid lightGrey",
             overflow:"auto",
 
         };
@@ -66,16 +65,34 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
         {
             defaultStyle["width"] = "20%";
             defaultStyle["height"] = "100%";
-            this.props.direction == "left"?defaultStyle["left"]= 0:defaultStyle["right"]= 0;
             defaultStyle["flexDirection"] = "column";
+            if(this.props.direction == "right")
+            {
+                defaultStyle["right"]= 0;
+                defaultStyle["borderLeft"]= "1px solid lightGrey";
+            }
+            else
+            {
+                defaultStyle["left"]= 0;
+                defaultStyle["borderRight"]= "1px solid lightGrey";
+            }
             closeIconStyle["alignSelf"] = this.props.direction == "right"? "flex-start":"flex-end";
         }
         else if(this.props.direction == "top" || this.props.direction == "bottom")
         {
             defaultStyle["width"] = "100%";
             defaultStyle["height"] = "20%";
-            this.props.direction == "top"?defaultStyle["top"]= 0:defaultStyle["bottom"]= 0;
-            defaultStyle["flexDirection"] = "row";
+            defaultStyle["flexDirection"] = "row-reverse"; // this makes close icon on right
+            if(this.props.direction == "top")
+            {
+                defaultStyle["top"]= 0;
+                defaultStyle["borderBottom"]= "1px solid lightGrey";
+            }
+            else
+            {
+                defaultStyle["bottom"]= 0;
+                defaultStyle["borderTop"]= "1px solid lightGrey";
+            }
             closeIconStyle["alignSelf"] = this.props.direction == "bottom"? "flex-start":"flex-end";
         }
 
