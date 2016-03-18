@@ -2,6 +2,7 @@ import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import HSlider from "../react-ui/RCSlider/HSlider";
 import RCSlider from "../react-ui/RCSlider/RCSlider";
+import classNames from "../modules/classnames";
 
 import SessionStateLog = weavejs.core.SessionStateLog;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -18,9 +19,8 @@ export interface SessionHistorySliderState
 	sliderMax?:number;
 }
 
-export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState> implements weavejs.api.core.ILinkableObject
+export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 {
-
 	private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog), this.handleStateLogChange, true);
 
 	constructor(props:SessionHistorySliderProps)
@@ -45,7 +45,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	}
 
 	// called when state log changes
-	private handleStateLogChange=()=>
+	private handleStateLogChange()
 	{
 		// if (objectWasDisposed(_stateLog))
 		// 	return;
@@ -71,16 +71,6 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		// _lastReplayTime = getTimer();
 	}
 	
-	save=()=>
-	{
-		
-	}
-	
-	load=()=>
-	{
-		
-	}
-	
 	play=()=>
 	{
 		
@@ -96,18 +86,29 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		
 	}
 	private _playSpeed:number;
-	playButton:HTMLButtonElement;
-	undoButton:HTMLButtonElement;
 
 	render():JSX.Element
 	{
+//				<button ref={(c) => this.playButton = c} label={this.getPlayLabel(this._playSpeed, "")} title={Weave.lang('Replay session history')} onClick={() => {if(this.playButton.value) this.play()}}>Replay</button>
+		//className="fa fa-undo fa-flip-horizontal"
 		return (
-			<HBox style={{alignItems: "center", paddingTop: 5, paddingLeft: 5, paddingRight: 5, paddingBottom: 5}}>
-				<button title={Weave.lang('Load a file...')} onClick={this.load}>Load</button> 
-				<button title={Weave.lang('Save as...')} onClick={this.save}>Save As...</button>
-				<button ref={(c) => this.playButton = c} label={this.getPlayLabel(this._playSpeed, "")} title={Weave.lang('Replay session history')} onClick={() => {if(this.playButton.value) this.play()}}>Replay</button>
-				<button ref={(c) => this.undoButton = c} onClick={() => this._stateLog.undo()} title={Weave.lang('Undo')}>Undo</button>
-				<button ref={(c) => this.undoButton = c} onClick={() => this._stateLog.redo()} title={Weave.lang('Redo')}>Redo</button>
+			<HBox style={{flex: 1, alignItems: "center", alignSelf: "stretch"}}>
+				<span style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}>
+					<i
+						style={{alignSelf: "center"}}
+						title={Weave.lang('Undo')}
+						className="fa fa-undo"
+						onClick={() => this._stateLog.undo()}
+					/>
+				</span>
+				<span style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}>
+					<i
+						style={{alignSelf: "center"}}
+						title={Weave.lang('Undo')}
+						className="fa fa-undo fa-flip-horizontal"
+						onClick={() => this._stateLog.redo()}
+					/>
+				</span>
 				<div style={{alignContent: "center", paddingLeft: 10, paddingRight: 10, flex: 1}}>
 					<HSlider min={0} max={this.state.sliderMax} step={1} onChange={this.handleSlider} type={RCSlider.CATEGORICAL}/>
 				</div>
@@ -122,4 +123,3 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	}
 }
 Weave.registerClass("weavejs.editors.SessionHistorySlider", SessionHistorySlider);
-Weave.registerClass("weave.editors::SessionHistorySlider", SessionHistorySlider);

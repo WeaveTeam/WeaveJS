@@ -7,11 +7,11 @@ import * as _ from "lodash";
 import * as WeaveUI from "./WeaveUI";
 import Layout from "./react-flexible-layout/Layout";
 import {HBox, VBox} from "./react-ui/FlexBox";
-import ResizingDiv from "./react-ui/ResizingDiv";
+import Div from "./react-ui/Div";
 import {HORIZONTAL, VERTICAL, LayoutState} from "./react-flexible-layout/Layout";
+import WeaveComponentRenderer from "./WeaveComponentRenderer";
 
-import WeaveTool from "./WeaveTool";
-import ToolOverlay from "./ToolOverlay";
+import PanelOverlay from "./PanelOverlay";
 import MiscUtils from "./utils/MiscUtils";
 import DOMUtils from "./utils/DOMUtils";
 
@@ -34,8 +34,15 @@ declare type PolarPoint = {
 
 export declare type WeavePathArray = string[];
 
+export type PanelProps = {
+	onDragStart:React.DragEventHandler,
+	onDragEnd:React.DragEventHandler,
+	onDragOver:React.DragEventHandler
+};
+
 export interface IFlexibleLayoutProps extends React.HTMLProps<FlexibleLayout>
 {
+	itemRenderer: (id:WeavePathArray, panelProps?:PanelProps) => JSX.Element;
 }
 
 export interface IFlexibleLayoutState extends LayoutState
@@ -48,9 +55,9 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	private nextState:Object;
 	private reactLayout:Layout;
 	private layoutRect:ClientRect;
-	private overlay:ToolOverlay;
-	private toolDragged:WeavePathArray;
-	private toolOver:WeavePathArray;
+	private overlay:PanelOverlay;
+	private panelDragged:WeavePathArray;
+	private panelOver:WeavePathArray;
 	private dropZone:string; //todo - change to enum
 	private prevClientWidth:number;
 	private prevClientHeight:number;
@@ -76,12 +83,12 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 	componentDidMount():void
 	{
-		this.repositionTools();
+		this.repositionPanels();
 	}
 
 	componentDidUpdate():void
 	{
-		this.repositionTools();
+		this.repositionPanels();
 	}
 	
 	componentWillUnmount():void
@@ -94,15 +101,15 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		// reposition on resize
 		var rect:ClientRect = Object(this.getLayoutPosition(this.reactLayout));
 		if (this.layoutRect.width != rect.width || this.layoutRect.height != rect.height)
-			this.repositionTools();
+			this.repositionPanels();
 	}
 
-	onDragStart(toolDragged:WeavePathArray, event:React.MouseEvent):void
+	onDragStart(panelDragged:WeavePathArray, event:React.MouseEvent):void
 	{
-		this.toolDragged = toolDragged;
+		this.panelDragged = panelDragged;
 
 		// hack because dataTransfer doesn't exist on type event
-		(event as any).dataTransfer.setDragImage(this.reactLayout.getElementFromId(toolDragged), 0, 0);
+		(event as any).dataTransfer.setDragImage(this.reactLayout.getElementFromId(panelDragged), 0, 0);
 		(event as any).dataTransfer.setData('text/html', null);
 	}
 
@@ -118,40 +125,40 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 	onDragEnd():void
 	{
-		if (this.toolDragged && this.toolOver)
+		if (this.panelDragged && this.panelOver)
 		{
 			this.updateLayout();
-			this.toolDragged = null;
+			this.panelDragged = null;
 			this.dropZone = null;
 			this.hideOverlay();
 		}
 	}
 
-	onDragOver(toolOver:WeavePathArray, event:React.MouseEvent):void
+	onDragOver(panelOver:WeavePathArray, event:React.MouseEvent):void
 	{
-		if (!this.toolDragged)
+		if (!this.panelDragged)
 			return;
 		
-		if (this.toolDragged === toolOver)
+		if (this.panelDragged === panelOver)
 		{
-			// hide the overlay if hovering over the tool being dragged
-			this.toolOver = null;
+			// hide the overlay if hovering over the panel being dragged
+			this.panelOver = null;
 			this.hideOverlay();
 			return;
 		}
 		
-		var toolOverChanged = this.toolOver === toolOver;
+		var panelOverChanged = this.panelOver === panelOver;
 		
-		this.toolOver = toolOver;
+		this.panelOver = panelOver;
 		
 		var dropZone = this.getDropZone(event);
 		
-		if (!toolOverChanged && this.dropZone === dropZone)
+		if (!panelOverChanged && this.dropZone === dropZone)
 			return;
 
 		this.dropZone = dropZone;
 		
-		var rect = this.getLayoutPosition(toolOver);
+		var rect = this.getLayoutPosition(panelOver);
 		var overlayStyle = _.clone(this.overlay.state.style);
 		overlayStyle.visibility = rect ? "visible" : "hidden";
 		if (rect)
@@ -188,11 +195,11 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 	getDropZone(event:React.MouseEvent):string
 	{
-		if (!this.toolDragged || this.toolDragged === this.toolOver)
+		if (!this.panelDragged || this.panelDragged === this.panelOver)
 			return null;
 		
-		var toolNode = this.reactLayout.getElementFromId(this.toolOver);
-		var rect = toolNode.getBoundingClientRect();
+		var panelNode = this.reactLayout.getElementFromId(this.panelOver);
+		var rect = panelNode.getBoundingClientRect();
 
 		var center:Point = {
 			x: (rect.right - rect.left) / 2,
@@ -269,12 +276,12 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 	updateLayout():void
 	{
-		if (!this.toolDragged || !this.toolOver || !this.dropZone || (this.toolDragged === this.toolOver))
+		if (!this.panelDragged || !this.panelOver || !this.dropZone || (this.panelDragged === this.panelOver))
 			return;
 
 		var newState:LayoutState = _.cloneDeep(this.getSessionState());
-		var src:LayoutState = MiscUtils.findDeep(newState, {id: this.toolDragged});
-		var dest:LayoutState = MiscUtils.findDeep(newState, {id: this.toolOver});
+		var src:LayoutState = MiscUtils.findDeep(newState, {id: this.panelDragged});
+		var dest:LayoutState = MiscUtils.findDeep(newState, {id: this.panelOver});
 
 		if (this.dropZone === "center")
 		{
@@ -302,11 +309,11 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			dest.direction = (this.dropZone === TOP || this.dropZone === BOTTOM) ? VERTICAL : HORIZONTAL;
 			dest.children = [
 				{
-					id: this.toolDragged,
+					id: this.panelDragged,
 					flex: 0.5
 				},
 				{
-					id: this.toolOver,
+					id: this.panelOver,
 					flex: 0.5
 				}
 			];
@@ -345,7 +352,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, node as HTMLElement);
 	}
 	
-	repositionTools=(layout:Layout = null):void=>
+	repositionPanels=(layout:Layout = null):void=>
 	{
 		if (!layout)
 			layout = this.reactLayout;
@@ -355,22 +362,23 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		if (layout == this.reactLayout)
 			this.layoutRect = Object(this.getLayoutPosition(layout));
 		
-		var tool:WeaveTool = this.refs[JSON.stringify(layout.state.id)] as WeaveTool;
-		if (tool instanceof WeaveTool)
+		var div:Div = this.refs[JSON.stringify(layout.state.id)] as Div;
+		if (div instanceof Div)
 		{
 			var rect = this.getLayoutPosition(layout);
 			if (rect)
-				tool.setState({
+				div.setState({
 					style: {
+						position: "absolute",
+						display: "flex",
 						top: rect.top,
 						left: rect.left,
 						width: rect.width,
-						height: rect.height,
-						position: "absolute"
+						height: rect.height
 					}
 				});
 			else
-				tool.setState({
+				div.setState({
 					style: {
 						display: "none"
 					}
@@ -378,7 +386,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		}
 		for (var child of layout.children)
 			if (child)
-				this.repositionTools(child);
+				this.repositionPanels(child);
 	}
 	
 	render():JSX.Element
@@ -392,19 +400,26 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			this.setSessionState(newState);
 		}
 		
-		var tools:JSX.Element[] = null;
+		var components:JSX.Element[] = null;
 		if (this.reactLayout)
-			tools = this.getLayoutIds(newState).map(path => {
+			components = this.getLayoutIds(newState).map(path => {
 				var key = JSON.stringify(path);
 				return (
-					<WeaveTool
+					<Div
 						key={key}
 						ref={key}
-						weave={weave}
-						path={path}
-						onDragOver={this.onDragOver.bind(this, path)}
-						onDragStart={this.onDragStart.bind(this, path)}
-						onDragEnd={this.onDragEnd.bind(this)}
+						children={
+							this.props.itemRenderer
+							?	this.props.itemRenderer(path, {
+									onDragOver: this.onDragOver.bind(this, path),
+									onDragStart: this.onDragStart.bind(this, path),
+									onDragEnd: this.onDragEnd.bind(this)
+								})
+							:	<WeaveComponentRenderer
+									weave={weave}
+									path={path}
+									style={{width: "100%", height: "100%"}}/>
+						}
 					/>
 				);
 			});
@@ -413,7 +428,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			key: "layout",
 			ref: (layout:Layout) => {
 				if (this.reactLayout = layout)
-					this.repositionTools();
+					this.repositionPanels();
 			},
 			state: newState,
 			onStateChange: this.setSessionState
@@ -421,14 +436,14 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 		var style = _.merge({flex: 1}, this.props.style, {
 			display: "flex", // layout fills the entire area
-			position: "relative", // allows floating tools to position themselves properly
+			position: "relative", // allows floating panels to position themselves properly
 			overflow: "hidden" // don't let overflow expand the div size
 		});
 		return (
 			<div {...this.props as React.HTMLAttributes} style={style}>
 				{layout}
-				{tools}
-				<ToolOverlay ref={(overlay:ToolOverlay) => this.overlay = overlay}/>
+				{components}
+				<PanelOverlay ref={(overlay:PanelOverlay) => this.overlay = overlay}/>
 			</div>
 		);
 	}

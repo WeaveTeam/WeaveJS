@@ -31,12 +31,13 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	onDragEnd:React.DragEventHandler;
 	onDragOver:React.DragEventHandler;
 	onContextMenu?:React.MouseEventHandler;
+	style?: CSSProperties;
+	onGearClick?:(tool:IVisTool, editorContent:JSX.Element)=>void;
 }
 
 export interface IWeaveToolState
 {
 	title?: string;
-	style?: CSSProperties;
 }
 
 export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
@@ -76,27 +77,38 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 		this.updateTitle();
     }
 	
-	showEditor()
-	{
-		if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
-			PopupWindow.open({
-				title: Weave.lang("Settings for {0}", this.state.title),
-				modal: false,
-				content: (this.watcher.target as any).renderEditor()
-			});
-	}
-
 	updateTitle():void
 	{
 		var title:string = (this.watcher && this.watcher.target ? (this.watcher.target as IVisTool).title : '') || this.props.path[this.props.path.length - 1];
 		if (this.state.title != title)
 			this.setState({title});
 	}
+	
+	onGearClick=():void=>
+	{
+		if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
+		{
+			var content = (this.watcher.target as any).renderEditor() as JSX.Element;
+			
+			if (this.props.onGearClick)
+			{
+				this.props.onGearClick(this.watcher.target as IVisTool, content);
+			}
+			else
+			{
+				PopupWindow.open({
+					title: Weave.lang("Settings for {0}", this.state.title),
+					modal: false,
+					content: content
+				});
+			}
+		}
+	}
 
 	render():JSX.Element
 	{
 		return (
-			<VBox style={this.state.style} className="weave-tool"
+			<VBox style={this.props.style} className="weave-tool"
 				  onMouseEnter={() => {
 						this.titleBar.setState({ showControls: true, notification: this.titleBar.state.notification });
 					}}
@@ -109,7 +121,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 						  onDragStart={this.props.onDragStart}
 						  titleBarHeight={this.titleBarHeight}
 						  title={Weave.lang(this.state.title)}
-						  onGearClick={this.showEditor.bind(this)}
+						  onGearClick={this.onGearClick.bind(this)}
 				/>
 				<WeaveComponentRenderer style={{overflow: 'auto'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
@@ -146,10 +158,19 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 	}
 	render()
 	{
-		var windowBar:CSSProperties = {
-			height: this.props.titleBarHeight,
-			backgroundColor: this.state.showControls ? "#f8f8f8": ""
-		};
+		var windowBar:CSSProperties;
+		if (this.state.showControls)
+			windowBar = {
+				height: this.props.titleBarHeight,
+				backgroundColor: "#f8f8f8",
+				borderBottomStyle: 'solid',
+				borderBottomWidth: 1,
+				borderBottomColor: '#e6e6e6'
+			};
+		else
+			windowBar = {
+				height: this.props.titleBarHeight
+			};
 
 		if(this.state.notification) {
 
@@ -204,6 +225,7 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 					<div style={{marginRight: 5}}>
 					</div>
 				</HBox>}
+
 			</HBox>
 		);
 	}

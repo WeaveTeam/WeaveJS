@@ -109,11 +109,17 @@ input[type="text"] {
   padding: 10px;
   border: solid 1px #dcdcdc;
   transition: box-shadow 0.3s, border 0.3s;
+  margin :5px 5px 5px 5px;
+  flex-grow: 1;
+  height:30px
 }
 
 input[type="text"]:focus {
   border: solid 1px rgba(153, 214, 255, 0.4);
   box-shadow: 0 0 5px 1px rgba(153, 214, 255, 0.4);
+  margin : 5px 5px 5px 5px;
+  flex-grow: 1;
+  height:30px
 }
 
 .weave-menu {
@@ -154,16 +160,24 @@ input[type="text"]:focus {
 	padding-right: 10;
 }
 
-.weave-menubar-item-bold {
-	font-weight: bold;
-}
-
 .weave-menubar-item:hover {
 	background-color: rgba(153, 214, 255, 0.4);
 }
 
 .weave-menubar-item:active {
 	background-color: #80CCFF;
+}
+
+.weave-menubar-item-disabled {
+	opacity: 0.5;
+}
+
+.weave-menubar-item-disabled:hover {
+	background-color: rgba(0,0,0,0);
+}
+
+.weave-menubar-item-bold {
+	font-weight: bold;
 }
 
 .weave-menuitem {
@@ -206,7 +220,7 @@ input[type="text"]:focus {
 	margin-bottom: 8;
 	margin-left: 0;
 	height: 1;
-	border: "none";
+	border: none;
 	opacity: 1;
 	background-color: rgb(224, 224, 224)
 }
@@ -242,7 +256,7 @@ input[type="text"]:focus {
 }
 
 .weave-window-content {
-	padding: 5
+	padding: 5px 5px 5px 5px;
 }
 
 .weave-window-footer {

@@ -8,11 +8,11 @@ import * as _ from "lodash";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import Menu from "../react-ui/Menu";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import LinkableTextField from "../ui/LinkableTextField";
+import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import MiscUtils from "../utils/MiscUtils";
 import {OverlayTrigger,Popover} from "react-bootstrap";
-import AttributeSelector from "../ui/AttributeSelector";
+import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -184,39 +184,33 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	
 	renderNumberEditor(linkableNumber:LinkableNumber):JSX.Element
 	{
-		return <LinkableTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+		return <StatefulTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
 	}
 	
 	renderEditor():JSX.Element
 	{
+		var labelStyle = {textAlign : 'center', flex: 0.45};
+		var boxStyle = { display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'};
+
 		return (
 			<VBox>
+				<HBox style = {boxStyle}>
+					<span style = {labelStyle}>{Weave.lang("Visualization Title")}</span>
+					<StatefulTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>
+				</HBox>
+				<HBox style = {boxStyle}>
+					<span style = {labelStyle}>{Weave.lang("X Axis Title")}</span>
+					<StatefulTextField ref={linkReactStateRef(this, {content: this.xAxisName})}/>
+				</HBox>
+				<HBox style = {boxStyle}>
+					<span style = {labelStyle}>{Weave.lang("Y Axis Title")}</span>
+					<StatefulTextField ref={linkReactStateRef(this, {content: this.yAxisName})}/>
+				</HBox>
+
 				{Object.keys(this.selectableAttributes).map( (label:string, index:number) => {
 					var attribute:DynamicColumn = this.selectableAttributes[label];
-					return (
-						<HBox>
-							<label>
-								{Weave.lang(label)}
-								<OverlayTrigger trigger="click" placement = "bottom"
-												overlay={<Popover id = "AttributeSelector" title="Attribute Selector"><AttributeSelector column={attribute}/></Popover>}>
-									<input type="text" />
-								</OverlayTrigger>
-							</label>
-						</HBox>
-					)
-				})}
-				<HBox>
-					<span>{Weave.lang("Visualization Title")}</span>
-					<LinkableTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>
-				</HBox>
-				<HBox>
-					<span>{Weave.lang("X Axis Title")}</span>
-					<LinkableTextField ref={linkReactStateRef(this, {content: this.xAxisName})}/>
-				</HBox>
-				<HBox>
-					<span>{Weave.lang("Y Axis Title")}</span>
-					<LinkableTextField ref={linkReactStateRef(this, {content: this.yAxisName})}/>
-				</HBox>
+					return(<SelectableAttributeComponent label = {label} attribute = {attribute}></SelectableAttributeComponent>);
+					})}
 
 				<HBox>
 					<span>{Weave.lang("Margins:")}</span>

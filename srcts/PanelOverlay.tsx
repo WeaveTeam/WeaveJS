@@ -12,17 +12,17 @@ const toolOverlayStyle:React.CSSProperties = {
     pointerEvents: "none"
 };
 
-export interface IToolOverlayProps extends React.Props<ToolOverlay>
+export interface IPanelOverlayProps extends React.Props<PanelOverlay>
 {
 }
 
-export interface IToolOverlayState
+export interface IPanelOverlayState
 {
     style: React.CSSProperties;
 }
-export default class ToolOverlay extends React.Component<IToolOverlayProps, IToolOverlayState>
+export default class PanelOverlay extends React.Component<IPanelOverlayProps, IPanelOverlayState>
 {
-    constructor(props:IToolOverlayProps)
+    constructor(props:IPanelOverlayProps)
     {
         super(props);
         this.state = {

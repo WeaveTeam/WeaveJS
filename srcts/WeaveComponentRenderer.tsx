@@ -14,18 +14,21 @@ import LinkableWatcher = weavejs.core.LinkableWatcher;
 export interface IWeaveComponentRendererProps extends React.HTMLProps<WeaveComponentRenderer>
 {
 	weave:Weave,
-	path:typeof LinkableWatcher.prototype.targetPath
+	path:typeof LinkableWatcher.prototype.targetPath,
+	requestType?:new(..._:any[])=>React.Component<any,any>,
+	props?:any
 }
 
 export interface IWeaveComponentRendererState
 {
-	type?:React.ComponentClass<any>;
+	actualType?:React.ComponentClass<any>;
 	target?:ILinkableObject;
 }
 
 export default class WeaveComponentRenderer extends React.Component<IWeaveComponentRendererProps, IWeaveComponentRendererState>
 {
 	watcher:LinkableWatcher;
+	key:number = 0;
 	
 	constructor(props:IWeaveComponentRendererProps)
 	{
@@ -45,8 +48,15 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 	{
 		if (this.props.weave != props.weave || !this.watcher)
 		{
+			// force React to create a new component for the new instance of Weave
+			this.key++;
+			
 			if (this.watcher)
+			{
+				// replace the component with a placeholder before it gets unmounted and disposed due to the key changing
+				LinkablePlaceholder.replaceInstanceWithPlaceholder(this.watcher.target);
 				Weave.dispose(this.watcher);
+			}
 			
 			if (props.weave)
 			{
@@ -58,9 +68,13 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 				this.watcher = null;
 			}
 		}
-
+		
 		if (this.watcher)
+		{
+			if (props.requestType)
+				props.weave.requestObject(props.path, props.requestType);
 			this.watcher.targetPath = props.path;
+		}
 	}
 
 	handleWatcher():void
@@ -70,22 +84,9 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 			ComponentClass = null;
 		
 		this.setState({
-			type: ComponentClass,
+			actualType: ComponentClass,
 			target: this.watcher.target
 		});
-	}
-
-	render():JSX.Element
-	{
-		var props = _.clone(this.props);
-		props.style = _.merge({flex: 1}, props.style);
-		delete props.weave;
-		delete props.path;
-		return (
-			<VBox {...props}>
-				{ this.state.type ? React.createElement(this.state.type, { ref: this.handleInstance }) : [] }
-			</VBox>
-		);
 	}
 	
 	handleInstance=(component:React.Component<any, any>):void=>
@@ -100,5 +101,23 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 	{
 		Weave.dispose(this.watcher);
 		this.watcher = null;
+	}
+
+	render():JSX.Element
+	{
+		var props = _.clone(this.props);
+		props.style = _.merge({flex: 1}, props.style);
+		delete props.weave;
+		delete props.path;
+		delete props.props;
+		return (
+			<VBox {...props}>
+				{
+					this.state.actualType
+					?	React.createElement(this.state.actualType, _.merge({key: this.key, ref: this.handleInstance}, this.props.props))
+					:	null
+				}
+			</VBox>
+		);
 	}
 }

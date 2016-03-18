@@ -7,7 +7,6 @@ import FileInput from "../react-ui/FileInput";
 import {ICheckBoxListProps} from "../react-ui/CheckBoxList";
 import CheckBoxList from "../react-ui/CheckBoxList";
 import * as FileSaver from "filesaver.js";
-import LinkableTextField from "../ui/LinkableTextField";
 
 import WeaveArchive = weavejs.core.WeaveArchive;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -67,10 +66,10 @@ export default class FileMenu implements MenuBarItemProps
 		
 	}
 	
-	loadUrl(urlParams:any)
+	loadUrl(url:string)
 	{
-		this.fileName = urlParams.file
-		return weavejs.core.WeaveArchive.loadUrl(this.weave, urlParams.file);
+		this.fileName = String(url).split('/').pop();
+		return weavejs.core.WeaveArchive.loadUrl(this.weave, this.fileName);
 	}
 
     saveFile()

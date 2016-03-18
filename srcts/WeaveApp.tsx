@@ -1,65 +1,78 @@
 import * as React from "react";
 import * as _ from "lodash";
-import Menu from "./react-ui/Menu";
+
 import {MenuItemProps} from "./react-ui/Menu";
+import SideBar from "./react-ui/SideBar";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
 import MiscUtils from "./utils/MiscUtils";
-import SessionHistorySlider from "./editors/SessionHistorySlider";
+import WeaveTool from "./WeaveTool";
+import {WeavePathArray, PanelProps} from "./FlexibleLayout";
+import DataSourceManager from "./ui/DataSourceManager";
+import ContextMenu from "./menus/ContextMenu";
+import ResizingDiv from "./react-ui/ResizingDiv";
+import {IVisTool} from "./tools/IVisTool";
 
+import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
+let is = Weave.IS;
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
-	weave?:Weave;
+	weave:Weave;
 	renderPath?:string[];
 	readUrlParams?:boolean;
 }
 
 export interface WeaveAppState
 {
-	showContextMenu: boolean;
-	contextMenuXPos?: number;
-	contextMenuYPos?: number;
-	contextMenuItems?: MenuItemProps[];
+	showSideBar:boolean;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
-	contextMenu:HTMLElement;
 	menuBar:WeaveMenuBar;
+	toolEditor:JSX.Element;
+
+	static defaultProps:WeaveAppProps = {
+		weave: null,
+		renderPath: ['Layout'],
+		readUrlParams: false
+	}
 
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
 		this.state = {
-			showContextMenu: false,
-			contextMenuXPos: 0,
-			contextMenuYPos: 0,
-			contextMenuItems: []
-		};
+			showSideBar: false
+		}
 	}
-
+	
+	getRenderPath():string[]
+	{
+		return this.props.renderPath || WeaveApp.defaultProps.renderPath;
+	}
+	
 	componentDidMount()
 	{
-		if(this.props.readUrlParams)
+		if (this.props.readUrlParams)
 		{
 			var urlParams = MiscUtils.getUrlParams();
 			var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
 			
 			if (urlParams.file)
 			{
-				// read from url
-				this.menuBar.fileMenu.loadUrl(urlParams).then(this.forceUpdate.bind(this));
+				// read content from url
+				this.menuBar.fileMenu.loadUrl(urlParams.file);
 			}
-
 			else if (weaveExternalTools && weaveExternalTools[window.name])
 			{
 				// read content from flash
@@ -70,54 +83,82 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 		}
 	}
-	
-	static defaultProps:WeaveAppProps = {
-		weave: new Weave(),
-		readUrlParams: false
-	}
-	
-	showContextMenu(event:React.MouseEvent)
-	{
-		// if context menu already showing do nothing
-		var contextMenuItems = Menu.getMenuItems(event.target as HTMLElement);
+
+	showSideBarForTool=(tool:IVisTool, content:JSX.Element):void=>{
+		this.toolEditor = content;
 		this.setState({
-			showContextMenu: true,
-			contextMenuItems,
-			contextMenuXPos: event.clientX,
-			contextMenuYPos: event.clientY
+			showSideBar: !this.state.showSideBar
 		});
-		event.preventDefault();
+	}
+
+	sideBarCloseHandler=(sideBarState:boolean):void=>{
+		this.setState({
+			showSideBar: sideBarState
+		});
 	}
 	
-	handleRightClickOnContextMenu(event:React.MouseEvent)
+
+
+	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
 	{
-		event.stopPropagation();
-		event.preventDefault();
+		//onGearClick={this.blah}
+		return (
+			<WeaveTool
+				weave={this.props.weave}
+				path={path}
+				style={{width: "100%", height: "100%"}}
+				{...panelProps}
+				onGearClick={this.showSideBarForTool}
+			/>
+		);
 	}
-	
-	hideContextMenu(event:React.MouseEvent)
+
+	createObject=(type:new(..._:any[])=>any):void=>
 	{
-		if (this.contextMenu && this.contextMenu.contains(event.target as HTMLElement))
+		var weave = this.props.weave;
+		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
+		var name = weave.root.generateUniqueName(baseName);
+		var instance = weave.root.requestObject(name, type);
+		var resultType = LinkablePlaceholder.getClass(weave.root.getObject(name));
+		
+		if (resultType != type)
 			return;
-		this.setState({
-			showContextMenu:false
-		});
+		
+		if (is(instance, IDataSource))
+		{
+			DataSourceManager.openInstance(weave, instance as IDataSource);
+		}
+		
+		if (React.Component.isPrototypeOf(type))
+		{
+			var layout = weave.getObject(this.getRenderPath()) as FlexibleLayout;
+			if (layout instanceof FlexibleLayout)
+			{
+				var state = layout.getSessionState();
+				state = {
+					children: [state, {id: [name]}],
+					direction: state.direction == 'horizontal' ? 'vertical' : 'horizontal'
+				};
+				layout.setSessionState(state);
+			}
+		}
 	}
 	
 	render():JSX.Element
 	{
-		var renderPath = this.props.renderPath || ["Layout"];
+		var weave = this.props.weave;
+		var renderPath = this.getRenderPath();
 		
-		if (!this.props.weave)
+		if (!weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 		
-		if (!this.props.weave.getObject(renderPath))
+		if (!weave.getObject(renderPath))
 		{
 			try
 			{
 				var parentPath = renderPath.concat();
 				var childName = parentPath.pop();
-				var parent = this.props.weave.getObject(parentPath);
+				var parent = weave.getObject(parentPath);
 				if (parent instanceof LinkableHashMap)
 					(parent as LinkableHashMap).requestObject(childName, FlexibleLayout);
 			}
@@ -128,35 +169,49 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 		
 		// backwards compatibility
-		var enableMenuBar = this.props.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
 
+		var scaleValue = this.state.showSideBar ? .8 : 1;
+		var sideBarDirection = "left"; //to-do make it configurable
+		var weaveUIOrigin = "";
+
+		if (sideBarDirection == "left")
+			weaveUIOrigin = "right";
+		else if (sideBarDirection == "right")
+			weaveUIOrigin = "left";
+		else if (sideBarDirection == "top")
+			weaveUIOrigin = "bottom";
+		else if (sideBarDirection == "bottom")
+			weaveUIOrigin = "top";
+		
 		return (
 			<VBox
 				className="weave-app"
 				{...this.props as React.HTMLAttributes}
 				style={_.merge({flex: 1}, this.props.style)}
-				onMouseDown={this.hideContextMenu.bind(this)}
-				onClick={()=>this.setState({showContextMenu: false})}
-				onContextMenu={this.showContextMenu.bind(this)}
+				onContextMenu={ContextMenu.open}
 			>
 				{
 					!enableMenuBar || enableMenuBar.value
-					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c}/>
+					?	<WeaveMenuBar weave={weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
 					:	null
 				}
-				{
-					<SessionHistorySlider stateLog={this.props.weave.history}/>
-				}
-				<WeaveComponentRenderer weave={this.props.weave} path={renderPath}/>
-				{
-					this.state.showContextMenu ? 
-					<div ref={(element:HTMLElement) => this.contextMenu = element} onContextMenu={this.handleRightClickOnContextMenu.bind(this)}>
-						{<Menu xPos={this.state.contextMenuXPos} yPos={this.state.contextMenuYPos} menu={this.state.contextMenuItems}/>}
-					</div>
-					: null
-				}
+				<ResizingDiv style={{flex: 1, position: "relative"}}>
+					<WeaveComponentRenderer
+						weave={weave}
+						path={renderPath}
+						props={{itemRenderer: this.renderTool}}
+						style={{position: "absolute", width: "100%", height: "100%", transform: `scale(${scaleValue})`, transformOrigin:weaveUIOrigin}}
+					/>
+					<SideBar
+						closeHandler={this.sideBarCloseHandler}
+						style={{background:"#f8f8f8"}}
+						open={this.state.showSideBar}
+						direction={sideBarDirection}
+						children={this.toolEditor}
+					/>
+				</ResizingDiv>
 			</VBox>
 		);
 	}
-	
 }

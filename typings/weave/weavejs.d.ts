@@ -38,6 +38,14 @@ declare module __global__ {
          */
         getObject(...path: (string | number | (string | number)[])[]): ILinkableObject;
         /**
+         * Requests that an object be created if it doesn't already exist at the given path.
+         * This function can also be used to assert that the object at the current path is of the type you expect it to be.
+         * @param path The path
+         * @param type The type
+         * @return Either an instance of the requested type, a LinkablePlaceholder, or null if the object could not be created.
+         */
+        requestObject<T>(path: Array<string | number>, type: (new (..._: any[]) => T) | string): T;
+        /**
          * Finds the Weave instance for a given Object.
          * @param object An Object.
          * @return The Weave instance, or null if the object was not registered as an ancestor of any instance of Weave.
@@ -103,7 +111,7 @@ declare module __global__ {
          * @return The closest ancestor of the given type.
          * @see weave.api.core.ISessionManager#getLinkableOwner()
          */
-        static getAncestor<T>(descendant: ILinkableObject, ancestorType: new (..._: any[]) => T | string): T & ILinkableObject;
+        static getAncestor<T>(descendant: ILinkableObject, ancestorType: (new (..._: any[]) => T) | string): T & ILinkableObject;
         /**
          * Shortcut for WeaveAPI.SessionManager.getLinkableOwner()
          * @copy weave.api.core.ISessionManager#getLinkableOwner()
@@ -113,7 +121,7 @@ declare module __global__ {
          * Shortcut for WeaveAPI.SessionManager.getLinkableDescendants()
          * @copy weave.api.core.ISessionManager#getLinkableDescendants()
          */
-        static getDescendants<T>(object: ILinkableObject, filter?: new (..._: any[]) => T | string): Array<T & ILinkableObject>;
+        static getDescendants<T>(object: ILinkableObject, filter?: (new (..._: any[]) => T) | string): Array<T & ILinkableObject>;
         /**
          * Shortcut for WeaveAPI.SessionManager.getSessionState()
          * @copy weave.api.core.ISessionManager#getSessionState()
@@ -180,6 +188,10 @@ declare module __global__ {
          * Checks if an object or class implements ILinkableObject
          */
         static isLinkable(objectOrClass: Object): boolean;
+        /**
+         * @return (object is type)
+         */
+        static IS(object: Object, type: new (..._: any[]) => any): boolean;
         /**
          * Registers a class that must be instantiated asynchronously.
          * Dynamic items in the session state that extend this class will be replaced with
@@ -1081,7 +1093,7 @@ declare module weavejs.api.core {
         /**
          * Registers a class under a given qualified name and adds metadata about implementing interfaces.
          */
-        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, additionalInterfaces?: any[]): void;
+        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[]): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -1090,6 +1102,31 @@ declare module weavejs.api.core {
          * Looks up a static definition by name.
          */
         getDefinition(name: string): any;
+        /**
+         * Gets FlexJS class info.
+         * @param class_or_instance Either a Class or an instance of a Class.
+         * @return FlexJS class info object containing properties "variables", "accessors", and "methods",
+         *         each being an Array of Objects like {type:String, declaredBy:String}
+         */
+        getClassInfo(class_or_instance: Object): {
+            variables: {
+                [name: string]: {
+                    type: string;
+                };
+            }[];
+            accessors: {
+                [name: string]: {
+                    type: string;
+                    declaredBy: string;
+                };
+            }[];
+            methods: {
+                [name: string]: {
+                    type: string;
+                    declaredBy: string;
+                };
+            }[];
+        };
         /**
          * Registers an implementation of an interface to be used as a singleton.
          */
@@ -1202,6 +1239,12 @@ declare module weavejs.api.core {
          * Callbacks will be triggered immediately if the path points to a new target.
          * @param newPath The new path to watch.
          */
+        /**
+         * Checks if the target is currently a placeholder for an instance of an async class.
+         * @return true if the target is a placeholder.
+         * @see Weave#registerAsyncClass()
+         */
+        foundPlaceholder: boolean;
         /**
          * This function creates a global object using the given Class definition if it doesn't already exist.
          * If the object gets disposed later, this object will still be linked to the global name.
@@ -3153,6 +3196,30 @@ declare module weavejs.core {
          */
         getDefinition(name: string): any;
         /**
+         * Gets FlexJS class info.
+         * @return FlexJS class info object containing properties "variables", "accessors", and "methods",
+         *         each being an Array of Objects like {type:String, declaredBy:String}
+         */
+        getClassInfo(class_or_instance: Object): {
+            variables: {
+                [name: string]: {
+                    type: string;
+                };
+            }[];
+            accessors: {
+                [name: string]: {
+                    type: string;
+                    declaredBy: string;
+                };
+            }[];
+            methods: {
+                [name: string]: {
+                    type: string;
+                    declaredBy: string;
+                };
+            }[];
+        };
+        /**
          * This registers an implementation for a singleton interface.
          * @param theInterface The interface to register.
          * @param theImplementation The implementation to register.
@@ -3644,6 +3711,12 @@ declare module weavejs.core {
          * Setting this will unset the targetPath.
          */
         target: ILinkableObject;
+        /**
+         * Checks if the target is currently a placeholder for an instance of an async class.
+         * @return true if the target is a placeholder.
+         * @see Weave#registerAsyncClass()
+         */
+        foundPlaceholder: boolean;
         /**
          * This sets the new target to be watched without resetting targetPath.
          * Callbacks will be triggered immediately if the new target is different from the old one.

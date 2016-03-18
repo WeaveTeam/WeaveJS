@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import DOMUtils from "../utils/DOMUtils";
@@ -32,9 +33,11 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 	{
 		var style = this.props.style || {};
 		style.position = "relative";
+		var props = _.clone(this.props);
+		delete props.children;
 		return (
 			<span style={{position: "relative"}} className={this.props.className}>
-				<input type="file" onClick={this.handleClick.bind(this)} onChange={this.onChange} style={{position:"absolute", width: "100%", height: "100%", opacity: 0, overflow: "hidden"}}/> 
+				<input type="file" onClick={this.handleClick.bind(this) } onChange={this.onChange} {...props as any} style={{ position: "absolute", width: "100%", height: "100%", opacity: 0, overflow: "hidden" }}/>
 				{
 					this.props.children
 				}
