@@ -131,33 +131,36 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	static BRANCH_ICON_CLASSNAME = "icon fa fa-folder fa-fw";
 	static LEAF_ICON_CLASSNAME = "icon fa fa-file-text-o fa-fw";
 	static OPEN_BRANCH_ICON_CLASSNAME = "icon fa fa-folder-open fa-fw";
+	static EXPANDER_CLOSED_CLASS_NAME = "icon fa fa-play fa-fw expander";
+	static EXPANDER_OPEN_CLASS_NAME = "icon fa fa-play fa-fw fa-rotate-90 expander";
 
 	private renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
 	{
-		let resultElements:JSX.Element[] = []
-		let childElements: JSX.Element[];
-
 		let className = WeaveTree.CLASSNAME;
 		let iconClassName = WeaveTree.LEAF_ICON_CLASSNAME;
 		let iconClickFunc: React.MouseEventHandler = null;
+		let expanderClassName:string = null;
 
 		let isOpen = this.getOpen(node);
 		let isSelected = this.getSelected(node);
 
-		if (node.isBranch() && node.getChildren() && node.getChildren().length)
+		/* If we are a branch, we still might not be expandable due to hiding leaves and not having any children who are also branches. */
+		let isExpandable = node.isBranch() && !(this.props.hideLeaves && !node.getChildren().some(child => child.isBranch()));
+
+		if (node.isBranch())
 		{
-			if (this.props.hideLeaves && !node.getChildren().some(child => child.isBranch()))
-			{
-				iconClassName = WeaveTree.BRANCH_ICON_CLASSNAME;
-			}
-			else
-			{
-				iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
-				iconClickFunc = (e: React.MouseEvent): void => {
-					this.internalSetOpen(node, !this.getOpen(node)); e.preventDefault();
-				};
-			}
+			iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
 		}
+
+		if (isExpandable)
+		{
+			iconClickFunc = (e: React.MouseEvent): void => {
+				this.internalSetOpen(node, !this.getOpen(node)); e.preventDefault();
+			};
+
+			expanderClassName = isOpen ? WeaveTree.EXPANDER_OPEN_CLASS_NAME : WeaveTree.EXPANDER_CLOSED_CLASS_NAME;
+		}
+
 		if (this.getSelected(node))
 		{
 			className += " " + WeaveTree.SELECTED_CLASSNAME;
@@ -165,9 +168,10 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 		return <span key={index} className={className}
 			onClick={ this.handleItemClick.bind(this, node) }
-			onDoubleClick={ iconClickFunc } style={{ verticalAlign: "middle", fontSize: "16px", position: "absolute", top: index * this.rowHeight, width: "100%"}}>
+			onDoubleClick={ iconClickFunc } style={{ verticalAlign: "middle", position: "absolute", top: index * this.rowHeight, width: "100%"}}>
 			<span style={{ marginLeft: node.depth * 16, whiteSpace: "pre"}}>
-				<i onMouseDown={ iconClickFunc } className={iconClassName}/>
+				<i onMouseDown={ iconClickFunc } className={ expanderClassName } style={{display: expanderClassName ? null : "none" }}/>
+				<i className={iconClassName}/>
 				{ " "+node.getLabel() }
 			</span></span>;
 	}
@@ -199,6 +203,9 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	rowHeight: number;
 
 	render(): JSX.Element {
+		if (Weave.isLinkable(this.props.root)) {
+			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
+		}
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22);
 		return <ListView style={this.props.style} items={this.enumerateItems(this.props.root)}
 				itemRender={this.renderItem}

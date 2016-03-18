@@ -326,6 +326,11 @@ span.weave-tree-view i.icon {
     color: #808080;
 }
 
+span.weave-tree-view i.icon.expander {
+    color: #000000;
+    font-size: 60%;
+}
+
 .weave-tree-view {
 	user-select: none;
 	-webkit-user-select: none;
