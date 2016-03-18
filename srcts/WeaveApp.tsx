@@ -19,6 +19,7 @@ import {IVisTool} from "./tools/IVisTool";
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
 let is = Weave.IS;
 
@@ -114,18 +115,23 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	createObject=(type:new(..._:any[])=>any):void=>
 	{
+		var weave = this.props.weave;
 		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
-		var name = this.props.weave.root.generateUniqueName(baseName);
-		var instance = this.props.weave.root.requestObject(name, type);
+		var name = weave.root.generateUniqueName(baseName);
+		var instance = weave.root.requestObject(name, type);
+		var resultType = LinkablePlaceholder.getClass(weave.root.getObject(name));
+		
+		if (resultType != type)
+			return;
 		
 		if (is(instance, IDataSource))
 		{
-			DataSourceManager.openInstance(this.props.weave, instance);
+			DataSourceManager.openInstance(weave, instance as IDataSource);
 		}
 		
-		if (instance instanceof React.Component)
+		if (React.Component.isPrototypeOf(type))
 		{
-			var layout = this.props.weave.getObject(this.getRenderPath()) as FlexibleLayout;
+			var layout = weave.getObject(this.getRenderPath()) as FlexibleLayout;
 			if (layout instanceof FlexibleLayout)
 			{
 				var state = layout.getSessionState();
@@ -140,18 +146,19 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	
 	render():JSX.Element
 	{
+		var weave = this.props.weave;
 		var renderPath = this.getRenderPath();
 		
-		if (!this.props.weave)
+		if (!weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 		
-		if (!this.props.weave.getObject(renderPath))
+		if (!weave.getObject(renderPath))
 		{
 			try
 			{
 				var parentPath = renderPath.concat();
 				var childName = parentPath.pop();
-				var parent = this.props.weave.getObject(parentPath);
+				var parent = weave.getObject(parentPath);
 				if (parent instanceof LinkableHashMap)
 					(parent as LinkableHashMap).requestObject(childName, FlexibleLayout);
 			}
@@ -162,21 +169,21 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 		
 		// backwards compatibility
-		var enableMenuBar = this.props.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
 
-		var scaleValue = this.state.showSideBar?.8:1;
+		var scaleValue = this.state.showSideBar ? .8 : 1;
 		var sideBarDirection = "left"; //to-do make it configurable
 		var weaveUIOrigin = "";
 
-		if(sideBarDirection == "left"){
-			weaveUIOrigin = "right"
-		}else if(sideBarDirection == "right"){
-			weaveUIOrigin = "left"
-		}else if(sideBarDirection == "top"){
-			weaveUIOrigin = "bottom"
-		}else if(sideBarDirection == "bottom"){
-			weaveUIOrigin = "top"
-		}
+		if (sideBarDirection == "left")
+			weaveUIOrigin = "right";
+		else if (sideBarDirection == "right")
+			weaveUIOrigin = "left";
+		else if (sideBarDirection == "top")
+			weaveUIOrigin = "bottom";
+		else if (sideBarDirection == "bottom")
+			weaveUIOrigin = "top";
+		
 		return (
 			<VBox
 				className="weave-app"
@@ -186,16 +193,23 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			>
 				{
 					!enableMenuBar || enableMenuBar.value
-					?	<WeaveMenuBar weave={this.props.weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
+					?	<WeaveMenuBar weave={weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
 					:	null
 				}
 				<ResizingDiv style={{flex: 1, position: "relative"}}>
-					<WeaveComponentRenderer weave={this.props.weave} path={renderPath} props={{itemRenderer: this.renderTool}}
-											style={{position: "absolute", width: "100%", height: "100%", transform: `scale(${scaleValue})`, transformOrigin:weaveUIOrigin}}/>
-					<SideBar closeHandler={this.sideBarCloseHandler} style={{background:"#f8f8f8"}}
-							 open={this.state.showSideBar} direction={sideBarDirection} >
-						{this.toolEditor}
-					</SideBar>
+					<WeaveComponentRenderer
+						weave={weave}
+						path={renderPath}
+						props={{itemRenderer: this.renderTool}}
+						style={{position: "absolute", width: "100%", height: "100%", transform: `scale(${scaleValue})`, transformOrigin:weaveUIOrigin}}
+					/>
+					<SideBar
+						closeHandler={this.sideBarCloseHandler}
+						style={{background:"#f8f8f8"}}
+						open={this.state.showSideBar}
+						direction={sideBarDirection}
+						children={this.toolEditor}
+					/>
 				</ResizingDiv>
 			</VBox>
 		);
