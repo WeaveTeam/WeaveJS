@@ -157,10 +157,19 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 	}
 	render()
 	{
-		var windowBar:CSSProperties = {
-			height: this.props.titleBarHeight,
-			backgroundColor: this.state.showControls ? "#f8f8f8": ""
-		};
+		var windowBar:CSSProperties;
+		if (this.state.showControls)
+			windowBar = {
+				height: this.props.titleBarHeight,
+				backgroundColor: "#f8f8f8",
+				borderBottomStyle: 'solid',
+				borderBottomWidth: 1,
+				borderBottomColor: '#e6e6e6'
+			};
+		else
+			windowBar = {
+				height: this.props.titleBarHeight
+			};
 
 		var titleStyle:CSSProperties = {
 			cursor: "move",
@@ -195,20 +204,20 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 
 		return(
 			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
-            {<HBox style={prefixer(leftControls)}>
-            	<div onClick={this.props.onGearClick}>
-					<Glyphicon glyph="cog"/>
-				</div>
-            </HBox>}
-			<span style={titleStyle} className="weave-panel">{this.props.title}</span>
-			{/*<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
-			<div style={{marginRight: 5}}>
-			<Glyphicon glyph="unchecked"/>
-			</div>
-			<div style={{marginRight: 5}}>
-			<Glyphicon glyph="remove"/>
-			</div>
-			</HBox>*/}
+				<HBox style={prefixer(leftControls)}>
+	            	<div onClick={this.props.onGearClick}>
+						<Glyphicon glyph="cog"/>
+					</div>
+	            </HBox>
+				<span style={titleStyle} className="weave-panel">{this.props.title}</span>
+				<HBox style={prefixer(rightControls)}>
+					<div style={{marginRight: 5}}>
+						<Glyphicon glyph="unchecked"/>
+					</div>
+					<div style={{marginRight: 5}}>
+						<Glyphicon glyph="remove"/>
+					</div>
+				</HBox>
 			</HBox>
 		);
 	}
