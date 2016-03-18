@@ -235,6 +235,12 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	{
 		if (!state)
 			return {};
+		
+		if (state.id === undefined)
+			delete state.id;
+		if (state.children === undefined)
+			delete state.children;
+		
 		var children:LayoutState[] = state.children;
 
 		if (!children)
