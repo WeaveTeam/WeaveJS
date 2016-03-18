@@ -93,18 +93,16 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		//className="fa fa-undo fa-flip-horizontal"
 		return (
 			<HBox style={{flex: 1, alignItems: "center", alignSelf: "stretch"}}>
-				<span style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}>
+				<span title={Weave.lang('Undo')} style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}>
 					<i
 						style={{alignSelf: "center"}}
-						title={Weave.lang('Undo')}
 						className="fa fa-undo"
 						onClick={() => this._stateLog.undo()}
 					/>
 				</span>
-				<span style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}>
+				<span title={Weave.lang('Redo')} style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}>
 					<i
 						style={{alignSelf: "center"}}
-						title={Weave.lang('Undo')}
 						className="fa fa-undo fa-flip-horizontal"
 						onClick={() => this._stateLog.redo()}
 					/>
