@@ -192,8 +192,8 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		var labelStyle = {textAlign : 'center', flex: 0.45};
 		var boxStyle = { display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'};
 		
-		var attrs = Object.keys(this.selectableAttributes);
-		var selectors = attrs && attrs.map((label:string, index:number) => {
+		var attrLabels = Object.keys(Object(this.selectableAttributes));
+		var selectors = attrLabels.map((label:string, index:number) => {
 			var attribute:DynamicColumn = this.selectableAttributes[label];
 			return <SelectableAttributeComponent label={label} attribute={attribute}/>;
 		});
