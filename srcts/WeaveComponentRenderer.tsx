@@ -28,6 +28,7 @@ export interface IWeaveComponentRendererState
 export default class WeaveComponentRenderer extends React.Component<IWeaveComponentRendererProps, IWeaveComponentRendererState>
 {
 	watcher:LinkableWatcher;
+	key:number = 0;
 	
 	constructor(props:IWeaveComponentRendererProps)
 	{
@@ -47,8 +48,15 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 	{
 		if (this.props.weave != props.weave || !this.watcher)
 		{
+			// force React to create a new component for the new instance of Weave
+			this.key++;
+			
 			if (this.watcher)
+			{
+				// replace the component with a placeholder before it gets unmounted and disposed due to the key changing
+				LinkablePlaceholder.replaceInstanceWithPlaceholder(this.watcher.target);
 				Weave.dispose(this.watcher);
+			}
 			
 			if (props.weave)
 			{
@@ -106,7 +114,7 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 			<VBox {...props}>
 				{
 					this.state.actualType
-					?	React.createElement(this.state.actualType, _.merge({ref: this.handleInstance}, this.props.props))
+					?	React.createElement(this.state.actualType, _.merge({key: this.key, ref: this.handleInstance}, this.props.props))
 					:	null
 				}
 			</VBox>
