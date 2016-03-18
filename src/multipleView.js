@@ -7,9 +7,11 @@ import {WeaveComponentRenderer} from "../lib/WeaveUI.js";
 
 window.weave1 = new Weave();
 window.weave2 = new Weave();
-window.weave = new Weave();
-weavejs.core.WeaveArchive.loadUrl(weave1, "test-export.weave").then(function(){
-	weavejs.core.WeaveArchive.loadUrl(weave2, "/tncp/TN_EDU.weave").then(render)
+window.weave3 = new Weave();
+weavejs.core.WeaveArchive.loadUrl(weave1, "/elm/Indicator_Toggle_View.weave").then(function(){
+	weavejs.core.WeaveArchive.loadUrl(weave2, "/elm/KSA_Health_Trends.weave").then(function(){
+		weavejs.core.WeaveArchive.loadUrl(weave3, "/elm/REMI_Saudi_Arabia_Trade_Inflow_Outflow.weave").then(render);
+	})
 });
 
 var weaveInsts = [weave1, weave2];
@@ -66,19 +68,54 @@ class MultipleView extends React.Component {
 
 		var weaveInst = this.props.weaveInstances[this.state.toggleIndex];
 		var layout = weaveInst.root.requestObject("Layout", Weave.getDefinition("FlexibleLayout"));
-		weave.root.setSessionState(weaveInst.root.getSessionState());
+
 		var weaveUI = [
 			<div key="0" style={styleObject}>
-				<WeaveComponentRenderer weave={weave} path={['Layout']} style={{width: "100%", height: "100%"}}/>
+				<WeaveComponentRenderer weave={weaveInst} path={['Layout']} style={{width: "100%", height: "100%"}}/>
 	   		</div>
 		];
 		
-		
+		/*
+		var weaveUI = this.props.weaveInstances.map((weaveInst, index) => {
+			var layout = weaveInst.root.requestObject("Layout", Weave.getDefinition("FlexibleLayout"));
+			var styleObject = {
+				border:"2px solid black",
+				display:"none"
+			}
+
+			if(this.state.toggleIndex == index){
+				border:"2px solid black",
+				styleObject.display = "flex",
+				styleObject.transform =  "scale(" + String(this.state.scale) + ")";
+			}
+
+			return (
+				<div key={index} style={styleObject}>
+					<FlexibleLayout layout={layout} style={{width: "100%", height: "100%"}}/>
+				</div>
+			);
+		});
+		*/
+
+		var singleViewLabel = "Add Single Tool View For Active Weave";
+		if (this.state.addView)
+		{
+			var weaveInst = this.props.weaveInstances[this.state.toggleIndex];
+			var keyIndex = weaveUI.length;
+			singleViewLabel = "Remove Single Tool View"
+
+			weaveUI.push(
+				<div key={keyIndex} style={{border: "2px solid blue"}}>
+					<WeaveComponentRenderer weave={weaveInst} path={['MapTool']} style={{width: "100%", height: "100%"}}/>
+				</div>
+			);
+		}
 
 		return (
 			<div style={this.props.style} className="weave-app">
 				<div>
 					<span onClick={this.toggleView}> Toggle Weave </span> |
+					<span onClick={this.addView}> {singleViewLabel} </span>|
 					<span onClick={this.scaleView}> Scale </span>
 					<br/>
 				</div>
