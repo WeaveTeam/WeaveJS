@@ -191,35 +191,38 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
 		var labelStyle = {textAlign : 'center', flex: 0.45};
 		var boxStyle = { display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'};
+		
+		var attrs = Object.keys(this.selectableAttributes);
+		var selectors = attrs && attrs.map((label:string, index:number) => {
+			var attribute:DynamicColumn = this.selectableAttributes[label];
+			return <SelectableAttributeComponent label={label} attribute={attribute}/>;
+		});
 
 		return (
 			<VBox>
-				<HBox style = {boxStyle}>
-					<span style = {labelStyle}>{Weave.lang("Visualization Title")}</span>
-					<StatefulTextField ref={linkReactStateRef(this, {content: this.panelTitle})}/>
+				<HBox style={ boxStyle }>
+					<span style={ labelStyle }>{ Weave.lang("Visualization Title") }</span>
+					<StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/>
 				</HBox>
-				<HBox style = {boxStyle}>
-					<span style = {labelStyle}>{Weave.lang("X Axis Title")}</span>
-					<StatefulTextField ref={linkReactStateRef(this, {content: this.xAxisName})}/>
+				<HBox style={ boxStyle }>
+					<span style={ labelStyle }>{ Weave.lang("X Axis Title") }</span>
+					<StatefulTextField ref={ linkReactStateRef(this, {content: this.xAxisName}) }/>
 				</HBox>
-				<HBox style = {boxStyle}>
-					<span style = {labelStyle}>{Weave.lang("Y Axis Title")}</span>
-					<StatefulTextField ref={linkReactStateRef(this, {content: this.yAxisName})}/>
+				<HBox style={ boxStyle }>
+					<span style={ labelStyle }>{ Weave.lang("Y Axis Title") }</span>
+					<StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/>
 				</HBox>
 
-				{Object.keys(this.selectableAttributes).map( (label:string, index:number) => {
-					var attribute:DynamicColumn = this.selectableAttributes[label];
-					return(<SelectableAttributeComponent label = {label} attribute = {attribute}></SelectableAttributeComponent>);
-					})}
+				{ selectors }
 
 				<HBox>
-					<span>{Weave.lang("Margins:")}</span>
-					{this.renderNumberEditor(this.margin.left)}
+					<span>{ Weave.lang("Margins:") }</span>
+					{ this.renderNumberEditor(this.margin.left) }
 					<VBox>
-						{this.renderNumberEditor(this.margin.top)}
-						{this.renderNumberEditor(this.margin.bottom)}
+						{ this.renderNumberEditor(this.margin.top) }
+						{ this.renderNumberEditor(this.margin.bottom) }
 					</VBox>
-					{this.renderNumberEditor(this.margin.right)}
+					{ this.renderNumberEditor(this.margin.right) }
 				</HBox>
 			</VBox>
 		);
@@ -253,8 +256,8 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		};
 	}
 
-	static handlePointClick(toolGroup: VisToolGroup, event: MouseEvent): void {
-
+	static handlePointClick(toolGroup:VisToolGroup, event:MouseEvent):void
+	{
 		let probeKeySet = toolGroup.probeFilter.target as KeySet;
 		let selectionKeySet = toolGroup.selectionFilter.target as KeySet;
 
@@ -262,25 +265,30 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			return;
 
         var probeKeys: IQualifiedKey[] = probeKeySet.keys;
-		if (!probeKeys.length) {
+		if (!probeKeys.length)
+		{
 			selectionKeySet.clearKeys();
 			return;
 		}
 
 		var isSelected = false;
-		for (var key of probeKeys) {
-			if (selectionKeySet.containsKey(key)) {
+		for (var key of probeKeys)
+		{
+			if (selectionKeySet.containsKey(key))
+			{
 				isSelected = true;
 				break;
 			}
 		}
-		if (event.ctrlKey || event.metaKey) {
+		if (event.ctrlKey || event.metaKey)
+		{
 			if (isSelected)
 				selectionKeySet.removeKeys(probeKeys);
 			else
 				selectionKeySet.addKeys(probeKeys);
 		}
-		else {
+		else
+		{
 			//Todo: needs to be more efficient check
 			if (_.isEqual(selectionKeySet.keys.sort(), probeKeys.sort()))
 				selectionKeySet.clearKeys();
