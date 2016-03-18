@@ -11,7 +11,7 @@ export interface VSliderProps extends React.Props<VSlider>
 	selectedValues?:string[];
     type:string;
     reversed?:boolean;
-    onChange?:React.EventHandler<React.FormEvent>;
+    onChange?:(selectedValue:[string]) => void;
 }
 
 export default class VSlider extends React.Component<VSliderProps, any>

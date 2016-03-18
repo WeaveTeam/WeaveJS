@@ -11,7 +11,7 @@ export interface HSliderProps extends React.Props<HSlider>
 	selectedValues?:string[];
     type:string;
     reversed?:boolean;
-    onChange?:React.EventHandler<React.FormEvent>;
+    onChange?:(selectedValue:[string]) => void;
 }
 
 export default class HSlider extends React.Component<HSliderProps, any>
