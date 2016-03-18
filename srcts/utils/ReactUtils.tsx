@@ -39,6 +39,40 @@ export default class ReactUtils
 		document.body.removeChild(element);
 	}
 	
+	static generateTable(header:(string|JSX.Element)[], body:(string|JSX.Element)[][], style:{
+		
+	} = null):JSX.Element
+	{
+		var tableHead = header && (
+			<thead>
+		  		{
+					header.map((cell, index) => <th key={index}>{cell}</th>)
+				}
+			</thead>
+		);
+		
+		var tableBody = body && (
+			<tbody>
+				{
+					body.map((row, index) => {
+						return (
+							<tr key={index}>
+								{
+									row.map((cell, index) => <td key={index}>{cell}</td>)
+								}
+							</tr>
+						)
+					})
+				}
+			</tbody>
+		)
+		return (
+			<table>
+				{tableHead}
+				{tableBody}
+			</table>
+		)
+	}
 	/**
 	 * Checks if a component has focus.
 	 */
