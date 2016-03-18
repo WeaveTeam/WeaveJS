@@ -2,7 +2,7 @@ import * as React from "react";
 import * as _ from "lodash";
 
 import {MenuItemProps} from "./react-ui/Menu";
-import SideBar from "./react-ui/SideBar";
+import SideBarContainer from "./react-ui/SideBarContainer";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
@@ -34,7 +34,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 
 export interface WeaveAppState
 {
-	showSideBar:boolean;
+
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
@@ -51,9 +51,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
-		this.state = {
-			showSideBar: false
-		}
 	}
 	
 	getRenderPath():string[]
@@ -86,16 +83,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	showSideBarForTool=(tool:IVisTool, content:JSX.Element):void=>{
 		this.toolEditor = content;
-		this.setState({
-			showSideBar: !this.state.showSideBar
-		});
+		this.forceUpdate();
 	}
 
-	sideBarCloseHandler=(sideBarState:boolean):void=>{
-		this.setState({
-			showSideBar: sideBarState
-		});
-	}
 	
 
 
@@ -171,18 +161,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		// backwards compatibility
 		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
 
-		var scaleValue = this.state.showSideBar ? .8 : 1;
-		var sideBarDirection = "left"; //to-do make it configurable
-		var weaveUIOrigin = "";
-
-		if (sideBarDirection == "left")
-			weaveUIOrigin = "right";
-		else if (sideBarDirection == "right")
-			weaveUIOrigin = "left";
-		else if (sideBarDirection == "top")
-			weaveUIOrigin = "bottom";
-		else if (sideBarDirection == "bottom")
-			weaveUIOrigin = "top";
 		
 		return (
 			<VBox
@@ -196,21 +174,16 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					?	<WeaveMenuBar weave={weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
 					:	null
 				}
-				<ResizingDiv style={{flex: 1, position: "relative"}}>
+				<SideBarContainer
+					barSize = ".2"
+					leftSideBarChildren={[this.toolEditor]}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
+						style={{width:"100%",height:"100%"}}
 						props={{itemRenderer: this.renderTool}}
-						style={{position: "absolute", width: "100%", height: "100%", transform: `scale(${scaleValue})`, transformOrigin:weaveUIOrigin}}
 					/>
-					<SideBar
-						closeHandler={this.sideBarCloseHandler}
-						style={{background:"#f8f8f8"}}
-						open={this.state.showSideBar}
-						direction={sideBarDirection}
-						children={this.toolEditor}
-					/>
-				</ResizingDiv>
+				</SideBarContainer>
 			</VBox>
 		);
 	}
