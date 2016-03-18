@@ -191,10 +191,9 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	rowHeight: number;
 
-	render(): JSX.Element
-	{
+	render(): JSX.Element {
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22);
-		return <ListView items={this.enumerateItems(this.props.root)}
+		return <ListView style={this.props.style} items={this.enumerateItems(this.props.root)}
 				itemRender={this.renderItem}
 				itemHeight={this.rowHeight}/>;
 	}

@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from "react";
 
 export interface IListViewState {
@@ -5,7 +6,7 @@ export interface IListViewState {
 	heightPx: number;
 }
 
-export interface IListViewProps {
+export interface IListViewProps extends React.HTMLProps<ListView> {
 	items: any[];
 	itemHeight: number;
 	itemRender: { (item: any, top: number): JSX.Element };
@@ -47,7 +48,7 @@ export default class ListView extends React.Component<IListViewProps, IListViewS
 			elements[idx-firstItem] = this.props.itemRender(item, idx);
 		}
 
-		return <div ref={ (c: HTMLElement) => { this.container = c; } } style={{ height: 500, overflow: "scroll"}}>
+		return <div ref={ (c) => { this.container = c; } } style={_.merge(this.props.style, {overflow: "scroll"})}>
 				<div style={{position: "relative", height: this.props.itemHeight * this.props.items.length}}>
 					{elements}
 				</div>

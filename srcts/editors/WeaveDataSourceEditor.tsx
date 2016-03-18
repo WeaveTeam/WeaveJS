@@ -84,7 +84,7 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
 						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
 					</label>
-					<WeaveTree hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>
+					<WeaveTree style={{ flex: 1 }} hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>
 			</VBox>;
 	}
 }
