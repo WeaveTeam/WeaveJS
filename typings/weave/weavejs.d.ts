@@ -44,7 +44,7 @@ declare module __global__ {
          * @param type The type
          * @return Either an instance of the requested type, a LinkablePlaceholder, or null if the object could not be created.
          */
-        requestObject(path: Array<string | number>, type: new (..._: any[]) => any): ILinkableObject;
+        requestObject<T>(path: Array<string | number>, type: (new (..._: any[]) => T) | string): T;
         /**
          * Finds the Weave instance for a given Object.
          * @param object An Object.
@@ -111,7 +111,7 @@ declare module __global__ {
          * @return The closest ancestor of the given type.
          * @see weave.api.core.ISessionManager#getLinkableOwner()
          */
-        static getAncestor<T>(descendant: ILinkableObject, ancestorType: new (..._: any[]) => T | string): T & ILinkableObject;
+        static getAncestor<T>(descendant: ILinkableObject, ancestorType: (new (..._: any[]) => T) | string): T & ILinkableObject;
         /**
          * Shortcut for WeaveAPI.SessionManager.getLinkableOwner()
          * @copy weave.api.core.ISessionManager#getLinkableOwner()
@@ -121,7 +121,7 @@ declare module __global__ {
          * Shortcut for WeaveAPI.SessionManager.getLinkableDescendants()
          * @copy weave.api.core.ISessionManager#getLinkableDescendants()
          */
-        static getDescendants<T>(object: ILinkableObject, filter?: new (..._: any[]) => T | string): Array<T & ILinkableObject>;
+        static getDescendants<T>(object: ILinkableObject, filter?: (new (..._: any[]) => T) | string): Array<T & ILinkableObject>;
         /**
          * Shortcut for WeaveAPI.SessionManager.getSessionState()
          * @copy weave.api.core.ISessionManager#getSessionState()
