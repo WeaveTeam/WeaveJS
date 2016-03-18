@@ -322,6 +322,10 @@ input[type="text"]:focus {
     background-color: #D0D0D0;
 }
 
+span.weave-tree-view i.icon {
+    color: #808080;
+}
+
 .weave-tree-view {
 	user-select: none;
 	-webkit-user-select: none;

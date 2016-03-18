@@ -128,9 +128,9 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	static CLASSNAME = "weave-tree-view";
 	static SELECTED_CLASSNAME = "selected";
 	
-	static BRANCH_ICON_CLASSNAME = "fa fa-plus-square-o fa-fw";
-	static LEAF_ICON_CLASSNAME = "fa fa-file-text-o fa-fw";
-	static OPEN_BRANCH_ICON_CLASSNAME = "fa fa-minus-square-o fa-fw";
+	static BRANCH_ICON_CLASSNAME = "icon fa fa-folder fa-fw";
+	static LEAF_ICON_CLASSNAME = "icon fa fa-file-text-o fa-fw";
+	static OPEN_BRANCH_ICON_CLASSNAME = "icon fa fa-folder-open fa-fw";
 
 	private renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
 	{
@@ -144,12 +144,19 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		let isOpen = this.getOpen(node);
 		let isSelected = this.getSelected(node);
 
-		if (node.isBranch())
+		if (node.isBranch() && node.getChildren() && node.getChildren().length)
 		{
-			iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
-			iconClickFunc = (e: React.MouseEvent):void => {
-				this.internalSetOpen(node, !this.getOpen(node)); e.preventDefault();
-			};
+			if (this.props.hideLeaves && !node.getChildren().some(child => child.isBranch()))
+			{
+				iconClassName = WeaveTree.BRANCH_ICON_CLASSNAME;
+			}
+			else
+			{
+				iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
+				iconClickFunc = (e: React.MouseEvent): void => {
+					this.internalSetOpen(node, !this.getOpen(node)); e.preventDefault();
+				};
+			}
 		}
 		if (this.getSelected(node))
 		{

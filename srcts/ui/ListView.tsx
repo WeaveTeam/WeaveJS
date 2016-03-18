@@ -48,7 +48,7 @@ export default class ListView extends React.Component<IListViewProps, IListViewS
 			elements[idx-firstItem] = this.props.itemRender(item, idx);
 		}
 
-		return <div ref={ (c) => { this.container = c; } } style={_.merge(this.props.style, {overflow: "scroll"})}>
+		return <div ref={ (c) => { this.container = c; } } style={_.merge({}, this.props.style, {overflow: "scroll"})}>
 				<div style={{position: "relative", height: this.props.itemHeight * this.props.items.length}}>
 					{elements}
 				</div>
