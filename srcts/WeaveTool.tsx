@@ -157,19 +157,18 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 	}
 	render()
 	{
-		var windowBar:CSSProperties;
+		var windowBar:CSSProperties = {
+			height: this.props.titleBarHeight,
+			padding:2,
+			alignItems:"center"
+		};
+
 		if (this.state.showControls)
-			windowBar = {
-				height: this.props.titleBarHeight,
+			_.merge(windowBar, {
 				backgroundColor: "#f8f8f8",
-				borderBottomStyle: 'solid',
-				borderBottomWidth: 1,
-				borderBottomColor: '#e6e6e6'
-			};
-		else
-			windowBar = {
-				height: this.props.titleBarHeight
-			};
+				borderBottom: '1px solid #e6e6e6'
+			});
+
 
 		var titleStyle:CSSProperties = {
 			cursor: "move",
@@ -178,8 +177,7 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 			overflow: "hidden",
 			whiteSpace: "nowrap",
 			flex: 1,
-			textOverflow: "ellipsis",
-			paddingTop: "3"
+			textOverflow: "ellipsis"
 		};
 
 		var transitions:CSSProperties = {
@@ -189,14 +187,18 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 		};
 
 		var leftControls:CSSProperties = {
-			marginLeft: 5,
-			marginTop: 2,
-			width: 20
+			paddingLeft:4,
+			fontSize: 14 // will set the size of the icons as icons are uniocode values
 		};
 
 		var rightControls:CSSProperties = {
-			marginTop: 2,
-			width: 38
+			paddingRight:4,
+			fontSize: 14 // will set the size of the icons as icons are uniocode values
+		};
+
+		var iconStyle:CSSProperties = {
+			marginRight:"4px",
+			cursor:"pointer"
 		};
 
 		_.merge(leftControls, transitions);
@@ -205,16 +207,16 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 		return(
 			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
 				<HBox style={prefixer(leftControls)}>
-	            	<div onClick={this.props.onGearClick}>
+	            	<div style={iconStyle} onClick={this.props.onGearClick}>
 						<Glyphicon glyph="cog"/>
 					</div>
 	            </HBox>
 				<span style={titleStyle} className="weave-panel">{this.props.title}</span>
 				<HBox style={prefixer(rightControls)}>
-					<div style={{marginRight: 5}}>
+					<div style={iconStyle}>
 						<Glyphicon glyph="unchecked"/>
 					</div>
-					<div style={{marginRight: 5}}>
+					<div style={iconStyle}>
 						<Glyphicon glyph="remove"/>
 					</div>
 				</HBox>
