@@ -216,7 +216,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 				if (i > 0)
 					elements.push(
 						<Resizer
-							key={`${key}.resizers[${i - 1}]`}
+							key={`resizer[${i - 1}]`}
 							ref={saveResizer.bind(null, i - 1)}
 							direction={state.direction}
 							spacing={spacing}
@@ -224,7 +224,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 					);
 				elements.push(
 					Layout.renderLayout({
-						key: `${key}.children[${i}]`,
+						key: `child[${i}]`,
 						ref: saveChild.bind(null, i),
 						state: childState,
 						onStateChange: onChildStateChange.bind(null, i),
