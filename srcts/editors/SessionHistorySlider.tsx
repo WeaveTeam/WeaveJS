@@ -21,7 +21,7 @@ export interface SessionHistorySliderState
 
 export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 {
-	private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog), this.handleStateLogChange, true);
+	private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog));
 
 	constructor(props:SessionHistorySliderProps)
 	{
@@ -30,6 +30,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		this.state = {
 			position: 0
 		}
+		Weave.getCallbacks(this._stateLogWatcher).addGroupedCallback(this, this.handleStateLogChange, true, false);
 	}
 	
 	componentWillReceiveProps(props:SessionHistorySliderProps)
@@ -115,14 +116,14 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 				<span title={Weave.lang('Undo')} style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}>
 					<i
 						style={{alignSelf: "center"}}
-						className="fa fa-undo"
+						className="fa fa-arrow-left"
 						onClick={() => this._stateLog.undo()}
 					/>
 				</span>
 				<span title={Weave.lang('Redo')} style={{alignSelf: "stretch", display: "flex"}} className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}>
 					<i
 						style={{alignSelf: "center"}}
-						className="fa fa-undo fa-flip-horizontal"
+						className="fa fa-arrow-right"
 						onClick={() => this._stateLog.redo()}
 					/>
 				</span>
