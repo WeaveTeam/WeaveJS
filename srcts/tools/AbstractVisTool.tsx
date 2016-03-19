@@ -205,9 +205,9 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		});
 
 		return (
-			<VBox style={{whiteSpace: "nowrap"}}>
+			<VBox>
 				{ReactUtils.generateTable(null, [
-					[Weave.lang("Visualization Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/>],
+					[Weave.lang("Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/>],
 					[Weave.lang("X Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.xAxisName}) }/>],
 					[Weave.lang("Y Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/>]
 				])}
