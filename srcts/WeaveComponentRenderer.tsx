@@ -48,7 +48,7 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 	componentWillReceiveProps(props:IWeaveComponentRendererProps):void
 	{
 		var weaveChanged = this.props.weave != props.weave;
-		var pathChanged = !_.isEqual(this.props.renderPath, props.renderPath);
+		var pathChanged = !_.isEqual(this.props.path, props.path);
 		
 		// force React to create a new component if weave instance or renderPath changes
 		if (weaveChanged || pathChanged)
