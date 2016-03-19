@@ -12,6 +12,8 @@ import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import MiscUtils from "../utils/MiscUtils";
 import {OverlayTrigger,Popover} from "react-bootstrap";
+import classNames from "../modules/classnames";
+import {CSSProperties} from "react";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -34,20 +36,20 @@ import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 
 export class Margin
 {
-    top = Weave.linkableChild(this, new LinkableNumber(20));
-    bottom = Weave.linkableChild(this, new LinkableNumber(100));
-    left = Weave.linkableChild(this, new LinkableNumber(100));
-    right = Weave.linkableChild(this, new LinkableNumber(20));
+	top = Weave.linkableChild(this, new LinkableNumber(20));
+	bottom = Weave.linkableChild(this, new LinkableNumber(100));
+	left = Weave.linkableChild(this, new LinkableNumber(100));
+	right = Weave.linkableChild(this, new LinkableNumber(20));
 }
 export class OverrideBounds
 {
-    xMin = Weave.linkableChild(this, LinkableNumber);
-    yMin = Weave.linkableChild(this, LinkableNumber);
-    xMax = Weave.linkableChild(this, LinkableNumber);
-    yMax = Weave.linkableChild(this, LinkableNumber);
+	xMin = Weave.linkableChild(this, LinkableNumber);
+	yMin = Weave.linkableChild(this, LinkableNumber);
+	xMax = Weave.linkableChild(this, LinkableNumber);
+	yMax = Weave.linkableChild(this, LinkableNumber);
 }
 
-export interface VisToolGroup 
+export interface VisToolGroup
 {
 	filteredKeySet:FilteredKeySet,
 	selectionFilter:DynamicKeyFilter,
@@ -60,20 +62,20 @@ Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
 	selectableAttributes:{[label:string]:DynamicColumn};
-    constructor(props:P)
+	constructor(props:P)
 	{
-        super(props);
-    }
-	
+		super(props);
+	}
+
 	componentDidMount()
 	{
 		Menu.registerMenuSource(this);
 	}
-	
+
 	panelTitle = Weave.linkableChild(this, LinkableString);
 	xAxisName = Weave.linkableChild(this, LinkableString);
 	yAxisName = Weave.linkableChild(this, LinkableString);
-    margin = Weave.linkableChild(this, Margin);
+	margin = Weave.linkableChild(this, Margin);
 	overrideBounds = Weave.linkableChild(this, OverrideBounds);
 
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -90,7 +92,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		var keySet = this.selectionFilter.target as KeySet;
 		return keySet instanceof KeySet && keySet.containsKey(key);
 	}
-	 
+
 	protected get probeKeySet()
 	{
 		var keySet = this.probeFilter.target as KeySet;
@@ -100,37 +102,37 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
 		var keySet = this.probeFilter.target as KeySet;
 		return keySet instanceof KeySet && keySet.containsKey(key);
-	} 
-	
+	}
+
 	get title():string
 	{
 		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
 	}
 
-    private static createFromSetToSubset(set: KeySet, filter:KeyFilter):void
-    {
+	private static createFromSetToSubset(set: KeySet, filter:KeyFilter):void
+	{
 		filter.replaceKeys(false, true, set.keys, null);
 		set.clearKeys();
-    }
-    private static removeFromSetToSubset(set: KeySet, filter: KeyFilter):void
-    {
+	}
+	private static removeFromSetToSubset(set: KeySet, filter: KeyFilter):void
+	{
 		filter.excludeKeys(set.keys);
 		set.clearKeys();
-    }
-    private static clearSubset(filter:KeyFilter):void
-    {
+	}
+	private static clearSubset(filter:KeyFilter):void
+	{
 		filter.replaceKeys(true, true);
-    }
+	}
 
-    private static localProbeKeySet = new weavejs.data.key.KeySet();
-	
+	private static localProbeKeySet = new weavejs.data.key.KeySet();
+
 	static getMenuItems(target:VisToolGroup):MenuItemProps[]
 	{
 		let menuItems:Array<any> = [];
 		let selectionKeySet = target.selectionFilter.target as KeySet;
 		let probeKeySet = target.probeFilter.target as KeySet;
 		let subset = target.filteredKeySet.keyFilter.getInternalKeyFilter() as KeyFilter;
-		
+
 		if (probeKeySet)
 			Weave.copyState(probeKeySet, this.localProbeKeySet);
 		else
@@ -181,17 +183,20 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
 		return AbstractVisTool.getMenuItems(this);
 	}
-	
+
 	renderNumberEditor(linkableNumber:LinkableNumber):JSX.Element
 	{
 		return <StatefulTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
 	}
-	
+
 	renderEditor():JSX.Element
 	{
-		var labelStyle = {textAlign : 'center', flex: 0.45};
+		var labelStyle = {textAlign : 'center', fontSize : '12px'};
 		var boxStyle = { display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'};
-		
+		var heading:CSSProperties = {fontWeight : 'bold',padding : '2px 2px 2px 2px'} ;
+		var icon = classNames({'fa fa-compass': true, 'weave-icon':true});
+
+
 		var attrLabels = Object.keys(Object(this.selectableAttributes));
 		var selectors = attrLabels.map((label:string, index:number) => {
 			var attribute:DynamicColumn = this.selectableAttributes[label];
@@ -200,35 +205,41 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 		return (
 			<VBox>
-				<HBox style={ boxStyle }>
-					<span style={ labelStyle }>{ Weave.lang("Visualization Title") }</span>
-					<StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/>
-				</HBox>
-				<HBox style={ boxStyle }>
-					<span style={ labelStyle }>{ Weave.lang("X Axis Title") }</span>
-					<StatefulTextField ref={ linkReactStateRef(this, {content: this.xAxisName}) }/>
-				</HBox>
-				<HBox style={ boxStyle }>
-					<span style={ labelStyle }>{ Weave.lang("Y Axis Title") }</span>
-					<StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/>
-				</HBox>
+				<label style={ heading }>{Weave.lang('Titles')}</label>
+				<table>
+					<tbody><tr>
+						<td><span style={ labelStyle }>{ Weave.lang("Visualization") }</span></td>
+						<td><StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/></td>
+					</tr></tbody>
+					<tbody><tr>
+						<td><span style={ labelStyle }>{ Weave.lang("X Axis") }</span></td>
+						<td><StatefulTextField style={{ flexBasis : 0.8}} ref={ linkReactStateRef(this, {content: this.xAxisName}) }/></td>
+					</tr></tbody>
+					<tbody><tr>
+						<td><span style={ labelStyle }>{ Weave.lang("Y Axis") }</span></td>
+						<td><StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/></td>
+					</tr></tbody>
+				</table>
 
+				<label style={ heading }>{Weave.lang('Attributes')}</label>
 				{ selectors }
 
-				<HBox>
-					<span>{ Weave.lang("Margins:") }</span>
-					{ this.renderNumberEditor(this.margin.left) }
-					<VBox>
-						{ this.renderNumberEditor(this.margin.top) }
-						{ this.renderNumberEditor(this.margin.bottom) }
-					</VBox>
-					{ this.renderNumberEditor(this.margin.right) }
-				</HBox>
+				<label style={ heading }>{Weave.lang('Margins')}</label>
+
+				<table>
+					<tbody><tr><td>{ this.renderNumberEditor(this.margin.top) }</td></tr></tbody>
+					<tbody><tr>
+						<td>{ this.renderNumberEditor(this.margin.left) }</td>
+						<td><span>blah</span></td>
+						<td>{ this.renderNumberEditor(this.margin.right) }</td>
+					</tr></tbody>
+					<tbody><tr><td>{ this.renderNumberEditor(this.margin.bottom) }</td></tr></tbody>
+				</table>
 			</VBox>
 		);
 	}
-	
-    get deprecatedStateMapping():Object
+
+	get deprecatedStateMapping():Object
 	{
 		return {
 			"children": {
@@ -238,11 +249,11 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 						"marginLeft": this.margin.left,
 						"marginRight": this.margin.right,
 						"marginBottom": this.margin.bottom,
-                        "overrideXMin": this.overrideBounds.xMin,
-                        "overrideYMin": this.overrideBounds.yMin,
-                        "overrideXMax": this.overrideBounds.xMax,
-                        "overrideYMax": this.overrideBounds.yMax,
-                        "plotters": {
+						"overrideXMin": this.overrideBounds.xMin,
+						"overrideYMin": this.overrideBounds.yMin,
+						"overrideXMax": this.overrideBounds.xMax,
+						"overrideYMax": this.overrideBounds.yMax,
+						"plotters": {
 							"yAxis": {
 								"overrideAxisName": this.yAxisName
 							},
@@ -264,7 +275,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		if (!(probeKeySet instanceof KeySet) || !(selectionKeySet instanceof KeySet))
 			return;
 
-        var probeKeys: IQualifiedKey[] = probeKeySet.keys;
+		var probeKeys: IQualifiedKey[] = probeKeySet.keys;
 		if (!probeKeys.length)
 		{
 			selectionKeySet.clearKeys();
