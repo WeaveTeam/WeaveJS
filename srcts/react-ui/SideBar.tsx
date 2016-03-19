@@ -20,7 +20,7 @@ export interface SideBarState
  */
 export default class SideBar extends React.Component<SideBarProps, SideBarState>
 {
-    constructor(props:any)
+    constructor(props:SideBarProps)
     {
         super(props);
 
@@ -36,7 +36,7 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
         if(this.props.closeHandler)this.props.closeHandler(!this.state.open);
     }
 
-    componentWillReceiveProps(nextProps:any){
+    componentWillReceiveProps(nextProps:SideBarProps){
         if(this.props.open != nextProps.open){
             this.setState({open:nextProps.open});
         }
