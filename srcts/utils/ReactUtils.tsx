@@ -39,9 +39,7 @@ export default class ReactUtils
 		document.body.removeChild(element);
 	}
 	
-	static generateTable(header:(string|JSX.Element)[], body:(string|JSX.Element)[][], style:{
-		
-	} = null):JSX.Element
+	static generateTable(header:(string|JSX.Element)[], body:(string|JSX.Element)[][]):JSX.Element
 	{
 		var tableHead = header && (
 			<thead>

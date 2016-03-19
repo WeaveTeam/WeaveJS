@@ -11,6 +11,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import MiscUtils from "../utils/MiscUtils";
+import ReactUtils from "../utils/ReactUtils";
 import {OverlayTrigger,Popover} from "react-bootstrap";
 import classNames from "../modules/classnames";
 import {CSSProperties} from "react";
@@ -204,37 +205,25 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		});
 
 		return (
-			<VBox>
-				<label style={ heading }>{Weave.lang('Titles')}</label>
-				<table>
-					<tbody><tr>
-						<td><span style={ labelStyle }>{ Weave.lang("Visualization") }</span></td>
-						<td><StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/></td>
-					</tr></tbody>
-					<tbody><tr>
-						<td><span style={ labelStyle }>{ Weave.lang("X Axis") }</span></td>
-						<td><StatefulTextField style={{ flexBasis : 0.8}} ref={ linkReactStateRef(this, {content: this.xAxisName}) }/></td>
-					</tr></tbody>
-					<tbody><tr>
-						<td><span style={ labelStyle }>{ Weave.lang("Y Axis") }</span></td>
-						<td><StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/></td>
-					</tr></tbody>
-				</table>
+			<VBox style={{whiteSpace: "nowrap"}}>
+				{ReactUtils.generateTable(null, [
+					[Weave.lang("Visualization Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/>],
+					[Weave.lang("X Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.xAxisName}) }/>],
+					[Weave.lang("Y Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/>]
+				])}
 
 				<label style={ heading }>{Weave.lang('Attributes')}</label>
 				{ selectors }
 
-				<label style={ heading }>{Weave.lang('Margins')}</label>
-
-				<table>
-					<tbody><tr><td>{ this.renderNumberEditor(this.margin.top) }</td></tr></tbody>
-					<tbody><tr>
-						<td>{ this.renderNumberEditor(this.margin.left) }</td>
-						<td><span>blah</span></td>
-						<td>{ this.renderNumberEditor(this.margin.right) }</td>
-					</tr></tbody>
-					<tbody><tr><td>{ this.renderNumberEditor(this.margin.bottom) }</td></tr></tbody>
-				</table>
+				<HBox style={{alignItems: 'center'}}>
+					<span>{ Weave.lang("Margins:") }</span>
+					{ this.renderNumberEditor(this.margin.left) }
+					<VBox style={{flex: 1}}>
+						{ this.renderNumberEditor(this.margin.top) }
+						{ this.renderNumberEditor(this.margin.bottom) }
+					</VBox>
+					{ this.renderNumberEditor(this.margin.right) }
+				</HBox>
 			</VBox>
 		);
 	}

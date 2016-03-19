@@ -55,11 +55,17 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		}
 		else
 		{
-			return <input style={this.props.style}
-				onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange}
-				type="text" value={this.state.content}
-				{...props as any}
-				/>;
+			return (
+				<input
+					{...props as any}
+					style={_.merge({width: "100%"}, this.props.style)}
+					type="text"
+					onFocus={this.onFocus}
+					onBlur={this.handleInputChange}
+					onChange={this.handleInputChange}
+					value={this.state.content}
+				/>
+			);
 		}
 	}
 }
