@@ -5,10 +5,10 @@ import SideBar from "./SideBar";
 export interface SideBarContainerProps extends React.Props<SideBarContainer>
 {
     barSize:number;
-    topSideBarChildren?:JSX.Element[];
-    bottomSideBarChildren?:JSX.Element[];
-    leftSideBarChildren?:JSX.Element[];
-    rightSideBarChildren?:JSX.Element[];
+    topSideBarChildren?:JSX.Element[] | JSX.Element;
+    bottomSideBarChildren?:JSX.Element[] | JSX.Element;
+    leftSideBarChildren?:JSX.Element[] | JSX.Element;
+    rightSideBarChildren?:JSX.Element[] | JSX.Element;
 }
 
 export interface SideBarContainerState
@@ -37,7 +37,8 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
         }
     }
 
-    sideBarCloseHandler=(direction:string,isOpen:boolean):void=>{
+    sideBarCloseHandler(direction:string,isOpen:boolean):void
+	{
         var stateObj:any = {}
         var dir = this.capitalizeFirstCharacter(direction);
         stateObj["open" + dir + "SideBar"] = isOpen;
@@ -151,7 +152,7 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
             return <SideBar
                         key={direction}
                         style={barStyle}
-                        closeHandler={this.sideBarCloseHandler.bind(null,direction)}
+                        closeHandler={this.sideBarCloseHandler.bind(this, direction)}
                         open={openStateValue}
                         direction={direction}
                         children={sideBarChildren}

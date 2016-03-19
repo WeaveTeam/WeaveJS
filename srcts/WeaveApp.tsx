@@ -172,7 +172,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					?	<WeaveMenuBar weave={weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
 					:	null
 				}
-				<SideBarContainer barSize={.2} leftSideBarChildren={[this.toolEditor]}>
+				<SideBarContainer barSize={.2} leftSideBarChildren={this.toolEditor}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
