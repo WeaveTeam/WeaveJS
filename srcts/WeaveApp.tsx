@@ -140,25 +140,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (!weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 		
-		if (!weave.getObject(renderPath))
-		{
-			try
-			{
-				var parentPath = renderPath.concat();
-				var childName = parentPath.pop();
-				var parent = weave.getObject(parentPath);
-				if (parent instanceof LinkableHashMap)
-					(parent as LinkableHashMap).requestObject(childName, FlexibleLayout);
-			}
-			catch (e)
-			{
-				// ignore
-			}
-		}
-		
-		// backwards compatibility
+		// backwards compatibility hack
 		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
-
 		
 		return (
 			<VBox
@@ -176,6 +159,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
+						defaultType={FlexibleLayout}
 						style={{width:"100%", height:"100%"}}
 						props={{itemRenderer: this.renderTool}}
 					/>

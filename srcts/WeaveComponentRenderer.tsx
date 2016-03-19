@@ -15,6 +15,7 @@ export interface IWeaveComponentRendererProps extends React.HTMLProps<WeaveCompo
 {
 	weave:Weave,
 	path:typeof LinkableWatcher.prototype.targetPath,
+	defaultType?:new(..._:any[])=>React.Component<any,any>,
 	requestType?:new(..._:any[])=>React.Component<any,any>,
 	props?:any
 }
@@ -78,14 +79,20 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 		// update watcher with new path
 		if (this.watcher)
 		{
-			if (props.requestType)
-				props.weave.requestObject(props.path, props.requestType);
 			this.watcher.targetPath = props.path;
+			this.handleWatcher(props);
 		}
 	}
 
-	handleWatcher():void
+	handleWatcher(props:IWeaveComponentRendererProps = null):void
 	{
+		if (!props)
+			props = this.props;
+		if (props.requestType)
+			props.weave.requestObject(props.path, props.requestType);
+		else if (props.defaultType && !this.watcher.target)
+			props.weave.requestObject(props.path, props.defaultType);
+		
 		var ComponentClass = LinkablePlaceholder.getClass(this.watcher.target) as React.ComponentClass<any> & typeof ILinkableObject;
 		if (!React.Component.isPrototypeOf(ComponentClass))
 			ComponentClass = null;
