@@ -47,11 +47,16 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 	
 	componentWillReceiveProps(props:IWeaveComponentRendererProps):void
 	{
-		if (this.props.weave != props.weave || !this.watcher)
-		{
-			// force React to create a new component for the new instance of Weave
+		var weaveChanged = this.props.weave != props.weave;
+		var pathChanged = !_.isEqual(this.props.renderPath, props.renderPath);
+		
+		// force React to create a new component if weave instance or renderPath changes
+		if (weaveChanged || pathChanged)
 			this.key++;
-			
+		
+		// create a new watcher when weave instance changes
+		if (weaveChanged || !this.watcher)
+		{
 			if (this.watcher)
 			{
 				// replace the component with a placeholder before it gets unmounted and disposed due to the key changing
@@ -70,6 +75,7 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 			}
 		}
 		
+		// update watcher with new path
 		if (this.watcher)
 		{
 			if (props.requestType)
