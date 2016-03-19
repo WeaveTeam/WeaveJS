@@ -81,13 +81,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 
-	showSideBarForTool=(tool:IVisTool, content:JSX.Element):void=>{
+	showSideBarForTool=(tool:IVisTool, content:JSX.Element):void=>
+	{
 		this.toolEditor = content;
 		this.forceUpdate();
 	}
-
-	
-
 
 	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
 	{
@@ -174,13 +172,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					?	<WeaveMenuBar weave={weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
 					:	null
 				}
-				<SideBarContainer
-					barSize = ".2"
-					leftSideBarChildren={[this.toolEditor]}>
+				<SideBarContainer barSize={.2} leftSideBarChildren={[this.toolEditor]}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
-						style={{width:"100%",height:"100%"}}
+						style={{width:"100%", height:"100%"}}
 						props={{itemRenderer: this.renderTool}}
 					/>
 				</SideBarContainer>

@@ -138,7 +138,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	onDragStart:React.DragEventHandler;
 	titleBarHeight:number;
 	title:string;
-	onGearClick:React.MouseEventHandler
+	onGearClick:React.MouseEventHandler;
 }
 
 interface ITitleBarState
