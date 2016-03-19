@@ -25,7 +25,7 @@ export interface SideBarContainerState
 export default class SideBarContainer extends React.Component<SideBarContainerProps, SideBarContainerState>
 {
 
-    constructor(props:any)
+    constructor(props:SideBarContainerProps)
     {
         super(props);
 
@@ -47,8 +47,8 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
     capitalizeFirstCharacter(str:string){
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
-    componentWillReceiveProps(nextProps:any){
-        var stateObject:any = {};
+    componentWillReceiveProps(nextProps:SideBarContainerProps){
+        var stateObject:SideBarContainerState = {};
         if(nextProps.leftSideBarChildren){
             stateObject["openLeftSideBar"] = true;
         }
@@ -134,7 +134,7 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
             var openStateValue:boolean = this.state["open" + this.capitalizeFirstCharacter(direction) + "SideBar"];
             var sideBarChildren:JSX.Element[] = this.props[ direction + "SideBarChildren"];
             var barPercentageSize:string = barSize * 100 + "%";
-            var barStyle:any = {}
+            var barStyle:React.CSSProperties = {}
 
             if(direction == "left" || direction == "right")
             {
