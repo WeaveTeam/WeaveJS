@@ -15,8 +15,8 @@ export interface IWeaveComponentRendererProps extends React.HTMLProps<WeaveCompo
 {
 	weave:Weave,
 	path:typeof LinkableWatcher.prototype.targetPath,
-	defaultType?:new(..._:any[])=>React.Component<any,any>,
-	requestType?:new(..._:any[])=>React.Component<any,any>,
+	defaultType?:React.ComponentClass<any>,
+	requestType?:React.ComponentClass<any>,
 	props?:any
 }
 
