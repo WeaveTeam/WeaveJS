@@ -4,7 +4,7 @@ import SideBar from "./SideBar";
 
 export interface SideBarContainerProps extends React.Props<SideBarContainer>
 {
-    barSize:string;
+    barSize:number;
     topSideBarChildren?:JSX.Element[];
     bottomSideBarChildren?:JSX.Element[];
     leftSideBarChildren?:JSX.Element[];
@@ -67,7 +67,7 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
 
     render()
     {
-        var barSize:number = Number(this.props.barSize);
+        var barSize:number = this.props.barSize;
         var scaleValue:number = 1;
         var transformOriginValue:string = "";
         var topOrBottomBarWidth:number = 1;
