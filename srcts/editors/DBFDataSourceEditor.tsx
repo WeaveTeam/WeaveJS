@@ -35,61 +35,65 @@ export default class DBFDataSourceEditor extends React.Component<IDataSourceEdit
 		let dataSource = this.props.dataSource as DBFDataSource;
 		let keyTypeSuggestions = WeaveAPI.QKeyManager.getAllKeyTypes();
 		
-		var tableStyle = {
+		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
 			td: { paddingBottom: 10, textAlign: "right"}
 		};
+		
+		var tableClasses = {
+			tr: "weave-datasource-manager-table-row"
+		}
+
 		var labelStyle = {
-			paddingRight: 5
+			paddingRight: 5,
+			whiteSpace: "nowrap"
+		}
+		
+		var inputStyle = {
+			width:"100%"
 		}
 
 		var editorFields = [
 			[
 				<span style={labelStyle}>{Weave.lang("Source Name *")}</span>,
-				<input type="text" style={{width: "100%"}} placeholder={Weave.lang("SHP/DBF files")}/>
+				<input type="text" style={inputStyle} placeholder={Weave.lang("SHP/DBF files")}/>
 			],
 			[
 				<span style={labelStyle}>{Weave.lang("DBF URL")}</span>,
-				<FileSelector 
-						  target={dataSource.dbfUrl} 
-						  placeholder={Weave.lang("http://www.example.com/example.dbf")} 
-						  accept=".dbf"
-						  />
+				<FileSelector target={dataSource.dbfUrl}
+						  	  placeholder={Weave.lang("http://www.example.com/example.dbf")} 
+						  	  accept=".dbf"/>
 			],
 			[
 				<span style={labelStyle}>{Weave.lang("SHP URL")}</span>,
-				<FileSelector 
-						  target={dataSource.shpUrl} 
-						  placeholder={Weave.lang("http://www.example.com/example.shp")} 
-						  accept=".shp"
-						  />
+				<FileSelector target={dataSource.shpUrl} 
+						  	  placeholder={Weave.lang("http://www.example.com/example.shp")} 
+						  	  accept=".shp"/>
 			],
 			[
 				<span style={labelStyle}>{Weave.lang("Projection")}</span>,
 				<StatefulTextField selectOnFocus={true} 
-							   placeholder={Weave.lang("Example: EPSG:4326")} 
-							   ref={linkReactStateRef(this, { content: dataSource.projection })}
-							   />
+							   	   placeholder={Weave.lang("Example: EPSG:4326")} 
+							       ref={linkReactStateRef(this, { content: dataSource.projection })}/>
 			],
 			[
 				<span style={labelStyle}>{Weave.lang("Key Column")}</span>,
 				<StatefulTextField selectOnFocus={true} 
-							   suggestions={dataSource.getColumnNames()}
-							   ref={linkReactStateRef(this, { content: dataSource.keyColName })}
-							   />
+							   	   suggestions={dataSource.getColumnNames()}
+							   	   ref={linkReactStateRef(this, { content: dataSource.keyColName })}/>
 			],
 			[
 				<span style={labelStyle}>{Weave.lang("Key Type")}</span>,
 				<StatefulTextField selectOnFocus={true} 
-							   suggestions={keyTypeSuggestions}
-							   ref={linkReactStateRef(this, { content: dataSource.keyType })}/>
+							   	   suggestions={keyTypeSuggestions}
+							   	   ref={linkReactStateRef(this, { content: dataSource.keyType })}/>
 			]
 		]
 		
 		return (
 			<VBox style={{flex: 1, margin: 10}}>
 				{
-					ReactUtils.generateTable(null, editorFields, tableStyle)
+					ReactUtils.generateTable(null, editorFields, tableStyles, tableClasses)
 				}
 			</VBox>
 		)

@@ -74,7 +74,7 @@ export default class ReactUtils
 						return (
 							<tr key={index} style={styles.tr} className={classes.tr}>
 								{
-									row.map((cell, index) => <td key={index} style={styles.td}>{cell}</td>)
+									row.map((cell, index) => <td key={index} style={styles.td} className={classes.td}>{cell}</td>)
 								}
 							</tr>
 						)
