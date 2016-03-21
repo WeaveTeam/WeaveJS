@@ -29,38 +29,23 @@ export default class CSVDataSourceEditor extends React.Component<IDataSourceEdit
 
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit" },
-			td: { paddingBottom: 10, textAlign: "right" }
+			td: [
+				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5},
+				{ paddingBottom: 10, textAlign: "right", width: "100%"}
+			]
 		};
 
-		var tableClasses = {
-			tr: "weave-datasource-manager-table-row"
-		}
-
-		var labelStyle = {
-			paddingRight: 5,
-			whiteSpace: "nowrap"
-		}
-
-		var inputStyle = {
-			width: "100%"
-		}
-
 		let editorFields = [
-			["URL", <FileSelector target={(this.props.dataSource as CSVDataSource).url} accept="text/csv,.csv"/>],
-			["Key Type", <StatefulTextField style={inputStyle} selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyType }) }
+			[Weave.lang("URL"), <FileSelector target={(this.props.dataSource as CSVDataSource).url} accept="text/csv,.csv"/>],
+			[Weave.lang("Key Type"), <StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyType }) }
 				suggestions={keyTypeSuggestions}/>],
-			["Key Column", <StatefulTextField style={inputStyle} selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyColName }) }
+			[Weave.lang("Key Column"), <StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyColName }) }
 				noneLabel={Weave.lang("Auto-generated keys") } suggestions={ds.getColumnNames().concat([null]) }/>]
-		].map((value: [string, JSX.Element]) => {
-			return [
-				<span style={labelStyle}>{Weave.lang(value[0]) }</span>,
-				value[1]
-			];
-		});
+		];
 
 		Weave.getCallbacks(ds).addGroupedCallback(this, this.forceUpdate);
 		return <div>
-			{ReactUtils.generateTable(null, editorFields, tableStyles, tableClasses)}
+			{ReactUtils.generateTable(null, editorFields, tableStyles)}
 		</div>;
 	}
 }

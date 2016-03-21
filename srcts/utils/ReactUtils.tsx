@@ -9,9 +9,9 @@ export interface DynamicTableStyles {
 	table?:React.CSSProperties;
 	thead?:React.CSSProperties;
 	tbody?:React.CSSProperties;
-	th?:React.CSSProperties;
+	th?:React.CSSProperties | React.CSSProperties[];
 	tr?:React.CSSProperties;
-	td?:React.CSSProperties;
+	td?:React.CSSProperties | React.CSSProperties[];
 };
 
 export interface DynamicTableClassNames {
@@ -62,7 +62,10 @@ export default class ReactUtils
 		var tableHead = header && (
 			<thead style={styles.thead} className={classes.thead}>
 		  		{
-					header.map((cell, index) => <th key={index} style={styles.th} className={classes.th}>{cell}</th>)
+					header.map((cell, index) => {
+						let style = Array.isArray(styles.th) ? (styles.th as React.CSSProperties[])[index] : styles.th;
+						return <th key={index} style={style} className={classes.th}>{cell}</th>
+					})
 				}
 			</thead>
 		);
@@ -74,7 +77,10 @@ export default class ReactUtils
 						return (
 							<tr key={index} style={styles.tr} className={classes.tr}>
 								{
-									row.map((cell, index) => <td key={index} style={styles.td} className={classes.td}>{cell}</td>)
+									row.map((cell, index) => {
+										let style = Array.isArray(styles.td) ? (styles.td as React.CSSProperties[])[index] : styles.td;
+										return <td key={index} style={style} className={classes.td}>{cell}</td>
+									})
 								}
 							</tr>
 						)

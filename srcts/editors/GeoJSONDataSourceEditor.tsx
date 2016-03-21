@@ -37,29 +37,19 @@ export default class GeoJSONDataSourceEditor extends React.Component<IDataSource
 		
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
-			td: { paddingBottom: 10, textAlign: "right"}
+			td: [
+				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5},
+				{ paddingBottom: 10, textAlign: "right", width: "100%"}
+			]
 		};
-		
-		var tableClasses = {
-			tr: "weave-datasource-manager-table-row"
-		}
-
-		var labelStyle = {
-			paddingRight: 5,
-			whiteSpace: "nowrap"
-		}
-		
-		var inputStyle = {
-			width:"100%"
-		}
 
 		var editorFields = [
 			[
-				<span style={labelStyle}>{Weave.lang("Source Name *")}</span>,
-				<input type="text" style={inputStyle} placeholder={Weave.lang("GeoJSON file")}/>
+				Weave.lang("Source Name *"),
+				<input type="text" style={{width: "100%"}} placeholder={Weave.lang("GeoJSON file")}/>
 			],
 			[
-				<span style={labelStyle}>{Weave.lang("GeoJSON URL")}</span>,
+				Weave.lang("GeoJSON URL"),
 				<FileSelector 
 						  target={dataSource.url} 
 						  placeholder={Weave.lang("http://www.example.com/example.geojson")} 
@@ -67,20 +57,20 @@ export default class GeoJSONDataSourceEditor extends React.Component<IDataSource
 						  />
 			],
 			[
-				<span style={labelStyle}>{Weave.lang("Projection")}</span>,
+				Weave.lang("Projection"),
 				<StatefulTextField selectOnFocus={true} 
 							   placeholder={Weave.lang("Example: EPSG:4326")} 
 							   ref={linkReactStateRef(this, { content: dataSource.projection })}
 							   />
 			],
 			[
-				<span style={labelStyle}>{Weave.lang("Key Property")}</span>,
+				Weave.lang("Key Property"),
 				<StatefulTextField selectOnFocus={true} 
 							   ref={linkReactStateRef(this, { content: dataSource.keyProperty })}
 							   />
 			],
 			[
-				<span style={labelStyle}>{Weave.lang("Key Type")}</span>,
+				Weave.lang("Key Type"),
 				<StatefulTextField selectOnFocus={true} 
 							   suggestions={keyTypeSuggestions}
 							   ref={linkReactStateRef(this, { content: dataSource.keyType })}/>
@@ -90,7 +80,7 @@ export default class GeoJSONDataSourceEditor extends React.Component<IDataSource
 		return (
 			<VBox style={{flex: 1, margin: 10}}>
 				{
-					ReactUtils.generateTable(null, editorFields, tableStyles, tableClasses)
+					ReactUtils.generateTable(null, editorFields, tableStyles)
 				}
 			</VBox>
 		)

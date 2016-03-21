@@ -213,7 +213,8 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 						[Weave.lang("X Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.xAxisName}) }/>],
 						[Weave.lang("Y Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/>]
 					], {
-						table: {width: "100%"}
+						table: {width: "100%"},
+						td: [{whiteSpace: "nowrap"}, {width: "100%"}]
 					}
 				)}
 

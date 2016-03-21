@@ -258,10 +258,6 @@ ul.dropdown-menu {
 	margin-right: 5;
 }
 
-.weave-datasource-manager-table-row td:nth-child(2) {
-	width: 100%;
-}
-
 .rc-slider {
     position: relative;
     height: 2px;
