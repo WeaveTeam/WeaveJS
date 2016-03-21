@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as lodash from "lodash";
 import StatefulTextField from "../ui/StatefulTextField";
-import StatefulTextDropdown from "../ui/StatefulTextDropdown";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
@@ -28,11 +27,40 @@ export default class CSVDataSourceEditor extends React.Component<IDataSourceEdit
 		let ds = (this.props.dataSource as CSVDataSource);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit" },
+			td: { paddingBottom: 10, textAlign: "right" }
+		};
+
+		var tableClasses = {
+			tr: "weave-datasource-manager-table-row"
+		}
+
+		var labelStyle = {
+			paddingRight: 5,
+			whiteSpace: "nowrap"
+		}
+
+		var inputStyle = {
+			width: "100%"
+		}
+
+		let editorFields = [
+			["URL", <FileSelector target={(this.props.dataSource as CSVDataSource).url} accept="text/csv,.csv"/>],
+			["Key Type", <StatefulTextField style={inputStyle} selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyType }) }
+				suggestions={keyTypeSuggestions}/>],
+			["Key Column", <StatefulTextField style={inputStyle} selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyColName }) }
+				noneLabel={Weave.lang("Auto-generated keys") } suggestions={ds.getColumnNames().concat([null]) }/>]
+		].map((value: [string, JSX.Element]) => {
+			return [
+				<span style={labelStyle}>{Weave.lang(value[0]) }</span>,
+				value[1]
+			];
+		});
+
 		Weave.getCallbacks(ds).addGroupedCallback(this, this.forceUpdate);
 		return <div>
-			{Weave.lang("URL")}<FileSelector target={(this.props.dataSource as CSVDataSource).url} accept="text/csv,.csv"/><br/>
-			{Weave.lang("Key Type") }<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyType }) } suggestions={keyTypeSuggestions}/><br/>
-			{Weave.lang("Key Column") }<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyColName }) } noneLabel={Weave.lang("Auto-generated keys")} suggestions={ds.getColumnNames().concat([null]) }/><br/>
+			{ReactUtils.generateTable(null, editorFields, tableStyles, tableClasses)}
 		</div>;
 	}
 }
