@@ -5,6 +5,7 @@ import {HBox, VBox} from "./FlexBox";
 import {MenuItemProps} from "./Menu";
 import Menu from "./Menu";
 import classNames from "../modules/classnames";
+import ReactUtils from "../utils/ReactUtils";
 
 export interface MenuBarItemProps
 {
@@ -20,91 +21,42 @@ export interface MenuBarProps extends React.HTMLProps<MenuBar>
 
 export interface MenuBarState
 {
-	xPos?:number;
-	yPos?:number;
-	showMenu?:boolean;
-	menu?:MenuItemProps[]
 }
 
 export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 {
 	element:Element;
+	menu:Menu;
+	
 	constructor(props:MenuBarProps)
 	{
 		super(props);
-		this.state = {
-			xPos: 0,
-			yPos: 0,
-			showMenu: false,
-			menu: []
-		};
-		this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
 	}
 	
 	componentDidMount()
 	{
-		document.addEventListener("mousedown", this.onDocumentMouseDown);
 		// TODO Add touch events for mobile
 		this.element = ReactDOM.findDOMNode(this);
-	}
-	
-	componentWillUnmount()
-	{
-		document.removeEventListener("mousedown", this.onDocumentMouseDown);
-	}
-	
-	onDocumentMouseDown(event:MouseEvent)
-	{
-		var elt = event.target;
-		
-		while( elt != null)
-		{
-			if(elt == this.element) {
-				return;
-			}
-			elt = (elt as HTMLElement).parentNode;
-		}
-		this.hideMenu();
-	}
-	
-	hideMenu()
-	{
-		this.setState({
-			showMenu: false
-		})
 	}
 	
 	showMenu(index:number)
 	{
 		var parent = this.refs[index] as HTMLElement;
 		var menuConfig = this.props.config[index].menu;
-		this.setState({
-			showMenu: true,
-			xPos: parent.offsetLeft,
-			yPos: parent.offsetTop + parent.clientHeight,
-			menu: menuConfig
-		});
+		this.menu = Menu.open(parent.offsetLeft, parent.offsetTop + parent.clientHeight, menuConfig);
 	}
 
 	onClick(index:number, event:React.MouseEvent)
 	{
-		if(this.state.showMenu) 
-		{
-			// hide menu if click on menubaritem and the menu was already visible
-			this.setState({
-				showMenu: false
-			});
-		}
-		else
-		{
-			this.showMenu(index);
-		}
+		this.showMenu(index);
 	}
 	
 	onMouseEnter(index:number, event:React.MouseEvent)
 	{
-		if(this.state.showMenu)
+		// allow toggling between menus once the menubar has been clicked on
+		if(this.menu)
 		{
+			ReactUtils.closePopup(this.menu);
 			this.showMenu(index);
 		}
 	}
@@ -134,12 +86,6 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 					this.props.config.map((menuBarItemProps, index) => {
 						return this.renderMenuBarItem(index, menuBarItemProps)
 					})
-				}
-				{
-					this.state.showMenu ?
-					<Menu menu={this.state.menu} xPos={this.state.xPos} yPos={this.state.yPos} onClick={this.hideMenu.bind(this)}/>
-					:
-					null
 				}
 				{this.props.children}
 			</HBox>

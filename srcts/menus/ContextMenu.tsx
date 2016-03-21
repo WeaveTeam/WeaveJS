@@ -4,7 +4,7 @@ import ReactUtils from "../utils/ReactUtils";
 import Menu from "../react-ui/Menu";
 import {MenuProps} from "../react-ui/Menu";
 
-export default class ContextMenu extends Menu
+export default class ContextMenu
 {
 	contextMenuContainer:HTMLElement;
 
@@ -12,12 +12,6 @@ export default class ContextMenu extends Menu
 	{
 		event.preventDefault();
 		var contextMenuItems = Menu.getMenuItems(event.target as HTMLElement);
-		return ReactUtils.openPopup(<ContextMenu xPos={event.clientX} yPos={event.clientY} menu={contextMenuItems}/>, true) as Menu;
-	}
-	
-	render():JSX.Element
-	{
-		return <Menu {...this.props} onClick={() => ReactUtils.closePopup(this)}/>;
+		return Menu.open(event.clientX, event.clientY, contextMenuItems) as Menu;
 	}
 }
-	
