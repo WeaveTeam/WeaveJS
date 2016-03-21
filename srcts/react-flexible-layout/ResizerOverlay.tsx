@@ -11,7 +11,6 @@ const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 const STYLE_BASE = {
     background: "#000",
     opacity: .3,
-    zIndex: 1,
     boxSizing: "border-box",
     backgroundClip: "padding",
     position: "absolute"

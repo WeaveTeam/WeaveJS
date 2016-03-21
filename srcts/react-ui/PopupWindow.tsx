@@ -131,7 +131,6 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 			position: "fixed",
 			width: "100%",
 			height: "100%",
-			zIndex: 48,
 			top: 0,
 			left: 0
 		};
@@ -143,7 +142,6 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 
 		var windowStyle:React.CSSProperties = this.state || {};
 		windowStyle.position = "absolute";
-		windowStyle.zIndex = 50;
 
 		var popupWindow = (
 			<VBox className="weave-app weave-window" ref={(c:VBox) => this.container = c} style={windowStyle}>

@@ -9,8 +9,9 @@ import DataMenu from './menus/DataMenu';
 import ToolsMenu from './menus/ToolsMenu';
 import SessionHistorySlider from "./editors/SessionHistorySlider";
 
-export interface WeaveMenuBarProps extends React.Props<WeaveMenuBar>
+export interface WeaveMenuBarProps extends React.HTMLProps<WeaveMenuBar>
 {
+	style:React.CSSProperties,
 	weave:Weave,
 	createObject:(type:new(..._:any[])=>any)=>void
 }
@@ -88,6 +89,7 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	{
 		return (
 			<MenuBar
+				style={this.props.style}
 				config={[
 					weaveMenu(this.props.weave),
 					this.fileMenu,

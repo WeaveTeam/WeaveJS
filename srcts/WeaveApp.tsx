@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 
+import prefixer from "./react-ui/VendorPrefixer";
 import {MenuItemProps} from "./react-ui/Menu";
 import SideBarContainer from "./react-ui/SideBarContainer";
 import {HBox, VBox} from "./react-ui/FlexBox";
@@ -170,11 +171,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}
 			>
-				{
-					!enableMenuBar || enableMenuBar.value
-					?	<WeaveMenuBar weave={weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
-					:	null
-				}
 				<SideBarContainer barSize={.2} leftSideBarChildren={this.toolEditor}>
 					<WeaveComponentRenderer
 						weave={weave}
@@ -184,6 +180,16 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						props={{itemRenderer: this.renderTool}}
 					/>
 				</SideBarContainer>
+				{
+					!enableMenuBar || enableMenuBar.value
+					?	<WeaveMenuBar
+							style={prefixer({order: -1})}
+							weave={weave}
+							ref={(c:WeaveMenuBar) => this.menuBar = c}
+							createObject={this.createObject}
+						/>
+					:	null
+				}
 			</VBox>
 		);
 	}

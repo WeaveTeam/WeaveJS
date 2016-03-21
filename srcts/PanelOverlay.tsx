@@ -4,7 +4,6 @@ import * as _ from "lodash";
 const toolOverlayStyle:React.CSSProperties = {
     background: "#000",
     opacity: .2,
-    zIndex: 3,
     boxSizing: "border-box",
     backgroundClip: "padding",
     position: "absolute",
