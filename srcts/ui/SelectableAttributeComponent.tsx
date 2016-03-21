@@ -37,7 +37,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		var labelStyle = {textAlign : 'center', flex: 0.35, fontSize : 'smaller'};
 
 		var refCol = this.props.attribute.getInternalColumn() as ReferencedColumn;
-		if(refCol)
+		if(Weave.IS(refCol, ReferencedColumn))
 			this.columnString = refCol.getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
 
 		return (
