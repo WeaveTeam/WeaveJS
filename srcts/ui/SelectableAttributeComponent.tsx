@@ -24,13 +24,10 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		super(props);
 	}
 
+	columnString: string;
 	componentDidMount(){
 		Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate)
-	}
-
-	componentWillUnmount(){
-		Weave.getCallbacks(this.props.attribute).removeCallback(this, this.forceUpdate);//is this needed ?
-	}
+	};
 
 	//TODO figure out how to make an indent component
 	render():JSX.Element
@@ -38,9 +35,10 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		var clearStyle = classNames({ 'fa fa-trash-o' : true, 'weave-icon' : true});
 		var inputStyle = classNames('input[type="text"]') ;
 		var labelStyle = {textAlign : 'center', flex: 0.35, fontSize : 'smaller'};
-		
 
-		var columnString = (this.props.attribute.getInternalColumn() as ReferencedColumn).getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
+		var refCol = this.props.attribute.getInternalColumn() as ReferencedColumn;
+		if(refCol)
+			this.columnString = refCol.getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
 
 		return (
 			<HBox>
@@ -53,7 +51,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 					</OverlayTrigger>
 					<HBox style={{flex: 0.85, display: "flex", flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-						<input className={inputStyle} type="text" value={ columnString } readOnly></input>
+						<input className={inputStyle} type="text" value={ this.columnString } readOnly></input>
 						<span className={clearStyle}/>
 					</HBox>
 				</HBox>
