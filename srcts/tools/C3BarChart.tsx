@@ -361,6 +361,12 @@ export default class C3BarChart extends AbstractC3Tool
         this.c3Config.data = data;
     }
 
+    //TODO - LinkableHashMap of DynamicColumns
+    selectableAttributes:{[label:string]:DynamicColumn} = {
+        label:this.labelColumn,
+        sort:this.sortColumn
+    };//TODO handle remaining attributes
+
     updateStyle()
     {
     	if (!this.chart || !this.heightColumnNames)
