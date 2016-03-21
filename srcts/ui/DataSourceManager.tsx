@@ -17,6 +17,9 @@ import CSVDataSourceEditor from "../editors/CSVDataSourceEditor";
 import DBFDataSource = weavejs.data.source.DBFDataSource;
 import DBFDataSourceEditor from "../editors/DBFDataSourceEditor";
 
+import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
+import GeoJSONDataSourceEditor from "../editors/GeoJSONDataSourceEditor";
+
 export interface IDataSourceManagerProps
 {
 	weave:Weave;
@@ -33,7 +36,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	static editorRegistry = new Map<typeof IDataSource, React.ComponentClass<IDataSourceEditorProps>>()
 		.set(CSVDataSource, CSVDataSourceEditor)
 		.set(DBFDataSource, DBFDataSourceEditor)
-//		.set(GeoJSONDataSource, GeoJSONDataSource)
+		.set(GeoJSONDataSource, GeoJSONDataSourceEditor)
 //		.set(CensusDataSource, CensusDataSourceEditor)
 //		.set(CKANDataSource, CKANDataSourceEditor)
 		.set(WeaveDataSource, WeaveDataSourceEditor)
