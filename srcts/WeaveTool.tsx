@@ -116,7 +116,7 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	{
 		return (
 			<VBox style={this.props.style} className="weave-tool"
-					onMouseEnter={() => {
+					onMouseOver={() => {
 						this.titleBar.setState({ showControls: true });
 					}}
 					onMouseLeave={() => {
