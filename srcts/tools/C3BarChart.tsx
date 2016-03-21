@@ -19,6 +19,7 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkableNumber = weavejs.core.LinkableNumber;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -48,10 +49,11 @@ export default class C3BarChart extends AbstractC3Tool
     sortColumn = Weave.linkableChild(this, DynamicColumn);
     colorColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#808080"));
     chartColors = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
-    groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode))
+    groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode));
     horizontalMode = Weave.linkableChild(this, new LinkableBoolean(true));
     showValueLabels = Weave.linkableChild(this, new LinkableBoolean(true));
     showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
+	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8));
 
     private verifyGroupingMode(mode:string):boolean
 	{
@@ -196,7 +198,7 @@ export default class C3BarChart extends AbstractC3Tool
             },
             bar: {
                 width: {
-                    ratio: 1.0
+                    ratio: this.barWidthRatio.value
                 }
             },
             legend: {
@@ -478,6 +480,12 @@ export default class C3BarChart extends AbstractC3Tool
             changeDetected = true;
             this.c3Config.axis.rotated = this.horizontalMode.value;
         }
+
+		if (Weave.detectChange(this, this.barWidthRatio))
+		{
+			changeDetected = true;
+			this.c3Config.bar.width = {ratio: this.barWidthRatio.value};
+		}
 
         if (changeDetected || forced)
 			return true;
