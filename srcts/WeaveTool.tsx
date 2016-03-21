@@ -15,6 +15,7 @@ import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
 import PopupWindow from "./react-ui/PopupWindow";
 import ReactUtils from "./utils/ReactUtils";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
+import SmartComponent from "./ui/SmartComponent";
 
 const grabberStyle:CSSProperties = {
 	width: "16",
@@ -41,7 +42,7 @@ export interface IWeaveToolState
 	title?: string;
 }
 
-export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
+export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
 {
 	private titleBarHeight:number = 25;
 	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
@@ -51,13 +52,6 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	{
 		super(props);
 		this.state = {};
-	}
-	
-	shouldComponentUpdate(nextProps:IWeaveToolProps, nextState:IWeaveToolState, nextContext:any):boolean
-	{
-		return !_.isEqual(this.state, nextState)
-			|| !_.isEqual(this.props, nextProps)
-			|| !_.isEqual(this.context, nextContext);
 	}
 	
 	handleTool=(wcr:WeaveComponentRenderer):void=>
@@ -155,7 +149,7 @@ interface ITitleBarState
 	showControls: boolean;
 }
 
-class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
+class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 {
 	constructor(props:ITitleBarProps)
 	{

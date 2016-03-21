@@ -9,6 +9,7 @@ import reactUpdate from "react-addons-update";
 import {CSSProperties} from "react";
 import ReactUtils from "./utils/ReactUtils";
 import {HBox, VBox} from "./react-ui/FlexBox";
+import SmartComponent from "./ui/SmartComponent";
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 
 export interface IWeaveComponentRendererProps extends React.HTMLProps<WeaveComponentRenderer>
@@ -26,7 +27,7 @@ export interface IWeaveComponentRendererState
 	target?:ILinkableObject;
 }
 
-export default class WeaveComponentRenderer extends React.Component<IWeaveComponentRendererProps, IWeaveComponentRendererState>
+export default class WeaveComponentRenderer extends SmartComponent<IWeaveComponentRendererProps, IWeaveComponentRendererState>
 {
 	generatedComponent:React.Component<any, any>;
 	watcher:LinkableWatcher;
@@ -37,13 +38,6 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 		super(props);
 		this.state = {};
 		this.componentWillReceiveProps(props);
-	}
-	
-	shouldComponentUpdate(nextProps:IWeaveComponentRendererProps, nextState:IWeaveComponentRendererState, nextContext:any):boolean
-	{
-		return !_.isEqual(this.state, nextState)
-			|| !_.isEqual(this.props, nextProps)
-			|| !_.isEqual(this.context, nextContext);
 	}
 	
 	componentWillReceiveProps(props:IWeaveComponentRendererProps):void
