@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as lodash from "lodash";
 import StatefulTextField from "../ui/StatefulTextField";
+import StatefulTextDropdown from "../ui/StatefulTextDropdown";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
@@ -31,7 +32,7 @@ export default class CSVDataSourceEditor extends React.Component<IDataSourceEdit
 		return <div>
 			{Weave.lang("URL")}<FileSelector target={(this.props.dataSource as CSVDataSource).url} accept="text/csv,.csv"/><br/>
 			{Weave.lang("Key Type") }<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyType }) } suggestions={keyTypeSuggestions}/><br/>
-			{Weave.lang("Key Column") }<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyColName }) } suggestions={ds.getColumnNames() }/><br/>
+			{Weave.lang("Key Column") }<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.keyColName }) } noneLabel={Weave.lang("Auto-generated keys")} suggestions={ds.getColumnNames().concat([null]) }/><br/>
 		</div>;
 	}
 }
