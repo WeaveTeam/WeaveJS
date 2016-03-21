@@ -155,11 +155,6 @@ export default class C3Histogram extends AbstractC3Tool
                 y: {
                     show: true
                 }
-            },
-            bar: {
-                width: {
-                    ratio: this.barWidthRatio.value
-                }
             }
         });
         this.c3ConfigYAxis = {
@@ -429,7 +424,7 @@ export default class C3Histogram extends AbstractC3Tool
         if(Weave.detectChange(this, this.barWidthRatio))
         {
             changeDetected = true;
-            this.c3Config.bar.width = {ratio: this.barWidthRatio.value};
+            this.c3Config.bar = {width: {ratio: this.barWidthRatio.value}};
         }
 
     	if (changeDetected || forced)

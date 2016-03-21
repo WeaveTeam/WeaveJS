@@ -196,11 +196,6 @@ export default class C3BarChart extends AbstractC3Tool
                     show: true
                 }
             },
-            bar: {
-                width: {
-                    ratio: this.barWidthRatio.value
-                }
-            },
             legend: {
                 show: false,
                 position: "bottom"
@@ -490,7 +485,7 @@ export default class C3BarChart extends AbstractC3Tool
 		if (Weave.detectChange(this, this.barWidthRatio))
 		{
 			changeDetected = true;
-			this.c3Config.bar.width = {ratio: this.barWidthRatio.value};
+			this.c3Config.bar = {width: {ratio: this.barWidthRatio.value}};
 		}
 
         if (changeDetected || forced)
