@@ -2,9 +2,8 @@ import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import ListView from "./ListView";
-import * as fs from 'fuse.js';//TODO make sure right way to do this
-var fuse = (fs as any)["default"] as typeof fs;
-(window as any).Fuse = fuse;
+import * as fs from 'fuse.js';
+var Fuse = (fs as any)["default"] as typeof fs;
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
