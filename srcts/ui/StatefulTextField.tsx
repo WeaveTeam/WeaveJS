@@ -40,7 +40,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		{
 
 			let listId: string = weavejs.util.StandardLib.guid();
-			let inputElement = <input style={this.props.style}
+			let inputElement = <input style={_.merge({width: "100%"}, this.props.style)}
 				onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange}
 				type="text" value={this.state.content}
 				{...props as any}

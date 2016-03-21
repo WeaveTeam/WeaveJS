@@ -5,6 +5,24 @@ import * as _ from "lodash";
 
 export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
 
+export interface DynamicTableStyles {
+	table?:React.CSSProperties;
+	thead?:React.CSSProperties;
+	tbody?:React.CSSProperties;
+	th?:React.CSSProperties;
+	tr?:React.CSSProperties;
+	td?:React.CSSProperties;
+};
+
+export interface DynamicTableClassNames {
+	table?:string;
+	thead?:string;
+	tbody?:string;
+	th?:string;
+	tr?:string;
+	td?:string;
+}
+
 export default class ReactUtils
 {
 	private static map_popup_element = new WeakMap<React.ReactInstance, [Element, EventListener]>();
@@ -39,24 +57,24 @@ export default class ReactUtils
 		document.body.removeChild(element);
 	}
 	
-	static generateTable(header:(string|JSX.Element)[], body:(string|JSX.Element)[][]):JSX.Element
+	static generateTable(header:(string|JSX.Element)[], body:(string|JSX.Element)[][], styles:DynamicTableStyles = {}, classes:DynamicTableClassNames = {}):JSX.Element
 	{
 		var tableHead = header && (
-			<thead>
+			<thead style={styles.thead} className={classes.thead}>
 		  		{
-					header.map((cell, index) => <th key={index}>{cell}</th>)
+					header.map((cell, index) => <th key={index} style={styles.th} className={classes.th}>{cell}</th>)
 				}
 			</thead>
 		);
 		
 		var tableBody = body && (
-			<tbody>
+			<tbody style={styles.tbody} className={classes.tbody}>
 				{
 					body.map((row, index) => {
 						return (
-							<tr key={index}>
+							<tr key={index} style={styles.tr} className={classes.tr}>
 								{
-									row.map((cell, index) => <td key={index}>{cell}</td>)
+									row.map((cell, index) => <td key={index} style={styles.td}>{cell}</td>)
 								}
 							</tr>
 						)
@@ -65,7 +83,7 @@ export default class ReactUtils
 			</tbody>
 		)
 		return (
-			<table>
+			<table style={styles.table} className={classes.table}>
 				{tableHead}
 				{tableBody}
 			</table>

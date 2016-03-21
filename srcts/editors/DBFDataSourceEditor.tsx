@@ -35,13 +35,21 @@ export default class DBFDataSourceEditor extends React.Component<IDataSourceEdit
 		let dataSource = this.props.dataSource as DBFDataSource;
 		let keyTypeSuggestions = WeaveAPI.QKeyManager.getAllKeyTypes();
 		
+		var tableStyle = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: { paddingBottom: 10, textAlign: "right"}
+		};
+		var labelStyle = {
+			paddingRight: 5
+		}
+
 		var editorFields = [
 			[
-				Weave.lang("Source Name *"),
-				<input type="text" placeholder={Weave.lang("SHP/DBF files")}/>
+				<span style={labelStyle}>{Weave.lang("Source Name *")}</span>,
+				<input type="text" style={{width: "100%"}} placeholder={Weave.lang("SHP/DBF files")}/>
 			],
 			[
-				Weave.lang("DBF URL"),
+				<span style={labelStyle}>{Weave.lang("DBF URL")}</span>,
 				<FileSelector 
 						  target={dataSource.dbfUrl} 
 						  placeholder={Weave.lang("http://www.example.com/example.dbf")} 
@@ -49,7 +57,7 @@ export default class DBFDataSourceEditor extends React.Component<IDataSourceEdit
 						  />
 			],
 			[
-				Weave.lang("SHP URL"),
+				<span style={labelStyle}>{Weave.lang("SHP URL")}</span>,
 				<FileSelector 
 						  target={dataSource.shpUrl} 
 						  placeholder={Weave.lang("http://www.example.com/example.shp")} 
@@ -57,21 +65,21 @@ export default class DBFDataSourceEditor extends React.Component<IDataSourceEdit
 						  />
 			],
 			[
-				Weave.lang("Projection"),
+				<span style={labelStyle}>{Weave.lang("Projection")}</span>,
 				<StatefulTextField selectOnFocus={true} 
 							   placeholder={Weave.lang("Example: EPSG:4326")} 
 							   ref={linkReactStateRef(this, { content: dataSource.projection })}
 							   />
 			],
 			[
-				Weave.lang("Key Column"),
+				<span style={labelStyle}>{Weave.lang("Key Column")}</span>,
 				<StatefulTextField selectOnFocus={true} 
 							   suggestions={dataSource.getColumnNames()}
 							   ref={linkReactStateRef(this, { content: dataSource.keyColName })}
 							   />
 			],
 			[
-				Weave.lang("Key Type"),
+				<span style={labelStyle}>{Weave.lang("Key Type")}</span>,
 				<StatefulTextField selectOnFocus={true} 
 							   suggestions={keyTypeSuggestions}
 							   ref={linkReactStateRef(this, { content: dataSource.keyType })}/>
@@ -79,9 +87,9 @@ export default class DBFDataSourceEditor extends React.Component<IDataSourceEdit
 		]
 		
 		return (
-			<VBox style={{flex: 1, padding: 10}}>
+			<VBox style={{flex: 1, margin: 10}}>
 				{
-					ReactUtils.generateTable(null, editorFields)
+					ReactUtils.generateTable(null, editorFields, tableStyle)
 				}
 			</VBox>
 		)
