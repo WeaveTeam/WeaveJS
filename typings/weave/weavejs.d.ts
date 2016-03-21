@@ -39,10 +39,9 @@ declare module __global__ {
         getObject(...path: (string | number | (string | number)[])[]): ILinkableObject;
         /**
          * Requests that an object be created if it doesn't already exist at the given path.
-         * This function can also be used to assert that the object at the current path is of the type you expect it to be.
          * @param path The path
          * @param type The type
-         * @return Either an instance of the requested type, a LinkablePlaceholder, or null if the object could not be created.
+         * @return Either an instance of the requested type, or null if the object could not be created or a LinkablePlaceholder was created.
          */
         requestObject<T>(path: Array<string | number>, type: (new (..._: any[]) => T) | string): T;
         /**
@@ -192,6 +191,10 @@ declare module __global__ {
          * @return (object is type)
          */
         static IS(object: Object, type: new (..._: any[]) => any): boolean;
+        /**
+         * @return (object as type)
+         */
+        static AS(object: Object, type: new (..._: any[]) => any): boolean;
         /**
          * Registers a class that must be instantiated asynchronously.
          * Dynamic items in the session state that extend this class will be replaced with
