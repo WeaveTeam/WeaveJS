@@ -73,7 +73,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         });
     }
 
-    onClick(id:string, event:React.MouseEvent)
+    onMouseDown(id:string, event:React.MouseEvent)
 	{
         var selectedIds:string[] = this.state.selectedIds.concat();
 
@@ -200,7 +200,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
                     <TableBody key="body" ref={(c:TableBody) => {this.tableBody = c;}}
                                idProperty={this.props.idProperty}
                                onMouseOver={this.onMouseOver.bind(this)}
-                               onClick={this.onClick.bind(this)}
+                               onMouseDown={this.onMouseDown.bind(this)}
                                rows={this.props.rows}
                                selectedIds={this.state.selectedIds}
                                probedIds={this.state.probedIds}
