@@ -2,6 +2,9 @@ import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import ListView from "./ListView";
+import * as fs from 'fuse.js';//TODO make sure right way to do this
+var fuse = (fs as any)["default"] as typeof fs;
+(window as any).Fuse = fuse;
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
@@ -16,6 +19,7 @@ export interface IWeaveTreeProps {
 	hideRoot?: boolean;
 	hideLeaves? : boolean;
 	multipleSelection?: boolean;
+	searchFilter? : string;
 	onSelect?: (selectedItems: Array<IWeaveTreeNode>) => void;
 	onExpand?: (openItems: Array<IWeaveTreeNode>) => void;
 };
@@ -123,7 +127,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	handleItemClick=(node:IWeaveTreeNode, e:React.MouseEvent)=>
 	{
 			this.internalSetSelected(node, !this.getSelected(node), e.ctrlKey);
-	}
+	};
 
 	static CLASSNAME = "weave-tree-view";
 	static SELECTED_CLASSNAME = "selected";
@@ -174,7 +178,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 				<i className={iconClassName}/>
 				{ " "+node.getLabel() }
 			</span></span>;
-	}
+	};
 
 	enumerateItems=(_node:IWeaveTreeNode, result:Array<IWeaveTreeNode> = [], depth:number = 0):Array<IWeaveTreeNode>=>
 	{
@@ -197,8 +201,19 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			}
 		}
 
+		if(this.props.searchFilter)
+			result = this.fuzzySearch(result, ['label'], this.props.searchFilter);//TODO make search possible using diff props of EntityNode
+
 		return result;
-	}
+	};
+
+	//filters a oollection of nodes by any filter Object
+	fuzzySearch=(input :Array<IWeaveTreeNode>, filterProps: Array<string>, filterString :string):Array<IWeaveTreeNode>=>{
+		var options:Object = {keys : filterProps};
+		let fuze:any = new Fuse(input, options);
+		var result : Array<IWeaveTreeNode> = fuze.search(filterString);
+		return result;
+	};
 
 	rowHeight: number;
 
