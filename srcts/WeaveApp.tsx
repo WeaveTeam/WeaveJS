@@ -58,6 +58,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		return this.props.renderPath || WeaveApp.defaultProps.renderPath;
 	}
 	
+	getRenderedComponent():React.Component<any, any>
+	{
+		if (!this.props.weave)
+			return null;
+		return this.props.weave.getObject(this.getRenderPath()) as React.Component<any, any>;
+	}
+	
 	componentDidMount()
 	{
 		if (this.props.readUrlParams)
@@ -80,8 +87,21 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 		}
 	}
+	
+	handleMaximizeClick(path:WeavePathArray):void
+	{
+		var layout = this.getRenderedComponent() as FlexibleLayout;
+		if (!(layout instanceof FlexibleLayout))
+			return;
+		var state = _.cloneDeep(layout.getSessionState());
+		var obj = MiscUtils.findDeep(state, {id: path});
+		if (!obj)
+			return;
+		obj.maximized = !obj.maximized;
+		layout.setSessionState(state);
+	}
 
-	showSideBarForTool=(tool:IVisTool, content:JSX.Element):void=>
+	handleGearClick=(tool:IVisTool, content:JSX.Element):void=>
 	{
 		this.toolEditor = content;
 		this.forceUpdate();
@@ -89,14 +109,14 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
 	{
-		//onGearClick={this.blah}
 		return (
 			<WeaveTool
 				weave={this.props.weave}
 				path={path}
 				style={{width: "100%", height: "100%"}}
 				{...panelProps}
-				onGearClick={this.showSideBarForTool}
+				onGearClick={this.handleGearClick}
+				onMaximizeClick={this.handleMaximizeClick.bind(this, path)}
 			/>
 		);
 	}

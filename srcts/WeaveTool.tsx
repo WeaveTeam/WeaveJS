@@ -33,6 +33,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	onContextMenu?:React.MouseEventHandler;
 	style?: CSSProperties;
 	onGearClick?:(tool:IVisTool, editorContent:JSX.Element)=>void;
+	onMaximizeClick?:(tool:IVisTool)=>void;
 }
 
 export interface IWeaveToolState
@@ -104,6 +105,12 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 			}
 		}
 	}
+	
+	onMaximizeClick=():void=>
+	{
+		if (this.props.onMaximizeClick)
+			this.props.onMaximizeClick(this.watcher.target as IVisTool);
+	}
 
 	render():JSX.Element
 	{
@@ -121,7 +128,8 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 						  onDragStart={this.props.onDragStart}
 						  titleBarHeight={this.titleBarHeight}
 						  title={Weave.lang(this.state.title)}
-						  onGearClick={this.onGearClick.bind(this)}
+						  onGearClick={this.onGearClick}
+						  onMaximizeClick={this.onMaximizeClick}
 						  />
 				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
@@ -139,6 +147,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	titleBarHeight:number;
 	title:string;
 	onGearClick:React.MouseEventHandler;
+	onMaximizeClick:React.MouseEventHandler;
 }
 
 interface ITitleBarState
@@ -213,7 +222,7 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 	            </HBox>
 				<span style={titleStyle} className="weave-panel">{this.props.title}</span>
 				<HBox style={prefixer(rightControls)}>
-					<div style={iconStyle}>
+					<div style={iconStyle} onClick={this.props.onMaximizeClick}>
 						<Glyphicon glyph="unchecked"/>
 					</div>
 					<div style={iconStyle}>
