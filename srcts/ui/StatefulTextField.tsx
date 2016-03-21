@@ -98,7 +98,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 
 		if (this.props.suggestions && this.props.suggestions.length > 0)
 		{
-			return <div style={{ position: "relative", display: "inline-block" }}>
+			return <div style={{ position: "relative"}}>
 				<input style={_.merge({ width: "100%" }, this.props.style)}
 					onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange}
 					type="text" value={this.state.content} placeholder={this.state.content || this.props.noneLabel}
