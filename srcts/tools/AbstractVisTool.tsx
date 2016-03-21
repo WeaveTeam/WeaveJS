@@ -206,11 +206,16 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 		return (
 			<VBox>
-				{ReactUtils.generateTable(null, [
-					[Weave.lang("Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/>],
-					[Weave.lang("X Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.xAxisName}) }/>],
-					[Weave.lang("Y Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/>]
-				])}
+				{ReactUtils.generateTable(
+					null,
+					[
+						[Weave.lang("Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/>],
+						[Weave.lang("X Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.xAxisName}) }/>],
+						[Weave.lang("Y Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/>]
+					], {
+						table: {width: "100%"}
+					}
+				)}
 
 				<label style={ heading }>{Weave.lang('Attributes')}</label>
 				{ selectors }
