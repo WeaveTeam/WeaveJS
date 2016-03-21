@@ -80,7 +80,8 @@ export default class WeaveComponentRenderer extends React.Component<IWeaveCompon
 		if (this.watcher)
 		{
 			this.watcher.targetPath = props.path;
-			this.handleWatcher(props);
+			if (props != this.props)
+				this.handleWatcher(props);
 		}
 	}
 
