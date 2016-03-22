@@ -23,12 +23,12 @@ import GeoJSONDataSourceEditor from "../editors/GeoJSONDataSourceEditor";
 export interface IDataSourceManagerProps
 {
 	weave:Weave;
-	selectedDataSource?:IDataSource;
+	selected?:IDataSource;
 }
 
 export interface IDataSourceManagerState
 {
-	selectedDataSource?:IDataSource;
+	selected?:IDataSource;
 }
 
 export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
@@ -54,8 +54,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	
 	componentWillReceiveProps(props:IDataSourceManagerProps)
 	{
-		if (props.selectedDataSource)
-			this.setState({selectedDataSource: props.selectedDataSource});
+		if (props.selected)
+			this.setState({selected: props.selected});
 	}
 
 	render():JSX.Element
@@ -64,7 +64,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let listOptions:ListOption[] = root.getObjects(IDataSource).map(value => { return {label: root.getName(value), value}; });
 
 		let editorJsx:JSX.Element;
-		let dataSource = this.state.selectedDataSource || this.props.selectedDataSource;
+		let dataSource = this.state.selected || this.props.selected;
 		if (dataSource)
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
@@ -85,7 +85,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						options={listOptions}
 						multiple={false}
 						selectedValues={[dataSource]}
-						onChange={ (selectedValues:IDataSource[]) => this.setState({ selectedDataSource: selectedValues[0] }) }
+						onChange={ (selectedValues:IDataSource[]) => this.setState({ selected: selectedValues[0] }) }
 					/>
 				</VBox>
 				<div style={{ backgroundColor: '#f0f0f0', width: 4 }}/>
@@ -97,18 +97,18 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	}
 
 	static map_weave_dsmPopup = new WeakMap<Weave, PopupWindow>();
-	static openInstance(weave:Weave, selectedDataSource:IDataSource = null):PopupWindow
+	static openInstance(weave:Weave, selected:IDataSource = null):PopupWindow
 	{
 		var dsm = DataSourceManager.map_weave_dsmPopup.get(weave);
 		if (dsm)
 		{
-			dsm.setState({selectedDataSource: selectedDataSource});
+			dsm.setState({content: <DataSourceManager weave={weave} selected={selected}/>});
 		}
 		else
 		{
 			dsm = PopupWindow.open({
 				title: "Manage data sources",
-				content: <DataSourceManager weave={weave} selectedDataSource={selectedDataSource}/>,
+				content: <DataSourceManager weave={weave} selected={selected}/>,
 				modal: false,
 				onCancel: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
 			});
