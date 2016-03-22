@@ -120,7 +120,6 @@ input[type="text"] {
 input[type="text"]:focus {
 	border: solid 1px rgba(153, 214, 255, 0.4);
 	box-shadow: 0 0 5px 1px rgba(153, 214, 255, 0.4);
-	margin : 5px 5px 5px 5px;
 	flex-grow: 1;
 	font-size:smaller;
 	height:25px
