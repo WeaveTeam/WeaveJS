@@ -53,39 +53,49 @@ export default class WeaveDataSourceEditor extends React.Component<IDataSourceEd
 
 	render():JSX.Element
 	{
-		let dataSource: WeaveDataSource;
-		let root: IWeaveTreeNode;
-		if (this.props.dataSource)
-		{
-			Weave.getCallbacks(this.props.dataSource).addGroupedCallback(this, this.forceUpdate, false);
-			dataSource = this.props.dataSource as WeaveDataSource;
 
-			let cache = (dataSource as WeaveDataSource).entityCache;
-			root = new EntityNode(cache, EntityType.HIERARCHY);
-			dataSource.rootId.addGroupedCallback(this, this.setHierarchySelection, false);
-		}
-		else
-		{
-			return <VBox/>;
-		}
+		let ds = (this.props.dataSource as WeaveDataSource);
+		let root = new EntityNode(ds.entityCache, EntityType.HIERARCHY);
 
-		let margins: React.CSSProperties = { marginLeft: "0.5em", marginRight: "0.5em" };
+		ds.rootId.addGroupedCallback(this, this.setHierarchySelection, false);
+		Weave.getCallbacks(ds).addGroupedCallback(this, this.forceUpdate, false);
 
-		return <VBox style={{ flex: 1 }}>
-					<label>{Weave.lang("Source display name") }
-						<StatefulTextField style={margins}/>
-					</label>
-					<label>{Weave.lang("Service URL")}
-						<StatefulTextField ref={linkReactStateRef(this, {content: dataSource.url}, 500) }
-							style={margins} placeholder={weavejs.net.WeaveDataServlet.DEFAULT_URL}/>
-					</label>
-					<label>{Weave.lang("Root hierarchy ID")}
-						<StatefulTextField ref={linkReactStateRef(this, { content: dataSource.rootId }, 500) }
-							style={margins} placeholder={Weave.lang("Hierarchy ID") }/>
-						<button type="button" onClick={ () => { dataSource && (dataSource.rootId.state = null) } }>{Weave.lang("Reset")}</button>
-					</label>
-					<WeaveTree style={{ flex: 1 }} hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>
-			</VBox>;
+
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit" },
+			td: { paddingBottom: 10, textAlign: "right" }
+		};
+
+		var tableClasses = {
+			tr: "weave-datasource-manager-table-row"
+		};
+
+		var labelStyle = {
+			paddingRight: 5,
+			whiteSpace: "nowrap"
+		};
+
+		var inputStyle = {
+			width: "100%"
+		};
+
+		let editorFields = [
+			["Service URL", <StatefulTextField style={inputStyle} ref={linkReactStateRef(this, { content: ds.url }, 500) } placeholder={weavejs.net.WeaveDataServlet.DEFAULT_URL}/>],
+			["Root hierarchy ID", <StatefulTextField style={inputStyle} ref={linkReactStateRef(this, { content: ds.rootId }, 500) } placeholder={Weave.lang("Hierarchy ID") }/>]
+		].map((value: [string, JSX.Element]) => {
+			return [
+				<span style={labelStyle}>{Weave.lang(value[0]) }</span>,
+				value[1]
+			];
+		});
+
+
+		return <VBox>
+			{
+				[ReactUtils.generateTable(null, editorFields, tableStyles, tableClasses), 
+				<WeaveTree style={{ flex: 1 }} hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>]
+			}
+		</VBox>;
 	}
 }
 
