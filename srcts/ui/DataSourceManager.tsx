@@ -79,7 +79,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 
 		return (
-			<HBox style={{ flex: 1, minWidth: 700, minHeight: 400 }}>
+			<HBox style={{width: "100%", height: "100%"}}>
 				<VBox style={{ flex: .25 }}>
 					<List
 						options={listOptions}
@@ -88,7 +88,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						onChange={ (selectedValues:IDataSource[]) => this.setState({ selected: selectedValues[0] }) }
 					/>
 				</VBox>
-				<div style={{ backgroundColor: '#f0f0f0', width: 4 }}/>
+				<div style={{ backgroundColor: '#f0f0f0', width: 4, height: "100%" }}/>
 				<VBox style={{ flex: .75 }}>
 					{editorJsx}
 				</VBox>
@@ -110,6 +110,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 				title: "Manage data sources",
 				content: <DataSourceManager weave={weave} selected={selected}/>,
 				modal: false,
+				width: 700,
+				height: 400,
 				onCancel: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
 			});
 			DataSourceManager.map_weave_dsmPopup.set(weave, dsm);

@@ -39,7 +39,7 @@ export default class DBFDataSourceEditor extends React.Component<IDataSourceEdit
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
 				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5},
-				{ paddingBottom: 10, textAlign: "right", width: "100%"}
+				{ paddingBottom: 10, width: "100%"}
 			]
 		};
 		
