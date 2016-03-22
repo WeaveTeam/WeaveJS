@@ -77,5 +77,5 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 	}
 }
 
-Weave.registerClass("weavejs.tool.Text", TextTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.Text", TextTool, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Text");
 Weave.registerClass("weave.ui::TextTool", TextTool);

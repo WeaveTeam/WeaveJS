@@ -167,5 +167,5 @@ export default class C3Gauge extends AbstractC3Tool
     }
 }
 
-Weave.registerClass("weavejs.tool.C3Gauge", C3Gauge, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.C3Gauge", C3Gauge, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties], "Gauge Tool");
 Weave.registerClass("weave.visualization.tools::GaugeTool", C3Gauge);

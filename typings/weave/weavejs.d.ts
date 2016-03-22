@@ -194,7 +194,7 @@ declare module __global__ {
         /**
          * @return (object as type)
          */
-        static AS(object: Object, type: new (..._: any[]) => any): boolean;
+        static AS<T>(object: Object, type: new (..._: any[]) => T): T;
         /**
          * Registers a class that must be instantiated asynchronously.
          * Dynamic items in the session state that extend this class will be replaced with
@@ -214,8 +214,9 @@ declare module __global__ {
          * @param qualifiedName
          * @param definition
          * @param additionalInterfaces An Array of interfaces (Class objects) that the definition implements in addition to ILinkableObject.
+         * @param displayName An optional display name for the class definition.
          */
-        static registerClass(qualifiedName: string, definition: new (..._: any[]) => any, additionalInterfaces?: Array<new () => any>): void;
+        static registerClass(qualifiedName: string, definition: new (..._: any[]) => any, additionalInterfaces?: Array<new () => any>, displayName?: string): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -1095,8 +1096,12 @@ declare module weavejs.api.core {
     interface IClassRegistry {
         /**
          * Registers a class under a given qualified name and adds metadata about implementing interfaces.
+         * @param qualifiedName
+         * @param definition
+         * @param interfaces An Array of Class objects that are the interfaces the class implements.
+         * @param displayName An optional display name for the class definition.
          */
-        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[]): void;
+        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[], displayName?: string): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -3004,6 +3009,22 @@ declare module weavejs.api.ui {
     }
     var IVisTool: new (..._: any[]) => IVisTool;
 }
+declare module weavejs.api.ui {
+    /**
+     * A basic visusalization tool which most users would want.
+     */
+    interface IVisTool_Basic extends IVisTool {
+    }
+    var IVisTool_Basic: new (..._: any[]) => IVisTool_Basic;
+}
+declare module weavejs.api.ui {
+    /**
+     * A visusalization tool that requires other tools to be useful (not stand-alone).
+     */
+    interface IVisTool_Utility extends IVisTool {
+    }
+    var IVisTool_Utility: new (..._: any[]) => IVisTool_Utility;
+}
 declare module weavejs.core {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
     import IDisposableObject = weavejs.api.core.IDisposableObject;
@@ -3188,8 +3209,9 @@ declare module weavejs.core {
          * @param qualifiedName
          * @param definition
          * @param interfaces An Array of Class objects that are the interfaces the class implements.
+         * @param displayName An optional display name for the class definition.
          */
-        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[]): void;
+        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[], displayName?: string): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -3959,7 +3981,9 @@ declare module weavejs.core {
          *******************/
         static DIFF_DELETE: string;
         computeDiff(oldState: Object, newState: Object): any;
+        _computeDiff(oldState: Object, newState: Object): any;
         combineDiff(baseDiff: Object, diffToAdd: Object): Object;
+        _combineDiff(baseDiff: Object, diffToAdd: Object): Object;
         testDiff(): void;
     }
 }

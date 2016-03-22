@@ -488,6 +488,6 @@ export default class C3Histogram extends AbstractC3Tool
     }
 }
 
-Weave.registerClass("weavejs.tool.C3Histogram", C3Histogram, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.C3Histogram", C3Histogram, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Histogram");
 Weave.registerClass("weave.visualization.tools::HistogramTool", C3Histogram);
 Weave.registerClass("weave.visualization.tools::ColormapHistogramTool", C3Histogram);
