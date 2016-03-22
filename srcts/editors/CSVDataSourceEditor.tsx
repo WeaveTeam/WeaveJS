@@ -44,8 +44,12 @@ export default class CSVDataSourceEditor extends React.Component<IDataSourceEdit
 		];
 
 		Weave.getCallbacks(ds).addGroupedCallback(this, this.forceUpdate);
-		return <div>
-			{ReactUtils.generateTable(null, editorFields, tableStyles)}
-		</div>;
+		return (
+			<VBox style={{flex: 1, margin: 10}}>
+				{
+					ReactUtils.generateTable(null, editorFields, tableStyles)
+				}
+			</VBox>
+		);
 	}
 }

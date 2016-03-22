@@ -79,7 +79,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 
 		return (
-			<HBox style={{width: "100%", height: "100%"}}>
+			<HBox style={{flex: 1}}>
 				<VBox style={{ flex: .25 }}>
 					<List
 						options={listOptions}
@@ -88,7 +88,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						onChange={ (selectedValues:IDataSource[]) => this.setState({ selected: selectedValues[0] }) }
 					/>
 				</VBox>
-				<div style={{ backgroundColor: '#f0f0f0', width: 4, height: "100%" }}/>
+				<div style={{ backgroundColor: '#f0f0f0', width: 4}}/>
 				<VBox style={{ flex: .75 }}>
 					{editorJsx}
 				</VBox>

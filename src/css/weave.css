@@ -256,10 +256,6 @@ input[type="text"]:focus {
 	background-color: #F8F8F8;
 }
 
-.weave-window-content {
-	padding: 5px 5px 5px 5px;
-}
-
 .weave-window-footer {
 	border-top-style: solid;
 	user-select: none;
