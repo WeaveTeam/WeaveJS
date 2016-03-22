@@ -16,6 +16,7 @@ import {OverlayTrigger,Popover} from "react-bootstrap";
 import classNames from "../modules/classnames";
 import {CSSProperties} from "react";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import SelectableAttributesList from "../ui/SelectableAttributesList";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -34,6 +35,7 @@ import WeaveMenuItem = weavejs.util.WeaveMenuItem;
 import KeyFilter = weavejs.data.key.KeyFilter;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export class Margin
 {
@@ -62,7 +64,7 @@ Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 
 export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
-	selectableAttributes:{[label:string]:DynamicColumn};
+	selectableAttributes:{[label:string]:DynamicColumn|LinkableHashMap};
 	constructor(props:P)
 	{
 		super(props);
@@ -195,13 +197,19 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		var labelStyle = {textAlign : 'center', fontSize : '12px'};
 		var boxStyle = { display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'};
 		var heading:CSSProperties = {fontWeight : 'bold',padding : '2px 2px 2px 2px'} ;
-		var icon = classNames({'fa fa-compass': true, 'weave-icon':true});
-
 
 		var attrLabels = Object.keys(Object(this.selectableAttributes));
+
 		var selectors = attrLabels.map((label:string, index:number) => {
-			var attribute:DynamicColumn = this.selectableAttributes[label];
-			return <SelectableAttributeComponent label={label} attribute={attribute}/>;
+			if(this.selectableAttributes[label] instanceof  DynamicColumn){//if AttributeColumn
+				let attribute = this.selectableAttributes[label] as DynamicColumn;
+				return <SelectableAttributeComponent label={ label } attribute={ attribute }/>;
+			}
+			else{// if LinkableHashMap
+				let attribute = this.selectableAttributes[label] as LinkableHashMap;
+				return(<SelectableAttributesList columns={ attribute }/>);
+			}
+
 		});
 
 		return (

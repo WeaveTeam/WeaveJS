@@ -8,6 +8,7 @@ import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import DOMUtils from "../utils/DOMUtils";
 import ToolTip from "./ToolTip";
+import {HBox, VBox} from "../react-ui/FlexBox";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -361,12 +362,6 @@ export default class C3BarChart extends AbstractC3Tool
         this.c3Config.data = data;
     }
 
-    //TODO - LinkableHashMap of DynamicColumns
-    selectableAttributes:{[label:string]:DynamicColumn} = {
-        label:this.labelColumn,
-        sort:this.sortColumn
-    };//TODO handle remaining attributes
-
     updateStyle()
     {
     	if (!this.chart || !this.heightColumnNames)
@@ -507,6 +502,24 @@ export default class C3BarChart extends AbstractC3Tool
 		this.updateStyle();
 		
 		return false;
+    }
+
+    selectableAttributes:{[label:string]:DynamicColumn|LinkableHashMap} = {
+        label:this.labelColumn,
+        sort:this.sortColumn,
+        height:this.heightColumns
+    };//TODO handle remaining attributes
+
+    renderEditor():JSX.Element
+    {
+        return (
+            <VBox>
+
+                {
+                    super.renderEditor()
+                }
+            </VBox>
+        )
     }
 
 	public get deprecatedStateMapping():Object

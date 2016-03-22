@@ -31,6 +31,7 @@ import EntityNode = weavejs.data.hierarchy.EntityNode;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import ListOption from "../react-ui/List";
 import ListItem from "../react-ui/List";
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 declare type Record = {
 	id: IQualifiedKey,
@@ -340,7 +341,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		return false;
 	}
 
-	selectableAttributes:{[label:string]:DynamicColumn} = {
+	selectableAttributes:{[label:string]:DynamicColumn|LinkableHashMap} = {
 			X:this.dataX,
 			Y:this.dataY,
 			Radius:this.radius.internalDynamicColumn
