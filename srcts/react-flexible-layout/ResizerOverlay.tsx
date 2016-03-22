@@ -100,6 +100,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
     {
         var style:React.CSSProperties = _.merge(
 			{
+				zIndex: 1, // temporary hack?
 				left: this.state.x,
 				top: this.state.y,
 				visibility: this.state.active ? "visible" : "hidden"
