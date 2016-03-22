@@ -141,6 +141,7 @@ input[type="text"]:focus {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	cursor: pointer;
+	z-index: 1;
 }
 
 .weave-menubar {
