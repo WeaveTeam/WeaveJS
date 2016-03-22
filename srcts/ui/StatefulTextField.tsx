@@ -104,7 +104,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 					type="text" value={this.state.content} placeholder={this.state.content || this.props.noneLabel}
 					{...props as any}
 					/>
-				<i style={{ position: "absolute", top: 0, right: height/2, height: height, fontSize: height/2 }} onClick={this.openPopup} className="fa fa-play fa-fw fa-rotate-90 expander"/>
+				<i style={{ position: "absolute", top: 4, right: height/2, height: height, fontSize: height/2 }} onClick={this.openPopup} className="fa fa-caret-down weave-icon"/>
 			</div>;
 		}
 		else

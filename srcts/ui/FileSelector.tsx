@@ -49,7 +49,7 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 	render():JSX.Element
 	{
 		return (
-			<HBox>
+			<HBox style={{ alignItems :'center' }}>
 				{
 					this.props.label
 				}

@@ -106,13 +106,11 @@ ul.dropdown-menu {
     text-decoration: none;
 }
 .weave-icon{
-	width: 25px;
-	height: 25px;
 	cursor : pointer;
 	padding: 5px 5px 5px 5px;
 }
 input[type="text"] {
-	padding: 10px;
+	padding: 0 5px 0 5px;
 	border: solid 1px #dcdcdc;
 	transition: box-shadow 0.3s, border 0.3s;
 	margin :5px 5px 5px 5px;
