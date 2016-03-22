@@ -232,9 +232,9 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 		return(
 			<HBox ref="header" style={this.windowBar} draggable={true} onDragStart={this.props.onDragStart}>
             {<HBox style={VendorPrefix.prefix({styles: leftControls}).styles}>
-            	<div onClick={this.props.onGearClick}>
+				{/*<div onClick={this.props.onGearClick}>
 					<Glyphicon glyph="cog"/>
-				</div>
+				</div>*/}
             </HBox>}
 			<span style={titleStyle} className="weave-panel">{this.props.title}</span>
 			{<HBox style={VendorPrefix.prefix({styles: rightControls}).styles}>
