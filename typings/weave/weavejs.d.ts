@@ -5772,6 +5772,40 @@ declare module weavejs.data.hierarchy {
     }
 }
 declare module weavejs.data.hierarchy {
+    import ILinkableObject = weavejs.api.core.ILinkableObject;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+    class EntityNodeSearch implements ILinkableObject {
+        /**
+         * Set this to true to include all descendants of matching nodes
+         * whether or not the descendants also matched the search.
+         */
+        includeAllDescendants: boolean;
+        /**
+         * The public metadata field used for searching.
+         * @default "title"
+         */
+        searchField: string;
+        /**
+         * The search string, which may contain '*' and '?' wildcards.
+         */
+        searchString: string;
+        /**
+         * Use this as the nodeFilter in a WeaveTree.
+         * @param node The node to test.
+         * @see weave.ui.WeaveTree#nodeFilter
+         */
+        nodeFilter(node: IWeaveTreeNode): boolean;
+        /**
+         * Surrounds a string with '*' and replaces ' ' with '*'
+         */
+        static replaceSpacesWithWildcards(searchString: string): string;
+        /**
+         * Generates a RegExp that matches a search string using '?' and '*' wildcards.
+         */
+        static strToRegExp(searchString: string, flags?: string): RegExp;
+    }
+}
+declare module weavejs.data.hierarchy {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
     import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
