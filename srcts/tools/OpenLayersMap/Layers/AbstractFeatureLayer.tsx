@@ -202,7 +202,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 	updateMetaStyle_unbound(feature:any):void
 	{
-		let id:IQualifiedKey = <IQualifiedKey>feature.getId();
+		let id:IQualifiedKey = feature.getId() as IQualifiedKey;
 		let nullStyle:any = new ol.style.Style({});
 		let unselectedStyle:any = feature.get("unselectedStyle") || nullStyle;
 		let normalStyle:any = feature.get("normalStyle") || nullStyle;
