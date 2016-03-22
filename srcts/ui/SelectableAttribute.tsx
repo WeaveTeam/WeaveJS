@@ -6,6 +6,7 @@ import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import ColumnUtils = weavejs.data.ColumnUtils;
 
 export interface ISelectableAttributeComponentProps
 {
@@ -38,7 +39,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 		var refCol = this.props.attribute.getInternalColumn() as ReferencedColumn;
 		if(Weave.IS(refCol, ReferencedColumn))
-			this.columnString = refCol.getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
+			this.columnString = ColumnUtils.getColumnListLabel(refCol);
 
 		return (
 			<HBox>
