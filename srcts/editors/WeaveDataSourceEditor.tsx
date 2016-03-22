@@ -77,19 +77,11 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 		return super.editorFields.concat(editorFields)
 	}
 	
-	render():JSX.Element
+	renderChildEditor():JSX.Element
 	{
 		let ds = (this.props.dataSource as WeaveDataSource);
 		let root = new EntityNode(ds.entityCache, EntityType.HIERARCHY);
-
-		return (
-			<VBox style={{flex:1, margin: 10}}>
-				{
-					this.renderFields()
-				}
-				<WeaveTree style={{ flex: 1 }} hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>
-			</VBox>
-		);
+		return <WeaveTree style={{ flex: 1 }} hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>;
 	}
 }
 

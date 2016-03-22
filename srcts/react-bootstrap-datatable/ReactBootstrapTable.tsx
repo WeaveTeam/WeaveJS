@@ -8,19 +8,19 @@ import {IColumnTitles} from "./TableHead";
 
 export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable>
 {
+	idProperty:string;
+	rows:IRow[];
+	columnTitles:IColumnTitles;
     striped?:boolean;
     bordered?:boolean;
     condensed?:boolean;
     hover?:boolean;
-    rows:IRow[];
-    columnTitles:IColumnTitles;
     sortable?:boolean;
-    idProperty:string;
-    selectedIds:string[];
-    probedIds:string[];
+    selectedIds?:string[];
+    probedIds?:string[];
     onProbe?:(id:string[]) => void;
     onSelection?:(id:string[]) => void;
-    showIdColumn:boolean;
+    showIdColumn?:boolean;
 }
 
 export interface IReactBootstrapTableState
@@ -43,10 +43,11 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 	{
         super(props);
         this.state = {
-            selectedIds: props.selectedIds,
-            probedIds: props.probedIds
+            selectedIds: props.selectedIds || [],
+            probedIds: props.probedIds || []
         }
-        this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
+		if(props.selectedIds && props.probedIds)
+        	this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
     }
 
     onMouseOver(id:string, status:boolean)
@@ -163,8 +164,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     componentWillReceiveProps(nextProps:IReactBootstrapTableProps)
 	{
         this.setState({
-            selectedIds: nextProps.selectedIds,
-            probedIds: nextProps.probedIds
+            selectedIds: nextProps.selectedIds || [],
+            probedIds: nextProps.probedIds || []
         });
     }
 

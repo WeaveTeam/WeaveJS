@@ -3,9 +3,11 @@ import {VBox, HBox} from "../react-ui/FlexBox";
 import ReactUtils from "../utils/ReactUtils";
 
 import WeaveAPI = weavejs.WeaveAPI;
+import LinkableWatcher = weavejs.core.LinkableWatcher;
+import IDataSource = weavejs.api.data.IDataSource;
 
 export interface IDataSourceEditorProps {
-	dataSource: weavejs.api.data.IDataSource;
+	dataSource: IDataSource;
 };
 
 export interface IDataSourceEditorState {
@@ -14,12 +16,17 @@ export interface IDataSourceEditorState {
 
 export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
 {
+	watcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.forceUpdate.bind(this)))
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
 		this.componentWillReceiveProps(props);
 	}
 	
+	componentDidMount() {
+		
+	}
+
 	componentWillReceiveProps(props:IDataSourceEditorProps)
 	{
 		Weave.getCallbacks(props.dataSource).addGroupedCallback(this, this.forceUpdate);
@@ -29,7 +36,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	{
 		return [
 			[
-				Weave.lang("Source Name *"),
+				Weave.lang("Source Name"),
 				<input type="text" style={{width: "100%"}} placeholder={Weave.lang(Weave.getRoot(this.props.dataSource).getName(this.props.dataSource))}/>
 			]
 		]
@@ -50,12 +57,17 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 		return (
 			<VBox>
-				<label> {Weave.lang("Add {0}", Weave.getRoot(dataSource).getName(dataSource))} </label>
+				<label> {Weave.lang("Edit {0}", Weave.getRoot(dataSource).getName(dataSource))} </label>
 				{
 					ReactUtils.generateTable(null, this.editorFields, tableStyles)
 				}
 			</VBox>
 		)
+	}
+	
+	renderChildEditor():JSX.Element
+	{
+		return null;
 	}
 	
 	render():JSX.Element
@@ -64,6 +76,9 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			<VBox style={{flex:1, margin: 10}}>
 				{
 					this.renderFields()
+				}
+				{
+					this.renderChildEditor()
 				}
 			</VBox>
 		)
