@@ -30,6 +30,9 @@ import {OverrideBounds} from "./AbstractVisTool";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import MiscUtils from "../utils/MiscUtils";
 
+import LayerEditor from "./OpenLayersMap/LayerEditor";
+import {VBox,HBox} from "../react-ui/FlexBox";
+
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ZoomBounds = weavejs.geom.ZoomBounds;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -570,6 +573,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	public static selectableLayerFilter(layer: ol.layer.Base): boolean {
 		return layer.get("selectable");
+	}
+
+	renderEditor():JSX.Element
+	{
+		return <VBox>
+			
+			<LayerEditor layers={this.layers}/>
+		</VBox>;
 	}
 }
 
