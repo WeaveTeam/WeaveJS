@@ -42,7 +42,8 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 		if (ref)
 		{
 			var meta = ref.getColumnMetadata();
-			this.props.column.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+			if (meta)
+				this.props.column.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
 		}
     };
 
