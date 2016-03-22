@@ -397,7 +397,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		var dataBounds = new weavejs.geom.Bounds2D();
 		this.zoomBounds.getDataBounds(dataBounds);
 		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
-		var scale = this.zoomBounds.getXScale();
+		var scale = this.zoomBounds.getXScale() || 1;
 		let view = this.map.getView();
 
 		view.un("change:center", this.updateCenter_olToWeave, this);
