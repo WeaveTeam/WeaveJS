@@ -160,7 +160,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 					{
 						!this.props.modal
 						? 
-							<div onClick={this.onCancel.bind(this)}>
+							<div onClick={this.onCancel.bind(this)} className="weave-icon">
 							{ "\u00d7" }
 							</div>
 						:
