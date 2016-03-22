@@ -16,6 +16,8 @@ export interface PopupWindowProps extends React.Props<PopupWindow>
 	resizable?:boolean;
 	top?:number;
 	left?:number;
+	width?:number;
+	height?:number;
 	footerContent?:JSX.Element;
 	onOk?:Function;
 	onCancel?:Function;
@@ -145,7 +147,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	render():JSX.Element
 	{
 
-		var windowStyle:React.CSSProperties = _.merge({position: "absolute", minWidth: this.minWidth, minHeight: this.minHeight}, this.state.style);
+		var windowStyle:React.CSSProperties = _.merge({position: "absolute", width: this.props.width, height: this.props.height, minWidth: this.minWidth, minHeight: this.minHeight}, this.state.style);
 
 		var popupWindow = (
 			<VBox className="weave-app weave-window" ref={(c:VBox) => this.container = c} style={windowStyle}>
