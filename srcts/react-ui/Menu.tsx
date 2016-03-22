@@ -3,7 +3,6 @@ import * as React from "react";
 import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
 import classNames from "../modules/classnames";
-import ReactUtils from "../utils/ReactUtils";
 
 export interface MenuItemProps
 {
@@ -46,7 +45,7 @@ const renderDivider = function(index:number):JSX.Element
 export default class Menu extends React.Component<MenuProps, MenuState>
 {
 	element:HTMLElement;
-	nestedMenu:Menu;
+
 	constructor(props:MenuProps)
 	{
 		super(props);
@@ -78,11 +77,6 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		return [];
 	}
 	
-	static open(x:number, y:number, menuItems:MenuItemProps[], closeOnMouseDown:boolean = true):Menu
-	{
-		return ReactUtils.openPopup(<Menu xPos={x} yPos={y} menu={menuItems}/>, closeOnMouseDown) as Menu;
-	}
-	
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
@@ -90,28 +84,28 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			this.forceUpdate();
 	}
 
-	onMouseEnter(props:MenuItemProps, index:number)
+	onMouseEnter(index:number)
 	{
-		if(this.nestedMenu)
-			return;
-
-		if(props.menu && this.element)
-		{
-			var menuItemContainer = ReactDOM.findDOMNode(this.refs[index]) as HTMLElement;
-			var clientRect = menuItemContainer.getBoundingClientRect();
-			this.nestedMenu = Menu.open(clientRect.left + menuItemContainer.offsetWidth, clientRect.top, props.menu);
-		}
+		this.setState({
+			hovered: index
+		});
 	}
 
-	onMouseLeave(props:MenuItemProps)
+	onMouseLeave(index:number, event:React.MouseEvent)
 	{
-		if(this.nestedMenu)
-		{
-			ReactUtils.closePopup(this.nestedMenu);
-			this.nestedMenu = null;
-		}
+		// var elt = event.relatedTarget as Node;
+		// 
+		// if(elt as any == window)
+		// 	return;
+		// 
+		// if(this.element.contains(elt))
+		// 	return;
+		// 
+		// this.setState({
+		// 	hovered: -1
+		// })
 	}
-
+	
 	renderMenuItem(index:number, props:MenuItemProps):JSX.Element
 	{
 		var enabled = props.hasOwnProperty('enabled') ? !!props.enabled : true; // default true
@@ -131,16 +125,20 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			if(!props.menu && props.click && enabled)
 				props.click()
 		};
-		
 
 		return (
-			<HBox key={index} ref={index as any} className={menuItemClass} onClick={click} onMouseEnter={this.onMouseEnter.bind(this, props, index)} onMouseLeave={this.onMouseLeave.bind(this, props, index)}>
+			<HBox key={index} className={menuItemClass} onClick={click} onMouseEnter={this.onMouseEnter.bind(this, index)} onMouseLeave={this.onMouseLeave.bind(this, index)}>
 				<HBox>
 					<div>{props.leftIcon}</div>
 					<HBox className={labelClass}>{props.label}</HBox>
 					<div>{props.rightIcon}</div>
 				</HBox>
 				<span>{props.secondaryLabel}</span>
+				{
+					props.menu && this.state.hovered == index && this.element ?
+					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} menu={props.menu}/>
+					: null
+				}
 			</HBox>
 		);
 	}
@@ -187,7 +185,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		}
 
 		return (
-			<VBox className="weave-menu" style={_.merge(menuStyle, this.props.style)} {...otherProps}>
+			<VBox className="weave-menu" style={_.merge(menuStyle, this.props.style)} onMouseEnter={() => this.setState({hovered: -1})} {...otherProps}>
 				{
 					this.props.menu.map((menuItem, index) => {
 							if(_.isEqual(menuItem, {}))
