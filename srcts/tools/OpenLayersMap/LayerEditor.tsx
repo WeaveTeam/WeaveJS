@@ -5,6 +5,7 @@ import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
 import {VBox, HBox} from "../../react-ui/FlexBox";
 import ListView from "../../ui/ListView";
 import StatefulCheckBox from "../../ui/StatefulCheckBox";
+import StatefulRangeSlider from "../../ui/StatefulRangeSlider";
 import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -32,8 +33,9 @@ export default class LayerEditor extends React.Component<ILayerEditorProps, ILay
 	renderItem=(layer:AbstractLayer, index:number):JSX.Element=>
 	{
 		let marginStyle: React.CSSProperties = {marginRight: "1em"};
-		return <div style={{ position: "absolute", top: index * this.rowHeight, width: "100%"}}>
+		return <div key={index} style={{ position: "absolute", top: index * this.rowHeight, width: "100%"}}>
 				<span style={marginStyle}><StatefulCheckBox ref={linkReactStateRef(this, { checked: layer.visible }) }/>{Weave.lang("Visible")}</span>
+				<span style={marginStyle}><StatefulRangeSlider min={0} max={1} step={0.01} style={{display: "inline", width: "50px"}} ref={linkReactStateRef(this, { value: layer.opacity })}/></span>
 				<span style={marginStyle}><StatefulCheckBox disabled={!(layer instanceof AbstractFeatureLayer)} ref={linkReactStateRef(this, {checked: layer.selectable})}/>{Weave.lang("Selectable")}</span>
 				<span style={marginStyle}>{layer.getDescription() }</span>
 				<i className="fa fa-gear" style={{float: "right"}} onClick={() => this.setState({ selectedLayer: layer})}/>
