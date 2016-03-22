@@ -48,10 +48,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
+		this.state = {};
 		this.props.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
-
-	state:IDataSourceManagerState = {};
 	
 	componentWillReceiveProps(props:IDataSourceManagerProps)
 	{
@@ -97,20 +96,23 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		);
 	}
 
-	static map_weave_dsmPopup= new WeakMap<Weave, PopupWindow>();
+	static map_weave_dsmPopup = new WeakMap<Weave, PopupWindow>();
 	static openInstance(weave:Weave, selectedDataSource:IDataSource = null):PopupWindow
 	{
-		var map = DataSourceManager.map_weave_dsmPopup;
-		var dsm = map.get(weave);
-		if (!dsm)
+		var dsm = DataSourceManager.map_weave_dsmPopup.get(weave);
+		if (dsm)
+		{
+			dsm.setState({selectedDataSource: selectedDataSource});
+		}
+		else
 		{
 			dsm = PopupWindow.open({
 				title: "Manage data sources",
 				content: <DataSourceManager weave={weave} selectedDataSource={selectedDataSource}/>,
 				modal: false,
-				onCancel: () => map.delete(weave)
+				onCancel: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
 			});
-			map.set(weave, dsm);
+			DataSourceManager.map_weave_dsmPopup.set(weave, dsm);
 		}
 		return dsm;
 	}
