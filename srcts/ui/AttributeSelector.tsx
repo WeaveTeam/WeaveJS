@@ -7,6 +7,7 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import IColumnReference = weavejs.api.data.IColumnReference;
 
 
 export interface IAttributeSelectorProps
@@ -37,8 +38,12 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     };
 
     setColumn =(selectedItems:Array<IWeaveTreeNode>):void =>{
-        var node:EntityNode = selectedItems[0] as EntityNode;
-        (this.props.column.getInternalColumn() as ReferencedColumn).setColumnReference(node.getDataSource(),node.getColumnMetadata());
+		var ref = Weave.AS(selectedItems[0], weavejs.api.data.IColumnReference);
+		if (ref)
+		{
+			var meta = ref.getColumnMetadata();
+			this.props.column.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+		}
     };
 
     filter = (event:React.FormEvent):void =>{
