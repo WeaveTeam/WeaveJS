@@ -187,7 +187,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	renderNumberEditor(linkableNumber:LinkableNumber):JSX.Element
 	{
-		return <StatefulTextField style={{ textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+		return <StatefulTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
 	}
 
 	renderEditor():JSX.Element
@@ -222,10 +222,10 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 				{ selectors }
 
 				<HBox style={{alignItems: 'center'}}>
+					<span>{ Weave.lang("Margins:") }</span>
 					{ this.renderNumberEditor(this.margin.left) }
-					<VBox style={{alignItems: 'center'}}>
+					<VBox style={{flex: 1}}>
 						{ this.renderNumberEditor(this.margin.top) }
-						<span>&ensp;{ Weave.lang("Margins") }&ensp;</span>
 						{ this.renderNumberEditor(this.margin.bottom) }
 					</VBox>
 					{ this.renderNumberEditor(this.margin.right) }
