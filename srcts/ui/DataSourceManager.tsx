@@ -20,6 +20,22 @@ import DBFDataSourceEditor from "../editors/DBFDataSourceEditor";
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
 import GeoJSONDataSourceEditor from "../editors/GeoJSONDataSourceEditor";
 
+// import CensusDataSource = weavejs.data.source.CensusDataSource;
+// import CensusDataSourceEditor from "../editors/CensusDataSourceEditor";
+
+// import CKANDataSource = weavejs.data.source.CKANDataSource;
+// import CKANDataSourceEditor from "../editors/CKANDataSourceEditor";
+
+// import CachedDataSource = weavejs.data.source.CachedDataSource;
+// import CachedDataSourceEditor from "../editors/CachedDataSourceEditor";
+
+import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;
+import ForeignDataMappingTransformEditor from "../editors/ForeignDataMappingTransformEditor";
+
+// import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
+// import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
+
+
 export interface IDataSourceManagerProps
 {
 	weave:Weave;
@@ -41,7 +57,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 //		.set(CKANDataSource, CKANDataSourceEditor)
 		.set(WeaveDataSource, WeaveDataSourceEditor)
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
-//		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
+		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
 //		.set(GroupedDataTransform, GroupedDataTransformEditor)
 //		
 

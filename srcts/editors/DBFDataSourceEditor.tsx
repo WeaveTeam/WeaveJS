@@ -6,7 +6,7 @@ import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import FileSelector from "../ui/FileSelector";
-
+import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
 import DBFDataSource = weavejs.data.source.DBFDataSource;
@@ -17,37 +17,13 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import WeaveAPI = weavejs.WeaveAPI;
 
-export default class DBFDataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState>
+export default class DBFDataSourceEditor extends DataSourceEditor
 {
-	constructor(props:IDataSourceEditorProps)
-	{
-		super(props);
-		this.componentWillReceiveProps(props);
-	}
-	
-	componentWillReceiveProps(props:IDataSourceEditorProps)
-	{
-		Weave.getCallbacks(props.dataSource).addGroupedCallback(this, this.forceUpdate);
-	}
-
-	render():JSX.Element
+	get editorFields():[string, JSX.Element][]
 	{
 		let dataSource = this.props.dataSource as DBFDataSource;
-		let keyTypeSuggestions = WeaveAPI.QKeyManager.getAllKeyTypes();
-		
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
-			td: [
-				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5},
-				{ paddingBottom: 10, width: "100%"}
-			]
-		};
-		
-		var editorFields = [
-			[
-				Weave.lang("Source Name *"),
-				<input type="text" style={{width: "100%"}} placeholder={Weave.lang("SHP/DBF files")}/>
-			],
+		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
+		let editorFields:[string, JSX.Element][] = [
 			[
 				Weave.lang("DBF URL"),
 				<FileSelector target={dataSource.dbfUrl}
@@ -78,14 +54,7 @@ export default class DBFDataSourceEditor extends React.Component<IDataSourceEdit
 							   	   suggestions={keyTypeSuggestions}
 							   	   ref={linkReactStateRef(this, { content: dataSource.keyType })}/>
 			]
-		]
-		
-		return (
-			<VBox style={{flex: 1, margin: 10}}>
-				{
-					ReactUtils.generateTable(null, editorFields, tableStyles)
-				}
-			</VBox>
-		)
+		];
+		return super.editorFields.concat(editorFields)
 	}
 }
