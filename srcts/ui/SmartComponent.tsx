@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from "react";
 
 /**
@@ -7,8 +8,8 @@ export default class SmartComponent<P,S> extends React.Component<P, S>
 {
 	shouldComponentUpdate(nextProps:P, nextState:S, nextContext:any):boolean
 	{
-		return !!weavejs.util.StandardLib.compare(this.state, nextState)
-			|| !!weavejs.util.StandardLib.compare(this.props, nextProps)
-			|| !!weavejs.util.StandardLib.compare(this.context, nextContext);
+		return !_.isEqual(this.state, nextState)
+			|| !_.isEqual(this.props, nextProps)
+			|| !_.isEqual(this.context, nextContext);
 	}
 }
