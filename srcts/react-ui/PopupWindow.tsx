@@ -1,7 +1,9 @@
+import * as _ from "lodash";
 import * as ReactDOM from "react-dom";
 import * as React from "react";
 import {HBox, VBox} from "./FlexBox";
 import ReactUtils from "../utils/ReactUtils";
+import SmartComponent from "../ui/SmartComponent";
 import prefixer from "./VendorPrefixer";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
@@ -21,13 +23,11 @@ export interface PopupWindowProps extends React.Props<PopupWindow>
 
 export interface PopupWindowState
 {
-	top?: number;
-	left?: number;
-	width?: number;
-	height?: number;
+	content?:JSX.Element;
+	style?: React.CSSProperties;
 }
 
-export default class PopupWindow extends React.Component<PopupWindowProps, PopupWindowState>
+export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupWindowState>
 {
 	private minWidth:number = 320;
 	private minHeight:number = 240;
@@ -42,6 +42,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 	constructor(props:PopupWindowProps)
 	{
 		super(props);
+		this.state = {};
 	}
 	
 	static open(props:PopupWindowProps):PopupWindow
@@ -58,10 +59,10 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 	{
 		this.element = ReactDOM.findDOMNode(this.container) as HTMLElement;
 		this.setState({
-			top: this.props.top || 1/2*window.innerHeight - 1/2*this.element.clientHeight,
-			left: this.props.left || 1/2*window.innerWidth - 1/2*this.element.clientWidth,
-			height: Math.max(this.minHeight, this.element.clientHeight),
-			width: Math.max(this.minWidth, this.element.clientWidth)
+			style: {
+				top: this.props.top || (window.innerHeight - this.element.clientHeight) / 2,
+				left: this.props.left || (window.innerWidth - this.element.clientWidth) / 2
+			}
 		});
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
@@ -77,7 +78,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 	
 	stopEventPropagation=()=>
 	{
-		if(this.dragging)
+		if (this.dragging)
 		{
 			event.stopImmediatePropagation();
 		}
@@ -106,16 +107,20 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 	
 	private onDrag=(event:MouseEvent)=>
 	{
-		if(this.dragging) {
+		if (this.dragging)
+		{
 			event.stopImmediatePropagation();
 			var mouseDeltaX = event.clientX - this.oldMousePos.x;
 			var mouseDeltaY = event.clientY - this.oldMousePos.y;
 			this.oldMousePos.x = event.clientX;
 			this.oldMousePos.y = event.clientY;
 			
+			var style = Object(this.state.style);
 			this.setState({
-				top: this.state.top + mouseDeltaY,
-				left: this.state.left + mouseDeltaX
+				style: {
+					top: style.top + mouseDeltaY,
+					left: style.left + mouseDeltaX
+				}
 			});
 		}
 	}
@@ -140,8 +145,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 	render():JSX.Element
 	{
 
-		var windowStyle:React.CSSProperties = this.state || {};
-		windowStyle.position = "absolute";
+		var windowStyle:React.CSSProperties = _.merge({position: "absolute", minWidth: this.minWidth, minHeight: this.minHeight}, this.state.style);
 
 		var popupWindow = (
 			<VBox className="weave-app weave-window" ref={(c:VBox) => this.container = c} style={windowStyle}>
@@ -162,7 +166,7 @@ export default class PopupWindow extends React.Component<PopupWindowProps, Popup
 					}
 				</HBox>
 				<HBox className="weave-window-content" style={{flex: 1}}>
-					{ this.props.content }
+					{ this.state.content || this.props.content }
 					{ this.props.children }
 				</HBox>
 				{
