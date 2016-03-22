@@ -29,7 +29,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	componentDidMount(){
 		Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate)
 	};
-
 	//TODO figure out how to make an indent component
 	render():JSX.Element
 	{
