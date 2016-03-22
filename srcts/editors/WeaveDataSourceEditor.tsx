@@ -42,7 +42,7 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 
 	private tree: WeaveTree;
 	
-	setHierarchySelection=():void=>{
+	setHierarchySelection():void {
 		if (this.tree && this.props.dataSource)
 		{
 			let id:number = (this.props.dataSource as WeaveDataSource).rootId.state as number;

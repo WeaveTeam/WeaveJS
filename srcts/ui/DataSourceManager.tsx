@@ -126,8 +126,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 				title: "Manage data sources",
 				content: <DataSourceManager weave={weave} selected={selected}/>,
 				modal: false,
-				width: 700,
-				height: 400,
+				width: 800,
+				height: 450,
 				onCancel: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
 			});
 			DataSourceManager.map_weave_dsmPopup.set(weave, dsm);
