@@ -23,6 +23,7 @@ export default class LayerEditor extends React.Component<ILayerEditorProps, ILay
 	constructor(props:ILayerEditorProps)
 	{
 		super(props);
+		this.componentWillReceiveProps(props);
 	}
 
 	state: ILayerEditorState = {
@@ -30,7 +31,10 @@ export default class LayerEditor extends React.Component<ILayerEditorProps, ILay
 		openedLayer: null
 	};
 
-	rowHeight = 16;
+	componentWillReceiveProps(nextProps:ILayerEditorProps)
+	{
+		nextProps.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+	}
 
 	generateItem=(layer:AbstractLayer, index:number):JSX.Element=>
 	{
@@ -55,20 +59,49 @@ export default class LayerEditor extends React.Component<ILayerEditorProps, ILay
 		</div>;
 	}
 
+	moveSelectedUp=()=>{
+		let names = this.props.layers.getNames();
+		[names[this.selectionIndex], names[this.selectionIndex + 1]] = [names[this.selectionIndex + 1], names[this.selectionIndex]];
+		this.props.layers.setNameOrder(names);
+	};
+
+	moveSelectedDown=()=>{
+		let names = this.props.layers.getNames();
+		[names[this.selectionIndex], names[this.selectionIndex - 1]] = [names[this.selectionIndex - 1], names[this.selectionIndex]];
+		this.props.layers.setNameOrder(names);
+	};
+
+	get selectionIndex():number {
+		return this.props.layers.getObjects().indexOf(this.state.selectedLayer);
+	}
+
+	/* TODO: Add drag-and-drop of layers. */
 	render():JSX.Element
 	{
+		let flex1: React.CSSProperties = { flex: 1 };
 		if (!this.state.openedLayer)
 		{
 			return <VBox>
-				<div style={{ height: 500, overflowY: "scroll" }}>
-					{this.props.layers.getObjects().map(this.generateItem)}
+				<div style={{ height: 200, overflowY: "scroll" }}>
+					{this.props.layers.getObjects().reverse().map(this.generateItem)}
 				</div>
+				<HBox>
+					<button style={flex1}><i className="fa fa-plus"/></button>
+					<button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} 
+							onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></button>
+					<button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down"/></button>
+				</HBox>
 			</VBox>
 		}
 		else
 		{
 			return <VBox>
-				<button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null })}><i className="fa fa-arrow-left"/></button>
+				<HBox>
+					<button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null }) }>
+						<i className="fa fa-arrow-left"/>
+					</button>
+					{Weave.lang("Layer: {0}", this.props.layers.getName(this.state.openedLayer))}
+				</HBox>
 				{this.state.selectedLayer.renderEditor()}
 			</VBox>;
 		}
