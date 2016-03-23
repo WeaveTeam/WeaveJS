@@ -124,6 +124,21 @@ input[type="text"]:focus {
 	font-size:smaller;
 	height:25px
 }
+
+.weave-padded-vbox {
+	margin-top: -8px;
+}
+.weave-padded-vbox > * {
+	margin-top: 8px;
+}
+
+.weave-padded-hbox {
+	margin-left: -8px;
+}
+.weave-padded-hbox > * {
+	margin-left: 8px;
+}
+
 .weave-menu {
 	box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
 	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;

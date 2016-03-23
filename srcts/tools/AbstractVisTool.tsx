@@ -187,56 +187,60 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return AbstractVisTool.getMenuItems(this);
 	}
 
-	renderNumberEditor(linkableNumber:LinkableNumber):JSX.Element
+	renderNumberEditor(linkableNumber:LinkableNumber, flex:number):JSX.Element
 	{
-		return <StatefulTextField style={{flex: 1, textAlign: 'center'}} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+		var style:React.CSSProperties = {textAlign: "center", height: 24};
+		if (flex)
+			style.flex = flex;
+		return <StatefulTextField style={style} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
 	}
 
 	renderEditor():JSX.Element
 	{
-		var labelStyle = {textAlign : 'center', fontSize : '12px'};
-		var boxStyle = { display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'};
-		var heading:CSSProperties = {fontWeight : 'bold',padding : '2px 2px 2px 2px'} ;
-
 		var attrLabels = Object.keys(Object(this.selectableAttributes));
 
 		var selectors = attrLabels.map((label:string, index:number) => {
-			if(this.selectableAttributes[label] instanceof  DynamicColumn){//if AttributeColumn
+			if (this.selectableAttributes[label] instanceof DynamicColumn)
+			{
 				let attribute = this.selectableAttributes[label] as DynamicColumn;
 				return <SelectableAttributeComponent label={ label } attribute={ attribute }/>;
 			}
-			else{// if LinkableHashMap
+			else // LinkableHashMap
+			{
 				let attribute = this.selectableAttributes[label] as LinkableHashMap;
 				return(<SelectableAttributesList label={ label } columns={ attribute }/>);
 			}
-
 		});
 
 		return (
-			<VBox>
+			<VBox className="weave-padded-vbox">
 				{ReactUtils.generateTable(
 					null,
 					[
-						[Weave.lang("Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.panelTitle}) }/>],
-						[Weave.lang("X Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.xAxisName}) }/>],
-						[Weave.lang("Y Axis Title"), <StatefulTextField ref={ linkReactStateRef(this, {content: this.yAxisName}) }/>]
-					], {
+						["Title", this.panelTitle],
+						["X Axis Title", this.xAxisName],
+						["Y Axis Title", this.yAxisName]
+					].map((row:[string, LinkableString]) => [
+						Weave.lang(row[0]),
+						<StatefulTextField ref={ linkReactStateRef(this, {content: row[1]}) }/>
+					]),
+					{
 						table: {width: "100%"},
-						td: [{whiteSpace: "nowrap"}, {width: "100%"}]
+						td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
 					}
 				)}
 
-				<label style={ heading }>{Weave.lang('Attributes')}</label>
+				<label style={ {fontWeight: 'bold'} }>{Weave.lang('Attributes')}</label>
 				{ selectors }
 
-				<HBox style={{alignItems: 'center'}}>
+				<HBox className="weave-padded-hbox" style={{alignItems: 'center'}}>
 					<span>{ Weave.lang("Margins:") }</span>
-					{ this.renderNumberEditor(this.margin.left) }
-					<VBox style={{flex: 1}}>
-						{ this.renderNumberEditor(this.margin.top) }
-						{ this.renderNumberEditor(this.margin.bottom) }
+					{ this.renderNumberEditor(this.margin.left, 1) }
+					<VBox className="weave-padded-vbox" style={{flex: 1}}>
+						{ this.renderNumberEditor(this.margin.top, 0) }
+						{ this.renderNumberEditor(this.margin.bottom, 0) }
 					</VBox>
-					{ this.renderNumberEditor(this.margin.right) }
+					{ this.renderNumberEditor(this.margin.right, 1) }
 				</HBox>
 			</VBox>
 		);

@@ -26,36 +26,29 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	}
 
 	columnString: string;
-	componentDidMount(){
+	componentDidMount()
+	{
 		Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate)
-	};
+	}
 	//TODO figure out how to make an indent component
 	render():JSX.Element
 	{
 		var clearStyle = classNames({ 'fa fa-trash-o' : true, 'weave-icon' : true});
-		var inputStyle = classNames('input[type="text"]') ;
-		var labelStyle = {textAlign : 'center', flex: 0.35, fontSize : 'smaller'};
+		var labelStyle = {textAlign: 'center', flex: 0.35, fontSize: 'smaller'};
 
-		var refCol = this.props.attribute.getInternalColumn() as ReferencedColumn;
-		if(Weave.IS(refCol, ReferencedColumn))
-			this.columnString = ColumnUtils.getColumnListLabel(refCol);
+		this.columnString = ColumnUtils.getColumnListLabel(this.props.attribute);
 
 		return (
-			<HBox>
-				<HBox style={{flex : 1, display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'}}>
-					<OverlayTrigger trigger="click" placement="bottom"
-									overlay={<Popover id="AttributeSelector" title="Attribute Selector">
-											<AttributeSelector column={ this.props.attribute }/>
-										</Popover>}>
-						<button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>
+			<HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
+				<OverlayTrigger trigger="click" placement="bottom"
+								overlay={<Popover id="AttributeSelector" title="Attribute Selector">
+										<AttributeSelector column={ this.props.attribute }/>
+									</Popover>}>
+					<button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>
 
-					</OverlayTrigger>
-					<HBox style={{flex: 0.85, display: "flex", flexDirection: 'row', justifyContent: 'space-around', alignItems: 'center'}}>
-						<input className={inputStyle} type="text" value={ this.columnString } readOnly></input>
-						<span className={clearStyle}/>
-					</HBox>
-				</HBox>
-
+				</OverlayTrigger>
+				<input style={{flex: 1}} type="text" value={ this.columnString } readOnly/>
+				<span className={clearStyle}/>
 			</HBox>
 		);
 	}
