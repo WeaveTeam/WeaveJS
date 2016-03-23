@@ -1,6 +1,7 @@
 import * as React from "react";
 import {VBox, HBox} from "../react-ui/FlexBox";
 import ReactUtils from "../utils/ReactUtils";
+import StatefulTextField from "../ui/StatefulTextField";
 
 import WeaveAPI = weavejs.WeaveAPI;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -16,7 +17,8 @@ export interface IDataSourceEditorState {
 
 export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
 {
-	watcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.forceUpdate.bind(this)))
+	watcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.forceUpdate.bind(this)));
+
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
@@ -31,14 +33,16 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	{
 		Weave.getCallbacks(props.dataSource).addGroupedCallback(this, this.forceUpdate);
 	}
-
+	
 	get editorFields():[string, JSX.Element][]
 	{
 		return [
-			[
-				Weave.lang("Source Name"),
-				<input type="text" style={{width: "100%"}} placeholder={Weave.lang(Weave.getRoot(this.props.dataSource).getName(this.props.dataSource))}/>
-			]
+			// [
+			// 	Weave.lang("Source Name"),
+			// 	<input type="text" style={{width: "100%"}}
+			// 					   defaultValue={Weave.lang(Weave.getRoot(this.props.dataSource).getName(this.props.dataSource))}
+			// 					   onChange={(e:React.FormEvent) => this.renameDataSource((e.target as any).value)}/>
+			// ]
 		]
 	}
 

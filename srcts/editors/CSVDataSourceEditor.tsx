@@ -7,7 +7,6 @@ import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import FileSelector from "../ui/FileSelector";
 import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootstrapTable";
-
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import CSVDataSource = weavejs.data.source.CSVDataSource;
@@ -16,6 +15,7 @@ import EntityType = weavejs.api.data.EntityType;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import ColumnUtils = weavejs.data.ColumnUtils;
+import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 export default class CSVDataSourceEditor extends DataSourceEditor
 {
@@ -48,32 +48,33 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	renderChildEditor():JSX.Element
 	{
 		let ds = this.props.dataSource as CSVDataSource;
-		if(!ds.keyColName.value)
-			return null;
-		
-		var keyColumn = ds.getColumnByName(ds.keyColName.value);
-		var keys = keyColumn.keys;
-		
+		let idProperty = '';
 		var columnNames = ds.getColumnNames();
 		var columns = columnNames.map((name) => ds.getColumnByName(name));
+	
+		if (weavejs.WeaveAPI.Locale.reverseLayout)
+		{
+			columns.reverse();
+			columnNames.reverse();
+		}
 		
-		var records = ColumnUtils.getRecords(columns, keys, String);
+		var format:any = _.zipObject(columnNames, columns);
+		format[idProperty] = IQualifiedKey;
 		
-		console.log(columns);
-		console.log(records);
-		
+		var keys = ColumnUtils.getAllKeys(columns);
+		var records = ColumnUtils.getRecords(format, keys, String);
+
 		var titles:string[] = columns.map(column => Weave.lang(column.getMetadata("title")));
 		var columnTitles = _.zipObject(columnNames, titles) as { [columnId: string]: string; };
 
 		return (
-			<ReactBootstrapTable columnTitles={columnTitles}
+			<div style={{flex: 1, position: "relative"}}>
+				<div style={{position: "absolute", width: "100%", height: "100%", overflow: "scroll"}}>
+					<ReactBootstrapTable columnTitles={columnTitles}
 								 rows={records}
-								 idProperty={''}
-								 striped={true}
-								 hover={true}
-								 bordered={true}
-								 condensed={true}
-								 showIdColumn={true}/>
+								 idProperty={''}/>
+				</div>
+			</div>
 		);
 	}
 }
