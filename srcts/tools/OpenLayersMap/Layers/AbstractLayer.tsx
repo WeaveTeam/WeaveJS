@@ -14,9 +14,9 @@ import WeaveAPI = weavejs.WeaveAPI;
 
 export default class AbstractLayer implements ILinkableObject
 {
-	opacity = Weave.linkableChild(this, LinkableNumber);
-	visible = Weave.linkableChild(this, LinkableBoolean);
-	selectable = Weave.linkableChild(this, LinkableBoolean);
+	opacity = Weave.linkableChild(this, new LinkableNumber(1));
+	visible = Weave.linkableChild(this, new LinkableBoolean(true));
+	selectable = Weave.linkableChild(this, new LinkableBoolean(true));
 
 	private projectionSRS: LinkableString; /* A reference to the parent's projectionSRS LinkableString */
 
