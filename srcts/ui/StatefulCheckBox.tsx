@@ -19,16 +19,19 @@ export default class StatefulCheckBox extends React.Component<StatefulCheckBoxPr
 
 	state: StatefulCheckBoxState = { checked: false };
 
-	handleInputChange = (event: React.FormEvent): void => {
-		this.setState({ checked: (event.target as HTMLInputElement).checked});
+	onClick=()=>
+	{
+		this.setState({ checked: !this.state.checked });
 	}
 
 	render(): JSX.Element {
 		var props = _.clone(this.props);
 		delete props.children;
 
+		let className = this.state.checked ? "fa fa-check-square-o fa-fw" : "fa fa-square-o fa-fw";
+
 		return (
-			<input {...props as any} onChange={this.handleInputChange} type="checkbox" value="" checked={this.state.checked}/>
+			<span className={className} onClick={this.onClick}/>
 		);
 	}
 }
