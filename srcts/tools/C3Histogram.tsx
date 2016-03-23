@@ -21,6 +21,7 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
 import StandardLib = weavejs.util.StandardLib;
+import LinkableNumber = weavejs.core.LinkableNumber;
 
 declare type Record = {
     id: weavejs.api.data.IQualifiedKey,
@@ -35,6 +36,7 @@ export default class C3Histogram extends AbstractC3Tool
 	aggregationMethod = Weave.linkableChild(this, LinkableString);
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
+    barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
 
 	private RECORD_FORMAT = {
 		id: IQualifiedKey,
@@ -156,7 +158,7 @@ export default class C3Histogram extends AbstractC3Tool
             },
             bar: {
                 width: {
-                    ratio: 0.95
+                    ratio: NaN
                 }
             }
         });
@@ -424,6 +426,12 @@ export default class C3Histogram extends AbstractC3Tool
 			this.updateConfigMargin();
     	}
 
+        if(Weave.detectChange(this, this.barWidthRatio))
+        {
+            changeDetected = true;
+            (this.c3Config.bar.width as {ratio:number}).ratio = this.barWidthRatio.value;
+        }
+
     	if (changeDetected || forced)
 			return true;
 		
@@ -480,6 +488,6 @@ export default class C3Histogram extends AbstractC3Tool
     }
 }
 
-Weave.registerClass("weavejs.tool.C3Histogram", C3Histogram, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.C3Histogram", C3Histogram, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Histogram");
 Weave.registerClass("weave.visualization.tools::HistogramTool", C3Histogram);
 Weave.registerClass("weave.visualization.tools::ColormapHistogramTool", C3Histogram);

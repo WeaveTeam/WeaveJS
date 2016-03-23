@@ -14,11 +14,11 @@ export interface ITableRowProps extends React.Props<TableRow>
     row:IRow;
     idProperty:string;
     onMouseOver:() => void;
-    onClick:() => void;
+    onMouseDown:() => void;
     probed:boolean;
     selected:boolean;
     showIdColumn:boolean;
-    hack:boolean;
+    hack?:boolean;
 }
 
 export interface ITableRowState
@@ -72,7 +72,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
 
     render():JSX.Element
 	{
-        var style = {}
+        var style = {};
         var selected:boolean = this.props.selected;
         var probed:boolean = this.props.probed;
 
@@ -103,7 +103,7 @@ export default class TableRow extends React.Component<ITableRowProps, ITableRowS
         });
 
         return (
-            <tr style={prefixer(style)} onMouseOver={this.props.onMouseOver.bind(this, true)} onMouseOut={this.props.onMouseOver.bind(this, false)} onClick={this.props.onClick.bind(this)}>
+            <tr style={prefixer(style)} onMouseOver={this.props.onMouseOver.bind(this, true)} onMouseOut={this.props.onMouseOver.bind(this, false)} onMouseDown={this.props.onMouseDown.bind(this)}>
                 {
                     cells
                 }

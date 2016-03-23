@@ -20,7 +20,7 @@ export interface SideBarState
  */
 export default class SideBar extends React.Component<SideBarProps, SideBarState>
 {
-    constructor(props:any)
+    constructor(props:SideBarProps)
     {
         super(props);
 
@@ -36,7 +36,7 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
         if(this.props.closeHandler)this.props.closeHandler(!this.state.open);
     }
 
-    componentWillReceiveProps(nextProps:any){
+    componentWillReceiveProps(nextProps:SideBarProps){
         if(this.props.open != nextProps.open){
             this.setState({open:nextProps.open});
         }
@@ -51,7 +51,7 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
             position: "absolute",
             display:"flex",
             overflow:"auto",
-
+            background:"#f8f8f8"
         };
 
         var closeIconStyle:React.CSSProperties = {
@@ -63,8 +63,6 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
 
         if(this.props.direction == "left" || this.props.direction == "right" || !this.props.direction)
         {
-            defaultStyle["width"] = "20%";
-            defaultStyle["height"] = "100%";
             defaultStyle["flexDirection"] = "column";
             if(this.props.direction == "right")
             {
@@ -80,8 +78,7 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
         }
         else if(this.props.direction == "top" || this.props.direction == "bottom")
         {
-            defaultStyle["width"] = "100%";
-            defaultStyle["height"] = "20%";
+
             defaultStyle["flexDirection"] = "row-reverse"; // this makes close icon on right
             if(this.props.direction == "top")
             {
@@ -96,10 +93,12 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
             closeIconStyle["alignSelf"] = this.props.direction == "bottom"? "flex-start":"flex-end";
         }
 
-        var style:React.CSSProperties = this.props.style ? _.merge(this.props.style,defaultStyle): defaultStyle;
+        var style:React.CSSProperties =  _.merge(defaultStyle,this.props.style);
 
         return (<div className={this.props.className} style={style}>
-                    <span style={closeIconStyle} onClick={this.onCloseClick}><i className="fa fa-times-circle"/></span>
+                    <span style={ closeIconStyle } onClick={ this.onCloseClick }>
+                        <i className="fa fa-times-circle"/>
+                    </span>
                     <div style={{padding:"8px",display:"inherit",flexDirection:"inherit"}}>
                         {this.props.children}
                     </div>

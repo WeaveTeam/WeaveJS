@@ -15,6 +15,7 @@ import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
 import PopupWindow from "./react-ui/PopupWindow";
 import ReactUtils from "./utils/ReactUtils";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
+import SmartComponent from "./ui/SmartComponent";
 
 const grabberStyle:CSSProperties = {
 	width: "16",
@@ -33,6 +34,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	onContextMenu?:React.MouseEventHandler;
 	style?: CSSProperties;
 	onGearClick?:(tool:IVisTool, editorContent:JSX.Element)=>void;
+	onMaximizeClick?:(tool:IVisTool)=>void;
 }
 
 export interface IWeaveToolState
@@ -40,7 +42,7 @@ export interface IWeaveToolState
 	title?: string;
 }
 
-export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveToolState>
+export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
 {
 	private titleBarHeight:number = 25;
 	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
@@ -50,13 +52,6 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 	{
 		super(props);
 		this.state = {};
-	}
-	
-	shouldComponentUpdate(nextProps:IWeaveToolProps, nextState:IWeaveToolState, nextContext:any):boolean
-	{
-		return !_.isEqual(this.state, nextState)
-			|| !_.isEqual(this.props, nextProps)
-			|| !_.isEqual(this.context, nextContext);
 	}
 	
 	handleTool=(wcr:WeaveComponentRenderer):void=>
@@ -104,6 +99,12 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 			}
 		}
 	}
+	
+	onMaximizeClick=():void=>
+	{
+		if (this.props.onMaximizeClick)
+			this.props.onMaximizeClick(this.watcher.target as IVisTool);
+	}
 
 	render():JSX.Element
 	{
@@ -121,9 +122,10 @@ export default class WeaveTool extends React.Component<IWeaveToolProps, IWeaveTo
 						  onDragStart={this.props.onDragStart}
 						  titleBarHeight={this.titleBarHeight}
 						  title={Weave.lang(this.state.title)}
-						  onGearClick={this.onGearClick.bind(this)}
-				/>
-				<WeaveComponentRenderer style={{overflow: 'auto'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
+						  onGearClick={this.onGearClick}
+						  onMaximizeClick={this.onMaximizeClick}
+						  />
+				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
 		);
 	}
@@ -137,7 +139,8 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	onDragStart:React.DragEventHandler;
 	titleBarHeight:number;
 	title:string;
-	onGearClick:React.MouseEventHandler
+	onGearClick:React.MouseEventHandler;
+	onMaximizeClick:React.MouseEventHandler;
 }
 
 interface ITitleBarState
@@ -146,7 +149,7 @@ interface ITitleBarState
 	notification: boolean;
 }
 
-class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
+class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 {
 	constructor(props:ITitleBarProps)
 	{
@@ -158,19 +161,18 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 	}
 	render()
 	{
-		var windowBar:CSSProperties;
+		var windowBar:CSSProperties = {
+			height: this.props.titleBarHeight,
+			padding:2,
+			alignItems:"center"
+		};
+
 		if (this.state.showControls)
-			windowBar = {
-				height: this.props.titleBarHeight,
+			_.merge(windowBar, {
 				backgroundColor: "#f8f8f8",
-				borderBottomStyle: 'solid',
-				borderBottomWidth: 1,
-				borderBottomColor: '#e6e6e6'
-			};
-		else
-			windowBar = {
-				height: this.props.titleBarHeight
-			};
+				borderBottom: '1px solid #e6e6e6'
+			});
+
 
 		if(this.state.notification) {
 
@@ -185,8 +187,7 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 			overflow: "hidden",
 			whiteSpace: "nowrap",
 			flex: 1,
-			textOverflow: "ellipsis",
-			paddingTop: "3"
+			textOverflow: "ellipsis"
 		};
 
 		var transitions:CSSProperties = {
@@ -196,15 +197,18 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 		};
 
 		var leftControls:CSSProperties = {
-			marginLeft: 5,
-			marginTop: 2,
-			width: 20,
-
+			paddingLeft:4,
+			fontSize: 14 // will set the size of the icons as icons are uniocode values
 		};
 
 		var rightControls:CSSProperties = {
-			marginTop: 2,
-			width: 38
+			paddingRight:4,
+			fontSize: 14 // will set the size of the icons as icons are uniocode values
+		};
+
+		var iconStyle:CSSProperties = {
+			marginRight:"4px",
+			cursor:"pointer"
 		};
 
 		_.merge(leftControls, transitions);
@@ -212,20 +216,20 @@ class TitleBar extends React.Component<ITitleBarProps, ITitleBarState>
 
 		return(
 			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
-				{<HBox style={prefixer(leftControls)}>
-					<div onClick={this.props.onGearClick}>
+				<HBox style={prefixer(leftControls)}>
+					{/*<div style={iconStyle} onClick={this.props.onGearClick}>
 						<Glyphicon glyph="cog"/>
-					</div>
-				</HBox>}
+					</div>*/}
+				</HBox>
 				<span style={titleStyle} className="weave-panel">{this.props.title}</span>
-				{<HBox style={prefixer(rightControls)}>
-					<div style={{marginRight: 5}}>
+				<HBox style={prefixer(rightControls)}>
+					<div style={iconStyle} onClick={this.props.onMaximizeClick}>
+						<Glyphicon glyph="unchecked"/>
+					</div>
+					<div style={iconStyle}>
 						<i className="fa fa-bell-o" onClick={this.notificationStyleUpdate.bind(this)}></i>
 					</div>
-					<div style={{marginRight: 5}}>
-					</div>
-				</HBox>}
-
+				</HBox>
 			</HBox>
 		);
 	}

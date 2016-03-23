@@ -40,10 +40,6 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
 	}
 
-	componentDidMount()
-	{
-	}
-
 	setTargetStates(states:any):void 
 	{
 		if (!states)
@@ -115,5 +111,5 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 	}
 }
 
-Weave.registerClass("weavejs.tool.SessionStateMenu", SessionStateMenuTool, [weavejs.api.ui.IVisTool/*, weavejs.api.core.ILinkableObjectWithNewProperties*/]);
+Weave.registerClass("weavejs.tool.SessionStateMenu", SessionStateMenuTool, [weavejs.api.ui.IVisTool_Utility/*, weavejs.api.core.ILinkableObjectWithNewProperties*/], "Session State Menu Tool");
 Weave.registerClass("weave.ui::SessionStateMenuTool", SessionStateMenuTool);

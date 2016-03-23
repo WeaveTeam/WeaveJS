@@ -7,7 +7,6 @@ import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 const STYLE_BASE = {
 	background: "#000",
     opacity: .1,
-    zIndex: 1,
     boxSizing: "border-box",
     backgroundClip: "padding"
 };

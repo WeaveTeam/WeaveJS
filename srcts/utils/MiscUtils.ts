@@ -1,7 +1,5 @@
 import * as _ from "lodash";
 
-import Dictionary2D = weavejs.util.Dictionary2D;
-
 export default class MiscUtils
 {
 	/**

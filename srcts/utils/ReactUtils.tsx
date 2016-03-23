@@ -5,6 +5,24 @@ import * as _ from "lodash";
 
 export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
 
+export interface DynamicTableStyles {
+	table?:React.CSSProperties;
+	thead?:React.CSSProperties;
+	tbody?:React.CSSProperties;
+	th?:React.CSSProperties | React.CSSProperties[];
+	tr?:React.CSSProperties;
+	td?:React.CSSProperties | React.CSSProperties[];
+};
+
+export interface DynamicTableClassNames {
+	table?:string;
+	thead?:string;
+	tbody?:string;
+	th?:string;
+	tr?:string;
+	td?:string;
+}
+
 export default class ReactUtils
 {
 	private static map_popup_element = new WeakMap<React.ReactInstance, [Element, EventListener]>();
@@ -39,6 +57,44 @@ export default class ReactUtils
 		document.body.removeChild(element);
 	}
 	
+	static generateTable(header:(string|JSX.Element)[], body:(string|JSX.Element)[][], styles:DynamicTableStyles = {}, classes:DynamicTableClassNames = {}):JSX.Element
+	{
+		var tableHead = header && (
+			<thead style={styles.thead} className={classes.thead}>
+		  		{
+					header.map((cell, index) => {
+						let style = Array.isArray(styles.th) ? (styles.th as React.CSSProperties[])[index] : styles.th;
+						return <th key={index} style={style} className={classes.th}>{cell}</th>
+					})
+				}
+			</thead>
+		);
+		
+		var tableBody = body && (
+			<tbody style={styles.tbody} className={classes.tbody}>
+				{
+					body.map((row, index) => {
+						return (
+							<tr key={index} style={styles.tr} className={classes.tr}>
+								{
+									row.map((cell, index) => {
+										let style = Array.isArray(styles.td) ? (styles.td as React.CSSProperties[])[index] : styles.td;
+										return <td key={index} style={style} className={classes.td}>{cell}</td>
+									})
+								}
+							</tr>
+						)
+					})
+				}
+			</tbody>
+		)
+		return (
+			<table style={styles.table} className={classes.table}>
+				{tableHead}
+				{tableBody}
+			</table>
+		)
+	}
 	/**
 	 * Checks if a component has focus.
 	 */

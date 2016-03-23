@@ -33,7 +33,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 		this.dataX.addGroupedCallback(this, this.updateLocations);
 		this.dataY.addGroupedCallback(this, this.updateLocations, true);
 
-		(<any>this.filteredKeySet).setColumnKeySources([this.dataX, this.dataY]);
+		this.filteredKeySet.setColumnKeySources([this.dataX, this.dataY]);
 	}
 
 	_getFeatureIds()

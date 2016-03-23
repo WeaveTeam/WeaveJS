@@ -18,7 +18,7 @@ function getVendorSpecificProperties():string[]
 	{
 		for (var prefix of dom_prefixes)
 		{
-			if (property.toLowerCase().startsWith(prefix))
+			if (property.toLowerCase().startsWith(prefix.toLowerCase()))
 				vendorSpecificProperties.push(property.replace(prefix, ""))
 		}
 	}

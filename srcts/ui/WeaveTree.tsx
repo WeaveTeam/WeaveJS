@@ -2,6 +2,8 @@ import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import ListView from "./ListView";
+import * as fs from 'fuse.js';
+var Fuse = (fs as any)["default"] as typeof fs;
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
@@ -16,6 +18,7 @@ export interface IWeaveTreeProps {
 	hideRoot?: boolean;
 	hideLeaves? : boolean;
 	multipleSelection?: boolean;
+	searchFilter? : string;
 	onSelect?: (selectedItems: Array<IWeaveTreeNode>) => void;
 	onExpand?: (openItems: Array<IWeaveTreeNode>) => void;
 };
@@ -123,34 +126,44 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	handleItemClick=(node:IWeaveTreeNode, e:React.MouseEvent)=>
 	{
 			this.internalSetSelected(node, !this.getSelected(node), e.ctrlKey);
-	}
+	};
 
 	static CLASSNAME = "weave-tree-view";
 	static SELECTED_CLASSNAME = "selected";
 	
-	static BRANCH_ICON_CLASSNAME = "fa fa-plus-square-o fa-fw";
-	static LEAF_ICON_CLASSNAME = "fa fa-file-text-o fa-fw";
-	static OPEN_BRANCH_ICON_CLASSNAME = "fa fa-minus-square-o fa-fw";
+	static BRANCH_ICON_CLASSNAME = "icon fa fa-folder fa-fw";
+	static LEAF_ICON_CLASSNAME = "icon fa fa-file-text-o fa-fw";
+	static OPEN_BRANCH_ICON_CLASSNAME = "icon fa fa-folder-open fa-fw";
+	static EXPANDER_CLOSED_CLASS_NAME = "icon fa fa-play fa-fw expander";
+	static EXPANDER_OPEN_CLASS_NAME = "icon fa fa-play fa-fw fa-rotate-90 expander";
 
 	private renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
 	{
-		let resultElements:JSX.Element[] = []
-		let childElements: JSX.Element[];
-
 		let className = WeaveTree.CLASSNAME;
 		let iconClassName = WeaveTree.LEAF_ICON_CLASSNAME;
 		let iconClickFunc: React.MouseEventHandler = null;
+		let expanderClassName:string = null;
 
 		let isOpen = this.getOpen(node);
 		let isSelected = this.getSelected(node);
 
+		/* If we are a branch, we still might not be expandable due to hiding leaves and not having any children who are also branches. */
+		let isExpandable = node.isBranch() && !(this.props.hideLeaves && !node.getChildren().some(child => child.isBranch()));
+
 		if (node.isBranch())
 		{
 			iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
-			iconClickFunc = (e: React.MouseEvent):void => {
+		}
+
+		if (isExpandable)
+		{
+			iconClickFunc = (e: React.MouseEvent): void => {
 				this.internalSetOpen(node, !this.getOpen(node)); e.preventDefault();
 			};
+
+			expanderClassName = isOpen ? WeaveTree.EXPANDER_OPEN_CLASS_NAME : WeaveTree.EXPANDER_CLOSED_CLASS_NAME;
 		}
+
 		if (this.getSelected(node))
 		{
 			className += " " + WeaveTree.SELECTED_CLASSNAME;
@@ -158,12 +171,13 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 		return <span key={index} className={className}
 			onClick={ this.handleItemClick.bind(this, node) }
-			onDoubleClick={ iconClickFunc } style={{ verticalAlign: "middle", fontSize: "16px", position: "absolute", top: index * this.rowHeight, width: "100%"}}>
+			onDoubleClick={ iconClickFunc } style={{ verticalAlign: "middle", position: "absolute", top: index * this.rowHeight, width: "100%"}}>
 			<span style={{ marginLeft: node.depth * 16, whiteSpace: "pre"}}>
-				<i onMouseDown={ iconClickFunc } className={iconClassName}/>
+				<i onMouseDown={ iconClickFunc } className={ expanderClassName } style={{display: expanderClassName ? null : "none" }}/>
+				<i className={iconClassName}/>
 				{ " "+node.getLabel() }
 			</span></span>;
-	}
+	};
 
 	enumerateItems=(_node:IWeaveTreeNode, result:Array<IWeaveTreeNode> = [], depth:number = 0):Array<IWeaveTreeNode>=>
 	{
@@ -186,15 +200,28 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			}
 		}
 
+		if(this.props.searchFilter)
+			result = this.fuzzySearch(result, ['label'], this.props.searchFilter);//TODO make search possible using diff props of EntityNode
+
 		return result;
-	}
+	};
+
+	//filters a oollection of nodes by any filter Object
+	fuzzySearch=(input :Array<IWeaveTreeNode>, filterProps: Array<string>, filterString :string):Array<IWeaveTreeNode>=>{
+		var options:Object = {keys : filterProps};
+		let fuze:any = new Fuse(input, options);
+		var result : Array<IWeaveTreeNode> = fuze.search(filterString);
+		return result;
+	};
 
 	rowHeight: number;
 
-	render(): JSX.Element
-	{
+	render(): JSX.Element {
+		if (Weave.isLinkable(this.props.root)) {
+			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
+		}
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22);
-		return <ListView items={this.enumerateItems(this.props.root)}
+		return <ListView style={this.props.style} items={this.enumerateItems(this.props.root)}
 				itemRender={this.renderItem}
 				itemHeight={this.rowHeight}/>;
 	}

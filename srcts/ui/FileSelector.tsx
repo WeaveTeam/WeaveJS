@@ -7,11 +7,14 @@ import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
 
 import LinkableFile = weavejs.core.LinkableFile;
+import LinkableString = weavejs.core.LinkableString;
 var URLRequestUtils = weavejs.WeaveAPI.URLRequestUtils;
 
-export interface IFileSelectorProps
+export interface IFileSelectorProps extends React.Props<LinkableFileSelector>
 {
-	target: LinkableFile;
+	target: LinkableFile|LinkableString;
+	label?:string|JSX.Element;
+	placeholder?:string;
 	accept?: string;
 }
 
@@ -45,11 +48,16 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 
 	render():JSX.Element
 	{
-		return <HBox>
-			<StatefulTextField ref={linkReactStateRef(this, {content: this.props.target}, 500)}/>
-			<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
-				<input type="button" value={Weave.lang("Add file")}/>
-			</FileInput>
-		</HBox>
+		return (
+			<HBox style={{ alignItems :'center' }}>
+				{
+					this.props.label
+				}
+				<StatefulTextField style={{flex: 1}} placeholder={this.props.placeholder} ref={linkReactStateRef(this, {content: this.props.target}, 500)}/>
+				<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
+					<input type="button" value={Weave.lang("Add file")}/>
+				</FileInput>
+			</HBox>
+		)
 	}
 }

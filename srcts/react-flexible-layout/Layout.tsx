@@ -17,6 +17,7 @@ export interface LayoutState
 	id?: Object;
 	direction?: Direction;
 	children?: LayoutState[];
+	maximized?: boolean;
 };
 
 export interface LayoutProps extends React.Props<Layout>
@@ -42,7 +43,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		super(props, state);
 		var ps = props.state || {};
-		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex || 1 };
+		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex || 1, maximized: ps.maximized };
 		this.minSize = 16;
 		this.dragging = false;
 	}
@@ -216,7 +217,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 				if (i > 0)
 					elements.push(
 						<Resizer
-							key={`${key}.resizers[${i - 1}]`}
+							key={`resizer[${i - 1}]`}
 							ref={saveResizer.bind(null, i - 1)}
 							direction={state.direction}
 							spacing={spacing}
@@ -224,7 +225,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 					);
 				elements.push(
 					Layout.renderLayout({
-						key: `${key}.children[${i}]`,
+						key: `child[${i}]`,
 						ref: saveChild.bind(null, i),
 						state: childState,
 						onStateChange: onChildStateChange.bind(null, i),

@@ -8,20 +8,20 @@ import {IColumnTitles} from "./TableHead";
 
 export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable>
 {
+	idProperty:string;
+	rows:IRow[];
+	columnTitles:IColumnTitles;
     striped?:boolean;
     bordered?:boolean;
     condensed?:boolean;
     hover?:boolean;
-    rows:IRow[];
-    columnTitles:IColumnTitles;
     sortable?:boolean;
-    idProperty:string;
-    selectedIds:string[];
-    probedIds:string[];
+    selectedIds?:string[];
+    probedIds?:string[];
     onProbe?:(id:string[]) => void;
     onSelection?:(id:string[]) => void;
     showIdColumn:boolean;
-    hack:boolean;
+    hack?:boolean;
 }
 
 export interface IReactBootstrapTableState
@@ -44,10 +44,11 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 	{
         super(props);
         this.state = {
-            selectedIds: props.selectedIds,
-            probedIds: props.probedIds
+            selectedIds: props.selectedIds || [],
+            probedIds: props.probedIds || []
         }
-        this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
+		if(props.selectedIds && props.probedIds)
+        	this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
     }
 
     onMouseOver(id:string, status:boolean)
@@ -74,7 +75,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         });
     }
 
-    onClick(id:string, event:React.MouseEvent)
+    onMouseDown(id:string, event:React.MouseEvent)
 	{
         var selectedIds:string[] = this.state.selectedIds.concat();
 
@@ -164,8 +165,8 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     componentWillReceiveProps(nextProps:IReactBootstrapTableProps)
 	{
         this.setState({
-            selectedIds: nextProps.selectedIds,
-            probedIds: nextProps.probedIds
+            selectedIds: nextProps.selectedIds || [],
+            probedIds: nextProps.probedIds || []
         });
     }
 
@@ -201,7 +202,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
                     <TableBody key="body" ref={(c:TableBody) => {this.tableBody = c;}}
                                idProperty={this.props.idProperty}
                                onMouseOver={this.onMouseOver.bind(this)}
-                               onClick={this.onClick.bind(this)}
+                               onMouseDown={this.onMouseDown.bind(this)}
                                rows={this.props.rows}
                                selectedIds={this.state.selectedIds}
                                probedIds={this.state.probedIds}

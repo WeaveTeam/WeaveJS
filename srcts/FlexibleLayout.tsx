@@ -75,7 +75,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	
 	setSessionState=(state:LayoutState):void=>
 	{
-		state = _.pick(state, 'id', 'children', 'flex', 'direction');
+		state = _.pick(state, 'id', 'children', 'flex', 'direction', 'maximize');
 		state = this.simplifyState(state);
 		state.flex = 1;
 		this.linkableState.state = state;
@@ -106,6 +106,10 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 	onDragStart(panelDragged:WeavePathArray, event:React.MouseEvent):void
 	{
+		var layout = this.reactLayout.getComponentFromId(panelDragged);
+		if (!layout || layout.state.maximized)
+			return;
+		
 		this.panelDragged = panelDragged;
 
 		// hack because dataTransfer doesn't exist on type event
@@ -235,6 +239,12 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	{
 		if (!state)
 			return {};
+		
+		if (state.id === undefined)
+			delete state.id;
+		if (state.children === undefined)
+			delete state.children;
+		
 		var children:LayoutState[] = state.children;
 
 		if (!children)
@@ -365,7 +375,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		var div:Div = this.refs[JSON.stringify(layout.state.id)] as Div;
 		if (div instanceof Div)
 		{
-			var rect = this.getLayoutPosition(layout);
+			var rect = layout.state.maximized ? this.layoutRect : this.getLayoutPosition(layout);
 			if (rect)
 				div.setState({
 					style: {
@@ -389,6 +399,23 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 				this.repositionPanels(child);
 	}
 	
+	private static _tempState:LayoutState;
+	private static _tempObj:LayoutState = {};
+	private static sortIds(id1:WeavePathArray, id2:WeavePathArray):number
+	{
+		FlexibleLayout._tempObj.id = id1;
+		var obj1:LayoutState = MiscUtils.findDeep(FlexibleLayout._tempState, FlexibleLayout._tempObj);
+		FlexibleLayout._tempObj.id = id2;
+		var obj2:LayoutState = MiscUtils.findDeep(FlexibleLayout._tempState, FlexibleLayout._tempObj);
+		var value1:number = obj1 && obj1.maximized ? 1 : 0;
+		var value2:number = obj2 && obj2.maximized ? 1 : 0;
+		if (value1 < value2)
+			return -1;
+		if (value1 > value2)
+			return 1;
+		return 0;
+	}
+	
 	render():JSX.Element
 	{
 		var weave:Weave = Weave.getWeave(this);
@@ -402,7 +429,9 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		
 		var components:JSX.Element[] = null;
 		if (this.reactLayout)
-			components = this.getLayoutIds(newState).map(path => {
+		{
+			FlexibleLayout._tempState = newState;
+			components = this.getLayoutIds(newState).sort(FlexibleLayout.sortIds).map(path => {
 				var key = JSON.stringify(path);
 				return (
 					<Div
@@ -423,6 +452,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 					/>
 				);
 			});
+		}
 		
 		var layout = Layout.renderLayout({
 			key: "layout",

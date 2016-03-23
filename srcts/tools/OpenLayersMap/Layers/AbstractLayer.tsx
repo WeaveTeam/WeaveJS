@@ -1,4 +1,5 @@
 import WeavePath = weavejs.path.WeavePath;
+import * as React from "react";
 
 import OpenLayersMapTool from "../../OpenLayersMapTool";
 import * as lodash from "lodash";
@@ -8,6 +9,7 @@ import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableString = weavejs.core.LinkableString;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 import WeaveAPI = weavejs.WeaveAPI;
 
 export default class AbstractLayer implements ILinkableObject
@@ -106,6 +108,17 @@ export default class AbstractLayer implements ILinkableObject
 	get outputProjection():string
 	{
 		return (this.projectionSRS && this.projectionSRS.value) || (this.parent && this.parent.getDefaultProjection()) || OpenLayersMapTool.DEFAULT_PROJECTION;
+	}
+
+	renderEditor():JSX.Element
+	{
+		return <div/>;
+	}
+
+	getDescription():string
+	{
+		let name = (Weave.getOwner(this) as LinkableHashMap).getName(this);
+		return name;
 	}
 
 	dispose()

@@ -1,11 +1,15 @@
 import * as _ from "lodash";
 import LinkableVariable = weavejs.core.LinkableVariable;
 import * as React from "react";
+import * as ReactDOM from "react-dom";
+import ReactUtils from "../utils/ReactUtils";
+import Menu from "../react-ui/Menu";
 
 export interface StatefulTextFieldProps extends React.HTMLProps<StatefulTextField> {
 	style?: React.CSSProperties;
 	suggestions?: string[];
 	selectOnFocus?: boolean;
+	noneLabel?: string;
 }
 
 export interface StatefulTextFieldState {
@@ -18,13 +22,11 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		super(props);
 	}
 
-	inputGuid = weavejs.util.StandardLib.guid();
-	listGuid = weavejs.util.StandardLib.guid();
-
-	state: StatefulTextFieldState = { content: "" };
+	state: StatefulTextFieldState = { content: ""};
+	private element: HTMLElement;
 
 	handleInputChange = (event: React.FormEvent): void=> {
-		this.setState({ content: (event.target as HTMLInputElement).value || "" });
+		this.setState({ content: (event.target as HTMLInputElement).value || ""});
 	}
 
 	onFocus=(event:React.FormEvent):void=>{
@@ -33,33 +35,91 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 			input.setSelectionRange(0, input.value.length);
 	}
 
+	componentDidMount() {
+		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
+	}
+
+	renderItem(item: string, index: number): JSX.Element {
+		let label = item;
+		let style: React.CSSProperties = {};
+		if (item === null) {
+			item = "";
+			label = this.props.noneLabel || " ";
+			style = { fontStyle: "italic", whiteSpace: "pre" };
+		}
+		let onClick = (event: React.MouseEvent): void => {
+			this.setState({ content: item });
+			this.closePopup();
+		};
+		return <div style={style} className="weave-menuitem" key={index} onClick={onClick}>{label}</div>;
+	}
+
+	private popupInstance: React.ReactInstance;
+
+	openPopup=()=>
+	{
+		let clientRect: ClientRect;
+		let width = 0;
+		if (this.element) {
+			clientRect = this.element.getBoundingClientRect();
+			width = this.element.offsetWidth;
+		}
+		else {
+			clientRect = new ClientRect();
+		}
+
+		this.popupInstance = ReactUtils.openPopup(<div className="weave-menu" style={{position: "absolute", top: clientRect.bottom, left: clientRect.left, minWidth:width}}>
+			{
+				this.props.suggestions.map(this.renderItem, this)
+			}
+		</div>, true);
+	}
+
+	closePopup=()=>
+	{
+		if (this.popupInstance)
+		{
+			ReactUtils.closePopup(this.popupInstance);
+			this.popupInstance = null;
+		}
+	}
+
 	render(): JSX.Element {
 		var props = _.clone(this.props);
 		delete props.children;
+
+		if (this.element) {
+			var [height, width] = [this.element.clientHeight, this.element.clientWidth];
+			var [top, left] = [this.element.clientTop, this.element.clientLeft];
+		}
+		else {
+			var [height, width, top, left] = [0, 0, 0, 0];
+		}
+
 		if (this.props.suggestions && this.props.suggestions.length > 0)
 		{
-
-			let listId: string = weavejs.util.StandardLib.guid();
-			let inputElement = <input style={this.props.style}
-				onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange}
-				type="text" value={this.state.content}
-				{...props as any}
-				list={listId}
-				/>;
-
-			let list = <datalist id={listId}>{this.props.suggestions.map(key => <option key={key} value={key}/>)}</datalist>;
-
-			return <div>
-				{[inputElement, list]}
+			return <div style={{ position: "relative"}}>
+				<input style={_.merge({ width: "100%" }, this.props.style)}
+					onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange}
+					type="text" value={this.state.content} placeholder={this.state.content || this.props.noneLabel}
+					{...props as any}
+					/>
+				<i style={{ position: "absolute", top: 4, right: height/2, height: height, fontSize: height/2 }} onClick={this.openPopup} className="fa fa-caret-down weave-icon"/>
 			</div>;
 		}
 		else
 		{
-			return <input style={this.props.style}
-				onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange}
-				type="text" value={this.state.content}
-				{...props as any}
-				/>;
+			return (
+				<input
+					{...props as any}
+					style={_.merge({width: "100%"}, this.props.style)}
+					type="text"
+					onFocus={this.onFocus}
+					onBlur={this.handleInputChange}
+					onChange={this.handleInputChange}
+					value={this.state.content}
+				/>
+			);
 		}
 	}
 }

@@ -22,7 +22,7 @@
     },
     "d3/d3.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
-	},
+    },
     "react-bootstrap/react-bootstrap.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
     },
@@ -46,6 +46,9 @@
     },
     "classnames/classnames.d.ts": {
       "commit": "55c750ace821f85e6643bbdb249dbd0b15a3df78"
+    },
+    "fuse/fuse.d.ts": {
+      "commit": "6766ed1d0faf02ede9e2edf2e66bbb2388c825ec"
     }
   }
 }

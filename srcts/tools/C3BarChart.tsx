@@ -8,6 +8,7 @@ import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import DOMUtils from "../utils/DOMUtils";
 import ToolTip from "./ToolTip";
+import {HBox, VBox} from "../react-ui/FlexBox";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -19,6 +20,7 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkableNumber = weavejs.core.LinkableNumber;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -48,10 +50,11 @@ export default class C3BarChart extends AbstractC3Tool
     sortColumn = Weave.linkableChild(this, DynamicColumn);
     colorColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#808080"));
     chartColors = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
-    groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode))
+    groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode));
     horizontalMode = Weave.linkableChild(this, new LinkableBoolean(true));
     showValueLabels = Weave.linkableChild(this, new LinkableBoolean(true));
     showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
+	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8));
 
     private verifyGroupingMode(mode:string):boolean
 	{
@@ -196,7 +199,7 @@ export default class C3BarChart extends AbstractC3Tool
             },
             bar: {
                 width: {
-                    ratio: 1.0
+                    ratio: NaN
                 }
             },
             legend: {
@@ -479,6 +482,12 @@ export default class C3BarChart extends AbstractC3Tool
             this.c3Config.axis.rotated = this.horizontalMode.value;
         }
 
+		if (Weave.detectChange(this, this.barWidthRatio))
+		{
+			changeDetected = true;
+            (this.c3Config.bar.width as {ratio:number}).ratio = this.barWidthRatio.value;
+		}
+
         if (changeDetected || forced)
 			return true;
 		
@@ -493,6 +502,24 @@ export default class C3BarChart extends AbstractC3Tool
 		this.updateStyle();
 		
 		return false;
+    }
+
+    selectableAttributes:{[label:string]:DynamicColumn|LinkableHashMap} = {
+        label:this.labelColumn,
+        sort:this.sortColumn,
+        height:this.heightColumns
+    };//TODO handle remaining attributes
+
+    renderEditor():JSX.Element
+    {
+        return (
+            <VBox>
+
+                {
+                    super.renderEditor()
+                }
+            </VBox>
+        )
     }
 
 	public get deprecatedStateMapping():Object
@@ -521,5 +548,5 @@ export default class C3BarChart extends AbstractC3Tool
 	}
 }
 
-Weave.registerClass("weavejs.tool.C3BarChart", C3BarChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.C3BarChart", C3BarChart, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Bar Chart");
 Weave.registerClass("weave.visualization.tools::CompoundBarChartTool", C3BarChart);

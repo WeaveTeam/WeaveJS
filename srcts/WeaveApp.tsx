@@ -1,8 +1,9 @@
 import * as React from "react";
 import * as _ from "lodash";
 
+import prefixer from "./react-ui/VendorPrefixer";
 import {MenuItemProps} from "./react-ui/Menu";
-import SideBar from "./react-ui/SideBar";
+import SideBarContainer from "./react-ui/SideBarContainer";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
@@ -34,7 +35,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 
 export interface WeaveAppState
 {
-	showSideBar:boolean;
+
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
@@ -51,14 +52,18 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
-		this.state = {
-			showSideBar: false
-		}
 	}
 	
 	getRenderPath():string[]
 	{
 		return this.props.renderPath || WeaveApp.defaultProps.renderPath;
+	}
+	
+	getRenderedComponent():React.Component<any, any>
+	{
+		if (!this.props.weave)
+			return null;
+		return this.props.weave.getObject(this.getRenderPath()) as React.Component<any, any>;
 	}
 	
 	componentDidMount()
@@ -83,32 +88,36 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 		}
 	}
-
-	showSideBarForTool=(tool:IVisTool, content:JSX.Element):void=>{
-		this.toolEditor = content;
-		this.setState({
-			showSideBar: !this.state.showSideBar
-		});
-	}
-
-	sideBarCloseHandler=(sideBarState:boolean):void=>{
-		this.setState({
-			showSideBar: sideBarState
-		});
-	}
 	
+	handleMaximizeClick(path:WeavePathArray):void
+	{
+		var layout = this.getRenderedComponent() as FlexibleLayout;
+		if (!(layout instanceof FlexibleLayout))
+			return;
+		var state = _.cloneDeep(layout.getSessionState());
+		var obj = MiscUtils.findDeep(state, {id: path});
+		if (!obj)
+			return;
+		obj.maximized = !obj.maximized;
+		layout.setSessionState(state);
+	}
 
+	handleGearClick=(tool:IVisTool, content:JSX.Element):void=>
+	{
+		this.toolEditor = content;
+		this.forceUpdate();
+	}
 
 	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
 	{
-		//onGearClick={this.blah}
 		return (
 			<WeaveTool
 				weave={this.props.weave}
 				path={path}
 				style={{width: "100%", height: "100%"}}
 				{...panelProps}
-				onGearClick={this.showSideBarForTool}
+				onGearClick={this.handleGearClick}
+				onMaximizeClick={this.handleMaximizeClick.bind(this, path)}
 			/>
 		);
 	}
@@ -152,37 +161,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (!weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 		
-		if (!weave.getObject(renderPath))
-		{
-			try
-			{
-				var parentPath = renderPath.concat();
-				var childName = parentPath.pop();
-				var parent = weave.getObject(parentPath);
-				if (parent instanceof LinkableHashMap)
-					(parent as LinkableHashMap).requestObject(childName, FlexibleLayout);
-			}
-			catch (e)
-			{
-				// ignore
-			}
-		}
-		
-		// backwards compatibility
+		// backwards compatibility hack
 		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
-
-		var scaleValue = this.state.showSideBar ? .8 : 1;
-		var sideBarDirection = "left"; //to-do make it configurable
-		var weaveUIOrigin = "";
-
-		if (sideBarDirection == "left")
-			weaveUIOrigin = "right";
-		else if (sideBarDirection == "right")
-			weaveUIOrigin = "left";
-		else if (sideBarDirection == "top")
-			weaveUIOrigin = "bottom";
-		else if (sideBarDirection == "bottom")
-			weaveUIOrigin = "top";
 		
 		return (
 			<VBox
@@ -191,26 +171,25 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}
 			>
-				{
-					!enableMenuBar || enableMenuBar.value
-					?	<WeaveMenuBar weave={weave} ref={(c:WeaveMenuBar) => this.menuBar = c} createObject={this.createObject}/>
-					:	null
-				}
-				<ResizingDiv style={{flex: 1, position: "relative"}}>
+				<SideBarContainer barSize={.2} leftSideBarChildren={this.toolEditor}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
+						defaultType={FlexibleLayout}
+						style={{width:"100%", height:"100%"}}
 						props={{itemRenderer: this.renderTool}}
-						style={{position: "absolute", width: "100%", height: "100%", transform: `scale(${scaleValue})`, transformOrigin:weaveUIOrigin}}
 					/>
-					<SideBar
-						closeHandler={this.sideBarCloseHandler}
-						style={{background:"#f8f8f8"}}
-						open={this.state.showSideBar}
-						direction={sideBarDirection}
-						children={this.toolEditor}
-					/>
-				</ResizingDiv>
+				</SideBarContainer>
+				{
+					!enableMenuBar || enableMenuBar.value
+					?	<WeaveMenuBar
+							style={prefixer({order: -1})}
+							weave={weave}
+							ref={(c:WeaveMenuBar) => this.menuBar = c}
+							createObject={this.createObject}
+						/>
+					:	null
+				}
 			</VBox>
 		);
 	}

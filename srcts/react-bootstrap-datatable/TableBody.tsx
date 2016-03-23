@@ -10,9 +10,9 @@ export interface ITableBodyProps extends React.Props<TableBody>
     selectedIds:string[];
     probedIds:string[];
     onMouseOver:(id:string, status:boolean) => void;
-    onClick:(id:string) => void;
+    onMouseDown:(id:string) => void;
     showIdColumn:boolean;
-    hack:boolean;
+    hack?:boolean;
 }
 
 export interface ITableBodyState
@@ -68,7 +68,7 @@ export default class TableBody extends React.Component<ITableBodyProps, ITableBo
                                      ref={(tableRow:TableRow) => { this.tableRows[row[this.props.idProperty]] = tableRow }}
                                      key={index}
                                      onMouseOver={this.props.onMouseOver.bind(this, row[this.props.idProperty])}
-                                     onClick={this.props.onClick.bind(this, row[this.props.idProperty])}
+                                     onMouseDown={this.props.onMouseDown.bind(this, row[this.props.idProperty])}
                                      idProperty={this.props.idProperty}
                                      row={row}
                                      probed={this.props.probedIds.indexOf(row[this.props.idProperty]) > -1}

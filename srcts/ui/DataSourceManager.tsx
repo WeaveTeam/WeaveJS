@@ -10,46 +10,68 @@ import IDataSource = weavejs.api.data.IDataSource;
 /* Import editors and their data sources */
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import WeaveDataSourceEditor from "../editors/WeaveDataSourceEditor";
+
 import CSVDataSource = weavejs.data.source.CSVDataSource;
 import CSVDataSourceEditor from "../editors/CSVDataSourceEditor";
+
+import DBFDataSource = weavejs.data.source.DBFDataSource;
+import DBFDataSourceEditor from "../editors/DBFDataSourceEditor";
+
+import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
+import GeoJSONDataSourceEditor from "../editors/GeoJSONDataSourceEditor";
+
+// import CensusDataSource = weavejs.data.source.CensusDataSource;
+// import CensusDataSourceEditor from "../editors/CensusDataSourceEditor";
+
+// import CKANDataSource = weavejs.data.source.CKANDataSource;
+// import CKANDataSourceEditor from "../editors/CKANDataSourceEditor";
+
+// import CachedDataSource = weavejs.data.source.CachedDataSource;
+// import CachedDataSourceEditor from "../editors/CachedDataSourceEditor";
+
+import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;
+import ForeignDataMappingTransformEditor from "../editors/ForeignDataMappingTransformEditor";
+
+// import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
+// import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
+
 
 export interface IDataSourceManagerProps
 {
 	weave:Weave;
-	selectedDataSource?:IDataSource;
+	selected?:IDataSource;
 }
 
 export interface IDataSourceManagerState
 {
-	selectedDataSource?:IDataSource;
+	selected?:IDataSource;
 }
 
 export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
 {
 	static editorRegistry = new Map<typeof IDataSource, React.ComponentClass<IDataSourceEditorProps>>()
 		.set(CSVDataSource, CSVDataSourceEditor)
-//		.set(DBFDataSource, DBFDataSource)
-//		.set(GeoJSONDataSource, GeoJSONDataSource)
+		.set(DBFDataSource, DBFDataSourceEditor)
+		.set(GeoJSONDataSource, GeoJSONDataSourceEditor)
 //		.set(CensusDataSource, CensusDataSourceEditor)
 //		.set(CKANDataSource, CKANDataSourceEditor)
 		.set(WeaveDataSource, WeaveDataSourceEditor)
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
-//		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
+		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
 //		.set(GroupedDataTransform, GroupedDataTransformEditor)
 //		
 
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
+		this.state = {};
 		this.props.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
-
-	state:IDataSourceManagerState = {};
 	
 	componentWillReceiveProps(props:IDataSourceManagerProps)
 	{
-		if (props.selectedDataSource)
-			this.setState({selectedDataSource: props.selectedDataSource});
+		if (props.selected)
+			this.setState({selected: props.selected});
 	}
 
 	render():JSX.Element
@@ -58,7 +80,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let listOptions:ListOption[] = root.getObjects(IDataSource).map(value => { return {label: root.getName(value), value}; });
 
 		let editorJsx:JSX.Element;
-		let dataSource = this.state.selectedDataSource || this.props.selectedDataSource;
+		let dataSource = this.state.selected || this.props.selected;
 		if (dataSource)
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
@@ -73,16 +95,16 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 
 		return (
-			<HBox style={{ flex: 1, minWidth: 700, minHeight: 400 }}>
+			<HBox style={{flex: 1}}>
 				<VBox style={{ flex: .25 }}>
 					<List
 						options={listOptions}
 						multiple={false}
 						selectedValues={[dataSource]}
-						onChange={ (selectedValues:IDataSource[]) => this.setState({ selectedDataSource: selectedValues[0] }) }
+						onChange={ (selectedValues:IDataSource[]) => this.setState({ selected: selectedValues[0] }) }
 					/>
 				</VBox>
-				<div style={{ backgroundColor: '#f0f0f0', width: 4 }}/>
+				<div style={{ backgroundColor: '#f0f0f0', width: 4}}/>
 				<VBox style={{ flex: .75 }}>
 					{editorJsx}
 				</VBox>
@@ -90,20 +112,25 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		);
 	}
 
-	static map_weave_dsmPopup= new WeakMap<Weave, PopupWindow>();
-	static openInstance(weave:Weave, selectedDataSource:IDataSource = null):PopupWindow
+	static map_weave_dsmPopup = new WeakMap<Weave, PopupWindow>();
+	static openInstance(weave:Weave, selected:IDataSource = null):PopupWindow
 	{
-		var map = DataSourceManager.map_weave_dsmPopup;
-		var dsm = map.get(weave);
-		if (!dsm)
+		var dsm = DataSourceManager.map_weave_dsmPopup.get(weave);
+		if (dsm)
+		{
+			dsm.setState({content: <DataSourceManager weave={weave} selected={selected}/>});
+		}
+		else
 		{
 			dsm = PopupWindow.open({
 				title: "Manage data sources",
-				content: <DataSourceManager weave={weave} selectedDataSource={selectedDataSource}/>,
+				content: <DataSourceManager weave={weave} selected={selected}/>,
 				modal: false,
-				onCancel: () => map.delete(weave)
+				width: 800,
+				height: 450,
+				onCancel: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
 			});
-			map.set(weave, dsm);
+			DataSourceManager.map_weave_dsmPopup.set(weave, dsm);
 		}
 		return dsm;
 	}

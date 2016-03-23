@@ -1,46 +1,55 @@
 import * as React from "react";
 import {VBox, HBox} from '../react-ui/FlexBox';
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import EntityNode = weavejs.data.hierarchy.EntityNode;
 import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
-import {OverlayTrigger,Popover} from "react-bootstrap";
+import {OverlayTrigger, Popover} from "react-bootstrap";
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import ColumnUtils = weavejs.data.ColumnUtils;
 
-export interface ISelectableAttributeComponentProps{
-    attribute : DynamicColumn;
-    label : string;
+export interface ISelectableAttributeComponentProps
+{
+	attribute : DynamicColumn;
+	label : string;
 }
 
-export interface ISelectableAttributeComponentState{
-
+export interface ISelectableAttributeComponentState
+{
 }
 
-export default class SelectableAttributeComponent extends React.Component<ISelectableAttributeComponentProps, ISelectableAttributeComponentState>{
+export default class SelectableAttributeComponent extends React.Component<ISelectableAttributeComponentProps, ISelectableAttributeComponentState>
+{
+	constructor(props:ISelectableAttributeComponentProps)
+	{
+		super(props);
+	}
 
-    constructor(props:ISelectableAttributeComponentProps){
-        super(props);
-    }
+	columnString: string;
+	componentDidMount()
+	{
+		Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate)
+	}
+	//TODO figure out how to make an indent component
+	render():JSX.Element
+	{
+		var clearStyle = classNames({ 'fa fa-trash-o' : true, 'weave-icon' : true});
+		var labelStyle = {textAlign: 'center', flex: 0.35, fontSize: 'smaller'};
 
-    render ():JSX.Element{
-        var launchStyle = classNames({'btn' : true, 'btn default' : true, 'fa fa-cog' : true});
-        var closeStyle = classNames({'btn' : true, 'btn default' : true,  'fa fa-close' : true});
-        var inputStyle = classNames('input[type="text"]') ;
-        return (
-            <HBox>
-                    <OverlayTrigger trigger="click" placement = "bottom"
-                                    overlay={<Popover id = "AttributeSelector" title="Attribute Selector"><AttributeSelector column={this.props.attribute}/></Popover>}>
+		this.columnString = ColumnUtils.getColumnListLabel(this.props.attribute);
 
-                        <HBox style = {{flex : 1, display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'}}>
-                            <label style = {{flex: 0.23, textAlign: 'center'}} >{Weave.lang(this.props.label)}</label>
+		return (
+			<HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
+				<OverlayTrigger trigger="click" placement="bottom"
+								overlay={<Popover id="AttributeSelector" title="Attribute Selector">
+										<AttributeSelector column={ this.props.attribute }/>
+									</Popover>}>
+					<button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>
 
-                            <HBox style = {{flex: 0.85, display : "flex", flexDirection : 'row', justifyContent:'space-around', alignItems: 'center'}}>
-                                <button  className = {launchStyle}/>
-                                <input className = {inputStyle} type="text"/>
-                                <button  className = {closeStyle}/>
-                            </HBox>
-                        </HBox>
-
-                    </OverlayTrigger>
-            </HBox>
-        )
-    }
+				</OverlayTrigger>
+				<input style={{flex: 1}} type="text" value={ this.columnString } readOnly/>
+				<span className={clearStyle}/>
+			</HBox>
+		);
+	}
 }

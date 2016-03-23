@@ -13,66 +13,60 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 export default class FileMenu implements MenuBarItemProps
 {
-	label: string = "File";
-	weave:Weave;
-	menu: MenuItemProps[] = [
-		{
-			label: <FileInput onChange={this.openFile.bind(this)}>{Weave.lang("Open a File...")}</FileInput> as any
-		},
-		{
-			label: Weave.lang("Save As..."),
-			click: this.saveFile.bind(this)
-		},
-		{},
-		{
-			label: Weave.lang("Export CSV"),
-			click: this.exportCSV.bind(this)
-		},
-		{
-			label: Weave.lang("Convert to Cached Data Sources"),
-			// click: this.convertToChachedDataSources.bind(this)
-		}
-
-	];
-
-	fileName:string;
-	bold: boolean = false;
-	
 	constructor(weave:Weave)
 	{
 		this.weave = weave;
 	}
 
-    openFile(e:any) 
+	weave:Weave;
+	label = "File";
+	bold = false;
+	fileName:string;
+	
+	get menu():MenuItemProps[]
+	{
+		return [
+			{
+				label: <FileInput onChange={this.openFile}>{Weave.lang("Open a File...")}</FileInput> as any
+			},
+			{
+				label: Weave.lang("Save As..."),
+				click: this.saveFile
+			},
+			{},
+			{
+				enabled: this.getColumnsToExport().length > 0,
+				label: Weave.lang("Export CSV"),
+				click: this.exportCSV
+			}
+		];
+	}
+
+    openFile=(e:any)=>
 	{
         const selectedFile:File = e.target.files[0];
 		this.fileName = selectedFile.name;
         new Promise((resolve:any, reject:any) => {
-                let reader:FileReader = new FileReader();
-                reader.onload = (event:Event) => {
-                    resolve([event, selectedFile]);
-                };
-                reader.readAsArrayBuffer(selectedFile);
-            })
-            .then((zippedResults:any) => {
-                var e:any = zippedResults[0];
-                var result:any = e.target.result;
-                weavejs.core.WeaveArchive.loadFileContent(this.weave, result);
-            });
+            let reader:FileReader = new FileReader();
+            reader.onload = (event:Event) => {
+                resolve([event, selectedFile]);
+            };
+            reader.readAsArrayBuffer(selectedFile);
+        })
+        .then((zippedResults:any) => {
+            var e:any = zippedResults[0];
+            var result:any = e.target.result;
+            WeaveArchive.loadFileContent(this.weave, result);
+        });
     }
-	
-	convertToChachedDataSources = () =>
-	{
-		
-	}
 	
 	loadUrl(url:string)
 	{
 		this.fileName = String(url).split('/').pop();
-		return weavejs.core.WeaveArchive.loadUrl(this.weave, this.fileName);
+		return WeaveArchive.loadUrl(this.weave, this.fileName);
 	}
 
-    saveFile()
+    saveFile=()=>
 	{
 		var filenameInput:HTMLInputElement;
 
@@ -105,7 +99,7 @@ export default class FileMenu implements MenuBarItemProps
 			{
 				option.call(this);
 			}
-			var archive:WeaveArchive  = weavejs.core.WeaveArchive.createArchive(this.weave)
+			var archive:WeaveArchive  = WeaveArchive.createArchive(this.weave)
 			var uint8Array:Uint8Array = archive.serialize();
 			var arrayBuffer:ArrayBuffer  = uint8Array.buffer;
 			FileSaver.saveAs(new Blob([arrayBuffer]), filenameInput.value || "defaults.weave");
@@ -134,16 +128,23 @@ export default class FileMenu implements MenuBarItemProps
 		});
   	}
 
-	exportCSV()
+	getColumnsToExport=()=>
 	{
-		PopupWindow.open({
-			title: "Export CSV",
-			content: <div style={{width: 300, height: 300}}>I am a save file dialog</div>,
-			modal: false
-		});
-		// var archive:any  = weavejs.core.WeaveArchive.createArchive(weave)
-		// var uint8Array:any = archive.serialize();
-		// var arrayBuffer:any  = uint8Array.buffer;
-		// FileSaver.saveAs(new Blob([arrayBuffer]), "test.weave");
+		var columnSet = new Set<weavejs.api.data.IAttributeColumn>();
+		for (var rc of Weave.getDescendants(this.weave.root, weavejs.data.column.ReferencedColumn))
+		{
+			var col = rc.getInternalColumn();
+			if (col && col.getMetadata(weavejs.api.data.ColumnMetadata.DATA_TYPE) != weavejs.api.data.DataType.GEOMETRY)
+				columnSet.add(col)
+		}
+		return weavejs.util.JS.toArray(columnSet.values());
+	}
+
+	exportCSV=()=>
+	{
+		var columns = this.getColumnsToExport();
+		var filter = Weave.AS(this.weave.getObject('defaultSubsetKeyFilter'), weavejs.api.data.IKeyFilter);
+		var csv = weavejs.data.ColumnUtils.generateTableCSV(columns, filter);	
+		FileSaver.saveAs(new Blob([csv]), "Weave-data-export.csv");
 	}
 }

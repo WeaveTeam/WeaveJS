@@ -217,5 +217,5 @@ export default class C3PieChart extends AbstractC3Tool
 	}
 }
 
-Weave.registerClass("weavejs.tool.C3PieChart", C3PieChart, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.C3PieChart", C3PieChart, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Pie Chart");
 Weave.registerClass("weave.visualization.tools::PieChartTool", C3PieChart);

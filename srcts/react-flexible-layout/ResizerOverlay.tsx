@@ -11,7 +11,6 @@ const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 const STYLE_BASE = {
     background: "#000",
     opacity: .3,
-    zIndex: 1,
     boxSizing: "border-box",
     backgroundClip: "padding",
     position: "absolute"
@@ -101,6 +100,7 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
     {
         var style:React.CSSProperties = _.merge(
 			{
+				zIndex: 1, // temporary hack?
 				left: this.state.x,
 				top: this.state.y,
 				visibility: this.state.active ? "visible" : "hidden"

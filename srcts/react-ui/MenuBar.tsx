@@ -29,7 +29,7 @@ export interface MenuBarState
 export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 {
 	element:Element;
-	constructor(props:any)
+	constructor(props:MenuBarProps)
 	{
 		super(props);
 		this.state = {

@@ -30,6 +30,11 @@ import {OverrideBounds} from "./AbstractVisTool";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import MiscUtils from "../utils/MiscUtils";
 
+import StatefulComboBox from "../ui/StatefulComboBox";
+import LayerEditor from "./OpenLayersMap/LayerEditor";
+import {VBox,HBox} from "../react-ui/FlexBox";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
+
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ZoomBounds = weavejs.geom.ZoomBounds;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -56,6 +61,22 @@ function isAlignment(obj:any):boolean
 
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
 {
+	renderEditor(): JSX.Element {
+		let controlLocationOpts = [
+			{ vertical: "top", horizontal: "left" },
+			{ vertical: "top", horizontal: "right" },
+			{ vertical: "bottom", horizontal: "left" },
+			{ vertical: "bottom", horizontal: "right" }
+		].map(
+			(value) => { return { label: Weave.lang(value.vertical + " " + value.horizontal), value } }
+			);
+
+		return <VBox>
+			<StatefulComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
+			<LayerEditor layers={this.layers}/>
+		</VBox>;
+	}
+
 	static DEFAULT_PROJECTION:string = "EPSG:4326";
 
 	map:ol.Map;
@@ -397,7 +418,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		var dataBounds = new weavejs.geom.Bounds2D();
 		this.zoomBounds.getDataBounds(dataBounds);
 		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
-		var scale = this.zoomBounds.getXScale();
+		var scale = this.zoomBounds.getXScale() || 1;
 		let view = this.map.getView();
 
 		view.un("change:center", this.updateCenter_olToWeave, this);
@@ -573,5 +594,5 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	}
 }
 
-Weave.registerClass("weavejs.tool.Map", OpenLayersMapTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.visualization.tools::MapTool", OpenLayersMapTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass("weavejs.tool.Map", OpenLayersMapTool, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Map");
+Weave.registerClass("weave.visualization.tools::MapTool", OpenLayersMapTool);
