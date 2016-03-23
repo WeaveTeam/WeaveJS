@@ -42,7 +42,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 								   suggestions={ds.getColumnNames().concat([null]) }/>
 			]
 		];
-		return super.editorFields.concat(editorFields)
+		return super.editorFields.concat(editorFields);
 	}
 	
 	renderChildEditor():JSX.Element

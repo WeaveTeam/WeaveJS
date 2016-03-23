@@ -5,6 +5,7 @@ import * as ReactDOM from "react-dom";
 
 export interface StatefulCheckBoxProps extends React.HTMLProps<StatefulCheckBox> {
 	style?: React.CSSProperties;
+	stopPropagation?: boolean;
 }
 
 export interface StatefulCheckBoxState {
@@ -19,9 +20,11 @@ export default class StatefulCheckBox extends React.Component<StatefulCheckBoxPr
 
 	state: StatefulCheckBoxState = { checked: false };
 
-	onClick=()=>
+	onClick=(event:React.MouseEvent)=>
 	{
 		this.setState({ checked: !this.state.checked });
+		if (this.props.stopPropagation)
+			event.stopPropagation();
 	}
 
 	render(): JSX.Element {

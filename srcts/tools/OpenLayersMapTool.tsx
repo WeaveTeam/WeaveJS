@@ -2,6 +2,7 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import ReactUtils from "../utils/ReactUtils";
 import * as jquery from "jquery";
 
 // loads jquery from the es6 default module.
@@ -30,6 +31,8 @@ import {OverrideBounds} from "./AbstractVisTool";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import MiscUtils from "../utils/MiscUtils";
 
+import StatefulCheckBox from "../ui/StatefulCheckBox";
+import StatefulTextField from "../ui/StatefulTextField";
 import StatefulComboBox from "../ui/StatefulComboBox";
 import LayerEditor from "./OpenLayersMap/LayerEditor";
 import {VBox,HBox} from "../react-ui/FlexBox";
@@ -61,6 +64,25 @@ function isAlignment(obj:any):boolean
 
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
 {
+
+	setOverrideExtent = () => {
+		let bounds = new Bounds2D();
+		this.zoomBounds.getDataBounds(bounds);
+		Weave.setState(this.extentOverride,
+			{
+				xMin: bounds.xMin,
+				xMax: bounds.xMax,
+				yMin: bounds.yMin,
+				yMax: bounds.yMax
+			});
+	};
+
+	clearOverrideExtent = () => {
+		Weave.setState(this.extentOverride,
+			{
+				xMin: NaN, xMax: NaN, yMin: NaN, yMax: NaN
+			});
+	};
 	renderEditor(): JSX.Element {
 		let controlLocationOpts = [
 			{ vertical: "top", horizontal: "left" },
@@ -68,11 +90,62 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			{ vertical: "bottom", horizontal: "left" },
 			{ vertical: "bottom", horizontal: "right" }
 		].map(
-			(value) => { return { label: Weave.lang(value.vertical + " " + value.horizontal), value } }
-			);
+			(value) => { return { label: Weave.lang(lodash.startCase(value.vertical) + " " + lodash.startCase(value.horizontal)), value} }
+		);
+
+		// TODO: Make this code more generic
+
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit" },
+			td: [
+				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5 },
+				{ paddingBottom: 10, textAlign: "right", width: "100%" }
+			]
+		};
+
+		let editorFields = [
+			[Weave.lang("Panel Title"),
+				<HBox>
+					<StatefulTextField ref= { linkReactStateRef(this, {value: this.panelTitle }) }/>
+				</HBox>
+			],
+			[Weave.lang("Control Location"),
+				<HBox>
+					<StatefulComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
+				</HBox>
+			],
+			[Weave.lang("Zoom Range"),
+				<HBox>
+					<StatefulTextField ref={linkReactStateRef(this, { content: this.minZoomLevel }) }/>
+					{"-"}
+					<StatefulTextField ref={linkReactStateRef(this, { content: this.maxZoomLevel }) }/>
+				</HBox>
+			],
+			[Weave.lang("Show Zoom Slider"),
+				<HBox>
+					<StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showZoomSlider })}/>
+				</HBox>
+			],
+			[Weave.lang("Projection SRS"),
+				<HBox>
+					<StatefulTextField ref={linkReactStateRef(this, {content: this.projectionSRS })}/>
+				</HBox>
+			],
+			[Weave.lang("Override extent"), 
+				<HBox>
+					<button onClick={this.setOverrideExtent}>{Weave.lang("Use current zoom")}</button>
+					<button onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</button>
+				</HBox>
+			],
+			[Weave.lang("Snap zoom to base map"),
+				<HBox>
+					<StatefulCheckBox ref={linkReactStateRef(this, {checked: this.snapZoomToBaseMap})}/>
+				</HBox>
+			],
+		];
 
 		return <VBox>
-			<StatefulComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
+			{ReactUtils.generateTable(null, editorFields, tableStyles)}
 			<LayerEditor layers={this.layers}/>
 		</VBox>;
 	}

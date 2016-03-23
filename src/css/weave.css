@@ -348,7 +348,7 @@ span.weave-tree-view i.icon.expander {
 	-webkit-user-select: none;
 }
 
-span.weave-tree-view.selected {
+.weave-tree-view.selected {
 	background-color: #ADD8E6;
 }
 

@@ -1,7 +1,8 @@
 import * as ol from "openlayers";
 import * as lodash from "lodash";
 import AbstractLayer from "./AbstractLayer";
-
+import * as React from "react";
+import {VBox, HBox} from "../../../react-ui/FlexBox";
 
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -12,6 +13,13 @@ export default class TileLayer extends AbstractLayer
 
 	provider = Weave.linkableChild(this, LinkableString);
 	providerOptions = Weave.linkableChild(this, LinkableVariable);
+
+	renderEditor():JSX.Element
+	{
+		return <VBox>
+
+		</VBox>;
+	}
 
 	constructor()
 	{
