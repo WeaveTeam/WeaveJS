@@ -5,7 +5,7 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import SelectableAttributeComponent from "../ui/SelectableAttribute";
+import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
