@@ -110,7 +110,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	{
 		return (
 			<VBox style={this.props.style} className="weave-tool"
-				  onMouseEnter={() => {
+					onMouseOver={() => {
 						this.titleBar.setState({ showControls: true, notification: this.titleBar.state.notification });
 					}}
 				  onMouseLeave={() => {
