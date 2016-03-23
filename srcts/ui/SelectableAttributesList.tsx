@@ -1,9 +1,11 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import classNames from "../modules/classnames";
+import {OverlayTrigger, Popover} from "react-bootstrap";
+import AttributeSelector from "../ui/AttributeSelector";
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import classNames from "../modules/classnames";
 
 export interface ISelectableAttributesListProps{
     columns : LinkableHashMap;
@@ -30,8 +32,16 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
             return(<li className={ columnItem } key={ index }>{label}</li>);
         });
 
+        var title = "Attribute Selector for " + this.props.label;
+
         return(<VBox>
-                    <button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>
+                    <OverlayTrigger trigger="click" placement="bottom"
+                                overlay={ <Popover id="AttributeSelector" title={ title }>
+                                               <AttributeSelector label={ this.props.label } attribute={ this.props.columns }/>
+                                         </Popover>}>
+                        <button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>
+                    </OverlayTrigger>
+
                     <ul className= { columnsList} style={{background: 'white'}}>
                         {columns}
                     </ul>

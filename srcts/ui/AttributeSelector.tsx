@@ -1,6 +1,7 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import WeaveTree from "./WeaveTree";
+import SelectableAttributesList from "../ui/SelectableAttributesList";
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -8,11 +9,12 @@ import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnReference = weavejs.api.data.IColumnReference;
-
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export interface IAttributeSelectorProps
 {
-    column : DynamicColumn;
+    attribute : DynamicColumn|LinkableHashMap;
+    label? : string;
 }
 
 export interface IAttributeSelectorState
@@ -28,7 +30,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
-        this.weaveRoot = Weave.getRoot(props.column);
+        this.weaveRoot = Weave.getRoot(props.attribute);
         this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
         this.state = {leafNode : null};
     };
@@ -42,8 +44,8 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 		if (ref)
 		{
 			var meta = ref.getColumnMetadata();
-			if (meta)
-				this.props.column.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+			if (meta && this.props.attribute instanceof DynamicColumn)
+                (this.props.attribute as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
 		}
     };
 
@@ -66,6 +68,11 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                         {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.tree = c; } }/> : null}
                     </VBox>
                 </HBox>
+
+
+                {this.props.attribute instanceof LinkableHashMap ?
+                    <VBox><SelectableAttributesList label={ this.props.label } columns={ (this.props.attribute as LinkableHashMap)}></SelectableAttributesList></VBox>
+                    : null}
             </VBox>
         );
     };

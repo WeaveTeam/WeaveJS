@@ -37,12 +37,14 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		var labelStyle = {textAlign: 'center', flex: 0.35, fontSize: 'smaller'};
 
 		this.columnString = ColumnUtils.getColumnListLabel(this.props.attribute);
+		var title = "Attribute Selector for " + this.props.label;
 
+		//TODO stop using popover replace with instance
 		return (
 			<HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
 				<OverlayTrigger trigger="click" placement="bottom"
-								overlay={<Popover id="AttributeSelector" title="Attribute Selector">
-										<AttributeSelector column={ this.props.attribute }/>
+								overlay={<Popover id="AttributeSelector" title={ title }>
+										<AttributeSelector label={ this.props.label } attribute={ this.props.attribute }/>
 									</Popover>}>
 					<button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>
 
