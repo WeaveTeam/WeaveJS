@@ -141,15 +141,10 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
         return <ReactBootstrapTable columnTitles={this.state.columnTitles}
                                     rows={this.state.data}
                                     idProperty={this.idProperty}
-                                    striped={true}
-                                    hover={true}
-                                    bordered={true}
-                                    condensed={true}
                                     selectedIds={this.selectionKeySet ? this.selectionKeySet.keys as any[] as string[] : []}
                                     probedIds={this.probeKeySet ? this.probeKeySet.keys as any[] as string[] : []}
                                     onProbe={this.handleProbe.bind(this)}
                                     onSelection={this.handleSelection.bind(this)}
-                                    showIdColumn={false}
                 />
     }
 }

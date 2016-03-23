@@ -139,6 +139,7 @@ export default class ListItem extends React.Component<IListProps, IListState>
                             padding: 5,
                             height: 30,
                             width: "100%",
+							whiteSpace: "nowrap"
                         };
 
                         if (selected && hovered)

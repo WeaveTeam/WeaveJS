@@ -351,6 +351,9 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	{
 		return (
 			<VBox>
+				{
+					super.renderEditor()
+				}
 				<HBox>
 					<label>
 						{Weave.lang("Fill")}
@@ -363,9 +366,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						<input type="text"/>
 					</label>
 				</HBox>
-				{
-					super.renderEditor()
-				}
 			</VBox>
 		)
 	}

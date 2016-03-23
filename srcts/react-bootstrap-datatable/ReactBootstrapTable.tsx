@@ -15,6 +15,7 @@ export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTab
     bordered?:boolean;
     condensed?:boolean;
     hover?:boolean;
+	selectable?:boolean;
     sortable?:boolean;
     selectedIds?:string[];
     probedIds?:string[];
@@ -50,9 +51,24 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         	this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
     }
 
+	static defaultProps:IReactBootstrapTableProps = {
+		idProperty:'',
+		rows:[] as any,
+		columnTitles:[] as any,
+		hover: true,
+		selectable: true,
+		striped: true,
+		bordered: true,
+		condensed: true,
+		showIdColumn: false
+	}
+
     onMouseOver(id:string, status:boolean)
 	{
-        var probedIds:string[] = this.state.probedIds.concat();
+		if(!this.props.hover)
+			return;
+        
+		var probedIds:string[] = this.state.probedIds.concat();
 
         // find the selected record location
         var keyLocation:number = probedIds.indexOf(id);
@@ -76,6 +92,9 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 
     onMouseDown(id:string, event:React.MouseEvent)
 	{
+		if(!this.props.selectable)
+			return;
+
         var selectedIds:string[] = this.state.selectedIds.concat();
 
         // in single selection mode,

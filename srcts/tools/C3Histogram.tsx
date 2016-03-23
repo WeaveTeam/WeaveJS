@@ -1,5 +1,7 @@
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
+import {VBox, HBox} from "../react-ui/FlexBox";
+import ReactUtils from "../utils/ReactUtils";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
@@ -456,6 +458,30 @@ export default class C3Histogram extends AbstractC3Tool
 		
 		return false;
     }
+	
+	selectableAttributes:{[label:string]:DynamicColumn} = {
+			"Group By":this.binnedColumn.internalDynamicColumn,
+			"Height values (Optional)": this.columnToAggregate,
+	};//TODO handle remaining attributes
+	
+	renderEditor():JSX.Element
+	{
+		return (
+			<VBox>
+				{
+					super.renderEditor()
+				}
+				{
+					ReactUtils.generateTable(null, [
+						[
+							Weave.lang("Height aggregation method"),
+							<div/>
+						]
+					])
+				}
+			</VBox>
+		)
+	}
 
     get deprecatedStateMapping()
     {

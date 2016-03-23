@@ -96,7 +96,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 
 		return (
 			<HBox style={{flex: 1}}>
-				<VBox style={{ flex: .25 }}>
+				<VBox style={{ width: 250 }}>
 					<List
 						options={listOptions}
 						multiple={false}
@@ -105,7 +105,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 					/>
 				</VBox>
 				<div style={{ backgroundColor: '#f0f0f0', width: 4}}/>
-				<VBox style={{ flex: .75 }}>
+				<VBox style={{ flex: 1 }}>
 					{editorJsx}
 				</VBox>
 			</HBox>
