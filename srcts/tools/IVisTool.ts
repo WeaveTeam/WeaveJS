@@ -18,5 +18,5 @@ export interface IVisTool extends ILinkableObject
 {
     title:string;
 	renderEditor?():JSX.Element;
-    selectableAttributes?:{[label:string]:DynamicColumn|LinkableHashMap};
+    selectableAttributes?:{[label:string]:DynamicColumn|LinkableHashMap};//TODO make this into an interface?
 }
