@@ -9,25 +9,29 @@ import LinkableWatcher = weavejs.core.LinkableWatcher;
 import IDataSource = weavejs.api.data.IDataSource;
 import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 
 export interface IDataSourceEditorProps {
 	dataSource: IDataSource;
 };
 
 export interface IDataSourceEditorState {
-	
+	selectedNode?: IWeaveTreeNode;
 };
 
 export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
 {
 	watcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.forceUpdate.bind(this)));
+
 	protected tree:WeaveTree;
 
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
 		this.componentWillReceiveProps(props);
+		this.state = {
+			selectedNode: null
+		}
 	}
 	
 	componentDidMount() {
@@ -76,10 +80,24 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	
 	showColumns(selectedItems:IWeaveTreeNode[])
 	{
+		var node = selectedItems && selectedItems.length && selectedItems[0];
+		this.setState({
+			selectedNode: node
+		});
+	}
+
+	showColumnPreview(selectedItems:IWeaveTreeNode[])
+	{
+		var ref = selectedItems && selectedItems.length && Weave.AS(selectedItems[0], weavejs.api.data.IColumnReference);
+		if (ref)
+		{
+			var meta = ref.getColumnMetadata();
+			//if (meta)
+		}
 		console.log(selectedItems);
 	}
 
-	customTable(props:{columns?:IAttributeColumn[], style?:React.CSSProperties}):JSX.Element
+	customTable(props:{columns:ReferencedColumn, style?:React.CSSProperties}):JSX.Element
 	{
 		return <div/>;
 	}
@@ -90,10 +108,15 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		return (
 			<HBox style={{flex: 1}}>
 				<VBox style={{flex: 1}}>
-					<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} onSelect={(selectedItems) => this.showColumns(selectedItems)} ref={ (c) => { this.tree = c; } }/>
+					<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
 				</VBox>
+				<div style={{width: 4}}/>
 				<VBox style={{flex: 1}}>
-					<div style={{flex: 1}}>List of Columns</div>
+					{
+						this.state.selectedNode
+						?  <WeaveTree root={this.state.selectedNode} hideRoot={true} hideBranches={true} onSelect={(selectedItems) => this.showColumnPreview(selectedItems)}/>
+						: null
+					}
 					<div style={{flex: 1}}>Table view</div>
 				</VBox>
 			</HBox>

@@ -21,8 +21,6 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 		(props.dataSource as WeaveDataSource).rootId.addGroupedCallback(this, this.setHierarchySelection, false);
 	}
 
-	state:IDataSourceEditorState = {dataSource: null};
-
 	onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
 		let item = selectedItems[0] as EntityNode;
 		if (this.props.dataSource && item instanceof EntityNode)

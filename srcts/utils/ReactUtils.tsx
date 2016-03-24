@@ -94,6 +94,29 @@ export default class ReactUtils
 				{tableBody}
 			</table>
 		)
+		// var allRows = [header].concat(body);
+		// var columns = _.zip(allRows);
+		// return (
+		// 	<HBox style={_.merge({flex: 1}, styles.table)} className={classes.table}>
+		// 	{
+		// 		columns.map((column, i) => {
+		// 			return (
+		// 				<VBox key={i} style={{flex: 1}}>
+		// 				{
+		// 					column.map((cell, j) => {
+		// 						if(j == 0)
+		// 							return <HBox key={j} style={_.merge({flex: 1}, styles.td)} className={classes.thead}> {cell} </HBox>
+		// 						let style = Array.isArray(styles.td) ? (styles.td as React.CSSProperties[])[j] : styles.td;
+		// 						return <HBox key={j} style={_.merge({flex: 1}, styles.td)} className={classes.td}> {cell} </HBox>
+		// 					})
+		// 				}
+		// 				</VBox>
+		// 			)
+		// 			
+		// 		})
+		// 	}
+		// 	</HBox>
+		// )
 	}
 	/**
 	 * Checks if a component has focus.

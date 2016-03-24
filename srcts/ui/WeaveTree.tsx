@@ -17,6 +17,7 @@ export interface IWeaveTreeProps {
 	style?: any;
 	hideRoot?: boolean;
 	hideLeaves? : boolean;
+	hideBranches? : boolean;
 	multipleSelection?: boolean;
 	searchFilter? : string;
 	onSelect?: (selectedItems: Array<IWeaveTreeNode>) => void;
@@ -222,8 +223,9 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
 		}
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22);
+		let items = this.props.hideBranches ? this.props.root.getChildren().filter((n) => !n.isBranch()) : this.enumerateItems(this.props.root);
 		return <ListView style={this.props.style}
-						 items={this.enumerateItems(this.props.root)}
+						 items={items}
 						 itemRender={this.renderItem}
 						 itemHeight={this.rowHeight}/>;
 	}
