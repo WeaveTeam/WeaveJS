@@ -20,10 +20,14 @@ export default class StatefulCheckBox extends React.Component<StatefulCheckBoxPr
 
 	state: StatefulCheckBoxState = { checked: false };
 
+	onChange=(event:React.FormEvent)=>
+	{
+		this.setState({ checked: (event.target as HTMLInputElement).checked });
+	}
+
 	onClick=(event:React.MouseEvent)=>
 	{
-		this.setState({ checked: !this.state.checked });
-		if (this.props.stopPropagation)
+		if (this.props.stopPropagation)		
 			event.stopPropagation();
 	}
 
@@ -31,10 +35,8 @@ export default class StatefulCheckBox extends React.Component<StatefulCheckBoxPr
 		var props = _.clone(this.props);
 		delete props.children;
 
-		let className = this.state.checked ? "fa fa-check-square-o fa-fw" : "fa fa-square-o fa-fw";
-
 		return (
-			<span className={className} onClick={this.onClick}/>
+			<input onClick={this.onClick} onChange={this.onChange} type="checkbox" checked={this.state.checked}/>
 		);
 	}
 }
