@@ -25,13 +25,24 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
     }
 
     private columnList:ListOption[] =[];
+    private selectedColumn:IAttributeColumn;
+
     removeSelected = ():void =>{
+        var colName = this.props.columns.getName(this.selectedColumn);
+        this.props.columns.removeObject(colName);
+    };
+
+    selectAll =():void =>{
 
     };
 
-    select =():void =>{
-
+    select =(selectedItems:Array<IAttributeColumn>): void =>{
+        this.selectedColumn = selectedItems[0];
     };
+
+    componentDidMount(){
+        Weave.getCallbacks(this.props.columns).addGroupedCallback(this, this.forceUpdate);
+    }
 
     render(): JSX.Element {
         var labelStyle = {textAlign : 'center',alignSelf :'flex-start', fontSize : 'smaller'};
@@ -39,11 +50,13 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         var columnItem = classNames({'weave-column-listItem': true});
 
         var colObjs = this.props.columns.getObjects();
+        let listItems : ListOption[] = [];
         colObjs.forEach((column:IAttributeColumn, index:number)=>{
             let label = ColumnUtils.getColumnListLabel(column);
-            this.columnList.push({label:label, value : column});
+            listItems.push({label:label, value : column});
 
         });
+        this.columnList = listItems;
 
         var title = "Attribute Selector for " + this.props.label;
         var buttonUI = <button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>;
@@ -56,8 +69,8 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
                         {this.props.btn ? buttonUI : labelUI}
                     </OverlayTrigger>
 
-                    <div style={ {flex : 1, fontSize: 'smaller'} }>
-                        <List options={ this.columnList }/>
+                    <div >
+                        <List style={ {flex : 1, fontSize: 'smaller'}}  options={ this.columnList }  onChange={ this.select }/>
 
                         <HBox>
                             <button>Select All</button>
