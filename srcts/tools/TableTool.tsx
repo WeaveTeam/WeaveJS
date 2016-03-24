@@ -10,6 +10,7 @@ import AbstractVisTool from "./AbstractVisTool";
 import Menu from "../react-ui/Menu";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
+import FixedDataTable from "./FixedDataTable";
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -22,11 +23,13 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import KeySet = weavejs.data.key.KeySet;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import QKey = weavejs.data.key.QKey;
 
 export interface IDataTableState extends IVisToolState
 {
     data:IRow[],
-    columnTitles:{[columnId:string]: string}
+    columnTitles:{[columnId:string]: string},
+	columnIds:string[]
 }
 
 export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool
@@ -34,6 +37,9 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
     columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 	
 	sortFieldIndex = Weave.linkableChild(this, new LinkableNumber(0));
+	columnWidth = Weave.linkableChild(this, new LinkableNumber(85));
+	rowHeight = Weave.linkableChild(this, new LinkableNumber(30));
+	headerHeight = Weave.linkableChild(this, new LinkableNumber(50));
 	sortInDescendingOrder = Weave.linkableChild(this, new LinkableBoolean(false));
 
     panelTitle = Weave.linkableChild(this, new LinkableString);
@@ -46,6 +52,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
     private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
 	
 	idProperty:string = ''; // won't conflict with any column name
+	private element:HTMLElement;
+	private secondRender = false;
 
     constructor(props:IVisToolProps)
     {
@@ -60,7 +68,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
         this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
         this.state = {
             data: [],
-            columnTitles: {}
+            columnTitles: {},
+			columnIds: []
         };
     }
 
@@ -81,7 +90,17 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
     componentDidUpdate()
     {
+		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
 
+		if (this.secondRender)
+		{
+			this.secondRender = false;
+		}
+		else
+		{
+			this.secondRender = true;
+			this.forceUpdate();
+		}
     }
 
 	getMenuItems():MenuItemProps[]
@@ -110,11 +129,11 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		var titles:string[] = columns.map(column => Weave.lang(column.getMetadata("title")));
         var columnTitles = _.zipObject(names, titles) as { [columnId: string]: string; };
         columnTitles[this.idProperty] = Weave.lang("Key");
-		
 
         this.setState({
             data: records,
-            columnTitles
+            columnTitles,
+			columnIds: names
         });
     }
 
@@ -126,27 +145,47 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
     //         return cell;
     // }
 
-    handleProbe(ids:IQualifiedKey[])
+    setProbe=(ids:IQualifiedKey[]) =>
     {
         this.probeKeySet.replaceKeys(ids)
-    }
+    };
 
-    handleSelection(ids:IQualifiedKey[])
+	clearProbe=() =>
+	{
+		this.probeKeySet.clearKeys();
+	};
+
+    handleSelection=(ids:IQualifiedKey[]) =>
     {
         this.selectionKeySet.replaceKeys(ids);
-    }
+    };
 
     render()
     {
-        return <ReactBootstrapTable columnTitles={this.state.columnTitles}
-                                    rows={this.state.data}
-                                    idProperty={this.idProperty}
-                                    selectedIds={this.selectionKeySet ? this.selectionKeySet.keys as any[] as string[] : []}
-                                    probedIds={this.probeKeySet ? this.probeKeySet.keys as any[] as string[] : []}
-                                    onProbe={this.handleProbe.bind(this)}
-                                    onSelection={this.handleSelection.bind(this)}
-                />
-    }
+		return(
+			<FixedDataTable
+				columnTitles={this.state.columnTitles}
+				rows={this.state.data}
+				idProperty={this.idProperty}
+				striped={true}
+				hover={true}
+				bordered={true}
+				condensed={true}
+				selectedIds={this.selectionKeySet ? this.selectionKeySet.keys as QKey[] : []}
+				probedIds={this.probeKeySet ? this.probeKeySet.keys as QKey[] : []}
+				onProbeOver={this.setProbe}
+				onProbeOut={this.clearProbe}
+				onSelection={this.handleSelection}
+				showIdColumn={false}
+				columnIds={this.state.columnIds}
+				width={this.secondRender ? this.element.clientWidth:0}
+				height={this.secondRender ? this.element.clientHeight:0}
+				rowHeight={this.rowHeight.value}
+				headerHeight={this.headerHeight.value}
+				columnWidth={this.columnWidth.value}
+			/>
+		);
+}
 }
 
 Weave.registerClass("weavejs.tool.Table", TableTool, [weavejs.api.ui.IVisTool_Utility, weavejs.api.core.ILinkableObjectWithNewProperties], "Table");
