@@ -2,10 +2,14 @@ import * as React from "react";
 import {VBox, HBox} from "../react-ui/FlexBox";
 import ReactUtils from "../utils/ReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
+import WeaveTree from "../ui/WeaveTree";
 
 import WeaveAPI = weavejs.WeaveAPI;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import IDataSource = weavejs.api.data.IDataSource;
+import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
+import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
 export interface IDataSourceEditorProps {
 	dataSource: IDataSource;
@@ -18,6 +22,7 @@ export interface IDataSourceEditorState {
 export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
 {
 	watcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.forceUpdate.bind(this)));
+	protected tree:WeaveTree;
 
 	constructor(props:IDataSourceEditorProps)
 	{
@@ -32,6 +37,11 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	componentWillReceiveProps(props:IDataSourceEditorProps)
 	{
 		Weave.getCallbacks(props.dataSource).addGroupedCallback(this, this.forceUpdate);
+	}
+	
+	get dataSourceTreeNode():IWeaveTreeNode
+	{
+		return null;
 	}
 	
 	get editorFields():[string, JSX.Element][]
@@ -69,6 +79,36 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		)
 	}
 	
+	showColumns(selectedItems:IWeaveTreeNode[])
+	{
+		console.log(selectedItems);
+	}
+
+	customTable(props:{columns?:IAttributeColumn[], style?:React.CSSProperties}):JSX.Element
+	{
+		return <div/>;
+	}
+	
+	renderBrowseView():JSX.Element
+	{
+		var CustomTable = this.customTable;
+		return (
+			<HBox style={{flex: 1}}>
+				<VBox style={{flex: 1}}>
+					{
+						this.dataSourceTreeNode 
+						? <WeaveTree root={this.dataSourceTreeNode} hideLeaves={true} onSelect={(selectedItems) => this.showColumns(selectedItems)} ref={ (c) => { this.tree = c; } }/>
+						: null
+					}
+				</VBox>
+				<VBox style={{flex: 1}}>
+						<div style={{flex: 1}}>List of Columns</div>
+						<div style={{flex: 1}}>Table view</div>
+				</VBox>
+			</HBox>
+		);
+	}
+	
 	renderChildEditor():JSX.Element
 	{
 		return null;
@@ -82,7 +122,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 					this.renderFields()
 				}
 				{
-					this.renderChildEditor()
+					this.renderBrowseView()
 				}
 			</VBox>
 		)

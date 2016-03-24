@@ -24,7 +24,7 @@ export default class ListView extends React.Component<IListViewProps, IListViewS
 		heightPx: 0
 	};
 
-	onFrame=()=>
+	onFrame()
 	{
 		if (!this.container) return;
 
@@ -40,7 +40,7 @@ export default class ListView extends React.Component<IListViewProps, IListViewS
 		let firstItem = Math.floor(this.state.scrollTopPx / this.props.itemHeight);
 		let lastItem = Math.ceil(firstItem + this.state.heightPx / this.props.itemHeight);
 
-		let elements: JSX.Element[] = new Array<JSX.Element>(lastItem - firstItem);
+		let elements: JSX.Element[] = [];
 
 		for (let idx = firstItem; (idx < lastItem + 1) && (idx < this.props.items.length); idx++)
 		{
@@ -48,10 +48,12 @@ export default class ListView extends React.Component<IListViewProps, IListViewS
 			elements[idx-firstItem] = this.props.itemRender(item, idx);
 		}
 
-		return <div ref={ (c) => { this.container = c; } } style={_.merge({}, this.props.style, {overflow: "scroll"})}>
+		return (
+			<div ref={ (c) => { this.container = c; } } style={_.merge({}, this.props.style, {overflow: "auto", flex: 1})}>
 				<div style={{position: "relative", height: this.props.itemHeight * this.props.items.length}}>
 					{elements}
 				</div>
-			</div>;
+			</div>
+		);
 	}
 }

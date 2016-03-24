@@ -221,8 +221,9 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
 		}
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22);
-		return <ListView style={this.props.style} items={this.enumerateItems(this.props.root)}
-				itemRender={this.renderItem}
-				itemHeight={this.rowHeight}/>;
+		return <ListView style={this.props.style}
+						 items={this.enumerateItems(this.props.root)}
+						 itemRender={this.renderItem}
+						 itemHeight={this.rowHeight}/>;
 	}
 }
