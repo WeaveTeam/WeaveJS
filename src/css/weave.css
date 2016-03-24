@@ -363,15 +363,6 @@ div.weave-tree-view {
     max-width: 100%;
     max-height: 75%;
 }
-.weave-columns-list{
-	border:solid 1px #DCDCDC;
-	flex-grow: 1;
-    max-height:100px;
-	overflow-y : auto;
-	list-style-type: none;
-	font-size: smaller;
-	padding-left: 0;
-}
 .weave-list-Item{
 	cursor:pointer;
 	background-color: #FFFFFF;

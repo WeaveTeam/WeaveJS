@@ -12,31 +12,36 @@ import {ListOption} from "../react-ui/List";
 export interface ISelectableAttributesListProps{
     columns : LinkableHashMap;
     label:string;
-    btn:boolean;//if btn is true it will render button else string
+    button:boolean;//if button is true it will render button else string
 }
 
 export interface ISelectableAttributesListState{
-    selectedItems: ListOption[];
+    selectAll:boolean;
 }
 
 export default class SelectableAttributesList extends React.Component<ISelectableAttributesListProps, ISelectableAttributesListState>{
     constructor(props:ISelectableAttributesListProps){
         super(props);
+        this.state = {selectAll :false};
     }
-
-    private columnList:ListOption[] =[];
     private selectedColumn:IAttributeColumn;
 
     removeSelected = ():void =>{
-        var colName = this.props.columns.getName(this.selectedColumn);
-        this.props.columns.removeObject(colName);
+        if(this.state.selectAll)
+            this.props.columns.removeAllObjects();
+        else{
+            var colName = this.props.columns.getName(this.selectedColumn);
+            this.props.columns.removeObject(colName);
+        }
     };
 
-    selectAll =():void =>{
-
+    handleSelectAll =():void =>{
+            this.setState({selectAll : true});
     };
 
     select =(selectedItems:Array<IAttributeColumn>): void =>{
+        if(this.state.selectAll)
+            this.setState({selectAll :false});
         this.selectedColumn = selectedItems[0];
     };
 
@@ -46,17 +51,18 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
     render(): JSX.Element {
         var labelStyle = {textAlign : 'center',alignSelf :'flex-start', fontSize : 'smaller'};
-        var columnsList = classNames({'weave-columns-list' : true});
-        var columnItem = classNames({'weave-column-listItem': true});
+        var listStyle = {maxHeight: '100px',minHeight: '70px', overflowY: 'auto', border:'1px solid #dcdcdc'};
 
-        var colObjs = this.props.columns.getObjects();
-        let listItems : ListOption[] = [];
-        colObjs.forEach((column:IAttributeColumn, index:number)=>{
+        var selectedObjects:IAttributeColumn[];
+        var columnList: ListOption[] = [];
+        var columns = this.props.columns.getObjects();
+
+        if(this.state.selectAll)selectedObjects = columns;
+
+        columns.forEach((column:IAttributeColumn, index:number)=>{
             let label = ColumnUtils.getColumnListLabel(column);
-            listItems.push({label:label, value : column});
-
+            columnList.push({label:label, value : column});
         });
-        this.columnList = listItems;
 
         var title = "Attribute Selector for " + this.props.label;
         var buttonUI = <button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>;
@@ -66,14 +72,16 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
                                 overlay={ <Popover id="AttributeSelector" title={ title }>
                                                <AttributeSelector label={ this.props.label } attribute={ this.props.columns }/>
                                          </Popover>}>
-                        {this.props.btn ? buttonUI : labelUI}
+                        {this.props.button ? buttonUI : labelUI}
                     </OverlayTrigger>
 
                     <div >
-                        <List style={ {flex : 1, fontSize: 'smaller'}}  options={ this.columnList }  onChange={ this.select }/>
+                        <div style={listStyle}>
+                            <List style={ {flex : 1, fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
+                        </div>
 
                         <HBox>
-                            <button>Select All</button>
+                            <button onClick={ this.handleSelectAll }>Select All</button>
                             <button onClick={ this.removeSelected }>Remove Selected</button>
                         </HBox>
                     </div>
