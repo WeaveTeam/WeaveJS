@@ -57,6 +57,11 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		return new ColumnTreeNode({ dataSource: this.props.dataSource });
 	}
 	
+	get dataSourceTreeNode():ColumnTreeNode
+	{
+		return new ColumnTreeNode({ dataSource: this.props.dataSource });
+	}
+	
 	renderChildEditor():JSX.Element
 	{
 		let ds = this.props.dataSource as CSVDataSource;
