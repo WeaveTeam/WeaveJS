@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 import LinkableVariable = weavejs.core.LinkableVariable;
+import {VBox, HBox} from "../react-ui/FlexBox";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ReactUtils from "../utils/ReactUtils";
@@ -98,27 +99,29 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 
 		if (this.props.suggestions && this.props.suggestions.length > 0)
 		{
-			return <div style={{ position: "relative"}}>
-				<input style={_.merge({ width: "100%" }, this.props.style)}
+			return <HBox style={this.props.style}>
+				<input style={{ flex: 1 }}
 					onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange}
 					type="text" value={this.state.content} placeholder={this.state.content || this.props.noneLabel}
 					{...props as any}
 					/>
-				<i style={{ position: "absolute", top: 4, right: height/2, height: height, fontSize: height/2 }} onClick={this.openPopup} className="fa fa-caret-down weave-icon"/>
-			</div>;
+				<i onClick={this.openPopup} className="fa fa-caret-down weave-icon"/>
+			</HBox>;
 		}
 		else
 		{
 			return (
-				<input
-					{...props as any}
-					style={_.merge({width: "100%"}, this.props.style)}
-					type="text"
-					onFocus={this.onFocus}
-					onBlur={this.handleInputChange}
-					onChange={this.handleInputChange}
-					value={this.state.content}
-				/>
+				<HBox style={this.props.style}>
+					<input
+						{...props as any}
+						style={{ flex: 1 }}
+						type="text"
+						onFocus={this.onFocus}
+						onBlur={this.handleInputChange}
+						onChange={this.handleInputChange}
+						value={this.state.content}
+					/>
+				</HBox>
 			);
 		}
 	}
