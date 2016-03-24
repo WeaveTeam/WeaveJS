@@ -71,7 +71,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 
 
                 {this.props.attribute instanceof LinkableHashMap ?
-                    <VBox><SelectableAttributesList label={ this.props.label } columns={ (this.props.attribute as LinkableHashMap)}></SelectableAttributesList></VBox>
+                    <VBox><SelectableAttributesList btn={ false } label={ this.props.label } columns={ (this.props.attribute as LinkableHashMap)}></SelectableAttributesList></VBox>
                     : null}
             </VBox>
         );

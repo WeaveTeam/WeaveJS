@@ -10,6 +10,7 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 export interface ISelectableAttributesListProps{
     columns : LinkableHashMap;
     label:string;
+    btn:boolean;//if btn is true it will render button else string
 }
 
 export interface ISelectableAttributesListState{
@@ -33,13 +34,14 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         });
 
         var title = "Attribute Selector for " + this.props.label;
-
+        var buttonUI = <button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>;
+        var labelUI =<span>{this.props.label}</span> ;
         return(<VBox>
                     <OverlayTrigger trigger="click" placement="bottom"
                                 overlay={ <Popover id="AttributeSelector" title={ title }>
                                                <AttributeSelector label={ this.props.label } attribute={ this.props.columns }/>
                                          </Popover>}>
-                        <button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>
+                        {this.props.btn ? buttonUI : labelUI}
                     </OverlayTrigger>
 
                     <ul className= { columnsList} style={{background: 'white'}}>
