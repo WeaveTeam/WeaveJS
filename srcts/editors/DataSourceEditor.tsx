@@ -39,11 +39,6 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		Weave.getCallbacks(props.dataSource).addGroupedCallback(this, this.forceUpdate);
 	}
 	
-	get dataSourceTreeNode():IWeaveTreeNode
-	{
-		return null;
-	}
-	
 	get editorFields():[string, JSX.Element][]
 	{
 		return [
@@ -95,15 +90,11 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		return (
 			<HBox style={{flex: 1}}>
 				<VBox style={{flex: 1}}>
-					{
-						this.dataSourceTreeNode 
-						? <WeaveTree root={this.dataSourceTreeNode} hideLeaves={true} onSelect={(selectedItems) => this.showColumns(selectedItems)} ref={ (c) => { this.tree = c; } }/>
-						: null
-					}
+					<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} onSelect={(selectedItems) => this.showColumns(selectedItems)} ref={ (c) => { this.tree = c; } }/>
 				</VBox>
 				<VBox style={{flex: 1}}>
-						<div style={{flex: 1}}>List of Columns</div>
-						<div style={{flex: 1}}>Table view</div>
+					<div style={{flex: 1}}>List of Columns</div>
+					<div style={{flex: 1}}>Table view</div>
 				</VBox>
 			</HBox>
 		);

@@ -14,23 +14,11 @@ import EntityType = weavejs.api.data.EntityType;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
 export default class WeaveDataSourceEditor extends DataSourceEditor
-{
-	protected _dataSourceNode:EntityNode;
-
-	constructor(props:IDataSourceEditorProps)
-	{
-		super(props);
-	}
-	
+{	
 	componentWillReceiveProps(props:IDataSourceEditorProps)
 	{
 		super.componentWillReceiveProps(props);
 		(props.dataSource as WeaveDataSource).rootId.addGroupedCallback(this, this.setHierarchySelection, false);
-	}
-	
-	get dataSourceTreeNode():EntityNode
-	{
-		return new EntityNode((this.props.dataSource as WeaveDataSource).entityCache, EntityType.HIERARCHY);
 	}
 
 	state:IDataSourceEditorState = {dataSource: null};
