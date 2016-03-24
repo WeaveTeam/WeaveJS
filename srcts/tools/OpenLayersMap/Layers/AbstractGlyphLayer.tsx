@@ -21,6 +21,19 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 	dataY = Weave.linkableChild(this, DynamicColumn);
 	sourceProjection = Weave.linkableChild(this, LinkableString);
 
+	get editableFields()
+	{
+		return super.editableFields
+			.set("", this.sourceProjection);
+	}
+
+	get selectableAttributes()
+	{
+		return super.selectableAttributes
+			.set("X", this.dataX)
+			.set("Y", this.dataY);
+	}
+
 	constructor()
 	{
 		super();

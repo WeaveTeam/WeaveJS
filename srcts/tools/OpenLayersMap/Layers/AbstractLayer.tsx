@@ -5,12 +5,26 @@ import OpenLayersMapTool from "../../OpenLayersMapTool";
 import * as lodash from "lodash";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import WeaveAPI = weavejs.WeaveAPI;
+
+import StatefulTextField from "../../../ui/StatefulTextField";
+import StatefulComboBox from "../../../ui/StatefulComboBox";
+import StatefulCheckBox from "../../../ui/StatefulCheckBox";
+import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
+import SelectableAttributeComponent from "../../../ui/SelectableAttributeComponent";
+import ReactUtils from "../../../utils/ReactUtils";
+
+export type EditableField = [
+	LinkableBoolean|LinkableString|LinkableNumber,
+	(string | {label: string, value: any })[]
+] | LinkableVariable;
 
 export default class AbstractLayer implements ILinkableObject
 {
@@ -19,6 +33,68 @@ export default class AbstractLayer implements ILinkableObject
 	selectable = Weave.linkableChild(this, new LinkableBoolean(true));
 
 	private projectionSRS: LinkableString; /* A reference to the parent's projectionSRS LinkableString */
+
+	private renderEditableField(value:EditableField, key:string):[string, JSX.Element]
+	{
+		let lv: LinkableVariable;
+		let options: (string|{ label: string, value: any })[];
+		if (value instanceof LinkableVariable)
+		{
+			lv = value;
+			options = [];
+		}
+		else if (Array.isArray(value))
+		{
+			lv = value[0];
+			options = value[1];
+		}
+
+		if (lv instanceof LinkableString || lv instanceof LinkableNumber)
+		{
+			if (typeof options[0] === typeof "") {
+				return [Weave.lang(key), <StatefulTextField key={key} ref={linkReactStateRef(this, { content: lv }) } suggestions={options as string[]} />];
+			}
+			else if (typeof options[0] === typeof {}) {
+				return [Weave.lang(key), <StatefulComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
+			}
+			else
+			{
+				return [Weave.lang(key), <StatefulTextField key={key} ref={linkReactStateRef(this, { value: lv }) }/>];
+			}
+		}
+		else
+		{
+			return [Weave.lang(key), <StatefulCheckBox key={key} ref={linkReactStateRef(this, { checked: lv }) }/>];
+		}		
+	}
+
+	renderEditor(): JSX.Element {
+		let attributeList: JSX.Element[] = [];
+		let idx = 0;
+
+		for (let [key, value] of this.selectableAttributes) {
+			attributeList.push(<SelectableAttributeComponent attribute={value} label={Weave.lang(key)}/>)
+		}
+
+		let fieldList:[string, JSX.Element][] = [];
+		let table: JSX.Element;
+		this.editableFields.forEach((value, key) => {fieldList.push(this.renderEditableField(value,key));});
+
+		return <div>
+			{attributeList}
+			{ReactUtils.generateTable(null, fieldList)}
+		</div>;
+	}
+
+	get editableFields()
+	{
+		return new Map<string,EditableField>();
+	}
+
+	get selectableAttributes()
+	{
+		return new Map<string,DynamicColumn>();
+	}
 
 	constructor()
 	{
@@ -108,11 +184,6 @@ export default class AbstractLayer implements ILinkableObject
 	get outputProjection():string
 	{
 		return (this.projectionSRS && this.projectionSRS.value) || (this.parent && this.parent.getDefaultProjection()) || OpenLayersMapTool.DEFAULT_PROJECTION;
-	}
-
-	renderEditor():JSX.Element
-	{
-		return <div/>;
 	}
 
 	getDescription():string

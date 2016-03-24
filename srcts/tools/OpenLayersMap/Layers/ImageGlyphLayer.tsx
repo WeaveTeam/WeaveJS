@@ -22,6 +22,15 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 	dataAlpha = Weave.linkableChild(this, new AlwaysDefinedColumn(1.0));
 	dataColor = Weave.linkableChild(this, AlwaysDefinedColumn);
 
+	get selectableAttributes()
+	{
+		return super.selectableAttributes
+			.set("Image Size", this.imageSize.internalDynamicColumn)
+			.set("Image URL", this.imageURL.internalDynamicColumn)
+			.set("Image Alpha", this.dataAlpha.internalDynamicColumn)
+			.set("Image Tint", this.dataColor.internalDynamicColumn);
+	}
+
 	constructor()
 	{
 		super();

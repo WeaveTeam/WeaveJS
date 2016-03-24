@@ -2,10 +2,72 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 import AbstractLayer from "./AbstractLayer";
 import * as React from "react";
+import StatefulComboBox from "../../../ui/StatefulComboBox";
+import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import {VBox, HBox} from "../../../react-ui/FlexBox";
 
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
+
+interface ITileLayerEditorProps {
+	layer: TileLayer;
+}
+
+interface ITileLayerEditorState {
+	paramLayer: string;
+	paramAttributions: string;
+	paramProjection: string;
+}
+
+class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEditorState>
+{
+	constructor(props:ITileLayerEditorProps)
+	{
+		super(props);
+		this.componentWillReceiveProps(props);
+	}
+
+	componentWillReceiveProps(nextProps: ITileLayerEditorProps)
+	{
+		Weave.getCallbacks(nextProps.layer).addGroupedCallback(this, this.forceUpdate);
+	}
+
+	render(): JSX.Element
+	{
+		let layers: string[];
+		switch (this.props.layer.provider.value)
+		{
+			case "stamen":
+				layers = ["watercolor", "toner"];
+				break;
+			case "mapquest":
+				layers = ["sat", "osm"];
+				break;
+			default:
+				layers = null;
+		}
+
+		let providerOptions = [{ value: "stamen", label: "Stamen" }, { value: "mapquest", label: "MapQuest" }];
+
+		let layerSelection: JSX.Element;
+		if (layers)
+		{
+			layerSelection = <StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer }) }
+				options={layers.map((name) => { return { label: lodash.startCase(name), value: name }; }) }/>;
+		}
+		else
+		{
+			layerSelection = <div/>;
+		}
+
+
+		
+		return <VBox>
+			<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+			{layerSelection}
+		</VBox>;
+	}
+}
 
 export default class TileLayer extends AbstractLayer
 {
@@ -16,9 +78,7 @@ export default class TileLayer extends AbstractLayer
 
 	renderEditor():JSX.Element
 	{
-		return <VBox>
-
-		</VBox>;
+		return <TileLayerEditor layer={this}/>;
 	}
 
 	constructor()

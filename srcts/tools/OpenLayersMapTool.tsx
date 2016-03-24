@@ -115,10 +115,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				</HBox>
 			],
 			[Weave.lang("Zoom Range"),
-				<HBox>
-					<StatefulTextField ref={linkReactStateRef(this, { content: this.minZoomLevel }) }/>
+				<HBox style={{ width: "100%" }}>
+					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { content: this.minZoomLevel }) }/>
 					{"-"}
-					<StatefulTextField ref={linkReactStateRef(this, { content: this.maxZoomLevel }) }/>
+					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { content: this.maxZoomLevel }) }/>
 				</HBox>
 			],
 			[Weave.lang("Show Zoom Slider"),
