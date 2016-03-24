@@ -49,6 +49,9 @@
     },
     "fuse/fuse.d.ts": {
       "commit": "6766ed1d0faf02ede9e2edf2e66bbb2388c825ec"
+    },
+    "fixed-data-table/fixed-data-table.d.ts": {
+      "commit": "7de6c3dd94feaeb21f20054b9f30d5dabc5efabd"
     }
   }
 }
