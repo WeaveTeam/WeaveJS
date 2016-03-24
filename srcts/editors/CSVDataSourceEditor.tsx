@@ -16,9 +16,16 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
 
 export default class CSVDataSourceEditor extends DataSourceEditor
 {
+	private _dataSourceNode:ColumnTreeNode
+	constructor(props:IDataSourceEditorProps)
+	{
+		super(props);
+	}
+	
 	get editorFields():[string, JSX.Element][]
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
@@ -43,6 +50,11 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			]
 		];
 		return super.editorFields.concat(editorFields)
+	}
+	
+	get dataSourceTreeNode():ColumnTreeNode
+	{
+		return new ColumnTreeNode({ dataSource: this.props.dataSource });
 	}
 	
 	renderChildEditor():JSX.Element

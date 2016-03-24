@@ -15,6 +15,8 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
 export default class WeaveDataSourceEditor extends DataSourceEditor
 {
+	protected _dataSourceNode:EntityNode;
+
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
@@ -24,6 +26,11 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 	{
 		super.componentWillReceiveProps(props);
 		(props.dataSource as WeaveDataSource).rootId.addGroupedCallback(this, this.setHierarchySelection, false);
+	}
+	
+	get dataSourceTreeNode():EntityNode
+	{
+		return new EntityNode((this.props.dataSource as WeaveDataSource).entityCache, EntityType.HIERARCHY);
 	}
 
 	state:IDataSourceEditorState = {dataSource: null};
@@ -40,8 +47,6 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 		}
 	}
 
-	private tree: WeaveTree;
-	
 	setHierarchySelection():void {
 		if (this.tree && this.props.dataSource)
 		{
@@ -75,13 +80,6 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			]
 		];
 		return super.editorFields.concat(editorFields)
-	}
-	
-	renderChildEditor():JSX.Element
-	{
-		let ds = (this.props.dataSource as WeaveDataSource);
-		let root = new EntityNode(ds.entityCache, EntityType.HIERARCHY);
-		return <WeaveTree style={{ flex: 1 }} hideRoot={true} root={root} onSelect={this.onHierarchySelected} ref={ (c) => { this.tree = c; } }/>;
 	}
 }
 
