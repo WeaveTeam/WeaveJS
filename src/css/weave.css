@@ -372,6 +372,16 @@ div.weave-tree-view {
 	font-size: smaller;
 	padding-left: 0;
 }
-.weave-column-listItem{
+.weave-list-Item{
 	cursor:pointer;
+	background-color: #FFFFFF;
+}
+.weave-list-Item:hover{
+	background-color: rgba(153, 214, 255, 0.4);
+}
+.weave-list-Item-selected{
+	background-color: #80CCFF;
+}
+.weave-list-Item-selected:hover{
+	background-color : #99D6FF;
 }

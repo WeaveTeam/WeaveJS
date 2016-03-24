@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as bs from "react-bootstrap";
 import * as _ from "lodash";
+import classNames from "../modules/classnames";
 import {HBox, VBox} from "./FlexBox";
 import MiscUtils from "../utils/MiscUtils";
 
@@ -10,20 +11,21 @@ export type ListOption = {
     label: string
 }
 
-export interface IListProps extends React.Props<ListItem> {
+export interface IListProps extends React.Props<List> {
     options: ListOption[];
     onChange?: (selectedValues: any[]) => void;
     selectedValues?: any[];
     allowClear?: boolean;
     multiple?: boolean;
+    style?:React.CSSProperties;
+    className?: string;
 }
 
 export interface IListState {
     selectedValues?: any[];
-    hovered?: number;
 }
 
-export default class ListItem extends React.Component<IListProps, IListState>
+export default class List extends React.Component<IListProps, IListState>
 {
     private checkboxes: HTMLElement[];
     private lastIndexClicked: number;
@@ -132,31 +134,20 @@ export default class ListItem extends React.Component<IListProps, IListState>
             <div style={{ flex: 1, overflow: "auto" }}>
                 {
                     this.values.map((value: any, index: number) => {
-                        var hovered: boolean = this.state.hovered == index;
                         var selected: boolean = this.state.selectedValues.indexOf(value) >= 0;
 
                         var style: React.CSSProperties = {
                             padding: 5,
-                            height: 30,
+                            height: 25,
                             width: "100%",
 							whiteSpace: "nowrap"
                         };
-
-                        if (selected && hovered)
-                            style["backgroundColor"] = "#99D6FF";
-
-                        if (selected && !hovered)
-                            style["backgroundColor"] = "#80CCFF";
-
-                        if (!selected && hovered) {
-                            style["backgroundColor"] = MiscUtils.rgba(153, 214, 255, 0.4);
-                        }
-
-                        if (!selected && !hovered)
-                            style["backgroundColor"] = "#FFFFFF";
+                        var className = classNames({
+                            'weave-list-Item' : true,
+                            'weave-list-Item-selected': selected });
 
                         return (
-                            <HBox key={index} style={style} onMouseOver={(event: React.MouseEvent) => { this.setState({ hovered: index }) } } onClick={this.handleChange.bind(this, value) }>
+                            <HBox key={index} style={_.merge(style, this.props.style)} className={ className }  onClick={this.handleChange.bind(this, value) }>
                                 <span style={{ flex: 1 }}>{this.labels[index] || value}</span>
                             </HBox>
                         );
