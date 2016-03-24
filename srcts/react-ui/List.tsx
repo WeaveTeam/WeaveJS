@@ -60,8 +60,8 @@ export default class List extends React.Component<IListProps, IListState>
     }
 
     componentWillReceiveProps(nextProps: IListProps) {
-        this.values = this.props.options.map((option: ListOption) => option.value);
-        this.labels = this.props.options.map((option: ListOption) => option.label);
+        this.values = nextProps.options.map((option: ListOption) => option.value);
+        this.labels = nextProps.options.map((option: ListOption) => option.label);
         if (nextProps.selectedValues) {
             this.setState({
                 selectedValues: nextProps.selectedValues
