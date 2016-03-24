@@ -125,7 +125,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	handleItemClick=(node:IWeaveTreeNode, e:React.MouseEvent)=>
 	{
-			this.internalSetSelected(node, !this.getSelected(node), e.ctrlKey);
+
+			this.internalSetSelected(node, e.ctrlKey ? !this.getSelected(node) : true, e.ctrlKey);
 	};
 
 	static CLASSNAME = "weave-tree-view";
@@ -158,7 +159,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		if (isExpandable)
 		{
 			iconClickFunc = (e: React.MouseEvent): void => {
-				this.internalSetOpen(node, !this.getOpen(node)); e.preventDefault();
+				this.internalSetOpen(node, !this.getOpen(node)); e.stopPropagation();
 			};
 
 			expanderClassName = isOpen ? WeaveTree.EXPANDER_OPEN_CLASS_NAME : WeaveTree.EXPANDER_CLOSED_CLASS_NAME;
@@ -170,10 +171,10 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		}
 
 		return <span key={index} className={className}
-			onClick={ this.handleItemClick.bind(this, node) }
+			onMouseDown={ this.handleItemClick.bind(this, node) }
 			onDoubleClick={ iconClickFunc } style={{ verticalAlign: "middle", position: "absolute", top: index * this.rowHeight, width: "100%"}}>
 			<span style={{ marginLeft: node.depth * 16, whiteSpace: "pre"}}>
-				<i onMouseDown={ iconClickFunc } className={ expanderClassName } style={{display: expanderClassName ? null : "none" }}/>
+				<i onMouseDown={ iconClickFunc } onDoubleClick={(e) => e.stopPropagation()} className={ expanderClassName } style={{display: expanderClassName ? null : "none" }}/>
 				<i className={iconClassName}/>
 				{ " "+node.getLabel() }
 			</span></span>;
