@@ -83,6 +83,14 @@ ul.dropdown-menu {
     color: -webkit-text;
 }
 
+div.table-row-selected>div>div>div>div>div {
+	background-color: rgb(128, 204, 255);
+}
+
+div.table-row-probed>div>div>div>div>div {
+	background-color: rgba(153, 214, 255, 0.4);
+}
+
 .weave-app {
 	user-select: none;
 	-webkit-user-select: none;
