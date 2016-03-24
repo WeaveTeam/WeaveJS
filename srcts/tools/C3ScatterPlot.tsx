@@ -298,11 +298,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					let probed = this.isProbed(key);
 					if (probed)
 						return 1.0;
-					if(selected)
-						return 0.5;
-					if (!selectionEmpty && !selected)
-						return 0;
-					return 0.0;
+					return 0.5;
 				})
 			.style("stroke-width",
 				(d: any, i: number, oi: number): number => {
