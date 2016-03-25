@@ -328,39 +328,6 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 			whiteSpace: "nowrap"
 		};
 
-		var selectedIds:string[];
-		var probedIds:string[];
-
-		// if (this.props.selectedIds)
-		//     selectedIds = this.props.selectedIds;
-		// else
-		//     selectedIds = this.state.selectedIds;
-		//
-		// if (this.props.probedIds)
-		//     probedIds = this.props.probedIds;
-		// else
-		//     probedIds = this.state.probedIds;
-
-		// return (
-		// 	<div style={tableContainer}>
-		// 		<Table key="table" ref="table" striped={this.props.striped} bordered={this.props.bordered} condensed={this.props.condensed}>
-		// 			<TableHead key="head"
-		// 					   ref={(c:TableHead) => {this.tableHead = c;}}
-		// 					   columnTitles={this.props.columnTitles}
-		// 					   idProperty={this.props.idProperty}
-		// 					   showIdColumn={this.props.showIdColumn}/>
-		// 			<TableBody key="body" ref={(c:TableBody) => {this.tableBody = c;}}
-		// 					   idProperty={this.props.idProperty}
-		// 					   onMouseOver={this.onMouseOver.bind(this)}
-		// 					   onMouseDown={this.onMouseDown.bind(this)}
-		// 					   rows={this.props.rows}
-		// 					   selectedIds={this.state.selectedIds}
-		// 					   probedIds={this.state.probedIds}
-		// 					   showIdColumn={this.props.showIdColumn}/>
-		// 		</Table>
-		// 	</div>
-		// );
-
 		return (
 			<div style={tableContainer}>
 				<Table
