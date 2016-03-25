@@ -133,12 +133,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 					? <FixedDataTable rows={rows} 
 									  columnIds={columnIds} 
 									  idProperty="id"
-									  width={this.tableContainerElement.clientWidth}
-									  height={this.tableContainerElement.clientHeight}
 									  columnWidth={this.tableContainerElement.clientWidth/columnIds.length} 
-									  columnTitles={columnTitles}
-									  headerHeight={15}
-									  rowHeight={15}/>
+									  columnTitles={columnTitles}/>
 					: ""
 				}
 			</VBox>
