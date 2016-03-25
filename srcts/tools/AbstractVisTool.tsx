@@ -21,11 +21,6 @@ import SelectableAttributesList from "../ui/SelectableAttributesList";
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import KeySet = weavejs.data.key.KeySet;
-import DynamicColumn = weavejs.data.column.DynamicColumn;
-import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
-import NormalizedColumn = weavejs.data.column.NormalizedColumn;
-import SolidFillStyle = weavejs.geom.SolidFillStyle;
-import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableString = weavejs.core.LinkableString;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
@@ -33,9 +28,8 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import WeaveMenuItem = weavejs.util.WeaveMenuItem;
 import KeyFilter = weavejs.data.key.KeyFilter;
-import EntityNode = weavejs.data.hierarchy.EntityNode;
-import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export class Margin
 {
@@ -64,7 +58,7 @@ Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 
 export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
-	selectableAttributes:{[label:string]:DynamicColumn|LinkableHashMap};
+	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap};
 	constructor(props:P)
 	{
 		super(props);
@@ -200,9 +194,9 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		var attrLabels = Object.keys(Object(this.selectableAttributes));
 
 		var selectors = attrLabels.map((label:string, index:number) => {
-			if (this.selectableAttributes[label] instanceof DynamicColumn)
+			if (Weave.IS(this.selectableAttributes[label], IColumnWrapper))
 			{
-				let attribute = this.selectableAttributes[label] as DynamicColumn;
+				let attribute = this.selectableAttributes[label] as IColumnWrapper;
 				return <SelectableAttributeComponent label={ label } attribute={ attribute }/>;
 			}
 			else // LinkableHashMap

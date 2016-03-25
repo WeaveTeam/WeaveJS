@@ -2,9 +2,8 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import WeavePath = weavejs.path.WeavePath;
 
 import ToolTip from "./ToolTip";
-import IAttributeColumn = weavejs.api.data.IAttributeColumn;
-import DynamicColumn = weavejs.data.column.DynamicColumn;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export interface IVisToolProps
 {
@@ -18,5 +17,6 @@ export interface IVisTool extends ILinkableObject
 {
     title:string;
 	renderEditor?():JSX.Element;
-    selectableAttributes?:{[label:string]:DynamicColumn|LinkableHashMap};//TODO make this into an interface?
+    selectableAttributes?:{[label:string]:IColumnWrapper|LinkableHashMap};//TODO make this into an interface?
+
 }
