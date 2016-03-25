@@ -1,5 +1,4 @@
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
 import * as _ from 'lodash';
 import {Table, Column, Cell} from 'fixed-data-table';
 import CellProps = FixedDataTable.CellProps;
@@ -52,6 +51,8 @@ export interface IFixedDataTableState
 	sortDirection?:string;
 	probedIds?:string[];
 	selectedIds?:string[];
+	width?:number;
+	height?:number;
 }
 
 export interface ISortHeaderProps extends React.Props<SortHeaderCell>
@@ -312,14 +313,13 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 		this.setState(newState);
 	}
 
-	componentDidMount()
-	{
-		this.container = ReactDOM.findDOMNode(this) as HTMLElement;
-	}
-
 	getCell(props:CellProps,id:string)
 	{
 		return
+	}
+
+	handleResize=(newSize:ResizingDivState) => {
+		_.debounce(() => this.setState({width:newSize.width, height:newSize.height}),0)();
 	}
 
 	render():JSX.Element
@@ -334,12 +334,12 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 		var	sortIndices = this.props.rows.map((row, index) => index);
 		this.sortColumnIndices(this.state.sortId, this.state.sortDirection, sortIndices);
 		return (
-			<ResizingDiv style={tableContainer}>
-				{this.container ?
+			<ResizingDiv style={tableContainer} onResize={this.handleResize}>
+				{this.state.width && this.state.height ?
 					<Table
 						rowsCount={this.props.rows.length}
-						width={this.container.clientWidth}
-						height={this.container.clientHeight}
+						width={this.state.width}
+						height={this.state.height}
 						headerHeight={this.props.headerHeight}
 						rowHeight={this.props.rowHeight}
 						onRowMouseDown={this.onMouseDown}
