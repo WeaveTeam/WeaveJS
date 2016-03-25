@@ -24,7 +24,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 	get editableFields()
 	{
 		return super.editableFields
-			.set("", this.sourceProjection);
+			.set("Source Projection", this.sourceProjection);
 	}
 
 	get selectableAttributes()

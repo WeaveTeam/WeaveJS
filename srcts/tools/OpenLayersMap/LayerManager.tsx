@@ -2,7 +2,9 @@ import * as _ from "lodash";
 import * as React from "react";
 import AbstractLayer from "./Layers/AbstractLayer";
 import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
+
 import {VBox, HBox} from "../../react-ui/FlexBox";
+import ReactUtils from "../../utils/ReactUtils";
 import ListView from "../../ui/ListView";
 import StatefulCheckBox from "../../ui/StatefulCheckBox";
 import StatefulRangeSlider from "../../ui/StatefulRangeSlider";
@@ -28,7 +30,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 
 	state: ILayerManagerState = {
 		selectedLayer: null,
-		openedLayer: null
+		openedLayer: null,
 	};
 
 	componentWillReceiveProps(nextProps:ILayerManagerProps)
@@ -55,7 +57,9 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 					{Weave.lang("Selectable")}
 				</span>
 				<span style={marginStyle}>{layer.getDescription() }</span>
-				<span style={{ float: "right", borderColor: "black", borderStyle: "solid", borderWidth: "1px" }} onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }><i className="fa fa-gear"/>{Weave.lang("Edit") }</span>
+				<button onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }>
+					<i className="fa fa-gear"/>{Weave.lang("Edit")}
+				</button>
 		</div>;
 	}
 
@@ -71,14 +75,37 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		this.props.layers.setNameOrder(names);
 	};
 
+	removeSelected=()=>{
+		let selectedName = this.props.layers.getName(this.state.selectedLayer);
+		this.props.layers.removeObject(selectedName);
+	}
+
 	get selectionIndex():number {
 		return this.props.layers.getObjects().indexOf(this.state.selectedLayer);
 	}
+
+	
+	static layerClassNames = [
+		"weave.visualization.plotters::GeometryPlotter",
+		"weave.visualization.plotters::ImageGlyphPlotter",
+		"weave.visualization.plotters::TextGlyphPlotter",
+		"weave.visualization.plotters::ScatterPlotPlotter",
+		"weave.visualization.plotters::WMSPlotter"
+	];
 
 	/* TODO: Add drag-and-drop of layers. */
 	render():JSX.Element
 	{
 		let flex1: React.CSSProperties = { flex: 1 };
+
+		let addLayerMenuItem = (layerClassName:string):{ label: string, onClick: React.MouseEventHandler } => {
+			let label = _.last(layerClassName.split("::"));
+			let onClick = () => {
+				this.props.layers.requestObject(this.props.layers.generateUniqueName(label), Weave.getDefinition(layerClassName));
+			}
+			return { label , onClick };
+		};
+
 		if (!this.state.openedLayer)
 		{
 			return <VBox>
@@ -86,7 +113,10 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 					{this.props.layers.getObjects().reverse().map(this.generateItem)}
 				</div>
 				<HBox>
-					<button style={flex1}><i className="fa fa-plus"/></button>
+					<MenuButton style={flex1} items={LayerManager.layerClassNames.map(addLayerMenuItem)}>
+						<i className="fa fa-plus"/>
+					</MenuButton>
+					<button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></button>
 					<button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} 
 							onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></button>
 					<button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down"/></button>
@@ -97,7 +127,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		{
 			return <VBox>
 				<HBox>
-					<button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null }) }>
+					<button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null}) }>
 						<i className="fa fa-arrow-left"/>
 					</button>
 					{Weave.lang("Layer: {0}", this.props.layers.getName(this.state.openedLayer))}
@@ -105,5 +135,60 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 				{this.state.selectedLayer.renderEditor()}
 			</VBox>;
 		}
+	}
+}
+
+interface IMenuButtonProps extends React.HTMLProps<MenuButton>
+{
+	items: { label: string, onClick: React.MouseEventHandler} [];
+
+}
+
+interface IMenuButtonState { };
+
+class MenuButton extends React.Component<IMenuButtonProps,IMenuButtonState> {
+	private dropdownInstance: React.ReactInstance;
+	private button: HTMLButtonElement
+
+	closePopup=():void=>
+	{
+		if (this.dropdownInstance) {
+			ReactUtils.closePopup(this.dropdownInstance);
+			this.dropdownInstance = null;
+		}
+	}
+
+	renderItem(value:{label:string, onClick: React.MouseEventHandler}, index:number)
+	{
+		let newOnClick = (e:React.MouseEvent) => {
+			this.closePopup();
+			value.onClick(e);
+		}
+		return <div className="weave-menuitem" onClick={newOnClick} key={index.toString() }>
+			{value.label}
+		</div>;
+	}
+
+	openPopup=():void=>
+	{
+		let rect = this.button.getBoundingClientRect();
+		this.dropdownInstance = ReactUtils.openPopup(
+			<div className="weave-menu" style={{position: "absolute", top: rect.bottom, left: rect.left}}>
+				{this.props.items.map(this.renderItem, this)}
+			</div>, true
+		);
+	}
+
+	render():JSX.Element
+	{
+		let props = _.clone(this.props);
+		delete props.children;
+		delete props.items;
+		delete props.style;
+		delete props.onClick;
+
+		return <button style={_.merge({ position: "relative" }, this.props.style) } ref={(c) => this.button = c} onClick={this.openPopup} {...props as any}>
+			{this.props.children}
+		</button>;
 	}
 }

@@ -20,11 +20,11 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 	get selectableAttributes()
 	{
 		return super.selectableAttributes
-			.set("Fill Color", this.fill.color.internalDynamicColumn)
-			.set("Fill Alpha", this.fill.alpha.internalDynamicColumn)
-			.set("Line Color", this.line.color.internalDynamicColumn)
-			.set("Line Alpha", this.line.alpha.internalDynamicColumn)
-			.set("Line Thickness", this.line.normalizedWeightColumn.internalDynamicColumn)
+			.set("Fill Color", this.fill.color)
+			.set("Fill Alpha", this.fill.alpha)
+			.set("Line Color", this.line.color)
+			.set("Line Alpha", this.line.alpha)
+			.set("Line Thickness", this.line.normalizedWeightColumn)
 			.set("Radius", this.radiusData);
 	}
 

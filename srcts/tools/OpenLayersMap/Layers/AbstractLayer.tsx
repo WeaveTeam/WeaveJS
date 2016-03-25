@@ -12,6 +12,7 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import WeaveAPI = weavejs.WeaveAPI;
 
 import StatefulTextField from "../../../ui/StatefulTextField";
@@ -93,7 +94,7 @@ export default class AbstractLayer implements ILinkableObject
 
 	get selectableAttributes()
 	{
-		return new Map<string,DynamicColumn>();
+		return new Map<string,IColumnWrapper>();
 	}
 
 	constructor()

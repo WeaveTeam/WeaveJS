@@ -25,10 +25,10 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 	get selectableAttributes()
 	{
 		return super.selectableAttributes
-			.set("Image Size", this.imageSize.internalDynamicColumn)
-			.set("Image URL", this.imageURL.internalDynamicColumn)
-			.set("Image Alpha", this.dataAlpha.internalDynamicColumn)
-			.set("Image Tint", this.dataColor.internalDynamicColumn);
+			.set("Image Size", this.imageSize)
+			.set("Image URL", this.imageURL)
+			.set("Image Alpha", this.dataAlpha)
+			.set("Image Tint", this.dataColor);
 	}
 
 	constructor()
