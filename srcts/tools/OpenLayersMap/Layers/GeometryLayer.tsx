@@ -10,6 +10,7 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import GeometryColumn = weavejs.data.column.GeometryColumn;
 
 
 export default class GeometryLayer extends AbstractFeatureLayer
@@ -18,7 +19,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
-	geometryColumn = Weave.linkableChild(this, DynamicColumn);
+	geometryColumn = Weave.linkableChild(this, new DynamicColumn(GeometryColumn));
 
 	get selectableAttributes()
 	{
