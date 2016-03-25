@@ -3,7 +3,7 @@ import {IVisTool, IVisToolProps, IVisToolState} from "../IVisTool";
 import AbstractFilterEditor from "./AbstractFilterEditor";
 import NumericRangeDataFilterEditor from "./NumericRangeDataFilterEditor";
 import DiscreteValuesDataFilterEditor from "./DiscreteValuesDataFilterEditor";
-import {FilterEditorProps, FilterEditorState} from "./AbstractFilterEditor";
+import SelectableAttributeComponent from "../../ui/SelectableAttributeComponent";
 import {HBox, VBox} from "../../react-ui/FlexBox";
 
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -19,48 +19,85 @@ import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 import WeaveAPI = weavejs.WeaveAPI;
+
 
 export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
-	public filter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(ColumnDataFilter));
-	public editor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(AbstractFilterEditor));
-	public editorType:typeof AbstractFilterEditor;
+	public filter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(ColumnDataFilter),this.handleFilterWatcher);
+	public filterEditor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(AbstractFilterEditor),this.handleEditor,true);
 
-	private listItemOptions:{value:new(..._:any[])=>AbstractFilterEditor, label:string}[] = [
-		{
-			value: NumericRangeDataFilterEditor,
-			label: "Continuous range"
-		},
-		{
-			value: DiscreteValuesDataFilterEditor,
-			label: "Discrete values"
-		}
-	]
 	
 	constructor(props:IVisToolProps) 
 	{
 		super(props);
 		Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
+
+		// Calling later will make sure instance of DataFilterTool linkableOwner is set
 		WeaveAPI.Scheduler.callLater(this, this.initLater);
 	}
 
-	handleEditorTypeChange(item:(typeof AbstractFilterEditor)[]) 
-	{
-		this.editor.requestLocalObject(item[0] as any, false);
-	}
-	
-	initLater() 
+	private initLater():void
 	{
 		// only set default path if session state hasn't been set yet
 		if (this.filter.triggerCounter == weavejs.core.CallbackCollection.DEFAULT_TRIGGER_COUNT)
 			this.filter.targetPath = ["defaultSubsetKeyFilter", "filters", Weave.getRoot(this).getName(this)];
+		if (!this.getFilter())
+			this.setEditorType(DiscreteValuesDataFilterEditor, null);
+	}
+
+	//todo does this require in JS version?
+	private _editorDiff:any = null;
+
+	private handleFilterWatcher():void
+	{
+
+		var _filter:ColumnDataFilter = this.getFilter();
+
+		if ( _filter)
+		{
+			var values:any[] = _filter.values.getSessionState() as any[] || [];
+			if (typeof values[0] == "number" || typeof values[0] == "string")
+				this.setEditorType(DiscreteValuesDataFilterEditor, this._editorDiff);
+		}
+		else
+		{
+			this.setEditorType(NumericRangeDataFilterEditor, this._editorDiff);
+			this._editorDiff = null;
+		}
+
+		var _editor:AbstractFilterEditor = this.getFilterEditor();
+		if (_editor)
+			_editor.filter = _filter;
+	}
+
+	private  handleEditor():void
+	{
+		var _editor:AbstractFilterEditor = this.getFilterEditor();
+		if (_editor)
+			_editor.filter = this.filter.target as ColumnDataFilter;
+	}
+
+	//todo replace with class Type
+	private setEditorType(editorType:(typeof AbstractFilterEditor),editorDiff:any):void{
+		var editorState:any = this.filterEditor.target && Weave.getState(this.filterEditor.target);
+
+		(Weave.getWeave(this) as Weave).requestObject(this.filter.targetPath, Weave.className(ColumnDataFilter));
+		this.filterEditor.requestLocalObject(editorType, false);
+
+		if (this.filterEditor.target && editorDiff)
+		{
+			editorState = WeaveAPI.SessionManager.combineDiff(editorState, editorDiff);
+			Weave.setState(this.filterEditor.target, editorState);
+		}
+
 	}
 	
 	get deprecatedStateMapping()
 	{
 		return {
-			"editor": this.editor,
+			"editor": this.filterEditor,
 			"filter": this.filter
 		};
 	}
@@ -70,9 +107,23 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		return this.filter.target as ColumnDataFilter;
 	}
 
+	private  getFilterEditor():AbstractFilterEditor
+	{
+		return this.filterEditor.target as AbstractFilterEditor;
+	}
+
 	private getFilterColumn():DynamicColumn
 	{
 		return this.getFilter() ? this.getFilter().column : null;
+	}
+
+	handleMissingSessionStateProperty(newState:any, property:String):void
+	{
+		if (property == 'editor')
+			this._editorDiff = {
+				"layoutMode": "Combobox",
+				"showToggle": true
+			};
 	}
 
 	get title():string
@@ -83,24 +134,87 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		return Weave.lang('Filter');
     }
 
+
+	private listItemOptions:{editorType:(typeof AbstractFilterEditor), label:string}[] = [
+		{
+			editorType: NumericRangeDataFilterEditor,
+			label: "Continuous range",
+
+		},
+		{
+			editorType: DiscreteValuesDataFilterEditor,
+			label: "Discrete values"
+		}
+	]
+
+	// it has to be function as Filter DynamicColumn is set at Fly
+	private getSelectableAttributes():{[label:string]:DynamicColumn} {
+		return {
+			Filter:this.getFilterColumn()
+		}
+	}
+
+	setDataFilterUI(listItem:{editorType:(typeof AbstractFilterEditor), label:string}){
+		this.filterEditor.requestLocalObject(listItem.editorType, false);
+	}
+
+
+	renderEditor():JSX.Element
+	{
+		var editorOptionsUI:JSX.Element[] = this.listItemOptions.map(function(listItem:{editorType:(typeof AbstractFilterEditor), label:string},index:number){
+			return <HBox key={index} style={{alignItems:"center"}}>
+						<input type="radio"
+							   name="dataFilterOptions"
+							   value={listItem.label}
+							   onClick={this.setDataFilterUI.bind(this,listItem)}/>
+						<span>&nbsp;{Weave.lang(listItem.label)}</span>
+					</HBox>
+		},this);
+
+		var selectableAttributes:{[label:string]:DynamicColumn} = this.getSelectableAttributes();
+		var attrLabels = Object.keys(selectableAttributes);
+		var selectors:JSX.Element[] =  attrLabels.map((label:string, index:number) => {
+				if (selectableAttributes[label] instanceof DynamicColumn)
+				{
+					let attribute = selectableAttributes[label] as DynamicColumn;
+					return <SelectableAttributeComponent key={index} label={ label } attribute={ attribute }/>;
+				}
+			});
+
+
+
+		return (
+			<VBox>
+				<form>
+					<VBox>
+						{editorOptionsUI}
+					</VBox>
+				</form>
+				<HBox>
+					{selectors}
+				</HBox>
+
+			</VBox>
+		)
+	}
+
 	render():JSX.Element
 	{
-		var editorClass = LinkablePlaceholder.getClass(this.editor.target) as typeof AbstractFilterEditor;
+		var editorClass = LinkablePlaceholder.getClass(this.filterEditor.target) as typeof AbstractFilterEditor;
 		
-		var editor:any = null;
+		var editor:JSX.Element = null;
 		if (editorClass)
 			editor = React.createElement(
 				editorClass as any,
 				{
 					ref: (editor:AbstractFilterEditor) => {
 						if (editor)
-							LinkablePlaceholder.setInstance(this.editor.target, editor);
+							LinkablePlaceholder.setInstance(this.filterEditor.target, editor);
 					},
 					filter: this.getFilter()
 				}
 			);
-		
-		//<ListItem options={this.listItemOptions} onChange={this.handleEditorTypeChange.bind(this)} selectedValues={[editorClass]}/>
+
 		return (
 			<VBox style={{flex: 1}}>
 				{

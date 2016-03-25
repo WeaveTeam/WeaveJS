@@ -57,6 +57,11 @@ export default class AbstractFilterEditor
 	{
 		return this.filterWatcher.target as ColumnDataFilter;
 	}
+
+	set filter(columnDataFilter:ColumnDataFilter)
+	{
+		this.filterWatcher.target  = columnDataFilter ;
+	}
 	
 	get column():DynamicColumn
 	{

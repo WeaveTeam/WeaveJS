@@ -24,7 +24,8 @@ export default class ToolsMenu implements MenuBarItemProps
 			WeaveUI.OpenLayersMapTool,
 			WeaveUI.C3PieChart,
 			WeaveUI.C3ScatterPlot,
-			WeaveUI.TableTool
+			WeaveUI.TableTool,
+			WeaveUI.DataFilterTool
 		];
 		
 		this.menu = impls.map(impl => {
