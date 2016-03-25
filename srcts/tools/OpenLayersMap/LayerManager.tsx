@@ -10,28 +10,28 @@ import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 
-export interface ILayerEditorState {
+export interface ILayerManagerState {
 	selectedLayer: AbstractLayer;
 	openedLayer: AbstractLayer;
 }
 
-export interface  ILayerEditorProps extends React.HTMLProps<LayerEditor> {
+export interface  ILayerManagerProps extends React.HTMLProps<LayerManager> {
 	layers: LinkableHashMap;
 }
 
-export default class LayerEditor extends React.Component<ILayerEditorProps, ILayerEditorState> {
-	constructor(props:ILayerEditorProps)
+export default class LayerManager extends React.Component<ILayerManagerProps, ILayerManagerState> {
+	constructor(props:ILayerManagerProps)
 	{
 		super(props);
 		this.componentWillReceiveProps(props);
 	}
 
-	state: ILayerEditorState = {
+	state: ILayerManagerState = {
 		selectedLayer: null,
 		openedLayer: null
 	};
 
-	componentWillReceiveProps(nextProps:ILayerEditorProps)
+	componentWillReceiveProps(nextProps:ILayerManagerProps)
 	{
 		nextProps.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
