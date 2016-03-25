@@ -3,6 +3,7 @@ import * as lodash from "lodash";
 import AbstractLayer from "./AbstractLayer";
 import * as React from "react";
 import StatefulComboBox from "../../../ui/StatefulComboBox";
+import StatefulTextField from "../../../ui/StatefulTextField";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import {VBox, HBox} from "../../../react-ui/FlexBox";
 
@@ -14,9 +15,6 @@ interface ITileLayerEditorProps {
 }
 
 interface ITileLayerEditorState {
-	paramLayer: string;
-	paramAttributions: string;
-	paramProjection: string;
 }
 
 class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEditorState>
@@ -24,12 +22,65 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 	constructor(props:ITileLayerEditorProps)
 	{
 		super(props);
+
+		this.tempLayer.addGroupedCallback(this, this.toProviderOptions);
+		this.tempAttributions.addGroupedCallback(this, this.toProviderOptions);
+		this.tempProjection.addGroupedCallback(this, this.toProviderOptions);
+		this.tempUrl.addGroupedCallback(this, this.toProviderOptions)
 		this.componentWillReceiveProps(props);
+	}
+
+	tempLayer = Weave.disposableChild(this, LinkableString);
+	tempAttributions = Weave.disposableChild(this, LinkableString);
+	tempProjection = Weave.disposableChild(this, LinkableString);
+	tempUrl = Weave.disposableChild(this, LinkableString);
+
+	toProviderOptions()
+	{
+		if (!this.props.layer) return;
+
+		if (this.props.layer.provider.value === "custom")
+		{
+			this.props.layer.providerOptions.state =
+				{
+					attributions: this.tempAttributions.value,
+					url: this.tempUrl.value,
+					projection: this.tempProjection.value
+				};
+		}
+		else
+		{
+			this.props.layer.providerOptions.state =
+				{
+					layer: this.tempLayer.value
+				};
+		}
+	}
+
+	fromProviderOptions()
+	{
+		let opts:any = this.props.layer.providerOptions.state || {};
+		this.tempLayer.value = opts.layer;
+		this.tempAttributions.value = opts.attributions;
+		this.tempUrl.value = opts.url;
+		this.tempProjection.value = opts.projection;
 	}
 
 	componentWillReceiveProps(nextProps: ITileLayerEditorProps)
 	{
+		if (this.props && this.props.layer)
+		{
+			this.props.layer.providerOptions.removeCallback(this, this.fromProviderOptions);
+			Weave.getCallbacks(this.props.layer).removeCallback(this, this.forceUpdate);
+		}
 		Weave.getCallbacks(nextProps.layer).addGroupedCallback(this, this.forceUpdate);
+		nextProps.layer.providerOptions.addGroupedCallback(this, this.fromProviderOptions);
+	}
+
+	componentWillUnmount()
+	{
+		Weave.getCallbacks(this.props.layer).removeCallback(this, this.forceUpdate);
+		this.props.layer.providerOptions.removeCallback(this, this.fromProviderOptions);
 	}
 
 	render(): JSX.Element
@@ -47,25 +98,32 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 				layers = null;
 		}
 
-		let providerOptions = [{ value: "stamen", label: "Stamen" }, { value: "mapquest", label: "MapQuest" }];
+		let providerOptions = [{ value: "osm", label: "OpenStreetMap" }, { value: "stamen", label: "Stamen" }, { value: "mapquest", label: "MapQuest" }, {value: "custom", label: Weave.lang("Custom")}];
 
 		let layerSelection: JSX.Element;
-		if (layers)
+		if (this.props.layer.provider.value === "osm")
 		{
-			layerSelection = <StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer }) }
-				options={layers.map((name) => { return { label: lodash.startCase(name), value: name }; }) }/>;
+			return <VBox>
+				{Weave.lang("Provider")+" "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+			</VBox>
+		}
+		else if (this.props.layer.provider.value === "custom")
+		{
+			return <VBox>
+				{Weave.lang("Provider") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				{Weave.lang("URL") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempUrl }) }/>
+				{Weave.lang("Attribution") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempAttributions }) }/>
+				{Weave.lang("Projection") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempProjection }) }/>
+			</VBox>
 		}
 		else
 		{
-			layerSelection = <div/>;
+			return <VBox>
+				{Weave.lang("Provider") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				{Weave.lang("Layer") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.tempLayer }) }
+					options={layers.map((name) => { return { label: lodash.startCase(name), value: name }; }) }/>
+			</VBox>
 		}
-
-
-		
-		return <VBox>
-			<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
-			{layerSelection}
-		</VBox>;
 	}
 }
 
@@ -87,8 +145,28 @@ export default class TileLayer extends AbstractLayer
 
 		this.olLayer = new ol.layer.Tile();
 
+		this.provider.addGroupedCallback(this, this.onProviderChange);
 		this.provider.addGroupedCallback(this, this.updateTileSource);
 		this.providerOptions.addGroupedCallback(this, this.updateTileSource, true);
+	}
+
+	onProviderChange()
+	{
+		if (this.provider.value == "stamen")
+		{
+			let layer:string = this.providerOptions.state && (this.providerOptions.state as any).layer;
+			if (!layer || !lodash.contains(TileLayer.STAMEN_LAYERS, layer))
+			{
+				this.providerOptions.state = lodash.merge(this.providerOptions.state || {}, { layer: TileLayer.STAMEN_LAYERS[0] });
+			}
+		}
+		else if (this.provider.value == "mapquest")
+		{
+			let layer: string = this.providerOptions.state && (this.providerOptions.state as any).layer;
+			if (!layer || !lodash.contains(TileLayer.MAPQUEST_LAYERS, layer)) {
+				this.providerOptions.state = lodash.merge(this.providerOptions.state || {}, { layer: TileLayer.MAPQUEST_LAYERS[0] });
+			}
+		}
 	}
 
 	updateProjection()
@@ -99,6 +177,9 @@ export default class TileLayer extends AbstractLayer
 		else
 		 	console.log('invalid proj -> no extent');
 	}
+
+	static STAMEN_LAYERS = ["watercolor", "toner"];
+	static MAPQUEST_LAYERS = ["sat", "osm"];
 
 	get deprecatedStateMapping()
 	{
@@ -187,11 +268,15 @@ export default class TileLayer extends AbstractLayer
 
 	updateTileSource()
 	{
-		let newLayer: ol.source.Tile = this.getSource();
-		if (newLayer !== undefined)
-		{
-			this.source = newLayer;
+		let newLayer: ol.source.Tile;
+		try {
+			newLayer = this.getSource();
 		}
+		catch(e)
+		{
+			console.error(e);
+		}
+		this.source = newLayer || null;
 	}
 }
 
