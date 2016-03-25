@@ -1,16 +1,14 @@
 import * as React from "react";
 import {VBox, HBox} from '../react-ui/FlexBox';
-import DynamicColumn = weavejs.data.column.DynamicColumn;
-import EntityNode = weavejs.data.hierarchy.EntityNode;
 import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
 import {OverlayTrigger, Popover} from "react-bootstrap";
-import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import ColumnUtils = weavejs.data.ColumnUtils;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export interface ISelectableAttributeComponentProps
 {
-	attribute : DynamicColumn;
+	attribute : IColumnWrapper;
 	label : string;
 }
 

@@ -131,18 +131,18 @@ export default class List extends React.Component<IListProps, IListState>
 
     render(): JSX.Element {
         return (
-            <div style={{ flex: 1, overflow: "auto" }}>
+            <VBox style={{ flex: 1, overflow: "auto" }}>
                 {
                     this.values.map((value: any, index: number) => {
                         var selected: boolean = this.state.selectedValues.indexOf(value) >= 0;
 
                         var style: React.CSSProperties = {
                             padding: 5,
-                            height: 25,
-                            width: "100%",
+							alignItems: "center",
 							whiteSpace: "nowrap"
                         };
-                        var className = classNames({
+
+						var className = classNames({
                             'weave-list-Item' : true,
                             'weave-list-Item-selected': selected });
 
@@ -153,7 +153,7 @@ export default class List extends React.Component<IListProps, IListState>
                         );
                     })
                 }
-            </div>
+            </VBox>
         );
     }
 }

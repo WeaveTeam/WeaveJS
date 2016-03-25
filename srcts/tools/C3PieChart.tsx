@@ -6,6 +6,7 @@ import * as React from "react";
 import * as c3 from "c3";
 import {ChartAPI, ChartConfiguration} from "c3";
 import ToolTip from "./ToolTip";
+import {HBox, VBox} from "../react-ui/FlexBox";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -14,6 +15,8 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import LinkableNumber = weavejs.core.LinkableNumber;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -192,6 +195,18 @@ export default class C3PieChart extends AbstractC3Tool
 		
 		return false;
     }
+
+    selectableAttributes :{[label:string] : IColumnWrapper|LinkableHashMap} = {
+        Label : this.label,
+        Color:this.fill.color,
+        WedgeSize : this.data
+    };
+
+    renderEditor() :JSX.Element{
+        return(<VBox>
+                { super.renderEditor() }
+              </VBox>);
+    };
 
 	get deprecatedStateMapping()
 	{

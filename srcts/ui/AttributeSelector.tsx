@@ -3,17 +3,18 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import WeaveTree from "./WeaveTree";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-import EntityNode = weavejs.data.hierarchy.EntityNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import ColumnUtils = weavejs.data.ColumnUtils;
 
 export interface IAttributeSelectorProps
 {
-    attribute : DynamicColumn|LinkableHashMap;
+    attribute : IColumnWrapper|LinkableHashMap;
     label? : string;
 }
 
@@ -43,9 +44,20 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 		var ref = Weave.AS(selectedItems[0], weavejs.api.data.IColumnReference);
 		if (ref)
 		{
+            //TODO is column handling correct?
 			var meta = ref.getColumnMetadata();
-			if (meta && this.props.attribute instanceof DynamicColumn)
+			/*if (meta && Weave.IS(this.props.attribute, DynamicColumn))
                 (this.props.attribute as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+
+            if (meta && Weave.IS(this.props.attribute, AlwaysDefinedColumn)){
+                let dy = ColumnUtils.hack_findInternalDynamicColumn(this.props.attribute as IColumnWrapper);
+                (dy as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+            }*/
+
+            if(meta && Weave.IS(this.props.attribute, IColumnWrapper)){
+                let dy = ColumnUtils.hack_findInternalDynamicColumn(this.props.attribute as IColumnWrapper);
+                (dy as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+            }
 		}
     };
 

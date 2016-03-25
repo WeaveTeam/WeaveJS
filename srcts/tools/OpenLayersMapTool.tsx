@@ -34,7 +34,7 @@ import MiscUtils from "../utils/MiscUtils";
 import StatefulCheckBox from "../ui/StatefulCheckBox";
 import StatefulTextField from "../ui/StatefulTextField";
 import StatefulComboBox from "../ui/StatefulComboBox";
-import LayerEditor from "./OpenLayersMap/LayerEditor";
+import LayerManager from "./OpenLayersMap/LayerManager";
 import {VBox,HBox} from "../react-ui/FlexBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
@@ -146,7 +146,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		return <VBox>
 			{ReactUtils.generateTable(null, editorFields, tableStyles)}
-			<LayerEditor layers={this.layers}/>
+			<LayerManager layers={this.layers}/>
 		</VBox>;
 	}
 

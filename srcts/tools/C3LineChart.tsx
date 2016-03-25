@@ -8,6 +8,7 @@ import * as c3 from "c3";
 import {ChartConfiguration, ChartAPI} from "c3";
 import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
+import {HBox, VBox} from "../react-ui/FlexBox";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -17,6 +18,7 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import LinkableString = weavejs.core.LinkableString;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -342,6 +344,17 @@ export default class C3LineChart extends AbstractC3Tool
 		
 		return false;
     }
+
+    selectableAttributes :{[label:string] : IColumnWrapper|LinkableHashMap} ={
+        Color : this.line.color,
+        YColumns : this.columns
+    };
+
+    renderEditor():JSX.Element{
+        return (<VBox>
+            {super.renderEditor()}
+        </VBox>);
+    };
 
     get deprecatedStateMapping()
 	{

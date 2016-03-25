@@ -28,10 +28,8 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import StandardLib = weavejs.util.StandardLib;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
-import ReferencedColumn = weavejs.data.column.ReferencedColumn;
-import ListOption from "../react-ui/List";
-import ListItem from "../react-ui/List";
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 declare type Record = {
 	id: IQualifiedKey,
@@ -337,10 +335,11 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		return false;
 	}
 
-	selectableAttributes:{[label:string]:DynamicColumn|LinkableHashMap} = {
+	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap} = {
 			X:this.dataX,
 			Y:this.dataY,
-			Radius:this.radius.internalDynamicColumn
+			Color:this.fill.color,
+			Radius:this.radius
 	};//TODO handle remaining attributes
 	
 	renderEditor():JSX.Element
