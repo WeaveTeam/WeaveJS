@@ -31,6 +31,19 @@ class LabelLayer extends AbstractGlyphLayer
 	sortColumn = Weave.linkableChild(this, DynamicColumn);
 	hideOverlappingText = Weave.linkableChild(this, LinkableBoolean);
 
+	get selectableAttributes() {
+		return super.selectableAttributes
+			.set("Text", this.text)
+			.set("Text Size", this.size)
+			.set("Text Color", this.color)
+			.set("Display precedence", this.sortColumn);
+	}
+
+	get editableFields() {
+		return super.editableFields
+			.set("Hide overlapping text", this.hideOverlappingText);
+	}
+
 	constructor()
 	{
 		super();
