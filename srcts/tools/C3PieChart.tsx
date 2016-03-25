@@ -16,6 +16,7 @@ import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -195,8 +196,9 @@ export default class C3PieChart extends AbstractC3Tool
 		return false;
     }
 
-    selectableAttributes :{[label:string] : DynamicColumn|LinkableHashMap} = {
+    selectableAttributes :{[label:string] : IColumnWrapper|LinkableHashMap} = {
         Label : this.label,
+        Color:this.fill.color,
         WedgeSize : this.data
     };
 

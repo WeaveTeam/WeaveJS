@@ -338,6 +338,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap} = {
 			X:this.dataX,
 			Y:this.dataY,
+			Color:this.fill.color,
 			Radius:this.radius
 	};//TODO handle remaining attributes
 	
