@@ -1,5 +1,6 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import {ButtonGroupBar} from "../react-ui/ButtonGroupBar";
 import WeaveTree from "./WeaveTree";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -28,12 +29,18 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     private tree: WeaveTree;
     private  weaveRoot: ILinkableHashMap;
     private searchFilter :string;
+    private items:{[label:string] : Function};
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
         this.weaveRoot = Weave.getRoot(props.attribute);
         this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
         this.state = {leafNode : null};
+        this.items = {'Hello' : this.click, "Shweta": this.click};
+    };
+
+    click=():void=>{
+        console.log('Peace');
     };
 
     onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
@@ -61,6 +68,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 		}
     };
 
+    //for the fuzzy search Implementation
     filter = (event:React.FormEvent):void =>{
         this.searchFilter = (event.target as HTMLInputElement).value;
         this.forceUpdate();
@@ -69,9 +77,12 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     render():JSX.Element
     {
         let treeNode:WeaveRootDataTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
+        var treeContainerStyle= {min};
         return (
             <VBox style={{ flex: 1, minWidth: 700, maxHeight: 400 }}>
-                <input type="text" placeholder="Search" onChange={ this.filter }/>
+
+                <ButtonGroupBar items={ this.items }></ButtonGroupBar>
+
                 <HBox>
                     <VBox style={{ flex: .5 }}>
                         <WeaveTree searchFilter={ this.searchFilter } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={treeNode} ref={ (c) => { this.tree = c; } }/>
