@@ -197,12 +197,12 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			if (Weave.IS(this.selectableAttributes[label], IColumnWrapper))
 			{
 				let attribute = this.selectableAttributes[label] as IColumnWrapper;
-				return <SelectableAttributeComponent label={ label } attribute={ attribute }/>;
+				return <SelectableAttributeComponent attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
 			}
 			else // LinkableHashMap
 			{
 				let attribute = this.selectableAttributes[label] as LinkableHashMap;
-				return(<SelectableAttributesList button={ true } label={ label } columns={ attribute }/>);
+				return(<SelectableAttributesList  attributeNames={attrLabels} button={ true } label={ label } columns={ attribute }/>);
 			}
 		});
 

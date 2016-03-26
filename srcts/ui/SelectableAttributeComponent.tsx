@@ -10,6 +10,7 @@ export interface ISelectableAttributeComponentProps
 {
 	attribute : IColumnWrapper;
 	label : string;
+	attributeNames?:string[];
 }
 
 export interface ISelectableAttributeComponentState
@@ -42,7 +43,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			<HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
 				<OverlayTrigger trigger="click" placement="bottom"
 								overlay={<Popover id="AttributeSelector" title={ title }>
-										<AttributeSelector label={ this.props.label } attribute={ this.props.attribute }/>
+										<AttributeSelector label={ this.props.label } attribute={ this.props.attribute } attributeNames={ this.props.attributeNames }/>
 									</Popover>}>
 					<button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>
 

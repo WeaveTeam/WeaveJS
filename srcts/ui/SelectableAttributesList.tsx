@@ -12,7 +12,8 @@ import {ListOption} from "../react-ui/List";
 export interface ISelectableAttributesListProps{
     columns : LinkableHashMap;
     label:string;
-    button:boolean;//if button is true it will render button else string
+    button:boolean;//if button is true it will render button else string//TODO fix this use JSX.Element |boolean
+    attributeNames?:string[];
 }
 
 export interface ISelectableAttributesListState{
@@ -70,7 +71,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         return(<VBox >
                     <OverlayTrigger trigger="click" placement="bottom"
                                 overlay={ <Popover id="AttributeSelector" title={ title }>
-                                               <AttributeSelector label={ this.props.label } attribute={ this.props.columns }/>
+                                               <AttributeSelector attributeNames={ this.props.attributeNames } label={ this.props.label } attribute={ this.props.columns }/>
                                          </Popover>}>
                         {this.props.button ? buttonUI : labelUI}
                     </OverlayTrigger>

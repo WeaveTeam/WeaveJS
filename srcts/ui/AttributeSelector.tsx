@@ -17,6 +17,7 @@ export interface IAttributeSelectorProps
 {
     attribute : IColumnWrapper|LinkableHashMap;
     label? : string;
+    attributeNames?:string[];
 }
 
 export interface IAttributeSelectorState
@@ -29,14 +30,20 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     private tree: WeaveTree;
     private  weaveRoot: ILinkableHashMap;
     private searchFilter :string;
-    private items:{[label:string] : Function};
+    private items:{[label:string] : Function}={};
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
         this.weaveRoot = Weave.getRoot(props.attribute);
         this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+        
+        props.attributeNames.forEach((label:string)=>{
+            this.items[label] = this.forceUpdate;
+        });
         this.state = {leafNode : null};
-        this.items = {'Hello' : this.click, "Shweta": this.click};
+
+
+
     };
 
     click=():void=>{
@@ -77,7 +84,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     render():JSX.Element
     {
         let treeNode:WeaveRootDataTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
-        var treeContainerStyle= {min};
+
         return (
             <VBox style={{ flex: 1, minWidth: 700, maxHeight: 400 }}>
 
