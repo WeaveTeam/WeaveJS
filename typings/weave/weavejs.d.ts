@@ -161,7 +161,7 @@ declare module __global__ {
          * @see weave.api.core.ISessionManager#newDisposableChild()
          * @see weave.api.core.ISessionManager#registerDisposableChild()
          */
-        static disposableChild(disposableParent: Object, disposableChildOrType: Object): any;
+        static disposableChild<T>(disposableParent: Object, disposableChildOrType: (new () => T) | T): T;
         /**
          * Shortcut for WeaveAPI.SessionManager.newLinkableChild() and WeaveAPI.SessionManager.registerLinkableChild()
          * @see weave.api.core.ISessionManager#newLinkableChild()
@@ -3981,9 +3981,7 @@ declare module weavejs.core {
          *******************/
         static DIFF_DELETE: string;
         computeDiff(oldState: Object, newState: Object): any;
-        _computeDiff(oldState: Object, newState: Object): any;
         combineDiff(baseDiff: Object, diffToAdd: Object): Object;
-        _combineDiff(baseDiff: Object, diffToAdd: Object): Object;
         testDiff(): void;
     }
 }
