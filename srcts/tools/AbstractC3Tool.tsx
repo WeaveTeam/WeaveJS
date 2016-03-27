@@ -360,4 +360,20 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
     {
         return this.props.fontSize + "pt " + this.props.font;
     }
+
+	formatXAxisLabel(label:string):string
+	{
+		var labelHeight:number = this.margin.bottom.value - DOMUtils.getTextHeight(label,this.getFontString());
+		var stringSize:number = DOMUtils.getTextWidth(label, this.getFontString());
+		var adjustmentCharacters:number = label.length - Math.floor(label.length * (labelHeight / stringSize));
+		//check if its necessary to put the ellipsis
+		if((adjustmentCharacters - 3) > 0) {
+			var middleIndex:number = Math.floor(label.length/2);
+			var startCut:number = middleIndex - Math.floor(adjustmentCharacters/2);
+			var endCut:number = middleIndex + Math.ceil(adjustmentCharacters/2);
+			var middle:string = label.slice(startCut, endCut);
+			return label.replace(middle, '...');
+		}
+		return label;
+	}
 }
