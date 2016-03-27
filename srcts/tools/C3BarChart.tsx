@@ -162,13 +162,10 @@ export default class C3BarChart extends AbstractC3Tool
 							{
 								if (this.element && this.margin.bottom)
 								{
-									var labelHeight:number = this.margin.bottom.value/Math.cos(45*(Math.PI/180));
 									var labelString:string = Weave.lang(record.stringValues.xLabel);
 									if (labelString)
 									{
-										var stringSize:number = DOMUtils.getTextWidth(labelString, this.getFontString());
-										var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
-										return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
+										return this.formatXAxisLabel(labelString);
 									}
 									else
 									{

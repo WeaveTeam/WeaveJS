@@ -132,9 +132,7 @@ export default class C3Histogram extends AbstractC3Tool
                                 var labelString:string = Weave.lang(this.getLabelString(num));
                                 if (labelString)
                                 {
-                                    var stringSize:number = DOMUtils.getTextWidth(labelString, this.getFontString());
-                                    var adjustmentCharacters:number = labelString.length - Math.floor(labelString.length * (labelHeight / stringSize));
-                                    return adjustmentCharacters > 0 ? labelString.substring(0, labelString.length - adjustmentCharacters - 3) + "..." : labelString;
+									return this.formatXAxisLabel(labelString);
                                 }
                                 else
                                 {
