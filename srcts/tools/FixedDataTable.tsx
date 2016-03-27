@@ -66,10 +66,8 @@ export interface ISortHeaderState
 
 }
 
-export interface ITextCellProps
+export interface ITextCellProps extends CellProps
 {
-	rowIndex?:number;
-	field?:string;
 	data?:IRow[];
 	sortIndices?:number[];
 }
@@ -94,10 +92,10 @@ export class TextCell extends React.Component<ITextCellProps, ITextCellState>
 	}
 
 	render():JSX.Element {
-		const {rowIndex, field, data, sortIndices} = this.props;
+		const {rowIndex, columnKey, data, sortIndices} = this.props;
 		return (
 			<Cell {...this.props}>
-				{data[sortIndices[rowIndex]] && data[sortIndices[rowIndex]][field]}
+				{data[sortIndices[rowIndex]] && data[sortIndices[rowIndex]][columnKey]}
 			</Cell>
 		);
 	}
@@ -385,12 +383,12 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 													{this.props.columnTitles ? this.props.columnTitles[id]:id}
 												</SortHeaderCell>
 											}
-											cell={
+											cell={(props:CellProps) => (
 												<TextCell
 													data={this.props.rows}
 													sortIndices={this.state.sortIndices}
-													field={id}
-												/>
+													{...props}
+												/>)
 											}
 											width={this.state.columnWidths[id] ? this.state.columnWidths[id]:this.props.columnWidth}
 											isResizable={true}
