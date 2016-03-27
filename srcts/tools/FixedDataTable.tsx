@@ -49,10 +49,9 @@ export interface IFixedDataTableState
 	columnWidths?:IColumnWidths;
 	sortId?:string;
 	sortDirection?:string;
-	probedIds?:string[];
-	selectedIds?:string[];
 	width?:number;
 	height?:number;
+	sortIndices?:number[];
 }
 
 export interface ISortHeaderProps extends React.Props<SortHeaderCell>
@@ -67,10 +66,42 @@ export interface ISortHeaderState
 
 }
 
+export interface ITextCellProps
+{
+	rowIndex?:number;
+	field?:string;
+	data?:IRow[];
+	sortIndices?:number[];
+}
+
+export interface ITextCellState
+{
+
+}
+
 const SortTypes = {
 	ASC: 'ASC',
 	DESC: 'DESC',
 };
+
+
+export class TextCell extends React.Component<ITextCellProps, ITextCellState>
+{
+
+	constructor(props:ITextCellProps) {
+		super(props);
+
+	}
+
+	render():JSX.Element {
+		const {rowIndex, field, data, sortIndices} = this.props;
+		return (
+			<Cell {...this.props}>
+				{data[sortIndices[rowIndex]] && data[sortIndices[rowIndex]][field]}
+			</Cell>
+		);
+	}
+}
 
 export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeaderState>
 {
@@ -82,8 +113,8 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 	render():JSX.Element {
 		return (
 			<Cell {...this.props}>
-				<a onClick={this.onSortChange}>
-					{this.props.children} {this.props.sortDirection ? (this.props.sortDirection === SortTypes.DESC ? '↓' : '↑') : ''}
+				<a style={{whiteSpace: "nowrap", overflow: "ellipsis"}} onClick={this.onSortChange}>
+					{this.props.sortDirection ? (this.props.sortDirection === SortTypes.DESC ? '↓' : '↑') : ''} {this.props.children}
 				</a>
 			</Cell>
 		);
@@ -97,13 +128,13 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 			this.props.onSortChange(
 				this.props.columnKey,
 				this.props.sortDirection ?
-					this.reversesortDirection(this.props.sortDirection) :
+					this.reverseSortDirection(this.props.sortDirection) :
 					SortTypes.DESC
 			);
 		}
 	};
 
-	reversesortDirection=(sortDirection:string) =>
+	reverseSortDirection=(sortDirection:string) =>
 	{
 		return sortDirection === SortTypes.DESC ? SortTypes.ASC : SortTypes.DESC;
 	}
@@ -140,27 +171,30 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 		if(props.selectedIds && props.probedIds)
 			this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
 
+		var sortIndices:number[] = this.props.rows.map((row, index) => index);
 		this.state = {
-			columnWidths
+			columnWidths,
+			sortIndices
 		};
 	}
 
 	getRowClass=(index: number):string =>
 	{
 		var id:string = this.props.rows[index][this.props.idProperty];
-		if(_.includes(this.state.probedIds,id))
+		if(_.includes(this.props.probedIds,id))
 		{
 			//item needs probed class
 			return "table-row-probed";
-		} else if(_.includes(this.state.selectedIds,id))
+		} else if(_.includes(this.props.selectedIds,id))
 		{
 			//item needs selected class
 			return "table-row-selected";
 		}
 	};
 
-	onColumnResizeEndCallback=(newColumnWidth:number, columnKey:string) =>
+	onColumnResizeEndCallback=(newColumnWidth:number, columnKey:string):void =>
 	{
+		console.log(newColumnWidth,columnKey);
 		var columnWidths = _.cloneDeep(this.state.columnWidths);
 		columnWidths[columnKey] = newColumnWidth;
 		this.setState({
@@ -170,25 +204,22 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 
 	onMouseEnter=(event:React.MouseEvent, index:number):void =>
 	{
+		//console.log("Enter",event,index);
 		//mouse entering, so set the keys
 		var id:string = this.props.rows[index][this.props.idProperty];
 		var probedIds:string[] = [id];
-		this.setState({
-			probedIds
-		})
 		this.props.onHover && this.props.onHover(probedIds);
 	};
 
 	onMouseLeave=(event:React.MouseEvent, index:number):void =>
 	{
-		this.setState({
-			probedIds: []
-		})
+		//console.log("Leave",event,index);
 		this.props.onHover && this.props.onHover([]);
 	};
 
 	onMouseDown=(event:React.MouseEvent, index:number):void =>
 	{
+		//console.log("Down",event,index);
 		var selectedIds:string[] = this.props.selectedIds;
 		var id:string = this.props.rows[index][this.props.idProperty];
 
@@ -264,9 +295,6 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 			}
 		}
 
-		this.setState({
-			selectedIds
-		});
 		if (this.props.onSelection)
 		{
 			this.props.onSelection(selectedIds);
@@ -275,9 +303,13 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 
 	updateSortDirection=(columnKey:string, sortDirection:string) =>
 	{
+		console.log(sortDirection,columnKey);
+		var sortIndices:number[] = this.state.sortIndices;
+		this.sortColumnIndices(columnKey,sortDirection,sortIndices);
 		this.setState({
 			sortId: columnKey,
-			sortDirection
+			sortDirection,
+			sortIndices
 		})
 	};
 
@@ -304,23 +336,14 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 	{
 		var newState:IFixedDataTableState = {};
 
-		if(nextProps.probedIds)
-			newState.probedIds = nextProps.probedIds;
-
-		if(nextProps.selectedIds)
-			newState.selectedIds = nextProps.selectedIds;
-
+		if(nextProps.rows.length !== this.state.sortIndices.length)
+			newState.sortIndices = this.props.rows.map((row, index) => index);
 		this.setState(newState);
-	}
-
-	getCell(props:CellProps,id:string)
-	{
-		return
 	}
 
 	handleResize=(newSize:ResizingDivState) => {
 		_.debounce(() => this.setState({width:newSize.width, height:newSize.height}),0)();
-	}
+	};
 
 	render():JSX.Element
 	{
@@ -330,9 +353,6 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 			whiteSpace: "nowrap"
 		};
 
-
-		var	sortIndices = this.props.rows.map((row, index) => index);
-		this.sortColumnIndices(this.state.sortId, this.state.sortDirection, sortIndices);
 		return (
 			<ResizingDiv style={tableContainer} onResize={this.handleResize}>
 				{this.state.width && this.state.height ?
@@ -347,7 +367,8 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 						onRowMouseLeave={this.onMouseLeave}
 						rowClassNameGetter={this.getRowClass}
 						onColumnResizeEndCallback={this.onColumnResizeEndCallback}
-						isColumnResizing={false}>
+						isColumnResizing={false}
+					>
 						{
 							this.props.columnIds.map((id:string,index:number) => {
 								if(this.props.showIdColumn || id != this.props.idProperty){
@@ -364,11 +385,13 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 													{this.props.columnTitles ? this.props.columnTitles[id]:id}
 												</SortHeaderCell>
 											}
-											cell={(props:CellProps) => (
-												<Cell {...props}>
-													{this.props.rows[sortIndices[props.rowIndex]][id]}
-												</Cell>
-											)}
+											cell={
+												<TextCell
+													data={this.props.rows}
+													sortIndices={this.state.sortIndices}
+													field={id}
+												/>
+											}
 											width={this.state.columnWidths[id] ? this.state.columnWidths[id]:this.props.columnWidth}
 											isResizable={true}
 										/>
