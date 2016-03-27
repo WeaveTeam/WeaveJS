@@ -68,9 +68,11 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                 (dy as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
             }*/
 
-            if(meta && Weave.IS(this.props.attribute, IColumnWrapper)){
-                let dy = ColumnUtils.hack_findInternalDynamicColumn(this.props.attribute as IColumnWrapper);
-                (dy as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+            if (meta && Weave.IS(this.props.attribute, IColumnWrapper))
+			{
+                let dc = ColumnUtils.hack_findInternalDynamicColumn(this.props.attribute as IColumnWrapper);
+				if (dc)
+                	dc.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
             }
 		}
     };
