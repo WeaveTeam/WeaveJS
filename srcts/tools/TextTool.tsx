@@ -1,3 +1,4 @@
+import AbstractVisTool from "./AbstractVisTool";
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 
 import * as React from "react";
@@ -6,6 +7,9 @@ import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 import * as jquery from "jquery";
 import MiscUtils from "../utils/MiscUtils";
+import {HBox, VBox} from "../react-ui/FlexBox";
+import StatefulTextField from "../ui/StatefulTextField";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -13,10 +17,11 @@ var $:JQueryStatic = (jquery as any)["default"];
 import StandardLib = weavejs.util.StandardLib;
 import LinkableString = weavejs.core.LinkableString
 import LinkableNumber = weavejs.core.LinkableNumber;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
-export default class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
+export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolState>
 {
-
 	htmlText = Weave.linkableChild(this, new LinkableString(""));
 	padding = Weave.linkableChild(this, new LinkableNumber(4));
 	panelBackgroundColor = Weave.linkableChild(this, LinkableNumber);
@@ -43,6 +48,23 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 	get title():string
 	{
 		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+	}
+
+	renderEditor():JSX.Element
+	{
+		return (
+			<VBox>
+				{
+					super.renderEditor()
+				}
+				<HBox>
+					<label>
+						{Weave.lang("Text")}
+						<StatefulTextField ref={ linkReactStateRef(this, {content: this.htmlText}) }/>
+					</label>
+				</HBox>
+			</VBox>
+		)
 	}
 
 	get deprecatedStateMapping()
