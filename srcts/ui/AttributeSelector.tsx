@@ -32,7 +32,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     private  weaveRoot: ILinkableHashMap;
     private searchFilter :string;
     private items:{[label:string] : Function}={};
-    private selectedColumn :IColumnReference;
+    private selectedColumnRef :IColumnReference;
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
@@ -54,10 +54,13 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 
     addSelected=():void=>{
         let columns = this.props.attribute;
+        var meta = ref.getColumnMetadata();
 
-        if(this.selectedColumn && Weave.IS(this.props.attribute, LinkableHashMap)){
-            let col= (columns as LinkableHashMap).requestObject((columns as LinkableHashMap).generateUniqueName('ReferencedColumn'),weavejs.data.column.ReferencedColumn);
-            col.setColumnReference(this.selectedColumn.getDataSource(), this.selectedColumn.getColumnMetadata());
+        if(meta){
+            if(this.selectedColumnRef && Weave.IS(this.props.attribute, LinkableHashMap)){
+                let col= (columns as LinkableHashMap).requestObject((columns as LinkableHashMap).generateUniqueName('ReferencedColumn'),weavejs.data.column.ReferencedColumn);
+                col.setColumnReference(this.selectedColumnRef.getDataSource(), this.selectedColumnRef.getColumnMetadata());
+            }
         }
     };
 
@@ -87,7 +90,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                         dc.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
                 }
                 else{//if selectable attribute is a LinkableHashmap
-                  this.selectedColumn = ref;
+                  this.selectedColumnRef = ref;
                 }
             }
 		}
