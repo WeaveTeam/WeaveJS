@@ -5,14 +5,7 @@ import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
-import {ChartConfiguration, ChartAPI} from "c3";
-import {MouseEvent} from "react";
-import ToolTip from "./ToolTip";
-import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import StatefulTextField from "../ui/StatefulTextField";
-import AttributeSelector from "../ui/AttributeSelector";
-import {OverlayTrigger,Popover} from "react-bootstrap";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
