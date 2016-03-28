@@ -73,12 +73,12 @@ ul.dropdown-menu {
     line-height: 14px;
 }
 
-.table {
+.weave-bootstrap-table {
     font-size: inherit;
 	white-space: nowrap;
 }
 
-.table-header {
+.weave-bootstrap-table-header {
     background-color: #eee;
     color: -webkit-text;
 }
