@@ -6,6 +6,7 @@ import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import SelectableAttributesList from "../ui/SelectableAttributesList";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
@@ -14,6 +15,8 @@ import EntityNode = weavejs.data.hierarchy.EntityNode;
 import EntityType = weavejs.api.data.EntityType;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {
@@ -23,8 +26,12 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 		let editorFields:[string, JSX.Element][] = [
 			[
-				Weave.lang("Foreign Key Mapping"), 
-				<SelectableAttributeComponent label="" attribute={ds.keyColumn}/>
+				Weave.lang("Foreign key mapping"), 
+				<SelectableAttributeComponent label="alpha" attribute={ds.keyColumn}/>
+			],
+			[
+				Weave.lang("Data to transform"),
+				<SelectableAttributesList label="alpha" columns={ds.dataColumns as LinkableHashMap} button={true}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)
