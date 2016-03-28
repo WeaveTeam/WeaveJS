@@ -146,7 +146,7 @@ export default class C3Gauge extends AbstractC3Tool
     }
 
 	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap} = {
-		meterColumn:this.meterColumn
+		Meter:this.meterColumn
 	};
 
 	renderEditor():JSX.Element

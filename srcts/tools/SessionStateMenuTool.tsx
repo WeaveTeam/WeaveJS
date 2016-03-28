@@ -1,3 +1,4 @@
+import AbstractVisTool from "./AbstractVisTool";
 import {IVisToolProps, IVisToolState} from "./IVisTool";
 import {IVisTool} from "./IVisTool";
 
@@ -14,8 +15,9 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableString = weavejs.core.LinkableString;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
-export default class SessionStateMenuTool extends React.Component<IVisToolProps, IVisToolState>
+export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps, IVisToolState>
 {
 	selectedChoice = Weave.linkableChild(this, LinkableString);
 	layoutMode = Weave.linkableChild(this, LinkableString);
@@ -72,6 +74,29 @@ export default class SessionStateMenuTool extends React.Component<IVisToolProps,
 	handleItemClick(index:number, event:MouseEvent):void 
 	{
 		this.selectedChoice.value = this.choices.getNames()[index];
+	}
+
+	renderEditor():JSX.Element
+	{
+		return (
+			<VBox>
+				{
+					super.renderEditor()
+				}
+				<HBox>
+					<label>
+						{Weave.lang("Choices")}
+						{/*Todo: need selectors and ui for adding choices*/}
+					</label>
+				</HBox>
+				<HBox>
+					<label>
+						{Weave.lang("Targets")}
+						{/*Todo: need selectors and ui for adding targets*/}
+					</label>
+				</HBox>
+			</VBox>
+		)
 	}
 
 	render()
