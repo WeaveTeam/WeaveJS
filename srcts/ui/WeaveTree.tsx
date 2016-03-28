@@ -8,8 +8,8 @@ var Fuse = (fs as any)["default"] as typeof fs;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
 export interface IWeaveTreeState {
-	selectedItems: Array<IWeaveTreeNode>;
-	openItems: Array<IWeaveTreeNode>;
+	selectedItems?: Array<IWeaveTreeNode>;
+	openItems?: Array<IWeaveTreeNode>;
 }
 
 export interface IWeaveTreeProps {

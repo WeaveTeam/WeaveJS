@@ -23,12 +23,14 @@ export interface IAttributeSelectorProps
 
 export interface IAttributeSelectorState
 {
-    leafNode : IWeaveTreeNode;
+    leafNode? : IWeaveTreeNode;
+    selectAll? :boolean
 }
 
 export default class AttributeSelector extends React.Component<IAttributeSelectorProps,IAttributeSelectorState>
 {
     private tree: WeaveTree;
+    private leafTree :WeaveTree;
     private  weaveRoot: ILinkableHashMap;
     private searchFilter :string;
     private items:{[label:string] : Function}={};
@@ -44,7 +46,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                 this.items[label] = this.forceUpdate;
             });
         }
-        this.state = {leafNode : null};
+        this.state = {leafNode : null, selectAll : false};
     };
 
     componentDidMount(){
@@ -64,11 +66,19 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
         }
     };
 
+    handleSelectAll=():void=>{
+       let selectedItems = this.state.leafNode.getChildren();//get all leaf nodes
+       this.leafTree.setState({selectedItems});//accessing leaf tree using ref concept
+       this.setState({selectAll :true});
+    };
+
     onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
         this.setState({leafNode : selectedItems[0]});
     };
 
     setColumn =(selectedItems:Array<IWeaveTreeNode>):void =>{
+        if(!this.state.selectAll)//if single item is clicked, disable selectAll boolean
+            this.setState({selectAll : false});
 		var ref = Weave.AS(selectedItems[0], weavejs.api.data.IColumnReference);
 		if (ref)
 		{
@@ -108,9 +118,9 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                         <WeaveTree searchFilter={ this.searchFilter } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={treeNode} ref={ (c) => { this.tree = c; } }/>
                     </VBox>
                     <VBox style={{ flex: .5 }}>
-                        {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.tree = c; } }/> : null}
+                        {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.leafTree = c; } }/> : null}
 
-                        {Weave.IS(this.props.attribute, LinkableHashMap) ? <HBox><button>Select All</button><button onClick={ this.addSelected }>Add Selected</button></HBox>
+                        {Weave.IS(this.props.attribute, LinkableHashMap) ? <HBox><button onClick={ this.handleSelectAll }>Select All</button><button onClick={ this.addSelected }>Add Selected</button></HBox>
                         : null}
                     </VBox>
                 </HBox>
