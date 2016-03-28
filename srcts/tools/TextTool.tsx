@@ -10,6 +10,7 @@ import MiscUtils from "../utils/MiscUtils";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import ReactUtils from "../utils/ReactUtils";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -58,10 +59,17 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 					super.renderEditor()
 				}
 				<HBox>
-					<label>
-						{Weave.lang("Text")}
-						<StatefulTextField ref={ linkReactStateRef(this, {content: this.htmlText}) }/>
-					</label>
+					{ReactUtils.generateTable(
+						null,
+						[["Text", this.htmlText]].map((row:[string, LinkableString]) => [
+							Weave.lang(row[0]),
+							<StatefulTextField ref={ linkReactStateRef(this, {content: row[1]}) }/>
+						]),
+						{
+							table: {width: "100%"},
+							td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
+						}
+					)}
 				</HBox>
 			</VBox>
 		)
