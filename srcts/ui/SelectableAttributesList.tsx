@@ -1,6 +1,5 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import classNames from "../modules/classnames";
 import List from "../react-ui/List";
 import {OverlayTrigger, Popover} from "react-bootstrap";
 import AttributeSelector from "../ui/AttributeSelector";
@@ -58,6 +57,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         var columnList: ListOption[] = [];
         var columns = this.props.columns.getObjects();
 
+        //When all options are selected, needed only for restyling the list and re-render
         if(this.state.selectAll)selectedObjects = columns;
 
         columns.forEach((column:IAttributeColumn, index:number)=>{

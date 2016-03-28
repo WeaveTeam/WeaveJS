@@ -12,6 +12,7 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColumnUtils = weavejs.data.ColumnUtils;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
 export interface IAttributeSelectorProps
 {
@@ -31,23 +32,33 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     private  weaveRoot: ILinkableHashMap;
     private searchFilter :string;
     private items:{[label:string] : Function}={};
+    private selectedColumn :IColumnReference;
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
         this.weaveRoot = Weave.getRoot(props.attribute);
         this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
         
-        props.attributeNames.forEach((label:string)=>{
-            this.items[label] = this.forceUpdate;
-        });
+        if(this.props.attributeNames){
+            props.attributeNames.forEach((label:string)=>{
+                this.items[label] = this.forceUpdate;
+            });
+        }
         this.state = {leafNode : null};
-
-
-
     };
 
-    click=():void=>{
-        console.log('Peace');
+    componentDidMount(){
+        if(Weave.IS(this.props.attribute, LinkableHashMap))
+            Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate);
+    }
+
+    addSelected=():void=>{
+        let columns = this.props.attribute;
+
+        if(this.selectedColumn && Weave.IS(this.props.attribute, LinkableHashMap)){
+            let col= (columns as LinkableHashMap).requestObject((columns as LinkableHashMap).generateUniqueName('ReferencedColumn'),weavejs.data.column.ReferencedColumn);
+            col.setColumnReference(this.selectedColumn.getDataSource(), this.selectedColumn.getColumnMetadata());
+        }
     };
 
     onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
@@ -68,11 +79,16 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                 (dy as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
             }*/
 
-            if (meta && Weave.IS(this.props.attribute, IColumnWrapper))
+            if (meta)
 			{
-                let dc = ColumnUtils.hack_findInternalDynamicColumn(this.props.attribute as IColumnWrapper);
-				if (dc)
-                	dc.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+                if(Weave.IS(this.props.attribute, IColumnWrapper)){//if selectable attribute is a single column
+                    let dc = ColumnUtils.hack_findInternalDynamicColumn(this.props.attribute as IColumnWrapper);
+                    if (dc)
+                        dc.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+                }
+                else{//if selectable attribute is a LinkableHashmap
+                  this.selectedColumn = ref;
+                }
             }
 		}
     };
@@ -98,6 +114,9 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                     </VBox>
                     <VBox style={{ flex: .5 }}>
                         {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.tree = c; } }/> : null}
+
+                        {Weave.IS(this.props.attribute, LinkableHashMap) ? <HBox><button>Select All</button><button onClick={ this.addSelected }>Add Selected</button></HBox>
+                        : null}
                     </VBox>
                 </HBox>
 
