@@ -144,10 +144,22 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (layout instanceof FlexibleLayout)
 			{
 				var state = layout.getSessionState();
-				state = {
-					children: [state, {id: [name]}],
-					direction: state.direction == 'horizontal' ? 'vertical' : 'horizontal'
-				};
+				// check if the current layout is empty
+				if(!state.id && (state.children && !state.children.length))
+				{
+					state = {
+						id: [name],
+						direction: "horizontal",
+						flex: 1
+					}
+				}	
+				else 
+				{
+					state = {
+						children: [state, {id: [name]}],
+						direction: state.direction == 'horizontal' ? 'vertical' : 'horizontal'
+					};
+				}
 				layout.setSessionState(state);
 			}
 		}
