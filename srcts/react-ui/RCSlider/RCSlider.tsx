@@ -151,14 +151,21 @@ export default class RCSlider extends React.Component<any, any>
 			let marks:{[value:number]: string} = {};
 			marks[this.min] = valueToLabel[this.min] || "0";
 			marks[this.max] = valueToLabel[this.max] || "1";
-            return  <Slider range={true}
-                            step={(this.max-this.min)/1024}
-                            min={this.min}
-                            max={this.max}
-                            marks={marks}
-                            value={[value.min, value.max]}
-                            onChange={this.onChange}
-                    />
+            let stepCount:number = (this.max - this.min)/1024;
+
+            //todo - needs better handling ? for step count 0
+
+            return <Slider range={true}
+                    step={stepCount > 0? stepCount :1}
+                    min={this.min}
+                    max={this.max}
+                    marks={marks}
+                    value={[value.min, value.max]}
+                    onChange={this.onChange}
+            />;
+
+
+
         }
 
         if (this.props.type == RCSlider.NUMERIC_DISCRETE)
