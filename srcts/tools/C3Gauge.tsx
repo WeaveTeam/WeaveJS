@@ -1,11 +1,8 @@
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
-import * as _ from "lodash";
-import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
-import * as c3 from "c3";
-import {ChartConfiguration, ChartAPI} from "c3";
+import {HBox, VBox} from "../react-ui/FlexBox";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -17,6 +14,8 @@ import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
 import StandardLib = weavejs.util.StandardLib;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -145,6 +144,21 @@ export default class C3Gauge extends AbstractC3Tool
 
         return changeDetected || forced;
     }
+
+	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap} = {
+		meterColumn:this.meterColumn
+	};
+
+	renderEditor():JSX.Element
+	{
+		return (
+			<VBox>
+				{
+					super.renderEditor()
+				}
+			</VBox>
+		)
+	}
 
     get deprecatedStateMapping()
     {
