@@ -65,9 +65,18 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	{
 		super(props);
 		this.state = {};
+	}
+	
+	componentDidMount()
+	{
 		this.props.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
 	
+	componentWillUnmount()
+	{
+		this.props.weave.root.childListCallbacks.removeCallback(this, this.forceUpdate);
+	}
+
 	componentWillReceiveProps(props:IDataSourceManagerProps)
 	{
 		if (props.selected)

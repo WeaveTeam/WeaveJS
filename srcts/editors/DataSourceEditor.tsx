@@ -123,7 +123,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var keyType = this.column.getMetadata("keyType");
 		var dataType = this.column.getMetadata("dataType");
 		var columnIds = ["id", "value"];
-		var columnTitles:IColumnTitles = {id: Weave.lang("Key {0}", keyType), value: Weave.lang("Value {0}", dataType)};
+		var columnTitles:IColumnTitles = {id: Weave.lang("Key ({0})", keyType), value: Weave.lang("Value ({0})", dataType)};
 
 		return (
 			<VBox style={{flex: 1}} ref={(c:VBox) => this.tableContainer = c}>
@@ -133,9 +133,10 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 					? <FixedDataTable rows={rows} 
 									  columnIds={columnIds} 
 									  idProperty="id"
+									  showIdColumn={true}
 									  columnWidth={this.tableContainerElement.clientWidth/columnIds.length} 
 									  columnTitles={columnTitles}/>
-					: ""
+					: null
 				}
 			</VBox>
 		)
