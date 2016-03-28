@@ -52,15 +52,15 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
             Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate);*/
     }
 
-    addSelected=():void=>{
-        let columns = this.props.attribute;
-        var meta = this.selectedColumnRef.getColumnMetadata();
-
-        if(meta){
-            if(this.selectedColumnRef && Weave.IS(this.props.attribute, LinkableHashMap)){
-                let col= (columns as LinkableHashMap).requestObject((columns as LinkableHashMap).generateUniqueName('ReferencedColumn'),weavejs.data.column.ReferencedColumn);
-                col.setColumnReference(this.selectedColumnRef.getDataSource(), this.selectedColumnRef.getColumnMetadata());
-            }
+    addSelected=():void=>
+	{
+		var ref = this.selectedColumnRef;
+        var meta = ref && ref.getColumnMetadata();
+        if (meta)
+		{
+			var lhm = Weave.AS(this.props.attribute, LinkableHashMap);
+            if (lhm)
+                lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
         }
     };
 
