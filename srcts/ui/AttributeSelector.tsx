@@ -48,13 +48,13 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     };
 
     componentDidMount(){
-        if(Weave.IS(this.props.attribute, LinkableHashMap))
-            Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate);
+       /* if(Weave.IS(this.props.attribute, LinkableHashMap))
+            Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate);*/
     }
 
     addSelected=():void=>{
         let columns = this.props.attribute;
-        var meta = ref.getColumnMetadata();
+        var meta = this.selectedColumnRef.getColumnMetadata();
 
         if(meta){
             if(this.selectedColumnRef && Weave.IS(this.props.attribute, LinkableHashMap)){
@@ -74,15 +74,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 		{
             //TODO is column handling correct?
 			var meta = ref.getColumnMetadata();
-			/*if (meta && Weave.IS(this.props.attribute, DynamicColumn))
-                (this.props.attribute as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
-
-            if (meta && Weave.IS(this.props.attribute, AlwaysDefinedColumn)){
-                let dy = ColumnUtils.hack_findInternalDynamicColumn(this.props.attribute as IColumnWrapper);
-                (dy as DynamicColumn).requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
-            }*/
-
-            if (meta)
+		    if (meta)
 			{
                 if(Weave.IS(this.props.attribute, IColumnWrapper)){//if selectable attribute is a single column
                     let dc = ColumnUtils.hack_findInternalDynamicColumn(this.props.attribute as IColumnWrapper);
