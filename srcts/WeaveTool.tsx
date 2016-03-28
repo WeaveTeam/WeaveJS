@@ -35,6 +35,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	style?: CSSProperties;
 	onGearClick?:(tool:IVisTool, editorContent:JSX.Element)=>void;
 	onMaximizeClick?:(tool:IVisTool)=>void;
+	onCloseClick?:(tool:IVisTool)=>void;
 }
 
 export interface IWeaveToolState
@@ -105,6 +106,13 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		if (this.props.onMaximizeClick)
 			this.props.onMaximizeClick(this.watcher.target as IVisTool);
 	}
+	
+	
+	onCloseClick=():void=>
+	{
+		if (this.props.onCloseClick)
+			this.props.onCloseClick(this.watcher.target as IVisTool);
+	}
 
 	render():JSX.Element
 	{
@@ -124,6 +132,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 						  title={Weave.lang(this.state.title)}
 						  onGearClick={this.onGearClick}
 						  onMaximizeClick={this.onMaximizeClick}
+						  onCloseClick={this.onCloseClick}
 						  />
 				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
@@ -142,6 +151,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	title:string;
 	onGearClick:React.MouseEventHandler;
 	onMaximizeClick:React.MouseEventHandler;
+	onCloseClick:React.MouseEventHandler;
 }
 
 interface ITitleBarState
@@ -219,7 +229,7 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 					<div style={iconStyle} onClick={this.props.onMaximizeClick}>
 						<Glyphicon glyph="unchecked"/>
 					</div>
-					<div style={iconStyle}>
+					<div style={iconStyle} onClick={this.props.onCloseClick}>
 						<Glyphicon glyph="remove"/>
 					</div>
 				</HBox>

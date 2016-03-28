@@ -118,6 +118,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{...panelProps}
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={this.handleMaximizeClick.bind(this, path)}
+				onCloseClick={this.removeObject.bind(this)}
 			/>
 		);
 	}
@@ -162,6 +163,34 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				}
 				layout.setSessionState(state);
 			}
+		}
+	}
+	
+	removeObject(object:any/*ILinkableObject*/)
+	{
+		var weave = this.props.weave;
+
+		if (is(object, IDataSource))
+		{
+			// remove data source
+		}
+		
+		if (object instanceof React.Component)
+		{
+			var layout = weave.getObject(this.getRenderPath()) as FlexibleLayout;
+			if (layout instanceof FlexibleLayout)
+			{
+				var state = layout.getSessionState();
+			}
+			var parentLayout = MiscUtils.findDeep(state, (newRoot:any) => {
+				return newRoot.children.map((child:any) => {
+					_.isEqual(child.id, Weave.getPath(object).getPath())
+				});
+			});
+			
+			// remove tool from Layout
+			
+			// remove tool from weave
 		}
 	}
 	
