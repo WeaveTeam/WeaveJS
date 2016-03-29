@@ -34,7 +34,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     private  weaveRoot: ILinkableHashMap;
     private searchFilter :string;
     private items:{[label:string] : Function}={};
-    private selectedColumnRef :IColumnReference;
+    private selectedColumnRef :IColumnReference[];
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
@@ -49,26 +49,25 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
         this.state = {leafNode : null, selectAll : false};
     };
 
-    componentDidMount(){
-       /* if(Weave.IS(this.props.attribute, LinkableHashMap))
-            Weave.getCallbacks(this.props.attribute).addGroupedCallback(this, this.forceUpdate);*/
-    }
-
     addSelected=():void=>
 	{
-		var ref = this.selectedColumnRef;
-        var meta = ref && ref.getColumnMetadata();
-        if (meta)
-		{
-			var lhm = Weave.AS(this.props.attribute, LinkableHashMap);
-            if (lhm)
-                lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+        var counter :number = this.selectedColumnRef.length;
+		for(var i:number =0; i < counter; i++ ){
+            var ref = this.selectedColumnRef[i];
+            var meta = ref && ref.getColumnMetadata();
+            if (meta)
+            {
+                var lhm = Weave.AS(this.props.attribute, LinkableHashMap);
+                if (lhm)
+                    lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+            }
         }
     };
 
     handleSelectAll=():void=>{
        let selectedItems = this.state.leafNode.getChildren();//get all leaf nodes
        this.leafTree.setState({selectedItems});//accessing leaf tree using ref concept
+
        this.setState({selectAll :true});
     };
 
@@ -92,7 +91,10 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                         dc.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
                 }
                 else{//if selectable attribute is a LinkableHashmap
-                  this.selectedColumnRef = ref;
+                      this.selectedColumnRef = [];
+                      this.selectedColumnRef = selectedItems.map((item:IWeaveTreeNode)=> {
+                            return Weave.AS(item, weavejs.api.data.IColumnReference);
+                      });
                 }
             }
 		}

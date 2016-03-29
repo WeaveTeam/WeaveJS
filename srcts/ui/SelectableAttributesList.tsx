@@ -78,7 +78,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
                     <div >
                         <div style={listStyle}>
-                            <List style={ {flex : 1, fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
+                            <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
                         </div>
 
                         <HBox>
