@@ -7,12 +7,11 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
-import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import PopupWindow from "../react-ui/PopupWindow";
 
 export interface IAttributeSelectorProps
 {
@@ -35,6 +34,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     private searchFilter :string;
     private items:{[label:string] : Function}={};
     private selectedColumnRef :IColumnReference[];
+
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
@@ -67,7 +67,6 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     handleSelectAll=():void=>{
        let selectedItems = this.state.leafNode.getChildren();//get all leaf nodes
        this.leafTree.setState({selectedItems});//accessing leaf tree using ref concept
-
        this.setState({selectAll :true});
     };
 
@@ -106,6 +105,18 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
         this.forceUpdate();
     };
 
+    static openInstance(label:string, attribute:IColumnWrapper|LinkableHashMap, attributeNames:string[]):PopupWindow{
+       var attrPop = PopupWindow.open({
+            title: 'Attribute Selector for ' + label,
+            content: <AttributeSelector label={ label } attribute={ attribute } attributeNames={ attributeNames }/>,
+            modal: false,
+            width: 800,
+            height: 450,
+        });
+
+       return attrPop;
+    }
+
     render():JSX.Element
     {
         let treeNode:WeaveRootDataTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
@@ -115,7 +126,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 
                 <ButtonGroupBar items={ this.items }></ButtonGroupBar>
 
-                <HBox>
+                <HBox style={{height: '300px'}}>
                     <VBox style={{ flex: .5 }}>
                         <WeaveTree searchFilter={ this.searchFilter } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={treeNode} ref={ (c) => { this.tree = c; } }/>
                     </VBox>
