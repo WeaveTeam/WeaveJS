@@ -16,7 +16,7 @@ export interface IVisToolState
 export interface IVisTool extends ILinkableObject
 {
     title:string;
-	renderEditor?():JSX.Element;
-    selectableAttributes?:{[label:string]:IColumnWrapper|LinkableHashMap};//TODO make this into an interface?
+	renderEditor():JSX.Element;
+    selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap};//TODO make this into an interface?
 
 }

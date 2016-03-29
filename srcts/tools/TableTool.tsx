@@ -7,6 +7,10 @@ import Menu, {MenuItemProps} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
 import FixedDataTable from "./FixedDataTable";
 import ResizingDiv, {ResizingDivState} from "../react-ui/ResizingDiv";
+import {HBox, VBox} from "../react-ui/FlexBox";
+import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import SelectableAttributesList from "../ui/SelectableAttributesList";
+
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -21,6 +25,7 @@ import KeySet = weavejs.data.key.KeySet;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import QKey = weavejs.data.key.QKey;
 import QKeyManager = weavejs.data.key.QKeyManager;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export interface IDataTableState extends IVisToolState
 {
@@ -140,6 +145,32 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	handleSelection=(ids:string[]) =>
 	{
 		this.selectionKeySet.replaceKeys(ids as any);
+	};
+
+	selectableAttributes:{[label:string] : IColumnWrapper|LinkableHashMap} ={
+		Columns : this.columns
+	};
+
+	renderEditor():JSX.Element {
+
+		var attrLabels = Object.keys(this.selectableAttributes);
+		var selectors = attrLabels.map((label:string, index:number) => {
+			if (Weave.IS(this.selectableAttributes[label], IColumnWrapper))
+			{
+				let attribute = this.selectableAttributes[label] as IColumnWrapper;
+				return <SelectableAttributeComponent attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
+			}
+			else // LinkableHashMap
+			{
+				let attribute = this.selectableAttributes[label] as LinkableHashMap;
+				return(<SelectableAttributesList  attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
+			}
+		});
+		return(
+			<VBox>
+				{selectors}
+			</VBox>
+		)
 	};
 
 	render()

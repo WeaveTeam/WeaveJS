@@ -14,6 +14,7 @@ import AbstractVisTool from "./AbstractVisTool";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import Menu from "../react-ui/Menu";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
+import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -26,15 +27,17 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import KeySet = weavejs.data.key.KeySet;
 import LinkableNumber = weavejs.core.LinkableNumber;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 const SHAPE_TYPE_BOX:string = "box";
 
-export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties
+export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool
 {
 	panelTitle = Weave.linkableChild(this, LinkableString);
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -354,6 +357,23 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			//Continuous plot case
 			return (<div/>);
 		}
+	}
+
+	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap} = {
+		ColorData : this.dynamicColorColumn
+	};
+
+	renderEditor ():JSX.Element{
+
+		var attrLabels = Object.keys(this.selectableAttributes);
+		var selectors = attrLabels.map((label:string, index:number)=>{
+			let attribute = this.selectableAttributes[label] as IColumnWrapper;
+			return <SelectableAttributeComponent attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
+		});
+
+		return(<VBox>
+					{selectors}
+				</VBox>);
 	}
 
 	get deprecatedStateMapping():Object

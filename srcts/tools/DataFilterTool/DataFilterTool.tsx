@@ -21,6 +21,7 @@ import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNe
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import WeaveAPI = weavejs.WeaveAPI;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export interface IDataFilterToolState extends IVisToolState{
 	filterType:string
@@ -169,6 +170,8 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 		this.filterEditor.requestLocalObject(this.filterEditorMap[key].editorType, false);
 	}
 
+
+	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap};
 
 	renderEditor():JSX.Element
 	{

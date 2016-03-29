@@ -16,6 +16,7 @@ import LinkableNumber = weavejs.core.LinkableNumber;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeySet = weavejs.data.key.DynamicKeySet;
 import LinkableString = weavejs.core.LinkableString;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -155,6 +156,11 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 					}
 			</VBox>
 		</div>);
+	}
+
+	selectableAttributes:{[label:string]: IColumnWrapper|LinkableHashMap};
+	renderEditor() : JSX.Element{
+		return(<VBox></VBox>);
 	}
 
 	get deprecatedStateMapping()

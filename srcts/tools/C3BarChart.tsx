@@ -21,6 +21,7 @@ import ColorRamp = weavejs.util.ColorRamp;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableNumber = weavejs.core.LinkableNumber;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -501,11 +502,12 @@ export default class C3BarChart extends AbstractC3Tool
 		return false;
     }
 
-    selectableAttributes:{[label:string]:DynamicColumn|LinkableHashMap} = {
+    selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap} = {
         label:this.labelColumn,
         sort:this.sortColumn,
+        color:this.colorColumn,
         height:this.heightColumns
-    };//TODO handle remaining attributes
+    };
 
     renderEditor():JSX.Element
     {
