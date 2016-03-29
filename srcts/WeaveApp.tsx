@@ -23,6 +23,7 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
+import ILinkableObject = weavejs.api.core.ILinkableObject;
 let is = Weave.IS;
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -167,7 +168,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 	
-	removeObject(object:any/*ILinkableObject*/)
+	removeObject(object:ILinkableObject)
 	{
 		var weave = this.props.weave;
 
