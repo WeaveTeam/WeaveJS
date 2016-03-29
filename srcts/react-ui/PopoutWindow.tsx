@@ -1,7 +1,11 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import * as jquery from "jquery";
 
 import SmartComponent from "../ui/SmartComponent";
+
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
 
 export interface PopoutWindowProps extends React.Props<PopoutWindow>
 {
@@ -65,6 +69,12 @@ export default class PopoutWindow extends SmartComponent<PopoutWindowProps, Popo
 			popoutWindow.document.title = this.props.title;
 			container = popoutWindow.document.createElement('div');
 			container.id = this.divId;
+			$("link, style").each(function() {
+				//Todo: find a better way to clone this link
+				var link:any = $(this).clone()[0];
+				link.setAttribute("href",window.location.origin + window.location.pathname + link.getAttribute("href"));
+				$(popoutWindow.document.head).append(link);
+			});
 			popoutWindow.document.body.appendChild(container);
 			ReactDOM.render(this.props.content, container);
 			update = newComponent => {
