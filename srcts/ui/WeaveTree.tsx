@@ -138,7 +138,6 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	handleItemClick=(node:IWeaveTreeNode, e:React.MouseEvent)=>
 	{
-
 			this.internalSetSelected(node, e.ctrlKey ? !this.getSelected(node) : true, e.ctrlKey);
 	};
 

@@ -349,7 +349,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		if (!lodash.every(extent, Number.isFinite))
 			extent = undefined;
 
-		let projection = this.projectionSRS.value || this.getDefaultProjection();
+		/* If this is a valid projection, use it. otherwise use default. */
+		let projection = ol.proj.get(this.projectionSRS.value) || this.getDefaultProjection();
 		let view = new CustomView({minZoom: this.minZoomLevel.value, maxZoom: this.maxZoomLevel.value, projection, extent});
 		view.set("extent", extent);
 

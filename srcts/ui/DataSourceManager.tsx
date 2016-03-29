@@ -22,8 +22,8 @@ import DBFDataSourceEditor from "../editors/DBFDataSourceEditor";
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
 import GeoJSONDataSourceEditor from "../editors/GeoJSONDataSourceEditor";
 
-// import CensusDataSource = weavejs.data.source.CensusDataSource;
-// import CensusDataSourceEditor from "../editors/CensusDataSourceEditor";
+import CensusDataSource = weavejs.data.source.CensusDataSource;
+import CensusDataSourceEditor from "../editors/CensusDataSourceEditor";
 
 import CKANDataSource = weavejs.data.source.CKANDataSource;
 import CKANDataSourceEditor from "../editors/CKANDataSourceEditor";
@@ -55,8 +55,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(CSVDataSource, CSVDataSourceEditor)
 		.set(DBFDataSource, DBFDataSourceEditor)
 		.set(GeoJSONDataSource, GeoJSONDataSourceEditor)
-//		.set(CensusDataSource, CensusDataSourceEditor)
+		.set(CensusDataSource, CensusDataSourceEditor)
 		.set(CKANDataSource, CKANDataSourceEditor)
+		.set(CensusDataSource, CensusDataSourceEditor)
 		.set(WeaveDataSource, WeaveDataSourceEditor)
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)

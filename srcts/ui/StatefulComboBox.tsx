@@ -6,6 +6,8 @@ import * as ReactDOM from "react-dom";
 export interface StatefulComboBoxProps extends React.HTMLProps<StatefulComboBox> {
 	style?: React.CSSProperties;
 	options: (string | { label: string, value: any })[];
+	value?: any;
+	onChange?: (selectedItem: any) => void;
 }
 
 export interface StatefulComboBoxState {
@@ -18,6 +20,14 @@ export default class StatefulComboBox extends React.Component<StatefulComboBoxPr
 		super(props);
 	}
 
+	componentWillReceiveProps(nextProps: StatefulComboBoxProps)
+	{
+		if (nextProps.value)
+		{
+			this.setState({ value: nextProps.value });
+		}
+	}
+
 	state: StatefulComboBoxState = { value: null };
 
 	handleInputChange = (event: React.FormEvent): void => {
@@ -25,6 +35,8 @@ export default class StatefulComboBox extends React.Component<StatefulComboBoxPr
 		let option = this.props.options[index];
 		let value: any;
 		value = (typeof option === "object") ? option.value : option;
+
+		if (this.props.onChange) this.props.onChange(value);
 		this.setState({value});
 	}
 
