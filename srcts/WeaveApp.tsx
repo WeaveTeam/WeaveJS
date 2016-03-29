@@ -183,40 +183,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (layout instanceof FlexibleLayout)
 			{
 				var state = layout.getSessionState();
-			}
-			
-			var parentLayoutState:LayoutState = null;
-			
-			if(state.id && _.isEqual(state.id, Weave.getPath(object).getPath()))
-			{
-				parentLayoutState = state;
-			} 
-			else
-			{
-				var parentLayoutState = MiscUtils.findDeep(state, (newRoot:LayoutState) => {
-					return _.find(_.pluck(newRoot.children, "id"), Weave.getPath(object).getPath());
+				var node = MiscUtils.findDeep(state, (root:LayoutState) => {
+					return _.isEqual(root.id, Weave.getPath(object).getPath());
 				}) as LayoutState;
+				
+				delete node.id;
+				node.children = [];
+				layout.setSessionState(state);
+				weave.root.removeObject(weave.root.getName(object));
 			}
-			
-			var index:number;
-			if(parentLayoutState.id)
-			{
-				state = {
-					children: [],
-					flex: 1,
-					direction: "horizontal"
-				};
-			}
-			else
-			{
-				parentLayoutState.children.forEach((child:LayoutState, i:number) => {
-					if(_.isEqual(child.id, Weave.getPath(object).getPath()))
-					index = i;
-				});
-				parentLayoutState.children.splice(index, 1);
-			}
-			layout.setSessionState(state);
-			weave.root.removeObject(weave.root.getName(object));
 		}
 	}
 	
