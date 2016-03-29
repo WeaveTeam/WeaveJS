@@ -123,7 +123,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (container) {
 				ReactDOM.unmountComponentAtNode(container);
 				//this.props.weave.root.removeObject(name);
-				//weavejs.WeaveAPI.Scheduler.frameCallbacks.removeCallback(this, this.requestNextFrame)
 			}
 		};
 		var onloadHandler = () => {
@@ -163,18 +162,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					style={{width:"100%", height:"100%"}}
 				/>
 				, container);
-			//weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.requestNextFrame);
-			//exportWindow.weave.triggerAll();
 		};
 
 		exportWindow.onload = onloadHandler;
 		onloadHandler();
-	}
-
-	requestNextFrame()
-	{
-		let fc = weavejs.WeaveAPI.Scheduler.frameCallbacks;
-		requestAnimationFrame(fc.triggerCallbacks.bind(fc));
 	}
 
 	handleGearClick=(tool:IVisTool, content:JSX.Element):void=>
