@@ -50,7 +50,7 @@ export default class WeaveComponentRenderer extends SmartComponent<IWeaveCompone
 			this.key++;
 		
 		// create a new watcher when weave instance changes
-		if (weaveChanged || !this.watcher)
+		if (weaveChanged || pathChanged || !this.watcher)
 		{
 			if (this.watcher)
 			{

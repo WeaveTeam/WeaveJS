@@ -8,17 +8,18 @@ import {WeaveComponentRenderer} from "../lib/WeaveUI.js";
 window.weave1 = new Weave();
 window.weave2 = new Weave();
 window.weave3 = new Weave();
-weavejs.core.WeaveArchive.loadUrl(weave1, "/elm/Indicator_Toggle_View.weave").then(function(){
-	weavejs.core.WeaveArchive.loadUrl(weave2, "/elm/KSA_Health_Trends.weave").then(function(){
-		weavejs.core.WeaveArchive.loadUrl(weave3, "/elm/REMI_Saudi_Arabia_Trade_Inflow_Outflow.weave").then(render);
-	})
+weavejs.core.WeaveArchive.loadUrl(weave1, "/elm/Ar_Riyadh_Health.weave").then(function(){
+	weavejs.core.WeaveArchive.loadUrl(weave2, "/elm/Riyadh_City_Health.weave").then(render)
 });
 
 var weaveInsts = [weave1, weave2];
+var layoutNames = ["Layout", "LineChartLayout"];
 function render()
 {
 	$(() => {
-		ReactDOM.render(<MultipleView weaveInstances={weaveInsts} style={{width: "90%", height: "90%"}}/>, document.getElementById("weaveElt"));
+		ReactDOM.render(<MultipleView weaveInstances={weaveInsts}  layouts={layoutNames}
+									  style={{width: "90%", height: "90%"}}/>,
+			document.getElementById("weaveElt"));
 	});
 }
 
@@ -28,10 +29,12 @@ class MultipleView extends React.Component {
 		super(props);
 		this.state = {
 			toggleIndex: 0,
+			toggleLayoutIndex: 0,
 			addView: false,
 			scale: 1
 		}
         this.toggleView = this.toggleView.bind(this);
+        this.toggleLayout = this.toggleLayout.bind(this);
         this.addView = this.addView.bind(this);
         this.scaleView = this.scaleView.bind(this);
 	}
@@ -41,6 +44,13 @@ class MultipleView extends React.Component {
 		this.setState({
 			toggleIndex: this.state.toggleIndex == 0 ? 1 : 0,
 			addView: false
+		});
+	}
+
+	toggleLayout()
+	{
+		this.setState({
+			toggleLayoutIndex: this.state.toggleLayoutIndex == 0 ? 1 : 0
 		});
 	}
 
@@ -67,11 +77,11 @@ class MultipleView extends React.Component {
 		}
 
 		var weaveInst = this.props.weaveInstances[this.state.toggleIndex];
-		var layout = weaveInst.root.requestObject("Layout", Weave.getDefinition("FlexibleLayout"));
+		var layoutName = this.props.layouts[this.state.toggleLayoutIndex];
 
 		var weaveUI = [
 			<div key="0" style={styleObject}>
-				<WeaveComponentRenderer weave={weaveInst} path={['Layout']} style={{width: "100%", height: "100%"}}/>
+				<WeaveComponentRenderer weave={weaveInst} path={[layoutName]} style={{width: "100%", height: "100%"}}/>
 	   		</div>
 		];
 		
@@ -115,7 +125,7 @@ class MultipleView extends React.Component {
 			<div style={this.props.style} className="weave-app">
 				<div>
 					<span onClick={this.toggleView}> Toggle Weave </span> |
-					<span onClick={this.addView}> {singleViewLabel} </span>|
+					<span onClick={this.toggleLayout}> Toggle Layout </span>|
 					<span onClick={this.scaleView}> Scale </span>
 					<br/>
 				</div>
