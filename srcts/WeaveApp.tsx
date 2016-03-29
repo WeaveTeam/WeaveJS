@@ -9,6 +9,7 @@ import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
+import {LayoutState} from "./react-flexible-layout/Layout";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
 import {WeavePathArray, PanelProps} from "./FlexibleLayout";
@@ -182,15 +183,39 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			{
 				var state = layout.getSessionState();
 			}
-			var parentLayout = MiscUtils.findDeep(state, (newRoot:any) => {
-				return newRoot.children.map((child:any) => {
-					_.isEqual(child.id, Weave.getPath(object).getPath())
+			
+			var parentLayoutState:LayoutState = null;
+			
+			if(state.id && _.isEqual(state.id, Weave.getPath(object).getPath()))
+			{
+				parentLayoutState = state;
+			} 
+			else
+			{
+				var parentLayoutState = MiscUtils.findDeep(state, (newRoot:LayoutState) => {
+					return _.find(_.pluck(newRoot.children, "id"), Weave.getPath(object).getPath());
+				}) as LayoutState;
+			}
+			
+			var index:number;
+			if(parentLayoutState.id)
+			{
+				state = {
+					children: [],
+					flex: 1,
+					direction: "horizontal"
+				};
+			}
+			else
+			{
+				parentLayoutState.children.forEach((child:LayoutState, i:number) => {
+					if(_.isEqual(child.id, Weave.getPath(object).getPath()))
+					index = i;
 				});
-			});
-			
-			// remove tool from Layout
-			
-			// remove tool from weave
+				parentLayoutState.children.splice(index, 1);
+			}
+			layout.setSessionState(state);
+			weave.root.removeObject(weave.root.getName(object));
 		}
 	}
 	
