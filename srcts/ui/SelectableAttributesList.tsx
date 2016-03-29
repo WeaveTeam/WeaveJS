@@ -7,6 +7,7 @@ import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import {ListOption} from "../react-ui/List";
+import PopupWindow from "../react-ui/PopupWindow";
 
 export interface ISelectableAttributesListProps{
     columns : LinkableHashMap;
@@ -45,6 +46,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         this.selectedColumn = selectedItems[0];
     };
 
+    launchAttributeSelector=():PopupWindow=>{
+      return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.attributeNames);
+    };
+
     componentDidMount(){
         Weave.getCallbacks(this.props.columns).addGroupedCallback(this, this.forceUpdate);
     }
@@ -65,16 +70,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
             columnList.push({label:label, value : column});
         });
 
-        var title = "Attribute Selector for " + this.props.label;
-        var buttonUI = <button style={ labelStyle }>{ Weave.lang(this.props.label) }</button>;
+        var buttonUI = <button style={ labelStyle } onClick={ this.launchAttributeSelector }>{ Weave.lang(this.props.label) }</button>;
         var labelUI =<span>{this.props.label}</span> ;
         return(<VBox >
-                    <OverlayTrigger trigger="click" placement="bottom"
-                                overlay={ <Popover id="AttributeSelector" title={ title }>
-                                               <AttributeSelector attributeNames={ this.props.attributeNames } label={ this.props.label } attribute={ this.props.columns }/>
-                                         </Popover>}>
-                        {this.props.button ? buttonUI : labelUI}
-                    </OverlayTrigger>
+                    {this.props.button ? buttonUI : labelUI}
 
                     <div >
                         <div style={listStyle}>
