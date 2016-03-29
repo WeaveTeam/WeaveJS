@@ -113,9 +113,9 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 			return (
 				<HBox style={this.props.style}>
 					<input
+						type="text"
 						{...props as any}
 						style={{ flex: 1 }}
-						type="text"
 						onFocus={this.onFocus}
 						onBlur={this.handleInputChange}
 						onChange={this.handleInputChange}

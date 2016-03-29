@@ -36,7 +36,7 @@ export default class StatefulCheckBox extends React.Component<StatefulCheckBoxPr
 		delete props.children;
 
 		return (
-			<input onClick={this.onClick} onChange={this.onChange} type="checkbox" checked={this.state.checked}/>
+			<input {...props as any} onClick={this.onClick} onChange={this.onChange} type="checkbox" checked={this.state.checked}/>
 		);
 	}
 }
