@@ -131,7 +131,7 @@ export default class List extends React.Component<IListProps, IListState>
 
     render(): JSX.Element {
         return (
-            <VBox style={{ flex: 1, overflow: "auto" }}>
+            <div style={{overflow: "auto" }}>
                 {
                     this.values.map((value: any, index: number) => {
                         var selected: boolean = this.state.selectedValues.indexOf(value) >= 0;
@@ -153,7 +153,7 @@ export default class List extends React.Component<IListProps, IListState>
                         );
                     })
                 }
-            </VBox>
+            </div>
         );
     }
 }
