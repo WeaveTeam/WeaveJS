@@ -133,11 +133,11 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	static CLASSNAME = "weave-tree-view";
 	static SELECTED_CLASSNAME = "selected";
 	
-	static BRANCH_ICON_CLASSNAME = "icon fa fa-folder fa-fw";
-	static LEAF_ICON_CLASSNAME = "icon fa fa-file-text-o fa-fw";
-	static OPEN_BRANCH_ICON_CLASSNAME = "icon fa fa-folder-open fa-fw";
-	static EXPANDER_CLOSED_CLASS_NAME = "icon fa fa-play fa-fw expander";
-	static EXPANDER_OPEN_CLASS_NAME = "icon fa fa-play fa-fw fa-rotate-90 expander";
+	static BRANCH_ICON_CLASSNAME = "weave-tree-view-icon fa fa-folder fa-fw";
+	static LEAF_ICON_CLASSNAME = "weave-tree-view-icon fa fa-file-text-o fa-fw";
+	static OPEN_BRANCH_ICON_CLASSNAME = "weave-tree-view-icon fa fa-folder-open fa-fw";
+	static EXPANDER_CLOSED_CLASS_NAME = "weave-tree-view-icon-expander fa fa-play fa-fw";
+	static EXPANDER_OPEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-play fa-fw fa-rotate-90";
 
 	private renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
 	{
@@ -171,14 +171,29 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			className += " " + WeaveTree.SELECTED_CLASSNAME;
 		}
 
-		return <span key={index} className={className}
-			onMouseDown={ this.handleItemClick.bind(this, node) }
-			onDoubleClick={ iconClickFunc } style={{ verticalAlign: "middle", position: "absolute", top: index * this.rowHeight, width: "100%"}}>
-			<span style={{ marginLeft: node.depth * 16, whiteSpace: "pre"}}>
-				<i onMouseDown={ iconClickFunc } onDoubleClick={(e) => e.stopPropagation()} className={ expanderClassName } style={{display: expanderClassName ? null : "none" }}/>
-				<i className={iconClassName}/>
-				{ " "+node.getLabel() }
-			</span></span>;
+		return <HBox key={index} 
+					 className={className}
+					 onMouseDown={ this.handleItemClick.bind(this, node) }
+					 onDoubleClick={ iconClickFunc }
+					 style={{ alignItems: "center", position: "absolute", top: index * this.rowHeight, height: this.rowHeight, width: "100%"}}>
+						<HBox style={{ marginLeft: (node.depth || 0) * 16 + 5, whiteSpace: "nowrap"}}>
+							<span style={{alignSelf: "stretch", display: "flex"}}>
+								<i
+									onMouseDown={ iconClickFunc }
+									onDoubleClick={(e) => e.stopPropagation()}
+									className={ expanderClassName }
+									style={{display: expanderClassName ? null : "none", alignSelf: "center"}}
+								/>
+							</span>
+							<span style={{alignSelf: "stretch", display: "flex"}}>
+								<i
+									style={{alignSelf: "center"}}
+									className={iconClassName}
+								/>
+							</span>
+							{ " "+node.getLabel() }
+						</HBox>
+				</HBox>;
 	};
 
 	enumerateItems=(_node:IWeaveTreeNode, result:Array<IWeaveTreeNode> = [], depth:number = 0):Array<IWeaveTreeNode>=>
@@ -222,7 +237,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		if (Weave.isLinkable(this.props.root)) {
 			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
 		}
-		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22);
+		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22) + 5;
 		let items = this.props.hideBranches ? this.props.root.getChildren().filter((n) => !n.isBranch()) : this.enumerateItems(this.props.root);
 		return <ListView style={this.props.style}
 						 items={items}

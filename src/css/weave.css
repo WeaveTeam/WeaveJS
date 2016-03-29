@@ -342,11 +342,11 @@ input[type="text"]:focus {
     background-color: #D0D0D0;
 }
 
-span.weave-tree-view i.icon {
+.weave-tree-view-icon {
     color: #808080;
 }
 
-span.weave-tree-view i.icon.expander {
+.weave-tree-view-icon-expander {
     color: #000000;
     font-size: 60%;
 }
@@ -356,8 +356,16 @@ span.weave-tree-view i.icon.expander {
 	-webkit-user-select: none;
 }
 
+.weave-tree-view:hover {
+	background-color: rgba(153, 214, 255, 0.4);
+}
+
 .weave-tree-view.selected {
-	background-color: #ADD8E6;
+	background-color: #80CCFF;
+}
+
+.weave-tree-view.selected:hover {
+	background-color: #99D6FF;
 }
 
 span.weave-tree-view.open {
