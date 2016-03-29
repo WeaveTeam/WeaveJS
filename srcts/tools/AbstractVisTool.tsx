@@ -202,7 +202,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			else // LinkableHashMap
 			{
 				let attribute = this.selectableAttributes[label] as LinkableHashMap;
-				return(<SelectableAttributesList  attributeNames={attrLabels} button={ true } label={ label } columns={ attribute }/>);
+				return(<SelectableAttributesList  attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
 			}
 		});
 

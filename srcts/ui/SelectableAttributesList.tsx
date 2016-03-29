@@ -12,8 +12,8 @@ import PopupWindow from "../react-ui/PopupWindow";
 export interface ISelectableAttributesListProps{
     columns : LinkableHashMap;
     label:string;
-    button:boolean;//if button is true it will render button else string//TODO fix this use JSX.Element |boolean
     attributeNames?:string[];
+    showLabelAsButton?:boolean;
 }
 
 export interface ISelectableAttributesListState{
@@ -73,7 +73,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         var buttonUI = <button style={ labelStyle } onClick={ this.launchAttributeSelector }>{ Weave.lang(this.props.label) }</button>;
         var labelUI =<span>{this.props.label}</span> ;
         return(<VBox >
-                    {this.props.button ? buttonUI : labelUI}
+                    {this.props.showLabelAsButton ? buttonUI : labelUI}
 
                     <div >
                         <div style={listStyle}>

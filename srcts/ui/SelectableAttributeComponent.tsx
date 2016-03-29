@@ -27,7 +27,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	columnString: string;
 
 	launchAttributeSelector=():PopupWindow=>{
-		console.log("label", this.props.label);
 		return AttributeSelector.openInstance(this.props.label, this.props.attribute, this.props.attributeNames);
 	};
 

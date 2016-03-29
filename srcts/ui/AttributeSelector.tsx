@@ -17,6 +17,7 @@ export interface IAttributeSelectorProps
 {
     attribute : IColumnWrapper|LinkableHashMap;
     label? : string;
+    showLabelAsButton?:boolean;
     attributeNames?:string[];
 }
 
@@ -140,7 +141,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 
 
                 {this.props.attribute instanceof LinkableHashMap ?
-                    <VBox><SelectableAttributesList button={ false } label={ this.props.label } columns={ (this.props.attribute as LinkableHashMap)}></SelectableAttributesList></VBox>
+                    <VBox><SelectableAttributesList  showLabelAsButton={ false } label={ this.props.label } columns={ (this.props.attribute as LinkableHashMap)}></SelectableAttributesList></VBox>
                     : null}
             </VBox>
         );
