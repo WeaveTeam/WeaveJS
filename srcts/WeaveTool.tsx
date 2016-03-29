@@ -36,6 +36,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	onGearClick?:(tool:IVisTool, editorContent:JSX.Element)=>void;
 	onMaximizeClick?:(tool:IVisTool)=>void;
 	onCloseClick?:(tool:IVisTool)=>void;
+	onExportClick?:(tool:IVisTool)=>void;
 }
 
 export interface IWeaveToolState
@@ -66,7 +67,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.updateTitle);
 		
 		this.updateTitle();
-	}
+	};
 
 	componentDidMount():void
 	{
@@ -99,20 +100,26 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				});
 			}
 		}
-	}
+	};
 	
 	onMaximizeClick=():void=>
 	{
 		if (this.props.onMaximizeClick)
 			this.props.onMaximizeClick(this.watcher.target as IVisTool);
-	}
+	};
 	
 	
 	onCloseClick=():void=>
 	{
 		if (this.props.onCloseClick)
 			this.props.onCloseClick(this.watcher.target as IVisTool);
-	}
+	};
+
+	onExportClick=():void=>
+	{
+		if (this.props.onExportClick)
+			this.props.onExportClick(this.watcher.target as IVisTool);
+	};
 
 	render():JSX.Element
 	{
@@ -132,6 +139,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 						  title={Weave.lang(this.state.title)}
 						  onGearClick={this.onGearClick}
 						  onMaximizeClick={this.onMaximizeClick}
+						  onExportClick={this.onExportClick}
 						  onCloseClick={this.onCloseClick}
 						  />
 				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
@@ -151,6 +159,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	title:string;
 	onGearClick:React.MouseEventHandler;
 	onMaximizeClick:React.MouseEventHandler;
+	onExportClick:React.MouseEventHandler;
 	onCloseClick:React.MouseEventHandler;
 }
 
@@ -221,13 +230,16 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
 				<HBox style={prefixer(leftControls)}>
 	            	<div style={iconStyle} onClick={this.props.onGearClick}>
-						<Glyphicon glyph="cog"/>
+						<i className="fa fa-cog fa-fw"/>
 					</div>
 	            </HBox>
 				<span style={titleStyle} className="weave-panel">{this.props.title}</span>
 				<HBox style={prefixer(rightControls)}>
 					<div style={iconStyle} onClick={this.props.onMaximizeClick}>
-						<Glyphicon glyph="unchecked"/>
+						<i className="fa fa-expand fa-fw"/>
+					</div>
+					<div style={iconStyle} onClick={this.props.onExportClick}>
+						<i className="fa fa-external-link fa-fw"></i>
 					</div>
 					<div style={iconStyle} onClick={this.props.onCloseClick}>
 						<Glyphicon glyph="remove"/>

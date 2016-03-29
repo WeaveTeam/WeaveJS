@@ -1,5 +1,7 @@
 import * as React from "react";
+import * as ReactDOM from 'react-dom';
 import * as _ from "lodash";
+import * as jquery from "jquery";
 
 import prefixer from "./react-ui/VendorPrefixer";
 import {MenuItemProps} from "./react-ui/Menu";
@@ -23,8 +25,12 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
+import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 let is = Weave.IS;
+
+// loads jquery from the es6 default module.
+var $:JQueryStatic = (jquery as any)["default"];
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -49,7 +55,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		weave: null,
 		renderPath: ['Layout'],
 		readUrlParams: false
-	}
+	};
 
 	constructor(props:WeaveAppProps)
 	{
@@ -103,12 +109,79 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		obj.maximized = !obj.maximized;
 		layout.setSessionState(state);
 	}
+	
+	handleExportClick(path:WeavePathArray):void
+	{
+		var exportWindow:any;
+		var container:HTMLElement;
+		var name:string;
+		var baseName:string;
+		var fc:ICallbackCollection = weavejs.WeaveAPI.Scheduler.frameCallbacks;
+
+		exportWindow = window.open("", "_blank", "width=500, height=500");
+		exportWindow.onbeforeunload = () => {
+			if (container) {
+				ReactDOM.unmountComponentAtNode(container);
+				//this.props.weave.root.removeObject(name);
+				//weavejs.WeaveAPI.Scheduler.frameCallbacks.removeCallback(this, this.requestNextFrame)
+			}
+		};
+		var onloadHandler = () => {
+			if (container) {
+				var existing = exportWindow.document.getElementById('popout-container');
+				if (!existing){
+					ReactDOM.unmountComponentAtNode(container);
+					container = null;
+				} else{
+					return;
+				}
+			}
+
+			container = exportWindow.document.createElement('div');
+			container.id = 'popout-container';
+			exportWindow.document.body.appendChild(container);
+			baseName = this.props.weave.path(path).getSimpleType();
+			//name = this.props.weave.root.generateUniqueName(baseName);
+			name = 'ExportVis';
+			this.props.weave.root.requestObjectCopy(name,this.props.weave.getObject(path));
+
+			//send weave objects, and css to new window
+			exportWindow.weave = this.props.weave;
+			exportWindow.weavejs = weavejs;
+			exportWindow.Weave = Weave;
+			$("link, style").each(function() {
+				//Todo: find a better way to clone this link
+				var link:any = $(this).clone()[0];
+				link.setAttribute("href",window.location.origin + window.location.pathname + link.getAttribute("href"));
+				$(exportWindow.document.head).append(link);
+			});
+
+			ReactDOM.render(
+				<WeaveComponentRenderer
+					weave={this.props.weave}
+					path={[name]}
+					style={{width:"100%", height:"100%"}}
+				/>
+				, container);
+			//weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.requestNextFrame);
+			//exportWindow.weave.triggerAll();
+		};
+
+		exportWindow.onload = onloadHandler;
+		onloadHandler();
+	}
+
+	requestNextFrame()
+	{
+		let fc = weavejs.WeaveAPI.Scheduler.frameCallbacks;
+		requestAnimationFrame(fc.triggerCallbacks.bind(fc));
+	}
 
 	handleGearClick=(tool:IVisTool, content:JSX.Element):void=>
 	{
 		this.toolEditor = content;
 		this.forceUpdate();
-	}
+	};
 
 	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
 	{
@@ -120,10 +193,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{...panelProps}
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={this.handleMaximizeClick.bind(this, path)}
+				onExportClick={this.handleExportClick.bind(this, path)}
 				onCloseClick={this.removeObject.bind(this)}
 			/>
 		);
-	}
+	};
 
 	createObject=(type:new(..._:any[])=>any):void=>
 	{
@@ -166,7 +240,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				layout.setSessionState(state);
 			}
 		}
-	}
+	};
 	
 	removeObject(object:ILinkableObject)
 	{
