@@ -26,8 +26,9 @@ export interface IDataSourceEditorState {
 
 export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
 {
-	dataSourceWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.forceUpdate.bind(this)));
-	columnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IAttributeColumn, null, this.forceUpdate.bind(this)));
+	boundforceUpdate = () => this.forceUpdate();
+	dataSourceWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.boundforceUpdate));
+	columnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IAttributeColumn, null, this.boundforceUpdate));
 
 	private tableContainer:VBox;
 	private tableContainerElement:HTMLElement;
@@ -50,6 +51,12 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	componentDidUpdate()
 	{
 		this.tableContainerElement = ReactDOM.findDOMNode(this.tableContainer) as HTMLElement;
+	}
+	
+	componentWillUnmount()
+	{
+		Weave.getCallbacks(this.columnWatcher.target).removeCallback(this, this.boundforceUpdate);
+		Weave.getCallbacks(this.dataSourceWatcher.target).removeCallback(this, this.boundforceUpdate);
 	}
 	
 	get column():IAttributeColumn
@@ -119,14 +126,19 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			id: IQualifiedKey,
 			value: this.column
 		}, null, String);
-
+		rows = rows.map((row) => {
+			return {
+				id: row.id.toString(),
+				value: row.value
+			}
+		});
 		var keyType = this.column.getMetadata("keyType");
 		var dataType = this.column.getMetadata("dataType");
 		var columnIds = ["id", "value"];
 		var columnTitles:IColumnTitles = {id: Weave.lang("Key ({0})", keyType), value: Weave.lang("Value ({0})", dataType)};
-
 		return (
-			<VBox style={{flex: 1}} ref={(c:VBox) => this.tableContainer = c}>
+			rows.length
+			? <VBox style={{flex: 1}} ref={(c:VBox) => this.tableContainer = c}>
 				{Weave.lang("Selected column has {0} records", rows.length)}
 				{
 					this.tableContainerElement
@@ -134,11 +146,12 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 									  columnIds={columnIds} 
 									  idProperty="id"
 									  showIdColumn={true}
-									  columnWidth={this.tableContainerElement.clientWidth/columnIds.length} 
+									  columnWidth={this.tableContainerElement.clientWidth/2} 
 									  columnTitles={columnTitles}/>
 					: null
 				}
 			</VBox>
+			: null
 		)
 	}
 	

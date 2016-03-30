@@ -158,12 +158,12 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			if (Weave.IS(this.selectableAttributes[label], IColumnWrapper))
 			{
 				let attribute = this.selectableAttributes[label] as IColumnWrapper;
-				return <SelectableAttributeComponent attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
+				return <SelectableAttributeComponent key={index} attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
 			}
 			else // LinkableHashMap
 			{
 				let attribute = this.selectableAttributes[label] as LinkableHashMap;
-				return(<SelectableAttributesList  attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
+				return(<SelectableAttributesList key={index}  attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
 			}
 		});
 		return(
