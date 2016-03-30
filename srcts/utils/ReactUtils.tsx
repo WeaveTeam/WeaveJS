@@ -2,6 +2,9 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import reactUpdate from "react-addons-update";
 import * as _ from "lodash";
+import * as jquery from "jquery";
+
+var $:JQueryStatic = (jquery as any)["default"];
 
 export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
 
@@ -26,6 +29,61 @@ export interface DynamicTableClassNames {
 export default class ReactUtils
 {
 	private static map_popup_element = new WeakMap<React.ReactInstance, [Element, EventListener]>();
+
+	static openPopout(jsx:JSX.Element, onLoad?:Function, onBeforeUnLoad?:Function, windowOptions?:any):Window
+	{
+		var popoutWindow:Window,
+			container:HTMLElement,
+			update:(newComponent:any) => void,
+			close:() => void,
+			divId:string = windowOptions.divId || 'popout-container',
+			url:string = windowOptions.url || '_blank',
+			title:string = windowOptions.title || '',
+			windowSettings:string = windowOptions.windowSettings || "width=500, height=500",
+
+		popoutWindow = window.open(title,url,windowSettings);
+		popoutWindow.onbeforeunload = () => {
+			if (container) {
+				ReactDOM.unmountComponentAtNode(container);
+				onBeforeUnLoad && onBeforeUnLoad();
+			}
+		};
+		var onloadHandler = () => {
+			if (container) {
+				var existing = popoutWindow.document.getElementById(divId);
+				if (!existing){
+					ReactDOM.unmountComponentAtNode(container);
+					container = null;
+				} else{
+					return;
+				}
+			}
+
+			popoutWindow.document.title = windowOptions.title;
+			container = popoutWindow.document.createElement('div');
+			container.id = divId;
+			popoutWindow.document.body.appendChild(container);
+
+			onLoad && onLoad();
+
+			if(windowOptions.transferStyle) {
+				$("link, style").each(function () {
+					//Todo: find a better way to clone this link
+					var link:any = $(this).clone()[0];
+					link.setAttribute("href", window.location.origin + window.location.pathname + link.getAttribute("href"));
+					$(popoutWindow.document.head).append(link);
+				});
+			}
+
+
+			ReactDOM.render(jsx, container);
+		};
+
+		popoutWindow.onload = onloadHandler;
+		(popoutWindow as any).update = (jsx:JSX.Element) => {ReactDOM.render(jsx, container)};
+		onloadHandler();
+		return popoutWindow;
+	}
 	
 	static openPopup(jsx:JSX.Element, closeOnMouseDown:boolean = false):React.ReactInstance
 	{
