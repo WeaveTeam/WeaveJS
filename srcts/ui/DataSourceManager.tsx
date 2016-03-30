@@ -32,8 +32,8 @@ import CKANDataSourceEditor from "../editors/CKANDataSourceEditor";
 import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;
 import ForeignDataMappingTransformEditor from "../editors/ForeignDataMappingTransformEditor";
 
-// import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
-// import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
+import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
+import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 
 
 export interface IDataSourceManagerProps
@@ -58,7 +58,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(WeaveDataSource, WeaveDataSourceEditor)
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
-//		.set(GroupedDataTransform, GroupedDataTransformEditor)
+		.set(GroupedDataTransform, GroupedDataTransformEditor)
 //		
 
 	constructor(props:IDataSourceManagerProps)
