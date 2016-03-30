@@ -1,7 +1,5 @@
 import * as React from "react";
-import * as ReactDOM from 'react-dom';
 import * as _ from "lodash";
-import * as jquery from "jquery";
 
 import prefixer from "./react-ui/VendorPrefixer";
 import {MenuItemProps} from "./react-ui/Menu";
@@ -28,9 +26,6 @@ import WeavePath = weavejs.path.WeavePath;
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 let is = Weave.IS;
-
-// loads jquery from the es6 default module.
-var $:JQueryStatic = (jquery as any)["default"];
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
