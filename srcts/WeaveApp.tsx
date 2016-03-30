@@ -17,8 +17,8 @@ import WeaveTool from "./WeaveTool";
 import {WeavePathArray, PanelProps} from "./FlexibleLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
-import ResizingDiv from "./react-ui/ResizingDiv";
 import {IVisTool} from "./tools/IVisTool";
+import WeavePopoutWindow, {WeavePopoutWindowProps} from "./react-ui/WeavePopoutWindow";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -112,60 +112,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	
 	handleExportClick(path:WeavePathArray):void
 	{
-		var exportWindow:any;
-		var container:HTMLElement;
-		var name:string;
-		var baseName:string;
-		var fc:ICallbackCollection = weavejs.WeaveAPI.Scheduler.frameCallbacks;
-
-		exportWindow = window.open("", "_blank", "width=500, height=500");
-		exportWindow.onbeforeunload = () => {
-			if (container) {
-				ReactDOM.unmountComponentAtNode(container);
-				//this.props.weave.root.removeObject(name);
-			}
+		var popoutProps:WeavePopoutWindowProps = {
+			weave:this.props.weave,
+			path
 		};
-		var onloadHandler = () => {
-			if (container) {
-				var existing = exportWindow.document.getElementById('popout-container');
-				if (!existing){
-					ReactDOM.unmountComponentAtNode(container);
-					container = null;
-				} else{
-					return;
-				}
-			}
+		WeavePopoutWindow.open(popoutProps);
 
-			container = exportWindow.document.createElement('div');
-			container.id = 'popout-container';
-			exportWindow.document.body.appendChild(container);
-			baseName = this.props.weave.path(path).getSimpleType();
-			//name = this.props.weave.root.generateUniqueName(baseName);
-			name = 'ExportVis';
-			this.props.weave.root.requestObjectCopy(name,this.props.weave.getObject(path));
-
-			//send weave objects, and css to new window
-			exportWindow.weave = this.props.weave;
-			exportWindow.weavejs = weavejs;
-			exportWindow.Weave = Weave;
-			$("link, style").each(function() {
-				//Todo: find a better way to clone this link
-				var link:any = $(this).clone()[0];
-				link.setAttribute("href",window.location.origin + window.location.pathname + link.getAttribute("href"));
-				$(exportWindow.document.head).append(link);
-			});
-
-			ReactDOM.render(
-				<WeaveComponentRenderer
-					weave={this.props.weave}
-					path={[name]}
-					style={{width:"100%", height:"100%"}}
-				/>
-				, container);
-		};
-
-		exportWindow.onload = onloadHandler;
-		onloadHandler();
 	}
 
 	handleGearClick=(tool:IVisTool, content:JSX.Element):void=>
