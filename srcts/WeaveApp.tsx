@@ -171,11 +171,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	removeObject(object:ILinkableObject)
 	{
 		var weave = this.props.weave;
-
-		if (is(object, IDataSource))
-		{
-			// remove data source
-		}
+		var path = Weave.findPath(weave.root, object);
 		
 		if (object instanceof React.Component)
 		{
@@ -183,16 +179,18 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (layout instanceof FlexibleLayout)
 			{
 				var state = layout.getSessionState();
-				var node = MiscUtils.findDeep(state, (root:LayoutState) => {
-					return _.isEqual(root.id, Weave.getPath(object).getPath());
-				}) as LayoutState;
-				
-				delete node.id;
-				node.children = [];
-				layout.setSessionState(state);
-				weave.root.removeObject(weave.root.getName(object));
+				var node = MiscUtils.findDeep(state, {id: path}) as LayoutState;
+				if (node)
+				{
+					delete node.id;
+					node.children = [];
+					layout.setSessionState(state);
+				}
 			}
 		}
+		
+		//TODO - handle objects not at top level?
+		weave.root.removeObject(weave.root.getName(object));
 	}
 	
 	render():JSX.Element

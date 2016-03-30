@@ -258,7 +258,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		for (var i = 0; i < children.length; i++)
 		{
 			var child:LayoutState = this.simplifyState(children[i]);
-			if (child.children && child.direction === state.direction)
+			if (child.children && (child.direction === state.direction || !child.children.length))
 			{
 				var childChildren:LayoutState[] = child.children;
 				for (var ii = 0; ii < childChildren.length; ii++)
