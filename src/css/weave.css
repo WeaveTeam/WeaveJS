@@ -176,6 +176,18 @@ input[type="text"]:focus {
 	padding-right: 10px;
 }
 
+.weave-help-icon:hover {
+	border-color: rgba(153, 214, 255, 0.4)
+}
+
+.weave-help-message {
+	padding-left: 5;
+	padding-right: 5;
+	background-color: #FCF8E3;
+	font-size: smaller;
+
+}
+
 .weave-menubar-item:hover {
 	background-color: rgba(153, 214, 255, 0.4);
 }

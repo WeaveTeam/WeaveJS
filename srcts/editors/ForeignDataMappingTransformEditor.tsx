@@ -9,6 +9,7 @@ import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import HelpIcon from "../react-ui/HelpIcon";
 
 import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -26,7 +27,10 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 		let editorFields:[string, JSX.Element][] = [
 			[
-				Weave.lang("Foreign key mapping"), 
+				<HBox>
+					{Weave.lang("Foreign key mapping")}
+					<HelpIcon message={"Each value in this column will be used as the key to look up records in the data columns"}/>
+				</HBox> as any, 
 				<SelectableAttributeComponent label="alpha" attribute={ds.keyColumn}/>
 			],
 			[
