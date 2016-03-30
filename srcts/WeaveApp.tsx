@@ -178,7 +178,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			var layout = weave.getObject(this.getRenderPath()) as FlexibleLayout;
 			if (layout instanceof FlexibleLayout)
 			{
-				var state = layout.getSessionState();
+				var state = _.cloneDeep(layout.getSessionState());
 				var node = MiscUtils.findDeep(state, {id: path}) as LayoutState;
 				if (node)
 				{
