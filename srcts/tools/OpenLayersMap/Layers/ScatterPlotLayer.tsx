@@ -45,12 +45,12 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 
 	get deprecatedStateMapping()
 	{
-		return {
+		return lodash.merge(super.deprecatedStateMapping, {
 			"sizeBy": this.radiusData,
 			"minScreenRadius": this.radiusNorm.min,
 			"maxScreenRadius": this.radiusNorm.max,
 			"defaultScreenRadius": this.radius.defaultValue
-		};
+		});
 	}
 	
 	getToolTipColumns():IAttributeColumn[]

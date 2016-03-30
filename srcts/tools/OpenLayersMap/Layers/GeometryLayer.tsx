@@ -1,4 +1,5 @@
 import * as ol from "openlayers";
+import * as _ from "lodash";
 import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
 import AbstractLayer from "./AbstractLayer";
 
@@ -59,11 +60,12 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 	get deprecatedStateMapping()
 	{
-		return {
+		return _.merge(super.deprecatedStateMapping,{
 			geometryColumn: {
 				internalDynamicColumn: this.geometryColumn
-			}
-		};
+			},
+			alpha: this.opacity
+		});
 	}
 
 	get inputProjection():any

@@ -1,5 +1,6 @@
 import * as jquery from "jquery";
 import * as ol from "openlayers";
+import * as _ from "lodash";
 import AbstractGlyphLayer from "./AbstractGlyphLayer";
 import AbstractFeatureLayer from "./AbstractFeatureLayer";
 import ImageGlyphCache from "./ImageGlyphCache";
@@ -154,10 +155,10 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 
 	get deprecatedStateMapping()
 	{
-		return {
+		return _.merge(super.deprecatedStateMapping, {
 			alpha: (state:any) => Weave.setState(typeof state === 'number' ? this.opacity : this.dataAlpha, state),
 			color: this.dataColor
-		};
+		});
 	}
 }
 

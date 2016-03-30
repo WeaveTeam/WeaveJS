@@ -35,6 +35,14 @@ export default class AbstractLayer implements ILinkableObject
 
 	private projectionSRS: LinkableString; /* A reference to the parent's projectionSRS LinkableString */
 
+	get deprecatedStateMapping(): Object
+	{
+		console.log("dsmAbstractLayer");
+		return {
+			alpha: this.opacity
+		};
+	}
+
 	private renderEditableField(value:EditableField, key:string):[string, JSX.Element]
 	{
 		let lv: LinkableVariable;

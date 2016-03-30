@@ -183,7 +183,7 @@ export default class TileLayer extends AbstractLayer
 
 	get deprecatedStateMapping()
 	{
-		return {
+		return lodash.merge(super.deprecatedStateMapping, {
 			service: {
 				'': (serviceState:any, removeMissingDynamicObjects:boolean) => {
 					if (serviceState.providerName)
@@ -231,7 +231,7 @@ export default class TileLayer extends AbstractLayer
 					}
 				}
 			}
-		};
+		});
 	}
 
 	private static isXYZString(url:string):boolean
