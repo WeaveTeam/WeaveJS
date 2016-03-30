@@ -90,7 +90,8 @@ module.exports = function (grunt) {
             fontawesomefont: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
             fonts: {expand: true, flatten: true, cwd: 'node_modules/bootstrap', src: 'fonts/*.*', dest: 'dist/fonts/'},
             images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'},
-            weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"}
+            weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"},
+            polyfill: {expand: true, flatten: true, cwd: 'node_modules/babel-polyfill/dist', src: 'polyfill.min.js', dest: 'dist/'}
         },
         clean: {
             ts: ["outts"],
