@@ -277,7 +277,7 @@ export default class C3BarChart extends AbstractC3Tool
 		this.RECORD_DATATYPE.heights.xLabel = String;
 		
         this.heightColumnNames = this.heightColumns.getNames();
-        this.heightColumnsLabels = columns.map(column => column.getMetadata("title"));
+        this.heightColumnsLabels = columns.map(column => Weave.lang(column.getMetadata("title")));
 
         this.yLabelColumnDataType = this.yLabelColumn.getMetadata("dataType");
 
