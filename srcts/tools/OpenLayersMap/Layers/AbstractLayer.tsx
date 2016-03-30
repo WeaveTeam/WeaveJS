@@ -37,7 +37,6 @@ export default class AbstractLayer implements ILinkableObject
 
 	get deprecatedStateMapping(): Object
 	{
-		console.log("dsmAbstractLayer");
 		return {
 			alpha: this.opacity
 		};
