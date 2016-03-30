@@ -24,8 +24,8 @@ export default class HelpIcon extends React.Component<HelpIconProps, HelpIconsta
 	{
 		var style:React.CSSProperties = {
 			position: "absolute",
-			top: event.clientX + 10,
-			left: event.clientY + 10,
+			top: event.pageY + 10,
+			left: event.pageX + 10,
 			width: 400
 		};
 
