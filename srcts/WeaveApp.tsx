@@ -16,7 +16,7 @@ import {WeavePathArray, PanelProps} from "./FlexibleLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
-import WeavePopoutWindow, {WeavePopoutWindowProps} from "./react-ui/WeavePopoutWindow";
+import ReactUtils from "./utils/ReactUtils";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -105,13 +105,22 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		layout.setSessionState(state);
 	}
 	
-	handleExportClick(path:WeavePathArray):void
+	handleExportClick(path:WeavePathArray,object:ILinkableObject):void
 	{
-		var popoutProps:WeavePopoutWindowProps = {
-			weave:this.props.weave,
-			path
+		var weave = this.props.weave;
+		var name = weave.root.getName(object);
+		this.removeFromLayout(name);
+		var tool:JSX.Element = <WeaveComponentRenderer
+				weave={this.props.weave}
+				path={path}
+				style={{width:"100%", height:"100%"}}
+			/>;
+		var onBeforeUnLoad:Function = () => {this.addToLayout(name)};
+		var onLoad:Function = () => {
+
 		};
-		WeavePopoutWindow.open(popoutProps);
+		var options:any = {transferStyle:true};
+		var popoutWindow = ReactUtils.openPopout(tool,onLoad,onBeforeUnLoad,options);
 
 	}
 
@@ -155,54 +164,59 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		if (React.Component.isPrototypeOf(type))
 		{
-			var layout = weave.getObject(this.getRenderPath()) as FlexibleLayout;
-			if (layout instanceof FlexibleLayout)
+			this.addToLayout(name);
+		}
+	};
+
+	addToLayout(name:string)
+	{
+		var layout = this.props.weave.getObject(this.getRenderPath()) as FlexibleLayout;
+		if (layout instanceof FlexibleLayout)
+		{
+			var state = layout.getSessionState();
+			// check if the current layout is empty
+			if(!state.id && (state.children && !state.children.length))
 			{
-				var state = layout.getSessionState();
-				// check if the current layout is empty
-				if(!state.id && (state.children && !state.children.length))
-				{
-					state = {
-						id: [name],
-						direction: "horizontal",
-						flex: 1
-					}
-				}	
-				else 
-				{
-					state = {
-						children: [state, {id: [name]}],
-						direction: state.direction == 'horizontal' ? 'vertical' : 'horizontal'
-					};
+				state = {
+					id: [name],
+					direction: "horizontal",
+					flex: 1
 				}
+			}
+			else
+			{
+				state = {
+					children: [state, {id: [name]}],
+					direction: state.direction == 'horizontal' ? 'vertical' : 'horizontal'
+				};
+			}
+			layout.setSessionState(state);
+		}
+	}
+
+	removeFromLayout(name:string)
+	{
+		var layout = this.props.weave.getObject(this.getRenderPath()) as FlexibleLayout;
+		if (layout instanceof FlexibleLayout)
+		{
+			var state = _.cloneDeep(layout.getSessionState());
+			var node = MiscUtils.findDeep(state, {id: [name]}) as LayoutState;
+			if (node)
+			{
+				delete node.id;
+				node.children = [];
 				layout.setSessionState(state);
 			}
 		}
-	};
+	}
 	
 	removeObject(object:ILinkableObject)
 	{
 		var weave = this.props.weave;
-		var path = Weave.findPath(weave.root, object);
-		
-		if (object instanceof React.Component)
-		{
-			var layout = weave.getObject(this.getRenderPath()) as FlexibleLayout;
-			if (layout instanceof FlexibleLayout)
-			{
-				var state = _.cloneDeep(layout.getSessionState());
-				var node = MiscUtils.findDeep(state, {id: path}) as LayoutState;
-				if (node)
-				{
-					delete node.id;
-					node.children = [];
-					layout.setSessionState(state);
-				}
-			}
-		}
-		
+		var name = weave.root.getName(object);
+		this.removeFromLayout(name);
 		//TODO - handle objects not at top level?
-		weave.root.removeObject(weave.root.getName(object));
+		weave.root.removeObject(name);
 	}
 	
 	render():JSX.Element
