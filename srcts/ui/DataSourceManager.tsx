@@ -3,7 +3,9 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
 import List from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
+import MenuButton from "../react-ui/MenuButton";
 import {IDataSourceEditorProps} from "../editors/DataSourceEditor";
+import {MenuItemProps} from "../react-ui/Menu";
 
 import IDataSource = weavejs.api.data.IDataSource;
 
@@ -64,7 +66,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
-		this.state = {};
+		this.state = {
+			selected: props.selected
+		};
 	}
 	
 	componentDidMount()
@@ -82,30 +86,65 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		if (props.selected)
 			this.setState({selected: props.selected});
 	}
+	
+	refreshDataSource(dataSource:IDataSource)
+	{
+		dataSource.hierarchyRefresh.triggerCallbacks();
+	}
+	
+	removeDataSource(dataSource:IDataSource)
+	{
+		let root = this.props.weave.root;
+		root.removeObject(root.getName(dataSource));
+	}
 
 	render():JSX.Element
 	{
 		let root = this.props.weave.root;
-		let listOptions:ListOption[] = root.getObjects(IDataSource).map(value => { return {label: root.getName(value), value}; });
+		
+		
+		let listOptions:ListOption[] = root.getObjects(IDataSource).map(dataSource => { 
+			var dataSourceMenu:MenuItemProps[] = [
+				{
+					label: Weave.lang("Refresh"),
+					click: () => this.refreshDataSource(dataSource)
+				},
+				{},
+				{
+					label: Weave.lang("Delete"),
+					click: () => this.removeDataSource(dataSource)
+				}
+			];
+			return {
+				label: (
+					<HBox style={{justifyContent: "space-between"}}>
+						{dataSource.getHierarchyRoot().getLabel()}
+						<MenuButton menu={dataSourceMenu}/>
+					</HBox>
+				),
+				value: dataSource
+			}; 
+		});
 
 		let editorJsx:JSX.Element;
-		let dataSource = this.state.selected || this.props.selected;
+		let dataSource = this.state.selected;
+		
 		if (dataSource)
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
 				editorJsx = <EditorClass dataSource={dataSource}/>;
 			else
-				editorJsx = <div>Editor not yet implemented for this data source type.</div>;
+				editorJsx = <HBox className="weave-padded-hbox">Editor not yet implemented for this data source type.</HBox>;
 		}
 		else
 		{
-			editorJsx = <div>Select a data source on the left.</div>;
+			editorJsx = <HBox className="weave-padded-hbox">Select a data source on the left.</HBox>;
 		}
 
 		return (
 			<HBox style={{flex: 1}}>
-				<VBox style={{ width: 200 }}>
+				<VBox style={{ width: 200, overflow: "hidden" }}>
 					<List
 						options={listOptions}
 						multiple={false}

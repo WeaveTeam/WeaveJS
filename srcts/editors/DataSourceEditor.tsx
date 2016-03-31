@@ -55,12 +55,12 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	get editorFields():[JSX.Element, JSX.Element][]
 	{
 		return [
-			// [
-			// 	Weave.lang("Source Name"),
-			// 	<input type="text" style={{width: "100%"}}
-			// 					   defaultValue={Weave.lang(Weave.getRoot(this.props.dataSource).getName(this.props.dataSource))}
-			// 					   onChange={(e:React.FormEvent) => this.renameDataSource((e.target as any).value)}/>
-			// ]
+			[
+				<span>{Weave.lang("Source Name")}</span>,
+				<input type="text" style={{width: "100%", userSelect: false}}
+								   disabled={true}
+								   defaultValue={this.props.dataSource.getHierarchyRoot().getLabel()}/>
+			]
 		]
 	}
 
@@ -79,7 +79,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 		return (
 			<VBox>
-				<label> {Weave.lang("Edit {0}", Weave.getRoot(dataSource).getName(dataSource))} </label>
+				<label> {Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel())} </label>
 				{
 					ReactUtils.generateTable(null, this.editorFields, tableStyles)
 				}

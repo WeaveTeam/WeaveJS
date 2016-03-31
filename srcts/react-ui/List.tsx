@@ -8,7 +8,7 @@ import MiscUtils from "../utils/MiscUtils";
 
 export type ListOption = {
     value: any,
-    label: string
+    label: string|JSX.Element
 }
 
 export interface IListProps extends React.Props<List> {
@@ -31,7 +31,7 @@ export default class List extends React.Component<IListProps, IListState>
     private lastIndexClicked: number;
     private selectedValues: any[];
     private values: any[];
-    private labels: string[];
+    private labels: (string|JSX.Element)[];
 
     constructor(props: IListProps) {
         super(props);
