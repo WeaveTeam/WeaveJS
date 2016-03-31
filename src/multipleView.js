@@ -8,8 +8,8 @@ import {WeaveComponentRenderer} from "../lib/WeaveUI.js";
 window.weave1 = new Weave();
 window.weave2 = new Weave();
 window.weave3 = new Weave();
-weavejs.core.WeaveArchive.loadUrl(weave1, "/elm/Ar_Riyadh_Health.weave").then(function(){
-	weavejs.core.WeaveArchive.loadUrl(weave2, "/elm/Riyadh_City_Health.weave").then(render)
+weavejs.core.WeaveArchive.loadUrl(weave1, "/elm/ELM_Alt_Demo/Ar_Riyadh_Health.weave").then(function(){
+	weavejs.core.WeaveArchive.loadUrl(weave2, "/elm/ELM_Alt_Demo/Riyadh_City_Health.weave").then(render)
 });
 
 var weaveInsts = [weave1, weave2];
