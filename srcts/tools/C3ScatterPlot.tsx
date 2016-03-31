@@ -328,12 +328,15 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		return false;
 	}
 
-	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap} = {
-			X:this.dataX,
-			Y:this.dataY,
-			Color:this.fill.color,
-			Radius:this.radius
-	};//TODO handle remaining attributes
+	get selectableAttributes()
+	{
+		return super.selectableAttributes
+			.set("X", this.dataX)
+			.set("Y", this.dataY)
+			.set("Color", this.fill.color)
+			.set("Radius", this.radius);
+			// TODO handle remaining attributes
+	}
 	
 	renderEditor():JSX.Element
 	{

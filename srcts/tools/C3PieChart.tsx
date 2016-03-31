@@ -196,11 +196,13 @@ export default class C3PieChart extends AbstractC3Tool
 		return false;
     }
 
-    selectableAttributes :{[label:string] : IColumnWrapper|LinkableHashMap} = {
-        Label : this.label,
-        Color:this.fill.color,
-        WedgeSize : this.data
-    };
+    get selectableAttributes()
+    {
+        return super.selectableAttributes
+            .set("Label", this.label)
+            .set("Color", this.fill.color)
+            .set("Wedge Size", this.data);
+    }
 
     renderEditor() :JSX.Element{
         return(<VBox>

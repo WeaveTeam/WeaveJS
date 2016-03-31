@@ -58,7 +58,11 @@ Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
 
 export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
-	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap};
+	get selectableAttributes():Map<string, (IColumnWrapper|LinkableHashMap)>
+	{
+		return new Map<string, (IColumnWrapper | LinkableHashMap)>();
+	}
+
 	constructor(props:P)
 	{
 		super(props);
@@ -191,18 +195,19 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	renderEditor():JSX.Element
 	{
-		var attrLabels = Object.keys(Object(this.selectableAttributes));
+		var attrLabels = Array.from(this.selectableAttributes.keys());
 
 		var selectors = attrLabels.map((label:string, index:number) => {
-			if (Weave.IS(this.selectableAttributes[label], IColumnWrapper))
+			let attribute_lhm_or_icw = this.selectableAttributes.get(label);
+			if (Weave.IS(attribute_lhm_or_icw, IColumnWrapper)) // IColumnWrapper
 			{
-				let attribute = this.selectableAttributes[label] as IColumnWrapper;
-				return <SelectableAttributeComponent key={ index } attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
+				let attribute = attribute_lhm_or_icw as IColumnWrapper;
+				return <SelectableAttributeComponent key={index} attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
 			}
 			else // LinkableHashMap
 			{
-				let attribute = this.selectableAttributes[label] as LinkableHashMap;
-				return(<SelectableAttributesList key={ index } attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
+				let attribute = attribute_lhm_or_icw as LinkableHashMap;
+				return (<SelectableAttributesList key={index} attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
 			}
 		});
 

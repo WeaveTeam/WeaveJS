@@ -502,12 +502,14 @@ export default class C3BarChart extends AbstractC3Tool
 		return false;
     }
 
-    selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap} = {
-        label:this.labelColumn,
-        sort:this.sortColumn,
-        color:this.colorColumn,
-        height:this.heightColumns
-    };
+    get selectableAttributes()
+    {
+        return super.selectableAttributes
+            .set("label", this.labelColumn)
+            .set("sort", this.sortColumn)
+            .set("color", this.colorColumn)
+            .set("height", this.heightColumns);
+    }
 
     renderEditor():JSX.Element
     {

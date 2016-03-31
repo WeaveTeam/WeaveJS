@@ -157,10 +157,9 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 
 
 	// it has to be function as Filter DynamicColumn is set at Fly
-	private getSelectableAttributes():{[label:string]:DynamicColumn} {
-		return {
-			Filter:this.getFilterColumn()
-		}
+	get selectableAttributes() {
+		return new Map<string, (IColumnWrapper | LinkableHashMap)>()
+			.set("Filter", this.getFilterColumn());
 	}
 
 	setDataFilterUI(key:string){
@@ -169,9 +168,6 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 		});
 		this.filterEditor.requestLocalObject(this.filterEditorMap[key].editorType, false);
 	}
-
-
-	selectableAttributes:{[label:string]:IColumnWrapper|LinkableHashMap};
 
 	renderEditor():JSX.Element
 	{
@@ -189,13 +185,12 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 					</HBox>
 		},this);
 
-		var selectableAttributes:{[label:string]:DynamicColumn} = this.getSelectableAttributes();
-		var attrLabels = Object.keys(selectableAttributes);
+		var attrLabels = Array.from(this.selectableAttributes.keys());
 
 		var selectors:JSX.Element[] =  attrLabels.map((label:string, index:number) => {
-				if (selectableAttributes[label] instanceof DynamicColumn)
+				if (this.selectableAttributes.get(label) instanceof DynamicColumn)
 				{
-					let attribute = selectableAttributes[label] as DynamicColumn;
+					let attribute = this.selectableAttributes.get(label) as DynamicColumn;
 					return <SelectableAttributeComponent key={index} label={ label } attribute={ attribute }/>;
 				}
 			});

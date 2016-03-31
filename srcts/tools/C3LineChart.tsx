@@ -345,10 +345,12 @@ export default class C3LineChart extends AbstractC3Tool
 		return false;
     }
 
-    selectableAttributes :{[label:string] : IColumnWrapper|LinkableHashMap} ={
-        Color : this.line.color,
-        YColumns : this.columns
-    };
+    get selectableAttributes()
+    {
+        return super.selectableAttributes
+            .set("Color", this.line.color)
+            .set("Y Columns", this.columns);
+    }
 
     renderEditor():JSX.Element{
         return (<VBox>

@@ -457,10 +457,13 @@ export default class C3Histogram extends AbstractC3Tool
 		return false;
     }
 	
-	selectableAttributes:{[label:string]:DynamicColumn} = {
-			"Group By":this.binnedColumn.internalDynamicColumn,
-			"Height values (Optional)": this.columnToAggregate,
-	};//TODO handle remaining attributes
+    get selectableAttributes()
+    {
+        return super.selectableAttributes
+            .set("Group By", this.binnedColumn.internalDynamicColumn)
+            .set("Height values (Optional)", this.columnToAggregate);
+        //TODO handle remaining attributes
+    }
 	
 	renderEditor():JSX.Element
 	{

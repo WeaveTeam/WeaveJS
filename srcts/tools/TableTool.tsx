@@ -147,22 +147,24 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.selectionKeySet.replaceKeys(ids as any);
 	};
 
-	selectableAttributes:{[label:string] : IColumnWrapper|LinkableHashMap} ={
-		Columns : this.columns
-	};
+	get selectableAttributes()
+	{
+		return new Map<string, (IColumnWrapper | LinkableHashMap)>()
+			.set("Columns", this.columns);
+	}
 
 	renderEditor():JSX.Element {
-
-		var attrLabels = Object.keys(this.selectableAttributes);
+		// This should be some sort of shared code, as there is similar code in AbstractVisTool and others.
+		var attrLabels = Array.from(this.selectableAttributes.keys());
 		var selectors = attrLabels.map((label:string, index:number) => {
-			if (Weave.IS(this.selectableAttributes[label], IColumnWrapper))
+			if (Weave.IS(this.selectableAttributes.get(label), IColumnWrapper))
 			{
-				let attribute = this.selectableAttributes[label] as IColumnWrapper;
+				let attribute = this.selectableAttributes.get(label) as IColumnWrapper;
 				return <SelectableAttributeComponent key={index} attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
 			}
 			else // LinkableHashMap
 			{
-				let attribute = this.selectableAttributes[label] as LinkableHashMap;
+				let attribute = this.selectableAttributes.get(label) as LinkableHashMap;
 				return(<SelectableAttributesList key={index}  attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
 			}
 		});
