@@ -16,6 +16,7 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|LinkableHashMap>
+    removeLabel? : boolean
 }
 
 export interface ISelectableAttributeComponentState{
@@ -95,7 +96,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                }
 
                let elem =      <HBox key={ label } className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
-                                        <span style={ labelStyle }>{ Weave.lang(label) }</span>
+                                        { this.props.removeLabel ? null : <span style={ labelStyle }>{ Weave.lang(label) }</span>}
                                         <StatefulComboBox disabled={ disabled } style={{flex: 1}} options={ siblings }/>
                                         <span className={clearStyle}/>
                                         <button style={ btnStyle }>...</button>

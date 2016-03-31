@@ -38,7 +38,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 						{Weave.lang("Each value in this column will be used as the key to look up records in the data columns")}
 					</HelpIcon>
 				</span>, 
-				<SelectableAttributeComponent attributes={ keyMap }/>
+				<SelectableAttributeComponent removeLabel={ true } attributes={ keyMap }/>
 			],
 			[
 				<span>{Weave.lang("Data to transform")}</span>,
