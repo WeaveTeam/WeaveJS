@@ -1,4 +1,4 @@
-import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
+import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "./IVisTool";
 import * as _ from "lodash";
 import * as React from "react";
 import {IRow} from "../react-bootstrap-datatable/TableRow";
@@ -154,23 +154,9 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	}
 
 	renderEditor():JSX.Element {
-		// This should be some sort of shared code, as there is similar code in AbstractVisTool and others.
-		var attrLabels = Array.from(this.selectableAttributes.keys());
-		var selectors = attrLabels.map((label:string, index:number) => {
-			if (Weave.IS(this.selectableAttributes.get(label), IColumnWrapper))
-			{
-				let attribute = this.selectableAttributes.get(label) as IColumnWrapper;
-				return <SelectableAttributeComponent key={index} attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
-			}
-			else // LinkableHashMap
-			{
-				let attribute = this.selectableAttributes.get(label) as LinkableHashMap;
-				return(<SelectableAttributesList key={index}  attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
-			}
-		});
 		return(
 			<VBox>
-				{selectors}
+				{renderSelectableAttributes(this)}
 			</VBox>
 		)
 	};

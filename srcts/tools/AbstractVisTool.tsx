@@ -1,4 +1,4 @@
-import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
+import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "./IVisTool";
 import {ChartAPI, ChartConfiguration} from "c3";
 
 import * as React from "react";
@@ -195,22 +195,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	renderEditor():JSX.Element
 	{
-		var attrLabels = Array.from(this.selectableAttributes.keys());
-
-		var selectors = attrLabels.map((label:string, index:number) => {
-			let attribute_lhm_or_icw = this.selectableAttributes.get(label);
-			if (Weave.IS(attribute_lhm_or_icw, IColumnWrapper)) // IColumnWrapper
-			{
-				let attribute = attribute_lhm_or_icw as IColumnWrapper;
-				return <SelectableAttributeComponent key={index} attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
-			}
-			else // LinkableHashMap
-			{
-				let attribute = attribute_lhm_or_icw as LinkableHashMap;
-				return (<SelectableAttributesList key={index} attributeNames={attrLabels}  label={ label } columns={ attribute } showLabelAsButton={ true }/>);
-			}
-		});
-
 		return (
 			<VBox className="weave-padded-vbox">
 				{ReactUtils.generateTable(
@@ -230,7 +214,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 				)}
 
 				<label style={ {fontWeight: 'bold'} }>{Weave.lang('Attributes')}</label>
-				{ selectors }
+				{ renderSelectableAttributes(this) }
 
 				<HBox className="weave-padded-hbox" style={{alignItems: 'center'}}>
 					<span>{ Weave.lang("Margins:") }</span>

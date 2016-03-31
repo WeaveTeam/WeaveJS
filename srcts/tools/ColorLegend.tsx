@@ -1,6 +1,6 @@
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 
-import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
+import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "./IVisTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
 import * as React from "react";
@@ -366,15 +366,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	}
 
 	renderEditor ():JSX.Element{
-		/* This logic should be in some shared class somewhere, as it shares a lot in common with AbstractVisTool */
-		var attrLabels = Array.from(this.selectableAttributes.keys());
-		var selectors = attrLabels.map((label:string, index:number)=>{
-			let attribute = this.selectableAttributes.get(label) as IColumnWrapper;
-			return <SelectableAttributeComponent attributeNames={attrLabels} label={ label } attribute={ attribute }/>;
-		});
-
 		return(<VBox>
-					{selectors}
+					{renderSelectableAttributes(this)}
 				</VBox>);
 	}
 

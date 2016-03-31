@@ -1,5 +1,5 @@
 import * as React from "react";
-import {IVisTool, IVisToolProps, IVisToolState} from "../IVisTool";
+import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "../IVisTool";
 import AbstractFilterEditor from "./AbstractFilterEditor";
 import NumericRangeDataFilterEditor from "./NumericRangeDataFilterEditor";
 import DiscreteValuesDataFilterEditor from "./DiscreteValuesDataFilterEditor";
@@ -185,18 +185,6 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 					</HBox>
 		},this);
 
-		var attrLabels = Array.from(this.selectableAttributes.keys());
-
-		var selectors:JSX.Element[] =  attrLabels.map((label:string, index:number) => {
-				if (this.selectableAttributes.get(label) instanceof DynamicColumn)
-				{
-					let attribute = this.selectableAttributes.get(label) as DynamicColumn;
-					return <SelectableAttributeComponent key={index} label={ label } attribute={ attribute }/>;
-				}
-			});
-
-
-
 		return (
 			<VBox>
 				<form>
@@ -205,7 +193,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 					</VBox>
 				</form>
 				<HBox>
-					{selectors}
+					{renderSelectableAttributes(this)}
 				</HBox>
 
 			</VBox>
