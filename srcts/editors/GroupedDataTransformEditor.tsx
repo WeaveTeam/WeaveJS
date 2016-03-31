@@ -15,6 +15,7 @@ import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {
@@ -22,7 +23,12 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 	{
 		let ds = (this.props.dataSource as GroupedDataTransform);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
+
+		let groupByMap = new Map<string, (IColumnWrapper|LinkableHashMap)>();
+		groupByMap.set("alpha", ds.groupByColumn as IColumnWrapper);
+
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
+
 			[
 				<div>
 					{Weave.lang("Group by")}
@@ -30,7 +36,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 						{Weave.lang('The keyType of the "Group by" column should match the keyType of each column to be transformed. The values in this column will be treated as foreign keys which map to aggregated values in the transformed columns.')}
 					</HelpIcon>
 				</div>, 
-				<SelectableAttributeComponent label="alpha" attribute={ds.groupByColumn}/>
+				<SelectableAttributeComponent attributes={ groupByMap }/>
 			],
 			[
 				<div>

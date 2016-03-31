@@ -18,6 +18,7 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {
@@ -25,6 +26,10 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 	{
 		let ds = (this.props.dataSource as ForeignDataMappingTransform);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
+
+		let keyMap = new Map<string, (IColumnWrapper|LinkableHashMap)>();
+		keyMap.set("alpha", ds.keyColumn as IColumnWrapper);
+
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				<span>
@@ -33,7 +38,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 						{Weave.lang("Each value in this column will be used as the key to look up records in the data columns")}
 					</HelpIcon>
 				</span>, 
-				<SelectableAttributeComponent label="alpha" attribute={ds.keyColumn}/>
+				<SelectableAttributeComponent attributes={ keyMap }/>
 			],
 			[
 				<span>{Weave.lang("Data to transform")}</span>,
