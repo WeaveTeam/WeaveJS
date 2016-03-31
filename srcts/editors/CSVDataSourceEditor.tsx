@@ -26,23 +26,23 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		super(props);
 	}
 	
-	get editorFields():[JSX.Element, JSX.Element][]
+	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
-		let editorFields:[JSX.Element, JSX.Element][] = [
+		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
-				<span>{Weave.lang("URL")}</span>,
+				Weave.lang("URL"),
 				<FileSelector target={(this.props.dataSource as CSVDataSource).url} accept="text/csv,.csv"/>
 			],
 			[
-				<span>{Weave.lang("Key Type")}</span>,
+				Weave.lang("Key Type"),
 				<StatefulTextField selectOnFocus={true} 
 								   ref={linkReactStateRef(this, { content: ds.keyType }) } 
 								   suggestions={keyTypeSuggestions}/>
 			],
 			[
-				<span>{Weave.lang("Key Column")}</span>,
+				Weave.lang("Key Column"),
 				<StatefulTextField selectOnFocus={true} 
 								   ref={linkReactStateRef(this, { content: ds.keyColName }) }
 								   noneLabel={Weave.lang("Auto-generated keys") } 

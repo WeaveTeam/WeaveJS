@@ -49,18 +49,18 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 		}
 	}
 	
-	get editorFields():[JSX.Element, JSX.Element][]
+	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as WeaveDataSource);
 
-		let editorFields:[JSX.Element, JSX.Element][] = [
+		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
-				<span>{Weave.lang("Service URL")}</span>, 
+				Weave.lang("Service URL"), 
 				<StatefulTextField ref={linkReactStateRef(this, { content: ds.url }, 500) } 
 								   placeholder={weavejs.net.WeaveDataServlet.DEFAULT_URL}/>
 			],
 			[
-				<span>{Weave.lang("Root hierarchy ID")}</span>,
+				Weave.lang("Root hierarchy ID"),
 				<StatefulTextField ref={linkReactStateRef(this, { content: ds.rootId }, 500) } 
 								   placeholder={Weave.lang("Hierarchy ID") }/>
 			]

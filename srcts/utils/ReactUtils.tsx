@@ -115,7 +115,7 @@ export default class ReactUtils
 		document.body.removeChild(element);
 	}
 	
-	static generateTable(header:(string|JSX.Element)[], body:(string|JSX.Element)[][], styles:DynamicTableStyles = {}, classes:DynamicTableClassNames = {}):JSX.Element
+	static generateTable(header:React.ReactChild[], body:React.ReactChild[][], styles:DynamicTableStyles = {}, classes:DynamicTableClassNames = {}):JSX.Element
 	{
 		var tableHead = header && (
 			<thead style={styles.thead} className={classes.thead}>

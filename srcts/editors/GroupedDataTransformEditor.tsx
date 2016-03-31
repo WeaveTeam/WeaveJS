@@ -18,11 +18,11 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {
-	get editorFields():[JSX.Element, JSX.Element][]
+	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as GroupedDataTransform);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
-		let editorFields:[JSX.Element, JSX.Element][] = [
+		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				<div>
 					{Weave.lang("Group by")}
@@ -43,7 +43,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 								   ref={linkReactStateRef(this, { content: ds.groupKeyType }) }/>
 			],
 			[
-				<span>{Weave.lang("Data to transform")}</span>,
+				Weave.lang("Data to transform"),
 				<SelectableAttributesList label="alpha" columns={ds.dataColumns as LinkableHashMap} showLabelAsButton={true}/>
 			]
 		];

@@ -21,11 +21,11 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {
-	get editorFields():[JSX.Element, JSX.Element][]
+	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as ForeignDataMappingTransform);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
-		let editorFields:[JSX.Element, JSX.Element][] = [
+		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				<span>
 					{Weave.lang("Foreign key mapping")}

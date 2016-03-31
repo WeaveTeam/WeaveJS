@@ -52,7 +52,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		return this.columnWatcher.target as IAttributeColumn;
 	}
 	
-	get editorFields():[JSX.Element, JSX.Element][]
+	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		return [
 			[
