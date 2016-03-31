@@ -32,9 +32,11 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
         tools = this.weaveRoot.getObjects().filter((tool:any)=>{return tool.selectableAttributes;});//returns IVisTools
     };
 
-    selectableAttributes:{[label:string] :IColumnWrapper|LinkableHashMap}={
+    get selectableAttributes()
+    {
+        return new Map<string, IColumnWrapper | LinkableHashMap>();
+    }
 
-    };
     renderEditor():JSX.Element{
         return(<VBox>
 
