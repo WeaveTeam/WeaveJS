@@ -42,7 +42,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	componentWillReceiveProps(nextProps: IWeaveTreeProps)
 	{
-		if (nextProps.root != this.props.root)
+		if (!nextProps.root.equals(this.props.root))
 		{
 			this.setState({ selectedItems: [], openItems: [] });
 		}
