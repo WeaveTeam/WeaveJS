@@ -38,13 +38,12 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 
 export interface WeaveAppState
 {
-
+	toolEdited?:IVisTool;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
 	menuBar:WeaveMenuBar;
-	toolEditor:JSX.Element;
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
@@ -55,6 +54,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
+		this.state = {
+			toolEdited: null
+		}
 	}
 	
 	getRenderPath():string[]
@@ -126,8 +128,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	handleGearClick=(tool:IVisTool, content:JSX.Element):void=>
 	{
-		this.toolEditor = content;
-		this.forceUpdate();
+		this.setState({
+			toolEdited: tool
+		})
 	};
 
 	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
@@ -141,7 +144,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={this.handleMaximizeClick.bind(this, path)}
 				onExportClick={this.handleExportClick.bind(this, path)}
-				onCloseClick={this.removeObject.bind(this)}
+				onCloseClick={this.removeTool.bind(this)}
 			/>
 		);
 	};
@@ -210,13 +213,19 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 	
-	removeObject(object:ILinkableObject)
+	removeTool(tool:IVisTool)
 	{
 		var weave = this.props.weave;
-		var name = weave.root.getName(object);
+		var name = weave.root.getName(tool);
 		this.removeFromLayout(name);
 		//TODO - handle objects not at top level?
 		weave.root.removeObject(name);
+		if(this.state.toolEdited == tool)
+		{
+			this.setState({
+				toolEdited: null
+			})
+		}
 	}
 	
 	render():JSX.Element
@@ -237,7 +246,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}
 			>
-				<SideBarContainer barSize={.2} leftSideBarChildren={this.toolEditor}>
+				<SideBarContainer barSize={.2} leftSideBarChildren={this.state.toolEdited && this.state.toolEdited.renderEditor()}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
