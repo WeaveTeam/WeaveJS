@@ -6,10 +6,7 @@ import AbstractVisTool from "./AbstractVisTool";
 import Menu, {MenuItemProps} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
 import FixedDataTable from "./FixedDataTable";
-import ResizingDiv, {ResizingDivState} from "../react-ui/ResizingDiv";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-import SelectableAttributesList from "../ui/SelectableAttributesList";
 
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
@@ -57,7 +54,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
 
 	idProperty:string = ''; // won't conflict with any column name
-	private debounced_forceUpdate:Function;
 
 	constructor(props:IVisToolProps)
 	{
@@ -70,6 +66,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 		this.columns.addGroupedCallback(this, this.dataChanged, true);
 		this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
+		this.selectionFilter.addGroupedCallback(this, this.forceUpdate);
+		this.probeFilter.addGroupedCallback(this, this.forceUpdate);
 		this.state = {
 			data: [],
 			columnTitles: {},
@@ -77,8 +75,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			width:0,
 			height:0
 		};
-
-		this.debounced_forceUpdate = _.debounce(this.forceUpdate.bind(this),30);
 	}
 
 	get deprecatedStateMapping()

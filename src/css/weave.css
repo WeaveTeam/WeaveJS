@@ -397,10 +397,14 @@ div.weave-tree-view {
 	background-color : #99D6FF;
 }
 
-.fixedDataTableRowLayout_rowWrapper:hover .public_fixedDataTableCell_main {
-	background-color: rgba(153, 214, 255, 0.4);;
+div.table-row-probed>div>div>div>div>div {
+	background-color: rgba(153, 214, 255, 0.4)
+}
+
+div.table-row-probed-selected>div>div>div>div>div {
+	background-color : #99D6FF;
 }
 
 div.table-row-selected>div>div>div>div>div {
-	background-color: rgb(128, 204, 255);
+	background-color: #80CCFF;
 }

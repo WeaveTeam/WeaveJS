@@ -5,6 +5,7 @@ import CellProps = FixedDataTable.CellProps;
 import QKey = weavejs.data.key.QKey;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ResizingDiv, {ResizingDivState} from "../react-ui/ResizingDiv";
+import SmartComponent from "../ui/SmartComponent";
 
 export interface IColumnTitles
 {
@@ -111,9 +112,9 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 	render():JSX.Element {
 		return (
 			<Cell {...this.props}>
-				<a style={{whiteSpace: "nowrap", overflow: "ellipsis"}} onClick={this.onSortChange}>
+				<div style={{whiteSpace: "nowrap", overflow: "ellipsis"}} onClick={this.onSortChange}>
 					{this.props.sortDirection ? (this.props.sortDirection === SortTypes.DESC ? '↓' : '↑') : ''} {this.props.children}
-				</a>
+				</div>
 			</Cell>
 		);
 	}
@@ -138,7 +139,7 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 	}
 }
 
-export default class FixedDataTable extends React.Component<IFixedDataTableProps, IFixedDataTableState>
+export default class FixedDataTable extends SmartComponent<IFixedDataTableProps, IFixedDataTableState>
 {
 	private keyDown:boolean;
 	private shiftDown:boolean;
@@ -179,12 +180,12 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 	getRowClass=(index: number):string =>
 	{
 		var id:string = this.props.rows[index][this.props.idProperty];
-		if(_.includes(this.props.probedIds,id))
-		{
-			//item needs probed class
+		if(_.includes(this.props.probedIds,id)&& _.includes(this.props.selectedIds,id)){
+			return "table-row-probed-selected"
+		} else if(_.includes(this.props.probedIds,id)) {
+			//item needs selected class
 			return "table-row-probed";
-		} else if(_.includes(this.props.selectedIds,id))
-		{
+		} else if(_.includes(this.props.selectedIds,id)) {
 			//item needs selected class
 			return "table-row-selected";
 		}
@@ -204,9 +205,11 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 	{
 		//console.log("Enter",event,index);
 		//mouse entering, so set the keys
-		var id:string = this.props.rows[index][this.props.idProperty];
-		var probedIds:string[] = [id];
-		this.props.onHover && this.props.onHover(probedIds);
+		if(this.props.onHover){
+			var id:string = this.props.rows[index][this.props.idProperty];
+			var probedIds:string[] = [id];
+			this.props.onHover(probedIds);
+		}
 	};
 
 	onMouseLeave=(event:React.MouseEvent, index:number):void =>
@@ -218,90 +221,88 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 	onMouseDown=(event:React.MouseEvent, index:number):void =>
 	{
 		//console.log("Down",event,index);
-		var selectedIds:string[] = this.props.selectedIds;
-		var id:string = this.props.rows[index][this.props.idProperty];
-
-		// in single selection mode,
-		// or ctrl/cmd selcection mode
-		// already selected keys get unselected
-
-		// find the selected record location
-		var keyLocation:number = selectedIds.indexOf(id);
-
-		// multiple selection
-		if ((event .ctrlKey || event.metaKey))
-		{
-			// if the record is already in the selection
-			// we remove it
-			if (_.includes(selectedIds,id))
-			{
-				selectedIds.splice(keyLocation, 1);
-			}
-			else
-			{
-				selectedIds.push(id)
-			}
-			this.lastClicked = id;
-		}
-
-		// shift selection
-		else if (event.shiftKey)
-		{
-			selectedIds = [];
-			if (this.lastClicked == null)
-			{
-			}
-			else
-			{
-				var start:number = _.findIndex(this.props.rows, (row:IRow) => {
-					return row[this.props.idProperty] == this.lastClicked;
-				});
-
-				var end:number = _.findIndex(this.props.rows, (row:IRow) => {
-					return row[this.props.idProperty] == id;
-				});
-
-				if (start > end)
-				{
-					let temp:number = start;
-					start = end;
-					end = temp;
-				}
-
-				for (var i:number = start; i <= end; i++)
-				{
-					selectedIds.push(this.props.rows[i][this.props.idProperty]);
-				}
-			}
-		}
-
-		// single selection
-		else
-		{
-			// if there was only one record selected
-			// and we are clicking on it again, then we want to
-			// clear the selection.
-			if (selectedIds.length == 1 && selectedIds[0] == id)
-			{
-				selectedIds = [];
-				this.lastClicked = null;
-			}
-			else
-			{
-				selectedIds = [id];
-				this.lastClicked = id;
-			}
-		}
-
 		if (this.props.onSelection)
 		{
+			var selectedIds:string[] = this.props.selectedIds;
+			var id:string = this.props.rows[index][this.props.idProperty];
+
+			// in single selection mode,
+			// or ctrl/cmd selcection mode
+			// already selected keys get unselected
+
+			// find the selected record location
+			var keyLocation:number = selectedIds.indexOf(id);
+
+			// multiple selection
+			if ((event .ctrlKey || event.metaKey))
+			{
+				// if the record is already in the selection
+				// we remove it
+				if (_.includes(selectedIds,id))
+				{
+					selectedIds.splice(keyLocation, 1);
+				}
+				else
+				{
+					selectedIds.push(id)
+				}
+				this.lastClicked = id;
+			}
+
+			// shift selection
+			else if (event.shiftKey)
+			{
+				selectedIds = [];
+				if (this.lastClicked == null)
+				{
+				}
+				else
+				{
+					var start:number = _.findIndex(this.props.rows, (row:IRow) => {
+						return row[this.props.idProperty] == this.lastClicked;
+					});
+
+					var end:number = _.findIndex(this.props.rows, (row:IRow) => {
+						return row[this.props.idProperty] == id;
+					});
+
+					if (start > end)
+					{
+						let temp:number = start;
+						start = end;
+						end = temp;
+					}
+
+					for (var i:number = start; i <= end; i++)
+					{
+						selectedIds.push(this.props.rows[i][this.props.idProperty]);
+					}
+				}
+			}
+
+			// single selection
+			else
+			{
+				// if there was only one record selected
+				// and we are clicking on it again, then we want to
+				// clear the selection.
+				if (selectedIds.length == 1 && selectedIds[0] == id)
+				{
+					selectedIds = [];
+					this.lastClicked = null;
+				}
+				else
+				{
+					selectedIds = [id];
+					this.lastClicked = id;
+				}
+			}
 			this.props.onSelection(selectedIds);
 		}
 	};
 
 	updateSortDirection=(columnKey:string, sortDirection:string) =>
 	{
-		console.log(sortDirection,columnKey);
 		var sortIndices:number[] = this.state.sortIndices;
 		this.sortColumnIndices(columnKey,sortDirection,sortIndices);
 		this.setState({
@@ -340,7 +341,10 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 	}
 
 	handleResize=(newSize:ResizingDivState) => {
-		_.debounce(() => this.setState({width:newSize.width, height:newSize.height}),0)();
+		this.setState({
+			width: newSize.width,
+			height: newSize.height
+		});
 	};
 
 	render():JSX.Element
@@ -379,7 +383,7 @@ export default class FixedDataTable extends React.Component<IFixedDataTableProps
 													onSortChange={this.updateSortDirection}
 													sortDirection={id == this.state.sortId ? this.state.sortDirection : ""}
 													columnKey={id}
-													>
+												>
 													{this.props.columnTitles ? this.props.columnTitles[id]:id}
 												</SortHeaderCell>
 											}
