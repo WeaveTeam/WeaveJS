@@ -1,5 +1,6 @@
 import * as _ from "lodash";
 import LinkableVariable = weavejs.core.LinkableVariable;
+import SmartComponent from "./SmartComponent";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
@@ -8,13 +9,15 @@ export interface StatefulComboBoxProps extends React.HTMLProps<StatefulComboBox>
 	options: (string | { label: string, value: any })[];
 	value?: any;
 	onChange?: (selectedItem: any) => void;
+	selectFirstOnInvalid?: boolean; /* If a change to the options list renders the value invalid, select the first item */
+	triggerOnForcedChange?: boolean; /* Trigger the onChange callback on changes forced by the invalid selection behavior */
 }
 
 export interface StatefulComboBoxState {
 	value: any;
 }
 
-export default class StatefulComboBox extends React.Component<StatefulComboBoxProps, StatefulComboBoxState>
+export default class StatefulComboBox extends SmartComponent<StatefulComboBoxProps, StatefulComboBoxState>
 {
 	constructor(props: StatefulComboBoxProps) {
 		super(props);
@@ -24,7 +27,7 @@ export default class StatefulComboBox extends React.Component<StatefulComboBoxPr
 	{
 		if (nextProps.value)
 		{
-			this.setState({ value: nextProps.value });
+			this.setState({value: nextProps.value});
 		}
 	}
 
@@ -49,24 +52,39 @@ export default class StatefulComboBox extends React.Component<StatefulComboBoxPr
 		}
 	}
 
+	private findOptionIndex(value:any):number
+	{
+		return this.props.options.findIndex(
+			(option): boolean => {
+				if (typeof option == "object") {
+					return _.isEqual((option as any).value, value);
+				}
+				else {
+					return _.isEqual(option, value);
+				}
+			}
+		);
+	}
+
 	render(): JSX.Element {
 		var props = _.clone(this.props);
 		delete props.options;
 		delete props.children;
 
-		let index = this.props.options.findIndex(
-			(option): boolean => {
-				if (typeof option == "object") {
-					return _.isEqual((option as any).value, this.state.value);
-				}
-				else {
-					return _.isEqual(option, this.state.value);
-				}
+		let index = this.findOptionIndex(this.state.value);
+		let refFunc: (c: HTMLSelectElement) => void = (c: HTMLSelectElement) => { };
+		if (index == -1)
+		{
+			if (this.props.selectFirstOnInvalid) {
+				index = 0;
 			}
-		);
+			if (props.triggerOnForcedChange) {
+				refFunc = (c: HTMLSelectElement) => c && c.dispatchEvent(new Event('change'));
+			}
+		}
 
 		return (
-			<select {...props as any} onChange={this.handleInputChange} value={index.toString()}>
+			<select {...props as any} ref={refFunc} onChange={this.handleInputChange} value={index.toString()}>
 				{this.props.options.map(this.renderOption)}
 			</select>
 		);
