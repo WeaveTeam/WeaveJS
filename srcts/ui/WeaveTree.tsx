@@ -22,6 +22,8 @@ export interface IWeaveTreeProps {
 	searchFilter? : string;
 	onSelect?: (selectedItems: Array<IWeaveTreeNode>) => void;
 	onExpand?: (openItems: Array<IWeaveTreeNode>) => void;
+	initialOpenItems?: Array<IWeaveTreeNode>;
+	initialSelectedItems?: Array<IWeaveTreeNode>;
 };
 
 interface ExtendedIWeaveTreeNode extends IWeaveTreeNode {
@@ -33,6 +35,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	constructor(props:IWeaveTreeProps)
 	{
 		super(props);
+
+		this.componentWillReceiveProps(props);
 	}
 
 	state: IWeaveTreeState = {
@@ -42,9 +46,9 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	componentWillReceiveProps(nextProps: IWeaveTreeProps)
 	{
-		if (!nextProps.root.equals(this.props.root))
+		if (!nextProps.root.equals(this.props && this.props.root))
 		{
-			this.setState({ selectedItems: [], openItems: [] });
+			this.setState({ selectedItems: nextProps.initialSelectedItems || [], openItems: nextProps.initialOpenItems || []});
 		}
 	}
 
