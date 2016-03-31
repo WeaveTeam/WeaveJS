@@ -38,7 +38,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 
 export interface WeaveAppState
 {
-	toolEdited?:IVisTool;
+	toolToEdit?:IVisTool;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
@@ -55,7 +55,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		super(props);
 		this.state = {
-			toolEdited: null
+			toolToEdit: null
 		}
 	}
 	
@@ -129,7 +129,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	handleGearClick=(tool:IVisTool, content:JSX.Element):void=>
 	{
 		this.setState({
-			toolEdited: tool
+			toolToEdit: tool
 		})
 	};
 
@@ -220,10 +220,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.removeFromLayout(name);
 		//TODO - handle objects not at top level?
 		weave.root.removeObject(name);
-		if(this.state.toolEdited == tool)
+		if(this.state.toolToEdit == tool)
 		{
 			this.setState({
-				toolEdited: null
+				toolToEdit: null
 			})
 		}
 	}
@@ -246,7 +246,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}
 			>
-				<SideBarContainer barSize={.2} leftSideBarChildren={this.state.toolEdited && this.state.toolEdited.renderEditor()}>
+				<SideBarContainer barSize={.2} leftSideBarChildren={this.state.toolToEdit && this.state.toolToEdit.renderEditor()}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
