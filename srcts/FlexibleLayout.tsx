@@ -91,11 +91,6 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		this.repositionPanels();
 	}
 	
-	componentWillUnmount():void
-	{
-		Weave.dispose(this);
-	}
-
 	frameHandler():void
 	{
 		// reposition on resize
