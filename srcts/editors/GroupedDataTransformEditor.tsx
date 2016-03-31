@@ -18,28 +18,32 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {
-	get editorFields():[string, JSX.Element][]
+	get editorFields():[JSX.Element, JSX.Element][]
 	{
 		let ds = (this.props.dataSource as GroupedDataTransform);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
-		let editorFields:[string, JSX.Element][] = [
+		let editorFields:[JSX.Element, JSX.Element][] = [
 			[
 				<div>
 					{Weave.lang("Group by")}
-					<HelpIcon message={Weave.lang('The keyType of the "Group by" column should match the keyType of each column to be transformed. The values in this column will be treated as foreign keys which map to aggregated values in the transformed columns.')}/>
-				</div> as any, 
+					<HelpIcon>
+						{Weave.lang('The keyType of the "Group by" column should match the keyType of each column to be transformed. The values in this column will be treated as foreign keys which map to aggregated values in the transformed columns.')}
+					</HelpIcon>
+				</div>, 
 				<SelectableAttributeComponent label="alpha" attribute={ds.groupByColumn}/>
 			],
 			[
 				<div>
 					{Weave.lang("Group keyType")}
-					<HelpIcon message={Weave.lang('Specifies the keyType of the foreign keys referenced by the "Group by" column. By default, the dataType of the "Group by" column is used as the foreign keyType.')}/>
-				</div> as any,
+					<HelpIcon>
+						{Weave.lang('Specifies the keyType of the foreign keys referenced by the "Group by" column. By default, the dataType of the "Group by" column is used as the foreign keyType.')}
+					</HelpIcon>
+				</div>,
 				<StatefulTextField selectOnFocus={true} 
 								   ref={linkReactStateRef(this, { content: ds.groupKeyType }) }/>
 			],
 			[
-				Weave.lang("Data to transform"),
+				<span>{Weave.lang("Data to transform")}</span>,
 				<SelectableAttributesList label="alpha" columns={ds.dataColumns as LinkableHashMap} showLabelAsButton={true}/>
 			]
 		];

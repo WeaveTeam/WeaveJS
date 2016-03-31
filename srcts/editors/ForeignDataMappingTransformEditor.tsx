@@ -21,20 +21,22 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {
-	get editorFields():[string, JSX.Element][]
+	get editorFields():[JSX.Element, JSX.Element][]
 	{
 		let ds = (this.props.dataSource as ForeignDataMappingTransform);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
-		let editorFields:[string, JSX.Element][] = [
+		let editorFields:[JSX.Element, JSX.Element][] = [
 			[
-				<div>
+				<span>
 					{Weave.lang("Foreign key mapping")}
-					<HelpIcon message={"Each value in this column will be used as the key to look up records in the data columns"}/>
-				</div> as any, 
+					<HelpIcon>
+						{Weave.lang("Each value in this column will be used as the key to look up records in the data columns")}
+					</HelpIcon>
+				</span>, 
 				<SelectableAttributeComponent label="alpha" attribute={ds.keyColumn}/>
 			],
 			[
-				Weave.lang("Data to transform"),
+				<span>{Weave.lang("Data to transform")}</span>,
 				<SelectableAttributesList label="alpha" columns={ds.dataColumns as LinkableHashMap} showLabelAsButton={true}/>
 			]
 		];

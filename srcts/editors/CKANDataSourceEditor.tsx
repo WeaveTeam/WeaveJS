@@ -25,7 +25,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		super(props);
 	}
 	
-	get editorFields():[string, JSX.Element][]
+	get editorFields():[JSX.Element, JSX.Element][]
 	{
 		let ds = (this.props.dataSource as CKANDataSource);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
@@ -42,13 +42,13 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			alignItems: "center"
 		}
 
-		let editorFields:[string, JSX.Element][] = [
+		let editorFields:[JSX.Element, JSX.Element][] = [
 			[
-				Weave.lang("Source URL *"), 
+				<span>{Weave.lang("Source URL *")}</span>, 
 				<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.url})}/>
 			],
 			[
-				Weave.lang("Items to show in hierarchy"),
+				<span>{Weave.lang("Items to show in hierarchy")}</span>,
 				<HBox style={hBoxStyle}>
 					<label style={labelStyle}><StatefulCheckbox style={checkBoxStyle} ref={linkReactStateRef(this, {checked: ds.showPackages})}/>{Weave.lang("Packages")}</label>
 					<label style={labelStyle}><StatefulCheckbox style={checkBoxStyle} ref={linkReactStateRef(this, {checked: ds.showGroups})}/>{Weave.lang("Groups")}</label>
@@ -56,14 +56,14 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 				</HBox>
 			],
 			[
-				Weave.lang("API Version"),
+				<span>{Weave.lang("API Version")}</span>,
 				<HBox style={hBoxStyle}>
 					<HBox style={labelStyle}><StatefulTextField ref={linkReactStateRef(this, {content: ds.apiVersion})} type="number" min="1" max="3" step="1"/></HBox>
 					<HBox style={labelStyle}><StatefulCheckbox style={checkBoxStyle} ref={linkReactStateRef(this, { checked: ds.useHttpPost})}/><span>{Weave.lang("Use HTTP POST")}</span></HBox>
 				</HBox>
 			],
 			[
-				"",
+				<span/>,
 				<HBox style={hBoxStyle}><StatefulCheckbox style={checkBoxStyle} ref={linkReactStateRef(this, { checked: ds.useDataStore})}/><span>{Weave.lang("Use Data Store if available")}</span></HBox>
 			]
 		];

@@ -19,13 +19,13 @@ import WeaveAPI = weavejs.WeaveAPI;
 
 export default class GeoJSONDataSourceEditor extends DataSourceEditor
 {
-	get editorFields():[string, JSX.Element][]
+	get editorFields():[JSX.Element, JSX.Element][]
 	{
 		let dataSource = (this.props.dataSource as GeoJSONDataSource);
 		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
-		let editorFields:[string, JSX.Element][] = [
+		let editorFields:[JSX.Element, JSX.Element][] = [
 			[
-				Weave.lang("GeoJSON URL"),
+				<span>{Weave.lang("GeoJSON URL")}</span>,
 				<FileSelector 
 						  target={dataSource.url} 
 						  placeholder={Weave.lang("http://www.example.com/example.geojson")} 
@@ -33,20 +33,20 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 						  />
 			],
 			[
-				Weave.lang("Projection"),
+				<span>{Weave.lang("Projection")}</span>,
 				<StatefulTextField selectOnFocus={true} 
 							   placeholder={Weave.lang("Example: EPSG:4326")} 
 							   ref={linkReactStateRef(this, { content: dataSource.projection })}
 							   />
 			],
 			[
-				Weave.lang("Key Property"),
+				<span>{Weave.lang("Key Property")}</span>,
 				<StatefulTextField selectOnFocus={true} 
 							   ref={linkReactStateRef(this, { content: dataSource.keyProperty })}
 							   />
 			],
 			[
-				Weave.lang("Key Type"),
+				<span>{Weave.lang("Key Type")}</span>,
 				<StatefulTextField selectOnFocus={true} 
 							   suggestions={keyTypeSuggestions}
 							   ref={linkReactStateRef(this, { content: dataSource.keyType })}/>

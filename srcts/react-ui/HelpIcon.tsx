@@ -2,9 +2,8 @@ import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import ReactUtils from "../utils/ReactUtils";
 
-export interface HelpIconProps
+export interface HelpIconProps extends React.Props<HelpIcon>
 {
-	message: string|JSX.Element;
 }
 
 export interface HelpIconstate
@@ -31,7 +30,7 @@ export default class HelpIcon extends React.Component<HelpIconProps, HelpIconsta
 
 		this.popup = ReactUtils.openPopup(
 			<HBox style={style} className="weave-menu weave-help-message">
-			 	{this.props.message}
+			 	{this.props.children}
 			</HBox>
 		);
 	}
