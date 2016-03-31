@@ -15,6 +15,7 @@ import C3LineChart from "./tools/C3LineChart";
 import C3ScatterPlot from "./tools/C3ScatterPlot";
 import C3PieChart from "./tools/C3PieChart";
 import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
+import AttributeMenuTool from "./tools/AttributeMenuTool/AttributeMenuTool";
 import OpenLayersMapTool from "./tools/OpenLayersMapTool";
 import SessionStateMenuTool from "./tools/SessionStateMenuTool";
 import TableTool from "./tools/TableTool";
@@ -68,6 +69,7 @@ export
 	C3PieChart,
 	DataFilterTool,
 	OpenLayersMapTool,
+	AttributeMenuTool,
 	SessionStateMenuTool,
 	TableTool,
 	TextTool,
