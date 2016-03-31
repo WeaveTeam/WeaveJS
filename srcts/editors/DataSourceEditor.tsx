@@ -165,7 +165,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	render():JSX.Element
 	{
 		return (
-			<VBox style={{flex:1, margin: 10}}>
+			<VBox style={{flex:1}}>
 				{
 					this.renderFields()
 				}

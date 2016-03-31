@@ -129,17 +129,17 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let editorJsx:JSX.Element;
 		let dataSource = this.state.selected;
 		
-		if (dataSource)
+		if (dataSource && !Weave.wasDisposed(dataSource))
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
 				editorJsx = <EditorClass dataSource={dataSource}/>;
 			else
-				editorJsx = <HBox className="weave-padded-hbox">Editor not yet implemented for this data source type.</HBox>;
+				editorJsx = <span>{Weave.lang("Editor not yet implemented for this data source type.")}</span>;
 		}
 		else
 		{
-			editorJsx = <HBox className="weave-padded-hbox">Select a data source on the left.</HBox>;
+			editorJsx = <span>{Weave.lang("Select a data source on the left.")}</span>;
 		}
 
 		return (
@@ -153,7 +153,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 					/>
 				</VBox>
 				<div style={{ backgroundColor: '#f0f0f0', width: 4}}/>
-				<VBox style={{ flex: 1 }}>
+				<VBox style={{ flex: 1, margin: 10 }}>
 					{editorJsx}
 				</VBox>
 			</HBox>
