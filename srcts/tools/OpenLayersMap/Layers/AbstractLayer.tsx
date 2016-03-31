@@ -77,12 +77,14 @@ export default class AbstractLayer implements ILinkableObject
 	}
 
 	renderEditor(): JSX.Element {
-		let attributeList: JSX.Element[] = [];
+		let attributeList: JSX.Element;
 		let idx = 0;
 
-		for (let [key, value] of this.selectableAttributes) {
+		/*for (let [key, value] of this.selectableAttributes) {
 			attributeList.push(<SelectableAttributeComponent key={key} attribute={value} label={Weave.lang(key)}/>)
-		}
+		}*/
+
+		attributeList = <SelectableAttributeComponent attributes={ this.selectableAttributes }/>;
 
 		let fieldList:[string, JSX.Element][] = [];
 		let table: JSX.Element;
