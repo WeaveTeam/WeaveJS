@@ -30,6 +30,7 @@ export interface IAttributeSelectorState
 export default class AttributeSelector extends React.Component<IAttributeSelectorProps,IAttributeSelectorState>
 {
     private tree: WeaveTree;
+    private rootTreeNode :IWeaveTreeNode;
     private leafTree :WeaveTree;
     private  weaveRoot: ILinkableHashMap;
     private searchFilter :string;
@@ -39,17 +40,28 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
-        this.weaveRoot = Weave.getRoot(props.attribute);
-        this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
-        
+
         if(this.props.attributeNames){
             props.attributeNames.forEach((label:string)=>{
                 this.items[label] = this.forceUpdate;
             });
         }
+        this.weaveRoot = Weave.getRoot(props.attribute);
+        this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
+        this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+
         this.state = {leafNode : null, selectAll : false};
     };
 
+    componentWillReceiveProps (nextProps :IAttributeSelectorProps){
+        if(nextProps.attribute != this.props.attribute){
+            this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
+            this.weaveRoot = Weave.getRoot(nextProps.attribute);
+            this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+
+            this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
+        }
+    }
     addSelected=():void=>
 	{
         var counter :number = this.selectedColumnRef.length;
@@ -120,7 +132,6 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 
     render():JSX.Element
     {
-        let treeNode:WeaveRootDataTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
 
         return (
             <VBox style={{ flex: 1, minWidth: 700, maxHeight: 400 }}>
@@ -129,7 +140,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 
                 <HBox style={{height: '300px'}}>
                     <VBox style={{ flex: .5 }}>
-                        <WeaveTree searchFilter={ this.searchFilter } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={treeNode} ref={ (c) => { this.tree = c; } }/>
+                        <WeaveTree searchFilter={ this.searchFilter } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={this.rootTreeNode} ref={ (c) => { this.tree = c; } }/>
                     </VBox>
                     <VBox style={{ flex: .5 }}>
                         {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.leafTree = c; } }/> : null}
