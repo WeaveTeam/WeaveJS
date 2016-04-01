@@ -8,12 +8,13 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import {ListOption} from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export interface ISelectableAttributesListProps{
     columns : LinkableHashMap;
     label:string;
-    attributeNames?:string[];
     showLabelAsButton?:boolean;
+    selectableAttributes? : Map<string, (IColumnWrapper|LinkableHashMap)>;
 }
 
 export interface ISelectableAttributesListState{
@@ -24,6 +25,8 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
     constructor(props:ISelectableAttributesListProps){
         super(props);
         this.state = {selectAll :false};
+
+        Weave.getCallbacks(this.props.columns).addGroupedCallback(this, this.forceUpdate);
     }
     private selectedColumn:IAttributeColumn;
 
@@ -47,11 +50,11 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
     };
 
     launchAttributeSelector=():PopupWindow=>{
-      return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.attributeNames);
+      return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.selectableAttributes);
     };
 
-    componentDidMount(){
-        Weave.getCallbacks(this.props.columns).addGroupedCallback(this, this.forceUpdate);
+    componentWillUnmount(){
+        Weave.getCallbacks(this.props.columns).removeCallback(this,this.forceUpdate);
     }
 
     render(): JSX.Element {
