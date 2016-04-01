@@ -5,10 +5,10 @@ import * as d3 from "d3";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
-import {ChartConfiguration, ChartAPI} from "c3";
-import DOMUtils from "../utils/DOMUtils";
-import ToolTip from "./ToolTip";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import StatefulCheckBox from "../ui/StatefulCheckBox";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import ReactUtils from "../utils/ReactUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -52,7 +52,7 @@ export default class C3BarChart extends AbstractC3Tool
     colorColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#808080"));
     chartColors = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
     groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode));
-    horizontalMode = Weave.linkableChild(this, new LinkableBoolean(true));
+    horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
     showValueLabels = Weave.linkableChild(this, new LinkableBoolean(true));
     showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
 	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8));
@@ -515,10 +515,19 @@ export default class C3BarChart extends AbstractC3Tool
     {
         return (
             <VBox>
-
                 {
                     super.renderEditor()
                 }
+				{ReactUtils.generateTable(
+					null,
+					[
+						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ]
+					],
+					{
+						table: {width: "100%"},
+						td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
+					}
+				)}
             </VBox>
         )
     }

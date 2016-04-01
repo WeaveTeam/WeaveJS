@@ -23,13 +23,13 @@ export default class StatefulCheckBox extends React.Component<StatefulCheckBoxPr
 	onChange=(event:React.FormEvent)=>
 	{
 		this.setState({ checked: (event.target as HTMLInputElement).checked });
-	}
+	};
 
 	onClick=(event:React.MouseEvent)=>
 	{
 		if (this.props.stopPropagation)		
 			event.stopPropagation();
-	}
+	};
 
 	render(): JSX.Element {
 		var props = _.clone(this.props);
