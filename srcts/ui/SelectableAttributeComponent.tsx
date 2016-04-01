@@ -13,6 +13,7 @@ import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import IDataSource = weavejs.api.data.IDataSource;
 import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|LinkableHashMap>
@@ -82,6 +83,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
         var selectableUI:JSX.Element[] = [];
         let disabled:boolean = false;
+        let alwaysDefnCol:boolean;
+        let defaultValue:any;
 
        //loop through selectable attributes
        this.props.attributes.forEach((value, label)=>{
@@ -90,17 +93,28 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
            if(Weave.IS(attribute_lhm_or_icw, IColumnWrapper)){
                let attribute = attribute_lhm_or_icw as IColumnWrapper;
 
+               //check for always defined column
+               if(Weave.IS(attribute, AlwaysDefinedColumn)){
+                   alwaysDefnCol = true;
+                   defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
+               }
+
                let siblings = this.siblings(attribute);
-               if(!siblings){//if no siblings are returned then disable combobox TODO Statefulcombobox should handle null option
+
+               //check for siblings
+               if(!siblings){//TODO Statefulcombobox should handle null option
                    siblings = []; disabled = true;
                }
 
-               let elem =      <HBox key={ label } className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
-                                        { this.props.removeLabel ? null : <span style={ labelStyle }>{ Weave.lang(label) }</span>}
-                                        <StatefulComboBox disabled={ disabled } style={{flex: 1}} options={ siblings }/>
-                                        <span className={clearStyle}/>
-                                        <button style={ btnStyle }>...</button>
-                               </HBox>;
+               let elem =  <VBox key={ label }>
+                                   <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
+                                       { this.props.removeLabel ? null : <span style={ labelStyle }>{ Weave.lang(label) }</span>}
+                                       <StatefulComboBox disabled={ disabled } style={{flex: 1}} options={ siblings }/>
+                                       <span className={clearStyle}/>
+                                       <button style={ btnStyle }>...</button>
+                                   </HBox>
+                                   { alwaysDefnCol ? <input type="text" defaultValue={defaultValue }/> :null}
+                            </VBox>
 
                selectableUI.push(elem);
            }
