@@ -4,6 +4,7 @@ import HSlider from "../react-ui/RCSlider/HSlider";
 import RCSlider from "../react-ui/RCSlider/RCSlider";
 import {SliderOption} from "../react-ui/RCSlider/RCSlider";
 import classNames from "../modules/classnames";
+import CenteredIcon from "../react-ui/CenteredIcon";
 import SessionStateLog = weavejs.core.SessionStateLog;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import LogEntry = weavejs.core.LogEntry;
@@ -113,26 +114,17 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 
 		return (
 			<HBox style={{flex: 1, alignItems: "center", alignSelf: "stretch"}}>
-				<span
-						title={Weave.lang('Undo')}
-						onClick={() => this._stateLog.undo()}
-						style={{alignSelf: "stretch", display: "flex"}}
-						className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}>
-					<i
-						style={{alignSelf: "center"}}
-						className="fa fa-arrow-left"
-					/>
-				</span>
-				<span
-						title={Weave.lang('Redo')}
-						onClick={() => this._stateLog.redo()}
-						style={{alignSelf: "stretch", display: "flex"}}
-						className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}>
-					<i
-						style={{alignSelf: "center"}}
-						className="fa fa-arrow-right"
-					/>
-				</span>
+
+				<CenteredIcon title={Weave.lang('Undo')}
+							  onClick={() => this._stateLog.undo()}
+							  className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}
+							  iconProps={{className: "fa fa-arrow-left"}}/>
+
+				<CenteredIcon title={Weave.lang('Redo')}
+							  onClick={() => this._stateLog.redo()}
+							  className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}
+							  iconProps={{className:"fa fa-arrow-right"}}/>
+
 				<div style={{alignContent: "center", paddingLeft: 10, paddingRight: 10, flex: 1}}>
 					<HSlider options={sliderOptions} selectedValues={[this.state.position as any]} step={1} onChange={this.handleSlider.bind(this)} type={RCSlider.CATEGORICAL}/>
 				</div>
