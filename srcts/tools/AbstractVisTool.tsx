@@ -12,7 +12,6 @@ import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import MiscUtils from "../utils/MiscUtils";
 import ReactUtils from "../utils/ReactUtils";
-import {OverlayTrigger,Popover} from "react-bootstrap";
 import classNames from "../modules/classnames";
 import {CSSProperties} from "react";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";

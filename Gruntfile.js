@@ -1,6 +1,6 @@
 /*global module */
 
-var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'react-bootstrap', 'openlayers', 'jszip', 'swfobject-amd'];
+var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'openlayers', 'jszip', 'swfobject-amd'];
 var libraries_colon = libraries.map(function (d) { return d + ":"});
 
 module.exports = function (grunt) {
@@ -88,7 +88,6 @@ module.exports = function (grunt) {
             olcss: {expand: true, flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
             fontawesomecss: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
             fontawesomefont: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
-            fonts: {expand: true, flatten: true, cwd: 'node_modules/bootstrap', src: 'fonts/*.*', dest: 'dist/fonts/'},
             images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'},
             weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"}
         },

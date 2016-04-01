@@ -1,5 +1,4 @@
 import * as React from "react";
-import {DropdownButton, MenuItem} from "react-bootstrap";
 
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;

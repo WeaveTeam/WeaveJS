@@ -43,7 +43,7 @@ export default class TableHead extends React.Component<ITableHeadProps, ITableHe
         });
 
         return (
-            <thead className="weave-bootstrap-table-header" style={prefixer(baseStyle)} >
+            <thead className="weave-table-header" style={prefixer(baseStyle)} >
                 <tr>
                     {
                         headers

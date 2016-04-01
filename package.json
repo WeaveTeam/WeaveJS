@@ -43,7 +43,6 @@
   "dependencies": {
     "babel": "^6.1.18",
     "babel-cli": "^6.4.5",
-    "bootstrap": "^3.3.5",
     "c3": "https://github.com/WeaveTeam/c3.git",
     "classnames": "^2.2.3",
     "d3": "^3.5.9",
@@ -57,7 +56,6 @@
     "openlayers": "^3.13.0",
     "rc-slider": "^3.3.2",
     "react-addons-update": "0.14.7",
-    "react-bootstrap": "^0.28.1",
     "swfobject-amd": "^2.3.1",
     "typescript": "^1.8.0",
     "fixed-data-table": "^0.6.0"

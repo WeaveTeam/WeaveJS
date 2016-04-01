@@ -5,7 +5,7 @@ module.exports = {
     entry: {
     	index: "./src/index.js", 
     	index2: "./src/index2.js",
-    	libs: ["react", "react-datagrid", "lodash", "jquery", "d3", "c3", "openlayers", "react-bootstrap", 
+    	libs: ["react", "react-datagrid", "lodash", "jquery", "d3", "c3", "openlayers", 
 				"copy!./src/index2.html", "copy!./src/index.html", "copy!./src/app.css"]
     },
 	output: {

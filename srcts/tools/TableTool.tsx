@@ -1,11 +1,11 @@
 import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "./IVisTool";
 import * as _ from "lodash";
 import * as React from "react";
-import {IRow} from "../react-bootstrap-datatable/TableRow";
 import AbstractVisTool from "./AbstractVisTool";
 import Menu, {MenuItemProps} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
 import FixedDataTable from "./FixedDataTable";
+import {IRow} from "./FixedDataTable";
 import {HBox, VBox} from "../react-ui/FlexBox";
 
 

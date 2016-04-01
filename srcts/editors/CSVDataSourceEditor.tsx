@@ -6,7 +6,7 @@ import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import FileSelector from "../ui/FileSelector";
-import ReactBootstrapTable from "../react-bootstrap-datatable/ReactBootstrapTable";
+import FixedDataTable from "../tools/FixedDataTable";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import CSVDataSource = weavejs.data.source.CSVDataSource;
@@ -77,9 +77,10 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		return (
 			<div style={{flex: 1, position: "relative"}}>
 				<div style={{position: "absolute", width: "100%", height: "100%", overflow: "scroll"}}>
-					<ReactBootstrapTable columnTitles={columnTitles}
-								 rows={records}
-								 idProperty={''}/>
+					{/*<FixedDataTable columnTitles={columnTitles}
+								 	rows={records}
+								 	idProperty={''}/>
+					*/}
 				</div>
 			</div>
 		);

@@ -6,7 +6,6 @@ import CheckBoxList from "../../react-ui/CheckBoxList";
 import List from "../../react-ui/List";
 import HSlider from "../../react-ui/RCSlider/HSlider";
 import VSlider from "../../react-ui/RCSlider/VSlider";
-import {DropdownButton, MenuItem} from "react-bootstrap";
 import AbstractFilterEditor from "./AbstractFilterEditor";
 import {FilterEditorProps, FilterEditorState, FilterOption} from "./AbstractFilterEditor";
 

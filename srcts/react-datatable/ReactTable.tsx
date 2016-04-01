@@ -1,12 +1,11 @@
 import * as React from "react";
-import {Table} from "react-bootstrap";
 import * as _ from "lodash";
 import TableHead from "./TableHead";
 import TableBody from "./TableBody";
 import {IRow} from "./TableRow";
 import {IColumnTitles} from "./TableHead";
 
-export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTable>
+export interface IReactTableProps extends React.Props<ReactTable>
 {
 	idProperty:string;
 	rows:IRow[];
@@ -24,13 +23,13 @@ export interface IReactBootstrapTableProps extends React.Props<ReactBootstrapTab
     showIdColumn?:boolean;
 }
 
-export interface IReactBootstrapTableState
+export interface IReactTableState
 {
     probedIds?:string[];
     selectedIds?:string[];
 }
 
-export default class ReactBootstrapTable extends React.Component<IReactBootstrapTableProps, IReactBootstrapTableState>
+export default class ReactTable extends React.Component<IReactTableProps, IReactTableState>
 {
     private tableHead:TableHead;
     private tableBody:TableBody;
@@ -40,7 +39,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
     private secondIndex:number;
     private lastClicked:string;
 
-    constructor(props:IReactBootstrapTableProps)
+    constructor(props:IReactTableProps)
 	{
         super(props);
         this.state = {
@@ -51,7 +50,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         	this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
     }
 
-	static defaultProps:IReactBootstrapTableProps = {
+	static defaultProps:IReactTableProps = {
 		idProperty:'',
 		rows:[] as any,
 		columnTitles:[] as any,
@@ -180,7 +179,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
         });
     }
 
-    componentWillReceiveProps(nextProps:IReactBootstrapTableProps)
+    componentWillReceiveProps(nextProps:IReactTableProps)
 	{
         this.setState({
             selectedIds: nextProps.selectedIds || [],
@@ -211,7 +210,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
 
         return (
             <div style={tableContainer}>
-                <Table key="weave-bootstrap-table" ref="weave-bootstrap-table" striped={this.props.striped} bordered={this.props.bordered} condensed={this.props.condensed}>
+                <table key="weave--table" ref="weave--table">
                     <TableHead key="head"
                                ref={(c:TableHead) => {this.tableHead = c;}}
                                columnTitles={this.props.columnTitles}
@@ -225,7 +224,7 @@ export default class ReactBootstrapTable extends React.Component<IReactBootstrap
                                selectedIds={this.state.selectedIds}
                                probedIds={this.state.probedIds}
                                showIdColumn={this.props.showIdColumn}/>
-                </Table>
+                </table>
             </div>
         );
     }

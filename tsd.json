@@ -17,13 +17,7 @@
     "lodash/lodash.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
     },
-    "bootstrap/bootstrap.d.ts": {
-      "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
-    },
     "d3/d3.d.ts": {
-      "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
-    },
-    "react-bootstrap/react-bootstrap.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
     },
     "react-swf/react-swf.d.ts": {
@@ -40,9 +34,6 @@
     },
     "jszip/jszip.d.ts": {
       "commit": "dc9dabe74a5be62613b17a3605309783a12ff28a"
-    },
-    "bootstrap-slider/bootstrap-slider.d.ts": {
-      "commit": "86dbea8fc37d9473fee465da4f0a21bea4f8cbd9"
     },
     "classnames/classnames.d.ts": {
       "commit": "55c750ace821f85e6643bbdb249dbd0b15a3df78"

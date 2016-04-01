@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as bs from "react-bootstrap";
 import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
 

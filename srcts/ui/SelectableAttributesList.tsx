@@ -1,7 +1,6 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import List from "../react-ui/List";
-import {OverlayTrigger, Popover} from "react-bootstrap";
 import AttributeSelector from "../ui/AttributeSelector";
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
