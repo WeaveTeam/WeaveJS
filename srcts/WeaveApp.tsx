@@ -25,7 +25,6 @@ import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
-let is = Weave.IS;
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -96,8 +95,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	
 	handleMaximizeClick(path:WeavePathArray):void
 	{
-		var layout = this.getRenderedComponent() as FlexibleLayout;
-		if (!(layout instanceof FlexibleLayout))
+		var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
+		if (!layout)
 			return;
 		var state = _.cloneDeep(layout.getSessionState());
 		var obj = MiscUtils.findDeep(state, {id: path});
@@ -107,22 +106,20 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		layout.setSessionState(state);
 	}
 	
-	handleExportClick(path:WeavePathArray,object:ILinkableObject):void
+	handleExportClick(path:WeavePathArray):void
 	{
-		var weave = this.props.weave;
-		var name = weave.root.getName(object);
-		this.removeFromLayout(name);
-		var tool:JSX.Element = <WeaveComponentRenderer
+		this.removeFromLayout(path);
+		var tool:JSX.Element = (
+			<WeaveComponentRenderer
 				weave={this.props.weave}
 				path={path}
-				style={{width:"100%", height:"100%"}}
-			/>;
-		var onBeforeUnLoad:Function = () => {this.addToLayout(name)};
-		var onLoad:Function = () => {
-
-		};
-		var options:any = {transferStyle:true};
-		var popoutWindow = ReactUtils.openPopout(tool,onLoad,onBeforeUnLoad,options);
+				style={{ width: "100%", height: "100%" }}
+			/>
+		);
+		var onBeforeUnLoad:Function = () => { this.addToLayout(path) };
+		var onLoad:Function = () => { };
+		var options:any = { transferStyle: true };
+		var popoutWindow = ReactUtils.openPopout(tool, onLoad, onBeforeUnLoad, options);
 
 	}
 
@@ -153,43 +150,39 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		var weave = this.props.weave;
 		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
-		var name = weave.root.generateUniqueName(baseName);
-		var instance = weave.root.requestObject(name, type);
-		var resultType = LinkablePlaceholder.getClass(weave.root.getObject(name));
+		var path = [weave.root.generateUniqueName(baseName)];
+		var instance = weave.requestObject(path, type);
+		var resultType = LinkablePlaceholder.getClass(weave.getObject(path));
 		
 		if (resultType != type)
 			return;
 		
-		if (is(instance, IDataSource))
+		if (Weave.IS(instance, IDataSource))
 		{
 			DataSourceManager.openInstance(weave, instance as IDataSource);
 		}
 		
 		if (React.Component.isPrototypeOf(type))
 		{
-			this.addToLayout(name);
+			this.addToLayout(path);
 		}
 	};
 
-	addToLayout(name:string)
+	addToLayout(path:WeavePathArray)
 	{
-		var layout = this.props.weave.getObject(this.getRenderPath()) as FlexibleLayout;
-		if (layout instanceof FlexibleLayout)
+		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
+		if (layout)
 		{
 			var state = layout.getSessionState();
 			// check if the current layout is empty
-			if(!state.id && (state.children && !state.children.length))
+			if (!state.id && (state.children && !state.children.length))
 			{
-				state = {
-					id: [name],
-					direction: "horizontal",
-					flex: 1
-				}
+				state = {id: path};
 			}
 			else
 			{
 				state = {
-					children: [state, {id: [name]}],
+					children: [state, {id: path}],
 					direction: state.direction == 'horizontal' ? 'vertical' : 'horizontal'
 				};
 			}
@@ -197,13 +190,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 
-	removeFromLayout(name:string)
+	removeFromLayout(path:WeavePathArray)
 	{
-		var layout = this.props.weave.getObject(this.getRenderPath()) as FlexibleLayout;
-		if (layout instanceof FlexibleLayout)
+		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
+		if (layout)
 		{
 			var state = _.cloneDeep(layout.getSessionState());
-			var node = MiscUtils.findDeep(state, {id: [name]}) as LayoutState;
+			var node = MiscUtils.findDeep(state, {id: path}) as LayoutState;
 			if (node)
 			{
 				delete node.id;
@@ -216,11 +209,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	removeTool(tool:IVisTool)
 	{
 		var weave = this.props.weave;
-		var name = weave.root.getName(tool);
-		this.removeFromLayout(name);
-		//TODO - handle objects not at top level?
-		weave.root.removeObject(name);
-		if(this.state.toolToEdit == tool)
+		var path = Weave.findPath(weave.root, tool);
+		this.removeFromLayout(path);
+		weave.removeObject(path);
+	
+		if (this.state.toolToEdit == tool)
 		{
 			this.setState({
 				toolToEdit: null

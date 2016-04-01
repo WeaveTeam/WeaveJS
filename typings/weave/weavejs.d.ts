@@ -45,6 +45,11 @@ declare module __global__ {
          */
         requestObject<T>(path: Array<string | number>, type: (new (..._: any[]) => T) | string): T;
         /**
+         * Removes an object at the given path.
+         * @param path The path
+         */
+        removeObject(path: Array<string | number>): void;
+        /**
          * Finds the Weave instance for a given Object.
          * @param object An Object.
          * @return The Weave instance, or null if the object was not registered as an ancestor of any instance of Weave.
