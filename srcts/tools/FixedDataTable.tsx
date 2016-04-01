@@ -193,7 +193,6 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 	onColumnResizeEndCallback=(newColumnWidth:number, columnKey:string):void =>
 	{
-		console.log(newColumnWidth,columnKey);
 		var columnWidths = _.cloneDeep(this.state.columnWidths);
 		columnWidths[columnKey] = newColumnWidth;
 		this.setState({
