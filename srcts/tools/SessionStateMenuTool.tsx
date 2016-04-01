@@ -4,12 +4,14 @@ import {IVisTool} from "./IVisTool";
 
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import {ListGroupItem, ListGroup, DropdownButton, MenuItem} from "react-bootstrap";
 import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 import ResizingDiv from "../react-ui/ResizingDiv";
+import List from "../react-ui/List";
 import MiscUtils from "../utils/MiscUtils";
+import StatefulComboBox from "../ui/StatefulComboBox";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -71,9 +73,9 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		this.forceUpdate();
 	}
 
-	handleItemClick(index:number, event:MouseEvent):void 
+	handleItemClick(value:string):void 
 	{
-		this.selectedChoice.value = this.choices.getNames()[index];
+		this.selectedChoice.value = value;
 	}
 
 	renderEditor():JSX.Element
@@ -104,33 +106,26 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		if (this.layoutMode.value === "ComboBox")
 		{
 			return (
-				<VBox style={{flex:1.0, alignItems: "center"}}>
-					<DropdownButton title={this.selectedChoice.value} id={`dropdown-${Weave.className(this)}`}>
-						{
-							this.choices.getNames().map((choice:string, index:number) => {
-								if (choice === this.selectedChoice.value)
-									return <MenuItem active key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>;
-								return <MenuItem key={index} onSelect={this.handleItemClick.bind(this, index)}>{choice}</MenuItem>;
-							})
-						}
-					</DropdownButton>
+				<VBox style={{flex: 1, alignItems: "center"}}>
+					<StatefulComboBox ref={linkReactStateRef(this, { value: this.selectedChoice })} options={this.choices.getNames()}/>
 				</VBox>
 			);
 		}
 		else
 		{
+			var listOptions = this.choices.getNames().map((name:string) => {
+				 return {
+					  value: name
+				 };
+			})
 			return (
-				<ResizingDiv>
-					<ListGroup>
-						{
-							this.choices.getNames().map((choice:string, index:number) => {
-								if (choice === this.selectedChoice.value)
-									return <ListGroupItem active key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
-								return <ListGroupItem key={index} onClick={this.handleItemClick.bind(this, index)}>{choice}</ListGroupItem>;
-							})
-						}
-					</ListGroup>
-				</ResizingDiv>
+				<List options={listOptions} 
+					  selectedValues={[this.selectedChoice.value]}
+					  allowClear={false}
+					  multiple={false}
+			    	  onChange={(selectedValues) => {
+						  this.selectedChoice.value = selectedValues[0];
+					  }}/>
 			);
 		}
 	}
