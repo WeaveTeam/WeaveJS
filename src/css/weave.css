@@ -1,3 +1,11 @@
+html {
+  font-family: sans-serif;
+}
+
+body {
+	margin: 0;
+}
+
 .axis path,
 .axis line {
     fill: none;
