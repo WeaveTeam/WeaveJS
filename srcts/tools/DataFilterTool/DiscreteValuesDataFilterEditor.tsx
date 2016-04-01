@@ -26,8 +26,17 @@ export const LAYOUT_VSLIDER:string = "VSlider";
 export const LAYOUT_HSLIDER:string = "HSlider";
 export const LAYOUT_CHECKBOXLIST:string = "CheckBoxList";
 
+
+
 export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 {
+	static get OPTIONS():string[]{
+		return [LAYOUT_LIST,
+			LAYOUT_COMBO,
+			LAYOUT_VSLIDER,
+			LAYOUT_HSLIDER,
+			LAYOUT_CHECKBOXLIST];
+	}
 
 	public layoutMode:LinkableString = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate);
 	public values:LinkableVariable = Weave.linkableChild(this, LinkableVariable);
@@ -37,6 +46,8 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 		super(props);
 		this.options = [];
 	}
+
+
 	
 	verifyLayoutMode(value:string):boolean
 	{

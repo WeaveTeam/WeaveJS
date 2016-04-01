@@ -23,10 +23,10 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import WeaveAPI = weavejs.WeaveAPI;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
-export interface IDataFilterToolState extends IVisToolState{
-	filterType:string
-}
-export default class DataFilterTool extends React.Component<IVisToolProps, IDataFilterToolState> implements IVisTool, ILinkableObjectWithNewProperties
+
+
+
+export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
 	public filter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(ColumnDataFilter),this.handleFilterWatcher);
 	public filterEditor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(AbstractFilterEditor),this.handleEditor,true);
@@ -40,12 +40,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 		// Calling later will make sure instance of DataFilterTool linkableOwner is set
 		WeaveAPI.Scheduler.callLater(this, this.initLater);
 
-		this.state = {
-			filterType: "continuous"
-		}
 	}
-
-
 
 	private initLater():void
 	{
@@ -143,61 +138,17 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 		return Weave.lang('Filter');
     }
 
-	private filterEditorMap:any = {
-		continuous:{
-			editorType: NumericRangeDataFilterEditor,
-			label: "Continuous range",
-		},
-		discrete:{
-			editorType: DiscreteValuesDataFilterEditor,
-			label: "Discrete values",
-		}
-	}
-
-
 
 	// it has to be function as Filter DynamicColumn is set at Fly
+
 	get selectableAttributes() {
 		return new Map<string, (IColumnWrapper | LinkableHashMap)>()
 			.set("Filter", this.getFilterColumn());
 	}
 
-	setDataFilterUI(key:string){
-		this.setState({
-			filterType:key
-		});
-		this.filterEditor.requestLocalObject(this.filterEditorMap[key].editorType, false);
-	}
 
-	renderEditor():JSX.Element
-	{
-		var filterEditorMapKeys:string[] = Object.keys(this.filterEditorMap);
-		var editorOptionsUI:JSX.Element[] = filterEditorMapKeys.map(function(key:string,index:number){
-			var filterEditorItem:any = this.filterEditorMap[key];
-
-			return <HBox key={index} style={{alignItems:"baseline"}}>
-						<input type="radio"
-							   name="dataFilterOptions"
-							   value={filterEditorItem.label}
-							   defaultChecked={(this.state.filterType == key)}
-							   onClick={this.setDataFilterUI.bind(this,key)}/>
-						<span>&nbsp;{Weave.lang(filterEditorItem.label)}</span>
-					</HBox>
-		},this);
-
-		return (
-			<VBox>
-				<form>
-					<VBox>
-						{editorOptionsUI}
-					</VBox>
-				</form>
-				<HBox>
-					{renderSelectableAttributes(this)}
-				</HBox>
-
-			</VBox>
-		)
+	renderEditor():JSX.Element{
+		return <DataFilterEditor filterEditor={ this.filterEditor }  selectableAttributes={ this.selectableAttributes }  />
 	}
 
 	render():JSX.Element
@@ -227,5 +178,157 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IData
 	}
 }
 
+
 Weave.registerClass("weavejs.tool.DataFilter", DataFilterTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties], "Data Filter");
 Weave.registerClass("weave.ui::DataFilterTool", DataFilterTool);
+
+
+export interface IDataFilterEditorState {
+
+}
+
+export interface IDataFilterEditorProps {
+	filterEditor:LinkableDynamicObject,
+	selectableAttributes:Map<string, (IColumnWrapper | LinkableHashMap)>
+}
+
+
+const FILTER_TYPE  = {
+	CONTINUOUS: "Continuous range",
+	DISCRETE:"Discrete Values"
+};
+
+class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilterEditorState>{
+	constructor(props:any)
+	{
+		super(props);
+		// ensures any change in Tool will reflect in editor render
+		Weave.getCallbacks(this.props.filterEditor).addGroupedCallback(this, this.forceUpdate);
+	}
+
+	// required to build UI in render
+	private filterEditorMap:any = {
+		continuous:{
+			editorClass: NumericRangeDataFilterEditor,
+			label: FILTER_TYPE.CONTINUOUS,
+			options: [NumericRangeDataFilterEditor.OPTIONS]
+		},
+		discrete:{
+			editorClass: DiscreteValuesDataFilterEditor,
+			label: FILTER_TYPE.DISCRETE,
+			options: DiscreteValuesDataFilterEditor.OPTIONS
+		}
+	}
+
+	// event listener for Filter Selection
+	onFilterTypeChange = (event:Event) =>
+	{
+		var key:string = (event.target as HTMLInputElement).value;
+		var filterEditorItem:any = this.filterEditorMap[key];
+		this.props.filterEditor.requestLocalObject(filterEditorItem.editorClass, false);
+	}
+
+	// event listener for Filter Options
+	onFilterOptionChange = (event:Event)=>
+	{
+		var value:string | boolean = (event.target as HTMLInputElement).value;
+		if(this.props.filterEditor.target){
+			if(this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
+			{
+				(this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state = value as string;
+			}
+			if(this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
+			{
+				var forceDiscreteValues:LinkableBoolean  = (this.props.filterEditor.target as NumericRangeDataFilterEditor).forceDiscreteValues;
+				forceDiscreteValues.state = value as boolean;
+			}
+		}
+
+	}
+
+	componentWillUnmount():void
+	{
+		Weave.getCallbacks(this.props.filterEditor).removeCallback(this, this.forceUpdate);
+	}
+
+	render(){
+		// variables used to decide the UI and its options
+		var selectedFilter:string = ""; // continuous | discrete
+		var selectedOption:string | boolean; // if its radio string checkbox boolean
+		var uiType:string = ""; // radio | checkbox
+
+		// session props are used to identify the respective UI
+		if(this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
+		{
+			selectedFilter = FILTER_TYPE.CONTINUOUS;
+			selectedOption = (this.props.filterEditor.target as NumericRangeDataFilterEditor).forceDiscreteValues.state as boolean;
+			uiType = "checkbox"
+		}
+		else if(this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
+		{
+			selectedFilter = FILTER_TYPE.DISCRETE;
+			selectedOption = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;
+			uiType = "radio"
+		}
+
+
+		var filterEditorMapKeys:string[] = Object.keys(this.filterEditorMap);
+
+		var editorOptionsUI:JSX.Element[] = filterEditorMapKeys.map(function(key:string,index:number){
+
+			var filterEditorItem:any = this.filterEditorMap[key];
+			var editorLabel:string = filterEditorItem.label;
+			var isEditorSelected:boolean = (selectedFilter == editorLabel);
+
+			var optionsUI:JSX.Element[];
+			if(isEditorSelected) // if selected add further option for the editor
+			{
+				optionsUI = filterEditorItem.options.map(function(option:string,index:number){
+					var defaultChecked:boolean;
+					if(uiType == "radio")
+					{
+						defaultChecked = (selectedOption == option)
+					}
+					else if(uiType == "checkbox")
+					{
+						defaultChecked = selectedOption as boolean;
+					}
+
+
+					return <li key={index}>
+								<input type={uiType}
+									   name={uiType + "UiOptions"}
+									   value={option}
+									   defaultChecked={ defaultChecked }
+									   onClick={ this.onFilterOptionChange }/>
+								<span>&nbsp;{ Weave.lang(option) }</span>
+							</li>
+				},this);
+
+			}
+			return  <li key={index}>
+						<input type="radio"
+							   name="dataFilterOptions"
+							   value={ key }
+							   defaultChecked={ isEditorSelected }
+							   onClick={ this.onFilterTypeChange }/>
+						<span>&nbsp;{ Weave.lang(editorLabel) }</span>
+						{isEditorSelected?<ul style={ {listStyleType:"none"} }>{ optionsUI }</ul>: ""}
+					</li>;
+
+		},this);
+
+
+		return <VBox className="weave-padded-vbox ">
+					<VBox className="weave-padded-vbox" >
+						<label style={ {fontWeight: 'bold'} }>Column</label>
+						<SelectableAttributeComponent attributes={ this.props.selectableAttributes }/>
+					</VBox>
+					<VBox className="weave-padded-vbox">
+						<label style={ {fontWeight: 'bold'} }>Filter Type</label>
+						<ul style={ {listStyleType:"none"} }>{editorOptionsUI}</ul>
+					</VBox>
+				</VBox>
+	}
+
+}

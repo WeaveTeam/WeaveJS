@@ -17,6 +17,10 @@ import LinkableWatcher = weavejs.core.LinkableWatcher;
 
 export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 {
+	static get OPTIONS():string[]{
+		return ["Force Discrete Values"];
+	}
+
 	public forceDiscreteValues:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false), this.handleColumn);
 
 	constructor(props:FilterEditorProps)
