@@ -90,25 +90,40 @@ ul.dropdown-menu {
 }
 
 .weave-tool {
-	background-color: white;
-    font-family: Roboto, sans-serif;
-    font-size: 12px;
-    font-weight: normal;
-    font-style: normal;
-    text-decoration: none;
+
 }
 
-.weave-panel {
+.weave-tool-title-bar {
+	visibility: hidden;
+	opacity: 0;
+	transition: visibility 0s 0.1s, opacity 0.1s linear;
+	-webkit-transition: visibility 0s 0.1s, opacity 0.1s linear;
+}
+
+.weave-tool-title-bar-hovered {
+	visibility: visible;
+	opacity: 0.7;
+	font-size: 14;
+	background-color: #f8f8f8;
+	border-bottom: 1px solid #e6e6e6;
+	transition: visibility 0s 0.1s, opacity 0.1s linear;
+	-webkit-transition: visibility 0s 0.1s, opacity 0.1s linear;
+}
+
+.weave-tool-title-bar-text {
     font-family: Roboto, sans-serif;
     font-size: 16px;
     font-weight: bold;
     font-style: normal;
     text-decoration: none;
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
+
 .weave-icon{
-	cursor : pointer;
 	padding: 5px 5px 5px 5px;
 }
+
 input[type="text"] {
 	border: solid 1px #dcdcdc;
 	transition: box-shadow 0.3s, border 0.3s;
@@ -345,6 +360,16 @@ input[type="text"]:focus {
 .rc-slider {
     background-color: #D0D0D0;
 }
+
+.weave-icon:hover {
+	background-color: rgba(153, 214, 255, 0.4);
+}
+
+.weave-icon:active {
+	background-color: #80CCFF;
+}
+
+
 
 .weave-tree-view-icon {
     color: #808080;

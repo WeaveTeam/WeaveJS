@@ -7,7 +7,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import prefixer from "./react-ui/VendorPrefixer";
-import {Glyphicon} from "react-bootstrap";
+import CenteredIcon from "./react-ui/CenteredIcon";
 import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import ToolTip from "./tools/ToolTip";
@@ -16,13 +16,7 @@ import PopupWindow from "./react-ui/PopupWindow";
 import ReactUtils from "./utils/ReactUtils";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import SmartComponent from "./ui/SmartComponent";
-
-const grabberStyle:CSSProperties = {
-	width: "16",
-	height: "16",
-	cursor: "move",
-	background: "url(http://placehold.it/32x32)"
-};
+import classNames from "./modules/classnames";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -42,6 +36,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 export interface IWeaveToolState
 {
 	title?: string;
+	showControls?: boolean;
 }
 
 export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
@@ -124,16 +119,18 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	render():JSX.Element
 	{
 		return (
-			<VBox style={this.props.style} className="weave-tool"
-					onMouseOver={() => {
-						this.titleBar.setState({ showControls: true });
-					}}
-					onMouseLeave={() => {
-						this.titleBar.setState({ showControls: false });
-					}}
-					onDragOver={this.props.onDragOver}
-					onDragEnd={this.props.onDragEnd}>
+			<VBox style={this.props.style} 
+				  className="weave-tool"
+				  onDragOver={this.props.onDragOver}
+				  onDragEnd={this.props.onDragEnd}
+				  onMouseOver={() => {
+						this.setState({ showControls: true });
+				  }}
+			      onMouseLeave={() => {
+						this.setState({ showControls: false });
+				  }}>
 				<TitleBar ref={(c:TitleBar) => this.titleBar = c }
+						  showControls={this.state.showControls}
 						  onDragStart={this.props.onDragStart}
 						  titleBarHeight={this.titleBarHeight}
 						  title={Weave.lang(this.state.title)}
@@ -155,6 +152,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 interface ITitleBarProps extends React.Props<TitleBar>
 {
 	onDragStart:React.DragEventHandler;
+	showControls:boolean;
 	titleBarHeight:number;
 	title:string;
 	onGearClick:React.MouseEventHandler;
@@ -165,7 +163,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 
 interface ITitleBarState
 {
-	showControls: boolean;
+	
 }
 
 class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
@@ -173,78 +171,24 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 	constructor(props:ITitleBarProps)
 	{
 		super(props);
-		this.state = {
-			showControls: false
-		};
 	}
 	render()
 	{
-		var windowBar:CSSProperties = {
-			height: this.props.titleBarHeight,
-			padding:2,
-			alignItems:"center"
-		};
-
-		if (this.state.showControls)
-			_.merge(windowBar, {
-				backgroundColor: "#f8f8f8",
-				borderBottom: '1px solid #e6e6e6'
-			});
-
-
-		var titleStyle:CSSProperties = {
-			cursor: "move",
-			height: this.props.titleBarHeight,
-			textAlign: "center",
-			overflow: "hidden",
-			whiteSpace: "nowrap",
-			flex: 1,
-			textOverflow: "ellipsis"
-		};
-
-		var transitions:CSSProperties = {
-			visibility: this.state.showControls ? "visible" : "hidden",
-			opacity: this.state.showControls ? 0.7 : 0,
-			transition: this.state.showControls ? "visibiliy 0s 0.1s, opacity 0.1s linear" : "visibility 0s 0.1s, opacity 0.1s linear"
-		};
-
-		var leftControls:CSSProperties = {
-			paddingLeft:4,
-			fontSize: 14 // will set the size of the icons as icons are uniocode values
-		};
-
-		var rightControls:CSSProperties = {
-			paddingRight:4,
-			fontSize: 14 // will set the size of the icons as icons are uniocode values
-		};
-
-		var iconStyle:CSSProperties = {
-			marginRight:"4px",
-			cursor:"pointer"
-		};
-
-		_.merge(leftControls, transitions);
-		_.merge(rightControls, transitions);
-
 		return(
-			<HBox ref="header" style={windowBar} draggable={true} onDragStart={this.props.onDragStart}>
-				<HBox style={prefixer(leftControls)}>
-	            	<div style={iconStyle} onClick={this.props.onGearClick}>
-						<i className="fa fa-cog fa-fw"/>
-					</div>
-	            </HBox>
-				<span style={titleStyle} className="weave-panel">{this.props.title}</span>
-				<HBox style={prefixer(rightControls)}>
-					<div style={iconStyle} onClick={this.props.onMaximizeClick}>
-						<i className="fa fa-expand fa-fw"/>
-					</div>
-					<div style={iconStyle} onClick={this.props.onExportClick}>
-						<i className="fa fa-external-link fa-fw"></i>
-					</div>
-					<div style={iconStyle} onClick={this.props.onCloseClick}>
-						<Glyphicon glyph="remove"/>
-					</div>
+			<HBox className={this.props.showControls ? "weave-tool-title-bar-hovered" : "weave-tool-title-bar"} style={{height: this.props.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart}>
+				<CenteredIcon onClick={this.props.onGearClick}
+							  iconProps={{className: "fa fa-cog fa-fw"}}/>
+
+				<HBox style={{flex: 1, alignSelf: "stretch", cursor: "move", overflow: "hidden", visibility: "visible"}}>
+					<span className="weave-tool-title-bar-text" style={{width: "100%", textAlign: "center", textOverflow: "ellipsis"}}>{this.props.title}</span>
 				</HBox>
+
+				<CenteredIcon onClick={this.props.onMaximizeClick}
+							  iconProps={{className: "fa fa-expand fa-fw"}}/>
+				<CenteredIcon onClick={this.props.onExportClick}
+							  iconProps={{className: "fa fa-external-link fa-fw"}}/>
+			    <CenteredIcon onClick={this.props.onCloseClick}
+							  iconProps={{className: "fa fa-times fa-fw"}}/>
 			</HBox>
 		);
 	}
