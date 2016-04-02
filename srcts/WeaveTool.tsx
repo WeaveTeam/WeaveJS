@@ -180,7 +180,7 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 							  iconProps={{className: "fa fa-cog fa-fw"}}/>
 
 				<HBox style={{flex: 1, alignSelf: "stretch", cursor: "move", overflow: "hidden", visibility: "visible"}}>
-					<span className="weave-tool-title-bar-text" style={{width: "100%", textAlign: "center", textOverflow: "ellipsis"}}>{this.props.title}</span>
+					<span className="weave-tool-title-bar-text" style={{width: "100%", paddingTop: 5, paddingBottom: 5, textAlign: "center", textOverflow: "ellipsis"}}>{this.props.title}</span>
 				</HBox>
 
 				<CenteredIcon onClick={this.props.onMaximizeClick}

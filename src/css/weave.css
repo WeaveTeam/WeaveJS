@@ -103,6 +103,8 @@ ul.dropdown-menu {
 
 .weave-tool-title-bar {
 	visibility: hidden;
+	font-size: 14;
+	border-bottom: 1px solid #ffffff;
 	transition: visibility 0s 0.1s, opacity 0.1s linear;
 	-webkit-transition: visibility 0s 0.1s, opacity 0.1s linear;
 }
