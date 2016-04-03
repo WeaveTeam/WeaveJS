@@ -30,7 +30,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	onGearClick?:(tool:IVisTool, editorContent:JSX.Element)=>void;
 	onMaximizeClick?:(tool:IVisTool)=>void;
 	onCloseClick?:(tool:IVisTool)=>void;
-	onExportClick?:(tool:IVisTool)=>void;
+	onPopoutClick?:(tool:IVisTool)=>void;
 }
 
 export interface IWeaveToolState
@@ -110,10 +110,10 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			this.props.onCloseClick(this.watcher.target as IVisTool);
 	};
 
-	onExportClick=():void=>
+	onPopoutClick=():void=>
 	{
-		if (this.props.onExportClick)
-			this.props.onExportClick(this.watcher.target as IVisTool);
+		if (this.props.onPopoutClick)
+			this.props.onPopoutClick(this.watcher.target as IVisTool);
 	};
 
 	render():JSX.Element
@@ -136,7 +136,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 						  title={Weave.lang(this.state.title)}
 						  onGearClick={this.onGearClick}
 						  onMaximizeClick={this.onMaximizeClick}
-						  onExportClick={this.onExportClick}
+						  onPopoutClick={this.onPopoutClick}
 						  onCloseClick={this.onCloseClick}
 						  />
 				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
@@ -157,7 +157,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	title:string;
 	onGearClick:React.MouseEventHandler;
 	onMaximizeClick:React.MouseEventHandler;
-	onExportClick:React.MouseEventHandler;
+	onPopoutClick:React.MouseEventHandler;
 	onCloseClick:React.MouseEventHandler;
 }
 
@@ -185,7 +185,7 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 
 				<CenteredIcon onClick={this.props.onMaximizeClick}
 							  iconProps={{className: "fa fa-expand fa-fw"}}/>
-				<CenteredIcon onClick={this.props.onExportClick}
+				<CenteredIcon onClick={this.props.onPopoutClick}
 							  iconProps={{className: "fa fa-external-link fa-fw"}}/>
 			    <CenteredIcon onClick={this.props.onCloseClick}
 							  iconProps={{className: "fa fa-times fa-fw"}}/>

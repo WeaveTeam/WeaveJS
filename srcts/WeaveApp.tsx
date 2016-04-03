@@ -106,7 +106,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		layout.setSessionState(state);
 	}
 	
-	handleExportClick(path:WeavePathArray):void
+	handlePopoutClick(path:WeavePathArray):void
 	{
 		this.removeFromLayout(path);
 		var tool:JSX.Element = (
@@ -140,7 +140,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{...panelProps}
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={this.handleMaximizeClick.bind(this, path)}
-				onExportClick={this.handleExportClick.bind(this, path)}
+				onPopoutClick={this.handlePopoutClick.bind(this, path)}
 				onCloseClick={this.removeTool.bind(this)}
 			/>
 		);
