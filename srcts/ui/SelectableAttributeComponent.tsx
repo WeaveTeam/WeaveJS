@@ -51,7 +51,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
          return label;
      };*/
 
-     siblings= (attribute:IColumnWrapper|LinkableHashMap): {label: string, value: IWeaveTreeNode}[]  =>{
+     siblings=(attribute:IColumnWrapper|LinkableHashMap): {label: string, value: IWeaveTreeNode}[] =>
+	 {
          var siblings:{label: string, value: IWeaveTreeNode}[];
          var label = ColumnUtils.getColumnListLabel(attribute as IColumnWrapper);//TODO figure out how to use this
          var dc = ColumnUtils.hack_findInternalDynamicColumn(attribute as IColumnWrapper);
@@ -63,13 +64,16 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
         //var columnNode = dataSource && dataSource.findHierarchyNode(meta);
 
-         if(dataSource){//if a column has not been set, datasource is not returned
-            var siblingNodes = HierarchyUtils.findParentNode(this.rootTreeNode, dataSource, meta).getChildren();
-
-            siblings = siblingNodes.map((value:IWeaveTreeNode, index:number)=>{
-                var label:string = value.getLabel();
-                return({label, value});
-            });
+		 //if a column has not been set, datasource is not returned
+         if (dataSource)
+		 {
+            var parentNode = HierarchyUtils.findParentNode(this.rootTreeNode, dataSource, meta);
+			var siblingNodes = parentNode ? parentNode.getChildren() : [];
+			if (siblingNodes)
+	            siblings = siblingNodes.map((value:IWeaveTreeNode, index:number)=>{
+	                var label:string = value.getLabel();
+	                return({label, value});
+	            });
         }
 
          return siblings;
