@@ -36,7 +36,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 						{Weave.lang('The keyType of the "Group by" column should match the keyType of each column to be transformed. The values in this column will be treated as foreign keys which map to aggregated values in the transformed columns.')}
 					</HelpIcon>
 				</div>, 
-				<SelectableAttributeComponent removeLabel={ true } attributes={ groupByMap }/>
+				<SelectableAttributeComponent showLabel={ false } attributes={ groupByMap }/>
 			],
 			[
 				<div>

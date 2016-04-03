@@ -17,7 +17,7 @@ import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|LinkableHashMap>
-    removeLabel? : boolean
+    showLabel? : boolean
 }
 
 export interface ISelectableAttributeComponentState{
@@ -37,6 +37,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
      private rootTreeNode:IWeaveTreeNode;
      columnString: string;
 
+	static defaultProps = { showLabel: true };
+	
      componentWillReceiveProps(props:ISelectableAttributeComponentProps){
 
      }
@@ -87,7 +89,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
          var selectableUI:JSX.Element[] = [];
          let disabled:boolean = false;
-         let alwaysDefnCol:boolean;
+         let alwaysDefinedCol:boolean;
          let defaultValue:any;
 
        //loop through selectable attributes
@@ -99,7 +101,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
                //check for always defined column
                if(Weave.IS(attribute, AlwaysDefinedColumn)){
-                   alwaysDefnCol = true;
+                   alwaysDefinedCol = true;
                    defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
                }
 
@@ -113,13 +115,13 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                let elem =  <VBox key={ label }>
 
                                    <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
-                                       { this.props.removeLabel ? null : <span style={ labelStyle }>{ Weave.lang(label) }</span>}
+                                       { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
                                        <StatefulComboBox disabled={ disabled } style={{flex: 1}} options={ siblings }/>
                                        <span className={clearStyle}/>
                                        <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
                                    </HBox>
 
-                                   { alwaysDefnCol ? <input type="text" defaultValue={defaultValue }/> :null}
+                                   { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
                             </VBox>;
 
                selectableUI.push(elem);
