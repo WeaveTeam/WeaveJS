@@ -119,7 +119,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 			return {
 				label: (
 					<HBox style={{justifyContent: "space-between"}}>
-						{dataSource.getHierarchyRoot().getLabel()}
+						<span style={{overflow: "hidden"}}>{dataSource.getHierarchyRoot().getLabel()}</span>
 						<MenuButton menu={dataSourceMenu}/>
 					</HBox>
 				),
@@ -145,7 +145,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 
 		return (
 			<HBox style={{flex: 1}}>
-				<VBox style={{ width: 200, overflow: "hidden" }}>
+				<VBox style={{ width: 200 }}>
 					<List
 						options={listOptions}
 						multiple={false}
@@ -176,7 +176,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 				content: <DataSourceManager weave={weave} selected={selected}/>,
 				modal: false,
 				width: 800,
-				height: 450,
+				height: 600,
 				onCancel: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
 			});
 			DataSourceManager.map_weave_dsmPopup.set(weave, dsm);
