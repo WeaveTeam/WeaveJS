@@ -53,6 +53,8 @@ export interface IFixedDataTableState
 	width?:number;
 	height?:number;
 	sortIndices?:number[];
+	probedIds?:string[];
+	selectedIds?:string[];
 }
 
 export interface ISortHeaderProps extends React.Props<SortHeaderCell>
@@ -173,19 +175,21 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		var sortIndices:number[] = this.props.rows.map((row, index) => index);
 		this.state = {
 			columnWidths,
-			sortIndices
+			sortIndices,
+			selectedIds: props.selectedIds,
+			probedIds: props.probedIds
 		};
 	}
 
 	getRowClass=(index: number):string =>
 	{
 		var id:string = this.props.rows[index][this.props.idProperty];
-		if(_.includes(this.props.probedIds,id)&& _.includes(this.props.selectedIds,id)){
+		if(_.includes(this.state.probedIds,id)&& _.includes(this.state.selectedIds,id)){
 			return "table-row-probed-selected"
-		} else if(_.includes(this.props.probedIds,id)) {
+		} else if(_.includes(this.state.probedIds,id)) {
 			//item needs selected class
 			return "table-row-probed";
-		} else if(_.includes(this.props.selectedIds,id)) {
+		} else if(_.includes(this.state.selectedIds,id)) {
 			//item needs selected class
 			return "table-row-selected";
 		}
@@ -202,11 +206,15 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 	onMouseEnter=(event:React.MouseEvent, index:number):void =>
 	{
-		//console.log("Enter",event,index);
 		//mouse entering, so set the keys
+		var id:string = this.props.rows[index][this.props.idProperty];
+		var probedIds:string[] = [id];
+
+		this.setState({
+			probedIds
+		});
+
 		if(this.props.onHover){
-			var id:string = this.props.rows[index][this.props.idProperty];
-			var probedIds:string[] = [id];
 			this.props.onHover(probedIds);
 		}
 	};
@@ -214,90 +222,96 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	onMouseLeave=(event:React.MouseEvent, index:number):void =>
 	{
 		//console.log("Leave",event,index);
+		this.setState({
+			probedIds: []
+		});
 		this.props.onHover && this.props.onHover([]);
 	};
 
 	onMouseDown=(event:React.MouseEvent, index:number):void =>
 	{
 		//console.log("Down",event,index);
-		if (this.props.onSelection)
+		
+		var selectedIds:string[] = this.state.selectedIds;
+		var id:string = this.props.rows[index][this.props.idProperty];
+
+		// in single selection mode,
+		// or ctrl/cmd selcection mode
+		// already selected keys get unselected
+
+		// find the selected record location
+		var keyLocation:number = selectedIds.indexOf(id);
+
+		// multiple selection
+		if ((event .ctrlKey || event.metaKey))
 		{
-			var selectedIds:string[] = this.props.selectedIds;
-			var id:string = this.props.rows[index][this.props.idProperty];
-
-			// in single selection mode,
-			// or ctrl/cmd selcection mode
-			// already selected keys get unselected
-
-			// find the selected record location
-			var keyLocation:number = selectedIds.indexOf(id);
-
-			// multiple selection
-			if ((event .ctrlKey || event.metaKey))
+			// if the record is already in the selection
+			// we remove it
+			if (_.includes(selectedIds,id))
 			{
-				// if the record is already in the selection
-				// we remove it
-				if (_.includes(selectedIds,id))
-				{
-					selectedIds.splice(keyLocation, 1);
-				}
-				else
-				{
-					selectedIds.push(id)
-				}
-				this.lastClicked = id;
+				selectedIds.splice(keyLocation, 1);
 			}
-
-			// shift selection
-			else if (event.shiftKey)
-			{
-				selectedIds = [];
-				if (this.lastClicked == null)
-				{
-				}
-				else
-				{
-					var start:number = _.findIndex(this.props.rows, (row:IRow) => {
-						return row[this.props.idProperty] == this.lastClicked;
-					});
-
-					var end:number = _.findIndex(this.props.rows, (row:IRow) => {
-						return row[this.props.idProperty] == id;
-					});
-
-					if (start > end)
-					{
-						let temp:number = start;
-						start = end;
-						end = temp;
-					}
-
-					for (var i:number = start; i <= end; i++)
-					{
-						selectedIds.push(this.props.rows[i][this.props.idProperty]);
-					}
-				}
-			}
-
-			// single selection
 			else
 			{
-				// if there was only one record selected
-				// and we are clicking on it again, then we want to
-				// clear the selection.
-				if (selectedIds.length == 1 && selectedIds[0] == id)
+				selectedIds.push(id)
+			}
+			this.lastClicked = id;
+		}
+
+		// shift selection
+		else if (event.shiftKey)
+		{
+			selectedIds = [];
+			if (this.lastClicked == null)
+			{
+			}
+			else
+			{
+				var start:number = _.findIndex(this.props.rows, (row:IRow) => {
+					return row[this.props.idProperty] == this.lastClicked;
+				});
+
+				var end:number = _.findIndex(this.props.rows, (row:IRow) => {
+					return row[this.props.idProperty] == id;
+				});
+
+				if (start > end)
 				{
-					selectedIds = [];
-					this.lastClicked = null;
+					let temp:number = start;
+					start = end;
+					end = temp;
 				}
-				else
+
+				for (var i:number = start; i <= end; i++)
 				{
-					selectedIds = [id];
-					this.lastClicked = id;
+					selectedIds.push(this.props.rows[i][this.props.idProperty]);
 				}
 			}
-			this.props.onSelection(selectedIds);
 		}
+
+		// single selection
+		else
+		{
+			// if there was only one record selected
+			// and we are clicking on it again, then we want to
+			// clear the selection.
+			if (selectedIds.length == 1 && selectedIds[0] == id)
+			{
+				selectedIds = [];
+				this.lastClicked = null;
+			}
+			else
+			{
+				selectedIds = [id];
+				this.lastClicked = id;
+			}
+		}
+		
+		this.setState({
+			selectedIds
+		});
+		if (this.props.onSelection)
+			this.props.onSelection(selectedIds);
 	};
 
 	updateSortDirection=(columnKey:string, sortDirection:string) =>
@@ -336,9 +350,12 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 		if(nextProps.rows.length !== this.state.sortIndices.length)
 			newState.sortIndices = this.props.rows.map((row, index) => index);
+
+		newState.probedIds = nextProps.probedIds;
+		newState.selectedIds = nextProps.selectedIds;
 		this.setState(newState);
 	}
-
+	
 	handleResize=(newSize:ResizingDivState) => {
 		this.setState({
 			width: newSize.width,
