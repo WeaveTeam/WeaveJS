@@ -79,8 +79,20 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/index.js': 'src/index.js'}, {'dist/multipleView.js': 'src/multipleView.js'}]
+                files: [{'dist/index.js': 'src/index.js'}]
             },
+			test: {
+				dev: {
+	                options: {
+	                    browserifyOptions: {
+	                        debug: true,
+	                        plugin: [],
+	                        extensions: ['.jsx']
+	                    }
+	                },
+	                files: [{'dist/multipleView.js': 'src/multipleView.js'}]
+	            }
+			}
         },
         copy: {
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
