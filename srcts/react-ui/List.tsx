@@ -130,7 +130,7 @@ export default class List extends React.Component<IListProps, IListState>
 
     render(): JSX.Element {
         return (
-            <div style={{overflow: "auto" }}>
+            <div style={{overflow: "auto", width: "100%", height: "100%"}}>
                 {
                     this.values.map((value: any, index: number) => {
                         var selected: boolean = this.state.selectedValues.indexOf(value) >= 0;
@@ -147,7 +147,7 @@ export default class List extends React.Component<IListProps, IListState>
 
                         return (
                             <HBox key={index} style={_.merge(style, this.props.style)} className={ className }  onClick={this.handleChange.bind(this, value) }>
-                                <span style={{ flex: 1 }}>{this.labels[index] || value}</span>
+                                <span style={{ flex: 1, overflow: "hidden"}}>{this.labels[index] || value}</span>
                             </HBox>
                         );
                     })
