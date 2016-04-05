@@ -147,7 +147,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	private shiftDown:boolean;
 	private firstIndex:number;
 	private secondIndex:number;
-	private lastClicked:string;
+	private lastClicked:number;
 	private container:HTMLElement;
 	static defaultProps:IFixedDataTableProps = {
 		idProperty: "",
@@ -167,12 +167,12 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	constructor(props:IFixedDataTableProps)
 	{
 		super(props);
-
 		var columnWidths = _.zipObject(props.columnIds, this.props.columnIds.map((id)=>{return this.props.columnWidth})) as { [columnId: string]: number; };
-		if(props.selectedIds && props.probedIds)
-			this.lastClicked = props.selectedIds[props.selectedIds.length - 1];
-
 		var sortIndices:number[] = this.props.rows.map((row, index) => index);
+
+		if(props.selectedIds && props.probedIds)
+			this.lastClicked = props.selectedIds.length - 1;
+
 		this.state = {
 			columnWidths,
 			sortIndices,
@@ -183,13 +183,13 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 	getRowClass=(index: number):string =>
 	{
-		var id:string = this.props.rows[index][this.props.idProperty];
-		if(_.includes(this.state.probedIds,id)&& _.includes(this.state.selectedIds,id)){
+		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty];
+		if (_.includes(this.state.probedIds, id) && _.includes(this.state.selectedIds, id)) {
 			return "table-row-probed-selected"
-		} else if(_.includes(this.state.probedIds,id)) {
-			//item needs selected class
+		} else if (_.includes(this.state.probedIds, id)) {
+			//item needs probed class
 			return "table-row-probed";
-		} else if(_.includes(this.state.selectedIds,id)) {
+		} else if (_.includes(this.state.selectedIds, id)) {
 			//item needs selected class
 			return "table-row-selected";
 		}
@@ -207,7 +207,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	onMouseEnter=(event:React.MouseEvent, index:number):void =>
 	{
 		//mouse entering, so set the keys
-		var id:string = this.props.rows[index][this.props.idProperty];
+		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty];
 		var probedIds:string[] = [id];
 
 		this.setState({
@@ -233,7 +233,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		//console.log("Down",event,index);
 		
 		var selectedIds:string[] = this.state.selectedIds;
-		var id:string = this.props.rows[index][this.props.idProperty];
+		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty];
 
 		// in single selection mode,
 		// or ctrl/cmd selcection mode
@@ -255,7 +255,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			{
 				selectedIds.push(id)
 			}
-			this.lastClicked = id;
+			this.lastClicked = index;
 		}
 
 		// shift selection
@@ -267,13 +267,9 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			}
 			else
 			{
-				var start:number = _.findIndex(this.props.rows, (row:IRow) => {
-					return row[this.props.idProperty] == this.lastClicked;
-				});
+				var start:number = this.lastClicked;
 
-				var end:number = _.findIndex(this.props.rows, (row:IRow) => {
-					return row[this.props.idProperty] == id;
-				});
+				var end:number = index;
 
 				if (start > end)
 				{
@@ -284,7 +280,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 				for (var i:number = start; i <= end; i++)
 				{
-					selectedIds.push(this.props.rows[i][this.props.idProperty]);
+					selectedIds.push(this.props.rows[this.state.sortIndices[i]][this.props.idProperty]);
 				}
 			}
 		}
@@ -303,7 +299,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			else
 			{
 				selectedIds = [id];
-				this.lastClicked = id;
+				this.lastClicked = index;
 			}
 		}
 		
@@ -312,6 +308,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		});
 		if (this.props.onSelection)
 			this.props.onSelection(selectedIds);
+
+		this.forceUpdate();
 	};
 
 	updateSortDirection=(columnKey:string, sortDirection:string) =>
@@ -349,11 +347,12 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		var newState:IFixedDataTableState = {};
 
 		if(nextProps.rows.length !== this.state.sortIndices.length)
-			newState.sortIndices = this.props.rows.map((row, index) => index);
+			newState.sortIndices = nextProps.rows.map((row, index) => index);
 
 		newState.probedIds = nextProps.probedIds;
 		newState.selectedIds = nextProps.selectedIds;
 		this.setState(newState);
+		this.forceUpdate();
 	}
 	
 	handleResize=(newSize:ResizingDivState) => {
