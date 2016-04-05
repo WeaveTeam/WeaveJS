@@ -47,22 +47,16 @@ export interface ICensusDataSourceEditorState extends IDataSourceEditorState
 	requires?: string[]; /* Required geography filter names */
 }
 
-export default class CensusDataSourceEditor extends React.Component<IDataSourceEditorProps, ICensusDataSourceEditorState>
+export default class CensusDataSourceEditor extends DataSourceEditor
 {
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
-		this.componentWillReceiveProps(props);
-	}
-
-	componentWillReceiveProps(nextProps:IDataSourceEditorProps)
-	{
 		let ds = (this.props.dataSource as CensusDataSource);
 		this.api = ds.getAPI();
 		this.api.getDatasets().then(
-			(result: { dataset: CensusRawDataset[] }) => { this.setState({ datasets: result.dataset }); }
+			(result: { dataset: CensusRawDataset[] }) => { this.state = { datasets: result.dataset } as any; }
 		);
-
 		ds.dataSet.addGroupedCallback(this, this.forceUpdate);
 		ds.geographicFilters.addGroupedCallback(this, this.forceUpdate);
 		ds.geographicScope.addGroupedCallback(this, this.updateRequiresAndOptional, true);
@@ -77,7 +71,7 @@ export default class CensusDataSourceEditor extends React.Component<IDataSourceE
 				let geography = geographies[ds.geographicScope.value];
 				if (geography) 
 				{
-					this.setState({ optional: geography.optional, requires: geography.requires });
+					this.setState({ optional: geography.optional, requires: geography.requires } as any);
 				}
 			}
 		)
@@ -151,18 +145,18 @@ export default class CensusDataSourceEditor extends React.Component<IDataSourceE
 				}
 
 				tempGeographies = _.sortBy(tempGeographies, "value");
-				this.setState({ geographies: tempGeographies });
+				this.setState({ geographies: tempGeographies } as any);
 			});
 	}
 
 	dataFamilyChanged=(selectedItem:any)=>
 	{
-		this.setState({ dataFamily: (selectedItem as string) });
+		this.setState({ dataFamily: (selectedItem as string) } as any);
 	}
 
 	dataVintageChanged=(selectedItem:any)=>
 	{
-		this.setState({ dataVintage: (selectedItem as string)});
+		this.setState({ dataVintage: (selectedItem as string)} as any);
 	}
 	dataSetChanged = (selectedItem: any) =>
 	{
@@ -191,47 +185,49 @@ export default class CensusDataSourceEditor extends React.Component<IDataSourceE
 			],
 			[
 				Weave.lang("Data Family"),
-				<StatefulComboBox onChange={this.dataFamilyChanged} triggerOnForcedChange selectFirstOnInvalid
-					options={families}/>
+				<StatefulComboBox style={{width: "100%"}}
+								  onChange={this.dataFamilyChanged} 
+								  triggerOnForcedChange
+								  selectFirstOnInvalid
+								  options={families}/>
 			],
 			[
 				Weave.lang("Year"),
-			<StatefulComboBox onChange={this.dataVintageChanged} triggerOnForcedChange selectFirstOnInvalid
-					options={vintages}/>
+				<StatefulComboBox style={{width: "100%"}} 
+								  onChange={this.dataVintageChanged}
+								  triggerOnForcedChange
+								  selectFirstOnInvalid
+								  options={vintages}/>
 			],
 			[
 				Weave.lang("Dataset"),
-				<VBox><StatefulComboBox onChange={this.dataSetChanged} ref={linkReactStateRef(this, { value: ds.dataSet }) } triggerOnForcedChange selectFirstOnInvalid
-					options={datasets}/>
-					<div>{datasetLabel}</div>
-				</VBox>
+				<StatefulComboBox style={{width: "100%"}}
+								  onChange={this.dataSetChanged}
+								  ref={linkReactStateRef(this, { value: ds.dataSet }) }
+								  triggerOnForcedChange
+								  selectFirstOnInvalid
+								  options={datasets}/>
 			],
 			[
 				Weave.lang("Geographic Scope"),
-				<StatefulComboBox ref={linkReactStateRef(this, {value: ds.geographicScope })} triggerOnForcedChange selectFirstOnInvalid
-					options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
+				<StatefulComboBox style={{width: "100%"}}
+								  ref={linkReactStateRef(this, {value: ds.geographicScope })}
+								  triggerOnForcedChange
+								  selectFirstOnInvalid
+								  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
 			],
 		];
 	}
 
 	renderFields(): JSX.Element {
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit" },
-			td: [
-				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5 },
-				{ paddingBottom: 10, textAlign: "right", width: "100%" }
-			]
-		};
-
 		return (
 			<VBox>
-				<label> {Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel()) } </label>
 				{
-					ReactUtils.generateTable(null, this.editorFields, tableStyles)
+					super.renderFields()
 				}
 				<CensusGeographyFilter filterLinkableVariable={(this.props.dataSource as CensusDataSource).geographicFilters}
-					optional={this.state.optional}
-					requires={this.state.requires || []}/>
+									   optional={this.state.optional}
+									   requires={this.state.requires || []}/>
 			</VBox>
 		)
 	}
