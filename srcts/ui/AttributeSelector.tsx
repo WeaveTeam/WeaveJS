@@ -50,23 +50,23 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 
         this.weaveRoot = Weave.getRoot(props.selectedAttribute);
         this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
-        this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+        //this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 
         this.state = {leafNode : null, selectAll : false, selectedAttribute:this.props.selectedAttribute, label:this.props.label};
     };
 
     componentWillReceiveProps (nextProps :IAttributeSelectorProps){
         if(nextProps.selectedAttribute != this.props.selectedAttribute){
-            this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
+            //this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
             this.weaveRoot = Weave.getRoot(nextProps.selectedAttribute);
-            this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+            //this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 
             this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
         }
     }
 
     componentWillUnmount (){
-        this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
+        //this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
     }
 
     handleSelectedAttribute= (name:string):void=>{
