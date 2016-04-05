@@ -165,7 +165,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 				}
 				<HBox style={{flex: 1}}>
 					<VBox style={{flex: 1}}>
-						<WeaveTree initialSelectedItems={[this.state.selectedNode]} initialOpenItems={[root]} root={root} hideLeaves={true} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
+						<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} initialSelectedItems={[this.props.dataSource.getHierarchyRoot()]} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
 					</VBox>
 					<div style={{width: 10}}/>
 					{ 
@@ -191,6 +191,9 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	
 	renderDataPreview():JSX.Element
 	{
+		// delay the callbacks on the selected column
+		// Weave.getCallbacks(this.column).delayCallbacks();
+		
 		var leaves = this.parentNode && this.parentNode.getChildren().filter((n) => !n.isBranch());
 		if(!leaves)
 			return;
@@ -205,16 +208,12 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var names:string[] = columns.map(column => column.getMetadata("title"));
 		var format:any = _.zipObject(names, columns);
 		var columnTitles = _.zipObject(names, names);
+		
+		var rows = ColumnUtils.getRecords(format, null, String);
 
-		// // adding the qkey
-		// format[""] = IQualifiedKey;
-		// names.unshift("");
-		// (columnTitles as any)[""] = Weave.lang("Key");
-
-		//var rows = ColumnUtils.getRecords(columns, null, String);
 		return (
 			<VBox>
-				<FixedDataTable rows={[]} 
+				<FixedDataTable rows={rows} 
 								columnIds={names} 
 								idProperty="id"
 								showIdColumn={true}
@@ -240,11 +239,11 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var currentView:JSX.Element = null;
 		
 		if(this.state.view == BROWSE)
-			currentView = this.renderBrowseView()
+			currentView = this.renderBrowseView();
 		else if(this.state.view == PREVIEW)
-			currentView = this.renderDataPreview()
+			currentView = this.renderDataPreview();
 		else if (this.state.view == METADATA)
-			currentView = this.renderMetadataView()
+			currentView = this.renderMetadataView();
 
 		return (
 			<VBox style={{flex: 1}}>
