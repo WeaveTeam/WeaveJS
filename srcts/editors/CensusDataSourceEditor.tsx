@@ -63,7 +63,9 @@ export default class CensusDataSourceEditor extends React.Component<IDataSourceE
 			(result: { dataset: CensusRawDataset[] }) => { this.setState({ datasets: result.dataset }); }
 		);
 
-		ds.geographicScope.addGroupedCallback(this, this.updateRequiresAndOptional);
+		ds.dataSet.addGroupedCallback(this, this.forceUpdate);
+		ds.geographicFilters.addGroupedCallback(this, this.forceUpdate);
+		ds.geographicScope.addGroupedCallback(this, this.updateRequiresAndOptional, true);
 	}
 
 	updateRequiresAndOptional=()=>
@@ -189,24 +191,24 @@ export default class CensusDataSourceEditor extends React.Component<IDataSourceE
 			],
 			[
 				Weave.lang("Data Family"),
-				<StatefulComboBox onChange={this.dataFamilyChanged} triggerOnForcedChange={true}
+				<StatefulComboBox onChange={this.dataFamilyChanged} triggerOnForcedChange selectFirstOnInvalid
 					options={families}/>
 			],
 			[
 				Weave.lang("Year"),
-				<StatefulComboBox onChange={this.dataVintageChanged} triggerOnForcedChange={true}
+			<StatefulComboBox onChange={this.dataVintageChanged} triggerOnForcedChange selectFirstOnInvalid
 					options={vintages}/>
 			],
 			[
 				Weave.lang("Dataset"),
-				<VBox><StatefulComboBox onChange={this.dataSetChanged} ref={linkReactStateRef(this, { value: ds.dataSet }) } triggerOnForcedChange={true}
+				<VBox><StatefulComboBox onChange={this.dataSetChanged} ref={linkReactStateRef(this, { value: ds.dataSet }) } triggerOnForcedChange selectFirstOnInvalid
 					options={datasets}/>
 					<div>{datasetLabel}</div>
 				</VBox>
 			],
 			[
 				Weave.lang("Geographic Scope"),
-				<StatefulComboBox ref={linkReactStateRef(this, {value: ds.geographicScope })}
+				<StatefulComboBox ref={linkReactStateRef(this, {value: ds.geographicScope })} triggerOnForcedChange selectFirstOnInvalid
 					options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
 			],
 		];

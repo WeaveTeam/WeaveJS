@@ -29,10 +29,14 @@ export default class CensusGeographyFilter extends React.Component<CensusGeograp
 
 	onFilterChange=(geoLevel: string, value:string) =>
 	{
-		let filters: { [geoLevel: string]: string } = this.props.filterLinkableVariable.state as { [geoLevel: string]: string };
-		filters = typeof filters == typeof {} ? _.clone(filters) : {};
-		filters[geoLevel] = value;
-		this.props.filterLinkableVariable.state = filters;
+		let oldFilters: { [geoLevel: string]: string } = this.props.filterLinkableVariable.state as { [geoLevel: string]: string };
+		let newFilters: { [geoLevel: string]: string } = {};
+		if (oldFilters) for (let level of this.props.requires)
+		{
+			newFilters[level] = oldFilters[level];
+		}
+		newFilters[geoLevel] = value;
+		this.props.filterLinkableVariable.state = newFilters;
 	}
 
 	renderFilter=(scope:string):JSX.Element=>
