@@ -16,6 +16,11 @@ import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import ListOption from "../react-ui/List";
+import IColumnReference = weavejs.api.data.IColumnReference;
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import Column = FixedDataTable.Column;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|LinkableHashMap>
@@ -29,15 +34,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
     constructor (props:ISelectableAttributeComponentProps){
         super(props);
 
-        //TODO find better way to get the root hashmap
-        props.attributes.forEach((value, key)=>{
-            this.weaveRoot = Weave.getRoot(value); return;
-        });
-        this.rootTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
     }
-    private weaveRoot:ILinkableHashMap;
-    private rootTreeNode:IWeaveTreeNode;
-    columnString: string;
 
     static defaultProps = { showLabel: true };
 	
@@ -84,7 +81,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
                         <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
                             { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
-                            <AttributeSetter style={{flex:1}} node={ attribute } rootTreeNode={ this.rootTreeNode }></AttributeSetter>
+                            <AttributeDropdown style={{flex:1}} attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }></AttributeDropdown>
                             <span className={clearStyle}/>
                             <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
                         </HBox>
@@ -109,27 +106,47 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 //Custom component to handle drop down selection of columns as well as when selection from attribute selector
 //StatefulCombobox allows selection only from drop down, Does not handle case of attribute selector
-interface IAttributeSetterProps {
-    node:IColumnWrapper|LinkableHashMap;
-    rootTreeNode:IWeaveTreeNode;
-    style :React.CSSProperties;
+interface IAttributeDropdownProps extends React.HTMLProps<AttributeDropdown> {
+    attribute:DynamicColumn;
 }
 
-interface IAttributeSetterState {
-    selectedNode?:IColumnWrapper|LinkableHashMap;
+interface IAttributeDropdownState {
 }
 
-//TODO find better name
-class AttributeSetter extends React.Component<IAttributeSetterProps, IAttributeSetterState>{
-    constructor(props:IAttributeSetterProps){
+type LocalColumnMetadata = {[attr:string]: string};
+
+type JSONColumnReference = {
+    dataSource: string;
+    metadata: LocalColumnMetadata;
+}
+
+class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttributeDropdownState>{
+    constructor(props:IAttributeDropdownProps){
         super(props);
-        this.state= {selectedNode : this.props.node};
+        this.componentWillReceiveProps(props);
     }
 
-    siblings=(attribute:IColumnWrapper|LinkableHashMap): {label: string, value: IWeaveTreeNode}[] =>
+    componentWillReceiveProps(nextProps:IAttributeDropdownProps)
     {
-        var siblings:{label: string, value: IWeaveTreeNode}[];
-        var dc = ColumnUtils.hack_findInternalDynamicColumn(attribute as IColumnWrapper);
+        if (!this.props || (this.props.attribute != nextProps.attribute))
+        {
+            //this.props.attribute.removeCallback(this, this.forceUpdate);//when props are replaced, old callbacks removed
+            //nextProps.attribute.addGroupedCallback(this, this.forceUpdate);
+        }
+    }
+
+    componentWillUnmount(){
+        this.props.attribute.removeCallback(this, this.forceUpdate);//forceUpdate keeps being called when component is unmounted
+    }
+
+    state: IAttributeDropdownState = {selectedOption: null};
+
+    siblings=(attribute:IColumnWrapper): {label: string, id:string}[] =>
+    {
+        var siblings:{label: string, id:string}[];
+        var dc = ColumnUtils.hack_findInternalDynamicColumn(attribute);
+
+        if (!dc) return [];
 
         var meta = ColumnMetadata.getAllMetadata(dc);//gets metadata for a column
 
@@ -139,28 +156,74 @@ class AttributeSetter extends React.Component<IAttributeSetterProps, IAttributeS
         //if a column has not been set, datasource is not returned
         if (dataSource)
         {
-            var parentNode = HierarchyUtils.findParentNode(this.props.rootTreeNode, dataSource, meta);
+            var parentNode = HierarchyUtils.findParentNode(dataSource.getHierarchyRoot(), dataSource, meta);
             var siblingNodes = parentNode ? parentNode.getChildren() : [];
             if (siblingNodes)
-                siblings = siblingNodes.map((value:IWeaveTreeNode, index:number)=>{
-                    var label:string = value.getLabel();
-                    return({label, value});
+                siblings = siblingNodes.map((node:IWeaveTreeNode)=>{
+                    return {label: node.getLabel(), id: this.getColumnReferenceString(node)};
                 });
         }
 
         return siblings;
     };
 
-    render():JSX.Element{
-        let columnString = ColumnUtils.getColumnListLabel(this.props.node as IColumnWrapper);//TODO how o display this
-        let siblings = this.siblings(this.props.node);
+    getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper):string=>
+        {
+            var metadata:{[attr:string]:string};
+            // If it's an IColumnWrapper, we need to normalize it to a treenode so we get the minimal reference metadata
+            if (!Weave.IS(node, IWeaveTreeNode))
+            {
+                let icw = node as IColumnWrapper;
+                metadata = ColumnMetadata.getAllMetadata(icw);
+                let dataSources = ColumnUtils.getDataSources(icw);
+                let dataSource = dataSources[0] as IDataSource;
+                if (!dataSource)
+                {
+                    console.log("The column", icw, "has no datasource.");
+                    return null;
+                }
+            node = dataSource.findHierarchyNode(metadata);
+        }
 
-        var options:JSX.Element[] = siblings.map((option:{label:string, value:IWeaveTreeNode})=>{
-            return(<option>{ option.label }</option>);
-        });
+        let colRef = Weave.AS(node as IWeaveTreeNode, weavejs.api.data.IColumnReference);
+        let dataSource = colRef.getDataSource();
+        let dataSourceName = (Weave.getOwner(dataSource) as ILinkableHashMap).getName(dataSource);
+
+        return Weave.stringify({dataSource: dataSourceName, metadata: colRef.getColumnMetadata()});
+    };
+
+    getColumnReference = (columnReferenceString: string):IColumnReference=>
+    {
+        let jsonColumnReference = JSON.parse(columnReferenceString) as JSONColumnReference;
+        let dataSource = Weave.getRoot(this.props.attribute).getObject(jsonColumnReference.dataSource) as IDataSource;
+        return Weave.AS(dataSource.findHierarchyNode(jsonColumnReference.metadata), IColumnReference);
+    };
+
+    onChange=(event:React.FormEvent)=>
+    {
+        let columnString = (event.target as HTMLSelectElement).value;
+        let columnReference = this.getColumnReference(columnString);
+        this.props.attribute
+            .requestLocalObject(ReferencedColumn)
+            .setColumnReference(columnReference.getDataSource(), columnReference.getColumnMetadata());
+    };
+
+    render():JSX.Element{
+        var options:JSX.Element[];
+        var disabled:boolean = false;
+        let currentColumnEntryId = this.getColumnReferenceString(this.props.attribute);
+
+        let columnEntry = {label: this.props.attribute.getMetadata(ColumnMetadata.TITLE), id: currentColumnEntryId};
+        let siblings = this.siblings(this.props.attribute);
+        if(siblings)
+             options = siblings.map((option:{label:string, id:string}, index:number)=>{
+                return(<option value={ option.id } key={ option.id }>{ option.label }</option>);
+            });
+
+        if(!options){ options = []; disabled = true;}
 
         return(<VBox style={ this.props.style }>
-                <select>{ options }</select>
+             <select disabled={ disabled } value={ columnEntry.id } onChange={this.onChange}>{ options }</select>
             </VBox>);
     }
 }
