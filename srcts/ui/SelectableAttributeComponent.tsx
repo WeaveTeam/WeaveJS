@@ -81,7 +81,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
                         <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
                             { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
-                            <AttributeDropdown style={{flex:1}} attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }></AttributeDropdown>
+                            <AttributeDropdown style={{flex:1}} attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
+                                               clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
                             <span className={clearStyle}/>
                             <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
                         </HBox>
@@ -108,6 +109,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 //StatefulCombobox allows selection only from drop down, Does not handle case of attribute selector
 interface IAttributeDropdownProps extends React.HTMLProps<AttributeDropdown> {
     attribute:DynamicColumn;
+    clickHandler:(event:React.MouseEvent)=>PopupWindow;
 }
 
 interface IAttributeDropdownState {
@@ -140,6 +142,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
     }
 
     state: IAttributeDropdownState = {selectedOption: null};
+    private click:(event:React.MouseEvent)=>PopupWindow = null;
 
     siblings=(attribute:IColumnWrapper): {label: string, id:string}[] =>
     {
@@ -211,19 +214,26 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
     render():JSX.Element{
         var options:JSX.Element[];
         var disabled:boolean = false;
-        let currentColumnEntryId = this.getColumnReferenceString(this.props.attribute);
 
+        let currentColumnEntryId = this.getColumnReferenceString(this.props.attribute);
         let columnEntry = {label: this.props.attribute.getMetadata(ColumnMetadata.TITLE), id: currentColumnEntryId};
+
         let siblings = this.siblings(this.props.attribute);
         if(siblings)
              options = siblings.map((option:{label:string, id:string}, index:number)=>{
                 return(<option value={ option.id } key={ option.id }>{ option.label }</option>);
             });
 
-        if(!options){ options = []; disabled = true;}
+        if(!options){
+            var defaultEntry = <option>Click here to select</option>;
+            options = [defaultEntry];
+            //disabled = true;
+            this.click = this.props.clickHandler;
+        }
 
         return(<VBox style={ this.props.style }>
-             <select disabled={ disabled } value={ columnEntry.id } onChange={this.onChange}>{ options }</select>
+             <select disabled={ disabled } value={ columnEntry.id } onClick={ this.click } onChange={ this.onChange } >
+                 { options }</select>
             </VBox>);
     }
 }
