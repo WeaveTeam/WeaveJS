@@ -42,7 +42,7 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	showIdColumn?:boolean;
 	rowHeight?:number;
 	headerHeight?:number;
-	columnWidth?:number;
+	initialColumnWidth?:number;
 }
 
 export interface IFixedDataTableState
@@ -161,13 +161,13 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		showIdColumn:false,
 		rowHeight:30,
 		headerHeight:30,
-		columnWidth:85
+		initialColumnWidth: 85
 	};
 
 	constructor(props:IFixedDataTableProps)
 	{
 		super(props);
-		var columnWidths = _.zipObject(props.columnIds, this.props.columnIds.map((id)=>{return this.props.columnWidth})) as { [columnId: string]: number; };
+		var columnWidths = _.zipObject(props.columnIds, this.props.columnIds.map((id)=>{return this.props.initialColumnWidth})) as { [columnId: string]: number; };
 		var sortIndices:number[] = this.props.rows.map((row, index) => index);
 
 		if(props.selectedIds && props.probedIds)
@@ -409,7 +409,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 													{...props}
 												/>)
 											}
-											width={this.state.columnWidths[id] ? this.state.columnWidths[id]:this.props.columnWidth}
+											width={this.state.columnWidths[id]}
 											isResizable={true}
 										/>
 									);
