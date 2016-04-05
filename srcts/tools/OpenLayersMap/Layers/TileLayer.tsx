@@ -121,7 +121,7 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 			return <VBox>
 				{Weave.lang("Provider") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 				{Weave.lang("Layer") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.tempLayer }) }
-					options={layers.map((name) => { return { label: lodash.startCase(name), value: name }; }) }/>
+					options={layers ? layers.map((name) => { return { label: lodash.startCase(name), value: name }; }) : [] }/>
 			</VBox>
 		}
 	}
@@ -131,8 +131,8 @@ export default class TileLayer extends AbstractLayer
 {
 	oldProviderName:string;
 
-	provider = Weave.linkableChild(this, LinkableString);
-	providerOptions = Weave.linkableChild(this, LinkableVariable);
+	provider = Weave.linkableChild(this, new LinkableString("osm"));
+	providerOptions = Weave.linkableChild(this, new LinkableVariable(Object, null, {}));
 
 	renderEditor():JSX.Element
 	{
