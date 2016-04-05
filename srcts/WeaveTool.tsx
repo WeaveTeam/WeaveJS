@@ -31,6 +31,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	onMaximizeClick?:(tool:IVisTool)=>void;
 	onCloseClick?:(tool:IVisTool)=>void;
 	onPopoutClick?:(tool:IVisTool)=>void;
+	onPopinClick?:(tool:IVisTool)=>void;
 }
 
 export interface IWeaveToolState
@@ -116,6 +117,12 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			this.props.onPopoutClick(this.watcher.target as IVisTool);
 	};
 
+	onPopinClick=():void=>
+	{
+		if(this.props.onPopinClick)
+			this.props.onPopinClick(this.watcher.target as IVisTool);
+	};
+
 	render():JSX.Element
 	{
 		return (
@@ -136,7 +143,8 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 						  title={Weave.lang(this.state.title)}
 						  onGearClick={this.onGearClick}
 						  onMaximizeClick={this.onMaximizeClick}
-						  onPopoutClick={this.onPopoutClick}
+						  onPopoutClick={this.props.onPopoutClick && this.onPopoutClick}
+						  onPopinClick={this.props.onPopinClick && this.onPopinClick}
 						  onCloseClick={this.onCloseClick}
 						  />
 				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
@@ -158,6 +166,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	onGearClick:React.MouseEventHandler;
 	onMaximizeClick:React.MouseEventHandler;
 	onPopoutClick:React.MouseEventHandler;
+	onPopinClick:React.MouseEventHandler;
 	onCloseClick:React.MouseEventHandler;
 }
 
@@ -185,8 +194,8 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 
 				<CenteredIcon onClick={this.props.onMaximizeClick}
 							  iconProps={{className: "fa fa-expand fa-fw"}}/>
-				<CenteredIcon onClick={this.props.onPopoutClick}
-							  iconProps={{className: "fa fa-external-link fa-fw"}}/>
+				<CenteredIcon onClick={this.props.onPopoutClick || this.props.onPopinClick}
+							  iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}/>
 			    <CenteredIcon onClick={this.props.onCloseClick}
 							  iconProps={{className: "fa fa-times fa-fw"}}/>
 			</HBox>

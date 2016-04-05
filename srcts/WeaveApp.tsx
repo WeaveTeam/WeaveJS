@@ -108,18 +108,49 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	
 	handlePopoutClick(path:WeavePathArray):void
 	{
-		this.removeFromLayout(path);
-		var tool:JSX.Element = (
-			<WeaveComponentRenderer
-				weave={this.props.weave}
-				path={path}
-				style={{ width: "100%", height: "100%" }}
-			/>
-		);
-		var onBeforeUnLoad:Function = () => { this.addToLayout(path) };
+		var popoutWindow:Window;
+		var onBeforeUnLoad:Function = () => { };
 		var onLoad:Function = () => { };
 		var options:any = { transferStyle: true };
-		var popoutWindow = ReactUtils.openPopout(tool, onLoad, onBeforeUnLoad, options);
+		var isMaximized:boolean = false, screenWidth:number, screenHeight:number;
+
+		this.removeFromLayout(path);
+		var tool:JSX.Element = (
+			<WeaveTool
+				weave={this.props.weave}
+				path={path}
+				style={{width: "100%", height: "100%"}}
+				onGearClick={this.handleGearClick}
+				onMaximizeClick={() => {
+					if (isMaximized){
+						isMaximized = false;
+						popoutWindow.resizeTo(screenWidth,screenHeight);
+				   }else{
+						isMaximized = true;
+						screenWidth = popoutWindow.innerWidth;
+						screenHeight = popoutWindow.innerHeight;
+						popoutWindow.moveTo(0,0);
+						popoutWindow.resizeTo(screen.availWidth,screen.availHeight);
+				   }
+				}}
+				onPopinClick={() => {
+					this.addToLayout(path);
+					popoutWindow.close();
+				}}
+				onCloseClick={() => popoutWindow.close()}
+				onDragEnd={() => {}}
+				onDragStart={() => {}}
+				onDragOver={() => {}}
+			>
+				<WeaveComponentRenderer
+					weave={this.props.weave}
+					path={path}
+					style={{ width: "100%", height: "100%" }}
+					props={{itemRenderer: this.renderTool}}
+				/>
+			</WeaveTool>
+		);
+		popoutWindow = ReactUtils.openPopout(tool, onLoad, onBeforeUnLoad, options);
 
 	}
 
