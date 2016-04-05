@@ -59,7 +59,7 @@ export default class ReactUtils
 				}
 			}
 
-			popoutWindow.document.title = windowOptions.title;
+			popoutWindow.document.title = windowOptions.windowName || "Exported Weave Tool";
 			container = popoutWindow.document.createElement('div');
 			container.id = divId;
 			popoutWindow.document.body.appendChild(container);
