@@ -1,5 +1,5 @@
 import * as React from 'react';
-import {IVisTool,IVisToolState, IVisToolProps} from "../IVisTool";
+import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "../IVisTool";
 import {HBox, VBox} from "../../react-ui/FlexBox";
 import ReactUtils from "../../utils/ReactUtils";
 import StatefulComboBox from "../../ui/StatefulComboBox";
@@ -9,6 +9,7 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import WeaveAPI = weavejs.WeaveAPI;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
 export interface IAttributeMenuToolState extends IVisToolState{
 
@@ -18,6 +19,8 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 {
     private openTools:any [];
     private weaveRoot :ILinkableHashMap;
+    private choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+
     constructor (props:IVisToolProps){
         super(props);
         this.state = {};
@@ -41,7 +44,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
     get selectableAttributes()
     {
-        return new Map<string, IColumnWrapper | LinkableHashMap>();
+        return new Map<string, IColumnWrapper | LinkableHashMap>().set("Choices", this.choices);
     }
 
     get toolConfigs():[string, JSX.Element][]{
@@ -52,6 +55,8 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
             ]
         ];
     }
+
+
 
     renderEditor():JSX.Element{
         var tableStyles = {
@@ -64,6 +69,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
         return(<VBox>
             { this.openTools ? ReactUtils.generateTable(null, this.toolConfigs, tableStyles): null}
+            { renderSelectableAttributes(this) }
         </VBox>);
     }
 
