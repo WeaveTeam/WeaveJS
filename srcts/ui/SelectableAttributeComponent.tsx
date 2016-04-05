@@ -224,11 +224,15 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
                 return(<option value={ option.id } key={ option.id }>{ option.label }</option>);
             });
 
+        //register the click handler only when options are absent
         if(!options){
             var defaultEntry = <option>Click here to select</option>;
             options = [defaultEntry];
             //disabled = true;
             this.click = this.props.clickHandler;
+        }
+        else{//once siblings retrieved , unregister it
+            this.click = null;
         }
 
         return(<VBox style={ this.props.style }>
