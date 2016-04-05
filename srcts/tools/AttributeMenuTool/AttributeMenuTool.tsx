@@ -36,9 +36,15 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
         this.openTools = [];
 
         this.weaveRoot.getObjects().forEach((tool:any):void=>{ if(tool.selectableAttributes)
-            this.openTools.push(this.weaveRoot.getName(tool));
+            this.openTools.push({label:this.weaveRoot.getName(tool), value:tool});
         });
 
+        console.log("open tools", this.openTools);
+    };
+
+    //TODO Figure out this issue
+    handleToolChange = (selectedItem:{label:string, value:IVisTool}):void => {
+        var selectedTool = selectedItem.value as IVisTool;
     };
 
 
@@ -51,7 +57,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
         return[
             [
                 Weave.lang("Visualization Tool"),
-                <StatefulComboBox options={ this.openTools }/>
+                <StatefulComboBox options={ this.openTools } onChange={ this.handleToolChange } />
             ]
         ];
     }
