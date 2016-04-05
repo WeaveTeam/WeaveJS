@@ -23,11 +23,19 @@ export default class StatefulComboBox extends SmartComponent<StatefulComboBoxPro
 		super(props);
 	}
 
+	triggerChangeNextRender: boolean = false;
+
 	componentWillReceiveProps(nextProps: StatefulComboBoxProps)
 	{
 		if (nextProps.value)
 		{
 			this.setState({value: nextProps.value});
+		}
+
+		if (nextProps.options != this.props.options)
+		{
+			console.log("Triggering change next render");
+			this.triggerChangeNextRender = true;
 		}
 	}
 
@@ -37,7 +45,9 @@ export default class StatefulComboBox extends SmartComponent<StatefulComboBoxPro
 		let index = Number((event.target as HTMLSelectElement).value)
 		let option = this.props.options[index];
 		let value: any;
+
 		value = (typeof option === "object") ? option.value : option;
+		console.log("handleInputChange", value);
 
 		if (this.props.onChange) this.props.onChange(value);
 		this.setState({value});
@@ -73,13 +83,16 @@ export default class StatefulComboBox extends SmartComponent<StatefulComboBoxPro
 
 		let index = this.findOptionIndex(this.state.value);
 		let refFunc: (c: HTMLSelectElement) => void = (c: HTMLSelectElement) => { };
-		if (index == -1)
+		if (index == -1 || this.triggerChangeNextRender)
 		{
-			if (this.props.selectFirstOnInvalid) {
+			if (this.props.selectFirstOnInvalid && index == -1) {
 				index = 0;
 			}
-			if (props.triggerOnForcedChange) {
-				refFunc = (c: HTMLSelectElement) => c && c.dispatchEvent(new Event('change'));
+			if (props.triggerOnForcedChange && this.props.onChange) {
+				let option = this.props.options[index];
+				let value = (typeof option === "object") ? option.value : option;
+				this.props.onChange(value);
+				this.triggerChangeNextRender = false;
 			}
 		}
 
