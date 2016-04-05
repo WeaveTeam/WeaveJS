@@ -38,7 +38,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		super(props);
 		this.componentWillReceiveProps(props);
 		this.state = {
-			selectedNode: null
+			selectedNode: props.dataSource.getHierarchyRoot()
 		}
 	}
 	
@@ -143,10 +143,11 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	
 	renderBrowseView():JSX.Element
 	{
+		let root = this.props.dataSource.getHierarchyRoot();
 		return (
 			<HBox style={{flex: 1}}>
 				<VBox style={{flex: 1}}>
-					<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
+					<WeaveTree initialSelectedItems={[this.state.selectedNode]} initialOpenItems={[root]} root={root} hideLeaves={true} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
 				</VBox>
 				<div style={{width: 10}}/>
 				{ 
