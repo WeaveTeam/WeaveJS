@@ -32,7 +32,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	private tableContainer:VBox;
 	private tableContainerElement:HTMLElement;
 	protected tree:WeaveTree;
-
+	protected editorButtons:Map<React.ReactChild, Function>;
+	
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
@@ -107,11 +108,18 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			this.columnWatcher.target = null;
 		}
 	}
+	
+	componentWillUpdate()
+	{
+		if(this.tableContainer)
+			this.tableContainerElement = ReactDOM.findDOMNode(this.tableContainer) as HTMLElement;
+	}
 
 	renderPreviewTable():JSX.Element
 	{
 		if(!this.column)
 			return;
+
 
 		var rows = ColumnUtils.getRecords({
 			id: IQualifiedKey,
@@ -128,14 +136,17 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var columnIds = ["id", "value"];
 		var columnTitles:IColumnTitles = {id: Weave.lang("Key ({0})", keyType), value: Weave.lang("Value ({0})", dataType)};
 		return (
-			<VBox style={{flex: rows.length ? 1 : 0}}>
+			<VBox style={{flex: rows.length ? 1 : 0}} ref={(c:VBox) => this.tableContainer = c}>
 				<span style={{marginTop: 5, marginBottom: 5}}>{Weave.lang("Selected column has {0} records", rows.length)}</span>
-				<FixedDataTable  rows={rows} 
-								 columnIds={columnIds} 
-								 idProperty="id"
-								 showIdColumn={true}
-								 columnWidth={85}
-								 columnTitles={columnTitles}/>
+				{
+					this.tableContainerElement &&
+					<FixedDataTable rows={rows} 
+								 	columnIds={columnIds} 
+								 	idProperty="id"
+								 	showIdColumn={true}
+								 	initialColumnWidth={this.tableContainerElement.clientWidth/2}
+								 	columnTitles={columnTitles}/>
+				}
 			</VBox>
 		)
 	}
