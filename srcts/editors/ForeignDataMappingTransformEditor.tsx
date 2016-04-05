@@ -27,7 +27,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 		let ds = (this.props.dataSource as ForeignDataMappingTransform);
 
 		let keyMap = new Map<string, (IColumnWrapper|LinkableHashMap)>();
-		keyMap.set("alpha", ds.keyColumn as IColumnWrapper);
+		keyMap.set("Foreign key mapping", ds.keyColumn as IColumnWrapper);
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
@@ -37,11 +37,11 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 						{Weave.lang("Each value in this column will be used as the key to look up records in the data columns")}
 					</HelpIcon>
 				</span>, 
-				<SelectableAttributeComponent showLabel={ false } attributes={ keyMap }/>
+				<SelectableAttributeComponent attributes={ keyMap }/>
 			],
 			[
 				<span>{Weave.lang("Data to transform")}</span>,
-				<SelectableAttributesList label="alpha" columns={ds.dataColumns as LinkableHashMap} showLabelAsButton={true}/>
+				<SelectableAttributesList label="Data to transform" columns={ds.dataColumns as LinkableHashMap} showLabelAsButton={true}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)

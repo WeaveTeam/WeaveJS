@@ -49,7 +49,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Data to transform"),
-				<SelectableAttributesList label="alpha" columns={ds.dataColumns as LinkableHashMap} showLabelAsButton={true}/>
+				<SelectableAttributesList label="Data to transform" columns={ds.dataColumns as LinkableHashMap} showLabelAsButton={true}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)
