@@ -124,7 +124,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		if (!raw_datasets || !family || !vintage) return [{ value: ds.dataSet.value, label: ds.dataSet.value}];
 
 		let filterFunc = (dataset: CensusRawDataset) => CensusDataSourceEditor.isInFamily(family, dataset) && CensusDataSourceEditor.isOfVintage(vintage, dataset);
-		let makeEntry = (dataset: CensusRawDataset) => { return { value: dataset.identifier, label: _.trunc(dataset.title, { omission: "…", length: 50 }) }; };
+		let makeEntry = (dataset: CensusRawDataset) => { return { value: dataset.identifier, label: dataset.title }; };
 
 		return _.sortBy(raw_datasets.filter(filterFunc).map(makeEntry), "label");
 	}
