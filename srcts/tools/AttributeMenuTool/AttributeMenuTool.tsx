@@ -64,7 +64,7 @@ interface IAttributeMenuTargetEditorProps {
 }
 
 interface IAttributMenuToolEditorState {
-    targetTool?:string;
+    targetTool?:IVisTool;
     targetAttribute?:string;
     menuLayout?:string;
 }
@@ -87,31 +87,32 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
     private weaveRoot:ILinkableHashMap;
 
     getOpenVizTools=():void =>{
-        this.openTools = ['Select a Visualization tool'];
+        this.openTools = ['Select a Visualization Tool'];
 
-        this.weaveRoot.getObjects().forEach((tool:any):void=>{ if(tool.selectableAttributes)
-            this.openTools.push({label:this.weaveRoot.getName(tool), value:tool});
+        this.weaveRoot.getObjects().forEach((tool:any):void=>{
+            if(tool.selectableAttributes && tool != this.props.attributeMenuTool)
+                this.openTools.push({label:this.weaveRoot.getName(tool), value:tool});
         });
     };
 
-    handleToolChange = (selectedItem:{label:string, value:IVisTool}):void => {
-        let targetToolName = this.weaveRoot.getName(selectedItem);
-        this.setState({targetTool:targetToolName});
+    handleToolChange = (selectedItem:IVisTool):void => {
+        //let targetToolName = this.weaveRoot.getName(selectedItem);
+        this.setState({targetTool:selectedItem});
     };
 
-    getTargetToolAttributes =():{label:string, value:any}[] =>{
-        let attributes:{label:string, value:any}[] =[];
+    getTargetToolAttributes =():void =>{
+        this.targetToolAttributes =[];
 
         if(this.state.targetTool){
-            let attributesObj = (this.weaveRoot.getObject(this.state.targetTool) as IVisTool).selectableAttributes;
+            let attributesObj = (this.state.targetTool as IVisTool).selectableAttributes;
             attributesObj.forEach((value:ILinkableHashMap|IColumnWrapper, key:string):void=>{
-                attributes.push({label:key, value:value});
+                this.targetToolAttributes.push({label:key, value:value});
             });
         }
-        return attributes;
     };
 
     get toolConfigs():[string, JSX.Element][]{
+        console.log('targetTool in render editor', this.state.targetTool);
         return[
             [
                 Weave.lang("Visualization Tool"),
@@ -137,8 +138,8 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
             ]
         };
 
-        this.targetToolAttributes = this.getTargetToolAttributes();
-        console.log('ta', this.targetToolAttributes);
+        this.getTargetToolAttributes();
+        console.log('targetTool in redner', this.state.targetTool);
 
         return(<VBox>
             { this.openTools ? ReactUtils.generateTable(null, this.toolConfigs, tableStyles): null}
