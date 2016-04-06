@@ -8,6 +8,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import FileSelector from "../ui/FileSelector";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import KeyTypeInput from "../ui/KeyTypeInput";
 
 import DBFDataSource = weavejs.data.source.DBFDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -22,7 +23,6 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let dataSource = this.props.dataSource as DBFDataSource;
-		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("DBF URL"),
@@ -50,9 +50,7 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Key Type"),
-				<StatefulTextField selectOnFocus={true} 
-							   	   suggestions={keyTypeSuggestions}
-							   	   ref={linkReactStateRef(this, { content: dataSource.keyType })}/>
+				<KeyTypeInput keyTypeProperty={dataSource.keyType}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)

@@ -67,7 +67,6 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	renderFields():JSX.Element
 	{
 		let dataSource = this.props.dataSource;
-		let keyTypeSuggestions = WeaveAPI.QKeyManager.getAllKeyTypes();
 		
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},

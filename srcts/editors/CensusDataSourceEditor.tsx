@@ -9,6 +9,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import CensusGeographyFilter from "./CensusGeographyFilter";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import KeyTypeInput from "../ui/KeyTypeInput";
 
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import EntityType = weavejs.api.data.EntityType;
@@ -165,7 +166,6 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 
 	get editorFields(): [string, JSX.Element][] {
 		let ds = (this.props.dataSource as CensusDataSource);
-		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 		this.api = ds.getAPI();
 		let families = this.getDataFamilies();
 		let vintages = this.getDataVintages(this.state.dataFamily);
@@ -179,9 +179,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Key Type"),
-				<StatefulTextField selectOnFocus={true}
-					ref={linkReactStateRef(this, { content: ds.keyType }) }
-					suggestions={keyTypeSuggestions}/>
+				<KeyTypeInput keyTypeProperty={ds.keyType}/>
 			],
 			[
 				Weave.lang("Data Family"),

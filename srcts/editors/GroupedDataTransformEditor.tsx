@@ -10,6 +10,7 @@ import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import KeyTypeInput from "../ui/KeyTypeInput";
 
 import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
@@ -22,7 +23,6 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as GroupedDataTransform);
-		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 
 		let groupByMap = new Map<string, (IColumnWrapper|LinkableHashMap)>();
 		groupByMap.set("alpha", ds.groupByColumn as IColumnWrapper);
@@ -45,8 +45,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 						{Weave.lang('Specifies the keyType of the foreign keys referenced by the "Group by" column. By default, the dataType of the "Group by" column is used as the foreign keyType.')}
 					</HelpIcon>
 				</div>,
-				<StatefulTextField selectOnFocus={true} 
-								   ref={linkReactStateRef(this, { content: ds.groupKeyType }) }/>
+				<KeyTypeInput keyTypeProperty={ds.groupKeyType}/>
 			],
 			[
 				Weave.lang("Data to transform"),

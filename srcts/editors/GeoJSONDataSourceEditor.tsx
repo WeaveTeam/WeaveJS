@@ -6,6 +6,7 @@ import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import FileSelector from "../ui/FileSelector";
+import KeyTypeInput from "../ui/KeyTypeInput";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
@@ -22,7 +23,6 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let dataSource = (this.props.dataSource as GeoJSONDataSource);
-		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("GeoJSON URL"),
@@ -47,9 +47,7 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Key Type"),
-				<StatefulTextField selectOnFocus={true} 
-							   suggestions={keyTypeSuggestions}
-							   ref={linkReactStateRef(this, { content: dataSource.keyType })}/>
+				<KeyTypeInput keyTypeProperty={dataSource.keyType}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)

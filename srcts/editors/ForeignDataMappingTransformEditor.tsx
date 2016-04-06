@@ -25,7 +25,6 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as ForeignDataMappingTransform);
-		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 
 		let keyMap = new Map<string, (IColumnWrapper|LinkableHashMap)>();
 		keyMap.set("alpha", ds.keyColumn as IColumnWrapper);
