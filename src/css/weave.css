@@ -390,19 +390,23 @@ input[type="text"]:focus {
 
 .weave-tree-view {
 	user-select: none;
+	cursor:pointer;
 	-webkit-user-select: none;
 }
 
 .weave-tree-view:hover {
 	background-color: rgba(153, 214, 255, 0.4);
+    cursor:pointer;
 }
 
 .weave-tree-view.selected {
 	background-color: #80CCFF;
+    cursor:pointer;
 }
 
 .weave-tree-view.selected:hover {
 	background-color: #99D6FF;
+    cursor:pointer;
 }
 
 span.weave-tree-view.open {
