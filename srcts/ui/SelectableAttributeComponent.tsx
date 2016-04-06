@@ -171,11 +171,11 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
     };
 
     getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper):string=>
-        {
-            var metadata:{[attr:string]:string};
+    {
+        var metadata:{[attr:string]:string};
             // If it's an IColumnWrapper, we need to normalize it to a treenode so we get the minimal reference metadata
-            if (!Weave.IS(node, IWeaveTreeNode))
-            {
+        if (!Weave.IS(node, IWeaveTreeNode))
+        {
                 let icw = node as IColumnWrapper;
                 metadata = ColumnMetadata.getAllMetadata(icw);
                 let dataSources = ColumnUtils.getDataSources(icw);
@@ -188,6 +188,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
             node = dataSource.findHierarchyNode(metadata);
         }
 
+        if(!node) return;
         let colRef = Weave.AS(node as IWeaveTreeNode, weavejs.api.data.IColumnReference);
         let dataSource = colRef.getDataSource();
         let dataSourceName = (Weave.getOwner(dataSource) as ILinkableHashMap).getName(dataSource);
@@ -225,7 +226,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
             });
 
         //register the click handler only when options are absent
-        if(!options){
+        if(!options || options.length ==0 ){
             var defaultEntry = <option>Click here to select</option>;
             options = [defaultEntry];
             //disabled = true;
