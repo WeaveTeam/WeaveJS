@@ -77,6 +77,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		this.radiusNorm.min.value = 3;
 		this.radiusNorm.max.value = 25;
 
+		this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
+
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
