@@ -387,6 +387,9 @@ input[type="text"]:focus {
     color: #000000;
     font-size: 60%;
 }
+.weave-tree-view-icon-expander.hidden-expander::before {
+	content: " ";
+}
 
 .weave-tree-view {
 	user-select: none;

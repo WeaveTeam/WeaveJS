@@ -149,13 +149,14 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	static OPEN_BRANCH_ICON_CLASSNAME = "weave-tree-view-icon fa fa-folder-open fa-fw";
 	static EXPANDER_CLOSED_CLASS_NAME = "weave-tree-view-icon-expander fa fa-play fa-fw";
 	static EXPANDER_OPEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-play fa-fw fa-rotate-90";
+	static EXPANDER_HIDDEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-fw hidden-expander";
 
 	private renderItem=(node:ExtendedIWeaveTreeNode, index:number):JSX.Element=>
 	{
 		let className = WeaveTree.CLASSNAME;
 		let iconClassName = WeaveTree.LEAF_ICON_CLASSNAME;
 		let iconClickFunc: React.MouseEventHandler = null;
-		let expanderClassName:string = null;
+		let expanderClassName: string = WeaveTree.EXPANDER_HIDDEN_CLASS_NAME;
 
 		let isOpen = this.getOpen(node);
 		let isSelected = this.getSelected(node);
@@ -193,8 +194,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 									onMouseDown={ iconClickFunc }
 									onDoubleClick={(e) => e.stopPropagation()}
 									className={ expanderClassName }
-									style={{display: expanderClassName ? null : "none", alignSelf: "center"}}
-								/>
+									style={{alignSelf: "center"}}
+								></i>
 							</span>
 							<span style={{alignSelf: "stretch", display: "flex"}}>
 								<i
