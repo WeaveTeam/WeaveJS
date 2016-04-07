@@ -1,8 +1,12 @@
 import * as React from "react";
 import {MenuBarItemProps} from "../react-ui/MenuBar";
 import {MenuItemProps} from "../react-ui/Menu";
+import PopupWindow from "../react-ui/PopupWindow";
 import IVisTool = weavejs.api.ui.IVisTool;
 import * as WeaveUI from "../WeaveUI";
+
+import ColorController from "../editors/ColorController";
+import ColorColumn = weavejs.data.column.ColorColumn;
 
 export default class ToolsMenu implements MenuBarItemProps
 {
@@ -28,12 +32,20 @@ export default class ToolsMenu implements MenuBarItemProps
 			WeaveUI.DataFilterTool
 		];
 		
-		this.menu = impls.map(impl => {
+		this.menu = [
+			{
+				label: Weave.lang("Color Controller"),
+				click: () => this.openColorController()
+			},
+			{}
+		];
+		
+		impls.forEach(impl => {
 			var name = registry.getDisplayName(impl);
-			return {
+			this.menu.push({
 				label: Weave.lang('+ {0}', name),
 				click: this.createObject.bind(this, impl)
-			};
+			});
 		});
 		this.createObject = createObject;
 	}
@@ -42,4 +54,15 @@ export default class ToolsMenu implements MenuBarItemProps
 	weave:Weave;
 	menu:MenuItemProps[];
 	createObject:(type:new(..._:any[])=>any)=>void;
+	
+	openColorController()
+	{
+		PopupWindow.open({
+			title: Weave.lang("Color Controller"),
+			content: <ColorController colorColumn={this.weave.getObject("defaultColorColumn") as ColorColumn}/>,
+			resizable: true,
+			width: 800,
+			height: 600
+		})
+	}
 }

@@ -5,6 +5,7 @@ import {HBox, VBox} from "./FlexBox";
 import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "./VendorPrefixer";
+import CenteredIcon from "./CenteredIcon";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 
@@ -160,9 +161,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 					{
 						!this.props.modal
 						? 
-							<div onClick={this.onCancel.bind(this)} className="weave-icon">
-							{ "\u00d7" }
-							</div>
+							<CenteredIcon onClick={this.onCancel.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
 						:
 							''
 					}
