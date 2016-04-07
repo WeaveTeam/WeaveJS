@@ -1,18 +1,19 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
+import {HBox, VBox} from "./FlexBox";
+import CenteredIcon from "./CenteredIcon";
 import ReactUtils from "../utils/ReactUtils";
 
-export interface SideBarProps extends React.HTMLProps<SideBar>
+export interface SideBarProps extends React.HTMLProps<HTMLDivElement>
 {
-    closeHandler:(open:boolean)=>void;
-    direction?:string;
-    open?:boolean;
+	onClose:React.MouseEventHandler;
+    location:string;
 }
 
 export interface SideBarState
 {
-    open:boolean
+
 }
 
 /**
@@ -23,86 +24,63 @@ export default class SideBar extends React.Component<SideBarProps, SideBarState>
     constructor(props:SideBarProps)
     {
         super(props);
-
-        this.state = {
-            open:this.props.open === undefined? false:this.props.open
-        };
-
-        this.onCloseClick = this.onCloseClick.bind(this);
-    }
-
-    onCloseClick(){
-        this.setState({open: !this.state.open});
-        if(this.props.closeHandler)this.props.closeHandler(!this.state.open);
-    }
-
-    componentWillReceiveProps(nextProps:SideBarProps){
-        if(this.props.open != nextProps.open){
-            this.setState({open:nextProps.open});
-        }
     }
 
     render()
     {
-        if(!this.state.open)
-            return <div/>;
 
         var defaultStyle:React.CSSProperties = {
-            position: "absolute",
-            display:"flex",
             overflow:"auto",
-            background:"#f8f8f8"
+            background:"#f8f8f8"/* move to css */
         };
+		
+		var closeIconStyle:React.CSSProperties = {
+			justifyContent: (this.props.location == "right" || this.props.location == "bottom") ? "flex-start":"flex-end"
+		}
 
-        var closeIconStyle:React.CSSProperties = {
-            order: -1,
-            fontSize:"24",
-            color:"grey",
-            margin:"4px"
-        };
-
-        if(this.props.direction == "left" || this.props.direction == "right" || !this.props.direction)
+        if(this.props.location == "left" || this.props.location == "right")
         {
-            defaultStyle["flexDirection"] = "column";
-            if(this.props.direction == "right")
+            defaultStyle.flexDirection = "column";
+            if(this.props.location == "right")
             {
-                defaultStyle["right"]= 0;
-                defaultStyle["borderLeft"]= "1px solid lightGrey";
+                defaultStyle.right = 0;
+                defaultStyle.borderLeft = "1px solid lightGrey";
             }
             else
             {
-                defaultStyle["left"]= 0;
-                defaultStyle["borderRight"]= "1px solid lightGrey";
+                defaultStyle.left = 0;
+                defaultStyle.borderRight = "1px solid lightGrey";
             }
-            closeIconStyle["alignSelf"] = this.props.direction == "right"? "flex-start":"flex-end";
         }
-        else if(this.props.direction == "top" || this.props.direction == "bottom")
+        else if(this.props.location == "top" || this.props.location == "bottom")
         {
 
-            defaultStyle["flexDirection"] = "row-reverse"; // this makes close icon on right
-            if(this.props.direction == "top")
+            defaultStyle.flexDirection = "row-reverse"; // this makes close icon on right
+            
+			if(this.props.location == "top")
             {
-                defaultStyle["top"]= 0;
-                defaultStyle["borderBottom"]= "1px solid lightGrey";
+                defaultStyle.top = 0;
+                defaultStyle["borderBottom"] = "1px solid lightGrey";
             }
-            else
+            
+			else
             {
-                defaultStyle["bottom"]= 0;
-                defaultStyle["borderTop"]= "1px solid lightGrey";
+                defaultStyle.bottom = 0;
+                defaultStyle.borderTop = "1px solid lightGrey";
             }
-            closeIconStyle["alignSelf"] = this.props.direction == "bottom"? "flex-start":"flex-end";
         }
 
-        var style:React.CSSProperties =  _.merge(defaultStyle,this.props.style);
+        var style:React.CSSProperties =  _.merge(defaultStyle, this.props.style);
 
-        return (<div className={this.props.className} style={style}>
-                    <span style={ closeIconStyle } onClick={ this.onCloseClick }>
-                        <i className="fa fa-times-circle"/>
-                    </span>
-                    <div style={{padding:"8px",display:"inherit",flexDirection:"inherit"}}>
-                        {this.props.children}
-                    </div>
-
-                </div>);
+        return (
+			<div {...this.props} style={style}>
+                <HBox style={closeIconStyle}>
+					<CenteredIcon onClick={ this.props.onClose } iconProps={{className: "fa fa-times"}}/>
+				</HBox>
+                <VBox style={{margin: 8}}>
+                    {this.props.children}
+                </VBox>
+            </div>
+		);
     }
 }

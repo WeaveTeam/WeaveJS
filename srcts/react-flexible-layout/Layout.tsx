@@ -44,7 +44,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		super(props, state);
 		var ps = props.state || {};
 		this.state = { id: ps.id, direction: ps.direction, children: ps.children, flex: ps.flex || 1, maximized: ps.maximized };
-		this.minSize = 16;
+		this.minSize = 25;
 		this.dragging = false;
 	}
 
