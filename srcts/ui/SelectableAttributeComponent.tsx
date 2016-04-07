@@ -52,6 +52,16 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
          return AttributeSelector.openInstance(label, attribute, this.props.attributes);
     };
 
+    private clearColumn =( attr:IColumnWrapper,event:MouseEvent):void =>{
+        var dc:any;//TODO assign right type
+        if(Weave.IS(attr, AlwaysDefinedColumn))
+            dc = ColumnUtils.hack_findInternalDynamicColumn(attr);
+        else
+            dc = attr;
+        dc.target = null;
+
+    };
+
     render():JSX.Element
     {
         //styles
@@ -60,43 +70,42 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         var btnStyle = {textAlign: 'center', flex: 0.05, fontSize: 'smaller'};
 
         var selectableUI:JSX.Element[] = [];
-        let disabled:boolean = false;
         let alwaysDefinedCol:boolean;
         let defaultValue:any;
 
         //loop through selectable attributes
         this.props.attributes.forEach((value, label)=>{
-        let attribute_lhm_or_icw = this.props.attributes.get(label);
+            let attribute_lhm_or_icw = this.props.attributes.get(label);
 
-        if(Weave.IS(attribute_lhm_or_icw, IColumnWrapper)){
-        let attribute = attribute_lhm_or_icw as IColumnWrapper;
+            if(Weave.IS(attribute_lhm_or_icw, IColumnWrapper)){
+                let attribute = attribute_lhm_or_icw as IColumnWrapper;
 
-        //check for always defined column
-        if(Weave.IS(attribute, AlwaysDefinedColumn)){
-            alwaysDefinedCol = true;
-            defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
-        }
+                //check for always defined column
+                if(Weave.IS(attribute, AlwaysDefinedColumn)){
+                    alwaysDefinedCol = true;
+                    defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
+                }
 
-        let elem =  <VBox key={ label }>
+                let elem =  <VBox key={ label }>
 
-                        <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
-                            { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
-                            <AttributeDropdown style={{flex:1}} attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
-                                               clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
-                            <span className={clearStyle}/>
-                            <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
-                        </HBox>
+                                <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
+                                    { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
+                                    <AttributeDropdown style={{flex:1}}
+                                                       attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
+                                                       clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
+                                    <span className={clearStyle} onClick={ this.clearColumn.bind( this, attribute) }/>
+                                    <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
+                                </HBox>
 
-                        { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
-                     </VBox>;
-
-        selectableUI.push(elem);
-        }
-        else{//LinkableHashMap
-           let attribute = attribute_lhm_or_icw as LinkableHashMap;
-           let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
-           selectableUI.push(elem);
-        }
+                                { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
+                             </VBox>;
+                selectableUI.push(elem);
+            }
+            else{//LinkableHashMap
+               let attribute = attribute_lhm_or_icw as LinkableHashMap;
+               let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
+               selectableUI.push(elem);
+            }
        });
 
         return (<VBox>{selectableUI}</VBox>);
@@ -227,7 +236,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 
         //register the click handler only when options are absent
         if(!options || options.length ==0 ){
-            var defaultEntry = <option>Click here to select</option>;
+            var defaultEntry = <option key={ 'def' }>Click here to select</option>;
             options = [defaultEntry];
             //disabled = true;
             this.click = this.props.clickHandler;
