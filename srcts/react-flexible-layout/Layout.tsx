@@ -125,8 +125,14 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 	getResizerRange(resizerIndex:number):[number, number]
 	{
-		var element1 = ReactDOM.findDOMNode(this.children[resizerIndex]) as HTMLElement
-		var element2 = ReactDOM.findDOMNode(this.children[resizerIndex + 1]) as HTMLElement;
+		var element1Index = resizerIndex;
+		var element2Index = resizerIndex + 1;
+		if(this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout){
+			element1Index = resizerIndex + 1;
+			element2Index = resizerIndex
+		}
+		var element1 = ReactDOM.findDOMNode(this.children[element1Index]) as HTMLElement;
+		var element2 = ReactDOM.findDOMNode(this.children[element2Index]) as HTMLElement;
 		if (this.state.direction === HORIZONTAL)
 			return [element1.offsetLeft + this.minSize, element2.offsetLeft + element2.offsetWidth - this.minSize];
 		else
@@ -146,9 +152,16 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 				var pos:number = this.state.direction === HORIZONTAL ? offsetPoint.x : offsetPoint.y;
 				var size:number = this.state.direction === HORIZONTAL ? element.offsetWidth : element.offsetHeight;
 
+				var element1Index = index;
+				var element2Index = index + 1;
+				if(this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout){
+					element1Index = index + 1;
+					element2Index = index
+				}
+
 				pos = Math.max(begin + this.minSize, Math.min(pos, end - this.minSize));
-				newState.children[index].flex = (pos - begin) / size;
-				newState.children[index + 1].flex = (end - pos) / size;
+				newState.children[element1Index].flex = (pos - begin) / size;
+				newState.children[element2Index].flex = (end - pos) / size;
 
 				resizer.setState({ active: false });
 				this.overlay.setState({ active: false });
