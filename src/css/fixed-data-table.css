@@ -208,6 +208,7 @@
   -webkit-transition-property: background-color width;
           transition-property: background-color width;
   width: 15px;
+  z-index: 0 !important;
 }
 
 .ScrollbarLayout_mainVertical.public_Scrollbar_mainActive,
@@ -458,6 +459,7 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
 .fixedDataTableLayout_rowsContainer {
   overflow: hidden;
   position: relative;
+  z-index: 0;
 }
 
 .fixedDataTableLayout_horizontalScrollbar {
