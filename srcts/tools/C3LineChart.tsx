@@ -65,6 +65,10 @@ export default class C3LineChart extends AbstractC3Tool
 
         this.c3ConfigYAxis = {
             show: true,
+			label: {
+				text: "",
+				position: "outer-middle"
+			},
             tick: {
                 multiline: true,
                 format: (num:number):string => {
@@ -79,7 +83,7 @@ export default class C3LineChart extends AbstractC3Tool
                     }
                 }
             }
-        }
+        };
 
         this.mergeConfig({
             data: {
@@ -111,6 +115,10 @@ export default class C3LineChart extends AbstractC3Tool
             },
             axis: {
                 x: {
+                    label: {
+                        text: "",
+                        position: "outer-center"
+                    },
                     tick: {
                         culling: {
                             max: null
@@ -175,7 +183,7 @@ export default class C3LineChart extends AbstractC3Tool
     protected validate(forced:boolean = false):boolean
     {
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds, this.margin);
+        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds, this.xAxisName, this.yAxisName, this.margin);
 		var dataChanged:boolean = axisChange || Weave.detectChange(this, this.curveType, this.line, this.filteredKeySet);
         if (dataChanged)
         {
