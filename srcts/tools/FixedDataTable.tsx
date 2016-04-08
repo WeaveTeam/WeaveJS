@@ -1,6 +1,9 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import {Table, Column, Cell} from 'fixed-data-table';
+import {HBox, VBox} from "../react-ui/FlexBox";
+
+
 import CellProps = FixedDataTable.CellProps;
 import QKey = weavejs.data.key.QKey;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -24,7 +27,7 @@ export interface IColumnSortDirections
 
 export interface IRow
 {
-	[columnId:string]: string
+	[columnId:string]: React.ReactChild;
 }
 
 export interface IFixedDataTableProps extends React.Props<FixedDataTable>
@@ -112,11 +115,21 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 	}
 
 	render():JSX.Element {
+		var upArrow:JSX.Element = (
+			<span style={{alignSelf: "stretch", display: "flex", cursor: "pointer"}}>
+				<i className="fa fa-play fa-fw fa-rotate-270" style={{alignSelf: "center",fontSize: "60%", paddingRight: 2}}/>
+			</span>
+		);
+		var downArrow:JSX.Element = (
+			<span style={{alignSelf: "stretch", display: "flex", cursor: "pointer"}}>
+				<i className="fa fa-play fa-fw fa-rotate-90" style={{alignSelf: "center",fontSize: "60%", paddingRight: 2}}/>
+			</span>
+		);
 		return (
 			<Cell {...this.props}>
-				<div style={{whiteSpace: "nowrap", overflow: "ellipsis"}} onClick={this.onSortChange}>
-					{this.props.sortDirection ? (this.props.sortDirection === SortTypes.DESC ? '↓' : '↑') : ''} {this.props.children}
-				</div>
+				<HBox style={{whiteSpace: "nowrap", overflow: "ellipsis"}} onClick={this.onSortChange}>
+					{this.props.sortDirection ? (this.props.sortDirection === SortTypes.DESC ? downArrow : upArrow) : ''} {this.props.children}
+				</HBox>
 			</Cell>
 		);
 	}
@@ -183,7 +196,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 	getRowClass=(index: number):string =>
 	{
-		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty];
+		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty] as string;
 		if (_.includes(this.state.probedIds, id) && _.includes(this.state.selectedIds, id)) {
 			return "table-row-probed-selected"
 		} else if (_.includes(this.state.probedIds, id)) {
@@ -207,7 +220,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	onMouseEnter=(event:React.MouseEvent, index:number):void =>
 	{
 		//mouse entering, so set the keys
-		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty];
+		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty] as string;
 		var probedIds:string[] = [id];
 
 		this.setState({
@@ -233,7 +246,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		//console.log("Down",event,index);
 		
 		var selectedIds:string[] = this.state.selectedIds;
-		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty];
+		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty] as string;
 
 		// in single selection mode,
 		// or ctrl/cmd selcection mode
@@ -280,7 +293,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 				for (var i:number = start; i <= end; i++)
 				{
-					selectedIds.push(this.props.rows[this.state.sortIndices[i]][this.props.idProperty]);
+					selectedIds.push(this.props.rows[this.state.sortIndices[i]][this.props.idProperty] as string);
 				}
 			}
 		}
@@ -328,6 +341,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		sortIndices.sort((indexA:number, indexB:number) => {
 			var valueA = this.props.rows[indexA][columnKey];
 			var valueB = this.props.rows[indexB][columnKey];
+			valueA = typeof valueA == "string" ? valueA:(valueA as any).value;
+			valueB = typeof valueB == "string" ? valueB:(valueB as any).value;
 			var sortVal = 0;
 			if (valueA > valueB) {
 				sortVal = 1;
