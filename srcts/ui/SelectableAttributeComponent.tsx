@@ -182,7 +182,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
                 let dataSource = dataSources[0] as IDataSource;
                 if (!dataSource)
                 {
-                    console.log("The column", icw, "has no datasource.");
+                    //console.log("The column", icw, "has no datasource.");
                     return null;
                 }
             node = dataSource.findHierarchyNode(metadata);
