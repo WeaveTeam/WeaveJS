@@ -427,7 +427,7 @@ export default class C3BarChart extends AbstractC3Tool
 														  this.overrideBounds,
 														  this.xAxisName,
 														  this.yAxisName);
-		var dataChange = axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet);
+		var dataChange = axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet, this.showValueLabels);
 		if (dataChange)
         {
             changeDetected = true;
@@ -526,6 +526,16 @@ export default class C3BarChart extends AbstractC3Tool
 					null,
 					[
 						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
+						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
+					],
+					{
+						table: {width: "100%"},
+						td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
+					}
+				)}
+				{ReactUtils.generateTable(
+					null,
+					[
 						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <StatefulComboBox ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					],
 					{
