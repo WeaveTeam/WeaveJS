@@ -1,6 +1,6 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import Tabs from "../react-ui/Tabs";
+import {VSpacer, HSpacer} from "../react-ui/Spacer";import Tabs from "../react-ui/Tabs";
 import StatefulCheckBox from "../ui/StatefulCheckBox";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import BinningDefinitionEditor from "./BinningDefinitionEditor";
@@ -50,10 +50,16 @@ export default class ColorController extends React.Component<ColorControllerProp
 							  <HBox><StatefulCheckBox/><span>{Weave.lang("Filter records prior to binning")}</span></HBox>
 						  </VBox>,
 						  <VBox key={this.tabLabels[1]} style={{flex: 1}}>
-							  <HBox><StatefulCheckBox/><span>label={Weave.lang("Center color ramp at zero (when binning is disabled)")}</span></HBox>
+						  	  <HSpacer/>
+							  <HBox>
+								<StatefulCheckBox/>
+								<span>
+									{Weave.lang("Center color ramp at zero (when binning is disabled)")}
+								</span>
+							  </HBox>
+							  <HSpacer/>
 							  <ColorRampEditor/>
 						  </VBox>
-						  
 					  ]}>
 				</Tabs>
 			</VBox>
