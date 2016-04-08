@@ -37,7 +37,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 	render():JSX.Element
 	{
 		return (
-			<VBox className="weave-tab-container">
+			<VBox className="weave-tab-container" style={{flex: 1}}>
 				<HBox className="weave-tab-label-container">
 					{
 						this.props.labels.map((label, index) => {
@@ -47,11 +47,11 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 						})
 					}
 				</HBox>
-				<div className="weave-tab-content">
+				<VBox className="weave-tab-content" style={{flex: 1}}>
 					{
 						this.props.tabs[this.state.activeTabIndex]
 					}
-				</div>
+				</VBox>
 			</VBox>
 		);
 	}
