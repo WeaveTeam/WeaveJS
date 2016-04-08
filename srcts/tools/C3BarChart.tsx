@@ -7,6 +7,7 @@ import * as React from "react";
 import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import StatefulCheckBox from "../ui/StatefulCheckBox";
+import StatefulComboBox from "../ui/StatefulComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 
@@ -43,6 +44,9 @@ declare type RecordHeightsFormat<T> = { xLabel: T } & {[columnName:string]: T};
 const GROUP:string = 'group';
 const STACK:string = 'stack';
 const PERCENT_STACK:string = 'percentStack';
+const GROUPING_MODES:{label:string, value:any}[] = [{label: "Grouped Bars", value: GROUP},
+													{label: "Stacked Bars", value: STACK},
+													{label: "100% Stacked Bars", value: PERCENT_STACK}];
 
 export default class C3BarChart extends AbstractC3Tool
 {
@@ -521,7 +525,8 @@ export default class C3BarChart extends AbstractC3Tool
 				{ReactUtils.generateTable(
 					null,
 					[
-						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ]
+						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
+						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <StatefulComboBox ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					],
 					{
 						table: {width: "100%"},
