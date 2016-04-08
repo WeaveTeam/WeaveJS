@@ -154,7 +154,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 					/>
 				</VBox>
 				<div style={{ backgroundColor: '#f0f0f0', width: 4}}/>
-				<VBox style={{ flex: 1, margin: 10 }}>
+				<VBox style={{ flex: 1 }}>
 					{editorJsx}
 				</VBox>
 			</HBox>

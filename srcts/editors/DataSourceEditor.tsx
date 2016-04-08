@@ -7,6 +7,7 @@ import StatefulTextField from "../ui/StatefulTextField";
 import WeaveTree from "../ui/WeaveTree";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
+import Tabs from "../react-ui/Tabs";
 
 import WeaveAPI = weavejs.WeaveAPI;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -28,17 +29,17 @@ export interface IDataSourceEditorProps {
 
 export interface IDataSourceEditorState {
 	selectedNode?: IWeaveTreeNode;
-	view?: View
+	showPreviewView?: boolean;
 };
 
 export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
 {
 	dataSourceWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.forceUpdate.bind(this)));
 	columnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IAttributeColumn, null, this.forceUpdate.bind(this)));
+	protected enablePreview:boolean = true;
 	private tableContainer:VBox;
 	private tableContainerElement:HTMLElement;
 	protected tree:WeaveTree;
-
 	protected editorButtons:Map<React.ReactChild, Function>;
 	private parentNode:IWeaveTreeNode;
 
@@ -48,7 +49,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		this.componentWillReceiveProps(props);
 		this.state = {
 			selectedNode: props.dataSource.getHierarchyRoot(),
-			view: BROWSE
+			showPreviewView: false
 		}
 	}
 	
@@ -160,9 +161,6 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		let root = this.props.dataSource.getHierarchyRoot();
 		return (
 			<VBox style={{flex: 1}}>
-				{
-					this.renderFields()
-				}
 				<HBox style={{flex: 1}}>
 					<VBox style={{flex: 1}}>
 						<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} initialSelectedItems={[this.props.dataSource.getHierarchyRoot()]} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
@@ -174,9 +172,6 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 						<VBox style={{flex: 1}}>
 						  <WeaveTree root={this.state.selectedNode} hideRoot={true} hideBranches={true} onSelect={(selectedItems) => this.updateColumnTarget(selectedItems)}/>
 						  <HBox style={{justifyContent: "flex-end"}}>
-						  	<button onClick={() => this.setState({view: PREVIEW})}>{Weave.lang("Preview")}</button>
-							<div style={{width: 10}}/>
-							<button onClick={() => this.setState({view: METADATA})}>{Weave.lang("Edit Metadata")}</button>
 						  </HBox>
 		    			  {
 							  this.renderPreviewTable()
@@ -189,7 +184,20 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		);
 	}
 	
-	renderDataPreview():JSX.Element
+	renderConfigureView():JSX.Element
+	{
+		let root = this.props.dataSource.getHierarchyRoot();
+		return (
+			<VBox style={{flex: 1}}>
+				<label> {Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel())} </label>
+				{
+					this.renderFields()
+				}
+			</VBox>
+		);
+	}
+	
+	renderPreviewView():JSX.Element
 	{
 		// delay the callbacks on the selected column
 		// Weave.getCallbacks(this.column).delayCallbacks();
@@ -218,42 +226,34 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 								idProperty="id"
 								showIdColumn={true}
 								columnTitles={columnTitles as any}/>
-				<button onClick={() => this.setState({view: BROWSE})}>{Weave.lang("Ok")}</button>
-			</VBox>
-		);
-	}
-	
-	renderMetadataView():JSX.Element
-	{
-		
-		return (
-			<VBox>
-				<button onClick={() => this.setState({view: BROWSE})}>Back</button>
-				Metadata view
 			</VBox>
 		);
 	}
 	
 	render():JSX.Element
 	{
-		var currentView:JSX.Element = null;
+		var tabLabels = ["Browse", "Configure"];
+		let root = this.props.dataSource.getHierarchyRoot();
+
+		var tabContents = [
+			this.renderBrowseView(),
+			this.renderConfigureView(),
+			this.renderPreviewView()
+		];
 		
-		if(this.state.view == BROWSE)
-			currentView = this.renderBrowseView();
-		else if(this.state.view == PREVIEW)
-			currentView = this.renderDataPreview();
-		else if (this.state.view == METADATA)
-			currentView = this.renderMetadataView();
+		if(this.state.showPreviewView)
+		{
+			tabLabels.push("Preview");
+			tabContents.push(this.renderPreviewView());
+		}
+		var activeTabIndex = 1;
+		if(root.getChildren().length)
+		{
+			activeTabIndex = 0;
+		}
 
 		return (
-			<VBox style={{flex: 1}}>
-				<label> {Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel())} </label>
-				<VBox style={{flex:1}}>
-				{
-					currentView
-				}
-				</VBox>
-			</VBox>
+			<Tabs labels={tabLabels} activeTabIndex={activeTabIndex} tabs={tabContents}/>
 		);
 	}
 };
