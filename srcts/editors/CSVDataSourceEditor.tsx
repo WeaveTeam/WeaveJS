@@ -25,6 +25,27 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
+		this.componentWillReceiveProps(props);
+	}
+
+	onUrlChange()
+	{
+		let ds = (this.props.dataSource as CSVDataSource);
+		if (ds.keyType.value === null && ds.url.value)
+		{
+			ds.keyType.value = ds.url.value;
+		}
+	}
+
+	componentWillReceiveProps(nextProps:IDataSourceEditorProps)
+	{
+		let ds = (nextProps.dataSource as CSVDataSource);
+		if (this.props.dataSource)
+		{
+			let old_ds = (this.props.dataSource as CSVDataSource);
+			Weave.getCallbacks(old_ds.url).removeCallback(this, this.onUrlChange);
+		}
+		Weave.getCallbacks(ds.url).addGroupedCallback(this, this.onUrlChange);
 	}
 	
 	get editorFields():[React.ReactChild, React.ReactChild][]
