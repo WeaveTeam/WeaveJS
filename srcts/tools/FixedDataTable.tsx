@@ -364,8 +364,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		if(nextProps.rows.length !== this.state.sortIndices.length)
 			newState.sortIndices = nextProps.rows.map((row, index) => index);
 
-		newState.probedIds = nextProps.probedIds;
-		newState.selectedIds = nextProps.selectedIds;
+		newState.probedIds = nextProps && nextProps.probedIds;
+		newState.selectedIds = nextProps && nextProps.selectedIds;
 		this.setState(newState);
 		this.forceUpdate();
 	}
