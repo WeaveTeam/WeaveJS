@@ -1,3 +1,4 @@
+
 html {
   font-family: sans-serif;
 }
@@ -387,6 +388,9 @@ input[type="text"]:focus {
     color: #000000;
     font-size: 60%;
 }
+.weave-tree-view-icon-expander.hidden-expander::before {
+	content: " ";
+}
 
 .weave-tree-view {
 	user-select: none;
@@ -432,6 +436,34 @@ div.weave-tree-view {
 }
 .weave-list-Item-selected:hover{
 	background-color : #99D6FF;
+}
+
+.weave-tab-container {
+	
+}
+
+.weave-tab-label-container {
+	border-bottom: 1px solid #ddd;
+}
+
+.weave-tab-label {
+	padding-left: 8;
+	padding-right: 8;
+	padding-top: 5;
+	padding-bottom: 5;
+	cursor: default;
+	border: 1px solid #E6E6E6;
+	background: #F8F8F8;
+}
+
+.weave-tab-label-active {
+	margin-bottom: -1px; /* hide border bottom */
+	border-bottom: 1px solid white;
+	background: none;
+}
+
+.weave-tab-content {
+	padding: 5;
 }
 
 div.table-row-probed>div>div>div>div>div {

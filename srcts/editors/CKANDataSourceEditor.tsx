@@ -28,7 +28,6 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as CKANDataSource);
-		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 		var labelStyle:React.CSSProperties = {
 			marginRight: 20,
 			fontWeight: "normal"

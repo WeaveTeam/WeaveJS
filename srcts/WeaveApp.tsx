@@ -69,9 +69,35 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			return null;
 		return this.props.weave.getObject(this.getRenderPath()) as React.Component<any, any>;
 	}
+
+	private createDefaultSessionElements()
+	{
+		let DEFAULT_COLOR_COLUMN = "defaultColorColumn";
+		let DEFAULT_COLOR_BIN_COLUMN = "defaultColorBinColumn";
+		let DEFAULT_COLOR_DATA_COLUMN = "defaultColorDataColumn";
+
+		let DEFAULT_SUBSET_KEYFILTER = "defaultSubsetKeyFilter";
+		let DEFAULT_SELECTION_KEYSET = "defaultSelectionKeySet";
+		let DEFAULT_PROBE_KEYSET = "defaultProbeKeySet";
+		let ALWAYS_HIGHLIGHT_KEYSET = "alwaysHighlightKeySet";
+		let SAVED_SELECTION_KEYSETS = "savedSelections";
+		let SAVED_SUBSETS_KEYFILTERS = "savedSubsets";
+
+		let root = this.props.weave.root;
+		/* default keysets */
+		root.requestObject(DEFAULT_PROBE_KEYSET, weavejs.data.key.KeySet, true);
+		root.requestObject(DEFAULT_SELECTION_KEYSET, weavejs.data.key.KeySet, true);
+		root.requestObject(DEFAULT_SUBSET_KEYFILTER, weavejs.data.key.KeyFilter, true);
+		/* default color column stuff */
+		let cc = root.requestObject("defaultColorColumn", weavejs.data.column.ColorColumn, true);
+		let bc = cc.internalDynamicColumn.requestGlobalObject(DEFAULT_COLOR_BIN_COLUMN, weavejs.data.column.BinnedColumn, true);
+		let fc = bc.internalDynamicColumn.requestGlobalObject(DEFAULT_COLOR_DATA_COLUMN, weavejs.data.column.FilteredColumn, true);
+		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
+	}
 	
 	componentDidMount()
 	{
+		this.createDefaultSessionElements();
 		if (this.props.readUrlParams)
 		{
 			var urlParams = MiscUtils.getUrlParams();

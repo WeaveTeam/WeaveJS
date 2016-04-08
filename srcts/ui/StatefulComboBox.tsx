@@ -49,8 +49,8 @@ export default class StatefulComboBox extends SmartComponent<StatefulComboBoxPro
 		let value: any;
 
 		value = (typeof option === "object") ? option.value : option;
-		//console.log("handleInputChange", value);
 
+		//console.log("handleInputChange", value);
 		if (this.props.onChange) this.props.onChange(value);
 		this.setState({value});
 	}

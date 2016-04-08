@@ -11,6 +11,7 @@ export interface StatefulTextFieldProps extends React.HTMLProps<StatefulTextFiel
 	suggestions?: string[];
 	selectOnFocus?: boolean;
 	noneLabel?: string;
+	onInputFinished?: (content: string) => void;
 }
 
 export interface StatefulTextFieldState {
@@ -27,7 +28,13 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 	private element: HTMLElement;
 
 	handleInputChange = (event: React.FormEvent): void=> {
-		this.setState({ content: (event.target as HTMLInputElement).value || ""});
+		let value = (event.target as HTMLInputElement).value;
+		this.setState({ content: value || ""});
+
+		if ((event.type == "blur" || event.type == "submit") && this.props.onInputFinished)
+		{
+			this.props.onInputFinished(value);
+		}
 	}
 
 	onFocus=(event:React.FormEvent):void=>{
@@ -50,6 +57,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		}
 		let onClick = (event: React.MouseEvent): void => {
 			this.setState({ content: item });
+			this.props.onInputFinished && this.props.onInputFinished(item);
 			this.closePopup();
 		};
 		return <div style={style} className="weave-menuitem" key={index} onClick={onClick}>{label}</div>;
@@ -96,26 +104,32 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		else {
 			var [height, width, top, left] = [0, 0, 0, 0];
 		}
+		
+		var hboxFlex:React.CSSProperties = {};
+		if(this.props.style && this.props.style.flex)
+			hboxFlex.flex = this.props.style.flex;
 
 		if (this.props.suggestions && this.props.suggestions.length > 0)
 		{
-			return <HBox style={this.props.style}>
-				<input style={{ flex: 1 }}
-					onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange}
-					type="text" value={this.state.content} placeholder={this.state.content || this.props.noneLabel}
-					{...props as any}
-					/>
-				<i onClick={this.openPopup} className="fa fa-caret-down weave-icon"/>
-			</HBox>;
+			return (
+				<HBox style={hboxFlex}>
+					<input style={_.merge({}, this.props.style, { flex: 1 })} // merge into new object
+						onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange} onSubmit={this.handleInputChange}
+						type="text" value={this.state.content} placeholder={this.state.content || this.props.noneLabel}
+						{...props as any}
+						/>
+					<i onClick={this.openPopup} className="fa fa-caret-down weave-icon"/>
+				</HBox>
+			);
 		}
 		else
 		{
 			return (
-				<HBox style={this.props.style}>
+				<HBox style={hboxFlex}>
 					<input
 						type="text"
 						{...props as any}
-						style={{ flex: 1 }}
+						style={_.merge({},this.props.style, { flex: 1 })} // merge into new object
 						onFocus={this.onFocus}
 						onBlur={this.handleInputChange}
 						onChange={this.handleInputChange}

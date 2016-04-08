@@ -52,8 +52,15 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as WeaveDataSource);
+		/* Hack, use actual parser, or better, have it configured in the admin service and use an actual call to retrieve. */
+		let consoleUri = (ds.url.value || "/WeaveServices/DataService") + "/../../" + "AdminConsole.html"; 
+
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
+			[
+				"",
+				<a target="_blank" href={consoleUri}>{Weave.lang("Open Admin Console") + " " }<i className="fa fa-external-link"/></a>
+			],
 			[
 				Weave.lang("Service URL"), 
 				<StatefulTextField ref={linkReactStateRef(this, { content: ds.url }, 500) } 

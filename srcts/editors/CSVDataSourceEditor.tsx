@@ -8,6 +8,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import FileSelector from "../ui/FileSelector";
 import FixedDataTable from "../tools/FixedDataTable";
 import DataSourceEditor from "./DataSourceEditor";
+import KeyTypeInput from "../ui/KeyTypeInput";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import CSVDataSource = weavejs.data.source.CSVDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -29,7 +30,6 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
-		let keyTypeSuggestions = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes();
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("URL"),
@@ -37,9 +37,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Key Type"),
-				<StatefulTextField selectOnFocus={true} 
-								   ref={linkReactStateRef(this, { content: ds.keyType }) } 
-								   suggestions={keyTypeSuggestions}/>
+				<KeyTypeInput keyTypeProperty={ds.keyType}/>
 			],
 			[
 				Weave.lang("Key Column"),

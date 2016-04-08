@@ -172,7 +172,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				columnIds={this.state.columnIds}
 				rowHeight={this.rowHeight.value}
 				headerHeight={this.headerHeight.value}
-				columnWidth={this.columnWidth.value}
+				initialColumnWidth={this.columnWidth.value}
 			/>
 		);
 	}

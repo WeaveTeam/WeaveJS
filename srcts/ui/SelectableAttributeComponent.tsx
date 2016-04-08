@@ -37,7 +37,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
     }
 
     static defaultProps = { showLabel: true };
-	
+
     componentWillReceiveProps(props:ISelectableAttributeComponentProps){
 
     }
@@ -49,7 +49,17 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         });
     }
     launchAttributeSelector=(label:string, attribute:IColumnWrapper|LinkableHashMap):PopupWindow=>{
-         return AttributeSelector.openInstance(label, attribute, this.props.attributes);
+        return AttributeSelector.openInstance(label, attribute, this.props.attributes);
+    };
+
+    private clearColumn =( attr:IColumnWrapper,event:MouseEvent):void =>{
+        var dc:any;//TODO assign right type
+        if(Weave.IS(attr, AlwaysDefinedColumn))
+            dc = ColumnUtils.hack_findInternalDynamicColumn(attr);
+        else
+            dc = attr;
+        dc.target = null;
+
     };
 
     render():JSX.Element
@@ -60,44 +70,43 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         var btnStyle = {textAlign: 'center', flex: 0.05, fontSize: 'smaller'};
 
         var selectableUI:JSX.Element[] = [];
-        let disabled:boolean = false;
         let alwaysDefinedCol:boolean;
         let defaultValue:any;
 
         //loop through selectable attributes
         this.props.attributes.forEach((value, label)=>{
-        let attribute_lhm_or_icw = this.props.attributes.get(label);
+            let attribute_lhm_or_icw = this.props.attributes.get(label);
 
-        if(Weave.IS(attribute_lhm_or_icw, IColumnWrapper)){
-        let attribute = attribute_lhm_or_icw as IColumnWrapper;
+            if(Weave.IS(attribute_lhm_or_icw, IColumnWrapper)){
+                let attribute = attribute_lhm_or_icw as IColumnWrapper;
 
-        //check for always defined column
-        if(Weave.IS(attribute, AlwaysDefinedColumn)){
-            alwaysDefinedCol = true;
-            defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
-        }
+                //check for always defined column
+                if(Weave.IS(attribute, AlwaysDefinedColumn)){
+                    alwaysDefinedCol = true;
+                    defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
+                }
 
-        let elem =  <VBox key={ label }>
+                let elem =  <VBox key={ label }>
 
-                        <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
-                            { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
-                            <AttributeDropdown style={{flex:1}} attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
-                                               clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
-                            <span className={clearStyle}/>
-                            <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
-                        </HBox>
+                    <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
+                        { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
+                        <AttributeDropdown style={{flex:1}}
+                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
+                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
+                        <span className={clearStyle} onClick={ this.clearColumn.bind( this, attribute) }/>
+                        <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
+                    </HBox>
 
-                        { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
-                     </VBox>;
-
-        selectableUI.push(elem);
-        }
-        else{//LinkableHashMap
-           let attribute = attribute_lhm_or_icw as LinkableHashMap;
-           let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
-           selectableUI.push(elem);
-        }
-       });
+                    { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
+                </VBox>;
+                selectableUI.push(elem);
+            }
+            else{//LinkableHashMap
+                let attribute = attribute_lhm_or_icw as LinkableHashMap;
+                let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
+                selectableUI.push(elem);
+            }
+        });
 
         return (<VBox>{selectableUI}</VBox>);
     }
@@ -173,18 +182,17 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
     getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper):string=>
     {
         var metadata:{[attr:string]:string};
-            // If it's an IColumnWrapper, we need to normalize it to a treenode so we get the minimal reference metadata
+        // If it's an IColumnWrapper, we need to normalize it to a treenode so we get the minimal reference metadata
         if (!Weave.IS(node, IWeaveTreeNode))
         {
-                let icw = node as IColumnWrapper;
-                metadata = ColumnMetadata.getAllMetadata(icw);
-                let dataSources = ColumnUtils.getDataSources(icw);
-                let dataSource = dataSources[0] as IDataSource;
-                if (!dataSource)
-                {
-                    //console.log("The column", icw, "has no datasource.");
-                    return null;
-                }
+            let icw = node as IColumnWrapper;
+            metadata = ColumnMetadata.getAllMetadata(icw);
+            let dataSources = ColumnUtils.getDataSources(icw);
+            let dataSource = dataSources[0] as IDataSource;
+            if (!dataSource)
+            {
+                return null;
+            }
             node = dataSource.findHierarchyNode(metadata);
         }
 
@@ -221,13 +229,13 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 
         let siblings = this.siblings(this.props.attribute);
         if(siblings)
-             options = siblings.map((option:{label:string, id:string}, index:number)=>{
+            options = siblings.map((option:{label:string, id:string}, index:number)=>{
                 return(<option value={ option.id } key={ option.id }>{ option.label }</option>);
             });
 
         //register the click handler only when options are absent
         if(!options || options.length ==0 ){
-            var defaultEntry = <option>Click here to select</option>;
+            var defaultEntry = <option key={ 'def' }>Click here to select</option>;
             options = [defaultEntry];
             //disabled = true;
             this.click = this.props.clickHandler;
@@ -237,8 +245,8 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
         }
 
         return(<VBox style={ this.props.style }>
-             <select disabled={ disabled } value={ columnEntry.id } onClick={ this.click } onChange={ this.onChange } >
-                 { options }</select>
-            </VBox>);
+            <select disabled={ disabled } value={ columnEntry.id } onClick={ this.click } onChange={ this.onChange } >
+                { options }</select>
+        </VBox>);
     }
 }
