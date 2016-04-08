@@ -409,7 +409,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 													{...props}
 												/>)
 											}
-											width={this.state.columnWidths[id]}
+											width={this.state.columnWidths[id] || this.props.initialColumnWidth}
 											isResizable={true}
 										/>
 									);
