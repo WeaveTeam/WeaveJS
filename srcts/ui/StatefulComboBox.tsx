@@ -27,19 +27,21 @@ export default class StatefulComboBox extends SmartComponent<StatefulComboBoxPro
 
 	componentWillReceiveProps(nextProps: StatefulComboBoxProps)
 	{
-		if (nextProps.value)
+		if (this.props.value != nextProps.value)
 		{
 			this.setState({value: nextProps.value});
 		}
 
 		if (nextProps.options != this.props.options)
 		{
-			console.log("Triggering change next render");
+			//console.log("Triggering change next render");
 			this.triggerChangeNextRender = true;
 		}
 	}
 
-	state: StatefulComboBoxState = { value: null };
+	state: StatefulComboBoxState = {
+        value: this.props.value
+    };
 
 	handleInputChange = (event: React.FormEvent): void => {
 		let index = Number((event.target as HTMLSelectElement).value)
@@ -47,7 +49,7 @@ export default class StatefulComboBox extends SmartComponent<StatefulComboBoxPro
 		let value: any;
 
 		value = (typeof option === "object") ? option.value : option;
-		console.log("handleInputChange", value);
+		//console.log("handleInputChange", value);
 
 		if (this.props.onChange) this.props.onChange(value);
 		this.setState({value});
@@ -60,7 +62,7 @@ export default class StatefulComboBox extends SmartComponent<StatefulComboBoxPro
 		else {
 			return <option key={index} value={index.toString()}>{item}</option>
 		}
-	}
+	};
 
 	private findOptionIndex(value:any):number
 	{
@@ -82,6 +84,7 @@ export default class StatefulComboBox extends SmartComponent<StatefulComboBoxPro
 		delete props.children;
 
 		let index = this.findOptionIndex(this.state.value);
+        //console.log("in combobox in render",this.props.value,this.state.value,index );
 		let refFunc: (c: HTMLSelectElement) => void = (c: HTMLSelectElement) => { };
 		if (index == -1 || this.triggerChangeNextRender)
 		{
