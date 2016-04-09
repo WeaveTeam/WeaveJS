@@ -16,6 +16,7 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import WeaveAPI = weavejs.WeaveAPI;
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 
 const LAYOUT_LIST:string = "List";
@@ -32,6 +33,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
     //session properties
     public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );//this will re render the TOOL (callbacks attached in TOOL)
     public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST), this.forceUpdate, true);//this will re render the TOOL (callbacks attached in TOOL)
+    public selectedAttribute = Weave.linkableChild(this, new LinkableString, this.forceUpdate, true);
 
     public targetToolPathWatcher = Weave.linkableChild(this, new LinkableWatcher());//this will re render the EDITOR (callbacks attached in editor)
 
@@ -62,9 +64,41 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
         return options;
     };
 
-    componentDidMount(){
+    //crude function, should be deleted when possible
+    getLabelToAttributeMapping = (labelToMap:string, tool:IVisTool):string =>{
+        let mappedvalue:string;
+        let root = Weave.getRoot(tool);
+        for (let [label, attribute] of tool.selectableAttributes.entries())
+        {
+            if(label == labelToMap){
 
-    }
+                let path = Weave.findPath(root, attribute);
+                mappedvalue = lodash.last(path);
+                break;
+            }
+
+        }
+
+        return mappedvalue;
+    };
+
+    //TODO confirm if right way to do
+    handleSelection = (selectedValues:any[]):void =>{
+        //get target attribute column
+        //NOTE: using the target Tool path and the label selected from the target dropdown combobox , we need to construct the correct path and retrieve the column
+        var root = Weave.getRoot(selectedValues[0]);//get root hashmap
+        var tool = Weave.followPath(root, this.targetToolPath.state as string[]) as IVisTool;//retrieve tool from targetTool Path
+        var attrLabel = this.getLabelToAttributeMapping(this.targetAttribute.state as string, tool);//get correct target attribute name from label selected in dropdown
+        var path = (this.targetToolPath.state as string[]).slice(); path.push(attrLabel);//get the entire path
+        let targetCol = ColumnUtils.hack_findInternalDynamicColumn(Weave.followPath(root, path) as IColumnWrapper);//retrieve column using that path
+
+        //use selected column to set session state of target column
+        var selectedColumn = selectedValues[0] as IColumnWrapper;
+
+        this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to re render
+        Weave.copyState(selectedColumn, (targetCol.getInternalColumn() as ReferencedColumn))
+
+    };
 
     renderEditor():JSX.Element{
         return(<VBox>
@@ -75,9 +109,11 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
     render():JSX.Element{
 
+        let selectedAttribute = this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn;//get object from name
+
         switch(this.layoutMode.value){
             case(LAYOUT_LIST):
-                return(<VBox><List options={ this.options } /></VBox>);
+                return(<VBox><List options={ this.options }  onChange={ this.handleSelection } selectedValues={ [selectedAttribute] }/></VBox>);
         }
     }
 }
@@ -128,7 +164,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
     }
 
-    private openTools:any [];
+    private openTools:any [];//visualization tools open at the given time
     private weaveRoot:ILinkableHashMap;
 
     getOpenVizTools=():void =>
@@ -142,13 +178,13 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         });
     };
 
-    //UI event handler
+    //UI event handler for target Tool
     handleTargetToolChange = (selectedItem:string):void =>
     {
         this.props.attributeMenuTool.targetToolPath.state = [selectedItem ];
     };
 
-    //UI event handler
+    //UI event handler for target attribute (one of the selectable attributes of the target tool)
     handleTargetAttributeChange =(selectedItem:string):void =>
     {
         this.props.attributeMenuTool.targetAttribute.state = selectedItem ;
