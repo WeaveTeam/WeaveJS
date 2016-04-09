@@ -65,6 +65,7 @@ export default class C3Histogram extends AbstractC3Tool
     {
         super(props);
 		
+        this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
 		this.filteredKeySet.setSingleKeySource(this.fill.color);
 
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];

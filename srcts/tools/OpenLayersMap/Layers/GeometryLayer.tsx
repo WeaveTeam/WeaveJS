@@ -35,7 +35,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 	constructor()
 	{
 		super();
-
+		this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
 		this.geoJsonParser = new ol.format.GeoJSON();
 
 		this.geometryColumn.addGroupedCallback(this, this.updateGeometryData);

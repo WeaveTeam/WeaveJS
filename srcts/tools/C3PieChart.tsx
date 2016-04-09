@@ -58,6 +58,7 @@ export default class C3PieChart extends AbstractC3Tool
         super(props);
 
         this.filteredKeySet.setSingleKeySource(this.data);
+        this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
 
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
         this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
