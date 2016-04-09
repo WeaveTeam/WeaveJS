@@ -19,15 +19,14 @@ export interface ColorRampEditorProps extends React.Props<ColorRampEditor>
 
 export interface ColorRampEditorState 
 {
-		currentColors:number[];
-		selectedFilter:string[];
+		selectedFilter:string;
 }
 
 const ALL:string = Weave.lang("All");
 // stub
-export default class ColorRampEditor extends React.Component<any, any>
+export default class ColorRampEditor extends React.Component<ColorRampEditorProps, ColorRampEditorState>
 {
-	private colorRampWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(ColorRamp, null, this.handleColorRampChange.bind(this)));
+	private colorRampWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(ColorRamp, null, this.forceUpdate.bind(this)));
 	public get colorRamp():ColorRamp { return this.colorRampWatcher.target as ColorRamp; }
 	public set colorRamp(value:ColorRamp) { this.colorRampWatcher.target = value; }
 	
@@ -37,7 +36,6 @@ export default class ColorRampEditor extends React.Component<any, any>
 	{
 		super(props);
 		this.state = {
-			currentColors: [],
 			selectedFilter: ALL
 		};
 
@@ -52,81 +50,54 @@ export default class ColorRampEditor extends React.Component<any, any>
 		this.filterOptions.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 		this.filterOptions.unshift(ALL);
 	}
-	
-	handleColorRampChange()
-	{
-		this.setState({
-			currentColors: this.colorRamp.getColors()
-		});
-	}
-	
-	componentDidUpdate(nextProps:ColorRampEditorProps, nextState:ColorRampEditorState):void
-	{
-		this.colorRamp && this.colorRamp.setSessionState(this.state.currentColors);
-	}
-	
+		
 	updateColorsAtIndex(index:number, color:string)
 	{
-		var colors = this.state.currentColors.concat();
+		var colors = this.colorRamp.getColors() as number[];
 		colors[index] = StandardLib.asNumber(color);
-		this.setState({
-			currentColors: colors
-		});
+		this.colorRamp.setSessionState(colors)
 	}
 	
 	removeColorAtIndex(index:number)
 	{
-		var colors:number[] = this.state.currentColors.concat();
+		var colors:number[] = this.colorRamp.getColors() as number[];
 		colors.splice(index, 1);
-		this.setState({
-			currentColors: colors
-		});
+		this.colorRamp.setSessionState(colors)
 	}
 	
 	addColor=()=>
 	{
-		var colors:number[] = this.state.currentColors.concat();
+		var colors:number[] = this.colorRamp.getColors() as number[];
 		colors.push(StandardLib.asNumber("#FFFFFF"));
-		this.setState({
-			currentColors: colors
-		});
+		this.colorRamp.setSessionState(colors);
 	}
 	
 	reverseColors=()=>
 	{
-		var colors:number[] = this.state.currentColors.concat();
-		colors.reverse();
-		this.setState({
-			currentColors: colors
-		});
+		this.colorRamp.reverse();
 	}
 	
 	handleColorRampSelectionChange = (newColors:number[]) =>
 	{
-		this.setState({
-			currentColors: newColors
-		});
+		this.colorRamp.setSessionState(newColors);
 	}
 
 	render()
 	{
-		var colors:string[] = this.state.currentColors.map((num:number) => {
-			var hexColor:string = StandardLib.getHexColor(num);
-			if(hexColor)
-				return hexColor.toUpperCase();
-		});
+		var colors:number[] = this.colorRamp.getColors() as number[];
+		var hexColors = this.colorRamp.getHexColors();
 		
 		var filteredRamps = this.state.selectedFilter == ALL ? ColorRamp.allColorRamps : ColorRamp.allColorRamps.filter((v) => v.tags.indexOf(this.state.selectedFilter) >= 0);
 		
-		var listOptions = colors.map((color, index) => {
+		var listOptions = hexColors.map((hexColor, index) => {
 			return {
 				value: index,
 				label: (
 					<HBox style={{flex: 1, justifyContent: "space-between", verticalAlign: "middle"}}>
 						<HBox>
-							<ColorPicker hexColor={color} onClose={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
+							<ColorPicker hexColor={hexColor} onClose={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
 							<VSpacer/>
-							<span style={{alignSelf: "center", fontFamily: "monospace"}}>{color}</span>
+							<span style={{alignSelf: "center", fontFamily: "monospace"}}>{hexColor.toUpperCase()}</span>
 						</HBox>
 						<CenteredIcon iconProps={{className: "fa fa-times fa-fw"}} onClick={() => this.removeColorAtIndex(index)}/>
 					</HBox>
@@ -137,14 +108,14 @@ export default class ColorRampEditor extends React.Component<any, any>
 			<VBox style={{flex: 1}}>
 				<HBox style={{flex: 1}}>
 					<HBox style={{flex: .7}}>
-						<ColorRampList selectedColors={this.state.currentColors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
+						<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
 					</HBox>
 					<VSpacer/>
 					<VBox style={{flex: .3}}>
 						<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang("Customize")}</label>
 						<HSpacer/>
 						<HBox style={{flex: 1, overflow: "auto"}}>
-							<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={colors}/>
+							<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={hexColors}/>
 							<VSpacer/>
 							<List options={listOptions}/>
 						</HBox>
