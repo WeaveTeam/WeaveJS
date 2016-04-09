@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as _ from "lodash";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IRow, IColumnTitles} from "../tools/FixedDataTable";
 import {HBox, VBox} from "../react-ui/FlexBox";
@@ -10,11 +11,13 @@ import StandardLib = weavejs.util.StandardLib;
 export interface ColorRampListProps extends React.Props<ColorRampList>
 {
 	allColorRamps:{name:string, tags:string, colors:number[]}[];
+	selectedColors?:number[];
+	onChange?:(selectedRamp:number[]) => void;
 }
 
 export interface ColorRampListState
 {
-	
+	selectedColors?:number[];
 }
 
 export default class ColorRampList extends React.Component<ColorRampListProps, ColorRampListState>
@@ -28,10 +31,24 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 		super(props);
 		this.columnTitles["id"] = "Key";
 		this.columnTitles["value"] = Weave.lang("Color scale presets");
+		this.state = {
+			selectedColors: props.selectedColors
+		}
 	}
 	
 	static defaultProps:ColorRampListProps = {
 		allColorRamps: []
+	}
+	
+	private getRampNameFromRamp(selectedColors:number[])
+	{
+		if(selectedColors)
+		{
+			var selectedRampConfig = this.props.allColorRamps.find(v => _.isEqual(v.colors, selectedColors));
+			if(selectedRampConfig)
+				return selectedRampConfig.name;
+			return "";
+		}
 	}
 	
 	componentDidMount()
@@ -39,14 +56,36 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 		this.forceUpdate(); // force update to get the correct size for the table
 	}
 	
+	componentWillReceiveProps(nextProps:ColorRampListProps)
+	{
+		if(nextProps.selectedColors)
+		{
+			this.setState({
+				selectedColors: nextProps.selectedColors
+			});
+		}
+	}
+	
 	componentWillUpdate()
 	{
 		this.tableContainerElement = ReactDOM.findDOMNode(this.tableContainer) as HTMLElement;
 	}
 	
+	
+	handleTableSelection = (id:string[]) =>
+	{
+		if(id.length)
+		{
+			var selectedRampConfig = this.props.allColorRamps.find(v => v.name == id[0]);
+			if(selectedRampConfig)
+				this.props.onChange && this.props.onChange(selectedRampConfig.colors);
+		}
+	}
+	
 	render():JSX.Element
 	{
-
+		
+		var selectedId = this.getRampNameFromRamp(this.state.selectedColors);
 		var rows:IRow[] = this.props.allColorRamps.map((colorRampConfig) => {
 			var row:IRow = {};
 			var rampRow = (
@@ -68,7 +107,9 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 									idProperty="id" rows={rows} 
 									columnTitles={this.columnTitles} 
 									showIdColumn={false}
-									initialColumnWidth={this.tableContainerElement.clientWidth}/>
+									selectedIds={[selectedId]}
+									initialColumnWidth={this.tableContainerElement.clientWidth}
+									onSelection={this.handleTableSelection}/>
 				}
 			</VBox>
 		);

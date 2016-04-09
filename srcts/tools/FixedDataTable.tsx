@@ -341,8 +341,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		sortIndices.sort((indexA:number, indexB:number) => {
 			var valueA = this.props.rows[indexA][columnKey];
 			var valueB = this.props.rows[indexB][columnKey];
-			valueA = typeof valueA == "string" ? valueA:(valueA as any).value;
-			valueB = typeof valueB == "string" ? valueB:(valueB as any).value;
+			valueA = typeof valueA == "string" ? valueA: (valueA as any).value;
+			valueB = typeof valueB == "string" ? valueB: (valueB as any).value;
 			var sortVal = 0;
 			if (valueA > valueB) {
 				sortVal = 1;
@@ -364,10 +364,14 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		if(nextProps.rows.length !== this.state.sortIndices.length)
 			newState.sortIndices = nextProps.rows.map((row, index) => index);
 
-		newState.probedIds = nextProps && nextProps.probedIds;
-		newState.selectedIds = nextProps && nextProps.selectedIds;
+		if(nextProps.probedIds)
+			newState.probedIds = nextProps.probedIds;
+		
+		if(nextProps.selectedIds)
+			newState.selectedIds = nextProps.selectedIds;
+		
 		this.setState(newState);
-		this.forceUpdate();
+		this.forceUpdate(); // why is this being done
 	}
 	
 	handleResize=(newSize:ResizingDivState) => {

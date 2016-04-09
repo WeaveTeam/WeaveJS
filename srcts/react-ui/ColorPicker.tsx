@@ -5,11 +5,14 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 
 export interface ColorPickerProps extends React.Props<ColorPicker>
 {
+	hexColor?:string;
+	onChange?: (hexColor:string) => void;
+	onClose?: (hexColor:string) => void;
 }
 
 export interface ColorPickerState
 {
-	color?:string;
+	hexColor?:string;
 }
 
 export default class ColorPicker extends React.Component<ColorPickerProps, ColorPickerState>
@@ -20,11 +23,17 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 	constructor(props:ColorPickerProps) {
 		super(props);
 		this.state = {
-			color: '#F17013',
+			hexColor: props.hexColor || '#FFFFFF',
 		};
 		this.handleClick = this.handleClick.bind(this);
 		this.handleClose = this.handleClose.bind(this);
 		this.handleChange = this.handleChange.bind(this);
+	}
+	
+	componentWillReceiveProps(nextProps:ColorPickerProps)
+	{
+		if(nextProps.hexColor)
+			this.setState({hexColor: nextProps.hexColor});
 	}
 
 	handleClick=(event:React.MouseEvent) =>{
@@ -42,7 +51,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 			this.popup = ReactUtils.openPopup(
 				<HBox style={style} onClick={(event:React.MouseEvent) => {event.nativeEvent.stopImmediatePropagation()}}>
 					<ReactColorPicker
-						color={ this.state.color }
+						color={ this.state.hexColor }
 						position="below"
 						display={ true }
 						onChange={ this.handleChange }
@@ -60,10 +69,12 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 			this.popup = null;
 			document.removeEventListener("click", this.handleClose);
 		}
+		this.props.onClose && this.props.onClose(this.state.hexColor);
 	};
 
 	handleChange=(color:any) => {
-		this.setState({ color: '#' + color.hex });
+		this.setState({ hexColor: '#' + color.hex });
+		this.props.onChange && this.props.onChange('#' + color.hex);
 	};
 
 	render():JSX.Element {
@@ -80,7 +91,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 			width: '36px',
 			height: '14px',
 			borderRadius: '2px',
-			background: this.state.color
+			background: this.state.hexColor
 		};
 
 		return (
