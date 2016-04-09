@@ -95,6 +95,7 @@ export default class ColorRampEditor extends React.Component<any, any>
 	reverseColors=()=>
 	{
 		var colors:number[] = this.state.currentColors.concat();
+		colors.reverse();
 		this.setState({
 			currentColors: colors
 		});
