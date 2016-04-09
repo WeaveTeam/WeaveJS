@@ -1,10 +1,11 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import Tabs from "../react-ui/Tabs";
+import {VSpacer, HSpacer} from "../react-ui/Spacer";import Tabs from "../react-ui/Tabs";
 import StatefulCheckBox from "../ui/StatefulCheckBox";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import BinningDefinitionEditor from "./BinningDefinitionEditor";
 import ColorRampEditor from "./ColorRampEditor";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColorColumn = weavejs.data.column.ColorColumn;
@@ -47,13 +48,23 @@ export default class ColorController extends React.Component<ColorControllerProp
 						  <VBox key={this.tabLabels[0]} style={{flex: 1}}>
 							  <SelectableAttributeComponent attributes={this.attributes}/>
 							  <BinningDefinitionEditor/>
-							  <HBox><StatefulCheckBox/><span>{Weave.lang("Filter records prior to binning")}</span></HBox>
+							  <HBox>
+							  	  <StatefulCheckBox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
+								  <span>
+								  	 {Weave.lang("Filter records prior to binning")}
+								  </span>
+							  </HBox>
 						  </VBox>,
-						  <VBox key={this.tabLabels[1]} style={{flex: 1}}>
-							  <HBox><StatefulCheckBox/><span>label={Weave.lang("Center color ramp at zero (when binning is disabled)")}</span></HBox>
-							  <ColorRampEditor/>
+						  <VBox key={this.tabLabels[1]} style={{flex: 1, padding: 5}}>
+							  <HBox>
+								  <StatefulCheckBox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
+								  <span>
+								  	{Weave.lang("Center color ramp at zero (when binning is disabled)")}
+								  </span>
+							  </HBox>
+							  <HSpacer/>
+							  <ColorRampEditor colorRamp={this.props.colorColumn.ramp}/>
 						  </VBox>
-						  
 					  ]}>
 				</Tabs>
 			</VBox>
