@@ -22,7 +22,7 @@ export interface ColorRampEditorState
 		selectedFilter:string;
 }
 
-const ALL:string = Weave.lang("All");
+const ALL:string = "All";
 // stub
 export default class ColorRampEditor extends React.Component<ColorRampEditorProps, ColorRampEditorState>
 {
@@ -129,7 +129,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 						<VSpacer/>
 						<select value={this.state.selectedFilter} onChange={(event:React.FormEvent) => { this.setState({ selectedFilter: (event.target as any).value}) }}>
 							{
-								this.filterOptions.map((option, index) => <option value={option as string} key={index}>{option}</option>)
+								this.filterOptions.map((option, index) => <option value={option as string} key={index}>{Weave.lang(option)}</option>)
 							}
 						</select>
 					</HBox>
