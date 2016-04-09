@@ -12,6 +12,8 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import PopupWindow from "../react-ui/PopupWindow";
+import IDataSource = weavejs.api.data.IDataSource;
+import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 
 export interface IAttributeSelectorProps
 {
@@ -128,6 +130,28 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
         this.forceUpdate();
     };
 
+    getSelectedTreeNode = ():IWeaveTreeNode =>{
+        var dsources  = ColumnUtils.getDataSources(this.state.selectedAttribute as IColumnWrapper);
+        var dsource = dsources[0] as IDataSource;
+        var metadata = ColumnMetadata.getAllMetadata(this.state.selectedAttribute as IColumnWrapper);
+        if(dsource){
+            console.log('found node', metadata);
+            return dsource.findHierarchyNode(metadata);
+        }
+        else
+            return;
+    };
+
+    getSelectedNodeRoot = ():IWeaveTreeNode =>{
+        var dsources  = ColumnUtils.getDataSources(this.state.selectedAttribute as IColumnWrapper);
+        var dsource = dsources[0] as IDataSource;
+        if(dsource){
+            return dsource.getHierarchyRoot();
+        }
+        else
+            return;
+    };
+
     static openInstance(label:string, selectedAttribute:IColumnWrapper|LinkableHashMap, selectableAttributes:Map<string, (IColumnWrapper|LinkableHashMap)>):PopupWindow{
        var attrPop = PopupWindow.open({
             title: 'Attribute Selector for ' + label,
@@ -143,8 +167,15 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     render():JSX.Element
     {
         var ui:JSX.Element = this.state.selectedAttribute instanceof LinkableHashMap ?
-            <VBox><SelectableAttributesList  showLabelAsButton={ false } label={ this.state.label } columns={ (this.state.selectedAttribute as LinkableHashMap)}></SelectableAttributesList></VBox>
+            <VBox>
+                <SelectableAttributesList  showLabelAsButton={ false } label={ this.state.label } columns={ (this.state.selectedAttribute as LinkableHashMap)}></SelectableAttributesList>
+            </VBox>
             : null;
+
+        var selectedNode:IWeaveTreeNode;
+        if(Weave.IS(this.state.selectedAttribute, IColumnWrapper)) selectedNode = this.getSelectedTreeNode();
+        var selectedRoot:IWeaveTreeNode;
+        if(Weave.IS(this.state.selectedAttribute, IColumnWrapper))selectedRoot = this.getSelectedNodeRoot();
 
         return (
             <VBox style={{ flex: 1, minWidth: 700, maxHeight: 400 }}>
@@ -152,21 +183,21 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                 <ButtonGroupBar items={ this.items }></ButtonGroupBar>
 
                 <HBox style={{height: '300px'}}>
-                    <VBox style={{ flex: .5 }}>
-                        <WeaveTree searchFilter={ this.searchFilter } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={this.rootTreeNode} ref={ (c) => { this.tree = c; } }/>
+                    <VBox style={{ flex: 0.5 }}>
+                        <WeaveTree searchFilter={ this.searchFilter } initialSelectedItems={ [selectedRoot] } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={this.rootTreeNode} ref={ (c) => { this.tree = c; } }/>
                     </VBox>
                     <VBox style={{ flex: .5 }}>
                         {this.state.leafNode ?
-                        <WeaveTree searchFilter={ this.searchFilter } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.leafTree = c; } }/>
+                        <WeaveTree searchFilter={ this.searchFilter } initialSelectedItems={ [selectedNode] } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.leafTree = c; } }/>
                         : null}
 
-                        {Weave.IS(this.state.selectedAttribute, LinkableHashMap) ? <HBox><button onClick={ this.handleSelectAll }>Select All</button><button onClick={ this.addSelected }>Add Selected</button></HBox>
+                        {Weave.IS(this.state.selectedAttribute, LinkableHashMap) ?
+                            <HBox><button onClick={ this.handleSelectAll }>Select All</button><button onClick={ this.addSelected }>Add Selected</button></HBox>
                         : null}
                     </VBox>
                 </HBox>
+
                 {ui}
-
-
             </VBox>
         );
     };
