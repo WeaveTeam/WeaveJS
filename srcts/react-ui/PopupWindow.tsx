@@ -147,17 +147,33 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		if (this.dragging)
 		{
 			event.stopImmediatePropagation();
+			var right = this.state.position.left + this.element.clientWidth;
+			var bottom = this.state.position.top + this.element.clientHeight;
+
 			var mouseDeltaX = event.clientX - this.oldMousePos.x;
 			var mouseDeltaY = event.clientY - this.oldMousePos.y;
 			this.oldMousePos.x = event.clientX;
 			this.oldMousePos.y = event.clientY;
 			
-			var style = Object(this.state.position); // prevents null position
+			var position = Object(this.state.position); // prevents null position
+			var newPosition:{top: number, left: number} = {
+				top: position.top,
+				left: position.left
+			};
+
+			var newLeft:number = position.left + mouseDeltaX;
+			var newTop:number = position.top + mouseDeltaY;
+
+			// check overflow left and right
+			if (newLeft < window.innerWidth - 25 && newLeft+this.element.clientWidth > 25)
+				newPosition.left = newLeft;
+
+			// check overflow left and right
+			if (newTop < window.innerHeight - 25 && newTop > 25)
+				newPosition.top = newTop;
+
 			this.setState({
-				position: {
-					top: style.top + mouseDeltaY,
-					left: style.left + mouseDeltaX
-				}
+				position: newPosition
 			});
 		}
 	}
