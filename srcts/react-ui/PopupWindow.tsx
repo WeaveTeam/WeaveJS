@@ -28,7 +28,8 @@ export interface PopupWindowProps extends React.Props<PopupWindow>
 export interface PopupWindowState
 {
 	content?:JSX.Element;
-	style?: React.CSSProperties;
+	position?: {top: number, left: number};
+	zIndex?: number;
 }
 
 export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupWindowState>
@@ -43,27 +44,46 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	}
 	private dragging:boolean;
 	
+	static windowRegistry = new Set<PopupWindow>(); 
+	
 	constructor(props:PopupWindowProps)
 	{
 		super(props);
-		this.state = {};
+		this.state = {
+			zIndex: 0
+		};
 	}
-	
+
 	static open(props:PopupWindowProps):PopupWindow
 	{
-		return ReactUtils.openPopup(<PopupWindow {...props}/>) as PopupWindow;
+		// set active window to non active
+		var popupWindow = ReactUtils.openPopup(<PopupWindow {...props}/>) as PopupWindow;
+		PopupWindow.windowRegistry.add(popupWindow);
+		PopupWindow.alignWindows();
+		return popupWindow;
 	}
 	
 	static close(popupWindow:PopupWindow)
 	{
+		PopupWindow.windowRegistry.delete(popupWindow);
 		ReactUtils.closePopup(popupWindow);
+	}
+	
+	static alignWindows()
+	{
+		var index = 0;
+		for( var popupWindow of PopupWindow.windowRegistry)
+		{
+			popupWindow.setState({ zIndex: index});
+			index++;
+		}
 	}
 	
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this.container) as HTMLElement;
 		this.setState({
-			style: {
+			position: {
 				top: this.props.top || (window.innerHeight - this.element.clientHeight) / 2,
 				left: this.props.left || (window.innerWidth - this.element.clientWidth) / 2
 			}
@@ -115,6 +135,13 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		}
 	}
 	
+	private handleClickOnWindow()
+	{
+		PopupWindow.windowRegistry.delete(this);
+		PopupWindow.windowRegistry.add(this);
+		PopupWindow.alignWindows();
+	}
+	
 	private onDrag=(event:MouseEvent)=>
 	{
 		if (this.dragging)
@@ -125,9 +152,9 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 			this.oldMousePos.x = event.clientX;
 			this.oldMousePos.y = event.clientY;
 			
-			var style = Object(this.state.style);
+			var style = Object(this.state.position); // prevents null position
 			this.setState({
-				style: {
+				position: {
 					top: style.top + mouseDeltaY,
 					left: style.left + mouseDeltaX
 				}
@@ -155,10 +182,17 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	render():JSX.Element
 	{
 
-		var windowStyle:React.CSSProperties = _.merge({position: "absolute", width: this.props.width, height: this.props.height, minWidth: this.minWidth, minHeight: this.minHeight}, this.state.style);
+		var windowStyle:React.CSSProperties = _.merge({	
+			position: "absolute", 
+			width: this.props.width,
+			height: this.props.height,
+			minWidth: this.minWidth,
+			minHeight: this.minHeight,
+			zIndex: this.state.zIndex
+		}, this.state.position);
 
 		var popupWindow = (
-			<VBox className="weave-app weave-window" ref={(c:VBox) => this.container = c} style={windowStyle}>
+			<VBox className="weave-app weave-window" onMouseDown={() => this.handleClickOnWindow()} ref={(c:VBox) => this.container = c} style={windowStyle}>
 				<HBox className="weave-window-header" onMouseDown={this.onDragStart.bind(this)}>
 					<div style={{flex: 1}}>
 					{

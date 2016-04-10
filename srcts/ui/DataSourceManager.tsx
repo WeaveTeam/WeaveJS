@@ -141,7 +141,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						options={listOptions}
 						multiple={false}
 						selectedValues={[dataSource]}
-						onChange={ (selectedValues:IDataSource[]) => DataSourceManager.selected = selectedValues[0] }
+						onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0], this.forceUpdate() }}
 					/>
 				</VBox>
 				<div style={{ backgroundColor: '#f0f0f0', width: 4}}/>

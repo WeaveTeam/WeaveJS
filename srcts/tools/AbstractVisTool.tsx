@@ -184,10 +184,10 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return AbstractVisTool.getMenuItems(this);
 	}
 
-	renderNumberEditor(linkableNumber:LinkableNumber, width:number):JSX.Element
+	renderNumberEditor(linkableNumber:LinkableNumber, width:number = 50):JSX.Element
 	{
 		var style:React.CSSProperties = {textAlign: "center", width};
-		return <StatefulTextField style={style} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+		return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
 	}
 
 	renderEditor():JSX.Element
@@ -214,12 +214,12 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 				{ renderSelectableAttributes(this) }
 				<HBox className="weave-padded-hbox" style={{alignItems: 'center', justifyContent: "space-between"}}>
 					<span>{ Weave.lang("Margins:") }</span>
-					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.left, 50) }</div>
+					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.left) }</div>
 					<VBox className="weave-padded-vbox" style={{width: 50}}>
-						{ this.renderNumberEditor(this.margin.top, 50) }
-						{ this.renderNumberEditor(this.margin.bottom, 50) }
+						{ this.renderNumberEditor(this.margin.top) }
+						{ this.renderNumberEditor(this.margin.bottom) }
 					</VBox>
-					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right, 50) }</div>
+					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right) }</div>
 				</HBox>
 			</VBox>
 		);

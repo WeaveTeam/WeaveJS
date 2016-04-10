@@ -73,7 +73,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 							  <BinningDefinitionEditor/>
 							  <HBox>
 							  	  <StatefulCheckBox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
-								  <span>
+								  <span style={{alignSelf: "center"}}>
 								  	 {Weave.lang("Filter records prior to binning")}
 								  </span>
 							  </HBox>

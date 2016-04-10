@@ -113,10 +113,11 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		{
 			return (
 				<HBox style={hboxFlex}>
-					<input style={_.merge({}, this.props.style, { flex: 1 })} // merge into new object
+					<input
 						onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange} onSubmit={this.handleInputChange}
 						type="text" value={this.state.content} placeholder={this.state.content || this.props.noneLabel}
 						{...props as any}
+						style={_.merge(this.props.style, { width: "100%" })}
 						/>
 					<i onClick={this.openPopup} className="fa fa-caret-down weave-icon"/>
 				</HBox>
@@ -129,7 +130,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 					<input
 						type="text"
 						{...props as any}
-						style={_.merge({},this.props.style, { flex: 1 })} // merge into new object
+						style={_.merge(this.props.style, { width: "100%" })}
 						onFocus={this.onFocus}
 						onBlur={this.handleInputChange}
 						onChange={this.handleInputChange}
