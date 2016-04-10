@@ -128,7 +128,7 @@ interface IAttributeMenuTargetEditorProps {
 }
 
 interface IAttributMenuToolEditorState {
-
+    openTools?:any[];
 }
 
 class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEditorProps, IAttributMenuToolEditorState>
@@ -164,6 +164,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
     }
 
+    state : {openTool:any[]};
     private openTools:any [];//visualization tools open at the given time
     private weaveRoot:ILinkableHashMap;
 
@@ -176,6 +177,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
             if(tool.selectableAttributes && tool != this.props.attributeMenuTool)//excluding AttributeMenuTool from the list
                 this.openTools.push(this.weaveRoot.getName(tool));
         });
+        this.setState({openTools: this.openTools});
     };
 
     //UI event handler for target Tool
@@ -200,47 +202,73 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
     //callback for targetToolPath
     setTargetToolPathWatcher = ():void=>{
         var amt = this.props.attributeMenuTool;
-        amt.targetToolPathWatcher.targetPath = amt.targetToolPath.state as string[];
+        if(amt.targetToolPath.state)
+            amt.targetToolPathWatcher.targetPath = amt.targetToolPath.state as string[];
     };
 
     get tool():IVisTool{
-        return Weave.followPath(this.weaveRoot, this.props.attributeMenuTool.targetToolPath.state as string[]) as IVisTool;
+        if(this.props.attributeMenuTool.targetToolPath.state)
+            return Weave.followPath(this.weaveRoot, this.props.attributeMenuTool.targetToolPath.state as string[]) as IVisTool;
     }
     getTargetToolAttributeOptions():{label: string, value: string}[] {
         let tool:IVisTool = this.tool;
         let attributes:{label:string, value: string}[] = [];
 
-        for (let [label, attribute] of tool.selectableAttributes.entries())
-        {
-            let path = Weave.findPath(this.weaveRoot, attribute);
-            let value = lodash.last(path);
+       if(tool){
+           for (let [label, attribute] of tool.selectableAttributes.entries())
+           {
+               let path = Weave.findPath(this.weaveRoot, attribute);
+               let value = lodash.last(path);
 
-            attributes.push({label, value});
-        }
+               attributes.push({label, value});
+           }
+       }
 
         //attributes.unshift({label:'Select an attribute', value : '0'});
-        console.log((this.props.attributeMenuTool.targetToolPath.state as string[])[0],attributes);
+       // console.log((this.props.attributeMenuTool.targetToolPath.state as string[])[0],attributes);
         return attributes;
     }
 
-    get toolConfigs():[string, JSX.Element][]{
-        let tool:IVisTool = this.tool;
+    getTargetToolPath= ():string =>{
         let toolPath = this.props.attributeMenuTool.targetToolPath.state as string[];
-        let toolName = toolPath[0];
+        return (toolPath[0] as string);
+    };
 
-        var atributeLabel:string = this.props.attributeMenuTool.targetAttribute.state as string;
-        var attribute:ILinkableObject = tool.selectableAttributes.get(atributeLabel) as ILinkableObject;
-        let path = Weave.findPath(this.weaveRoot, attribute);
-        let attributeValue:string = lodash.last(path) as string;
+    getTargetAttribute = ():string =>{
+        var tool:IVisTool= this.tool;
+        var path:string[];
+        if(tool) {
+            var attributeName:string = this.props.attributeMenuTool.targetAttribute.state as string;
+            var attribute:ILinkableObject = tool.selectableAttributes.get(attributeName) as ILinkableObject;
+            path = Weave.findPath(this.weaveRoot, attribute);
+        }
+        return(lodash.last(path) as string);
+    };
+
+    get toolConfigs():[string, JSX.Element][]{
+
+        var toolName:string;
+        var attributeValue :string;
+
+        if(this.props.attributeMenuTool.targetToolPath.state){
+            toolName = this.getTargetToolPath();
+            attributeValue = this.getTargetAttribute();
+        }
+
+        console.log('toolName', toolName);
+        console.log('attributeValue', attributeValue );
+        console.log('open tools in toolconfigs', this.openTools);
 
         return[
             [
                 Weave.lang("Visualization Tool"),
+                //<StatefulComboBox value={ 'Scatterplot' } options={ this.openTools } onChange={ this.handleTargetToolChange } />
                 <StatefulComboBox value={ toolName } options={ this.openTools } onChange={ this.handleTargetToolChange } />
             ],
             [
                 Weave.lang("Visualization Attribute"),
 
+                //<StatefulComboBox value={ 'c' } options={ ['a', 'c'] } onChange={ this.handleTargetAttributeChange }  />
                 <StatefulComboBox value={ attributeValue } options={ this.getTargetToolAttributeOptions() } onChange={ this.handleTargetAttributeChange }  />
             ]
         ];
@@ -257,7 +285,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         };
 
         return (<VBox>
-            { this.openTools && this.openTools.length > 0 ? ReactUtils.generateTable(null, this.toolConfigs, tableStyles): null}
+            {this.openTools && this.openTools.length >0 ? ReactUtils.generateTable(null, this.toolConfigs, tableStyles):null}
         </VBox>);
     }
 
