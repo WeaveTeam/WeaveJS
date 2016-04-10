@@ -467,6 +467,10 @@ div.weave-tree-view {
 	padding: 5;
 }
 
+.public_fixedDataTableCell_cellContent {
+	white-space: nowrap;
+}
+
 div.table-row-probed>div>div>div>div>div {
 	background-color: rgba(153, 214, 255, 0.4)
 }
