@@ -22,6 +22,7 @@ export interface PopupWindowProps extends React.Props<PopupWindow>
 	footerContent?:JSX.Element;
 	onOk?:Function;
 	onCancel?:Function;
+	onClose?:Function;
 }
 
 export interface PopupWindowState
@@ -90,12 +91,18 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	private onOk()
 	{
 		this.props.onOk && this.props.onOk();
-		PopupWindow.close(this);
+		this.onClose();
 	}
 	
 	private onCancel()
 	{
 		this.props.onCancel && this.props.onCancel();
+		this.onClose();
+	}
+	
+	private onClose()
+	{
+		this.props.onClose && this.props.onClose();
 		PopupWindow.close(this);
 	}
 
@@ -161,7 +168,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 					{
 						!this.props.modal
 						? 
-							<CenteredIcon onClick={this.onCancel.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
+							<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
 						:
 							''
 					}

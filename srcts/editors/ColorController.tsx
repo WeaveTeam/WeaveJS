@@ -1,11 +1,13 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import {VSpacer, HSpacer} from "../react-ui/Spacer";import Tabs from "../react-ui/Tabs";
+import {VSpacer, HSpacer} from "../react-ui/Spacer";
+import Tabs from "../react-ui/Tabs";
 import StatefulCheckBox from "../ui/StatefulCheckBox";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import BinningDefinitionEditor from "./BinningDefinitionEditor";
 import ColorRampEditor from "./ColorRampEditor";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import PopupWindow from "../react-ui/PopupWindow";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColorColumn = weavejs.data.column.ColorColumn;
@@ -29,21 +31,42 @@ export default class ColorController extends React.Component<ColorControllerProp
 	
 	tabLabels = ["Binning", "Color Scale"]; // , "Color Specific Records"]
 	attributes = new Map<string, IColumnWrapper>();
-	
+	static window:PopupWindow;
+	static activeTabIndex:number = 0;
 
 	constructor(props:ColorControllerProps)
 	{
 		super(props);
 		this.attributes.set("Color Data", this.props.colorColumn);
 	}
+	
+	static close(window:PopupWindow)
+	{
+		ColorController.window = null;
+	}
 
+	static open(colorColumn:ColorColumn)
+	{
+		if(ColorController.window)
+			PopupWindow.close(ColorController.window);
 
+		ColorController.window = PopupWindow.open({
+			title: Weave.lang("Color Controller"),
+			content: <ColorController colorColumn={colorColumn}/>,
+			resizable: true,
+			width: 800,
+			height: 600,
+			onClose: ColorController.close
+		});
+	}
 	
 	render():JSX.Element
 	{
 		return (
 			<VBox style={{flex: 1}}>
-				<Tabs labels={this.tabLabels}
+				<Tabs activeTabIndex={ColorController.activeTabIndex}
+					  onViewChange={(index) => ColorController.activeTabIndex = index}
+					  labels={this.tabLabels}
 					  tabs={[
 						  <VBox key={this.tabLabels[0]} style={{flex: 1}}>
 							  <SelectableAttributeComponent attributes={this.attributes}/>
