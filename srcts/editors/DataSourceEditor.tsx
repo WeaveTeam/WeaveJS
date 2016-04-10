@@ -74,6 +74,11 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			]
 		]
 	}
+	
+	shouldComponentUpdate()
+	{
+		return Weave.detectChange(this, this.column);
+	}
 
 	renderFields():JSX.Element
 	{
@@ -131,7 +136,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		
 		rows = rows.map((row) => {
 			return {
-				id: row.id.toString(),
+				id: row.id.localName,
 				value: row.value
 			}
 		});
@@ -200,34 +205,34 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	renderPreviewView():JSX.Element
 	{
 		// delay the callbacks on the selected column
-		// Weave.getCallbacks(this.column).delayCallbacks();
-		
-		var leaves = this.parentNode && this.parentNode.getChildren().filter((n) => !n.isBranch());
-		if(!leaves)
-			return;
-		var columns:IAttributeColumn[] = [];
-		for(var leaf of leaves)
-		{
-			var columnRef = Weave.AS(leaf, weavejs.api.data.IColumnReference);
-			if(columnRef)
-				columns.push(columnRef.getDataSource().getAttributeColumn(columnRef.getColumnMetadata()));
-		}
-		
-		var names:string[] = columns.map(column => column.getMetadata("title"));
-		var format:any = _.zipObject(names, columns);
-		var columnTitles = _.zipObject(names, names);
-		
-		var rows = ColumnUtils.getRecords(format, null, String);
-
-		return (
-			<VBox>
-				<FixedDataTable rows={rows} 
-								columnIds={names} 
-								idProperty="id"
-								showIdColumn={true}
-								columnTitles={columnTitles as any}/>
-			</VBox>
-		);
+		// Weave.getCallbacks(this.column).delayCallbacks(); doesn't work
+		return <div/>;
+		// var leaves = this.parentNode && this.parentNode.getChildren().filter((n) => !n.isBranch());
+		// if(!leaves)
+		// 	return;
+		// var columns:IAttributeColumn[] = [];
+		// for(var leaf of leaves)
+		// {
+		// 	var columnRef = Weave.AS(leaf, weavejs.api.data.IColumnReference);
+		// 	if(columnRef)
+		// 		columns.push(columnRef.getDataSource().getAttributeColumn(columnRef.getColumnMetadata()));
+		// }
+		// 
+		// var names:string[] = columns.map(column => column.getMetadata("title"));
+		// var format:any = _.zipObject(names, columns);
+		// var columnTitles = _.zipObject(names, names);
+		// 
+		// var rows = ColumnUtils.getRecords(format, null, String);
+		// 
+		// return (
+		// 	<VBox>
+		// 		<FixedDataTable rows={rows} 
+		// 						columnIds={names} 
+		// 						idProperty="id"
+		// 						showIdColumn={true}
+		// 						columnTitles={columnTitles as any}/>
+		// 	</VBox>
+		// );
 	}
 	
 	render():JSX.Element
@@ -237,8 +242,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 		var tabContents = [
 			this.renderBrowseView(),
-			this.renderConfigureView(),
-			this.renderPreviewView()
+			this.renderConfigureView()
 		];
 		
 		if(this.state.showPreviewView)
@@ -246,7 +250,9 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			tabLabels.push("Preview");
 			tabContents.push(this.renderPreviewView());
 		}
+		
 		var activeTabIndex = 1;
+		
 		if(root.getChildren().length)
 		{
 			activeTabIndex = 0;
