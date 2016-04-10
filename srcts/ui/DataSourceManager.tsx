@@ -41,12 +41,10 @@ import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 export interface IDataSourceManagerProps
 {
 	weave:Weave;
-	selected?:IDataSource;
 }
 
 export interface IDataSourceManagerState
 {
-	selected?:IDataSource;
 }
 
 export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
@@ -63,13 +61,12 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
 		.set(GroupedDataTransform, GroupedDataTransformEditor)
 //		
+	
+	static selected:IDataSource;
 
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
-		this.state = {
-			selected: props.selected
-		};
 	}
 	
 	componentDidMount()
@@ -82,12 +79,6 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		this.props.weave.root.childListCallbacks.removeCallback(this, this.forceUpdate);
 	}
 
-	componentWillReceiveProps(props:IDataSourceManagerProps)
-	{
-		if (props.selected)
-			this.setState({selected: props.selected});
-	}
-	
 	refreshDataSource(dataSource:IDataSource)
 	{
 		dataSource.hierarchyRefresh.triggerCallbacks();
@@ -128,7 +119,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		});
 
 		let editorJsx:JSX.Element;
-		let dataSource = this.state.selected;
+		let dataSource = DataSourceManager.selected;
 		
 		if (dataSource && !Weave.wasDisposed(dataSource))
 		{
@@ -150,7 +141,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						options={listOptions}
 						multiple={false}
 						selectedValues={[dataSource]}
-						onChange={ (selectedValues:IDataSource[]) => this.setState({ selected: selectedValues[0] }) }
+						onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0], this.forceUpdate() }}
 					/>
 				</VBox>
 				<div style={{ backgroundColor: '#f0f0f0', width: 4}}/>
@@ -166,21 +157,16 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	{
 		var dsm = DataSourceManager.map_weave_dsmPopup.get(weave);
 		if (dsm)
-		{
-			dsm.setState({content: <DataSourceManager weave={weave} selected={selected}/>});
-		}
-		else
-		{
-			dsm = PopupWindow.open({
-				title: "Manage data sources",
-				content: <DataSourceManager weave={weave} selected={selected}/>,
-				modal: false,
-				width: 800,
-				height: 600,
-				onCancel: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
-			});
-			DataSourceManager.map_weave_dsmPopup.set(weave, dsm);
-		}
+			PopupWindow.close(dsm);
+		dsm = PopupWindow.open({
+			title: "Manage data sources",
+			content: <DataSourceManager weave={weave}/>,
+			modal: false,
+			width: 800,
+			height: 600,
+			onClose: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
+		});
+		DataSourceManager.map_weave_dsmPopup.set(weave, dsm);
 		return dsm;
 	}
 }

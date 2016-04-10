@@ -194,8 +194,10 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 
 				<CenteredIcon onClick={this.props.onMaximizeClick}
 							  iconProps={{className: "fa fa-expand fa-fw"}}/>
+				{/*
 				<CenteredIcon onClick={this.props.onPopoutClick || this.props.onPopinClick}
 							  iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}/>
+				*/}
 			    <CenteredIcon onClick={this.props.onCloseClick}
 							  iconProps={{className: "fa fa-times fa-fw"}}/>
 			</HBox>

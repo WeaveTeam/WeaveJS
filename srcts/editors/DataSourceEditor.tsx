@@ -32,7 +32,7 @@ export interface IDataSourceEditorState {
 	showPreviewView?: boolean;
 };
 
-export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
+export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState>
 {
 	dataSourceWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IDataSource, null, this.forceUpdate.bind(this)));
 	columnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(IAttributeColumn, null, this.forceUpdate.bind(this)));
@@ -52,33 +52,38 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			showPreviewView: false
 		}
 	}
-	
+
 	componentWillReceiveProps(props:IDataSourceEditorProps)
 	{
 		this.dataSourceWatcher.target = props.dataSource;
 	}
-	
+
 	get column():IAttributeColumn
 	{
 		return this.columnWatcher.target as IAttributeColumn;
 	}
-	
+
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		return [
 			[
 				<span>{Weave.lang("Source Name")}</span>,
 				<input type="text" style={{width: "100%", userSelect: false}}
-								   disabled={true}
-								   defaultValue={this.props.dataSource.getHierarchyRoot().getLabel()}/>
+					   disabled={true}
+					   defaultValue={this.props.dataSource.getHierarchyRoot().getLabel()}/>
 			]
 		]
+	}
+
+	shouldComponentUpdate()
+	{
+		return Weave.detectChange(this, this.column);
 	}
 
 	renderFields():JSX.Element
 	{
 		let dataSource = this.props.dataSource;
-		
+
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
@@ -89,7 +94,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 		return ReactUtils.generateTable(null, this.editorFields, tableStyles);
 	}
-	
+
 	showColumns(selectedItems:IWeaveTreeNode[])
 	{
 		this.parentNode = selectedItems && selectedItems.length && selectedItems[0];
@@ -111,7 +116,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			this.columnWatcher.target = null;
 		}
 	}
-	
+
 	componentWillUpdate()
 	{
 		if(this.tableContainer)
@@ -128,14 +133,14 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			id: IQualifiedKey,
 			value: this.column
 		}, null, String);
-		
+
 		rows = rows.map((row) => {
 			return {
-				id: row.id.toString(),
+				id: row.id.localName,
 				value: row.value
 			}
 		});
-		
+
 		var keyType = this.column.getMetadata("keyType");
 		var dataType = this.column.getMetadata("dataType");
 		var columnIds = ["id", "value"];
@@ -145,17 +150,17 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 				<span style={{marginTop: 5, marginBottom: 5}}>{Weave.lang("Selected column has {0} records", rows.length)}</span>
 				{
 					this.tableContainerElement &&
-					<FixedDataTable rows={rows} 
-								 	columnIds={columnIds} 
-								 	idProperty="id"
-								 	showIdColumn={true}
-								 	initialColumnWidth={this.tableContainerElement.clientWidth/2}
-								 	columnTitles={columnTitles}/>
-				}
+					<FixedDataTable rows={rows}
+									columnIds={columnIds}
+									idProperty="id"
+									showIdColumn={true}
+									initialColumnWidth={this.tableContainerElement.clientWidth/2}
+									columnTitles={columnTitles}/>
+					}
 			</VBox>
 		)
 	}
-	
+
 	renderBrowseView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
@@ -166,24 +171,24 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 						<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} initialSelectedItems={[this.props.dataSource.getHierarchyRoot()]} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
 					</VBox>
 					<div style={{width: 10}}/>
-					{ 
+					{
 						this.state.selectedNode
-						?	
+							?
 						<VBox style={{flex: 1}}>
-						  <WeaveTree root={this.state.selectedNode} hideRoot={true} hideBranches={true} onSelect={(selectedItems) => this.updateColumnTarget(selectedItems)}/>
-						  <HBox style={{justifyContent: "flex-end"}}>
-						  </HBox>
-		    			  {
-							  this.renderPreviewTable()
-						  }
+							<WeaveTree root={this.state.selectedNode} hideRoot={true} hideBranches={true} onSelect={(selectedItems) => this.updateColumnTarget(selectedItems)}/>
+							<HBox style={{justifyContent: "flex-end"}}>
+							</HBox>
+							{
+								this.renderPreviewTable()
+								}
 						</VBox>
-						: ""
-					}
+							: ""
+						}
 				</HBox>
 			</VBox>
 		);
 	}
-	
+
 	renderConfigureView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
@@ -192,44 +197,44 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 				<label> {Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel())} </label>
 				{
 					this.renderFields()
-				}
+					}
 			</VBox>
 		);
 	}
-	
+
 	renderPreviewView():JSX.Element
 	{
 		// delay the callbacks on the selected column
-		// Weave.getCallbacks(this.column).delayCallbacks();
-		
-		var leaves = this.parentNode && this.parentNode.getChildren().filter((n) => !n.isBranch());
-		if(!leaves)
-			return;
-		var columns:IAttributeColumn[] = [];
-		for(var leaf of leaves)
-		{
-			var columnRef = Weave.AS(leaf, weavejs.api.data.IColumnReference);
-			if(columnRef)
-				columns.push(columnRef.getDataSource().getAttributeColumn(columnRef.getColumnMetadata()));
-		}
-		
-		var names:string[] = columns.map(column => column.getMetadata("title"));
-		var format:any = _.zipObject(names, columns);
-		var columnTitles = _.zipObject(names, names);
-		
-		var rows = ColumnUtils.getRecords(format, null, String);
-
-		return (
-			<VBox>
-				<FixedDataTable rows={rows} 
-								columnIds={names} 
-								idProperty="id"
-								showIdColumn={true}
-								columnTitles={columnTitles as any}/>
-			</VBox>
-		);
+		// Weave.getCallbacks(this.column).delayCallbacks(); doesn't work
+		return <div/>;
+		// var leaves = this.parentNode && this.parentNode.getChildren().filter((n) => !n.isBranch());
+		// if(!leaves)
+		// 	return;
+		// var columns:IAttributeColumn[] = [];
+		// for(var leaf of leaves)
+		// {
+		// 	var columnRef = Weave.AS(leaf, weavejs.api.data.IColumnReference);
+		// 	if(columnRef)
+		// 		columns.push(columnRef.getDataSource().getAttributeColumn(columnRef.getColumnMetadata()));
+		// }
+		//
+		// var names:string[] = columns.map(column => column.getMetadata("title"));
+		// var format:any = _.zipObject(names, columns);
+		// var columnTitles = _.zipObject(names, names);
+		//
+		// var rows = ColumnUtils.getRecords(format, null, String);
+		//
+		// return (
+		// 	<VBox>
+		// 		<FixedDataTable rows={rows}
+		// 						columnIds={names}
+		// 						idProperty="id"
+		// 						showIdColumn={true}
+		// 						columnTitles={columnTitles as any}/>
+		// 	</VBox>
+		// );
 	}
-	
+
 	render():JSX.Element
 	{
 		var tabLabels = ["Browse", "Configure"];
@@ -237,16 +242,17 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 		var tabContents = [
 			this.renderBrowseView(),
-			this.renderConfigureView(),
-			this.renderPreviewView()
+			this.renderConfigureView()
 		];
-		
+
 		if(this.state.showPreviewView)
 		{
 			tabLabels.push("Preview");
 			tabContents.push(this.renderPreviewView());
 		}
+
 		var activeTabIndex = 1;
+
 		if(root.getChildren().length)
 		{
 			activeTabIndex = 0;

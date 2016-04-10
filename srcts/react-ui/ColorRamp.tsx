@@ -3,7 +3,7 @@ import * as _ from "lodash";
 
 export interface ColorRampProps extends React.HTMLProps<HTMLDivElement>
 {
-	ramp:string[];
+	ramp: string[];
 	direction?:string;
 }
 
@@ -19,10 +19,10 @@ export default class ColorRamp extends React.Component<ColorRampProps, ColorRamp
 	}
 
 	render():JSX.Element {
-		var direction:string = this.props.direction ? this.props.direction:"to right";
+		var direction:string = this.props.direction || "to right";
 		var rampStyle:React.CSSProperties = {
 			background: "linear-gradient("+  direction + "," + this.props.ramp.join(", ") + ")",
-			border: '1px'
+			border: '1px solid #ddd'
 		};
 
 		return (<div {...this.props} style={_.merge(this.props.style,rampStyle)}/>);

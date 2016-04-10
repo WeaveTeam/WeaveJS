@@ -1,69 +1,70 @@
 
 html {
-  font-family: sans-serif;
+	font-family: sans-serif;
 }
 
 body {
 	margin: 0;
 	color: #333;
+	overflow: hidden;
 }
 
 .axis path,
 .axis line {
-    fill: none;
-    stroke: #CCCCCC;
-    shape-rendering: crispEdges;
+	fill: none;
+	stroke: #CCCCCC;
+	shape-rendering: crispEdges;
 }
 
 .axis text {
-    font-family: sans-serif;
-    font-size: 11px;
+	font-family: sans-serif;
+	font-size: 11px;
 }
 
 .list-group-item:first-child {
-    margin-bottom: 0;
-    border-top-right-radius: 0px;
-    border-top-left-radius: 0px;
+	margin-bottom: 0;
+	border-top-right-radius: 0px;
+	border-top-left-radius: 0px;
 }
 
 .list-group-item:last-child {
-    margin-bottom: 0;
-    border-bottom-right-radius: 0px;
-    border-bottom-left-radius: 0px;
+	margin-bottom: 0;
+	border-bottom-right-radius: 0px;
+	border-bottom-left-radius: 0px;
 }
 
 .list-group-item {
-    width: 100%;
-    outline: none;
-    padding: 3px 15px;
+	width: 100%;
+	outline: none;
+	padding: 3px 15px;
 }
 
 .list-group {
-    height:100%;
-    margin-bottom: 5px;
-    min-width:max-content;
+	height:100%;
+	margin-bottom: 5px;
+	min-width:max-content;
 }
 
 .list-group-item.active, .list-group-item.active:focus {
-    z-index: 0;
-    color: -webkit-text;
-    background-color: #80CCFF;
-    border: 1px solid #ddd;
+	z-index: 0;
+	color: -webkit-text;
+	background-color: #80CCFF;
+	border: 1px solid #ddd;
 }
 
 .list-group-item.active:hover {
-    z-index: 0;
-    color: -webkit-text;
-    background-color: #99D6FF;
-    border: 1px solid #ddd;
+	z-index: 0;
+	color: -webkit-text;
+	background-color: #99D6FF;
+	border: 1px solid #ddd;
 }
 
 button.list-group-item:hover {
-    background-color: rgba(153, 214, 255, 0.4);
+	background-color: rgba(153, 214, 255, 0.4);
 }
 
 .btn {
-    font-size: inherit;
+	font-size: inherit;
 }
 
 .c3-tooltip td.value {
@@ -75,22 +76,22 @@ button.list-group-item:hover {
 }
 
 ul.dropdown-menu {
-    width:100%;
-    overflow:auto;
+	width:100%;
+	overflow:auto;
 }
 
 .react-bs-container .table-container>table>tbody>tr>td, .react-bs-container .table-container>table>thead>tr>th, .react-bs-container .table-header>table>thead>tr>th .table-header-column {
-    line-height: 14px;
+	line-height: 14px;
 }
 
 .weave-table {
-    font-size: inherit;
+	font-size: inherit;
 	white-space: nowrap;
 }
 
 .weave-table-header {
-    background-color: #eee;
-    color: -webkit-text;
+	background-color: #eee;
+	color: -webkit-text;
 }
 
 .weave-app {
@@ -121,11 +122,11 @@ ul.dropdown-menu {
 }
 
 .weave-tool-title-bar-text {
-    font-family: Roboto, sans-serif;
-    font-size: 16px;
-    font-weight: bold;
-    font-style: normal;
-    text-decoration: none;
+	font-family: Roboto, sans-serif;
+	font-size: 16px;
+	font-weight: bold;
+	font-style: normal;
+	text-decoration: none;
 	white-space: nowrap;
 	text-overflow: ellipsis;
 }
@@ -280,19 +281,19 @@ input[type="text"]:focus {
 
 .weave-dialog-overlay {
 	background-color: #ccc;
-    opacity: .5;
+	opacity: .5;
 }
 
 .weave-window {
 	resize: both;
-    overflow: hidden;
-    border-style: solid;
-    border-width: 1px;
-    border-color: #E6E6E6;
+	overflow: hidden;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #E6E6E6;
 	background-color: #FFFFFF;
-    box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.2);
-    -webkit-box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.2);
-    -moz-box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.2);
+	box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.2);
+	-webkit-box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.2);
+	-moz-box-shadow: 0px 0px 20px 1px rgba(0, 0, 0, 0.2);
 }
 
 /* same weave-menubar but can be customized */
@@ -326,49 +327,49 @@ input[type="text"]:focus {
 }
 
 .rc-slider {
-    position: relative;
-    height: 2px;
-    width: 100%;
-    border-radius: 3px;
-    background-color: #D0D0D0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-    z-index: 0;
+	position: relative;
+	height: 2px;
+	width: 100%;
+	border-radius: 3px;
+	background-color: #D0D0D0;
+	box-sizing: border-box;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+	z-index: 0;
 }
 .rc-slider-track {
-    position: absolute;
-    left: 0;
-    height: 2px;
-    border-radius: 6px;
-    background-color: #D0D0D0;
+	position: absolute;
+	left: 0;
+	height: 2px;
+	border-radius: 6px;
+	background-color: #D0D0D0;
 }
 
 .rc-slider-dot {
-    position: absolute;
-    top: -3px;
-    margin-left: 0px;
-    width: 1px;
-    height: 8px;
-    border: 1px solid #D0D0D0;
-    background-color: #fff;
-    cursor: pointer;
-    /* border-radius: 50%; */
-    vertical-align: middle;
+	position: absolute;
+	top: -3px;
+	margin-left: 0px;
+	width: 1px;
+	height: 8px;
+	border: 1px solid #D0D0D0;
+	background-color: #fff;
+	cursor: pointer;
+	/* border-radius: 50%; */
+	vertical-align: middle;
 }
 
 .rc-slider-dot:first-child {
-    margin-left: -1px
+	margin-left: -1px
 }
 .rc-slider-dot:last-child {
-    margin-left: -1px;
+	margin-left: -1px;
 }
 
 .rc-slider-dot-active {
-    border-color: #D0D0D0;
+	border-color: #D0D0D0;
 }
 
 .rc-slider {
-    background-color: #D0D0D0;
+	background-color: #D0D0D0;
 }
 
 .weave-icon:hover {
@@ -382,12 +383,12 @@ input[type="text"]:focus {
 
 
 .weave-tree-view-icon {
-    color: #808080;
+	color: #808080;
 }
 
 .weave-tree-view-icon-expander {
-    color: #000000;
-    font-size: 60%;
+	color: #000000;
+	font-size: 60%;
 }
 .weave-tree-view-icon-expander.hidden-expander::before {
 	content: " ";
@@ -401,29 +402,29 @@ input[type="text"]:focus {
 
 .weave-tree-view:hover {
 	background-color: rgba(153, 214, 255, 0.4);
-    cursor:pointer;
+	cursor:pointer;
 }
 
 .weave-tree-view.selected {
 	background-color: #80CCFF;
-    cursor:pointer;
+	cursor:pointer;
 }
 
 .weave-tree-view.selected:hover {
 	background-color: #99D6FF;
-    cursor:pointer;
+	cursor:pointer;
 }
 
 span.weave-tree-view.open {
-	
+
 }
 /* The pane for the weave-tree-view */
 div.weave-tree-view {
 
 }
 .popover{
-    max-width: 100%;
-    max-height: 75%;
+	max-width: 100%;
+	max-height: 75%;
 }
 .weave-list-Item{
 	cursor:pointer;
@@ -440,7 +441,7 @@ div.weave-tree-view {
 }
 
 .weave-tab-container {
-	
+
 }
 
 .weave-tab-label-container {
@@ -465,6 +466,10 @@ div.weave-tree-view {
 
 .weave-tab-content {
 	padding: 5;
+}
+
+.public_fixedDataTableCell_cellContent {
+	white-space: nowrap;
 }
 
 div.table-row-probed>div>div>div>div>div {

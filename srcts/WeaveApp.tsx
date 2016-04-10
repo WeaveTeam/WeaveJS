@@ -25,6 +25,7 @@ import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import WeavePath = weavejs.path.WeavePath;
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
+import WeaveToolEditor from "./ui/WeaveToolEditor";
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -203,6 +204,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		);
 	};
 
+
 	createObject=(type:new(..._:any[])=>any):void=>
 	{
 		var weave = this.props.weave;
@@ -288,6 +290,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		// backwards compatibility hack
 		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+		var sideBarUI:JSX.Element = null;
+		if(this.state.toolToEdit)
+			sideBarUI =  <WeaveToolEditor tool={this.state.toolToEdit}/>
 		
 		return (
 			<VBox
@@ -296,7 +301,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}
 			>
-				<SideBarContainer barSize={.2} leftSideBarChildren={this.state.toolToEdit && this.state.toolToEdit.renderEditor()}>
+				<SideBarContainer barSize={.2} leftSideBarChildren={ sideBarUI }>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}

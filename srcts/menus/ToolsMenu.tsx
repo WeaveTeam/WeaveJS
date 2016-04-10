@@ -35,7 +35,7 @@ export default class ToolsMenu implements MenuBarItemProps
 		this.menu = [
 			{
 				label: Weave.lang("Color Controller"),
-				click: () => this.openColorController()
+				click: () => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)
 			},
 			{}
 		];
@@ -57,12 +57,6 @@ export default class ToolsMenu implements MenuBarItemProps
 	
 	openColorController()
 	{
-		PopupWindow.open({
-			title: Weave.lang("Color Controller"),
-			content: <ColorController colorColumn={this.weave.getObject("defaultColorColumn") as ColorColumn}/>,
-			resizable: true,
-			width: 800,
-			height: 600
-		})
+		
 	}
 }

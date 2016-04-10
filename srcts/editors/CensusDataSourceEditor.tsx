@@ -229,10 +229,4 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 			</VBox>
 		)
 	}
-	
-	render():JSX.Element
-	{
-		console.log("CensusDataSourceEditorRendered", this.state);
-		return this.renderFields();
-	}
 }

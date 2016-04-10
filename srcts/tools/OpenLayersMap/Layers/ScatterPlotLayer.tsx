@@ -38,6 +38,7 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 	constructor()
 	{
 		super();
+		this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
 		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
 		for (let obj of [this.fill, this.line, this.radius])
 			Weave.getCallbacks(obj).addGroupedCallback(this, this.updateStyleData, true)
