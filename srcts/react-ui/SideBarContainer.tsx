@@ -1,14 +1,15 @@
 import * as React from "react";
 import ResizingDiv from "./ResizingDiv";
 import SideBar from "./SideBar";
+import SmartComponent from "../ui/SmartComponent";
 
 export interface SideBarContainerProps extends React.Props<SideBarContainer>
 {
     barSize:number;
-    topSideBarChildren?:JSX.Element;
-    bottomSideBarChildren?:JSX.Element;
-    leftSideBarChildren?:JSX.Element;
-    rightSideBarChildren?:JSX.Element;
+    topSideBarChildren?:JSX.Element | JSX.Element[]; // important to support both Array and composite element
+    bottomSideBarChildren?:JSX.Element | JSX.Element[];
+    leftSideBarChildren?:JSX.Element | JSX.Element[];
+    rightSideBarChildren?:JSX.Element | JSX.Element[];
 }
 
 export interface SideBarContainerState
@@ -22,13 +23,15 @@ export interface SideBarContainerState
 /**
  * Provides a way to make elements using percentage coordinates resize properly within a div that uses flex layout.
  */
-export default class SideBarContainer extends React.Component<SideBarContainerProps, SideBarContainerState>
+export default class SideBarContainer extends SmartComponent<SideBarContainerProps, SideBarContainerState>
 {
 
     constructor(props:SideBarContainerProps)
     {
         super(props);
 
+        // side bars has to remain closed by default
+        // props values are not passed here
         this.state = {
             openLeftSideBar:false,
             openRightSideBar:false,
@@ -37,11 +40,11 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
         }
     }
 
-    sideBarCloseHandler(direction:string, isOpen:boolean):void
+    sideBarCloseHandler(location:string, isOpen:boolean):void
 	{
         var stateObj:any = {}
-        var dir = this.capitalizeFirstCharacter(direction);
-        stateObj["open" + dir + "SideBar"] = isOpen;
+        var loc = this.capitalizeFirstCharacter(location);
+        stateObj["open" + loc + "SideBar"] = isOpen;
         this.setState(stateObj);
     }
 
@@ -53,18 +56,10 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
 	componentWillReceiveProps(nextProps:SideBarContainerProps)
 	{
         var stateObject:SideBarContainerState = {};
-        if(nextProps.leftSideBarChildren)
-            stateObject["openLeftSideBar"] = true;
-
-        if(nextProps.rightSideBarChildren)
-            stateObject["openRightSideBar"] = true;
-
-        if(nextProps.topSideBarChildren)
-            stateObject["openTopSideBar"] = true;
-
-        if(nextProps.bottomSideBarChildren)
-            stateObject["openBottomSideBar"] = true;
-
+        stateObject.openLeftSideBar = nextProps.leftSideBarChildren ? true :false
+        stateObject.openRightSideBar = nextProps.rightSideBarChildren ? true :false
+        stateObject.openTopSideBar = nextProps.topSideBarChildren ? true :false
+        stateObject.openBottomSideBar = nextProps.bottomSideBarChildren ? true :false
         this.setState(stateObject);
     }
 
@@ -76,21 +71,21 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
         var transformOriginValue:string = "";
         var topOrBottomBarWidth:number = 1;
 
-        if(this.state.openLeftSideBar && this.props.leftSideBarChildren)
+        if(this.state.openLeftSideBar )
         {
             scaleValue = scaleValue - barSize;
             transformOriginValue = "right";
             topOrBottomBarWidth = 1 - barSize;
         }
 
-        if(this.state.openRightSideBar && this.props.rightSideBarChildren)
+        if(this.state.openRightSideBar )
         {
             scaleValue = scaleValue - barSize;
             topOrBottomBarWidth = topOrBottomBarWidth - barSize;
             transformOriginValue = this.state.openLeftSideBar?"center":"left";
         }
 
-        if(this.state.openTopSideBar && this.props.rightSideBarChildren)
+        if(this.state.openTopSideBar)
         {
             scaleValue = scaleValue < 1 ? scaleValue:scaleValue - barSize;
 
@@ -107,7 +102,7 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
             }
         }
 
-        if(this.state.openBottomSideBar && this.props.rightSideBarChildren)
+        if(this.state.openBottomSideBar)
         {
             scaleValue = this.state.openTopSideBar ? 1 - 2 * barSize : scaleValue;
 
@@ -144,50 +139,53 @@ export default class SideBarContainer extends React.Component<SideBarContainerPr
             wrapperStyle["transformOrigin"]  = transformOriginValue;
         }
 
-        var sideBars:JSX.Element[] = [];
-		
-		["left","right","top","bottom"].forEach((direction, index) => {
 
-            var openStateValue:boolean = (this.state as any)["open" + this.capitalizeFirstCharacter(direction) + "SideBar"];
-            var sideBarChildren:JSX.Element = (this.props as any)[ direction + "SideBarChildren"];
-			if(openStateValue && sideBarChildren)
+        var sideBars:JSX.Element[] = ["left","right","top","bottom"].map(function(location,index){
+
+            var openStateValue:boolean = this.state["open" + this.capitalizeFirstCharacter(location) + "SideBar"];
+            if(!openStateValue)
             {
-				var barPercentageSize:string = barSize * 100 + "%";
-				var barStyle:React.CSSProperties = {}
-				
-				if(direction == "left" || direction == "right")
-				{
-					barStyle["width"] = barPercentageSize;
-					barStyle["height"] = "100%";
-				}
-				else if(direction == "top" || direction == "bottom")
-				{
-					barStyle["width"] = topOrBottomBarWidth * 100  + "%";
-					barStyle["height"] = barPercentageSize;
-					barStyle["left"] = this.state.openLeftSideBar ? barPercentageSize : "0";
-				}
-				
-				sideBars.push(<SideBar key={direction}
-									   style={barStyle}
-									   onClose={this.sideBarCloseHandler.bind(this, direction, false)}
-									   open={openStateValue}
-									   location={direction}
-									   children={sideBarChildren}/>);
-			}
-			else
-			{
-				
-			}
+                return null
+            }
 
-        });
+            var barStyle:React.CSSProperties = {};
 
-        return (
-			<ResizingDiv style={{flex: 1, position: "relative"}}>
-                <div style={wrapperStyle}>
-                	{this.props.children}
-                </div>
-                {sideBars}
-            </ResizingDiv>
-		);
+            // important to support both array and Composite Element
+            var sideBarChildren:JSX.Element[] | JSX.Element = this.props[ location + "SideBarChildren"];
+
+            var barPercentageSize:string = barSize * 100 + "%";
+
+
+            if(location == "right" || location == "left")
+            {
+                barStyle.width = barPercentageSize;
+                barStyle.height = "100%";
+            }
+            else if(location == "top" || location == "bottom")
+            {
+                barStyle.width = topOrBottomBarWidth * 100  + "%";
+                barStyle.height = barPercentageSize;
+                barStyle.left = this.state.openLeftSideBar ? barPercentageSize : "0";
+            }
+
+
+            return <SideBar
+                        key={ location }
+                        style={ barStyle }
+                        onClose={ this.sideBarCloseHandler.bind(this, location) }
+                        open={ openStateValue }
+                        location={ location }
+                        children={ sideBarChildren }
+                    />;
+
+        },this);
+
+        return (<ResizingDiv style={ {flex: 1, position: "relative"} }>
+                    {sideBars}
+                    <div style={ wrapperStyle }>
+                        {this.props.children}
+                    </div>
+
+                </ResizingDiv>);
     }
 }
