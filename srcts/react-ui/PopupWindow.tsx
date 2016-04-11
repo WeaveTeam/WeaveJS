@@ -113,14 +113,6 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
 	}
-	
-	stopEventPropagation=()=>
-	{
-		if (this.dragging)
-		{
-			event.stopImmediatePropagation();
-		}
-	}
 
 	private onOk()
 	{
