@@ -15,6 +15,8 @@ import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import {VSpacer, HSpacer} from "../react-ui/Spacer";
 import ColorRampComponent from "../react-ui/ColorRamp";
+import StatefulComboBox from "../ui/StatefulComboBox";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -37,6 +39,10 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 const SHAPE_TYPE_BOX:string = "box";
+const SHAPE_MODES:{label:string, value:any}[] = [{label: "Box", value: SHAPE_TYPE_BOX},
+												{label: "Circle", value: SHAPE_TYPE_CIRCLE},
+												{label: "Line", value: SHAPE_TYPE_LINE},
+												{label: "Square", value: SHAPE_TYPE_SQUARE}];
 
 export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool
 {
@@ -378,8 +384,18 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 	renderEditor ():JSX.Element{
 		return(<VBox>
-					{renderSelectableAttributes(this)}
-				</VBox>);
+			{renderSelectableAttributes(this)}
+			{ReactUtils.generateTable(
+				null,
+				[
+					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <StatefulComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ]
+				],
+				{
+					table: {width: "100%"},
+					td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
+				}
+			)}
+		</VBox>);
 	}
 
 	get deprecatedStateMapping():Object
