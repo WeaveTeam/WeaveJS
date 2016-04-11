@@ -1,5 +1,5 @@
 import * as React from "react";
-import {HBox, VBox} from "../react-ui/FlexBox";
+import {HBox, VBox,HDividedBox} from "../react-ui/FlexBox";
 import {ButtonGroupBar} from "../react-ui/ButtonGroupBar";
 import WeaveTree from "./WeaveTree";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
@@ -7,6 +7,7 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
@@ -14,6 +15,7 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import PopupWindow from "../react-ui/PopupWindow";
 import IDataSource = weavejs.api.data.IDataSource;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+import SmartComponent from "./SmartComponent";
 
 export interface IAttributeSelectorProps
 {
@@ -26,12 +28,12 @@ export interface IAttributeSelectorProps
 export interface IAttributeSelectorState
 {
     leafNode? : IWeaveTreeNode;
-    selectAll? :boolean;
     selectedAttribute?: IColumnWrapper|LinkableHashMap;
     label?:string;
+
 }
 
-export default class AttributeSelector extends React.Component<IAttributeSelectorProps,IAttributeSelectorState>
+export default class AttributeSelector extends SmartComponent<IAttributeSelectorProps,IAttributeSelectorState>
 {
     private tree: WeaveTree;
     private rootTreeNode :IWeaveTreeNode;
@@ -40,6 +42,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     private searchFilter :string;
     private items:{[label:string] : Function}={};
     private selectedColumnRef :IColumnReference[];
+    private selectedNodes:IWeaveTreeNode[];
 
     constructor(props:IAttributeSelectorProps)
     {
@@ -54,7 +57,13 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
         this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
         //this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 
-        this.state = {leafNode : null, selectAll : false, selectedAttribute:this.props.selectedAttribute, label:this.props.label};
+        this.state = {
+            leafNode : null,
+            selectedAttribute:this.props.selectedAttribute,
+            label:this.props.label
+        };
+
+        this.selectedNodes = this.getSelectedTreeNodesFor(this.props.selectedAttribute);//handles initial loading of selected items
     };
 
     componentWillReceiveProps (nextProps :IAttributeSelectorProps){
@@ -71,10 +80,18 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
         //this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
     }
 
-    handleSelectedAttribute= (name:string):void=>{
-        this.setState({selectedAttribute : this.props.selectableAttributes.get(name), label:name});
+    handleSelectedAttribute = (name:string):void=>
+    {
+        let selectedAttribute:IColumnWrapper|LinkableHashMap = this.props.selectableAttributes.get(name);
+
+        this.setState({
+            selectedAttribute : selectedAttribute,
+            label:name
+        });
+        this.selectedNodes = this.getSelectedTreeNodesFor(selectedAttribute);
     };
-    addSelected=():void=>
+
+    addSelected =():void=>
 	{
         var counter :number = this.selectedColumnRef.length;
 		for(var i:number =0; i < counter; i++ ){
@@ -91,9 +108,11 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
 
     handleSelectAll=():void=>{
         if(this.state.leafNode){
-          let selectedItems = this.state.leafNode.getChildren();//get all leaf nodes
-          this.leafTree.setState({selectedItems});//accessing leaf tree using ref concept
-          this.setState({selectAll :true});
+          this.selectedNodes = this.state.leafNode.getChildren() as IWeaveTreeNode[];//get all leaf nodes
+          this.leafTree.setState({
+              selectedItems:this.selectedNodes
+          });//accessing leaf tree using ref concept
+          //this.setState({selectAll :true});
         }
         else{
             alert("Please select a datasource");
@@ -106,8 +125,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
     };
 
     setColumn =(selectedItems:Array<IWeaveTreeNode>):void =>{
-        if(!this.state.selectAll)//if single item is clicked, disable selectAll boolean
-            this.setState({selectAll : false});
+
 		var ref = Weave.AS(selectedItems[0], weavejs.api.data.IColumnReference);
 		if (ref)
 		{
@@ -128,6 +146,7 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
                 }
             }
 		}
+        this.selectedNodes = selectedItems;
     };
 
     //for the fuzzy search Implementation
@@ -136,16 +155,32 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
         this.forceUpdate();
     };
 
-    getSelectedTreeNode = ():IWeaveTreeNode =>{
-        var dsources  = ColumnUtils.getDataSources(this.state.selectedAttribute as IColumnWrapper);
-        var dsource = dsources[0] as IDataSource;
-        var metadata = ColumnMetadata.getAllMetadata(this.state.selectedAttribute as IColumnWrapper);
-        if(dsource){
-            console.log('found node', metadata);
-            return dsource.findHierarchyNode(metadata);
+    getSelectedTreeNodesFor = (selectedAttribute:IColumnWrapper|LinkableHashMap):IWeaveTreeNode[] =>{
+        let selectedNodes:IWeaveTreeNode[]=[];
+        let selectableObjects:any[] = [];
+
+        if(Weave.IS(selectedAttribute, IColumnWrapper))
+        {
+            selectableObjects.push(selectedAttribute);//single entry
         }
         else
-            return;
+        {//LinkableHashMap
+            selectableObjects = (selectedAttribute as LinkableHashMap).getObjects();
+        }
+
+       for(var i:number = 0; i < selectableObjects.length; i++)
+       {
+           var dsources = ColumnUtils.getDataSources(selectableObjects[i] as IColumnWrapper);
+           var dsource = dsources[0] as IDataSource;
+           var metadata = ColumnMetadata.getAllMetadata(selectableObjects[i] as IColumnWrapper);
+           if (dsource)
+           {
+               selectedNodes.push(dsource.findHierarchyNode(metadata));
+
+           }
+       }
+        console.log(selectedNodes);
+           return selectedNodes;
     };
 
     getSelectedNodeRoot = ():IWeaveTreeNode =>{
@@ -170,6 +205,8 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
        return attrPop;
     }
 
+
+
     render():JSX.Element
     {
         if(this.rootTreeNode)
@@ -179,28 +216,29 @@ export default class AttributeSelector extends React.Component<IAttributeSelecto
             </VBox>
             : null;
 
-        var selectedNode:IWeaveTreeNode;
-        if(Weave.IS(this.state.selectedAttribute, IColumnWrapper)) selectedNode = this.getSelectedTreeNode();
+        //var selectedNodes:IWeaveTreeNode[];
+        //selectedNodes = this.getSelectedTreeNodes();
+        //console.log("selected nodes", selectedNodes);
 
         return (
             <VBox style={{ flex: 1, minWidth: 700, maxHeight: 400 }}>
 
-                <ButtonGroupBar items={ this.items }></ButtonGroupBar>
+                <ButtonGroupBar style={{ margin:'10px' }} items={ this.items }></ButtonGroupBar>
 
-                <HBox style={{height: '300px'}}>
-                    <VBox style={{ flex: 0.5 }}>
+                <HDividedBox style={{height: '200px', margin:'10px'}}>
+                    <VBox>
                         <WeaveTree searchFilter={ this.searchFilter } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={this.rootTreeNode} ref={ (c) => { this.tree = c; } }/>
                     </VBox>
-                    <VBox style={{ flex: .5 }}>
+                    <VBox>
                         {this.state.leafNode ?
-                        <WeaveTree searchFilter={ this.searchFilter } initialSelectedItems={ [selectedNode] } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.leafTree = c; } }/>
+                        <WeaveTree searchFilter={ this.searchFilter } multipleSelection={ true } initialSelectedItems={ this.selectedNodes } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.leafTree = c; } }/>
                         : null}
 
                         {Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.leafNode ?
-                            <HBox><button onClick={ this.handleSelectAll }>Select All</button><button onClick={ this.addSelected }>Add Selected</button></HBox>
+                            <HBox style={{ justifyContent:'flex-end'} }><button onClick={ this.handleSelectAll }>Select All</button><button onClick={ this.addSelected }>Add Selected</button></HBox>
                         : null}
                     </VBox>
-                </HBox>
+                </HDividedBox>
 
                 {ui}
             </VBox>

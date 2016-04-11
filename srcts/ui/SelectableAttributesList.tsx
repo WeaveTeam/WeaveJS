@@ -74,7 +74,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
         var buttonUI = <button style={ labelStyle } onClick={ this.launchAttributeSelector }>{ Weave.lang(this.props.label) }</button>;
         var labelUI =<span>{this.props.label}</span> ;
-        return(<VBox >
+        return(<VBox style={{ padding:'10px 10px 10px 10px' }}>
                     {this.props.showLabelAsButton ? buttonUI : labelUI}
 
                     <div >
@@ -82,7 +82,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
                             <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
                         </div>
 
-                        <HBox>
+                        <HBox style={{ margin:'5px 5px 5px 5px', justifyContent:'flex-end' }}>
                             <button onClick={ this.handleSelectAll }>Select All</button>
                             <button onClick={ this.removeSelected }>Remove Selected</button>
                         </HBox>
