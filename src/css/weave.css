@@ -285,7 +285,6 @@ input[type="text"]:focus {
 }
 
 .weave-window {
-	resize: both;
     overflow: hidden;
     border-style: solid;
     border-width: 1px;
