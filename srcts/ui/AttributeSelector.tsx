@@ -223,7 +223,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         return (
             <VBox style={{ flex: 1, minWidth: 700, maxHeight: 400 }}>
 
-                <ButtonGroupBar style={{ margin:'10px' }} items={ this.items }></ButtonGroupBar>
+                <ButtonGroupBar items={ this.items }></ButtonGroupBar>
 
                 <HDividedBox style={{height: '200px', margin:'10px'}}>
                     <VBox>
