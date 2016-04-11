@@ -186,6 +186,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				rowHeight={this.rowHeight.value}
 				headerHeight={this.headerHeight.value}
 				initialColumnWidth={this.columnWidth.value}
+				evenlyExpandRows={true}
 				ref={(c:FixedDataTable) => this.fixedDataTable = c}
 			/>
 		);
