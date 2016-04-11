@@ -113,14 +113,6 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
 	}
-	
-	stopEventPropagation=()=>
-	{
-		if (this.dragging)
-		{
-			event.stopImmediatePropagation();
-		}
-	}
 
 	private onOk()
 	{
@@ -209,8 +201,9 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 				newState.height = this.state.height + mouseDeltaY;
 			}
 			
-			if(newState.width > this.minWidth && newState.height > this.minHeight)
+			if((!newState.width || newState.width > this.minWidth) && (!newState.height || newState.height > this.minHeight))
 				this.setState(newState);
+			
 			return;
 		}
 
@@ -246,8 +239,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	componentWillUnmount()
 	{
-		document.removeEventListener("mouseup", this.onDragEnd);
-		document.removeEventListener("mousemove", this.onDrag);
+		document.removeEventListener("mouseup", this.onDragEnd, true);
+		document.removeEventListener("mousemove", this.onDrag, true);
 	}
 
 	renderOverlay(modal:boolean)

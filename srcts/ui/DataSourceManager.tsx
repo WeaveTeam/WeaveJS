@@ -155,6 +155,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	static map_weave_dsmPopup = new WeakMap<Weave, PopupWindow>();
 	static openInstance(weave:Weave, selected:IDataSource = null):PopupWindow
 	{
+		DataSourceManager.selected = selected;
 		var dsm = DataSourceManager.map_weave_dsmPopup.get(weave);
 		if (dsm)
 			PopupWindow.close(dsm);

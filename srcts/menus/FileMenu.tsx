@@ -102,16 +102,19 @@ export default class FileMenu implements MenuBarItemProps
 			var archive:WeaveArchive  = WeaveArchive.createArchive(this.weave)
 			var uint8Array:Uint8Array = archive.serialize();
 			var arrayBuffer:ArrayBuffer  = uint8Array.buffer;
-			FileSaver.saveAs(new Blob([arrayBuffer]), filenameInput.value || "defaults.weave");
+			FileSaver.saveAs(new Blob([arrayBuffer]), filenameInput.value+".weave" || "default.weave");
 		}
 		
 		PopupWindow.open({
-			title: "Export session state",
+			title: Weave.lang("Export session state"),
 			content: (
-				<VBox style={{width: 400, height: 300, padding: 20}}>
+				<VBox style={{width: 400, height: 200, padding: 20}}>
 					<span>{Weave.lang("Enter a file name")}</span>
-					<input style={{marginTop: 5}} type="text" placeholder="defaults.weave" defaultValue={this.fileName} ref={(c:HTMLInputElement) => filenameInput = c}/>
-					<span style={{marginTop: 5}}>{Weave.lang("Export options")}</span>
+					<HBox style={{alignItems: "center", marginTop: 10}}>
+						<input type="text" ref={(input) => {filenameInput = input; input && input.select(); input && input.focus()}} placeholder="defaults" defaultValue={this.fileName.substr(0, this.fileName.lastIndexOf(".weave"))}/>
+						.weave
+					</HBox>
+					<span style={{marginTop: 5}}>{Weave.lang("Export options:")}</span>
 					<VBox style={{marginLeft: 20, marginTop: 5, flex: 1}}>
 						<CheckBoxList options={checkboxListOptions}
 									  selectedValues={selectedOptions}
@@ -123,6 +126,7 @@ export default class FileMenu implements MenuBarItemProps
 					</HBox>
 				</VBox>
 			),
+			resizable: false,
 			modal: true,
 			onOk: onOk
 		});
