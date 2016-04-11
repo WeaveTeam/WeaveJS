@@ -51,6 +51,39 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
     render()
     {
         var className:string = "weave-icon-button";
+        var borderStyle:React.CSSProperties = {}
+        if(this.props.style)
+        {
+            if(this.props.style.borderWidth )
+            {
+                borderStyle.borderWidth = this.props.style.borderWidth;
+                borderStyle.borderStyle = (this.props.style.borderStyle)?this.props.style.borderStyle : "solid";
+            }
+            else if(this.props.style.border)
+            {
+                borderStyle.border = this.props.style.border;
+            }
+            else //default value
+            {
+                borderStyle.border = "1px solid";
+            }
+
+            if(this.props.style.borderRightColor || this.props.style.borderTopColor || this.props.style["borderBottomColor"] || this.props.style.borderLeftColor)
+            {
+                borderStyle["borderRightColor"] = this.props.style.borderRightColor;
+                borderStyle["borderTopColor"] = this.props.style.borderTopColor;
+                borderStyle["borderBottomColor"] = this.props.style["borderBottomColor"];
+                borderStyle["borderLeftColor"] = this.props.style.borderLeftColor;
+            }
+            else if(this.props.style.borderColor)
+            {
+                borderStyle.borderColor = this.props.style.borderColor;
+            }
+            else //default value
+            {
+                borderStyle.borderColor = "rgba(0, 0, 0, 0)";
+            }
+        }
         // important to set border color in rgba mode with alpha to 0
         // to ensure border is used in layout Calculation (CSS BOX  Model),
         // but not visible at same time
@@ -59,10 +92,10 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
             display:"flex",
             alignItems:"center",
             justifyContent:"center",
-            border: this.props.style && this.props.style.border ? this.props.style.border : "1px solid",
-            borderColor:this.props.style && this.props.style.borderColor ? this.props.style.borderColor : "rgba(0, 0, 0, 0)",
             cursor:"pointer"
         };
+
+        iconStyle = _.merge(iconStyle,borderStyle);
 
 
         if(this.props.style)
@@ -70,6 +103,7 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
             // the order of merge ensures iconStyle overrider props style
             // empty object required  to copy the props style as they are read-only
             iconStyle = _.merge({},this.props.style,iconStyle);
+
         }
 
         if(this.state.mouseOver)

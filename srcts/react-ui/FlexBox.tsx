@@ -247,8 +247,7 @@ class Resizer extends React.Component<IResizerProps, {}> {
 				margin: "0 -5px",
 				borderLeft: "5px solid rgba(255, 255, 255, 0)",
 				borderRight: "5px solid rgba(255, 255, 255, 0)",
-				cursor: "col-resize",
-				height: "100%"
+				cursor: "col-resize"
 			});
 		}else if(this.props.type === HORIZONTAL){
 			_.merge(styleObj, {
@@ -256,8 +255,7 @@ class Resizer extends React.Component<IResizerProps, {}> {
 				margin: "-5px 0",
 				borderTop: "5px solid rgba(255, 255, 255, 0)",
 				borderBottom: "5px solid rgba(255, 255, 255, 0)",
-				cursor: "row-resize",
-				width: "100%"
+				cursor: "row-resize"
 			});
 		}
 
