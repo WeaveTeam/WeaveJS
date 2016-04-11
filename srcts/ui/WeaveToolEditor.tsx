@@ -50,7 +50,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
         var toolEditorUI:JSX.Element[] | JSX.Element = this.props.tool.renderEditor()
 
         return (<div>
-                    <HBox className="weave-window-header" style = { {alignItems:"center"} }>
+                    <HBox className="weave-editor-header" style = { {alignItems:"center"} }>
                         <div style={ crumbStyle }>
                             {this.toolName}
                         </div>
