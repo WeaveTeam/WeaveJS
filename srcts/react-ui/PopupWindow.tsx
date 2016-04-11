@@ -239,8 +239,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	componentWillUnmount()
 	{
-		document.removeEventListener("mouseup", this.onDragEnd);
-		document.removeEventListener("mousemove", this.onDrag);
+		document.removeEventListener("mouseup", this.onDragEnd, true);
+		document.removeEventListener("mousemove", this.onDrag, true);
 	}
 
 	renderOverlay(modal:boolean)
