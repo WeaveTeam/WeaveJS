@@ -1,5 +1,6 @@
 import * as React from "react";
 import {HBox, VBox,HDividedBox} from "../react-ui/FlexBox";
+import IconButton from "../react-ui/IconButton";
 import {ButtonGroupBar} from "../react-ui/ButtonGroupBar";
 import WeaveTree from "./WeaveTree";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
@@ -216,26 +217,48 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                 </VBox>
                 : null;
 
+        let constrollerStyle:React.CSSProperties = {
+            justifyContent:'flex-end',
+            background:"#F8F8F8",
+            padding:"4px",
+            marginLeft:"0"
+        }
+
         //var selectedNodes:IWeaveTreeNode[];
         //selectedNodes = this.getSelectedTreeNodes();
         //console.log("selected nodes", selectedNodes);
 
         return (
-            <VBox style={{ flex: 1, minWidth: 700, maxHeight: 400 }}>
+            <VBox className="weave-padded-vbox" style={ {flex:1,padding:"4px"} }>
 
                 <ButtonGroupBar items={ this.items }></ButtonGroupBar>
 
-                <HDividedBox style={{height: '200px', margin:'10px'}}>
+                <HDividedBox style={ {flex:1 ,border:"1px solid #E6E6E6"} }>
+                    <div>
+                        <WeaveTree searchFilter={ this.searchFilter }
+                                   hideRoot = {true} hideLeaves = {true}
+                                   onSelect={this.onHierarchySelected}
+                                   root={this.rootTreeNode}
+                                   ref={ (c) => { this.tree = c; } }/>
+                    </div>
+
                     <VBox>
-                        <WeaveTree searchFilter={ this.searchFilter } hideRoot = {true} hideLeaves = {true} onSelect={this.onHierarchySelected} root={this.rootTreeNode} ref={ (c) => { this.tree = c; } }/>
-                    </VBox>
-                    <VBox>
-                        {this.state.leafNode ?
-                        <WeaveTree searchFilter={ this.searchFilter } multipleSelection={ true } initialSelectedItems={ this.selectedNodes } hideRoot={true} root={this.state.leafNode} onSelect={this.setColumn} ref={ (c) => { this.leafTree = c; } }/>
+                        {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter }
+                                                          multipleSelection={ true }
+                                                          initialSelectedItems={ this.selectedNodes }
+                                                          hideRoot={true}
+                                                          root={this.state.leafNode}
+                                                          onSelect={this.setColumn}
+                                                          ref={ (c) => { this.leafTree = c; } }/>
                             : null}
 
                         {Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.leafNode ?
-                        <HBox style={{ justifyContent:'flex-end'} }><button onClick={ this.handleSelectAll }>Select All</button><button onClick={ this.addSelected }>Add Selected</button></HBox>
+                        <HBox className="weave-padded-hbox" style={ constrollerStyle }>
+                            <IconButton clickHandler={ this.handleSelectAll }
+                                        style={ {borderColor:"grey", fontSize:"smaller"} }>Select All</IconButton>
+                            <IconButton clickHandler={ this.addSelected }
+                                        style={ {borderColor:"grey", fontSize:"smaller"} }>Add Selected</IconButton>
+                        </HBox>
                             : null}
                     </VBox>
                 </HDividedBox>
