@@ -49,6 +49,10 @@ import * as moment from "moment";
 weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 
+import * as jquery from "jquery";
+(window as any).jQuery = (jquery as any)["default"];
+(window as any).$ = (jquery as any)["default"];
+
 export
 {
 	WeaveApp,
