@@ -1,5 +1,3 @@
-import ILinkableObject = weavejs.api.core.ILinkableObject;
-
 import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "./IVisTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
@@ -15,7 +13,10 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import Menu from "../react-ui/Menu";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import {VSpacer, HSpacer} from "../react-ui/Spacer";
+import ColorRampComponent from "../react-ui/ColorRamp";
 
+import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -355,7 +356,17 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		else
 		{
 			//Continuous plot case
-			return (<div/>);
+			return (
+				<VBox style={{flex: 1}}>
+					<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</label>
+					<HSpacer/>
+					<HBox style={{flex: 1, overflow: "auto"}}>
+						<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={this.colorColumn ? this.colorColumn.ramp.getHexColors():[]}/>
+						<VSpacer/>
+						{/* labels will go here eventually*/}
+					</HBox>
+				</VBox>
+			);
 		}
 	}
 
