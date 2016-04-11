@@ -9,11 +9,11 @@ export interface IButtonGroupProps extends React.HTMLProps<ButtonGroupBar>{
     items:{
         [label:string] : Function;//label of button : function to call when the button is clicked
     };
-    activeButton?:number;
+    activeButton?:number|string;
 }
 
 export interface IButtonGroupState{
-    activeButton:number;
+    activeButton:number|string;
 }
 
 export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGroupState> {
@@ -85,7 +85,7 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
             else {
                 iconButtonStyle["borderRadius"] = 0;
             }
-            if(index == this.state.activeButton)
+            if(index == this.state.activeButton || label == this.state.activeButton)
             {
                 iconButtonStyle.color = "black";
                 iconButtonStyle.backgroundColor = "#C1C1C1";

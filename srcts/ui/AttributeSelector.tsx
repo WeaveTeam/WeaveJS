@@ -180,7 +180,6 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
             }
         }
-        console.log(selectedNodes);
         return selectedNodes;
     };
 
@@ -222,7 +221,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             background:"#F8F8F8",
             padding:"4px",
             marginLeft:"0"
-        }
+        };
 
         //var selectedNodes:IWeaveTreeNode[];
         //selectedNodes = this.getSelectedTreeNodes();
@@ -231,7 +230,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         return (
             <VBox className="weave-padded-vbox" style={ {flex:1,padding:"4px"} }>
 
-                <ButtonGroupBar items={ this.items }></ButtonGroupBar>
+                <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar>
 
                 <HDividedBox style={ {flex:1 ,border:"1px solid #E6E6E6"} }>
                     <div>
