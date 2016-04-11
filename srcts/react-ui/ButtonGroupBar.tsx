@@ -59,24 +59,28 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
 
         buttons = keys.map(function (label:string, index:number) {
             var iconButtonStyle:React.CSSProperties = {
-                borderColor: 'grey',
+                borderLeftColor: '#E6E6E6',
+                borderTopColor: '#E6E6E6',
+                borderBottomColor: '#E6E6E6',
+                borderRightColor:"rgba(0, 0, 0, 0)", //set alpha to 0
                 fontSize:'smaller',
                 backgroundColor:"#F8F8F8"
             };
 
-            if(index == 0)
+            if(index == 0)//first child
             {
                 iconButtonStyle.borderTopLeftRadius = 8;
                 iconButtonStyle.borderBottomLeftRadius = 8;
                 iconButtonStyle.borderTopRightRadius = 0;
                 iconButtonStyle.borderBottomRightRadius = 0;
             }
-            else if(index == keys.length - 1)
+            else if(index == keys.length - 1) //last child
             {
                 iconButtonStyle.borderTopRightRadius = 8;
                 iconButtonStyle.borderBottomRightRadius = 8;
                 iconButtonStyle.borderTopLeftRadius = 0;
                 iconButtonStyle.borderBottomLeftRadius = 0;
+                iconButtonStyle.borderRightColor ="#E6E6E6";
             }
             else {
                 iconButtonStyle["borderRadius"] = 0;
