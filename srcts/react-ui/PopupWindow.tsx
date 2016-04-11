@@ -209,8 +209,9 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 				newState.height = this.state.height + mouseDeltaY;
 			}
 			
-			if(newState.width > this.minWidth && newState.height > this.minHeight)
+			if((!newState.width || newState.width > this.minWidth) && (!newState.height || newState.height > this.minHeight))
 				this.setState(newState);
+			
 			return;
 		}
 
