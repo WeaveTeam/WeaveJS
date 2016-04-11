@@ -136,7 +136,10 @@ export default class TileLayer extends AbstractLayer
 
 	renderEditor():JSX.Element
 	{
-		return <TileLayerEditor layer={this}/>;
+		return <VBox>
+			<TileLayerEditor layer={this}/>
+			{this.renderEditableFields()}
+		</VBox>;
 	}
 
 	constructor()
