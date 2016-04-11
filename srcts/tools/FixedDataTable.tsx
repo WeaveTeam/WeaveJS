@@ -47,6 +47,9 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	headerHeight?:number;
 	initialColumnWidth?:number;
 	evenlyExpandRows?:boolean;
+	allowResizing?:boolean;
+	width?:number;
+	height?:number;
 }
 
 export interface IFixedDataTableState
@@ -175,7 +178,9 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		showIdColumn:false,
 		rowHeight:30,
 		headerHeight:30,
-		initialColumnWidth: 85
+		initialColumnWidth: 85,
+		allowResizing: true,
+		evenlyExpandRows: true
 	};
 
 	constructor(props:IFixedDataTableProps)
@@ -192,7 +197,9 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			columnWidths,
 			sortIndices,
 			selectedIds: props.selectedIds,
-			probedIds: props.probedIds
+			probedIds: props.probedIds,
+			width: props.width,
+			height: props.height
 		};
 	}
 
@@ -400,10 +407,11 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	}
 	
 	handleResize=(newSize:ResizingDivState) => {
-		this.setState({
-			width: newSize.width,
-			height: newSize.height
-		});
+		if(this.props.allowResizing)
+			this.setState({
+				width: newSize.width,
+				height: newSize.height
+			});
 	};
 
 	render():JSX.Element
