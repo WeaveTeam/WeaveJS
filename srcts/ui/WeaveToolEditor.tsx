@@ -56,10 +56,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
                         </div>
                         <span style={ {flex:"1"} }/>
                         <IconButton clickHandler={ this.openSessionStateEditor }
-                                    useDefaultStyle={true}
                                     iconName="fa fa-bars"
-                                    toolTip="Open Session State"
-                                    mouseOverStyle={ {color:"white",background:"grey"} }/>
+                                    toolTip={"Click to open Session State of " + this.toolName}/>
                     </HBox>
 
 

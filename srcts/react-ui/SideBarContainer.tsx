@@ -43,12 +43,14 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
     sideBarCloseHandler(location:string, isOpen:boolean):void
 	{
         var stateObj:any = {}
-        var loc = this.capitalizeFirstCharacter(location);
+        var loc:string = this.capitalizeFirstCharacter(location);
         stateObj["open" + loc + "SideBar"] = isOpen;
         this.setState(stateObj);
     }
 
-    capitalizeFirstCharacter(str:string)
+
+    // util function to make first charter capitalized
+    private capitalizeFirstCharacter=(str:string):string=>
 	{
         return str.charAt(0).toUpperCase() + str.slice(1);
     }
@@ -135,15 +137,15 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 
         if(scaleValue != 1)
 		{
-            wrapperStyle["transform"] =  `scale(${scaleValue})`;
-            wrapperStyle["transformOrigin"]  = transformOriginValue;
+            wrapperStyle.transform =  `scale(${scaleValue})`;
+            wrapperStyle.transformOrigin  = transformOriginValue;
         }
 
 
         var sideBars:JSX.Element[] = ["left","right","top","bottom"].map(function(location,index){
 
             var openStateValue:boolean = this.state["open" + this.capitalizeFirstCharacter(location) + "SideBar"];
-            if(!openStateValue)
+            if(!openStateValue) // don't render if sidebar is not open
             {
                 return null
             }
@@ -167,7 +169,6 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
                 barStyle.height = barPercentageSize;
                 barStyle.left = this.state.openLeftSideBar ? barPercentageSize : "0";
             }
-
 
             return <SideBar
                         key={ location }

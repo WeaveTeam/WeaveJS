@@ -191,10 +191,8 @@ class WeaveTreeItemEditor extends SmartComponent<IWeaveTreeItemEditorProps, IWea
                         <span style={ {flex:"1"} }/>
                         {linkableDynamicObjectUI}
                         <IconButton clickHandler={ this.saveSessionValue }
-                                    useDefaultStyle={true}
-                                    toolTip={"Save Session State of " + title}
-                                    style={ {borderColor:"grey",fontSize:"inherit"} }
-                                    mouseOverStyle={ {color:"white",background:"grey"} }>
+                                    toolTip={"click to save Session State of " + title}
+                                    style={ {borderColor:"grey",fontSize:"inherit"} }>
                             Apply
                         </IconButton>
                     </HBox>

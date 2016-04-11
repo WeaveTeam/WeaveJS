@@ -135,6 +135,22 @@ ul.dropdown-menu {
 	padding: 5px 5px 5px 5px;
 }
 
+.weave-icon-button{
+	padding: 5px;
+	border-radius:4px;
+	color:grey;
+ }
+
+.weave-icon-button-mouse-over{
+	padding: 5px;
+	border-color: grey;
+	border-radius:4px;
+	color:white;
+	background:grey;
+}
+
+
+
 input[type="text"] {
 	border: solid 1px #dcdcdc;
 	transition: box-shadow 0.3s, border 0.3s;
