@@ -1,5 +1,6 @@
 import * as React from "react";
 import {VBox, HBox} from '../react-ui/FlexBox';
+import IconButton from '../react-ui/IconButton';
 import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
 import PopupWindow from "../react-ui/PopupWindow";
@@ -66,8 +67,21 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
     {
         //styles
         var clearStyle = classNames({ 'fa fa-times-circle' : true, 'weave-icon' : true});
-        var labelStyle = {textAlign: 'center', flex: 0.35, fontSize: 'smaller'};
-        var btnStyle = {textAlign: 'center', flex: 0.05, fontSize: 'smaller'};
+        var labelStyle:React.CSSProperties = {
+            textAlign: 'center',
+            flex: 0.35,
+            fontSize: 'smaller'
+        };
+        var btnStyle:React.CSSProperties = {
+            fontSize: 'smaller',
+            padding:"2px"
+        };
+
+        var cleanBtnStyle:React.CSSProperties = {
+            fontSize: 'smaller',
+            padding:"2px"
+        };
+
 
         var selectableUI:JSX.Element[] = [];
         let alwaysDefinedCol:boolean;
@@ -90,11 +104,17 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
                                 <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
                                     { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
-                                    <AttributeDropdown style={{flex:1}}
+                                    <AttributeDropdown title="click to change column"
+                                                       style={ {flex:1} }
                                                        attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
                                                        clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
-                                    <span className={clearStyle} onClick={ this.clearColumn.bind( this, attribute) }/>
-                                    <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
+                                    <IconButton style={ cleanBtnStyle }
+                                                title={"click to remove the column from " + label }
+                                                iconName='fa fa-times'
+                                                clickHandler={ this.clearColumn.bind( this, attribute) }/>
+                                    <IconButton style={ btnStyle }
+                                                toolTip={"Click to explore data sources for " + label}
+                                                clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }>...</IconButton>
                                 </HBox>
 
                                 { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
