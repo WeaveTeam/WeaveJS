@@ -167,18 +167,18 @@ input[type="text"]:focus {
 	height:25px
 }
 
-.weave-padded-vbox {
-	margin-top: -8px;
-}
 .weave-padded-vbox > * {
 	margin-top: 8px;
 }
-
-.weave-padded-hbox {
-	margin-left: -8px;
+.weave-padded-vbox > *:nth-child(1) {
+	margin-top: 0px;
 }
+
 .weave-padded-hbox > * {
 	margin-left: 8px;
+}
+.weave-padded-hbox > *:nth-child(1) {
+	margin-left: 0px;
 }
 
 .weave-menu {
