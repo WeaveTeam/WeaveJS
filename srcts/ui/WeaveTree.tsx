@@ -142,6 +142,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	};
 
 	static CLASSNAME = "weave-tree-view";
+	static CONTAINER_CLASSNAME = "weave-tree-view-container";
 	static SELECTED_CLASSNAME = "selected";
 	
 	static BRANCH_ICON_CLASSNAME = "weave-tree-view-icon fa fa-folder fa-fw";
@@ -251,7 +252,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		}
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22) + 5;
 		let items = this.props.hideBranches ? this.props.root.getChildren().filter((n) => !n.isBranch()) : this.enumerateItems(this.props.root);
-		return <ListView style={this.props.style}
+		return <ListView className={WeaveTree.CONTAINER_CLASSNAME} style={this.props.style}
 						 items={items}
 						 itemRender={this.renderItem}
 						 itemHeight={this.rowHeight}/>;
