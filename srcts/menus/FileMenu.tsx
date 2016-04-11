@@ -7,6 +7,7 @@ import FileInput from "../react-ui/FileInput";
 import {ICheckBoxListProps} from "../react-ui/CheckBoxList";
 import CheckBoxList from "../react-ui/CheckBoxList";
 import * as FileSaver from "filesaver.js";
+import Input from "../semantic-ui/Input";
 
 import WeaveArchive = weavejs.core.WeaveArchive;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -123,11 +124,20 @@ export default class FileMenu implements MenuBarItemProps
 			title: Weave.lang("Export session state"),
 			content: (
 				<VBox style={{width: 400, height: 200, padding: 20}}>
-					<span>{Weave.lang("Enter a file name")}</span>
+					<span>{Weave.lang("Enter a file name:")}</span>
 					<HBox style={{alignItems: "center", marginTop: 10}}>
-						<input
+						<Input
 							type="text"
-							ref={(input) => {filenameInput = input; input && input.select(); input && input.focus()}}
+							style={{flex: 1}}
+							ref={(c:Input) => {
+								if(c && c.inputElement)
+								{ 
+									filenameInput = c.inputElement; 
+									c.inputElement.select(); 
+									c.inputElement; 
+									c.inputElement.focus()
+								}
+							}}
 							placeholder={this.dropExtension(defaultFileName)}
 							defaultValue={this.dropExtension(this.fileName)}
 						/>

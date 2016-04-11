@@ -8,7 +8,6 @@ import BinningDefinitionEditor from "./BinningDefinitionEditor";
 import ColorRampEditor from "./ColorRampEditor";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import PopupWindow from "../react-ui/PopupWindow";
-
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;

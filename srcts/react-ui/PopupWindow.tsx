@@ -5,6 +5,7 @@ import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "./VendorPrefixer";
 import CenteredIcon from "./CenteredIcon";
+import Button from "../semantic-ui/Button";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 const LEFT = "left";
@@ -316,6 +317,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 								this.props.footerContent
 							:
 								<HBox style={prefixer({flex: 1, justifyContent: "flex-end"})}>
+									<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
+									<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
 									<input className="weave-window-footer-input" type="button" value="Ok" onClick={this.onOk.bind(this)}/>
 									<input className="weave-window-footer-input" type="button" value="Cancel" onClick={this.onCancel.bind(this)}/>
 								</HBox>

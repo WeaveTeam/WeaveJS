@@ -7,6 +7,7 @@ import ColorRampComponent from "../react-ui/ColorRamp";
 import ColorPicker from "../react-ui/ColorPicker";
 import List from "../react-ui/List";
 import CenteredIcon from "../react-ui/CenteredIcon";
+import Button from "../semantic-ui/Button";
 
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -136,7 +137,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 					<VSpacer/>
 					<HBox style={{flex: .3, justifyContent: "space-between"}}>
 						<CenteredIcon onClick={this.reverseColors}>{'↓↑'}</CenteredIcon>
-						<button onClick={this.addColor}>{Weave.lang("Add color")}</button>
+						<Button onClick={this.addColor}>{Weave.lang("Add color")}</Button>
 					</HBox>
 				</HBox>
 				<HSpacer/>
