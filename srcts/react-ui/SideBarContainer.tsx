@@ -181,7 +181,7 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 
         },this);
 
-        return (<ResizingDiv style={ {flex: 1, position: "relative"} }>
+        return (<ResizingDiv style={ {flex: 1, position: "relative", background: "#e0e0e0"} }>
                     {sideBars}
                     <div style={ wrapperStyle }>
                         {this.props.children}
