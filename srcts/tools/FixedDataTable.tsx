@@ -182,6 +182,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		super(props);
 		var columnWidths = _.zipObject(props.columnIds, this.props.columnIds.map((id)=>{return this.props.initialColumnWidth})) as { [columnId: string]: number; };
 		var sortIndices:number[] = this.props.rows.map((row, index) => index);
+		var headerIndices:number[] = [];
 
 		if(props.selectedIds && props.probedIds)
 			this.lastClicked = props.selectedIds.length - 1;
@@ -192,6 +193,29 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			selectedIds: props.selectedIds,
 			probedIds: props.probedIds
 		};
+	}
+
+	moveSelectedToTop():void {
+		//get sort index of selected records
+		var sortIndices:number[] = this.state.sortIndices;
+		var selectedIndices:number[] = this.state.selectedIds.map( (id:string,index:number) => {
+			return sortIndices.indexOf(_.findIndex(this.props.rows.map((row:IRow) => {return row[this.props.idProperty] }), id));
+		});
+		//splice found indices to front of sort list
+		selectedIndices.forEach( (value) => {
+			var element = sortIndices[value];
+			sortIndices.splice(value, 1);
+			sortIndices.splice(0, 0, element);
+		});
+
+		this.setState({
+			sortIndices
+		});
+
+		if (this.props.onSelection)
+			this.props.onSelection(this.state.selectedIds);
+
+		this.forceUpdate();
 	}
 
 	getRowClass=(index: number):string =>

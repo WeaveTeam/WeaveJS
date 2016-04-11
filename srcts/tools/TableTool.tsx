@@ -35,6 +35,8 @@ export interface IDataTableState extends IVisToolState
 
 export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool
 {
+	fixedDataTable:FixedDataTable;
+
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 
 	sortFieldIndex = Weave.linkableChild(this, new LinkableNumber(0));
@@ -52,6 +54,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
 	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
+
 
 	idProperty:string = ''; // won't conflict with any column name
 
@@ -97,7 +100,17 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	getMenuItems():MenuItemProps[]
 	{
-		return AbstractVisTool.getMenuItems(this);
+		let menuItems:MenuItemProps[] = AbstractVisTool.getMenuItems(this);
+
+		if (this.selectionKeySet && this.selectionKeySet.keys.length)
+		{
+			menuItems.push({
+				label: Weave.lang("Move selected to top"),
+				click: () => this.fixedDataTable.moveSelectedToTop()
+			});
+		}
+
+		return menuItems;
 	}
 
 	dataChanged()
@@ -173,6 +186,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				rowHeight={this.rowHeight.value}
 				headerHeight={this.headerHeight.value}
 				initialColumnWidth={this.columnWidth.value}
+				ref={(c:FixedDataTable) => this.fixedDataTable = c}
 			/>
 		);
 	}
