@@ -6,6 +6,7 @@ import StatefulComboBox from "../../ui/StatefulComboBox";
 import {ListOption} from "../../react-ui/List";
 import List from "../../react-ui/List";
 import * as lodash from "lodash";
+import HSlider from "../../react-ui/RCSlider/HSlider";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -18,6 +19,7 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import WeaveAPI = weavejs.WeaveAPI;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import SliderOption from "../../react-ui/RCSlider/RCSlider";
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -54,14 +56,10 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
         return new Map<string, IColumnWrapper | LinkableHashMap>().set("Choices", this.choices);
     }
 
-    get options (): ListOption[]{
-        var options :ListOption[] =[];
-        //TODO handle them according to the layout mode
-        this.choices.getObjects().forEach((column:IAttributeColumn):void =>{
-            var option:ListOption = {label: ColumnUtils.getTitle(column), value : column};
-            options.push(option);
-        });
-        return options;
+    get options (){
+        return(this.choices.getObjects().map((column:IAttributeColumn) =>{
+            return({label: ColumnUtils.getTitle(column), value : column});//TODO replace getTitle with metadata title property?
+        }));
     };
 
     //crude function, should be deleted when possible
@@ -78,7 +76,6 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
             }
 
         }
-
         return mappedvalue;
     };
 
@@ -114,6 +111,9 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
         switch(this.layoutMode.value){
             case(LAYOUT_LIST):
                 return(<VBox><List options={ this.options }  onChange={ this.handleSelection } selectedValues={ [selectedAttribute] }/></VBox>);
+            case(LAYOUT_HSLIDER):
+                return(<VBox style={{ padding: "70px" }}>
+                        <HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type={ "categorical" }/></VBox>);
         }
     }
 }
