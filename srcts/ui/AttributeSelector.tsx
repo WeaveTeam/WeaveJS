@@ -59,7 +59,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         //this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 
         this.state = {
-            leafNode : null,
+            leafNode : this.getSelectedNodeRoot(this.props.selectedAttribute),
             selectedAttribute:this.props.selectedAttribute,
             label:this.props.label
         };
@@ -183,8 +183,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         return selectedNodes;
     };
 
-    getSelectedNodeRoot = ():IWeaveTreeNode =>{
-        var dsources  = ColumnUtils.getDataSources(this.state.selectedAttribute as IColumnWrapper);
+    getSelectedNodeRoot = (selectedAttribute:IColumnWrapper|LinkableHashMap):IWeaveTreeNode =>{
+        var dsources  = ColumnUtils.getDataSources(selectedAttribute as IColumnWrapper);
         var dsource = dsources[0] as IDataSource;
         if(dsource){
             return dsource.getHierarchyRoot();
