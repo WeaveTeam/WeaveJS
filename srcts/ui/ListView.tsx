@@ -49,7 +49,7 @@ export default class ListView extends React.Component<IListViewProps, IListViewS
 		}
 
 		return (
-			<div className={this.props.className} ref={ (c) => { this.container = c; } } style={_.merge({}, this.props.style, {overflow: "auto", flex: 1})}>
+			<div className={this.props.className || "weave-list-view-container"} ref={ (c) => { this.container = c; } } style={_.merge({}, this.props.style, {overflow: "auto", flex: 1})}>
 				<div style={{position: "relative", height: this.props.itemHeight * this.props.items.length}}>
 					{elements}
 				</div>
