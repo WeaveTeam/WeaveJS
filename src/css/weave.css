@@ -309,6 +309,11 @@ input[type="text"]:focus {
 	background-color: #F8F8F8;
 }
 
+.weave-window-content {
+    border:1px solid #E6E6E6;
+    margin: 10px 10px 10px 10px;
+}
+
 .weave-window-footer {
 	border-top-style: solid;
 	user-select: none;
