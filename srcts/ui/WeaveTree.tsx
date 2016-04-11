@@ -3,6 +3,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import ListView from "./ListView";
 import * as fs from 'fuse.js';
+import * as lodash from 'lodash';
 var Fuse = (fs as any)["default"] as typeof fs;
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -50,7 +51,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		{
 			this.setState({ selectedItems: nextProps.initialSelectedItems || [], openItems: nextProps.initialOpenItems || []});
 		}
-		if (nextProps.initialSelectedItems != this.props.initialSelectedItems)
+		if (!lodash.isEqual(nextProps.initialSelectedItems, this.props.initialSelectedItems))//TODO does not work with _.IsEqual
             this.setState({ selectedItems: nextProps.initialSelectedItems || [] });
 	}
 
