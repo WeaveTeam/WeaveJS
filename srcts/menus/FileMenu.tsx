@@ -10,6 +10,7 @@ import * as FileSaver from "filesaver.js";
 
 import WeaveArchive = weavejs.core.WeaveArchive;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export default class FileMenu implements MenuBarItemProps
 {
@@ -66,17 +67,29 @@ export default class FileMenu implements MenuBarItemProps
 		return WeaveArchive.loadUrl(this.weave, this.fileName);
 	}
 
+	private dropExtension(fileName:string)
+	{
+		if (!fileName)
+			fileName = '';
+		var i = fileName.lastIndexOf(".weave");
+		return i < 0 ? fileName : fileName.substr(0, i);
+	}
+
     saveFile=()=>
 	{
+		var defaultFileName:string = 'defaults.weave';
 		var filenameInput:HTMLInputElement;
+		if (!this.fileName)
+			this.fileName = defaultFileName;
 
-		var setShowTopMenuBar = () =>
+		var setShowTopMenuBar = (checked:boolean) =>
 		{
-			var enableMenuBar = this.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
-			enableMenuBar.value = true;
+			var wp = this.weave.requestObject(['WeaveProperties'], LinkableHashMap);
+			var enableMenuBar = wp.requestObject('enableMenuBar', LinkableBoolean);
+			enableMenuBar.value = checked;
 		}
 		
-		var setSaveHistory = () =>
+		var setSaveHistory = (checked:boolean) =>
 		{
 			console.log("Save history");
 		}
@@ -86,23 +99,24 @@ export default class FileMenu implements MenuBarItemProps
 			{
 				value: setShowTopMenuBar,
 				label: Weave.lang("Show top menu bar")
-			},
-			{
-				value: setSaveHistory,
-				label: Weave.lang("Save history")
+//			},
+//			{
+//				value: setSaveHistory,
+//				label: Weave.lang("Save history")
 			}
 		];
 		
-		var selectedOptions:Function[] = [setShowTopMenuBar, setSaveHistory];
+		var allOptions:Function[] = checkboxListOptions.map(opt => opt.value);
+		var selectedOptions:Function[] = allOptions;
 		var onOk = () => {
-			for(var option of selectedOptions)
+			for (var option of allOptions)
 			{
-				option.call(this);
+				option.call(this, selectedOptions.indexOf(option) >= 0);
 			}
 			var archive:WeaveArchive  = WeaveArchive.createArchive(this.weave)
 			var uint8Array:Uint8Array = archive.serialize();
 			var arrayBuffer:ArrayBuffer  = uint8Array.buffer;
-			FileSaver.saveAs(new Blob([arrayBuffer]), filenameInput.value+".weave" || "default.weave");
+			FileSaver.saveAs(new Blob([arrayBuffer]), (filenameInput.value && filenameInput.value + ".weave") || defaultFileName);
 		}
 		
 		PopupWindow.open({
@@ -111,7 +125,12 @@ export default class FileMenu implements MenuBarItemProps
 				<VBox style={{width: 400, height: 200, padding: 20}}>
 					<span>{Weave.lang("Enter a file name")}</span>
 					<HBox style={{alignItems: "center", marginTop: 10}}>
-						<input type="text" ref={(input) => {filenameInput = input; input && input.select(); input && input.focus()}} placeholder="defaults" defaultValue={this.fileName.substr(0, this.fileName.lastIndexOf(".weave"))}/>
+						<input
+							type="text"
+							ref={(input) => {filenameInput = input; input && input.select(); input && input.focus()}}
+							placeholder={this.dropExtension(defaultFileName)}
+							defaultValue={this.dropExtension(this.fileName)}
+						/>
 						.weave
 					</HBox>
 					<span style={{marginTop: 5}}>{Weave.lang("Export options:")}</span>
