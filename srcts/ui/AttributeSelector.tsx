@@ -56,7 +56,6 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
         this.weaveRoot = Weave.getRoot(props.selectedAttribute);
         this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
-        //this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 
         this.state = {
             leafNode : this.getSelectedNodeRoot(this.props.selectedAttribute),
@@ -69,16 +68,9 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
     componentWillReceiveProps (nextProps :IAttributeSelectorProps){
         if(nextProps.selectedAttribute != this.props.selectedAttribute){
-            //this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
             this.weaveRoot = Weave.getRoot(nextProps.selectedAttribute);
-            //this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
-
             this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
         }
-    }
-
-    componentWillUnmount (){
-        //this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
     }
 
     handleSelectedAttribute = (name:string):void=>
