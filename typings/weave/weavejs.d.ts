@@ -1694,8 +1694,8 @@ declare module weavejs.api.core {
         registerLinkableChild<T extends ILinkableObject>(linkableParent: Object, linkableChild: T, callback?: Function, useGroupedCallback?: boolean): T;
         /**
          * This function will create a new instance of the specified child class and register it as a child of the parent.
-         * Use this function when a child object can be disposed but you do not want to link the callbacks.
          * The child will be disposed when the parent is disposed.
+         * Use this function when a child object can be disposed but you do not want to link the callbacks or either object is not an ILinkableObject.
          *
          * Example usage:   public const foo:LinkableNumber = newDisposableChild(this, LinkableNumber);
          *
@@ -1707,8 +1707,7 @@ declare module weavejs.api.core {
         newDisposableChild(disposableParent: Object, disposableChildType: new (..._: any[]) => any): any;
         /**
          * This will register a child of a parent and cause the child to be disposed when the parent is disposed.
-         * Use this function when a child object can be disposed but you do not want to link the callbacks.
-         * The child will be disposed when the parent is disposed.
+         * Use this function when a child object can be disposed but you do not want to link the callbacks or either object is not an ILinkableObject.
          *
          * Example usage:   public const foo:LinkableNumber = registerDisposableChild(this, someLinkableNumber);
          *
@@ -4209,6 +4208,7 @@ declare module weavejs.data {
     import IColumnWrapper = weavejs.api.data.IColumnWrapper;
     import IKeyFilter = weavejs.api.data.IKeyFilter;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import DynamicColumn = weavejs.data.column.DynamicColumn;
     import Bounds2D = weavejs.geom.Bounds2D;
     /**
@@ -4257,6 +4257,7 @@ declare module weavejs.data {
         static deriveStringFromNumber(column: IAttributeColumn, number: number): string;
         static hack_findNonWrapperColumn(column: IAttributeColumn): IAttributeColumn;
         static hack_findInternalDynamicColumn(columnWrapper: IColumnWrapper): DynamicColumn;
+        static hack_findHierarchyNode(columnWrapper: IColumnWrapper): IWeaveTreeNode;
         /**
          * Gets an array of QKey objects from <code>column</code> which meet the criteria
          * <code>min &lt;= getNumber(column, key) &lt;= max</code>, where key is a <code>QKey</code>
@@ -5403,6 +5404,7 @@ declare module weavejs.data.column {
     import IColumnWrapper = weavejs.api.data.IColumnWrapper;
     import IDataSource = weavejs.api.data.IDataSource;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import CallbackCollection = weavejs.core.CallbackCollection;
     import LinkableString = weavejs.core.LinkableString;
     import LinkableVariable = weavejs.core.LinkableVariable;
@@ -5422,6 +5424,7 @@ declare module weavejs.data.column {
          */
         metadata: LinkableVariable;
         getDataSource(): IDataSource;
+        getHierarchyNode(): IWeaveTreeNode;
         /**
          * Updates the session state to refer to a new column.
          */
