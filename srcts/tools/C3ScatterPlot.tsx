@@ -347,18 +347,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				{
 					super.renderEditor()
 				}
-				<HBox>
-					<label>
-						{Weave.lang("Fill")}
-						<input type="text"/>
-					</label>
-				</HBox>
-				<HBox>
-					<label>
-						{Weave.lang("Line")}
-						<input type="text"/>
-					</label>
-				</HBox>
 			</VBox>
 		)
 	}
