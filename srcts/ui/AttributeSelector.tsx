@@ -232,7 +232,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
                 <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar>
 
-                <HDividedBox style={ {flex:1 ,border:"1px solid #E6E6E6"} }>
+                <HDividedBox style={ {flex:1 ,border:"1px solid #E6E6E6"} } loadWithEqualWidthChildren={true}>
                     <div>
                         <WeaveTree searchFilter={ this.searchFilter }
                                    hideRoot = {true} hideLeaves = {true}

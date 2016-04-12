@@ -46,13 +46,13 @@ export class VBox extends React.Component<React.HTMLProps<VBox>, {}>
 export interface IHDividedBoxState {
 	activeResizerIndex?:number;
 	dragging?:boolean;
-	leftChildWidth?:number;
+	resizingLeftChildWidth?:number;
 	mouseXPos?:number;
 }
 
 //todo option to disable live dragging
 export interface IHDividedBoxProps extends React.HTMLProps<HDividedBox> {
-
+	loadWithEqualWidthChildren?:boolean;
 }
 export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBoxState>
 {
@@ -69,16 +69,26 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 	constructor(props:React.HTMLProps<HBox>)
 	{
 		super(props)
+		if(this.props.loadWithEqualWidthChildren)
+		{
+			this.setEqualWidthChildren();
+		}
+	}
+
+	setEqualWidthChildren=():void=>{
+		var childCount:number = React.Children.count(this.props.children);
+
+		React.Children.forEach(this.props.children,function(child:ReactNode , index:number) {
+			this.leftChildWidths[index] = String(100/childCount) + "%";
+		}.bind(this));
 	}
 
 	state:IHDividedBoxState = {
 		activeResizerIndex:NaN,
-		leftChildWidth:null, // needs to be null as default value, to avoid warning for NaN  as "mutated Style"
+		resizingLeftChildWidth:null, // needs to be null as default value, to avoid warning for NaN  as "mutated Style"
 		mouseXPos:NaN,
 		dragging:false
 	}
-
-
 
 	// set the state with initial values from mouse event
 	private resizerMouseDownHandler = (index:number, event:React.MouseEvent):void=>
@@ -89,7 +99,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			mouseXPos:event.clientX,
 			activeResizerIndex:index,
 			dragging:true,
-			leftChildWidth:leftChild.getBoundingClientRect().width
+			resizingLeftChildWidth:leftChild.getBoundingClientRect().width
 		});
 
 		// important to add mouseup/mousemove on the window /document /parent div
@@ -102,11 +112,11 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 	}
 
 
-	// leftChildWidth and mouseXPos state values are updated while dragging
+	// resizingLeftChildWidth and mouseXPos state values are updated while dragging
 	private resizerMouseMoveHandler = (event:MouseEvent):void =>
 	{
 		// ensures no value is calculated when no resizer is active
-		// todo try removing mousemove when
+		// todo: try removing mousemove when
 		if(!this.state.dragging )
 		{
 			return;
@@ -114,10 +124,10 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 
 		//calculates width of the child left to active resizer
 		let deltaXPos:number = event.clientX - this.state.mouseXPos ;
-		let newWidth:number = this.state.leftChildWidth + deltaXPos;
+		let newWidth:number = this.state.resizingLeftChildWidth + deltaXPos;
 
 		this.setState({
-			leftChildWidth:newWidth,
+			resizingLeftChildWidth:newWidth,
 			mouseXPos:event.clientX
 		});
 
@@ -135,14 +145,14 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 		if(!isNaN(this.state.activeResizerIndex) )
 		{
 			//cache the width of left child for released resizer
-			this.leftChildWidths[this.state.activeResizerIndex] =  this.state.leftChildWidth;
+			this.leftChildWidths[this.state.activeResizerIndex] =  this.state.resizingLeftChildWidth;
 		}
 
 		// reset all values to avoid conflicts in next resizing event
 		this.setState({
 			dragging:false,
 			activeResizerIndex:NaN,
-			leftChildWidth:null,
+			resizingLeftChildWidth:null,
 			mouseXPos:NaN
 		});
 
@@ -180,7 +190,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			{
 				// if index is not there undefined comes, browser ignores one without the value
 				// and browser Layout mechanism set the width values
-				childStyle.width = (this.state.activeResizerIndex == index) ?  this.state.leftChildWidth : this.leftChildWidths[index];
+				childStyle.width = (this.state.activeResizerIndex == index) ?  this.state.resizingLeftChildWidth : this.leftChildWidths[index];
 			}
 			else 
 			{
