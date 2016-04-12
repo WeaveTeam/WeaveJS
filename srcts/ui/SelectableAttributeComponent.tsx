@@ -183,7 +183,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
     {
         var metadata:{[attr:string]:string};
             // If it's an IColumnWrapper, we need to normalize it to a treenode so we get the minimal reference metadata
-        if (!Weave.IS(node, IWeaveTreeNode))
+        if (Weave.IS(node, IColumnWrapper))
         {
                 let icw = node as IColumnWrapper;
                 metadata = ColumnMetadata.getAllMetadata(icw);
