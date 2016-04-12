@@ -20,7 +20,6 @@ import ControlPanel from "./ControlPanel";
 
 export interface IAttributeSelectorProps
 {
-    weave:Weave;
     label? : string;
     selectedAttribute : IColumnWrapper|LinkableHashMap;
     showLabelAsButton?:boolean;
