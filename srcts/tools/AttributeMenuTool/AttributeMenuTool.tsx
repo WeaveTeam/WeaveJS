@@ -7,6 +7,7 @@ import {ListOption} from "../../react-ui/List";
 import List from "../../react-ui/List";
 import * as lodash from "lodash";
 import HSlider from "../../react-ui/RCSlider/HSlider";
+import VSlider from "../../react-ui/RCSlider/VSlider";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -116,6 +117,9 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
             case(LAYOUT_HSLIDER):
                 return(<VBox style={{ padding: "70px" }}>
                         <HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type={ "categorical" }/></VBox>);
+            case(LAYOUT_VSLIDER):
+                return(<VBox><VSlider options={ this.options } onChange={ this.handleSelection } selectedValues={ [selectedAttribute] } type={ "categorical" }/>
+                        </VBox>)
         }
     }
 }
@@ -230,9 +234,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
                attributes.push({label, value});
            }
        }
-
-        //attributes.unshift({label:'Select an attribute', value : '0'});
-       // console.log((this.props.attributeMenuTool.targetToolPath.state as string[])[0],attributes);
         return attributes;
     }
 
@@ -281,7 +282,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
                 <StatefulComboBox value={ attributeValue } options={ this.getTargetToolAttributeOptions() } onChange={ this.handleTargetAttributeChange }  />
             ],
             [
-                Weave.lang("Attribute Menu Layout"),
+                Weave.lang("Menu Layout"),
                 <StatefulComboBox value={ menuLayout } options={ menuOptions } onChange={ this.handleMenuLayoutChange }/>
             ]
         ];
