@@ -63,13 +63,13 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		}
 		else
 		{
-			return !!this.state.openItems.find((otherNode) => otherNode.equals(node));
+			return node && !!this.state.openItems.find((otherNode) => otherNode.equals(node));
 		}
 	}
 
 	getSelected(node: IWeaveTreeNode): boolean
 	{
-		return !!this.state.selectedItems.find((otherNode) => otherNode.equals(node));
+		return node && !!this.state.selectedItems.find((otherNode) => otherNode.equals(node));
 	}
 
 	setSelected(newSelectedItems:Array<IWeaveTreeNode>):void
@@ -105,6 +105,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	private internalSetOpen(node: IWeaveTreeNode, value: boolean)
 	{
+		if (!node) return;
 		let isOpen = this.getOpen(node);
 		let openItems = this.state.openItems;
 		let selectedItems = this.state.selectedItems;
@@ -122,6 +123,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	private internalSetSelected(node: IWeaveTreeNode, value:boolean, keepSelection:boolean = false)
 	{
+		if (!node) return;
 		let isSelected = this.getSelected(node);
 		let openItems = this.state.openItems;
 		let selectedItems = this.state.selectedItems;
