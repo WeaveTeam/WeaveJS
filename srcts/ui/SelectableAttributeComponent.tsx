@@ -155,49 +155,25 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 
     siblings=(attribute:IColumnWrapper): {label: string, id:string}[] =>
     {
-        var siblings:{label: string, id:string}[];
-        var dc = ColumnUtils.hack_findInternalDynamicColumn(attribute);
-
-        if (!dc) return [];
-
-        var meta = ColumnMetadata.getAllMetadata(dc);//gets metadata for a column
-
-        var dataSources = ColumnUtils.getDataSources(dc) as IDataSource[];
-        var dataSource = dataSources.length && dataSources[0];
-
-        //if a column has not been set, datasource is not returned
-        if (dataSource)
-        {
-            var parentNode = HierarchyUtils.findParentNode(dataSource.getHierarchyRoot(), dataSource, meta);
-            var siblingNodes = parentNode ? parentNode.getChildren() : [];
-            if (siblingNodes)
-                siblings = siblingNodes.map((node:IWeaveTreeNode)=>{
-                    return {label: node.getLabel(), id: this.getColumnReferenceString(node)};
-                });
-        }
-
-        return siblings;
+		var siblings:{label: string, id:string}[];
+		var colRef = ColumnUtils.hack_findHierarchyNode(attribute);
+		if (!colRef)
+			return [];
+		var siblingNodes = HierarchyUtils.findSiblingNodes(colRef.getDataSource(), colRef.getColumnMetadata());
+		return siblingNodes.map((node:IWeaveTreeNode) => {
+			return {label: node.getLabel(), id: this.getColumnReferenceString(node)};
+		});
     };
 
     getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper):string=>
     {
         var metadata:{[attr:string]:string};
-            // If it's an IColumnWrapper, we need to normalize it to a treenode so we get the minimal reference metadata
+        // get IWeaveTreeNode from IColumnWrapper
         if (Weave.IS(node, IColumnWrapper))
-        {
-                let icw = node as IColumnWrapper;
-                metadata = ColumnMetadata.getAllMetadata(icw);
-                let dataSources = ColumnUtils.getDataSources(icw);
-                let dataSource = dataSources[0] as IDataSource;
-                if (!dataSource)
-                {
-                    console.log("The column", icw, "has no datasource.");
-                    return null;
-                }
-            node = dataSource.findHierarchyNode(metadata);
-        }
+			node = ColumnUtils.hack_findHierarchyNode(node as IColumnWrapper);
 
-        if(!node) return;
+        if (!node)
+			return;
         let colRef = Weave.AS(node as IWeaveTreeNode, weavejs.api.data.IColumnReference);
         let dataSource = colRef.getDataSource();
         let dataSourceName = (Weave.getOwner(dataSource) as ILinkableHashMap).getName(dataSource);

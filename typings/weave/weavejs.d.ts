@@ -4205,6 +4205,7 @@ declare module weavejs.data {
 declare module weavejs.data {
     import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+    import IColumnReference = weavejs.api.data.IColumnReference;
     import IColumnWrapper = weavejs.api.data.IColumnWrapper;
     import IKeyFilter = weavejs.api.data.IKeyFilter;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -4257,7 +4258,7 @@ declare module weavejs.data {
         static deriveStringFromNumber(column: IAttributeColumn, number: number): string;
         static hack_findNonWrapperColumn(column: IAttributeColumn): IAttributeColumn;
         static hack_findInternalDynamicColumn(columnWrapper: IColumnWrapper): DynamicColumn;
-        static hack_findHierarchyNode(columnWrapper: IColumnWrapper): IWeaveTreeNode;
+        static hack_findHierarchyNode(columnWrapper: IColumnWrapper): IWeaveTreeNode & IColumnReference;
         /**
          * Gets an array of QKey objects from <code>column</code> which meet the criteria
          * <code>min &lt;= getNumber(column, key) &lt;= max</code>, where key is a <code>QKey</code>
@@ -5401,6 +5402,7 @@ declare module weavejs.data.column {
 }
 declare module weavejs.data.column {
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+    import IColumnReference = weavejs.api.data.IColumnReference;
     import IColumnWrapper = weavejs.api.data.IColumnWrapper;
     import IDataSource = weavejs.api.data.IDataSource;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -5424,7 +5426,7 @@ declare module weavejs.data.column {
          */
         metadata: LinkableVariable;
         getDataSource(): IDataSource;
-        getHierarchyNode(): IWeaveTreeNode;
+        getHierarchyNode(): IWeaveTreeNode & IColumnReference;
         /**
          * Updates the session state to refer to a new column.
          */
@@ -5841,6 +5843,7 @@ declare module weavejs.data.hierarchy {
      */
     class HierarchyUtils {
         static findParentNode(root: IWeaveTreeNode, dataSource: IDataSource, metadata: Object): IWeaveTreeNode;
+        static findSiblingNodes(dataSource: IDataSource, metadata: Object): Array<IWeaveTreeNode>;
         /**
          * Finds a series of IWeaveTreeNode objects which can be traversed as a path to a descendant node.
          * @param root The root IWeaveTreeNode.
