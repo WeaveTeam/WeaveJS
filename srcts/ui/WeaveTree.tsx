@@ -193,7 +193,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 					 className={className}
 					 onMouseDown={ this.handleItemClick.bind(this, node) }
 					 onDoubleClick={ iconClickFunc }
-					 style={{ alignItems: "center", position: "relative", height: this.rowHeight, width: "100%"}}>
+					 style={{ alignItems: "center", position: "absolute", top: index * this.rowHeight, height: this.rowHeight, width: "100%"}}>
 						<HBox style={{ marginLeft: (node.depth || 0) * 16 + 5, whiteSpace: "nowrap"}}>
 							<span style={{alignSelf: "stretch", display: "flex"}}>
 								<i
