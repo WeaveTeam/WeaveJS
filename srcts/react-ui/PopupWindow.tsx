@@ -1,4 +1,3 @@
-import * as _ from "lodash";
 import * as ReactDOM from "react-dom";
 import * as React from "react";
 import {HBox, VBox} from "./FlexBox";
@@ -6,8 +5,22 @@ import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "./VendorPrefixer";
 import CenteredIcon from "./CenteredIcon";
+import Button from "../semantic-ui/Button";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
+const LEFT = "left";
+const RIGHT = "right";
+const TOP = "top";
+const BOTTOM = "bottom";
+const TOP_LEFT = "top-left";
+const TOP_RIGHT = "top-right";
+const BOTTOM_RIGHT = "bottom-right";
+const BOTTOM_LEFT = "bottom-left";
+
+type Handle = typeof LEFT | typeof RIGHT |
+				 typeof TOP | typeof BOTTOM |
+				 typeof TOP_LEFT | typeof TOP_RIGHT |
+				 typeof BOTTOM_RIGHT | typeof BOTTOM_LEFT;
 
 export interface PopupWindowProps extends React.Props<PopupWindow>
 {
@@ -28,7 +41,10 @@ export interface PopupWindowProps extends React.Props<PopupWindow>
 export interface PopupWindowState
 {
 	content?:JSX.Element;
-	position?: {top: number, left: number};
+	top?:number;
+	left?:number;
+	width?: number;
+	height?: number;
 	zIndex?: number;
 }
 
@@ -43,15 +59,22 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		y: number
 	}
 	private dragging:boolean;
-	
+	private activeResizeHandle:Handle;
+
 	static windowRegistry = new Set<PopupWindow>(); 
 	
 	constructor(props:PopupWindowProps)
 	{
 		super(props);
 		this.state = {
-			zIndex: 0
+			zIndex: 0,
+			width: props.width,
+			height: props.height
 		};
+	}
+	
+	static defaultProps = {
+		resizable: true
 	}
 
 	static open(props:PopupWindowProps):PopupWindow
@@ -82,30 +105,14 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this.container) as HTMLElement;
+		var top = this.props.top || (window.innerHeight - this.element.clientHeight) / 2;
+		var left = this.props.left || (window.innerWidth - this.element.clientWidth) / 2; 
 		this.setState({
-			position: {
-				top: this.props.top || (window.innerHeight - this.element.clientHeight) / 2,
-				left: this.props.left || (window.innerWidth - this.element.clientWidth) / 2
-			}
+			top: top,
+			left: left,
 		});
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
-		mouseevents.forEach((mouseevent: string) => document.addEventListener(mouseevent, this.stopEventPropagation, true));
-	}
-	
-	componentWillUnmount()
-	{
-		document.removeEventListener("mouseup", this.onDragEnd);
-		document.removeEventListener("mousemove", this.onDrag);
-		mouseevents.forEach((mouseevent) => document.removeEventListener(mouseevent, this.stopEventPropagation));
-	}
-	
-	stopEventPropagation=()=>
-	{
-		if (this.dragging)
-		{
-			event.stopImmediatePropagation();
-		}
 	}
 
 	private onOk()
@@ -135,6 +142,15 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		}
 	}
 	
+	private onResizeStart(event:React.MouseEvent, handle:Handle)
+	{
+		this.activeResizeHandle = handle;
+		this.oldMousePos = {
+			x: event.clientX,
+			y: event.clientY
+		}
+	}
+	
 	private handleClickOnWindow()
 	{
 		PopupWindow.windowRegistry.delete(this);
@@ -144,68 +160,132 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	
 	private onDrag=(event:MouseEvent)=>
 	{
+		if(!this.activeResizeHandle && !this.dragging)
+			return;
+
+		// TODO: correctly handle the page offsets
+		var mouseDeltaX = event.clientX - this.oldMousePos.x;
+		var mouseDeltaY = event.clientY - this.oldMousePos.y;
+		this.oldMousePos.x = event.clientX;
+		this.oldMousePos.y = event.clientY;
+		var newState:PopupWindowState = {};
+		var newLeft:number;
+		var newRight:number;
+		var newTop:number;
+		var newBottom:number;
+		var newWidth:number;
+		var newHeight:number;
+		
+		// don't resize if mouse goes out of screen
+
+		if(this.activeResizeHandle)
+		{
+			if(this.activeResizeHandle.indexOf(LEFT) >= 0 && event.clientX > 0)
+			{
+				newState.left = this.state.left + mouseDeltaX;
+				newState.width = this.state.width - mouseDeltaX;
+			}
+			
+			if(this.activeResizeHandle.indexOf(RIGHT) >= 0 && event.clientX < window.innerWidth)
+			{
+				newState.width = this.state.width + mouseDeltaX;
+			}
+			
+			if(this.activeResizeHandle.indexOf(TOP) >= 0 && event.clientY > 25)
+			{
+				newState.top = this.state.top + mouseDeltaY;
+				newState.height = this.state.height - mouseDeltaY;
+			}
+			
+			if(this.activeResizeHandle.indexOf(BOTTOM) >= 0 && event.clientY < window.innerHeight)
+			{
+				newState.height = this.state.height + mouseDeltaY;
+			}
+			
+			if((!newState.width || newState.width > this.minWidth) && (!newState.height || newState.height > this.minHeight))
+				this.setState(newState);
+			
+			return;
+		}
+
 		if (this.dragging)
 		{
-			event.stopImmediatePropagation();
-			var right = this.state.position.left + this.element.clientWidth;
-			var bottom = this.state.position.top + this.element.clientHeight;
-
-			var mouseDeltaX = event.clientX - this.oldMousePos.x;
-			var mouseDeltaY = event.clientY - this.oldMousePos.y;
-			this.oldMousePos.x = event.clientX;
-			this.oldMousePos.y = event.clientY;
+			var right = this.state.left + this.element.clientWidth;
+			var bottom = this.state.top + this.element.clientHeight;
 			
-			var position = Object(this.state.position); // prevents null position
-			var newPosition:{top: number, left: number} = {
-				top: position.top,
-				left: position.left
-			};
+			var newState:PopupWindowState = {};
 
-			var newLeft:number = position.left + mouseDeltaX;
-			var newTop:number = position.top + mouseDeltaY;
+			var newLeft:number = this.state.left + mouseDeltaX;
+			var newTop:number = this.state.top + mouseDeltaY;
 
 			// check overflow left and right
 			if (newLeft < window.innerWidth - 25 && newLeft+this.element.clientWidth > 25)
-				newPosition.left = newLeft;
+				newState.left = newLeft;
 
 			// check overflow left and right
 			if (newTop < window.innerHeight - 25 && newTop > 25)
-				newPosition.top = newTop;
-
-			this.setState({
-				position: newPosition
-			});
+				newState.top = newTop;
+			
+			if(Object.keys(newState).length)
+				this.setState(newState);
 		}
 	}
 	
 	private onDragEnd=(event:MouseEvent)=>
 	{
 		this.dragging = false;
+		this.activeResizeHandle = null;
+		this.forceUpdate(); // removes the overlay
 	}
 
-	static Overlay():JSX.Element
+	componentWillUnmount()
 	{
-		var overlayStyle:React.CSSProperties = {
+		document.removeEventListener("mouseup", this.onDragEnd, true);
+		document.removeEventListener("mousemove", this.onDrag, true);
+	}
+
+	renderOverlay(modal:boolean)
+	{
+		var style:React.CSSProperties = {
 			position: "fixed",
 			width: "100%",
 			height: "100%",
 			top: 0,
 			left: 0
 		};
-		return <div className="weave-dialog-overlay" style={overlayStyle}/>;
+		var className:string;
+		if(modal)
+		{
+			className = "weave-dialog-overlay";
+		}
+		return <div style={style} className={className}/>;
+	}
+	
+	renderResizers():JSX.Element[]
+	{
+		return [
+			<div key={LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, LEFT)} style={{position: "absolute", left: 0, top: 0, width: 4, height: "100%", cursor: "ew-resize"}}/>,
+			<div key={RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, RIGHT)} style={{position: "absolute", right: 0, top: 0, width: 4, height: "100%", cursor: "ew-resize"}}/>,
+			<div key={TOP} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP)} style={{position: "absolute", left: 0, top: 0, width: "100%", height: 4, cursor: "ns-resize"}}/>,
+			<div key={BOTTOM} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM)} style={{position: "absolute", left: 0, bottom: 0, width: "100%", height: 4, cursor: "ns-resize"}}/>,
+			<div key={TOP_LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP_LEFT)} style={{position: "absolute", left: 0, top: 0, width: 4, height: 4, cursor: "nwse-resize"}}/>,
+			<div key={TOP_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event,  TOP_RIGHT)} style={{position: "absolute", right: 0, top: 0, width: 4, height: 4, cursor: "nesw-resize"}}/>,
+			<div key={BOTTOM_LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event,  BOTTOM_LEFT)} style={{position: "absolute", left: 0, bottom: 0, width: 4, height: 4, cursor: "nesw-resize"}}/>,
+			<div key={BOTTOM_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM_RIGHT)} style={{position: "absolute", bottom: 0, right: 0, width: 4, height: 4, cursor: "nwse-resize"}}/>
+		];
 	}
 
 	render():JSX.Element
 	{
 
-		var windowStyle:React.CSSProperties = _.merge({	
+		var windowStyle:React.CSSProperties = {	
 			position: "absolute", 
-			width: this.props.width,
-			height: this.props.height,
-			minWidth: this.minWidth,
-			minHeight: this.minHeight,
+			top: this.state.top,
+			left: this.state.left,
+			width: this.state.width,
+			height: this.state.height,
 			zIndex: this.state.zIndex
-		}, this.state.position);
+		};
 
 		var popupWindow = (
 			<VBox className="weave-app weave-window" onMouseDown={() => this.handleClickOnWindow()} ref={(c:VBox) => this.container = c} style={windowStyle}>
@@ -223,7 +303,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 							''
 					}
 				</HBox>
-				<HBox className="weave-window-content" style={{flex: 1}}>
+				<HBox className="weave-window-content" style={{flex: 1, overflow: "auto"}}>
 					{ this.state.content || this.props.content }
 					{ this.props.children }
 				</HBox>
@@ -237,25 +317,25 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 								this.props.footerContent
 							:
 								<HBox style={prefixer({flex: 1, justifyContent: "flex-end"})}>
-									<input className="weave-window-footer-input" type="button" value="Ok" onClick={this.onOk.bind(this)}/>
-									<input className="weave-window-footer-input" type="button" value="Cancel" onClick={this.onCancel.bind(this)}/>
+									<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
+									<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
 								</HBox>
 						}
 						</HBox>
 					:
 						null
 				}
+				{
+					this.props.resizable && this.renderResizers()
+				}
 			</VBox>
 		);
 		
-		if (this.props.modal)
-			return (
-				<div>
-					<PopupWindow.Overlay/>
-					{popupWindow}
-				</div>
-			);
-		
-		return popupWindow;
+		return (
+			<div style={{zIndex: this.state.zIndex}}>
+				{(this.dragging ||this.activeResizeHandle || this.props.modal) ? this.renderOverlay(this.props.modal) : null}
+				{popupWindow}
+			</div>
+		);
 	}
 }

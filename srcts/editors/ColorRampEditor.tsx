@@ -7,6 +7,8 @@ import ColorRampComponent from "../react-ui/ColorRamp";
 import ColorPicker from "../react-ui/ColorPicker";
 import List from "../react-ui/List";
 import CenteredIcon from "../react-ui/CenteredIcon";
+import Button from "../semantic-ui/Button";
+import Dropdown from "../semantic-ui/Dropdown";
 
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -124,19 +126,15 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 				</HBox>
 				<HSpacer/>
 				<HBox>
-					<HBox style={{flex: .7}}>
+					<HBox style={{flex: .7, alignItems: "center"}}>
 						{Weave.lang("Filter: ")}
 						<VSpacer/>
-						<select value={this.state.selectedFilter} onChange={(event:React.FormEvent) => { this.setState({ selectedFilter: (event.target as any).value}) }}>
-							{
-								this.filterOptions.map((option, index) => <option value={option as string} key={index}>{Weave.lang(option)}</option>)
-							}
-						</select>
+						<Dropdown value={this.state.selectedFilter} options={this.filterOptions.map((option) => {return { value: Weave.lang(option) }})} onChange={(value:string) => { this.setState({ selectedFilter: value}) }}/>
 					</HBox>
 					<VSpacer/>
 					<HBox style={{flex: .3, justifyContent: "space-between"}}>
 						<CenteredIcon onClick={this.reverseColors}>{'↓↑'}</CenteredIcon>
-						<button onClick={this.addColor}>{Weave.lang("Add color")}</button>
+						<Button onClick={this.addColor}>{Weave.lang("Add color")}</Button>
 					</HBox>
 				</HBox>
 				<HSpacer/>

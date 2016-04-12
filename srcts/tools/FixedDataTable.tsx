@@ -46,6 +46,10 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	rowHeight?:number;
 	headerHeight?:number;
 	initialColumnWidth?:number;
+	evenlyExpandRows?:boolean;
+	allowResizing?:boolean;
+	width?:number;
+	height?:number;
 }
 
 export interface IFixedDataTableState
@@ -174,7 +178,9 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		showIdColumn:false,
 		rowHeight:30,
 		headerHeight:30,
-		initialColumnWidth: 85
+		initialColumnWidth: 85,
+		allowResizing: true,
+		evenlyExpandRows: true
 	};
 
 	constructor(props:IFixedDataTableProps)
@@ -182,6 +188,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		super(props);
 		var columnWidths = _.zipObject(props.columnIds, this.props.columnIds.map((id)=>{return this.props.initialColumnWidth})) as { [columnId: string]: number; };
 		var sortIndices:number[] = this.props.rows.map((row, index) => index);
+		var headerIndices:number[] = [];
 
 		if(props.selectedIds && props.probedIds)
 			this.lastClicked = props.selectedIds.length - 1;
@@ -190,8 +197,33 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			columnWidths,
 			sortIndices,
 			selectedIds: props.selectedIds,
-			probedIds: props.probedIds
+			probedIds: props.probedIds,
+			width: props.width,
+			height: props.height
 		};
+	}
+
+	moveSelectedToTop():void {
+		//get sort index of selected records
+		var sortIndices:number[] = this.state.sortIndices;
+		var selectedIndices:number[] = this.state.selectedIds.map( (id:string,index:number) => {
+			return sortIndices.indexOf(_.findIndex(this.props.rows.map((row:IRow) => {return row[this.props.idProperty] }), id));
+		});
+		//splice found indices to front of sort list
+		selectedIndices.forEach( (value) => {
+			var element = sortIndices[value];
+			sortIndices.splice(value, 1);
+			sortIndices.splice(0, 0, element);
+		});
+
+		this.setState({
+			sortIndices
+		});
+
+		if (this.props.onSelection)
+			this.props.onSelection(this.state.selectedIds);
+
+		this.forceUpdate();
 	}
 
 	getRowClass=(index: number):string =>
@@ -366,19 +398,20 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 		if(nextProps.probedIds)
 			newState.probedIds = nextProps.probedIds;
-		
+
 		if(nextProps.selectedIds)
 			newState.selectedIds = nextProps.selectedIds;
-		
+
 		this.setState(newState);
 		this.forceUpdate(); // why is this being done
 	}
 
 	handleResize=(newSize:ResizingDivState) => {
-		this.setState({
-			width: newSize.width,
-			height: newSize.height
-		});
+		if(this.props.allowResizing)
+			this.setState({
+				width: newSize.width,
+				height: newSize.height
+			});
 	};
 
 	render():JSX.Element
@@ -388,6 +421,10 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			flex: 1,
 			whiteSpace: "nowrap"
 		};
+		var evenWidth:number;
+
+		if(this.props.evenlyExpandRows && this.state.width > 0)
+			evenWidth = Math.max(this.state.width / (this.props.columnIds.length - (this.props.showIdColumn ? 0:1)), this.props.initialColumnWidth);
 
 		return (
 			<ResizingDiv style={tableContainer} onResize={this.handleResize}>
@@ -428,7 +465,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 													{...props}
 												/>)
 											}
-									width={this.state.columnWidths[id] || this.props.initialColumnWidth}
+									width={this.state.columnWidths[id] || (this.props.evenlyExpandRows ? (evenWidth || this.props.initialColumnWidth):this.props.initialColumnWidth)}
 									isResizable={true}
 								/>
 									);

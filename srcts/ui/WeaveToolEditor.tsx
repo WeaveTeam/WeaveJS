@@ -50,16 +50,14 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
         var toolEditorUI:JSX.Element[] | JSX.Element = this.props.tool.renderEditor()
 
         return (<div>
-                    <HBox className="weave-window-header" style = { {alignItems:"center"} }>
+                    <HBox className="weave-editor-header" style = { {alignItems:"center"} }>
                         <div style={ crumbStyle }>
                             {this.toolName}
                         </div>
                         <span style={ {flex:"1"} }/>
                         <IconButton clickHandler={ this.openSessionStateEditor }
-                                    useDefaultStyle={true}
                                     iconName="fa fa-bars"
-                                    toolTip="Open Session State"
-                                    mouseOverStyle={ {color:"white",background:"grey"} }/>
+                                    toolTip={"Click to open Session State of " + this.toolName}/>
                     </HBox>
 
 

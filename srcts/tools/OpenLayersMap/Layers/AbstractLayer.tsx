@@ -16,6 +16,7 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import WeaveAPI = weavejs.WeaveAPI;
 
 import StatefulTextField from "../../../ui/StatefulTextField";
+import StatefulRangeSlider from "../../../ui/StatefulRangeSlider";
 import StatefulComboBox from "../../../ui/StatefulComboBox";
 import StatefulCheckBox from "../../../ui/StatefulCheckBox";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
@@ -57,6 +58,11 @@ export default class AbstractLayer implements ILinkableObject
 			options = value[1];
 		}
 
+		if (key == "Opacity")
+		{
+			return [Weave.lang(key), <StatefulRangeSlider min={0} max={1} step={0.01} style={{ display: "inline", width: "50px" }} ref={linkReactStateRef(this, { value }) }/>]
+		}
+
 		if (lv instanceof LinkableString || lv instanceof LinkableNumber)
 		{
 			if (typeof options[0] === typeof "") {
@@ -76,6 +82,13 @@ export default class AbstractLayer implements ILinkableObject
 		}		
 	}
 
+	renderEditableFields(): JSX.Element
+	{
+		let fieldList: [string, JSX.Element][] = [];
+		this.editableFields.forEach((value, key) => { fieldList.push(this.renderEditableField(value, key)); });
+		return ReactUtils.generateTable(null, fieldList);
+	}
+
 	renderEditor(): JSX.Element {
 		let attributeList: JSX.Element;
 		let idx = 0;
@@ -86,19 +99,16 @@ export default class AbstractLayer implements ILinkableObject
 
 		attributeList = <SelectableAttributeComponent attributes={ this.selectableAttributes }/>;
 
-		let fieldList:[string, JSX.Element][] = [];
-		let table: JSX.Element;
-		this.editableFields.forEach((value, key) => {fieldList.push(this.renderEditableField(value,key));});
-
 		return <div>
 			{attributeList}
-			{ReactUtils.generateTable(null, fieldList)}
+			{this.renderEditableFields()}
 		</div>;
 	}
 
 	get editableFields()
 	{
-		return new Map<string,EditableField>();
+		return new Map<string, EditableField>()
+			.set("Opacity", this.opacity);
 	}
 
 	get selectableAttributes()

@@ -426,7 +426,9 @@ export default class C3BarChart extends AbstractC3Tool
 														  this.margin,
 														  this.overrideBounds,
 														  this.xAxisName,
-														  this.yAxisName);
+														  this.yAxisName,
+			 											  this.showXAxisLabel
+		);
 		var dataChange = axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet, this.showValueLabels);
 		if (dataChange)
         {
@@ -526,7 +528,8 @@ export default class C3BarChart extends AbstractC3Tool
 					null,
 					[
 						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
-						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
+						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ],
+						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showXAxisLabel })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show X Axis Title")}</span> ]
 					],
 					{
 						table: {width: "100%"},

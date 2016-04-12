@@ -42,7 +42,12 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	{
 		var keySet = this.probeFilter.target as KeySet;
 		return keySet instanceof KeySet && keySet.containsKey(key);
-	} 
+	}
+
+	get editableFields() {
+		return super.editableFields
+			.set("Selectable", this.selectable);
+	}
 
 	styleResolutionDependent: boolean = false;
 

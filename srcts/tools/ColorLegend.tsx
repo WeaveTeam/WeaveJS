@@ -1,5 +1,3 @@
-import ILinkableObject = weavejs.api.core.ILinkableObject;
-
 import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "./IVisTool";
 import * as _ from "lodash";
 import * as d3 from "d3";
@@ -15,7 +13,12 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import Menu from "../react-ui/Menu";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import {VSpacer, HSpacer} from "../react-ui/Spacer";
+import ColorRampComponent from "../react-ui/ColorRamp";
+import StatefulComboBox from "../ui/StatefulComboBox";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
+import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -36,6 +39,10 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 const SHAPE_TYPE_BOX:string = "box";
+const SHAPE_MODES:{label:string, value:any}[] = [{label: "Box", value: SHAPE_TYPE_BOX},
+												{label: "Circle", value: SHAPE_TYPE_CIRCLE},
+												{label: "Line", value: SHAPE_TYPE_LINE},
+												{label: "Square", value: SHAPE_TYPE_SQUARE}];
 
 export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool
 {
@@ -355,7 +362,17 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		else
 		{
 			//Continuous plot case
-			return (<div/>);
+			return (
+				<VBox style={{flex: 1}}>
+					<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</label>
+					<HSpacer/>
+					<HBox style={{flex: 1, overflow: "auto"}}>
+						<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={this.colorColumn ? this.colorColumn.ramp.getHexColors():[]}/>
+						<VSpacer/>
+						{/* labels will go here eventually*/}
+					</HBox>
+				</VBox>
+			);
 		}
 	}
 
@@ -367,8 +384,18 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 	renderEditor ():JSX.Element{
 		return(<VBox>
-					{renderSelectableAttributes(this)}
-				</VBox>);
+			{renderSelectableAttributes(this)}
+			{ReactUtils.generateTable(
+				null,
+				[
+					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <StatefulComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ]
+				],
+				{
+					table: {width: "100%"},
+					td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
+				}
+			)}
+		</VBox>);
 	}
 
 	get deprecatedStateMapping():Object

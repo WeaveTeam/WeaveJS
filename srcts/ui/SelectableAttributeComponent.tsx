@@ -1,5 +1,6 @@
 import * as React from "react";
 import {VBox, HBox} from '../react-ui/FlexBox';
+import IconButton from '../react-ui/IconButton';
 import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
 import PopupWindow from "../react-ui/PopupWindow";
@@ -66,8 +67,21 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
     {
         //styles
         var clearStyle = classNames({ 'fa fa-times-circle' : true, 'weave-icon' : true});
-        var labelStyle = {textAlign: 'center', flex: 0.35, fontSize: 'smaller'};
-        var btnStyle = {textAlign: 'center', flex: 0.05, fontSize: 'smaller'};
+        var labelStyle:React.CSSProperties = {
+            textAlign: 'center',
+            flex: 0.35,
+            fontSize: 'smaller'
+        };
+        var btnStyle:React.CSSProperties = {
+            fontSize: 'smaller',
+            padding:"2px"
+        };
+
+        var cleanBtnStyle:React.CSSProperties = {
+            fontSize: 'smaller',
+            padding:"2px"
+        };
+
 
         var selectableUI:JSX.Element[] = [];
         let alwaysDefinedCol:boolean;
@@ -90,11 +104,17 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
                     <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
                         { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
-                        <AttributeDropdown style={{flex:1}}
+                        <AttributeDropdown title="click to change column"
+                                           style={ {flex:1} }
                                            attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
                                            clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
-                        <span className={clearStyle} onClick={ this.clearColumn.bind( this, attribute) }/>
-                        <button style={ btnStyle } onClick={ this.launchAttributeSelector.bind(this,label,attribute) }>...</button>
+                        <IconButton style={ cleanBtnStyle }
+                                    title={"click to remove the column from " + label }
+                                    iconName='fa fa-times'
+                                    clickHandler={ this.clearColumn.bind( this, attribute) }/>
+                        <IconButton style={ btnStyle }
+                                    toolTip={"Click to explore data sources for " + label}
+                                    clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }>...</IconButton>
                     </HBox>
 
                     { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
@@ -156,48 +176,27 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
     siblings=(attribute:IColumnWrapper): {label: string, id:string}[] =>
     {
         var siblings:{label: string, id:string}[];
-        var dc = ColumnUtils.hack_findInternalDynamicColumn(attribute);
-
-        if (!dc) return [];
-
-        var meta = ColumnMetadata.getAllMetadata(dc);//gets metadata for a column
-
-        var dataSources = ColumnUtils.getDataSources(dc) as IDataSource[];
-        var dataSource = dataSources.length && dataSources[0];
-
-        //if a column has not been set, datasource is not returned
-        if (dataSource)
-        {
-            var parentNode = HierarchyUtils.findParentNode(dataSource.getHierarchyRoot(), dataSource, meta);
-            var siblingNodes = parentNode ? parentNode.getChildren() : [];
-            if (siblingNodes)
-                siblings = siblingNodes.map((node:IWeaveTreeNode)=>{
-                    return {label: node.getLabel(), id: this.getColumnReferenceString(node)};
-                });
-        }
-
-        return siblings;
+        var colRef = ColumnUtils.hack_findHierarchyNode(attribute);
+        if (!colRef)
+            return [];
+        var siblingNodes = HierarchyUtils.findSiblingNodes(colRef.getDataSource(), colRef.getColumnMetadata());
+        return siblingNodes.filter((node:IWeaveTreeNode) => Weave.IS(node, IColumnReference)).map((node:IWeaveTreeNode) => {
+            return {label: node.getLabel(), id: this.getColumnReferenceString(node)};
+        });
     };
 
     getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper):string=>
     {
         var metadata:{[attr:string]:string};
-        // If it's an IColumnWrapper, we need to normalize it to a treenode so we get the minimal reference metadata
-        if (!Weave.IS(node, IWeaveTreeNode))
-        {
-            let icw = node as IColumnWrapper;
-            metadata = ColumnMetadata.getAllMetadata(icw);
-            let dataSources = ColumnUtils.getDataSources(icw);
-            let dataSource = dataSources[0] as IDataSource;
-            if (!dataSource)
-            {
-                return null;
-            }
-            node = dataSource.findHierarchyNode(metadata);
-        }
+        // get IWeaveTreeNode from IColumnWrapper
+        if (Weave.IS(node, IColumnWrapper))
+            node = ColumnUtils.hack_findHierarchyNode(node as IColumnWrapper);
 
-        if(!node) return;
+        if (!node)
+            return null;
         let colRef = Weave.AS(node as IWeaveTreeNode, weavejs.api.data.IColumnReference);
+        if (!colRef)
+            return null;
         let dataSource = colRef.getDataSource();
         let dataSourceName = (Weave.getOwner(dataSource) as ILinkableHashMap).getName(dataSource);
 

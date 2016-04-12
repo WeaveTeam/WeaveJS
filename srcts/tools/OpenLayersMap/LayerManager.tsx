@@ -40,27 +40,18 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 
 	generateItem=(layer:AbstractLayer, index:number):JSX.Element=>
 	{
-		let marginStyle: React.CSSProperties = {marginRight: "0.5em"};
 		/* Stop propagation is necessary because otherwise state linkage breaks when the selectedLayer changes. */
-		return <div key={index} style={{width: "100%", whiteSpace: "nowrap"}}
+		return <tr key={index}
 				className={layer === this.state.selectedLayer ? "weave-tree-view selected" : "weave-tree-view"}
 				onClick={() => { if (this.state.selectedLayer !== layer) this.setState({ selectedLayer: layer, openedLayer: null }); }}>
-				<span style={marginStyle}>
-				<StatefulCheckBox ref={linkReactStateRef(this, { checked: layer.visible }) } stopPropagation/>
-					{Weave.lang("Visible")}
-				</span>
-				<span style={marginStyle}>
-					<StatefulRangeSlider min={0} max={1} step={0.01} style={{display: "inline", width: "50px"}} ref={linkReactStateRef(this, { value: layer.opacity })}/>
-				</span>
-				<span style={marginStyle}>
-					<StatefulCheckBox ref={linkReactStateRef(this, { checked: layer.selectable }) } disabled={!(layer instanceof AbstractFeatureLayer) } stopPropagation/>
-					{Weave.lang("Selectable")}
-				</span>
-				<span style={marginStyle}>{layer.getDescription() }</span>
-				<button onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }>
-					<i className="fa fa-gear"/>{Weave.lang("Edit")}
-				</button>
-		</div>;
+				<td><StatefulCheckBox title={Weave.lang("Show layer")} ref={linkReactStateRef(this, { checked: layer.visible }) } stopPropagation={true}/></td>
+				<td style={{width: "100%"}}>{layer.getDescription() }</td>
+				<td>
+					<button title={Weave.lang("Edit layer")} style={{whiteSpace: "nowrap"}} onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }>
+						<i className="fa fa-gear"/>{" " + Weave.lang("Edit")}
+					</button>
+				</td>
+		</tr>;
 	}
 
 	moveSelectedUp=()=>{
@@ -84,36 +75,38 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		return this.props.layers.getObjects().indexOf(this.state.selectedLayer);
 	}
 
-	
-	static layerClassNames = [
-		"weave.visualization.plotters::GeometryPlotter",
-		"weave.visualization.plotters::ImageGlyphPlotter",
-		"weave.visualization.plotters::TextGlyphPlotter",
-		"weave.visualization.plotters::ScatterPlotPlotter",
-		"weave.visualization.plotters::WMSPlotter"
-	];
+	static layerClassNames = new Map<string, string>()
+		.set("weave.visualization.plotters::WMSPlotter", "Base Map Layer")
+		.set("weave.visualization.plotters::GeometryPlotter", "Geometry Layer")
+		.set("weave.visualization.plotters::TextGlyphPlotter", "Label Layer")
+		.set("weave.visualization.plotters::ScatterPlotPlotter", "Bubble Layer")
+		.set("weave.visualization.plotters::ImageGlyphPlotter", "Icon Layer");
 
 	/* TODO: Add drag-and-drop of layers. */
 	render():JSX.Element
 	{
 		let flex1: React.CSSProperties = { flex: 1 };
 
-		let addLayerMenuItem = (layerClassName:string):{ label: string, onClick: React.MouseEventHandler } => {
-			let label = _.last(layerClassName.split("::"));
+		let addLayerMenuItem = (layerClassInfo:[string,string]):{ label: string, onClick: React.MouseEventHandler } => {
+			let [layerClassName, layerClassLabel] = layerClassInfo;
 			let onClick = () => {
-				this.props.layers.requestObject(this.props.layers.generateUniqueName(label), Weave.getDefinition(layerClassName));
+				this.props.layers.requestObject(this.props.layers.generateUniqueName(layerClassLabel), Weave.getDefinition(layerClassName));
 			}
-			return { label , onClick };
+			return {label: layerClassLabel, onClick};
 		};
 
 		if (!this.state.openedLayer)
 		{
 			return <VBox>
 				<div style={{ height: 200, overflowY: "scroll" }}>
-					{this.props.layers.getObjects().reverse().map(this.generateItem)}
+					<table style={{ width: "100%" }}>
+						<tbody>
+							{this.props.layers.getObjects().reverse().map(this.generateItem)}
+						</tbody>
+					</table>
 				</div>
 				<HBox>
-					<MenuButton style={flex1} items={LayerManager.layerClassNames.map(addLayerMenuItem)}>
+					<MenuButton style={flex1} items={Array.from(LayerManager.layerClassNames.entries()).map(addLayerMenuItem)}>
 						<i className="fa fa-plus"/>
 					</MenuButton>
 					<button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></button>

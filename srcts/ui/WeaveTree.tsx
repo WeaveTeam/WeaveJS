@@ -3,6 +3,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import ListView from "./ListView";
 import * as fs from 'fuse.js';
+import * as lodash from 'lodash';
 var Fuse = (fs as any)["default"] as typeof fs;
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -50,6 +51,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		{
 			this.setState({ selectedItems: nextProps.initialSelectedItems || [], openItems: nextProps.initialOpenItems || []});
 		}
+		if (!lodash.isEqual(nextProps.initialSelectedItems, this.props.initialSelectedItems))//TODO does not work with _.IsEqual
+            this.setState({ selectedItems: nextProps.initialSelectedItems || [] });
 	}
 
 	getOpen(node: IWeaveTreeNode): boolean
@@ -60,13 +63,13 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		}
 		else
 		{
-			return !!this.state.openItems.find((otherNode) => otherNode.equals(node));
+			return node && !!this.state.openItems.find((otherNode) => otherNode.equals(node));
 		}
 	}
 
 	getSelected(node: IWeaveTreeNode): boolean
 	{
-		return !!this.state.selectedItems.find((otherNode) => otherNode.equals(node));
+		return node && !!this.state.selectedItems.find((otherNode) => otherNode.equals(node));
 	}
 
 	setSelected(newSelectedItems:Array<IWeaveTreeNode>):void
@@ -102,6 +105,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	private internalSetOpen(node: IWeaveTreeNode, value: boolean)
 	{
+		if (!node) return;
 		let isOpen = this.getOpen(node);
 		let openItems = this.state.openItems;
 		let selectedItems = this.state.selectedItems;
@@ -119,6 +123,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	private internalSetSelected(node: IWeaveTreeNode, value:boolean, keepSelection:boolean = false)
 	{
+		if (!node) return;
 		let isSelected = this.getSelected(node);
 		let openItems = this.state.openItems;
 		let selectedItems = this.state.selectedItems;
@@ -142,6 +147,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	};
 
 	static CLASSNAME = "weave-tree-view";
+	static CONTAINER_CLASSNAME = "weave-tree-view-container";
 	static SELECTED_CLASSNAME = "selected";
 	
 	static BRANCH_ICON_CLASSNAME = "weave-tree-view-icon fa fa-folder fa-fw";

@@ -120,10 +120,9 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
                     <div style={closeButtonStyle}>
                         <IconButton clickHandler={ this.onCloseClick }
                                     iconName="&#x2715"
-                                    useDefaultStyle={true}
                                     style={ {width:"14px" , height:"14px"} }
-                                    mouseOverStyle={ {color:"white",background:"#F56666",borderRadius:"50%"} }
-                                    toolTip="Close Sidebar"/>
+                                    mouseOverStyle={ {background:"#F56666",borderRadius:"50%"} }
+                                    toolTip="click to close Sidebar"/>
                     </div>
 
                     <div style={ {padding:"8px",display:"inherit",flexDirection:"inherit"} }>

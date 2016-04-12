@@ -107,10 +107,8 @@ export default class LinkableDynamicObjectComponent extends React.Component<ILin
                 <input style={{flex: 1}} type="text" value={this.state.linkedObjectName} readOnly/>
                 <VBox style={ {position:"relative"} }>
                     <IconButton clickHandler={ this.toggleFilteredSessionNav }
-                                useDefaultStyle={true}
                                 iconName="fa fa-link"
-                                toolTip={"link object of type " + filterTypeName}
-                                mouseOverStyle={ {color:"white",background:"grey"} }>
+                                toolTip={"link object of type " + filterTypeName}>
                     </IconButton>
                     <div ref="popOver" style={popOverStyle} onMouseLeave={this.closePopOver}>
                         <SessionStateTree root={weaveTreeItem}
@@ -121,10 +119,8 @@ export default class LinkableDynamicObjectComponent extends React.Component<ILin
                 </VBox>
 
                 <IconButton clickHandler={ this.unLinkSessionObject }
-                            useDefaultStyle={true}
                             toolTip={"Un link " + filterTypeName + " object"}
-                            iconName="fa fa-chain-broken"
-                            mouseOverStyle={ {color:"white",background:"grey"} }>
+                            iconName="fa fa-chain-broken">
                 </IconButton>
 
             </HBox>

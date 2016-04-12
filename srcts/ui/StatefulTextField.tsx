@@ -5,6 +5,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ReactUtils from "../utils/ReactUtils";
 import Menu from "../react-ui/Menu";
+import Input from "../semantic-ui/Input";
 
 export interface StatefulTextFieldProps extends React.HTMLProps<StatefulTextField> {
 	style?: React.CSSProperties;
@@ -113,13 +114,20 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		{
 			return (
 				<HBox style={hboxFlex}>
-					<input
-						onFocus={this.onFocus} onBlur={this.handleInputChange} onChange={this.handleInputChange} onSubmit={this.handleInputChange}
-						type="text" value={this.state.content} placeholder={this.state.content || this.props.noneLabel}
+					<Input
+						className="icon"
+						type="text"
+						onFocus={this.onFocus}
+						onBlur={this.handleInputChange}
+						onChange={this.handleInputChange}
+						onSubmit={this.handleInputChange}
+						value={this.state.content}
+						onClick={this.openPopup}
+						placeholder={this.state.content || this.props.noneLabel}
 						{...props as any}
-						style={_.merge(this.props.style, { width: "100%" })}
-						/>
-					<i onClick={this.openPopup} className="fa fa-caret-down weave-icon"/>
+						style={_.merge(this.props.style, { width: "100%" })}>
+							<i className="dropdown icon"/>
+					</Input>
 				</HBox>
 			);
 		}
@@ -127,7 +135,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		{
 			return (
 				<HBox style={hboxFlex}>
-					<input
+					<Input
 						type="text"
 						{...props as any}
 						style={_.merge(this.props.style, { width: "100%" })}

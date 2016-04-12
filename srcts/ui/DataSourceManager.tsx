@@ -6,6 +6,7 @@ import PopupWindow from "../react-ui/PopupWindow";
 import MenuButton from "../react-ui/MenuButton";
 import {IDataSourceEditorProps} from "../editors/DataSourceEditor";
 import {MenuItemProps} from "../react-ui/Menu";
+import ControlPanel from "./ControlPanel";
 
 import IDataSource = weavejs.api.data.IDataSource;
 
@@ -152,21 +153,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		);
 	}
 
-	static map_weave_dsmPopup = new WeakMap<Weave, PopupWindow>();
-	static openInstance(weave:Weave, selected:IDataSource = null):PopupWindow
+	static openInstance(weave:Weave, selected:IDataSource = null):ControlPanel
 	{
-		var dsm = DataSourceManager.map_weave_dsmPopup.get(weave);
-		if (dsm)
-			PopupWindow.close(dsm);
-		dsm = PopupWindow.open({
-			title: "Manage data sources",
-			content: <DataSourceManager weave={weave}/>,
-			modal: false,
-			width: 800,
-			height: 600,
-			onClose: () => DataSourceManager.map_weave_dsmPopup.delete(weave)
-		});
-		DataSourceManager.map_weave_dsmPopup.set(weave, dsm);
-		return dsm;
+		DataSourceManager.selected = selected;
+		return ControlPanel.openInstance(weave, DataSourceManager, {title: Weave.lang("Manage data sources")}, {weave});
 	}
 }

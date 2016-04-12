@@ -7,9 +7,11 @@ import FileInput from "../react-ui/FileInput";
 import {ICheckBoxListProps} from "../react-ui/CheckBoxList";
 import CheckBoxList from "../react-ui/CheckBoxList";
 import * as FileSaver from "filesaver.js";
+import Input from "../semantic-ui/Input";
 
 import WeaveArchive = weavejs.core.WeaveArchive;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export default class FileMenu implements MenuBarItemProps
 {
@@ -66,17 +68,29 @@ export default class FileMenu implements MenuBarItemProps
 		return WeaveArchive.loadUrl(this.weave, this.fileName);
 	}
 
+	private dropExtension(fileName:string)
+	{
+		if (!fileName)
+			fileName = '';
+		var i = fileName.lastIndexOf(".weave");
+		return i < 0 ? fileName : fileName.substr(0, i);
+	}
+
     saveFile=()=>
 	{
+		var defaultFileName:string = 'defaults.weave';
 		var filenameInput:HTMLInputElement;
+		if (!this.fileName)
+			this.fileName = defaultFileName;
 
-		var setShowTopMenuBar = () =>
+		var setShowTopMenuBar = (checked:boolean) =>
 		{
-			var enableMenuBar = this.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
-			enableMenuBar.value = true;
+			var wp = this.weave.requestObject(['WeaveProperties'], LinkableHashMap);
+			var enableMenuBar = wp.requestObject('enableMenuBar', LinkableBoolean);
+			enableMenuBar.value = checked;
 		}
 		
-		var setSaveHistory = () =>
+		var setSaveHistory = (checked:boolean) =>
 		{
 			console.log("Save history");
 		}
@@ -86,32 +100,50 @@ export default class FileMenu implements MenuBarItemProps
 			{
 				value: setShowTopMenuBar,
 				label: Weave.lang("Show top menu bar")
-			},
-			{
-				value: setSaveHistory,
-				label: Weave.lang("Save history")
+//			},
+//			{
+//				value: setSaveHistory,
+//				label: Weave.lang("Save history")
 			}
 		];
 		
-		var selectedOptions:Function[] = [setShowTopMenuBar, setSaveHistory];
+		var allOptions:Function[] = checkboxListOptions.map(opt => opt.value);
+		var selectedOptions:Function[] = allOptions;
 		var onOk = () => {
-			for(var option of selectedOptions)
+			for (var option of allOptions)
 			{
-				option.call(this);
+				option.call(this, selectedOptions.indexOf(option) >= 0);
 			}
 			var archive:WeaveArchive  = WeaveArchive.createArchive(this.weave)
 			var uint8Array:Uint8Array = archive.serialize();
 			var arrayBuffer:ArrayBuffer  = uint8Array.buffer;
-			FileSaver.saveAs(new Blob([arrayBuffer]), filenameInput.value || "defaults.weave");
+			FileSaver.saveAs(new Blob([arrayBuffer]), (filenameInput.value && filenameInput.value + ".weave") || defaultFileName);
 		}
 		
 		PopupWindow.open({
-			title: "Export session state",
+			title: Weave.lang("Export session state"),
 			content: (
-				<VBox style={{width: 400, height: 300, padding: 20}}>
-					<span>{Weave.lang("Enter a file name")}</span>
-					<input style={{marginTop: 5}} type="text" placeholder="defaults.weave" defaultValue={this.fileName} ref={(c:HTMLInputElement) => filenameInput = c}/>
-					<span style={{marginTop: 5}}>{Weave.lang("Export options")}</span>
+				<VBox style={{width: 400, height: 200, padding: 20}}>
+					<span>{Weave.lang("Enter a file name:")}</span>
+					<HBox style={{alignItems: "center", marginTop: 10}}>
+						<Input
+							type="text"
+							style={{flex: 1}}
+							ref={(c:Input) => {
+								if(c && c.inputElement)
+								{ 
+									filenameInput = c.inputElement; 
+									c.inputElement.select(); 
+									c.inputElement; 
+									c.inputElement.focus()
+								}
+							}}
+							placeholder={this.dropExtension(defaultFileName)}
+							defaultValue={this.dropExtension(this.fileName)}
+						/>
+						.weave
+					</HBox>
+					<span style={{marginTop: 5}}>{Weave.lang("Export options:")}</span>
 					<VBox style={{marginLeft: 20, marginTop: 5, flex: 1}}>
 						<CheckBoxList options={checkboxListOptions}
 									  selectedValues={selectedOptions}
@@ -123,6 +155,7 @@ export default class FileMenu implements MenuBarItemProps
 					</HBox>
 				</VBox>
 			),
+			resizable: false,
 			modal: true,
 			onOk: onOk
 		});

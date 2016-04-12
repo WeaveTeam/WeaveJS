@@ -12,7 +12,6 @@ export interface IconButtonProps extends React.HTMLProps<IconButton>
     mouseOverStyle?: any;
     iconName?:string;
     toolTip?:string;
-    useDefaultStyle?:boolean;
 }
 
 export interface IconButtonState
@@ -51,52 +50,71 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
 
     render()
     {
-        // important to set border color in rgba mode with alpha to 0 - to ensure border is used in layout Calculation (CSS BOX  Model),
+        var className:string = "weave-icon-button";
+        var borderStyle:React.CSSProperties = {}
+        if(this.props.style)
+        {
+            if(this.props.style.borderWidth )
+            {
+                borderStyle.borderWidth = this.props.style.borderWidth;
+                borderStyle.borderStyle = (this.props.style.borderStyle)?this.props.style.borderStyle : "solid";
+            }
+            else if(this.props.style.border)
+            {
+                borderStyle.border = this.props.style.border;
+            }
+            else //default value
+            {
+                borderStyle.border = "1px solid";
+            }
+
+            if(this.props.style.borderRightColor || this.props.style.borderTopColor || this.props.style["borderBottomColor"] || this.props.style.borderLeftColor)
+            {
+                borderStyle["borderRightColor"] = this.props.style.borderRightColor;
+                borderStyle["borderTopColor"] = this.props.style.borderTopColor;
+                borderStyle["borderBottomColor"] = this.props.style["borderBottomColor"];
+                borderStyle["borderLeftColor"] = this.props.style.borderLeftColor;
+            }
+            else if(this.props.style.borderColor)
+            {
+                borderStyle.borderColor = this.props.style.borderColor;
+            }
+            else //default value
+            {
+                borderStyle.borderColor = "rgba(0, 0, 0, 0)";
+            }
+        }
+        // important to set border color in rgba mode with alpha to 0
+        // to ensure border is used in layout Calculation (CSS BOX  Model),
         // but not visible at same time
         // this will avoid the flickering in the screen when border gets visible
-        var iconStyle:React.CSSProperties = {
+        var iconStyle:React.CSSProperties = { //must properties
             display:"flex",
             alignItems:"center",
             justifyContent:"center",
-            border:"1px solid",
-            borderColor:"rgba(0, 0, 0, 0)",
             cursor:"pointer"
         };
+
+        iconStyle = _.merge(iconStyle,borderStyle);
 
 
         if(this.props.style)
         {
-            _.merge(iconStyle,this.props.style);
+            // the order of merge ensures iconStyle overrider props style
+            // empty object required  to copy the props style as they are read-only
+            iconStyle = _.merge({},this.props.style,iconStyle);
 
         }
 
         if(this.state.mouseOver)
         {
+            className = "weave-icon-button-mouse-over";
             if(this.props.mouseOverStyle)
             {
-                var mouseOverStyleCopy:React.CSSProperties = _.merge({},this.props.mouseOverStyle);//make copy
-                iconStyle = _.merge(mouseOverStyleCopy,iconStyle); // override borderColor to set transparency
-            }
-
-            if(this.props.useDefaultStyle) //default icon mouseOver style values
-            {
-                iconStyle = _.merge({
-                    margin:"4px",
-                    padding:"4px",
-                    borderColor:"grey",
-                    borderRadius:"4px"
-                },iconStyle);
-            }
-        }
-        else
-        {
-            if(this.props.useDefaultStyle)
-            {
-                iconStyle = _.merge({
-                    margin:"4px",
-                    padding:"4px",
-                    borderRadius:"4px"
-                },iconStyle);
+                iconStyle = _.merge({},this.props.mouseOverStyle,iconStyle);
+                // preference given to border and border color of user defined
+                iconStyle.border = this.props.mouseOverStyle.border ? this.props.mouseOverStyle.border : iconStyle.border
+                iconStyle.borderColor = this.props.mouseOverStyle.borderColor ? this.props.mouseOverStyle.borderColor : iconStyle.borderColor
             }
         }
 
@@ -114,7 +132,8 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
 
         }
 
-        return  <span title={ Weave.lang(this.props.toolTip) }
+        return  <span className= {className}
+                      title={ Weave.lang(this.props.toolTip) }
                       style={ prefixer(iconStyle) }
                       onClick={ this.clickHandler }
                       onMouseOver={ this.mouseOverHandler }
