@@ -129,7 +129,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 					<HBox style={{flex: .7, alignItems: "center"}}>
 						{Weave.lang("Filter: ")}
 						<VSpacer/>
-						<Dropdown value={this.state.selectedFilter} options={this.filterOptions.map((option) => {return { value: Weave.lang(option) }})} onChange={(value:string) => { this.setState({ selectedFilter: value}) }}/>
+						<Dropdown value={this.state.selectedFilter} options={this.filterOptions} onChange={(value:string) => { this.setState({ selectedFilter: value}) }}/>
 					</HBox>
 					<VSpacer/>
 					<HBox style={{flex: .3, justifyContent: "space-between"}}>

@@ -17,7 +17,7 @@ import WeaveAPI = weavejs.WeaveAPI;
 
 import StatefulTextField from "../../../ui/StatefulTextField";
 import StatefulRangeSlider from "../../../ui/StatefulRangeSlider";
-import StatefulComboBox from "../../../ui/StatefulComboBox";
+import Dropdown from "../../../semantic-ui/Dropdown";
 import StatefulCheckBox from "../../../ui/StatefulCheckBox";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import SelectableAttributeComponent from "../../../ui/SelectableAttributeComponent";
@@ -69,7 +69,7 @@ export default class AbstractLayer implements ILinkableObject
 				return [Weave.lang(key), <StatefulTextField key={key} ref={linkReactStateRef(this, { content: lv }) } suggestions={options as string[]} />];
 			}
 			else if (typeof options[0] === typeof {}) {
-				return [Weave.lang(key), <StatefulComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
+				return [Weave.lang(key), <Dropdown key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
 			}
 			else
 			{

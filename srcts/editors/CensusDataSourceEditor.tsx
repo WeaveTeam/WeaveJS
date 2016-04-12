@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import StatefulTextField from "../ui/StatefulTextField";
-import StatefulComboBox from "../ui/StatefulComboBox";
+import Dropdown from "../semantic-ui/Dropdown";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
@@ -183,34 +183,30 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Data Family"),
-				<StatefulComboBox style={{width: "100%"}}
-								  onChange={this.dataFamilyChanged} 
-								  triggerOnForcedChange
-								  selectFirstOnInvalid
-								  options={families}/>
+				<Dropdown style={{width: "100%"}}
+						  onChange={this.dataFamilyChanged} 
+						  selectFirstOnInvalid
+						  options={families}/>
 			],
 			[
 				Weave.lang("Year"),
-				<StatefulComboBox style={{width: "100%"}} 
+				<Dropdown style={{width: "100%"}} 
 								  onChange={this.dataVintageChanged}
-								  triggerOnForcedChange
 								  selectFirstOnInvalid
 								  options={vintages}/>
 			],
 			[
 				Weave.lang("Dataset"),
-				<StatefulComboBox style={{width: "100%"}}
+				<Dropdown style={{width: "100%"}}
 								  onChange={this.dataSetChanged}
 								  ref={linkReactStateRef(this, { value: ds.dataSet }) }
-								  triggerOnForcedChange
 								  selectFirstOnInvalid
 								  options={datasets}/>
 			],
 			[
 				Weave.lang("Geographic Scope"),
-				<StatefulComboBox style={{width: "100%"}}
+				<Dropdown style={{width: "100%"}}
 								  ref={linkReactStateRef(this, {value: ds.geographicScope })}
-								  triggerOnForcedChange
 								  selectFirstOnInvalid
 								  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
 			],

@@ -6,8 +6,8 @@ import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import Dropdown from "../semantic-ui/Dropdown";
 import StatefulCheckBox from "../ui/StatefulCheckBox";
-import StatefulComboBox from "../ui/StatefulComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 
@@ -539,7 +539,7 @@ export default class C3BarChart extends AbstractC3Tool
 				{ReactUtils.generateTable(
 					null,
 					[
-						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <StatefulComboBox ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <Dropdown ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					],
 					{
 						table: {width: "100%"},

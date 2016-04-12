@@ -5,7 +5,7 @@ import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
 import PopupWindow from "../react-ui/PopupWindow";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
-import StatefulComboBox from '../ui/StatefulComboBox';
+import Dropdown from '../semantic-ui/Dropdown';
 import List from '../react-ui/List';
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
@@ -135,7 +135,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 
 //Custom component to handle drop down selection of columns as well as when selection from attribute selector
-//StatefulCombobox allows selection only from drop down, Does not handle case of attribute selector
+//Dropdown allows selection only from drop down, Does not handle case of attribute selector
 interface IAttributeDropdownProps extends React.HTMLProps<AttributeDropdown> {
     attribute:DynamicColumn;
     clickHandler:(event:React.MouseEvent)=>PopupWindow;

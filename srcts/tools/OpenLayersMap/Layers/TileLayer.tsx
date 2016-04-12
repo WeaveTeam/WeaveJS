@@ -2,7 +2,7 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 import AbstractLayer from "./AbstractLayer";
 import * as React from "react";
-import StatefulComboBox from "../../../ui/StatefulComboBox";
+import Dropdown from "../../../semantic-ui/Dropdown";
 import StatefulTextField from "../../../ui/StatefulTextField";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import {VBox, HBox} from "../../../react-ui/FlexBox";
@@ -104,13 +104,13 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 		if (this.props.layer.provider.value === "osm")
 		{
 			return <VBox>
-				{Weave.lang("Provider")+" "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				{Weave.lang("Provider")+" "}<Dropdown ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 			</VBox>
 		}
 		else if (this.props.layer.provider.value === "custom")
 		{
 			return <VBox>
-				{Weave.lang("Provider") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				{Weave.lang("Provider") + " "}<Dropdown ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 				{Weave.lang("URL") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempUrl }) }/>
 				{Weave.lang("Attribution") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempAttributions }) }/>
 				{Weave.lang("Projection") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempProjection }) }/>
@@ -119,8 +119,8 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 		else
 		{
 			return <VBox>
-				{Weave.lang("Provider") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
-				{Weave.lang("Layer") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.tempLayer }) }
+				{Weave.lang("Provider") + " "}<Dropdown ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				{Weave.lang("Layer") + " "}<Dropdown ref={linkReactStateRef(this, { value: this.tempLayer }) }
 					options={layers ? layers.map((name) => { return { label: lodash.startCase(name), value: name }; }) : [] }/>
 			</VBox>
 		}
