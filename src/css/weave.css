@@ -507,3 +507,8 @@ div.table-row-selected>div>div>div>div>div {
 	background-color: #F8F8F8;
 	background-image: linear-gradient(#F8F8F8, #F8F8F8); /* needed for override of item in fixed data table css */
 }
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
