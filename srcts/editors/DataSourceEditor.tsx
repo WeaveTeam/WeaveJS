@@ -8,6 +8,7 @@ import WeaveTree from "../ui/WeaveTree";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
 import Tabs from "../react-ui/Tabs";
+import Input from "../semantic-ui/Input";
 
 import WeaveAPI = weavejs.WeaveAPI;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -68,8 +69,9 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		return [
 			[
 				<span>{Weave.lang("Source Name")}</span>,
-				<input type="text" style={{width: "100%", userSelect: false}}
+				<Input type="text" style={{width: "100%", userSelect: false}}
 								   disabled={true}
+								   title="Renaming data sources is not supported yet"
 								   defaultValue={this.props.dataSource.getHierarchyRoot().getLabel()}/>
 			]
 		]
@@ -87,8 +89,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
-				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5},
-				{ paddingBottom: 10, width: "100%"}
+				{ paddingBottom: 8, textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
 			]
 		};
 
@@ -193,8 +195,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
 		return (
-			<VBox style={{flex: 1}}>
-				<label> {Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel())} </label>
+			<VBox className="weave-padded-vbox weave-container" style={ {flex: 1, border:"none"} }>
+				<label style={ {fontWeight: "bold"} }> { Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel()) } </label>
 				{
 					this.renderFields()
 				}

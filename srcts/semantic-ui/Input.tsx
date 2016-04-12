@@ -1,4 +1,5 @@
 import * as React from "react";
+import ToolTip from "../react-ui/ToolTip";
 
 export interface InputProps extends React.HTMLProps<Input>
 {
@@ -16,11 +17,13 @@ export default class Input extends React.Component<InputProps, InputState>
 	{
 		super(props);
 	}
-	
+
 	render()
 	{
 		var inputProps:React.HTMLProps<HTMLInputElement> = {};
 
+		// since typescript doesn't support destructuring yet
+		// we manually remove children from props
 		for(var key in this.props)
 		{
 			if(key != "children")
@@ -28,9 +31,29 @@ export default class Input extends React.Component<InputProps, InputState>
 				(inputProps as any)[key] = (this.props as any)[key];
 			}
 		}
+		delete inputProps.title;
+		delete inputProps.className;
+		delete inputProps.style;
 
+		if(inputProps.disabled)
+		{
+			if(inputProps.style)
+			{
+				inputProps.style["cursor"] = "not-allowed";
+			}
+			else
+			{
+				inputProps.style = {
+					cursor: "not-allowed"
+				}
+			}
+		}
+		
 		return (
-			<div className={"ui input " + (this.props.className || "")}>
+			<div className={"ui input " + (this.props.className || "")}
+				 style={this.props.style}
+				 onMouseEnter={(event) => this.props.title && ToolTip.open(this.props.title, event)}
+				 onMouseLeave={this.props.title && ToolTip.close}>
 				<input {...inputProps} ref={(c) => this.inputElement = c}/>
 				{
 					this.props.children

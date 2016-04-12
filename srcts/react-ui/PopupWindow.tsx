@@ -289,7 +289,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 		var popupWindow = (
 			<VBox className="weave-app weave-window" onMouseDown={() => this.handleClickOnWindow()} ref={(c:VBox) => this.container = c} style={windowStyle}>
-				<HBox className="weave-window-header" onMouseDown={this.onDragStart.bind(this)}>
+				<HBox className="weave-header weave-window-header" onMouseDown={this.onDragStart.bind(this)}>
 					<div style={{flex: 1}}>
 					{
 						this.props.title

@@ -407,11 +407,10 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	}
 	
 	handleResize=(newSize:ResizingDivState) => {
-		if(this.props.allowResizing)
-			this.setState({
-				width: newSize.width,
-				height: newSize.height
-			});
+		this.setState({
+			width: newSize.width,
+			height: newSize.height
+		});
 	};
 
 	render():JSX.Element
@@ -466,7 +465,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 												/>)
 											}
 											width={this.state.columnWidths[id] || (this.props.evenlyExpandRows ? (evenWidth || this.props.initialColumnWidth):this.props.initialColumnWidth)}
-											isResizable={true}
+											isResizable={this.props.allowResizing}
 										/>
 									);
 								}
