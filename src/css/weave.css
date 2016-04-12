@@ -311,7 +311,6 @@ input[type="text"]:focus {
 
 /* same weave-menubar but can be customized */
 .weave-window-header {
-	border-bottom-style: solid;
 	user-select: none;
 	padding: 5px;
 	-webkit-user-select: none;
@@ -461,31 +460,36 @@ div.weave-tree-view {
 }
 
 .weave-tab-container {
-	
+	border-left: 1px solid #ddd;
 }
 
 .weave-tab-label-container {
 	border-bottom: 1px solid #ddd;
 }
 
-.weave-tab-label {
+.weave-tab-label { /*  border left , will come from left child,first child gets from Container, border-bottom comes from label container */
 	padding-left: 8;
 	padding-right: 8;
 	padding-top: 5;
 	padding-bottom: 5;
 	cursor: default;
-	border: 1px solid #E6E6E6;
+	border-top: 1px solid #ddd;
+	border-right: 1px solid #ddd;
 	background: #F8F8F8;
 }
 
-.weave-tab-label-active {
-	margin-bottom: -1px; /* hide border bottom */
+.weave-tab-label-active { /* todo: border bottom white is not right way has to match backgroundcolor  */
+	margin-bottom: -1px; /* to cover the label container border*/
 	border-bottom: 1px solid white;
+	border-right: 1px solid #ddd;
+	border-top: 1px solid #ddd;
 	background: none;
 }
 
-.weave-tab-content {
-	padding: 5;
+.weave-tab-content { /* border left , comes from container to cover label region too , top comes from label to distinct the active label */
+	padding: 8px;
+	border-right: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 }
 
 .public_fixedDataTableCell_cellContent {
