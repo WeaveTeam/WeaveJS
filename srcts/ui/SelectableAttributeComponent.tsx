@@ -160,7 +160,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 		if (!colRef)
 			return [];
 		var siblingNodes = HierarchyUtils.findSiblingNodes(colRef.getDataSource(), colRef.getColumnMetadata());
-		return siblingNodes.map((node:IWeaveTreeNode) => {
+		return siblingNodes.filter((node:IWeaveTreeNode) => Weave.IS(node, IColumnReference)).map((node:IWeaveTreeNode) => {
 			return {label: node.getLabel(), id: this.getColumnReferenceString(node)};
 		});
     };
@@ -173,8 +173,10 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 			node = ColumnUtils.hack_findHierarchyNode(node as IColumnWrapper);
 
         if (!node)
-			return;
+			return null;
         let colRef = Weave.AS(node as IWeaveTreeNode, weavejs.api.data.IColumnReference);
+		if (!colRef)
+			return null;
         let dataSource = colRef.getDataSource();
         let dataSourceName = (Weave.getOwner(dataSource) as ILinkableHashMap).getName(dataSource);
 
