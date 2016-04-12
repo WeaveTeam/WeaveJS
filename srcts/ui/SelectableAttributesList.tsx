@@ -9,6 +9,7 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import {ListOption} from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import ControlPanel from "./ControlPanel";
 
 export interface ISelectableAttributesListProps{
     columns : LinkableHashMap;
@@ -51,7 +52,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         this.selectedColumn = selectedItems[0];
     };
 
-    launchAttributeSelector=():PopupWindow=>{
+    launchAttributeSelector=():ControlPanel=>{
       return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.selectableAttributes);
     };
 

@@ -13,15 +13,16 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import PopupWindow from "../react-ui/PopupWindow";
 import IDataSource = weavejs.api.data.IDataSource;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import SmartComponent from "./SmartComponent";
+import ControlPanel from "./ControlPanel";
 
 export interface IAttributeSelectorProps
 {
-    selectedAttribute : IColumnWrapper|LinkableHashMap;
+    weave:Weave;
     label? : string;
+    selectedAttribute : IColumnWrapper|LinkableHashMap;
     showLabelAsButton?:boolean;
     selectableAttributes:Map<string,(IColumnWrapper|LinkableHashMap)>;
 }
@@ -185,19 +186,12 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             return;
     };
 
-    static openInstance(label:string, selectedAttribute:IColumnWrapper|LinkableHashMap, selectableAttributes:Map<string, (IColumnWrapper|LinkableHashMap)>):PopupWindow{
-        var attrPop = PopupWindow.open({
-            title: 'Attribute Selector for ' + label,
-            content: <AttributeSelector label={ label } selectedAttribute={ selectedAttribute } selectableAttributes={ selectableAttributes } />,
-            modal: false,
-            width: 800,
-            height: 450,
-        });
-
-        return attrPop;
+    static openInstance(label:string, selectedAttribute:IColumnWrapper|LinkableHashMap, selectableAttributes:Map<string, (IColumnWrapper|LinkableHashMap)>):ControlPanel{
+        let weave = Weave.getWeave(selectedAttribute);
+        return ControlPanel.openInstance<IAttributeSelectorProps>(weave, AttributeSelector,
+                                        {title:Weave.lang('Attribute Selector')},
+                                        {weave, label, selectedAttribute, selectableAttributes});
     }
-
-
 
     render():JSX.Element
     {

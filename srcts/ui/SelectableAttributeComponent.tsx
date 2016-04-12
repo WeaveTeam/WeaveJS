@@ -20,8 +20,8 @@ import ListOption from "../react-ui/List";
 import IColumnReference = weavejs.api.data.IColumnReference;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
-import Column = FixedDataTable.Column;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import ControlPanel from "./ControlPanel";
 
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|LinkableHashMap>
@@ -34,11 +34,10 @@ export interface ISelectableAttributeComponentState{
 export default class SelectableAttributeComponent extends React.Component<ISelectableAttributeComponentProps, ISelectableAttributeComponentState>{
     constructor (props:ISelectableAttributeComponentProps){
         super(props);
-
     }
 
     static defaultProps = { showLabel: true };
-	
+
     componentWillReceiveProps(props:ISelectableAttributeComponentProps){
 
     }
@@ -49,8 +48,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             Weave.getCallbacks(value).addGroupedCallback(this, this.forceUpdate);
         });
     }
-    launchAttributeSelector=(label:string, attribute:IColumnWrapper|LinkableHashMap):PopupWindow=>{
-         return AttributeSelector.openInstance(label, attribute, this.props.attributes);
+    launchAttributeSelector=(label:string, attribute:IColumnWrapper|LinkableHashMap):ControlPanel=>{
+        return AttributeSelector.openInstance(label, attribute, this.props.attributes);
     };
 
     private clearColumn =( attr:IColumnWrapper,event:MouseEvent):void =>{
@@ -102,31 +101,31 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
                 let elem =  <VBox key={ label }>
 
-                                <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
-                                    { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
-                                    <AttributeDropdown title="click to change column"
-                                                       style={ {flex:1} }
-                                                       attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
-                                                       clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
-                                    <IconButton style={ cleanBtnStyle }
-                                                title={"click to remove the column from " + label }
-                                                iconName='fa fa-times'
-                                                clickHandler={ this.clearColumn.bind( this, attribute) }/>
-                                    <IconButton style={ btnStyle }
-                                                toolTip={"Click to explore data sources for " + label}
-                                                clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }>...</IconButton>
-                                </HBox>
+                    <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
+                        { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
+                        <AttributeDropdown title="click to change column"
+                                           style={ {flex:1} }
+                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
+                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
+                        <IconButton style={ cleanBtnStyle }
+                                    title={"click to remove the column from " + label }
+                                    iconName='fa fa-times'
+                                    clickHandler={ this.clearColumn.bind( this, attribute) }/>
+                        <IconButton style={ btnStyle }
+                                    toolTip={"Click to explore data sources for " + label}
+                                    clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }>...</IconButton>
+                    </HBox>
 
-                                { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
-                             </VBox>;
+                    { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
+                </VBox>;
                 selectableUI.push(elem);
             }
             else{//LinkableHashMap
-               let attribute = attribute_lhm_or_icw as LinkableHashMap;
-               let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
-               selectableUI.push(elem);
+                let attribute = attribute_lhm_or_icw as LinkableHashMap;
+                let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
+                selectableUI.push(elem);
             }
-       });
+        });
 
         return (<VBox>{selectableUI}</VBox>);
     }
@@ -175,14 +174,14 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 
     siblings=(attribute:IColumnWrapper): {label: string, id:string}[] =>
     {
-		var siblings:{label: string, id:string}[];
-		var colRef = ColumnUtils.hack_findHierarchyNode(attribute);
-		if (!colRef)
-			return [];
-		var siblingNodes = HierarchyUtils.findSiblingNodes(colRef.getDataSource(), colRef.getColumnMetadata());
-		return siblingNodes.filter((node:IWeaveTreeNode) => Weave.IS(node, IColumnReference)).map((node:IWeaveTreeNode) => {
-			return {label: node.getLabel(), id: this.getColumnReferenceString(node)};
-		});
+        var siblings:{label: string, id:string}[];
+        var colRef = ColumnUtils.hack_findHierarchyNode(attribute);
+        if (!colRef)
+            return [];
+        var siblingNodes = HierarchyUtils.findSiblingNodes(colRef.getDataSource(), colRef.getColumnMetadata());
+        return siblingNodes.filter((node:IWeaveTreeNode) => Weave.IS(node, IColumnReference)).map((node:IWeaveTreeNode) => {
+            return {label: node.getLabel(), id: this.getColumnReferenceString(node)};
+        });
     };
 
     getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper):string=>
@@ -190,13 +189,13 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
         var metadata:{[attr:string]:string};
         // get IWeaveTreeNode from IColumnWrapper
         if (Weave.IS(node, IColumnWrapper))
-			node = ColumnUtils.hack_findHierarchyNode(node as IColumnWrapper);
+            node = ColumnUtils.hack_findHierarchyNode(node as IColumnWrapper);
 
         if (!node)
-			return null;
+            return null;
         let colRef = Weave.AS(node as IWeaveTreeNode, weavejs.api.data.IColumnReference);
-		if (!colRef)
-			return null;
+        if (!colRef)
+            return null;
         let dataSource = colRef.getDataSource();
         let dataSourceName = (Weave.getOwner(dataSource) as ILinkableHashMap).getName(dataSource);
 
@@ -228,7 +227,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 
         let siblings = this.siblings(this.props.attribute);
         if(siblings)
-             options = siblings.map((option:{label:string, id:string}, index:number)=>{
+            options = siblings.map((option:{label:string, id:string}, index:number)=>{
                 return(<option value={ option.id } key={ option.id }>{ option.label }</option>);
             });
 
@@ -244,8 +243,8 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
         }
 
         return(<VBox style={ this.props.style }>
-             <select disabled={ disabled } value={ columnEntry.id } onClick={ this.click } onChange={ this.onChange } >
-                 { options }</select>
-            </VBox>);
+            <select disabled={ disabled } value={ columnEntry.id } onClick={ this.click } onChange={ this.onChange } >
+                { options }</select>
+        </VBox>);
     }
 }
