@@ -189,7 +189,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         let weave = Weave.getWeave(selectedAttribute);
         return ControlPanel.openInstance<IAttributeSelectorProps>(weave, AttributeSelector,
                                         {title:Weave.lang('Attribute Selector')},
-                                        {weave, label, selectedAttribute, selectableAttributes});
+                                        {label, selectedAttribute, selectableAttributes});
     }
 
     render():JSX.Element
