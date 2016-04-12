@@ -2,7 +2,7 @@ import * as React from "react";
 
 export interface ButtonProps extends React.HTMLProps<HTMLButtonElement>
 {
-	color?: string;
+	colorClass?: string;
 }
 
 export interface ButtonState
@@ -17,7 +17,7 @@ export default class Button extends React.Component<ButtonProps, ButtonState>
 	}
 	
 	static defaultProps:ButtonProps = {
-		color: "primary"
+		colorClass: "primary"
 	}
 	
 	render()
