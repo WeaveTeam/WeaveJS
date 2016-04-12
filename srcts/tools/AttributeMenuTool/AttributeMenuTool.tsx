@@ -26,6 +26,8 @@ const LAYOUT_COMBO:string = "ComboBox";
 const LAYOUT_VSLIDER:string = "VSlider";
 const LAYOUT_HSLIDER:string = "HSlider";
 
+const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];
+
 export interface IAttributeMenuToolState extends IVisToolState{
 
 }
@@ -192,6 +194,11 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         this.props.attributeMenuTool.targetAttribute.state = selectedItem ;
     };
 
+    //UI event handler for attribute menu layout
+    handleMenuLayoutChange = (selectedItem:string):void =>{
+        this.props.attributeMenuTool.layoutMode.state = selectedItem;// will re render the tool with new layout
+    };
+
     //callback for the attribute
     monitoringAttribute = ():void =>{
         console.log("target Attribute callback");
@@ -249,16 +256,18 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
         var toolName:string;
         var attributeValue :string;
+        var menuLayout:string = this.props.attributeMenuTool.layoutMode.state as string;
 
         if(this.props.attributeMenuTool.targetToolPath.state){
             toolName = this.getTargetToolPath();
             attributeValue = this.getTargetAttribute();
         }
 
-        console.log('toolName', toolName);
+       /* console.log('toolName', toolName);
         console.log('attributeValue', attributeValue );
         console.log('open tools in toolconfigs', this.openTools);
-
+*/
+        //TODO replace all statefulcomboboxes with semantic dropdowns
         return[
             [
                 Weave.lang("Visualization Tool"),
@@ -270,6 +279,10 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
                 //<StatefulComboBox value={ 'c' } options={ ['a', 'c'] } onChange={ this.handleTargetAttributeChange }  />
                 <StatefulComboBox value={ attributeValue } options={ this.getTargetToolAttributeOptions() } onChange={ this.handleTargetAttributeChange }  />
+            ],
+            [
+                Weave.lang("Attribute Menu Layout"),
+                <StatefulComboBox value={ menuLayout } options={ menuOptions } onChange={ this.handleMenuLayoutChange }/>
             ]
         ];
     }
