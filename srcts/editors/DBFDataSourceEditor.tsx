@@ -27,31 +27,36 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("DBF URL"),
-				<FileSelector targetUrl={dataSource.dbfUrl}
+				<FileSelector style={{width: "100%"}}
+							  targetUrl={dataSource.dbfUrl}
 						  	  placeholder={Weave.lang("http://www.example.com/example.dbf")} 
 						  	  accept=".dbf"/>
 			],
 			[
 				Weave.lang("SHP URL"),
-				<FileSelector targetUrl={dataSource.shpUrl} 
+				<FileSelector style={{width: "100%"}}
+							  targetUrl={dataSource.shpUrl} 
 						  	  placeholder={Weave.lang("http://www.example.com/example.shp")} 
 						  	  accept=".shp"/>
 			],
 			[
 				Weave.lang("Projection"),
-				<StatefulTextField selectOnFocus={true} 
+				<StatefulTextField style={{width: "100%"}}
+								   selectOnFocus={true} 
 							   	   placeholder={Weave.lang("Example: EPSG:4326")} 
 							       ref={linkReactStateRef(this, { value: dataSource.projection })}/>
 			],
 			[
 				Weave.lang("Key Column"),
-				<Dropdown ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
+				<Dropdown style={{width: "100%"}}
+						  ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
 						  placeholder={Weave.lang("Auto-generated keys") } 
 						  options={dataSource.getColumnNames()}/>
 			],
 			[
 				Weave.lang("Key Type"),
-				<KeyTypeInput keyTypeProperty={dataSource.keyType}/>
+				<KeyTypeInput style={{width: "100%"}}
+							  keyTypeProperty={dataSource.keyType}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)
