@@ -2,6 +2,11 @@ import * as _ from "lodash";
 import * as React from "react";
 import AbstractLayer from "./Layers/AbstractLayer";
 import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
+import TileLayer from "./Layers/TileLayer";
+import GeometryLayer from "./Layers/GeometryLayer";
+import LabelLayer from "./Layers/LabelLayer";
+import ScatterPlotLayer from "./Layers/ScatterPlotLayer";
+import ImageGlyphLayer from "./Layers/ImageGlyphLayer";
 
 import {VBox, HBox} from "../../react-ui/FlexBox";
 import ReactUtils from "../../utils/ReactUtils";
@@ -75,28 +80,22 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		return this.props.layers.getObjects().indexOf(this.state.selectedLayer);
 	}
 
-	static layerClassNames = new Map<string, string>()
-		.set("weave.visualization.plotters::WMSPlotter", "Base Map Layer")
-		.set("weave.visualization.plotters::GeometryPlotter", "Geometry Layer")
-		.set("weave.visualization.plotters::TextGlyphPlotter", "Label Layer")
-		.set("weave.visualization.plotters::ScatterPlotPlotter", "Bubble Layer")
-		.set("weave.visualization.plotters::ImageGlyphPlotter", "Icon Layer");
-
 	/* TODO: Add drag-and-drop of layers. */
 	render():JSX.Element
 	{
 		let flex1: React.CSSProperties = { flex: 1 };
 
-		let addLayerMenuItem = (layerClassInfo:[string,string]):{ label: string, onClick: React.MouseEventHandler } => {
-			let [layerClassName, layerClassLabel] = layerClassInfo;
-			let onClick = () => {
-				this.props.layers.requestObject(this.props.layers.generateUniqueName(layerClassLabel), Weave.getDefinition(layerClassName));
-			}
-			return {label: layerClassLabel, onClick};
+		let addLayerMenuItem = (layerClass:new()=>AbstractLayer):IMenuButtonItem => {
+			return {
+				label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
+				onClick: () => this.props.layers.requestObject('', layerClass)
+			};
 		};
 
 		if (!this.state.openedLayer)
 		{
+			var layerTypes = [TileLayer, GeometryLayer, LabelLayer, ScatterPlotLayer, ImageGlyphLayer];
+
 			return <VBox>
 				<div style={{ height: 200, overflowY: "scroll" }}>
 					<table style={{ width: "100%" }}>
@@ -106,7 +105,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 					</table>
 				</div>
 				<HBox>
-					<MenuButton style={flex1} items={Array.from(LayerManager.layerClassNames.entries()).map(addLayerMenuItem)}>
+					<MenuButton style={flex1} items={layerTypes.map(addLayerMenuItem)}>
 						<i className="fa fa-plus"/>
 					</MenuButton>
 					<button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></button>
@@ -131,10 +130,14 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 	}
 }
 
+interface IMenuButtonItem {
+	label: string;
+	onClick: React.MouseEventHandler;
+}
+
 interface IMenuButtonProps extends React.HTMLProps<MenuButton>
 {
-	items: { label: string, onClick: React.MouseEventHandler} [];
-
+	items: IMenuButtonItem[];
 }
 
 interface IMenuButtonState { };
@@ -151,7 +154,7 @@ class MenuButton extends React.Component<IMenuButtonProps,IMenuButtonState> {
 		}
 	}
 
-	renderItem(value:{label:string, onClick: React.MouseEventHandler}, index:number)
+	renderItem(value:IMenuButtonItem, index:number)
 	{
 		let newOnClick = (e:React.MouseEvent) => {
 			this.closePopup();
