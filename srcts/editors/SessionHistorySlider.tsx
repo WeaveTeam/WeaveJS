@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import HSlider from "../react-ui/RCSlider/HSlider";
 import RCSlider from "../react-ui/RCSlider/RCSlider";
@@ -11,6 +12,7 @@ import LogEntry = weavejs.core.LogEntry;
 
 export interface SessionHistorySliderProps extends React.Props<SessionHistorySlider>
 {
+	style:React.CSSProperties;
 	stateLog:SessionStateLog;
 }
 
@@ -113,7 +115,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		}
 
 		return (
-			<HBox style={{flex: 1, alignItems: "center", alignSelf: "stretch"}}>
+			<HBox style={_.merge(this.props.style||{}, {flex: 1, alignItems: "center", alignSelf: "stretch"})}>
 
 				<CenteredIcon title={Weave.lang('Undo')}
 							  onClick={() => this._stateLog.undo()}

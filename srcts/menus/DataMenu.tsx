@@ -4,35 +4,47 @@ import {MenuItemProps} from "../react-ui/Menu";
 import DataSourceManager from "../ui/DataSourceManager";
 import IDataSource = weavejs.api.data.IDataSource;
 
-export default class DataMenu implements MenuBarItemProps
+export interface DataMenuProps extends React.HTMLProps<DataMenu>
 {
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	weave:Weave,
+	createObject:(type:new(..._:any[])=>any)=>void
+}
+
+export interface DataMenuState
+{
+
+}
+
+export default class DataMenu extends React.Component<DataMenuProps,DataMenuState>
+{
+	private weave:Weave;
+	private createObject:(type:new(..._:any[])=>any)=>void;
+	private implementations:JSX.Element[];
+
+	constructor(props:DataMenuProps)
 	{
-		this.weave = weave;
-		this.createObject = createObject;
+		super();
+		this.weave = props.weave;
+		this.createObject = props.createObject;
 
 		var registry = weavejs.WeaveAPI.ClassRegistry;
 		var impls = registry.getImplementations(IDataSource);
-		
+
 		// filter out those data sources without editors
 		impls = impls.filter(impl => DataSourceManager.editorRegistry.has(impl));
-		
-		this.menu = [
-			{
-				label: Weave.lang('Manage or browse data'),
-				click: DataSourceManager.openInstance.bind(null, weave)
-			},
-			{}
-		].concat(impls.map(impl => {
-			return {
-				label: Weave.lang('+ {0}', registry.getDisplayName(impl)),
-				click: this.createObject.bind(this, impl)
-			};
-		}));
+
+		this.implementations = impls.map( (impl,index) => {
+			return (
+				<a key={index} className="item" onClick={this.createObject.bind(this, impl)}>{Weave.lang('+ {0}', registry.getDisplayName(impl))}</a>
+			);
+		});
 	}
 
-	label:string = "Data";
-	weave:Weave;
-	menu:MenuItemProps[];
-	createObject:(type:new(..._:any[])=>any)=>void;
+	render():JSX.Element {
+		return (<div className="menu">
+			<a className="item" onClick={DataSourceManager.openInstance.bind(null, this.weave)}>{Weave.lang('Manage or browse data')}</a>
+			<div className="ui divider"></div>
+			{this.implementations}
+		</div>)
+	}
 }

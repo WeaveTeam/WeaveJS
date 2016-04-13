@@ -8,16 +8,32 @@ import * as WeaveUI from "../WeaveUI";
 import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
 
-export default class ToolsMenu implements MenuBarItemProps
+export interface ToolsMenuProps extends React.HTMLProps<ToolsMenu>
 {
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	weave:Weave,
+	createObject:(type:new(..._:any[])=>any)=>void
+}
+
+export interface ToolsMenuState
+{
+
+}
+
+export default class ToolsMenu extends React.Component<ToolsMenuProps,ToolsMenuState>
+{
+	private weave:Weave;
+	private createObject:(type:new(..._:any[])=>any)=>void;
+	private tools:JSX.Element[];
+
+	constructor(props:ToolsMenuProps)
 	{
-		this.weave = weave;
-		this.createObject = createObject;
-		
+		super();
+		this.weave = props.weave;
+		this.createObject = props.createObject;
+
 		var registry = weavejs.WeaveAPI.ClassRegistry;
 		var impls = registry.getImplementations(IVisTool);
-		
+
 		// temporary solution - only include tools we want
 		impls = [
 			WeaveUI.C3BarChart,
@@ -29,34 +45,28 @@ export default class ToolsMenu implements MenuBarItemProps
 			WeaveUI.C3PieChart,
 			WeaveUI.C3ScatterPlot,
 			WeaveUI.TableTool,
-			WeaveUI.DataFilterTool
+			WeaveUI.DataFilterTool,
+			WeaveUI.TextTool
 		];
-		
-		this.menu = [
-			{
-				label: Weave.lang("Color Controller"),
-				click: () => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)
-			},
-			{}
-		];
-		
-		impls.forEach(impl => {
+
+		this.tools = impls.map( (impl,index) => {
 			var name = registry.getDisplayName(impl);
-			this.menu.push({
-				label: Weave.lang('+ {0}', name),
-				click: this.createObject.bind(this, impl)
-			});
+			return (
+				<a key={index} className="item" onClick={this.createObject.bind(this, impl)}>{Weave.lang('+ {0}', name)}</a>
+			);
 		});
-		this.createObject = createObject;
 	}
 
-	label:string = "Tools";
-	weave:Weave;
-	menu:MenuItemProps[];
-	createObject:(type:new(..._:any[])=>any)=>void;
-	
+	render():JSX.Element {
+		return (<div className="menu">
+			<a className="item" onClick={() => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)}>{Weave.lang("Color Controller")}</a>
+			<div className="ui divider"></div>
+			{this.tools}
+		</div>)
+	}
+
 	openColorController()
 	{
-		
+
 	}
 }
