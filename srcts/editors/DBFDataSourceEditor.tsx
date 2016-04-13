@@ -10,6 +10,7 @@ import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import Dropdown from "../semantic-ui/Dropdown";
 import KeyTypeInput from "../ui/KeyTypeInput";
+import HelpIcon from "../react-ui/HelpIcon";
 
 import DBFDataSource = weavejs.data.source.DBFDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -47,14 +48,20 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 							       ref={linkReactStateRef(this, { value: dataSource.projection })}/>
 			],
 			[
-				Weave.lang("Key Column"),
+				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Column")}
+					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
+				</HBox>,
 				<Dropdown style={{width: "100%"}}
 						  ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
 						  placeholder={Weave.lang("Auto-generated keys") } 
 						  options={dataSource.getColumnNames()}/>
 			],
 			[
-				Weave.lang("Key Type"),
+				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Category")}
+					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
+				</HBox>,
 				<KeyTypeInput style={{width: "100%"}}
 							  keyTypeProperty={dataSource.keyType}/>
 			]

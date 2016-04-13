@@ -9,6 +9,7 @@ import FileSelector from "../ui/FileSelector";
 import KeyTypeInput from "../ui/KeyTypeInput";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import HelpIcon from "../react-ui/HelpIcon";
 
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -46,7 +47,10 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 							   />
 			],
 			[
-				Weave.lang("Key Type"),
+				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Category")}
+					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
+				</HBox>,
 				<KeyTypeInput style={{width: "100%"}}
 							  keyTypeProperty={dataSource.keyType}/>
 			]

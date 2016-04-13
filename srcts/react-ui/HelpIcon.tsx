@@ -22,7 +22,7 @@ export default class HelpIcon extends React.Component<HelpIconProps, HelpIconsta
 	render()
 	{
 		return (
-			<i  style={{paddingLeft: 5, paddingRight: 5}} 
+			<i  style={{paddingLeft: 5}} 
 				className="weave-help-icon fa fa-question-circle" 
 				onMouseEnter={(event) => ToolTip.open(this.props.children, event, { style: { width: 400 }, className: "weave-help-tooltip"})} 
 				onMouseLeave={ToolTip.close}/>

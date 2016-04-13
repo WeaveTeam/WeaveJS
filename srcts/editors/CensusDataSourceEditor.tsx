@@ -10,6 +10,7 @@ import CensusGeographyFilter from "./CensusGeographyFilter";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import KeyTypeInput from "../ui/KeyTypeInput";
+import HelpIcon from "../react-ui/HelpIcon";
 
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import EntityType = weavejs.api.data.EntityType;
@@ -164,7 +165,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		this.getGeographies(selectedItem);
 	}
 
-	get editorFields(): [string, JSX.Element][] {
+	get editorFields(): [React.ReactChild, React.ReactChild][] {
 		let ds = (this.props.dataSource as CensusDataSource);
 		this.api = ds.getAPI();
 		let families = this.getDataFamilies();
@@ -179,7 +180,10 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 								   ref={linkReactStateRef(this, { content: ds.apiKey }) }/>
 			],
 			[
-				Weave.lang("Key Type"),
+				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Category")}
+					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
+				</HBox>,
 				<KeyTypeInput style={{widtn: "100%"}}
 							  keyTypeProperty={ds.keyType}/>
 			],
