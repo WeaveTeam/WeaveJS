@@ -116,7 +116,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                                     clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }>...</IconButton>
                     </HBox>
 
-                    { alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null }
+                    {/* alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null */}
                 </VBox>;
                 selectableUI.push(elem);
             }
