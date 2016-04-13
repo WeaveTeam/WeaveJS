@@ -69,7 +69,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
 				<Dropdown style={{width: "100%"}}
-						  ref={linkReactStateRef(this, { value: ds.keyColName }) } /* searchable field */
+						  ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
 						  options={columnIds}/>
 			],
 			[
