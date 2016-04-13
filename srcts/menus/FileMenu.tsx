@@ -12,6 +12,7 @@ import Input from "../semantic-ui/Input";
 import WeaveArchive = weavejs.core.WeaveArchive;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import IDataSource = weavejs.api.data.IDataSource;
 
 export default class FileMenu implements MenuBarItemProps
 {
@@ -29,7 +30,7 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		return [
 			{
-				label: <FileInput onChange={this.openFile}>{Weave.lang("Open a File...")}</FileInput>
+				label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes()}>{Weave.lang("Open a File...")}</FileInput>
 			},
 			{
 				label: Weave.lang("Save As..."),
@@ -46,21 +47,122 @@ export default class FileMenu implements MenuBarItemProps
 
     openFile=(e:any)=>
 	{
-        const selectedFile:File = e.target.files[0];
-		this.fileName = selectedFile.name;
-        new Promise((resolve:any, reject:any) => {
-            let reader:FileReader = new FileReader();
-            reader.onload = (event:Event) => {
-                resolve([event, selectedFile]);
-            };
-            reader.readAsArrayBuffer(selectedFile);
-        })
-        .then((zippedResults:any) => {
-            var e:any = zippedResults[0];
-            var result:any = e.target.result;
-            WeaveArchive.loadFileContent(this.weave, result);
-        });
+		var files = e.target.files as FileList;
+		for (let i = 0; i < files.length; i++)
+			this.handleOpenedFile(files[i]);
     }
+	
+	/**
+	 * TEMPORARY SOLUTION until we have a place to register file type handlers
+	 * Ideally this list would be dynamically generated.
+	 * @return An Array of FileFilter objects
+	 */
+	getSupportedFileTypes()
+	{
+		return '.weave';
+		//return '.weave,.csv,.tsv,.txt,.shp,.dbf,.geojson,.zip';
+	}
+	
+	handleOpenedFile(file:File, dataFilesOnly:Boolean = false)
+	{
+		let reader:FileReader = new FileReader();
+		reader.onload = (event:any) => {
+			this.handleOpenedFileContent(file.name, event.target.result, dataFilesOnly);
+		};
+		reader.readAsArrayBuffer(file);
+	}
+	
+	private handleOpenedFileContent(fileName:string, fileContent:Uint8Array, dataFilesOnly:Boolean = false):void
+	{
+		var ext:String = String(fileName.split('.').pop()).toLowerCase();
+		var dataSource:any;
+		
+		if (!dataFilesOnly && ext == 'weave')
+		{
+            WeaveArchive.loadFileContent(this.weave, fileContent);
+			return;
+		}
+		
+//		if (ext == 'zip')
+//		{
+//			var files:Object = weave.flascc.readZip(fileContent);
+//			for (var fileName:String in files)
+//				handleOpenedFile(fileName, files[fileName], true);
+//			
+//			adsp = DraggablePanel.getStaticInstance(AddDataSourcePanel);
+//			if (adsp.parent)
+//				adsp.sendWindowToForeground();
+//			
+//			return;
+//		}
+//		
+//		function newDataSource(type:Class):any
+//		{
+//			return dataSource = WeaveAPI.globalHashMap.requestObject(fileName, type, false);
+//		}
+//		function getFileUrl():String
+//		{
+//			return WeaveAPI.URLRequestUtils.saveLocalFile(fileName, fileContent);
+//		}
+//		
+//		if (ext == 'tsv' || ext == 'txt')
+//		{
+//			adsp = DraggablePanel.openStaticInstance(AddDataSourcePanel);
+//			adsp.dataSourceType = CSVDataSource;
+//			var csvEditor:CSVDataSourceEditor = adsp.editor as CSVDataSourceEditor;
+//			csvEditor.sourceName.text = fileName;
+//			csvEditor.keyTypeSelector.selectedKeyType = fileName;
+//			csvEditor.setText(fileContent.toString(), ext == 'tsv' ? '\t' : ',');
+//		}
+//		else if (ext == 'csv')
+//		{
+//			var csv:CSVDataSource = newDataSource(CSVDataSource);
+//			csv.url.value = getFileUrl();
+//			csv.keyType.value = fileName;
+//		}
+//		else if (ext == 'xls')
+//		{
+//			var xls:XLSDataSource = newDataSource(XLSDataSource);
+//			xls.url.value = getFileUrl();
+//			xls.keyType.value = fileName;
+//		}
+//		else if (ext == 'shp' || ext == 'dbf')
+//		{
+//			adsp = DraggablePanel.openStaticInstance(AddDataSourcePanel);
+//			adsp.dataSourceType = DBFDataSource;
+//			var dbfEditor:DBFDataSourceEditor = adsp.editor as DBFDataSourceEditor;
+//			var fileNameWithoutExt:string = fileName.substr(0, -4);
+//			dbfEditor.sourceName.text = fileNameWithoutExt;
+//			dbfEditor.keyTypeSelector.selectedKeyType = fileNameWithoutExt;
+//			if (ext == 'shp')
+//				dbfEditor.shpURL.text = getFileUrl();
+//			else
+//				dbfEditor.dbfURL.text = getFileUrl();
+//			if (dbfEditor.shpURL.text && dbfEditor.dbfURL.text)
+//				adsp.addSource();
+//		}
+//		else if (ext == 'geojson')
+//		{
+//			var geojson:GeoJSONDataSource = newDataSource(GeoJSONDataSource);
+//			geojson.url.value = getFileUrl();
+//			geojson.keyType.value = fileName;
+//		}
+//		
+//		if (dataSource && !FileMenu.initTemplate(dataSource))
+//		{
+//			var dsm:DataSourceManager = DraggablePanel.openStaticInstance(DataSourceManager);
+//			dsm.selectDataSource(dataSource);
+//		}
+	}
+
+	private findDataSource<T extends (new()=>IDataSource)>(type:new(..._:any[])=>T, filter:(dataSource:T)=>boolean, create:boolean = false):T
+	{
+		var results = Weave.getDescendants(this.weave.root, type).filter(filter);
+		var ds:T = results[0];
+		if (!ds && create)
+			return this.weave.root.requestObject('', type);
+		return results[0];
+	}
 	
 	loadUrl(url:string)
 	{
