@@ -1,7 +1,6 @@
 import * as React from "react";
 import {HBox,VBox,HDividedBox} from '../react-ui/FlexBox';
 import SessionStateTree from './SessionStateTree';
-import PopupWindow from "../react-ui/PopupWindow";
 import IconButton from "../react-ui/IconButton";
 import LinkableDynamicObjectComponent from "./LinkableDynamicObjectComponent";
 
@@ -12,10 +11,12 @@ import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableString = weavejs.core.LinkableString;
 import SmartComponent from "./SmartComponent";
 import FormEvent = __React.FormEvent;
+import ControlPanel from "./ControlPanel";
 
 
 export interface ISessionStateEditorProps extends React.HTMLProps<SessionStateEditor>
 {
+    weave:Weave;
     weaveRoot:ILinkableHashMap;
     name:string;
 }
@@ -27,20 +28,10 @@ export interface ISessionStateEditorState
 
 export default class SessionStateEditor extends SmartComponent<ISessionStateEditorProps, ISessionStateEditorState>
 {
-    static openInstance(label:string, weaveRoot:ILinkableHashMap):PopupWindow{
-
-        var attrPop = PopupWindow.open({
-            title: 'Session State for ' + label,
-            content: <SessionStateEditor  weaveRoot={ weaveRoot } name= {label}/>,
-            modal: false,
-            width: 800,
-            height: 450,
-        });
-
-        return attrPop;
+    static openInstance(name:string, weaveRoot:ILinkableHashMap):ControlPanel{
+        var weave = Weave.getWeave(weaveRoot);
+        return ControlPanel.openInstance<ISessionStateEditorProps>(weave, SessionStateEditor, {title: Weave.lang('Session State Editor for ' + name)}, {weave, name, weaveRoot});
     }
-
-
 
     constructor(props:ISessionStateEditorProps)
     {
