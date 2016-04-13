@@ -169,5 +169,5 @@ Weave.registerClass(
 	ScatterPlotLayer,
 	["weavejs.layer.ScatterPlotLayer", "weave.visualization.plotters::ScatterPlotPlotter"],
 	[weavejs.api.core.ILinkableObjectWithNewProperties],
-	"Scatterplot"
+	"Bubbles"
 );
