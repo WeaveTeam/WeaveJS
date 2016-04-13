@@ -79,7 +79,7 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 	render()
 	{
 		return (
-			<div className={"ui selection dropdown " + (this.props.className || "")}>
+			<div className={"ui selection dropdown " + (this.props.className || "")} style={this.props.style}>
 				<input type="hidden"/>
 				<i className="dropdown icon"/>
 				<div className="default text">{this.props.placeholder}</div>
