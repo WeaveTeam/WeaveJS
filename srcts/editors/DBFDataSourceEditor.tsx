@@ -48,7 +48,7 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 							       ref={linkReactStateRef(this, { value: dataSource.projection })}/>
 			],
 			[
-				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Key Column")}
 					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
@@ -58,7 +58,7 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 						  options={dataSource.getColumnNames()}/>
 			],
 			[
-				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Key Category")}
 					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,

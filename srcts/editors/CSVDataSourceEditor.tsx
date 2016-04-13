@@ -64,7 +64,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 				<FileSelector targetUrl={ds.url} style={{width: "100%"}} accept="text/csv,.csv"/>
 			],
 			[
-				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Key Column")}
 					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
@@ -73,7 +73,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 						  options={columnIds}/>
 			],
 			[
-				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Key Category")}
 					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
