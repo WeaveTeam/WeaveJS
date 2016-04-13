@@ -3247,6 +3247,13 @@ declare module weavejs.core {
          * Verifies that a Class implements an interface.
          */
         verifyImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any): void;
+        /**
+         * Partitions a list of classes based on which interfaces they implement.
+         * @param A list of interfaces.
+         * @return An Array of filtered Arrays corresponding to the given interfaces, including a final
+         *         Array containing the remaining classes that did not implement any of the given interfaces.
+         */
+        static partitionClassList(classes: Array<new (..._: any[]) => any>, ...interfaces: Array<new () => any>): typeof classes;
     }
 }
 declare module weavejs.core {
@@ -6398,7 +6405,7 @@ declare module weavejs.data.source {
         constructor();
         csvData: LinkableVariable;
         keyType: LinkableString;
-        keyColName: LinkableString;
+        keyColumn: LinkableVariable;
         metadata: LinkableVariable;
         url: LinkableFile;
         delimiter: LinkableString;
@@ -6406,8 +6413,8 @@ declare module weavejs.data.source {
          * Convenience function for setting session state of csvData.
          * @param rows
          */
-        setCSVData(rows: any[]): void;
-        getCSVData(): any[];
+        setCSVData(rows: string[][]): void;
+        getCSVData(): string[][];
         /**
          * Convenience function for setting session state of csvData.
          * @param csvDataString CSV string using comma as a delimiter.
@@ -6416,11 +6423,11 @@ declare module weavejs.data.source {
         /**
          * This will get a list of column names in the data, which are taken directly from the header row and not guaranteed to be unique.
          */
-        getColumnNames(): any[];
+        getColumnNames(): Array<string>;
         /**
          * A unique list of identifiers for columns which may be a mix of Strings and Numbers, depending on the uniqueness of column names.
          */
-        getColumnIds(): any[];
+        getColumnIds(): Array<number | string>;
         /**
          * Gets whatever is stored in the "metadata" session state for the specified id.
          */
@@ -6457,6 +6464,7 @@ declare module weavejs.data.source {
         getHierarchyRoot(): IWeaveTreeNode;
         static METADATA_COLUMN_INDEX: string;
         static METADATA_COLUMN_NAME: string;
+        keyColName: string;
         csvDataString: string;
         getColumnByName(name: string): IAttributeColumn;
     }
