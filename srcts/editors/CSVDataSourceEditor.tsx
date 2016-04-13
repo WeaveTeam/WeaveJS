@@ -54,6 +54,10 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
+		let columnIds:{label:string, value:any}[] = ds.getColumnIds().map( (id, index) => {
+			return {label: id, value: id};
+		});
+		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("URL"),
@@ -66,8 +70,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 				</HBox>,
 				<Dropdown style={{width: "100%"}}
 						  ref={linkReactStateRef(this, { value: ds.keyColName }) } /* searchable field */
-						  placeholder={Weave.lang("Auto-generated keys") } 
-						  options={ds.getColumnNames()}/>
+						  options={columnIds}/>
 			],
 			[
 				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
