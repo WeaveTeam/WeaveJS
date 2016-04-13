@@ -71,7 +71,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 				<Input type="text" style={{width: "100%", userSelect: false}}
 								   disabled={true}
 								   title="Renaming data sources is not supported yet"
-								   defaultValue={this.props.dataSource.getHierarchyRoot().getLabel()}/>
+								   value={this.props.dataSource.getHierarchyRoot().getLabel()}/>
 			]
 		]
 	}
