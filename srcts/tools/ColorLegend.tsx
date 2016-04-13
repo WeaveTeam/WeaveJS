@@ -388,7 +388,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			{ReactUtils.generateTable(
 				null,
 				[
-					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <Dropdown ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ]
+					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <Dropdown className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ]
 				],
 				{
 					table: {width: "100%"},
