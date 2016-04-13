@@ -53,8 +53,8 @@ export default class ColorController extends React.Component<ColorControllerProp
 			title: Weave.lang("Color Controller"),
 			content: <ColorController colorColumn={colorColumn}/>,
 			resizable: true,
-			width: 800,
-			height: 600,
+			width: 920,
+			height: 675,
 			onClose: ColorController.close
 		});
 	}
@@ -67,7 +67,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 					  onViewChange={(index) => ColorController.activeTabIndex = index}
 					  labels={this.tabLabels}
 					  tabs={[
-						  <VBox key={this.tabLabels[0]} style={{flex: 1}}>
+						  <VBox className="weave-container weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1}}>
 							  <SelectableAttributeComponent attributes={this.attributes}/>
 							  <BinningDefinitionEditor/>
 							  <HBox>
