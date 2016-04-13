@@ -30,6 +30,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let ds = (this.props.dataSource as CKANDataSource);
 		var labelStyle:React.CSSProperties = {
 			marginRight: 20,
+			display: "flex",
 			fontWeight: "normal"
 		};
 		
@@ -44,7 +45,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("Source URL *"), 
-				<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { value: ds.url})}/>
+				<StatefulTextField selectOnFocus={true} style={{width: "100%"}} ref={linkReactStateRef(this, { value: ds.url})}/>
 			],
 			[
 				Weave.lang("Items to show in hierarchy"),
