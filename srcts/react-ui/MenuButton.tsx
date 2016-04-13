@@ -28,11 +28,10 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 		{
 			ReactUtils.closePopup(this.menu);
 			this.menu = null;
-			document.removeEventListener("click", this.closeMenu);
 		}
 	}
 
-	onClick=(event:React.MouseEvent)=>
+	openMenu=()=>
 	{
 		var clientRect = this.element.getBoundingClientRect();
 		// close the popup if it was already open
@@ -42,18 +41,21 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 		}
 		else
 		{
-			this.menu = ReactUtils.openPopup(<Menu menu={this.props.menu} 
-													xPos={clientRect.left} 
-													yPos={clientRect.top+this.element.clientHeight}
-													onClick={this.closeMenu}/>) as Menu;
-			document.addEventListener("click", this.closeMenu)
+			this.menu = ReactUtils.openPopup(
+				<Menu menu={this.props.menu} 
+					xPos={clientRect.left} 
+					yPos={clientRect.top+this.element.clientHeight}
+					onClick={this.closeMenu}
+				/>,
+				true
+			) as Menu;
 		}
 	}
 	
 	render():JSX.Element
 	{
 		return (
-			<button ref={(elt:Element) => this.element = elt as HTMLElement} onClick={this.onClick}>
+			<button ref={(elt:Element) => this.element = elt as HTMLElement} onMouseDown={this.openMenu}>
 				<i className="fa fa-bars"/>
 			</button>
 		);

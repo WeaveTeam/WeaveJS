@@ -30,18 +30,13 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		return [
 			{
-				label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes()}>{Weave.lang("Open a File...")}</FileInput>
+				label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes().join(',')}>{Weave.lang("Open...")}</FileInput>
 			},
 			{
 				label: Weave.lang("Save As..."),
 				click: this.saveFile
 			},
 			{},
-			{
-				enabled: this.getColumnsToExport().length > 0,
-				label: Weave.lang("Export CSV"),
-				click: this.exportCSV
-			}
 		];
 	}
 
@@ -57,10 +52,12 @@ export default class FileMenu implements MenuBarItemProps
 	 * Ideally this list would be dynamically generated.
 	 * @return An Array of FileFilter objects
 	 */
-	getSupportedFileTypes()
+	getSupportedFileTypes(dataFilesOnly:Boolean = false):string[]
 	{
-		return '.weave';
-		//return '.weave,.csv,.tsv,.txt,.shp,.dbf,.geojson,.zip';
+		var types = ['.csv', '.tsv', '.txt', '.shp', '.dbf', '.geojson', '.zip'];
+		if (!dataFilesOnly)
+			types.unshift('.weave');
+		return types;
 	}
 	
 	handleOpenedFile(file:File, dataFilesOnly:Boolean = false)
@@ -262,24 +259,4 @@ export default class FileMenu implements MenuBarItemProps
 			onOk: onOk
 		});
   	}
-
-	getColumnsToExport=()=>
-	{
-		var columnSet = new Set<weavejs.api.data.IAttributeColumn>();
-		for (var rc of Weave.getDescendants(this.weave.root, weavejs.data.column.ReferencedColumn))
-		{
-			var col = rc.getInternalColumn();
-			if (col && col.getMetadata(weavejs.api.data.ColumnMetadata.DATA_TYPE) != weavejs.api.data.DataType.GEOMETRY)
-				columnSet.add(col)
-		}
-		return weavejs.util.JS.toArray(columnSet.values());
-	}
-
-	exportCSV=()=>
-	{
-		var columns = this.getColumnsToExport();
-		var filter = Weave.AS(this.weave.getObject('defaultSubsetKeyFilter'), weavejs.api.data.IKeyFilter);
-		var csv = weavejs.data.ColumnUtils.generateTableCSV(columns, filter);	
-		FileSaver.saveAs(new Blob([csv]), "Weave-data-export.csv");
-	}
 }

@@ -107,7 +107,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (urlParams.file)
 			{
 				// read content from url
-				this.menuBar.fileMenu.loadUrl(urlParams.file);
+				this.menuBar.systemMenu.fileMenu.loadUrl(urlParams.file);
 			}
 			else if (weaveExternalTools && weaveExternalTools[window.name])
 			{

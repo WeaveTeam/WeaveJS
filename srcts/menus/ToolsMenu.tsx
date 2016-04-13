@@ -28,8 +28,8 @@ export default class ToolsMenu implements MenuBarItemProps
 			WeaveUI.OpenLayersMapTool,
 			WeaveUI.C3PieChart,
 			WeaveUI.C3ScatterPlot,
-			WeaveUI.TableTool,
-			WeaveUI.DataFilterTool
+			WeaveUI.TableTool
+			//WeaveUI.DataFilterTool
 		];
 		
 		this.menu = [
@@ -50,7 +50,7 @@ export default class ToolsMenu implements MenuBarItemProps
 		this.createObject = createObject;
 	}
 
-	label:string = "Tools";
+	label:string = "Visualizations";
 	weave:Weave;
 	menu:MenuItemProps[];
 	createObject:(type:new(..._:any[])=>any)=>void;

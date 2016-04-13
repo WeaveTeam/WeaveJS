@@ -56,7 +56,6 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(GeoJSONDataSource, GeoJSONDataSourceEditor)
 		.set(CensusDataSource, CensusDataSourceEditor)
 		.set(CKANDataSource, CKANDataSourceEditor)
-		.set(CensusDataSource, CensusDataSourceEditor)
 		.set(WeaveDataSource, WeaveDataSourceEditor)
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
