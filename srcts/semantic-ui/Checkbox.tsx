@@ -54,8 +54,8 @@ export default class Checkbox extends React.Component<CheckboxProps, CheckboxSta
 		let checkbox = this;
 
 		selector.checkbox({
-			onChange: function() {
-				checkbox.setState({ checked: this.checked});
+			onChange: () => {
+				checkbox.setState({ checked: this.state.checked});
 			}
 		});
 
