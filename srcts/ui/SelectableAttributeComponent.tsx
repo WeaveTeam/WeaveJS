@@ -99,25 +99,22 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                     defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
                 }
 
-                let elem =  <VBox key={ label }>
-
-                    <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
-                        { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
-                        <AttributeDropdown title="click to change column"
-                                           style={ {flex:1} }
-                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
-                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
-                        <IconButton style={ cleanBtnStyle }
-                                    title={"click to remove the column from " + label }
-                                    iconName='fa fa-times'
-                                    clickHandler={ this.clearColumn.bind( this, attribute) }/>
-                        <IconButton style={ btnStyle }
-                                    toolTip={"Click to explore data sources for " + label}
-                                    clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }>...</IconButton>
-                    </HBox>
-
-                    {/* alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null */}
-                </VBox>;
+                let elem = (
+					<VBox key={ label }>
+	                    <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
+	                        { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
+	                        <AttributeDropdown title="Change column"
+	                                           style={ {flex:1} }
+	                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
+	                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
+	                        <IconButton style={ btnStyle }
+	                                    toolTip={"Explore data sources"}
+	                                    clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }>...</IconButton>
+	                    </HBox>
+	
+	                    {/* alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null */}
+	                </VBox>
+				);
                 selectableUI.push(elem);
             }
             else{//LinkableHashMap
