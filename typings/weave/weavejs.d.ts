@@ -216,12 +216,12 @@ declare module __global__ {
         static getAsyncInstanceHandler(type: new (..._: any[]) => any): Function;
         /**
          * Registers an ILinkableObject class for use with Weave.className() and Weave.getDefinition().
-         * @param qualifiedName
-         * @param definition
+         * @param qualifiedName Either a single String or an Array of Strings which are qualified class names under which to register the class definition.
+         * @param definition The class definition.
          * @param additionalInterfaces An Array of interfaces (Class objects) that the definition implements in addition to ILinkableObject.
          * @param displayName An optional display name for the class definition.
          */
-        static registerClass(qualifiedName: string, definition: new (..._: any[]) => any, additionalInterfaces?: Array<new () => any>, displayName?: string): void;
+        static registerClass(qualifiedName: string | string[], definition: new (..._: any[]) => any, additionalInterfaces?: Array<new () => any>, displayName?: string): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -1101,8 +1101,8 @@ declare module weavejs.api.core {
     interface IClassRegistry {
         /**
          * Registers a class under a given qualified name and adds metadata about implementing interfaces.
-         * @param qualifiedName
-         * @param definition
+         * @param qualifiedName The qualified class name under which to register the class definition.
+         * @param definition The class definition.
          * @param interfaces An Array of Class objects that are the interfaces the class implements.
          * @param displayName An optional display name for the class definition.
          */
@@ -1142,6 +1142,9 @@ declare module weavejs.api.core {
         };
         /**
          * Registers an implementation of an interface to be used as a singleton.
+         * @param theInterface The interface to register.
+         * @param theImplementation The implementation to register.
+         * @return A value of true if the implementation was successfully registered.
          */
         registerSingletonImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any): boolean;
         /**
@@ -3208,27 +3211,9 @@ declare module weavejs.core {
          * An Array of default packages to check when looking up a class by name.
          */
         defaultPackages: any[];
-        /**
-         * Registers a class for use with Weave.className() and Weave.getDefinition().
-         * @param qualifiedName
-         * @param definition
-         * @param interfaces An Array of Class objects that are the interfaces the class implements.
-         * @param displayName An optional display name for the class definition.
-         */
         registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[], displayName?: string): void;
-        /**
-         * Gets the qualified class name from a class definition or an object instance.
-         */
         getClassName(definition: Object): string;
-        /**
-         * Looks up a static definition by name.
-         */
         getDefinition(name: string): any;
-        /**
-         * Gets FlexJS class info.
-         * @return FlexJS class info object containing properties "variables", "accessors", and "methods",
-         *         each being an Array of Objects like {type:String, declaredBy:String}
-         */
         getClassInfo(class_or_instance: Object): {
             variables: {
                 [name: string]: {
@@ -3248,46 +3233,11 @@ declare module weavejs.core {
                 };
             }[];
         };
-        /**
-         * This registers an implementation for a singleton interface.
-         * @param theInterface The interface to register.
-         * @param theImplementation The implementation to register.
-         * @return A value of true if the implementation was successfully registered.
-         */
         registerSingletonImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any): boolean;
-        /**
-         * Gets the registered implementation of an interface.
-         * @return The registered implementation Class for the given interface Class.
-         */
         getSingletonImplementation(theInterface: new (..._: any[]) => any): new (..._: any[]) => any;
-        /**
-         * This function returns the singleton instance for a registered interface.
-         *
-         * This method should not be called at static initialization time,
-         * because the implementation may not have been registered yet.
-         *
-         * @param singletonInterface An interface to a singleton class.
-         * @return The singleton instance that implements the specified interface.
-         */
         getSingletonInstance(theInterface: new (..._: any[]) => any): any;
-        /**
-         * This will register an implementation of an interface.
-         * @param theInterface The interface class.
-         * @param theImplementation An implementation of the interface.
-         * @param displayName An optional display name for the implementation.
-         */
         registerImplementation(theInterface: new (..._: any[]) => any, theImplementation: new (..._: any[]) => any, displayName?: string): void;
-        /**
-         * This will get an Array of class definitions that were previously registered as map_interface_implementations of the specified interface.
-         * @param theInterface The interface class.
-         * @return An Array of class definitions that were previously registered as map_interface_implementations of the specified interface.
-         */
         getImplementations(theInterface: new (..._: any[]) => any): any[];
-        /**
-         * This will get the displayName that was specified when an implementation was registered with registerImplementation().
-         * @param theImplementation An implementation that was registered with registerImplementation().
-         * @return The display name for the implementation.
-         */
         getDisplayName(theImplementation: new (..._: any[]) => any): string;
         /**
          * @private
