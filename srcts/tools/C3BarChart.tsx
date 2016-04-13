@@ -539,7 +539,7 @@ export default class C3BarChart extends AbstractC3Tool
 				{ReactUtils.generateTable(
 					null,
 					[
-						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <Dropdown ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <Dropdown className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					],
 					{
 						table: {width: "100%"},
