@@ -2,7 +2,6 @@ import * as React from 'react';
 import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "../IVisTool";
 import {HBox, VBox} from "../../react-ui/FlexBox";
 import ReactUtils from "../../utils/ReactUtils";
-import StatefulComboBox from "../../ui/StatefulComboBox";
 import {ListOption} from "../../react-ui/List";
 import List from "../../react-ui/List";
 import * as lodash from "lodash";
@@ -21,6 +20,8 @@ import WeaveAPI = weavejs.WeaveAPI;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import SliderOption from "../../react-ui/RCSlider/RCSlider";
+import Dropdown from "../../semantic-ui/Dropdown";
+import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -268,26 +269,26 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
             attributeValue = this.getTargetAttribute();
         }
 
-        /* console.log('toolName', toolName);
+         console.log('toolName', toolName);
          console.log('attributeValue', attributeValue );
-         console.log('open tools in toolconfigs', this.openTools);
-         */
-        //TODO replace all statefulcomboboxes with semantic dropdowns
+         //console.log('open tools in toolconfigs', this.openTools);
+
         return[
             [
                 Weave.lang("Visualization Tool"),
-                //<StatefulComboBox value={ 'Scatterplot' } options={ this.openTools } onChange={ this.handleTargetToolChange } />
-                <StatefulComboBox value={ toolName } options={ this.openTools } onChange={ this.handleTargetToolChange } />
+                <Dropdown className="weave-sidbar-dropdown" value={ toolName }
+                            options={ this.openTools } onChange={ this.handleTargetToolChange } />
             ],
             [
                 Weave.lang("Visualization Attribute"),
 
-                //<StatefulComboBox value={ 'c' } options={ ['a', 'c'] } onChange={ this.handleTargetAttributeChange }  />
-                <StatefulComboBox value={ attributeValue } options={ this.getTargetToolAttributeOptions() } onChange={ this.handleTargetAttributeChange }  />
+                <Dropdown className="weave-sidebar-dropdown" value={ attributeValue }
+                            options={ this.getTargetToolAttributeOptions() } onChange={ this.handleTargetAttributeChange }  />
             ],
             [
                 Weave.lang("Menu Layout"),
-                <StatefulComboBox value={ menuLayout } options={ menuOptions } onChange={ this.handleMenuLayoutChange }/>
+                <Dropdown className="weave-sidebar-dropdown" value={ menuLayout }
+                            options={ menuOptions } onChange={ this.handleMenuLayoutChange }/>
             ]
         ];
     }
