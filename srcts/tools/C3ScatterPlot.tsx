@@ -36,17 +36,17 @@ export default class C3ScatterPlot extends AbstractC3Tool
 {
 	dataX = Weave.linkableChild(this, DynamicColumn);
 	dataY = Weave.linkableChild(this, DynamicColumn);
-	radius = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
+	size = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
 
-	private get radiusNorm() { return this.radius.getInternalColumn() as NormalizedColumn; }
-	private get radiusData() { return this.radiusNorm.internalDynamicColumn; }
+	private get sizeNorm() { return this.size.getInternalColumn() as NormalizedColumn; }
+	private get sizeData() { return this.sizeNorm.internalDynamicColumn; }
 
 	private RECORD_FORMAT = {
 		id: IQualifiedKey,
 		point: { x: this.dataX, y: this.dataY },
-		size: this.radius,
+		size: this.size,
 		fill: { color: this.fill.color },
 		line: { color: this.line.color }
 	};
@@ -66,16 +66,22 @@ export default class C3ScatterPlot extends AbstractC3Tool
 
 	protected c3ConfigYAxis:c3.YAxisConfiguration;
 
+	private recordToRadius(d:Record)
+	{
+		return Math.sqrt(d.size);
+	}
+
 	constructor(props:IVisToolProps)
 	{
 		super(props);
 
-		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
+		this.size.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
+		this.sizeNorm.preserveRatio.value = true;
 
 		this.filteredKeySet.setColumnKeySources([this.dataX, this.dataY]);
 
-		this.radiusNorm.min.value = 3;
-		this.radiusNorm.max.value = 25;
+		this.sizeNorm.min.value = 3;
+		this.sizeNorm.max.value = 25;
 
 		this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
 
@@ -188,7 +194,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		var key:IQualifiedKey = this.records[d.index].id;
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([key]);
-		this.toolTip.show(this, this.chart.internal.d3.event, [key], [this.dataX, this.dataY, this.radiusData]);
+		this.toolTip.show(this, this.chart.internal.d3.event, [key], [this.dataX, this.dataY, this.sizeData]);
 	}
 	
 	protected handleC3Selection():void
@@ -203,7 +209,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	protected validate(forced:boolean = false):boolean
 	{
 		var xyChanged = Weave.detectChange(this, this.dataX, this.dataY);
-		var dataChanged = xyChanged || Weave.detectChange(this, this.radius, this.fill, this.line, this.filteredKeySet);
+		var dataChanged = xyChanged || Weave.detectChange(this, this.size, this.fill, this.line, this.filteredKeySet);
 		if (dataChanged)
 		{
 			this.dataXType = this.dataX.getMetadata('dataType');
@@ -336,7 +342,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			.set("X", this.dataX)
 			.set("Y", this.dataY)
 			.set("Color", this.fill.color)
-			.set("Radius", this.radius);
+			.set("Size", this.size);
 			// TODO handle remaining attributes
 	}
 	
@@ -362,10 +368,10 @@ export default class C3ScatterPlot extends AbstractC3Tool
 								"filteredKeySet": this.filteredKeySet,
 								"dataX": this.dataX,
 								"dataY": this.dataY,
-								"sizeBy": this.radiusData,
-								"minScreenRadius": this.radiusNorm.min,
-								"maxScreenRadius": this.radiusNorm.max,
-								"defaultScreenRadius": this.radius.defaultValue,
+								"sizeBy": this.sizeData,
+								"minScreenRadius": this.sizeNorm.min,
+								"maxScreenRadius": this.sizeNorm.max,
+								"defaultScreenRadius": this.size.defaultValue,
 
 								"fill": this.fill,
 								"line": this.line,
