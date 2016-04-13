@@ -2,7 +2,7 @@ import * as ol from "openlayers";
 import * as lodash from "lodash";
 import AbstractLayer from "./AbstractLayer";
 import * as React from "react";
-import StatefulComboBox from "../../../ui/StatefulComboBox";
+import Dropdown from "../../../semantic-ui/Dropdown";
 import StatefulTextField from "../../../ui/StatefulTextField";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import {VBox, HBox} from "../../../react-ui/FlexBox";
@@ -104,23 +104,23 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 		if (this.props.layer.provider.value === "osm")
 		{
 			return <VBox>
-				{Weave.lang("Provider")+" "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				{Weave.lang("Provider")+" "}<Dropdown ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 			</VBox>
 		}
 		else if (this.props.layer.provider.value === "custom")
 		{
 			return <VBox>
-				{Weave.lang("Provider") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
-				{Weave.lang("URL") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempUrl }) }/>
-				{Weave.lang("Attribution") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempAttributions }) }/>
-				{Weave.lang("Projection") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempProjection }) }/>
+				{Weave.lang("Provider") + " "}<Dropdown ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				{Weave.lang("URL") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempUrl }) }/>
+				{Weave.lang("Attribution") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempAttributions }) }/>
+				{Weave.lang("Projection") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempProjection }) }/>
 			</VBox>
 		}
 		else
 		{
 			return <VBox>
-				{Weave.lang("Provider") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
-				{Weave.lang("Layer") + " "}<StatefulComboBox ref={linkReactStateRef(this, { value: this.tempLayer }) }
+				{Weave.lang("Provider") + " "}<Dropdown ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				{Weave.lang("Layer") + " "}<Dropdown ref={linkReactStateRef(this, { value: this.tempLayer }) }
 					options={layers ? layers.map((name) => { return { label: lodash.startCase(name), value: name }; }) : [] }/>
 			</VBox>
 		}
@@ -283,4 +283,9 @@ export default class TileLayer extends AbstractLayer
 	}
 }
 
-Weave.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass(
+	TileLayer,
+	["weavejs.layer.TileLayer", "weave.visualization.plotters::WMSPlotter"],
+	[weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Base Map"
+);

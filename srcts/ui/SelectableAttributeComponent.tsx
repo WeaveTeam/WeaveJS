@@ -5,7 +5,7 @@ import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
 import PopupWindow from "../react-ui/PopupWindow";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
-import StatefulComboBox from '../ui/StatefulComboBox';
+import Dropdown from '../semantic-ui/Dropdown';
 import List from '../react-ui/List';
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
@@ -20,8 +20,8 @@ import ListOption from "../react-ui/List";
 import IColumnReference = weavejs.api.data.IColumnReference;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
-import Column = FixedDataTable.Column;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import ControlPanel from "./ControlPanel";
 
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|LinkableHashMap>
@@ -34,7 +34,6 @@ export interface ISelectableAttributeComponentState{
 export default class SelectableAttributeComponent extends React.Component<ISelectableAttributeComponentProps, ISelectableAttributeComponentState>{
     constructor (props:ISelectableAttributeComponentProps){
         super(props);
-
     }
 
     static defaultProps = { showLabel: true };
@@ -49,7 +48,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             Weave.getCallbacks(value).addGroupedCallback(this, this.forceUpdate);
         });
     }
-    launchAttributeSelector=(label:string, attribute:IColumnWrapper|LinkableHashMap):PopupWindow=>{
+    launchAttributeSelector=(label:string, attribute:IColumnWrapper|LinkableHashMap):ControlPanel=>{
         return AttributeSelector.openInstance(label, attribute, this.props.attributes);
     };
 
@@ -135,7 +134,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 
 //Custom component to handle drop down selection of columns as well as when selection from attribute selector
-//StatefulCombobox allows selection only from drop down, Does not handle case of attribute selector
+//Dropdown allows selection only from drop down, Does not handle case of attribute selector
 interface IAttributeDropdownProps extends React.HTMLProps<AttributeDropdown> {
     attribute:DynamicColumn;
     clickHandler:(event:React.MouseEvent)=>PopupWindow;
@@ -185,16 +184,16 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
         });
     };
 
-    getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper):string=>
+    getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper|IColumnReference):string=>
     {
         var metadata:{[attr:string]:string};
-        // get IWeaveTreeNode from IColumnWrapper
+        // get IWeaveTreeNode from IColumnWrapper, which will also be an IColumnReference
         if (Weave.IS(node, IColumnWrapper))
             node = ColumnUtils.hack_findHierarchyNode(node as IColumnWrapper);
 
         if (!node)
             return null;
-        let colRef = Weave.AS(node as IWeaveTreeNode, weavejs.api.data.IColumnReference);
+        let colRef = Weave.AS(node, IColumnReference);
         if (!colRef)
             return null;
         let dataSource = colRef.getDataSource();

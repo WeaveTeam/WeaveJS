@@ -74,7 +74,6 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 			weavejs.WeaveAPI.Scheduler.callLater(localContext, updateReactState, [true]);
 			return;
 		}
-
 		authority = null;
 		var updatedReactState = reactUpdate(reactState, reactUpdateSpec);
 		if (!_.isEqual(reactState, updatedReactState))

@@ -17,8 +17,8 @@ import WeaveAPI = weavejs.WeaveAPI;
 
 import StatefulTextField from "../../../ui/StatefulTextField";
 import StatefulRangeSlider from "../../../ui/StatefulRangeSlider";
-import StatefulComboBox from "../../../ui/StatefulComboBox";
-import StatefulCheckBox from "../../../ui/StatefulCheckBox";
+import Dropdown from "../../../semantic-ui/Dropdown";
+import Checkbox from "../../../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import SelectableAttributeComponent from "../../../ui/SelectableAttributeComponent";
 import ReactUtils from "../../../utils/ReactUtils";
@@ -66,10 +66,10 @@ export default class AbstractLayer implements ILinkableObject
 		if (lv instanceof LinkableString || lv instanceof LinkableNumber)
 		{
 			if (typeof options[0] === typeof "") {
-				return [Weave.lang(key), <StatefulTextField key={key} ref={linkReactStateRef(this, { content: lv }) } suggestions={options as string[]} />];
+				return [Weave.lang(key), <Dropdown key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />]; /* searchable field */
 			}
 			else if (typeof options[0] === typeof {}) {
-				return [Weave.lang(key), <StatefulComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
+				return [Weave.lang(key), <Dropdown key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
 			}
 			else
 			{
@@ -78,7 +78,7 @@ export default class AbstractLayer implements ILinkableObject
 		}
 		else
 		{
-			return [Weave.lang(key), <StatefulCheckBox key={key} ref={linkReactStateRef(this, { checked: lv }) }/>];
+			return [Weave.lang(key), <Checkbox key={key} ref={linkReactStateRef(this, { checked: lv }) }/>];
 		}		
 	}
 

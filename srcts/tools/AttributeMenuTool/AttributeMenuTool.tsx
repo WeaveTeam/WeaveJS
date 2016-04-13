@@ -102,8 +102,8 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
     renderEditor():JSX.Element{
         return(<VBox>
-                <AttributeMenuTargetEditor attributeMenuTool={ this }/>
-                { renderSelectableAttributes(this) }
+            <AttributeMenuTargetEditor attributeMenuTool={ this }/>
+            { renderSelectableAttributes(this) }
         </VBox>);
     }
 
@@ -116,10 +116,10 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
                 return(<VBox><List options={ this.options }  onChange={ this.handleSelection } selectedValues={ [selectedAttribute] }/></VBox>);
             case(LAYOUT_HSLIDER):
                 return(<VBox style={{ padding: "70px" }}>
-                        <HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type={ "categorical" }/></VBox>);
+                    <HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type={ "categorical" }/></VBox>);
             case(LAYOUT_VSLIDER):
                 return(<VBox><VSlider options={ this.options } onChange={ this.handleSelection } selectedValues={ [selectedAttribute] } type={ "categorical" }/>
-                        </VBox>)
+                </VBox>)
         }
     }
 }
@@ -225,15 +225,15 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         let tool:IVisTool = this.tool;
         let attributes:{label:string, value: string}[] = [];
 
-       if(tool){
-           for (let [label, attribute] of tool.selectableAttributes.entries())
-           {
-               let path = Weave.findPath(this.weaveRoot, attribute);
-               let value = lodash.last(path);
+        if(tool){
+            for (let [label, attribute] of tool.selectableAttributes.entries())
+            {
+                let path = Weave.findPath(this.weaveRoot, attribute);
+                let value = lodash.last(path);
 
-               attributes.push({label, value});
-           }
-       }
+                attributes.push({label, value});
+            }
+        }
         return attributes;
     }
 
@@ -264,10 +264,10 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
             attributeValue = this.getTargetAttribute();
         }
 
-       /* console.log('toolName', toolName);
-        console.log('attributeValue', attributeValue );
-        console.log('open tools in toolconfigs', this.openTools);
-*/
+        /* console.log('toolName', toolName);
+         console.log('attributeValue', attributeValue );
+         console.log('open tools in toolconfigs', this.openTools);
+         */
         //TODO replace all statefulcomboboxes with semantic dropdowns
         return[
             [

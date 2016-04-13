@@ -13,15 +13,15 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import PopupWindow from "../react-ui/PopupWindow";
 import IDataSource = weavejs.api.data.IDataSource;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import SmartComponent from "./SmartComponent";
+import ControlPanel from "./ControlPanel";
 
 export interface IAttributeSelectorProps
 {
-    selectedAttribute : IColumnWrapper|LinkableHashMap;
     label? : string;
+    selectedAttribute : IColumnWrapper|LinkableHashMap;
     showLabelAsButton?:boolean;
     selectableAttributes:Map<string,(IColumnWrapper|LinkableHashMap)>;
 }
@@ -56,7 +56,6 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
         this.weaveRoot = Weave.getRoot(props.selectedAttribute);
         this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
-        //this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 
         this.state = {
             leafNode : this.getSelectedNodeRoot(this.props.selectedAttribute),
@@ -69,16 +68,9 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
     componentWillReceiveProps (nextProps :IAttributeSelectorProps){
         if(nextProps.selectedAttribute != this.props.selectedAttribute){
-            //this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
             this.weaveRoot = Weave.getRoot(nextProps.selectedAttribute);
-            //this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
-
             this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
         }
-    }
-
-    componentWillUnmount (){
-        //this.weaveRoot.childListCallbacks.removeCallback(this, this.forceUpdate);
     }
 
     handleSelectedAttribute = (name:string):void=>
@@ -193,19 +185,12 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             return;
     };
 
-    static openInstance(label:string, selectedAttribute:IColumnWrapper|LinkableHashMap, selectableAttributes:Map<string, (IColumnWrapper|LinkableHashMap)>):PopupWindow{
-        var attrPop = PopupWindow.open({
-            title: 'Attribute Selector for ' + label,
-            content: <AttributeSelector label={ label } selectedAttribute={ selectedAttribute } selectableAttributes={ selectableAttributes } />,
-            modal: false,
-            width: 800,
-            height: 450,
-        });
-
-        return attrPop;
+    static openInstance(label:string, selectedAttribute:IColumnWrapper|LinkableHashMap, selectableAttributes:Map<string, (IColumnWrapper|LinkableHashMap)>):ControlPanel{
+        let weave = Weave.getWeave(selectedAttribute);
+        return ControlPanel.openInstance<IAttributeSelectorProps>(weave, AttributeSelector,
+                                        {title:Weave.lang('Attribute Selector')},
+                                        {label, selectedAttribute, selectableAttributes});
     }
-
-
 
     render():JSX.Element
     {
@@ -232,7 +217,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
                 <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar>
 
-                <HDividedBox style={ {flex:1 ,border:"1px solid #E6E6E6"} }>
+                <HDividedBox style={ {flex:1 ,border:"1px solid #E6E6E6"} } loadWithEqualWidthChildren={true}>
                     <div>
                         <WeaveTree searchFilter={ this.searchFilter }
                                    hideRoot = {true} hideLeaves = {true}

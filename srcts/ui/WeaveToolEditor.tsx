@@ -7,6 +7,7 @@ import {IVisTool} from "../tools/IVisTool";
 import IconButton from "../react-ui/IconButton";
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import ControlPanel from "./ControlPanel";
 
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
@@ -31,8 +32,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
     }
 
     openSessionStateEditor=()=>{
-        SessionStateEditor.openInstance(this.toolName,this.weaveRoot)
-    }
+        return SessionStateEditor.openInstance(this.toolName,this.weaveRoot);
+    };
 
 
     componentWillReceiveProps(nextProps:WeaveToolEditorProps)

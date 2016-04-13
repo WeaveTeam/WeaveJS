@@ -9,7 +9,10 @@ import FileSelector from "../ui/FileSelector";
 import FixedDataTable from "../tools/FixedDataTable";
 import DataSourceEditor from "./DataSourceEditor";
 import KeyTypeInput from "../ui/KeyTypeInput";
+import Dropdown from "../semantic-ui/Dropdown";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import HelpIcon from "../react-ui/HelpIcon";
+
 import CSVDataSource = weavejs.data.source.CSVDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import EntityType = weavejs.api.data.EntityType;
@@ -54,18 +57,24 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("URL"),
-				<FileSelector target={(this.props.dataSource as CSVDataSource).url} accept="text/csv,.csv"/>
+				<FileSelector targetUrl={ds.url} style={{width: "100%"}} accept="text/csv,.csv"/>
 			],
 			[
-				Weave.lang("Key Type"),
+				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Column")}
+					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
+				</HBox>,
+				<Dropdown style={{width: "100%"}}
+						  ref={linkReactStateRef(this, { value: ds.keyColName }) } /* searchable field */
+						  placeholder={Weave.lang("Auto-generated keys") } 
+						  options={ds.getColumnNames()}/>
+			],
+			[
+				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Category")}
+					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
+				</HBox>,
 				<KeyTypeInput keyTypeProperty={ds.keyType}/>
-			],
-			[
-				Weave.lang("Key Column"),
-				<StatefulTextField selectOnFocus={true} 
-								   ref={linkReactStateRef(this, { content: ds.keyColName }) }
-								   noneLabel={Weave.lang("Auto-generated keys") } 
-								   suggestions={ds.getColumnNames().concat([null]) }/>
 			]
 		];
 		return super.editorFields.concat(editorFields);

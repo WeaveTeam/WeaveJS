@@ -52,8 +52,8 @@ export interface VisToolGroup
 	probeFilter:DynamicKeyFilter
 }
 
-Weave.registerClass("weavejs.tool.Margin", Margin);
-Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
+Weave.registerClass(Margin, "weavejs.tool.Margin");
+Weave.registerClass(OverrideBounds, "weavejs.tool.OverrideBounds");
 
 export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {
@@ -187,7 +187,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	renderNumberEditor(linkableNumber:LinkableNumber, width:number = 50):JSX.Element
 	{
 		var style:React.CSSProperties = {textAlign: "center", width};
-		return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+		return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {value: linkableNumber})}/>;
 	}
 
 	renderEditor():JSX.Element
@@ -202,7 +202,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 						["Y Axis Title", this.yAxisName]
 					].map((row:[string, LinkableString]) => [
 						Weave.lang(row[0]),
-						<StatefulTextField ref={ linkReactStateRef(this, {content: row[1]}) }/>
+						<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>
 					]),
 					{
 						table: {width: "100%"},

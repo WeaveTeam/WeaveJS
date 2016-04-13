@@ -31,9 +31,9 @@ import {OverrideBounds} from "./AbstractVisTool";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import MiscUtils from "../utils/MiscUtils";
 
-import StatefulCheckBox from "../ui/StatefulCheckBox";
+import Checkbox from "../semantic-ui/Checkbox";
 import StatefulTextField from "../ui/StatefulTextField";
-import StatefulComboBox from "../ui/StatefulComboBox";
+import Dropdown from "../semantic-ui/Dropdown";
 import LayerManager from "./OpenLayersMap/LayerManager";
 import {VBox,HBox} from "../react-ui/FlexBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
@@ -106,29 +106,29 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let editorFields = [
 			[Weave.lang("Panel Title"),
 				<HBox>
-					<StatefulTextField ref= { linkReactStateRef(this, {content: this.panelTitle }) }/>
+					<StatefulTextField ref= { linkReactStateRef(this, {value: this.panelTitle }) }/>
 				</HBox>
 			],
 			[Weave.lang("Control Location"),
 				<HBox>
-					<StatefulComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
+					<Dropdown ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
 				</HBox>
 			],
 			[Weave.lang("Zoom Range"),
 				<HBox style={{ width: "100%" }}>
-					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { content: this.minZoomLevel }) }/>
+					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
 					{"-"}
-					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { content: this.maxZoomLevel }) }/>
+					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
 				</HBox>
 			],
 			[Weave.lang("Show Zoom Slider"),
 				<HBox>
-					<StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showZoomSlider })}/>
+					<Checkbox ref={linkReactStateRef(this, { checked: this.showZoomSlider })}/>
 				</HBox>
 			],
 			[Weave.lang("Projection SRS"),
 				<HBox>
-					<StatefulTextField ref={linkReactStateRef(this, {content: this.projectionSRS })}/>
+					<StatefulTextField ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
 				</HBox>
 			],
 			[Weave.lang("Override extent"), 
@@ -139,7 +139,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Snap zoom to base map"),
 				<HBox>
-					<StatefulCheckBox ref={linkReactStateRef(this, {checked: this.snapZoomToBaseMap})}/>
+					<Checkbox ref={linkReactStateRef(this, {checked: this.snapZoomToBaseMap})}/>
 				</HBox>
 			],
 		];
@@ -668,5 +668,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	}
 }
 
-Weave.registerClass("weavejs.tool.Map", OpenLayersMapTool, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Map");
-Weave.registerClass("weave.visualization.tools::MapTool", OpenLayersMapTool);
+Weave.registerClass(
+	OpenLayersMapTool,
+	["weavejs.tool.Map", "weave.visualization.tools::MapTool"],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Map"
+);

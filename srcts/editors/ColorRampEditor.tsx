@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {VBox, HBox} from "../react-ui/FlexBox";
 import {VSpacer, HSpacer} from "../react-ui/Spacer";
@@ -84,7 +85,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 		this.colorRamp.setSessionState(newColors);
 	}
 
-	render()
+	render():any
 	{
 		var colors:number[] = this.colorRamp.getColors() as number[];
 		var hexColors = this.colorRamp.getHexColors();
@@ -129,7 +130,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 					<HBox style={{flex: .7, alignItems: "center"}}>
 						{Weave.lang("Filter: ")}
 						<VSpacer/>
-						<Dropdown value={this.state.selectedFilter} options={this.filterOptions.map((option) => {return { value: Weave.lang(option) }})} onChange={(value:string) => { this.setState({ selectedFilter: value}) }}/>
+						<Dropdown value={this.state.selectedFilter} options={this.filterOptions} onChange={(value:string) => { this.setState({ selectedFilter: value}) }} direction="upward"/>
 					</HBox>
 					<VSpacer/>
 					<HBox style={{flex: .3, justifyContent: "space-between"}}>

@@ -15,7 +15,7 @@ import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import {VSpacer, HSpacer} from "../react-ui/Spacer";
 import ColorRampComponent from "../react-ui/ColorRamp";
-import StatefulComboBox from "../ui/StatefulComboBox";
+import Dropdown from "../semantic-ui/Dropdown";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -388,7 +388,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			{ReactUtils.generateTable(
 				null,
 				[
-					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <StatefulComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ]
+					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <Dropdown className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ]
 				],
 				{
 					table: {width: "100%"},
@@ -415,5 +415,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	}
 }
 
-Weave.registerClass("weavejs.tool.ColorLegend", ColorLegend, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Color Legend");
-Weave.registerClass("weave.visualization.tools::ColorBinLegendTool", ColorLegend);
+Weave.registerClass(
+	ColorLegend,
+	["weavejs.tool.ColorLegend", "weave.visualization.tools::ColorBinLegendTool"],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Color Legend"
+);

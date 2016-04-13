@@ -397,5 +397,9 @@ export default class C3LineChart extends AbstractC3Tool
 	}
 }
 
-Weave.registerClass("weavejs.tool.C3LineChart", C3LineChart, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Line Chart");
-Weave.registerClass("weave.visualization.tools::LineChartTool", C3LineChart);
+Weave.registerClass(
+	C3LineChart,
+	["weavejs.tool.C3LineChart", "weave.visualization.tools::LineChartTool"],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Line Chart"
+);

@@ -63,7 +63,7 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 						null,
 						[["Text", this.htmlText]].map((row:[string, LinkableString]) => [
 							Weave.lang(row[0]),
-							<StatefulTextField ref={ linkReactStateRef(this, {content: row[1]}) }/>
+							<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>
 						]),
 						{
 							table: {width: "100%"},
@@ -107,5 +107,9 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 	}
 }
 
-Weave.registerClass("weavejs.tool.Text", TextTool, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Text");
-Weave.registerClass("weave.ui::TextTool", TextTool);
+Weave.registerClass(
+	TextTool,
+	["weavejs.tool.Text", "weave.ui::TextTool"],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Text"
+);

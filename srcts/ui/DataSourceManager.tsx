@@ -56,7 +56,6 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(GeoJSONDataSource, GeoJSONDataSourceEditor)
 		.set(CensusDataSource, CensusDataSourceEditor)
 		.set(CKANDataSource, CKANDataSourceEditor)
-		.set(CensusDataSource, CensusDataSourceEditor)
 		.set(WeaveDataSource, WeaveDataSourceEditor)
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
@@ -134,19 +133,19 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		{
 			editorJsx = <span>{Weave.lang("Select a data source on the left.")}</span>;
 		}
+		
 
 		return (
-			<HBox style={{flex: 1}}>
-				<VBox style={{ width: 200 }}>
+			<HBox className="weave-padded-hbox" style={ {flex:1} }>
+				<VBox className="weave-container" style={ {width:200, padding: 0} }>
 					<List
 						options={listOptions}
 						multiple={false}
-						selectedValues={[dataSource]}
-						onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0], this.forceUpdate() }}
+						selectedValues={ [dataSource] }
+						onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0]; this.forceUpdate() }}
 					/>
 				</VBox>
-				<div style={{ backgroundColor: '#f0f0f0', width: 4}}/>
-				<VBox style={{ flex: 1 }}>
+				<VBox  style={ {flex: 1} }>
 					{editorJsx}
 				</VBox>
 			</HBox>

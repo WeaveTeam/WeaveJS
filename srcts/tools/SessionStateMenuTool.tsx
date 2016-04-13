@@ -10,7 +10,7 @@ import {CSSProperties} from "react";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import List from "../react-ui/List";
 import MiscUtils from "../utils/MiscUtils";
-import StatefulComboBox from "../ui/StatefulComboBox";
+import Dropdown from "../semantic-ui/Dropdown";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -107,7 +107,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		{
 			return (
 				<VBox style={{flex: 1, alignItems: "center"}}>
-					<StatefulComboBox ref={linkReactStateRef(this, { value: this.selectedChoice })} options={this.choices.getNames()}/>
+					<Dropdown ref={linkReactStateRef(this, { value: this.selectedChoice })} options={this.choices.getNames()}/>
 				</VBox>
 			);
 		}
@@ -131,5 +131,9 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	}
 }
 
-Weave.registerClass("weavejs.tool.SessionStateMenu", SessionStateMenuTool, [weavejs.api.ui.IVisTool_Utility/*, weavejs.api.core.ILinkableObjectWithNewProperties*/], "Session State Menu Tool");
-Weave.registerClass("weave.ui::SessionStateMenuTool", SessionStateMenuTool);
+Weave.registerClass(
+	SessionStateMenuTool,
+	["weavejs.tool.SessionStateMenu", "weave.ui::SessionStateMenuTool"],
+	[weavejs.api.ui.IVisTool_Utility/*, weavejs.api.core.ILinkableObjectWithNewProperties*/],
+	"Session State Menu Tool"
+);

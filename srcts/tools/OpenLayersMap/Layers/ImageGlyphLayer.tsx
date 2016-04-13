@@ -162,4 +162,9 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 	}
 }
 
-Weave.registerClass("weave.visualization.plotters::ImageGlyphPlotter", ImageGlyphLayer);
+Weave.registerClass(
+	ImageGlyphLayer,
+	["weavejs.layer.ImageGlyphLayer", "weave.visualization.plotters::ImageGlyphPlotter"],
+	[weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Icons"
+);

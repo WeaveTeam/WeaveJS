@@ -9,6 +9,7 @@ import FileSelector from "../ui/FileSelector";
 import KeyTypeInput from "../ui/KeyTypeInput";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import HelpIcon from "../react-ui/HelpIcon";
 
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -26,28 +27,32 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("GeoJSON URL"),
-				<FileSelector 
-						  target={dataSource.url} 
-						  placeholder={Weave.lang("http://www.example.com/example.geojson")} 
-						  accept=".geojson"
-						  />
+				<FileSelector style={{width: "100%"}}
+							  targetUrl={dataSource.url} 
+							  placeholder={Weave.lang("http://www.example.com/example.geojson")} 
+							  accept=".geojson"/>
 			],
 			[
 				Weave.lang("Projection"),
-				<StatefulTextField selectOnFocus={true} 
-							   placeholder={Weave.lang("Example: EPSG:4326")} 
-							   ref={linkReactStateRef(this, { content: dataSource.projection })}
-							   />
+				<StatefulTextField style={{width: "100%"}}
+								   selectOnFocus={true} 
+								   placeholder={Weave.lang("Example: EPSG:4326")} 
+							   	   ref={linkReactStateRef(this, { value: dataSource.projection })}/>
 			],
 			[
 				Weave.lang("Key Property"),
-				<StatefulTextField selectOnFocus={true} 
-							   ref={linkReactStateRef(this, { content: dataSource.keyProperty })}
+				<StatefulTextField style={{width: "100%"}}
+								   selectOnFocus={true} 
+		   						   ref={linkReactStateRef(this, { value: dataSource.keyProperty })}
 							   />
 			],
 			[
-				Weave.lang("Key Type"),
-				<KeyTypeInput keyTypeProperty={dataSource.keyType}/>
+				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Category")}
+					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
+				</HBox>,
+				<KeyTypeInput style={{width: "100%"}}
+							  keyTypeProperty={dataSource.keyType}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)

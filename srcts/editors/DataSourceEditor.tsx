@@ -8,6 +8,7 @@ import WeaveTree from "../ui/WeaveTree";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
 import Tabs from "../react-ui/Tabs";
+import Input from "../semantic-ui/Input";
 
 import WeaveAPI = weavejs.WeaveAPI;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -41,7 +42,6 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	private tableContainerElement:HTMLElement;
 	protected tree:WeaveTree;
 	protected editorButtons:Map<React.ReactChild, Function>;
-	private parentNode:IWeaveTreeNode;
 
 	constructor(props:IDataSourceEditorProps)
 	{
@@ -68,18 +68,19 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		return [
 			[
 				<span>{Weave.lang("Source Name")}</span>,
-				<input type="text" style={{width: "100%", userSelect: false}}
+				<Input type="text" style={{width: "100%", userSelect: false}}
 					   disabled={true}
-					   defaultValue={this.props.dataSource.getHierarchyRoot().getLabel()}/>
+					   title="Renaming data sources is not supported yet"
+					   value={this.props.dataSource.getHierarchyRoot().getLabel()}/>
 			]
 		]
 	}
-
-	shouldComponentUpdate()
-	{
-		return Weave.detectChange(this, this.column);
-	}
-
+	/*
+	 shouldComponentUpdate()
+	 {
+	 return Weave.detectChange(this, this.column);
+	 }
+	 */
 	renderFields():JSX.Element
 	{
 		let dataSource = this.props.dataSource;
@@ -87,8 +88,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
-				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5},
-				{ paddingBottom: 10, width: "100%"}
+				{ paddingBottom: 8, textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
 			]
 		};
 
@@ -97,9 +98,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 	showColumns(selectedItems:IWeaveTreeNode[])
 	{
-		this.parentNode = selectedItems && selectedItems.length && selectedItems[0];
 		this.setState({
-			selectedNode: this.parentNode
+			selectedNode: selectedItems && selectedItems.length && selectedItems[0]
 		});
 	}
 
@@ -168,6 +168,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			<VBox style={{flex: 1}}>
 				<HBox style={{flex: 1}}>
 					<VBox style={{flex: 1}}>
+						<label style={{ fontWeight: "bold" }}>{Weave.lang("Tables", this.props.dataSource.getHierarchyRoot().getLabel())}</label>
 						<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} initialSelectedItems={[this.props.dataSource.getHierarchyRoot()]} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
 					</VBox>
 					<div style={{width: 10}}/>
@@ -175,6 +176,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 						this.state.selectedNode
 							?
 						<VBox style={{flex: 1}}>
+							<label style={{ fontWeight: "bold" }}>{Weave.lang("Columns", this.state.selectedNode.getLabel())}</label>
 							<WeaveTree root={this.state.selectedNode} hideRoot={true} hideBranches={true} onSelect={(selectedItems) => this.updateColumnTarget(selectedItems)}/>
 							<HBox style={{justifyContent: "flex-end"}}>
 							</HBox>
@@ -192,9 +194,9 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	renderConfigureView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
+		// <label style={ { fontWeight: "bold" } }> { Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel()) } </label>
 		return (
-			<VBox style={{flex: 1}}>
-				<label> {Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel())} </label>
+			<VBox className="weave-padded-vbox weave-container" style={ {flex: 1, border:"none"} }>
 				{
 					this.renderFields()
 					}
@@ -237,29 +239,26 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 	render():JSX.Element
 	{
-		var tabLabels = ["Browse", "Configure"];
+		var tabs = new Map<string, JSX.Element>()
+			.set("Configure", this.renderConfigureView())
+			.set("Browse", this.renderBrowseView());
+
 		let root = this.props.dataSource.getHierarchyRoot();
 
-		var tabContents = [
-			this.renderBrowseView(),
-			this.renderConfigureView()
-		];
-
-		if(this.state.showPreviewView)
+		if (this.state.showPreviewView)
 		{
-			tabLabels.push("Preview");
-			tabContents.push(this.renderPreviewView());
+			tabs.set("Preview", this.renderPreviewView());
 		}
 
-		var activeTabIndex = 1;
+		var activeTabIndex = 0;
 
 		if(root.getChildren().length)
 		{
-			activeTabIndex = 0;
+			activeTabIndex = 1;
 		}
 
 		return (
-			<Tabs labels={tabLabels} activeTabIndex={activeTabIndex} tabs={tabContents}/>
+			<Tabs labels={Array.from(tabs.keys())} activeTabIndex={activeTabIndex} tabs={Array.from(tabs.values())}/>
 		);
 	}
 };

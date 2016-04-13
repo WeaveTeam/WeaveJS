@@ -327,4 +327,10 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 		);
 	}
 }
-Weave.registerClass("weavejs.tool.BoxWhiskerPlot", BoxWhiskerPlot, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties], "Box and Whisker Plot");
+
+Weave.registerClass(
+	BoxWhiskerPlot,
+	"weavejs.tool.BoxWhiskerPlot",
+	[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Box and Whisker Plot"
+);

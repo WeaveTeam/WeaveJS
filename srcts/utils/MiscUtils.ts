@@ -47,16 +47,6 @@ export default class MiscUtils
 	}
 
 	/**
-	 * Use this as a temporary solution before we use Weave.registerClass().
-	 */
-	static debounce(target:any, methodName:string, delay:number = 20):void
-	{
-		if (target[methodName] === Object.getPrototypeOf(target)[methodName])
-			target[methodName] = _.debounce(target[methodName].bind(target), delay);
-		target[methodName]();
-	}
-
-	/**
 	 * Searches for the first nested object with matching properties
 	 *
 	 * @param roo The root Object.

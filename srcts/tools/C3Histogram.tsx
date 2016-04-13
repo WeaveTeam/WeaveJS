@@ -84,18 +84,12 @@ export default class C3Histogram extends AbstractC3Tool
                 color: (color:string, d:any):string => {
                     if (d && d.hasOwnProperty("index"))
 					{
-                        var decColor:number;
-                        if (weavejs.WeaveAPI.Locale.reverseLayout)
-						{
-                            //handle case where labels need to be reversed for chart flip
-                            var temp:number = this.histData.length - 1;
-                            decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(temp - d.index);
-                        }
-                        else
-                        {
-                            decColor = (this.fill.color.internalDynamicColumn.getInternalColumn() as ColorColumn).getColorFromDataValue(d.index);
-                        }
-                        return StandardLib.getHexColor(decColor);
+						var binIndex = d.index;
+						if (weavejs.WeaveAPI.Locale.reverseLayout)
+							binIndex = this.histData.length - 1 - binIndex;
+						var cc = Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
+						if (cc)
+							return StandardLib.getHexColor(cc.getColorFromDataValue(binIndex));
                     }
                     return "#808080";
                 },
@@ -330,7 +324,6 @@ export default class C3Histogram extends AbstractC3Tool
 
         this.histData = [];
 
-        // this._columnToAggregatePath.getObject().getInternalColumn();
         var columnToAggregateNameIsDefined:boolean = !!this.columnToAggregate.getInternalColumn();
 
         var numberOfBins = this.binnedColumn.numberOfBins;
@@ -516,6 +509,9 @@ export default class C3Histogram extends AbstractC3Tool
     }
 }
 
-Weave.registerClass("weavejs.tool.C3Histogram", C3Histogram, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Histogram");
-Weave.registerClass("weave.visualization.tools::HistogramTool", C3Histogram);
-Weave.registerClass("weave.visualization.tools::ColormapHistogramTool", C3Histogram);
+Weave.registerClass(
+	C3Histogram,
+	["weavejs.tool.C3Histogram", "weave.visualization.tools::HistogramTool", "weave.visualization.tools::ColormapHistogramTool"],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Histogram"
+);

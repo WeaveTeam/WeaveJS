@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import StatefulTextField from "../ui/StatefulTextField";
-import StatefulComboBox from "../ui/StatefulComboBox";
+import Dropdown from "../semantic-ui/Dropdown";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
@@ -10,6 +10,7 @@ import CensusGeographyFilter from "./CensusGeographyFilter";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import KeyTypeInput from "../ui/KeyTypeInput";
+import HelpIcon from "../react-ui/HelpIcon";
 
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import EntityType = weavejs.api.data.EntityType;
@@ -164,7 +165,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		this.getGeographies(selectedItem);
 	}
 
-	get editorFields(): [string, JSX.Element][] {
+	get editorFields(): [React.ReactChild, React.ReactChild][] {
 		let ds = (this.props.dataSource as CensusDataSource);
 		this.api = ds.getAPI();
 		let families = this.getDataFamilies();
@@ -175,44 +176,45 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		return [
 			[
 				Weave.lang("API Key"),
-				<StatefulTextField ref={linkReactStateRef(this, { content: ds.apiKey }) }/>
+				<StatefulTextField style={{width: "100%"}}
+								   ref={linkReactStateRef(this, { content: ds.apiKey }) }/>
 			],
 			[
-				Weave.lang("Key Type"),
-				<KeyTypeInput keyTypeProperty={ds.keyType}/>
+				<HBox style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Category")}
+					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
+				</HBox>,
+				<KeyTypeInput style={{widtn: "100%"}}
+							  keyTypeProperty={ds.keyType}/>
 			],
 			[
 				Weave.lang("Data Family"),
-				<StatefulComboBox style={{width: "100%"}}
-								  onChange={this.dataFamilyChanged} 
-								  triggerOnForcedChange
-								  selectFirstOnInvalid
-								  options={families}/>
+				<Dropdown style={{width: "100%"}}
+						  onChange={this.dataFamilyChanged} 
+						  selectFirstOnInvalid
+						  options={families}/>
 			],
 			[
 				Weave.lang("Year"),
-				<StatefulComboBox style={{width: "100%"}} 
-								  onChange={this.dataVintageChanged}
-								  triggerOnForcedChange
-								  selectFirstOnInvalid
-								  options={vintages}/>
+				<Dropdown style={{width: "100%"}} 
+						  onChange={this.dataVintageChanged}
+						  selectFirstOnInvalid
+						  options={vintages}/>
 			],
 			[
 				Weave.lang("Dataset"),
-				<StatefulComboBox style={{width: "100%"}}
-								  onChange={this.dataSetChanged}
-								  ref={linkReactStateRef(this, { value: ds.dataSet }) }
-								  triggerOnForcedChange
-								  selectFirstOnInvalid
-								  options={datasets}/>
+				<Dropdown style={{width: "100%"}}
+						  onChange={this.dataSetChanged}
+						  ref={linkReactStateRef(this, { value: ds.dataSet }) }
+						  selectFirstOnInvalid
+						  options={datasets}/>
 			],
 			[
 				Weave.lang("Geographic Scope"),
-				<StatefulComboBox style={{width: "100%"}}
-								  ref={linkReactStateRef(this, {value: ds.geographicScope })}
-								  triggerOnForcedChange
-								  selectFirstOnInvalid
-								  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
+				<Dropdown style={{width: "100%"}}
+						  ref={linkReactStateRef(this, {value: ds.geographicScope })}
+						  selectFirstOnInvalid
+						  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
 			],
 		];
 	}

@@ -61,4 +61,4 @@ export default class WeaveFlash extends React.Component <IWeaveProps, IWeaveStat
     }
 }
 
-Weave.registerClass("WeaveFlash", Weave);
+Weave.registerClass(WeaveFlash, "WeaveFlash");

@@ -122,6 +122,4 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 	}
 }
 
-
-Weave.registerClass("weavejs.tool.DiscreteValuesDataFilterEditor", DiscreteValuesDataFilterEditor, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.editors::DiscreteValuesDataFilterEditor", DiscreteValuesDataFilterEditor);
+Weave.registerClass(DiscreteValuesDataFilterEditor, "weavejs.tool.DiscreteValuesDataFilterEditor", [weavejs.api.core.ILinkableObjectWithNewProperties]);

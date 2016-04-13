@@ -2,7 +2,7 @@ import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import {VSpacer, HSpacer} from "../react-ui/Spacer";
 import Tabs from "../react-ui/Tabs";
-import StatefulCheckBox from "../ui/StatefulCheckBox";
+import Checkbox from "../semantic-ui/Checkbox";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import BinningDefinitionEditor from "./BinningDefinitionEditor";
 import ColorRampEditor from "./ColorRampEditor";
@@ -71,7 +71,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 							  <SelectableAttributeComponent attributes={this.attributes}/>
 							  <BinningDefinitionEditor/>
 							  <HBox>
-							  	  <StatefulCheckBox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
+							  	  <Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
 								  <span style={{alignSelf: "center"}}>
 								  	 {Weave.lang("Filter records prior to binning")}
 								  </span>
@@ -79,7 +79,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 						  </VBox>,
 						  <VBox key={this.tabLabels[1]} style={{flex: 1, padding: 5}}>
 							  <HBox>
-								  <StatefulCheckBox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
+								  <Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
 								  <span>
 								  	{Weave.lang("Center color ramp at zero (when binning is disabled)")}
 								  </span>
