@@ -491,3 +491,7 @@ div.weave-tree-view {
 .weave-list-Item-selected:hover{
 	background-color : #99D6FF;
 }
+
+.weave-sidebar-dropdown {
+	min-width: 0 !important;
+}
