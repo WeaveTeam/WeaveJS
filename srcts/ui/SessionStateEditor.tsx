@@ -16,7 +16,6 @@ import ControlPanel from "./ControlPanel";
 
 export interface ISessionStateEditorProps extends React.HTMLProps<SessionStateEditor>
 {
-    weave:Weave;
     weaveRoot:ILinkableHashMap;
     name:string;
 }
@@ -30,7 +29,7 @@ export default class SessionStateEditor extends SmartComponent<ISessionStateEdit
 {
     static openInstance(name:string, weaveRoot:ILinkableHashMap):ControlPanel{
         var weave = Weave.getWeave(weaveRoot);
-        return ControlPanel.openInstance<ISessionStateEditorProps>(weave, SessionStateEditor, {title: Weave.lang('Session State Editor for ' + name)}, {weave, name, weaveRoot});
+        return ControlPanel.openInstance<ISessionStateEditorProps>(weave, SessionStateEditor, {title: Weave.lang('Session State Editor for ' + name)}, { name, weaveRoot});
     }
 
     constructor(props:ISessionStateEditorProps)
