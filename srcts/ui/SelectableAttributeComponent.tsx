@@ -26,6 +26,8 @@ import ControlPanel from "./ControlPanel";
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|LinkableHashMap>
     showLabel? : boolean
+    linkFunction?:any
+
 }
 
 export interface ISelectableAttributeComponentState{
@@ -49,7 +51,16 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         });
     }
     launchAttributeSelector=(label:string, attribute:IColumnWrapper|LinkableHashMap):ControlPanel=>{
-        return AttributeSelector.openInstance(label, attribute, this.props.attributes);
+        if(this.props.linkFunction)
+        {
+            this.props.linkFunction( AttributeSelector.openInWeaveToolEditor("Attribute Selector",label, attribute, this.props.attributes))
+            return null;
+        }
+        else
+        {
+            return AttributeSelector.openInstance(label, attribute, this.props.attributes);
+        }
+
     };
 
     private clearColumn =( attr:IColumnWrapper,event:MouseEvent):void =>{
@@ -124,7 +135,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             }
         });
 
-        return (<VBox>{selectableUI}</VBox>);
+        return (<VBox style={{flex:1}}>{selectableUI}</VBox>);
     }
 }
 

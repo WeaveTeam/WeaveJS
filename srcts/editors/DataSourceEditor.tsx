@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {VBox, HBox} from "../react-ui/FlexBox";
+import ResizingDiv from "../react-ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import WeaveTree from "../ui/WeaveTree";
@@ -166,18 +167,28 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		let root = this.props.dataSource.getHierarchyRoot();
 		return (
 			<VBox style={{flex: 1}}>
-				<HBox style={{flex: 1}}>
+				<HBox className="weave-padded-hbox weave-container" style={{flex: 1,border:"none"}}>
 					<VBox style={{flex: 1}}>
 						<label style={{ fontWeight: "bold" }}>{Weave.lang("Tables", this.props.dataSource.getHierarchyRoot().getLabel())}</label>
-						<WeaveTree root={this.props.dataSource.getHierarchyRoot()} hideLeaves={true} initialSelectedItems={[this.props.dataSource.getHierarchyRoot()]} onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
-					</VBox>
-					<div style={{width: 10}}/>
+						<VBox style={ {border:"1px solid lightgrey",flex: 1} }>
+							<WeaveTree root={this.props.dataSource.getHierarchyRoot()}
+									   hideLeaves={true} initialSelectedItems={[this.props.dataSource.getHierarchyRoot()]}
+									   onSelect={(selectedItems) => this.showColumns(selectedItems)}/>
+						</VBox>
+						</VBox>
+
 					{ 
 						this.state.selectedNode
 						?	
 						<VBox style={{flex: 1}}>
 						  <label style={{ fontWeight: "bold" }}>{Weave.lang("Columns", this.state.selectedNode.getLabel())}</label>
-						  <WeaveTree root={this.state.selectedNode} hideRoot={true} hideBranches={true} onSelect={(selectedItems) => this.updateColumnTarget(selectedItems)}/>
+							<VBox style={ {display:"flex",border:"1px solid lightgrey",flex: 1} }>
+								<WeaveTree root={this.state.selectedNode}
+										   hideRoot={true}
+										   hideBranches={true}
+										   onSelect={(selectedItems) => this.updateColumnTarget(selectedItems)}/>
+							</VBox>
+
 						  <HBox style={{justifyContent: "flex-end"}}>
 						  </HBox>
 		    			  {

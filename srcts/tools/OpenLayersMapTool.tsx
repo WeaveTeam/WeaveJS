@@ -83,7 +83,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				xMin: NaN, xMax: NaN, yMin: NaN, yMax: NaN
 			});
 	};
-	renderEditor(): JSX.Element {
+
+	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(linkFunction:Function): JSX.Element {
 		let controlLocationOpts = [
 			{ vertical: "top", horizontal: "left" },
 			{ vertical: "top", horizontal: "right" },

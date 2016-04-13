@@ -518,12 +518,13 @@ export default class C3BarChart extends AbstractC3Tool
             .set("height", this.heightColumns);
     }
 
-    renderEditor():JSX.Element
+    //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
+    renderEditor(linkFunction:Function):JSX.Element
     {
         return (
-            <VBox>
+            <VBox style={{flex:1}}>
                 {
-                    super.renderEditor()
+                    super.renderEditor(linkFunction)
                 }
 				{ReactUtils.generateTable(
 					null,

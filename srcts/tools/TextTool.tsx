@@ -54,7 +54,7 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 	renderEditor():JSX.Element
 	{
 		return (
-			<VBox>
+			<VBox style={{flex:1}}>
 				{
 					super.renderEditor()
 				}
