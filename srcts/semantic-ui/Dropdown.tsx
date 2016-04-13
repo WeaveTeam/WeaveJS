@@ -9,6 +9,8 @@ export interface DropdownProps extends React.HTMLProps<Dropdown>
 	value?:any;
 	onChange?:(value:any)=>void;
 	selectFirstOnInvalid?:boolean;
+	context?:Element;
+	direction?:string;
 }
 
 export interface DropdownState
@@ -49,8 +51,9 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 
 	componentDidUpdate(prevProps:DropdownProps, prevState:DropdownState)
 	{
-		if(prevState.value && this.state.value && !_.isEqual(prevState.value, this.state.value)) {
-			this.props.onChange && this.props.onChange(this.state.value);
+		if (!_.isEqual(prevState.value, this.state.value)) {
+			if(prevState.value && this.state.value)
+				this.props.onChange && this.props.onChange(this.state.value);
 			let selector = ($(this.element) as any);
 			let option = this.props.options[this.getIndexFromValue(this.state.value)];
 			selector.dropdown("set value", this.state.value);
@@ -68,9 +71,10 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 				let option = this.props.options[index];
 				let value:any = (typeof option === "object") ? option.value : option;
 				this.setState({value})
-			}
+			},
+			context: this.props.context || null,
+			direction: this.props.direction || 'auto'
 		});
-
 		let option = this.props.options[this.getIndexFromValue(this.state.value)];
 		selector.dropdown("set value", this.state.value);
 		selector.dropdown("set text", (typeof option === "object") ? option.label : option);
