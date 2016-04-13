@@ -437,10 +437,7 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 /* lists */
-.weave-list-view-container {
-	border: 1px solid lightgrey;
-	margin: 1px;
-}
+
 
 .weave-tree-view-icon {
     color: #808080;
