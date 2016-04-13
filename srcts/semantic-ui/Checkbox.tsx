@@ -30,7 +30,7 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	{
 		super(props);
 		this.state = {
-			value: false
+			value: !!props.value
 		}
 	}
 
@@ -47,7 +47,7 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	componentWillReceiveProps(nextProps:CheckboxProps)
 	{
 		this.setState({
-			value: nextProps.value
+			value: !!nextProps.value
 		});
 	}
 
@@ -69,12 +69,15 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 		let selector = ($(this.element) as any);
 		let checkbox = this;
 		selector.checkbox({
-			onChange: (value:boolean) => {
-				checkbox.setState({ value: this.state.value});
+			onChecked: () => {
+				checkbox.setState({ value: true});
+			},
+			onUnchecked: () => {
+				checkbox.setState({ value: false});
 			}
 		});
 		if(this.state.value)
-			selector.checkbox('set checked', this.state.value);
+			selector.checkbox('set checked', !!this.state.value);
 		else
 			selector.checkbox('set unchecked')
 	}
