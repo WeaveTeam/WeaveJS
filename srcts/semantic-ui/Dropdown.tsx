@@ -11,6 +11,7 @@ export interface DropdownProps extends React.HTMLProps<Dropdown>
 	selectFirstOnInvalid?:boolean;
 	context?:Element;
 	direction?:string;
+	valueEqualityFunc?: (valueA:any,valueB:any)=>boolean;
 }
 
 export interface DropdownState
@@ -32,31 +33,33 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 	
 	private getIndexFromValue(value:any):number
 	{
-		return this.props.options.findIndex((option) => (typeof option === "object") ? _.isEqual(option.value, value) : _.isEqual(option, value) );
+		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
+		return this.props.options.findIndex((option) => (typeof option === "object") ? equalityFunc(option.value, value) : equalityFunc(option, value) );
 	}
 	
 	componentWillReceiveProps(nextProps: DropdownProps)
 	{
 		var value = nextProps.value;
-		if (value &&  this.getIndexFromValue(value) >= 0)
+
+		if (nextProps.selectFirstOnInvalid && this.getIndexFromValue(value) < 0)
 		{
 			this.setState({value});
 		}
-		else {
-			if (nextProps.selectFirstOnInvalid) {
-				this.setState({value: this.props.options[0]});
-			}
+		else if (value !== undefined)
+		{
+			this.setState({value});
 		}
 	}
 
 	componentDidUpdate(prevProps:DropdownProps, prevState:DropdownState)
 	{
 		if (!_.isEqual(prevState.value, this.state.value)) {
-			if(prevState.value && this.state.value)
+			if(this.state.value)
 				this.props.onChange && this.props.onChange(this.state.value);
 			let selector = ($(this.element) as any);
-			let option = this.props.options[this.getIndexFromValue(this.state.value)];
-			selector.dropdown("set value", this.state.value);
+			let index = this.getIndexFromValue(this.state.value);
+			let option = this.props.options[index];
+			selector.dropdown("set value", index);
 			selector.dropdown("set text", (typeof option === "object") ? option.label : option);
 		}
 	}
@@ -72,18 +75,22 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 				let value:any = (typeof option === "object") ? option.value : option;
 				this.setState({value})
 			},
+			onClick: (index:number) => {
+				this.props.onClick && this.props.onClick(null);
+			},
 			context: this.props.context || null,
 			direction: this.props.direction || 'auto'
 		});
-		let option = this.props.options[this.getIndexFromValue(this.state.value)];
-		selector.dropdown("set value", this.state.value);
+		let index = this.getIndexFromValue(this.state.value);
+		let option = this.props.options[index];
+		selector.dropdown("set value", index);
 		selector.dropdown("set text", (typeof option === "object") ? option.label : option);
 	}
 
 	render()
 	{
 		return (
-			<div className={"ui selection dropdown " + (this.props.className || "")} style={this.props.style}>
+			<div onClick={this.props.onClick} className={"ui selection dropdown " + (this.props.className || "")} style={this.props.style}>
 				<input type="hidden"/>
 				<i className="dropdown icon"/>
 				<div className="default text">{this.props.placeholder}</div>

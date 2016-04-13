@@ -166,10 +166,10 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             var dsources = ColumnUtils.getDataSources(selectableObjects[i] as IColumnWrapper);
             var dsource = dsources[0] as IDataSource;
             var metadata = ColumnMetadata.getAllMetadata(selectableObjects[i] as IColumnWrapper);
-            if (dsource)
+            let node = dsource && dsource.findHierarchyNode(metadata);
+            if (node)
             {
-                selectedNodes.push(dsource.findHierarchyNode(metadata));
-
+                selectedNodes.push(node);
             }
         }
         return selectedNodes;
