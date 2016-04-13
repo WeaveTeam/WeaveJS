@@ -172,11 +172,11 @@ div.table-row-selected>div>div>div>div>div {
  }
 
  .weave-icon:hover {
- 	background-color: rgba(153, 214, 255, 0.4);
+ 	background-color: rgba(0,0,0,.05);
  }
 
  .weave-icon:active {
- 	background-color: #80CCFF;
+ 	background-color: #CCCCCC;
  }
 
 .weave-icon-button-mouse-over{
@@ -301,18 +301,19 @@ div.table-row-selected>div>div>div>div>div {
 
 /* menus */
 .weave-menu {
-	box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
-	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
-	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
-	border-radius: 2px;
+	box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+	-webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+	-moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
+	border-radius: 3px;
 	background-color: #FFFFFF;
-	padding-top: 5px;
-	padding-bottom: 5px;
+	padding-top: 3px;
+	padding-bottom: 3px;
 	user-select: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	cursor: pointer;
-	z-index: 1;
+	z-index: 2147483647; /* max z-index */
+	border: 1px solid rgba(34,36,38,.15);
 }
 
 /* menubar */
@@ -325,25 +326,24 @@ div.table-row-selected>div>div>div>div>div {
 	border-bottom-width: 2px;
 	border-bottom-color: #E6E6E6;
 	background-color: #F8F8F8;
+	
 	/*box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
 	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
 	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;*/
 }
 
 .weave-menubar-item {
-	padding-top: 2px;
 	user-select: none;
-	padding-bottom: 2px;
-	padding-left: 10px;
-	padding-right: 10px;
+	font-size: 0.8em;
+	padding: .5em 1em;
 }
 
 .weave-menubar-item:hover {
-	background-color: rgba(153, 214, 255, 0.4);
+	background-color: rgba(0,0,0,.05);
 }
 
 .weave-menubar-item:active {
-	background-color: #80CCFF;
+	background-color: #CCCCCC;
 }
 
 .weave-menubar-item-disabled {
@@ -362,18 +362,23 @@ div.table-row-selected>div>div>div>div>div {
 
 /* menu */
 .weave-menuitem {
-	padding-left: 20px;
-	padding-right: 20px;
+	/* padding-left: 20px; */
+	/* padding-right: 20px; */
 	background-color: rgba(255, 255, 255, 1);
-	justify-content: space-between
+	justify-content: space-between;
+	padding: 4;
+	padding-left: 8px;
+	padding-right: 8px;
+	font-size: 12;
+	font-weight: 400;
 }
 
 .weave-menuitem:hover {
-	background-color: rgba(153, 214, 255, 0.4)
+	background-color: rgba(0,0,0,.05)!important
 }
 
 .weave-menuitem:active {
-	background-color: #80CCFF
+	background-color: #CCCCCC
 }
 
 .weave-menuitem-disabled {
@@ -423,7 +428,7 @@ div.table-row-selected>div>div>div>div>div {
 
 /* help icon */
 .weave-help-icon:hover {
-	border-color: rgba(153, 214, 255, 0.4)
+	border-color: rgba(0,0,0,.05)
 }
 
 .weave-help-tooltip {
@@ -442,7 +447,7 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-tree-view-icon-expander {
-    color: #000000;
+    color: #676767;
     font-size: 60%;
 }
 .weave-tree-view-icon-expander.hidden-expander::before {
