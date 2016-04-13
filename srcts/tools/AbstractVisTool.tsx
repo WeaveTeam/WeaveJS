@@ -194,6 +194,18 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
 		return (
 			<VBox className="weave-padded-vbox">
+				{ renderSelectableAttributes(this) }
+	
+				<HBox className="weave-padded-hbox" style={{alignItems: 'center', justifyContent: "space-between"}}>
+					<span>{ Weave.lang("Margins:") }</span>
+					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.left) }</div>
+					<VBox className="weave-padded-vbox" style={{width: 50}}>
+						{ this.renderNumberEditor(this.margin.top) }
+						{ this.renderNumberEditor(this.margin.bottom) }
+					</VBox>
+					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right) }</div>
+				</HBox>
+
 				{ReactUtils.generateTable(
 					null,
 					[
@@ -209,18 +221,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 						td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
 					}
 				)}
-
-				<label style={ {fontWeight: 'bold'} }>{Weave.lang('Attributes')}</label>
-				{ renderSelectableAttributes(this) }
-				<HBox className="weave-padded-hbox" style={{alignItems: 'center', justifyContent: "space-between"}}>
-					<span>{ Weave.lang("Margins:") }</span>
-					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.left) }</div>
-					<VBox className="weave-padded-vbox" style={{width: 50}}>
-						{ this.renderNumberEditor(this.margin.top) }
-						{ this.renderNumberEditor(this.margin.bottom) }
-					</VBox>
-					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right) }</div>
-				</HBox>
 			</VBox>
 		);
 	}
