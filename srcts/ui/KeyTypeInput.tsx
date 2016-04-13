@@ -2,11 +2,10 @@ import * as _ from "lodash";
 import LinkableString = weavejs.core.LinkableString;
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {StatefulTextFieldProps} from "./StatefulTextField";
-import StatefulTextField from "./StatefulTextField";
+import Input from "../semantic-ui/Input";
 import WeaveAPI = weavejs.WeaveAPI;
 
-export interface KeyTypeInputProps extends StatefulTextFieldProps {
+export interface KeyTypeInputProps extends React.HTMLProps<Input> {
 	keyTypeProperty: LinkableString;
 }
 
@@ -18,55 +17,49 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 {
 	constructor(props: KeyTypeInputProps) {
 		super(props);
-		this.componentWillReceiveProps(props);
+		props.keyTypeProperty.addGroupedCallback(this, this.forceUpdate, true);
 	}
-
-	componentWillReceiveProps(nextProps: KeyTypeInputProps)
-	{
-		if (this.props && this.props.keyTypeProperty)
-		{
-			this.props.keyTypeProperty.removeCallback(this, this.updateStatefulTextField);
-		}
-		if (nextProps && nextProps.keyTypeProperty)
-		{
-			nextProps.keyTypeProperty.addGroupedCallback(this, this.updateStatefulTextField, true);
-		}
-	}
-
-	updateStatefulTextField=()=>
-	{
-		if (!this.textField) 
-		{
-			console.error("textfield not ready, calling update later.");
-			WeaveAPI.Scheduler.callLater(this, this.updateStatefulTextField);
-			return;
-		}
-		this.textField.setState({ content: this.props.keyTypeProperty.value });
-	}
+	private input:Input;
+	private element:Element;
 
 	onInputFinished=(content:string):void=>{
 		this.props.keyTypeProperty.value = content;
 	}
 
-	private textField: StatefulTextField;
+	// componentDidUpdate(prevProps:DropdownProps, prevState:DropdownState)
+	// {
+	// 	($(this.element) as any).dropdown("set selected", this.state.value);
+	// 	if(!_.isEqual(prevState.value,this.state.value))
+	// 		this.props.onChange && this.props.onChange(this.state.value);
+	// }
+	// 
+	componentDidMount()
+	{
+		this.element = ReactDOM.findDOMNode(this.input);
+		
+		($(this.element) as any).dropdown()
+		// {
+		// 	selected: this.getIndexFromValue(this.props.value),
+		// 	onChange: (index:number) => {
+		// 		this.props.onChange && this.props.onChange(this.props.options[index])
+		// 	}
+		// });
+	}
 
 	render(): JSX.Element {
-		var props = _.clone(this.props);
-		delete props.children;
-		delete props.suggestions;
 		let keyTypes = WeaveAPI.QKeyManager.getAllKeyTypes();
-		if (this.props.suggestions)
-			keyTypes = this.props.suggestions.concat(keyTypes);
 		
-		/* make selectOnFocus the default behavior for keyType fields */
-		let selectOnFocus: boolean = this.props.selectOnFocus;
-		if (selectOnFocus === undefined)
-		{
-			selectOnFocus = true;
-		}
-
 		return (
-			<StatefulTextField {...props as any} selectOnFocus={selectOnFocus} ref={(c: StatefulTextField) => this.textField = c} onInputFinished={this.onInputFinished} suggestions={keyTypes}/>
+			<div>
+				<Input ref={(input:Input) => this.input = input} className="dropdown" {...this.props}>
+					<i className="dropdown icon"/>
+				</Input>
+				<div className="menu">
+					{
+						keyTypes.map((keyType, index) => <div className="item" key={index} data-value={keyType}>{keyType}</div>)
+					}
+				</div>
+			</div>
 		);
 	}
 }

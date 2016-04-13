@@ -187,7 +187,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	renderNumberEditor(linkableNumber:LinkableNumber, width:number = 50):JSX.Element
 	{
 		var style:React.CSSProperties = {textAlign: "center", width};
-		return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {content: linkableNumber})}/>;
+		return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {value: linkableNumber})}/>;
 	}
 
 	renderEditor():JSX.Element
@@ -202,7 +202,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 						["Y Axis Title", this.yAxisName]
 					].map((row:[string, LinkableString]) => [
 						Weave.lang(row[0]),
-						<StatefulTextField ref={ linkReactStateRef(this, {content: row[1]}) }/>
+						<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>
 					]),
 					{
 						table: {width: "100%"},

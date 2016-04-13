@@ -9,6 +9,7 @@ import FileSelector from "../ui/FileSelector";
 import FixedDataTable from "../tools/FixedDataTable";
 import DataSourceEditor from "./DataSourceEditor";
 import KeyTypeInput from "../ui/KeyTypeInput";
+import Dropdown from "../semantic-ui/Dropdown";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import CSVDataSource = weavejs.data.source.CSVDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -54,7 +55,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("URL"),
-				<FileSelector target={(this.props.dataSource as CSVDataSource).url} accept="text/csv,.csv"/>
+				<FileSelector targetUrl={ds.url} style={{width: "100%"}} accept="text/csv,.csv"/>
 			],
 			[
 				Weave.lang("Key Type"),
@@ -62,10 +63,9 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Key Column"),
-				<StatefulTextField selectOnFocus={true} 
-								   ref={linkReactStateRef(this, { content: ds.keyColName }) }
-								   noneLabel={Weave.lang("Auto-generated keys") } 
-								   suggestions={ds.getColumnNames().concat([null]) }/>
+				<Dropdown ref={linkReactStateRef(this, { value: ds.keyColName }) } /* searchable field */
+						  placeholder={Weave.lang("Auto-generated keys") } 
+						  options={ds.getColumnNames()}/>
 			]
 		];
 		return super.editorFields.concat(editorFields);

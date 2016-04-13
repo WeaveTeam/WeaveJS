@@ -106,7 +106,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let editorFields = [
 			[Weave.lang("Panel Title"),
 				<HBox>
-					<StatefulTextField ref= { linkReactStateRef(this, {content: this.panelTitle }) }/>
+					<StatefulTextField ref= { linkReactStateRef(this, {value: this.panelTitle }) }/>
 				</HBox>
 			],
 			[Weave.lang("Control Location"),
@@ -116,9 +116,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Zoom Range"),
 				<HBox style={{ width: "100%" }}>
-					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { content: this.minZoomLevel }) }/>
+					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
 					{"-"}
-					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { content: this.maxZoomLevel }) }/>
+					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
 				</HBox>
 			],
 			[Weave.lang("Show Zoom Slider"),
@@ -128,7 +128,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Projection SRS"),
 				<HBox>
-					<StatefulTextField ref={linkReactStateRef(this, {content: this.projectionSRS })}/>
+					<StatefulTextField ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
 				</HBox>
 			],
 			[Weave.lang("Override extent"), 

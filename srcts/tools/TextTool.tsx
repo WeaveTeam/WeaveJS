@@ -63,7 +63,7 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 						null,
 						[["Text", this.htmlText]].map((row:[string, LinkableString]) => [
 							Weave.lang(row[0]),
-							<StatefulTextField ref={ linkReactStateRef(this, {content: row[1]}) }/>
+							<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>
 						]),
 						{
 							table: {width: "100%"},

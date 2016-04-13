@@ -175,11 +175,13 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		return [
 			[
 				Weave.lang("API Key"),
-				<StatefulTextField ref={linkReactStateRef(this, { content: ds.apiKey }) }/>
+				<StatefulTextField style={{width: "100%"}}
+								   ref={linkReactStateRef(this, { content: ds.apiKey }) }/>
 			],
 			[
 				Weave.lang("Key Type"),
-				<KeyTypeInput keyTypeProperty={ds.keyType}/>
+				<KeyTypeInput style={{widtn: "100%"}}
+							  keyTypeProperty={ds.keyType}/>
 			],
 			[
 				Weave.lang("Data Family"),
@@ -191,24 +193,24 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 			[
 				Weave.lang("Year"),
 				<Dropdown style={{width: "100%"}} 
-								  onChange={this.dataVintageChanged}
-								  selectFirstOnInvalid
-								  options={vintages}/>
+						  onChange={this.dataVintageChanged}
+						  selectFirstOnInvalid
+						  options={vintages}/>
 			],
 			[
 				Weave.lang("Dataset"),
 				<Dropdown style={{width: "100%"}}
-								  onChange={this.dataSetChanged}
-								  ref={linkReactStateRef(this, { value: ds.dataSet }) }
-								  selectFirstOnInvalid
-								  options={datasets}/>
+						  onChange={this.dataSetChanged}
+						  ref={linkReactStateRef(this, { value: ds.dataSet }) }
+						  selectFirstOnInvalid
+						  options={datasets}/>
 			],
 			[
 				Weave.lang("Geographic Scope"),
 				<Dropdown style={{width: "100%"}}
-								  ref={linkReactStateRef(this, {value: ds.geographicScope })}
-								  selectFirstOnInvalid
-								  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
+						  ref={linkReactStateRef(this, {value: ds.geographicScope })}
+						  selectFirstOnInvalid
+						  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
 			],
 		];
 	}

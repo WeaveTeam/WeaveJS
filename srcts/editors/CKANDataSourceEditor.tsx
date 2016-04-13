@@ -44,7 +44,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("Source URL *"), 
-				<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { content: ds.url})}/>
+				<StatefulTextField selectOnFocus={true} ref={linkReactStateRef(this, { value: ds.url})}/>
 			],
 			[
 				Weave.lang("Items to show in hierarchy"),
@@ -57,7 +57,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			[
 				Weave.lang("API Version"),
 				<HBox style={hBoxStyle}>
-					<HBox style={labelStyle}><StatefulTextField ref={linkReactStateRef(this, {content: ds.apiVersion})} type="number" min="1" max="3" step="1"/></HBox>
+					<HBox style={labelStyle}><StatefulTextField ref={linkReactStateRef(this, {value: ds.apiVersion})} type="number" min="1" max="3" step="1"/></HBox>
 					<HBox style={labelStyle}><StatefulCheckbox style={checkBoxStyle} ref={linkReactStateRef(this, { checked: ds.useHttpPost})}/><span>{Weave.lang("Use HTTP POST")}</span></HBox>
 				</HBox>
 			],

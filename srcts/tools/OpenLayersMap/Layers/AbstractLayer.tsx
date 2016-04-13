@@ -66,7 +66,7 @@ export default class AbstractLayer implements ILinkableObject
 		if (lv instanceof LinkableString || lv instanceof LinkableNumber)
 		{
 			if (typeof options[0] === typeof "") {
-				return [Weave.lang(key), <StatefulTextField key={key} ref={linkReactStateRef(this, { content: lv }) } suggestions={options as string[]} />];
+				return [Weave.lang(key), <Dropdown key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />]; /* searchable field */
 			}
 			else if (typeof options[0] === typeof {}) {
 				return [Weave.lang(key), <Dropdown key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];

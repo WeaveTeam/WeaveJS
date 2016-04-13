@@ -75,7 +75,7 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 				<div className="default text">{this.props.placeholder}</div>
 				<div className="menu">
 				{
-					this.props.options.map((option, index) => <div className="item" key={index} data-value={index}>{typeof option === "object" ? (option.label || option.value) : option}</div>)
+					this.props.options.map((option, index) => <div className="item" key={index} data-value={index}>{typeof option === "object" ? option && (option.label || option.value) : option}</div>)
 				}
 				</div>
 			</div>

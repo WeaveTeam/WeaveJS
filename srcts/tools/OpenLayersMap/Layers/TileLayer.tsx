@@ -111,9 +111,9 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 		{
 			return <VBox>
 				{Weave.lang("Provider") + " "}<Dropdown ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
-				{Weave.lang("URL") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempUrl }) }/>
-				{Weave.lang("Attribution") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempAttributions }) }/>
-				{Weave.lang("Projection") + " "}<StatefulTextField ref={linkReactStateRef(this, { content: this.tempProjection }) }/>
+				{Weave.lang("URL") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempUrl }) }/>
+				{Weave.lang("Attribution") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempAttributions }) }/>
+				{Weave.lang("Projection") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempProjection }) }/>
 			</VBox>
 		}
 		else

@@ -10,10 +10,9 @@ import LinkableFile = weavejs.core.LinkableFile;
 import LinkableString = weavejs.core.LinkableString;
 var URLRequestUtils = weavejs.WeaveAPI.URLRequestUtils;
 
-export interface IFileSelectorProps extends React.Props<LinkableFileSelector>
+export interface IFileSelectorProps extends React.HTMLProps<LinkableFileSelector>
 {
-	target: LinkableFile|LinkableString;
-	label?:string|JSX.Element;
+	targetUrl: LinkableFile|LinkableString;
 	placeholder?:string;
 	accept?: string;
 }
@@ -39,8 +38,8 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 		reader.onload = (event:Event) =>
 		{
 			let buffer = reader.result as ArrayBuffer;
-			let fileName = URLRequestUtils.saveLocalFile(Weave.getRoot(this.props.target), file.name, new Uint8Array(buffer));
-			this.props.target.value = fileName;
+			let fileName = URLRequestUtils.saveLocalFile(Weave.getRoot(this.props.targetUrl), file.name, new Uint8Array(buffer));
+			this.props.targetUrl.value = fileName;
 		}
 
 		reader.readAsArrayBuffer(file);
@@ -49,15 +48,17 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 	render():JSX.Element
 	{
 		return (
-			<HBox style={{flex: 1}}>
-				{
-					this.props.label
-				}
-				<StatefulTextField style={{flex: 1}} placeholder={this.props.placeholder} ref={linkReactStateRef(this, {content: this.props.target}, 500)}/>
-				<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
-					<input type="button" value={Weave.lang("Add file")}/>
-				</FileInput>
-			</HBox>
+				<StatefulTextField {...this.props}
+								   className={"right labeled " + (this.props.className || "")}
+							   	   ref={linkReactStateRef(this, {value: this.props.targetUrl}, 500)}>
+				   {
+					   <div className="ui label">
+					   		<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
+						   		{Weave.lang("Add file")}
+					   		</FileInput>
+						</div>
+				   }
+				</StatefulTextField>
 		)
 	}
 }

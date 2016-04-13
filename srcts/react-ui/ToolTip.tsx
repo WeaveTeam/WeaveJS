@@ -25,6 +25,6 @@ export default class ToolTip {
 	
 	static close()
 	{
-		ReactUtils.closePopup(ToolTip.popup);
+		ToolTip.popup && ReactUtils.closePopup(ToolTip.popup);
 	}
 }

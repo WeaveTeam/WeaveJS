@@ -3,7 +3,7 @@ import ToolTip from "../react-ui/ToolTip";
 
 export interface InputProps extends React.HTMLProps<Input>
 {
-	children?: React.ReactNode[];
+	children?: React.ReactNode;
 }
 
 export interface InputState

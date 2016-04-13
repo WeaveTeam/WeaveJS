@@ -63,12 +63,12 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Service URL"), 
-				<StatefulTextField ref={linkReactStateRef(this, { content: ds.url }, 500) } 
+				<StatefulTextField ref={linkReactStateRef(this, { value: ds.url }, 500) } 
 								   placeholder={weavejs.net.WeaveDataServlet.DEFAULT_URL}/>
 			],
 			[
 				Weave.lang("Root hierarchy ID"),
-				<StatefulTextField ref={linkReactStateRef(this, { content: ds.rootId }, 500) } 
+				<StatefulTextField ref={linkReactStateRef(this, { value: ds.rootId }, 500) } 
 								   placeholder={Weave.lang("Hierarchy ID") }/>
 			]
 		];

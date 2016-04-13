@@ -8,6 +8,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import FileSelector from "../ui/FileSelector";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import Dropdown from "../semantic-ui/Dropdown";
 import KeyTypeInput from "../ui/KeyTypeInput";
 
 import DBFDataSource = weavejs.data.source.DBFDataSource;
@@ -26,13 +27,13 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("DBF URL"),
-				<FileSelector target={dataSource.dbfUrl}
+				<FileSelector targetUrl={dataSource.dbfUrl}
 						  	  placeholder={Weave.lang("http://www.example.com/example.dbf")} 
 						  	  accept=".dbf"/>
 			],
 			[
 				Weave.lang("SHP URL"),
-				<FileSelector target={dataSource.shpUrl} 
+				<FileSelector targetUrl={dataSource.shpUrl} 
 						  	  placeholder={Weave.lang("http://www.example.com/example.shp")} 
 						  	  accept=".shp"/>
 			],
@@ -40,13 +41,13 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 				Weave.lang("Projection"),
 				<StatefulTextField selectOnFocus={true} 
 							   	   placeholder={Weave.lang("Example: EPSG:4326")} 
-							       ref={linkReactStateRef(this, { content: dataSource.projection })}/>
+							       ref={linkReactStateRef(this, { value: dataSource.projection })}/>
 			],
 			[
 				Weave.lang("Key Column"),
-				<StatefulTextField selectOnFocus={true} 
-							   	   suggestions={dataSource.getColumnNames()}
-							   	   ref={linkReactStateRef(this, { content: dataSource.keyColName })}/>
+				<Dropdown ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
+						  placeholder={Weave.lang("Auto-generated keys") } 
+						  options={dataSource.getColumnNames()}/>
 			],
 			[
 				Weave.lang("Key Type"),
