@@ -107,5 +107,9 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 	}
 }
 
-Weave.registerClass("weavejs.tool.Text", TextTool, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Text");
-Weave.registerClass("weave.ui::TextTool", TextTool);
+Weave.registerClass(
+	TextTool,
+	["weavejs.tool.Text", "weave.ui::TextTool"],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Text"
+);

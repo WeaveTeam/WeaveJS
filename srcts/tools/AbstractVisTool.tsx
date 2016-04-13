@@ -52,8 +52,8 @@ export interface VisToolGroup
 	probeFilter:DynamicKeyFilter
 }
 
-Weave.registerClass("weavejs.tool.Margin", Margin);
-Weave.registerClass("weavejs.tool.OverrideBounds", OverrideBounds);
+Weave.registerClass(Margin, "weavejs.tool.Margin");
+Weave.registerClass(OverrideBounds, "weavejs.tool.OverrideBounds");
 
 export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
 {

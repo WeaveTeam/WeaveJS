@@ -216,12 +216,12 @@ declare module __global__ {
         static getAsyncInstanceHandler(type: new (..._: any[]) => any): Function;
         /**
          * Registers an ILinkableObject class for use with Weave.className() and Weave.getDefinition().
-         * @param qualifiedName Either a single String or an Array of Strings which are qualified class names under which to register the class definition.
          * @param definition The class definition.
+         * @param qualifiedName Either a single String or an Array of Strings which are qualified class names under which to register the class definition.
          * @param additionalInterfaces An Array of interfaces (Class objects) that the definition implements in addition to ILinkableObject.
          * @param displayName An optional display name for the class definition.
          */
-        static registerClass(qualifiedName: string | string[], definition: new (..._: any[]) => any, additionalInterfaces?: Array<new () => any>, displayName?: string): void;
+        static registerClass(definition: new (..._: any[]) => any, qualifiedName: string | string[], additionalInterfaces?: Array<new () => any>, displayName?: string): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -1101,12 +1101,12 @@ declare module weavejs.api.core {
     interface IClassRegistry {
         /**
          * Registers a class under a given qualified name and adds metadata about implementing interfaces.
-         * @param qualifiedName The qualified class name under which to register the class definition.
          * @param definition The class definition.
+         * @param qualifiedName The qualified class name under which to register the class definition.
          * @param interfaces An Array of Class objects that are the interfaces the class implements.
          * @param displayName An optional display name for the class definition.
          */
-        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[], displayName?: string): void;
+        registerClass(definition: new (..._: any[]) => any, qualifiedName: string, interfaces?: any[], displayName?: string): void;
         /**
          * Gets the qualified class name from a class definition or an object instance.
          */
@@ -3211,7 +3211,7 @@ declare module weavejs.core {
          * An Array of default packages to check when looking up a class by name.
          */
         defaultPackages: any[];
-        registerClass(qualifiedName: string, definition: new (..._: any[]) => any, interfaces?: any[], displayName?: string): void;
+        registerClass(definition: new (..._: any[]) => any, qualifiedName: string, interfaces?: any[], displayName?: string): void;
         getClassName(definition: Object): string;
         getDefinition(name: string): any;
         getClassInfo(class_or_instance: Object): {

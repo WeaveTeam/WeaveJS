@@ -165,4 +165,9 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 	}
 }
 
-Weave.registerClass("weave.visualization.plotters::ScatterPlotPlotter", ScatterPlotLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass(
+	ScatterPlotLayer,
+	["weavejs.layer.ScatterPlotLayer", "weave.visualization.plotters::ScatterPlotPlotter"],
+	[weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Scatterplot"
+);

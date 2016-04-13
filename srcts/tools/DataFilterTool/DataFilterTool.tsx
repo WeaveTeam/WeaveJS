@@ -178,9 +178,12 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 	}
 }
 
-
-Weave.registerClass("weavejs.tool.DataFilter", DataFilterTool, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties], "Data Filter");
-Weave.registerClass("weave.ui::DataFilterTool", DataFilterTool);
+Weave.registerClass(
+	DataFilterTool,
+	["weave.ui::DataFilterTool", "weavejs.tool.DataFilter"],
+	[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Data Filter"
+);
 
 
 export interface IDataFilterEditorState {

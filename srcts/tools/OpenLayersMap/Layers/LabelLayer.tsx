@@ -23,7 +23,7 @@ interface LabelRecord
 	bounds: weavejs.geom.Bounds2D;
 }
 
-class LabelLayer extends AbstractGlyphLayer
+export default class LabelLayer extends AbstractGlyphLayer
 {
 	size = Weave.linkableChild(this, AlwaysDefinedColumn);
 	text = Weave.linkableChild(this, DynamicColumn);
@@ -178,5 +178,9 @@ class LabelLayer extends AbstractGlyphLayer
 	}
 }
 
-Weave.registerClass("weave.visualization.plotters::TextGlyphPlotter", LabelLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-export default LabelLayer;
+Weave.registerClass(
+	LabelLayer,
+	["weavejs.layer.LabelLayer", "weave.visualization.plotters::TextGlyphPlotter"],
+	[weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Labels"
+);

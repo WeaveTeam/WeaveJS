@@ -474,4 +474,8 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	}
 }
 
-Weave.registerClass('weave.ui.FlexibleLayout', FlexibleLayout, [weavejs.api.core.ILinkableVariable]);
+Weave.registerClass(
+	FlexibleLayout,
+	'weave.ui.FlexibleLayout',
+	[weavejs.api.core.ILinkableVariable]
+);

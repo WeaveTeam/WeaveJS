@@ -131,5 +131,9 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	}
 }
 
-Weave.registerClass("weavejs.tool.SessionStateMenu", SessionStateMenuTool, [weavejs.api.ui.IVisTool_Utility/*, weavejs.api.core.ILinkableObjectWithNewProperties*/], "Session State Menu Tool");
-Weave.registerClass("weave.ui::SessionStateMenuTool", SessionStateMenuTool);
+Weave.registerClass(
+	SessionStateMenuTool,
+	["weavejs.tool.SessionStateMenu", "weave.ui::SessionStateMenuTool"],
+	[weavejs.api.ui.IVisTool_Utility/*, weavejs.api.core.ILinkableObjectWithNewProperties*/],
+	"Session State Menu Tool"
+);
