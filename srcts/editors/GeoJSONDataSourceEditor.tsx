@@ -26,25 +26,29 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("GeoJSON URL"),
-				<FileSelector targetUrl={dataSource.url} 
+				<FileSelector style={{width: "100%"}}
+							  targetUrl={dataSource.url} 
 							  placeholder={Weave.lang("http://www.example.com/example.geojson")} 
 							  accept=".geojson"/>
 			],
 			[
 				Weave.lang("Projection"),
-				<StatefulTextField selectOnFocus={true} 
+				<StatefulTextField style={{width: "100%"}}
+								   selectOnFocus={true} 
 								   placeholder={Weave.lang("Example: EPSG:4326")} 
 							   	   ref={linkReactStateRef(this, { value: dataSource.projection })}/>
 			],
 			[
 				Weave.lang("Key Property"),
-				<StatefulTextField selectOnFocus={true} 
-							   ref={linkReactStateRef(this, { value: dataSource.keyProperty })}
+				<StatefulTextField style={{width: "100%"}}
+								   selectOnFocus={true} 
+		   						   ref={linkReactStateRef(this, { value: dataSource.keyProperty })}
 							   />
 			],
 			[
 				Weave.lang("Key Type"),
-				<KeyTypeInput keyTypeProperty={dataSource.keyType}/>
+				<KeyTypeInput style={{width: "100%"}}
+							  keyTypeProperty={dataSource.keyType}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)
