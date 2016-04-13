@@ -142,6 +142,12 @@ export default class TileLayer extends AbstractLayer
 		</VBox>;
 	}
 
+	getExtent() {
+		let bounds = super.getExtent();
+		bounds.setCoords(this.olLayer.getExtent());
+		return bounds;
+	}
+
 	constructor()
 	{
 		super();

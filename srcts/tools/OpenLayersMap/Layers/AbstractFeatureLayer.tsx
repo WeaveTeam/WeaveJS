@@ -22,6 +22,13 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
 
+	getExtent()
+	{
+		let bounds = super.getExtent();
+		bounds.setCoords(this.source.getExtent());
+		return bounds;
+	}
+
 	get selectionKeySet()
 	{
 		var keySet = this.selectionFilter.target as KeySet;
