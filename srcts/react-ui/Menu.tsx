@@ -6,7 +6,7 @@ import classNames from "../modules/classnames";
 
 export interface MenuItemProps
 {
-	label?:string /*|JSX.Element*/;
+	label?:React.ReactChild;
 	leftIcon?:React.ReactElement<any>;
 	rightIcon?:React.ReactElement<any>;
 	secondaryLabel?:string;

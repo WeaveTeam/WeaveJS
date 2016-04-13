@@ -29,7 +29,7 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		return [
 			{
-				label: <FileInput onChange={this.openFile}>{Weave.lang("Open a File...")}</FileInput> as any
+				label: <FileInput onChange={this.openFile}>{Weave.lang("Open a File...")}</FileInput>
 			},
 			{
 				label: Weave.lang("Save As..."),

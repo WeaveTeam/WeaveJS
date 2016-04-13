@@ -184,16 +184,16 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
         });
     };
 
-    getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper):string=>
+    getColumnReferenceString=(node:IWeaveTreeNode|IColumnWrapper|IColumnReference):string=>
     {
         var metadata:{[attr:string]:string};
-        // get IWeaveTreeNode from IColumnWrapper
+        // get IWeaveTreeNode from IColumnWrapper, which will also be an IColumnReference
         if (Weave.IS(node, IColumnWrapper))
             node = ColumnUtils.hack_findHierarchyNode(node as IColumnWrapper);
 
         if (!node)
             return null;
-        let colRef = Weave.AS(node as IWeaveTreeNode, weavejs.api.data.IColumnReference);
+        let colRef = Weave.AS(node, IColumnReference);
         if (!colRef)
             return null;
         let dataSource = colRef.getDataSource();
