@@ -166,5 +166,5 @@ Weave.registerClass(
 	ImageGlyphLayer,
 	["weavejs.layer.ImageGlyphLayer", "weave.visualization.plotters::ImageGlyphPlotter"],
 	[weavejs.api.core.ILinkableObjectWithNewProperties],
-	"Image glyphs"
+	"Icons"
 );
