@@ -59,12 +59,12 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
 
         buttons = keys.map(function (label:string, index:number) {
             var iconButtonStyle:React.CSSProperties = {
-                borderLeftColor: '#E6E6E6',
-                borderTopColor: '#E6E6E6',
-                borderBottomColor: '#E6E6E6',
-                borderRightColor:"rgba(0, 0, 0, 0)", //set alpha to 0
+                borderTopColor: 'lightgrey',
+                borderBottomColor: 'lightgrey',
+                borderRightColor:"lightgrey", //set alpha to 0
                 fontSize:'smaller',
-                backgroundColor:"#F8F8F8"
+                backgroundColor:"#F8F8F8",
+                padding:"4 16 4 16"
             };
 
             if(index == 0)//first child
@@ -73,6 +73,7 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
                 iconButtonStyle.borderBottomLeftRadius = 8;
                 iconButtonStyle.borderTopRightRadius = 0;
                 iconButtonStyle.borderBottomRightRadius = 0;
+                iconButtonStyle.borderLeftColor = "lightgrey";
             }
             else if(index == keys.length - 1) //last child
             {
@@ -80,17 +81,19 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
                 iconButtonStyle.borderBottomRightRadius = 8;
                 iconButtonStyle.borderTopLeftRadius = 0;
                 iconButtonStyle.borderBottomLeftRadius = 0;
-                iconButtonStyle.borderRightColor ="#E6E6E6";
+                iconButtonStyle.borderLeftColor = "none";
             }
-            else {
+            else
+            {
                 iconButtonStyle["borderRadius"] = 0;
             }
             if(index == this.state.activeButton || label == this.state.activeButton)
             {
-                iconButtonStyle.color = "black";
-                iconButtonStyle.backgroundColor = "#C1C1C1";
+                iconButtonStyle.color = "white";
+                iconButtonStyle.borderColor = "grey";
+                iconButtonStyle.backgroundColor = "grey";
             }
-            return (<IconButton style={ iconButtonStyle } mouseOverStyle= { {color:"grey"} }
+            return (<IconButton style={ iconButtonStyle } mouseOverStyle= { {color:"black",backgroundColor:"lightgrey" } }
                                 clickHandler={ this.clickHandler.bind(this,label,index) }
                                 key={ index }> {label} </IconButton>)
         }, this);
