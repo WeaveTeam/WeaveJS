@@ -71,11 +71,9 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 		if (ReactUtils.hasFocus(component))
 		{
 			authority = updateReactState;
-			console.log("input has focus can't update");
 			weavejs.WeaveAPI.Scheduler.callLater(localContext, updateReactState, [true]);
 			return;
 		}
-		console.log("no longer focus updating now");
 		authority = null;
 		var updatedReactState = reactUpdate(reactState, reactUpdateSpec);
 		if (!_.isEqual(reactState, updatedReactState))
