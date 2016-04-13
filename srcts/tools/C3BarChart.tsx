@@ -7,7 +7,7 @@ import * as React from "react";
 import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import Dropdown from "../semantic-ui/Dropdown";
-import StatefulCheckBox from "../ui/StatefulCheckBox";
+import Checkbox from "../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 
@@ -527,9 +527,9 @@ export default class C3BarChart extends AbstractC3Tool
 				{ReactUtils.generateTable(
 					null,
 					[
-						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
-						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ],
-						[ <StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showXAxisLabel })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show X Axis Title")}</span> ]
+						[ <Checkbox ref={linkReactStateRef(this, { checked: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
+						[ <Checkbox ref={linkReactStateRef(this, { checked: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ],
+						[ <Checkbox ref={linkReactStateRef(this, { checked: this.showXAxisLabel })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show X Axis Title")}</span> ]
 					],
 					{
 						table: {width: "100%"},

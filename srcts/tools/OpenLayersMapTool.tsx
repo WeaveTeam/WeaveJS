@@ -31,7 +31,7 @@ import {OverrideBounds} from "./AbstractVisTool";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import MiscUtils from "../utils/MiscUtils";
 
-import StatefulCheckBox from "../ui/StatefulCheckBox";
+import Checkbox from "../semantic-ui/Checkbox";
 import StatefulTextField from "../ui/StatefulTextField";
 import Dropdown from "../semantic-ui/Dropdown";
 import LayerManager from "./OpenLayersMap/LayerManager";
@@ -123,7 +123,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Show Zoom Slider"),
 				<HBox>
-					<StatefulCheckBox ref={linkReactStateRef(this, { checked: this.showZoomSlider })}/>
+					<Checkbox ref={linkReactStateRef(this, { checked: this.showZoomSlider })}/>
 				</HBox>
 			],
 			[Weave.lang("Projection SRS"),
@@ -139,7 +139,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Snap zoom to base map"),
 				<HBox>
-					<StatefulCheckBox ref={linkReactStateRef(this, {checked: this.snapZoomToBaseMap})}/>
+					<Checkbox ref={linkReactStateRef(this, {checked: this.snapZoomToBaseMap})}/>
 				</HBox>
 			],
 		];

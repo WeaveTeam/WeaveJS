@@ -6,7 +6,7 @@ import AbstractFeatureLayer from "./Layers/AbstractFeatureLayer";
 import {VBox, HBox} from "../../react-ui/FlexBox";
 import ReactUtils from "../../utils/ReactUtils";
 import ListView from "../../ui/ListView";
-import StatefulCheckBox from "../../ui/StatefulCheckBox";
+import Checkbox from "../../semantic-ui/Checkbox";
 import StatefulRangeSlider from "../../ui/StatefulRangeSlider";
 import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 
@@ -44,7 +44,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		return <tr key={index}
 				className={layer === this.state.selectedLayer ? "weave-tree-view selected" : "weave-tree-view"}
 				onClick={() => { if (this.state.selectedLayer !== layer) this.setState({ selectedLayer: layer, openedLayer: null }); }}>
-				<td><StatefulCheckBox title={Weave.lang("Show layer")} ref={linkReactStateRef(this, { checked: layer.visible }) } stopPropagation={true}/></td>
+				<td><Checkbox title={Weave.lang("Show layer")} ref={linkReactStateRef(this, { checked: layer.visible }) } stopPropagation={true}/></td>
 				<td style={{width: "100%"}}>{layer.getDescription() }</td>
 				<td>
 					<button title={Weave.lang("Edit layer")} style={{whiteSpace: "nowrap"}} onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }>
