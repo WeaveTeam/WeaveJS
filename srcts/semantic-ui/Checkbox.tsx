@@ -2,48 +2,64 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import $ from "../modules/jquery";
 import * as _ from "lodash";
+import SmartComponent from "../ui/SmartComponent";
 
-export interface CheckboxProps extends React.HTMLProps<Checkbox>
+export interface CheckboxProps extends React.Props<Checkbox>
 {
 	type?: string;
 	label?: string;
 	name?: string;
 	style?: React.CSSProperties;
 	stopPropagation?: boolean;
+	onChange?: (value:boolean) => void;
+	className?:string;
+	value?:boolean;
+	title?:string;
 }
 
 export interface CheckboxState
 {
-	checked?:boolean;
+	value?:boolean;
 }
 
-export default class Checkbox extends React.Component<CheckboxProps, CheckboxState>
+export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxState>
 {
 	element:Element;
 
 	constructor(props:CheckboxProps)
 	{
 		super(props);
+		this.state = {
+			value: false
+		}
 	}
 
 	static defaultProps:CheckboxProps = {
 		type: "toggle"
 	};
 
-	state: CheckboxState = { checked: false };
-
 	onClick=(event:React.MouseEvent)=>
 	{
 		if (this.props.stopPropagation)
 			event.stopPropagation();
 	};
+	
+	componentWillReceiveProps(nextProps:CheckboxProps)
+	{
+		this.setState({
+			value: nextProps.value
+		});
+	}
 
 	componentDidUpdate(prevProps:CheckboxProps, prevState:CheckboxState)
 	{
-		if(!_.isEqual(prevState.checked,this.state.checked)) {
+		if(!_.isEqual(prevState.value, this.state.value)) {
 			let selector = ($(this.element) as any);
-			if(this.state.checked)
+			if(this.state.value)
 				selector.checkbox("set checked");
+			else
+				selector.checkbox("set unchecked");
+			this.props.onChange && this.props.onChange(this.state.value);
 		}
 	}
 
@@ -52,16 +68,15 @@ export default class Checkbox extends React.Component<CheckboxProps, CheckboxSta
 		this.element = ReactDOM.findDOMNode(this);
 		let selector = ($(this.element) as any);
 		let checkbox = this;
-
 		selector.checkbox({
-			onChange: () => {
-				checkbox.setState({ checked: this.state.checked});
+			onChange: (value:boolean) => {
+				checkbox.setState({ value: this.state.value});
 			}
 		});
-
-		if (this.state.checked) {
-			selector.checkbox('set checked');
-		}
+		if(this.state.value)
+			selector.checkbox('set checked', this.state.value);
+		else
+			selector.checkbox('set unchecked')
 	}
 
 	render()
@@ -71,7 +86,7 @@ export default class Checkbox extends React.Component<CheckboxProps, CheckboxSta
 
 		return (
 			<div className={"ui " + this.props.type + " checkbox " + (this.props.className || "")}>
-				<input {...props as any} onClick={this.onClick} type="checkbox" name={this.props.name}/>
+				<input {...props as any} onClick={this.onClick} type="checkbox" title={this.props.title} name={this.props.name}/>
 				{this.props.label ? <label>{this.props.label}</label>:null}
 			</div>
 		);
