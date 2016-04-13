@@ -22,7 +22,10 @@ export interface WeaveMenuBarProps extends React.HTMLProps<WeaveMenuBar>
 
 export interface WeaveMenuBarState
 {
-
+	showSystemMenu?:boolean;
+	showFileMenu?:boolean;
+	showDataMenu?:boolean;
+	showToolsMenu?:boolean;
 }
 
 export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
@@ -34,22 +37,84 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	toolsMenu:ToolsMenu;
 	private weave:Weave;
 	private createObject:(type:new(..._:any[])=>any)=>void;
+
+	defaultState:WeaveMenuBarState = {
+		showSystemMenu:false,
+		showFileMenu:false,
+		showDataMenu:false,
+		showToolsMenu:false
+	};
+
 	constructor(props:WeaveMenuBarProps)
 	{
 		super(props);
 		this.weave = props.weave;
 		this.createObject = props.createObject;
+		this.state = _.cloneDeep(this.defaultState);
 	}
 	
 	componentDidUpdate() {
-		($(this.element).find('.ui.dropdown') as any)
-			.dropdown('refresh');
+		this.toggleDropdown('system-menu', this.state.showSystemMenu ?'show':'hide');
+		this.toggleDropdown('file-menu', this.state.showFileMenu ?'show':'hide');
+		this.toggleDropdown('data-menu', this.state.showDataMenu ?'show':'hide');
+		this.toggleDropdown('tools-menu', this.state.showToolsMenu ?'show':'hide')
 	}
 
 	componentDidMount() {
 		this.element = ReactDOM.findDOMNode(this);
 		($(this.element).find('.ui.dropdown') as any)
-			.dropdown();
+			.dropdown({
+				duration: 0,
+				onHide: () => {
+					this.setState({
+						showSystemMenu:false,
+						showFileMenu: false,
+						showDataMenu: false,
+						showToolsMenu: false
+					})
+				}
+			});
+	}
+
+	toggleSystemMenu = () => {
+		this.setState({
+			showSystemMenu:!this.state.showSystemMenu,
+		});
+	};
+
+	toggleFileMenu = () => {
+		this.setState({
+			showFileMenu: !this.state.showFileMenu,
+		});
+	};
+
+	toggleDataMenu = () => {
+		this.setState({
+			showDataMenu: !this.state.showDataMenu,
+		});
+	};
+
+	toggleToolsMenu = () => {
+		this.setState({
+			showToolsMenu: !this.state.showToolsMenu
+		});
+	};
+
+	toggleDropdown(className:string,action:string) {
+		let selector = ($(this.element).find('.ui.dropdown.'+className) as any);
+		if (className !== 'file-menu')
+			selector.dropdown({
+				duration: 0,
+				onHide: () => {
+					this.setState({
+						showSystemMenu:false,
+						showFileMenu: false,
+						showDataMenu: false,
+						showToolsMenu: false
+					})
+				}
+			});
+		selector.dropdown(action);
 	}
 
 
@@ -57,36 +122,42 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	{
 		return (
 			<div className="ui small menu" style={_.merge(this.props.style||{}, {fontSize: "0.8em", margin: "0em", borderRadius: "0em"})}>
-				<div className="ui dropdown header item" style={{borderRadius: 0, padding: "0 5 0 5"}}>
+				<div className="ui dropdown header item system-menu" style={{borderRadius: 0, padding: "0 5 0 5"}} onClick={this.toggleSystemMenu}>
 					Weave
-					<SystemMenu
-						ref={(c:SystemMenu) => this.systemMenu = c}
-						weave={this.weave}
-					/>
+					{this.state.showSystemMenu ?
+						<SystemMenu
+							ref={(c:SystemMenu) => this.systemMenu = c}
+							weave={this.weave}
+						/>:null
+					}
 				</div>
-				<div className="ui dropdown item" onClick={() => this.fileMenu.forceUpdate()}>
+				<div className="ui dropdown item file-menu" onClick={this.toggleFileMenu}>
 					File
-					<FileMenu
-						ref={(c:FileMenu) => this.fileMenu = c}
-						weave={this.weave}
-						createObject={this.createObject}
-					/>
+						<FileMenu
+							ref={(c:FileMenu) => this.fileMenu = c}
+							weave={this.weave}
+							createObject={this.createObject}
+						/>
 				</div>
-				<div className="ui dropdown item">
+				<div className="ui dropdown item data-menu" onClick={this.toggleDataMenu}>
 					Data
-					<DataMenu
-						ref={(c:DataMenu) => this.dataMenu = c}
-						weave={this.weave}
-						createObject={this.createObject}
-					/>
+					{this.state.showDataMenu ?
+						<DataMenu
+							ref={(c:DataMenu) => this.dataMenu = c}
+							weave={this.weave}
+							createObject={this.createObject}
+						/>:null
+					}
 				</div>
-				<div className="ui dropdown item">
+				<div className="ui dropdown item tools-menu" onClick={this.toggleToolsMenu}>
 					Tools
-					<ToolsMenu
-						ref={(c:ToolsMenu) => this.toolsMenu = c}
-						weave={this.weave}
-						createObject={this.createObject}
-					/>
+					{this.state.showToolsMenu ?
+						<ToolsMenu
+							ref={(c:ToolsMenu) => this.toolsMenu = c}
+							weave={this.weave}
+							createObject={this.createObject}
+						/>:null
+					}
 				</div>
 				<SessionHistorySlider stateLog={this.props.weave.history} style={{borderRadius: "0em"}}/>
 			</div>);
