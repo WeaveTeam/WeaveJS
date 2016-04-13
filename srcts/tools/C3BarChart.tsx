@@ -10,6 +10,7 @@ import Dropdown from "../semantic-ui/Dropdown";
 import Checkbox from "../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
+import {DropDownOption} from "../semantic-ui/Dropdown";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -44,7 +45,7 @@ declare type RecordHeightsFormat<T> = { xLabel: T } & {[columnName:string]: T};
 const GROUP:string = 'group';
 const STACK:string = 'stack';
 const PERCENT_STACK:string = 'percentStack';
-const GROUPING_MODES:{label:string, value:any}[] = [{label: "Grouped Bars", value: GROUP},
+const GROUPING_MODES:DropDownOption[] = [{label: "Grouped Bars", value: GROUP},
 													{label: "Stacked Bars", value: STACK},
 													{label: "100% Stacked Bars", value: PERCENT_STACK}];
 

@@ -21,6 +21,7 @@ import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
+import {DropDownOption} from "../semantic-ui/Dropdown";
 
 export default class CSVDataSourceEditor extends DataSourceEditor
 {
@@ -37,6 +38,8 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		if (ds.keyType.value === null && ds.url.value)
 		{
 			ds.keyType.value = ds.url.value;
+			//Todo: Put this in a grouped callback, will be fixed with key type issue in csv datasource
+			this.forceUpdate();
 		}
 	}
 
@@ -55,9 +58,9 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
 		let columnIds:{label:string, value:any}[] = ds.getColumnIds().map( (id, index) => {
-			return {label: id.toString(), value: id};
+			return {label: id.toString(), value: id}
 		});
-		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
+		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: ""});
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("URL"),
@@ -70,14 +73,20 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 				</HBox>,
 				<Dropdown style={{width: "100%"}}
 						  ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
-						  options={columnIds}/>
+						  options={columnIds}
+				/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Key Category")}
 					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
-				<KeyTypeInput keyTypeProperty={ds.keyType}/>
+				<Dropdown style={{width: "100%"}}
+					ref={linkReactStateRef(this, { value: ds.keyType }) }
+					options={weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
+						return {label:keyType, value:keyType} as DropDownOption;
+					})}
+				/>
 			]
 		];
 		return super.editorFields.concat(editorFields);
