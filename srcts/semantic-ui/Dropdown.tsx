@@ -49,7 +49,7 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 
 	componentDidUpdate(prevProps:DropdownProps, prevState:DropdownState)
 	{
-		if(!_.isEqual(prevState.value,this.state.value)) {
+		if(prevState.value && this.state.value && !_.isEqual(prevState.value, this.state.value)) {
 			this.props.onChange && this.props.onChange(this.state.value);
 			let selector = ($(this.element) as any);
 			let option = this.props.options[this.getIndexFromValue(this.state.value)];

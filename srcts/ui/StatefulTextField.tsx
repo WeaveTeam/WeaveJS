@@ -7,7 +7,7 @@ import ReactUtils from "../utils/ReactUtils";
 import Menu from "../react-ui/Menu";
 import Input from "../semantic-ui/Input";
 
-export interface StatefulTextFieldProps extends React.HTMLProps<Input> {
+export interface StatefulTextFieldProps extends React.HTMLProps<StatefulTextField> {
 	selectOnFocus?:boolean;
 }
 
@@ -24,7 +24,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 		};
 	}
 
-	private input:Input;
+	public input:Input;
 	
 	handleSelectOnFocus = () =>
 	{
