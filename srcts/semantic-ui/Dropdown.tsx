@@ -24,13 +24,13 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 	{
 		super(props);
 		this.state = {
-			value: null
-		};
+			value: this.props.value || null
+		}
 	}
 	
 	private getIndexFromValue(value:any):number
 	{
-		return this.props.options.findIndex((option) => _.isEqual(option, value));
+		return this.props.options.findIndex((option) => (typeof option === "object") ? _.isEqual(option.value, value) : _.isEqual(option, value) );
 	}
 	
 	componentWillReceiveProps(nextProps: DropdownProps)
@@ -49,21 +49,31 @@ export default class Dropdown extends React.Component<DropdownProps, DropdownSta
 
 	componentDidUpdate(prevProps:DropdownProps, prevState:DropdownState)
 	{
-		($(this.element) as any).dropdown("set selected", this.state.value);
-		if(!_.isEqual(prevState.value,this.state.value))
+		if(!_.isEqual(prevState.value,this.state.value)) {
 			this.props.onChange && this.props.onChange(this.state.value);
+			let selector = ($(this.element) as any);
+			let option = this.props.options[this.getIndexFromValue(this.state.value)];
+			selector.dropdown("set value", this.state.value);
+			selector.dropdown("set text", (typeof option === "object") ? option.label : option);
+		}
 	}
 	
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
+		let selector = ($(this.element) as any);
 		
-		($(this.element) as any).dropdown({
-			selected: this.getIndexFromValue(this.props.value),
+		selector.dropdown({
 			onChange: (index:number) => {
-				this.props.onChange && this.props.onChange(this.props.options[index])
+				let option = this.props.options[index];
+				let value:any = (typeof option === "object") ? option.value : option;
+				this.setState({value})
 			}
 		});
+
+		let option = this.props.options[this.getIndexFromValue(this.state.value)];
+		selector.dropdown("set value", this.state.value);
+		selector.dropdown("set text", (typeof option === "object") ? option.label : option);
 	}
 
 	render()
