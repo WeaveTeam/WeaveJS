@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import $ from "../modules/jquery";
 import * as _ from "lodash";
+import SmartComponent from "../ui/SmartComponent";
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
@@ -19,7 +20,7 @@ export interface DropdownState
 	value: any;
 }
 
-export default class Dropdown extends React.Component<DropdownProps, DropdownState>
+export default class Dropdown extends SmartComponent<DropdownProps, DropdownState>
 {
 	element:Element;
 	
