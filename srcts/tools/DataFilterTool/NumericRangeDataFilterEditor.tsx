@@ -68,5 +68,4 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 	}
 }
 
-Weave.registerClass("weavejs.tool.NumericRangeDataFilterEditor", NumericRangeDataFilterEditor, [weavejs.api.core.ILinkableObjectWithNewProperties]);
-Weave.registerClass("weave.editors::NumericRangeDataFilterEditor", NumericRangeDataFilterEditor);
+Weave.registerClass(NumericRangeDataFilterEditor, "weavejs.tool.NumericRangeDataFilterEditor", [weavejs.api.core.ILinkableObjectWithNewProperties]);

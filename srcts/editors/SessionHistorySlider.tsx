@@ -138,4 +138,4 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		);
 	}
 }
-Weave.registerClass("weavejs.editors.SessionHistorySlider", SessionHistorySlider);
+Weave.registerClass(SessionHistorySlider, "weavejs.editors.SessionHistorySlider");

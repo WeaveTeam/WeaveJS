@@ -187,5 +187,9 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 	}
 }
 
-Weave.registerClass("weavejs.tool.BarChartLegend", BarChartLegend, [weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties], "Bar Chart Legend");
-Weave.registerClass("weave.visualization.tools::BarChartLegendTool", BarChartLegend);
+Weave.registerClass(
+	BarChartLegend,
+	["weavejs.tool.BarChartLegend", "weave.visualization.tools::BarChartLegendTool"],
+	[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Bar Chart Legend"
+);

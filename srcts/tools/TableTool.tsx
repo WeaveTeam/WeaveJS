@@ -194,6 +194,9 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	}
 }
 
-Weave.registerClass("weavejs.tool.Table", TableTool, [weavejs.api.ui.IVisTool_Utility, weavejs.api.core.ILinkableObjectWithNewProperties], "Table");
-Weave.registerClass("weave.visualization.tools::TableTool", TableTool);
-Weave.registerClass("weave.visualization.tools::AdvancedTableTool", TableTool);
+Weave.registerClass(
+	TableTool,
+	["weavejs.tool.TableTool", "weave.visualization.tools::TableTool", "weave.visualization.tools::AdvancedTableTool"],
+	[weavejs.api.ui.IVisTool_Utility, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Table"
+);

@@ -76,4 +76,4 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 	}
 }
 
-Weave.registerClass("weavejs.editors.WeaveDataSourceEditor", WeaveDataSourceEditor, []);
+Weave.registerClass(WeaveDataSourceEditor, "weavejs.editors.WeaveDataSourceEditor", []);

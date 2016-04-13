@@ -283,4 +283,9 @@ export default class TileLayer extends AbstractLayer
 	}
 }
 
-Weave.registerClass("weave.visualization.plotters::WMSPlotter", TileLayer, [weavejs.api.core.ILinkableObjectWithNewProperties]);
+Weave.registerClass(
+	TileLayer,
+	["weavejs.layer.TileLayer", "weave.visualization.plotters::WMSPlotter"],
+	[weavejs.api.core.ILinkableObjectWithNewProperties],
+	"WMS images"
+);

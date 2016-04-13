@@ -668,5 +668,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	}
 }
 
-Weave.registerClass("weavejs.tool.Map", OpenLayersMapTool, [weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties], "Map");
-Weave.registerClass("weave.visualization.tools::MapTool", OpenLayersMapTool);
+Weave.registerClass(
+	OpenLayersMapTool,
+	["weavejs.tool.Map", "weave.visualization.tools::MapTool"],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	"Map"
+);
