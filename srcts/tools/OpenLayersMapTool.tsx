@@ -125,7 +125,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Show Zoom Slider"),
 				<HBox>
-					<Checkbox ref={linkReactStateRef(this, { checked: this.showZoomSlider })}/>
+					<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })}/>
 				</HBox>
 			],
 			[Weave.lang("Projection SRS"),
@@ -141,7 +141,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Snap zoom to base map"),
 				<HBox>
-					<Checkbox ref={linkReactStateRef(this, {checked: this.snapZoomToBaseMap})}/>
+					<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}/>
 				</HBox>
 			],
 		];

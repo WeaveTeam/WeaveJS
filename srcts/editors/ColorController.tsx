@@ -87,7 +87,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 						  </VBox>,
 						  <VBox key={this.tabLabels[1]} style={{flex: 1, padding: 5}}>
 							  <HBox>
-								  <Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
+								  <Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})}/>
 								  <span>
 								  	{Weave.lang("Center color ramp at zero (when binning is disabled)")}
 								  </span>
