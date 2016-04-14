@@ -47,8 +47,6 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 	private  _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.forceUpdate.bind(this)));
 
 	private  get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }
-
-	private  gridSource:any[] = [];
 	public  _simple:SimpleBinningDefinition = Weave.disposableChild(this, SimpleBinningDefinition);
 	private  _customSplit:CustomSplitBinningDefinition = Weave.disposableChild(this, CustomSplitBinningDefinition);
 	private  _quantile:QuantileBinningDefinition = Weave.disposableChild(this, QuantileBinningDefinition);
@@ -65,31 +63,41 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 	
 	componentDidMount()
 	{
-		// in order to get the 
-		this.forceUpdate();
+		var binDef = this.binnedColumn.binningDefinition.target;
+		// link the selected def at initialization
+		if(binDef)
+		{
+			for(var localDef of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
+			{
+				if(this.isRadioSelected(localDef))
+				{
+					Weave.linkState(binDef, localDef);
+				}
+			}
+		}
 	}
 
-	private linkOverrideMin(ref:StatefulTextField)
+	private linkOverrideMin = (ref:StatefulTextField) =>
 	{
 		for(var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
 		{
 			var abd:AbstractBinningDefinition = def;
 			if(abd && abd.overrideInputMin)
 			{
-				linkReactStateRef(ref, {value: abd.overrideInputMin})
+				linkReactStateRef(ref, {value: abd.overrideInputMin}, 500)
 			}
 		}
 	}
 	
 	/* can be merged into single function with second argument */
-	private linkOverrideMax(ref:StatefulTextField)
+	private linkOverrideMax = (ref:StatefulTextField) =>
 	{
 		for(var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
 		{
 			var abd:AbstractBinningDefinition = def;
 			if(abd && abd.overrideInputMax)
 			{
-				linkReactStateRef(ref, {value: abd.overrideInputMax})
+				linkReactStateRef(ref, {value: abd.overrideInputMax}, 500)
 			}
 		}
 	}
@@ -130,23 +138,23 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		);
 	}
 
-	setBinningDefinition(value:boolean, binDef:AbstractBinningDefinition)
+	setBinningDefinition(value:boolean, localDef:AbstractBinningDefinition)
 	{
 		// if we are clicking on the already selected binning definition
 		// we keep it selected
-		var binnedColumnBinDef = this.binnedColumn.binningDefinition.target;
-		if(binnedColumnBinDef)
+		var binDef = this.binnedColumn.binningDefinition.target;
+		
+		if(!value && binDef && localDef.constructor == binDef.constructor)
 		{
-			if(binDef.constructor == binnedColumnBinDef.constructor)
-			{
 				this.forceUpdate(); // trigger a render because no session state change
-				return;
-			}
+				return;				// and we need to update the checkboxes to reflect correct value
 		}
 
 		if(value)
 		{
-			this.binnedColumn.binningDefinition.requestLocalObjectCopy(binDef);
+			this.binnedColumn.binningDefinition.requestLocalObjectCopy(localDef);
+			binDef = this.binnedColumn.binningDefinition.target;
+			Weave.linkState(binDef, localDef);
 		}
 	}
 
@@ -215,7 +223,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<StatefulTextField disabled={!this.isRadioSelected(this._simple)}
 													   style={inputStyle}
 													   type="number"
-													   ref={linkReactStateRef(this, {value: this._simple.numberOfBins})}/>
+													   ref={linkReactStateRef(this, {value: this._simple.numberOfBins}, 500)}/>
 								<HelpIcon style={iyle}>
 										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
 									</HelpIcon>
@@ -231,7 +239,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<StatefulTextField type="text" 
-													   ref={linkReactStateRef(this, {value: this._customSplit.splitValues})}
+													   ref={linkReactStateRef(this, {value: this._customSplit.splitValues}, 500)}
 													   disabled={!this.isRadioSelected(this._customSplit)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]')}
@@ -251,7 +259,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<StatefulTextField style={inputStyle} 
 													   type="text"
 													   disabled={!this.isRadioSelected(this._quantile)}
-													   ref={linkReactStateRef(this, {value: this._quantile.refQuantile})}/>
+													   ref={linkReactStateRef(this, {value: this._quantile.refQuantile}, 500)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order')}
 									</HelpIcon>
@@ -271,7 +279,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<StatefulTextField style={inputStyle}
 													   disabled={!this.isRadioSelected(this._equalInterval)}
 													   type="text"
-													   ref={linkReactStateRef(this, {value: this._equalInterval.dataInterval})}/>
+													   ref={linkReactStateRef(this, {value: this._equalInterval.dataInterval}, 500)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]')}
 									</HelpIcon>
@@ -304,7 +312,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<StatefulTextField style={inputStyle}
 													   type="number"
 													   disabled={!this.isRadioSelected(this._jenks)}
-													   ref={linkReactStateRef(this, {value: this._jenks.numOfBins})}/>
+													   ref={linkReactStateRef(this, {value: this._jenks.numOfBins}, 500)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization')}
 									</HelpIcon>
@@ -346,7 +354,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 						</VBox>
 					</HBox>
 				</VBox>
-				<VBox className="weave-container" style={{flex: 1, minWidth: 350}}>
+				<VBox className="weave-container weave-padded-vbox" style={{flex: 1, minWidth: 350, padding: 8}}>
 					{
 						this.hasOverrideMinAndMax() ?
 						<HBox className="weave-padded-hbox" style={{alignItems: "center", height: 50}}> {/* temporary hack */}
@@ -354,8 +362,8 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<div style={{flex: 1, height: "100%", position: "relative"}}>
 								<div style={{position: "absolute", width: "100%", height: "100%"}}>
 									<HBox style={{fontSize: "smaller", position: "relative", width: "100%", height: "100%"}}>
-										<StatefulTextField style={{width: "50%"}} ref={() => this.linkOverrideMin} placeholder="min"/>
-										<StatefulTextField style={{width: "50%", marginLeft: 8}} ref={() => this.linkOverrideMax} placeholder="max"/>
+										<StatefulTextField style={{width: "50%"}} ref={this.linkOverrideMin} placeholder="min"/>
+										<StatefulTextField style={{width: "50%", marginLeft: 8}} ref={this.linkOverrideMax} placeholder="max"/>
 									</HBox>
 								</div>
 							</div>
@@ -364,6 +372,10 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 					<HBox style={{flex: 1}}>
 						{this.generateBinTable()}
 					</HBox>
+					{/*<HBox style={{alignItems: "center"}}>
+						<Checkbox/>
+						<span style={textStyle}>{Weave.lang("Edit and override names")}</span>
+					</HBox>*/}
 				</VBox>
 			</HBox>
 		)
