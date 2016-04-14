@@ -17,7 +17,7 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
 
-export default class CSVDataSourceEditor extends DataSourceEditor
+export default class CKANDataSourceEditor extends DataSourceEditor
 {
 	private _dataSourceNode:ColumnTreeNode
 	constructor(props:IDataSourceEditorProps)
