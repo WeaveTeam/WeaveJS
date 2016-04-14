@@ -62,43 +62,22 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
     get options (){
         return(this.choices.getObjects().map((column:IAttributeColumn) =>{
-            return({label: ColumnUtils.getTitle(column), value : column});//TODO replace getTitle with metadata title property?
+            return {label: ColumnUtils.getTitle(column), value : column};//TODO replace getTitle with metadata title property?
         }));
     };
 
-    //crude function, should be deleted when possible
-    getLabelToAttributeMapping = (labelToMap:string, tool:IVisTool):string =>{
-        let mappedvalue:string;
-        let root = Weave.getRoot(tool);
-        for (let [label, attribute] of tool.selectableAttributes.entries())
-        {
-            if(label == labelToMap){
-
-                let path = Weave.findPath(root, attribute);
-                mappedvalue = lodash.last(path);
-                break;
-            }
-
-        }
-        return mappedvalue;
-    };
-
-    //TODO confirm if right way to do
     handleSelection = (selectedValues:any[]):void =>{
-        //get target attribute column
-        //NOTE: using the target Tool path and the label selected from the target dropdown combobox , we need to construct the correct path and retrieve the column
         var root = Weave.getRoot(selectedValues[0]);//get root hashmap
         var tool = Weave.followPath(root, this.targetToolPath.state as string[]) as IVisTool;//retrieve tool from targetTool Path
-        var attrLabel = this.getLabelToAttributeMapping(this.targetAttribute.state as string, tool);//get correct target attribute name from label selected in dropdown
-        console.log("attrLabel", attrLabel);
-        var path = (this.targetToolPath.state as string[]).slice(); path.push(attrLabel);//get the entire path
-        let targetCol = ColumnUtils.hack_findInternalDynamicColumn(Weave.followPath(root, path) as IColumnWrapper);//retrieve column using that path
+
+	    var targetCol = tool.selectableAttributes.get(this.targetAttribute.state as string) as IColumnWrapper;
+	    var targetInternalCol = ColumnUtils.hack_findInternalDynamicColumn(targetCol);
 
         //use selected column to set session state of target column
-        var selectedColumn = selectedValues[0] as IColumnWrapper;
-
+        var selectedColumn = selectedValues[0] as IAttributeColumn;
         this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to re render
-        Weave.copyState(selectedColumn, (targetCol.getInternalColumn() as ReferencedColumn))//TODO handle selectable attributes hashmaps eg height columns barchart
+
+        targetInternalCol.requestLocalObjectCopy(selectedColumn) ;//TODO handle selectable attributes hashmaps eg height columns barchart
 
     };
 
@@ -224,19 +203,8 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
     getTargetToolAttributeOptions():string[] {
         let tool:IVisTool = this.tool;
         let attributes:string[] =[];
-        if(tool) attributes= Array.from(tool.selectableAttributes.keys()) as string[];
-       /* let attributes:{label:string, value: string}[] = [];
-
-        if(tool){
-            for (var [label, attribute] of tool.selectableAttributes.entries())
-            {
-                let path = Weave.findPath(this.weaveRoot, attribute);
-                let value = lodash.last(path);
-
-                attributes.push({label, value});
-            }
-        }*/
-
+        if(tool)
+	        attributes= Array.from(tool.selectableAttributes.keys()) as string[];
         return attributes;
     }
 
@@ -262,9 +230,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         var toolName:string;
         var attributeValue :string;
         var menuLayout:string = this.props.attributeMenuTool.layoutMode.state as string;
-
-        /*console.log("attribuite selections", this.getTargetToolAttributeOptions());
-        console.log("target attribute", this.props.attributeMenuTool.targetAttribute.state);*/
+	    
         if(this.props.attributeMenuTool.targetToolPath.state){
             toolName = this.getTargetToolPath();
             attributeValue = this.getTargetAttribute();
