@@ -40,11 +40,11 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			let node = this.props.dataSource.findHierarchyNode(id) as EntityNode;
 			if (node != null && node.id > -1)
 			{
-				this.tree.setSelected([node]);	
+				//this.tree.setSelected([node]);	
 			}
 			else
 			{
-				this.tree.setSelected([]);
+				//this.tree.setSelected([]);
 			}
 		}
 	}

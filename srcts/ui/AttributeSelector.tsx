@@ -223,18 +223,15 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                 <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar>
 
                 <HDividedBox style={ {flex:1 ,border:"1px solid lightgrey"} } space={8} loadWithEqualWidthChildren={true}>
-                    <div>
-                        <WeaveTree searchFilter={ this.searchFilter }
+                    <VBox>
+                        <WeaveTree
                                     hideRoot = {true} hideLeaves = {true}
                                     onSelect={this.onHierarchySelected}
                                     root={this.rootTreeNode}
                                     ref={ (c) => { this.tree = c; } }/>
-                    </div>
-
-
-
+                    </VBox>
                     <VBox>
-                        {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter }
+                        {this.state.leafNode ? <WeaveTree
                                                           multipleSelection={ true }
                                                           initialSelectedItems={ this.selectedNodes }
                                                           hideRoot={true}
@@ -242,8 +239,6 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                                                           onSelect={this.setColumn}
                                                           ref={ (c) => { this.leafTree = c; } }/>
                             : null}
-
-
                     </VBox>
                 </HDividedBox>
                 {
