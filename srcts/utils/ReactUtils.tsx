@@ -4,6 +4,10 @@ import reactUpdate from "react-addons-update";
 import * as _ from "lodash";
 import * as jquery from "jquery";
 
+import {linkReactStateRef} from "./WeaveReactUtils";
+
+import LinkableString = weavejs.core.LinkableString;
+
 var $:JQueryStatic = (jquery as any)["default"];
 
 export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
@@ -116,6 +120,28 @@ export default class ReactUtils
 			document.removeEventListener("mousedown", handler);
 		ReactDOM.unmountComponentAtNode(element);
 		document.body.removeChild(element);
+	}
+
+
+	static generateGridLayout=(gridValues:string[],gridRowsUI:JSX.Element[][]):JSX.Element=>
+	{
+
+		var columnGridUI:JSX.Element[][] = gridRowsUI.map((row:JSX.Element[]) => {
+
+			let cellsUI:JSX.Element[] = [];
+			for(let index:number = 0 ; index < row.length ; index++)
+			{
+				let cell = <div className={gridValues[index] + " wide column"}>
+								{row[index]}
+							</div>
+				cellsUI.push(cell);
+			}
+			return cellsUI
+		});
+
+		return <div className="ui grid">
+					{columnGridUI}
+				</div>;
 	}
 	
 	static generateTable(header:React.ReactChild[], body:React.ReactChild[][], styles:DynamicTableStyles = {}, classes:DynamicTableClassNames = {}):JSX.Element
