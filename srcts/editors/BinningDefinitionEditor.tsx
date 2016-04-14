@@ -162,7 +162,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<Checkbox type="radio" 
 											  value={this.isRadioSelected(this._simple)}
 											  onChange={(value) => this.setBinningDefinition(value, this._simple)} 
-											  className="toggle"/> 
+											  /> 
 									<span style={textStyle}>{Weave.lang("Equally spaced")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
@@ -180,7 +180,6 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio" 
-											  className="toggle"
 											  value={this.isRadioSelected(this._customSplit)}
 											  onChange={(value) => this.setBinningDefinition(value, this._customSplit)}/> 
 									<span style={textStyle}>{Weave.lang("Custom breaks")}</span>
@@ -198,7 +197,6 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-									 		  className="toggle"
 											  value={this.isRadioSelected(this._quantile)}
 											  onChange={(value) => this.setBinningDefinition(value, this._quantile)}/> 
 									<span style={textStyle}>{Weave.lang("Quantile")}</span>
@@ -220,7 +218,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<Checkbox type="radio"
 											  value={this.isRadioSelected(this._equalInterval)}
 											  onChange={(value) => this.setBinningDefinition(value, this._equalInterval)}
-									 		  className="toggle"/> 
+									 		  /> 
 									<span style={textStyle}>{Weave.lang("Equally interval")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
@@ -238,7 +236,6 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  className="toggle"
 											  value={this.isRadioSelected(this._stdDev)}
 											  onChange={(value) => this.setBinningDefinition(value, this._stdDev)}/> 
 									<span style={textStyle}>{Weave.lang("Standard deviations")}</span>
@@ -253,7 +250,6 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  className="toggle"
 											  value={this.isRadioSelected(this._jenks)}
 											  onChange={(value) => this.setBinningDefinition(value, this._jenks)}/> 
 									<span style={textStyle}>{Weave.lang("Natural breaks")}</span>
@@ -273,7 +269,6 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  className="toggle"
 											  value={this.isRadioSelected(this._category)}
 											  onChange={(value) => this.setBinningDefinition(value, this._category)}/> 
 									<span style={textStyle}>{Weave.lang("All Categories (string values)")}</span>
@@ -288,7 +283,6 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  className="toggle"
 											  value={!this.binnedColumn.binningDefinition.target}
 											  onChange={(value) => { 
 												  if(value)
