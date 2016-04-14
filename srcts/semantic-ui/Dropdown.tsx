@@ -11,11 +11,13 @@ export interface DropdownProps extends React.HTMLProps<Dropdown>
 	options:DropDownOption[];
 	value?:any;
 	onChange?:(value:any)=>void;
+	onAdd?:(value:any)=>void;
 	selectFirstOnInvalid?:boolean;
 	context?:Element;
 	direction?:string;
 	valueEqualityFunc?: (valueA:any,valueB:any)=>boolean;
 	allowAdditions?:boolean;
+	type?:string;
 }
 
 export interface DropdownState
@@ -82,6 +84,9 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			onClick: (index:number) => {
 				this.props.onClick && this.props.onClick(null);
 			},
+			onAdd: (value:string) => {
+				this.props.onAdd && this.props.onAdd(value);
+			},
 			context: this.props.context || null,
 			direction: this.props.direction || 'auto',
 			allowAdditions: this.props.allowAdditions || false
@@ -95,7 +100,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	render()
 	{
 		return (
-			<div onClick={this.props.onClick} className={"ui selection dropdown " + (this.props.className || "")} style={this.props.style}>
+			<div onClick={this.props.onClick} className={"ui " + (this.props.type || "") + " selection dropdown " + (this.props.className || "")} style={this.props.style}>
 				<input type="hidden"/>
 				<i className="dropdown icon"/>
 				<div className="default text">{this.props.placeholder}</div>
