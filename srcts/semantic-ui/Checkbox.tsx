@@ -35,7 +35,7 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	}
 
 	static defaultProps:CheckboxProps = {
-		type: "toggle"
+		type: ""
 	};
 
 	onClick=(event:React.MouseEvent)=>
@@ -53,13 +53,10 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 
 	componentDidUpdate(prevProps:CheckboxProps, prevState:CheckboxState)
 	{
-		if(!_.isEqual(prevState.value, this.state.value)) {
-			if(this.state.value)
-				($(this.element) as any).checkbox("set checked")
-			else
-				($(this.element) as any).checkbox("set unchecked")
-			this.props.onChange && this.props.onChange(this.state.value);
-		}
+		if(this.state.value)
+			($(this.element) as any).checkbox("set checked")
+		else
+			($(this.element) as any).checkbox("set unchecked")
 	}
 	
 	handleChange=(event:React.MouseEvent)=>
@@ -67,6 +64,7 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 		this.setState({
 			value: !this.state.value
 		})
+		this.props.onChange && this.props.onChange(!this.state.value);
 	}
 
 	componentDidMount()

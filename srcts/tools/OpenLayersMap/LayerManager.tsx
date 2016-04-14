@@ -49,7 +49,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		return <tr key={index}
 				className={layer === this.state.selectedLayer ? "weave-tree-view selected" : "weave-tree-view"}
 				onClick={() => { if (this.state.selectedLayer !== layer) this.setState({ selectedLayer: layer, openedLayer: null }); }}>
-				<td><Checkbox title={Weave.lang("Show layer")} ref={linkReactStateRef(this, { checked: layer.visible }) } stopPropagation={true}/></td>
+				<td><Checkbox title={Weave.lang("Show layer")} ref={linkReactStateRef(this, { value: layer.visible }) } stopPropagation={true}/></td>
 				<td style={{width: "100%"}}>{layer.getDescription() }</td>
 				<td>
 					<button title={Weave.lang("Edit layer")} style={{whiteSpace: "nowrap"}} onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }>
