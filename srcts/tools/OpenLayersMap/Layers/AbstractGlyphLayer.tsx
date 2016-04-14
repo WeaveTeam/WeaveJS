@@ -2,6 +2,8 @@ import AbstractFeatureLayer from "./AbstractFeatureLayer";
 import * as lodash from "lodash";
 import * as ol from "openlayers";
 
+import OpenLayersMapTool from "../../OpenLayersMapTool";
+
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import LinkableString = weavejs.core.LinkableString;
@@ -19,7 +21,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 
 	dataX = Weave.linkableChild(this, DynamicColumn);
 	dataY = Weave.linkableChild(this, DynamicColumn);
-	sourceProjection = Weave.linkableChild(this, LinkableString);
+	sourceProjection = Weave.linkableChild(this, new LinkableString("EPSG:4326", OpenLayersMapTool.projectionVerifier));
 
 	get editableFields()
 	{
@@ -30,8 +32,8 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 	get selectableAttributes()
 	{
 		return super.selectableAttributes
-			.set("X", this.dataX)
-			.set("Y", this.dataY);
+			.set("Latitude", this.dataY)
+			.set("Longitude", this.dataX);
 	}
 
 	constructor()
@@ -66,7 +68,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
 		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
 
-		var rawProj = this.sourceProjection.value || this.dataX.getMetadata("projection") || "EPSG:4326";
+		var rawProj = this.dataX.getMetadata("projection") || this.sourceProjection.value || "EPSG:4326";
 		var mapProj = this.outputProjection;
 
 		for (let id of removedIds)
