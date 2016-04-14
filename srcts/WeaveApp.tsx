@@ -22,6 +22,7 @@ import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
+import ColumnUtils = weavejs.data.ColumnUtils;
 import WeavePath = weavejs.path.WeavePath;
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -211,8 +212,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var weave = this.props.weave;
 		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
 		var path = [weave.root.generateUniqueName(baseName)];
-		var instance = weave.requestObject(path, type);
-		var resultType = LinkablePlaceholder.getClass(weave.getObject(path));
+		weave.requestObject(path, type);
+		var instance = weave.getObject(path);
+		var resultType = LinkablePlaceholder.getClass(instance);
 		
 		if (resultType != type)
 			return;
@@ -224,9 +226,23 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		if (React.Component.isPrototypeOf(type))
 		{
+			var placeholder = Weave.AS(instance, LinkablePlaceholder);
+			if (placeholder)
+				Weave.getCallbacks(placeholder).addDisposeCallback(this, this.handlePlaceholderDispose.bind(this, placeholder));
 			this.addToLayout(path);
 		}
 	};
+
+	private handlePlaceholderDispose(placeholder:LinkablePlaceholder<any>)
+	{
+		var INIT = 'initSelectableAttributes';
+		var instance = placeholder.getInstance();
+		if (instance[INIT])
+		{
+			var refs = ColumnUtils.findFirstDataSet(this.props.weave.root);
+			instance[INIT](refs);
+		}
+	}
 
 	addToLayout(path:WeavePathArray)
 	{
