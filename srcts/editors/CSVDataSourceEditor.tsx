@@ -86,6 +86,12 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					options={weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
 						return {label:keyType, value:keyType} as DropDownOption;
 					})}
+					allowAdditions={true}
+					type="search"
+				  	/*onAdd={(content:string):void=>{
+				  		console.log("on change");
+						ds.keyType.value = content;
+					}}*/
 				/>
 			]
 		];
