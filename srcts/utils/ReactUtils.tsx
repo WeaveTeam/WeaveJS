@@ -91,7 +91,7 @@ export default class ReactUtils
 		var popup = ReactDOM.render(jsx, element);
 		var mousedownHandler:EventListener = null;
 		
-		if(closeOnMouseDown) 
+		if (closeOnMouseDown) 
 		{
 			document.addEventListener("mousedown", mousedownHandler = (event:MouseEvent) => {
 				if (element.contains(event.target as HTMLElement))
@@ -106,10 +106,13 @@ export default class ReactUtils
 
 	static closePopup(popup:React.ReactInstance):void
 	{
-		var [element, handler] = ReactUtils.map_popup_element.get(popup) || [null, null];
-		if (!element)
+		if (!ReactUtils.map_popup_element.has(popup))
 			throw new Error("closePopup() can only be called for popups created by openPopup()");
-		if(handler)
+		
+		var [element, handler] = ReactUtils.map_popup_element.get(popup);
+		if (!element.parentNode)
+			return;
+		if (handler)
 			document.removeEventListener("mousedown", handler);
 		ReactDOM.unmountComponentAtNode(element);
 		document.body.removeChild(element);
