@@ -4,7 +4,7 @@ import IconButton from "../react-ui/IconButton";
 import List from "../react-ui/List";
 import AttributeSelector from "../ui/AttributeSelector";
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
-import LinkableHashMap = weavejs.core.LinkableHashMap;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import {ListOption} from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
@@ -12,10 +12,10 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ControlPanel from "./ControlPanel";
 
 export interface ISelectableAttributesListProps{
-    columns : LinkableHashMap;
+    columns : ILinkableHashMap;
     label:string;
     showLabelAsButton?:boolean;
-    selectableAttributes? : Map<string, (IColumnWrapper|LinkableHashMap)>;
+    selectableAttributes? : Map<string, (IColumnWrapper|ILinkableHashMap)>;
 }
 
 export interface ISelectableAttributesListState{
@@ -88,7 +88,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
         var selectedObjects:IAttributeColumn[];
         var columnList: ListOption[] = [];
-        var columns = this.props.columns.getObjects();
+        var columns = this.props.columns.getObjects(IAttributeColumn);
 
         //When all options are selected, needed only for restyling the list and re-render
         if(this.state.selectAll)

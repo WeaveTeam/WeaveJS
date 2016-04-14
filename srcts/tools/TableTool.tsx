@@ -11,6 +11,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import IColumnReference = weavejs.api.data.IColumnReference;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableString = weavejs.core.LinkableString;
@@ -23,6 +24,7 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import QKey = weavejs.data.key.QKey;
 import QKeyManager = weavejs.data.key.QKeyManager;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 
 export interface IDataTableState extends IVisToolState
 {
@@ -33,7 +35,7 @@ export interface IDataTableState extends IVisToolState
 	height?:number
 }
 
-export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool
+export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool, IInitSelectableAttributes
 {
 	fixedDataTable:FixedDataTable;
 
@@ -158,8 +160,13 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	get selectableAttributes()
 	{
-		return new Map<string, (IColumnWrapper | LinkableHashMap)>()
+		return new Map<string, (IColumnWrapper | ILinkableHashMap)>()
 			.set("Columns", this.columns);
+	}
+
+	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
+	{
+		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
 	}
 
 	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes

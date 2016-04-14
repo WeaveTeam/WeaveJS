@@ -24,7 +24,7 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import ControlPanel from "./ControlPanel";
 
 export interface ISelectableAttributeComponentProps{
-    attributes : Map<string, IColumnWrapper|LinkableHashMap>
+    attributes : Map<string, IColumnWrapper|ILinkableHashMap>
     showLabel? : boolean
     linkFunction?:any
 
@@ -50,10 +50,10 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             Weave.getCallbacks(value).addGroupedCallback(this, this.forceUpdate);
         });
     }
-    launchAttributeSelector=(label:string, attribute:IColumnWrapper|LinkableHashMap):ControlPanel=>{
+    launchAttributeSelector=(label:string, attribute:IColumnWrapper|ILinkableHashMap):ControlPanel=>{
         if(this.props.linkFunction)
         {
-            this.props.linkFunction( AttributeSelector.openInWeaveToolEditor("Attribute Selector",label, attribute, this.props.attributes))
+            this.props.linkFunction( AttributeSelector.openInWeaveToolEditor("Attribute Selector", label, attribute, this.props.attributes))
             return null;
         }
         else
@@ -99,10 +99,10 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
         //loop through selectable attributes
         this.props.attributes.forEach((value, label)=>{
-            let attribute_lhm_or_icw = this.props.attributes.get(label);
+            let attribute_ilhm_or_icw = this.props.attributes.get(label);
 
-            if(Weave.IS(attribute_lhm_or_icw, IColumnWrapper)){
-                let attribute = attribute_lhm_or_icw as IColumnWrapper;
+            if(Weave.IS(attribute_ilhm_or_icw, IColumnWrapper)){
+                let attribute = attribute_ilhm_or_icw as IColumnWrapper;
 
                 //check for always defined column
                 if(Weave.IS(attribute, AlwaysDefinedColumn)){
@@ -129,7 +129,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                 selectableUI.push(elem);
             }
             else{//LinkableHashMap
-                let attribute = attribute_lhm_or_icw as LinkableHashMap;
+                let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
                 let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
                 selectableUI.push(elem);
             }

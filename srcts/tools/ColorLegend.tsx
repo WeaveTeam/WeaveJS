@@ -30,10 +30,12 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import KeySet = weavejs.data.key.KeySet;
 import LinkableNumber = weavejs.core.LinkableNumber;
-import LinkableHashMap = weavejs.core.LinkableHashMap;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import IColumnReference = weavejs.api.data.IColumnReference;
+import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -44,7 +46,7 @@ const SHAPE_MODES:{label:string, value:any}[] = [{label: "Box", value: SHAPE_TYP
 												{label: "Line", value: SHAPE_TYPE_LINE},
 												{label: "Square", value: SHAPE_TYPE_SQUARE}];
 
-export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool
+export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool, IInitSelectableAttributes
 {
 	panelTitle = Weave.linkableChild(this, LinkableString);
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -378,10 +380,15 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 	get selectableAttributes()
 	{
-		return new Map<string, (IColumnWrapper | LinkableHashMap)>()
+		return new Map<string, (IColumnWrapper | ILinkableHashMap)>()
 			.set("Color Data", this.dynamicColorColumn);
 	}
 
+	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
+	{
+		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
+	}
+	
 	renderEditor (linkFunction:any = null):JSX.Element{
 		return(<VBox>
 			{renderSelectableAttributes(this,linkFunction)}

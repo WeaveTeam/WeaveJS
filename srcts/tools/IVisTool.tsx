@@ -4,7 +4,7 @@ import * as React from "react";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 
 import ToolTip from "./ToolTip";
-import LinkableHashMap = weavejs.core.LinkableHashMap;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export interface IVisToolProps
@@ -19,10 +19,10 @@ export interface IVisTool extends ILinkableObject
 {
     title:string;
 	renderEditor(linkFunction:any):JSX.Element;
-    selectableAttributes:Map<string,(IColumnWrapper|LinkableHashMap)>;//TODO make this into an interface?
+    selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>;//TODO make this into an interface?
 }
 
 export function renderSelectableAttributes(tool:IVisTool,linkFunction:Function)
 {
-	return(<SelectableAttributeComponent attributes={ tool.selectableAttributes } linkFunction= {linkFunction}/>);
+	return <SelectableAttributeComponent attributes={ tool.selectableAttributes } linkFunction={ linkFunction }/>;
 }
