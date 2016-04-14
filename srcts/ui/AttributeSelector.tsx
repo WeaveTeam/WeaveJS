@@ -21,15 +21,15 @@ import ControlPanel from "./ControlPanel";
 export interface IAttributeSelectorProps
 {
     label? : string;
-    selectedAttribute : IColumnWrapper|LinkableHashMap;
+    selectedAttribute : IColumnWrapper|ILinkableHashMap;
     showLabelAsButton?:boolean;
-    selectableAttributes:Map<string,(IColumnWrapper|LinkableHashMap)>;
+    selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>;
 }
 
 export interface IAttributeSelectorState
 {
     leafNode? : IWeaveTreeNode;
-    selectedAttribute?: IColumnWrapper|LinkableHashMap;
+    selectedAttribute?: IColumnWrapper|ILinkableHashMap;
     label?:string;
 
 }
@@ -39,7 +39,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     private tree: WeaveTree;
     private rootTreeNode :IWeaveTreeNode;
     private leafTree :WeaveTree;
-    private  weaveRoot: ILinkableHashMap;
+    private weaveRoot: ILinkableHashMap;
     private searchFilter :string;
     private items:{[label:string] : Function}={};
     private selectedColumnRef :IColumnReference[];
@@ -75,7 +75,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
     handleSelectedAttribute = (name:string):void=>
     {
-        let selectedAttribute:IColumnWrapper|LinkableHashMap = this.props.selectableAttributes.get(name);
+        let selectedAttribute:IColumnWrapper|ILinkableHashMap = this.props.selectableAttributes.get(name);
 
         this.setState({
             selectedAttribute : selectedAttribute,
@@ -92,7 +92,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             var meta = ref && ref.getColumnMetadata();
             if (meta)
             {
-                var lhm = Weave.AS(this.state.selectedAttribute, LinkableHashMap);
+                var lhm = Weave.AS(this.state.selectedAttribute, ILinkableHashMap);
                 if (lhm)
                     lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
             }
@@ -131,7 +131,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                     if (dc)
                         dc.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
                 }
-                else{//if selectable attribute is a LinkableHashmap
+                else{//if selectable attribute is an ILinkableHashMap
                     this.selectedColumnRef = [];
                     this.selectedColumnRef = selectedItems.map((item:IWeaveTreeNode)=> {
                         return Weave.AS(item, weavejs.api.data.IColumnReference);
@@ -148,7 +148,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         this.forceUpdate();
     };
 
-    getSelectedTreeNodesFor = (selectedAttribute:IColumnWrapper|LinkableHashMap):IWeaveTreeNode[] =>{
+    getSelectedTreeNodesFor = (selectedAttribute:IColumnWrapper|ILinkableHashMap):IWeaveTreeNode[] =>{
         let selectedNodes:IWeaveTreeNode[]=[];
         let selectableObjects:any[] = [];
 
@@ -157,8 +157,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             selectableObjects.push(selectedAttribute);//single entry
         }
         else
-        {//LinkableHashMap
-            selectableObjects = (selectedAttribute as LinkableHashMap).getObjects();
+        {//ILinkableHashMap
+            selectableObjects = (selectedAttribute as ILinkableHashMap).getObjects();
         }
 
         for(var i:number = 0; i < selectableObjects.length; i++)
@@ -175,7 +175,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         return selectedNodes;
     };
 
-    getSelectedNodeRoot = (selectedAttribute:IColumnWrapper|LinkableHashMap):IWeaveTreeNode =>{
+    getSelectedNodeRoot = (selectedAttribute:IColumnWrapper|ILinkableHashMap):IWeaveTreeNode =>{
         var dsources  = ColumnUtils.getDataSources(selectedAttribute as IColumnWrapper);
         var dsource = dsources[0] as IDataSource;
         if(dsource){
@@ -185,26 +185,26 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             return;
     };
 
-    static openInstance(label:string, selectedAttribute:IColumnWrapper|LinkableHashMap, selectableAttributes:Map<string, (IColumnWrapper|LinkableHashMap)>):ControlPanel{
+    static openInstance(label:string, selectedAttribute:IColumnWrapper|ILinkableHashMap, selectableAttributes:Map<string, IColumnWrapper|ILinkableHashMap>):ControlPanel{
         let weave = Weave.getWeave(selectedAttribute);
         return ControlPanel.openInstance<IAttributeSelectorProps>(weave, AttributeSelector,
                                         {title:Weave.lang('Attribute Selector')},
                                         {label, selectedAttribute, selectableAttributes});
     }
 
-    static openInWeaveToolEditor(title:string,label:string, selectedAttribute:IColumnWrapper|LinkableHashMap, selectableAttributes:Map<string, (IColumnWrapper|LinkableHashMap)>):any{
+    static openInWeaveToolEditor(title:string,label:string, selectedAttribute:IColumnWrapper|ILinkableHashMap, selectableAttributes:Map<string, IColumnWrapper|ILinkableHashMap>):any{
         let weave = Weave.getWeave(selectedAttribute);
         return  {title:title,label:label,toolClass:AttributeSelector, toolProps:{label, selectedAttribute, selectableAttributes}};
     }
 
     render():JSX.Element
     {
-        if(this.rootTreeNode)
-            var ui:JSX.Element = this.state.selectedAttribute instanceof LinkableHashMap && this.state.leafNode ?
-                <VBox style={{flex:1}}>
-                    <SelectableAttributesList  showLabelAsButton={ false } label={ this.state.label } columns={ (this.state.selectedAttribute as LinkableHashMap)}></SelectableAttributesList>
-                </VBox>
-                : null;
+		if (this.rootTreeNode)
+			var ui:JSX.Element = Weave.IS(this.state.selectedAttribute, ILinkableHashMap) && this.state.leafNode
+				?	<VBox style={{flex:1}}>
+						<SelectableAttributesList  showLabelAsButton={ false } label={ this.state.label } columns={ this.state.selectedAttribute as ILinkableHashMap}></SelectableAttributesList>
+					</VBox>
+				:	null;
 
         let constrollerStyle:React.CSSProperties = {
             justifyContent:'flex-end',

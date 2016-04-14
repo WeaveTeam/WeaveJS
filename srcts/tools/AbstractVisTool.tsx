@@ -27,7 +27,7 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 import WeaveMenuItem = weavejs.util.WeaveMenuItem;
 import KeyFilter = weavejs.data.key.KeyFilter;
-import LinkableHashMap = weavejs.core.LinkableHashMap;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
@@ -107,14 +107,19 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
 	}
 
-	get selectableAttributes():Map<string, (IColumnWrapper|LinkableHashMap)>
+	get selectableAttributes():Map<string, (IColumnWrapper|ILinkableHashMap)>
 	{
-		return new Map<string, (IColumnWrapper | LinkableHashMap)>();
+		return new Map<string, (IColumnWrapper | ILinkableHashMap)>();
 	}
 	
 	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
 	{
-		var attrs = weavejs.util.JS.mapValues(this.selectableAttributes);
+		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
+	}
+	
+	static initSelectableAttributes(selectableAttributes:Map<string, (IColumnWrapper|ILinkableHashMap)>, input:(IAttributeColumn | IColumnReference)[]):void
+	{
+		var attrs = weavejs.util.JS.mapValues(selectableAttributes);
 		ColumnUtils.initSelectableAttributes(attrs, input);
 	}
 	
