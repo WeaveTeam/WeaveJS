@@ -186,7 +186,6 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	constructor(props:IFixedDataTableProps)
 	{
 		super(props);
-		var columnWidths = _.zipObject(props.columnIds, this.props.columnIds.map((id)=>{return this.props.initialColumnWidth})) as { [columnId: string]: number; };
 		var sortIndices:number[] = this.props.rows.map((row, index) => index);
 		var headerIndices:number[] = [];
 
@@ -194,7 +193,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			this.lastClicked = props.selectedIds.length - 1;
 
 		this.state = {
-			columnWidths,
+			columnWidths: {},
 			sortIndices,
 			selectedIds: props.selectedIds,
 			probedIds: props.probedIds,
