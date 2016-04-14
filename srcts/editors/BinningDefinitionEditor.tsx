@@ -234,7 +234,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 													   ref={linkReactStateRef(this, {value: this._customSplit.splitValues})}
 													   disabled={!this.isRadioSelected(this._customSplit)}/>
 									<HelpIcon style={iyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+										{Weave.lang('Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
@@ -253,7 +253,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 													   disabled={!this.isRadioSelected(this._quantile)}
 													   ref={linkReactStateRef(this, {value: this._quantile.refQuantile})}/>
 									<HelpIcon style={iyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+										{Weave.lang('Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
@@ -273,7 +273,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 													   type="text"
 													   ref={linkReactStateRef(this, {value: this._equalInterval.dataInterval})}/>
 									<HelpIcon style={iyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+										{Weave.lang('Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
@@ -287,7 +287,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<HelpIcon style={iyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+										{Weave.lang('Six bins will be created for standard deviations above and below the mean value.')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
@@ -306,7 +306,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 													   disabled={!this.isRadioSelected(this._jenks)}
 													   ref={linkReactStateRef(this, {value: this._jenks.numOfBins})}/>
 									<HelpIcon style={iyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+										{Weave.lang('The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
@@ -320,7 +320,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<HelpIcon style={iyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+										{Weave.lang('One bin will be created for each unique string value in the column.')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
@@ -339,7 +339,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<HelpIcon style={iyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+										{Weave.lang('The data will not be binned.')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
