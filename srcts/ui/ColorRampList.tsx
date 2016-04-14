@@ -51,11 +51,6 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 		}
 	}
 	
-	componentDidMount()
-	{
-		this.forceUpdate(); // force update to get the correct size for the table
-	}
-	
 	componentWillReceiveProps(nextProps:ColorRampListProps)
 	{
 		if(nextProps.selectedColors)
@@ -65,12 +60,6 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 			});
 		}
 	}
-	
-	componentWillUpdate()
-	{
-		this.tableContainerElement = ReactDOM.findDOMNode(this.tableContainer) as HTMLElement;
-	}
-	
 	
 	handleTableSelection = (id:string[]) =>
 	{
@@ -100,18 +89,14 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 		});
 
 		return (
-			<VBox style={{flex: 1}} ref={(c:VBox) => this.tableContainer = c}>
-				{
-					this.tableContainerElement && 
-					<FixedDataTable columnIds={["id", "value"]} 
-									idProperty="id" rows={rows} 
-									columnTitles={this.columnTitles} 
-									showIdColumn={false}
-									selectedIds={[selectedId]}
-									initialColumnWidth={this.tableContainerElement.clientWidth}
-									onSelection={this.handleTableSelection}/>
-				}
-			</VBox>
+			<FixedDataTable columnIds={["id", "value"]} 
+							idProperty="id" rows={rows} 
+							columnTitles={this.columnTitles} 
+							showIdColumn={false}
+							selectedIds={[selectedId]}
+							allowResizing={false}
+							evenlyExpandRows={true}
+							onSelection={this.handleTableSelection}/>
 		);
 	}
 }
