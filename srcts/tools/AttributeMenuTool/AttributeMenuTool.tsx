@@ -90,6 +90,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
         var root = Weave.getRoot(selectedValues[0]);//get root hashmap
         var tool = Weave.followPath(root, this.targetToolPath.state as string[]) as IVisTool;//retrieve tool from targetTool Path
         var attrLabel = this.getLabelToAttributeMapping(this.targetAttribute.state as string, tool);//get correct target attribute name from label selected in dropdown
+        console.log("attrLabel", attrLabel);
         var path = (this.targetToolPath.state as string[]).slice(); path.push(attrLabel);//get the entire path
         let targetCol = ColumnUtils.hack_findInternalDynamicColumn(Weave.followPath(root, path) as IColumnWrapper);//retrieve column using that path
 
@@ -97,14 +98,14 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
         var selectedColumn = selectedValues[0] as IColumnWrapper;
 
         this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to re render
-        Weave.copyState(selectedColumn, (targetCol.getInternalColumn() as ReferencedColumn))
+        Weave.copyState(selectedColumn, (targetCol.getInternalColumn() as ReferencedColumn))//TODO handle selectable attributes hashmaps eg height columns barchart
 
     };
 
     renderEditor():JSX.Element{
         return(<VBox>
             <AttributeMenuTargetEditor attributeMenuTool={ this }/>
-            { renderSelectableAttributes(this) }
+            { renderSelectableAttributes(this, null) }
         </VBox>);
     }
 
@@ -114,7 +115,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
         switch(this.layoutMode.value){
             case(LAYOUT_LIST):
-                return(<VBox><List options={ this.options }  onChange={ this.handleSelection } selectedValues={ [selectedAttribute] }/></VBox>);
+                return(<VBox><List options={ this.options }  onChange={ this.handleSelection.bind(this) } selectedValues={ [selectedAttribute] }/></VBox>);
             case(LAYOUT_HSLIDER):
                 return(<VBox style={{ padding: "70px" }}>
                     <HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type={ "categorical" }/></VBox>);
@@ -153,7 +154,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         Weave.getCallbacks(this.props.attributeMenuTool.targetToolPathWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
 
         this.props.attributeMenuTool.targetToolPath.addImmediateCallback(this, this.setTargetToolPathWatcher, true);
-        this.props.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.monitoringAttribute);
+        this.props.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
     }
 
     componentWillReceiveProps(nextProps:IAttributeMenuTargetEditorProps)
@@ -163,13 +164,13 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
             this.weaveRoot.childListCallbacks.removeCallback(this, this.getOpenVizTools);
             Weave.getCallbacks(this.props.attributeMenuTool.targetToolPathWatcher).removeCallback(this, this.forceUpdate);
             this.props.attributeMenuTool.targetToolPath.removeCallback(this, this.setTargetToolPathWatcher);
-            this.props.attributeMenuTool.targetAttribute.removeCallback(this, this.monitoringAttribute);
+            this.props.attributeMenuTool.targetAttribute.removeCallback(this, this.forceUpdate);
 
             this.weaveRoot = Weave.getRoot(nextProps.attributeMenuTool);
             this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizTools,true);//will be called whenever a new tool is added
             Weave.getCallbacks(nextProps.attributeMenuTool.targetToolPathWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
             nextProps.attributeMenuTool.targetToolPath.addImmediateCallback(this, this.setTargetToolPathWatcher, true);
-            nextProps.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.monitoringAttribute);
+            nextProps.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
         }
 
 
@@ -188,6 +189,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
             if(tool.selectableAttributes && tool != this.props.attributeMenuTool)//excluding AttributeMenuTool from the list
                 this.openTools.push(this.weaveRoot.getName(tool));
         });
+        //this.openTools.unshift({label:"Select a visualization", value:''});
         this.setState({openTools: this.openTools});
     };
 
@@ -208,13 +210,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         this.props.attributeMenuTool.layoutMode.state = selectedItem;// will re render the tool with new layout
     };
 
-    //callback for the attribute
-    monitoringAttribute = ():void =>{
-        console.log("target Attribute callback");
-        console.log("attribute label", this.props.attributeMenuTool.targetAttribute.state);
-        this.forceUpdate();
-    };
-
     //callback for targetToolPath
     setTargetToolPathWatcher = ():void=>{
         var amt = this.props.attributeMenuTool;
@@ -226,19 +221,22 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         if(this.props.attributeMenuTool.targetToolPath.state)
             return Weave.followPath(this.weaveRoot, this.props.attributeMenuTool.targetToolPath.state as string[]) as IVisTool;
     }
-    getTargetToolAttributeOptions():{label: string, value: string}[] {
+    getTargetToolAttributeOptions():string[] {
         let tool:IVisTool = this.tool;
-        let attributes:{label:string, value: string}[] = [];
+        let attributes:string[] =[];
+        if(tool) attributes= Array.from(tool.selectableAttributes.keys()) as string[];
+       /* let attributes:{label:string, value: string}[] = [];
 
         if(tool){
-            for (let [label, attribute] of tool.selectableAttributes.entries())
+            for (var [label, attribute] of tool.selectableAttributes.entries())
             {
                 let path = Weave.findPath(this.weaveRoot, attribute);
                 let value = lodash.last(path);
 
                 attributes.push({label, value});
             }
-        }
+        }*/
+
         return attributes;
     }
 
@@ -248,6 +246,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
     };
 
     getTargetAttribute = ():string =>{
+        let amt = this.props.attributeMenuTool;
         var tool:IVisTool= this.tool;
         var path:string[];
         if(tool) {
@@ -264,25 +263,24 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         var attributeValue :string;
         var menuLayout:string = this.props.attributeMenuTool.layoutMode.state as string;
 
+        /*console.log("attribuite selections", this.getTargetToolAttributeOptions());
+        console.log("target attribute", this.props.attributeMenuTool.targetAttribute.state);*/
         if(this.props.attributeMenuTool.targetToolPath.state){
             toolName = this.getTargetToolPath();
             attributeValue = this.getTargetAttribute();
         }
 
-         console.log('toolName', toolName);
-         console.log('attributeValue', attributeValue );
-         //console.log('open tools in toolconfigs', this.openTools);
 
         return[
             [
                 Weave.lang("Visualization Tool"),
-                <Dropdown className="weave-sidbar-dropdown" value={ toolName }
+                <Dropdown className="weave-sidbar-dropdown" value={ toolName } selectFirstOnInvalid={ true }
                             options={ this.openTools } onChange={ this.handleTargetToolChange } />
             ],
             [
                 Weave.lang("Visualization Attribute"),
 
-                <Dropdown className="weave-sidebar-dropdown" value={ attributeValue }
+                <Dropdown className="weave-sidebar-dropdown"  selectFirstOnInvalid={ true }
                             options={ this.getTargetToolAttributeOptions() } onChange={ this.handleTargetAttributeChange }  />
             ],
             [
