@@ -219,23 +219,23 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right) }</div>
 				</HBox>
 
-				{ReactUtils.generateTable(
-					null,
-					[
-						["Title", this.panelTitle],
-						["X Axis Title", this.xAxisName],
-						["Y Axis Title", this.yAxisName]
-					].map((row:[string, LinkableString]) => [
-						Weave.lang(row[0]),
-						<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>
-					]),
-					{
-						table: {width: "100%"},
-						td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
-					}
-				)}
+				{this.renderGridLayout()}
 			</VBox>
 		);
+	}
+
+	renderGridLayout=():JSX.Element=>
+	{
+		var gridUIs:JSX.Element[][] = [
+			["Title", this.panelTitle],
+			["X Axis Title", this.xAxisName],
+			["Y Axis Title", this.yAxisName]
+		].map((row:[string, LinkableString]) => {
+			return [<span className="ui label" style={ {width:"100%"} }>{Weave.lang(row[0])}</span>,
+					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) } style={ {width:"100%"} }/>]
+		});
+
+		return ReactUtils.generateGridLayout(["four","twelve"],gridUIs);
 	}
 
 	get deprecatedStateMapping():Object

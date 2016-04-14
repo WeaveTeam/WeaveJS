@@ -22,6 +22,7 @@ import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import ControlPanel from "./ControlPanel";
+import ReactUtils from "../utils/ReactUtils";
 
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|ILinkableHashMap>
@@ -73,6 +74,22 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
     };
 
+    renderGridLayout=():JSX.Element=>
+    {
+        /*var gridUIs:JSX.Element[][] = [
+            ["Title", this.panelTitle],
+            ["X Axis Title", this.xAxisName],
+            ["Y Axis Title", this.yAxisName]
+        ].map((row:[string, LinkableString]) => {
+            return [<span className="ui label" style={ {width:"100%"} }>{Weave.lang(row[0])}</span>,
+                <StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) } style={ {width:"100%"} }/>]
+        });
+
+        return ReactUtils.generateGridLayout(["four","twelve"],gridUIs);*/
+
+        return null
+    }
+
     render():JSX.Element
     {
         //styles
@@ -83,7 +100,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             fontSize: 'smaller'
         };
         var btnStyle:React.CSSProperties = {
-            fontSize: 'smaller',
+            fontSize: '24px',
             padding:"2px"
         };
 
@@ -93,7 +110,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         };
 
 
-        var selectableUI:JSX.Element[] = [];
+        var selectableUI:JSX.Element[][] = [];
+        var listUI:JSX.Element[] = [];
         let alwaysDefinedCol:boolean;
         let defaultValue:any;
 
@@ -110,32 +128,32 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                     defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
                 }
 
-                let elem = (
-					<VBox key={ label }>
-	                    <HBox className="weave-padded-hbox" style={{justifyContent: 'space-around', alignItems: 'center'}}>
-	                        { this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null }
+                let labelUI:JSX.Element = this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null;
+                let moreDataSourceLabel:string = " > "
+                let elements:JSX.Element[] = [
+	                        labelUI,
 	                        <AttributeDropdown title="Change column"
-	                                           style={ {flex:1} }
+	                                           style={ {flex:1,width:"100%"} }
 	                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
-	                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>
+	                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>,
 	                        <IconButton style={ btnStyle }
 	                                    toolTip={"Explore data sources"}
-	                                    clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }>...</IconButton>
-	                    </HBox>
-	
-	                    {/* alwaysDefinedCol ? <input type="text" defaultValue={defaultValue}/> : null */}
-	                </VBox>
-				);
-                selectableUI.push(elem);
+	                                    clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }> {moreDataSourceLabel} </IconButton>];
+                selectableUI.push(elements);
             }
             else{//LinkableHashMap
                 let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
                 let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
-                selectableUI.push(elem);
+                listUI.push(elem);
             }
         });
 
-        return (<VBox style={{flex:1}}>{selectableUI}</VBox>);
+        let gridLayout:JSX.Element = ReactUtils.generateGridLayout(["three", "eleven","two"],selectableUI)
+
+        return (<VBox style={{flex:1}}>
+                    {gridLayout}
+                    {listUI}
+                </VBox>);
     }
 }
 
@@ -154,7 +172,6 @@ interface IAttributeDropdownState {
 class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttributeDropdownState>{
     constructor(props:IAttributeDropdownProps){
         super(props);
-        this.componentWillReceiveProps(props);
     }
 
     componentWillReceiveProps(nextProps:IAttributeDropdownProps)
@@ -217,7 +234,8 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
         options.push({ value: null, label: Weave.lang("(None)") });
 
         return <Dropdown valueEqualityFunc={AttributeDropdown.nodeEqualityFunc}
-            value={currentColumnNode}
+                         style={ this.props.style }
+                         value={currentColumnNode}
             onClick={clickHandler}
             options={options}
             onChange={this.onChange}/>;
