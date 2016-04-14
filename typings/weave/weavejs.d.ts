@@ -2995,6 +2995,17 @@ declare module weavejs.api.ui {
     var IEditorManager: new (..._: any[]) => IEditorManager;
 }
 declare module weavejs.api.ui {
+    interface IInitSelectableAttributes {
+        /**
+         * This will initialize the selectable attributes using a list of columns and/or column references.
+         * Tools can override this function for different behavior.
+         * @param input An Array of IAttributeColumn and/or IColumnReference objects
+         */
+        initSelectableAttributes(input: any[]): void;
+    }
+    var IInitSelectableAttributes: new (..._: any[]) => IInitSelectableAttributes;
+}
+declare module weavejs.api.ui {
     /**
      * An Object with a description.
      */
@@ -3600,7 +3611,6 @@ declare module weavejs.core {
     class LinkableString extends LinkableVariable {
         constructor(defaultValue?: string, verifier?: Function, defaultValueTriggersCallbacks?: boolean);
         value: string;
-        getSessionState(): Object;
         setSessionState(value: Object): void;
     }
 }
@@ -4344,12 +4354,16 @@ declare module weavejs.data {
         static getAllCommonMetadata(columns: any[]): Object;
         static sortMetadataPropertyNames(names: any[]): void;
         /**
+         * Finds a set of columns from available data sources, preferring ones that are already in use.
+         */
+        static findFirstDataSet(root: ILinkableHashMap): Array<IColumnReference>;
+        /**
          * This will initialize selectable attributes using a list of columns and/or column references.
          * @param selectableAttributes An Array of IColumnWrapper and/or ILinkableHashMaps to initialize.
          * @param input An Array of IAttributeColumn and/or IColumnReference objects. If not specified, getColumnsWithCommonKeyType() will be used.
          * @see #getColumnsWithCommonKeyType()
          */
-        static initSelectableAttributes(selectableAttributes: any[], input?: any[]): void;
+        static initSelectableAttributes(selectableAttributes: Array<IColumnWrapper | ILinkableHashMap>, input?: Array<IAttributeColumn | IColumnReference>): void;
         /**
          * Gets a list of columns with a common keyType.
          */

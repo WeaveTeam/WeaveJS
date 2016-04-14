@@ -29,6 +29,9 @@ import WeaveMenuItem = weavejs.util.WeaveMenuItem;
 import KeyFilter = weavejs.data.key.KeyFilter;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import IColumnReference = weavejs.api.data.IColumnReference;
+import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
+import ColumnUtils = weavejs.data.ColumnUtils;
 
 export class Margin
 {
@@ -55,13 +58,8 @@ export interface VisToolGroup
 Weave.registerClass(Margin, "weavejs.tool.Margin");
 Weave.registerClass(OverrideBounds, "weavejs.tool.OverrideBounds");
 
-export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems
+export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems, IInitSelectableAttributes
 {
-	get selectableAttributes():Map<string, (IColumnWrapper|LinkableHashMap)>
-	{
-		return new Map<string, (IColumnWrapper | LinkableHashMap)>();
-	}
-
 	constructor(props:P)
 	{
 		super(props);
@@ -109,6 +107,17 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
 	}
 
+	get selectableAttributes():Map<string, (IColumnWrapper|LinkableHashMap)>
+	{
+		return new Map<string, (IColumnWrapper | LinkableHashMap)>();
+	}
+	
+	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
+	{
+		var attrs = weavejs.util.JS.mapValues(this.selectableAttributes);
+		ColumnUtils.initSelectableAttributes(attrs, input);
+	}
+	
 	private static createFromSetToSubset(set: KeySet, filter:KeyFilter):void
 	{
 		filter.replaceKeys(false, true, set.keys, null);
