@@ -60,7 +60,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let columnIds:{label:string, value:any}[] = ds.getColumnIds().map( (id, index) => {
 			return {label: id.toString(), value: id}
 		});
-		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: ""});
+		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("URL"),
