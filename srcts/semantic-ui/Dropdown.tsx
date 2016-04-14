@@ -31,7 +31,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	{
 		super(props);
 		this.state = {
-			value: this.props.value || null
+			value: this.props.value === undefined ? null : this.props.value
 		}
 	}
 	
