@@ -5,8 +5,6 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 
 
 import CellProps = FixedDataTable.CellProps;
-import QKey = weavejs.data.key.QKey;
-import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ResizingDiv, {ResizingDivState} from "../react-ui/ResizingDiv";
 import SmartComponent from "../ui/SmartComponent";
 
@@ -173,8 +171,6 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		columnIds:[],
 		enableHover:true,
 		enableSelection:true,
-		selectedIds: [],
-		probedIds: [],
 		showIdColumn:false,
 		rowHeight:30,
 		headerHeight:30,
@@ -195,8 +191,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		this.state = {
 			columnWidths: {},
 			sortIndices,
-			selectedIds: props.selectedIds,
-			probedIds: props.probedIds,
+			selectedIds: props.selectedIds || [],
+			probedIds: props.probedIds || [],
 			width: props.width,
 			height: props.height
 		};
@@ -396,10 +392,10 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			newState.sortIndices = nextProps.rows.map((row, index) => index);
 
 		if(nextProps.probedIds)
-			newState.probedIds = nextProps.probedIds;
+			newState.probedIds = nextProps.probedIds.concat([]);
 		
 		if(nextProps.selectedIds)
-			newState.selectedIds = nextProps.selectedIds;
+			newState.selectedIds = nextProps.selectedIds.concat([]);
 		
 		this.setState(newState);
 		this.forceUpdate(); // why is this being done
