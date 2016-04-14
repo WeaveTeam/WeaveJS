@@ -12,8 +12,9 @@ import {IColumnTitles} from "../tools/FixedDataTable";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
+import LinkableString = weavejs.core.LinkableString;
+import LinkableNumber = weavejs.core.LinkableNumber;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
-
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import AbstractBinningDefinition = weavejs.data.bin.AbstractBinningDefinition;
 import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
@@ -77,29 +78,21 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		}
 	}
 
-	private linkOverrideMin = (ref:StatefulTextField) =>
+	private linkOverride(property:"overrideInputMin"|"overrideInputMax")
 	{
 		for(var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
 		{
-			var abd:AbstractBinningDefinition = def;
-			if(abd && abd.overrideInputMin)
+			var abd:any = def;
+			if(abd[property] && this.isRadioSelected(def))
 			{
-				linkReactStateRef(ref, {value: abd.overrideInputMin}, 500)
+				return linkReactStateRef(this, {value: abd[property]}, 500);
 			}
 		}
 	}
 	
-	/* can be merged into single function with second argument */
-	private linkOverrideMax = (ref:StatefulTextField) =>
+	private linkBinningDefinition(value:LinkableString|LinkableNumber)
 	{
-		for(var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
-		{
-			var abd:AbstractBinningDefinition = def;
-			if(abd && abd.overrideInputMax)
-			{
-				linkReactStateRef(ref, {value: abd.overrideInputMax}, 500)
-			}
-		}
+		return linkReactStateRef(this, {value}, 500);
 	}
 	
 	private hasOverrideMinAndMax()
@@ -223,7 +216,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<StatefulTextField disabled={!this.isRadioSelected(this._simple)}
 													   style={inputStyle}
 													   type="number"
-													   ref={linkReactStateRef(this, {value: this._simple.numberOfBins}, 500)}/>
+													   ref={this.linkBinningDefinition(this._simple.numberOfBins)}/>
 								<HelpIcon style={iyle}>
 										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
 									</HelpIcon>
@@ -239,7 +232,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<StatefulTextField type="text" 
-													   ref={linkReactStateRef(this, {value: this._customSplit.splitValues}, 500)}
+													   ref={this.linkBinningDefinition(this._customSplit.splitValues)}
 													   disabled={!this.isRadioSelected(this._customSplit)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]')}
@@ -279,7 +272,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<StatefulTextField style={inputStyle}
 													   disabled={!this.isRadioSelected(this._equalInterval)}
 													   type="text"
-													   ref={linkReactStateRef(this, {value: this._equalInterval.dataInterval}, 500)}/>
+													   ref={this.linkBinningDefinition(this._equalInterval.dataInterval)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]')}
 									</HelpIcon>
@@ -312,7 +305,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									<StatefulTextField style={inputStyle}
 													   type="number"
 													   disabled={!this.isRadioSelected(this._jenks)}
-													   ref={linkReactStateRef(this, {value: this._jenks.numOfBins}, 500)}/>
+													   ref={this.linkBinningDefinition(this._jenks.numOfBins)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization')}
 									</HelpIcon>
@@ -362,8 +355,8 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<div style={{flex: 1, height: "100%", position: "relative"}}>
 								<div style={{position: "absolute", width: "100%", height: "100%"}}>
 									<HBox style={{fontSize: "smaller", position: "relative", width: "100%", height: "100%"}}>
-										<StatefulTextField style={{width: "50%"}} ref={this.linkOverrideMin} placeholder="min"/>
-										<StatefulTextField style={{width: "50%", marginLeft: 8}} ref={this.linkOverrideMax} placeholder="max"/>
+										<StatefulTextField type="number" style={{width: "50%"}} ref={this.linkOverride( "overrideInputMin")} placeholder="min"/>
+										<StatefulTextField type="number" style={{width: "50%", marginLeft: 8}} ref={this.linkOverride("overrideInputMax")} placeholder="max"/>
 									</HBox>
 								</div>
 							</div>
