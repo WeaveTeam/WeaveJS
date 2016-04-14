@@ -83,7 +83,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				xMin: NaN, xMax: NaN, yMin: NaN, yMax: NaN
 			});
 	};
-	renderEditor(): JSX.Element {
+
+	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(linkFunction:Function): JSX.Element {
 		let controlLocationOpts = [
 			{ vertical: "top", horizontal: "left" },
 			{ vertical: "top", horizontal: "right" },
@@ -150,6 +152,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		</VBox>;
 	}
 
+
+
 	static DEFAULT_PROJECTION:string = "EPSG:4326";
 
 	map:ol.Map;
@@ -158,9 +162,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	resolutionCallbackHandle:any;
 	private element:Element;
 
+	private static projectionVerifier(value:string):boolean
+	{
+		return !!ol.proj.get(value);
+	}
+
 	zoomBounds = Weave.linkableChild(this, ZoomBounds);
 	extentOverride = Weave.linkableChild(this, OverrideBounds);
-	projectionSRS = Weave.linkableChild(this, LinkableString);
+	projectionSRS = Weave.linkableChild(this, new LinkableString("EPSG:3857", OpenLayersMapTool.projectionVerifier));
 	interactionMode = Weave.linkableChild(this, LinkableString);
 
 	layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
@@ -491,6 +500,17 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	{
 		var dataBounds = new weavejs.geom.Bounds2D();
 		this.zoomBounds.getDataBounds(dataBounds);
+
+		if (dataBounds.isEmpty())
+		{
+			let proj = ol.proj.get(this.projectionSRS.value)
+			if (proj)
+			{
+				dataBounds.setCoords(proj.getExtent());
+				this.zoomBounds.setDataBounds(dataBounds);
+				return;	
+			}
+		}
 		var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
 		var scale = this.zoomBounds.getXScale() || 1;
 		let view = this.map.getView();
@@ -618,6 +638,23 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				<div ref={(c:HTMLElement) => {this.element = c;}}/>
 			</ResizingDiv>
 		);
+	}
+
+	getExtent():weavejs.geom.Bounds2D
+	{
+		let bounds = new weavejs.geom.Bounds2D();
+		let viewExtent:ol.Extent = this.map.getView().get("extent");
+		if (viewExtent)
+		{
+			bounds.setCoords(viewExtent);
+		}
+		else
+		{
+			for (let layer of this.layers.getObjects() as AbstractLayer[]) {
+				bounds.includeBounds(layer.getExtent());
+			}
+		}
+		return bounds;
 	}
 
 	zoomToSelection(inputKeys:Array<IQualifiedKey> = null, zoomMarginPercent:number = 0.2):void

@@ -125,7 +125,7 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
                                     toolTip="click to close Sidebar"/>
                     </div>
 
-                    <div style={ {padding:"8px",display:"inherit",flexDirection:"inherit"} }>
+                    <div style={ {padding:"8px",display:"flex",flexDirection:"inherit",flex:1} }>
                         {this.props.children}
                     </div>
                 </div>

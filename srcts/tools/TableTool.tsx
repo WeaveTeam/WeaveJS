@@ -162,10 +162,11 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			.set("Columns", this.columns);
 	}
 
-	renderEditor():JSX.Element {
+	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(linkFunction:Function):JSX.Element {
 		return(
-			<VBox>
-				{renderSelectableAttributes(this)}
+			<VBox style={{flex:1}}>
+				{renderSelectableAttributes(this,linkFunction)}
 			</VBox>
 		)
 	};

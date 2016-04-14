@@ -44,19 +44,27 @@ export default class ColorController extends React.Component<ColorControllerProp
 		ColorController.window = null;
 	}
 
-	static open(colorColumn:ColorColumn)
+	static open(colorColumn:ColorColumn, binColumn:BinnedColumn, dataColumn:FilteredColumn)
 	{
 		if(ColorController.window)
 			PopupWindow.close(ColorController.window);
 
 		ColorController.window = PopupWindow.open({
 			title: Weave.lang("Color Controller"),
-			content: <ColorController colorColumn={colorColumn}/>,
+			content: <ColorController colorColumn={colorColumn} binColumn={binColumn} dataColumn={dataColumn}/>,
 			resizable: true,
 			width: 920,
 			height: 675,
 			onClose: ColorController.close
 		});
+	}
+	
+	handleFilterCheck = (value:boolean) =>
+	{
+		if(value)
+			this.props.dataColumn.filter.targetPath = ["defaultSubsetKeyFilter"];
+		else
+			this.props.dataColumn.filter.targetPath = null;
 	}
 	
 	render():JSX.Element
@@ -69,9 +77,9 @@ export default class ColorController extends React.Component<ColorControllerProp
 					  tabs={[
 						  <VBox className="weave-container weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1}}>
 							  <SelectableAttributeComponent attributes={this.attributes}/>
-							  <BinningDefinitionEditor/>
+							  <BinningDefinitionEditor binnedColumn={this.props.binColumn}/>
 							  <HBox>
-							  	  <Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {checked: this.props.colorColumn.rampCenterAtZero})}/>
+							  	  <Checkbox style={{marginRight: 5}} onChange={this.handleFilterCheck}/>
 								  <span style={{alignSelf: "center"}}>
 								  	 {Weave.lang("Filter records prior to binning")}
 								  </span>

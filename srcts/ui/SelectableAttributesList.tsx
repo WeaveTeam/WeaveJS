@@ -68,10 +68,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         };
 
         var listStyle:React.CSSProperties = {
-            maxHeight: '100px',
             minHeight: '70px',
             overflowY: 'auto',
-            border:'1px solid #dcdcdc'
+            border:'1px solid lightgrey',
+            flex:1
         };
 
         let constrollerStyle:React.CSSProperties = {
@@ -82,7 +82,8 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         }
         let styleObj:React.CSSProperties = {
             padding:"4px",
-            marginTop:"0"
+            marginTop:"0",
+            flex:1
         }
 
         var selectedObjects:IAttributeColumn[];
@@ -110,10 +111,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         return(<VBox className="weave-padded-vbox" style={styleObj}>
                     {labelUI}
 
-                    <div >
-                        <div style={listStyle}>
+                    <VBox className="weave-padded-vbox" style={{flex:1}}>
+                        <HBox style={listStyle}>
                             <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
-                        </div>
+                        </HBox>
 
                         <HBox className="weave-padded-hbox" style={constrollerStyle}>
                             <IconButton clickHandler={ this.handleSelectAll }
@@ -121,7 +122,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
                             <IconButton clickHandler={ this.removeSelected }
                                         style={ {borderColor:"grey", fontSize:"12px"} }>Remove Selected</IconButton>
                         </HBox>
-                    </div>
+                    </VBox>
                </VBox>);
     }
 }

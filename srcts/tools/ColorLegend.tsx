@@ -382,9 +382,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			.set("Color Data", this.dynamicColorColumn);
 	}
 
-	renderEditor ():JSX.Element{
+	renderEditor (linkFunction:any = null):JSX.Element{
 		return(<VBox>
-			{renderSelectableAttributes(this)}
+			{renderSelectableAttributes(this,linkFunction)}
 			{ReactUtils.generateTable(
 				null,
 				[

@@ -4,15 +4,18 @@ import $ from "../modules/jquery";
 import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
 
+export type DropDownOption = (string | { label: string, value: any } | { label: number, value: any });
+
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
-	options: (string | { label: string, value: any })[];
+	options:DropDownOption[];
 	value?:any;
 	onChange?:(value:any)=>void;
 	selectFirstOnInvalid?:boolean;
 	context?:Element;
 	direction?:string;
 	valueEqualityFunc?: (valueA:any,valueB:any)=>boolean;
+	allowAdditions?:boolean;
 }
 
 export interface DropdownState
@@ -28,7 +31,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	{
 		super(props);
 		this.state = {
-			value: this.props.value || null
+			value: this.props.value === undefined ? null : this.props.value
 		}
 	}
 	
@@ -80,7 +83,8 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				this.props.onClick && this.props.onClick(null);
 			},
 			context: this.props.context || null,
-			direction: this.props.direction || 'auto'
+			direction: this.props.direction || 'auto',
+			allowAdditions: this.props.allowAdditions || false
 		});
 		let index = this.getIndexFromValue(this.state.value);
 		let option = this.props.options[index];

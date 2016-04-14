@@ -192,11 +192,16 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                                         {label, selectedAttribute, selectableAttributes});
     }
 
+    static openInWeaveToolEditor(title:string,label:string, selectedAttribute:IColumnWrapper|LinkableHashMap, selectableAttributes:Map<string, (IColumnWrapper|LinkableHashMap)>):any{
+        let weave = Weave.getWeave(selectedAttribute);
+        return  {title:title,label:label,toolClass:AttributeSelector, toolProps:{label, selectedAttribute, selectableAttributes}};
+    }
+
     render():JSX.Element
     {
         if(this.rootTreeNode)
             var ui:JSX.Element = this.state.selectedAttribute instanceof LinkableHashMap && this.state.leafNode ?
-                <VBox>
+                <VBox style={{flex:1}}>
                     <SelectableAttributesList  showLabelAsButton={ false } label={ this.state.label } columns={ (this.state.selectedAttribute as LinkableHashMap)}></SelectableAttributesList>
                 </VBox>
                 : null;
@@ -213,18 +218,20 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         //console.log("selected nodes", selectedNodes);
 
         return (
-            <VBox className="weave-padded-vbox" style={ {flex:1,padding:"4px"} }>
+            <VBox className="weave-padded-vbox weave-container" style={ {flex:1,border:"none"} }>
 
                 <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar>
 
-                <HDividedBox style={ {flex:1 ,border:"1px solid #E6E6E6"} } loadWithEqualWidthChildren={true}>
+                <HDividedBox style={ {flex:1 ,border:"1px solid lightgrey"} } space={8} loadWithEqualWidthChildren={true}>
                     <div>
                         <WeaveTree searchFilter={ this.searchFilter }
-                                   hideRoot = {true} hideLeaves = {true}
-                                   onSelect={this.onHierarchySelected}
-                                   root={this.rootTreeNode}
-                                   ref={ (c) => { this.tree = c; } }/>
+                                    hideRoot = {true} hideLeaves = {true}
+                                    onSelect={this.onHierarchySelected}
+                                    root={this.rootTreeNode}
+                                    ref={ (c) => { this.tree = c; } }/>
                     </div>
+
+
 
                     <VBox>
                         {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter }
@@ -236,16 +243,18 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                                                           ref={ (c) => { this.leafTree = c; } }/>
                             : null}
 
-                        {Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.leafNode ?
-                        <HBox className="weave-padded-hbox" style={ constrollerStyle }>
+
+                    </VBox>
+                </HDividedBox>
+                {
+                    Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.leafNode ?
+                        <HBox className="weave-padded-hbox" style={ constrollerStyle } >
                             <IconButton clickHandler={ this.handleSelectAll }
                                         style={ {borderColor:"grey", fontSize:"smaller"} }>Select All</IconButton>
                             <IconButton clickHandler={ this.addSelected }
                                         style={ {borderColor:"grey", fontSize:"smaller"} }>Add Selected</IconButton>
                         </HBox>
-                            : null}
-                    </VBox>
-                </HDividedBox>
+                        : null}
 
                 {ui}
             </VBox>

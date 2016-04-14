@@ -7,6 +7,8 @@ import * as WeaveUI from "../WeaveUI";
 
 import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
+import BinnedColumn = weavejs.data.column.BinnedColumn;
+import FilteredColumn = weavejs.data.column.FilteredColumn;
 
 export default class ToolsMenu implements MenuBarItemProps
 {
@@ -36,7 +38,11 @@ export default class ToolsMenu implements MenuBarItemProps
 		this.menu = [
 			{
 				label: Weave.lang("Color Controller"),
-				click: () => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)
+				click: () => ColorController.open(
+					this.weave.getObject("defaultColorColumn") as ColorColumn, 
+					this.weave.getObject("defaultColorBinColumn") as BinnedColumn,
+					this.weave.getObject("defaultColorDataColumn") as FilteredColumn
+				)
 			},
 			{}
 		];

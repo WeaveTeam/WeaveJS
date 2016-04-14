@@ -40,6 +40,8 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 		super();
 		this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
 		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
+		this.radiusNorm.min.value = 3;
+		this.radiusNorm.max.value = 25;
 		for (let obj of [this.fill, this.line, this.radius])
 			Weave.getCallbacks(obj).addGroupedCallback(this, this.updateStyleData, true)
 	}

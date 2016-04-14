@@ -28,6 +28,8 @@ export type EditableField = [
 	(string | {label: string, value: any })[]
 ] | LinkableVariable;
 
+import Bounds2D = weavejs.geom.Bounds2D;
+
 export default class AbstractLayer implements ILinkableObject
 {
 	opacity = Weave.linkableChild(this, new LinkableNumber(1));
@@ -41,6 +43,11 @@ export default class AbstractLayer implements ILinkableObject
 		return {
 			alpha: this.opacity
 		};
+	}
+
+	getExtent():Bounds2D
+	{
+		return new Bounds2D();
 	}
 
 	private renderEditableField(value:EditableField, key:string):[string, JSX.Element]

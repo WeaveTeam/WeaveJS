@@ -53,6 +53,7 @@ export interface IHDividedBoxState {
 //todo option to disable live dragging
 export interface IHDividedBoxProps extends React.HTMLProps<HDividedBox> {
 	loadWithEqualWidthChildren?:boolean;
+	space?:number;
 }
 export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBoxState>
 {
@@ -81,7 +82,12 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 		React.Children.forEach(this.props.children,function(child:ReactNode , index:number) {
 			this.leftChildWidths[index] = String(100/childCount) + "%";
 		}.bind(this));
+
+		this.childHeight = 100
 	}
+
+	//temp solution to handle child which has only one child that is abolute,
+	private childHeight:number = NaN
 
 	state:IHDividedBoxState = {
 		activeResizerIndex:NaN,
@@ -182,19 +188,32 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 				overflow:"auto"
 			};
 
-			if(childCount - 1 == index){ //last child takes rest of the space
-				childStyle.flex = 1;
-			}
+
 			//set left child width 
 			if(this.state.dragging)
 			{
 				// if index is not there undefined comes, browser ignores one without the value
 				// and browser Layout mechanism set the width values
 				childStyle.width = (this.state.activeResizerIndex == index) ?  this.state.resizingLeftChildWidth : this.leftChildWidths[index];
+				//if(!isNaN(this.childHeight))
+					//childStyle.height = this.childHeight;
 			}
 			else 
 			{
 				childStyle.width = this.leftChildWidths[index];
+				//if(!isNaN(this.childHeight))
+					//childStyle.height = this.childHeight;
+			}
+
+			if(this.props.space)
+			{
+				if(childCount - 1 != index){ //margin right is ignored in last child
+					childStyle.marginRight = String(this.props.space/2) + "px";
+				}
+			}
+
+			if(childCount - 1 == index){ //last child takes rest of the space
+				childStyle.flex = 1;
 			}
 
 			var childRef:string = "child"+index;
@@ -210,13 +229,20 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 
 			/* ***** Resizer ****** */
 
+
 			//resizer is added right after every child except last child
 			if(childCount - 1 !== index) // resizer not required for last child
 			{
+				let resizerStyle:React.CSSProperties = {};
+				if(this.props.space)
+				{
+					resizerStyle.marginRight = String(this.props.space/2) + "px";
+				}
 				// index matches with left child
 				var ref:string = "resizer"+index;
 				var resizerUI:JSX.Element = <Resizer key={ref}
 													 ref={ref}
+													 style={resizerStyle}
 													 type={VERTICAL}
 													 onMouseDown = { this.resizerMouseDownHandler.bind(this,index) }/>;
 
@@ -225,7 +251,10 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			
 		}.bind(this));
 
-		return <div {...this.props as React.HTMLAttributes} style={HDividedBox.style(this.props.style)}>
+		var styleObj:React.CSSProperties = HDividedBox.style(this.props.style);
+		styleObj.position = "relative"; //important to accommodate if any children is absolute
+
+		return <div {...this.props as React.HTMLAttributes} style={ styleObj }>
 					{childrenUI}
 				</div>;
 	}
@@ -243,12 +272,13 @@ class Resizer extends React.Component<IResizerProps, {}> {
 
 
 	render(){
-		var styleObj:React.CSSProperties = {
+		//order of merge important to copy props style as style readonly
+		var styleObj:React.CSSProperties = _.merge({},this.props.style,{
 			boxSizing: "border-box",
 			background:"#000",
 			opacity: .2,
 			backgroundClip: "padding-box",
-		};
+		});
 		
 
 		if(this.props.type === VERTICAL){

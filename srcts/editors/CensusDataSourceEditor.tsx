@@ -181,8 +181,8 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
-					{Weave.lang("Key Category")}
-					<HelpIcon>{Weave.lang("Key Categories are used to link tables using matching key columns.")}</HelpIcon>
+					{Weave.lang("Key Namespace")}
+					<HelpIcon>{Weave.lang("Key Namespaces are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
 				<KeyTypeInput style={{widtn: "100%"}}
 							  keyTypeProperty={ds.keyType}/>
