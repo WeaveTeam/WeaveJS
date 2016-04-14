@@ -181,6 +181,8 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 		var childCount:number = React.Children.count(this.props.children);
 
 		React.Children.forEach(this.props.children,function(child:ReactNode , index:number){
+			if(!child)// this case happen in react Composite element based on a condition sometimes null or empty string will come in place of react element
+				return
 
 			/* ***** Child ****** */
 

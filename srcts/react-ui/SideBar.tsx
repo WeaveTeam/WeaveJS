@@ -60,8 +60,7 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
         var defaultStyle:React.CSSProperties = {
             overflow:"auto",
             background:"#f8f8f8",
-            display:"flex",
-            position:"absolute"
+            display:"flex"
         };
 
         var closeButtonStyle:React.CSSProperties = {
@@ -125,12 +124,15 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
                                     toolTip="click to close Sidebar"/>
                     </div>
 
-                    <div style={ {padding:"8px",display:"flex",flexDirection:"inherit",flex:1} }>
-                        {this.props.children}
-                    </div>
+                        <div style={ {padding:"8px",display:"flex",flexDirection:"inherit",flex:1} }>
+                            {this.props.children}
+                        </div>
+
                 </div>
 		);
     }
 }
+
+
 
 
