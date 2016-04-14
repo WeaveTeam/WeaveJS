@@ -6,6 +6,9 @@ import HelpIcon from "../react-ui/HelpIcon";
 import Input from "../semantic-ui/Input";
 import Checkbox from "../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import FixedDataTable from "../tools/FixedDataTable";
+import {IRow} from "../tools/FixedDataTable";
+import {IColumnTitles} from "../tools/FixedDataTable";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -30,7 +33,7 @@ export interface BinningDefinitionEditorState
 {
 	
 }
-// stub
+
 export default class BinningDefinitionEditor extends React.Component<any, any>
 {
 	
@@ -59,6 +62,12 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		super(props);
 		this._binnedColumnWatcher.target = props.binnedColumn;
 	}
+	
+	componentDidMount()
+	{
+		// in order to get the 
+		this.forceUpdate();
+	}
 
 	private linkOverrideMin(ref:StatefulTextField)
 	{
@@ -78,13 +87,49 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		for(var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
 		{
 			var abd:AbstractBinningDefinition = def;
-			if(abd && abd.overrideInputMin)
+			if(abd && abd.overrideInputMax)
 			{
 				linkReactStateRef(ref, {value: abd.overrideInputMax})
 			}
 		}
 	}
 	
+	private hasOverrideMinAndMax()
+	{
+		var binDef:AbstractBinningDefinition = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
+		return binDef && binDef.overrideInputMin && binDef.overrideInputMax;
+	}
+	
+	generateBinTable()
+	{
+		var binDef:AbstractBinningDefinition = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
+		var rows:IRow[] = [];
+		if(binDef)
+		{
+			rows = binDef.getBinNames().map((binName, index) => {
+				return {
+					id: index,
+					value: binName
+				} as IRow;
+			});
+		}
+		
+		var columnTitles:IColumnTitles = {
+			id: "Key",
+			value: "Bin names"
+		};
+
+		return (
+			<FixedDataTable columnIds={["id", "value"]} 
+							idProperty="id" 
+							rows={rows}
+							columnTitles={columnTitles}
+							showIdColumn={false}
+							allowResizing={false}
+							evenlyExpandRows={true}/>
+		);
+	}
+
 	setBinningDefinition(value:boolean, binDef:AbstractBinningDefinition)
 	{
 		// if we are clicking on the already selected binning definition
@@ -302,18 +347,22 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 					</HBox>
 				</VBox>
 				<VBox className="weave-container" style={{flex: 1, minWidth: 350}}>
-					<HBox className="weave-padded-hbox" style={{alignItems: "center", height: 50}}> {/* temporary hack */}
-						<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range:")}</span>
-						<div style={{flex: 1, height: "100%", position: "relative"}}>
-							<div style={{position: "absolute", width: "100%", height: "100%"}}>
-								<HBox style={{fontSize: "smaller", position: "relative", width: "100%", height: "100%"}}>
-									<StatefulTextField style={{width: "50%"}} ref={() => this.linkOverrideMin} placeholder="min"/>
-									<StatefulTextField style={{width: "50%", marginLeft: 8}} ref={() => this.linkOverrideMax} placeholder="max"/>
-								</HBox>
+					{
+						this.hasOverrideMinAndMax() ?
+						<HBox className="weave-padded-hbox" style={{alignItems: "center", height: 50}}> {/* temporary hack */}
+							<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range:")}</span>
+							<div style={{flex: 1, height: "100%", position: "relative"}}>
+								<div style={{position: "absolute", width: "100%", height: "100%"}}>
+									<HBox style={{fontSize: "smaller", position: "relative", width: "100%", height: "100%"}}>
+										<StatefulTextField style={{width: "50%"}} ref={() => this.linkOverrideMin} placeholder="min"/>
+										<StatefulTextField style={{width: "50%", marginLeft: 8}} ref={() => this.linkOverrideMax} placeholder="max"/>
+									</HBox>
+								</div>
 							</div>
-						</div>
-					</HBox>
+						</HBox> : null
+					}
 					<HBox style={{flex: 1}}>
+						{this.generateBinTable()}
 					</HBox>
 				</VBox>
 			</HBox>
