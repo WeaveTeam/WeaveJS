@@ -200,6 +200,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         if(this.props.attributeMenuTool.targetToolPath.state)
             return Weave.followPath(this.weaveRoot, this.props.attributeMenuTool.targetToolPath.state as string[]) as IVisTool;
     }
+	
     getTargetToolAttributeOptions():string[] {
         let tool:IVisTool = this.tool;
         let attributes:string[] =[];
@@ -213,18 +214,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         return (toolPath[0] as string);
     };
 
-    getTargetAttribute = ():string =>{
-        let amt = this.props.attributeMenuTool;
-        var tool:IVisTool= this.tool;
-        var path:string[];
-        if(tool) {
-            var attributeName:string = this.props.attributeMenuTool.targetAttribute.state as string;
-            var attribute:ILinkableObject = tool.selectableAttributes.get(attributeName) as ILinkableObject;
-            path = Weave.findPath(this.weaveRoot, attribute);
-        }
-        return(lodash.last(path) as string);
-    };
-
     get toolConfigs():[string, JSX.Element][]{
 
         var toolName:string;
@@ -233,14 +222,13 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	    
         if(this.props.attributeMenuTool.targetToolPath.state){
             toolName = this.getTargetToolPath();
-            attributeValue = this.getTargetAttribute();
         }
 
 
         return[
             [
                 Weave.lang("Visualization Tool"),
-                <Dropdown className="weave-sidbar-dropdown" value={ toolName } selectFirstOnInvalid={ true }
+                <Dropdown className="weave-sidbar-dropdown" placeholder="Select a visualization" value={ toolName } selectFirstOnInvalid={ true }
                             options={ this.openTools } onChange={ this.handleTargetToolChange } />
             ],
             [
