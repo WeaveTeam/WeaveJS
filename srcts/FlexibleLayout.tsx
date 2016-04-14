@@ -259,7 +259,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 				for (var ii = 0; ii < childChildren.length; ii++)
 				{
 					var childChild:LayoutState = childChildren[ii];
-					childChild.flex *= child.flex;
+					childChild.flex *= child.flex || 1;
 					simpleChildren.push(childChild);
 				}
 			}
@@ -274,7 +274,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		//Scale flex values between 0 and 1 so they sum to 1, avoiding an apparent
 		//flex bug where space is lost if sum of flex values is less than 1.
 		for (var i = 0; i < state.children.length; i++)
-			state.children[i].flex = StandardLib.normalize(state.children[i].flex, 0, totalSizeChildren);
+			state.children[i].flex = StandardLib.normalize(state.children[i].flex || 1, 0, totalSizeChildren);
 
 		return state;
 	}
