@@ -162,7 +162,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	resolutionCallbackHandle:any;
 	private element:Element;
 
-	private static projectionVerifier(value:string):boolean
+	static projectionVerifier(value:string):boolean
 	{
 		return !!ol.proj.get(value);
 	}
@@ -651,7 +651,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		else
 		{
 			for (let layer of this.layers.getObjects() as AbstractLayer[]) {
-				bounds.includeBounds(layer.getExtent());
+				if (layer.visible.value)
+					bounds.includeBounds(layer.getExtent());
 			}
 		}
 		return bounds;
