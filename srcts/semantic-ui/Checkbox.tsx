@@ -37,12 +37,6 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	static defaultProps:CheckboxProps = {
 		type: ""
 	};
-
-	onClick=(event:React.MouseEvent)=>
-	{
-		if (this.props.stopPropagation)
-			event.stopPropagation();
-	};
 	
 	componentWillReceiveProps(nextProps:CheckboxProps)
 	{
@@ -61,9 +55,13 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	
 	handleChange=(event:React.MouseEvent)=>
 	{
+		if (this.props.stopPropagation)
+			event.stopPropagation();
+
 		this.setState({
 			value: !this.state.value
 		})
+
 		this.props.onChange && this.props.onChange(!this.state.value);
 	}
 
