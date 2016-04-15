@@ -48,9 +48,11 @@ export default class ToolsMenu implements MenuBarItemProps
 		];
 		
 		impls.forEach(impl => {
-			var name = registry.getDisplayName(impl);
+			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
+			if (impl == WeaveUI.DataFilterTool)
+				label += " (low priority)";
 			this.menu.push({
-				label: Weave.lang('+ {0}', name),
+				label: label,
 				click: this.createObject.bind(this, impl)
 			});
 		});

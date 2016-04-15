@@ -17,7 +17,7 @@ export default class DataMenu implements MenuBarItemProps
 
 		this.menu = [].concat(
 			{
-				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)...")}</FileInput>
+				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)... (not implemented yet)")}</FileInput>
 			},
 			{
 				enabled: this.getColumnsToExport().length > 0,
