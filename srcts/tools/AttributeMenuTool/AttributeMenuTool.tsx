@@ -79,10 +79,10 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
     };
 
-    renderEditor():JSX.Element{
+    renderEditor(linkFunction :Function = null):JSX.Element{
         return(<VBox>
             <AttributeMenuTargetEditor attributeMenuTool={ this }/>
-            { renderSelectableAttributes(this, null) }
+            { renderSelectableAttributes(this, linkFunction) }
         </VBox>);
     }
 
