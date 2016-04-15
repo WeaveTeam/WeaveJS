@@ -53,11 +53,11 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		}
 		Weave.getCallbacks(ds.url).addGroupedCallback(this, this.onUrlChange);
 	}
-	
+
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
-		let columnIds:{label:string, value:any}[] = ds.getColumnIds().map( (id, index) => {
+		let columnIds:DropDownOption[] = ds.getColumnIds().map( (id, index) => {
 			return {label: id.toString(), value: id}
 		});
 		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
@@ -72,8 +72,8 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
 				<Dropdown style={{width: "100%"}}
-						  ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
-						  options={columnIds}
+					ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
+					options={columnIds}
 				/>
 			],
 			[
@@ -81,18 +81,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					{Weave.lang("Namespace")}
 					<HelpIcon>{Weave.lang("Namespaces are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
-				<Dropdown style={{width: "100%"}}
-					ref={linkReactStateRef(this, { value: ds.keyType }) }
-					options={weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
-						return {label:keyType, value:keyType} as DropDownOption;
-					})}
-					allowAdditions={true}
-					type="search"
-				  	/*onAdd={(content:string):void=>{
-				  		console.log("on change");
-						ds.keyType.value = content;
-					}}*/
-				/>
+				<KeyTypeInput keyTypeProperty={ds.keyType}/>
 			]
 		];
 		return super.editorFields.concat(editorFields);
