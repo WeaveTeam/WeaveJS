@@ -15,12 +15,6 @@ export default class DataMenu implements MenuBarItemProps
 		this.fileMenu = new FileMenu(weave);
 		this.createObject = createObject;
 
-		var registry = weavejs.WeaveAPI.ClassRegistry;
-		var impls = registry.getImplementations(IDataSource);
-		
-		// filter out those data sources without editors
-		impls = impls.filter(impl => DataSourceManager.editorRegistry.has(impl));
-		
 		this.menu = [].concat(
 			{
 				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)...")}</FileInput>
@@ -36,10 +30,7 @@ export default class DataMenu implements MenuBarItemProps
 				click: DataSourceManager.openInstance.bind(null, weave)
 			},
 			{},
-			impls.filter(impl => impl != weavejs.data.source.CensusDataSource).map(impl => ({
-				label: Weave.lang('+ {0}', registry.getDisplayName(impl)),
-				click: this.createObject.bind(this, impl)
-			}))
+			this.getDataSourceItems()
 		);
 	}
 
@@ -48,6 +39,25 @@ export default class DataMenu implements MenuBarItemProps
 	fileMenu:FileMenu; // temp solution
 	menu:MenuItemProps[];
 	createObject:(type:new(..._:any[])=>any)=>void;
+
+	getDataSourceItems()
+	{
+		var registry = weavejs.WeaveAPI.ClassRegistry;
+		var impls = registry.getImplementations(IDataSource);
+		
+		// filter out those data sources without editors
+		impls = impls.filter(impl => DataSourceManager.editorRegistry.has(impl));
+		
+		return impls.map(impl => {
+			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
+			if (impl == weavejs.data.source.CensusDataSource)
+				label += " (low priority)";
+			return {
+				label: label,
+				click: this.createObject.bind(this, impl)
+			}
+		});
+	}
 	
 	getColumnsToExport=()=>
 	{
