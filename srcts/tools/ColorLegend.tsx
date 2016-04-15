@@ -17,6 +17,7 @@ import {VSpacer, HSpacer} from "../react-ui/Spacer";
 import ColorRampComponent from "../react-ui/ColorRamp";
 import Dropdown from "../semantic-ui/Dropdown";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import StatefulTextField from "../ui/StatefulTextField";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -395,7 +396,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			{ReactUtils.generateTable(
 				null,
 				[
-					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <Dropdown className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ]
+					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <Dropdown className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ],
+					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Number of Columns")}</span>, <StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>]
 				],
 				{
 					table: {width: "100%"},
