@@ -39,7 +39,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
     public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST), this.forceUpdate, true);//this will re render the TOOL (callbacks attached in TOOL)
     public selectedAttribute = Weave.linkableChild(this, new LinkableString, this.forceUpdate, true);
 
-    public targetToolPathWatcher = Weave.linkableChild(this, new LinkableWatcher());//this will re render the EDITOR (callbacks attached in editor)
+    public toolWatcher = Weave.linkableChild(this, new LinkableWatcher());//this will re render the EDITOR (callbacks attached in editor)
 
     public targetToolPath:LinkableVariable = Weave.linkableChild(this, new LinkableVariable(Array));
     public targetAttribute = Weave.linkableChild(this, new LinkableVariable(null));//this will re render the EDITOR (callbacks attached in editor)
@@ -128,9 +128,9 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
         this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizTools,true);//will be called whenever a new tool is added
 
-        Weave.getCallbacks(this.props.attributeMenuTool.targetToolPathWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
+        Weave.getCallbacks(this.props.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
 
-        this.props.attributeMenuTool.targetToolPath.addImmediateCallback(this, this.setTargetToolPathWatcher, true);
+        this.props.attributeMenuTool.targetToolPath.addImmediateCallback(this, this.setToolWatcher, true);
         this.props.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
     }
 
@@ -139,14 +139,14 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         if(this.props.attributeMenuTool != nextProps.attributeMenuTool)
         {
             this.weaveRoot.childListCallbacks.removeCallback(this, this.getOpenVizTools);
-            Weave.getCallbacks(this.props.attributeMenuTool.targetToolPathWatcher).removeCallback(this, this.forceUpdate);
-            this.props.attributeMenuTool.targetToolPath.removeCallback(this, this.setTargetToolPathWatcher);
+            Weave.getCallbacks(this.props.attributeMenuTool.toolWatcher).removeCallback(this, this.forceUpdate);
+            this.props.attributeMenuTool.targetToolPath.removeCallback(this, this.setToolWatcher);
             this.props.attributeMenuTool.targetAttribute.removeCallback(this, this.forceUpdate);
 
             this.weaveRoot = Weave.getRoot(nextProps.attributeMenuTool);
             this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizTools,true);//will be called whenever a new tool is added
-            Weave.getCallbacks(nextProps.attributeMenuTool.targetToolPathWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
-            nextProps.attributeMenuTool.targetToolPath.addImmediateCallback(this, this.setTargetToolPathWatcher, true);
+            Weave.getCallbacks(nextProps.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
+            nextProps.attributeMenuTool.targetToolPath.addImmediateCallback(this, this.setToolWatcher, true);
             nextProps.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
         }
 
@@ -187,10 +187,10 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
     };
 
     //callback for targetToolPath
-    setTargetToolPathWatcher = ():void=>{
+    setToolWatcher = ():void=>{
         var amt = this.props.attributeMenuTool;
         if(amt.targetToolPath.state)
-            amt.targetToolPathWatcher.targetPath = amt.targetToolPath.state as string[];
+            amt.toolWatcher.targetPath = amt.targetToolPath.state as string[];
     };
 
     get tool():IVisTool{
