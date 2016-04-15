@@ -15,9 +15,13 @@ import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import {VSpacer, HSpacer} from "../react-ui/Spacer";
 import ColorRampComponent from "../react-ui/ColorRamp";
+import Input from "../semantic-ui/Input";
 import Dropdown from "../semantic-ui/Dropdown";
+import Button from "../semantic-ui/Button";
+import ColorController from "../editors/ColorController";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
+import BinNamesList from "../ui/BinNamesList";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -26,6 +30,7 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
+import FilteredColumn = weavejs.data.column.FilteredColumn;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
@@ -34,9 +39,21 @@ import LinkableNumber = weavejs.core.LinkableNumber;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import LinkableWatcher = weavejs.core.LinkableWatcher;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
+import ColorRamp = weavejs.util.ColorRamp;
+import StandardLib = weavejs.util.StandardLib;
+
+import AbstractBinningDefinition = weavejs.data.bin.AbstractBinningDefinition;
+import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
+import CustomSplitBinningDefinition = weavejs.data.bin.CustomSplitBinningDefinition;
+import QuantileBinningDefinition = weavejs.data.bin.QuantileBinningDefinition;
+import EqualIntervalBinningDefinition = weavejs.data.bin.EqualIntervalBinningDefinition;
+import StandardDeviationBinningDefinition = weavejs.data.bin.StandardDeviationBinningDefinition;
+import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
+import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -390,20 +407,67 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
 	}
 	
+	static colorRampOptions = ColorRamp.allColorRamps.map((colorRamp) => {
+			return {
+				value: colorRamp.colors,
+				label: <HBox className="weave-padded-hbox">
+							<ColorRampComponent style={{flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/>
+							<HBox style={{flex: 1}}>{colorRamp.name}</HBox>
+						</HBox>
+			};
+	});
+	
+	// TODO
+	openColorController(tabIndex:number)
+	{
+		ColorController.activeTabIndex = tabIndex;
+		ColorController.open(this.colorColumn, this.binnedColumn, this.binnedColumn.internalDynamicColumn.target as FilteredColumn)
+	}
+	
 	renderEditor (linkFunction:any = null):JSX.Element{
 		return(<VBox>
 			{renderSelectableAttributes(this,linkFunction)}
 			{ReactUtils.generateTable(
 				null,
 				[
-					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Shape Type")}</span>, <Dropdown className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> ],
-					[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Number of Columns")}</span>, <StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>]
+					[ 
+						Weave.lang("Shape Type"),
+						<Dropdown ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
+					],
+					[ 
+						Weave.lang("Color Theme"),
+						<HBox className="weave-padded-hbox" style={{padding: 0}}>
+							<Dropdown options={ColorLegend.colorRampOptions} ref={linkReactStateRef(this, {value: this.colorColumn.ramp})}/>
+							<Button onClick={() => this.openColorController(1)}>{Weave.lang("Edit")}</Button>
+						</HBox>
+					],
 				],
 				{
 					table: {width: "100%"},
-					td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
+					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
 				}
 			)}
+			{
+				<CustomBinLabelComponent binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+			}
+			{
+				ReactUtils.generateTable(
+					null,
+					[
+						[
+							Weave.lang("Layout"),
+							<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
+								<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
+								{Weave.lang("Columns")}
+							</HBox>
+						]
+					],
+					{
+						table: {width: "100%"},
+						td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
+					}
+				)
+			}
 		</VBox>);
 	}
 
@@ -421,6 +485,73 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				}
 			}
 		};
+	}
+}
+
+// internal
+// this custom label component watches the state of the binnedColumn to display
+// the approprivate values of its binning definition
+
+interface CustomBinLabelComponentProps {
+	binnedColumn:BinnedColumn;
+	onButtonClick:()=>void
+}
+
+class CustomBinLabelComponent extends React.Component<CustomBinLabelComponentProps, {}>
+{
+	static binClassToBinLabel = new Map<typeof IBinningDefinition, string>()
+							   .set(SimpleBinningDefinition, "Equally spaced")
+							   .set(CustomSplitBinningDefinition, "Custom breaks")
+							   .set(QuantileBinningDefinition, "Quantile")
+							   .set(EqualIntervalBinningDefinition, "Equal interval")
+							   .set(StandardDeviationBinningDefinition, "Standard deviations")
+							   .set(NaturalJenksBinningDefinition, "Natural breaks")
+							   .set(CategoryBinningDefinition, "All Categories(string values)");
+							   
+		
+	private  _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.forceUpdate.bind(this)));
+	private  get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }					   
+	
+	constructor(props:CustomBinLabelComponentProps)
+	{
+		super(props);
+		this.setTarget(props.binnedColumn);
+	}
+		
+	componentWillReceiveProps(props:CustomBinLabelComponent)
+	{
+		this.setTarget(props.binnedColumn);
+	}
+
+	public setTarget(object:ILinkableObject):void
+	{
+		this._binnedColumnWatcher.target = object as BinnedColumn;
+	}
+	
+	render()
+	{
+		return (
+			ReactUtils.generateTable(
+				null,
+				[
+					[
+						Weave.lang("Binning Method"),
+						<HBox className="weave-padded-hbox" style={{padding: 0}}>
+							<Input style={{flex: 1}} readOnly value={Weave.lang(CustomBinLabelComponent.binClassToBinLabel.get((this.binnedColumn.binningDefinition.target as AbstractBinningDefinition).constructor as typeof IBinningDefinition))}/>
+							<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+						</HBox>
+					],
+					[
+						Weave.lang("Bin names"),
+						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={this.binnedColumn.binningDefinition.target as AbstractBinningDefinition}/></VBox>
+					]
+				],
+				{
+					table: {width: "100%"},
+					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
+				}
+			)
+		);
 	}
 }
 

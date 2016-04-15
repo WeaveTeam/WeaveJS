@@ -9,6 +9,7 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IRow} from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
+import BinNamesList from "../ui/BinNamesList";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -101,35 +102,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		return binDef && binDef.overrideInputMin && binDef.overrideInputMax;
 	}
 	
-	generateBinTable()
-	{
-		var binDef:AbstractBinningDefinition = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
-		var rows:IRow[] = [];
-		if(binDef)
-		{
-			rows = binDef.getBinNames().map((binName, index) => {
-				return {
-					id: index,
-					value: binName
-				} as IRow;
-			});
-		}
-		
-		var columnTitles:IColumnTitles = {
-			id: "Key",
-			value: "Bin names"
-		};
-
-		return (
-			<FixedDataTable columnIds={["id", "value"]} 
-							idProperty="id" 
-							rows={rows}
-							columnTitles={columnTitles}
-							showIdColumn={false}
-							allowResizing={false}
-							evenlyExpandRows={true}/>
-		);
-	}
+	
 
 	setBinningDefinition(value:boolean, localDef:AbstractBinningDefinition)
 	{
@@ -365,7 +338,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 						</HBox> : null
 					}
 					<HBox style={{flex: 1}}>
-						{this.generateBinTable()}
+						<BinNamesList binningDefinition={this.binnedColumn.binningDefinition.target as AbstractBinningDefinition}/>
 					</HBox>
 					{/*<HBox style={{alignItems: "center"}}>
 						<Checkbox/>
