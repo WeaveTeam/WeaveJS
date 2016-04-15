@@ -12,9 +12,8 @@ import {IColumnTitles} from "../tools/FixedDataTable";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
-import LinkableString = weavejs.core.LinkableString;
-import LinkableNumber = weavejs.core.LinkableNumber;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
+
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
 import AbstractBinningDefinition = weavejs.data.bin.AbstractBinningDefinition;
 import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
@@ -32,12 +31,12 @@ export interface BinningDefinitionEditorProps
 
 export interface BinningDefinitionEditorState
 {
-	
+
 }
 
 export default class BinningDefinitionEditor extends React.Component<any, any>
 {
-	
+
 	public setTarget(object:ILinkableObject):void
 	{
 		this._binnedColumnWatcher.target = object as BinnedColumn;
@@ -61,7 +60,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		super(props);
 		this._binnedColumnWatcher.target = props.binnedColumn;
 	}
-	
+
 	componentDidMount()
 	{
 		var binDef = this.binnedColumn.binningDefinition.target;
@@ -78,29 +77,37 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		}
 	}
 
-	private linkOverride(property:"overrideInputMin"|"overrideInputMax")
+	private linkOverrideMin = (ref:StatefulTextField) =>
 	{
 		for(var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
 		{
-			var abd:any = def;
-			if(abd[property] && this.isRadioSelected(def))
+			var abd:AbstractBinningDefinition = def;
+			if(abd && abd.overrideInputMin)
 			{
-				return linkReactStateRef(this, {value: abd[property]}, 500);
+				linkReactStateRef(ref, {value: abd.overrideInputMin}, 500)
 			}
 		}
 	}
-	
-	private linkBinningDefinition(value:LinkableString|LinkableNumber)
+
+	/* can be merged into single function with second argument */
+	private linkOverrideMax = (ref:StatefulTextField) =>
 	{
-		return linkReactStateRef(this, {value}, 500);
+		for(var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
+		{
+			var abd:AbstractBinningDefinition = def;
+			if(abd && abd.overrideInputMax)
+			{
+				linkReactStateRef(ref, {value: abd.overrideInputMax}, 500)
+			}
+		}
 	}
-	
+
 	private hasOverrideMinAndMax()
 	{
 		var binDef:AbstractBinningDefinition = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
 		return binDef && binDef.overrideInputMin && binDef.overrideInputMax;
 	}
-	
+
 	generateBinTable()
 	{
 		var binDef:AbstractBinningDefinition = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
@@ -114,20 +121,20 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 				} as IRow;
 			});
 		}
-		
+
 		var columnTitles:IColumnTitles = {
 			id: "Key",
 			value: "Bin names"
 		};
 
 		return (
-			<FixedDataTable columnIds={["id", "value"]} 
-							idProperty="id" 
-							rows={rows}
-							columnTitles={columnTitles}
-							showIdColumn={false}
-							allowResizing={false}
-							evenlyExpandRows={true}/>
+			<FixedDataTable columnIds={["id", "value"]}
+			                idProperty="id"
+			                rows={rows}
+			                columnTitles={columnTitles}
+			                showIdColumn={false}
+			                allowResizing={false}
+			                evenlyExpandRows={true}/>
 		);
 	}
 
@@ -136,11 +143,11 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		// if we are clicking on the already selected binning definition
 		// we keep it selected
 		var binDef = this.binnedColumn.binningDefinition.target;
-		
+
 		if(!value && binDef && localDef.constructor == binDef.constructor)
 		{
-				this.forceUpdate(); // trigger a render because no session state change
-				return;				// and we need to update the checkboxes to reflect correct value
+			this.forceUpdate(); // trigger a render because no session state change
+			return;				// and we need to update the checkboxes to reflect correct value
 		}
 
 		if(value)
@@ -176,7 +183,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 			padding: 0,
 			flex: 1
 		};
-		
+
 		var leftItemsStyle:React.CSSProperties = {
 			justifyContent: "flex-start",
 			alignItems: "center"
@@ -187,11 +194,11 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 			alignItems: "center",
 			fontSize: "smaller"
 		};
-		
+
 		var iyle:React.CSSProperties = {
 			fontSize: "initial"
 		};
-		
+
 		var inputStyle:React.CSSProperties = {
 			width: 60
 		}
@@ -202,88 +209,88 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 					{Weave.lang("Binning type:")}
 					<HBox style={{minHeight: 400, maxHeight: 400}}> {/*fixed height for binning option spacing*/}
 						<VBox className="weave-padded-vbox" style={{flex: 1}}>
-							
+
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
-									<Checkbox type="radio" 
-											  value={this.isRadioSelected(this._simple)}
-											  onChange={(value) => this.setBinningDefinition(value, this._simple)} 
-											  /> 
+									<Checkbox type="radio"
+									          value={this.isRadioSelected(this._simple)}
+									          onChange={(value) => this.setBinningDefinition(value, this._simple)}
+									/>
 									<span style={textStyle}>{Weave.lang("Equally spaced")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
 									<StatefulTextField disabled={!this.isRadioSelected(this._simple)}
-													   style={inputStyle}
-													   type="number"
-													   ref={this.linkBinningDefinition(this._simple.numberOfBins)}/>
-								<HelpIcon style={iyle}>
+									                   style={inputStyle}
+									                   type="number"
+									                   ref={linkReactStateRef(this, {value: this._simple.numberOfBins}, 500)}/>
+									<HelpIcon style={iyle}>
 										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
-							
+
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
-									<Checkbox type="radio" 
-											  value={this.isRadioSelected(this._customSplit)}
-											  onChange={(value) => this.setBinningDefinition(value, this._customSplit)}/> 
+									<Checkbox type="radio"
+									          value={this.isRadioSelected(this._customSplit)}
+									          onChange={(value) => this.setBinningDefinition(value, this._customSplit)}/>
 									<span style={textStyle}>{Weave.lang("Custom breaks")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<StatefulTextField type="text" 
-													   ref={this.linkBinningDefinition(this._customSplit.splitValues)}
-													   disabled={!this.isRadioSelected(this._customSplit)}/>
+									<StatefulTextField type="text"
+									                   ref={linkReactStateRef(this, {value: this._customSplit.splitValues}, 500)}
+									                   disabled={!this.isRadioSelected(this._customSplit)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
-							
+
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  value={this.isRadioSelected(this._quantile)}
-											  onChange={(value) => this.setBinningDefinition(value, this._quantile)}/> 
+									          value={this.isRadioSelected(this._quantile)}
+									          onChange={(value) => this.setBinningDefinition(value, this._quantile)}/>
 									<span style={textStyle}>{Weave.lang("Quantile")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<span style={textStyle}>{Weave.lang("Reference quantile:")}</span>
-									<StatefulTextField style={inputStyle} 
-													   type="text"
-													   disabled={!this.isRadioSelected(this._quantile)}
-													   ref={linkReactStateRef(this, {value: this._quantile.refQuantile}, 500)}/>
+									<StatefulTextField style={inputStyle}
+									                   type="text"
+									                   disabled={!this.isRadioSelected(this._quantile)}
+									                   ref={linkReactStateRef(this, {value: this._quantile.refQuantile}, 500)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
-							
+
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  value={this.isRadioSelected(this._equalInterval)}
-											  onChange={(value) => this.setBinningDefinition(value, this._equalInterval)}
-									 		  /> 
+									          value={this.isRadioSelected(this._equalInterval)}
+									          onChange={(value) => this.setBinningDefinition(value, this._equalInterval)}
+									/>
 									<span style={textStyle}>{Weave.lang("Equally interval")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<span style={textStyle}>{Weave.lang("Data interval:")}</span>
 									<StatefulTextField style={inputStyle}
-													   disabled={!this.isRadioSelected(this._equalInterval)}
-													   type="text"
-													   ref={this.linkBinningDefinition(this._equalInterval.dataInterval)}/>
+									                   disabled={!this.isRadioSelected(this._equalInterval)}
+									                   type="text"
+									                   ref={linkReactStateRef(this, {value: this._equalInterval.dataInterval}, 500)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
-							
+
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  value={this.isRadioSelected(this._stdDev)}
-											  onChange={(value) => this.setBinningDefinition(value, this._stdDev)}/> 
+									          value={this.isRadioSelected(this._stdDev)}
+									          onChange={(value) => this.setBinningDefinition(value, this._stdDev)}/>
 									<span style={textStyle}>{Weave.lang("Standard deviations")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
@@ -292,31 +299,31 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									</HelpIcon>
 								</HBox>
 							</HBox>
-							
+
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  value={this.isRadioSelected(this._jenks)}
-											  onChange={(value) => this.setBinningDefinition(value, this._jenks)}/> 
+									          value={this.isRadioSelected(this._jenks)}
+									          onChange={(value) => this.setBinningDefinition(value, this._jenks)}/>
 									<span style={textStyle}>{Weave.lang("Natural breaks")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
 									<StatefulTextField style={inputStyle}
-													   type="number"
-													   disabled={!this.isRadioSelected(this._jenks)}
-													   ref={this.linkBinningDefinition(this._jenks.numOfBins)}/>
+									                   type="number"
+									                   disabled={!this.isRadioSelected(this._jenks)}
+									                   ref={linkReactStateRef(this, {value: this._jenks.numOfBins}, 500)}/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization')}
 									</HelpIcon>
 								</HBox>
 							</HBox>
-							
+
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  value={this.isRadioSelected(this._category)}
-											  onChange={(value) => this.setBinningDefinition(value, this._category)}/> 
+									          value={this.isRadioSelected(this._category)}
+									          onChange={(value) => this.setBinningDefinition(value, this._category)}/>
 									<span style={textStyle}>{Weave.lang("All Categories (string values)")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
@@ -325,17 +332,17 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 									</HelpIcon>
 								</HBox>
 							</HBox>
-							
+
 							<HBox className="weave-padded-hbox" style={HBoxJustify}>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
-											  value={!this.binnedColumn.binningDefinition.target}
-											  onChange={(value) => { 
+									          value={!this.binnedColumn.binningDefinition.target}
+									          onChange={(value) => {
 												  if(value)
 												  	this.binnedColumn.binningDefinition.target = null;
 												  else
 												  	this.forceUpdate();
-											  }}/> 
+											  }}/>
 									<span style={textStyle}>{Weave.lang("None")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
@@ -355,20 +362,20 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 							<div style={{flex: 1, height: "100%", position: "relative"}}>
 								<div style={{position: "absolute", width: "100%", height: "100%"}}>
 									<HBox style={{fontSize: "smaller", position: "relative", width: "100%", height: "100%"}}>
-										<StatefulTextField type="number" style={{width: "50%"}} ref={this.linkOverride( "overrideInputMin")} placeholder="min"/>
-										<StatefulTextField type="number" style={{width: "50%", marginLeft: 8}} ref={this.linkOverride("overrideInputMax")} placeholder="max"/>
+										<StatefulTextField style={{width: "50%"}} ref={this.linkOverrideMin} placeholder="min"/>
+										<StatefulTextField style={{width: "50%", marginLeft: 8}} ref={this.linkOverrideMax} placeholder="max"/>
 									</HBox>
 								</div>
 							</div>
 						</HBox> : null
-					}
+						}
 					<HBox style={{flex: 1}}>
 						{this.generateBinTable()}
 					</HBox>
 					{/*<HBox style={{alignItems: "center"}}>
-						<Checkbox/>
-						<span style={textStyle}>{Weave.lang("Edit and override names")}</span>
-					</HBox>*/}
+					 <Checkbox/>
+					 <span style={textStyle}>{Weave.lang("Edit and override names")}</span>
+					 </HBox>*/}
 				</VBox>
 			</HBox>
 		)
