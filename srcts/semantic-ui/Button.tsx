@@ -23,7 +23,7 @@ export default class Button extends React.Component<ButtonProps, ButtonState>
 	render()
 	{
 		return (
-			<button {...this.props} className={"ui " + this.props.color + " button " + (this.props.className || "")}>
+			<button {...this.props} className={"ui " + (this.props.color ? this.props.color:"") + " button " + (this.props.className || "")}>
 				{
 					this.props.children
 				}
