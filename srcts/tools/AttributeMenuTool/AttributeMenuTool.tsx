@@ -163,7 +163,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
         this.weaveRoot.getObjects().forEach((tool:any):void=>
         {
-            if(tool.selectableAttributes && tool != this.props.attributeMenuTool)//excluding AttributeMenuTool from the list
+            if(tool.selectableAttributes && Weave.className(tool) != Weave.className(this.props.attributeMenuTool))//excluding AttributeMenuTool from the list
                 this.openTools.push(this.weaveRoot.getName(tool));
         });
         this.setState({openTools: this.openTools});
