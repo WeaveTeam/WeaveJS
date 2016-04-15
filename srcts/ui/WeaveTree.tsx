@@ -1,7 +1,6 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
-import ListView from "./ListView";
 import FixedDataTable from "../tools/FixedDataTable";
 import * as fs from 'fuse.js';
 import * as lodash from 'lodash';

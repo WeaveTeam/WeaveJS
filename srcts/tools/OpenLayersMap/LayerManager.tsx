@@ -10,10 +10,11 @@ import ImageGlyphLayer from "./Layers/ImageGlyphLayer";
 
 import {VBox, HBox} from "../../react-ui/FlexBox";
 import ReactUtils from "../../utils/ReactUtils";
-import ListView from "../../ui/ListView";
 import Checkbox from "../../semantic-ui/Checkbox";
 import StatefulRangeSlider from "../../ui/StatefulRangeSlider";
 import {linkReactStateRef} from "../../utils/WeaveReactUtils";
+
+
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 
