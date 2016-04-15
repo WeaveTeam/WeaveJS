@@ -8,7 +8,7 @@ export interface VSliderProps extends React.Props<VSlider>
     max?:number;
     step?:number;
     options?:SliderOption[];
-	selectedValues?:any[];
+	selectedValues?:string[];
     type:string;
     reversed?:boolean;
     onChange?:(selectedValue:[string]) => void;
