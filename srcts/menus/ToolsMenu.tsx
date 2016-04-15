@@ -16,10 +16,10 @@ export default class ToolsMenu implements MenuBarItemProps
 	{
 		this.weave = weave;
 		this.createObject = createObject;
-		
+
 		var registry = weavejs.WeaveAPI.ClassRegistry;
 		var impls = registry.getImplementations(IVisTool);
-		
+
 		// temporary solution - only include tools we want
 		impls = [
 			WeaveUI.C3BarChart,
@@ -30,10 +30,11 @@ export default class ToolsMenu implements MenuBarItemProps
 			WeaveUI.OpenLayersMapTool,
 			WeaveUI.C3PieChart,
 			WeaveUI.C3ScatterPlot,
-			WeaveUI.TableTool
-			//WeaveUI.DataFilterTool
+			WeaveUI.TableTool,
+			WeaveUI.DataFilterTool,
+			WeaveUI.AttributeMenuTool
 		];
-		
+
 		this.menu = [
 			{
 				label: Weave.lang("Color Controller"),
@@ -45,7 +46,7 @@ export default class ToolsMenu implements MenuBarItemProps
 			},
 			{}
 		];
-		
+
 		impls.forEach(impl => {
 			var name = registry.getDisplayName(impl);
 			this.menu.push({
@@ -56,13 +57,13 @@ export default class ToolsMenu implements MenuBarItemProps
 		this.createObject = createObject;
 	}
 
-	label:string = "Visualizations";
+	label:string = "Tools";
 	weave:Weave;
 	menu:MenuItemProps[];
 	createObject:(type:new(..._:any[])=>any)=>void;
-	
+
 	openColorController()
 	{
-		
+
 	}
 }

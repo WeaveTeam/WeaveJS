@@ -8,7 +8,7 @@ export interface HSliderProps extends React.Props<HSlider>
     max?:number;
     step?:number;
     options?:SliderOption[];
-	selectedValues?:string[];
+	selectedValues?:any[];
     type:string;
     reversed?:boolean;
     onChange?:(selectedValue:[string]) => void;
