@@ -143,14 +143,18 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             }
             else{//LinkableHashMap
                 let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
-                let elem= <SelectableAttributesList key={ label } label={ label } columns={ attribute } showLabelAsButton={ true } selectableAttributes={ this.props.attributes }/>;
+                let elem= <SelectableAttributesList key={ label } label={ label } 
+                                                    columns={ attribute } 
+                                                    showLabelAsButton={ true } 
+                                                    linkFunction={this.props.linkFunction}
+                                                    selectableAttributes={ this.props.attributes }/>;
                 listUI.push(elem);
             }
         });
 
-        let gridLayout:JSX.Element = ReactUtils.generateGridLayout(["three", "eleven","two"],selectableUI)
+        let gridLayout:JSX.Element = ReactUtils.generateFlexBoxLayout([.3,.5,.2],selectableUI)
 
-        return (<VBox style={{flex:1}}>
+        return (<VBox className="weave-padded-vbox">
                     {gridLayout}
                     {listUI}
                 </VBox>);

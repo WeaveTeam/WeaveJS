@@ -463,7 +463,7 @@ export default class C3Histogram extends AbstractC3Tool
 	renderEditor(linkFunction:Function):JSX.Element
 	{
 		return (
-			<VBox style={{flex:1}}>
+			<VBox>
 				{
 					super.renderEditor(linkFunction)
 				}

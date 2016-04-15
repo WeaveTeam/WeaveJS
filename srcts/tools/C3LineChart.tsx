@@ -362,7 +362,7 @@ export default class C3LineChart extends AbstractC3Tool
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
     renderEditor(linkFunction:Function):JSX.Element{
-        return (<VBox style={{flex:1}}>
+        return (<VBox>
             {super.renderEditor(linkFunction)}
         </VBox>);
     };

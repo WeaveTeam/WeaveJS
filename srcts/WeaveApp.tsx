@@ -318,7 +318,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}
 			>
-				<SideBarContainer barSize={.25} leftSideBarChildren={ sideBarUI }>
+				<SideBarContainer barSize={.3} leftSideBarChildren={ sideBarUI }>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}

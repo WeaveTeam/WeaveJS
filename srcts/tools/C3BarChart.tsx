@@ -522,31 +522,23 @@ export default class C3BarChart extends AbstractC3Tool
     renderEditor(linkFunction:Function):JSX.Element
     {
         return (
-            <VBox style={{flex:1}}>
+            <VBox className="weave-padded-vbox">
                 {
                     super.renderEditor(linkFunction)
                 }
-				{ReactUtils.generateTable(
-					null,
+				{ReactUtils.generateFlexBoxLayout(
+					[.3,.7],
 					[
 						[ <Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
 						[ <Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ],
 						[ <Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show X Axis Title")}</span> ]
-					],
-					{
-						table: {width: "100%"},
-						td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
-					}
+					]
 				)}
-				{ReactUtils.generateTable(
-					null,
+				{ReactUtils.generateFlexBoxLayout(
+                    [.3,.7],
 					[
-						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <Dropdown className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
-					],
-					{
-						table: {width: "100%"},
-						td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
-					}
+						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <Dropdown style={{width:"100%"}}className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+					]
 				)}
             </VBox>
         )
