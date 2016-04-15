@@ -19,6 +19,8 @@ export interface DropdownProps extends React.HTMLProps<Dropdown>
 	allowAdditions?:boolean;
 	type?:string;
 	fluid?:boolean;
+	header?:React.ReactChild
+	optionStyle?:React.CSSProperties;
 }
 
 export interface DropdownState
@@ -113,8 +115,10 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				<i className="dropdown icon"/>
 				<div className="default text">{this.props.placeholder}</div>
 				<div className="menu">
+					{this.props.header ? (<div className="header">{this.props.header}</div>):null}
+
 				{
-					this.props.options.map((option, index) => <div className="item" key={index} data-value={index}>{typeof option === "object" ? option && (option.label || option.value) : option}</div>)
+					this.props.options.map((option, index) => <div className="item" style={this.props.optionStyle} key={index} data-value={index}>{typeof option === "object" ? option && (option.label || option.value) : option}</div>)
 				}
 				</div>
 			</div>
