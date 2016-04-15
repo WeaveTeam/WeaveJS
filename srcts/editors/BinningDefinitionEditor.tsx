@@ -233,7 +233,9 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<StatefulTextField type="text" 
 													   ref={this.linkBinningDefinition(this._customSplit.splitValues)}
-													   disabled={!this.isRadioSelected(this._customSplit)}/>
+													   disabled={!this.isRadioSelected(this._customSplit)}
+									                   fluid={false}
+									/>
 									<HelpIcon style={iyle}>
 										{Weave.lang('Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]')}
 									</HelpIcon>

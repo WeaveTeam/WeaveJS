@@ -4,6 +4,7 @@ import ToolTip from "../react-ui/ToolTip";
 export interface InputProps extends React.HTMLProps<Input>
 {
 	children?: React.ReactNode;
+	fluid?:boolean;
 }
 
 export interface InputState
@@ -13,6 +14,11 @@ export interface InputState
 export default class Input extends React.Component<InputProps, InputState>
 {
 	inputElement:HTMLInputElement;
+
+	static defaultProps:InputProps = {
+		fluid:true
+	};
+
 	constructor(props:InputProps)
 	{
 		super(props);
@@ -50,7 +56,7 @@ export default class Input extends React.Component<InputProps, InputState>
 		}
 		
 		return (
-			<div className={"ui input fluid " + (this.props.className || "")}
+			<div className={"ui input " + (this.props.fluid ? " fluid":"") + (this.props.className || "")}
 				 style={this.props.style}
 				 onMouseEnter={(event) => this.props.title && ToolTip.open(this.props.title, event)}
 				 onMouseLeave={this.props.title && ToolTip.close}>

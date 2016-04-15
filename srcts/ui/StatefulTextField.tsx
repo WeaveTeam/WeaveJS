@@ -9,6 +9,7 @@ import Input from "../semantic-ui/Input";
 
 export interface StatefulTextFieldProps extends React.HTMLProps<StatefulTextField> {
 	selectOnFocus?:boolean;
+	fluid?:boolean;
 }
 
 export interface StatefulTextFieldState {
@@ -23,6 +24,10 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 			value: props.value
 		};
 	}
+
+	static defaultProps:StatefulTextFieldProps = {
+		fluid:true
+	};
 
 	public input:Input;
 	
@@ -48,7 +53,8 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 					onBlur={this.handleInputChange}
 					onSubmit={this.handleInputChange}
 					onFocus={this.handleSelectOnFocus}
-					value={this.state.value}/>
+					value={this.state.value}
+			/>
 		);
 	}
 }
