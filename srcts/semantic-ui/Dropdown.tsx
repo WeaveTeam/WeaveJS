@@ -4,7 +4,7 @@ import $ from "../modules/jquery";
 import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
 
-export type DropDownOption = (string | { label: string, value: any } | { label: number, value: any });
+export type DropDownOption = (string | { label: any, value: any });
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
@@ -76,16 +76,19 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		let selector = ($(this.element) as any);
 		
 		selector.dropdown({
-			onChange: (index:number) => {
-				let option = this.props.options[index];
-				let value:any = (typeof option === "object") ? option.value : option;
-				this.setState({value})
+			onChange: (selected:number,text:string) => {
+				let index:number = this.getIndexFromValue(text);
+				if(this.props.onAdd && text &&  (index < 0) ) {
+					this.props.onAdd && this.props.onAdd(text);
+				}else {
+					let option = this.props.options[selected];
+					let value:any = (typeof option === "object") ? option.value : option;
+					this.setState({value});
+					this.props.onChange && this.props.onChange(value);
+				}
 			},
 			onClick: (index:number) => {
 				this.props.onClick && this.props.onClick(null);
-			},
-			onAdd: (value:string) => {
-				this.props.onAdd && this.props.onAdd(value);
 			},
 			context: this.props.context || null,
 			direction: this.props.direction || 'auto',
