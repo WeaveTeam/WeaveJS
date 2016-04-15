@@ -19,12 +19,10 @@ export default class InteractionModeCluster extends ol.control.Control
 
 		var options: any = optOptions || {};
 		var div = $(`
-			<div style="display: flex; flexDirection: column" class="iModeCluster ol-control ol-unselectable">
-				<button class="activeInteractionMode fa"></button>
-				<span style="width: 1px; border-left: 1px solid white; margin-left: 0.25em; margin-right: 0.25em;" class="modeButton"></span>
-				<button class="modeButton pan fa"></button>
-				<button class="modeButton select fa"></button>
-				<button class="modeButton zoom fa"></button>
+			<div style="display: flex; flex-direction: column" class="iModeCluster ol-control ol-unselectable">
+				<button class="modeButton pan fa" style="border-radius: 2px 2px 0 0"></button>
+				<button class="modeButton select fa" style="border-radius: 0"></button>
+				<button class="modeButton zoom fa" style="border-radius: 0 0 2px 2px"></button>
 			</div>
 		`);
 
@@ -33,16 +31,6 @@ export default class InteractionModeCluster extends ol.control.Control
 		let divider: JQuery = div.find("span.modeButton");
 
 		let oldPosition: JQueryCoordinates;
-		function toggleMenuOpen(isOpen:boolean)
-		{
-			activeButton.off("click");
-			activeButton.click(toggleMenuOpen.bind(null, !isOpen));
-			activeButton.css({ "display": isOpen ? "inline" : "inline"});
-			clusterButtons.css({ "display": isOpen ? "inline" : "none"});
-			divider.css({ "display": isOpen ? "inline" : "none" });
-		}
-
-		toggleMenuOpen(false);
 
 
 		super({ element: div[0], target: options.target });
@@ -52,7 +40,7 @@ export default class InteractionModeCluster extends ol.control.Control
 		{
 			div.find("button." + mode)
 				.addClass(iconMapping[mode])
-				.click(() => { if (self.interactionMode) self.interactionMode.value = mode; toggleMenuOpen(false); });
+				.click(() => { if (self.interactionMode) self.interactionMode.value = mode; });
 		}
 
 		for (let key in iconMapping) setupButton(key);
@@ -62,9 +50,6 @@ export default class InteractionModeCluster extends ol.control.Control
 
 			div.find("button.modeButton").removeClass("active");
 			div.find("button.modeButton." + mode).addClass("active");
-
-			activeButton.removeClass(lodash.values(iconMapping).join(" "));
-			activeButton.addClass(iconMapping[mode]);
 		});
 	}
 

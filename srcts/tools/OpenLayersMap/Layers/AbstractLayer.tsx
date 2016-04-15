@@ -92,8 +92,16 @@ export default class AbstractLayer implements ILinkableObject
 	renderEditableFields(): JSX.Element
 	{
 		let fieldList: [string, JSX.Element][] = [];
+
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ paddingBottom: 8, textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+			]
+		};
 		this.editableFields.forEach((value, key) => { fieldList.push(this.renderEditableField(value, key)); });
-		return ReactUtils.generateTable(null, fieldList);
+		return ReactUtils.generateTable(null, fieldList, tableStyles);
 	}
 
 	renderEditor(): JSX.Element {

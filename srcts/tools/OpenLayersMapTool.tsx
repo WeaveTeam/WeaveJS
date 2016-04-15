@@ -293,14 +293,23 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	updateCursor():void
 	{
-		let modesToCursors: any = {
-			"select": "default",
-			"pan": "move",
-			"zoom": "zoom-in"
+		let modesToCursors: {[value:string]: string[]} = {
+			"select": ["default"],
+			"pan": ["grabbing", "-webkit-grabbing", "move"],
+			"zoom": ["zoom-in"]
 		};
 		let interactionMode = this.interactionMode.value || "select";
-		if (this.map && this.map.getTargetElement())
-			$(this.map.getTargetElement()).css({ cursor: modesToCursors[interactionMode] });
+		let cursorValues = modesToCursors[interactionMode];
+		if (!this.map) return;
+		let mapElement = this.map.getTargetElement();
+		if (mapElement)
+		{
+			for (let cursor of cursorValues)
+			{
+				$(mapElement).css({cursor});
+				if ($(mapElement).css("cursor") == cursor) return;
+			}
+		}
 	}
 
 	componentDidMount():void
