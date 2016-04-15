@@ -55,7 +55,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	dynamicColorColumn = Weave.linkableChild(this, DynamicColumn);
 	maxColumns = Weave.linkableChild(this, new LinkableNumber(1));
 	shapeSize = Weave.linkableChild(this, new LinkableNumber(25));
-	shapeType = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_BOX));
+	shapeType = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE));
 	showLegendName = Weave.linkableChild(this, new LinkableBoolean(true));
 	//lineStyle = Weave.linkableChild(this, SolidLineStyle);
 	
