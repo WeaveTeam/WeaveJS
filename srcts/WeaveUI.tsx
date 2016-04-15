@@ -33,7 +33,6 @@ import PopupWindow from "./react-ui/PopupWindow";
 
 import DataSourceManager from "./ui/DataSourceManager";
 import StatefulTextField from "./ui/StatefulTextField";
-import ListView from "./ui/ListView";
 import WeaveTree from "./ui/WeaveTree";
 
 import MiscUtils from "./utils/MiscUtils";
@@ -91,7 +90,6 @@ export
 	
 	DataSourceManager,
 	StatefulTextField,
-	ListView,
 	WeaveTree,
 	
 	MiscUtils,
