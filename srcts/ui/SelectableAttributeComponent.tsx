@@ -1,6 +1,6 @@
 import * as React from "react";
 import {VBox, HBox} from '../react-ui/FlexBox';
-import IconButton from '../react-ui/IconButton';
+import Button from "../semantic-ui/Button";
 import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
 import PopupWindow from "../react-ui/PopupWindow";
@@ -129,16 +129,16 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                 }
 
                 let labelUI:JSX.Element = this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null;
-                let moreDataSourceLabel:string = " > "
+                let moreDataSourceLabel:string = ">";
                 let elements:JSX.Element[] = [
 	                        labelUI,
 	                        <AttributeDropdown title="Change column"
 	                                           style={ {flex:1,width:"100%"} }
 	                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
 	                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>,
-	                        <IconButton style={ btnStyle }
-	                                    toolTip={"Explore data sources"}
-	                                    clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }> {moreDataSourceLabel} </IconButton>];
+	                        <Button onClick={ this.launchAttributeSelector.bind(this, label, attribute)}>
+									{moreDataSourceLabel} 
+							</Button>];
                 selectableUI.push(elements);
             }
             else{//LinkableHashMap
