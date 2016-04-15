@@ -3,6 +3,9 @@ import LinkableString = weavejs.core.LinkableString;
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Input from "../semantic-ui/Input";
+import Dropdown from "../semantic-ui/Dropdown";
+import {DropDownOption} from "../semantic-ui/Dropdown";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import WeaveAPI = weavejs.WeaveAPI;
 
 export interface KeyTypeInputProps extends React.HTMLProps<Input> {
@@ -22,44 +25,28 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 	private input:Input;
 	private element:Element;
 
-	onInputFinished=(content:string):void=>{
-		this.props.keyTypeProperty.value = content;
-	}
-
-	// componentDidUpdate(prevProps:DropdownProps, prevState:DropdownState)
-	// {
-	// 	($(this.element) as any).dropdown("set selected", this.state.value);
-	// 	if(!_.isEqual(prevState.value,this.state.value))
-	// 		this.props.onChange && this.props.onChange(this.state.value);
-	// }
-	// 
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this.input);
 		
-		($(this.element) as any).dropdown()
-		// {
-		// 	selected: this.getIndexFromValue(this.props.value),
-		// 	onChange: (index:number) => {
-		// 		this.props.onChange && this.props.onChange(this.props.options[index])
-		// 	}
-		// });
+		($(this.element) as any).dropdown();
 	}
 
 	render(): JSX.Element {
 		let keyTypes = WeaveAPI.QKeyManager.getAllKeyTypes();
 		
 		return (
-			<div>
-				<Input ref={(input:Input) => this.input = input} className="dropdown" {...this.props}>
-					<i className="dropdown icon"/>
-				</Input>
-				<div className="menu">
-					{
-						keyTypes.map((keyType, index) => <div className="item" key={index} data-value={keyType}>{keyType}</div>)
-					}
-				</div>
-			</div>
+			<Dropdown style={{width: "100%"}}
+				ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
+				options={weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
+					return {label:keyType, value:keyType} as DropDownOption;
+				})}
+				allowAdditions={true}
+				type="search"
+				onAdd={(content:string):void=>{
+				    this.props.keyTypeProperty.value = content;
+				 }}
+			/>
 		);
 	}
 }

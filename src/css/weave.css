@@ -201,9 +201,6 @@ div.table-row-selected>div>div>div>div>div {
 	margin-top: 0px;
 }
 
-.weave-padded-hbox  {
-	padding: 8px;
-}
 
 .weave-padded-hbox > * {
 	margin-left: 8px;
@@ -456,7 +453,7 @@ div.table-row-selected>div>div>div>div>div {
 	cursor:pointer;
 	-webkit-user-select: none;
 }
-
+/*
 .weave-tree-view:hover {
 	background-color: rgba(153, 214, 255, 0.4);
     cursor:pointer;
@@ -471,6 +468,7 @@ div.table-row-selected>div>div>div>div>div {
 	background-color: #99D6FF;
     cursor:pointer;
 }
+*/
 
 span.weave-tree-view.open {
 	

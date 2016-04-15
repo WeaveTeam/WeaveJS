@@ -17,11 +17,9 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import WeaveAPI = weavejs.WeaveAPI;
-import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import SliderOption from "../../react-ui/RCSlider/RCSlider";
 import Dropdown from "../../semantic-ui/Dropdown";
-import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -168,7 +166,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
             if(tool.selectableAttributes && tool != this.props.attributeMenuTool)//excluding AttributeMenuTool from the list
                 this.openTools.push(this.weaveRoot.getName(tool));
         });
-        //this.openTools.unshift({label:"Select a visualization", value:''});
         this.setState({openTools: this.openTools});
     };
 
@@ -200,6 +197,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         if(this.props.attributeMenuTool.targetToolPath.state)
             return Weave.followPath(this.weaveRoot, this.props.attributeMenuTool.targetToolPath.state as string[]) as IVisTool;
     }
+
     getTargetToolAttributeOptions():string[] {
         let tool:IVisTool = this.tool;
         let attributes:string[] =[];
@@ -213,46 +211,35 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
         return (toolPath[0] as string);
     };
 
-    getTargetAttribute = ():string =>{
-        let amt = this.props.attributeMenuTool;
-        var tool:IVisTool= this.tool;
-        var path:string[];
-        if(tool) {
-            var attributeName:string = this.props.attributeMenuTool.targetAttribute.state as string;
-            var attribute:ILinkableObject = tool.selectableAttributes.get(attributeName) as ILinkableObject;
-            path = Weave.findPath(this.weaveRoot, attribute);
-        }
-        return(lodash.last(path) as string);
-    };
-
     get toolConfigs():[string, JSX.Element][]{
 
         var toolName:string;
-        var attributeValue :string;
         var menuLayout:string = this.props.attributeMenuTool.layoutMode.state as string;
 	    
         if(this.props.attributeMenuTool.targetToolPath.state){
             toolName = this.getTargetToolPath();
-            attributeValue = this.getTargetAttribute();
         }
 
 
         return[
             [
                 Weave.lang("Visualization Tool"),
-                <Dropdown className="weave-sidbar-dropdown" value={ toolName } selectFirstOnInvalid={ true }
-                            options={ this.openTools } onChange={ this.handleTargetToolChange } />
+                <Dropdown className="weave-sidbar-dropdown" placeholder="Select a visualization"
+							value={ toolName } selectFirstOnInvalid={ true }
+							options={ this.openTools } onChange={ this.handleTargetToolChange } />
             ],
             [
                 Weave.lang("Visualization Attribute"),
 
-                <Dropdown className="weave-sidebar-dropdown"  selectFirstOnInvalid={ true }
-                            options={ this.getTargetToolAttributeOptions() } onChange={ this.handleTargetAttributeChange }  />
+                <Dropdown className="weave-sidebar-dropdown" placeholder="Select an attribute"
+							value={ this.props.attributeMenuTool.targetAttribute.state} selectFirstOnInvalid={ true }
+							options={ this.getTargetToolAttributeOptions() } onChange={ this.handleTargetAttributeChange }  />
             ],
             [
                 Weave.lang("Menu Layout"),
-                <Dropdown className="weave-sidebar-dropdown" value={ menuLayout }
-                            options={ menuOptions } onChange={ this.handleMenuLayoutChange }/>
+                <Dropdown className="weave-sidebar-dropdown"
+							value={ menuLayout }
+							options={ menuOptions } onChange={ this.handleMenuLayoutChange }/>
             ]
         ];
     }

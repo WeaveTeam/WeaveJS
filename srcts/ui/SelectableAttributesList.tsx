@@ -15,6 +15,7 @@ export interface ISelectableAttributesListProps{
     columns : ILinkableHashMap;
     label:string;
     showLabelAsButton?:boolean;
+    linkFunction?:Function;
     selectableAttributes? : Map<string, (IColumnWrapper|ILinkableHashMap)>;
 }
 
@@ -53,6 +54,11 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
     };
 
     launchAttributeSelector=():ControlPanel=>{
+        if(this.props.linkFunction)
+        {
+            this.props.linkFunction( AttributeSelector.openInWeaveToolEditor("Attribute Selector", this.props.label, this.props.columns, this.props.selectableAttributes))
+            return null;
+        }
       return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.selectableAttributes);
     };
 
@@ -70,21 +76,14 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         var listStyle:React.CSSProperties = {
             minHeight: '70px',
             overflowY: 'auto',
-            border:'1px solid lightgrey',
-            flex:1
+            border:'1px solid lightgrey'
         };
 
         let constrollerStyle:React.CSSProperties = {
             justifyContent:'flex-end',
-            background:"#F8F8F8",
-            padding:"4px",
-            marginLeft:"0"
+            background:"#F8F8F8"
         }
-        let styleObj:React.CSSProperties = {
-            padding:"4px",
-            marginTop:"0",
-            flex:1
-        }
+
 
         var selectedObjects:IAttributeColumn[];
         var columnList: ListOption[] = [];
@@ -108,10 +107,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
             labelUI = <span>{this.props.label}</span>
         }
 
-        return(<VBox className="weave-padded-vbox" style={styleObj}>
+        return(<VBox className="weave-padded-vbox weave-container" style={ {border:"none"} }>
                     {labelUI}
 
-                    <VBox className="weave-padded-vbox" style={{flex:1}}>
+                    <VBox className="weave-padded-vbox">
                         <HBox style={listStyle}>
                             <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
                         </HBox>

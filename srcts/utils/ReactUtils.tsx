@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import reactUpdate from "react-addons-update";
+import {HBox,VBox} from "../react-ui/FlexBox";
 import * as _ from "lodash";
 import * as jquery from "jquery";
 
@@ -122,6 +123,27 @@ export default class ReactUtils
 		document.body.removeChild(element);
 	}
 
+	static generateFlexBoxLayout=(flexValues:number[],rowsUI:JSX.Element[][]):JSX.Element=>
+	{
+
+		var wrappedRowsUI:JSX.Element[] = rowsUI.map((cells:JSX.Element[],rowIndex:number) => {
+
+			let cellsUI:JSX.Element[] = [];
+
+			for(let cellIndex:number = 0 ; cellIndex < cells.length ; cellIndex++)
+			{
+				let cell = <div key={cellIndex} style={ {flex:flexValues[cellIndex]} }>
+								{cells[cellIndex]}
+							</div>
+				cellsUI.push(cell);
+			}
+			return <HBox key={rowIndex}className="weave-padded-hbox" style={ {alignItems:"center"} }>{cellsUI}</HBox>
+		});
+
+		return <VBox  className="weave-padded-vbox" >
+					{wrappedRowsUI}
+				</VBox>;
+	}
 
 	static generateGridLayout=(gridValues:string[],gridRowsUI:JSX.Element[][]):JSX.Element=>
 	{

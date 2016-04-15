@@ -112,11 +112,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
                          onClick={this.crumbClick.bind(this,crumb,index)}> {label}&nbsp;</span>
         },this);
 
-        var styleObj:React.CSSProperties = _.merge({},this.props.style,{
-            flex:1
-        })
 
-        return (<VBox className={this.props.className} style={styleObj}>
+        return (<VBox className={ this.props.className } style={ this.props.style }>
                     <HBox className="weave-editor-header" style = { {alignItems:"center"} }>
                         <HBox style={ crumbStyle }>
                             {crumbUI}
@@ -128,7 +125,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
                     </HBox>
 
 
-                    <div style={{padding:"8px",display:"flex",flexDirection:"inherit",flex:1}}>
+                    <div style={ {padding:"8px",display:"flex",flexDirection:"inherit",overflow:"auto"} }>
                         {editorUI}
                     </div>
 

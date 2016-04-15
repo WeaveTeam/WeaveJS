@@ -280,6 +280,18 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		};
 	}
 
+	updateCursor():void
+	{
+		let modesToCursors: any = {
+			"select": "default",
+			"pan": "move",
+			"zoom": "zoom-in"
+		};
+		let interactionMode = this.interactionMode.value || "select";
+		if (this.map && this.map.getTargetElement())
+			$(this.map.getTargetElement()).css({ cursor: modesToCursors[interactionMode] });
+	}
+
 	componentDidMount():void
 	{
 		Menu.registerMenuSource(this);
@@ -309,6 +321,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			dragPan.setActive(interactionMode === "pan");
 			dragSelect.setActive(interactionMode === "select");
 			dragZoom.setActive(interactionMode === "zoom");
+			this.updateCursor();
 		}, true);
 
 		/* Setup custom controls */

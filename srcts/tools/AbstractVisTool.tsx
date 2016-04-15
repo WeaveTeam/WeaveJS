@@ -207,7 +207,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	renderEditor(linkFunction:Function = null):JSX.Element
 	{
 		return (
-			<VBox className="weave-padded-vbox" style={{flex:1}}>
+			<VBox className="weave-padded-vbox" >
 				{ renderSelectableAttributes(this,linkFunction) }
 				<HBox className="weave-padded-hbox" style={{alignItems: 'center', justifyContent: "space-between"}}>
 					<span>{ Weave.lang("Margins:") }</span>
@@ -231,11 +231,11 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			["X Axis Title", this.xAxisName],
 			["Y Axis Title", this.yAxisName]
 		].map((row:[string, LinkableString]) => {
-			return [<span className="ui label" style={ {width:"100%"} }>{Weave.lang(row[0])}</span>,
+			return [<span>{Weave.lang(row[0])}</span>,
 					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) } style={ {width:"100%"} }/>]
 		});
 
-		return ReactUtils.generateGridLayout(["four","twelve"],gridUIs);
+		return ReactUtils.generateFlexBoxLayout([.3,.7],gridUIs);
 	}
 
 	get deprecatedStateMapping():Object

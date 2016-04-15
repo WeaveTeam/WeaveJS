@@ -218,23 +218,20 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         //console.log("selected nodes", selectedNodes);
 
         return (
-            <VBox className="weave-padded-vbox weave-container" style={ {flex:1,border:"none"} }>
+            <VBox className="weave-padded-vbox" style={ {border:"none"} }>
 
                 <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar>
 
-                <HDividedBox style={ {flex:1 ,border:"1px solid lightgrey"} } space={8} loadWithEqualWidthChildren={true}>
-                    <div>
-                        <WeaveTree searchFilter={ this.searchFilter }
+                <HDividedBox style={ {height:"100%", border:"1px solid lightgrey"} } loadWithEqualWidthChildren={true}>
+                       <div style={ {display:"flex"} } >
+                           <WeaveTree
                                     hideRoot = {true} hideLeaves = {true}
                                     onSelect={this.onHierarchySelected}
                                     root={this.rootTreeNode}
                                     ref={ (c) => { this.tree = c; } }/>
-                    </div>
-
-
-
-                    <VBox>
-                        {this.state.leafNode ? <WeaveTree searchFilter={ this.searchFilter }
+                       </div>
+                        <div style={ {display:"flex"} }>
+                        {this.state.leafNode ? <WeaveTree
                                                           multipleSelection={ true }
                                                           initialSelectedItems={ this.selectedNodes }
                                                           hideRoot={true}
@@ -242,9 +239,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                                                           onSelect={this.setColumn}
                                                           ref={ (c) => { this.leafTree = c; } }/>
                             : null}
-
-
-                    </VBox>
+                        </div>
                 </HDividedBox>
                 {
                     Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.leafNode ?
