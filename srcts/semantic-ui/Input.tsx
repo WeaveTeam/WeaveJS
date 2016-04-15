@@ -50,7 +50,7 @@ export default class Input extends React.Component<InputProps, InputState>
 		}
 		
 		return (
-			<div className={"ui input " + (this.props.className || "")}
+			<div className={"ui input fluid " + (this.props.className || "")}
 				 style={this.props.style}
 				 onMouseEnter={(event) => this.props.title && ToolTip.open(this.props.title, event)}
 				 onMouseLeave={this.props.title && ToolTip.close}>

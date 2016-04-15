@@ -103,7 +103,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	render()
 	{
 		return (
-			<div onClick={this.props.onClick} className={"ui " + (this.props.type || "") + " selection dropdown " + (this.props.className || "")} style={this.props.style}>
+			<div onClick={this.props.onClick} className={"ui " + (this.props.type || "") + " fluid selection dropdown " + (this.props.className || "")} style={this.props.style}>
 				<input type="hidden"/>
 				<i className="dropdown icon"/>
 				<div className="default text">{this.props.placeholder}</div>
