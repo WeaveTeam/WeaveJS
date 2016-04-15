@@ -220,6 +220,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
         let currentColumnNode = ColumnUtils.hack_findHierarchyNode(this.props.attribute);
         let options:{value: IColumnReference&IWeaveTreeNode, label: string}[] = [];
         let clickHandler = this.props.clickHandler;
+        let header:JSX.Element;
         if (currentColumnNode)
         {
             clickHandler = null;
@@ -233,6 +234,8 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
                     let title:string = metadata[ColumnMetadata.TITLE];
                     return {value: colRef, label: title};
                 });
+
+            header = (<span style={{fontWeight: "bold", fontSize: "small"}}>{HierarchyUtils.findParentNode(currentColumnNode.getDataSource().getHierarchyRoot(),currentColumnNode.getDataSource(),currentColumnNode.getColumnMetadata()).getLabel()}</span>)
         }
 
         options.push({ value: null, label: Weave.lang("(None)") });
@@ -242,6 +245,9 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
                          value={currentColumnNode}
             onClick={clickHandler}
             options={options}
-            onChange={this.onChange}/>;
+            onChange={this.onChange}
+             header={header}
+             optionStyle={{marginLeft:10}}
+        />;
     }
 }
