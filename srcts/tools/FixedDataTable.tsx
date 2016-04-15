@@ -5,8 +5,6 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 
 
 import CellProps = FixedDataTable.CellProps;
-import QKey = weavejs.data.key.QKey;
-import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ResizingDiv, {ResizingDivState} from "../react-ui/ResizingDiv";
 import SmartComponent from "../ui/SmartComponent";
 
@@ -173,8 +171,6 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		columnIds:[],
 		enableHover:true,
 		enableSelection:true,
-		selectedIds: [],
-		probedIds: [],
 		showIdColumn:false,
 		rowHeight:30,
 		headerHeight:30,
@@ -195,8 +191,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		this.state = {
 			columnWidths: {},
 			sortIndices,
-			selectedIds: props.selectedIds,
-			probedIds: props.probedIds,
+			selectedIds: props.selectedIds || [],
+			probedIds: props.probedIds || [],
 			width: props.width,
 			height: props.height
 		};
@@ -275,7 +271,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	onMouseDown=(event:React.MouseEvent, index:number):void =>
 	{
 		//console.log("Down",event,index);
-
+		
 		var selectedIds:string[] = this.state.selectedIds;
 		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty] as string;
 
@@ -346,7 +342,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 				this.lastClicked = index;
 			}
 		}
-
+		
 		this.setState({
 			selectedIds
 		});
@@ -396,21 +392,20 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			newState.sortIndices = nextProps.rows.map((row, index) => index);
 
 		if(nextProps.probedIds)
-			newState.probedIds = nextProps.probedIds;
-
+			newState.probedIds = nextProps.probedIds.concat([]);
+		
 		if(nextProps.selectedIds)
-			newState.selectedIds = nextProps.selectedIds;
-
+			newState.selectedIds = nextProps.selectedIds.concat([]);
+		
 		this.setState(newState);
 		this.forceUpdate(); // why is this being done
 	}
-
+	
 	handleResize=(newSize:ResizingDivState) => {
-		if(this.props.allowResizing)
-			this.setState({
-				width: newSize.width,
-				height: newSize.height
-			});
+		this.setState({
+			width: newSize.width,
+			height: newSize.height
+		});
 	};
 
 	render():JSX.Element
@@ -428,27 +423,27 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		return (
 			<ResizingDiv style={tableContainer} onResize={this.handleResize}>
 				{this.state.width && this.state.height ?
-				<Table
-					rowsCount={this.props.rows.length}
-					width={this.state.width}
-					height={this.state.height}
-					headerHeight={this.props.headerHeight}
-					rowHeight={this.props.rowHeight}
-					onRowMouseDown={this.onMouseDown}
-					onRowMouseEnter={this.onMouseEnter}
-					onRowMouseLeave={this.onMouseLeave}
-					rowClassNameGetter={this.getRowClass}
-					onColumnResizeEndCallback={this.onColumnResizeEndCallback}
-					isColumnResizing={false}
-				>
-					{
-						this.props.columnIds.map((id:string,index:number) => {
-							if(this.props.showIdColumn || id != this.props.idProperty){
-								return (
-								<Column
-									key={index}
-									columnKey={id}
-									header={
+					<Table
+						rowsCount={this.props.rows.length}
+						width={this.state.width}
+						height={this.state.height}
+						headerHeight={this.props.headerHeight}
+						rowHeight={this.props.rowHeight}
+						onRowMouseDown={this.onMouseDown}
+						onRowMouseEnter={this.onMouseEnter}
+						onRowMouseLeave={this.onMouseLeave}
+						rowClassNameGetter={this.getRowClass}
+						onColumnResizeEndCallback={this.onColumnResizeEndCallback}
+						isColumnResizing={false}
+					>
+						{
+							this.props.columnIds.map((id:string,index:number) => {
+								if(this.props.showIdColumn || id != this.props.idProperty){
+									return (
+										<Column
+											key={index}
+											columnKey={id}
+											header={
 												<SortHeaderCell
 													onSortChange={this.updateSortDirection}
 													sortDirection={id == this.state.sortId ? this.state.sortDirection : ""}
@@ -457,22 +452,22 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 													{this.props.columnTitles ? this.props.columnTitles[id]:id}
 												</SortHeaderCell>
 											}
-									cell={(props:CellProps) => (
+											cell={(props:CellProps) => (
 												<TextCell
 													data={this.props.rows}
 													sortIndices={this.state.sortIndices}
 													{...props}
 												/>)
 											}
-									width={this.state.columnWidths[id] || (this.props.evenlyExpandRows ? (evenWidth || this.props.initialColumnWidth):this.props.initialColumnWidth)}
-									isResizable={true}
-								/>
+											width={this.state.columnWidths[id] || (this.props.evenlyExpandRows ? (evenWidth || this.props.initialColumnWidth):this.props.initialColumnWidth)}
+											isResizable={this.props.allowResizing}
+										/>
 									);
 								}
 							})
 						}
-				</Table>:""
-					}
+					</Table>:""
+				}
 			</ResizingDiv>
 		);
 	}
