@@ -8,7 +8,7 @@ export type DropDownOption = (string | { label: any, value: any });
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
-	options:DropDownOption[];
+	options?:DropDownOption[];
 	value?:any;
 	onChange?:(value:any)=>void;
 	onAdd?:(value:any)=>void;
@@ -18,6 +18,7 @@ export interface DropdownProps extends React.HTMLProps<Dropdown>
 	valueEqualityFunc?: (valueA:any,valueB:any)=>boolean;
 	allowAdditions?:boolean;
 	type?:string;
+	fluid?:boolean;
 }
 
 export interface DropdownState
@@ -28,7 +29,11 @@ export interface DropdownState
 export default class Dropdown extends SmartComponent<DropdownProps, DropdownState>
 {
 	element:Element;
-	
+
+	static defaultProps:DropdownProps = {
+		fluid:true
+	};
+
 	constructor(props:DropdownProps)
 	{
 		super(props);
@@ -103,7 +108,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	render()
 	{
 		return (
-			<div onClick={this.props.onClick} className={"ui " + (this.props.type || "") + " fluid selection dropdown " + (this.props.className || "")} style={this.props.style}>
+			<div onClick={this.props.onClick} className={"ui " + (this.props.type || "") + " " + this.props.fluid +" selection dropdown " + (this.props.className || "")} style={this.props.style}>
 				<input type="hidden"/>
 				<i className="dropdown icon"/>
 				<div className="default text">{this.props.placeholder}</div>
