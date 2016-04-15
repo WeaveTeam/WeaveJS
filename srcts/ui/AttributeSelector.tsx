@@ -42,7 +42,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     private weaveRoot: ILinkableHashMap;
     private searchFilter :string;
     private items:{[label:string] : Function}={};
-    private selectedColumnRef :IColumnReference[];
+    private selectedColumnRef :IColumnReference[] = [];
     private selectedNodes:IWeaveTreeNode[];
 
     constructor(props:IAttributeSelectorProps)
@@ -126,14 +126,17 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             var meta = ref.getColumnMetadata();
             if (meta)
             {
-                if(Weave.IS(this.state.selectedAttribute, IColumnWrapper)){//if selectable attribute is a single column
+                if (Weave.IS(this.state.selectedAttribute, IColumnWrapper))
+				{
+					//if selectable attribute is a single column
                     let dc = ColumnUtils.hack_findInternalDynamicColumn(this.state.selectedAttribute as IColumnWrapper);
                     if (dc)
                         dc.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
                 }
-                else{//if selectable attribute is an ILinkableHashMap
-                    this.selectedColumnRef = [];
-                    this.selectedColumnRef = selectedItems.map((item:IWeaveTreeNode)=> {
+                else
+				{
+					//if selectable attribute is an ILinkableHashMap
+                    this.selectedColumnRef = selectedItems.map((item:IWeaveTreeNode) => {
                         return Weave.AS(item, weavejs.api.data.IColumnReference);
                     });
                 }
