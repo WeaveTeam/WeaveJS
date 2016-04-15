@@ -263,7 +263,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		
 		var activeTabIndex = 0;
 		
-		if(root.getChildren().length)
+		if(root.getChildren() && root.getChildren().length)
 		{
 			activeTabIndex = 1;
 		}
