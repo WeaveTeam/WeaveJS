@@ -58,7 +58,7 @@ export default class C3BarChart extends AbstractC3Tool
     chartColors = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
     groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode));
     horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
-    showValueLabels = Weave.linkableChild(this, new LinkableBoolean(true));
+    showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
     showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
 	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8));
 
@@ -537,7 +537,7 @@ export default class C3BarChart extends AbstractC3Tool
 				{ReactUtils.generateFlexBoxLayout(
                     [.3,.7],
 					[
-						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <Dropdown style={{width:"100%"}}className="weave-sidebar-dropdown" ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <Dropdown style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					]
 				)}
             </VBox>
