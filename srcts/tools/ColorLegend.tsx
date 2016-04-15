@@ -54,6 +54,7 @@ import EqualIntervalBinningDefinition = weavejs.data.bin.EqualIntervalBinningDef
 import StandardDeviationBinningDefinition = weavejs.data.bin.StandardDeviationBinningDefinition;
 import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
 import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
+import ColumnUtils = weavejs.data.ColumnUtils;
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -382,17 +383,28 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		else
 		{
 			//Continuous plot case
-			return (
-				<VBox style={{flex: 1}}>
-					<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</label>
-					<HSpacer/>
-					<HBox style={{flex: 1, overflow: "auto"}}>
-						<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={this.colorColumn ? this.colorColumn.ramp.getHexColors():[]}/>
-						<VSpacer/>
-						{/* labels will go here eventually*/}
-					</HBox>
-				</VBox>
-			);
+			if(this.colorColumn)
+			{
+				var dataColumn = this.colorColumn.internalDynamicColumn;
+				
+				return (
+					<VBox style={{flex: 1, marginLeft: 20}}>
+						<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</label>
+						<HSpacer/>
+						<HBox style={{flex: 1, overflow: "auto"}}>
+							<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={this.colorColumn ? this.colorColumn.ramp.getHexColors():[]}/>
+							<VSpacer/>
+							<VBox style={{justifyContent: "space-between"}}>
+								{ColumnUtils.deriveStringFromNumber(dataColumn, this.colorColumn.getDataMin())}
+								{this.colorColumn.rampCenterAtZero.value ? ColumnUtils.deriveStringFromNumber(dataColumn, 0) : null}
+								{ColumnUtils.deriveStringFromNumber(dataColumn, this.colorColumn.getDataMax())}
+							  </VBox>
+						   </HBox>
+						<HSpacer/>
+					</VBox>
+				);
+			}
+			return <div/>;
 		}
 	}
 
@@ -530,6 +542,8 @@ class CustomBinLabelComponent extends React.Component<CustomBinLabelComponentPro
 	
 	render()
 	{
+		
+		var binDef = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
 		return (
 			ReactUtils.generateTable(
 				null,
@@ -537,13 +551,13 @@ class CustomBinLabelComponent extends React.Component<CustomBinLabelComponentPro
 					[
 						Weave.lang("Binning Method"),
 						<HBox className="weave-padded-hbox" style={{padding: 0}}>
-							<Input style={{flex: 1}} readOnly value={Weave.lang(CustomBinLabelComponent.binClassToBinLabel.get((this.binnedColumn.binningDefinition.target as AbstractBinningDefinition).constructor as typeof IBinningDefinition))}/>
+							<Input style={{flex: 1}} readOnly value={Weave.lang(binDef ? CustomBinLabelComponent.binClassToBinLabel.get(binDef.constructor as typeof IBinningDefinition) : "None")}/>
 							<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
 						</HBox>
 					],
 					[
 						Weave.lang("Bin names"),
-						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={this.binnedColumn.binningDefinition.target as AbstractBinningDefinition}/></VBox>
+						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
 					]
 				],
 				{
