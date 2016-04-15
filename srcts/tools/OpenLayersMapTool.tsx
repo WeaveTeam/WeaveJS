@@ -31,6 +31,7 @@ import {OverrideBounds} from "./AbstractVisTool";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import MiscUtils from "../utils/MiscUtils";
 
+import Button from "../semantic-ui/Button";
 import Checkbox from "../semantic-ui/Checkbox";
 import StatefulTextField from "../ui/StatefulTextField";
 import Dropdown from "../semantic-ui/Dropdown";
@@ -84,6 +85,16 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			});
 	};
 
+	overrideSet():boolean
+	{
+		let state: { [coord: string]: number } = Weave.getState(this.extentOverride) as { [coord: string]: number };
+		for (let coord of Object.keys(state))
+		{
+			if (!lodash.isFinite(state[coord])) return false;
+		}
+		return true;
+	}
+
 	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linkFunction:Function): JSX.Element {
 		let controlLocationOpts = [
@@ -108,7 +119,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let editorFields = [
 			[Weave.lang("Panel Title"),
 				<HBox>
-					<StatefulTextField ref= { linkReactStateRef(this, {value: this.panelTitle }) }/>
+					<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) }/>
 				</HBox>
 			],
 			[Weave.lang("Control Location"),
@@ -117,7 +128,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				</HBox>
 			],
 			[Weave.lang("Zoom Range"),
-				<HBox style={{ width: "100%" }}>
+				<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
 					{"-"}
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
@@ -130,13 +141,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Projection SRS"),
 				<HBox>
-					<StatefulTextField ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
+					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
 				</HBox>
 			],
 			[Weave.lang("Override extent"), 
 				<HBox>
-					<button onClick={this.setOverrideExtent}>{Weave.lang("Use current zoom")}</button>
-					<button onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</button>
+					<Button onClick={this.setOverrideExtent}>{Weave.lang("Use current zoom")}</Button>
+					<Button onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</Button>
 				</HBox>
 			],
 			[Weave.lang("Snap zoom to base map"),

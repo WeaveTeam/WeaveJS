@@ -13,14 +13,14 @@ import ReactUtils from "../../utils/ReactUtils";
 import Checkbox from "../../semantic-ui/Checkbox";
 import StatefulRangeSlider from "../../ui/StatefulRangeSlider";
 import {linkReactStateRef} from "../../utils/WeaveReactUtils";
-
-
+import Button from "../../semantic-ui/Button";
+import FixedDataTable from "../FixedDataTable";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export interface ILayerManagerState {
-	selectedLayer: AbstractLayer;
-	openedLayer: AbstractLayer;
+	selectedLayer?: AbstractLayer;
+	openedLayer?: AbstractLayer;
 }
 
 export interface  ILayerManagerProps extends React.HTMLProps<LayerManager> {
@@ -47,17 +47,15 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 	generateItem=(layer:AbstractLayer, index:number):JSX.Element=>
 	{
 		/* Stop propagation is necessary because otherwise state linkage breaks when the selectedLayer changes. */
-		return <tr key={index}
-				className={layer === this.state.selectedLayer ? "weave-tree-view selected" : "weave-tree-view"}
-				onClick={() => { if (this.state.selectedLayer !== layer) this.setState({ selectedLayer: layer, openedLayer: null }); }}>
-				<td><Checkbox title={Weave.lang("Show layer")} ref={linkReactStateRef(this, { value: layer.visible }) } stopPropagation={true}/></td>
-				<td style={{width: "100%"}}>{layer.getDescription() }</td>
-				<td>
-					<button title={Weave.lang("Edit layer")} style={{whiteSpace: "nowrap"}} onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }>
-						<i className="fa fa-gear"/>{" " + Weave.lang("Edit")}
-					</button>
-				</td>
-		</tr>;
+
+		return <HBox key={index} style={{width: "100%", alignItems: "center", paddingTop: "4px", paddingBottom: "4px"}} className={layer == this.state.selectedLayer ? "weave-list-Item-selected" : "weave-list-Item"}
+				onClick={() => {if (this.state.selectedLayer != layer) this.setState({selectedLayer: layer});}}>
+				<Checkbox title={Weave.lang("Show layer")} ref={linkReactStateRef(this, { value: layer.visible }) } stopPropagation={true}/>
+				<span style={{width: "100%"}}>{layer.getDescription()}</span>
+				<button className="ui button" title={Weave.lang("Edit layer")} style={{alignSelf: "flex-end", whiteSpace: "nowrap"}} onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }>
+					{" > "}
+				</button>
+		</HBox>
 	}
 
 	moveSelectedUp=()=>{
@@ -97,22 +95,19 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		{
 			var layerTypes = [TileLayer, GeometryLayer, LabelLayer, ScatterPlotLayer, ImageGlyphLayer];
 
-			return <VBox>
-				<div style={{ height: 200, overflowY: "scroll" }}>
-					<table style={{ width: "100%" }}>
-						<tbody>
+			return <VBox className="weave-padded-vbox">
+				<label>{Weave.lang("Layers")}</label>
+				<VBox className="weave-container" style={{overflowY: "scroll", width: "100%" }}>
 							{this.props.layers.getObjects().reverse().map(this.generateItem)}
-						</tbody>
-					</table>
-				</div>
-				<HBox>
+				</VBox>
+				<HBox className="weave-padded-hbox">
 					<MenuButton style={flex1} items={layerTypes.map(addLayerMenuItem)}>
 						<i className="fa fa-plus"/>
 					</MenuButton>
-					<button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></button>
-					<button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} 
-							onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></button>
-					<button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down"/></button>
+					<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></Button>
+					<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} 
+							onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></Button>
+					<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down"/></Button>
 				</HBox>
 			</VBox>
 		}
@@ -120,9 +115,9 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		{
 			return <VBox>
 				<HBox>
-					<button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null}) }>
+					<Button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null}) }>
 						<i className="fa fa-arrow-left"/>
-					</button>
+					</Button>
 					{Weave.lang("Layer: {0}", this.props.layers.getName(this.state.openedLayer))}
 				</HBox>
 				{this.state.selectedLayer.renderEditor()}
@@ -184,7 +179,7 @@ class MenuButton extends React.Component<IMenuButtonProps,IMenuButtonState> {
 		delete props.style;
 		delete props.onClick;
 
-		return <button style={_.merge({ position: "relative" }, this.props.style) } ref={(c) => this.button = c} onClick={this.openPopup} {...props as any}>
+		return <button className="ui button" style={_.merge({ position: "relative" }, this.props.style) } ref={(c) => this.button = c} onClick={this.openPopup} {...props as any}>
 			{this.props.children}
 		</button>;
 	}
