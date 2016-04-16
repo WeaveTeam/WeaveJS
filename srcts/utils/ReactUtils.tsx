@@ -123,10 +123,10 @@ export default class ReactUtils
 		document.body.removeChild(element);
 	}
 
-	static generateFlexBoxLayout=(flexValues:number[],rowsUI:JSX.Element[][]):JSX.Element=>
+	static generateFlexBoxLayout=(flexValues:number[],rowsUI:React.ReactChild[][]):JSX.Element=>
 	{
 
-		var wrappedRowsUI:JSX.Element[] = rowsUI.map((cells:JSX.Element[],rowIndex:number) => {
+		var wrappedRowsUI:JSX.Element[] = rowsUI.map((cells:React.ReactChild[],rowIndex:number) => {
 
 			let cellsUI:JSX.Element[] = [];
 
