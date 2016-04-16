@@ -10,6 +10,8 @@ import FixedDataTable from "../tools/FixedDataTable";
 import {IRow} from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
 import BinNamesList from "../ui/BinNamesList";
+import ReactUtils from "../utils/ReactUtils";
+import Button from "../semantic-ui/Button";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -347,5 +349,71 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 				</VBox>
 			</HBox>
 		)
+	}
+}
+
+
+export interface CompactBinningDefinitionEditorProps {
+	binnedColumn:BinnedColumn;
+	onButtonClick:()=>void
+}
+
+export class CompactBinningDefinitionEditor extends React.Component<CompactBinningDefinitionEditorProps, {}>
+{
+	static binClassToBinLabel = new Map<typeof IBinningDefinition, string>()
+							   .set(SimpleBinningDefinition, "Equally spaced")
+							   .set(CustomSplitBinningDefinition, "Custom breaks")
+							   .set(QuantileBinningDefinition, "Quantile")
+							   .set(EqualIntervalBinningDefinition, "Equal interval")
+							   .set(StandardDeviationBinningDefinition, "Standard deviations")
+							   .set(NaturalJenksBinningDefinition, "Natural breaks")
+							   .set(CategoryBinningDefinition, "All Categories(string values)");
+							   
+		
+	private  _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.forceUpdate.bind(this)));
+	private  get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }					   
+	
+	constructor(props:CompactBinningDefinitionEditorProps)
+	{
+		super(props);
+		this.setTarget(props.binnedColumn);
+	}
+		
+	componentWillReceiveProps(props:CompactBinningDefinitionEditorProps)
+	{
+		this.setTarget(props.binnedColumn);
+	}
+
+	public setTarget(object:ILinkableObject):void
+	{
+		this._binnedColumnWatcher.target = object as BinnedColumn;
+	}
+	
+	render()
+	{
+		
+		var binDef = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
+		return (
+			ReactUtils.generateTable(
+				null,
+				[
+					[
+						Weave.lang("Binning Method"),
+						<HBox className="weave-padded-hbox" style={{padding: 0}}>
+							<Input style={{flex: 1}} readOnly value={Weave.lang(binDef ? CompactBinningDefinitionEditor.binClassToBinLabel.get(binDef.constructor as typeof IBinningDefinition) : "None")}/>
+							<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+						</HBox>
+					],
+					[
+						Weave.lang("Bin names"),
+						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
+					]
+				],
+				{
+					table: {width: "100%"},
+					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
+				}
+			)
+		);
 	}
 }

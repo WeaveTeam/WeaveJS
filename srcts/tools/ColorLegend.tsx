@@ -22,6 +22,7 @@ import ColorController from "../editors/ColorController";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import BinNamesList from "../ui/BinNamesList";
+import CompactBinningDefinitionEditor from "../editors/BinningDefinitionEditor";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -460,7 +461,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				}
 			)}
 			{
-				<CustomBinLabelComponent binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+				<CompactBinningDefinitionEditor binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 			}
 			{
 				ReactUtils.generateTable(
@@ -497,75 +498,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				}
 			}
 		};
-	}
-}
-
-// internal
-// this custom label component watches the state of the binnedColumn to display
-// the approprivate values of its binning definition
-
-interface CustomBinLabelComponentProps {
-	binnedColumn:BinnedColumn;
-	onButtonClick:()=>void
-}
-
-class CustomBinLabelComponent extends React.Component<CustomBinLabelComponentProps, {}>
-{
-	static binClassToBinLabel = new Map<typeof IBinningDefinition, string>()
-							   .set(SimpleBinningDefinition, "Equally spaced")
-							   .set(CustomSplitBinningDefinition, "Custom breaks")
-							   .set(QuantileBinningDefinition, "Quantile")
-							   .set(EqualIntervalBinningDefinition, "Equal interval")
-							   .set(StandardDeviationBinningDefinition, "Standard deviations")
-							   .set(NaturalJenksBinningDefinition, "Natural breaks")
-							   .set(CategoryBinningDefinition, "All Categories(string values)");
-							   
-		
-	private  _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.forceUpdate.bind(this)));
-	private  get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }					   
-	
-	constructor(props:CustomBinLabelComponentProps)
-	{
-		super(props);
-		this.setTarget(props.binnedColumn);
-	}
-		
-	componentWillReceiveProps(props:CustomBinLabelComponent)
-	{
-		this.setTarget(props.binnedColumn);
-	}
-
-	public setTarget(object:ILinkableObject):void
-	{
-		this._binnedColumnWatcher.target = object as BinnedColumn;
-	}
-	
-	render()
-	{
-		
-		var binDef = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
-		return (
-			ReactUtils.generateTable(
-				null,
-				[
-					[
-						Weave.lang("Binning Method"),
-						<HBox className="weave-padded-hbox" style={{padding: 0}}>
-							<Input style={{flex: 1}} readOnly value={Weave.lang(binDef ? CustomBinLabelComponent.binClassToBinLabel.get(binDef.constructor as typeof IBinningDefinition) : "None")}/>
-							<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
-						</HBox>
-					],
-					[
-						Weave.lang("Bin names"),
-						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
-					]
-				],
-				{
-					table: {width: "100%"},
-					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
-				}
-			)
-		);
 	}
 }
 
