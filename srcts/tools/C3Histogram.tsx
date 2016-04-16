@@ -11,6 +11,8 @@ import FormatUtils from "../utils/FormatUtils";
 import DOMUtils from "../utils/DOMUtils"
 import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
+import Checkbox from "../semantic-ui/Checkbox";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -18,6 +20,7 @@ import BinnedColumn = weavejs.data.column.BinnedColumn;
 import ColorColumn = weavejs.data.column.ColorColumn;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import LinkableString = weavejs.core.LinkableString;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
 import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -39,6 +42,8 @@ export default class C3Histogram extends AbstractC3Tool
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
     barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
+	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
+	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
 
 	private RECORD_FORMAT = {
 		id: IQualifiedKey,
@@ -81,6 +86,18 @@ export default class C3Histogram extends AbstractC3Tool
                 type: "bar",
                 xSort: false,
                 names: {},
+	            labels: {
+		            format: (v, id, i, j) => {
+			            if (this.showValueLabels.value)
+			            {
+				            return FormatUtils.defaultNumberFormatting(v);
+			            }
+			            else
+			            {
+				            return "";
+			            }
+		            }
+	            },
                 color: (color:string, d:any):string => {
                     if (d && d.hasOwnProperty("index"))
 					{
@@ -382,7 +399,7 @@ export default class C3Histogram extends AbstractC3Tool
     {
         var changeDetected:boolean = false;
         var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin);
-        if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fill, this.line, this.filteredKeySet))
+        if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fill, this.line, this.filteredKeySet, this.showValueLabels))
         {
             changeDetected = true;
             this.dataChanged();
@@ -419,6 +436,12 @@ export default class C3Histogram extends AbstractC3Tool
 			
 			this.updateConfigMargin();
     	}
+
+	    if (Weave.detectChange(this, this.horizontalMode))
+	    {
+		    changeDetected = true;
+		    this.c3Config.axis.rotated = this.horizontalMode.value;
+	    }
 
         if(Weave.detectChange(this, this.barWidthRatio))
         {
@@ -475,6 +498,13 @@ export default class C3Histogram extends AbstractC3Tool
 						]
 					])
 				}
+				{ReactUtils.generateFlexBoxLayout(
+					[.3,.7],
+					[
+						[ <Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
+						[ <Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
+					]
+				)}
 			</VBox>
 		)
 	}
