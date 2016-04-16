@@ -65,15 +65,10 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 //		
 	
 	static selected:IDataSource;
-	static menu:MenuItemProps[];
-	//made this static because the MenuButton in the DataSourceManager(DSM) requires the menu options even when props.dataMenu is null (case when WeaveApp.createObject creates Instance of DSM
 
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
-		if(this.props.dataMenu){
-			DataSourceManager.menu = props.dataMenu.getDataSourceItems();
-		}
 	}
 
 	componentDidMount()
@@ -144,7 +139,11 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		return (
 			<HBox className="weave-padded-hbox" style={ {flex:1} }>
 				<VBox className="weave-container" style={ {width:200, padding: 0} }>
-					<MenuButton menu={ DataSourceManager.menu  }>New Data Source</MenuButton>
+					{
+						this.props.dataMenu
+						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() }>{Weave.lang('New Data Source')}</MenuButton>
+						: 	null
+					}
 					<List
 						options={listOptions}
 						multiple={false}

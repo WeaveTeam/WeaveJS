@@ -54,18 +54,23 @@ export default class DataMenu implements MenuBarItemProps
 		
 		return impls.map(impl => {
 			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
-			if (impl == weavejs.data.source.CensusDataSource)
-			{
-				if (Weave.experimental)
-					label += " (experimental)";
-				else
-					return null;
-			}
 			return {
-				label: label,
+				get shown() {
+					return Weave.experimental || !DataMenu.isExperimental(impl);
+				},
+				get label() {
+					if (DataMenu.isExperimental(impl))
+						return label + " (experimental)";
+					return label;
+				},
 				click: this.createObject.bind(this, impl)
 			}
-		}).filter(item => !!item);
+		});
+	}
+
+	static isExperimental(impl:new()=>IDataSource):boolean
+	{
+		return impl == weavejs.data.source.CensusDataSource;
 	}
 	
 	getColumnsToExport=()=>
