@@ -10,6 +10,8 @@ import {ListOption} from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ControlPanel from "./ControlPanel";
+import ReactUtils from "../utils/ReactUtils";
+import Button from "../semantic-ui/Button";
 
 export interface ISelectableAttributesListProps{
     columns : ILinkableHashMap;
@@ -68,14 +70,15 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
     render(): JSX.Element {
         var labelStyle:React.CSSProperties = {
-            fontSize : 'smaller',
-            alignSelf:'flex-start',
-            borderColor: '#E6E6E6'
+            textAlign: 'center',
+            display:"flex",
+            justifyContent: "flex-end"
         };
 
         var listStyle:React.CSSProperties = {
             minHeight: '70px',
-            overflowY: 'auto',
+            overflow: 'auto',
+            flex:1,
             border:'1px solid lightgrey'
         };
 
@@ -101,27 +104,27 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         var labelUI:JSX.Element = null;
         if(this.props.showLabelAsButton)
         {
-            labelUI = <IconButton style={ labelStyle } clickHandler={ this.launchAttributeSelector }>{ Weave.lang(this.props.label) }</IconButton>;
+            labelStyle.borderColor = '#E6E6E6';
+            labelStyle.fontSize = "smaller";
+            labelUI = <Button style={ labelStyle } onClick={ this.launchAttributeSelector }>{ Weave.lang(this.props.label) }</Button>;
         }else
         {
-            labelUI = <span>{this.props.label}</span>
+            labelUI = <span style={ labelStyle }>{this.props.label}</span>
         }
 
-        return(<VBox className="weave-padded-vbox weave-container" style={ {border:"none"} }>
-                    {labelUI}
+        let listUI:JSX.Element = <VBox className="weave-padded-vbox">
+                                    <HBox style={listStyle}>
+                                        <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
+                                    </HBox>
 
-                    <VBox className="weave-padded-vbox">
-                        <HBox style={listStyle}>
-                            <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
-                        </HBox>
+                                    <HBox className="weave-padded-hbox" style={constrollerStyle}>
+                                        <Button style={ {fontSize:"smaller"} } onClick={ this.handleSelectAll }>Select All</Button>
+                                        <Button style={ {fontSize:"smaller"} } onClick={ this.removeSelected }>Remove Selected</Button>
+                                    </HBox>
+                                </VBox>
 
-                        <HBox className="weave-padded-hbox" style={constrollerStyle}>
-                            <IconButton clickHandler={ this.handleSelectAll }
-                                        style={ {borderColor:"grey", fontSize:"12px"} }>Select All</IconButton>
-                            <IconButton clickHandler={ this.removeSelected }
-                                        style={ {borderColor:"grey", fontSize:"12px"} }>Remove Selected</IconButton>
-                        </HBox>
-                    </VBox>
-               </VBox>);
+        let ui:JSX.Element = ReactUtils.generateFlexBoxLayout([.3,.7],[[labelUI,listUI]],[{alignSelf:"flex-start"}])
+
+        return(ui);
     }
 }

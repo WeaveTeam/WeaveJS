@@ -96,8 +96,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         var clearStyle = classNames({ 'fa fa-times-circle' : true, 'weave-icon' : true});
         var labelStyle:React.CSSProperties = {
             textAlign: 'center',
-            flex: 0.35,
-            fontSize: 'smaller'
+            display:"flex",
+            justifyContent: "flex-end"
         };
         var btnStyle:React.CSSProperties = {
             fontSize: '24px',
@@ -128,7 +128,10 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                     defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
                 }
 
-                let labelUI:JSX.Element = this.props.showLabel ? <span style={ labelStyle }>{ Weave.lang(label) }</span> : null;
+                let labelUI:JSX.Element = this.props.showLabel ? <span style={ labelStyle }>
+                                                                    { Weave.lang(label) }
+                                                                 </span>
+                                                                : null;
                 let moreDataSourceLabel:string = ">";
                 let elements:JSX.Element[] = [
 	                        labelUI,

@@ -17,6 +17,8 @@ import IDataSource = weavejs.api.data.IDataSource;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import SmartComponent from "./SmartComponent";
 import ControlPanel from "./ControlPanel";
+import Button from "../semantic-ui/Button";
+import ResizingDiv from "../react-ui/ResizingDiv";
 
 export interface IAttributeSelectorProps
 {
@@ -204,7 +206,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     {
 		if (this.rootTreeNode)
 			var ui:JSX.Element = Weave.IS(this.state.selectedAttribute, ILinkableHashMap) && this.state.leafNode
-				?	<VBox style={{flex:1}}>
+				?	<VBox>
 						<SelectableAttributesList  showLabelAsButton={ false } label={ this.state.label } columns={ this.state.selectedAttribute as ILinkableHashMap}></SelectableAttributesList>
 					</VBox>
 				:	null;
@@ -225,16 +227,16 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
                 <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar>
 
-                <HDividedBox style={ {height:"100%", border:"1px solid lightgrey"} } loadWithEqualWidthChildren={true}>
-                       <div style={ {display:"flex"} } >
-                           <WeaveTree
-                                    hideRoot = {true} hideLeaves = {true}
+                <HDividedBox style={ { border:"1px solid lightgrey",width:"100%",height:"50%"} } loadWithEqualWidthChildren={true}>
+                       <div style={{display:"flex"}}>
+                           <WeaveTree style={ {flex:"1"} }
+                                      hideRoot = {true} hideLeaves = {true}
                                     onSelect={this.onHierarchySelected}
                                     root={this.rootTreeNode}
                                     ref={ (c) => { this.tree = c; } }/>
                        </div>
-                        <div style={ {display:"flex"} }>
-                        {this.state.leafNode ? <WeaveTree
+                        <div style={{display:"flex"}}>
+                        {this.state.leafNode ? <WeaveTree style={ {flex:"1"} }
                                                           multipleSelection={ true }
                                                           initialSelectedItems={ this.selectedNodes }
                                                           hideRoot={true}
@@ -247,10 +249,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                 {
                     Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.leafNode ?
                         <HBox className="weave-padded-hbox" style={ constrollerStyle } >
-                            <IconButton clickHandler={ this.handleSelectAll }
-                                        style={ {borderColor:"grey", fontSize:"smaller"} }>Select All</IconButton>
-                            <IconButton clickHandler={ this.addSelected }
-                                        style={ {borderColor:"grey", fontSize:"smaller"} }>Add Selected</IconButton>
+                            <Button style={ {fontSize:"smaller"} } onClick={ this.handleSelectAll }>Select All</Button>
+                            <Button style={ {fontSize:"smaller"} } onClick={ this.addSelected }>Add Selected</Button>
                         </HBox>
                         : null}
 

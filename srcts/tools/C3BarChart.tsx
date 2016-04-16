@@ -521,23 +521,31 @@ export default class C3BarChart extends AbstractC3Tool
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
     renderEditor(linkFunction:Function):JSX.Element
     {
+        var labelStyle:React.CSSProperties = {
+            textAlign: 'center',
+            display:"flex",
+            justifyContent: "flex-end",
+        };
+
         return (
             <VBox className="weave-padded-vbox">
                 {
                     super.renderEditor(linkFunction)
                 }
+                <br/>
 				{ReactUtils.generateFlexBoxLayout(
 					[.3,.7],
 					[
-						[ <Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
-						[ <Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ],
-						[ <Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show X Axis Title")}</span> ]
+						[ <span style={labelStyle} ><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>,<span >{Weave.lang("Horizontal Bars")}</span>  ],
+						[ <span style={labelStyle} ><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>,<span >{Weave.lang("Show Value Labels")}</span> ],
+						[ <span style={labelStyle} ><Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/></span>, <span >{Weave.lang("Show X Axis Title")}</span> ]
 					]
 				)}
+                <br/>
 				{ReactUtils.generateFlexBoxLayout(
                     [.3,.7],
 					[
-						[ <span style={{fontSize: 'smaller'}}>{Weave.lang("Grouping Mode")}</span>, <Dropdown style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+						[ <span style={labelStyle}>{Weave.lang("Grouping Mode")}</span>, <Dropdown style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					]
 				)}
             </VBox>

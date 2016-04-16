@@ -151,6 +151,8 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 
 		["left","right","top","bottom"].map((location:string, index:number) => {
 			var openStateValue:boolean = (this.state as any)["open" + this.capitalizeFirstCharacter(location) + "SideBar"];
+
+
 			if (!openStateValue) // don't render if sidebar is not open
 			{
 				return null
@@ -276,6 +278,7 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 
 		return (containerUI);
 	}
+
 }
 
 class Wrapper extends React.Component<React.HTMLProps<Wrapper>,{}>

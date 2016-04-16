@@ -123,7 +123,8 @@ export default class ReactUtils
 		document.body.removeChild(element);
 	}
 
-	static generateFlexBoxLayout=(flexValues:number[],rowsUI:React.ReactChild[][]):JSX.Element=>
+
+	static generateFlexBoxLayout=(flexValues:number[],rowsUI:React.ReactChild[][],cellStyles:React.CSSProperties[] = [],cellClassNames:string[] = []):JSX.Element=>
 	{
 
 		var wrappedRowsUI:JSX.Element[] = rowsUI.map((cells:React.ReactChild[],rowIndex:number) => {
@@ -132,7 +133,9 @@ export default class ReactUtils
 
 			for(let cellIndex:number = 0 ; cellIndex < cells.length ; cellIndex++)
 			{
-				let cell = <div key={cellIndex} style={ {flex:flexValues[cellIndex]} }>
+				let customCellStyle:React.CSSProperties = cellStyles[cellIndex]?cellStyles[cellIndex]:{};
+				let cellStyle:React.CSSProperties = _.merge(customCellStyle,{flex:flexValues[cellIndex]})
+				let cell = <div key={cellIndex} style={ cellStyle } className={cellClassNames[cellIndex]}>
 								{cells[cellIndex]}
 							</div>
 				cellsUI.push(cell);

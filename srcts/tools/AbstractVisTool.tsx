@@ -206,33 +206,48 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	renderEditor(linkFunction:Function = null):JSX.Element
 	{
+		var labelStyle:React.CSSProperties = {
+			textAlign: 'center',
+			display:"flex",
+			justifyContent: "flex-end",
+		};
+
+		let marginCellsUI:JSX.Element = <HBox style={{alignItems: 'center',justifyContent: "space-between"}} >
+											<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.left) }</div>
+											<VBox className="weave-padded-vbox" style={{width: 50}}>
+												{ this.renderNumberEditor(this.margin.top) }
+												{ this.renderNumberEditor(this.margin.bottom) }
+											</VBox>
+											<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right) }</div>
+										</HBox>;
+
+		let marginUI:JSX.Element = ReactUtils.generateFlexBoxLayout([.3,.7],[[<span style={labelStyle}>{ Weave.lang("Margins") }</span>,marginCellsUI]]);
+
 		return (
 			<VBox className="weave-padded-vbox" >
 				{ renderSelectableAttributes(this,linkFunction) }
-				<HBox className="weave-padded-hbox" style={{alignItems: 'center', justifyContent: "space-between"}}>
-					<span>{ Weave.lang("Margins:") }</span>
-					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.left) }</div>
-					<VBox className="weave-padded-vbox" style={{width: 50}}>
-						{ this.renderNumberEditor(this.margin.top) }
-						{ this.renderNumberEditor(this.margin.bottom) }
-					</VBox>
-					<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right) }</div>
-				</HBox>
-
-				{this.renderGridLayout()}
+				<br/>
+				{marginUI}
+				<br/>
+				{this.renderFlexBoxLayout()}
 			</VBox>
 		);
 	}
 
-	renderGridLayout=():JSX.Element=>
+	renderFlexBoxLayout=():JSX.Element=>
 	{
+		var labelStyle:React.CSSProperties = {
+			textAlign: 'center',
+			display:"flex",
+			justifyContent: "flex-end"
+		};
 		var gridUIs:JSX.Element[][] = [
 			["Title", this.panelTitle],
 			["X Axis Title", this.xAxisName],
 			["Y Axis Title", this.yAxisName]
 		].map((row:[string, LinkableString]) => {
-			return [<span>{Weave.lang(row[0])}</span>,
-					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) } style={ {width:"100%"} }/>]
+			return [<span style={ labelStyle }>{Weave.lang(row[0])}</span>,
+					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>]
 		});
 
 		return ReactUtils.generateFlexBoxLayout([.3,.7],gridUIs);
