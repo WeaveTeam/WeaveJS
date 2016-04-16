@@ -12,6 +12,7 @@ export interface SideBarContainerProps extends React.Props<SideBarContainer>
     bottomSideBarChildren?:JSX.Element | JSX.Element[];
     leftSideBarChildren?:JSX.Element | JSX.Element[];
     rightSideBarChildren?:JSX.Element | JSX.Element[];
+	onSideBarClose?:()=>void
 }
 
 export interface SideBarContainerState
@@ -48,6 +49,8 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
         var loc:string = this.capitalizeFirstCharacter(location);
         stateObj["open" + loc + "SideBar"] = isOpen;
         this.setState(stateObj);
+		if (!isOpen && this.props.onSideBarClose)
+			this.props.onSideBarClose();
     }
 
 

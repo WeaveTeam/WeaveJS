@@ -27,17 +27,18 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	onDragOver:React.DragEventHandler;
 	onContextMenu?:React.MouseEventHandler;
 	style?: CSSProperties;
-	onGearClick?:(tool:IVisTool, editorContent:JSX.Element)=>void;
-	onMaximizeClick?:(tool:IVisTool)=>void;
-	onCloseClick?:(tool:IVisTool)=>void;
-	onPopoutClick?:(tool:IVisTool)=>void;
-	onPopinClick?:(tool:IVisTool)=>void;
+	onGearClick?:(tool:WeaveTool)=>void;
+	onMaximizeClick?:(tool:WeaveTool)=>void;
+	onPopoutClick?:(tool:WeaveTool)=>void;
+	onPopinClick?:(tool:WeaveTool)=>void;
+	onCloseClick?:(tool:WeaveTool)=>void;
 }
 
 export interface IWeaveToolState
 {
 	title?: string;
 	showControls?: boolean;
+	highlightTitle?: boolean;
 }
 
 export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
@@ -81,18 +82,16 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	{
 		if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
 		{
-			var content = (this.watcher.target as any).renderEditor() as JSX.Element;
-			
 			if (this.props.onGearClick)
 			{
-				this.props.onGearClick(this.watcher.target as IVisTool, content);
+				this.props.onGearClick(this);
 			}
 			else
 			{
 				PopupWindow.open({
 					title: Weave.lang("Settings for {0}", this.state.title),
 					modal: false,
-					content: content
+					content: (this.watcher.target as any).renderEditor()
 				});
 			}
 		}
@@ -101,26 +100,25 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	onMaximizeClick=():void=>
 	{
 		if (this.props.onMaximizeClick)
-			this.props.onMaximizeClick(this.watcher.target as IVisTool);
+			this.props.onMaximizeClick(this);
 	};
 	
-	
-	onCloseClick=():void=>
-	{
-		if (this.props.onCloseClick)
-			this.props.onCloseClick(this.watcher.target as IVisTool);
-	};
-
 	onPopoutClick=():void=>
 	{
 		if (this.props.onPopoutClick)
-			this.props.onPopoutClick(this.watcher.target as IVisTool);
+			this.props.onPopoutClick(this);
 	};
 
 	onPopinClick=():void=>
 	{
-		if(this.props.onPopinClick)
-			this.props.onPopinClick(this.watcher.target as IVisTool);
+		if (this.props.onPopinClick)
+			this.props.onPopinClick(this);
+	};
+
+	onCloseClick=():void=>
+	{
+		if (this.props.onCloseClick)
+			this.props.onCloseClick(this);
 	};
 
 	render():JSX.Element
@@ -136,17 +134,19 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			      onMouseLeave={() => {
 						this.setState({ showControls: false });
 				  }}>
-				<TitleBar ref={(c:TitleBar) => this.titleBar = c }
-						  showControls={this.state.showControls}
-						  onDragStart={this.props.onDragStart}
-						  titleBarHeight={this.titleBarHeight}
-						  title={Weave.lang(this.state.title)}
-						  onGearClick={this.onGearClick}
-						  onMaximizeClick={this.onMaximizeClick}
-						  onPopoutClick={this.props.onPopoutClick && this.onPopoutClick}
-						  onPopinClick={this.props.onPopinClick && this.onPopinClick}
-						  onCloseClick={this.onCloseClick}
-						  />
+				<TitleBar
+					ref={(c:TitleBar) => this.titleBar = c }
+					showControls={this.state.showControls}
+					onDragStart={this.props.onDragStart}
+					titleBarHeight={this.titleBarHeight}
+					title={Weave.lang(this.state.title)}
+					highlighted={this.state.highlightTitle}
+					onGearClick={this.onGearClick}
+					onMaximizeClick={this.onMaximizeClick}
+					onPopoutClick={this.onPopoutClick}
+					onPopinClick={this.onPopinClick}
+					onCloseClick={this.onCloseClick}
+				/>
 				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
 		);
@@ -163,6 +163,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	showControls:boolean;
 	titleBarHeight:number;
 	title:string;
+	highlighted:boolean;
 	onGearClick:React.MouseEventHandler;
 	onMaximizeClick:React.MouseEventHandler;
 	onPopoutClick:React.MouseEventHandler;
@@ -183,8 +184,14 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 	}
 	render()
 	{
+		var className = "weave-tool-title-bar";
+		if (this.props.showControls || this.props.highlighted)
+			className = "weave-tool-title-bar-hovered";
+		if (this.props.highlighted)
+			className += " weave-tool-title-bar-highlighted";
+		
 		return(
-			<HBox className={this.props.showControls ? "weave-tool-title-bar-hovered" : "weave-tool-title-bar"} style={{height: this.props.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart}>
+			<HBox className={className} style={{height: this.props.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart}>
 				<CenteredIcon onClick={this.props.onGearClick}
 							  iconProps={{className: "fa fa-cog fa-fw"}}/>
 
@@ -194,10 +201,14 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 
 				<CenteredIcon onClick={this.props.onMaximizeClick}
 							  iconProps={{className: "fa fa-expand fa-fw"}}/>
-				{/*
-				<CenteredIcon onClick={this.props.onPopoutClick || this.props.onPopinClick}
-							  iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}/>
-				*/}
+				{
+					Weave.experimental
+					?	<CenteredIcon
+							onClick={this.props.onPopoutClick || this.props.onPopinClick}
+							iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
+						/>
+					:	null
+				}
 			    <CenteredIcon onClick={this.props.onCloseClick}
 							  iconProps={{className: "fa fa-times fa-fw"}}/>
 			</HBox>

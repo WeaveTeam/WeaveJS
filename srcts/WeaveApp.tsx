@@ -39,7 +39,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 
 export interface WeaveAppState
 {
-	toolToEdit?:IVisTool;
+	toolPathToEdit?:WeavePathArray;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
@@ -56,7 +56,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		super(props);
 		this.state = {
-			toolToEdit: null
+			toolPathToEdit: null
 		}
 	}
 	
@@ -121,8 +121,22 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 	
-	handleMaximizeClick(path:WeavePathArray):void
+	handleSideBarClose=()=>
 	{
+		this.setState({ toolPathToEdit: null });
+	}
+	
+	handleGearClick=(tool:WeaveTool):void=>
+	{
+		var path = tool.props.path;
+		this.setState({
+			toolPathToEdit: path
+		});
+	}
+
+	handleMaximizeClick=(tool:WeaveTool):void=>
+	{
+		var path = tool.props.path;
 		var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
 		if (!layout)
 			return;
@@ -134,8 +148,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		layout.setSessionState(state);
 	}
 	
-	handlePopoutClick(path:WeavePathArray):void
+	handlePopoutClick=(tool:WeaveTool):void=>
 	{
+		var path = tool.props.path;
 		var popoutWindow:Window;
 		var onBeforeUnLoad:Function = () => { };
 		var onLoad:Function = () => { };
@@ -143,23 +158,26 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var isMaximized:boolean = false, screenWidth:number, screenHeight:number;
 
 		this.removeFromLayout(path);
-		var tool:JSX.Element = (
+		var content:JSX.Element = (
 			<WeaveTool
 				weave={this.props.weave}
 				path={path}
 				style={{width: "100%", height: "100%"}}
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={() => {
-					if (isMaximized){
+					if (isMaximized)
+					{
 						isMaximized = false;
-						popoutWindow.resizeTo(screenWidth,screenHeight);
-				   }else{
+						popoutWindow.resizeTo(screenWidth, screenHeight);
+					}
+					else
+					{
 						isMaximized = true;
 						screenWidth = popoutWindow.innerWidth;
 						screenHeight = popoutWindow.innerHeight;
 						popoutWindow.moveTo(0,0);
-						popoutWindow.resizeTo(screen.availWidth,screen.availHeight);
-				   }
+						popoutWindow.resizeTo(screen.availWidth, screen.availHeight);
+					}
 				}}
 				onPopinClick={() => {
 					this.addToLayout(path);
@@ -178,33 +196,52 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				/>
 			</WeaveTool>
 		);
-		popoutWindow = ReactUtils.openPopout(tool, onLoad, onBeforeUnLoad, options);
+		popoutWindow = ReactUtils.openPopout(content, onLoad, onBeforeUnLoad, options);
 
 	}
-
-	handleGearClick=(tool:IVisTool, content:JSX.Element):void=>
+	
+	handleCloseClick=(tool:WeaveTool)=>
 	{
-		this.setState({
-			toolToEdit: tool
-		})
-	};
+		var weave = this.props.weave;
+		var path = tool.props.path;
+		this.removeFromLayout(path);
+		weave.removeObject(path);
+	
+		if (_.isEqual(path, this.state.toolPathToEdit))
+		{
+			this.setState({
+				toolPathToEdit: null
+			});
+		}
+	}
 
 	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
 	{
+		var tool = this.props.weave.getObject(path);
+		if (_.isEqual(path, this.state.toolPathToEdit))
+			console.log('editing', path.join(','));
 		return (
 			<WeaveTool
+				ref={this.handleWeaveTool}
 				weave={this.props.weave}
 				path={path}
 				style={{width: "100%", height: "100%"}}
 				{...panelProps}
 				onGearClick={this.handleGearClick}
-				onMaximizeClick={this.handleMaximizeClick.bind(this, path)}
-				onPopoutClick={this.handlePopoutClick.bind(this, path)}
-				onCloseClick={this.removeTool.bind(this)}
+				onMaximizeClick={this.handleMaximizeClick}
+				onPopoutClick={this.handlePopoutClick}
+				onCloseClick={this.handleCloseClick}
 			/>
 		);
-	};
+	}
 
+	private toolSet = new Set<WeaveTool>();
+
+	handleWeaveTool=(tool:WeaveTool)=>
+	{
+		if (tool)
+			this.toolSet.add(tool);
+	}
 
 	createObject=(type:new(..._:any[])=>any):void=>
 	{
@@ -228,13 +265,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		{
 			var placeholder = Weave.AS(instance, LinkablePlaceholder);
 			if (placeholder)
-				Weave.getCallbacks(placeholder).addDisposeCallback(this, this.handlePlaceholderDispose.bind(this, placeholder));
+				Weave.getCallbacks(placeholder).addDisposeCallback(this, this.handlePlaceholderDispose.bind(this, path, placeholder));
+			this.setState({ toolPathToEdit: path });
 			this.addToLayout(path);
 		}
-	};
+	}
 
-	private handlePlaceholderDispose(placeholder:LinkablePlaceholder<any>)
+	private handlePlaceholderDispose(path:WeavePathArray, placeholder:LinkablePlaceholder<any>)
 	{
+		// hack
 		var INIT = 'initSelectableAttributes';
 		var instance = placeholder.getInstance();
 		if (instance[INIT])
@@ -242,6 +281,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			var refs = ColumnUtils.findFirstDataSet(this.props.weave.root);
 			instance[INIT](refs);
 		}
+		this.forceUpdate();
 	}
 
 	addToLayout(path:WeavePathArray)
@@ -282,18 +322,14 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 	
-	removeTool(tool:IVisTool)
+	componentWillUpdate(nextProps:WeaveAppProps, nextState:WeaveAppState)
 	{
-		var weave = this.props.weave;
-		var path = Weave.findPath(weave.root, tool);
-		this.removeFromLayout(path);
-		weave.removeObject(path);
-	
-		if (this.state.toolToEdit == tool)
+		for (var tool of this.toolSet)
 		{
-			this.setState({
-				toolToEdit: null
-			})
+			if (Weave.wasDisposed(tool))
+				this.toolSet.delete(tool);
+			else
+				tool.setState({ highlightTitle: _.isEqual(nextState.toolPathToEdit, tool.props.path) });
 		}
 	}
 	
@@ -308,8 +344,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		// backwards compatibility hack
 		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
 		var sideBarUI:JSX.Element = null;
-		if(this.state.toolToEdit)
-			sideBarUI =  <WeaveToolEditor tool={this.state.toolToEdit}/>
+		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
+		if (toolToEdit && toolToEdit.renderEditor) // hack
+			sideBarUI = <WeaveToolEditor tool={toolToEdit}/>
 		
 		return (
 			<VBox
@@ -318,12 +355,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}
 			>
-				<SideBarContainer barSize={.3} leftSideBarChildren={ sideBarUI }>
+				<SideBarContainer barSize={.3} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
 						defaultType={FlexibleLayout}
-						style={{width:"100%", height:"100%"}}
+						style={{width: "100%", height: "100%"}}
 						props={{itemRenderer: this.renderTool}}
 					/>
 				</SideBarContainer>

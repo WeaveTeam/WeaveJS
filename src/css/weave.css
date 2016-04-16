@@ -150,6 +150,10 @@ div.table-row-selected>div>div>div>div>div {
 	-webkit-transition: visibility 0s 0.1s, opacity 0.1s linear;
 }
 
+.weave-tool-title-bar-highlighted {
+	background-color: #e0e0e0;
+}
+
 .weave-tool-title-bar-text {
 	font-family: Roboto, sans-serif;
 	font-size: 16px;
