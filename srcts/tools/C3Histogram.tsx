@@ -12,12 +12,19 @@ import DOMUtils from "../utils/DOMUtils"
 import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 import Checkbox from "../semantic-ui/Checkbox";
+import Dropdown from "../semantic-ui/Dropdown";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import ColorController from "../editors/ColorController";
+import ColorRampComponent from "../react-ui/ColorRamp";
+import {CompactBinningDefinitionEditor} from "../editors/BinningDefinitionEditor";
+import Button from "../semantic-ui/Button";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
+import FilteredColumn = weavejs.data.column.FilteredColumn;
 import ColorColumn = weavejs.data.column.ColorColumn;
+import ColorRamp = weavejs.util.ColorRamp;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
@@ -33,6 +40,11 @@ declare type Record = {
 	binnedColumn: number,
 	columnToAggregate: number
 };
+
+const COUNT = "count";
+const SUM = "sum";
+const MEAN = "mean"; 
+declare type AggregationMethod = "count"|"sum"|"mean";
 
 export default class C3Histogram extends AbstractC3Tool
 {
@@ -220,11 +232,11 @@ export default class C3Histogram extends AbstractC3Tool
             {
                 switch(this.aggregationMethod.value)
                 {
-                    case "count":
+                    case COUNT:
                         return Weave.lang("Number of records");
-                    case "sum":
+                    case SUM:
                         return Weave.lang("Sum of {0}", Weave.lang(this.columnToAggregate.getMetadata('title')));
-                    case "mean":
+                    case MEAN:
                         return Weave.lang("Mean of {0}", Weave.lang(this.columnToAggregate.getMetadata('title')));
                 }
             }
@@ -359,7 +371,7 @@ export default class C3Histogram extends AbstractC3Tool
                 }
                 else
                 {
-                    obj.height = this.getAggregateValue(recordsInBin, "binnedColumn", "count");
+                    obj.height = this.getAggregateValue(recordsInBin, "binnedColumn", COUNT);
                     this.histData.push(obj);
                 }
             }
@@ -385,10 +397,10 @@ export default class C3Histogram extends AbstractC3Tool
             sum += record[columnToAggregateName as string] as number;
         });
 
-        if (aggregationMethod === "mean")
+        if (aggregationMethod === MEAN)
             return sum / count; // convert sum to mean
 
-        if (aggregationMethod === "count")
+        if (aggregationMethod === COUNT)
             return count; // use count of finite values
 
         // sum
@@ -481,6 +493,23 @@ export default class C3Histogram extends AbstractC3Tool
             .set("Height values (Optional)", this.columnToAggregate);
         //TODO handle remaining attributes
     }
+	
+	// TODO move this to BinningDefinitionEditor
+	openColorController(tabIndex:number)
+	{
+		ColorController.activeTabIndex = tabIndex;
+		ColorController.open(Weave.AS(this.fill.color.getInternalColumn(), ColorColumn), this.binnedColumn, this.binnedColumn.internalDynamicColumn.target as FilteredColumn)
+	}
+	
+	static colorRampOptions = ColorRamp.allColorRamps.map((colorRamp) => {
+			return {
+				value: colorRamp.colors,
+				label: <HBox className="weave-padded-hbox">
+							<ColorRampComponent style={{flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/>
+							<HBox style={{flex: 1}}>{colorRamp.name}</HBox>
+						</HBox>
+			};
+	});
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linkFunction:Function):JSX.Element
@@ -491,16 +520,19 @@ export default class C3Histogram extends AbstractC3Tool
 					super.renderEditor(linkFunction)
 				}
 				{
-					ReactUtils.generateTable(null, [
-						[
-							Weave.lang("Height aggregation method"),
-							<div/>
-						]
-					])
+					<CompactBinningDefinitionEditor binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 				}
 				{ReactUtils.generateFlexBoxLayout(
 					[.3,.7],
 					[
+						[ 
+							Weave.lang("Color Theme"),
+							<HBox className="weave-padded-hbox" style={{padding: 0}}>
+								<Dropdown options={C3Histogram.colorRampOptions} ref={linkReactStateRef(this, {value: Weave.AS(this.fill.color.getInternalColumn(), ColorColumn).ramp})}/>
+								<Button onClick={() => this.openColorController(1)}>{Weave.lang("Edit")}</Button>
+							</HBox>
+						],
+						[ Weave.lang("Aggregation method"), <Dropdown options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
 						[ <Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
 						[ <Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
 					]
