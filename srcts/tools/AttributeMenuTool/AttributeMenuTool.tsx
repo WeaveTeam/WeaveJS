@@ -7,6 +7,8 @@ import List from "../../react-ui/List";
 import * as lodash from "lodash";
 import HSlider from "../../react-ui/RCSlider/HSlider";
 import VSlider from "../../react-ui/RCSlider/VSlider";
+import SliderOption from "../../react-ui/RCSlider/RCSlider";
+import ComboBox from "../../semantic-ui/ComboBox";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -18,8 +20,6 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import WeaveAPI = weavejs.WeaveAPI;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
-import SliderOption from "../../react-ui/RCSlider/RCSlider";
-import Dropdown from "../../semantic-ui/Dropdown";
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -125,6 +125,8 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 						<VSlider options={ this.options } onChange={ this.handleSelection } selectedValues={ [selectedAttribute] } type={ "categorical" }/>
 					</VBox>
 				);
+			case LAYOUT_COMBO:
+				return (<div/>); //have to return a valid react component, otherwise invariant violation
 		}
 	}
 }
@@ -242,7 +244,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		return [
 			[
 				Weave.lang("Visualization Tool"),
-				<Dropdown
+				<ComboBox
 					className="weave-sidbar-dropdown"
 					placeholder="Select a visualization"
 					value={ toolName }
@@ -254,7 +256,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 			[
 				Weave.lang("Visualization Attribute"),
 
-				<Dropdown
+				<ComboBox
 					className="weave-sidebar-dropdown"
 					placeholder="Select an attribute"
 					value={ this.props.attributeMenuTool.targetAttribute.state}
@@ -265,7 +267,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 			],
 			[
 				Weave.lang("Menu Layout"),
-				<Dropdown
+				<ComboBox
 					className="weave-sidebar-dropdown"
 					value={ menuLayout }
 					options={ menuOptions }
