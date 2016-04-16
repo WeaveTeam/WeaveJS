@@ -22,7 +22,7 @@ import ColorController from "../editors/ColorController";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import BinNamesList from "../ui/BinNamesList";
-import CompactBinningDefinitionEditor from "../editors/BinningDefinitionEditor";
+import {CompactBinningDefinitionEditor} from "../editors/BinningDefinitionEditor";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
