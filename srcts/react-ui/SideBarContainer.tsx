@@ -149,8 +149,8 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 		let bottomSideBar:JSX.Element = null;
 		let sideBars:JSX.Element[] = [];
 
-		["left","right","top","bottom"].map((location,index) => {
-			var openStateValue:boolean = this.state["open" + this.capitalizeFirstCharacter(location) + "SideBar"];
+		["left","right","top","bottom"].map((location:string, index:number) => {
+			var openStateValue:boolean = (this.state as any)["open" + this.capitalizeFirstCharacter(location) + "SideBar"];
 			if (!openStateValue) // don't render if sidebar is not open
 			{
 				return null
@@ -161,7 +161,7 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 			};
 
 			// important to support both array and Composite Element
-			var sideBarChildren:JSX.Element[] | JSX.Element = this.props[ location + "SideBarChildren"];
+			var sideBarChildren:JSX.Element[] | JSX.Element = (this.props as any)[location + "SideBarChildren"];
 
 			var barPercentageSize:string = barSize * 100 + "%";
 
