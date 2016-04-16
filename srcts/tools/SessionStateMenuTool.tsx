@@ -10,7 +10,7 @@ import {CSSProperties} from "react";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import List from "../react-ui/List";
 import MiscUtils from "../utils/MiscUtils";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -107,7 +107,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		{
 			return (
 				<VBox style={{flex: 1, alignItems: "center"}}>
-					<Dropdown ref={linkReactStateRef(this, { value: this.selectedChoice })} options={this.choices.getNames()}/>
+					<ComboBox ref={linkReactStateRef(this, { value: this.selectedChoice })} options={this.choices.getNames()}/>
 				</VBox>
 			);
 		}

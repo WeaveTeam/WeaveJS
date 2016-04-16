@@ -9,7 +9,7 @@ import ColorPicker from "../react-ui/ColorPicker";
 import List from "../react-ui/List";
 import CenteredIcon from "../react-ui/CenteredIcon";
 import Button from "../semantic-ui/Button";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -130,7 +130,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 					<HBox style={{flex: .7, alignItems: "center"}}>
 						{Weave.lang("Filter: ")}
 						<VSpacer/>
-						<Dropdown fluid={false} value={this.state.selectedFilter} options={this.filterOptions} onChange={(value:string) => { this.setState({ selectedFilter: value}) }} direction="upward"/>
+						<ComboBox fluid={false} value={this.state.selectedFilter} options={this.filterOptions} onChange={(value:string) => { this.setState({ selectedFilter: value}) }} direction="upward"/>
 					</HBox>
 					<VSpacer/>
 					<HBox style={{flex: .3, justifyContent: "space-between"}}>

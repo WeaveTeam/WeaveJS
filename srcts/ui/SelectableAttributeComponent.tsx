@@ -5,8 +5,11 @@ import AttributeSelector from "../ui/AttributeSelector";
 import classNames from "../modules/classnames";
 import PopupWindow from "../react-ui/PopupWindow";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
-import Dropdown from '../semantic-ui/Dropdown';
+import ComboBox from '../semantic-ui/ComboBox';
 import List from '../react-ui/List';
+import ControlPanel from "./ControlPanel";
+import ReactUtils from "../utils/ReactUtils";
+
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -21,8 +24,6 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
-import ControlPanel from "./ControlPanel";
-import ReactUtils from "../utils/ReactUtils";
 
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|ILinkableHashMap>
@@ -167,7 +168,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 
 //Custom component to handle drop down selection of columns as well as when selection from attribute selector
-//Dropdown allows selection only from drop down, Does not handle case of attribute selector
+//ComboBox allows selection only from drop down, Does not handle case of attribute selector
 interface IAttributeDropdownProps extends React.HTMLProps<AttributeDropdown> {
     attribute:DynamicColumn;
     clickHandler:(event:React.MouseEvent)=>PopupWindow;
@@ -243,14 +244,14 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 
         options.push({ value: null, label: Weave.lang("(None)") });
 
-        return <Dropdown valueEqualityFunc={AttributeDropdown.nodeEqualityFunc}
+        return <ComboBox valueEqualityFunc={AttributeDropdown.nodeEqualityFunc}
                          style={ this.props.style }
                          value={currentColumnNode}
-            onClick={clickHandler}
-            options={options}
-            onChange={this.onChange}
-             header={header}
-             optionStyle={{marginLeft:10}}
+                         onClick={clickHandler}
+                         options={options}
+                         onChange={this.onChange}
+                         header={header}
+                         optionStyle={{marginLeft:10}}
         />;
     }
 }

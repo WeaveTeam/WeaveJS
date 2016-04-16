@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as _ from "lodash";
 import StatefulTextField from "../ui/StatefulTextField";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
@@ -189,32 +189,32 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Data Family"),
-				<Dropdown style={{width: "100%"}}
-						  onChange={this.dataFamilyChanged} 
-						  selectFirstOnInvalid
-						  options={families}/>
+				<ComboBox style={{width: "100%"}}
+				          onChange={this.dataFamilyChanged}
+				          selectFirstOnInvalid
+				          options={families}/>
 			],
 			[
 				Weave.lang("Year"),
-				<Dropdown style={{width: "100%"}} 
-						  onChange={this.dataVintageChanged}
-						  selectFirstOnInvalid
-						  options={vintages}/>
+				<ComboBox style={{width: "100%"}}
+				          onChange={this.dataVintageChanged}
+				          selectFirstOnInvalid
+				          options={vintages}/>
 			],
 			[
 				Weave.lang("Dataset"),
-				<Dropdown style={{width: "100%"}}
-						  onChange={this.dataSetChanged}
-						  ref={linkReactStateRef(this, { value: ds.dataSet }) }
-						  selectFirstOnInvalid
-						  options={datasets}/>
+				<ComboBox style={{width: "100%"}}
+				          onChange={this.dataSetChanged}
+				          ref={linkReactStateRef(this, { value: ds.dataSet }) }
+				          selectFirstOnInvalid
+				          options={datasets}/>
 			],
 			[
 				Weave.lang("Geographic Scope"),
-				<Dropdown style={{width: "100%"}}
-						  ref={linkReactStateRef(this, {value: ds.geographicScope })}
-						  selectFirstOnInvalid
-						  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
+				<ComboBox style={{width: "100%"}}
+				          ref={linkReactStateRef(this, {value: ds.geographicScope })}
+				          selectFirstOnInvalid
+				          options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
 			],
 		];
 	}

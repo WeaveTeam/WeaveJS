@@ -9,7 +9,7 @@ import FileSelector from "../ui/FileSelector";
 import FixedDataTable from "../tools/FixedDataTable";
 import DataSourceEditor from "./DataSourceEditor";
 import KeyTypeInput from "../ui/KeyTypeInput";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import HelpIcon from "../react-ui/HelpIcon";
 
@@ -21,7 +21,7 @@ import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
-import {DropDownOption} from "../semantic-ui/Dropdown";
+import {ComboBoxOption} from "../semantic-ui/ComboBox";
 
 export default class CSVDataSourceEditor extends DataSourceEditor
 {
@@ -57,7 +57,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
-		let columnIds:DropDownOption[] = ds.getColumnIds().map( (id, index) => {
+		let columnIds:ComboBoxOption[] = ds.getColumnIds().map( (id, index) => {
 			return {label: id.toString(), value: id}
 		});
 		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
@@ -71,9 +71,9 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					{Weave.lang("Key Column")}
 					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
-				<Dropdown style={{width: "100%"}}
-					ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
-					options={columnIds}
+				<ComboBox style={{width: "100%"}}
+				          ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
+				          options={columnIds}
 				/>
 			],
 			[

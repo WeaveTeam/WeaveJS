@@ -16,7 +16,7 @@ import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import {VSpacer, HSpacer} from "../react-ui/Spacer";
 import ColorRampComponent from "../react-ui/ColorRamp";
 import Input from "../semantic-ui/Input";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 import Button from "../semantic-ui/Button";
 import ColorController from "../editors/ColorController";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
@@ -445,12 +445,12 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				[
 					[ 
 						Weave.lang("Shape Type"),
-						<Dropdown ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
+						<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
 					],
 					[ 
 						Weave.lang("Color Theme"),
 						<HBox className="weave-padded-hbox" style={{padding: 0}}>
-							<Dropdown options={ColorLegend.colorRampOptions} ref={linkReactStateRef(this, {value: this.colorColumn.ramp})}/>
+							<ComboBox options={ColorLegend.colorRampOptions} ref={linkReactStateRef(this, {value: this.colorColumn.ramp})}/>
 							<Button onClick={() => this.openColorController(1)}>{Weave.lang("Edit")}</Button>
 						</HBox>
 					],

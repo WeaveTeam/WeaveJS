@@ -6,11 +6,11 @@ import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 import Checkbox from "../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
-import {DropDownOption} from "../semantic-ui/Dropdown";
+import {ComboBoxOption} from "../semantic-ui/ComboBox";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -45,7 +45,7 @@ declare type RecordHeightsFormat<T> = { xLabel: T } & {[columnName:string]: T};
 const GROUP:string = 'group';
 const STACK:string = 'stack';
 const PERCENT_STACK:string = 'percentStack';
-const GROUPING_MODES:DropDownOption[] = [{label: "Grouped Bars", value: GROUP},
+const GROUPING_MODES:ComboBoxOption[] = [{label: "Grouped Bars", value: GROUP},
 													{label: "Stacked Bars", value: STACK},
 													{label: "100% Stacked Bars", value: PERCENT_STACK}];
 
@@ -545,7 +545,7 @@ export default class C3BarChart extends AbstractC3Tool
 				{ReactUtils.generateFlexBoxLayout(
                     [.3,.7],
 					[
-						[ <span style={labelStyle}>{Weave.lang("Grouping Mode")}</span>, <Dropdown style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+						[ <span style={labelStyle}>{Weave.lang("Grouping Mode")}</span>, <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					]
 				)}
             </VBox>

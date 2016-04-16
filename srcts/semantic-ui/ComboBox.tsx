@@ -4,11 +4,11 @@ import $ from "../modules/jquery";
 import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
 
-export type DropDownOption = (string | { label: any, value: any });
+export type ComboBoxOption = (string | { label: any, value: any });
 
-export interface DropdownProps extends React.HTMLProps<Dropdown>
+export interface DropdownProps extends React.HTMLProps<ComboBox>
 {
-	options?:DropDownOption[];
+	options?:ComboBoxOption[];
 	value?:any;
 	onChange?:(value:any)=>void;
 	onAdd?:(value:any)=>void;
@@ -23,12 +23,12 @@ export interface DropdownProps extends React.HTMLProps<Dropdown>
 	optionStyle?:React.CSSProperties;
 }
 
-export interface DropdownState
+export interface ComboBoxState
 {
 	value: any;
 }
 
-export default class Dropdown extends SmartComponent<DropdownProps, DropdownState>
+export default class ComboBox extends SmartComponent<DropdownProps, ComboBoxState>
 {
 	element:Element;
 
@@ -64,7 +64,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		}
 	}
 
-	componentDidUpdate(prevProps:DropdownProps, prevState:DropdownState)
+	componentDidUpdate(prevProps:DropdownProps, prevState:ComboBoxState)
 	{
 		if (!_.isEqual(prevState.value, this.state.value)) {
 			if(this.state.value)

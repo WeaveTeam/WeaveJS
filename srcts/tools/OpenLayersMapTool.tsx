@@ -34,7 +34,7 @@ import MiscUtils from "../utils/MiscUtils";
 import Button from "../semantic-ui/Button";
 import Checkbox from "../semantic-ui/Checkbox";
 import StatefulTextField from "../ui/StatefulTextField";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 import LayerManager from "./OpenLayersMap/LayerManager";
 import {VBox,HBox} from "../react-ui/FlexBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
@@ -124,7 +124,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[Weave.lang("Control Location"),
 				<HBox>
-					<Dropdown ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
+					<ComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
 				</HBox>
 			],
 			[Weave.lang("Zoom Range"),

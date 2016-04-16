@@ -1,8 +1,14 @@
 import WeavePath = weavejs.path.WeavePath;
 import * as React from "react";
-
-import OpenLayersMapTool from "../../OpenLayersMapTool";
 import * as lodash from "lodash";
+import OpenLayersMapTool from "../../OpenLayersMapTool";
+import StatefulTextField from "../../../ui/StatefulTextField";
+import StatefulRangeSlider from "../../../ui/StatefulRangeSlider";
+import ComboBox from "../../../semantic-ui/ComboBox";
+import Checkbox from "../../../semantic-ui/Checkbox";
+import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
+import SelectableAttributeComponent from "../../../ui/SelectableAttributeComponent";
+import ReactUtils from "../../../utils/ReactUtils";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -15,13 +21,6 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import WeaveAPI = weavejs.WeaveAPI;
 
-import StatefulTextField from "../../../ui/StatefulTextField";
-import StatefulRangeSlider from "../../../ui/StatefulRangeSlider";
-import Dropdown from "../../../semantic-ui/Dropdown";
-import Checkbox from "../../../semantic-ui/Checkbox";
-import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
-import SelectableAttributeComponent from "../../../ui/SelectableAttributeComponent";
-import ReactUtils from "../../../utils/ReactUtils";
 
 export type EditableField = [
 	LinkableBoolean|LinkableString|LinkableNumber,
@@ -73,10 +72,10 @@ export default class AbstractLayer implements ILinkableObject
 		if (lv instanceof LinkableString || lv instanceof LinkableNumber)
 		{
 			if (typeof options[0] === typeof "") {
-				return [Weave.lang(key), <Dropdown key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />]; /* searchable field */
+				return [Weave.lang(key), <ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />]; /* searchable field */
 			}
 			else if (typeof options[0] === typeof {}) {
-				return [Weave.lang(key), <Dropdown key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
+				return [Weave.lang(key), <ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
 			}
 			else
 			{

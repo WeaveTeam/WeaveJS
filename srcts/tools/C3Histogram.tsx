@@ -12,7 +12,7 @@ import DOMUtils from "../utils/DOMUtils"
 import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 import Checkbox from "../semantic-ui/Checkbox";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ColorController from "../editors/ColorController";
 import ColorRampComponent from "../react-ui/ColorRamp";
@@ -528,11 +528,11 @@ export default class C3Histogram extends AbstractC3Tool
 						[ 
 							Weave.lang("Color Theme"),
 							<HBox className="weave-padded-hbox" style={{padding: 0}}>
-								<Dropdown options={C3Histogram.colorRampOptions} ref={linkReactStateRef(this, {value: Weave.AS(this.fill.color.getInternalColumn(), ColorColumn).ramp})}/>
+								<ComboBox options={C3Histogram.colorRampOptions} ref={linkReactStateRef(this, {value: Weave.AS(this.fill.color.getInternalColumn(), ColorColumn).ramp})}/>
 								<Button onClick={() => this.openColorController(1)}>{Weave.lang("Edit")}</Button>
 							</HBox>
 						],
-						[ Weave.lang("Aggregation method"), <Dropdown options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
+						[ Weave.lang("Aggregation method"), <ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
 						[ <Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
 						[ <Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
 					]

@@ -3,8 +3,8 @@ import LinkableString = weavejs.core.LinkableString;
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import Input from "../semantic-ui/Input";
-import Dropdown from "../semantic-ui/Dropdown";
-import {DropDownOption} from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
+import {ComboBoxOption} from "../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import WeaveAPI = weavejs.WeaveAPI;
 
@@ -36,14 +36,14 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 		let keyTypes = WeaveAPI.QKeyManager.getAllKeyTypes();
 		
 		return (
-			<Dropdown style={{width: "100%"}}
-				ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
-				options={weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
-					return {label:keyType, value:keyType} as DropDownOption;
+			<ComboBox style={{width: "100%"}}
+			          ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
+			          options={weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
+					return {label:keyType, value:keyType} as ComboBoxOption;
 				})}
-				allowAdditions={true}
-				type="search"
-				onAdd={(content:string):void=>{
+			          allowAdditions={true}
+			          type="search"
+			          onAdd={(content:string):void=>{
 				    this.props.keyTypeProperty.value = content;
 				 }}
 			/>

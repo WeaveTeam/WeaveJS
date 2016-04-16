@@ -8,7 +8,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import FileSelector from "../ui/FileSelector";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
-import Dropdown from "../semantic-ui/Dropdown";
+import ComboBox from "../semantic-ui/ComboBox";
 import KeyTypeInput from "../ui/KeyTypeInput";
 import HelpIcon from "../react-ui/HelpIcon";
 
@@ -52,10 +52,10 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 					{Weave.lang("Key Column")}
 					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
-				<Dropdown style={{width: "100%"}}
-						  ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
-						  placeholder={Weave.lang("Auto-generated keys") } 
-						  options={dataSource.getColumnNames()}/>
+				<ComboBox style={{width: "100%"}}
+				          ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
+				          placeholder={Weave.lang("Auto-generated keys") }
+				          options={dataSource.getColumnNames()}/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
