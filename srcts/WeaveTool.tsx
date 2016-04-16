@@ -143,8 +143,8 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					highlighted={this.state.highlightTitle}
 					onGearClick={this.onGearClick}
 					onMaximizeClick={this.onMaximizeClick}
-					onPopoutClick={this.onPopoutClick}
-					onPopinClick={this.onPopinClick}
+					onPopoutClick={this.props.onPopoutClick && this.onPopoutClick}
+					onPopinClick={this.props.onPopinClick && this.onPopinClick}
 					onCloseClick={this.onCloseClick}
 				/>
 				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
