@@ -183,7 +183,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					this.addToLayout(path);
 					popoutWindow.close();
 				}}
-				onCloseClick={() => popoutWindow.close()}
+				onCloseClick={(tool:WeaveTool) => {
+					this.handleCloseClick(tool);
+					popoutWindow.close();
+				}}
 				onDragEnd={() => {}}
 				onDragStart={() => {}}
 				onDragOver={() => {}}
