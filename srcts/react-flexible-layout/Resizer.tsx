@@ -5,8 +5,7 @@ import * as ReactDOM from "react-dom";
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 
 const STYLE_BASE = {
-	background: "#000",
-    opacity: .1,
+	background: "#e6e6e6",
     boxSizing: "border-box",
     backgroundClip: "padding"
 };
