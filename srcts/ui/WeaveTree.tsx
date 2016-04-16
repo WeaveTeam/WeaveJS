@@ -193,7 +193,6 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 				if (this.state.selectedItems.some(node => node.equals(item))) selectedIndices.push(index.toString());
 				return ({ id: index.toString(), tree: this.renderItem(item as ExtendedIWeaveTreeNode, index) });
 			});
-		console.log(selectedIndices);
 		return <FixedDataTable
 			idProperty={"id"}
 			headerHeight={0}
