@@ -7,6 +7,7 @@ import MenuButton from "../react-ui/MenuButton";
 import {IDataSourceEditorProps} from "../editors/DataSourceEditor";
 import {MenuItemProps} from "../react-ui/Menu";
 import ControlPanel from "./ControlPanel";
+import DataMenu from "../menus/DataMenu";
 
 import IDataSource = weavejs.api.data.IDataSource;
 
@@ -42,6 +43,7 @@ import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 export interface IDataSourceManagerProps
 {
 	weave:Weave;
+	dataMenu?:DataMenu;
 }
 
 export interface IDataSourceManagerState
@@ -63,12 +65,17 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 //		
 	
 	static selected:IDataSource;
+	static menu:MenuItemProps[];
+	//made this static because the MenuButton in the DataSourceManager(DSM) requires the menu options even when props.dataMenu is null (case when WeaveApp.createObject creates Instance of DSM
 
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
+		if(this.props.dataMenu){
+			DataSourceManager.menu = props.dataMenu.getDataSourceItems();
+		}
 	}
-	
+
 	componentDidMount()
 	{
 		this.props.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
@@ -93,8 +100,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	render():JSX.Element
 	{
 		let root = this.props.weave.root;
-		
-		
+
 		let listOptions:ListOption[] = root.getObjects(IDataSource).map(dataSource => { 
 			var dataSourceMenu:MenuItemProps[] = [
 				{
@@ -138,6 +144,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		return (
 			<HBox className="weave-padded-hbox" style={ {flex:1} }>
 				<VBox className="weave-container" style={ {width:200, padding: 0} }>
+					<MenuButton menu={ DataSourceManager.menu  }>New Data Source</MenuButton>
 					<List
 						options={listOptions}
 						multiple={false}
@@ -152,9 +159,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		);
 	}
 
-	static openInstance(weave:Weave, selected:IDataSource = null):ControlPanel
+	static openInstance(weave:Weave, selected:IDataSource = null, dataMenu:DataMenu =null):ControlPanel
 	{
 		DataSourceManager.selected = selected;
-		return ControlPanel.openInstance(weave, DataSourceManager, {title: Weave.lang("Manage data sources")}, {weave});
+		return ControlPanel.openInstance(weave, DataSourceManager, {title: Weave.lang("Manage data sources")}, {weave, dataMenu});
 	}
 }

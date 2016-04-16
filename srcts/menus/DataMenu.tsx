@@ -27,7 +27,7 @@ export default class DataMenu implements MenuBarItemProps
 			{},
 			{
 				label: Weave.lang('Manage or browse data'),
-				click: DataSourceManager.openInstance.bind(null, weave)
+				click: DataSourceManager.openInstance.bind(null, weave, null, this)
 			},
 			{},
 			this.getDataSourceItems()
