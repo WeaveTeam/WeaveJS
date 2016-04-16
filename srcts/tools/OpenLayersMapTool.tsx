@@ -237,6 +237,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
+	initSelectableAttributes()
+	{
+		this.layers.requestObject('', TileLayer);
+	}
+
 	get deprecatedStateMapping():Object
 	{
 		return {
