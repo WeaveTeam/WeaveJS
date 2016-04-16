@@ -86,31 +86,45 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
     render()
     {
         var crumbStyle:React.CSSProperties = {}
-        var editorUI:JSX.Element[] | JSX.Element = this.childrenCrumbMap[this.state.activeCrumb]
+        var editorUI:JSX.Element[] | JSX.Element = this.childrenCrumbMap[this.state.activeCrumb];
 
-        var crumbUI:JSX.Element[] | JSX.Element = this.crumbOrder.map(function(crumb:string,index:number){
-            let styleObj:React.CSSProperties = {}
+        var crumbUI:JSX.Element = (<div className="ui breadcrumb">{this.crumbOrder.map(function(crumb:string,index:number):JSX.Element[]{
+            let styleObj:React.CSSProperties = {};
+            let elements:JSX.Element[];
 
             let label:string = crumb;
             if(this.state.activeCrumb == crumb && this.crumbOrder.length > 1)
             {
-                styleObj.color = "black"
+                styleObj.color = "black";
                 styleObj["cursor"] ="none";
+                elements = [(<div key={String(index)}
+                    ref={String(index)}
+                    style={styleObj}
+                    className="active section"
+                    onClick={this.crumbClick.bind(this,crumb,index)}
+                >
+                    {label}
+                </div>)];
 
             }else{
                 styleObj.color = "grey";
                 styleObj["cursor"] ="pointer";
+                elements = [(<div key={String(index)}
+                    ref={String(index)}
+                    style={styleObj}
+                    className="section"
+                    onClick={this.crumbClick.bind(this,crumb,index)}
+                >
+                    {label}
+                </div>)];
             }
 
             if(this.crumbOrder.length > 1 && index < this.crumbOrder.length -1){
-                label = label + " >";
+                elements.push(<i className="right chevron icon divider"></i>);
             }
 
-            return <span key={String(index)}
-                         ref={String(index)}
-                         style={styleObj}
-                         onClick={this.crumbClick.bind(this,crumb,index)}> {label}&nbsp;</span>
-        },this);
+            return (elements)
+        },this)}</div>);
 
 
         return (<VBox className={ this.props.className } style={ this.props.style }>
