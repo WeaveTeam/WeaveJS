@@ -1,11 +1,14 @@
 import * as React from "react";
+import * as ReactDOM from 'react-dom';
 import Menu from "./Menu";
 import {MenuItemProps} from "./Menu";
 import ReactUtils from "../utils/ReactUtils";
+import Button from "../semantic-ui/Button";
 
 export interface MenuButtonProps extends React.Props<MenuButton>
 {
 	menu:MenuItemProps[];
+	showHamburgerIcon?:boolean;
 }
 
 export interface MenuButtonState
@@ -21,7 +24,13 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 	{
 		super(props)
 	}
-	
+
+	static defaultProps:MenuButtonProps = { showHamburgerIcon : true, menu:[] };
+
+	componentDidMount (){
+		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
+	}
+
 	closeMenu=()=>
 	{
 		if(this.menu)
@@ -55,9 +64,10 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 	render():JSX.Element
 	{
 		return (
-			<button ref={(elt:Element) => this.element = elt as HTMLElement} onMouseDown={this.openMenu}>
-				<i className="fa fa-bars"/>
-			</button>
+			<Button onMouseDown={this.openMenu}>
+				{ this.props.showHamburgerIcon ? <i className="fa fa-bars"/> : '' }
+				{ this.props.children }
+			</Button>
 		);
 	}
 }
