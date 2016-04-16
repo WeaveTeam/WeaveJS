@@ -12,6 +12,7 @@ export interface MenuItemProps
 	secondaryLabel?:string;
 	click?:Function;
 	enabled?:boolean;
+	shown?:boolean;
 	menu?:MenuItemProps[]
 }
 
@@ -62,10 +63,10 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	static getMenuItems(element:HTMLElement):MenuItemProps[]
 	{
 		//var elt = element as any;
-		while(element != null)
+		while (element != null)
 		{
 			let elt = element as any;
-			if(elt[REACT_COMPONENT] && elt[REACT_COMPONENT][GET_MENU_ITEMS])
+			if (elt[REACT_COMPONENT] && elt[REACT_COMPONENT][GET_MENU_ITEMS])
 			{
 				return elt[REACT_COMPONENT][GET_MENU_ITEMS]() as MenuItemProps[];
 			}
@@ -108,6 +109,10 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	
 	renderMenuItem(index:number, props:MenuItemProps):JSX.Element
 	{
+		var shown = props.hasOwnProperty('shown') ? !!props.shown : true; // default true
+		if (!shown)
+			return null;
+		
 		var enabled = props.hasOwnProperty('enabled') ? !!props.enabled : true; // default true
 		
 		var labelClass = classNames({
@@ -122,7 +127,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		});
 		
 		var click = () => {
-			if(!props.menu && props.click && enabled)
+			if (!props.menu && props.click && enabled)
 				props.click()
 		};
 
@@ -135,9 +140,9 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 				</HBox>
 				<span>{props.secondaryLabel}</span>
 				{
-					props.menu && this.state.hovered == index && this.element ?
-					<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} menu={props.menu}/>
-					: null
+					props.menu && this.state.hovered == index && this.element
+					?	<Menu xPos={this.element.clientWidth} yPos={this.element.offsetTop} menu={props.menu}/>
+					:	null
 				}
 			</HBox>
 		);
@@ -163,24 +168,24 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			visibility: "hidden"
 		}, menuStyle);
 
-		if(this.element) {
+		if (this.element)
+		{
 			menuStyle.visibility = null;
 			var bottomOverflow:number = this.props.yPos + this.element.clientHeight - window.innerHeight;
-			if (bottomOverflow > 0) {
+			if (bottomOverflow > 0)
 				menuStyle.top = menuStyle.top - this.element.clientHeight;
-			}
 
-			if (weavejs.WeaveAPI.Locale.reverseLayout) {
+			if (weavejs.WeaveAPI.Locale.reverseLayout)
+			{
 				menuStyle.left = menuStyle.left - this.element.clientWidth;
-				if (menuStyle.left < 0) {
+				if (menuStyle.left < 0)
 					menuStyle.left = this.props.xPos;
-				}
 			}
-			else {
+			else
+			{
 				var rightOverflow:number = this.props.xPos + this.element.clientWidth - window.innerWidth;
-				if (rightOverflow > 0) {
+				if (rightOverflow > 0)
 					menuStyle.left = menuStyle.left - this.element.clientWidth;
-				}
 			}
 		}
 
@@ -188,15 +193,13 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			<VBox className="weave-menu" style={_.merge(menuStyle, this.props.style)} onMouseEnter={() => this.setState({hovered: -1})} {...otherProps}>
 				{
 					this.props.menu.map((menuItem, index) => {
-							if(_.isEqual(menuItem, {}))
-								return renderDivider(index);
-							else
-							{
-								return this.renderMenuItem(index, menuItem);
-							}
-					})
+						if (_.isEqual(menuItem, {}))
+							return renderDivider(index);
+						else
+							return this.renderMenuItem(index, menuItem);
+					}).filter(item => !!item)
 				}
 			</VBox>
-		)
+		);
 	}
 }
