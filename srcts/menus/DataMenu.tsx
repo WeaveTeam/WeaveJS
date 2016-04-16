@@ -15,8 +15,18 @@ export default class DataMenu implements MenuBarItemProps
 		this.fileMenu = new FileMenu(weave);
 		this.createObject = createObject;
 
-		this.menu = [].concat(
+	}
+
+	label:string = "Data";
+	weave:Weave;
+	fileMenu:FileMenu; // temp solution
+	createObject:(type:new(..._:any[])=>any)=>void;
+	
+	get menu():MenuItemProps[]
+	{
+		return [].concat(
 			{
+				shown: Weave.experimental,
 				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)... (not implemented yet)")}</FileInput>
 			},
 			{
@@ -27,18 +37,12 @@ export default class DataMenu implements MenuBarItemProps
 			{},
 			{
 				label: Weave.lang('Manage or browse data'),
-				click: DataSourceManager.openInstance.bind(null, weave, null, this)
+				click: DataSourceManager.openInstance.bind(null, this.weave, null, this)
 			},
 			{},
 			this.getDataSourceItems()
 		);
 	}
-
-	label:string = "Data";
-	weave:Weave;
-	fileMenu:FileMenu; // temp solution
-	menu:MenuItemProps[];
-	createObject:(type:new(..._:any[])=>any)=>void;
 
 	getDataSourceItems()
 	{
@@ -51,12 +55,17 @@ export default class DataMenu implements MenuBarItemProps
 		return impls.map(impl => {
 			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
 			if (impl == weavejs.data.source.CensusDataSource)
-				label += " (low priority)";
+			{
+				if (Weave.experimental)
+					label += " (experimental)";
+				else
+					return null;
+			}
 			return {
 				label: label,
 				click: this.createObject.bind(this, impl)
 			}
-		});
+		}).filter(item => !!item);
 	}
 	
 	getColumnsToExport=()=>

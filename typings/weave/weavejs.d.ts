@@ -8,6 +8,7 @@ declare module __global__ {
     class Weave implements IDisposableObject {
         static HISTORY_SYNC_DELAY: number;
         static FRAME_INTERVAL: number;
+        static experimental: boolean;
         constructor();
         dispose(): void;
         /**
@@ -262,6 +263,10 @@ declare module __global__ {
          * For testing purposes.
          */
         populateColumns(): void;
+        /**
+         * For testing purposes.
+         */
+        stringifyState(...pathOrType: any[]): string;
     }
 }
 import Weave = __global__.Weave;

@@ -16,7 +16,29 @@ export default class ToolsMenu implements MenuBarItemProps
 	{
 		this.weave = weave;
 		this.createObject = createObject;
-		
+	}
+
+	label:string = "Visualizations";
+	weave:Weave;
+	createObject:(type:new(..._:any[])=>any)=>void;
+	get menu():MenuItemProps[]
+	{
+		return [].concat(
+			{
+				label: Weave.lang("Color Controller"),
+				click: () => ColorController.open(
+					this.weave.getObject("defaultColorColumn") as ColorColumn, 
+					this.weave.getObject("defaultColorBinColumn") as BinnedColumn,
+					this.weave.getObject("defaultColorDataColumn") as FilteredColumn
+				)
+			},
+			{},
+			this.getVisualizationItems()
+		);
+	}
+	
+	getVisualizationItems()
+	{
 		var registry = weavejs.WeaveAPI.ClassRegistry;
 		var impls = registry.getImplementations(IVisTool);
 		
@@ -34,38 +56,20 @@ export default class ToolsMenu implements MenuBarItemProps
 			WeaveUI.DataFilterTool,
 			WeaveUI.AttributeMenuTool
 		];
-		
-		this.menu = [
-			{
-				label: Weave.lang("Color Controller"),
-				click: () => ColorController.open(
-					this.weave.getObject("defaultColorColumn") as ColorColumn, 
-					this.weave.getObject("defaultColorBinColumn") as BinnedColumn,
-					this.weave.getObject("defaultColorDataColumn") as FilteredColumn
-				)
-			},
-			{}
-		];
-		
-		impls.forEach(impl => {
+
+		return impls.map(impl => {
 			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
 			if (impl == WeaveUI.DataFilterTool)
-				label += " (low priority)";
-			this.menu.push({
+			{
+				if (Weave.experimental)
+					label += " (experimental)";
+				else
+					return null;
+			}
+			return {
 				label: label,
 				click: this.createObject.bind(this, impl)
-			});
-		});
-		this.createObject = createObject;
-	}
-
-	label:string = "Visualizations";
-	weave:Weave;
-	menu:MenuItemProps[];
-	createObject:(type:new(..._:any[])=>any)=>void;
-	
-	openColorController()
-	{
-		
+			};
+		}).filter(item => !!item);
 	}
 }

@@ -10,7 +10,16 @@ export default class SystemMenu implements MenuBarItemProps
 	{
 		this.weave = weave;
 		this.fileMenu = new FileMenu(weave);
-		this.menu = [
+	}
+
+	weave:Weave;
+	fileMenu:FileMenu; // temp solution
+	label = "Weave";
+	bold = true;
+	
+	get menu():MenuItemProps[]
+	{
+		return [
 			{
 				label: <FileInput onChange={this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes().join(',')}>{Weave.lang("Open...")}</FileInput>
 			},
@@ -29,15 +38,15 @@ export default class SystemMenu implements MenuBarItemProps
 			},
 			{},
 			{
+				enabled: !Weave.experimental,
+				label: Weave.experimental ? "Experimental features enabled" : "Enable experimental features",
+				click: () => Weave.experimental = true
+			},
+			{},
+			{
 				enabled: false,
 				label: "Version: 2.0"
 			}, 
 		];
 	}
-
-	weave:Weave;
-	fileMenu:FileMenu; // temp solution
-	label = "Weave";
-	bold = true;
-	menu:MenuItemProps[];
 }
