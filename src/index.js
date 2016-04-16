@@ -8,7 +8,7 @@ import {MiscUtils} from "../lib/WeaveUI.js";
 window.weave = new Weave;
 var urlParams = MiscUtils.getUrlParams();
 $(() => {
-	ReactDOM.render(
+	window.weaveApp = ReactDOM.render(
 		<WeaveApp
 			readUrlParams={true}
 			weave={weave}
