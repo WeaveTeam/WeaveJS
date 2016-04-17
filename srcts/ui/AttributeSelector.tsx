@@ -225,7 +225,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         return (
             <VBox className="weave-padded-vbox" style={ {border:"none"} }>
 
-                <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar>
+                {Object.keys(this.items).length > 1 ? <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar> : ""}
 
                 <HDividedBox style={ { border:"1px solid lightgrey",width:"100%",height:"50%"} } loadWithEqualWidthChildren={true}>
                        <div style={{display:"flex"}}>
