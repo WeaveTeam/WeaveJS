@@ -16,7 +16,7 @@ import ComboBox from "../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ColorController from "../editors/ColorController";
 import ColorRampComponent from "../react-ui/ColorRamp";
-import {CompactBinningDefinitionEditor} from "../editors/BinningDefinitionEditor";
+import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
 import Button from "../semantic-ui/Button";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
@@ -520,7 +520,7 @@ export default class C3Histogram extends AbstractC3Tool
 					super.renderEditor(linkFunction)
 				}
 				{
-					<CompactBinningDefinitionEditor binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+					<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 				}
 				{ReactUtils.generateFlexBoxLayout(
 					[.3,.7],

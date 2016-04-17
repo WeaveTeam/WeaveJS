@@ -12,6 +12,7 @@ import {IColumnTitles} from "../tools/FixedDataTable";
 import BinNamesList from "../ui/BinNamesList";
 import ReactUtils from "../utils/ReactUtils";
 import Button from "../semantic-ui/Button";
+import ComboBox from "../semantic-ui/ComboBox";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -31,6 +32,7 @@ import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefin
 export interface BinningDefinitionEditorProps
 {
 	binnedColumn:BinnedColumn;
+	compact?:boolean;
 }
 
 export interface BinningDefinitionEditorState
@@ -59,6 +61,26 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 	private  _category:CategoryBinningDefinition = Weave.disposableChild(this, CategoryBinningDefinition);
 	private  _jenks:NaturalJenksBinningDefinition = Weave.disposableChild(this, NaturalJenksBinningDefinition);
 
+	// TODO should Dictionary 2D be used ?
+	static binClassToBinLabel = new Map<typeof AbstractBinningDefinition, string>()
+								   .set(SimpleBinningDefinition, "Equally spaced")
+								   .set(CustomSplitBinningDefinition, "Custom breaks")
+								   .set(QuantileBinningDefinition, "Quantile")
+								   .set(EqualIntervalBinningDefinition, "Equal interval")
+								   .set(StandardDeviationBinningDefinition, "Standard deviations")
+								   .set(NaturalJenksBinningDefinition, "Natural breaks")
+								   .set(CategoryBinningDefinition, "All Categories(string values)");
+
+   binLabelToBin = new Map<string, AbstractBinningDefinition>()
+							   .set("Equally spaced", this._simple)
+							   .set("Custom breaks", this._customSplit)
+							   .set("Quantile", this._quantile)
+							   .set("Equal interval", this._equalInterval)
+							   .set("Standard deviations", this._stdDev)
+							   .set("Natural breaks", this._jenks)
+							   .set("All Categories(string values)", this._category)
+							   .set("None", null);
+	
 	constructor(props:BinningDefinitionEditorProps)
 	{
 		super(props);
@@ -103,8 +125,6 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		var binDef:AbstractBinningDefinition = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
 		return binDef && binDef.overrideInputMin && binDef.overrideInputMax;
 	}
-	
-	
 
 	setBinningDefinition(value:boolean, localDef:AbstractBinningDefinition)
 	{
@@ -112,17 +132,22 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		// we keep it selected
 		var binDef = this.binnedColumn.binningDefinition.target;
 		
-		if(!value && binDef && localDef.constructor == binDef.constructor)
+		if(!value && binDef && localDef && localDef.constructor == binDef.constructor)
 		{
 				this.forceUpdate(); // trigger a render because no session state change
 				return;				// and we need to update the checkboxes to reflect correct value
 		}
 
-		if(value)
+		else if(value && binDef && localDef && localDef.constructor != binDef.constructor)
 		{
 			this.binnedColumn.binningDefinition.requestLocalObjectCopy(localDef);
 			binDef = this.binnedColumn.binningDefinition.target;
 			Weave.linkState(binDef, localDef);
+		}
+		
+		if(value && !localDef)
+		{
+			this.binnedColumn.binningDefinition.target = null;
 		}
 	}
 
@@ -138,8 +163,42 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 	{
 		this._binnedColumnWatcher.target = nextProps.binnedColumn;
 	}
+	
+	renderCompactView()
+	{
+		var binDef = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
+		var binLabel:string = binDef ? BinningDefinitionEditor.binClassToBinLabel.get(binDef.constructor as typeof AbstractBinningDefinition) : "None";
 
-	render()
+		var options = Array.from(this.binLabelToBin.keys()) as string[];
+		
+		return (
+			ReactUtils.generateTable(
+				null,
+				[
+					[
+						Weave.lang("Binning Method"),
+						<HBox className="weave-padded-hbox" style={{padding: 0}}>
+							<ComboBox style={{flex: 1}} 
+									  options={options} 
+									  value={binLabel}
+									  onChange={(binLabel) => this.setBinningDefinition(true, this.binLabelToBin.get(binLabel))}/>
+							<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+						</HBox>
+					],
+					[
+						Weave.lang("Bin names"),
+						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
+					]
+				],
+				{
+					table: {width: "100%"},
+					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
+				}
+			)
+		);
+	}
+
+	renderFullView()
 	{
 		var textStyle:React.CSSProperties = {
 			whiteSpace: "nowrap"
@@ -307,12 +366,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 								<HBox style={leftItemsStyle}>
 									<Checkbox type="radio"
 											  value={!this.binnedColumn.binningDefinition.target}
-											  onChange={(value) => { 
-												  if(value)
-												  	this.binnedColumn.binningDefinition.target = null;
-												  else
-												  	this.forceUpdate();
-											  }}/> 
+											  onChange={(value) => this.setBinningDefinition(value, null)}/> 
 									<span style={textStyle}>{Weave.lang("None")}</span>
 								</HBox>
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
@@ -350,70 +404,8 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 			</HBox>
 		)
 	}
-}
-
-
-export interface CompactBinningDefinitionEditorProps {
-	binnedColumn:BinnedColumn;
-	onButtonClick:()=>void
-}
-
-export class CompactBinningDefinitionEditor extends React.Component<CompactBinningDefinitionEditorProps, {}>
-{
-	static binClassToBinLabel = new Map<typeof IBinningDefinition, string>()
-							   .set(SimpleBinningDefinition, "Equally spaced")
-							   .set(CustomSplitBinningDefinition, "Custom breaks")
-							   .set(QuantileBinningDefinition, "Quantile")
-							   .set(EqualIntervalBinningDefinition, "Equal interval")
-							   .set(StandardDeviationBinningDefinition, "Standard deviations")
-							   .set(NaturalJenksBinningDefinition, "Natural breaks")
-							   .set(CategoryBinningDefinition, "All Categories(string values)");
-							   
-		
-	private  _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.forceUpdate.bind(this)));
-	private  get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }					   
 	
-	constructor(props:CompactBinningDefinitionEditorProps)
-	{
-		super(props);
-		this.setTarget(props.binnedColumn);
-	}
-		
-	componentWillReceiveProps(props:CompactBinningDefinitionEditorProps)
-	{
-		this.setTarget(props.binnedColumn);
-	}
-
-	public setTarget(object:ILinkableObject):void
-	{
-		this._binnedColumnWatcher.target = object as BinnedColumn;
-	}
-	
-	render()
-	{
-		
-		var binDef = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
-		return (
-			ReactUtils.generateTable(
-				null,
-				[
-					[
-						Weave.lang("Binning Method"),
-						<HBox className="weave-padded-hbox" style={{padding: 0}}>
-							<Input style={{flex: 1}} readOnly value={Weave.lang(binDef ? CompactBinningDefinitionEditor.binClassToBinLabel.get(binDef.constructor as typeof IBinningDefinition) : "None")}/>
-							<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
-						</HBox>
-					],
-					[
-						Weave.lang("Bin names"),
-						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
-					]
-				],
-				{
-					table: {width: "100%"},
-					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
-				}
-			)
-		);
+	render() {
+		return this.props.compact ? this.renderCompactView() : this.renderFullView();
 	}
 }

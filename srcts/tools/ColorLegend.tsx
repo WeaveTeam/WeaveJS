@@ -22,7 +22,7 @@ import ColorController from "../editors/ColorController";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import BinNamesList from "../ui/BinNamesList";
-import {CompactBinningDefinitionEditor} from "../editors/BinningDefinitionEditor";
+import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -461,7 +461,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				}
 			)}
 			{
-				<CompactBinningDefinitionEditor binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+				<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 			}
 			{
 				ReactUtils.generateTable(
