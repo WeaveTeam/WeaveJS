@@ -44,7 +44,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	};
 
 	componentWillReceiveProps(nextProps: IWeaveTreeProps) {
-		if (!nextProps.root.equals(this.props && this.props.root)) {
+		if (!this.props.root != !nextProps.root || (nextProps.root && !nextProps.root.equals(this.props.root))) {
 			this.setState({ selectedItems: nextProps.initialSelectedItems || [], openItems: nextProps.initialOpenItems || [] });
 		}
 		if (!lodash.isEqual(nextProps.initialSelectedItems, this.props.initialSelectedItems))//TODO does not work with _.IsEqual
@@ -153,6 +153,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	enumerateItems = (_node: IWeaveTreeNode, result: Array<IWeaveTreeNode> = [], depth: number = 0): Array<IWeaveTreeNode> => {
 		let node = _node as ExtendedIWeaveTreeNode;
+		if (!node)
+			return result;
 
 		if (node !== this.props.root || !this.props.hideRoot) {
 			if (node.isBranch() || node == this.props.root || !this.props.hideLeaves) {
@@ -185,7 +187,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
 		}
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22) + 5;
-		let rootChildren = this.props.root.getChildren() || [];
+		let rootChildren = this.props.root && this.props.root.getChildren() || [];
 		this.lastEnumeration = this.props.hideBranches ? rootChildren.filter((n) => !n.isBranch()) : this.enumerateItems(this.props.root);
 		let selectedIndices:string[] = [];
 		let rows = this.lastEnumeration.map(
