@@ -240,6 +240,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                                                           multipleSelection={ true }
                                                           initialSelectedItems={ this.selectedNodes }
                                                           hideRoot={true}
+                                                          hideBranches={true}
                                                           root={this.state.leafNode}
                                                           onSelect={this.setColumn}
                                                           ref={ (c) => { this.leafTree = c; } }/>
