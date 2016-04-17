@@ -261,7 +261,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		if (Weave.IS(instance, IDataSource))
 		{
-			DataSourceManager.openInstance(weave, instance as IDataSource);
+			DataSourceManager.openInstance(this.menuBar.dataMenu, instance as IDataSource);
 		}
 		
 		if (React.Component.isPrototypeOf(type))

@@ -42,8 +42,7 @@ import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 
 export interface IDataSourceManagerProps
 {
-	weave:Weave;
-	dataMenu?:DataMenu;
+	dataMenu:DataMenu;
 }
 
 export interface IDataSourceManagerState
@@ -73,12 +72,12 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 
 	componentDidMount()
 	{
-		this.props.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
 	
 	componentWillUnmount()
 	{
-		this.props.weave.root.childListCallbacks.removeCallback(this, this.forceUpdate);
+		this.props.dataMenu.weave.root.childListCallbacks.removeCallback(this, this.forceUpdate);
 	}
 
 	refreshDataSource(dataSource:IDataSource)
@@ -88,13 +87,13 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	
 	removeDataSource(dataSource:IDataSource)
 	{
-		let root = this.props.weave.root;
+		let root = this.props.dataMenu.weave.root;
 		root.removeObject(root.getName(dataSource));
 	}
 
 	render():JSX.Element
 	{
-		let root = this.props.weave.root;
+		let root = this.props.dataMenu.weave.root;
 
 		let listOptions:ListOption[] = root.getObjects(IDataSource).map(dataSource => { 
 			var dataSourceMenu:MenuItemProps[] = [
@@ -158,9 +157,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		);
 	}
 
-	static openInstance(weave:Weave, selected:IDataSource = null, dataMenu:DataMenu =null):ControlPanel
+	static openInstance(dataMenu:DataMenu, selected:IDataSource = null):ControlPanel
 	{
 		DataSourceManager.selected = selected;
-		return ControlPanel.openInstance(weave, DataSourceManager, {title: Weave.lang("Manage data sources")}, {weave, dataMenu});
+		return ControlPanel.openInstance(dataMenu.weave, DataSourceManager, {title: Weave.lang("Manage data sources")}, {dataMenu});
 	}
 }
