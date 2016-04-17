@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import FixedDataTable from "../tools/FixedDataTable";
@@ -182,24 +183,59 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		this.setState({ selectedItems: nodes });
 	}
 
+	computeRowWidth(rowJSX:React.ReactChild):number
+	{
+		var body = document.getElementsByTagName("body")[0];
+		let div = document.createElement("span");
+		body.appendChild(div);
+		let renderedRow = ReactDOM.render(rowJSX as React.ReactElement<any>, div);
+		let node = ReactDOM.findDOMNode(renderedRow) as HTMLDivElement;
+		node.style.display = "inline-block";
+		node.style.width = null;
+		let width = node.offsetWidth;
+		body.removeChild(div);
+
+		return width;
+	}
+
 	render(): JSX.Element {
 		if (Weave.isLinkable(this.props.root)) {
 			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
 		}
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22) + 5;
 		let rootChildren = this.props.root && this.props.root.getChildren() || [];
+
+
 		this.lastEnumeration = this.props.hideBranches ? rootChildren.filter((n) => !n.isBranch()) : this.enumerateItems(this.props.root);
+
 		let selectedIndices:string[] = [];
+		let maxRowIndex = -1;
+		let maxRowLength = -Infinity;
+
 		let rows = this.lastEnumeration.map(
 			(item, index): { [columnId: string]: React.ReactChild } => {
 				if (this.state.selectedItems.some(node => node.equals(item))) selectedIndices.push(index.toString());
+				/* keep a running maximum node length */
+				let rowLengthHeuristic = item.getLabel().length + (item as ExtendedIWeaveTreeNode).depth;
+				if (rowLengthHeuristic > maxRowLength)
+				{
+					maxRowLength = rowLengthHeuristic;
+					maxRowIndex = index;
+				}
+
 				return ({ id: index.toString(), tree: this.renderItem(item as ExtendedIWeaveTreeNode, index) });
 			});
+		let columnWidth: number = undefined;
+
+		if (rows[maxRowIndex])
+			columnWidth = this.computeRowWidth(rows[maxRowIndex]["tree"]);
+
 		return <FixedDataTable
 			idProperty={"id"}
 			headerHeight={0}
 			rowHeight={this.rowHeight}
 			columnIds={["id", "tree"]}
+			initialColumnWidth={columnWidth}
 			rows={rows}
 			selectedIds={selectedIndices}
 			onSelection={this.onSelect}
