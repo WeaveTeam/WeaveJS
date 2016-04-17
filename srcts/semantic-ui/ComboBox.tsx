@@ -6,7 +6,7 @@ import SmartComponent from "../ui/SmartComponent";
 
 export type ComboBoxOption = (string | { label: any, value: any });
 
-export interface DropdownProps extends React.HTMLProps<ComboBox>
+export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 {
 	options?:ComboBoxOption[];
 	value?:any;
@@ -28,15 +28,15 @@ export interface ComboBoxState
 	value: any;
 }
 
-export default class ComboBox extends SmartComponent<DropdownProps, ComboBoxState>
+export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
 {
 	element:Element;
 
-	static defaultProps:DropdownProps = {
+	static defaultProps:ComboBoxProps = {
 		fluid:true
 	};
 
-	constructor(props:DropdownProps)
+	constructor(props:ComboBoxProps)
 	{
 		super(props);
 		this.state = {
@@ -50,7 +50,7 @@ export default class ComboBox extends SmartComponent<DropdownProps, ComboBoxStat
 		return this.props.options.findIndex((option) => (typeof option === "object") ? equalityFunc(option.value, value) : equalityFunc(option, value) );
 	}
 	
-	componentWillReceiveProps(nextProps: DropdownProps)
+	componentWillReceiveProps(nextProps: ComboBoxProps)
 	{
 		var value = nextProps.value;
 
@@ -64,7 +64,7 @@ export default class ComboBox extends SmartComponent<DropdownProps, ComboBoxStat
 		}
 	}
 
-	componentDidUpdate(prevProps:DropdownProps, prevState:ComboBoxState)
+	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
 		if (!_.isEqual(prevState.value, this.state.value)) {
 			if(this.state.value)
@@ -97,7 +97,7 @@ export default class ComboBox extends SmartComponent<DropdownProps, ComboBoxStat
 			onClick: (index:number) => {
 				this.props.onClick && this.props.onClick(null);
 			},
-			context: this.props.context || null,
+			context: this.props.context || window,
 			direction: this.props.direction || 'auto',
 			allowAdditions: this.props.allowAdditions || false
 		});
