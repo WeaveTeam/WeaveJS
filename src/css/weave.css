@@ -109,6 +109,11 @@ div.table-row-selected>div>div>div>div>div {
 	white-space: nowrap;
 }
 
+.weave-disableBottomBorder .fixedDataTableLayout_header,
+.weave-disableBottomBorder .fixedDataTableLayout_hasBottomBorder {
+	border-style: none;
+} 
+
 
 /* weave custom css */
 .weave-app {

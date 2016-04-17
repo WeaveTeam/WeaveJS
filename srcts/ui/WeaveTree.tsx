@@ -203,6 +203,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			rows={rows}
 			selectedIds={selectedIndices}
 			onSelection={this.onSelect}
-			/>;
+			showBottomBorder={false}
+		/>;
 	}
 }

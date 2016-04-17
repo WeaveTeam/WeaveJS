@@ -48,6 +48,7 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	allowResizing?:boolean;
 	width?:number;
 	height?:number;
+	showBottomBorder?:boolean;
 }
 
 export interface IFixedDataTableState
@@ -176,7 +177,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		headerHeight:30,
 		initialColumnWidth: 85,
 		allowResizing: true,
-		evenlyExpandRows: true
+		evenlyExpandRows: true,
+		showBottomBorder: true
 	};
 
 	constructor(props:IFixedDataTableProps)
@@ -421,7 +423,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			evenWidth = Math.max(this.state.width / (this.props.columnIds.length - (this.props.showIdColumn ? 0:1)), this.props.initialColumnWidth);
 
 		return (
-			<ResizingDiv style={tableContainer} onResize={this.handleResize}>
+			<ResizingDiv className={this.props.showBottomBorder ? null : "weave-disableBottomBorder"} style={tableContainer} onResize={this.handleResize}>
 				{this.state.width && this.state.height ?
 					<Table
 						rowsCount={this.props.rows.length}
