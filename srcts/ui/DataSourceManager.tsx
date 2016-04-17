@@ -1,5 +1,5 @@
 import * as React from "react";
-import {HBox, VBox} from "../react-ui/FlexBox";
+import {HBox, VBox, HDividedBox} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
 import List from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
@@ -8,6 +8,7 @@ import {IDataSourceEditorProps} from "../editors/DataSourceEditor";
 import {MenuItemProps} from "../react-ui/Menu";
 import ControlPanel from "./ControlPanel";
 import DataMenu from "../menus/DataMenu";
+import CenteredIcon from "../react-ui/CenteredIcon";
 
 import IDataSource = weavejs.api.data.IDataSource;
 
@@ -61,8 +62,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
 		.set(GroupedDataTransform, GroupedDataTransformEditor)
-//		
-	
+//
+
 	static selected:IDataSource;
 
 	constructor(props:IDataSourceManagerProps)
@@ -74,7 +75,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	{
 		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
-	
+
 	componentWillUnmount()
 	{
 		this.props.dataMenu.weave.root.childListCallbacks.removeCallback(this, this.forceUpdate);
@@ -84,7 +85,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	{
 		dataSource.hierarchyRefresh.triggerCallbacks();
 	}
-	
+
 	removeDataSource(dataSource:IDataSource)
 	{
 		let root = this.props.dataMenu.weave.root;
@@ -95,32 +96,29 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	{
 		let root = this.props.dataMenu.weave.root;
 
-		let listOptions:ListOption[] = root.getObjects(IDataSource).map(dataSource => { 
-			var dataSourceMenu:MenuItemProps[] = [
-				{
-					label: Weave.lang("Refresh"),
-					click: () => this.refreshDataSource(dataSource)
-				},
-				{},
-				{
-					label: Weave.lang("Delete"),
-					click: () => this.removeDataSource(dataSource)
-				}
-			];
+		let listOptions:ListOption[] = root.getObjects(IDataSource).map(dataSource => {
 			return {
 				label: (
-					<HBox style={{justifyContent: "space-between"}}>
+					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
 						<span style={{overflow: "hidden"}}>{dataSource.getHierarchyRoot().getLabel()}</span>
-						<MenuButton menu={dataSourceMenu}/>
+
+						<HBox>
+							<CenteredIcon onClick={()=>this.refreshDataSource(dataSource)}
+							              iconProps={{ className: "fa fa-refresh", title: "Refresh this datasource" }}/>
+
+							<CenteredIcon onClick={()=>this.removeDataSource(dataSource)}
+							              iconProps={{ className: "fa fa-times", title: " this datasource" }}/>
+						</HBox>
+
 					</HBox>
 				),
 				value: dataSource
-			}; 
+			};
 		});
 
 		let editorJsx:JSX.Element;
 		let dataSource = DataSourceManager.selected;
-		
+
 		if (dataSource && !Weave.wasDisposed(dataSource))
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
@@ -142,7 +140,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } style={{width: "100%"}}>{Weave.lang('New Data Source')}</MenuButton>
 						: 	null
 					}
-					<VBox className="weave-container" style={ {flex: 1, width: 200, padding: 0} }>
+					<VBox className="weave-container" style={ {flex: 1, width: 250, padding: 0} }>
 						<List
 							options={listOptions}
 							multiple={false}
