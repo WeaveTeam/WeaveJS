@@ -150,7 +150,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 								toolTip={"Edit session state"}/>
 				</HBox>
 	
-				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto" } }>
+				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto", flex:1 } }>
 					{editorUI}
 				</div>
 			</VBox>
