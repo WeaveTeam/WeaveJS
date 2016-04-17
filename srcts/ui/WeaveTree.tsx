@@ -27,10 +27,6 @@ export interface IWeaveTreeProps {
 	initialSelectedItems?: Array<IWeaveTreeNode>;
 };
 
-interface ExtendedIWeaveTreeNode extends IWeaveTreeNode {
-	depth: number;
-}
-
 export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTreeState>
 {
 	constructor(props: IWeaveTreeProps) {
@@ -105,7 +101,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	static EXPANDER_OPEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-play fa-fw fa-rotate-90";
 	static EXPANDER_HIDDEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-fw hidden-expander";
 
-	private renderItem = (node: ExtendedIWeaveTreeNode, index: number): JSX.Element => {
+	private renderItem = (node: IWeaveTreeNode, index: number, depth: number): JSX.Element => {
 		let className = WeaveTree.CLASSNAME;
 		let iconClassName = WeaveTree.LEAF_ICON_CLASSNAME;
 		let iconClickFunc: React.MouseEventHandler = null;
@@ -132,7 +128,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			className={className}
 			onDoubleClick={ iconClickFunc }
 			style={{ alignItems: "center", width: "100%" }}>
-			<HBox style={{ marginLeft: (node.depth || 0) * 16 + 5, whiteSpace: "nowrap" }}>
+			<HBox style={{ marginLeft: (depth || 0) * 16 + 5, whiteSpace: "nowrap" }}>
 				<span style={{ alignSelf: "stretch", display: "flex" }}>
 					<i
 						onMouseDown={ iconClickFunc }
@@ -152,15 +148,13 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		</HBox>;
 	};
 
-	enumerateItems = (_node: IWeaveTreeNode, result: Array<IWeaveTreeNode> = [], depth: number = 0): Array<IWeaveTreeNode> => {
-		let node = _node as ExtendedIWeaveTreeNode;
+	enumerateItems = (node: IWeaveTreeNode, result: Array<[number, IWeaveTreeNode]> = [], depth: number = 0): Array<[number, IWeaveTreeNode]> => {
 		if (!node)
 			return result;
 
 		if (node !== this.props.root || !this.props.hideRoot) {
 			if (node.isBranch() || node == this.props.root || !this.props.hideLeaves) {
-				node.depth = depth;
-				result.push(node);
+				result.push([depth, node]);
 				depth++;
 			}
 		}
@@ -175,11 +169,11 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	};
 
 	rowHeight: number;
-	private lastEnumeration: IWeaveTreeNode[];
+	private lastEnumeration: [number, IWeaveTreeNode][];
 
 	onSelect=(indices:string[])=>
 	{
-		let nodes = indices.map((index) => this.lastEnumeration[Number(index)]);
+		let nodes = indices.map((index) => this.lastEnumeration[Number(index)][1]);
 		this.setState({ selectedItems: nodes });
 	}
 
@@ -206,24 +200,27 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		let rootChildren = this.props.root && this.props.root.getChildren() || [];
 
 
-		this.lastEnumeration = this.props.hideBranches ? rootChildren.filter((n) => !n.isBranch()) : this.enumerateItems(this.props.root);
+		this.lastEnumeration = this.props.hideBranches ?
+			rootChildren.filter((n) => !n.isBranch()).map((n):[number, IWeaveTreeNode]=>[0, n]) :
+			this.enumerateItems(this.props.root);
 
 		let selectedIndices:string[] = [];
 		let maxRowIndex = -1;
 		let maxRowLength = -Infinity;
 
 		let rows = this.lastEnumeration.map(
-			(item, index): { [columnId: string]: React.ReactChild } => {
+			(row, index): { [columnId: string]: React.ReactChild } => {
+				let [depth, item] = row;
 				if (this.state.selectedItems.some(node => node.equals(item))) selectedIndices.push(index.toString());
 				/* keep a running maximum node length */
-				let rowLengthHeuristic = item.getLabel().length + (item as ExtendedIWeaveTreeNode).depth;
+				let rowLengthHeuristic = item.getLabel().length + depth;
 				if (rowLengthHeuristic > maxRowLength)
 				{
 					maxRowLength = rowLengthHeuristic;
 					maxRowIndex = index;
 				}
 
-				return ({ id: index.toString(), tree: this.renderItem(item as ExtendedIWeaveTreeNode, index) });
+				return ({ id: index.toString(), tree: this.renderItem(item, index, depth) });
 			});
 		let columnWidth: number = undefined;
 
