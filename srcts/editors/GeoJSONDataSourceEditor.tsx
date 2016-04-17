@@ -9,6 +9,7 @@ import FileSelector from "../ui/FileSelector";
 import KeyTypeInput from "../ui/KeyTypeInput";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
+import ComboBox from "../semantic-ui/ComboBox";
 import HelpIcon from "../react-ui/HelpIcon";
 
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
@@ -24,6 +25,10 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let dataSource = (this.props.dataSource as GeoJSONDataSource);
+		/* TODO: Update to use new typings. */
+		let propertyIds = ((dataSource as any).getPropertyNames() as string[]).map((id:string)=>({label: id.toString(), value: id}));
+		propertyIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
+
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("GeoJSON URL"),
@@ -40,11 +45,14 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 							   	   ref={linkReactStateRef(this, { value: dataSource.projection })}/>
 			],
 			[
-				Weave.lang("Key Property"),
-				<StatefulTextField style={{width: "100%"}}
-								   selectOnFocus={true} 
-		   						   ref={linkReactStateRef(this, { value: dataSource.keyProperty })}
-							   />
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Key Property")}
+					<HelpIcon>{Weave.lang("A property that can uniquely identify each row in the data. If there are no such properties, choose \"Auto-generated keys\"")}</HelpIcon>
+				</HBox>,
+				<ComboBox style={{width: "100%"}}
+				          ref={linkReactStateRef(this, { value: dataSource.keyProperty }) } /* searchable field */
+				          options={propertyIds}
+				/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
