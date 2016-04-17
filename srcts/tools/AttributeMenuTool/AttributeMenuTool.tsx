@@ -8,7 +8,9 @@ import * as lodash from "lodash";
 import HSlider from "../../react-ui/RCSlider/HSlider";
 import VSlider from "../../react-ui/RCSlider/VSlider";
 import SliderOption from "../../react-ui/RCSlider/RCSlider";
-import ComboBox from "../../semantic-ui/ComboBox";
+import ComboBox from '../../semantic-ui/ComboBox';
+import {ComboBoxOption} from "../../semantic-ui/ComboBox";
+import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -26,7 +28,7 @@ const LAYOUT_COMBO:string = "ComboBox";
 const LAYOUT_VSLIDER:string = "VSlider";
 const LAYOUT_HSLIDER:string = "HSlider";
 
-const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];
+const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];//todo add the verify callback
 
 export interface IAttributeMenuToolState extends IVisToolState
 {
@@ -161,7 +163,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 		Weave.getCallbacks(this.props.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
 
-		this.props.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
+		//this.props.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
 	}
 
 	componentWillReceiveProps(nextProps:IAttributeMenuTargetEditorProps)
@@ -170,12 +172,12 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		{
 			this.weaveRoot.childListCallbacks.removeCallback(this, this.getOpenVizTools);
 			Weave.getCallbacks(this.props.attributeMenuTool.toolWatcher).removeCallback(this, this.forceUpdate);
-			this.props.attributeMenuTool.targetAttribute.removeCallback(this, this.forceUpdate);
+			//this.props.attributeMenuTool.targetAttribute.removeCallback(this, this.forceUpdate);
 
 			this.weaveRoot = Weave.getRoot(nextProps.attributeMenuTool);
 			this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizTools, true);//will be called whenever a new tool is added
 			Weave.getCallbacks(nextProps.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
-			nextProps.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
+			//nextProps.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
 		}
 	}
 
@@ -202,9 +204,9 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	};
 
 	//UI event handler for target attribute (one of the selectable attributes of the target tool)
-	handleTargetAttributeChange =(selectedItem:string):void =>
+	handleTargetAttributeChange =(selectedItem:any):void =>
 	{
-		this.props.attributeMenuTool.targetAttribute.state = selectedItem ;
+		//this.props.attributeMenuTool.targetAttribute.state = selectedItem ;
 	};
 
 	//UI event handler for attribute menu layout
@@ -220,11 +222,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 	getTargetToolAttributeOptions():string[]
 	{
-		let tool:IVisTool = this.tool;
-		let attributes:string[] =[];
-		if (tool)
-			attributes= Array.from(tool.selectableAttributes.keys()) as string[];
-		return attributes;
+		return(this.tool ? Array.from(this.tool.selectableAttributes.keys())as string[] : []);
 	}
 
 	getTargetToolPath= ():string =>
@@ -245,7 +243,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 			[
 				Weave.lang("Visualization Tool"),
 				<ComboBox
-					className="weave-sidbar-dropdown"
+					className="weave-sidebar-dropdown"
 					placeholder="Select a visualization"
 					value={ toolName }
 					selectFirstOnInvalid={ true }
@@ -259,10 +257,9 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					placeholder="Select an attribute"
-					value={ this.props.attributeMenuTool.targetAttribute.state}
+					ref={ linkReactStateRef(this, { value: this.props.attributeMenuTool.targetAttribute })}
 					selectFirstOnInvalid={ true }
 					options={ this.getTargetToolAttributeOptions() }
-					onChange={ this.handleTargetAttributeChange }
 				/>
 			],
 			[
