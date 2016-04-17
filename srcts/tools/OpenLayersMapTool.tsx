@@ -117,7 +117,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		};
 
 		let editorFields = [
-			[Weave.lang("Panel Title"),
+			[Weave.lang("Title"),
 				<HBox>
 					<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) }/>
 				</HBox>
