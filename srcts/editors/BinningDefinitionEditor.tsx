@@ -50,7 +50,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 	public  hasPendingChanges():boolean { return false; }
 	public  applyChanges():void { }
 
-	private  _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.forceUpdate.bind(this)));
+	private  _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.handleBinnedColumnChange.bind(this)));
 
 	private  get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }
 	public  _simple:SimpleBinningDefinition = Weave.disposableChild(this, SimpleBinningDefinition);
@@ -87,10 +87,9 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		this._binnedColumnWatcher.target = props.binnedColumn;
 	}
 	
-	componentDidMount()
+	handleBinnedColumnChange()
 	{
 		var binDef = this.binnedColumn.binningDefinition.target;
-		// link the selected def at initialization
 		if(binDef)
 		{
 			for(var localDef of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
@@ -101,6 +100,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 				}
 			}
 		}
+		this.forceUpdate();
 	}
 
 	private linkOverride(property:"overrideInputMin"|"overrideInputMax")
