@@ -59,8 +59,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		this.api.getDatasets().then(
 			(result: { dataset: CensusRawDataset[] }) => { this.state = { datasets: result.dataset } as any; }
 		);
-		ds.dataSet.addGroupedCallback(this, this.forceUpdate);
-		ds.geographicFilters.addGroupedCallback(this, this.forceUpdate);
+		ds.dataSet.addGroupedCallback(this, this.getGeographies, true);
 		ds.geographicScope.addGroupedCallback(this, this.updateRequiresAndOptional, true);
 	}
 
@@ -139,7 +138,8 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 
 	private getGeographies(dataSet: string)
 	{
-		this.api.getGeographies(dataSet).then(
+		let ds = (this.props.dataSource as CensusDataSource);
+		this.api.getGeographies(ds.dataSet.value).then(
 			(geographies: { [id: string]: { name: string } }) => {
 				let tempGeographies = new Array<{ value: string, label: string }>();
 				for (let id in geographies) {
@@ -147,7 +147,8 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 				}
 
 				tempGeographies = _.sortBy(tempGeographies, "value");
-				this.setState({ geographies: tempGeographies } as any);
+				if (!_.isEqual(this.state.geographies, tempGeographies))
+					this.setState({ geographies: tempGeographies } as any);
 			});
 	}
 
@@ -160,17 +161,11 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 	{
 		this.setState({ dataVintage: (selectedItem as string)} as any);
 	}
-	dataSetChanged = (selectedItem: any) =>
-	{
-		this.getGeographies(selectedItem);
-	}
 
 	get editorFields(): [React.ReactChild, React.ReactChild][] {
 		let ds = (this.props.dataSource as CensusDataSource);
 		this.api = ds.getAPI();
-		let families = this.getDataFamilies();
-		let vintages = this.getDataVintages(this.state.dataFamily);
-		let datasets = this.getDatasets(this.state.dataFamily, this.state.dataVintage);
+		let datasets = this.getDatasets("All", "All");
 		let dataset = _.first(this.getDataset(ds.dataSet.value));
 		let datasetLabel: string = dataset ? dataset.title : "";
 		return [
@@ -184,30 +179,15 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 					{Weave.lang("Namespace")}
 					<HelpIcon>{Weave.lang("Namespaces are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
-				<KeyTypeInput style={{widtn: "100%"}}
+				<KeyTypeInput style={{width: "100%"}}
 							  keyTypeProperty={ds.keyType}/>
 			],
 			[
-				Weave.lang("Data Family"),
-				<ComboBox style={{width: "100%"}}
-				          onChange={this.dataFamilyChanged}
-				          selectFirstOnInvalid
-				          options={families}/>
-			],
-			[
-				Weave.lang("Year"),
-				<ComboBox style={{width: "100%"}}
-				          onChange={this.dataVintageChanged}
-				          selectFirstOnInvalid
-				          options={vintages}/>
-			],
-			[
 				Weave.lang("Dataset"),
-				<ComboBox style={{width: "100%"}}
-				          onChange={this.dataSetChanged}
+				<ComboBox className="search" style={{width: "100%"}}
 				          ref={linkReactStateRef(this, { value: ds.dataSet }) }
 				          selectFirstOnInvalid
-				          options={datasets}/>
+				          options={datasets || [{value: dataset, label: dataset}]}/>
 			],
 			[
 				Weave.lang("Geographic Scope"),
@@ -227,7 +207,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 				}
 				<CensusGeographyFilter filterLinkableVariable={(this.props.dataSource as CensusDataSource).geographicFilters}
 									   optional={this.state.optional}
-									   requires={this.state.requires || []}/>
+									   requires={this.state.requires || null}/>
 			</VBox>
 		)
 	}

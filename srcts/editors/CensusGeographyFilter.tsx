@@ -22,6 +22,8 @@ export default class CensusGeographyFilter extends React.Component<CensusGeograp
 
 		this.state_fips = (CensusApi as any).state_fips; // Hack until this is changed in the core.
 		this.county_fips = (CensusApi as any).county_fips;
+
+		this.props.filterLinkableVariable.addGroupedCallback(this, this.forceUpdate, true);
 	}
 
 	private state_fips: { [fips: string]: string };
@@ -34,8 +36,11 @@ export default class CensusGeographyFilter extends React.Component<CensusGeograp
 		if (oldFilters) for (let level of this.props.requires)
 		{
 			newFilters[level] = oldFilters[level];
+			if (!newFilters[level])
+				delete newFilters[level];
 		}
 		newFilters[geoLevel] = value;
+		if (!value) delete newFilters[geoLevel];
 		this.props.filterLinkableVariable.state = newFilters;
 	}
 
@@ -60,7 +65,7 @@ export default class CensusGeographyFilter extends React.Component<CensusGeograp
 		return <CensusGeographyFilterColumn key={scope}
 				geoLevel={scope}
 				options={options}
-				required={scope != this.props.optional}
+				required={this.props.optional !== undefined ? scope != this.props.optional : true}
 				parentGeo={parentGeoKey && filters[parentGeoKey]}
 				selection={typeof filters == typeof {} ? filters[scope] : null}
 				onChange={this.onFilterChange}
@@ -72,7 +77,7 @@ export default class CensusGeographyFilter extends React.Component<CensusGeograp
 		this.props.filterLinkableVariable.addGroupedCallback(this, this.forceUpdate);
 
 		return <HBox>
-			{this.props.requires.map(this.renderFilter)}
+			{this.props.requires ? this.props.requires.map(this.renderFilter) : ""}
 		</HBox>
 	}
 }
@@ -96,8 +101,10 @@ export class CensusGeographyFilterColumn extends React.Component<CensusGeography
 	constructor(props:CensusGeographyFilterColumnProps)
 	{
 		super(props);
-
-		this.componentWillReceiveProps(props);
+		this.state = {
+			enabled: props.required || !!props.selection,
+			selection: props.selection
+		};
 	}
 
 	state: CensusGeographyFilterColumnState = { selection: null };
@@ -109,10 +116,11 @@ export class CensusGeographyFilterColumn extends React.Component<CensusGeography
 		{
 			this.setState({ enabled: true });
 		}
-		if (!this.props || (nextProps.selection != this.props.selection))
+		if (nextProps.selection)
 		{
 			this.setState({ selection: nextProps.selection, enabled: true });
 		}
+
 	}
 
 	componentDidUpdate(prevProps: CensusGeographyFilterColumnProps, prevState: CensusGeographyFilterColumnState):void
@@ -135,11 +143,12 @@ export class CensusGeographyFilterColumn extends React.Component<CensusGeography
 	render(): JSX.Element {
 		let check = <label><input type="checkbox" onChange={this.updateEnabled} onInput={this.updateEnabled} disabled={this.props.required} checked={this.props.required || this.state.enabled}/>{this.props.geoLevel}</label>;
 		let inputDisabled = !this.state.enabled && !this.props.required;
+		let selection = this.props.selection || (this.state.enabled && this.state.selection) || null;
 		if (this.props.geoLevel == "state" || this.props.geoLevel == "county")
 		{
 			return <VBox style={{flex: 1}}>
 				{check}
-				<select size={5} disabled={inputDisabled} onClick={this.updateSelection} onInput={this.updateSelection} value={this.state.enabled ? this.state.selection : null}>
+				<select size={5} disabled={inputDisabled} onClick={this.updateSelection} onChange={this.updateSelection} onInput={this.updateSelection} value={selection}>
 					{this.props.options.map((option) => <option disabled={inputDisabled} key={option.fips} value={option.fips}>{option.name}</option>)}
 				</select>
 			</VBox>
@@ -148,7 +157,7 @@ export class CensusGeographyFilterColumn extends React.Component<CensusGeography
 		{
 			return <VBox style={{ flex: 1 }}>
 				{check}
-				<input onInput={this.updateSelection} disabled={inputDisabled} type="text" value={this.state.selection}/>
+				<input onChange={this.updateSelection} onInput={this.updateSelection} disabled={inputDisabled} type="text" value={selection}/>
 			</VBox>
 		}
 	}
