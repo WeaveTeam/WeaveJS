@@ -147,7 +147,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 					<span style={ {flex: "1"} }/>
 					<IconButton clickHandler={ this.openSessionStateEditor }
 								iconName="fa fa-code"
-								toolTip={"Click to open Session State of " + this.toolName}/>
+								toolTip={"Edit session state"}/>
 				</HBox>
 	
 				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto" } }>
