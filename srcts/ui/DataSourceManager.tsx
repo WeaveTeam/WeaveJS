@@ -107,7 +107,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 							              iconProps={{ className: "fa fa-refresh", title: "Refresh this datasource" }}/>
 
 							<CenteredIcon onClick={()=>this.removeDataSource(dataSource)}
-							              iconProps={{ className: "fa fa-times", title: " this datasource" }}/>
+							              iconProps={{ className: "fa fa-times", title: "Delete this datasource" }}/>
 						</HBox>
 
 					</HBox>
