@@ -31,7 +31,8 @@ export interface ComboBoxState
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
 {
 	element:Element;
-
+	labelsHTML:HTMLDivElement[] = [];
+	
 	static defaultProps:ComboBoxProps = {
 		fluid:true
 	};
@@ -56,7 +57,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 		if (nextProps.selectFirstOnInvalid && this.getIndexFromValue(value) < 0)
 		{
-			this.setState({value});
+			this.setState({value}); // TODO this is incorrect
 		}
 		else if (value !== undefined)
 		{
@@ -66,14 +67,15 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
-		if (!_.isEqual(prevState.value, this.state.value)) {
+		if (!_.isEqual(prevState.value, this.state.value))
+		{
 			if(this.state.value)
 				this.props.onChange && this.props.onChange(this.state.value);
 			let selector = ($(this.element) as any);
 			let index = this.getIndexFromValue(this.state.value);
 			let option = this.props.options[index];
 			selector.dropdown("set value", index);
-			selector.dropdown("set text", (typeof option === "object") ? option.label : option);
+			selector.dropdown("set text", (typeof option === "object") ?  this.labelsHTML[index] : option);
 		}
 	}
 	
@@ -83,11 +85,13 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let selector = ($(this.element) as any);
 		
 		selector.dropdown({
-			onChange: (selected:number,text:string) => {
-				let index:number = this.getIndexFromValue(text);
-				if(this.props.onAdd && text &&  (index < 0) ) {
+			onChange: (selected:number, text:string) => {
+				if(this.props.onAdd && text &&  (Number(index) < 0) )
+				{
 					this.props.onAdd && this.props.onAdd(text);
-				}else {
+				}
+				else
+				{
 					let option = this.props.options[selected];
 					let value:any = (typeof option === "object") ? option.value : option;
 					this.setState({value});
@@ -104,21 +108,27 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let index = this.getIndexFromValue(this.state.value);
 		let option = this.props.options[index];
 		selector.dropdown("set value", index);
-		selector.dropdown("set text", (typeof option === "object") ? option.label : option);
+		selector.dropdown("set text", (typeof option === "object") ? this.labelsHTML[index] : option);
 	}
 
 	render()
 	{
+		let index = this.getIndexFromValue(this.state.value);
+		let option = this.props.options[index];
+
 		return (
 			<div onClick={this.props.onClick} className={"ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"") +" selection dropdown " + (this.props.className || "")} style={this.props.style}>
 				<input type="hidden"/>
 				<i className="dropdown icon"/>
 				<div className="default text">{this.props.placeholder}</div>
 				<div className="menu">
-					{this.props.header ? (<div className="header">{this.props.header}</div>):null}
-
 				{
-					this.props.options.map((option, index) => <div className="item" style={this.props.optionStyle} key={index} data-value={index}>{typeof option === "object" ? option && (option.label || option.value) : option}</div>)
+					this.props.header ? 
+					<div className="header">{this.props.header}</div>
+					: null
+				}
+				{
+					this.props.options.map((option, index) => <div className="item" style={this.props.optionStyle} ref={(ref) => this.labelsHTML[index] = ref} key={index} data-value={index}>{typeof option === "object" ? option && (option.label || option.value) : option}</div>)
 				}
 				</div>
 			</div>

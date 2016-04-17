@@ -424,7 +424,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			return {
 				value: colorRamp.colors,
 				label: <HBox className="weave-padded-hbox">
-							<ColorRampComponent style={{flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/>
+							<HBox style={{flex: 1, alignItems: "center"}}><ColorRampComponent style={{height: 15, flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/></HBox>
 							<HBox style={{flex: 1}}>{colorRamp.name}</HBox>
 						</HBox>
 			};
@@ -450,7 +450,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					[ 
 						Weave.lang("Color Theme"),
 						<HBox className="weave-padded-hbox" style={{padding: 0}}>
-							<ComboBox options={ColorLegend.colorRampOptions} ref={linkReactStateRef(this, {value: this.colorColumn.ramp})}/>
+							<ComboBox options={ColorLegend.colorRampOptions} ref={linkReactStateRef(this, {value: this.colorColumn.ramp})} valueEqualityFunc={(a:any, b:any) => {
+								return _.isEqual(a && a.map(StandardLib.asNumber), b && b.map(StandardLib.asNumber));
+							}}/>
 							<Button onClick={() => this.openColorController(1)}>{Weave.lang("Edit")}</Button>
 						</HBox>
 					],

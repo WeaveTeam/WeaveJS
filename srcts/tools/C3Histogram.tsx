@@ -503,10 +503,10 @@ export default class C3Histogram extends AbstractC3Tool
 	
 	static colorRampOptions = ColorRamp.allColorRamps.map((colorRamp) => {
 			return {
-				value: colorRamp.colors,
+				value: colorRamp.colors.map(StandardLib.getHexColor),
 				label: <HBox className="weave-padded-hbox">
 							<ColorRampComponent style={{flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/>
-							<HBox style={{flex: 1}}>{colorRamp.name}</HBox>
+							<HBox style={{flex: 1, whiteSpace: "nowrap"}}>{colorRamp.name}</HBox>
 						</HBox>
 			};
 	});
@@ -525,7 +525,7 @@ export default class C3Histogram extends AbstractC3Tool
 				{ReactUtils.generateFlexBoxLayout(
 					[.3,.7],
 					[
-						[ 
+						[ // TODO move this to color ramp editor and make it compact view
 							Weave.lang("Color Theme"),
 							<HBox className="weave-padded-hbox" style={{padding: 0}}>
 								<ComboBox options={C3Histogram.colorRampOptions} ref={linkReactStateRef(this, {value: Weave.AS(this.fill.color.getInternalColumn(), ColorColumn).ramp})}/>
