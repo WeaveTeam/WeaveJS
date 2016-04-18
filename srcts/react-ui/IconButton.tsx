@@ -9,7 +9,7 @@ import ReactNode = __React.ReactNode;
 export interface IconButtonProps extends React.HTMLProps<IconButton>
 {
     clickHandler:(event:React.MouseEvent)=>void;
-    mouseOverStyle?: any;
+    mouseOverStyle?: React.CSSProperties;
     iconName?:string;
     toolTip?:string;
 }
@@ -111,10 +111,9 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
             className = "weave-icon-button-mouse-over";
             if(this.props.mouseOverStyle)
             {
-                iconStyle = _.merge({},this.props.mouseOverStyle,iconStyle);
+                iconStyle = _.merge({},iconStyle,this.props.mouseOverStyle);
                 // preference given to border and border color of user defined
-                iconStyle.border = this.props.mouseOverStyle.border ? this.props.mouseOverStyle.border : iconStyle.border
-                iconStyle.borderColor = this.props.mouseOverStyle.borderColor ? this.props.mouseOverStyle.borderColor : iconStyle.borderColor
+                iconStyle.border = this.props.mouseOverStyle.border == "none" ? "1px solid grey" : iconStyle.border
             }
         }
 
@@ -132,6 +131,12 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
 
         }
 
+        let labelUI:JSX.Element = null;
+        if(this.props.children) // add space between icon and Label , when label is sent as children
+        {
+            labelUI = <span>&nbsp;{Weave.lang(this.props.children as string)}</span>
+        }
+
         return  <span className= {className}
                       title={ Weave.lang(this.props.toolTip) }
                       style={ prefixer(iconStyle) }
@@ -139,7 +144,7 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
                       onMouseOver={ this.mouseOverHandler }
                       onMouseOut={ this.mouseOutHandler }>
                     {iconUI}
-                    {Weave.lang(this.props.children as string)}
+                    {labelUI}
                 </span>;
     }
 }

@@ -84,9 +84,20 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		this.crumbOrder = this.crumbOrder.slice(0, index + 1);
 	}
 
+	stepBackInCrumbView = ()=>{
+		let index:number = this.crumbOrder.length-2; //prev index make it active
+		let activeCrumbTitle:string = this.crumbOrder[index ]
+		this.setState({
+			activeCrumb:activeCrumbTitle
+		});
+		this.crumbOrder = this.crumbOrder.slice(0, index + 1);
+	}
+
 	render()
 	{
-		var crumbStyle:React.CSSProperties = {};
+		var crumbStyle:React.CSSProperties = {
+			alignItems:"center"
+		};
 		var editorUI:JSX.Element[] | JSX.Element = this.childrenCrumbMap[this.state.activeCrumb];
 
 		var crumbUI:JSX.Element = (
@@ -129,7 +140,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 							];
 						}
 			
-						if (this.crumbOrder.length > 1 && index < this.crumbOrder.length - 1)
+						if (this.crumbOrder.length > 1 && index < this.crumbOrder.length - 1) // add icon except for last crumb
 							elements.push(<i className="right chevron icon divider"/>);
 			
 						return elements;
@@ -138,10 +149,21 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			</div>
 		);
 
+		let backButtonUI:JSX.Element = null;
+		if(this.crumbOrder.length > 1)
+		{
+			let prevCrumbTitle:string = this.crumbOrder[this.crumbOrder.length - 2];
+			backButtonUI = <IconButton clickHandler={ this.stepBackInCrumbView }
+					            style={ {color:"black"} } mouseOverStyle={ {color:"white"} }
+					            iconName="fa fa-chevron-left"
+					            toolTip={"Go back to view: " + prevCrumbTitle}> {Weave.lang("Back")}</IconButton>
+		}
+
 		return (
 			<VBox className={ this.props.className } style={ this.props.style }>
 				<HBox className="weave-editor-header" style = { {alignItems: "center"} }>
-					<HBox style={ crumbStyle }>
+					<HBox className="weave-padded-hbox" style={ crumbStyle }>
+						{backButtonUI}
 						{crumbUI}
 					</HBox>
 					<span style={ {flex: "1"} }/>
