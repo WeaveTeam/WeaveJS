@@ -226,12 +226,24 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	getRowClass=(index: number):string =>
 	{
 		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty] as string;
-		if (_.includes(this.state.probedIds, id) && _.includes(this.state.selectedIds, id)) {
+
+		if(!this.props.enableHover)
+			return "";
+
+		if(!this.props.enableSelection)
+			return "";
+
+		if (this.props.enableHover && this.props.enableSelection && _.includes(this.state.probedIds, id) && _.includes(this.state.selectedIds, id))
+		{
 			return "table-row-probed-selected"
-		} else if (_.includes(this.state.probedIds, id)) {
+		}
+		else if (this.props.enableHover && _.includes(this.state.probedIds, id))
+		{
 			//item needs probed class
 			return "table-row-probed";
-		} else if (_.includes(this.state.selectedIds, id)) {
+		}
+		else if (this.props.enableSelection && _.includes(this.state.selectedIds, id)) 
+		{
 			//item needs selected class
 			return "table-row-selected";
 		}
