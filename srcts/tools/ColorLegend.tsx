@@ -425,7 +425,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				value: colorRamp.colors,
 				label: <HBox className="weave-padded-hbox">
 							<HBox style={{flex: 1, alignItems: "center"}}><ColorRampComponent style={{height: 15, flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/></HBox>
-							<HBox style={{flex: 1}}>{colorRamp.name}</HBox>
+							<HBox style={{flex: 1, whiteSpace: "nowrap", overflow: "hidden"}}>{colorRamp.name}</HBox>
 						</HBox>
 			};
 	});

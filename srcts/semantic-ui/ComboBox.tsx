@@ -75,7 +75,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			let index = this.getIndexFromValue(this.state.value);
 			let option = this.props.options[index];
 			selector.dropdown("set value", index);
-			selector.dropdown("set text", (typeof option === "object") ?  this.labelsHTML[index] : option);
+			//Todo: This is still very hacky, but when JSX is passed we have an object for label, so we pass the HTML as the text
+			selector.dropdown("set text", (typeof option === "object") ?  (typeof option.label === "object" ? this.labelsHTML[index]:option.label) : option);
 		}
 	}
 	
@@ -108,7 +109,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let index = this.getIndexFromValue(this.state.value);
 		let option = this.props.options[index];
 		selector.dropdown("set value", index);
-		selector.dropdown("set text", (typeof option === "object") ? this.labelsHTML[index] : option);
+		//Todo: as above, this is hacky and needs to be removed
+		selector.dropdown("set text", (typeof option === "object") ?  (typeof option.label === "object" ? this.labelsHTML[index]:option.label) : option);
 	}
 
 	render()

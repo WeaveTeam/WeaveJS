@@ -506,7 +506,7 @@ export default class C3Histogram extends AbstractC3Tool
 				value: colorRamp.colors.map(StandardLib.getHexColor),
 				label: <HBox className="weave-padded-hbox">
 							<ColorRampComponent style={{flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/>
-							<HBox style={{flex: 1, whiteSpace: "nowrap"}}>{colorRamp.name}</HBox>
+							<HBox style={{flex: 1, whiteSpace: "nowrap", overflow: "hidden"}}>{colorRamp.name}</HBox>
 						</HBox>
 			};
 	});
