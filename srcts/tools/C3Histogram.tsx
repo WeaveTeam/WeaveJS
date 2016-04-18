@@ -50,7 +50,7 @@ export default class C3Histogram extends AbstractC3Tool
 {
 	binnedColumn = Weave.linkableChild(this, BinnedColumn);
 	columnToAggregate = Weave.linkableChild(this, DynamicColumn);
-	aggregationMethod = Weave.linkableChild(this, LinkableString);
+	aggregationMethod = Weave.linkableChild(this, new LinkableString("count"));
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
     barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
