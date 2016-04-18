@@ -340,6 +340,11 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			// TODO handle remaining attributes
 	}
 
+	get defaultPanelTitle():string
+	{
+		return Weave.lang("Scatter plot {0} -vs- {1}", weavejs.data.ColumnUtils.getTitle(this.dataX), weavejs.data.ColumnUtils.getTitle(this.dataY));
+	}
+
 	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linkFunction:Function):JSX.Element
 	{

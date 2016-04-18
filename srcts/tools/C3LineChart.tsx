@@ -362,6 +362,16 @@ export default class C3LineChart extends AbstractC3Tool
             .set("Y Columns", this.columns);
     }
 
+
+    get defaultPanelTitle():string
+    {
+        var columns = this.columns.getObjects() as IAttributeColumn[];
+        if (columns.length == 0)
+            return Weave.lang('Line Chart');
+
+        return Weave.lang("Line Chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+    }
+
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
     renderEditor(linkFunction:Function):JSX.Element{
         return (<VBox>

@@ -104,7 +104,12 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;
+	}
+
+	get defaultPanelTitle():string
+	{
+		return "";
 	}
 
 	get selectableAttributes():Map<string, (IColumnWrapper|ILinkableHashMap)>

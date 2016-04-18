@@ -197,12 +197,18 @@ export default class C3PieChart extends AbstractC3Tool
 		return false;
     }
 
+
     get selectableAttributes()
     {
         return super.selectableAttributes
             .set("Label", this.label)
             .set("Color", this.fill.color)
             .set("Wedge Size", this.data);
+    }
+
+    get defaultPanelTitle():string
+    {
+        return Weave.lang("Pie Chart of {0}", weavejs.data.ColumnUtils.getTitle(this.data));
     }
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes

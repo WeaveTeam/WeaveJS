@@ -219,6 +219,8 @@ export default class C3Histogram extends AbstractC3Tool
         //this.forceUpdate();
     }
 
+
+
     private getYAxisLabel():string
     {
         var overrideAxisName = this.yAxisName.value;
@@ -492,6 +494,11 @@ export default class C3Histogram extends AbstractC3Tool
             .set("Group By", this.binnedColumn.internalDynamicColumn)
             .set("Height values (Optional)", this.columnToAggregate);
         //TODO handle remaining attributes
+    }
+
+    get defaultPanelTitle():string
+    {
+        return Weave.lang("Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
     }
 	
 	// TODO move this to BinningDefinitionEditor

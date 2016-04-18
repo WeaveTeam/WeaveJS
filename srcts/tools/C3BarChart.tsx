@@ -518,6 +518,15 @@ export default class C3BarChart extends AbstractC3Tool
             .set("height", this.heightColumns);
     }
 
+    get defaultPanelTitle():string
+    {
+        var columns = this.heightColumns.getObjects() as IAttributeColumn[];
+        if (columns.length == 0)
+            return Weave.lang('Bar Chart');
+
+        return Weave.lang("Bar Chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+    }
+
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
     renderEditor(linkFunction:Function):JSX.Element
     {

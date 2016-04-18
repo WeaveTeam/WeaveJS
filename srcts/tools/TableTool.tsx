@@ -89,7 +89,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;
 	}
 
 	componentDidMount()
@@ -162,6 +162,15 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	{
 		return new Map<string, (IColumnWrapper | ILinkableHashMap)>()
 			.set("Columns", this.columns);
+	}
+
+	get defaultPanelTitle():string
+	{
+		var columns = this.columns.getObjects() as IAttributeColumn[];
+		if (columns.length == 0)
+			return Weave.lang('Table');
+
+		return Weave.lang("Table of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 	}
 
 	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void

@@ -210,7 +210,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;
 	}
 
 	constructor(props:IVisToolProps)
@@ -663,10 +663,18 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return menuItems;
 	}
 
-	dispose():void
+	get defaultPanelTitle():string
 	{
+		let columns = Weave.getDescendants(this, weavejs.data.column.ColorColumn) as weavejs.data.column.ColorColumn[];
 
+		if (!columns.length)
+		{
+			return Weave.lang("Map");
+		}
+
+		return Weave.lang("Map of {0}", weavejs.data.ColumnUtils.getTitle(columns[0]));
 	}
+
 
 	render():JSX.Element 
 	{

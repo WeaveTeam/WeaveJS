@@ -161,6 +161,11 @@ export default class C3Gauge extends AbstractC3Tool
 		)
 	}
 
+    get defaultPanelTitle():string
+    {
+        return Weave.lang("Gauge of {0}", weavejs.data.ColumnUtils.getTitle(this.meterColumn));
+    }
+
     get deprecatedStateMapping()
     {
         return [super.deprecatedStateMapping, {
