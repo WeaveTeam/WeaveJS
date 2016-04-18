@@ -73,12 +73,21 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 
 	componentDidMount()
 	{
-		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.updateDataSources,true );
 	}
 
 	componentWillUnmount()
 	{
-		this.props.dataMenu.weave.root.childListCallbacks.removeCallback(this, this.forceUpdate);
+		this.props.dataMenu.weave.root.childListCallbacks.removeCallback(this, this.updateDataSources);
+	}
+
+	updateDataSources()
+	{
+		let dataSources = this.props.dataMenu.weave.root.getObjects(IDataSource);
+
+		dataSources.forEach((ds:IDataSource):void =>{
+			Weave.getCallbacks(ds).addGroupedCallback(this, this.forceUpdate);//adding callbacks to every datasource
+		});
 	}
 
 	refreshDataSource(dataSource:IDataSource)
