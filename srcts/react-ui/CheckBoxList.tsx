@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
+import Checkbox from "../semantic-ui/Checkbox";
 
 export type CheckBoxOption = {
 	value:any, 
@@ -117,7 +118,7 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
                 {
                     this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
                         var checkboxItem:JSX.Element[] = [
-                            <input key="input" type="checkbox" checked={checkBoxState} value={this.values[index]} onChange={this.handleChange.bind(this, index)}/>,
+                            <Checkbox key="input" type="checkbox" value={this.values[index]} onChange={this.handleChange.bind(this, index)}/>,
                             <span key="span" style={{paddingLeft: 5, textAlign: "center", whiteSpace: "nowrap"}}>
 								{ this.labels[index] }
 							</span>
