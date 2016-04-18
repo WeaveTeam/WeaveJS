@@ -10,6 +10,8 @@ import FixedDataTable from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
 import Tabs from "../react-ui/Tabs";
 import Input from "../semantic-ui/Input";
+import MenuButton from '../react-ui/MenuButton';
+import ToolsMenu from "../menus/ToolsMenu";
 
 import WeaveAPI = weavejs.WeaveAPI;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -27,6 +29,7 @@ export type View = typeof PREVIEW | typeof METADATA | typeof BROWSE;
 
 export interface IDataSourceEditorProps {
 	dataSource: IDataSource;
+	toolsMenu: ToolsMenu;
 };
 
 export interface IDataSourceEditorState {
@@ -178,7 +181,14 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 						/>
 					</VBox>
 					<VBox style={{flex: 1}}>
+						{
+							this.props.toolsMenu
+								?	<MenuButton menu={ this.props.toolsMenu.getVisualizationItems() } style={{width: "100%"}}>{Weave.lang('Create a visualization')}</MenuButton>
+								: 	null
+						}
+
 						<label style={{ fontWeight: "bold" }}>{Weave.lang("Columns")}</label>
+
 						<WeaveTree
 							root={this.state.selectedNode}
 							hideRoot={true}

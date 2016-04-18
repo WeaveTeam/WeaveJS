@@ -6,6 +6,7 @@ import DataSourceManager from "../ui/DataSourceManager";
 import IDataSource = weavejs.api.data.IDataSource;
 import FileMenu from "./FileMenu";
 import FileInput from "../react-ui/FileInput";
+import ToolsMenu from "./ToolsMenu";
 
 export default class DataMenu implements MenuBarItemProps
 {
@@ -13,12 +14,13 @@ export default class DataMenu implements MenuBarItemProps
 	{
 		this.weave = weave;
 		this.fileMenu = new FileMenu(weave);
+		this.toolsMenu = new ToolsMenu(weave, createObject);
 		this.createObject = createObject;
-
 	}
 
 	label:string = "Data";
 	weave:Weave;
+	toolsMenu:ToolsMenu;//menu to be passed for creating visualizations from tha datasource manager
 	fileMenu:FileMenu; // temp solution
 	createObject:(type:new(..._:any[])=>any)=>void;
 	
