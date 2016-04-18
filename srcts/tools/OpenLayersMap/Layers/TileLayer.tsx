@@ -180,11 +180,9 @@ export default class TileLayer extends AbstractLayer
 
 	updateProjection()
 	{
-		var proj = ol.proj.get(this.outputProjection);
-		if (proj)
+		var proj = ol.proj.get(this.outputProjection)
+		if (proj && proj.getExtent())
 			this.olLayer.setExtent(proj.getExtent());
-		else
-		 	console.log('invalid proj -> no extent');
 	}
 
 	static STAMEN_LAYERS = ["watercolor", "toner"];
