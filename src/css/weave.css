@@ -375,6 +375,7 @@ div.table-row-selected>div>div>div>div>div {
 	padding: 4;
 	padding-left: 8px;
 	padding-right: 8px;
+	line-height: normal;
 	font-size: 12;
 	font-weight: 400;
 }
