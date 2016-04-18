@@ -4,7 +4,7 @@ import $ from "../modules/jquery";
 import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
 
-export type ComboBoxOption = (string | { label: any, value: any });
+export type ComboBoxOption = (string | { label: string, value: any });
 
 export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 {
@@ -31,7 +31,6 @@ export interface ComboBoxState
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
 {
 	element:Element;
-	labelsHTML:HTMLDivElement[] = [];
 	
 	static defaultProps:ComboBoxProps = {
 		fluid:true
@@ -75,8 +74,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			let index = this.getIndexFromValue(this.state.value);
 			let option = this.props.options[index];
 			selector.dropdown("set value", index);
-			//Todo: This is still very hacky, but when JSX is passed we have an object for label, so we pass the HTML as the text
-			selector.dropdown("set text", (typeof option === "object") ?  (typeof option.label === "object" ? this.labelsHTML[index]:option.label) : option);
+			selector.dropdown("set text", (typeof option === "object") ?  option.label : option);
 		}
 	}
 	
@@ -110,7 +108,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let option = this.props.options[index];
 		selector.dropdown("set value", index);
 		//Todo: as above, this is hacky and needs to be removed
-		selector.dropdown("set text", (typeof option === "object") ?  (typeof option.label === "object" ? this.labelsHTML[index]:option.label) : option);
+		selector.dropdown("set text", (typeof option === "object") ?  option.label : option);
 	}
 
 	render()
@@ -130,7 +128,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					: null
 				}
 				{
-					this.props.options.map((option, index) => <div className="item" style={this.props.optionStyle} ref={(ref) => this.labelsHTML[index] = ref} key={index} data-value={index}>{typeof option === "object" ? option && (option.label || option.value) : option}</div>)
+					this.props.options.map((option, index) => <div className="item" style={this.props.optionStyle} key={index} data-value={index}>{typeof option === "object" ? option && (option.label || option.value) : option}</div>)
 				}
 				</div>
 			</div>

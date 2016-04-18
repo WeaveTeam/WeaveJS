@@ -187,7 +187,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 				<ComboBox className="search" style={{width: "100%"}}
 				          ref={linkReactStateRef(this, { value: ds.dataSet }) }
 				          selectFirstOnInvalid
-				          options={datasets || [{value: dataset, label: dataset}]}/>
+				          options={datasets || [{value: dataset, label: datasetLabel}]}/>
 			],
 			[
 				Weave.lang("Geographic Scope"),
