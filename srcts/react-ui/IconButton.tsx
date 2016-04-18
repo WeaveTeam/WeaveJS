@@ -112,8 +112,13 @@ export default class IconButton extends SmartComponent<IconButtonProps, IconButt
             if(this.props.mouseOverStyle)
             {
                 iconStyle = _.merge({},iconStyle,this.props.mouseOverStyle);
-                // preference given to border and border color of user defined
-                iconStyle.border = this.props.mouseOverStyle.border == "none" ? "1px solid grey" : iconStyle.border
+                // if mouseoverstyle sets border to null set the border alpha to 0 , to avoid flickering
+                if(this.props.mouseOverStyle.border == "none" || this.props.mouseOverStyle.border == null)
+                {
+                    iconStyle.border =  "1px solid";
+                    iconStyle.borderColor = "rgba(0, 0, 0, 0)"
+                }
+
             }
         }
 

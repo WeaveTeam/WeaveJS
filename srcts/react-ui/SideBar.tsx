@@ -63,9 +63,10 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 			display:"flex"
 		};
 
+
 		var closeButtonStyle:React.CSSProperties = {
 			alignSelf:"flex-end",
-			fontSize:"14px"
+			paddingRight:"8px"
 		};
 		
 		var closeIconStyle:React.CSSProperties = {
@@ -115,8 +116,8 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 					<IconButton
 						clickHandler={ this.onCloseClick }
 						iconName="&#x2715"
-						style={ {width:"14px" , height:"14px"} }
-						mouseOverStyle={ {background:"#F56666",borderRadius:"50%"} }
+						style={ {fontSize:"16px"} }
+						mouseOverStyle={ {color:"red",background:"none"} }
 						toolTip="click to close Sidebar"
 					/>
 				</div>
