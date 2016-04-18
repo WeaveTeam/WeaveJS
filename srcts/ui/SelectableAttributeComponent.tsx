@@ -55,7 +55,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
     launchAttributeSelector=(label:string, attribute:IColumnWrapper|ILinkableHashMap):ControlPanel=>{
         if(this.props.linkToToolEditorCrumb)
         {
-            this.props.linkToToolEditorCrumb("Attribute Selector", <AttributeSelector label={ label }
+            this.props.linkToToolEditorCrumb("Attributes", <AttributeSelector label={ label }
                                                                              selectedAttribute={ attribute }
                                                                              selectableAttributes = { this.props.attributes }/> )
             return null;

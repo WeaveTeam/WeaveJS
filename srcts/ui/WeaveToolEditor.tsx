@@ -1,6 +1,5 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as _ from "lodash";
 
 import {HBox, VBox} from "../react-ui/FlexBox";
 import SessionStateEditor from "../ui/SessionStateEditor";
@@ -8,11 +7,11 @@ import {IVisTool} from "../tools/IVisTool";
 import IconButton from "../react-ui/IconButton";
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
-import ControlPanel from "./ControlPanel";
 
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
-	tool:IVisTool
+	tool:IVisTool;
+	onCloseHandler:(event: React.MouseEvent) => void;
 }
 
 export interface WeaveToolEditorState
@@ -24,6 +23,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 {
 	private weaveRoot:ILinkableHashMap;
 	private toolName:string;
+	private displayName:string;
 	private childrenCrumbMap:any = {};
 	private crumbOrder:string[] = [];
 
@@ -31,13 +31,14 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	{
 		super(props);
 		this.weaveRoot = Weave.getRoot(this.props.tool);
+		this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.tool.constructor as new (..._: any[]) => any)
 		this.toolName = this.weaveRoot.getName(this.props.tool);
 		//todo : find a better way to get linked children
-		this.childrenCrumbMap[this.toolName] = this.props.tool.renderEditor(this.linktoToolEditorCrumbFunction);
+		this.childrenCrumbMap[this.displayName] = this.props.tool.renderEditor(this.linktoToolEditorCrumbFunction);
 		this.state = {
-			activeCrumb: this.toolName
+			activeCrumb: this.displayName
 		};
-		this.crumbOrder[0] = this.toolName;
+		this.crumbOrder[0] = this.displayName;
 	}
 
 	openSessionStateEditor=()=>
@@ -67,12 +68,13 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 			//set new
 			this.weaveRoot = Weave.getRoot(nextProps.tool);
+			this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(nextProps.tool.constructor as new (..._: any[]) => any)
 			this.toolName = this.weaveRoot.getName(nextProps.tool);
-			this.childrenCrumbMap[this.toolName] = nextProps.tool.renderEditor(this.linktoToolEditorCrumbFunction);
+			this.childrenCrumbMap[this.displayName] = nextProps.tool.renderEditor(this.linktoToolEditorCrumbFunction);
 			this.setState({
-				activeCrumb: this.toolName
+				activeCrumb: this.displayName
 			});
-			this.crumbOrder[0] = this.toolName;
+			this.crumbOrder[0] = this.displayName;
 		}
 	}
 
@@ -154,26 +156,33 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		{
 			let prevCrumbTitle:string = this.crumbOrder[this.crumbOrder.length - 2];
 			backButtonUI = <IconButton clickHandler={ this.stepBackInCrumbView }
-					            style={ {color:"black"} } mouseOverStyle={ {color:"white"} }
-					            iconName="fa fa-chevron-left"
-					            toolTip={"Go back to view: " + prevCrumbTitle}> {Weave.lang("Back")}</IconButton>
+			                           mouseOverStyle={ {color:"black",background:"none"} }
+			                           iconName="fa fa-chevron-left"
+			                           toolTip={"Go back to view: " + prevCrumbTitle}/>
 		}
 
 		return (
-			<VBox className={ this.props.className } style={ this.props.style }>
-				<HBox className="weave-editor-header" style = { {alignItems: "center"} }>
+			<VBox className={ "weave-padded-vbox "  + this.props.className } style={ this.props.style }>
+				<HBox className="weave-padded-hbox" style = { {alignItems: "center",borderBottom:"1px solid lightgrey"} }>
+					{backButtonUI}
 					<HBox className="weave-padded-hbox" style={ crumbStyle }>
-						{backButtonUI}
 						{crumbUI}
 					</HBox>
 					<span style={ {flex: "1"} }/>
 					<IconButton clickHandler={ this.openSessionStateEditor }
 								iconName="fa fa-code"
 								toolTip={"Edit session state"}/>
+					<IconButton clickHandler={ this.props.onCloseHandler }
+					            iconName="&#x2715"
+					            mouseOverStyle={ {color:"red",background:"none"} }
+					            toolTip="click to close Sidebar"
+					/>
 				</HBox>
+
+
 	
-				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto", flex:1 } }>
-					{editorUI}
+				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto" } }>
+					<div style={ {overflow: "auto" } }>{editorUI}</div>
 				</div>
 			</VBox>
 		);

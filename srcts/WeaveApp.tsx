@@ -349,7 +349,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
 		if (toolToEdit && toolToEdit.renderEditor) // hack
-			sideBarUI = <WeaveToolEditor tool={toolToEdit} style={{flex:1}}/>
+			sideBarUI = <WeaveToolEditor tool={toolToEdit} onCloseHandler={this.handleSideBarClose}/>
 		
 		return (
 			<VBox

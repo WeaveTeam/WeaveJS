@@ -51,7 +51,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 
 		if(this.props.linktoToolEditorCrumb)
 		{
-			this.props.linktoToolEditorCrumb(Weave.lang("{0} layer", this.props.layers.getName(layer)),layer.renderEditor(this.props.linktoToolEditorCrumb));
+			this.props.linktoToolEditorCrumb(Weave.lang("Layer"),layer.renderEditor(this.props.linktoToolEditorCrumb));
 		}
 		else
 		{

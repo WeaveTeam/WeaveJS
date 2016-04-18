@@ -132,8 +132,8 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 
 		var wrapperStyle:React.CSSProperties = {
 			position:this.props.mode == "scale"?"absolute":"relative",
-			flex:1,
-			display:"flex"
+			display:"flex",
+			flex:1
 		}
 
 		if (this.props.mode == "scale" && scaleValue != 1)
@@ -171,7 +171,6 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 				<SideBar
 					key={ location }
 					style={ barStyle }
-					onClose={ this.sideBarCloseHandler.bind(this, location) }
 					open={ openStateValue }
 					location={ location }
 					children={ sideBarChildren }
@@ -185,7 +184,7 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 				else
 					barStyle.width = barPercentageSize;
 
-				barStyle.height = "100%";
+				//barStyle.height = "100%";
 				if (this.props.mode != "scale")
 				{
 					if (location == "right")
@@ -228,7 +227,7 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 			// important to set " style={ {width:"100%",height:"100%"} }" ensures calculated size values are passed on
 			// wrapperStyle passed the width height values here
 			containerUI = (
-				<ResizingDiv style={ {display:"flex",flex: 1, position: "relative", background: "#e0e0e0"} }>
+				<ResizingDiv style={ {position: "relative", background: "#e0e0e0"} }>
 					{sideBars}
 					<div style={ wrapperStyle }>
 						{this.props.children}

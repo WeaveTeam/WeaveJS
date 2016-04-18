@@ -7,9 +7,10 @@ import SmartComponent from "../ui/SmartComponent";
 
 export interface SideBarProps extends React.HTMLProps<SideBar>
 {
-	onClose:(open:boolean)=>void;
+	onClose?:(open:boolean)=>void;
 	location:string;
 	open:boolean; //ensures side bar can be closed by external componenets
+	enableClose?:boolean;
 }
 
 export interface SideBarState
@@ -110,18 +111,23 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 		// this ensures default style overrides user defined style, to make sure layout style in not changed
 		var style:React.CSSProperties =  _.merge({}, this.props.style, defaultStyle);
 
+		let closeButtonUI:JSX.Element = null;
+		if(this.props.enableClose){
+			closeButtonUI = <div style={closeButtonStyle}>
+								<IconButton
+									clickHandler={ this.onCloseClick }
+									iconName="&#x2715"
+									style={ {fontSize:"16px"} }
+									mouseOverStyle={ {color:"red",background:"none"} }
+									toolTip="click to close Sidebar"
+								/>
+							</div>
+		}
+
 		return (
 			<div className={this.props.className} style={style}>
-				<div style={closeButtonStyle}>
-					<IconButton
-						clickHandler={ this.onCloseClick }
-						iconName="&#x2715"
-						style={ {fontSize:"16px"} }
-						mouseOverStyle={ {color:"red",background:"none"} }
-						toolTip="click to close Sidebar"
-					/>
-				</div>
-				<div style={ {padding:"8px",display:"flex",flexDirection:"inherit", flex:1} }>
+				{closeButtonUI}
+				<div style={ {padding:"8px",display:"flex",flexDirection:"inherit"} }>
 					{this.props.children}
 				</div>
 			</div>
