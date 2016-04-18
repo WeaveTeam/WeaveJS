@@ -89,9 +89,11 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 
 		return (
 			<Dropdown {...dropdownProps} {...props as any}>
-				{ this.props.showIcon ? <i className="fa fa-bars"/> : '' }
-				{' '}
-				{ this.props.children }
+				<div style={{display:"flex", justifyContent:"center"}}>
+					{ this.props.showIcon ? <i className="fa fa-bars fa-fw"/> : '' }
+					{ this.props.showIcon ? ' ':''}
+					{ this.props.children }
+				</div>
 			</Dropdown>
 		);
 	}
