@@ -46,7 +46,9 @@ export default class BinNamesList extends React.Component<BinNamesListProps, {}>
 			columnTitles,
 			showIdColumn: false,
 			allowResizing: false,
-			evenlyExpandRows: true
+			evenlyExpandRows: true,
+			enableHover: false,
+			enableSelection: false
 		}
 
 		if(!this.props.showHeaderRow) props.headerHeight = 0;
