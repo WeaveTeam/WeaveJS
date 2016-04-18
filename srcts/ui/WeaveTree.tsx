@@ -12,6 +12,7 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 export interface IWeaveTreeState {
 	selectedItems?: Array<IWeaveTreeNode>;
 	openItems?: Array<IWeaveTreeNode>;
+	columnWidth?: number;
 }
 
 export interface IWeaveTreeProps {
@@ -37,7 +38,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	state: IWeaveTreeState = {
 		selectedItems: [],
-		openItems: []
+		openItems: [],
+		columnWidth: 0
 	};
 
 	componentWillReceiveProps(nextProps: IWeaveTreeProps) {
@@ -69,6 +71,15 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 		if (this.props.onExpand && WeaveTree.arrayChanged(prevState.openItems, this.state.openItems, nodeComp)) {
 			this.props.onExpand(this.state.openItems);
+		}
+
+		if (this.longestRowJSX)
+		{
+			let newColumnWidth = this.computeRowWidth(this.longestRowJSX);
+			if (newColumnWidth != this.state.columnWidth)
+			{
+				this.setState({columnWidth: newColumnWidth});
+			}
 		}
 
 		return;
@@ -192,6 +203,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		return width;
 	}
 
+	private longestRowJSX:React.ReactChild;
+
 	render(): JSX.Element {
 		if (Weave.isLinkable(this.props.root)) {
 			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
@@ -222,17 +235,16 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 				return ({ id: index.toString(), tree: this.renderItem(item, index, depth) });
 			});
-		let columnWidth: number = undefined;
 
 		if (rows[maxRowIndex])
-			columnWidth = this.computeRowWidth(rows[maxRowIndex]["tree"]);
+			this.longestRowJSX = rows[maxRowIndex]["tree"];
 
 		return <FixedDataTable
 			idProperty={"id"}
 			headerHeight={0}
 			rowHeight={this.rowHeight}
 			columnIds={["id", "tree"]}
-			initialColumnWidth={columnWidth}
+			initialColumnWidth={this.state.columnWidth}
 			rows={rows}
 			selectedIds={selectedIndices}
 			onSelection={this.onSelect}
