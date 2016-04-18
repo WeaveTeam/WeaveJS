@@ -85,7 +85,17 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		return;
 	}
 
-
+	componentDidMount():void
+	{
+		if (this.longestRowJSX)
+		{
+			let newColumnWidth = this.computeRowWidth(this.longestRowJSX);
+			if (newColumnWidth != this.state.columnWidth)
+			{
+				this.setState({columnWidth: newColumnWidth});
+			}
+		}		
+	}
 
 	private internalSetOpen(node: IWeaveTreeNode, value: boolean) {
 		if (!node) return;
