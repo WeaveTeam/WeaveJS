@@ -2258,6 +2258,16 @@ declare module weavejs.api.data {
      */
     interface IDataSource extends ILinkableObject {
         /**
+         * Gets the label of the root hierarchy node.
+         * @return The label of the root hierarchy node.
+         */
+        getLabel(): string;
+        /**
+         * Overrides the label in the root hierarchy node, or resets it if given a value of null.
+         * @param value The new label, or null to reset it to the default.
+         */
+        setLabel(value: string): void;
+        /**
          * When explicitly triggered, this will force the hierarchy to be refreshed.
          * This should not be used to determine when the hierarchy is updated.
          * For that purpose, add a callback directly to the IDataSource instead.
@@ -5798,6 +5808,8 @@ declare module weavejs.data.hierarchy {
     class GlobalColumnDataSource implements IDataSource {
         static getInstance(root: ILinkableHashMap): IDataSource;
         constructor(root?: ILinkableHashMap);
+        getLabel(): string;
+        setLabel(value: string): void;
         /**
          * The metadata property name used to identify a column appearing in root.
          */
@@ -6290,6 +6302,7 @@ declare module weavejs.data.source {
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IDataSource = weavejs.api.data.IDataSource;
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+    import LinkableString = weavejs.core.LinkableString;
     /**
      * This is a base class to make it easier to develope a new class that implements IDataSource.
      * Classes that extend AbstractDataSource should implement the following methods:
@@ -6299,6 +6312,12 @@ declare module weavejs.data.source {
      */
     class AbstractDataSource implements IDataSource, IDisposableObject {
         constructor();
+        /**
+         * Overrides root hierarchy label.
+         */
+        label: LinkableString;
+        getLabel(): string;
+        setLabel(value: string): void;
         hierarchyRefresh: ICallbackCollection;
         /**
          * Sets _rootNode to null and triggers callbacks.
@@ -6422,6 +6441,7 @@ declare module weavejs.data.source {
      */
     class CSVDataSource extends AbstractDataSource implements IDataSource_File {
         constructor();
+        getLabel(): string;
         csvData: LinkableVariable;
         keyType: LinkableString;
         keyColumn: LinkableVariable;
@@ -6492,6 +6512,7 @@ declare module weavejs.data.source {
     import LinkableString = weavejs.core.LinkableString;
     import LinkableVariable = weavejs.core.LinkableVariable;
     class CachedDataSource extends AbstractDataSource {
+        constructor();
         type: LinkableString;
         state: LinkableVariable;
     }
@@ -6541,6 +6562,7 @@ declare module weavejs.data.source {
      */
     class DBFDataSource extends AbstractDataSource implements IDataSource_File {
         constructor();
+        getLabel(): string;
         keyType: LinkableString;
         keyColName: LinkableString;
         dbfUrl: LinkableString;
@@ -6594,6 +6616,7 @@ declare module weavejs.data.source {
     import LinkableString = weavejs.core.LinkableString;
     class GeoJSONDataSource extends AbstractDataSource implements IDataSource_File {
         constructor();
+        getLabel(): string;
         url: LinkableFile;
         keyType: LinkableString;
         keyProperty: LinkableString;
@@ -6608,6 +6631,7 @@ declare module weavejs.data.source {
         /**
          * Gets the keyType metadata used in the columns.
          */
+        getPropertyNames(): any[];
         getKeyType(): string;
         /**
          * This gets called as a grouped callback.
@@ -9634,6 +9658,10 @@ declare module weavejs.util {
          *               If params is a String, both <code>label</code> and <code>data</code> will be set to that String.
          */
         constructor(params?: Object);
+        /**
+         * Maps a property name to a Boolean which enables or disables caching for that property.
+         */
+        cacheSettings: Object;
         /**
          * Computes a Boolean value from various structures
          * @param param Either a Boolean, and Object like {not: param}, a Function, an ILinkableVariable, or an Array of those objects.
