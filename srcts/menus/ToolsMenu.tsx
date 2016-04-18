@@ -61,8 +61,8 @@ export default class ToolsMenu implements MenuBarItemProps
 			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
 			if (impl == WeaveUI.DataFilterTool)
 			{
-				if (Weave.experimental)
-					label += " (experimental)";
+				if (Weave.beta)
+					label += " (beta)";
 				else
 					return null;
 			}

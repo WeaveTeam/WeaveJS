@@ -28,7 +28,7 @@ export default class DataMenu implements MenuBarItemProps
 	{
 		return [].concat(
 			{
-				shown: Weave.experimental,
+				shown: Weave.beta,
 				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)... (not implemented yet)")}</FileInput>
 			},
 			{
@@ -58,11 +58,11 @@ export default class DataMenu implements MenuBarItemProps
 			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
 			return {
 				get shown() {
-					return Weave.experimental || !DataMenu.isExperimental(impl);
+					return Weave.beta || !DataMenu.isBeta(impl);
 				},
 				get label() {
-					if (DataMenu.isExperimental(impl))
-						return label + " (experimental)";
+					if (DataMenu.isBeta(impl))
+						return label + " (beta)";
 					return label;
 				},
 				click: this.createObject.bind(this, impl)
@@ -70,7 +70,7 @@ export default class DataMenu implements MenuBarItemProps
 		});
 	}
 
-	static isExperimental(impl:new()=>IDataSource):boolean
+	static isBeta(impl:new()=>IDataSource):boolean
 	{
 		return impl == weavejs.data.source.CensusDataSource;
 	}

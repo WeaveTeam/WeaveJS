@@ -8,7 +8,7 @@ declare module __global__ {
     class Weave implements IDisposableObject {
         static HISTORY_SYNC_DELAY: number;
         static FRAME_INTERVAL: number;
-        static experimental: boolean;
+        static beta: boolean;
         constructor();
         dispose(): void;
         /**

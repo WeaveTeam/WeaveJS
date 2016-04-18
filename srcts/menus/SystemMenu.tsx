@@ -38,9 +38,9 @@ export default class SystemMenu implements MenuBarItemProps
 			},
 			{},
 			{
-				enabled: !Weave.experimental,
-				label: Weave.experimental ? "Experimental features enabled" : "Enable experimental features",
-				click: () => Weave.experimental = true
+				enabled: !Weave.beta,
+				label: Weave.beta ? "Beta features enabled" : "Enable beta features",
+				click: () => Weave.beta = true
 			},
 			{},
 			{

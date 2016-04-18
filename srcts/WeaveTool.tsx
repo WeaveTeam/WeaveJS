@@ -202,7 +202,7 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 				<CenteredIcon onClick={this.props.onMaximizeClick}
 							  iconProps={{className: "fa fa-expand fa-fw"}}/>
 				{
-					Weave.experimental
+					Weave.beta
 					?	<CenteredIcon
 							onClick={this.props.onPopoutClick || this.props.onPopinClick}
 							iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
