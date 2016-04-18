@@ -8,6 +8,7 @@ import LabelLayer from "./Layers/LabelLayer";
 import ScatterPlotLayer from "./Layers/ScatterPlotLayer";
 import ImageGlyphLayer from "./Layers/ImageGlyphLayer";
 
+
 import {VBox, HBox} from "../../react-ui/FlexBox";
 import ReactUtils from "../../utils/ReactUtils";
 import Checkbox from "../../semantic-ui/Checkbox";
@@ -15,6 +16,7 @@ import StatefulRangeSlider from "../../ui/StatefulRangeSlider";
 import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 import Button from "../../semantic-ui/Button";
 import FixedDataTable from "../FixedDataTable";
+import MenuButton from "../../react-ui/MenuButton";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 
@@ -108,31 +110,26 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 	{
 		let flex1: React.CSSProperties = { flex: 1 };
 
-		let addLayerMenuItem = (layerClass:new()=>AbstractLayer):IMenuButtonItem => {
-			return {
-				label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
-				onClick: () => this.props.layers.requestObject('', layerClass)
-			};
-		};
-
 		if (!this.state.openedLayer)
 		{
-			var layerTypes = [TileLayer, GeometryLayer, LabelLayer, ScatterPlotLayer, ImageGlyphLayer];
+			var layerTypes:(new()=>AbstractLayer)[] = [TileLayer, GeometryLayer, LabelLayer, ScatterPlotLayer, ImageGlyphLayer];
 
 			return <VBox className="weave-padded-vbox">
 						<label>{Weave.lang("Layers")}</label>
-						<VBox style={{overflowY: "scroll",border:"1px solid lightgrey"}}>
-									{this.props.layers.getObjects().reverse().map(this.generateItem)}
-						</VBox>
 						<HBox className="weave-padded-hbox">
-							<MenuButton style={flex1} items={layerTypes.map(addLayerMenuItem)}>
+							<MenuButton showIcon={false} style={{flex: "1", alignItems: "center", justifyContent: "center"}} menu={layerTypes.map((layerClass) => ({
+									label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
+									click: () => this.props.layers.requestObject('', layerClass)
+								}))}>
 								<i className="fa fa-plus"/>
 							</MenuButton>
 							<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></Button>
-							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)}
-									onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></Button>
 							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down"/></Button>
+							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></Button>
 						</HBox>
+						<VBox style={{overflowY: "scroll",border:"1px solid lightgrey"}}>
+									{this.props.layers.getObjects().reverse().map(this.generateItem)}
+						</VBox>
 					</VBox>
 		}
 		else
@@ -147,64 +144,5 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 				{this.state.selectedLayer.renderEditor()}
 			</VBox>;
 		}
-	}
-}
-
-interface IMenuButtonItem {
-	label: string;
-	onClick: React.MouseEventHandler;
-}
-
-interface IMenuButtonProps extends React.HTMLProps<MenuButton>
-{
-	items: IMenuButtonItem[];
-}
-
-interface IMenuButtonState { };
-
-class MenuButton extends React.Component<IMenuButtonProps,IMenuButtonState> {
-	private dropdownInstance: React.ReactInstance;
-	private button: HTMLButtonElement
-
-	closePopup=():void=>
-	{
-		if (this.dropdownInstance) {
-			ReactUtils.closePopup(this.dropdownInstance);
-			this.dropdownInstance = null;
-		}
-	}
-
-	renderItem(value:IMenuButtonItem, index:number)
-	{
-		let newOnClick = (e:React.MouseEvent) => {
-			this.closePopup();
-			value.onClick(e);
-		}
-		return <div className="weave-menuitem" onClick={newOnClick} key={index.toString() }>
-			{value.label}
-		</div>;
-	}
-
-	openPopup=():void=>
-	{
-		let rect = this.button.getBoundingClientRect();
-		this.dropdownInstance = ReactUtils.openPopup(
-			<div className="weave-menu" style={{position: "absolute", top: rect.bottom, left: rect.left}}>
-				{this.props.items.map(this.renderItem, this)}
-			</div>, true
-		);
-	}
-
-	render():JSX.Element
-	{
-		let props = _.clone(this.props);
-		delete props.children;
-		delete props.items;
-		delete props.style;
-		delete props.onClick;
-
-		return <button className="ui button" style={_.merge({ position: "relative" }, this.props.style) } ref={(c) => this.button = c} onClick={this.openPopup} {...props as any}>
-			{this.props.children}
-		</button>;
 	}
 }
