@@ -30,9 +30,13 @@ export default class ResizingDiv extends React.Component<ResizingDivProps, Resiz
 
 	handleFrame()
 	{
+		var rect = this.outerDiv.getBoundingClientRect();
+		var width = this.outerDiv.offsetWidth == this.outerDiv.clientWidth ? rect.width : this.outerDiv.offsetWidth;
+		var height = this.outerDiv.offsetHeight == this.outerDiv.clientHeight ? rect.height : this.outerDiv.offsetHeight;
+		
 		ReactUtils.updateState(this, {
-			width: this.outerDiv.offsetWidth,
-			height: this.outerDiv.offsetHeight
+			width: Math.floor(width),
+			height: Math.floor(height)
 		});
 	}
 	
