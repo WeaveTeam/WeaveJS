@@ -514,6 +514,12 @@ export default class C3Histogram extends AbstractC3Tool
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linkFunction:Function):JSX.Element
 	{
+		var labelStyle:React.CSSProperties = {
+			textAlign: 'center',
+			display:"flex",
+			justifyContent: "flex-end",
+		};
+
 		return (
 			<VBox>
 				{
@@ -526,15 +532,15 @@ export default class C3Histogram extends AbstractC3Tool
 					[.3,.7],
 					[
 						[ // TODO move this to color ramp editor and make it compact view
-							Weave.lang("Color Theme"),
-							<HBox className="weave-padded-hbox" style={{padding: 0}}>
+							<span style={labelStyle}>{Weave.lang("Color Theme")}</span>,
+							<HBox className="weave-padded-hbox">
 								<ComboBox options={C3Histogram.colorRampOptions} ref={linkReactStateRef(this, {value: Weave.AS(this.fill.color.getInternalColumn(), ColorColumn).ramp})}/>
 								<Button onClick={() => this.openColorController(1)}>{Weave.lang("Edit")}</Button>
 							</HBox>
 						],
-						[ Weave.lang("Aggregation method"), <ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
-						[ <Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
-						[ <Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
+						[ <span style={labelStyle}>{Weave.lang("Aggregation method")}</span>, <ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
+						[ <span style={labelStyle}><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
+						[ <span style={labelStyle}><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
 					]
 				)}
 			</VBox>

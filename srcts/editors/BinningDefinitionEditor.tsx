@@ -170,14 +170,22 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		var binLabel:string = binDef ? BinningDefinitionEditor.binClassToBinLabel.get(binDef.constructor as typeof AbstractBinningDefinition) : "None";
 
 		var options = Array.from(this.binLabelToBin.keys()) as string[];
+
+		var labelStyle:React.CSSProperties = {
+			textAlign: 'center',
+			display:"flex",
+			justifyContent: "flex-end",
+		};
 		
 		return (
-			ReactUtils.generateTable(
-				null,
+
+		
+			ReactUtils.generateFlexBoxLayout(
+				[.3,.7],
 				[
 					[
-						Weave.lang("Binning Method"),
-						<HBox className="weave-padded-hbox" style={{padding: 0}}>
+						<span style={labelStyle}>{Weave.lang("Binning Method")}</span>,
+						<HBox className="weave-padded-hbox">
 							<ComboBox style={{flex: 1}} 
 									  options={options} 
 									  value={binLabel}
@@ -186,14 +194,10 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 						</HBox>
 					],
 					[
-						Weave.lang("Bin names"),
+						<span style={labelStyle}>{Weave.lang("Bin names")}</span>,
 						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
 					]
-				],
-				{
-					table: {width: "100%"},
-					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
-				}
+				]
 			)
 		);
 	}
@@ -210,7 +214,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 			padding: 0,
 			flex: 1
 		};
-		
+
 		var leftItemsStyle:React.CSSProperties = {
 			justifyContent: "flex-start",
 			alignItems: "center"
@@ -231,7 +235,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		}
 
 		return (
-			<HBox className="weave-padded-hbox" style={{padding: 0}}>
+			<HBox className="weave-padded-hbox">
 				<VBox style={{width: 430, minWidth: 430, maxWidth: 430, overflow: "auto"}} className="weave-container"> {/*fixed height for binning option spacing*/}
 					{Weave.lang("Binning type:")}
 					<HBox style={{minHeight: 400, maxHeight: 400}}> {/*fixed height for binning option spacing*/}

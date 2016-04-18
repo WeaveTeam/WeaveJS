@@ -33,7 +33,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		this.weaveRoot = Weave.getRoot(this.props.tool);
 		this.toolName = this.weaveRoot.getName(this.props.tool);
 		//todo : find a better way to get linked children
-		this.childrenCrumbMap[this.toolName] = this.props.tool.renderEditor(this.linkFunction);
+		this.childrenCrumbMap[this.toolName] = this.props.tool.renderEditor(this.linktoToolEditorCrumbFunction);
 		this.state = {
 			activeCrumb: this.toolName
 		};
@@ -47,13 +47,13 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 
 	//todo : find a better way to get linked children
-	linkFunction=(obj:any):void=>
+	linktoToolEditorCrumbFunction=(title:string,ui:React.ReactChild):void=>
 	{
-		this.childrenCrumbMap[obj.title] = <obj.toolClass {...obj.toolProps}/>;
+		this.childrenCrumbMap[title] = ui;
 		this.setState({
-			activeCrumb: obj.title
+			activeCrumb: title
 		});
-		this.crumbOrder.push(obj.title);
+		this.crumbOrder.push(title);
 	}
 
 
@@ -68,7 +68,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			//set new
 			this.weaveRoot = Weave.getRoot(nextProps.tool);
 			this.toolName = this.weaveRoot.getName(nextProps.tool);
-			this.childrenCrumbMap[this.toolName] = nextProps.tool.renderEditor(this.linkFunction);
+			this.childrenCrumbMap[this.toolName] = nextProps.tool.renderEditor(this.linktoToolEditorCrumbFunction);
 			this.setState({
 				activeCrumb: this.toolName
 			});

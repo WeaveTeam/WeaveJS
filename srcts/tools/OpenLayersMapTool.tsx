@@ -95,8 +95,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return true;
 	}
 
-	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(linkFunction:Function): JSX.Element {
+	//todo:(linktoToolEditorCrumbFunction)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(linktoToolEditorCrumbFunction:Function): JSX.Element {
 		let controlLocationOpts = [
 			{ vertical: "top", horizontal: "left" },
 			{ vertical: "top", horizontal: "right" },
@@ -106,51 +106,49 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			(value) => { return { label: Weave.lang(lodash.startCase(value.vertical) + " " + lodash.startCase(value.horizontal)), value} }
 		);
 
-		// TODO: Make this code more generic
 
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit" },
-			td: [
-				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5 },
-				{ paddingBottom: 10, textAlign: "right", width: "100%" }
-			]
+		var labelStyle:React.CSSProperties = {
+			textAlign: 'center',
+			display:"flex",
+			justifyContent: "flex-end",
 		};
 
+
 		let editorFields = [
-			[Weave.lang("Title"),
+			[<span style={ labelStyle }>{Weave.lang("Title")}</span>,
 				<HBox>
 					<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) }/>
 				</HBox>
 			],
-			[Weave.lang("Control location"),
+			[<span style={ labelStyle }>{Weave.lang("Control location")}</span>,
 				<HBox>
 					<ComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
 				</HBox>
 			],
-			[Weave.lang("Zoom range"),
+			[<span style={ labelStyle }>{Weave.lang("Zoom range")}</span>,
 				<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
 					{"-"}
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
 				</HBox>
 			],
-			[Weave.lang("Show zoom slider"),
+			[<span style={ labelStyle }>{Weave.lang("Show zoom slider")}</span>,
 				<HBox>
 					<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })}/>
 				</HBox>
 			],
-			[Weave.lang("Projection SRS"),
+			[<span style={ labelStyle }>{Weave.lang("Projection SRS")}</span>,
 				<HBox>
 					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
 				</HBox>
 			],
-			[Weave.lang("Override extent"), 
+			[<span style={ labelStyle }>{Weave.lang("Override extent")}</span>,
 				<HBox>
 					<Button onClick={this.setOverrideExtent}>{Weave.lang("Use current zoom")}</Button>
 					<Button onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</Button>
 				</HBox>
 			],
-			[Weave.lang("Snap zoom to base map"),
+			[<span style={ labelStyle }>{Weave.lang("Snap zoom to base map")}</span>,
 				<HBox>
 					<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}/>
 				</HBox>
@@ -158,8 +156,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		];
 
 		return <VBox>
-			{ReactUtils.generateTable(null, editorFields, tableStyles)}
-			<LayerManager layers={this.layers}/>
+			{ReactUtils.generateFlexBoxLayout([.3,.7], editorFields)}
+			<br/>
+			<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
 		</VBox>;
 	}
 

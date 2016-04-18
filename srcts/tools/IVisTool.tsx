@@ -18,11 +18,11 @@ export interface IVisToolState
 export interface IVisTool extends ILinkableObject
 {
     title:string;
-	renderEditor(linkFunction:any):JSX.Element;
+	renderEditor(linktoToolEditorCrumbFunction:Function):JSX.Element;
     selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>;//TODO make this into an interface?
 }
 
-export function renderSelectableAttributes(tool:IVisTool,linkFunction:Function)
+export function renderSelectableAttributes(tool:IVisTool,linkToToolEditorCrumbFunction:Function)
 {
-	return <SelectableAttributeComponent attributes={ tool.selectableAttributes } linkFunction={ linkFunction }/>;
+	return <SelectableAttributeComponent attributes={ tool.selectableAttributes } linkToToolEditorCrumb={ linkToToolEditorCrumbFunction }/>;
 }

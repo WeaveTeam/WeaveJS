@@ -49,8 +49,14 @@ export default class AbstractLayer implements ILinkableObject
 		return new Bounds2D();
 	}
 
-	private renderEditableField(value:EditableField, key:string):[string, JSX.Element]
+	private renderEditableField(value:EditableField, key:string):[JSX.Element, JSX.Element]
 	{
+		let labelStyle:React.CSSProperties = {
+			textAlign: 'center',
+			display:"flex",
+			justifyContent: "flex-end"
+		};
+
 		let lv: LinkableVariable;
 		let options: (string|{ label: string, value: any })[];
 		if (value instanceof LinkableVariable)
@@ -66,44 +72,38 @@ export default class AbstractLayer implements ILinkableObject
 
 		if (key == "Opacity")
 		{
-			return [Weave.lang(key), <StatefulRangeSlider min={0} max={1} step={0.01} style={{ display: "inline", width: "50px" }} ref={linkReactStateRef(this, { value }) }/>]
+			return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <StatefulRangeSlider min={0} max={1} step={0.01} style={{ display: "inline", width: "50px" }} ref={linkReactStateRef(this, { value }) }/>]
 		}
 
 		if (lv instanceof LinkableString || lv instanceof LinkableNumber)
 		{
 			if (typeof options[0] === typeof "") {
-				return [Weave.lang(key), <ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />]; /* searchable field */
+				return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />]; /* searchable field */
 			}
 			else if (typeof options[0] === typeof {}) {
-				return [Weave.lang(key), <ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
+				return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
 			}
 			else
 			{
-				return [Weave.lang(key), <StatefulTextField key={key} ref={linkReactStateRef(this, { value: lv }) }/>];
+				return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <StatefulTextField key={key} ref={linkReactStateRef(this, { value: lv }) }/>];
 			}
 		}
 		else
 		{
-			return [Weave.lang(key), <Checkbox key={key} ref={linkReactStateRef(this, { value: lv }) }/>];
+			return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <Checkbox key={key} ref={linkReactStateRef(this, { value: lv }) }/>];
 		}		
 	}
 
 	renderEditableFields(): JSX.Element
 	{
-		let fieldList: [string, JSX.Element][] = [];
+		let fieldList: [JSX.Element, JSX.Element][] = [];
 
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
-			td: [
-				{ paddingBottom: 8, textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
-			]
-		};
 		this.editableFields.forEach((value, key) => { fieldList.push(this.renderEditableField(value, key)); });
-		return ReactUtils.generateTable(null, fieldList, tableStyles);
+		return ReactUtils.generateFlexBoxLayout([.3,.7], fieldList);
 	}
 
-	renderEditor(): JSX.Element {
+	//todo:find a better way to pass linkToToolEditorCrumbFunction
+	renderEditor(linkToToolEditorCrumbFunction:Function = null): JSX.Element {
 		let attributeList: JSX.Element;
 		let idx = 0;
 
@@ -111,12 +111,13 @@ export default class AbstractLayer implements ILinkableObject
 			attributeList.push(<SelectableAttributeComponent key={key} attribute={value} label={Weave.lang(key)}/>)
 		}*/
 
-		attributeList = <SelectableAttributeComponent attributes={ this.selectableAttributes }/>;
+		attributeList = <SelectableAttributeComponent attributes={ this.selectableAttributes } linkToToolEditorCrumb={linkToToolEditorCrumbFunction}/>;
 
 		return <div>
-			{attributeList}
-			{this.renderEditableFields()}
-		</div>;
+					{attributeList}
+					<br/>
+					{this.renderEditableFields()}
+				</div>;
 	}
 
 	get editableFields()

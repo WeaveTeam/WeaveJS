@@ -28,7 +28,7 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 export interface ISelectableAttributeComponentProps{
     attributes : Map<string, IColumnWrapper|ILinkableHashMap>
     showLabel? : boolean
-    linkFunction?:any
+    linkToToolEditorCrumb?:Function
 
 }
 
@@ -53,9 +53,11 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         });
     }
     launchAttributeSelector=(label:string, attribute:IColumnWrapper|ILinkableHashMap):ControlPanel=>{
-        if(this.props.linkFunction)
+        if(this.props.linkToToolEditorCrumb)
         {
-            this.props.linkFunction( AttributeSelector.openInWeaveToolEditor("Attribute Selector", label, attribute, this.props.attributes))
+            this.props.linkToToolEditorCrumb("Attribute Selector", <AttributeSelector label={ label }
+                                                                             selectedAttribute={ attribute }
+                                                                             selectableAttributes = { this.props.attributes }/> )
             return null;
         }
         else
@@ -150,7 +152,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                 let elem= <SelectableAttributesList key={ label } label={ label } 
                                                     columns={ attribute } 
                                                     showLabelAsButton={ true } 
-                                                    linkFunction={this.props.linkFunction}
+                                                    linkFunction={this.props.linkToToolEditorCrumb}
                                                     selectableAttributes={ this.props.attributes }/>;
                 listUI.push(elem);
             }

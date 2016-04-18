@@ -204,7 +204,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {value: linkableNumber})}/>;
 	}
 
-	renderEditor(linkFunction:Function = null):JSX.Element
+	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
 		var labelStyle:React.CSSProperties = {
 			textAlign: 'center',
@@ -225,7 +225,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 		return (
 			<VBox className="weave-padded-vbox" >
-				{ renderSelectableAttributes(this,linkFunction) }
+				{ renderSelectableAttributes(this,linktoToolEditorCrumbFunction) }
 				<br/>
 				{marginUI}
 				<br/>

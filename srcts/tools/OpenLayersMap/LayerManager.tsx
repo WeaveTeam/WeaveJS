@@ -25,6 +25,7 @@ export interface ILayerManagerState {
 
 export interface  ILayerManagerProps extends React.HTMLProps<LayerManager> {
 	layers: LinkableHashMap;
+	linktoToolEditorCrumb?: Function;
 }
 
 export default class LayerManager extends React.Component<ILayerManagerProps, ILayerManagerState> {
@@ -44,18 +45,41 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		nextProps.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
 
+	onEditLayerClick=(layer:AbstractLayer,e: React.MouseEvent) =>{
+
+		if(this.props.linktoToolEditorCrumb)
+		{
+			this.props.linktoToolEditorCrumb(Weave.lang("{0} layer", this.props.layers.getName(layer)),layer.renderEditor(this.props.linktoToolEditorCrumb));
+		}
+		else
+		{
+			this.setState({
+				selectedLayer: layer,
+				openedLayer: layer
+			});
+		}
+		e.stopPropagation()
+	}
+
+
+
 	generateItem=(layer:AbstractLayer, index:number):JSX.Element=>
 	{
 		/* Stop propagation is necessary because otherwise state linkage breaks when the selectedLayer changes. */
+		// layer description style set to flex value 1 to take up the remaining space
 
-		return <HBox key={index} style={{width: "100%", alignItems: "center", paddingTop: "4px", paddingBottom: "4px"}} className={layer == this.state.selectedLayer ? "weave-list-Item-selected" : "weave-list-Item"}
-				onClick={() => {if (this.state.selectedLayer != layer) this.setState({selectedLayer: layer});}}>
-				<Checkbox title={Weave.lang("Show layer")} ref={linkReactStateRef(this, { value: layer.visible }) } stopPropagation={true}/>
-				<span style={{width: "100%"}}>{layer.getDescription()}</span>
-				<button className="ui button" title={Weave.lang("Edit layer")} style={{alignSelf: "flex-end", whiteSpace: "nowrap"}} onClick={(e: React.MouseEvent) => { this.setState({ selectedLayer: layer, openedLayer: layer }); e.stopPropagation() } }>
+		return <HBox key={index} style={ {alignItems: "center", padding: "4px"} }
+		             className={layer == this.state.selectedLayer ? "weave-list-Item-selected" : "weave-list-Item"}
+		             onClick={() => {if (this.state.selectedLayer != layer) this.setState({selectedLayer: layer});}}>
+				<Checkbox title={ Weave.lang("Show layer") } ref={ linkReactStateRef(this, { value: layer.visible }) } stopPropagation={true}/>
+				<span style={ {flex:1} }>{ layer.getDescription() }</span>
+				<button className="ui button"
+				        title={ Weave.lang("Edit layer") }
+				        style={ {alignSelf: "flex-end", whiteSpace: "nowrap"} }
+				        onClick={ this.onEditLayerClick.bind(this,layer) }>
 					{" > "}
 				</button>
-		</HBox>
+			</HBox>
 	}
 
 	moveSelectedUp=()=>{
@@ -96,20 +120,20 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 			var layerTypes = [TileLayer, GeometryLayer, LabelLayer, ScatterPlotLayer, ImageGlyphLayer];
 
 			return <VBox className="weave-padded-vbox">
-				<label>{Weave.lang("Layers")}</label>
-				<VBox className="weave-container" style={{overflowY: "scroll", width: "100%" }}>
-							{this.props.layers.getObjects().reverse().map(this.generateItem)}
-				</VBox>
-				<HBox className="weave-padded-hbox">
-					<MenuButton style={flex1} items={layerTypes.map(addLayerMenuItem)}>
-						<i className="fa fa-plus"/>
-					</MenuButton>
-					<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></Button>
-					<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} 
-							onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></Button>
-					<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down"/></Button>
-				</HBox>
-			</VBox>
+						<label>{Weave.lang("Layers")}</label>
+						<VBox style={{overflowY: "scroll",border:"1px solid lightgrey"}}>
+									{this.props.layers.getObjects().reverse().map(this.generateItem)}
+						</VBox>
+						<HBox className="weave-padded-hbox">
+							<MenuButton style={flex1} items={layerTypes.map(addLayerMenuItem)}>
+								<i className="fa fa-plus"/>
+							</MenuButton>
+							<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></Button>
+							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)}
+									onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></Button>
+							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down"/></Button>
+						</HBox>
+					</VBox>
 		}
 		else
 		{
