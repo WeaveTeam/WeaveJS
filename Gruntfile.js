@@ -43,7 +43,8 @@ module.exports = function (grunt) {
                     external: null,
                     transform: null,
                     browserifyOptions: {
-                        debug: false,
+                        debug: true,
+                        plugin: [['minifyify']]
                     }
                 },
             },
@@ -68,7 +69,7 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/index.min.js': 'src/index.js'}/*, {'dist/test.min.js': 'src/test.js'}*/]
+                files: [{'dist/index.js': 'src/index.js'}/*, {'dist/test.min.js': 'src/test.js'}*/]
             },
             // generates a non minified output without the libs but with source maps
             dev: {
