@@ -413,7 +413,6 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	render():JSX.Element
 	{
 		var tableContainer:React.CSSProperties = {
-			overflow: "auto",
 			flex: 1,
 			whiteSpace: "nowrap"
 		};
