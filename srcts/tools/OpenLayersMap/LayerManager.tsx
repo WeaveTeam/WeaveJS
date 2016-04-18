@@ -121,11 +121,11 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 									label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
 									click: () => this.props.layers.requestObject('', layerClass)
 								}))}>
-								<i className="fa fa-plus"/>
+								<i className="fa fa-plus fa-fw"/>
 							</MenuButton>
-							<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus"/></Button>
-							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down"/></Button>
-							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} onClick={this.moveSelectedUp}><i className="fa fa-arrow-up"/></Button>
+							<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus fa-fw"/></Button>
+							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down fa-fw"/></Button>
+							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} onClick={this.moveSelectedUp}><i className="fa fa-arrow-up fa-fw"/></Button>
 						</HBox>
 						<VBox style={{overflowY: "scroll",border:"1px solid lightgrey"}}>
 									{this.props.layers.getObjects().reverse().map(this.generateItem)}
