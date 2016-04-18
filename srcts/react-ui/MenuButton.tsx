@@ -5,6 +5,9 @@ import Menu from "./Menu";
 import {MenuItemProps} from "./Menu";
 import ReactUtils from "../utils/ReactUtils";
 import Button from "../semantic-ui/Button";
+import Dropdown from "../semantic-ui/Dropdown";
+import {DropdownProps} from "../semantic-ui/Dropdown";
+import classNames from "../modules/classnames";
 
 export interface MenuButtonProps extends React.HTMLProps<MenuButton>
 {
@@ -71,12 +74,25 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 		var props = _.clone(this.props);
 		delete props.menu;
 		delete props.showIcon;
+
+		var dropdownClass = classNames({
+			"button": true,
+			"icon": !!this.props.showIcon
+		});
+
+		let dropdownProps:DropdownProps = {
+			className:dropdownClass,
+			menu:this.props.menu,
+			action:"hide",
+			duration: 0
+		};
+
 		return (
-			<Button {...props as any} onMouseDown={this.openMenu}>
+			<Dropdown {...dropdownProps} {...props as any}>
 				{ this.props.showIcon ? <i className="fa fa-bars"/> : '' }
-				{ ' ' }
+				{' '}
 				{ this.props.children }
-			</Button>
+			</Dropdown>
 		);
 	}
 }
