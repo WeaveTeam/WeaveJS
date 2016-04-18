@@ -13,7 +13,6 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import Menu from "../react-ui/Menu";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-import {VSpacer, HSpacer} from "../react-ui/Spacer";
 import ColorRampComponent from "../react-ui/ColorRamp";
 import Input from "../semantic-ui/Input";
 import ComboBox from "../semantic-ui/ComboBox";
@@ -390,19 +389,16 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				var dataColumn = this.colorColumn.internalDynamicColumn;
 				
 				return (
-					<VBox style={{flex: 1, marginLeft: 20}}>
+					<VBox style={{flex: 1, marginLeft: 20}} className="weave-padded-vbox">
 						<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</label>
-						<HSpacer/>
-						<HBox style={{flex: 1, overflow: "auto"}}>
+						<HBox style={{flex: 1, overflow: "auto"}} className="weave-padded-hbox">
 							<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={this.colorColumn ? this.colorColumn.ramp.getHexColors():[]}/>
-							<VSpacer/>
 							<VBox style={{justifyContent: "space-between"}}>
 								{ColumnUtils.deriveStringFromNumber(dataColumn, this.colorColumn.getDataMin())}
 								{this.colorColumn.rampCenterAtZero.value ? ColumnUtils.deriveStringFromNumber(dataColumn, 0) : null}
 								{ColumnUtils.deriveStringFromNumber(dataColumn, this.colorColumn.getDataMax())}
-							  </VBox>
-						   </HBox>
-						<HSpacer/>
+							</VBox>
+						</HBox>
 					</VBox>
 				);
 			}
