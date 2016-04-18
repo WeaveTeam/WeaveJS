@@ -56,6 +56,8 @@ export default class C3LineChart extends AbstractC3Tool
     {
         super(props);
 
+
+		this.line.color.internalDynamicColumn.globalName = "defaultColorColumn";
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
         this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
         this.probeFilter.targetPath = ['defaultProbeKeySet'];
