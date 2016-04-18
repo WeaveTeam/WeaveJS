@@ -32,6 +32,7 @@ export interface BinningDefinitionEditorProps
 {
 	binnedColumn:BinnedColumn;
 	compact?:boolean;
+	onButtonClick?:React.MouseEventHandler;
 }
 
 export interface BinningDefinitionEditorState
@@ -39,7 +40,7 @@ export interface BinningDefinitionEditorState
 	
 }
 
-export default class BinningDefinitionEditor extends React.Component<any, any>
+export default class BinningDefinitionEditor extends React.Component<BinningDefinitionEditorProps, BinningDefinitionEditorState>
 {
 	
 	public setTarget(object:ILinkableObject):void
@@ -137,7 +138,7 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 				return;				// and we need to update the checkboxes to reflect correct value
 		}
 
-		else if(value && binDef && localDef && localDef.constructor != binDef.constructor)
+		else if(value && localDef)
 		{
 			this.binnedColumn.binningDefinition.requestLocalObjectCopy(localDef);
 			binDef = this.binnedColumn.binningDefinition.target;
@@ -146,15 +147,16 @@ export default class BinningDefinitionEditor extends React.Component<any, any>
 		
 		if(value && !localDef)
 		{
+			console.log("we get here");
 			this.binnedColumn.binningDefinition.target = null;
 		}
 	}
 
-	isRadioSelected(binDef:AbstractBinningDefinition):boolean
+	isRadioSelected(localDef:AbstractBinningDefinition):boolean
 	{
-		var binnedColumnBinDef = this.binnedColumn.binningDefinition.target
-		if(binDef && binnedColumnBinDef)
-			return binDef.constructor == binnedColumnBinDef.constructor;
+		var binDef = this.binnedColumn.binningDefinition.target
+		if(localDef && binDef)
+			return localDef.constructor == binDef.constructor;
 		return false; // can only get here if the binDef is null
 	}
 
