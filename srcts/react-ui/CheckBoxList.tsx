@@ -87,9 +87,8 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
 		}
     }
 
-    handleChange(index:number, event:React.FormEvent)
+    handleChange(checkboxState:boolean, index:number)
 	{
-        var checkboxState:boolean = (event.target as any).checked;
         var checkboxStates:boolean[] = this.state.checkboxStates.concat();
         checkboxStates[index] = checkboxState;
 
@@ -118,7 +117,7 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
                 {
                     this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
                         var checkboxItem:JSX.Element[] = [
-                            <Checkbox key="input" type="checkbox" value={this.values[index]} onChange={this.handleChange.bind(this, index)}/>,
+                            <Checkbox value={checkBoxState} onChange={(value:boolean) => this.handleChange(value, index)}/>,
                             <span key="span" style={{paddingLeft: 5, textAlign: "center", whiteSpace: "nowrap"}}>
 								{ this.labels[index] }
 							</span>
