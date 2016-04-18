@@ -15,7 +15,7 @@ import Checkbox from "../semantic-ui/Checkbox";
 import ComboBox from "../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ColorController from "../editors/ColorController";
-import ColorRampComponent from "../react-ui/ColorRamp";
+import ColorRampEditor from "../editors/ColorRampEditor";
 import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
 import Button from "../semantic-ui/Button";
 
@@ -507,16 +507,6 @@ export default class C3Histogram extends AbstractC3Tool
 		ColorController.activeTabIndex = tabIndex;
 		ColorController.open(Weave.AS(this.fill.color.getInternalColumn(), ColorColumn), this.binnedColumn, this.binnedColumn.internalDynamicColumn.target as FilteredColumn)
 	}
-	
-	static colorRampOptions = ColorRamp.allColorRamps.map((colorRamp) => {
-			return {
-				value: colorRamp.colors.map(StandardLib.getHexColor),
-				label: <HBox className="weave-padded-hbox">
-							<ColorRampComponent style={{flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/>
-							<HBox style={{flex: 1, whiteSpace: "nowrap", overflow: "hidden"}}>{colorRamp.name}</HBox>
-						</HBox>
-			};
-	});
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linkFunction:Function):JSX.Element
@@ -526,6 +516,8 @@ export default class C3Histogram extends AbstractC3Tool
 			display:"flex",
 			justifyContent: "flex-end",
 		};
+		
+		var cc = Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
 
 		return (
 			<VBox>
@@ -535,16 +527,12 @@ export default class C3Histogram extends AbstractC3Tool
 				{
 					<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 				}
+				{
+					<ColorRampEditor compact={true} colorRamp={cc && cc.ramp} onButtonClick={() => this.openColorController(1)}/>
+				}
 				{ReactUtils.generateFlexBoxLayout(
 					[.3,.7],
 					[
-						[ // TODO move this to color ramp editor and make it compact view
-							<span style={labelStyle}>{Weave.lang("Color Theme")}</span>,
-							<HBox className="weave-padded-hbox">
-								<ComboBox options={C3Histogram.colorRampOptions} ref={linkReactStateRef(this, {value: Weave.AS(this.fill.color.getInternalColumn(), ColorColumn).ramp})}/>
-								<Button onClick={() => this.openColorController(1)}>{Weave.lang("Edit")}</Button>
-							</HBox>
-						],
 						[ <span style={labelStyle}>{Weave.lang("Aggregation method")}</span>, <ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
 						[ <span style={labelStyle}><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
 						[ <span style={labelStyle}><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
