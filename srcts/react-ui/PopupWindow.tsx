@@ -61,7 +61,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	private dragging:boolean;
 	private activeResizeHandle:Handle;
 
-	static windowRegistry = new Set<PopupWindow>(); 
+	static windowSet = new Set<PopupWindow>(); 
 	
 	constructor(props:PopupWindowProps)
 	{
@@ -81,21 +81,21 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	{
 		// set active window to non active
 		var popupWindow = ReactUtils.openPopup(<PopupWindow {...props}/>) as PopupWindow;
-		PopupWindow.windowRegistry.add(popupWindow);
+		PopupWindow.windowSet.add(popupWindow);
 		PopupWindow.alignWindows();
 		return popupWindow;
 	}
 	
 	static close(popupWindow:PopupWindow)
 	{
-		PopupWindow.windowRegistry.delete(popupWindow);
+		PopupWindow.windowSet.delete(popupWindow);
 		ReactUtils.closePopup(popupWindow);
 	}
 	
 	static alignWindows()
 	{
 		var index = 0;
-		for( var popupWindow of PopupWindow.windowRegistry)
+		for( var popupWindow of PopupWindow.windowSet)
 		{
 			popupWindow.setState({ zIndex: index});
 			index++;
@@ -153,8 +153,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	
 	private handleClickOnWindow()
 	{
-		PopupWindow.windowRegistry.delete(this);
-		PopupWindow.windowRegistry.add(this);
+		PopupWindow.windowSet.delete(this);
+		PopupWindow.windowSet.add(this);
 		PopupWindow.alignWindows();
 	}
 	
