@@ -17,7 +17,7 @@ export interface ISelectableAttributesListProps{
     columns : ILinkableHashMap;
     label:string;
     showLabelAsButton?:boolean;
-    linkFunction?:Function;
+    linkToToolEditorCrumb?:Function;
     selectableAttributes? : Map<string, (IColumnWrapper|ILinkableHashMap)>;
 }
 
@@ -56,9 +56,11 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
     };
 
     launchAttributeSelector=():ControlPanel=>{
-        if(this.props.linkFunction)
+        if(this.props.linkToToolEditorCrumb)
         {
-            this.props.linkFunction( AttributeSelector.openInWeaveToolEditor("Attribute Selector", this.props.label, this.props.columns, this.props.selectableAttributes))
+            this.props.linkToToolEditorCrumb( "Attribute Selector",<AttributeSelector label={  this.props.label }
+                                                                             selectedAttribute={ this.props.columns }
+                                                                             selectableAttributes = { this.props.selectableAttributes }/>)
             return null;
         }
       return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.selectableAttributes);

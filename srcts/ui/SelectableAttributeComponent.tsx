@@ -151,8 +151,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                 let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
                 let elem= <SelectableAttributesList key={ label } label={ label } 
                                                     columns={ attribute } 
-                                                    showLabelAsButton={ true } 
-                                                    linkFunction={this.props.linkToToolEditorCrumb}
+                                                    showLabelAsButton={ true }
+                                                    linkToToolEditorCrumb={this.props.linkToToolEditorCrumb}
                                                     selectableAttributes={ this.props.attributes }/>;
                 listUI.push(elem);
             }
