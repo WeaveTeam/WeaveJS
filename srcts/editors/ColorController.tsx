@@ -1,6 +1,5 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import {VSpacer, HSpacer} from "../react-ui/Spacer";
 import Tabs from "../react-ui/Tabs";
 import Checkbox from "../semantic-ui/Checkbox";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
@@ -85,14 +84,13 @@ export default class ColorController extends React.Component<ColorControllerProp
 								  </span>
 							  </HBox>
 						  </VBox>,
-						  <VBox key={this.tabLabels[1]} style={{flex: 1, padding: 5}}>
+						  <VBox key={this.tabLabels[1]} style={{flex: 1, padding: 5}} className="weave-padded-vbox">
 							  <HBox>
 								  <Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})}/>
 								  <span>
 								  	{Weave.lang("Center color ramp at zero (when binning is disabled)")}
 								  </span>
 							  </HBox>
-							  <HSpacer/>
 							  <ColorRampEditor colorRamp={this.props.colorColumn.ramp}/>
 						  </VBox>
 					  ]}>
