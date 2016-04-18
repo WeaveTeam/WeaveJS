@@ -100,7 +100,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 			return {
 				label: (
 					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
-						<span style={{overflow: "hidden"}}>{dataSource.getHierarchyRoot().getLabel()}</span>
+						<span style={{overflow: "hidden"}}>{dataSource.getLabel()}</span>
 
 						<HBox>
 							<CenteredIcon onClick={()=>this.refreshDataSource(dataSource)}
