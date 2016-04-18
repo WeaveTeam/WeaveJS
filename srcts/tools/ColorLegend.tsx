@@ -16,6 +16,7 @@ import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import ColorRampComponent from "../react-ui/ColorRamp";
 import Input from "../semantic-ui/Input";
 import ComboBox from "../semantic-ui/ComboBox";
+import ColorRampEditor from "../editors/ColorRampEditor";
 import Button from "../semantic-ui/Button";
 import ColorController from "../editors/ColorController";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
@@ -416,16 +417,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
 	}
 	
-	static colorRampOptions = ColorRamp.allColorRamps.map((colorRamp) => {
-			return {
-				value: colorRamp.colors,
-				label: <HBox className="weave-padded-hbox">
-							<HBox style={{flex: 1, alignItems: "center"}}><ColorRampComponent style={{height: 15, flex: 1}} ramp={colorRamp.colors.map(StandardLib.getHexColor)}/></HBox>
-							<HBox style={{flex: 1, whiteSpace: "nowrap", overflow: "hidden"}}>{colorRamp.name}</HBox>
-						</HBox>
-			};
-	});
-	
 	// TODO
 	openColorController(tabIndex:number)
 	{
@@ -443,21 +434,15 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 						Weave.lang("Shape Type"),
 						<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
 					],
-					[ 
-						Weave.lang("Color Theme"),
-						<HBox className="weave-padded-hbox" style={{padding: 0}}>
-							<ComboBox options={ColorLegend.colorRampOptions} ref={linkReactStateRef(this, {value: this.colorColumn.ramp})} valueEqualityFunc={(a:any, b:any) => {
-								return _.isEqual(a && a.map(StandardLib.asNumber), b && b.map(StandardLib.asNumber));
-							}}/>
-							<Button onClick={() => this.openColorController(1)}>{Weave.lang("Edit")}</Button>
-						</HBox>
-					],
 				],
 				{
 					table: {width: "100%"},
 					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
 				}
 			)}
+			{
+				<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(1)}/>
+			}
 			{
 				<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 			}
