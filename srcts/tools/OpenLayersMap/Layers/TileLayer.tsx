@@ -1,5 +1,5 @@
 import * as ol from "openlayers";
-import * as lodash from "lodash";
+import * as _ from "lodash";
 import AbstractLayer from "./AbstractLayer";
 import * as React from "react";
 import ComboBox from "../../../semantic-ui/ComboBox";
@@ -121,7 +121,7 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 			return <VBox>
 				{Weave.lang("Provider") + " "}<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 				{Weave.lang("Layer") + " "}<ComboBox ref={linkReactStateRef(this, { value: this.tempLayer }) }
-				                                     options={layers ? layers.map((name) => { return { label: lodash.startCase(name), value: name }; }) : [] }/>
+				                                     options={layers ? layers.map((name) => { return { label: _.startCase(name), value: name }; }) : [] }/>
 			</VBox>
 		}
 	}
@@ -164,16 +164,16 @@ export default class TileLayer extends AbstractLayer
 		if (this.provider.value == "stamen")
 		{
 			let layer:string = this.providerOptions.state && (this.providerOptions.state as any).layer;
-			if (!layer || !lodash.contains(TileLayer.STAMEN_LAYERS, layer))
+			if (!layer || !_.contains(TileLayer.STAMEN_LAYERS, layer))
 			{
-				this.providerOptions.state = lodash.merge(this.providerOptions.state || {}, { layer: TileLayer.STAMEN_LAYERS[0] });
+				this.providerOptions.state = _.merge(this.providerOptions.state || {}, { layer: TileLayer.STAMEN_LAYERS[0] });
 			}
 		}
 		else if (this.provider.value == "mapquest")
 		{
 			let layer: string = this.providerOptions.state && (this.providerOptions.state as any).layer;
-			if (!layer || !lodash.contains(TileLayer.MAPQUEST_LAYERS, layer)) {
-				this.providerOptions.state = lodash.merge(this.providerOptions.state || {}, { layer: TileLayer.MAPQUEST_LAYERS[0] });
+			if (!layer || !_.contains(TileLayer.MAPQUEST_LAYERS, layer)) {
+				this.providerOptions.state = _.merge(this.providerOptions.state || {}, { layer: TileLayer.MAPQUEST_LAYERS[0] });
 			}
 		}
 	}
@@ -192,7 +192,7 @@ export default class TileLayer extends AbstractLayer
 
 	get deprecatedStateMapping()
 	{
-		return lodash.merge(super.deprecatedStateMapping, {
+		return _.merge(super.deprecatedStateMapping, {
 			service: {
 				'': (serviceState:any, removeMissingDynamicObjects:boolean) => {
 					if (serviceState.providerName)

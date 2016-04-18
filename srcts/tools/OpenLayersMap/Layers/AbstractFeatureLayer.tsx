@@ -1,5 +1,5 @@
 import * as ol from "openlayers";
-import * as lodash from "lodash";
+import * as _ from "lodash";
 
 import AbstractLayer from "./AbstractLayer";
 
@@ -68,7 +68,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		this.probeFilter.targetPath = ["defaultProbeKeySet"];
 	
 		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
-		this.debounced_updateMetaStyles = lodash.debounce(this.updateMetaStyles.bind(this), 0);
+		this.debounced_updateMetaStyles = _.debounce(this.updateMetaStyles.bind(this), 0);
 
 		this.olLayer = new ol.layer.Vector();
 		this.source = new ol.source.Vector({wrapX: false});
@@ -97,7 +97,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	{
 		let propertyName = objectEvent.key;
 
-		if (!lodash.contains(AbstractFeatureLayer.Styles, propertyName))
+		if (!_.contains(AbstractFeatureLayer.Styles, propertyName))
 		{
 			/* The property that changed isn't one of our metaStyle properties, so we don't care. */
 			return;

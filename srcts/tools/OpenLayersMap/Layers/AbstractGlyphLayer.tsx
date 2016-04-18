@@ -1,5 +1,5 @@
 import AbstractFeatureLayer from "./AbstractFeatureLayer";
-import * as lodash from "lodash";
+import * as _ from "lodash";
 import * as ol from "openlayers";
 
 import OpenLayersMapTool from "../../OpenLayersMapTool";
@@ -53,7 +53,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 
 	_getFeatureIds()
 	{
-		return lodash.map(this.source.getFeatures(), (item:ol.Feature) => item.getId());
+		return _.map(this.source.getFeatures(), (item:ol.Feature) => item.getId());
 	}
 
 	updateProjection():void 
@@ -66,7 +66,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 		/* Update feature locations */
 		var recordIds = this.dataX.keys;
 		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
-		var removedIds = lodash.difference(this._getFeatureIds(), recordIds);
+		var removedIds = _.difference(this._getFeatureIds(), recordIds);
 
 		var rawProj = this.dataX.getMetadata("projection") || this.sourceProjection.value || "EPSG:4326";
 		var mapProj = this.outputProjection;

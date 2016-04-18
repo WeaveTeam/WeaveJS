@@ -4,7 +4,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import FixedDataTable from "../tools/FixedDataTable";
 import * as fs from 'fuse.js';
-import * as lodash from 'lodash';
+import * as _ from 'lodash';
 var Fuse = (fs as any)["default"] as typeof fs;
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -46,7 +46,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		if (!this.props.root != !nextProps.root || (nextProps.root && !nextProps.root.equals(this.props.root))) {
 			this.setState({ selectedItems: nextProps.initialSelectedItems || [], openItems: nextProps.initialOpenItems || [] });
 		}
-		if (!lodash.isEqual(nextProps.initialSelectedItems, this.props.initialSelectedItems))//TODO does not work with _.IsEqual
+		if (!_.isEqual(nextProps.initialSelectedItems, this.props.initialSelectedItems))//TODO does not work with _.IsEqual
             this.setState({ selectedItems: nextProps.initialSelectedItems || [] });
 	}
 

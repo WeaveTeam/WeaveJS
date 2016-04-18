@@ -1,5 +1,5 @@
 import * as ol from "openlayers";
-import * as lodash from "lodash";
+import * as _ from "lodash";
 
 import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
 import AbstractGlyphLayer from "./AbstractGlyphLayer";
@@ -48,7 +48,7 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 
 	get deprecatedStateMapping()
 	{
-		return lodash.merge(super.deprecatedStateMapping, {
+		return _.merge(super.deprecatedStateMapping, {
 			"sizeBy": this.radiusData,
 			"minScreenRadius": this.radiusNorm.min,
 			"maxScreenRadius": this.radiusNorm.max,
@@ -91,7 +91,7 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 			}
 		);
 
-		styleRecords = lodash.sortByOrder(styleRecords, ["radius", "id"], ["desc", "asc"]);
+		styleRecords = _.sortByOrder(styleRecords, ["radius", "id"], ["desc", "asc"]);
 
 		let zOrder = 0;
 

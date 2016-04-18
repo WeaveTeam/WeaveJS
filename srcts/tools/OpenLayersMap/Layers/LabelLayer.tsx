@@ -1,5 +1,5 @@
 import * as ol from "openlayers";
-import * as lodash from "lodash";
+import * as _ from "lodash";
 
 import DOMUtils from "../../../utils/DOMUtils";
 import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
@@ -121,7 +121,7 @@ export default class LabelLayer extends AbstractGlyphLayer
 				text, color, sort, font, feature, bounds
 			});
 		}
-		records = lodash.sortByOrder(records, ["sort"], ["desc"]);
+		records = _.sortByOrder(records, ["sort"], ["desc"]);
 		for (let record of records)
 		{
 			let doRender: boolean = true;

@@ -1,5 +1,5 @@
 import * as ol from "openlayers";
-import * as lodash from "lodash";
+import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ReactUtils from "../utils/ReactUtils";
@@ -90,7 +90,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let state: { [coord: string]: number } = Weave.getState(this.extentOverride) as { [coord: string]: number };
 		for (let coord of Object.keys(state))
 		{
-			if (!lodash.isFinite(state[coord])) return false;
+			if (!_.isFinite(state[coord])) return false;
 		}
 		return true;
 	}
@@ -103,7 +103,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			{ vertical: "bottom", horizontal: "left" },
 			{ vertical: "bottom", horizontal: "right" }
 		].map(
-			(value) => { return { label: Weave.lang(lodash.startCase(value.vertical) + " " + lodash.startCase(value.horizontal)), value} }
+			(value) => { return { label: Weave.lang(_.startCase(value.vertical) + " " + _.startCase(value.horizontal)), value} }
 		);
 
 
@@ -392,7 +392,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			this.extentOverride.xMax.value,
 			this.extentOverride.yMax.value
 		];
-		if (!lodash.every(extent, Number.isFinite))
+		if (!_.every(extent, Number.isFinite))
 			extent = undefined;
 
 		/* If this is a valid projection, use it. otherwise use default. */
@@ -416,7 +416,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		var element = this.map.getTargetElement() as HTMLElement;
 		var newSize = [element.offsetWidth, element.offsetHeight];
 
-		if (lodash.isEqual(this._lastSize, newSize)) return;
+		if (_.isEqual(this._lastSize, newSize)) return;
 		this._lastSize = newSize;
 
 		var screenBounds = new Bounds2D(0, 0, newSize[0], newSize[1]);
@@ -429,7 +429,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	{
 		if (lbool.value)
 		{
-			if (!lodash.contains(this.map.getControls().getArray(), control))
+			if (!_.contains(this.map.getControls().getArray(), control))
 				this.map.addControl(control);
 		}
 		else
@@ -457,8 +457,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	private updateControlPositions():void
 	{
-		let controls = lodash.sortBy(this.map.getControls().getArray(), item => OpenLayersMapTool.controlIndex.get(item.constructor));
-		let maxWidth = lodash.max(controls, (control) => control.element.scrollWidth).element.scrollWidth;
+		let controls = _.sortBy(this.map.getControls().getArray(), item => OpenLayersMapTool.controlIndex.get(item.constructor));
+		let maxWidth = _.max(controls, (control) => control.element.scrollWidth).element.scrollWidth;
 
 		let mapWidth = this.map.getSize()[0];
 		let mapHeight = this.map.getSize()[1];
@@ -560,7 +560,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		
 		view.setResolution(view.constrainResolution(resolution));
 
-		lodash.defer(() => {
+		_.defer(() => {
 			view.on("change:center", this.updateCenter_olToWeave, this);
 			view.on("change:resolution", this.updateZoom_olToWeave, this);
 		});
