@@ -116,7 +116,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 			return <VBox>
 				<HBox>
 					<Button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null}) }>
-						<i className="fa fa-arrow-left"/>
+						{" < "}
 					</Button>
 					{Weave.lang("Layer: {0}", this.props.layers.getName(this.state.openedLayer))}
 				</HBox>
