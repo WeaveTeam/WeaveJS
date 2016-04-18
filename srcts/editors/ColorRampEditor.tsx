@@ -9,6 +9,7 @@ import List from "../react-ui/List";
 import CenteredIcon from "../react-ui/CenteredIcon";
 import Button from "../semantic-ui/Button";
 import ComboBox from "../semantic-ui/ComboBox";
+import ReactUtils from "../utils/ReactUtils";
 
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -17,6 +18,8 @@ import StandardLib = weavejs.util.StandardLib;
 export interface ColorRampEditorProps extends React.Props<ColorRampEditor>
 {
 		colorRamp:ColorRamp;
+		compact?:boolean;
+		onButtonClick?:React.MouseEventHandler;
 }
 
 export interface ColorRampEditorState 
@@ -83,8 +86,28 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 	{
 		this.colorRamp.setSessionState(newColors);
 	}
+	
+	renderCompactView()
+	{
+		return ReactUtils.generateTable(
+			null,
+			[
+				[ 
+					Weave.lang("Color Theme"),
+					<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
+						<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
+						<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+					</HBox>
+				],
+			],
+			{
+				table: {width: "100%"},
+				td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
+			}
+		)
+	}
 
-	render():any
+	renderFullView()
 	{
 		var colors:number[] = this.colorRamp.getColors() as number[];
 		var hexColors = this.colorRamp.getHexColors();
@@ -131,5 +154,10 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 				</HBox>
 			</VBox>
 		)
+	}
+	
+	render()
+	{
+		return this.props.compact ? this.renderCompactView() : this.renderFullView();
 	}
 }
