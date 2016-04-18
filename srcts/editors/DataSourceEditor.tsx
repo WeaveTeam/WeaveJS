@@ -71,13 +71,13 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	{
 		return [
 			[
-				<span>{Weave.lang("Source Name")}</span>,
+				<span>{Weave.lang("Label")}</span>,
 				<Input type="text" style={{width: "100%", userSelect: false}}
 								   disabled={true}
 								   title="Renaming data sources is not supported yet"
-								   value={this.props.dataSource.getHierarchyRoot().getLabel()}/>
+								   value={this.props.dataSource.getLabel()}/>
 			]
-		]
+		];
 	}
 	/*
 	shouldComponentUpdate()
@@ -130,7 +130,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	renderPreviewTable():JSX.Element
 	{
 		if (!this.column)
-			return;
+			return null;
 
 
 		var rows = ColumnUtils.getRecords({
@@ -151,14 +151,14 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var columnTitles:IColumnTitles = {id: Weave.lang("Key ({0})", keyType), value: Weave.lang("Value ({0})", dataType)};
 		return (
 			<VBox style={{flex: rows.length ? 1 : 0}} ref={(c:VBox) => this.tableContainer = c}>
-				<span style={{marginTop: 5, marginBottom: 5}}>{Weave.lang("Selected column has {0} records", rows.length)}</span>
+				<span style={{marginBottom: 5}}>{Weave.lang("Selected column has {0} records", rows.length)}</span>
 				{
 					this.tableContainerElement &&
 					<FixedDataTable rows={rows} 
 								 	columnIds={columnIds} 
 								 	idProperty="id"
 								 	showIdColumn={true}
-								 	initialColumnWidth={this.tableContainerElement.clientWidth/2}
+								 	initialColumnWidth={this.tableContainerElement.clientWidth / 2}
 								 	columnTitles={columnTitles}/>
 				}
 			</VBox>
@@ -170,9 +170,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		let root = this.props.dataSource.getHierarchyRoot();
 		return (
 			<VBox style={{flex: 1}}>
-				<HBox className="weave-padded-hbox" style={{flex: 1,border:"none"}}>
+				<HBox className="weave-padded-hbox" style={{flex: 1, border: "none"}}>
 					<VBox style={{flex: 1}}>
-						<label style={{ fontWeight: "bold" }}>{Weave.lang("Tables")}</label>
 						<WeaveTree
 							root={this.props.dataSource.getHierarchyRoot()}
 							hideLeaves={true}
@@ -180,25 +179,19 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 							onSelect={(selectedItems) => this.showColumns(selectedItems)}
 						/>
 					</VBox>
-					<VBox style={{flex: 1}}>
+					<VBox className="weave-padded-vbox" style={{flex: 1}}>
 						{
 							this.props.toolsMenu
 								?	<MenuButton menu={ this.props.toolsMenu.getVisualizationItems() } style={{width: "100%"}}>{Weave.lang('Create a visualization')}</MenuButton>
 								: 	null
 						}
-
-						<label style={{ fontWeight: "bold" }}>{Weave.lang("Columns")}</label>
-
 						<WeaveTree
 							root={this.state.selectedNode}
 							hideRoot={true}
 							hideBranches={true}
 							onSelect={(selectedItems) => this.updateColumnTarget(selectedItems)}
 						/>
-						<HBox style={{justifyContent: "flex-end"}}/>
-		    			{
-							this.renderPreviewTable()
-						}
+		    			{ this.renderPreviewTable() }
 					</VBox>
 				</HBox>
 			</VBox>
@@ -208,7 +201,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	renderConfigureView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
-		// <label style={ { fontWeight: "bold" } }> { Weave.lang("Edit {0}", this.props.dataSource.getHierarchyRoot().getLabel()) } </label>
+		// <label style={ { fontWeight: "bold" } }> { Weave.lang("Edit {0}", this.props.dataSource.getLabel()) } </label>
 		return (
 			<VBox className="weave-padded-vbox weave-container" style={ {flex: 1, border:"none"} }>
 				{
