@@ -1,5 +1,6 @@
 import * as React from "react";
 import {VBox, HBox} from "../react-ui/FlexBox";
+import {HSpacer, VSpacer} from "../react-ui/Spacer";
 import StatefulTextField from "../ui/StatefulTextField";
 import HelpIcon from "../react-ui/HelpIcon";
 import Input from "../semantic-ui/Input";
