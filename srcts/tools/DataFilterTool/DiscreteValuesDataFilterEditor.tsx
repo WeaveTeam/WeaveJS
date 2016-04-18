@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox, VBox} from "../../react-ui/FlexBox";
 import CheckBoxList from "../../react-ui/CheckBoxList";
+import ComboBox from "../../semantic-ui/ComboBox";
 import List from "../../react-ui/List";
 import HSlider from "../../react-ui/RCSlider/HSlider";
 import VSlider from "../../react-ui/RCSlider/VSlider";
@@ -104,19 +105,8 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 						</VBox>;
 				
 			case LAYOUT_COMBO:
-				return <VBox style={{flex: 1, alignItems:"center"}}>
-							<select style={{flex:1, padding: 5}} value={values && values.length ? values[0] : ""} onChange={(event:React.FormEvent) => { this.onChange([(event.target as any).value]) }} placeholder="Selected filter value...">
-								{
-									this.options.map((option:FilterOption, index:number) => {
-										// TODO non efficient.. needs to be fixed with external bound function
-										return  <option value={option.value as string} key={index}>
-											{
-												option.label || option.value
-											}
-										</option>;
-									})
-								}
-							</select>
+				return <VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
+							<ComboBox style={{textAlign: "center"}} options={this.options} value={ values && values[0]} onChange={(value) => this.onChange([value])}/>
 						</VBox>;
 		}
 	}
