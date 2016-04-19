@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {VBox, HBox} from "../react-ui/FlexBox";
-import ResizingDiv from "../ui/ResizingDiv";
+import ResizingDiv from "../react-ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import WeaveTree from "../ui/WeaveTree";
