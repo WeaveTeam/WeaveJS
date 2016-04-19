@@ -4368,6 +4368,7 @@ declare module weavejs.data {
         static getCommonMetadata(columns: any[], propertyName: string): string;
         static getAllCommonMetadata(columns: any[]): Object;
         static sortMetadataPropertyNames(names: any[]): void;
+        static firstDataSet: Array<IColumnReference>;
         /**
          * Finds a set of columns from available data sources, preferring ones that are already in use.
          */

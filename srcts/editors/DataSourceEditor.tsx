@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {VBox, HBox} from "../react-ui/FlexBox";
-import ResizingDiv from "../react-ui/ResizingDiv";
+import ResizingDiv from "../ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import WeaveTree from "../ui/WeaveTree";
@@ -20,6 +20,7 @@ import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import IColumnReference = weavejs.api.data.IColumnReference;
 import ColumnUtils = weavejs.data.ColumnUtils;
 
 export const PREVIEW = "preview";
@@ -109,7 +110,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 	updateColumnTarget(selectedItems:IWeaveTreeNode[])
 	{
-		var ref = selectedItems && selectedItems.length && Weave.AS(selectedItems[0], weavejs.api.data.IColumnReference);
+		var ref = selectedItems && selectedItems.length && Weave.AS(selectedItems[0], IColumnReference);
 		if (ref)
 		{
 			var meta = ref.getColumnMetadata();
@@ -168,6 +169,10 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	renderBrowseView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
+	
+		var nodes = this.state.selectedNode && this.state.selectedNode.getChildren();
+		weavejs.data.ColumnUtils.firstDataSet = nodes && nodes.filter(node => Weave.IS(node, IColumnReference)) as any;
+	
 		return (
 			<VBox style={{flex: 1}}>
 				<HBox className="weave-padded-hbox" style={{flex: 1, border: "none"}}>
@@ -223,7 +228,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var columns:IAttributeColumn[] = [];
 		for (var leaf of leaves)
 		{
-			var columnRef = Weave.AS(leaf, weavejs.api.data.IColumnReference);
+			var columnRef = Weave.AS(leaf, IColumnReference);
 			if (columnRef)
 				columns.push(columnRef.getDataSource().getAttributeColumn(columnRef.getColumnMetadata()));
 		}
