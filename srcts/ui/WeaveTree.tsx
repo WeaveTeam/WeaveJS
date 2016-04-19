@@ -131,7 +131,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		let isOpen = this.getOpen(node);
 
 		/* If we are a branch, we still might not be expandable due to hiding leaves and not having any children who are also branches. */
-		let isExpandable = node.isBranch() && !(this.props.hideLeaves && !node.getChildren().some(child => child.isBranch()));
+		let isExpandable = node.isBranch() && (!this.props.hideLeaves || node.hasChildBranches());
 
 		if (node.isBranch()) {
 			iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
