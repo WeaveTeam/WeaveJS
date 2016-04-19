@@ -111,6 +111,7 @@ export default class C3BarChart extends AbstractC3Tool
     {
         super(props);
 
+		this.colorColumn.internalDynamicColumn.globalName = "defaultColorColumn";
 		this.filteredKeySet.setColumnKeySources([this.sortColumn]);
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
@@ -139,7 +140,8 @@ export default class C3BarChart extends AbstractC3Tool
                     if (this.heightColumnNames.length === 1 && d && d.hasOwnProperty("index"))
                     {
 						// use the color from the color column because we only have one height
-						return this.records[d.index].stringValues.color;
+						var record = this.records[d.index];
+						return record && record.stringValues ? record.stringValues.color : "";
                     }
                     else
                     {
