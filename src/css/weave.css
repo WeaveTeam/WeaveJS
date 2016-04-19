@@ -505,3 +505,58 @@ div.weave-tree-view {
 .weave-sidebar-dropdown {
 	min-width: 0 !important;
 }
+
+/* Override Semantic ui CSS*/
+
+/******* grid *********/
+
+.ui.grid {
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	-ms-flex-direction: row;
+	flex-direction: row;
+	-webkit-flex-wrap: wrap;
+	-ms-flex-wrap: wrap;
+	flex-wrap: wrap;
+	-webkit-box-align: center;
+	-webkit-align-items: center;
+	-ms-flex-align: center;
+	align-items: center;
+	padding: 0;
+	 margin: 0;
+}
+
+.ui.grid>* {
+	padding-left: 0px;
+	padding-right: 8px;
+}
+
+.ui.grid>.column:not(.row) {
+	padding-top: 4px;
+	padding-bottom: 4px;
+}
+
+.ui.grid>.column:not(.row), .ui.grid>.row>.column {
+	position: relative;
+	display: inline-block;
+	padding-left: 0px;
+	padding-right: 8px;
+	vertical-align: middle;
+}
+
+.ui.grid>.column:not(.row), .ui.grid>.row>.column {
+	position: relative;
+	display: inline-block;
+	padding-left: 0px;
+	padding-right: 8px;
+	vertical-align: middle;
+}
+
+
+
+
