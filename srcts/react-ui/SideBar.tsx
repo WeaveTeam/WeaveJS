@@ -109,7 +109,7 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 		}
 
 		// this ensures default style overrides user defined style, to make sure layout style in not changed
-		var style:React.CSSProperties =  _.merge({}, this.props.style, defaultStyle);
+		var style:React.CSSProperties =  _.merge({flex: 1}, this.props.style, defaultStyle);
 
 		let closeButtonUI:JSX.Element = null;
 		if(this.props.enableClose){

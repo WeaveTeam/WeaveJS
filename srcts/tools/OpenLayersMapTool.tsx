@@ -155,11 +155,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 		];
 
-		return <VBox>
-					{ReactUtils.generateGridLayout(["four","twelve"], editorFields)}
-					<br/>
-					<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
-				</VBox>;
+		return (
+			<VBox style={{flex: 1}}>
+				{ReactUtils.generateGridLayout(["four","twelve"], editorFields)}
+				<br/>
+				<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
+			</VBox>
+		);
 	}
 
 

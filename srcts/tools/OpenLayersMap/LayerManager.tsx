@@ -114,35 +114,39 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		{
 			var layerTypes:(new()=>AbstractLayer)[] = [TileLayer, GeometryLayer, LabelLayer, ScatterPlotLayer, ImageGlyphLayer];
 
-			return <VBox className="weave-padded-vbox">
-						<label>{Weave.lang("Layers")}</label>
-						<HBox className="weave-padded-hbox">
-							<MenuButton showIcon={false} style={{flex: "1", alignItems: "center", justifyContent: "center"}} menu={layerTypes.map((layerClass) => ({
-									label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
-									click: () => this.props.layers.requestObject('', layerClass)
-								}))}>
-								<i className="fa fa-plus fa-fw"/>
-							</MenuButton>
-							<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus fa-fw"/></Button>
-							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down fa-fw"/></Button>
-							<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} onClick={this.moveSelectedUp}><i className="fa fa-arrow-up fa-fw"/></Button>
-						</HBox>
-						<VBox style={{overflowY: "scroll",border:"1px solid lightgrey"}}>
-									{this.props.layers.getObjects().reverse().map(this.generateItem)}
-						</VBox>
-					</VBox>
+			return (
+				<VBox style={{minHeight: 200, flex: 1}} className="weave-padded-vbox">
+					<label>{Weave.lang("Layers")}</label>
+					<HBox className="weave-padded-hbox">
+						<MenuButton showIcon={false} style={{flex: "1", alignItems: "center", justifyContent: "center"}} menu={layerTypes.map((layerClass) => ({
+								label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
+								click: () => this.props.layers.requestObject('', layerClass)
+							}))}>
+							<i className="fa fa-plus fa-fw"/>
+						</MenuButton>
+						<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus fa-fw"/></Button>
+						<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down fa-fw"/></Button>
+						<Button style={flex1} disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} onClick={this.moveSelectedUp}><i className="fa fa-arrow-up fa-fw"/></Button>
+					</HBox>
+					<div style={{flex: 1, overflow: "auto", border: "1px solid lightgrey"}}>
+						{this.props.layers.getObjects().reverse().map(this.generateItem)}
+					</div>
+				</VBox>
+			);
 		}
 		else
 		{
-			return <VBox>
-				<HBox>
-					<Button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null}) }>
-						{" < "}
-					</Button>
-					{Weave.lang("Layer: {0}", this.props.layers.getName(this.state.openedLayer))}
-				</HBox>
-				{this.state.selectedLayer.renderEditor()}
-			</VBox>;
+			return (
+				<VBox style={{flex: 1}}>
+					<HBox>
+						<Button onClick={() => this.setState({ selectedLayer: this.state.selectedLayer, openedLayer: null}) }>
+							{" < "}
+						</Button>
+						{Weave.lang("Layer: {0}", this.props.layers.getName(this.state.openedLayer))}
+					</HBox>
+					{this.state.selectedLayer.renderEditor()}
+				</VBox>
+			);
 		}
 	}
 }

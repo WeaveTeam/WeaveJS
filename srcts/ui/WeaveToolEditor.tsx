@@ -24,7 +24,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	private weaveRoot:ILinkableHashMap;
 	private toolName:string;
 	private displayName:string;
-	private childrenCrumbMap:any = {};
+	private mapping_crumb_children:any = {};
 	private crumbOrder:string[] = [];
 
 	constructor(props:WeaveToolEditorProps)
@@ -34,7 +34,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.tool.constructor as new (..._: any[]) => any)
 		this.toolName = this.weaveRoot.getName(this.props.tool);
 		//todo : find a better way to get linked children
-		this.childrenCrumbMap[this.displayName] = this.props.tool.renderEditor(this.linktoToolEditorCrumbFunction);
+		this.mapping_crumb_children[this.displayName] = this.props.tool.renderEditor(this.linktoToolEditorCrumbFunction);
 		this.state = {
 			activeCrumb: this.displayName
 		};
@@ -50,7 +50,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	//todo : find a better way to get linked children
 	linktoToolEditorCrumbFunction=(title:string,ui:React.ReactChild):void=>
 	{
-		this.childrenCrumbMap[title] = ui;
+		this.mapping_crumb_children[title] = ui;
 		this.setState({
 			activeCrumb: title
 		});
@@ -63,14 +63,14 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		if (this.props.tool !== nextProps.tool)
 		{
 			//reset
-			this.childrenCrumbMap = {};
+			this.mapping_crumb_children = {};
 			this.crumbOrder = [];
 
 			//set new
 			this.weaveRoot = Weave.getRoot(nextProps.tool);
 			this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(nextProps.tool.constructor as new (..._: any[]) => any)
 			this.toolName = this.weaveRoot.getName(nextProps.tool);
-			this.childrenCrumbMap[this.displayName] = nextProps.tool.renderEditor(this.linktoToolEditorCrumbFunction);
+			this.mapping_crumb_children[this.displayName] = nextProps.tool.renderEditor(this.linktoToolEditorCrumbFunction);
 			this.setState({
 				activeCrumb: this.displayName
 			});
@@ -100,7 +100,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		var crumbStyle:React.CSSProperties = {
 			alignItems:"center"
 		};
-		var editorUI:JSX.Element[] | JSX.Element = this.childrenCrumbMap[this.state.activeCrumb];
+		var editorUI:JSX.Element[] | JSX.Element = this.mapping_crumb_children[this.state.activeCrumb];
 
 		var crumbUI:JSX.Element = (
 			<div className="ui breadcrumb">
@@ -161,16 +161,6 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			                           toolTip={"Go back to view: " + prevCrumbTitle}/>
 		}
 
-		// wrapping with empty div, ensures the content width if it overflows - scrollbar is provided
-		let scrollableEditor:JSX.Element = null;
-		if(this.displayName == this.state.activeCrumb)
-		{
-			 scrollableEditor = <div>{editorUI}</div>;
-		}
-		else // attribute section contains absolute child . for firefox we have to pass the prev parent height through flex
-		{
-			scrollableEditor = <div style={ {display:"flex" ,flex:1} }>{editorUI}</div>;
-		}
 		return (
 			<VBox className={ "weave-padded-vbox "  + this.props.className } style={ this.props.style }>
 				<HBox className="weave-padded-hbox" style = { {alignItems: "center",borderBottom:"1px solid lightgrey"} }>
@@ -188,12 +178,9 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 					            toolTip="click to close Sidebar"
 					/>
 				</HBox>
-
-
-	
-				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto",flex:1 } }>
-					{scrollableEditor}
-				</div>
+				<VBox style={{flex: 1, padding: 8, overflow: "auto"}}>
+					{editorUI}
+				</VBox>
 			</VBox>
 		);
 	}
