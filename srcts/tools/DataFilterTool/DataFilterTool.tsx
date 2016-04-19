@@ -148,6 +148,9 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 
 
 	renderEditor():JSX.Element{
+
+		if(!this.filter.target) // scenario arises when tool opened from menu
+			this.initLater();
 		return <DataFilterEditor filterEditor={ this.filterEditor }  selectableAttributes={ this.selectableAttributes }  />
 	}
 

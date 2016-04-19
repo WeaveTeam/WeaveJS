@@ -131,7 +131,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 							</Button>];
                 selectableUI.push(elements);
             }
-            else{//LinkableHashMap
+            else if(Weave.IS(attribute_ilhm_or_icw, ILinkableHashMap)){//LinkableHashMap
                 let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
                 let elem= <SelectableAttributesList key={ label } label={ label } 
                                                     columns={ attribute } 
