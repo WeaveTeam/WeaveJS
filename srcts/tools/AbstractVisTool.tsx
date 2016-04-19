@@ -227,15 +227,17 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 										</HBox>;
 
 		let marginUI:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[<span style={labelStyle}>{ Weave.lang("Margins") }</span>,marginCellsUI]]);
+		//div wrapper is must if this dom becomes child of flexBox display has to be block for overflow to work correctly
+		return (<div>
+					<VBox className="weave-padded-vbox" >
+						{ renderSelectableAttributes(this,linktoToolEditorCrumbFunction) }
 
-		return (
-			<VBox className="weave-padded-vbox" >
-				{ renderSelectableAttributes(this,linktoToolEditorCrumbFunction) }
-				<br/>
-				{marginUI}
-				<br/>
-				{this.renderLayout()}
-			</VBox>
+						<br/>
+						{marginUI}
+						<br/>
+						{this.renderLayout()}
+					</VBox>
+				</div>
 		);
 	}
 

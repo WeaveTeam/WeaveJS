@@ -144,9 +144,10 @@ export default class ReactUtils
 			return <HBox key={rowIndex} className="weave-padded-hbox" style={ {alignItems:"center"} }>{cellsUI}</HBox>
 		});
 
-		return <VBox  className="weave-padded-vbox" >
+		//div wrapper is must if this dom becomes child of flexBox display has to be block for overflow to work correctly
+		return <div><VBox  className="weave-padded-vbox" >
 					{wrappedRowsUI}
-				</VBox>;
+				</VBox></div>;
 	}
 
 	static generateGridLayout=(gridValues:string[],gridRowsUI:JSX.Element[][]):JSX.Element=>
@@ -165,8 +166,11 @@ export default class ReactUtils
 			return cellsUI
 		});
 
-		return <div className="ui grid">
-					{columnGridUI}
+		//div wrapper is must if this dom becomes child of flexBox display has to be block for overflow to work correctly
+		return <div>
+					<div className="ui grid">
+						{columnGridUI}
+					</div>
 				</div>;
 	}
 	
