@@ -88,6 +88,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		dataSources.forEach((ds:IDataSource):void =>{
 			Weave.getCallbacks(ds).addGroupedCallback(this, this.forceUpdate);//adding callbacks to every datasource
 		});
+		
+		this.forceUpdate();
 	}
 
 	refreshDataSource(dataSource:IDataSource)
