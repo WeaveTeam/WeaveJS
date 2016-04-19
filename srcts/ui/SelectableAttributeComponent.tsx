@@ -124,7 +124,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                 let elements:JSX.Element[] = [
 	                        labelUI,
 	                        <AttributeDropdown title="Change column"
-	                                           style={ {flex:1,width:"100%"} }
 	                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
 	                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>,
 	                        <Button onClick={ this.launchAttributeSelector.bind(this, label, attribute)}>
