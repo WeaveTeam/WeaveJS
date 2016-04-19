@@ -22,6 +22,9 @@ import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import WeaveAPI = weavejs.WeaveAPI;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import ReactUtils from "../../utils/ReactUtils";
+import ComboBox from "../../semantic-ui/ComboBox";
+import Checkbox from "../../semantic-ui/Checkbox";
 
 
 
@@ -147,11 +150,11 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 	}
 
 
-	renderEditor():JSX.Element{
+	renderEditor(linkToToolEditorCrumb:Function = null):JSX.Element{
 
 		if(!this.filter.target) // scenario arises when tool opened from menu
 			this.initLater();
-		return <DataFilterEditor filterEditor={ this.filterEditor }  selectableAttributes={ this.selectableAttributes }  />
+		return <DataFilterEditor filterEditor={ this.filterEditor }  linkToToolEditorCrumb={linkToToolEditorCrumb} selectableAttributes={ this.selectableAttributes }  />
 	}
 
 	render():JSX.Element
@@ -196,6 +199,7 @@ export interface IDataFilterEditorState {
 export interface IDataFilterEditorProps {
 	filterEditor:LinkableDynamicObject,
 	selectableAttributes:Map<string, (IColumnWrapper | LinkableHashMap)>
+	linkToToolEditorCrumb?:Function
 }
 
 
@@ -214,14 +218,12 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 
 	// required to build UI in render
 	private filterEditorMap:any = {
-		continuous:{
+		[FILTER_TYPE.CONTINUOUS]:{
 			editorClass: NumericRangeDataFilterEditor,
-			label: FILTER_TYPE.CONTINUOUS,
-			options: [NumericRangeDataFilterEditor.OPTIONS]
+			options: NumericRangeDataFilterEditor.OPTIONS
 		},
-		discrete:{
+		[FILTER_TYPE.DISCRETE]:{
 			editorClass: DiscreteValuesDataFilterEditor,
-			label: FILTER_TYPE.DISCRETE,
 			options: DiscreteValuesDataFilterEditor.OPTIONS
 		}
 	}
@@ -257,83 +259,107 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		Weave.getCallbacks(this.props.filterEditor).removeCallback(this, this.forceUpdate);
 	}
 
-	render(){
-		// variables used to decide the UI and its options
-		var selectedFilter:string = ""; // continuous | discrete
-		var selectedOption:string | boolean; // if its radio string checkbox boolean
-		var uiType:string = ""; // radio | checkbox
+	//UI event handler for attribute menu layout
+	handleFilterTypeChange = (selectedItem:string):void =>
+	{
+		if(selectedItem)
+		{
+			var filterEditorItem:any = this.filterEditorMap[selectedItem];
 
+			this.props.filterEditor.requestLocalObject(filterEditorItem.editorClass, false);
+		}
+
+	};
+
+	// event listener for Filter Options
+	handleContinuousFilterOptionChange = (isSelected:boolean)=>
+	{
+		if(this.props.filterEditor.target)
+		{
+			var forceDiscreteValues:LinkableBoolean  = (this.props.filterEditor.target as NumericRangeDataFilterEditor).forceDiscreteValues;
+			forceDiscreteValues.state = isSelected;
+		}
+	}
+
+	// event listener for Filter Options
+	handleDiscreteFilterOptionChange = (selectedItem:string)=>
+	{
+		if(this.props.filterEditor.target)
+		{
+			(this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state = selectedItem as string;
+		}
+	}
+
+	render(){
+
+		let labelStyle:React.CSSProperties = {
+			textAlign: 'right',
+			display:"flex",
+			justifyContent: "flex-end"
+		};
+		// variables used to decide the UI and its options
+		var selectedFilter:string;
+		var selectedOption:string | boolean; // if its radio string checkbox boolean
+		var filterOptionUI:JSX.Element[] = null; // combobox | checkbox
+
+		let filterEditorItem:any = null;
 		// session props are used to identify the respective UI
 		if(this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
 		{
 			selectedFilter = FILTER_TYPE.CONTINUOUS;
+			filterEditorItem = this.filterEditorMap[FILTER_TYPE.CONTINUOUS]
 			selectedOption = (this.props.filterEditor.target as NumericRangeDataFilterEditor).forceDiscreteValues.state as boolean;
-			uiType = "checkbox"
+			filterOptionUI =  [
+				<span style={labelStyle}></span>,
+				<Checkbox value={ selectedOption as boolean}
+				          label={ filterEditorItem.options[0] }
+				          onChange={ this.handleContinuousFilterOptionChange }
+				/>
+			]
 		}
 		else if(this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
 		{
 			selectedFilter = FILTER_TYPE.DISCRETE;
+			filterEditorItem = this.filterEditorMap[FILTER_TYPE.DISCRETE]
 			selectedOption = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;
-			uiType = "radio"
+			filterOptionUI =  [
+				<span style={labelStyle}>{ Weave.lang("Layout") }</span>,
+				<ComboBox className="weave-sidebar-dropdown"
+				          value={ selectedOption }
+				          options={ filterEditorItem.options }
+				          onChange={ this.handleDiscreteFilterOptionChange }
+				/>
+			]
 		}
 
 
 		var filterEditorMapKeys:string[] = Object.keys(this.filterEditorMap);
 
-		var editorOptionsUI:JSX.Element[] = filterEditorMapKeys.map(function(key:string,index:number){
 
-			var filterEditorItem:any = this.filterEditorMap[key];
-			var editorLabel:string = filterEditorItem.label;
-			var isEditorSelected:boolean = (selectedFilter == editorLabel);
 
-			var optionsUI:JSX.Element[];
-			if(isEditorSelected) // if selected add further option for the editor
-			{
-				optionsUI = filterEditorItem.options.map(function(option:string,index:number){
-					var defaultChecked:boolean;
-					if(uiType == "radio")
+
+
+		let editorConfigs: JSX.Element[][] = [
+			[
+				<span style={labelStyle}>{ Weave.lang("Filter Type") }</span>,
+				<ComboBox
+					className="weave-sidebar-dropdown"
+					value={ selectedFilter }
+					options={ filterEditorMapKeys }
+					onChange={ this.handleFilterTypeChange }
+				/>
+
+			]
+		]
+
+		if(filterOptionUI){
+			editorConfigs.push(filterOptionUI)
+		}
+		return <VBox>
+					<SelectableAttributeComponent attributes={ this.props.selectableAttributes } linkToToolEditorCrumb={this.props.linkToToolEditorCrumb}/>
 					{
-						defaultChecked = (selectedOption == option)
+						ReactUtils.generateGridLayout(["four","twelve"],editorConfigs)
 					}
-					else if(uiType == "checkbox")
-					{
-						defaultChecked = selectedOption as boolean;
-					}
-
-
-					return <li key={index}>
-								<input type={uiType}
-									   name={uiType + "UiOptions"}
-									   value={option}
-									   defaultChecked={ defaultChecked }
-									   onClick={ this.onFilterOptionChange }/>
-								<span>&nbsp;{ Weave.lang(option) }</span>
-							</li>
-				},this);
-
-			}
-			return  <li key={index}>
-						<input type="radio"
-							   name="dataFilterOptions"
-							   value={ key }
-							   defaultChecked={ isEditorSelected }
-							   onClick={ this.onFilterTypeChange }/>
-						<span>&nbsp;{ Weave.lang(editorLabel) }</span>
-						{isEditorSelected?<ul style={ {listStyleType:"none"} }>{ optionsUI }</ul>: ""}
-					</li>;
-
-		},this);
-
-
-		return <VBox className="weave-padded-vbox ">
-					<VBox className="weave-padded-vbox" >
-						<label style={ {fontWeight: 'bold'} }>Column</label>
-						<SelectableAttributeComponent attributes={ this.props.selectableAttributes }/>
-					</VBox>
-					<VBox className="weave-padded-vbox">
-						<label style={ {fontWeight: 'bold'} }>Filter Type</label>
-						<ul style={ {listStyleType:"none"} }>{editorOptionsUI}</ul>
-					</VBox>
 				</VBox>
 	}
 
