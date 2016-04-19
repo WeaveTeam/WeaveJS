@@ -127,7 +127,7 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 		return (
 			<div className={this.props.className} style={style}>
 				{closeButtonUI}
-				<div style={ {padding:"8px",display:"flex",flexDirection:"inherit"} }>
+				<div style={ {padding:"8px",display:"flex",flexDirection:"inherit",flex:1} }>
 					{this.props.children}
 				</div>
 			</div>

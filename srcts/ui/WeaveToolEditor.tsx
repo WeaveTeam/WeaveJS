@@ -161,6 +161,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			                           toolTip={"Go back to view: " + prevCrumbTitle}/>
 		}
 
+		// wrapping with empty div, ensures the content width if it overflows - scrollbar is provided
+		let scrollableEditor:JSX.Element = <div>{editorUI}</div>;
 		return (
 			<VBox className={ "weave-padded-vbox "  + this.props.className } style={ this.props.style }>
 				<HBox className="weave-padded-hbox" style = { {alignItems: "center",borderBottom:"1px solid lightgrey"} }>
@@ -181,8 +183,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 
 	
-				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto" } }>
-					<div>{editorUI}</div>
+				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto",flex:1 } }>
+					{scrollableEditor}
 				</div>
 			</VBox>
 		);
