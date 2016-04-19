@@ -162,7 +162,15 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		}
 
 		// wrapping with empty div, ensures the content width if it overflows - scrollbar is provided
-		let scrollableEditor:JSX.Element = <div>{editorUI}</div>;
+		let scrollableEditor:JSX.Element = null;
+		if(this.displayName == this.state.activeCrumb)
+		{
+			 scrollableEditor = <div>{editorUI}</div>;
+		}
+		else // attribute section contains absolute child . for firefox we have to pass the prev parent height through flex
+		{
+			scrollableEditor = <div style={ {display:"flex" ,flex:1} }>{editorUI}</div>;
+		}
 		return (
 			<VBox className={ "weave-padded-vbox "  + this.props.className } style={ this.props.style }>
 				<HBox className="weave-padded-hbox" style = { {alignItems: "center",borderBottom:"1px solid lightgrey"} }>

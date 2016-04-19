@@ -223,7 +223,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         //console.log("selected nodes", selectedNodes);
 
         return (
-            <VBox className="weave-padded-vbox" style={ {border:"none"} }>
+            <VBox className="weave-padded-vbox" style={ {border:"none",flex:1} }>
 
                 {Object.keys(this.items).length > 1 ? <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar> : ""}
 
