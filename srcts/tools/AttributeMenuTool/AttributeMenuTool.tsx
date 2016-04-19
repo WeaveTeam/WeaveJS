@@ -231,7 +231,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		return (toolPath[0] as string);
 	};
 
-	get toolConfigs():[string, JSX.Element][]
+	get toolConfigs():[ JSX.Element, JSX.Element][]
 	{
 		var toolName:string;
 		var menuLayout:string = this.props.attributeMenuTool.layoutMode.state as string;
@@ -239,9 +239,15 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		if (this.props.attributeMenuTool.targetToolPath.state)
 			toolName = this.getTargetToolPath();
 
+		var labelStyle:React.CSSProperties = {
+			textAlign: 'right',
+			display:"flex",
+			justifyContent: "flex-end"
+		};
+
 		return [
 			[
-				Weave.lang("Visualization Tool"),
+				<span style={ labelStyle }>{ Weave.lang("Visualization Tool") }</span>,
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					placeholder="Select a visualization"
@@ -252,7 +258,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				/>
 			],
 			[
-				Weave.lang("Visualization Attribute"),
+				<span style={ labelStyle }>{ Weave.lang("Visualization Attribute")}</span>,
 
 				<ComboBox
 					className="weave-sidebar-dropdown"
@@ -263,7 +269,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				/>
 			],
 			[
-				Weave.lang("Menu Layout"),
+				<span style={ labelStyle }>{ Weave.lang("Menu Layout")}</span>,
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					value={ menuLayout }
@@ -277,19 +283,12 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 	render ():JSX.Element
 	{
-		var tableStyles = {
-			table: { width: "100%", fontSize: "smaller" },
-			td: [
-				{ paddingBottom: 10, textAlign: "right", whiteSpace: "nowrap", paddingRight: 5 },
-				{ paddingBottom: 10, textAlign: "right", width: "100%" }
-			]
-		};
 
 		return (
 			<VBox>
 				{
 					this.openTools && this.openTools.length > 0
-					?	ReactUtils.generateTable(null, this.toolConfigs, tableStyles)
+					?	ReactUtils.generateGridLayout(["four","twelve"], this.toolConfigs)
 					:	null
 				}
 			</VBox>
