@@ -182,7 +182,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 	
 				<div style={ { padding: "8px", display: "flex", flexDirection: "inherit", overflow: "auto" } }>
-					<div style={ {overflow: "auto" } }>{editorUI}</div>
+					<div>{editorUI}</div>
 				</div>
 			</VBox>
 		);
