@@ -11,7 +11,9 @@ export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 	options?:ComboBoxOption[];
 	value?:any;
 	onChange?:(value:any)=>void;
-	onAdd?:(value:any)=>void;
+	onNew?:(value:any)=>void;
+	onRemoved?:(value:any)=>void;
+	onAdded?:(value:any)=>void;
 	selectFirstOnInvalid?:boolean;
 	context?:Element;
 	direction?:string;
@@ -56,7 +58,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 		if (nextProps.selectFirstOnInvalid && this.getIndexFromValue(value) < 0)
 		{
-			this.setState({value}); // TODO this is incorrect
+			let option = nextProps.options[0];
+			if(option)
+				this.setState({value:(typeof option === "object") ? option.value : option});
 		}
 		else if (value !== undefined)
 		{
@@ -66,15 +70,27 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
-		if (!_.isEqual(prevState.value, this.state.value))
-		{
-			if(this.state.value)
-				this.props.onChange && this.props.onChange(this.state.value);
+		console.log("ComponentDidUpdate");
+		if (!_.isEqual(prevState.value, this.state.value)) {
 			let selector = ($(this.element) as any);
-			let index = this.getIndexFromValue(this.state.value);
-			let option = this.props.options[index];
-			selector.dropdown("set value", index);
-			selector.dropdown("set text", (typeof option === "object") ?  option.label : option);
+			if (this.props.type === "multiple") {
+				let indices:string[] = [];
+				this.state.value.forEach((item:any) => {
+					let index:number = this.getIndexFromValue(item);
+					if (index >= 0)
+						indices.push(String(index));
+				});
+				console.log(indices);
+				selector.dropdown('set exactly', indices)
+			}
+			else {
+				let index = this.getIndexFromValue(this.state.value);
+				if (index >= 0) {
+					let option = this.props.options[index];
+					selector.dropdown('set selected', (typeof option === "object") ? option.label : option);
+				}
+			}
+			this.props.onChange && this.props.onChange(this.state.value);
 		}
 	}
 	
@@ -84,21 +100,49 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let selector = ($(this.element) as any);
 		
 		selector.dropdown({
-			onChange: (selected:number, text:string) => {
-				if(this.props.onAdd && text &&  (Number(index) < 0) )
+			onChange: (selected:number|string, text:string) => {
+				if(this.props.onNew && text &&  (Number(index) < 0) )
 				{
-					this.props.onAdd && this.props.onAdd(text);
+					this.props.onNew && this.props.onNew(text);
 				}
 				else
 				{
-					let option = this.props.options[selected];
-					let value:any = (typeof option === "object") ? option.value : option;
-					this.setState({value});
-					this.props.onChange && this.props.onChange(value);
+					if(this.props.type !== "multiple") {
+						let option = this.props.options[selected as number];
+						let value:any = (typeof option === "object") ? option.value : option;
+						this.setState({value});
+						this.props.onChange && this.props.onChange(value);
+					} else {
+						let indices:number[] = (selected as string).split(",").map(Number);
+						let values:any[] = indices.map( (index) => {
+							let option = this.props.options[index];
+							return (typeof option === "object") ? option.value : option;
+						});
+						this.setState({value:values});
+					}
+
+
 				}
 			},
 			onClick: (index:number) => {
 				this.props.onClick && this.props.onClick(null);
+			},
+			onAdd: (addedValue:number, addedText:string) => {
+				let option = this.props.options[addedValue];
+				let value:any = (typeof option === "object") ? option.value : option;
+				let values:any = _.clone(this.state.value);
+				if(!_.includes(values,value)) {
+					values.push(value);
+					this.setState({value:values});
+				}
+				this.props.onAdded && this.props.onAdded(value);
+			},
+			onRemove: (removedValue:number, removedText:string) => {
+				let option = this.props.options[removedValue];
+				let value:any = (typeof option === "object") ? option.value : option;
+				let values:any = _.without(this.state.value,value);
+				this.setState({value:values});
+				this.props.onRemoved && this.props.onRemoved(value);
 			},
 			context: this.props.context || window,
 			direction: this.props.direction || 'auto',
@@ -106,16 +150,19 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		});
 		let index = this.getIndexFromValue(this.state.value);
 		let option = this.props.options[index];
-		selector.dropdown("set value", index);
-		//Todo: as above, this is hacky and needs to be removed
-		selector.dropdown("set text", (typeof option === "object") ?  option.label : option);
+		if(this.props.type === "multiple")
+		{
+			selector.dropdown('clear');
+			this.state.value.forEach( (item:any,index:number) => {
+				selector.dropdown('set selected',(typeof item === "object") ? item.label:item);
+			});
+		}
+		else if(index >= 0)
+			selector.dropdown('set selected',(typeof option === "object") ? option.label:option);
 	}
 
 	render()
 	{
-		let index = this.getIndexFromValue(this.state.value);
-		let option = this.props.options[index];
-
 		return (
 			<div onClick={this.props.onClick} className={"ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"") +" selection dropdown " + (this.props.className || "")} style={this.props.style}>
 				<input type="hidden"/>

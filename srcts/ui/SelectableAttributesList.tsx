@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import IconButton from "../react-ui/IconButton";
 import List from "../react-ui/List";
@@ -12,6 +13,12 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ControlPanel from "./ControlPanel";
 import ReactUtils from "../utils/ReactUtils";
 import Button from "../semantic-ui/Button";
+import ComboBox from "../semantic-ui/ComboBox";
+import {ComboBoxOption} from "../semantic-ui/ComboBox";
+import ReferencedColumn = weavejs.data.column.ReferencedColumn;
+import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+import IColumnReference = weavejs.api.data.IColumnReference;
+import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 
 export interface ISelectableAttributesListProps{
     columns : ILinkableHashMap;
@@ -45,6 +52,40 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         }
     };
 
+	addSelected =(value:IWeaveTreeNode):void=>
+	{
+		var ref:IColumnReference = Weave.AS(value, weavejs.api.data.IColumnReference);
+		var meta = ref && ref.getColumnMetadata();
+		if (meta)
+		{
+			var lhm = Weave.AS(this.props.columns, ILinkableHashMap);
+			if (lhm){
+				lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+			}
+		}
+	};
+
+	removeAll =():void=>
+	{
+		this.props.columns.removeAllObjects();
+	};
+
+	setSelected =(values:IWeaveTreeNode[]):void=>
+	{
+		var colRefs:IColumnReference[] = [];
+		values.forEach( (node,index) => {
+			let ref:IColumnReference = Weave.AS(node,weavejs.api.data.IColumnReference);
+			let meta = ref && ref.getColumnMetadata();
+			if (meta) {
+				colRefs.push(ref);
+			}
+		});
+		var lhm = Weave.AS(this.props.columns, ILinkableHashMap);
+		if (lhm){
+			ColumnUtils.replaceColumnsInHashMap(lhm,colRefs);
+		}
+	};
+
     handleSelectAll =():void =>{
             this.setState({selectAll : true});
     };
@@ -65,6 +106,14 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         }
       return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.selectableAttributes);
     };
+
+	private static nodeEqualityFunc(a:IColumnReference&IWeaveTreeNode, b:IColumnReference&IWeaveTreeNode):boolean
+	{
+		if (a && b)
+			return a.equals(b);
+		else
+			return (a === b);
+	}
 
     componentWillUnmount(){
         Weave.getCallbacks(this.props.columns).removeCallback(this,this.forceUpdate);
@@ -91,16 +140,24 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
 
         var selectedObjects:IAttributeColumn[];
-        var columnList: ListOption[] = [];
+        var columnList: IWeaveTreeNode[] = [];
+	    var options: ComboBoxOption[] = [];
+	    let siblings:IWeaveTreeNode[] = [];
         var columns = this.props.columns.getObjects(IAttributeColumn);
 
         //When all options are selected, needed only for restyling the list and re-render
         if(this.state.selectAll)
             selectedObjects = columns;
 
-        columns.forEach((column:IAttributeColumn, index:number)=>{
-            let label = ColumnUtils.getColumnListLabel(column);
-            columnList.push({label:label, value : column});
+        columns.forEach((column:ReferencedColumn, index:number)=>{
+	        let node:IWeaveTreeNode&IColumnReference = column.getHierarchyNode();
+            columnList.push(node);
+	        HierarchyUtils.findSiblingNodes(column.getDataSource(),node.getColumnMetadata()).forEach( (siblingNode:IWeaveTreeNode,index:number) => {
+		        if(!_.includes(siblings,siblingNode)){
+			        siblings.push(siblingNode);
+			        options.push({label:siblingNode.getLabel(), value: siblingNode});
+		        }
+	        });
         });
 
         var labelUI:JSX.Element = null;
@@ -115,13 +172,17 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         }
 
         let listUI:JSX.Element = <VBox className="weave-padded-vbox">
-                                    <HBox style={listStyle}>
+	                                 {/*<HBox style={listStyle}>
                                         <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
-                                    </HBox>
-
+                                    </HBox>*/}
+                                    <ComboBox type="multiple"
+                                              value={ columnList }
+                                              options={ options }
+                                              valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
+                                              onChange={this.setSelected}
+                                    />
                                     <HBox className="weave-padded-hbox" style={constrollerStyle}>
-                                        <Button style={ {fontSize:"smaller"} } onClick={ this.handleSelectAll }>Select All</Button>
-                                        <Button style={ {fontSize:"smaller"} } onClick={ this.removeSelected }>Remove Selected</Button>
+                                        <Button style={ {fontSize:"smaller"} } onClick={ this.removeAll }>Remove All</Button>
                                     </HBox>
                                 </VBox>
 
