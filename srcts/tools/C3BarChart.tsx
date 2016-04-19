@@ -531,19 +531,20 @@ export default class C3BarChart extends AbstractC3Tool
     renderEditor(linkFunction:Function):JSX.Element
     {
         var labelStyle:React.CSSProperties = {
-            textAlign: 'center',
+            textAlign: 'right',
             display:"flex",
             justifyContent: "flex-end",
         };
 
+	    // 16 columns -  leave one column to avoid scrollbar - [3 + 12]
         return (
             <VBox className="weave-padded-vbox">
                 {
                     super.renderEditor(linkFunction)
                 }
                 <br/>
-				{ReactUtils.generateFlexBoxLayout(
-					[.3,.7],
+				{ReactUtils.generateGridLayout(
+					["three","twelve"],
 					[
 						[ <span style={labelStyle} ><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>,<span >{Weave.lang("Horizontal Bars")}</span>  ],
 						[ <span style={labelStyle} ><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>,<span >{Weave.lang("Show Value Labels")}</span> ],
@@ -551,8 +552,8 @@ export default class C3BarChart extends AbstractC3Tool
 					]
 				)}
                 <br/>
-				{ReactUtils.generateFlexBoxLayout(
-                    [.3,.7],
+				{ReactUtils.generateGridLayout(
+					["three","twelve"],
 					[
 						[ <span style={labelStyle}>{Weave.lang("Grouping Mode")}</span>, <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					]

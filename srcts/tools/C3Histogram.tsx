@@ -512,7 +512,7 @@ export default class C3Histogram extends AbstractC3Tool
 	renderEditor(linkFunction:Function):JSX.Element
 	{
 		var labelStyle:React.CSSProperties = {
-			textAlign: 'center',
+			textAlign: 'right',
 			display:"flex",
 			justifyContent: "flex-end",
 		};
@@ -524,14 +524,17 @@ export default class C3Histogram extends AbstractC3Tool
 				{
 					super.renderEditor(linkFunction)
 				}
+				<br/>
 				{
 					<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 				}
+				<br/>
 				{
 					<ColorRampEditor compact={true} colorRamp={cc && cc.ramp} onButtonClick={() => this.openColorController(1)}/>
 				}
-				{ReactUtils.generateFlexBoxLayout(
-					[.3,.7],
+				<br/>
+				{ReactUtils.generateGridLayout(
+					["four","twelve"],
 					[
 						[ <span style={labelStyle}>{Weave.lang("Aggregation method")}</span>, <ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
 						[ <span style={labelStyle}><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],

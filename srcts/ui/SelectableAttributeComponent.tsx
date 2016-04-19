@@ -76,29 +76,14 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         dc.target = null;
 
     };
-
-    renderGridLayout=():JSX.Element=>
-    {
-        /*var gridUIs:JSX.Element[][] = [
-            ["Title", this.panelTitle],
-            ["X Axis Title", this.xAxisName],
-            ["Y Axis Title", this.yAxisName]
-        ].map((row:[string, LinkableString]) => {
-            return [<span className="ui label" style={ {width:"100%"} }>{Weave.lang(row[0])}</span>,
-                <StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) } style={ {width:"100%"} }/>]
-        });
-
-        return ReactUtils.generateGridLayout(["four","twelve"],gridUIs);*/
-
-        return null
-    }
+    
 
     render():JSX.Element
     {
         //styles
         var clearStyle = classNames({ 'fa fa-times-circle' : true, 'weave-icon' : true});
         var labelStyle:React.CSSProperties = {
-            textAlign: 'center',
+            textAlign: 'right',
             display:"flex",
             justifyContent: "flex-end"
         };
@@ -158,7 +143,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             }
         });
 
-        let gridLayout:JSX.Element = ReactUtils.generateFlexBoxLayout([.3,.5,.2],selectableUI)
+        let gridLayout:JSX.Element = ReactUtils.generateGridLayout(["four","ten","two"],selectableUI)
 
         return (<VBox className="weave-padded-vbox">
                     {gridLayout}

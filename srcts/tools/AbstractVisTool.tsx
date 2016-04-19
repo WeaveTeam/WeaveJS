@@ -212,7 +212,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
 		var labelStyle:React.CSSProperties = {
-			textAlign: 'center',
+			textAlign: 'right',
 			display:"flex",
 			justifyContent: "flex-end",
 		};
@@ -226,7 +226,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 											<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right) }</div>
 										</HBox>;
 
-		let marginUI:JSX.Element = ReactUtils.generateFlexBoxLayout([.3,.7],[[<span style={labelStyle}>{ Weave.lang("Margins") }</span>,marginCellsUI]]);
+		let marginUI:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[<span style={labelStyle}>{ Weave.lang("Margins") }</span>,marginCellsUI]]);
 
 		return (
 			<VBox className="weave-padded-vbox" >
@@ -234,15 +234,15 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 				<br/>
 				{marginUI}
 				<br/>
-				{this.renderFlexBoxLayout()}
+				{this.renderLayout()}
 			</VBox>
 		);
 	}
 
-	renderFlexBoxLayout=():JSX.Element=>
+	renderLayout=():JSX.Element=>
 	{
 		var labelStyle:React.CSSProperties = {
-			textAlign: 'center',
+			textAlign: 'right',
 			display:"flex",
 			justifyContent: "flex-end"
 		};
@@ -255,7 +255,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>]
 		});
 
-		return ReactUtils.generateFlexBoxLayout([.3,.7],gridUIs);
+		return ReactUtils.generateGridLayout(["four","twelve"],gridUIs);
 	}
 
 	get deprecatedStateMapping():Object

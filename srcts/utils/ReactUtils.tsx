@@ -134,13 +134,14 @@ export default class ReactUtils
 			for(let cellIndex:number = 0 ; cellIndex < cells.length ; cellIndex++)
 			{
 				let customCellStyle:React.CSSProperties = cellStyles[cellIndex]?cellStyles[cellIndex]:{};
-				let cellStyle:React.CSSProperties = _.merge(customCellStyle,{flex:flexValues[cellIndex]})
+				// overflow hidden ensures flex values are maintained // default if no overflow values are mentioned
+				let cellStyle:React.CSSProperties = _.merge({overflow:"hidden"},customCellStyle,{flex:flexValues[cellIndex]});
 				let cell = <div key={cellIndex} style={ cellStyle } className={cellClassNames[cellIndex]}>
 								{cells[cellIndex]}
 							</div>
 				cellsUI.push(cell);
 			}
-			return <HBox key={rowIndex}className="weave-padded-hbox" style={ {alignItems:"center"} }>{cellsUI}</HBox>
+			return <HBox key={rowIndex} className="weave-padded-hbox" style={ {alignItems:"center"} }>{cellsUI}</HBox>
 		});
 
 		return <VBox  className="weave-padded-vbox" >

@@ -89,7 +89,26 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 	
 	renderCompactView()
 	{
-		return ReactUtils.generateTable(
+		var labelStyle:React.CSSProperties = {
+			textAlign: 'right',
+			display:"flex",
+			justifyContent: "flex-end",
+		};
+
+		return ReactUtils.generateGridLayout(
+			["four","twelve"],
+			[
+				[
+					<span style={labelStyle}>{Weave.lang("Color Theme")}</span>,
+					<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
+						<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
+						<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+					</HBox>
+				],
+			]
+		)
+
+		/*return ReactUtils.generateTable(
 			null,
 			[
 				[ 
@@ -104,7 +123,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 				table: {width: "100%"},
 				td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
 			}
-		)
+		)*/
 	}
 
 	renderFullView()

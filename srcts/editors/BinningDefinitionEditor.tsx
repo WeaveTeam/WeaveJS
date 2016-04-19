@@ -173,7 +173,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		var options = Array.from(this.binLabelToBin.keys()) as string[];
 
 		var labelStyle:React.CSSProperties = {
-			textAlign: 'center',
+			textAlign: 'right',
 			display:"flex",
 			justifyContent: "flex-end",
 		};
@@ -181,8 +181,8 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		return (
 
 		
-			ReactUtils.generateFlexBoxLayout(
-				[.3,.7],
+			ReactUtils.generateGridLayout(
+				["four","twelve"],
 				[
 					[
 						<span style={labelStyle}>{Weave.lang("Binning Method")}</span>,

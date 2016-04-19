@@ -72,7 +72,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
     render(): JSX.Element {
         var labelStyle:React.CSSProperties = {
-            textAlign: 'center',
+            textAlign: 'right',
             display:"flex",
             justifyContent: "flex-end"
         };
@@ -125,7 +125,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
                                     </HBox>
                                 </VBox>
 
-        let ui:JSX.Element = ReactUtils.generateFlexBoxLayout([.3,.7],[[labelUI,listUI]],[{alignSelf:"flex-start"}])
+        let ui:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[labelUI,listUI]])
 
         return(ui);
     }

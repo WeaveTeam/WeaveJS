@@ -52,7 +52,7 @@ export default class AbstractLayer implements ILinkableObject
 	private renderEditableField(value:EditableField, key:string):[JSX.Element, JSX.Element]
 	{
 		let labelStyle:React.CSSProperties = {
-			textAlign: 'center',
+			textAlign: 'right',
 			display:"flex",
 			justifyContent: "flex-end"
 		};
@@ -99,7 +99,7 @@ export default class AbstractLayer implements ILinkableObject
 		let fieldList: [JSX.Element, JSX.Element][] = [];
 
 		this.editableFields.forEach((value, key) => { fieldList.push(this.renderEditableField(value, key)); });
-		return ReactUtils.generateFlexBoxLayout([.3,.7], fieldList);
+		return ReactUtils.generateGridLayout(["four","twelve"], fieldList);
 	}
 
 	//todo:find a better way to pass linkToToolEditorCrumbFunction

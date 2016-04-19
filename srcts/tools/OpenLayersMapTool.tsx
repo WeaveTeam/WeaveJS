@@ -108,7 +108,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 
 		var labelStyle:React.CSSProperties = {
-			textAlign: 'center',
+			textAlign: 'right',
 			display:"flex",
 			justifyContent: "flex-end",
 		};
@@ -156,10 +156,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		];
 
 		return <VBox>
-			{ReactUtils.generateFlexBoxLayout([.3,.7], editorFields)}
-			<br/>
-			<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
-		</VBox>;
+					{ReactUtils.generateGridLayout(["four","twelve"], editorFields)}
+					<br/>
+					<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
+				</VBox>;
 	}
 
 
