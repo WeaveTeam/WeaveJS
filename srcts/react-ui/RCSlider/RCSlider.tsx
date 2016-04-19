@@ -15,7 +15,8 @@ export interface SliderProps
     step?:number;
     options?:SliderOption[];
     selectedValues:any[];
-    onChange:Function
+    onChange:Function;
+	vertical:boolean
 }
 
 export default class RCSlider extends React.Component<any, any>
@@ -117,6 +118,7 @@ export default class RCSlider extends React.Component<any, any>
                            marks={this.indexToLabel}
                            value={this.valueToIndex.get((this.props.selectedValues || [])[0])}
                            onChange={this.onChange}
+						   vertical={this.props.vertical}
                     />;
 
         }
@@ -154,15 +156,15 @@ export default class RCSlider extends React.Component<any, any>
             let stepCount:number = (this.max - this.min)/1024;
 
             //todo - needs better handling ? for step count 0
-
             return <Slider range={true}
-                    step={stepCount > 0? stepCount :1}
-                    min={this.min}
-                    max={this.max}
-                    marks={marks}
-                    value={[value.min, value.max]}
-                    onChange={this.onChange}
-            />;
+		                   step={stepCount > 0 ? stepCount :1}
+		                   min={this.min}
+		                   max={this.max}
+		                   marks={marks}
+		                   value={[value.min, value.max]}
+		                   onChange={this.onChange}
+						   vertical={this.props.vertical}
+            		/>;
 
 
 
@@ -187,6 +189,7 @@ export default class RCSlider extends React.Component<any, any>
                            marks={this.indexToLabel}
                            value={[this.valueToIndex.get(value.min), this.valueToIndex.get(value.max)]}
                            onChange={this.onChange}
+						   vertical={this.props.vertical}
                     />
         }
     }

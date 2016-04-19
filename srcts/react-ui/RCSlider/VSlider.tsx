@@ -23,6 +23,6 @@ export default class VSlider extends React.Component<VSliderProps, any>
 
     render()
     {
-        return <RCSlider {...this.props}/>;
+        return <RCSlider vertical={true} {...this.props}/>;
     }
 }
