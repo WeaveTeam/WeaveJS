@@ -4384,6 +4384,7 @@ declare module weavejs.data {
          * Gets a list of columns with a common keyType.
          */
         static getColumnsWithCommonKeyType(root: ILinkableHashMap, keyType?: string): any[];
+        static replaceColumnsInHashMap(destination: ILinkableHashMap, columnReferences: Array<IColumnReference>): void;
         /**
          * This will initialize one selectable attribute using a column or column reference.
          * @param selectableAttribute A selectable attribute (IColumnWrapper/ILinkableHashMap/ReferencedColumn)
@@ -5418,6 +5419,7 @@ declare module weavejs.data.column {
          * Updates the session state to refer to a new column.
          */
         setColumnReference(dataSource: IDataSource, metadata: Object): void;
+        static generateReferencedColumnStateFromColumnReference(ref: IColumnReference): Object;
         getInternalColumn(): IAttributeColumn;
         /************************************
          * Begin IAttributeColumn interface
