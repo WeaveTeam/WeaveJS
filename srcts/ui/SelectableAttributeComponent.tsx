@@ -9,6 +9,7 @@ import ComboBox from '../semantic-ui/ComboBox';
 import List from '../react-ui/List';
 import ControlPanel from "./ControlPanel";
 import ReactUtils from "../utils/ReactUtils";
+import ResizingDiv from "../react-ui/ResizingDiv";
 
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
@@ -137,14 +138,18 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                                                                 : null;
                 let moreDataSourceLabel:string = ">";
                 let elements:JSX.Element[] = [
-	                        labelUI,
-	                        <AttributeDropdown title="Change column"
-	                                           style={ {flex:1,width:"100%"} }
-	                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
-	                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>,
-	                        <Button onClick={ this.launchAttributeSelector.bind(this, label, attribute)}>
-									{moreDataSourceLabel} 
-							</Button>];
+                    labelUI,
+					<ResizingDiv innerStyle={{position: "absolute"}}>
+	                    <AttributeDropdown
+							title="Change column"
+                        	attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
+                        	clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }
+						/>
+					</ResizingDiv>,
+                    <Button onClick={ this.launchAttributeSelector.bind(this, label, attribute)}>
+						{moreDataSourceLabel} 
+					</Button>
+				];
                 selectableUI.push(elements);
             }
             else{//LinkableHashMap
@@ -158,7 +163,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             }
         });
 
-        let gridLayout:JSX.Element = ReactUtils.generateFlexBoxLayout([.3,.5,.2],selectableUI)
+        let gridLayout:JSX.Element = ReactUtils.generateFlexBoxLayout([.3, .7, null], selectableUI, [null, {alignSelf: "flex-start"}, null])
 
         return (<VBox className="weave-padded-vbox">
                     {gridLayout}
