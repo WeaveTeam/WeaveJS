@@ -2,6 +2,7 @@ import * as ol from "openlayers";
 import * as _ from "lodash";
 import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
 import AbstractLayer from "./AbstractLayer";
+import OpenLayersMapTool from "../../OpenLayersMapTool";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -90,8 +91,8 @@ export default class GeometryLayer extends AbstractFeatureLayer
 			let id = keys[idx];
 
 			let geometry = this.geoJsonParser.readGeometry(rawGeom,
-				{ dataProjection: this.geometryColumn.getMetadata('projection') || this.outputProjection,
-				featureProjection: this.outputProjection});
+				{ dataProjection: OpenLayersMapTool.getProjection(this.inputProjection),
+				featureProjection: OpenLayersMapTool.getProjection(this.outputProjection)});
 
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);

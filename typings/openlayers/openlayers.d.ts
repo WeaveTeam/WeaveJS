@@ -3973,7 +3973,7 @@ declare module ol {
     module proj {
 
         // Type definitions
-        interface ProjectionLike extends String { }
+        type ProjectionLike = string | ol.proj.Projection;
         interface Units extends String { }
 
         // Methods

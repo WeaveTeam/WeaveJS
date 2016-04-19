@@ -103,7 +103,8 @@ module.exports = function (grunt) {
             fontawesomefont: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
             images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'},
 			semantic: {expand: true, cwd: 'src/semantic', src: '**', dest: 'dist/semantic/'},
-            weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"}
+            weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"},
+            projdb: {expand: true, flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"}
         },
         clean: {
             ts: ["outts"],

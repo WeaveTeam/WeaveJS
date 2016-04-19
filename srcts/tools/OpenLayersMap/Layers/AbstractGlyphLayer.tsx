@@ -68,8 +68,9 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
 		var removedIds = _.difference(this._getFeatureIds(), recordIds);
 
-		var rawProj = this.dataX.getMetadata("projection") || this.sourceProjection.value || "EPSG:4326";
-		var mapProj = this.outputProjection;
+		var rawProjName = this.dataX.getMetadata("projection") || this.sourceProjection.value || "EPSG:4326";
+		var rawProj = OpenLayersMapTool.getProjection(rawProjName);
+		var mapProj = OpenLayersMapTool.getProjection(this.outputProjection);
 
 		for (let id of removedIds)
 		{

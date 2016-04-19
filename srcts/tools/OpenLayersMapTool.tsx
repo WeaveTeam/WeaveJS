@@ -63,6 +63,9 @@ function isAlignment(obj:any):boolean
 	return obj && (obj.vertical == "top" || obj.vertical == "bottom") && (obj.horizontal == "left" || obj.horizontal == "right");
 }
 
+import URLRequest = weavejs.net.URLRequest;
+import WeavePromise = weavejs.util.WeavePromise;
+
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
 {
 
@@ -84,6 +87,58 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				xMin: NaN, xMax: NaN, yMin: NaN, yMax: NaN
 			});
 	};
+
+	private static projectionDbPromise:WeavePromise = 
+		weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
+	private static projectionDbLoadAttempted:boolean = false;
+
+	static getProjection(projectionName:string):ol.proj.Projection
+	{
+		let proj = ol.proj.get(projectionName);
+		if (!proj && !OpenLayersMapTool.projectionDbLoadAttempted)
+		{
+			let result = OpenLayersMapTool.projectionDbPromise.getResult();
+			if (result)
+			{
+				try 
+				{
+					let zip = new weavejs.core.WeaveArchive.JSZip(result);
+					let content:string = zip.file("ProjDatabase.json").asText();
+					let db:{[name:string]: string} = JSON.parse(content);
+					for (let newProjName of Object.keys(db))
+					{
+						let projDef = db[newProjName];
+						if (projDef)
+							((window as any).proj4 as any).defs(newProjName, projDef);
+					}
+				}
+				catch (error)
+				{
+					console.error("Failed to parse ProjDatabase.zip:", error);
+				}
+			}
+			else /*!result*/
+			{
+				let error = OpenLayersMapTool.projectionDbPromise.getError();
+
+				if (error)
+				{
+					console.error("ProjDatabase.zip not ready by the time it was needed.");	
+					return null;
+				}
+				else
+				{
+					console.error("Failed to retrieve ProjDatabase.zip:", error);
+					return null;
+				}
+			}
+
+			OpenLayersMapTool.projectionDbLoadAttempted = true;
+			proj = ol.proj.get(projectionName);
+		}
+
+		return proj;
+	}
 
 	overrideSet():boolean
 	{
@@ -172,7 +227,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	static projectionVerifier(value:string):boolean
 	{
-		return !!ol.proj.get(value);
+		return !!OpenLayersMapTool.getProjection(value);
 	}
 
 	zoomBounds = Weave.linkableChild(this, ZoomBounds);
@@ -538,7 +593,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		if (dataBounds.isEmpty())
 		{
-			let proj = ol.proj.get(this.projectionSRS.value)
+			let proj = OpenLayersMapTool.getProjection(this.projectionSRS.value)
 			if (proj)
 			{
 				dataBounds.setCoords(proj.getExtent());
