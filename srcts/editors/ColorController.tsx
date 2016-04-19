@@ -15,8 +15,6 @@ import FilteredColumn = weavejs.data.column.FilteredColumn;
 export interface ColorControllerProps extends React.Props<ColorController>
 {
 	colorColumn:ColorColumn;
-	binColumn?:BinnedColumn;
-	dataColumn?:FilteredColumn;
 }
 
 export interface ColorControllerState
@@ -43,14 +41,14 @@ export default class ColorController extends React.Component<ColorControllerProp
 		ColorController.window = null;
 	}
 
-	static open(colorColumn:ColorColumn, binColumn:BinnedColumn, dataColumn:FilteredColumn)
+	static open(colorColumn:ColorColumn)
 	{
 		if(ColorController.window)
 			PopupWindow.close(ColorController.window);
 
 		ColorController.window = PopupWindow.open({
 			title: Weave.lang("Color Controller"),
-			content: <ColorController colorColumn={colorColumn} binColumn={binColumn} dataColumn={dataColumn}/>,
+			content: <ColorController colorColumn={colorColumn}/>,
 			resizable: true,
 			width: 920,
 			height: 675,
@@ -58,12 +56,15 @@ export default class ColorController extends React.Component<ColorControllerProp
 		});
 	}
 	
+	get binnedColumn():BinnedColumn { return this.props.colorColumn && this.props.colorColumn.getInternalColumn() as BinnedColumn };
+	get dataColumn():FilteredColumn { return this.binnedColumn && this.binnedColumn.internalDynamicColumn.target as FilteredColumn };
+
 	handleFilterCheck = (value:boolean) =>
 	{
 		if(value)
-			this.props.dataColumn.filter.targetPath = ["defaultSubsetKeyFilter"];
+			this.dataColumn.filter.targetPath = ["defaultSubsetKeyFilter"];
 		else
-			this.props.dataColumn.filter.targetPath = null;
+			this.dataColumn.filter.targetPath = null;
 	}
 	
 	render():JSX.Element
@@ -76,7 +77,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 					  tabs={[
 						  <VBox className="weave-container weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1}}>
 							  <SelectableAttributeComponent attributes={this.attributes}/>
-							  <BinningDefinitionEditor binnedColumn={this.props.binColumn}/>
+							  <BinningDefinitionEditor binnedColumn={this.binnedColumn}/>
 							  <HBox>
 							  	  <Checkbox style={{marginRight: 5}} onChange={this.handleFilterCheck}/>
 								  <span style={{alignSelf: "center"}}>

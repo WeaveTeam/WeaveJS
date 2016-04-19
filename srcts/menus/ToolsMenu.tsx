@@ -26,11 +26,7 @@ export default class ToolsMenu implements MenuBarItemProps
 		return [].concat(
 			{
 				label: Weave.lang("Color Controller"),
-				click: () => ColorController.open(
-					this.weave.getObject("defaultColorColumn") as ColorColumn, 
-					this.weave.getObject("defaultColorBinColumn") as BinnedColumn,
-					this.weave.getObject("defaultColorDataColumn") as FilteredColumn
-				)
+				click: () => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)
 			},
 			{},
 			this.getVisualizationItems()

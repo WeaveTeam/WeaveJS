@@ -48,19 +48,54 @@ declare type AggregationMethod = "count"|"sum"|"mean";
 
 export default class C3Histogram extends AbstractC3Tool
 {
-	binnedColumn = Weave.linkableChild(this, BinnedColumn);
+	binnedColumn = Weave.linkableChild(this, BinnedColumn, this.setColorColumn);
 	columnToAggregate = Weave.linkableChild(this, DynamicColumn);
 	aggregationMethod = Weave.linkableChild(this, new LinkableString("count"));
-	fill = Weave.linkableChild(this, SolidFillStyle);
+	fill = Weave.linkableChild(this, SolidFillStyle, this.setBinnedColumn);
 	line = Weave.linkableChild(this, SolidLineStyle);
     barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
 	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
 	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
+	//linkColor = Weave.linkableChild(this, new LinkableBoolean(false), this.linkColorColumn);
 
-	private RECORD_FORMAT = {
-		id: IQualifiedKey,
-		binnedColumn: this.binnedColumn,
-		columnToAggregate: this.columnToAggregate
+	private setColorColumn():void
+	{
+		var colorBinCol:BinnedColumn = this.internalColorColumn ? this.internalColorColumn.getInternalColumn() as BinnedColumn : null;
+		if (!colorBinCol)
+			return;
+		
+		if (colorBinCol.binningDefinition.internalObject)
+			Weave.copyState(this.binnedColumn, colorBinCol);
+		else
+			Weave.copyState(this.binnedColumn.internalDynamicColumn, colorBinCol.internalDynamicColumn);
+	}
+
+	private setBinnedColumn():void
+	{
+		var colorBinCol:BinnedColumn = this.internalColorColumn ? this.internalColorColumn.getInternalColumn() as BinnedColumn : null;
+		if (!colorBinCol)
+			return;
+		
+		if (colorBinCol.binningDefinition.internalObject)
+			Weave.copyState(colorBinCol, this.binnedColumn);
+		else
+			Weave.copyState(colorBinCol.internalDynamicColumn, this.binnedColumn.internalDynamicColumn);
+	}
+
+	// private linkColorColumn():void
+	// {
+	// 	if(this.linkColor.value)
+	// 		Weave.linkState(Weave.getRoot(this).getObject("defaultColorColumn"), this.internalColorColumn);
+	// 	else
+	// 		Weave.unlinkState(Weave.getRoot(this).getObject("defaultColorColumn"), this.internalColorColumn);
+	// }
+
+	private get RECORD_FORMAT() {
+		return {
+			id: IQualifiedKey,
+			binnedColumn: this.binnedColumn,
+			columnToAggregate: this.columnToAggregate
+		}
 	};
 
 	private RECORD_DATATYPE = {
@@ -71,12 +106,15 @@ export default class C3Histogram extends AbstractC3Tool
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
     private heightColumnNames:string[];
-    private binnedColumnDataType:string;
     private showXAxisLabel:boolean = false;
     private histData:{[key:string]: number}[];
     private keys:{x?:string, value:string[]};
 	private records:Record[];
     protected c3ConfigYAxis:c3.YAxisConfiguration;
+
+	get internalColorColumn():ColorColumn {
+		return Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
+	}
 
     constructor(props:IVisToolProps)
     {
@@ -116,7 +154,7 @@ export default class C3Histogram extends AbstractC3Tool
 						var binIndex = d.index;
 						if (weavejs.WeaveAPI.Locale.reverseLayout)
 							binIndex = this.histData.length - 1 - binIndex;
-						var cc = Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
+						var cc = this.internalColorColumn;
 						if (cc)
 							return StandardLib.getHexColor(cc.getColorFromDataValue(binIndex));
                     }
@@ -341,8 +379,6 @@ export default class C3Histogram extends AbstractC3Tool
 
     private dataChanged()
     {
-        this.binnedColumnDataType = this.binnedColumn.getMetadata('dataType');
-
 		this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
         this.idToRecord = {};
@@ -505,7 +541,7 @@ export default class C3Histogram extends AbstractC3Tool
 	openColorController(tabIndex:number)
 	{
 		ColorController.activeTabIndex = tabIndex;
-		ColorController.open(Weave.AS(this.fill.color.getInternalColumn(), ColorColumn), this.binnedColumn, this.binnedColumn.internalDynamicColumn.target as FilteredColumn)
+		ColorController.open(Weave.AS(this.fill.color.getInternalColumn(), ColorColumn));
 	}
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
@@ -520,7 +556,7 @@ export default class C3Histogram extends AbstractC3Tool
 		var cc = Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
 
 		return (
-			<VBox>
+			<VBox className="weave-padded-vbox">
 				{
 					super.renderEditor(linkFunction)
 				}

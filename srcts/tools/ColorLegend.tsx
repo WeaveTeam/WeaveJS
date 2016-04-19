@@ -394,9 +394,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 						<HBox style={{flex: 1, overflow: "auto"}} className="weave-padded-hbox">
 							<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={this.colorColumn ? this.colorColumn.ramp.getHexColors():[]}/>
 							<VBox style={{justifyContent: "space-between"}}>
-								{ColumnUtils.deriveStringFromNumber(dataColumn, this.colorColumn.getDataMin())}
-								{this.colorColumn.rampCenterAtZero.value ? ColumnUtils.deriveStringFromNumber(dataColumn, 0) : null}
 								{ColumnUtils.deriveStringFromNumber(dataColumn, this.colorColumn.getDataMax())}
+								{this.colorColumn.rampCenterAtZero.value ? ColumnUtils.deriveStringFromNumber(dataColumn, 0) : null}
+								{ColumnUtils.deriveStringFromNumber(dataColumn, this.colorColumn.getDataMin())}
 							</VBox>
 						</HBox>
 					</VBox>
@@ -421,25 +421,26 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	openColorController(tabIndex:number)
 	{
 		ColorController.activeTabIndex = tabIndex;
-		ColorController.open(this.colorColumn, this.binnedColumn, this.binnedColumn.internalDynamicColumn.target as FilteredColumn)
+		ColorController.open(this.colorColumn);
 	}
 	
 	renderEditor (linkFunction:any = null):JSX.Element{
-		return(<VBox>
-			{renderSelectableAttributes(this,linkFunction)}
-			{ReactUtils.generateTable(
-				null,
-				[
-					[ 
-						Weave.lang("Shape Type"),
-						<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
-					],
-				],
-				{
-					table: {width: "100%"},
-					td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
-				}
-			)}
+		return (
+		<VBox className="weave-padded-vbox">
+			{
+				renderSelectableAttributes(this,linkFunction)
+			}
+			{
+				ReactUtils.generateFlexBoxLayout(
+					[.3,.7],
+					[
+						[ 
+							Weave.lang("Shape Type"),
+							<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
+						],
+					]
+				)
+			}
 			{
 				<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(1)}/>
 			}
@@ -447,8 +448,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 			}
 			{
-				ReactUtils.generateTable(
-					null,
+				ReactUtils.generateFlexBoxLayout(
+					[.3,.7],
 					[
 						[
 							Weave.lang("Layout"),
@@ -457,11 +458,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 								{Weave.lang("Columns")}
 							</HBox>
 						]
-					],
-					{
-						table: {width: "100%"},
-						td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
-					}
+					]
 				)
 			}
 		</VBox>);
