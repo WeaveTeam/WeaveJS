@@ -181,8 +181,10 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 			{
 				if (this.props.mode == "resize")
 					barStyle.maxWidth = barPercentageSize;
-				else
+				else if(this.props.mode == "scale")
 					barStyle.width = barPercentageSize;
+				else
+					barStyle.flex = barSize;
 
 				//barStyle.height = "100%";
 				if (this.props.mode != "scale")
@@ -202,8 +204,11 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 				barStyle.width = topOrBottomBarWidth * 100  + "%";
 				if (this.props.mode == "resize")
 					barStyle.maxHeight = barPercentageSize;
-				else
+				else if(this.props.mode == "scale")
 					barStyle.height = barPercentageSize;
+				else
+					barStyle.flex = barSize;
+				
 				barStyle.left = this.state.openLeftSideBar ? barPercentageSize : "0";
 
 				if (this.props.mode != "scale")
