@@ -5,6 +5,7 @@ import ReactUtils from "../utils/ReactUtils";
 
 export interface ResizingDivProps extends React.HTMLProps<ResizingDiv>
 {
+	innerStyle?:React.CSSProperties;
 	onResize?:(state:ResizingDivState)=>void;
 }
 
@@ -54,7 +55,7 @@ export default class ResizingDiv extends React.Component<ResizingDivProps, Resiz
 	render()
 	{
 		var outerStyle:React.CSSProperties = _.merge({flex: 1}, this.props.style, {overflow: 'hidden'});
-		var innerStyle:React.CSSProperties = this.state;
+		var innerStyle:React.CSSProperties = _.merge({}, this.state, this.props.innerStyle);
 		return (
 			<div {...this.props as any} style={outerStyle}>
 				<div style={innerStyle}>
