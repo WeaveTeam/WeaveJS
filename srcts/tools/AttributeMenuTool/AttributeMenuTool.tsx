@@ -70,9 +70,8 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	get options()
 	{
 		return this.choices.getObjects(IAttributeColumn).map(column => {
-			//TODO replace getTitle with metadata title property?
 			return {
-				label: ColumnUtils.getTitle(column),
+				label: column.getMetadata(weavejs.api.data.ColumnMetadata.TITLE),
 				value: column
 			};
 		});
