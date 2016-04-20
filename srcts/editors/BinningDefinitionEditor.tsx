@@ -147,7 +147,6 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		
 		if (value && !localDef)
 		{
-			console.log("we get here");
 			this.binnedColumn.binningDefinition.target = null;
 		}
 	}
