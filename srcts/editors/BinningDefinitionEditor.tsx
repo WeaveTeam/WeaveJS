@@ -171,30 +171,49 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		var binLabel:string = binDef ? BinningDefinitionEditor.binClassToBinLabel.get(binDef.constructor as typeof AbstractBinningDefinition) : "None";
 
 		var options = Array.from(this.binLabelToBin.keys()) as string[];
-
 		
-		return (
-
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+			]
+		};
 		
-			ReactUtils.generateGridLayout(
-				["four","twelve"],
+		// [
+		// 	<span className="weave-sidebar-label">{Weave.lang("Binning Method")}</span>,
+		// 	<HBox className="weave-padded-hbox">
+		// 		<ComboBox style={{flex: 1}} 
+		// 				  options={options} 
+		// 				  value={binLabel}
+		// 				  onChange={(binLabel) => this.setBinningDefinition(true, this.binLabelToBin.get(binLabel))}/>
+		// 		<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+		// 	</HBox>
+		// ],
+		// [
+		// 	<span className="weave-sidebar-label">{Weave.lang("Bin names")}</span>,
+		// 	<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
+		// ]
+		
+		return ReactUtils.generateTable(
+			null,
+			[
 				[
-					[
-						<span className="weave-sidebar-label">{Weave.lang("Binning Method")}</span>,
-						<HBox className="weave-padded-hbox">
-							<ComboBox style={{flex: 1}} 
-									  options={options} 
-									  value={binLabel}
-									  onChange={(binLabel) => this.setBinningDefinition(true, this.binLabelToBin.get(binLabel))}/>
-							<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
-						</HBox>
-					],
-					[
-						<span className="weave-sidebar-label">{Weave.lang("Bin names")}</span>,
-						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
-					]
+					Weave.lang("Binning Method"),
+					<HBox className="weave-padded-hbox">
+						<ComboBox style={{flex: 1}} 
+								  options={options} 
+								  value={binLabel}
+								  onChange={(binLabel) => this.setBinningDefinition(true, this.binLabelToBin.get(binLabel))}/>
+						<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+					</HBox>
+				],
+				[
+					Weave.lang("Bin names"),
+					<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
 				]
-			)
+			],
+			tableStyles
 		);
 	}
 

@@ -89,20 +89,30 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 	
 	renderCompactView()
 	{
-
-		return ReactUtils.generateGridLayout(
-			["four","twelve"],
-			[
-				[
-					<span className="weave-sidebar-label">{Weave.lang("Color Theme")}</span>,
-					<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
-						<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
-						<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
-					</HBox>
-				],
+		// return ReactUtils.generateGridLayout(
+		// 	["four","twelve"],
+		// 	[
+		// 		[
+		// 			<span className="weave-sidebar-label">{Weave.lang("Color Theme")}</span>,
+		// 			<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
+		// 				<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
+		// 				<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+		// 			</HBox>
+		// 		],
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
 			]
-		)
-
+		};
+		
+		return (
+			<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
+				<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
+				<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+			</HBox>
+		);
 		/*return ReactUtils.generateTable(
 			null,
 			[

@@ -530,34 +530,66 @@ export default class C3BarChart extends AbstractC3Tool
     }
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-    renderEditor(linkFunction:Function):JSX.Element
-    {
-
-	    // 16 columns -  leave one column to avoid scrollbar - [3 + 12]
-        return (
-            <VBox className="weave-padded-vbox">
-                {
-                    super.renderEditor(linkFunction)
-                }
-                <br/>
-				{ReactUtils.generateGridLayout(
-					["four","twelve"],
+    // renderEditor(linkFunction:Function):JSX.Element
+    // {
+	// 
+	//     // 16 columns -  leave one column to avoid scrollbar - [3 + 12]
+    //     return (
+    //         <VBox className="weave-padded-vbox">
+    //             {
+    //                 super.renderEditor(linkFunction)
+    //             }
+    //             <br/>
+	// 			{ReactUtils.generateGridLayout(
+	// 				["four","twelve"],
+	// 				[
+	// 					[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>,<span >{Weave.lang("Horizontal Bars")}</span>  ],
+	// 					[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>,<span >{Weave.lang("Show Value Labels")}</span> ],
+	// 					[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/></span>, <span >{Weave.lang("Show X Axis Title")}</span> ]
+	// 				]
+	// 			)}
+    //             <br/>
+	// 			{ReactUtils.generateGridLayout(
+	// 				["four","twelve"],
+	// 				[
+	// 					[ <span className="weave-sidebar-label">{Weave.lang("Grouping Mode")}</span>, <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+	renderEditor(linkFunction:Function = null):JSX.Element
+	{
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+			]
+		};
+		
+		return ReactUtils.generateTable(
+			null,
+			this.getSelectableAttributesEditor(linkFunction).concat(
+				[
+					[ 
+						Weave.lang("Grouping Mode"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> 
+					],
+					[ 
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>,
+						Weave.lang("Horizontal Bars")
+					],
 					[
-						[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>,<span >{Weave.lang("Horizontal Bars")}</span>  ],
-						[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>,<span >{Weave.lang("Show Value Labels")}</span> ],
-						[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/></span>, <span >{Weave.lang("Show X Axis Title")}</span> ]
-					]
-				)}
-                <br/>
-				{ReactUtils.generateGridLayout(
-					["four","twelve"],
+						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>,
+						Weave.lang("Show Value Labels")
+					],
 					[
-						[ <span className="weave-sidebar-label">{Weave.lang("Grouping Mode")}</span>, <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+						<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/>, 
+						Weave.lang("Show X Axis Title")
 					]
-				)}
-            </VBox>
-        )
-    }
+				],
+				this.getTitlesEditor(),
+				this.getMarginEditor()
+			),
+			tableStyles
+		);
+	}
 
 	public get deprecatedStateMapping():Object
 	{

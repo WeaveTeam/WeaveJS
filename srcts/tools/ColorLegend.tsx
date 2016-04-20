@@ -424,44 +424,45 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		ColorController.open(this.colorColumn);
 	}
 	
-	renderEditor (linkFunction:any = null):JSX.Element{
-		return (
-		<VBox className="weave-padded-vbox">
-			{
-				renderSelectableAttributes(this,linkFunction)
-			}
-			{
-				ReactUtils.generateFlexBoxLayout(
-					[.3,.7],
-					[
-						[ 
-							Weave.lang("Shape Type"),
-							<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
-						],
-					]
-				)
-			}
-			{
-				<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(1)}/>
-			}
-			{
-				<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
-			}
-			{
-				ReactUtils.generateFlexBoxLayout(
-					[.3,.7],
-					[
-						[
-							Weave.lang("Layout"),
-							<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
-								<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
-								{Weave.lang("Columns")}
-							</HBox>
-						]
-					]
-				)
-			}
-		</VBox>);
+	renderEditor(linkFunction:Function = null):JSX.Element
+	{
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+			]
+		};
+		
+		return ReactUtils.generateTable(
+			null,
+			[
+				[
+					null,
+					renderSelectableAttributes(this, linkFunction)
+				],
+				[ 
+					Weave.lang("Shape Type"),
+					<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
+				],
+				[
+					Weave.lang("Color Theme"),
+					<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(1)}/>
+				],
+				[
+					null,
+					<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+				],
+				[ 
+					Weave.lang("Layout"),
+					<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
+						<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
+						{Weave.lang("Columns")}
+					</HBox>
+				]
+			],
+			tableStyles
+		);
 	}
 
 	get deprecatedStateMapping():Object
