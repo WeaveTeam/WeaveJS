@@ -215,7 +215,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	
 	renderNumberEditor(linkableNumber:LinkableNumber, flex:number):JSX.Element
 	{
-		var style:React.CSSProperties = {textAlign: "center", flex};
+		var style:React.CSSProperties = {textAlign: "center", flex, minWidth: 60};
 		return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {value: linkableNumber})}/>;
 	}
 
