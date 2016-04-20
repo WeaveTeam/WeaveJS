@@ -70,7 +70,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
-		console.log("ComponentDidUpdate");
 		if (!_.isEqual(prevState.value, this.state.value)) {
 			let selector = ($(this.element) as any);
 			if (this.props.type === "multiple") {
