@@ -277,8 +277,8 @@ class Resizer extends React.Component<IResizerProps, {}> {
 		//order of merge important to copy props style as style readonly
 		var styleObj:React.CSSProperties = _.merge({},this.props.style,{
 			boxSizing: "border-box",
-			background:"#000",
-			opacity: .2,
+			background:"#fff",
+			opacity: .1,
 			backgroundClip: "padding-box",
 		});
 		
