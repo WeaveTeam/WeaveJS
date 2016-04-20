@@ -120,7 +120,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 					<HBox className="weave-padded-hbox">
 						<MenuButton showIcon={false} style={{flex: "1", alignItems: "center", justifyContent: "center"}} menu={layerTypes.map((layerClass) => ({
 								label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
-								click: () => this.props.layers.requestObject('', layerClass)
+								click: () => this.setState({selectedLayer: this.props.layers.requestObject('', layerClass)})
 							}))}>
 							<i className="fa fa-plus fa-fw"/>
 						</MenuButton>
