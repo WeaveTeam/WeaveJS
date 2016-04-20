@@ -223,7 +223,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	//UI event handler for target Tool
 	handleTargetToolChange = (selectedItem:string):void =>
 	{
-		console.log("selected item", selectedItem);
 		this.props.attributeMenuTool.targetToolPath.state = [selectedItem];
 	};
 
@@ -269,8 +268,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 			display:"flex",
 			justifyContent: "flex-end"
 		};
-
-		console.log('targetAttribute in editor', this.props.attributeMenuTool.targetAttribute.state);
+		
 		return [
 			[
 				<span style={ labelStyle }>{ Weave.lang("Visualization Tool") }</span>,
