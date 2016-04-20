@@ -4,14 +4,8 @@ import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import SessionStateEditor from "../ui/SessionStateEditor";
 import {IVisTool} from "../tools/IVisTool";
-<<<<<<< Updated upstream
 import Button from "../semantic-ui/Button";
-||||||| merged common ancestors
-import IconButton from "../react-ui/IconButton";
-=======
-import IconButton from "../react-ui/IconButton";
 import classNames from "../modules/classnames";
->>>>>>> Stashed changes
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
