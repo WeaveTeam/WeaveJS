@@ -7,12 +7,14 @@ import StatefulTextField from "../../../ui/StatefulTextField";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import {VBox, HBox} from "../../../react-ui/FlexBox";
 import OpenLayersMapTool from "../../OpenLayersMapTool";
+import ReactUtils from "../../../utils/ReactUtils";
 
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 
 interface ITileLayerEditorProps {
 	layer: TileLayer;
+	editableFields: React.ReactChild[][]
 }
 
 interface ITileLayerEditorState {
@@ -78,12 +80,6 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 		nextProps.layer.providerOptions.addGroupedCallback(this, this.fromProviderOptions);
 	}
 
-	componentWillUnmount()
-	{
-		Weave.getCallbacks(this.props.layer).removeCallback(this, this.forceUpdate);
-		this.props.layer.providerOptions.removeCallback(this, this.fromProviderOptions);
-	}
-
 	render(): JSX.Element
 	{
 		let layers: string[];
@@ -102,29 +98,67 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 		let providerOptions = [{ value: "osm", label: "OpenStreetMap" }, { value: "stamen", label: "Stamen" }, { value: "mapquest", label: "MapQuest" }, {value: "custom", label: Weave.lang("Custom")}];
 
 		let layerSelection: JSX.Element;
+		let editorFields:React.ReactChild[][];
 		if (this.props.layer.provider.value === "osm")
 		{
-			return <VBox>
-				{Weave.lang("Provider")+" "}<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
-			</VBox>
+			editorFields = [
+				[
+					Weave.lang("Provider"),
+					<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				]
+			]
 		}
 		else if (this.props.layer.provider.value === "custom")
 		{
-			return <VBox>
-				{Weave.lang("Provider") + " "}<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
-				{Weave.lang("URL") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempUrl }) }/>
-				{Weave.lang("Attribution") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempAttributions }) }/>
-				{Weave.lang("Projection") + " "}<StatefulTextField ref={linkReactStateRef(this, { value: this.tempProjection }) }/>
-			</VBox>
+			editorFields = [
+				[
+					Weave.lang("Provider"),
+					<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				],
+				[
+					Weave.lang("URL"),
+					<StatefulTextField ref={linkReactStateRef(this, { value: this.tempUrl }) }/>
+				],
+				[
+					Weave.lang("Attribution"),
+					<StatefulTextField ref={linkReactStateRef(this, { value: this.tempAttributions }) }/>
+				],
+				[
+					Weave.lang("Projection"),
+					<StatefulTextField ref={linkReactStateRef(this, { value: this.tempProjection }) }/>
+				]
+			]
 		}
 		else
 		{
-			return <VBox>
-				{Weave.lang("Provider") + " "}<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
-				{Weave.lang("Layer") + " "}<ComboBox ref={linkReactStateRef(this, { value: this.tempLayer }) }
-				                                     options={layers ? layers.map((name) => { return { label: _.startCase(name), value: name }; }) : [] }/>
-			</VBox>
+			editorFields = [
+				[
+					Weave.lang("Provider"),
+					<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+				],
+				[
+					Weave.lang("Layer"),
+					<ComboBox ref={linkReactStateRef(this, { value: this.tempLayer }) }
+					                                     options={layers ? layers.map((name) => { return { label: _.startCase(name), value: name }; }) : [] }/>
+				]
+				
+			]
 		}
+		
+		
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+			]
+		};
+		
+		return ReactUtils.generateTable(
+			null,
+			editorFields.concat(this.props.editableFields),
+			tableStyles
+		);
 	}
 }
 
@@ -137,10 +171,7 @@ export default class TileLayer extends AbstractLayer
 
 	renderEditor():JSX.Element
 	{
-		return <VBox>
-			<TileLayerEditor layer={this}/>
-			{this.renderEditableFields()}
-		</VBox>;
+		return <TileLayerEditor layer={this} editableFields={this.renderEditableFields()}/>;
 	}
 
 	getExtent() {

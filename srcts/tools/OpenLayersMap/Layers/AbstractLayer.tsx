@@ -50,14 +50,8 @@ export default class AbstractLayer implements ILinkableObject
 		return new Bounds2D();
 	}
 
-	private renderEditableField(value:EditableField, key:string):[JSX.Element, JSX.Element]
+	private renderEditableField(value:EditableField, key:string):[React.ReactChild, React.ReactChild]
 	{
-		let labelStyle:React.CSSProperties = {
-			textAlign: 'right',
-			display:"flex",
-			justifyContent: "flex-end"
-		};
-
 		let lv: LinkableVariable;
 		let options: (string|{ label: string, value: any })[];
 		if (value instanceof LinkableVariable)
@@ -73,25 +67,40 @@ export default class AbstractLayer implements ILinkableObject
 
 		if (key == "Opacity")
 		{
-			return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <StatefulRangeSlider min={0} max={1} step={0.01} style={{ display: "inline", width: "50px" }} ref={linkReactStateRef(this, { value }) }/>]
+			return [
+				Weave.lang(key),
+				<StatefulRangeSlider min={0} max={1} step={0.01} style={{ display: "inline", width: "50px" }} ref={linkReactStateRef(this, { value }) }/>
+			]
 		}
 
 		if (lv instanceof LinkableString || lv instanceof LinkableNumber)
 		{
 			if (typeof options[0] === typeof "") {
-				return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />]; /* searchable field */
+				return [
+					Weave.lang(key),
+					<ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />
+				]; /* searchable field */
 			}
 			else if (typeof options[0] === typeof {}) {
-				return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>];
+				return [
+					Weave.lang(key),
+					<ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>
+				];
 			}
 			else
 			{
-				return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <StatefulTextField key={key} ref={linkReactStateRef(this, { value: lv }) }/>];
+				return [
+					Weave.lang(key),
+					<StatefulTextField key={key} ref={linkReactStateRef(this, { value: lv }) }/>
+				];
 			}
 		}
 		else
 		{
-			return [<span style={ labelStyle }> {Weave.lang(key)} </span>, <Checkbox key={key} ref={linkReactStateRef(this, { value: lv }) }/>];
+			return [
+				Weave.lang(key),
+				<Checkbox key={key} ref={linkReactStateRef(this, { value: lv }) }/>
+			];
 		}		
 	}
 
