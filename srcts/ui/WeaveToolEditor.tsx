@@ -177,7 +177,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						Weave.beta
 						?	<Button onClick={ this.openSessionStateEditor } 
 						             style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} } 
-						             title="Click to view Sesssion State" >>
+						             title="Click to view Sesssion State" >
 								<i className="fa fa-code"/>
 							</Button>
 						:	null
