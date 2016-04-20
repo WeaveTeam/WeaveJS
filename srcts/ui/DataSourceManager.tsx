@@ -148,7 +148,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 				<VBox className="weave-padded-vbox">
 					{
 						this.props.dataMenu
-						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } style={{width: "100%"}}>{Weave.lang('New Data Source')}</MenuButton>
+						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } showIcon={false} style={{width: "100%"}}><i className="fa fa-database fa-fw" style={{paddingRight: 5}}/>{Weave.lang('New Data Source')}</MenuButton>
 						: 	null
 					}
 					<VBox className="weave-container" style={ {flex: 1, width: 250, padding: 0} }>
