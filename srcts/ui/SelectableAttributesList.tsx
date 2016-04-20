@@ -1,17 +1,13 @@
 import * as React from "react";
 import * as _ from "lodash";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import IconButton from "../react-ui/IconButton";
 import List from "../react-ui/List";
 import AttributeSelector from "../ui/AttributeSelector";
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import ColumnUtils = weavejs.data.ColumnUtils;
-import {ListOption} from "../react-ui/List";
-import PopupWindow from "../react-ui/PopupWindow";
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ControlPanel from "./ControlPanel";
-import ReactUtils from "../utils/ReactUtils";
 import Button from "../semantic-ui/Button";
 import ComboBox from "../semantic-ui/ComboBox";
 import {ComboBoxOption} from "../semantic-ui/ComboBox";
@@ -90,7 +86,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         {
             this.props.linkToToolEditorCrumb( "Attribute Selector",<AttributeSelector label={  this.props.label }
                                                                              selectedAttribute={ this.props.columns }
-                                                                             selectableAttributes = { this.props.selectableAttributes }/>)
+                                                                             selectableAttributes = { this.props.selectableAttributes }/>);
             return null;
         }
       return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.selectableAttributes);
@@ -109,11 +105,6 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
     }
 
     render(): JSX.Element {
-        var labelStyle:React.CSSProperties = {
-            textAlign: 'right',
-            display:"flex",
-            justifyContent: "flex-end"
-        };
 
         var listStyle:React.CSSProperties = {
             minHeight: '70px',
@@ -125,7 +116,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         let constrollerStyle:React.CSSProperties = {
             justifyContent:'flex-end',
             background:"#F8F8F8"
-        }
+        };
 
 
         var selectedObjects:IAttributeColumn[];
@@ -138,10 +129,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         if(this.state.selectAll)
             selectedObjects = columns;
 
-        columns.forEach((column:ReferencedColumn, index:number)=>{
+        columns.forEach((column:ReferencedColumn)=>{
 	        let node:IWeaveTreeNode&IColumnReference = column.getHierarchyNode();
             columnList.push(node);
-	        HierarchyUtils.findSiblingNodes(column.getDataSource(),node.getColumnMetadata()).forEach( (siblingNode:IWeaveTreeNode,index:number) => {
+	        HierarchyUtils.findSiblingNodes(column.getDataSource(),node.getColumnMetadata()).forEach( (siblingNode:IWeaveTreeNode) => {
 		        if(!_.includes(siblings,siblingNode)){
 			        siblings.push(siblingNode);
 			        options.push({label:siblingNode.getLabel(), value: siblingNode});
