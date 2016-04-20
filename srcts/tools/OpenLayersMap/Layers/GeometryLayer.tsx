@@ -2,6 +2,7 @@ import * as ol from "openlayers";
 import * as _ from "lodash";
 import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
 import AbstractLayer from "./AbstractLayer";
+import OpenLayersMapTool from "../../OpenLayersMapTool";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -11,6 +12,8 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+import DataType = weavejs.api.data.DataType;
 
 
 export default class GeometryLayer extends AbstractFeatureLayer
@@ -79,6 +82,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 		var idc = this.geometryColumn;
 		var keys:Array<IQualifiedKey> = this.filteredKeySet.keys;
+		if (idc.getMetadata(ColumnMetadata.DATA_TYPE) != DataType.GEOMETRY) return;
 		var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, keys);
 
 		for (let idx = 0; idx < keys.length; idx++)
@@ -90,8 +94,8 @@ export default class GeometryLayer extends AbstractFeatureLayer
 			let id = keys[idx];
 
 			let geometry = this.geoJsonParser.readGeometry(rawGeom,
-				{ dataProjection: this.geometryColumn.getMetadata('projection') || this.outputProjection,
-				featureProjection: this.outputProjection});
+				{ dataProjection: OpenLayersMapTool.getProjection(this.inputProjection),
+				featureProjection: OpenLayersMapTool.getProjection(this.outputProjection)});
 
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);

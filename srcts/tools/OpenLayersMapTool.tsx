@@ -63,6 +63,9 @@ function isAlignment(obj:any):boolean
 	return obj && (obj.vertical == "top" || obj.vertical == "bottom") && (obj.horizontal == "left" || obj.horizontal == "right");
 }
 
+import URLRequest = weavejs.net.URLRequest;
+import WeavePromise = weavejs.util.WeavePromise;
+
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
 {
 
@@ -84,6 +87,63 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				xMin: NaN, xMax: NaN, yMin: NaN, yMax: NaN
 			});
 	};
+
+	private static projectionDbPromise:WeavePromise = 
+		weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
+	private static projectionDbLoadAttempted:boolean = false;
+
+	static get projectionDbReadyOrFailed():boolean
+	{
+		return !!OpenLayersMapTool.projectionDbPromise.getResult() || !!OpenLayersMapTool.projectionDbPromise.getError();
+	}
+
+	static getProjection(projectionName:string):ol.proj.Projection
+	{
+		let proj = ol.proj.get(projectionName);
+		if (!proj && !OpenLayersMapTool.projectionDbLoadAttempted)
+		{
+			let result = OpenLayersMapTool.projectionDbPromise.getResult();
+			if (result)
+			{
+				try 
+				{
+					let zip = new weavejs.core.WeaveArchive.JSZip(result);
+					let content:string = zip.file("ProjDatabase.json").asText();
+					let db:{[name:string]: string} = JSON.parse(content);
+					for (let newProjName of Object.keys(db))
+					{
+						let projDef = db[newProjName];
+						if (projDef)
+							((window as any).proj4 as any).defs(newProjName, projDef);
+					}
+				}
+				catch (error)
+				{
+					console.error("Failed to parse ProjDatabase.zip:", error);
+				}
+			}
+			else /*!result*/
+			{
+				let error = OpenLayersMapTool.projectionDbPromise.getError();
+
+				if (error)
+				{
+					console.error("ProjDatabase.zip not ready by the time it was needed.");	
+					return null;
+				}
+				else
+				{
+					console.error("Failed to retrieve ProjDatabase.zip:", error);
+					return null;
+				}
+			}
+
+			OpenLayersMapTool.projectionDbLoadAttempted = true;
+			proj = ol.proj.get(projectionName);
+		}
+
+		return proj;
+	}
 
 	overrideSet():boolean
 	{
@@ -172,7 +232,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	static projectionVerifier(value:string):boolean
 	{
-		return !!ol.proj.get(value);
+		return !!OpenLayersMapTool.getProjection(value);
 	}
 
 	zoomBounds = Weave.linkableChild(this, ZoomBounds);
@@ -394,7 +454,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			extent = undefined;
 
 		/* If this is a valid projection, use it. otherwise use default. */
-		let projection = ol.proj.get(this.projectionSRS.value) || this.getDefaultProjection();
+		let projection = OpenLayersMapTool.getProjection(this.projectionSRS.value) || this.getDefaultProjection();
 		let view = new CustomView({minZoom: this.minZoomLevel.value, maxZoom: this.maxZoomLevel.value, projection, extent});
 		view.set("extent", extent);
 
@@ -514,6 +574,38 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
+	static getEstimatedExtent(proj:ol.proj.Projection):ol.Extent
+	{
+		let extentBounds:Bounds2D = new Bounds2D();
+		let IOTA = Number("1e-10");
+		if (!proj.getExtent())
+		{
+			for (let lat = -180; lat < 180; lat++)
+			{
+				for (let long = -90; long < 180; long++)
+				{
+					let coord:ol.Coordinate = [long, lat];
+					if (coord[0] == -180)
+						coord[0] += IOTA;
+					if (coord[0] == 180)
+						coord[0] -= IOTA;
+					if (coord[1] == -90)
+						coord[1] += IOTA;
+					if (coord[1] == 90)
+						coord[1] -= IOTA;
+
+					let projectedPoint = ol.proj.fromLonLat(coord, proj);
+					extentBounds.includeCoords(projectedPoint[0], projectedPoint[1]);
+				}
+			}
+			return extentBounds.getCoords();
+		}
+		else
+		{
+			return proj.getExtent();
+		}
+	}
+
 	updateZoom_olToWeave():void
 	{
 		let view = this.map.getView();
@@ -538,10 +630,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		if (dataBounds.isEmpty())
 		{
-			let proj = ol.proj.get(this.projectionSRS.value)
+			let proj = OpenLayersMapTool.getProjection(this.projectionSRS.value)
 			if (proj)
 			{
-				dataBounds.setCoords(proj.getExtent());
+				dataBounds.setCoords(OpenLayersMapTool.getEstimatedExtent(proj));
 				this.zoomBounds.setDataBounds(dataBounds);
 				return;	
 			}
@@ -693,8 +785,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 		else
 		{
-			for (let layer of this.layers.getObjects() as AbstractLayer[]) {
-				if (layer.visible.value)
+			let layers = this.layers.getObjects() as AbstractLayer[];
+			for (let layer of layers) {
+				/* The layer must be visible. If there is only one layer, we will consider non-FeatureLayers (ie, the default base layer,) */
+				if (layer.visible.value && ((layer instanceof AbstractFeatureLayer) || layers.length == 1))
 					bounds.includeBounds(layer.getExtent());
 			}
 		}

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import $ from "jquery";
 import WeaveApp from "../lib/WeaveApp";
 import {MiscUtils} from "../lib/WeaveUI.js";
-
+window.proj4 = require("proj4");
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 window.weave = new Weave;
 var urlParams = MiscUtils.getUrlParams();
