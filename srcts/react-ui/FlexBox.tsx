@@ -54,6 +54,7 @@ export interface IHDividedBoxState {
 export interface IHDividedBoxProps extends React.HTMLProps<HDividedBox> {
 	loadWithEqualWidthChildren?:boolean;
 	space?:number;
+	resizerStyle?:React.CSSProperties;
 }
 export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBoxState>
 {
@@ -235,7 +236,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			//resizer is added right after every child except last child
 			if(childCount - 1 !== index) // resizer not required for last child
 			{
-				let resizerStyle:React.CSSProperties = {};
+				let resizerStyle:React.CSSProperties = this.props.resizerStyle?this.props.resizerStyle:{};
 				if(this.props.space)
 				{
 					resizerStyle.marginRight = String(this.props.space/2) + "px";
@@ -274,13 +275,13 @@ class Resizer extends React.Component<IResizerProps, {}> {
 
 
 	render(){
-		//order of merge important to copy props style as style readonly
-		var styleObj:React.CSSProperties = _.merge({},this.props.style,{
+
+		var styleObj:React.CSSProperties = _.merge({
 			boxSizing: "border-box",
 			background:"#fff",
 			opacity: .1,
 			backgroundClip: "padding-box",
-		});
+		},this.props.style);
 		
 
 		if(this.props.type === VERTICAL){
