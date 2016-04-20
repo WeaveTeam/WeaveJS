@@ -770,7 +770,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	{
 		return (
 			<ResizingDiv>
-				<div ref={(c:HTMLElement) => {this.element = c;}}/>
+				<div ref={(c:HTMLElement) => {this.element = c;}} style={{height:"100%", width: "100%"}}/>
 			</ResizingDiv>
 		);
 	}
