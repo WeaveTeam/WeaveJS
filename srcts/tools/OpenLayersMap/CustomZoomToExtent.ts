@@ -48,7 +48,8 @@ export default class CustomZoomToExtent extends ol.control.Control
 		{
 			extent = view.get("extent") || view.getProjection().getExtent();
 		}
-		view.fit(extent, map.getSize());
+		if (extent)
+			view.fit(extent, map.getSize());
 	}
 
 }
