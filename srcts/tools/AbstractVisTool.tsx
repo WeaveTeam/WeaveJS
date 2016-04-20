@@ -203,9 +203,9 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return AbstractVisTool.getMenuItems(this);
 	}
 
-	renderNumberEditor(linkableNumber:LinkableNumber, width:number = 50):JSX.Element
+	renderNumberEditor(linkableNumber:LinkableNumber, flex:number):JSX.Element
 	{
-		var style:React.CSSProperties = {textAlign: "center", width};
+		var style:React.CSSProperties = {textAlign: "center", flex};
 		return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {value: linkableNumber})}/>;
 	}
 
@@ -217,31 +217,33 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			justifyContent: "flex-end",
 		};
 
-		let marginCellsUI:JSX.Element = <HBox style={{alignItems: 'center',justifyContent: "space-between"}} >
-											<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.left) }</div>
-											<VBox className="weave-padded-vbox" style={{width: 50}}>
-												{ this.renderNumberEditor(this.margin.top) }
-												{ this.renderNumberEditor(this.margin.bottom) }
-											</VBox>
-											<div style={{width: 50}}>{ this.renderNumberEditor(this.margin.right) }</div>
-										</HBox>;
+		let marginCellsUI:JSX.Element = (
+			<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
+				{ this.renderNumberEditor(this.margin.left, 1) }
+				<VBox className="weave-padded-vbox" style={{flex: 1}}>
+					{ this.renderNumberEditor(this.margin.top, null) }
+					{ this.renderNumberEditor(this.margin.bottom, null) }
+				</VBox>
+				{ this.renderNumberEditor(this.margin.right, 1) }
+			</HBox>
+		);
 
 		let marginUI:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[<span style={labelStyle}>{ Weave.lang("Margins") }</span>,marginCellsUI]]);
 		//div wrapper is must if this dom becomes child of flexBox display has to be block for overflow to work correctly
-		return (<div>
-					<VBox className="weave-padded-vbox" >
-						{ renderSelectableAttributes(this,linktoToolEditorCrumbFunction) }
-
-						<br/>
-						{marginUI}
-						<br/>
-						{this.renderLayout()}
-					</VBox>
-				</div>
+		return (
+			<div>
+				<VBox className="weave-padded-vbox" >
+					{ renderSelectableAttributes(this, linktoToolEditorCrumbFunction) }
+					<br/>
+					{marginUI}
+					<br/>
+					{this.renderTitleEditors()}
+				</VBox>
+			</div>
 		);
 	}
 
-	renderLayout=():JSX.Element=>
+	renderTitleEditors=():JSX.Element=>
 	{
 		var labelStyle:React.CSSProperties = {
 			textAlign: 'right',
