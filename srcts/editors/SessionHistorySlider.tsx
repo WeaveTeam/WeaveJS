@@ -125,7 +125,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 							  className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}
 							  iconProps={{className:"fa fa-arrow-right"}}/>
 
-				<div style={{alignContent: "center", paddingLeft: 10, paddingRight: 10, flex: 1}}>
+				<div className="weave-history-slider" style={{alignContent: "center", paddingLeft: 10, paddingRight: 10, flex: 1}}>
 					<HSlider options={sliderOptions} selectedValues={[this.state.position as any]} step={1} onChange={this.handleSlider.bind(this)} type={RCSlider.CATEGORICAL}/>
 				</div>
 				{/*<MenuButton width="24" id="menuButton" toolTip="{lang('Menu')}" initialize="menuButton.data = [

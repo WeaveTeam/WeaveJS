@@ -135,13 +135,13 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 				);
 			case LAYOUT_HSLIDER:
 				return (
-					<HBox style={{ flex: 1, alignItems: "center", padding: 10}}>
+					<HBox style={{ flex: 1, padding: 25}}>
 						<HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type="categorical"/>
 					</HBox>
 				);
 			case LAYOUT_VSLIDER:
 				return (
-					<VBox style={{ flex: 1, paddingLeft: 20, padding: 10 }}>
+					<VBox style={{ flex: 1, padding: 25 }}>
 						<VSlider options={ this.options } onChange={ this.handleSelection } selectedValues={ [selectedAttribute] } type="categorical"/>
 					</VBox>
 				);
