@@ -80,11 +80,11 @@ export default class SessionStateEditor extends SmartComponent<ISessionStateEdit
 
     render():JSX.Element
     {
-        return (<HDividedBox style={{flex:1}}>
+        return (<HDividedBox style={ {flex:1,border:"1px solid lightgrey"} } resizerStyle={ {background:"black"} }>
                     <div style={ {padding:"4px",fontSize:"14px"} }>
-                        <SessionStateTree root={ this.rootWeaveTreeItem } clickHandler= { this.nodeClickHandler } open={true}/>
+                        <SessionStateTree root={ this.rootWeaveTreeItem } clickHandler= { this.nodeClickHandler } open={true} enableAccordion={true}/>
                     </div>
-                    <WeaveTreeItemEditor item={ this.state.activeItem } style={ {padding:"4px",fontSize:"14px"} }/>
+                    <WeaveTreeItemEditor item={ this.state.activeItem } style={ {padding:"8px",fontSize:"14px"} }/>
                 </HDividedBox>
             );
     }
@@ -176,7 +176,7 @@ class WeaveTreeItemEditor extends SmartComponent<IWeaveTreeItemEditorProps, IWea
 
 
         return (<VBox className = "weave-padded-vbox" style={ this.props.style }>
-                    <HBox className = "weave-window-header" style= { {alignItems:"center",fontSize:"inherit"} }>
+                    <HBox className = "weave-padded-hbox weave-window-header" style= { {alignItems:"center",fontSize:"inherit",paddingBottom:"10px"} }>
                         {title}
                         <span style={ {flex:"1"} }/>
                         {linkableDynamicObjectUI}
@@ -186,12 +186,11 @@ class WeaveTreeItemEditor extends SmartComponent<IWeaveTreeItemEditorProps, IWea
                             Apply
                         </IconButton>
                     </HBox>
+                    <hr/>
                     <form style={ {display:"flex",flexWrap:"wrap",overflow:"auto", flex:"1"} }>
                         <textarea ref="textArea" style={ {border:"none",flex:"1"} }
                                    value={this.state.sessionValue} onChange={this.changeSessionStateValue}/>
                     </form>
-
-
                 </VBox>
         );
     }

@@ -11,6 +11,7 @@ import WeaveTreeItem = weavejs.util.WeaveTreeItem;
 import SessionManager = weavejs.core.SessionManager;
 import ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import SmartComponent from "./SmartComponent";
 
 export interface ILinkableDynamicObjectComponentProps extends React.HTMLProps<LinkableDynamicObjectComponent>
 {
@@ -24,7 +25,7 @@ export interface ILinkableDynamicObjectComponentState
     linkedObjectName?:string;
 }
 
-export default class LinkableDynamicObjectComponent extends React.Component<ILinkableDynamicObjectComponentProps, ILinkableDynamicObjectComponentState>
+export default class LinkableDynamicObjectComponent extends SmartComponent<ILinkableDynamicObjectComponentProps, ILinkableDynamicObjectComponentState>
 {
     constructor(props:ILinkableDynamicObjectComponentProps)
     {
