@@ -22,6 +22,7 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import WeaveAPI = weavejs.WeaveAPI;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -82,19 +83,33 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	{
 		if(!selectedValue)
 			return;
+
 		var tool = this.toolWatcher.target as IVisTool;
+		var targetAttribute = tool.selectableAttributes.get(this.targetAttribute.state as string);
 
-		var targetCol = tool.selectableAttributes.get(this.targetAttribute.state as string) as IColumnWrapper;
-		var targetInternalCol = ColumnUtils.hack_findInternalDynamicColumn(targetCol);
+		var targetAttributeColumn:DynamicColumn;//attribute which will be set
+		var selectedColumn:IColumnWrapper = selectedValue instanceof Array ? selectedValue[0] as IColumnWrapper : selectedValue as IColumnWrapper;//attribute option chosen from tool; used to set target attribute
 
-		//use selected column to set session state of target column
-		var selectedColumn = selectedValue instanceof Array ? selectedValue[0] as IColumnWrapper : selectedValue as IColumnWrapper;//List and sliders return an array, combobox returns one
-		if(selectedColumn)
-			this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to re render
 
-		if(targetInternalCol)
-			targetInternalCol.requestLocalObjectCopy(selectedColumn) ;//TODO handle selectable attributes hashmaps eg height columns barchart
+		if(Weave.IS(targetAttribute, IColumnWrapper))
+		{
+			targetAttributeColumn = ColumnUtils.hack_findInternalDynamicColumn(targetAttribute as IColumnWrapper);
+		}
+		else//LinkableHashMap take the first object and force it into a column
+		{
+			var hm = targetAttribute as LinkableHashMap;
+			ColumnUtils.forceFirstColumnDynamic(hm);
+			var firstColumn = hm.getObjects(IAttributeColumn)[0];
+			targetAttributeColumn = ColumnUtils.hack_findInternalDynamicColumn(firstColumn as IColumnWrapper);
+		}
 
+		this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to rerender
+
+		if(targetAttributeColumn)
+		{
+			if(selectedColumn)
+				targetAttributeColumn.requestLocalObjectCopy(selectedColumn);
+		}
 	};
 
 	renderEditor(linkFunction :Function = null):JSX.Element
