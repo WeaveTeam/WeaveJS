@@ -47,39 +47,39 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	{
 		this._binnedColumnWatcher.target = object as BinnedColumn;
 	}
-	public  hasPendingChanges():boolean { return false; }
-	public  applyChanges():void { }
+	public hasPendingChanges():boolean { return false; }
+	public applyChanges():void { }
 
-	private  _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.handleBinnedColumnChange.bind(this)));
+	private _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.handleBinnedColumnChange.bind(this)));
 
-	private  get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }
-	public  _simple:SimpleBinningDefinition = Weave.disposableChild(this, SimpleBinningDefinition);
-	private  _customSplit:CustomSplitBinningDefinition = Weave.disposableChild(this, CustomSplitBinningDefinition);
-	private  _quantile:QuantileBinningDefinition = Weave.disposableChild(this, QuantileBinningDefinition);
-	private  _equalInterval:EqualIntervalBinningDefinition = Weave.disposableChild(this, EqualIntervalBinningDefinition);
-	private  _stdDev:StandardDeviationBinningDefinition = Weave.disposableChild(this, StandardDeviationBinningDefinition);
-	private  _category:CategoryBinningDefinition = Weave.disposableChild(this, CategoryBinningDefinition);
-	private  _jenks:NaturalJenksBinningDefinition = Weave.disposableChild(this, NaturalJenksBinningDefinition);
+	private get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }
+	public _simple:SimpleBinningDefinition = Weave.disposableChild(this, SimpleBinningDefinition);
+	private _customSplit:CustomSplitBinningDefinition = Weave.disposableChild(this, CustomSplitBinningDefinition);
+	private _quantile:QuantileBinningDefinition = Weave.disposableChild(this, QuantileBinningDefinition);
+	private _equalInterval:EqualIntervalBinningDefinition = Weave.disposableChild(this, EqualIntervalBinningDefinition);
+	private _stdDev:StandardDeviationBinningDefinition = Weave.disposableChild(this, StandardDeviationBinningDefinition);
+	private _category:CategoryBinningDefinition = Weave.disposableChild(this, CategoryBinningDefinition);
+	private _jenks:NaturalJenksBinningDefinition = Weave.disposableChild(this, NaturalJenksBinningDefinition);
 
 	// TODO should Dictionary 2D be used ?
 	static binClassToBinLabel = new Map<typeof AbstractBinningDefinition, string>()
-								   .set(SimpleBinningDefinition, "Equally spaced")
-								   .set(CustomSplitBinningDefinition, "Custom breaks")
-								   .set(QuantileBinningDefinition, "Quantile")
-								   .set(EqualIntervalBinningDefinition, "Equal interval")
-								   .set(StandardDeviationBinningDefinition, "Standard deviations")
-								   .set(NaturalJenksBinningDefinition, "Natural breaks")
-								   .set(CategoryBinningDefinition, "All Categories(string values)");
+		.set(SimpleBinningDefinition, "Equally spaced")
+		.set(CustomSplitBinningDefinition, "Custom breaks")
+		.set(QuantileBinningDefinition, "Quantile")
+		.set(EqualIntervalBinningDefinition, "Equal interval")
+		.set(StandardDeviationBinningDefinition, "Standard deviations")
+		.set(NaturalJenksBinningDefinition, "Natural breaks")
+		.set(CategoryBinningDefinition, "All Categories (string values)");
 
-   binLabelToBin = new Map<string, AbstractBinningDefinition>()
-							   .set("Equally spaced", this._simple)
-							   .set("Custom breaks", this._customSplit)
-							   .set("Quantile", this._quantile)
-							   .set("Equal interval", this._equalInterval)
-							   .set("Standard deviations", this._stdDev)
-							   .set("Natural breaks", this._jenks)
-							   .set("All Categories(string values)", this._category)
-							   .set("None", null);
+	binLabelToBin = new Map<string, AbstractBinningDefinition>()
+		.set("Equally spaced", this._simple)
+		.set("Custom breaks", this._customSplit)
+		.set("Quantile", this._quantile)
+		.set("Equal interval", this._equalInterval)
+		.set("Standard deviations", this._stdDev)
+		.set("Natural breaks", this._jenks)
+		.set("All Categories (string values)", this._category)
+		.set("None", null);
 	
 	constructor(props:BinningDefinitionEditorProps)
 	{
@@ -90,11 +90,11 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	handleBinnedColumnChange()
 	{
 		var binDef = this.binnedColumn.binningDefinition.target;
-		if(binDef)
+		if (binDef)
 		{
-			for(var localDef of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
+			for (var localDef of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
 			{
-				if(this.isRadioSelected(localDef))
+				if (this.isRadioSelected(localDef))
 				{
 					Weave.linkState(binDef, localDef);
 				}
@@ -105,10 +105,10 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 
 	private linkOverride(property:"overrideInputMin"|"overrideInputMax")
 	{
-		for(var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
+		for (var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
 		{
 			var abd:any = def;
-			if(abd[property] && this.isRadioSelected(def))
+			if (abd[property] && this.isRadioSelected(def))
 			{
 				return linkReactStateRef(this, {value: abd[property]}, 500);
 			}
@@ -132,20 +132,20 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		// we keep it selected
 		var binDef = this.binnedColumn.binningDefinition.target;
 		
-		if(!value && binDef && localDef && localDef.constructor == binDef.constructor)
+		if (!value && binDef && localDef && localDef.constructor == binDef.constructor)
 		{
 				this.forceUpdate(); // trigger a render because no session state change
 				return;				// and we need to update the checkboxes to reflect correct value
 		}
 
-		else if(value && localDef)
+		else if (value && localDef)
 		{
 			this.binnedColumn.binningDefinition.requestLocalObjectCopy(localDef);
 			binDef = this.binnedColumn.binningDefinition.target;
 			Weave.linkState(binDef, localDef);
 		}
 		
-		if(value && !localDef)
+		if (value && !localDef)
 		{
 			console.log("we get here");
 			this.binnedColumn.binningDefinition.target = null;
@@ -155,7 +155,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	isRadioSelected(localDef:AbstractBinningDefinition):boolean
 	{
 		var binDef = this.binnedColumn.binningDefinition.target
-		if(localDef && binDef)
+		if (localDef && binDef)
 			return localDef.constructor == binDef.constructor;
 		return false; // can only get here if the binDef is null
 	}
@@ -237,7 +237,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		var leftItemsStyle:React.CSSProperties = {
 			justifyContent: "flex-start",
 			alignItems: "center"
-		}
+		};
 
 		var rightItemsStyle:React.CSSProperties = {
 			justifyContent: "flex-end",
@@ -251,7 +251,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		
 		var inputStyle:React.CSSProperties = {
 			width: 60
-		}
+		};
 
 		return (
 			<HBox className="weave-padded-hbox">
@@ -428,7 +428,8 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		)
 	}
 	
-	render() {
+	render()
+	{
 		return this.props.compact ? this.renderCompactView() : this.renderFullView();
 	}
 }
