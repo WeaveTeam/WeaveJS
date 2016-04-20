@@ -1333,40 +1333,56 @@ declare module weavejs.api.core {
          */
         setNameOrder(newOrder: Array<string>): void;
         /**
-         * This function returns an ordered list of names in the hash map.
+         * This function returns an ordered list of names in the LinkableHashMap.
          * @param filter If specified, names of objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return A copy of the ordered list of names of objects contained in this LinkableHashMap.
          */
         getNames(filter?: new (..._: any[]) => any | string, filterIncludesPlaceholders?: boolean): Array<string>;
         /**
-         * This function returns an ordered list of objects in the hash map.
+         * This function returns an ordered list of objects in the LinkableHashMap.
          * @param filter If specified, objects that are not of this type will be filtered out.
          * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
          * @return An ordered Array of objects that correspond to the names returned by getNames(filter).
          */
         getObjects<T>(filter?: new (..._: any[]) => T | string, filterIncludesPlaceholders?: boolean): Array<T & ILinkableObject>;
         /**
-         * This function gets the name of the specified object in the hash map.
+         * This function returns an Object mapping names to objects contained in the LinkableHashMap.
+         * @param filter If specified, objects that are not of this type will be filtered out.
+         * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
+         * @return An Object mapping names to objects contained in the LinkableHashMap.
+         */
+        toObject<T>(filter?: new (..._: any[]) => T | string, filterIncludesPlaceholders?: boolean): {
+            [name: string]: T & ILinkableObject;
+        };
+        /**
+         * This function returns a Map containing the entries in the LinkableHashMap.
+         * @param filter If specified, objects that are not of this type will be filtered out.
+         * @param filterIncludesPlaceholders If true, matching LinkablePlaceholders will be included in the results.
+         * @return A Map containing the ordered entries in the LinkableHashMap.
+         */
+        toMap<T>(filter?: new (..._: any[]) => T | string, filterIncludesPlaceholders?: boolean): Map<String, T & ILinkableObject>;
+        /**
+         * This function gets the name of the specified object in the LinkableHashMap.
          * @param object An object contained in this LinkableHashMap.
          * @return The name associated with the object, or null if the object was not found.
          */
         getName(object: ILinkableObject): string;
         /**
          * This function gets the object associated with the specified name.
-         * @param name The name identifying an object in the hash map.
+         * @param name The name identifying an object in the LinkableHashMap.
          * @return The object associated with the given name.
          */
         getObject(name: string): ILinkableObject;
         /**
-         * Sets an entry in the hash map, replacing any existing object under the same name.
+         * Sets an entry in the LinkableHashMap, replacing any existing object under the same name.
          * @param name The identifying name to associate with an object.
          * @param lockObject If this is true, the object will be locked in place under the specified name.
          * @return The object to be associated with the given name.
          */
         setObject(name: string, object: ILinkableObject, lockObject?: boolean): void;
         /**
-         * This function creates an object in the hash map if it doesn't already exist.
+         * This function creates an object in the LinkableHashMap if it doesn't already exist.
          * If there is an existing object associated with the specified name, it will be kept if it
          * is the specified type, or replaced with a new instance of the specified type if it is not.
          * @param name The identifying name of a new or existing object.
@@ -1395,7 +1411,7 @@ declare module weavejs.api.core {
          */
         objectIsLocked(name: string): boolean;
         /**
-         * This function removes an object from the hash map.
+         * This function removes an object from the LinkableHashMap.
          * @param name The identifying name of an object previously saved with setObject().
          */
         removeObject(name: string): void;
@@ -3488,6 +3504,8 @@ declare module weavejs.core {
         childListCallbacks: IChildListCallbackInterface;
         getNames(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
         getObjects(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): any[];
+        toObject(filter?: new (..._: any[]) => any, filterIncludesPlaceholders?: boolean): Object;
+        toMap<T>(filter?: new (..._: any[]) => T | string, filterIncludesPlaceholders?: boolean): Map<String, T & ILinkableObject>;
         getObject(name: string): ILinkableObject;
         setObject(name: string, object: ILinkableObject, lockObject?: boolean): void;
         getName(object: ILinkableObject): string;
