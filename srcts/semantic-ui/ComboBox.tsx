@@ -66,6 +66,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		{
 			this.setState({value});
 		}
+		else {
+			this.setState({value:null});
+		}
 	}
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
@@ -79,7 +82,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					if (index >= 0)
 						indices.push(String(index));
 				});
-				console.log(indices);
 				selector.dropdown('set exactly', indices)
 			}
 			else {
@@ -87,6 +89,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				if (index >= 0) {
 					let option = this.props.options[index];
 					selector.dropdown('set selected', (typeof option === "object") ? option.label : option);
+				} else {
+					selector.dropdown('clear');
 				}
 			}
 			this.props.onChange && this.props.onChange(this.state.value);
@@ -151,13 +155,18 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let option = this.props.options[index];
 		if(this.props.type === "multiple")
 		{
-			selector.dropdown('clear');
-			this.state.value.forEach( (item:any,index:number) => {
-				selector.dropdown('set selected',(typeof item === "object") ? item.label:item);
+			let indices:string[] = [];
+			this.state.value.forEach((item:any) => {
+				let index:number = this.getIndexFromValue(item);
+				if (index >= 0)
+					indices.push(String(index));
 			});
+			selector.dropdown('set exactly', indices)
 		}
 		else if(index >= 0)
 			selector.dropdown('set selected',(typeof option === "object") ? option.label:option);
+		else
+			selector.dropdown('clear');
 	}
 
 	render()
