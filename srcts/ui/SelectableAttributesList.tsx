@@ -162,7 +162,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 	                      valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
 	                      onChange={this.setSelected}
 					/>
-					<Button onClick={ this.launchAttributeSelector }>{ ">" }</Button>
+					<Button onClick={ this.launchAttributeSelector }
+					        title={"Click to explore other DataSources for " + this.props.label}>
+						<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
+					</Button>
 				</HBox>
 			);
 		}

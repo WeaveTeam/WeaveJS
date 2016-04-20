@@ -98,8 +98,9 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 					<AttributeDropdown title="Change column"
 									   attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
 									   clickHandler={ this.launchAttributeSelector.bind(this, this.props.attributeName, attribute) }/>
-					<Button onClick={ this.launchAttributeSelector.bind(this, this.props.attributeName, attribute)}>
-							{">"} 
+					<Button onClick={ this.launchAttributeSelector.bind(this, this.props.attributeName, attribute)}
+                            title={"Click to explore other DataSources for " + this.props.attributeName}>
+                        <i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
 					</Button>
 				</HBox>
 			)

@@ -175,12 +175,16 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 					<span style={ {flex: "1"} }/>
 					{
 						Weave.beta
-						?	<Button onClick={ this.openSessionStateEditor } style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} }>
+						?	<Button onClick={ this.openSessionStateEditor } 
+						             style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} } 
+						             title="Click to view Sesssion State" >>
 								<i className="fa fa-code"/>
 							</Button>
 						:	null
 					}
-					<Button onClick={ this.props.onCloseHandler } style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} }>
+					<Button onClick={ this.props.onCloseHandler } 
+					        style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} } 
+					        title="Click to close Editor">
 						&#x2715;
 					</Button>
 				</HBox>
