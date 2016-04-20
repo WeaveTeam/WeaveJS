@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import {VBox, HBox} from '../react-ui/FlexBox';
 import Button from "../semantic-ui/Button";
 import AttributeSelector from "../ui/AttributeSelector";
@@ -175,7 +176,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
     render():JSX.Element{
 
         let currentColumnNode = ColumnUtils.hack_findHierarchyNode(this.props.attribute);
-        let options:{value: IColumnReference&IWeaveTreeNode, label: string}[] = [];
+        let options:{value: IColumnReference, label: string}[] = [];
         let clickHandler = this.props.clickHandler;
         let header:JSX.Element;
         if (currentColumnNode)
@@ -183,14 +184,15 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
             clickHandler = null;
             options = 
                 HierarchyUtils.findSiblingNodes(currentColumnNode.getDataSource(), currentColumnNode.getColumnMetadata())
-                .filter((node:IWeaveTreeNode)=> Weave.IS(node, IColumnReference))
                 .map((node) =>
                 {
-                    let colRef = Weave.AS(node, IColumnReference) as IColumnReference&IWeaveTreeNode;
+                    let colRef = Weave.AS(node, IColumnReference);
+                    if (!colRef) return null;
                     let metadata = colRef.getColumnMetadata() as any;
+                    if (!metadata) return null;
                     let title:string = metadata[ColumnMetadata.TITLE];
                     return {value: colRef, label: title};
-                });
+                }).filter(_.identity);
 
             header = (<span style={{fontWeight: "bold", fontSize: "small"}}>{HierarchyUtils.findParentNode(currentColumnNode.getDataSource().getHierarchyRoot(),currentColumnNode.getDataSource(),currentColumnNode.getColumnMetadata()).getLabel()}</span>)
         }
