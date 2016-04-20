@@ -6,7 +6,7 @@ import Menu, {MenuItemProps} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
 import FixedDataTable from "./FixedDataTable";
 import {IRow} from "./FixedDataTable";
-import {HBox, VBox} from "../react-ui/FlexBox";
+import ReactUtils from "../utils/ReactUtils";
 
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
@@ -180,11 +180,19 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linkFunction:Function):JSX.Element {
-		return(
-			<VBox style={{flex:1}}>
-				{renderSelectableAttributes(this.selectableAttributes, linkFunction)}
-			</VBox>
-		)
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+			]
+		};
+
+		return ReactUtils.generateTable(
+			null,
+			renderSelectableAttributes(this.selectableAttributes, linkFunction),
+			tableStyles
+		);
 	};
 
 	render()
