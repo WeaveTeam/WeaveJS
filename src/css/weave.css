@@ -515,6 +515,32 @@ div.weave-tree-view {
 
 /* Override Semantic ui CSS*/
 
+/******* Button *******/
+.ui.button {
+	margin:0;
+	border:1px solid lightgrey;
+	background:none;
+	color:grey;
+}
+
+.ui.button:hover {
+	background:grey;
+	color:white;
+}
+
+/******* Dropdown *****/
+
+.ui.multiple.dropdown>.label {
+	display: inline-flex;
+	align-items: center;
+	background:none;
+}
+
+.ui.multiple.dropdown>.label:hover {
+	color:white;
+	background:grey;
+}
+
 /******* grid *********/
 
 .ui.grid {
