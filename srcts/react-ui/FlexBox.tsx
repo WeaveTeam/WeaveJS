@@ -15,7 +15,7 @@ export class HBox extends React.Component<React.HTMLProps<HBox>, {}>
 	 */
 	private static style(style:React.CSSProperties):React.CSSProperties
 	{
-		return _.merge({}, style, { display: "inline-flex", flexDirection: "row" });
+		return _.merge({}, style, { display: "flex", flexDirection: "row" });
 	}
 
 	render()
@@ -33,7 +33,7 @@ export class VBox extends React.Component<React.HTMLProps<VBox>, {}>
 	 */
 	private static style(style:React.CSSProperties):React.CSSProperties
 	{
-		return _.merge({}, style, { display: "inline-flex", flexDirection: "column" });
+		return _.merge({}, style, { display: "flex", flexDirection: "column" });
 	}
 
 	render()
