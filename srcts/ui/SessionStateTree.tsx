@@ -276,7 +276,8 @@ class TreeNode extends React.Component<ITreeNodeProps, ISessionTreeState>
             else //leaf
             {
                 let listStyle:React.CSSProperties = {};
-                if(this.state.open){
+                if(this.state.open)
+                {
                     let selectionStyle:React.CSSProperties = this.props.manager.props.selectionStyle;
                     listStyle = selectionStyle ? selectionStyle : {color:"white",background:"grey"};
                 }

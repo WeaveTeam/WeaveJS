@@ -93,7 +93,6 @@ export default class LinkableDynamicObjectComponent extends SmartComponent<ILink
             padding:"8px",
             right:"0"
         };
-        console.log((this.props.dynamicObject as any)._typeRestriction);
 
         var filterType:any = (this.props.dynamicObject as any)._typeRestriction;
         var filterTypeName:string = Weave.className(filterType);

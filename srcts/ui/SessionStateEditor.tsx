@@ -175,8 +175,15 @@ class WeaveTreeItemEditor extends SmartComponent<IWeaveTreeItemEditorProps, IWea
         }
 
 
+        let headerStyle:React.CSSProperties = {
+            alignItems:"center",
+            fontSize:"inherit",
+            paddingBottom:"10px",
+            borderBottom:"1px solid lightgrey"
+        }
+
         return (<VBox className = "weave-padded-vbox" style={ this.props.style }>
-                    <HBox className = "weave-padded-hbox weave-window-header" style= { {alignItems:"center",fontSize:"inherit",paddingBottom:"10px"} }>
+                    <HBox className = "weave-padded-hbox weave-window-header" style= { headerStyle }>
                         {title}
                         <span style={ {flex:"1"} }/>
                         {linkableDynamicObjectUI}
@@ -186,7 +193,6 @@ class WeaveTreeItemEditor extends SmartComponent<IWeaveTreeItemEditorProps, IWea
                             Apply
                         </IconButton>
                     </HBox>
-                    <hr/>
                     <form style={ {display:"flex",flexWrap:"wrap",overflow:"auto", flex:"1"} }>
                         <textarea ref="textArea" style={ {border:"none",flex:"1"} }
                                    value={this.state.sessionValue} onChange={this.changeSessionStateValue}/>
