@@ -133,12 +133,16 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 						this.setState({value});
 						this.props.onChange && this.props.onChange(value);
 					} else {
-						let indices:number[] = (selected as string).split(",").map(Number);
-						let values:any[] = indices.map( (index) => {
-							let option = this.props.options[index];
-							return (typeof option === "object") ? option.value : option;
-						});
-						this.setState({value:values});
+						if(selected !== "") {
+							let indices:number[] = (selected as string).split(",").map(Number);
+							let values:any[] = indices.map((index) => {
+								let option = this.props.options[index];
+								return (typeof option === "object") ? option.value : option;
+							});
+							this.setState({value: values});
+						} else {
+							this.setState({value: []});
+						}
 					}
 
 
