@@ -96,7 +96,7 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 			if (this.props.location == "top")
 			{
 				defaultStyle.top = 0;
-				defaultStyle["borderBottom"]= "1px solid lightGrey";
+				defaultStyle["borderBottom"] = "1px solid lightGrey";
 				closeButtonStyle.alignSelf = "flex-end";
 			}
 			else
@@ -108,25 +108,28 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 		}
 
 		// this ensures default style overrides user defined style, to make sure layout style in not changed
-		var style:React.CSSProperties =  _.merge({flex: 1}, this.props.style, defaultStyle);
+		var style:React.CSSProperties = _.merge({flex: 1}, this.props.style, defaultStyle);
 
 		let closeButtonUI:JSX.Element = null;
-		if(this.props.enableClose){
-			closeButtonUI = <div style={closeButtonStyle}>
-								<IconButton
-									clickHandler={ this.onCloseClick }
-									iconName="&#x2715"
-									style={ {fontSize:"16px"} }
-									mouseOverStyle={ {color:"red",background:"none"} }
-									toolTip="click to close Sidebar"
-								/>
-							</div>
+		if (this.props.enableClose)
+		{
+			closeButtonUI = (
+				<div style={closeButtonStyle}>
+					<IconButton
+						clickHandler={ this.onCloseClick }
+						iconName="&#x2715"
+						style={ {fontSize: "16px"} }
+						mouseOverStyle={ {color: "red", background: "none"} }
+						toolTip="click to close Sidebar"
+					/>
+				</div>
+			);
 		}
 
 		return (
 			<div className={this.props.className} style={style}>
 				{closeButtonUI}
-				<div style={ {padding:"8px",display:"flex",flexDirection:"inherit",flex:1} }>
+				<div style={ {display: "flex", flexDirection: "inherit", flex: 1} }>
 					{this.props.children}
 				</div>
 			</div>

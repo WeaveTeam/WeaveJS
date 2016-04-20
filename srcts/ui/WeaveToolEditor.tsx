@@ -4,7 +4,14 @@ import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import SessionStateEditor from "../ui/SessionStateEditor";
 import {IVisTool} from "../tools/IVisTool";
+<<<<<<< Updated upstream
 import Button from "../semantic-ui/Button";
+||||||| merged common ancestors
+import IconButton from "../react-ui/IconButton";
+=======
+import IconButton from "../react-ui/IconButton";
+import classNames from "../modules/classnames";
+>>>>>>> Stashed changes
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
@@ -152,7 +159,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		);
 
 		let backButtonUI:JSX.Element = null;
-		if(this.crumbOrder.length > 1)
+		if (this.crumbOrder.length > 1)
 		{
 			let prevCrumbTitle:string = this.crumbOrder[this.crumbOrder.length - 2];
 			backButtonUI = <Button onClick={ this.stepBackInCrumbView } style={{borderColor:"rgba(0, 0, 0, 0)",padding:"8px"}}>
@@ -161,17 +168,25 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		}
 
 		return (
-			<VBox className={ "weave-padded-vbox "  + this.props.className } style={ this.props.style }>
-				<HBox className="weave-padded-hbox" style = { {alignItems: "center",borderBottom:"1px solid lightgrey"} }>
+			<VBox className={ classNames("weave-padded-vbox", this.props.className) } style={ this.props.style }>
+				<HBox
+					className="weave-padded-hbox"
+					style={ {alignItems: "center", borderBottom: "1px solid lightgrey", margin: 8} }
+					onMouseEnter={() => Weave.beta && this.forceUpdate()}
+				>
 					{backButtonUI}
 					<HBox className="weave-padded-hbox" style={ crumbStyle }>
 						{crumbUI}
 					</HBox>
 					<span style={ {flex: "1"} }/>
-					<Button onClick={ this.openSessionStateEditor } style={ {borderColor:"rgba(0, 0, 0, 0)",padding:"8px"} }>
-						<i className="fa fa-code"/>
-					</Button>
-					<Button onClick={ this.props.onCloseHandler } style={ {borderColor:"rgba(0, 0, 0, 0)",padding:"8px"} }>
+					{
+						Weave.beta
+						?	<Button onClick={ this.openSessionStateEditor } style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} }>
+								<i className="fa fa-code"/>
+							</Button>
+						:	null
+					}
+					<Button onClick={ this.props.onCloseHandler } style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} }>
 						&#x2715;
 					</Button>
 				</HBox>
@@ -182,6 +197,3 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		);
 	}
 }
-
-
-
