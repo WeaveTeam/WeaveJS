@@ -598,12 +598,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 					extentBounds.includeCoords(projectedPoint[0], projectedPoint[1]);
 				}
 			}
-			return extentBounds.getCoords();
+			proj.setExtent(extentBounds.getCoords());
 		}
-		else
-		{
-			return proj.getExtent();
-		}
+		return proj.getExtent();
 	}
 
 	updateZoom_olToWeave():void

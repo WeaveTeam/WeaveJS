@@ -4056,6 +4056,7 @@ declare module ol {
         class Projection {
             constructor(options: olx.Projection);
             getExtent():ol.Extent;
+            setExtent(extent:ol.Extent):void;
             getCode(): string;
         }
     }
