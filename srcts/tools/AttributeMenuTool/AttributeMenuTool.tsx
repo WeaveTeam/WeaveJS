@@ -66,7 +66,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	get selectableAttributes()
 	{
-		return new Map<string, IColumnWrapper | LinkableHashMap>().set("Choices", this.choices);
+		return new Map<string, IColumnWrapper | ILinkableHashMap>().set("Choices", this.choices);
 	}
 
 	get options()
@@ -95,9 +95,9 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		{
 			targetAttributeColumn = ColumnUtils.hack_findInternalDynamicColumn(targetAttribute as IColumnWrapper);
 		}
-		else//LinkableHashMap take the first object and force it into a column
+		else//ILinkableHashMap take the first object and force it into a column
 		{
-			var hm = targetAttribute as LinkableHashMap;
+			var hm = targetAttribute as ILinkableHashMap;
 			ColumnUtils.forceFirstColumnDynamic(hm);
 			var firstColumn = hm.getObjects(IAttributeColumn)[0];
 			targetAttributeColumn = ColumnUtils.hack_findInternalDynamicColumn(firstColumn as IColumnWrapper);
