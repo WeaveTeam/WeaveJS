@@ -172,11 +172,6 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 
 		var options = Array.from(this.binLabelToBin.keys()) as string[];
 
-		var labelStyle:React.CSSProperties = {
-			textAlign: 'right',
-			display:"flex",
-			justifyContent: "flex-end",
-		};
 		
 		return (
 
@@ -185,7 +180,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 				["four","twelve"],
 				[
 					[
-						<span style={labelStyle}>{Weave.lang("Binning Method")}</span>,
+						<span className="weave-sidebar-label">{Weave.lang("Binning Method")}</span>,
 						<HBox className="weave-padded-hbox">
 							<ComboBox style={{flex: 1}} 
 									  options={options} 
@@ -195,7 +190,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 						</HBox>
 					],
 					[
-						<span style={labelStyle}>{Weave.lang("Bin names")}</span>,
+						<span className="weave-sidebar-label">{Weave.lang("Bin names")}</span>,
 						<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
 					]
 				]

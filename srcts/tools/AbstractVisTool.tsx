@@ -211,11 +211,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
-		var labelStyle:React.CSSProperties = {
-			textAlign: 'right',
-			display:"flex",
-			justifyContent: "flex-end",
-		};
 
 		let marginCellsUI:JSX.Element = (
 			<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
@@ -228,7 +223,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			</HBox>
 		);
 
-		let marginUI:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[<span style={labelStyle}>{ Weave.lang("Margins") }</span>,marginCellsUI]]);
+		let marginUI:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[<span className="weave-sidebar-label">{ Weave.lang("Margins") }</span>,marginCellsUI]]);
 		//div wrapper is must if this dom becomes child of flexBox display has to be block for overflow to work correctly
 		return (
 			<div>
@@ -245,17 +240,12 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	renderTitleEditors=():JSX.Element=>
 	{
-		var labelStyle:React.CSSProperties = {
-			textAlign: 'right',
-			display:"flex",
-			justifyContent: "flex-end"
-		};
 		var gridUIs:JSX.Element[][] = [
 			["Title", this.panelTitle],
 			["X Axis Title", this.xAxisName],
 			["Y Axis Title", this.yAxisName]
 		].map((row:[string, LinkableString]) => {
-			return [<span style={ labelStyle }>{Weave.lang(row[0])}</span>,
+			return [<span className="weave-sidebar-label">{Weave.lang(row[0])}</span>,
 					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>]
 		});
 

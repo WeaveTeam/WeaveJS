@@ -107,48 +107,44 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		);
 
 
-		var labelStyle:React.CSSProperties = {
-			textAlign: 'right',
-			display:"flex",
-			justifyContent: "flex-end",
-		};
+
 
 
 		let editorFields = [
-			[<span style={ labelStyle }>{Weave.lang("Title")}</span>,
+			[<span className="weave-sidebar-label">{Weave.lang("Title")}</span>,
 				<HBox>
 					<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) }/>
 				</HBox>
 			],
-			[<span style={ labelStyle }>{Weave.lang("Control location")}</span>,
+			[<span className="weave-sidebar-label">{Weave.lang("Control location")}</span>,
 				<HBox>
 					<ComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
 				</HBox>
 			],
-			[<span style={ labelStyle }>{Weave.lang("Zoom range")}</span>,
+			[<span className="weave-sidebar-label">{Weave.lang("Zoom range")}</span>,
 				<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
 					{"-"}
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
 				</HBox>
 			],
-			[<span style={ labelStyle }>{Weave.lang("Show zoom slider")}</span>,
+			[<span className="weave-sidebar-label">{Weave.lang("Show zoom slider")}</span>,
 				<HBox>
 					<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })}/>
 				</HBox>
 			],
-			[<span style={ labelStyle }>{Weave.lang("Projection SRS")}</span>,
+			[<span className="weave-sidebar-label">{Weave.lang("Projection SRS")}</span>,
 				<HBox>
 					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
 				</HBox>
 			],
-			[<span style={ labelStyle }>{Weave.lang("Override extent")}</span>,
+			[<span className="weave-sidebar-label">{Weave.lang("Override extent")}</span>,
 				<HBox>
 					<Button onClick={this.setOverrideExtent}>{Weave.lang("Use current zoom")}</Button>
 					<Button onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</Button>
 				</HBox>
 			],
-			[<span style={ labelStyle }>{Weave.lang("Snap zoom to base map")}</span>,
+			[<span className="weave-sidebar-label">{Weave.lang("Snap zoom to base map")}</span>,
 				<HBox>
 					<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}/>
 				</HBox>

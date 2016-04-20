@@ -196,11 +196,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                                         {title:Weave.lang('Attribute Selector')},
                                         {label, selectedAttribute, selectableAttributes});
     }
-
-    static openInWeaveToolEditor(title:string,label:string, selectedAttribute:IColumnWrapper|ILinkableHashMap, selectableAttributes:Map<string, IColumnWrapper|ILinkableHashMap>):any{
-        let weave = Weave.getWeave(selectedAttribute);
-        return  {title:title,label:label,toolClass:AttributeSelector, toolProps:{label, selectedAttribute, selectableAttributes}};
-    }
+    
 
     render():JSX.Element
     {

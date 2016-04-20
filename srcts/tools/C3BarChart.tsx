@@ -532,11 +532,6 @@ export default class C3BarChart extends AbstractC3Tool
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
     renderEditor(linkFunction:Function):JSX.Element
     {
-        var labelStyle:React.CSSProperties = {
-            textAlign: 'right',
-            display:"flex",
-            justifyContent: "flex-end",
-        };
 
 	    // 16 columns -  leave one column to avoid scrollbar - [3 + 12]
         return (
@@ -546,18 +541,18 @@ export default class C3BarChart extends AbstractC3Tool
                 }
                 <br/>
 				{ReactUtils.generateGridLayout(
-					["three","twelve"],
+					["four","twelve"],
 					[
-						[ <span style={labelStyle} ><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>,<span >{Weave.lang("Horizontal Bars")}</span>  ],
-						[ <span style={labelStyle} ><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>,<span >{Weave.lang("Show Value Labels")}</span> ],
-						[ <span style={labelStyle} ><Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/></span>, <span >{Weave.lang("Show X Axis Title")}</span> ]
+						[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>,<span >{Weave.lang("Horizontal Bars")}</span>  ],
+						[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>,<span >{Weave.lang("Show Value Labels")}</span> ],
+						[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/></span>, <span >{Weave.lang("Show X Axis Title")}</span> ]
 					]
 				)}
                 <br/>
 				{ReactUtils.generateGridLayout(
-					["three","twelve"],
+					["four","twelve"],
 					[
-						[ <span style={labelStyle}>{Weave.lang("Grouping Mode")}</span>, <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
+						[ <span className="weave-sidebar-label">{Weave.lang("Grouping Mode")}</span>, <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 					]
 				)}
             </VBox>

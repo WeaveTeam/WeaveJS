@@ -502,8 +502,15 @@ div.weave-tree-view {
 	background-color : #99D6FF;
 }
 
+/* sidebar */
 .weave-sidebar-dropdown {
 	min-width: 0 !important;
+}
+
+.weave-sidebar-label {
+	text-align: right;
+	display:flex;
+	justify-content: flex-end;
 }
 
 /* Override Semantic ui CSS*/

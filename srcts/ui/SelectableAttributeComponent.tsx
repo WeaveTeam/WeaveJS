@@ -80,24 +80,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
     render():JSX.Element
     {
-        //styles
-        var clearStyle = classNames({ 'fa fa-times-circle' : true, 'weave-icon' : true});
-        var labelStyle:React.CSSProperties = {
-            textAlign: 'right',
-            display:"flex",
-            justifyContent: "flex-end"
-        };
-        var btnStyle:React.CSSProperties = {
-            fontSize: '24px',
-            padding:"2px"
-        };
-
-        var cleanBtnStyle:React.CSSProperties = {
-            fontSize: 'smaller',
-            padding:"2px"
-        };
-
-
+        
         var selectableUI:JSX.Element[][] = [];
         var listUI:JSX.Element[] = [];
         let alwaysDefinedCol:boolean;
@@ -116,7 +99,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                     defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
                 }
 
-                let labelUI:JSX.Element = this.props.showLabel ? <span style={ labelStyle }>
+                let labelUI:JSX.Element = this.props.showLabel ? <span className="weave-sidebar-label">
                                                                     { Weave.lang(label) }
                                                                  </span>
                                                                 : null;

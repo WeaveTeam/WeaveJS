@@ -547,11 +547,6 @@ export default class C3Histogram extends AbstractC3Tool
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linkFunction:Function):JSX.Element
 	{
-		var labelStyle:React.CSSProperties = {
-			textAlign: 'right',
-			display:"flex",
-			justifyContent: "flex-end",
-		};
 		
 		var cc = Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
 
@@ -572,9 +567,9 @@ export default class C3Histogram extends AbstractC3Tool
 				{ReactUtils.generateGridLayout(
 					["four","twelve"],
 					[
-						[ <span style={labelStyle}>{Weave.lang("Aggregation method")}</span>, <ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
-						[ <span style={labelStyle}><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Horizontal Bars")}</span> ],
-						[ <span style={labelStyle}><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>, <span style={{fontSize: 'smaller'}}>{Weave.lang("Show Value Labels")}</span> ]
+						[ <span className="weave-sidebar-label">{Weave.lang("Aggregation method")}</span>, <ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
+						[ <span className="weave-sidebar-label"><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>, <span>{Weave.lang("Horizontal Bars")}</span> ],
+						[ <span className="weave-sidebar-label"><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>, <span>{Weave.lang("Show Value Labels")}</span> ]
 					]
 				)}
 			</VBox>

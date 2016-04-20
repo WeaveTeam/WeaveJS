@@ -89,17 +89,12 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 	
 	renderCompactView()
 	{
-		var labelStyle:React.CSSProperties = {
-			textAlign: 'right',
-			display:"flex",
-			justifyContent: "flex-end",
-		};
 
 		return ReactUtils.generateGridLayout(
 			["four","twelve"],
 			[
 				[
-					<span style={labelStyle}>{Weave.lang("Color Theme")}</span>,
+					<span className="weave-sidebar-label">{Weave.lang("Color Theme")}</span>,
 					<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
 						<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
 						<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
