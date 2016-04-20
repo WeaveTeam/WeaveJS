@@ -72,7 +72,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
 	setSelected =(values:IWeaveTreeNode[]):void=>
 	{
-		ColumnUtils.replaceColumnsInHashMap(this.props.columns,values as any);
+		ColumnUtils.replaceColumnsInHashMap(this.props.columns, values);
 	};
 
     handleSelectAll =():void =>{

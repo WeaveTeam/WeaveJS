@@ -4384,7 +4384,7 @@ declare module weavejs.data {
          * Gets a list of columns with a common keyType.
          */
         static getColumnsWithCommonKeyType(root: ILinkableHashMap, keyType?: string): any[];
-        static replaceColumnsInHashMap(destination: ILinkableHashMap, columnReferences: Array<IColumnReference>): void;
+        static replaceColumnsInHashMap(destination: ILinkableHashMap, columnReferences: Array<IWeaveTreeNode | IColumnReference>): void;
         /**
          * This will initialize one selectable attribute using a column or column reference.
          * @param selectableAttribute A selectable attribute (IColumnWrapper/ILinkableHashMap/ReferencedColumn)
