@@ -43,18 +43,19 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	}
 
 	//session properties
-	public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );//this will re render the TOOL (callbacks attached in TOOL)
-	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST), this.forceUpdate, true);//this will re render the TOOL (callbacks attached in TOOL)
+	public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );
+	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST));
 	public selectedAttribute = Weave.linkableChild(this, new LinkableString, this.forceUpdate, true);
 
 	public targetToolPath:LinkableVariable = Weave.linkableChild(this, new LinkableVariable(Array), this.setToolWatcher.bind(this));
-	public targetAttribute = Weave.linkableChild(this, new LinkableVariable(null));
+	public targetAttribute = Weave.linkableChild(this, new LinkableString);
 	public toolWatcher = Weave.linkableChild(this, new LinkableWatcher());
 
 	//callback for targetToolPath
 	setToolWatcher():void
 	{
 		this.toolWatcher.targetPath = this.targetToolPath.state as string[];
+		this.forceUpdate();
 	}
 
 	get title():string
@@ -77,18 +78,22 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		});
 	}
 
-	handleSelection = (selectedValues:any[]):void =>
+	handleSelection = (selectedValue:any):void =>
 	{
+		if(!selectedValue)
+			return;
 		var tool = this.toolWatcher.target as IVisTool;
 
 		var targetCol = tool.selectableAttributes.get(this.targetAttribute.state as string) as IColumnWrapper;
 		var targetInternalCol = ColumnUtils.hack_findInternalDynamicColumn(targetCol);
 
 		//use selected column to set session state of target column
-		var selectedColumn = selectedValues[0] as IAttributeColumn;
-		this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to re render
+		var selectedColumn = selectedValue instanceof Array ? selectedValue[0] as IColumnWrapper : selectedValue as IColumnWrapper;//List and sliders return an array, combobox returns one
+		if(selectedColumn)
+			this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to re render
 
-		targetInternalCol.requestLocalObjectCopy(selectedColumn) ;//TODO handle selectable attributes hashmaps eg height columns barchart
+		if(targetInternalCol)
+			targetInternalCol.requestLocalObjectCopy(selectedColumn) ;//TODO handle selectable attributes hashmaps eg height columns barchart
 
 	};
 
@@ -104,6 +109,10 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	render():JSX.Element
 	{
+		//console.log("toolPath", this.targetToolPath.state);
+		console.log("targetAttribute in tool", this.targetAttribute.state);
+		//console.log("selectedAttribute", this.selectedAttribute.state);
+		//console.log("choices***************************", this.choices.getNames());
 		let selectedAttribute = this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn;//get object from name
 
 		switch (this.layoutMode.value)
@@ -127,7 +136,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 					</VBox>
 				);
 			case LAYOUT_COMBO:
-				return (<div/>); //have to return a valid react component, otherwise invariant violation
+				return (<ComboBox options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection.bind(this) } value={ selectedAttribute } placeholder="Select an attribute" />); //have to return a valid react component, otherwise invariant violation
 		}
 	}
 }
@@ -199,11 +208,12 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	//UI event handler for target Tool
 	handleTargetToolChange = (selectedItem:string):void =>
 	{
+		console.log("selected item", selectedItem);
 		this.props.attributeMenuTool.targetToolPath.state = [selectedItem];
 	};
 
 	//UI event handler for target attribute (one of the selectable attributes of the target tool)
-	handleTargetAttributeChange =(selectedItem:any):void =>
+	handleTargetAttributeChange =(selectedItem:string):void =>
 	{
 		//this.props.attributeMenuTool.targetAttribute.state = selectedItem ;
 	};
@@ -221,6 +231,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 	getTargetToolAttributeOptions():string[]
 	{
+		//if(this.tool) console.log('targetattroptions',Array.from(this.tool.selectableAttributes.keys())as string[]);
 		return(this.tool ? Array.from(this.tool.selectableAttributes.keys())as string[] : []);
 	}
 
@@ -234,7 +245,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	{
 		var toolName:string;
 		var menuLayout:string = this.props.attributeMenuTool.layoutMode.state as string;
-		
+
 		if (this.props.attributeMenuTool.targetToolPath.state)
 			toolName = this.getTargetToolPath();
 
@@ -244,6 +255,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 			justifyContent: "flex-end"
 		};
 
+		console.log('targetAttribute in editor', this.props.attributeMenuTool.targetAttribute.state);
 		return [
 			[
 				<span style={ labelStyle }>{ Weave.lang("Visualization Tool") }</span>,
@@ -251,7 +263,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 					className="weave-sidebar-dropdown"
 					placeholder="Select a visualization"
 					value={ toolName }
-					selectFirstOnInvalid={ true }
 					options={ this.openTools }
 					onChange={ this.handleTargetToolChange }
 				/>
@@ -263,7 +274,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 					className="weave-sidebar-dropdown"
 					placeholder="Select an attribute"
 					ref={ linkReactStateRef(this, { value: this.props.attributeMenuTool.targetAttribute })}
-					selectFirstOnInvalid={ true }
 					options={ this.getTargetToolAttributeOptions() }
 				/>
 			],
@@ -271,9 +281,8 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				<span style={ labelStyle }>{ Weave.lang("Menu Layout")}</span>,
 				<ComboBox
 					className="weave-sidebar-dropdown"
-					value={ menuLayout }
+					ref={ linkReactStateRef(this, { value: this.props.attributeMenuTool.layoutMode })}
 					options={ menuOptions }
-					onChange={ this.handleMenuLayoutChange }
 				/>
 			]
 		];
