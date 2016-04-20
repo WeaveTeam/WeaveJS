@@ -4,7 +4,7 @@ import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import SessionStateEditor from "../ui/SessionStateEditor";
 import {IVisTool} from "../tools/IVisTool";
-import IconButton from "../react-ui/IconButton";
+import Button from "../semantic-ui/Button";
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
@@ -155,10 +155,9 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		if(this.crumbOrder.length > 1)
 		{
 			let prevCrumbTitle:string = this.crumbOrder[this.crumbOrder.length - 2];
-			backButtonUI = <IconButton clickHandler={ this.stepBackInCrumbView }
-			                           mouseOverStyle={ {color:"black",background:"none"} }
-			                           iconName="fa fa-chevron-left"
-			                           toolTip={"Go back to view: " + prevCrumbTitle}/>
+			backButtonUI = <Button onClick={ this.stepBackInCrumbView } style={{borderColor:"rgba(0, 0, 0, 0)",padding:"8px"}}>
+								<i className="fa fa-chevron-left"/>
+							</Button>
 		}
 
 		return (
@@ -169,14 +168,12 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						{crumbUI}
 					</HBox>
 					<span style={ {flex: "1"} }/>
-					<IconButton clickHandler={ this.openSessionStateEditor }
-								iconName="fa fa-code"
-								toolTip={"Edit session state"}/>
-					<IconButton clickHandler={ this.props.onCloseHandler }
-					            iconName="&#x2715"
-					            mouseOverStyle={ {color:"red",background:"none"} }
-					            toolTip="click to close Sidebar"
-					/>
+					<Button onClick={ this.openSessionStateEditor } style={ {borderColor:"rgba(0, 0, 0, 0)",padding:"8px"} }>
+						<i className="fa fa-code"/>
+					</Button>
+					<Button onClick={ this.props.onCloseHandler } style={ {borderColor:"rgba(0, 0, 0, 0)",padding:"8px"} }>
+						&#x2715;
+					</Button>
 				</HBox>
 				<VBox style={{flex: 1, padding: 8, overflow: "auto"}}>
 					{editorUI}
