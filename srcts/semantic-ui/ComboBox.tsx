@@ -51,6 +51,22 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
 		return this.props.options.findIndex((option) => (typeof option === "object") ? equalityFunc(option.value, value) : equalityFunc(option, value) );
 	}
+
+	private statesEqual(prevState:ComboBoxState, currentState:ComboBoxState)
+	{
+		//check if included elements are the same, even if in a different order
+		if(this.props.type === "multiple"){
+			if(prevState.value.length !== currentState.value.length)
+				return false;
+			prevState.value.forEach( (item:any,index:number) => {
+				if(!_.includes(currentState.value,item))
+					return false;
+			});
+			return true;
+		} else {
+			return _.isEqual(prevState.value, currentState.value)
+		}
+	}
 	
 	componentWillReceiveProps(nextProps: ComboBoxProps)
 	{
@@ -73,7 +89,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
-		if (!_.isEqual(prevState.value, this.state.value)) {
+		//if (!_.isEqual(prevState.value, this.state.value)) {
+		if (!this.statesEqual(prevState,this.state)) {
 			let selector = ($(this.element) as any);
 			if (this.props.type === "multiple") {
 				let indices:string[] = [];
