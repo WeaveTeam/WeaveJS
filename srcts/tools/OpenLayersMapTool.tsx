@@ -166,6 +166,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			(value) => { return { label: Weave.lang(_.startCase(value.vertical) + " " + _.startCase(value.horizontal)), value} }
 		);
 
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+			]
+		};
+
 
 
 
@@ -188,11 +196,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
 				</HBox>
 			],
-			[<span className="weave-sidebar-label">{Weave.lang("Show zoom slider")}</span>,
-				<HBox>
-					<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })}/>
-				</HBox>
-			],
+			[<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })}/>, Weave.lang("Show zoom slider")],
 			[<span className="weave-sidebar-label">{Weave.lang("Projection SRS")}</span>,
 				<HBox>
 					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
@@ -204,16 +208,12 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 					<Button onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</Button>
 				</HBox>
 			],
-			[<span className="weave-sidebar-label">{Weave.lang("Snap zoom to base map")}</span>,
-				<HBox>
-					<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}/>
-				</HBox>
-			],
+			[<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}/>, Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.")]
 		];
 
 		return (
 			<VBox style={{flex: 1}}>
-				{ReactUtils.generateGridLayout(["four","twelve"], editorFields)}
+				{ReactUtils.generateTable(null, editorFields, tableStyles)}
 				<br/>
 				<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
 			</VBox>
@@ -573,13 +573,17 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			}
 		}
 	}
-
+	// TODO: Figure out why setting extent on the projections themselves breaks subsequent renders.
+	static estimatedExtentMap = new Map<string,ol.Extent>();
 	static getEstimatedExtent(proj:ol.proj.Projection):ol.Extent
 	{
 		let extentBounds:Bounds2D = new Bounds2D();
 		let IOTA = Number("1e-10");
 		if (!proj.getExtent())
 		{
+			let code = proj.getCode();
+			if (OpenLayersMapTool.estimatedExtentMap.get(code))
+				return OpenLayersMapTool.estimatedExtentMap.get(code);
 			for (let lat = -180; lat < 180; lat++)
 			{
 				for (let long = -90; long < 180; long++)
@@ -598,7 +602,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 					extentBounds.includeCoords(projectedPoint[0], projectedPoint[1]);
 				}
 			}
-			proj.setExtent(extentBounds.getCoords());
+			return OpenLayersMapTool.estimatedExtentMap.set(code, extentBounds.getCoords()).get(code);
 		}
 		return proj.getExtent();
 	}
