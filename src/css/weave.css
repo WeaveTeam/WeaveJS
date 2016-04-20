@@ -524,8 +524,7 @@ div.weave-tree-view {
 }
 
 .ui.button:hover {
-	background:grey;
-	color:white;
+	background: lightgrey;
 }
 
 /******* Dropdown *****/
@@ -533,12 +532,11 @@ div.weave-tree-view {
 .ui.multiple.dropdown>.label {
 	display: inline-flex;
 	align-items: center;
-	background:none;
+	background: none;
 }
 
 .ui.multiple.dropdown>.label:hover {
-	color:white;
-	background:grey;
+	background: lightgrey;
 }
 
 /******* grid *********/
