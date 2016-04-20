@@ -45,7 +45,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	//session properties
 	public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );
-	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST));
+	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST), this.forceUpdate, true);
 	public selectedAttribute = Weave.linkableChild(this, new LinkableString, this.forceUpdate, true);
 
 	public targetToolPath:LinkableVariable = Weave.linkableChild(this, new LinkableVariable(Array), this.setToolWatcher.bind(this));
@@ -116,18 +116,13 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	{
 		return (
 			<VBox>
-				<AttributeMenuTargetEditor attributeMenuTool={ this }/>
-				{ renderSelectableAttributes(this.selectableAttributes, linkFunction) }
+				<AttributeMenuTargetEditor attributeMenuTool={ this } linkFunction={ linkFunction }/>
 			</VBox>
 		);
 	}
 
 	render():JSX.Element
 	{
-		//console.log("toolPath", this.targetToolPath.state);
-		console.log("targetAttribute in tool", this.targetAttribute.state);
-		//console.log("selectedAttribute", this.selectedAttribute.state);
-		//console.log("choices***************************", this.choices.getNames());
 		let selectedAttribute = this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn;//get object from name
 
 		switch (this.layoutMode.value)
@@ -168,6 +163,7 @@ Weave.registerClass(
 interface IAttributeMenuTargetEditorProps
 {
 	attributeMenuTool:AttributeMenuTool;
+	linkFunction : Function;
 }
 
 interface IAttributMenuToolEditorState
@@ -255,23 +251,16 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		return (toolPath[0] as string);
 	};
 
-	get toolConfigs():[ JSX.Element, JSX.Element][]
+	get toolConfigs():React.ReactChild[][]
 	{
 		var toolName:string;
-		var menuLayout:string = this.props.attributeMenuTool.layoutMode.state as string;
 
 		if (this.props.attributeMenuTool.targetToolPath.state)
 			toolName = this.getTargetToolPath();
-
-		var labelStyle:React.CSSProperties = {
-			textAlign: 'right',
-			display:"flex",
-			justifyContent: "flex-end"
-		};
 		
 		return [
 			[
-				<span style={ labelStyle }>{ Weave.lang("Visualization Tool") }</span>,
+				Weave.lang("Visualization Tool"),
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					placeholder="Select a visualization"
@@ -281,8 +270,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				/>
 			],
 			[
-				<span style={ labelStyle }>{ Weave.lang("Visualization Attribute")}</span>,
-
+				Weave.lang("Visualization Attribute"),
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					placeholder="Select an attribute"
@@ -291,7 +279,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				/>
 			],
 			[
-				<span style={ labelStyle }>{ Weave.lang("Menu Layout")}</span>,
+				Weave.lang("Menu Layout"),
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					ref={ linkReactStateRef(this, { value: this.props.attributeMenuTool.layoutMode })}
@@ -302,14 +290,23 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	}
 
 
-	render ():JSX.Element
+	render ()
 	{
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+			]
+		};
 
 		return (
 			<VBox>
 				{
 					this.openTools && this.openTools.length > 0
-					?	ReactUtils.generateGridLayout(["four","twelve"], this.toolConfigs)
+					?	ReactUtils.generateTable(null,
+						this.toolConfigs.concat(renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction)),
+						tableStyles)
 					:	null
 				}
 			</VBox>
