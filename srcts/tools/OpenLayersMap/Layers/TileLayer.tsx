@@ -6,6 +6,7 @@ import ComboBox from "../../../semantic-ui/ComboBox";
 import StatefulTextField from "../../../ui/StatefulTextField";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import {VBox, HBox} from "../../../react-ui/FlexBox";
+import OpenLayersMapTool from "../../OpenLayersMapTool";
 
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -180,9 +181,11 @@ export default class TileLayer extends AbstractLayer
 
 	updateProjection()
 	{
-		var proj = ol.proj.get(this.outputProjection)
-		if (proj && proj.getExtent())
-			this.olLayer.setExtent(proj.getExtent());
+		var proj = OpenLayersMapTool.getProjection(this.outputProjection);
+		if (proj)
+		{
+			this.olLayer.setExtent(OpenLayersMapTool.getEstimatedExtent(proj));
+		}			
 	}
 
 	static STAMEN_LAYERS = ["watercolor", "toner"];

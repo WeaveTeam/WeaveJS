@@ -3,11 +3,7 @@ import ReactDOM from "react-dom";
 import $ from "jquery";
 import WeaveApp from "../lib/WeaveApp";
 import {MiscUtils} from "../lib/WeaveUI.js";
-
-// Hack to pull proj4 into the global context so OpenLayers can access it.
-import proj4 from "proj4";
-window.proj4 = proj4;
-
+window.proj4 = require("proj4");
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 window.weave = new Weave;
 var urlParams = MiscUtils.getUrlParams();

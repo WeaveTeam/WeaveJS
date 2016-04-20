@@ -92,6 +92,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
 	private static projectionDbLoadAttempted:boolean = false;
 
+	static get projectionDbReadyOrFailed():boolean
+	{
+		return !!OpenLayersMapTool.projectionDbPromise.getResult() || !!OpenLayersMapTool.projectionDbPromise.getError();
+	}
+
 	static getProjection(projectionName:string):ol.proj.Projection
 	{
 		let proj = ol.proj.get(projectionName);
@@ -449,7 +454,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			extent = undefined;
 
 		/* If this is a valid projection, use it. otherwise use default. */
-		let projection = ol.proj.get(this.projectionSRS.value) || this.getDefaultProjection();
+		let projection = OpenLayersMapTool.getProjection(this.projectionSRS.value) || this.getDefaultProjection();
 		let view = new CustomView({minZoom: this.minZoomLevel.value, maxZoom: this.maxZoomLevel.value, projection, extent});
 		view.set("extent", extent);
 
@@ -569,6 +574,38 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
+	static getEstimatedExtent(proj:ol.proj.Projection):ol.Extent
+	{
+		let extentBounds:Bounds2D = new Bounds2D();
+		let IOTA = Number("1e-10");
+		if (!proj.getExtent())
+		{
+			for (let lat = -180; lat < 180; lat++)
+			{
+				for (let long = -90; long < 180; long++)
+				{
+					let coord:ol.Coordinate = [long, lat];
+					if (coord[0] == -180)
+						coord[0] += IOTA;
+					if (coord[0] == 180)
+						coord[0] -= IOTA;
+					if (coord[1] == -90)
+						coord[1] += IOTA;
+					if (coord[1] == 90)
+						coord[1] -= IOTA;
+
+					let projectedPoint = ol.proj.fromLonLat(coord, proj);
+					extentBounds.includeCoords(projectedPoint[0], projectedPoint[1]);
+				}
+			}
+			return extentBounds.getCoords();
+		}
+		else
+		{
+			return proj.getExtent();
+		}
+	}
+
 	updateZoom_olToWeave():void
 	{
 		let view = this.map.getView();
@@ -596,7 +633,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			let proj = OpenLayersMapTool.getProjection(this.projectionSRS.value)
 			if (proj)
 			{
-				dataBounds.setCoords(proj.getExtent());
+				dataBounds.setCoords(OpenLayersMapTool.getEstimatedExtent(proj));
 				this.zoomBounds.setDataBounds(dataBounds);
 				return;	
 			}
@@ -748,8 +785,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 		else
 		{
-			for (let layer of this.layers.getObjects() as AbstractLayer[]) {
-				if (layer.visible.value)
+			let layers = this.layers.getObjects() as AbstractLayer[];
+			for (let layer of layers) {
+				/* The layer must be visible. If there is only one layer, we will consider non-FeatureLayers (ie, the default base layer,) */
+				if (layer.visible.value && ((layer instanceof AbstractFeatureLayer) || layers.length == 1))
 					bounds.includeBounds(layer.getExtent());
 			}
 		}
