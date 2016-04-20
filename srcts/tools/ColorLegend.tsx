@@ -430,37 +430,35 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
 				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
 			]
 		};
 		
 		return ReactUtils.generateTable(
 			null,
-			[
+			renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(
 				[
-					null,
-					renderSelectableAttributes(this, linkFunction)
-				],
-				[ 
-					Weave.lang("Shape Type"),
-					<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
-				],
-				[
-					Weave.lang("Color Theme"),
-					<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(1)}/>
-				],
-				[
-					null,
-					<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
-				],
-				[ 
-					Weave.lang("Layout"),
-					<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
-						<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
-						{Weave.lang("Columns")}
-					</HBox>
+					[
+						Weave.lang("Shape Type"),
+						<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
+					],
+					[
+						Weave.lang("Color Theme"),
+						<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(1)}/>
+					],
+					[
+						Weave.lang("Binning Method"),
+						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+					],
+					[ 
+						Weave.lang("Layout"),
+						<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
+							<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
+							{Weave.lang("Columns")}
+						</HBox>
+					]
 				]
-			],
+			),
 			tableStyles
 		);
 	}

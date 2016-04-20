@@ -22,8 +22,8 @@ import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 
 export interface ISelectableAttributesListProps{
     columns : ILinkableHashMap;
+	showAsList: boolean;
     label:string;
-    showLabelAsButton?:boolean;
     linkToToolEditorCrumb?:Function;
     selectableAttributes? : Map<string, (IColumnWrapper|ILinkableHashMap)>;
 }
@@ -72,18 +72,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
 	setSelected =(values:IWeaveTreeNode[]):void=>
 	{
-		var colRefs:IColumnReference[] = [];
-		values.forEach( (node,index) => {
-			let ref:IColumnReference = Weave.AS(node,weavejs.api.data.IColumnReference);
-			let meta = ref && ref.getColumnMetadata();
-			if (meta) {
-				colRefs.push(ref);
-			}
-		});
-		var lhm = Weave.AS(this.props.columns, ILinkableHashMap);
-		if (lhm){
-			ColumnUtils.replaceColumnsInHashMap(lhm,colRefs);
-		}
+		ColumnUtils.replaceColumnsInHashMap(this.props.columns,values as any);
 	};
 
     handleSelectAll =():void =>{
@@ -159,35 +148,59 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 		        }
 	        });
         });
-
-        var labelUI:JSX.Element = null;
-        if(this.props.showLabelAsButton)
-        {
-            labelStyle.borderColor = '#E6E6E6';
-            labelStyle.fontSize = "smaller";
-            labelUI = <Button style={ labelStyle } onClick={ this.launchAttributeSelector }>{ Weave.lang(this.props.label) }</Button>;
-        }else
-        {
-            labelUI = <span style={ labelStyle }>{this.props.label}</span>
-        }
-
-        let listUI:JSX.Element = <VBox className="weave-padded-vbox">
-	                                 {/*<HBox style={listStyle}>
-                                        <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
-                                    </HBox>*/}
-                                    <ComboBox type="multiple"
-                                              value={ columnList }
-                                              options={ options }
-                                              valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
-                                              onChange={this.setSelected}
-                                    />
-                                    <HBox className="weave-padded-hbox" style={constrollerStyle}>
-                                        <Button style={ {fontSize:"smaller"} } onClick={ this.removeAll }>Remove All</Button>
-                                    </HBox>
-                                </VBox>
-
-        let ui:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[labelUI,listUI]])
-
-        return(ui);
+		
+		if(this.props.showAsList)
+		{
+			return (
+				<VBox style={listStyle} className="weave-padded-vbox">
+					<List selectedValues= { selectedObjects } options={options as any}  onChange={ this.select }/>
+					<HBox className="weave-padded-hbox" style={constrollerStyle}>
+				    	<Button>{Weave.lang("Add All")}</Button>
+						<Button onClick={ this.removeAll }>{Weave.lang("Remove All")}</Button>
+					</HBox>
+				</VBox>
+			);
+		}
+		else
+		{
+			return (
+				<HBox style={{flex: 1}}>
+					<ComboBox type="multiple"
+	                      value={ columnList }
+	                      options={ options }
+	                      valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
+	                      onChange={this.setSelected}
+					/>
+					<Button onClick={ this.launchAttributeSelector }>{ ">" }</Button>
+				</HBox>
+			);
+		}
+        // var labelUI:JSX.Element = null;
+        // if(this.props.showLabelAsButton)
+        // {
+        //     labelStyle.borderColor = '#E6E6E6';
+        //     labelStyle.fontSize = "smaller";
+        //     labelUI = <Button style={ labelStyle } onClick={ this.launchAttributeSelector }>{ Weave.lang(this.props.label) }</Button>;
+        // }else
+        // {
+        //     labelUI = <span style={ labelStyle }>{this.props.label}</span>
+        // }
+		// 
+        // let listUI:JSX.Element = <VBox className="weave-padded-vbox">
+	    //                              {/*<HBox style={listStyle}>
+        //                                 <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
+        //                             </HBox>*/}
+        //                             <ComboBox type="multiple"
+        //                                       value={ columnList }
+        //                                       options={ options }
+        //                                       valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
+        //                                       onChange={this.setSelected}
+        //                             />
+        //                             <HBox className="weave-padded-hbox" style={constrollerStyle}>
+        //                                 <Button style={ {fontSize:"smaller"} } onClick={ this.removeAll }>Remove All</Button>
+        //                             </HBox>
+        //                         </VBox>
+		// 
+        // let ui:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[labelUI,listUI]])
     }
 }

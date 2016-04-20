@@ -205,12 +205,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	
 	getSelectableAttributesEditor(linktoToolEditorCrumbFunction:Function = null):React.ReactChild[][]
 	{
-		return [
-			[
-				null,
-				renderSelectableAttributes(this, linktoToolEditorCrumbFunction)
-			]
-		];
+		return renderSelectableAttributes(this.selectableAttributes, linktoToolEditorCrumbFunction);
 	}
 	
 	renderNumberEditor(linkableNumber:LinkableNumber, flex:number):JSX.Element
@@ -297,7 +292,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
 				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
 			]
 		};
 		

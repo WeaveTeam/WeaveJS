@@ -108,7 +108,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 		};
 		
 		return (
-			<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
+			<HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
 				<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
 				<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
 			</HBox>

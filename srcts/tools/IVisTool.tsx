@@ -22,7 +22,12 @@ export interface IVisTool extends ILinkableObject
     selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>;//TODO make this into an interface?
 }
 
-export function renderSelectableAttributes(tool:IVisTool,linkToToolEditorCrumbFunction:Function)
+export function renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, linkToToolEditorCrumbFunction:Function):React.ReactChild[][]
 {
-	return <SelectableAttributeComponent attributes={ tool.selectableAttributes } linkToToolEditorCrumb={ linkToToolEditorCrumbFunction }/>;
+	return weavejs.util.JS.mapEntries(selectableAttributes).map(([key, value]) => {
+			return [
+				Weave.lang(key),
+				<SelectableAttributeComponent attributeName={key} attributes={ selectableAttributes } linkToToolEditorCrumb={ linkToToolEditorCrumbFunction }/>
+			]
+	})
 }

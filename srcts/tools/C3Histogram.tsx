@@ -56,7 +56,6 @@ export default class C3Histogram extends AbstractC3Tool
     barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
 	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
 	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
-	//linkColor = Weave.linkableChild(this, new LinkableBoolean(false), this.linkColorColumn);
 
 	private setColorColumn():void
 	{
@@ -81,14 +80,6 @@ export default class C3Histogram extends AbstractC3Tool
 		else
 			Weave.copyState(colorBinCol.internalDynamicColumn, this.binnedColumn.internalDynamicColumn);
 	}
-
-	// private linkColorColumn():void
-	// {
-	// 	if(this.linkColor.value)
-	// 		Weave.linkState(Weave.getRoot(this).getObject("defaultColorColumn"), this.internalColorColumn);
-	// 	else
-	// 		Weave.unlinkState(Weave.getRoot(this).getObject("defaultColorColumn"), this.internalColorColumn);
-	// }
 
 	private get RECORD_FORMAT() {
 		return {
@@ -126,6 +117,16 @@ export default class C3Histogram extends AbstractC3Tool
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
+
+		// don't lock the ColorColumn, so linking to global ColorColumn is possible
+		var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn, false);
+		_colorColumn.ramp.setSessionState([0x808080]);
+
+		var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn, true);
+		
+		// the data inside the binned column needs to be filtered by the subset
+		var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn, true);
+		Weave.linkState(this.filteredKeySet.keyFilter, filteredColumn.filter);
 
         this.idToRecord = {};
         this.keyToIndex = {};
@@ -549,31 +550,72 @@ export default class C3Histogram extends AbstractC3Tool
 	{
 		
 		var cc = Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+			]
+		};
 
-		return (
-			<VBox className="weave-padded-vbox">
-				{
-					super.renderEditor(linkFunction)
-				}
-				<br/>
-				{
-					<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
-				}
-				<br/>
-				{
-					<ColorRampEditor compact={true} colorRamp={cc && cc.ramp} onButtonClick={() => this.openColorController(1)}/>
-				}
-				<br/>
-				{ReactUtils.generateGridLayout(
-					["four","twelve"],
+		return ReactUtils.generateTable(
+			null,
+			([
+				[ 
+					<Checkbox ref={(checkBox:Checkbox) => this.linkColorCheckbox(checkBox)} 
+							  onChange={(value) => { 
+								  this.fill.color.internalDynamicColumn.globalName = value ? "defaultColorColumn" : null
+							  }}/>,
+					Weave.lang("Link to global Color Column")
+				]
+			] as React.ReactChild[][]).concat(
+				this.getSelectableAttributesEditor(linkFunction),
+				[
 					[
-						[ <span className="weave-sidebar-label">{Weave.lang("Aggregation method")}</span>, <ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>],
-						[ <span className="weave-sidebar-label"><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>, <span>{Weave.lang("Horizontal Bars")}</span> ],
-						[ <span className="weave-sidebar-label"><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>, <span>{Weave.lang("Show Value Labels")}</span> ]
+						Weave.lang("Color Theme"),
+						<ColorRampEditor ref={(colorRampEditor:ColorRampEditor) => {
+											 cc.addGroupedCallback(colorRampEditor, () => {
+												 if(colorRampEditor)
+												 {
+													 colorRampEditor.colorRamp = cc.ramp;
+												 }
+											})
+										 }}
+										 compact={true}
+										 colorRamp={cc && cc.ramp}
+										 onButtonClick={() => this.openColorController(1)}/>
+
+					],
+					[
+						Weave.lang("Binning Method"),
+						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+					],
+					[ 
+						Weave.lang("Aggregation method"),
+						<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
+					],
+					[ 
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, 
+						Weave.lang("Horizontal Bars")
+					],
+					[
+						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>,
+						Weave.lang("Show Value Labels")
 					]
-				)}
-			</VBox>
-		)
+				],
+				this.getTitlesEditor(),
+				this.getMarginEditor()
+			), tableStyles);
+		}
+
+	linkColorCheckbox(ref:Checkbox)
+	{
+		this.fill.color.addGroupedCallback(ref, () => {
+			if(ref)
+				ref.setState({
+					value: !!this.fill.color.internalDynamicColumn.globalName
+				});
+		})
 	}
 
     get deprecatedStateMapping()

@@ -5,7 +5,6 @@ import NumericRangeDataFilterEditor from "./NumericRangeDataFilterEditor";
 import DiscreteValuesDataFilterEditor from "./DiscreteValuesDataFilterEditor";
 import SelectableAttributeComponent from "../../ui/SelectableAttributeComponent";
 import {HBox, VBox} from "../../react-ui/FlexBox";
-
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnStatistics = weavejs.api.data.IColumnStatistics;
@@ -332,14 +331,9 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 			]
 		}
 
-
 		var filterEditorMapKeys:string[] = Object.keys(this.filterEditorMap);
 
-
-
-
-
-		let editorConfigs: JSX.Element[][] = [
+		let editorConfigs: React.ReactChild[][] = [
 			[
 				<span style={labelStyle}>{ Weave.lang("Filter Type") }</span>,
 				<ComboBox
@@ -351,16 +345,20 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 
 			]
 		]
-
-		if(filterOptionUI){
-			editorConfigs.push(filterOptionUI)
-		}
-		return <VBox>
-					<SelectableAttributeComponent attributes={ this.props.selectableAttributes } linkToToolEditorCrumb={this.props.linkToToolEditorCrumb}/>
-					{
-						ReactUtils.generateGridLayout(["four","twelve"],editorConfigs)
-					}
-				</VBox>
+		
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+			]
+		};
+		
+		return ReactUtils.generateTable(
+			null,
+			renderSelectableAttributes(this.props.selectableAttributes, this.props.linkToToolEditorCrumb).concat(editorConfigs),
+			tableStyles
+		);
 	}
 
 }

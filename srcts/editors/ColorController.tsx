@@ -76,7 +76,10 @@ export default class ColorController extends React.Component<ColorControllerProp
 					  labels={this.tabLabels}
 					  tabs={[
 						  <VBox className="weave-container weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1}}>
-							  <SelectableAttributeComponent attributes={this.attributes}/>
+							  <HBox>
+							  	{Weave.lang("Color Data")}
+							  	<SelectableAttributeComponent attributes={this.attributes} attributeName="Color Data"/>
+							  </HBox>
 							  <BinningDefinitionEditor binnedColumn={this.binnedColumn}/>
 							  <HBox>
 							  	  <Checkbox style={{marginRight: 5}} onChange={this.handleFilterCheck}/>

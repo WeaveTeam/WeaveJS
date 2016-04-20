@@ -514,10 +514,10 @@ export default class C3BarChart extends AbstractC3Tool
     get selectableAttributes()
     {
         return super.selectableAttributes
-            .set("label", this.labelColumn)
-            .set("sort", this.sortColumn)
-            .set("color", this.colorColumn)
-            .set("height", this.heightColumns);
+            .set("Label", this.labelColumn)
+            .set("Sort", this.sortColumn)
+            .set("Color", this.colorColumn)
+            .set("Height", this.heightColumns);
     }
 
     get defaultPanelTitle():string
@@ -559,7 +559,7 @@ export default class C3BarChart extends AbstractC3Tool
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
 				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
 			]
 		};
 		

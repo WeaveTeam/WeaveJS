@@ -203,7 +203,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 		if (this.rootTreeNode)
 			var ui:JSX.Element = Weave.IS(this.state.selectedAttribute, ILinkableHashMap) && this.state.leafNode
 				?	<VBox>
-						<SelectableAttributesList  showLabelAsButton={ false } label={ this.state.label } columns={ this.state.selectedAttribute as ILinkableHashMap}></SelectableAttributesList>
+						<SelectableAttributesList label={ this.state.label } showAsList={true} columns={ this.state.selectedAttribute as ILinkableHashMap}></SelectableAttributesList>
 					</VBox>
 				:	null;
 

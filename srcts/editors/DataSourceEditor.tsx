@@ -93,7 +93,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
-				{ paddingBottom: 8, textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
 				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
 			]
 		};

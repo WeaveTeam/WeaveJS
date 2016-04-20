@@ -195,26 +195,30 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		// 	<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
 		// ]
 		
-		return ReactUtils.generateTable(
-			null,
-			[
-				[
-					Weave.lang("Binning Method"),
-					<HBox className="weave-padded-hbox">
-						<ComboBox style={{flex: 1}} 
-								  options={options} 
-								  value={binLabel}
-								  onChange={(binLabel) => this.setBinningDefinition(true, this.binLabelToBin.get(binLabel))}/>
-						<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
-					</HBox>
-				],
-				[
-					Weave.lang("Bin names"),
-					<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
-				]
-			],
-			tableStyles
+		return (
+			<HBox className="weave-padded-hbox">
+				<ComboBox style={{flex: 1}} 
+						  options={options} 
+						  value={binLabel}
+						  onChange={(binLabel) => this.setBinningDefinition(true, this.binLabelToBin.get(binLabel))}/>
+				<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
+			</HBox>
 		);
+		
+		// ReactUtils.generateTable(
+		// 	null,
+		// 	[
+		// 		[
+		// 			Weave.lang("Binning Method"),
+		// 			
+		// 		],
+		// 		[
+		// 			Weave.lang("Bin names"),
+		// 			<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
+		// 		]
+		// 	],
+		// 	tableStyles
+		// );
 	}
 
 	renderFullView()

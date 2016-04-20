@@ -182,7 +182,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	renderEditor(linkFunction:Function):JSX.Element {
 		return(
 			<VBox style={{flex:1}}>
-				{renderSelectableAttributes(this,linkFunction)}
+				{renderSelectableAttributes(this.selectableAttributes, linkFunction)}
 			</VBox>
 		)
 	};

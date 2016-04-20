@@ -25,7 +25,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 		let ds = (this.props.dataSource as GroupedDataTransform);
 
 		let groupByMap = new Map<string, (IColumnWrapper|LinkableHashMap)>();
-		groupByMap.set("alpha", ds.groupByColumn as IColumnWrapper);
+		groupByMap.set("Group by", ds.groupByColumn as IColumnWrapper);
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 
@@ -36,7 +36,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 						{Weave.lang('The keyType of the "Group by" column should match the keyType of each column to be transformed. The values in this column will be treated as foreign keys which map to aggregated values in the transformed columns.')}
 					</HelpIcon>
 				</div>, 
-				<SelectableAttributeComponent showLabel={ false } attributes={ groupByMap }/>
+				<SelectableAttributeComponent attributeName="Group by" attributes={ groupByMap }/>
 			],
 			[
 				<div>
@@ -49,7 +49,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Data to transform"),
-				<SelectableAttributesList label="Data to transform" columns={ds.dataColumns as LinkableHashMap} showLabelAsButton={true}/>
+				<SelectableAttributesList label="Data to transform" showAsList={true} columns={ds.dataColumns as LinkableHashMap}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)

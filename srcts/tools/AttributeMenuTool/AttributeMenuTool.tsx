@@ -97,7 +97,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		return (
 			<VBox>
 				<AttributeMenuTargetEditor attributeMenuTool={ this }/>
-				{ renderSelectableAttributes(this, linkFunction) }
+				{ renderSelectableAttributes(this.selectableAttributes, linkFunction) }
 			</VBox>
 		);
 	}
@@ -116,14 +116,14 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 				);
 			case LAYOUT_HSLIDER:
 				return (
-					<VBox style={{ padding: "70px" }}>
-						<HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type={ "categorical" }/>
-					</VBox>
+					<HBox style={{ flex: 1, alignItems: "center", padding: 10}}>
+						<HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type="categorical"/>
+					</HBox>
 				);
 			case LAYOUT_VSLIDER:
 				return (
-					<VBox>
-						<VSlider options={ this.options } onChange={ this.handleSelection } selectedValues={ [selectedAttribute] } type={ "categorical" }/>
+					<VBox style={{ flex: 1, paddingLeft: 20, padding: 10 }}>
+						<VSlider options={ this.options } onChange={ this.handleSelection } selectedValues={ [selectedAttribute] } type="categorical"/>
 					</VBox>
 				);
 			case LAYOUT_COMBO:

@@ -9,6 +9,7 @@ import Checkbox from "../../../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
 import SelectableAttributeComponent from "../../../ui/SelectableAttributeComponent";
 import ReactUtils from "../../../utils/ReactUtils";
+import {renderSelectableAttributes} from "../../IVisTool";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -94,12 +95,14 @@ export default class AbstractLayer implements ILinkableObject
 		}		
 	}
 
-	renderEditableFields(): JSX.Element
+	renderEditableFields(): React.ReactChild[][]
 	{
-		let fieldList: [JSX.Element, JSX.Element][] = [];
+		let fieldList: [React.ReactChild, React.ReactChild][] = [];
 
-		this.editableFields.forEach((value, key) => { fieldList.push(this.renderEditableField(value, key)); });
-		return ReactUtils.generateGridLayout(["four","twelve"], fieldList);
+		this.editableFields.forEach((value, key) => {
+			fieldList.push(this.renderEditableField(value, key)); 
+		});
+		return fieldList;
 	}
 
 	//todo:find a better way to pass linkToToolEditorCrumbFunction
@@ -110,14 +113,20 @@ export default class AbstractLayer implements ILinkableObject
 		/*for (let [key, value] of this.selectableAttributes) {
 			attributeList.push(<SelectableAttributeComponent key={key} attribute={value} label={Weave.lang(key)}/>)
 		}*/
-
-		attributeList = <SelectableAttributeComponent attributes={ this.selectableAttributes } linkToToolEditorCrumb={linkToToolEditorCrumbFunction}/>;
-
-		return <div>
-					{attributeList}
-					<br/>
-					{this.renderEditableFields()}
-				</div>;
+		
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+			]
+		};
+		
+		return ReactUtils.generateTable(
+			null,
+			renderSelectableAttributes(this.selectableAttributes, linkToToolEditorCrumbFunction).concat(this.renderEditableFields()),
+			tableStyles
+		);
 	}
 
 	get editableFields()

@@ -25,11 +25,11 @@ import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 
-export interface ISelectableAttributeComponentProps{
-    attributes : Map<string, IColumnWrapper|ILinkableHashMap>
-    showLabel? : boolean
+export interface ISelectableAttributeComponentProps
+{
+	attributeName: string;
+    attributes: Map<string, IColumnWrapper|ILinkableHashMap>
     linkToToolEditorCrumb?:Function
-
 }
 
 export interface ISelectableAttributeComponentState{
@@ -52,7 +52,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
             Weave.getCallbacks(value).addGroupedCallback(this, this.forceUpdate);
         });
     }
-    launchAttributeSelector=(label:string, attribute:IColumnWrapper|ILinkableHashMap):ControlPanel=>{
+    
+	launchAttributeSelector=(label:string, attribute:IColumnWrapper|ILinkableHashMap):ControlPanel=>{
         if(this.props.linkToToolEditorCrumb)
         {
             this.props.linkToToolEditorCrumb("Attributes", <AttributeSelector label={ label }
@@ -86,51 +87,34 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         let alwaysDefinedCol:boolean;
         let defaultValue:any;
 
-        //loop through selectable attributes
-        this.props.attributes.forEach((value, label)=>{
-            let attribute_ilhm_or_icw = this.props.attributes.get(label);
+		let attribute_ilhm_or_icw = this.props.attributes.get(this.props.attributeName);
 
-            if(Weave.IS(attribute_ilhm_or_icw, IColumnWrapper)){
-                let attribute = attribute_ilhm_or_icw as IColumnWrapper;
+        if(Weave.IS(attribute_ilhm_or_icw, IColumnWrapper)){
+            let attribute = attribute_ilhm_or_icw as IColumnWrapper;
 
-                //check for always defined column
-                if(Weave.IS(attribute, AlwaysDefinedColumn)){
-                    alwaysDefinedCol = true;
-                    defaultValue = (attribute as AlwaysDefinedColumn).defaultValue.state;
-                }
+            return (
+				<HBox style={{flex: 1}}>
+					<AttributeDropdown title="Change column"
+									   attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
+									   clickHandler={ this.launchAttributeSelector.bind(this, this.props.attributeName, attribute) }/>
+					<Button onClick={ this.launchAttributeSelector.bind(this, this.props.attributeName, attribute)}>
+							{">"} 
+					</Button>
+				</HBox>
+			)
+        }
 
-                let labelUI:JSX.Element = this.props.showLabel ? <span className="weave-sidebar-label">
-                                                                    { Weave.lang(label) }
-                                                                 </span>
-                                                                : null;
-                let moreDataSourceLabel:string = ">";
-                let elements:JSX.Element[] = [
-	                        labelUI,
-	                        <AttributeDropdown title="Change column"
-	                                           attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
-	                                           clickHandler={ this.launchAttributeSelector.bind(this,label,attribute) }/>,
-	                        <Button onClick={ this.launchAttributeSelector.bind(this, label, attribute)}>
-									{moreDataSourceLabel} 
-							</Button>];
-                selectableUI.push(elements);
-            }
-            else if(Weave.IS(attribute_ilhm_or_icw, ILinkableHashMap)){//LinkableHashMap
-                let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
-                let elem= <SelectableAttributesList key={ label } label={ label } 
-                                                    columns={ attribute } 
-                                                    showLabelAsButton={ true }
-                                                    linkToToolEditorCrumb={this.props.linkToToolEditorCrumb}
-                                                    selectableAttributes={ this.props.attributes }/>;
-                listUI.push(elem);
-            }
-        });
-
-        let gridLayout:JSX.Element = ReactUtils.generateGridLayout(["four","ten","two"],selectableUI)
-
-        return (<VBox className="weave-padded-vbox">
-                    {gridLayout}
-                    {listUI}
-                </VBox>);
+        else if(Weave.IS(attribute_ilhm_or_icw, ILinkableHashMap)){//LinkableHashMap
+            let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
+            return (
+				<SelectableAttributesList key={this.props.attributeName} 
+													showAsList={false}
+													label={this.props.attributeName} 
+	                                                columns={attribute} 
+	                                                linkToToolEditorCrumb={this.props.linkToToolEditorCrumb}
+	                                                selectableAttributes={ this.props.attributes }/>
+			);
+        }
     }
 }
 
