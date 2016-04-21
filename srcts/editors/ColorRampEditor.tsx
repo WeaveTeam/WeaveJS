@@ -155,7 +155,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 		return (
 			<VBox className="weave-padded-vbox" style={{flex: 1}}>
 				<HBox className="weave-padded-hbox" style={{flex: 1}}>
-					<HBox style={{flex: .7}}>
+					<HBox style={{flex: .7, overflow: "auto"}}>
 						<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
 					</HBox>
 					<VBox style={{flex: .3}} className="weave-padded-vbox">
