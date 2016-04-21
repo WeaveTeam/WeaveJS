@@ -519,18 +519,35 @@ div.weave-tree-view {
 /****** ButtonGroupBar ******/
 
 .weave-buttonGroupBar {
-	border-radius:16px;
+	border-radius:12px;
 	border:1px solid grey;
 }
-
-.weave-buttonGroupBar-button {
-	padding:12px;
+.weave-buttonGroupBar .ui.button { /* inline style will override hover state */
+	background-color:white;
 }
 
-.weave-buttonGroupBar-button-active { /* addition or override to excisting weave-buttonGroupBar-button */
-	color:white;
-	background:grey;
+/****** Tool Editor ******/
+
+.weave-ToolEditor-Header {
+	align-items: center;
+	border-bottom: 1px solid lightgrey;
+	margin: 8px;/* this ensures border bottom will be disconnected seperator */
+	padding:2px;
 }
+
+.weave-ToolEditor-Header .ui.button { /* inline style will override hover state */
+	border-color: transparent;
+	padding: 8px;
+	background-color: transparent;
+}
+
+.weave-ToolEditor-Header .ui.button:hover { /* inline style will override hover state */
+	color: black;
+	font-weight: bolder;
+	background-color: transparent;
+}
+
+
 
 /* Override Semantic ui CSS*/
 
@@ -550,10 +567,13 @@ div.weave-tree-view {
 .ui.button {
 	margin:0;
 	border:1px solid lightgrey;
+	background-color:#ECECEC;
+	color:black;
+	font-weight: normal;
 }
 
 .ui.button:hover {
-	background: lightgrey;
+	background-color: lightgrey;
 }
 
 .ui.button:active {

@@ -11,9 +11,7 @@ export interface IButtonGroupProps extends React.HTMLProps<ButtonGroupBar>{
     items:string[]; //  array of string labels
     activeButton?:number|string; // when called from parent either label or index can be sent
     buttonStyle?:React.CSSProperties;
-    buttonClassName?:string;
     activeButtonStyle?:React.CSSProperties;
-    activeButtonClassName?:string;
     clickHandler?:Function;
 }
 
@@ -83,8 +81,7 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
                 border:"none"
             };
             buttonStyle = this.props.buttonStyle ? _.merge({},this.props.buttonStyle,buttonStyle):buttonStyle ;
-
-            let buttonClassName:string = this.props.buttonClassName ? this.props.buttonClassName : "weave-buttonGroupBar-button";
+            
 
             if(index == this.state.activeButton || label == this.state.activeButton)
             {
@@ -98,15 +95,11 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
                     buttonStyle.backgroundColor = "grey";
                 }
 
-                if(this.props.activeButtonClassName)
-                {
-                    buttonClassName = buttonClassName + " " + this.props.activeButtonClassName;
-                }
+                
 
             }
 
             return (<Button  style={ buttonStyle }
-                             className={ buttonClassName }
                              onClick={ this.clickHandler.bind(this,label,index) }
                              key={ index }>
                         {label}

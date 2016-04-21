@@ -154,30 +154,24 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 				}
 			</div>
 		);
-		
-		var buttonStyle:React.CSSProperties = {background: "none", borderColor: "rgba(0, 0, 0, 0)", padding: "8px"};
+
 
 		let backButtonUI:JSX.Element = null;
 		if (this.crumbOrder.length > 1)
 		{
 			let prevCrumbTitle:string = this.crumbOrder[this.crumbOrder.length - 2];
 			backButtonUI = (
-				<Button onClick={ this.stepBackInCrumbView } style={buttonStyle}>
+				<Button onClick={ this.stepBackInCrumbView }>
 					<i className="fa fa-chevron-left"/>
 				</Button>
 			);
 		}
 
 		return (
-			<VBox
-				className={ classNames("weave-padded-vbox", this.props.className) }
-				style={ this.props.style }
-				onMouseEnter={() => Weave.beta && this.forceUpdate()}
-			>
-				<HBox
-					className="weave-padded-hbox"
-					style={ {alignItems: "center", borderBottom: "1px solid lightgrey", margin: 8} }
-				>
+			<VBox className={ classNames("weave-padded-vbox", this.props.className) }
+			      style={ this.props.style }
+			      onMouseEnter={() => Weave.beta && this.forceUpdate()}>
+				<HBox className="weave-ToolEditor-Header">
 					{backButtonUI}
 					<HBox className="weave-padded-hbox" style={ crumbStyle }>
 						{crumbUI}
@@ -187,18 +181,14 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						Weave.beta
 						?	<Button
 								onClick={ this.openSessionStateEditor }
-						        style={buttonStyle}
-						        title="Edit session state"
-							>
+								title="Edit session state">
 								<i className="fa fa-code"/>
 							</Button>
 						:	null
 					}
 					<Button
-						onClick={ this.props.onCloseHandler } 
-					    style={buttonStyle}
-					    title="Close editor"
-					>
+						onClick={ this.props.onCloseHandler }
+					    title="Close editor">
 						&#x2715;
 					</Button>
 				</HBox>
