@@ -93,12 +93,25 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
         if(Weave.IS(attribute_ilhm_or_icw, IColumnWrapper)){
             let attribute = attribute_ilhm_or_icw as IColumnWrapper;
 
+            let dropDownStyle:React.CSSProperties = {
+                borderBottomRightRadius:0,
+                borderTopRightRadius:0
+
+            };
+
+            let buttonStyle:React.CSSProperties = {
+                borderBottomLeftRadius:0,
+                borderTopLeftRadius:0,
+                borderLeft:"none"
+            };
+
             return (
-				<HBox style={{flex: 1}}>
-					<AttributeDropdown title="Change column"
+				<HBox style={ {flex: 1} }>
+					<AttributeDropdown title="Change column" style={ dropDownStyle }
 									   attribute={ ColumnUtils.hack_findInternalDynamicColumn(attribute) }
 									   clickHandler={ this.launchAttributeSelector.bind(this, this.props.attributeName, attribute) }/>
-					<Button onClick={ this.launchAttributeSelector.bind(this, this.props.attributeName, attribute)}
+					<Button onClick={ this.launchAttributeSelector.bind(this, this.props.attributeName, attribute) }
+                            style={buttonStyle}
                             title={"Click to explore other DataSources for " + this.props.attributeName}>
                         <i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
 					</Button>
@@ -108,6 +121,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
         else if(Weave.IS(attribute_ilhm_or_icw, ILinkableHashMap)){//LinkableHashMap
             let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
+
             return (
 				<SelectableAttributesList key={this.props.attributeName} 
 													showAsList={false}
