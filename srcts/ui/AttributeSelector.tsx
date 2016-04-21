@@ -28,7 +28,7 @@ export interface IAttributeSelectorProps
 
 export interface IAttributeSelectorState
 {
-    leafNode? : IWeaveTreeNode;
+    categoryNode? : IWeaveTreeNode;
     selectedAttribute?: IColumnWrapper|ILinkableHashMap;
     attributeName?:string;
 
@@ -57,7 +57,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
 
         this.state = {
-            leafNode : this.getSelectedNodeRoot(this.props.selectedAttribute),
+            categoryNode : this.getSelectedNodeRoot(this.props.selectedAttribute),
             selectedAttribute:this.props.selectedAttribute,
             attributeName:this.props.label
         };
@@ -108,8 +108,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     };
 
     handleSelectAll=():void=>{
-        if(this.state.leafNode){
-            this.selectedNodes = this.state.leafNode.getChildren() as IWeaveTreeNode[];//get all leaf nodes
+        if(this.state.categoryNode){
+            this.selectedNodes = this.state.categoryNode.getChildren() as IWeaveTreeNode[];//get all leaf nodes
             this.leafTree.setState({
                 selectedItems:this.selectedNodes
             });//accessing leaf tree using ref concept
@@ -123,7 +123,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
     onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
         this.setState({
-            leafNode : selectedItems[0]
+            categoryNode : selectedItems[0]
         });
     };
 
@@ -208,61 +208,80 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
     render():JSX.Element
     {
-		if (this.rootTreeNode)
-			var ui:JSX.Element = Weave.IS(this.state.selectedAttribute, ILinkableHashMap) && this.state.leafNode
-				?	<VBox>
-						<SelectableAttributesList label={ this.state.attributeName } showAsList={true} columns={ this.state.selectedAttribute as ILinkableHashMap}></SelectableAttributesList>
-					</VBox>
-				:	null;
-
         let constrollerStyle:React.CSSProperties = {
-            justifyContent:'flex-end',
-            background:"#F8F8F8",
-            padding:"4px",
-            marginLeft:"0"
+            justifyContent: 'flex-end',
+            background: "#F8F8F8",
+            padding: "4px",
+            marginLeft: "0"
         };
-
 
         // weave tree contains absolute child inside so its important to have dispaly flex wrapper to pass on width height
         return (
             <VBox className="weave-padded-vbox" style={ {flex:1} }>
-
-                {
-                    (this.attributeNames.length > 0) ? <ButtonGroupBar activeButton={ this.props.label }
-                                                                       items={ this.attributeNames }
-                                                                       clickHandler={this.handleSelectedAttribute}/> : null
-                }
-
+				{
+					(this.attributeNames.length > 0)
+					?	<ButtonGroupBar activeButton={ this.props.label }
+							items={ this.attributeNames }
+							clickHandler={this.handleSelectedAttribute}
+						/>
+					:	null
+				}
+				{
+					Weave.IS(this.state.selectedAttribute, ILinkableHashMap)
+					?	<SelectableAttributesList
+							style={{flex: null}}
+							label={ this.state.attributeName }
+							showAsList={false}
+							columns={ this.state.selectedAttribute as ILinkableHashMap}
+						/>
+					:	null
+				}
+				{
+					Weave.IS(this.state.selectedAttribute, ILinkableHashMap) ? "WORK IN PROGRESS" : null
+				}
                 <HDividedBox style={ {flex:1} } loadWithEqualWidthChildren={true}>
-                       <div style={{display:"flex"}}>
-                           <WeaveTree style={ {flex:"1"} }
-                                      hideRoot = {true} hideLeaves = {true}
-                                      onSelect={this.onHierarchySelected}
-                                      root={this.rootTreeNode}
-                                      ref={ (c) => { this.tree = c; } }/>
-                       </div>
-                        <div style={{display:"flex"}}>
-                        {this.state.leafNode ? <WeaveTree style={ {flex:"1"} }
-                                                          multipleSelection={ true }
-                                                          initialSelectedItems={ this.selectedNodes }
-                                                          hideRoot={true}
-                                                          hideBranches={true}
-                                                          root={this.state.leafNode}
-                                                          onSelect={this.setColumn}
-                                                          ref={ (c) => { this.leafTree = c; } }/>
-                            : null}
-                        </div>
-                </HDividedBox>
-                {
-                    Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.leafNode ?
-                        <HBox className="weave-padded-hbox" style={ constrollerStyle } >
-                            <Button onClick={ this.handleSelectAll }>Select All</Button>
-                            <Button onClick={ this.addSelected }>Add Selected</Button>
-                        </HBox>
-                        : null}
-
-                {ui}
-            </VBox>
-        );
-    };
+				   <div style={{display:"flex"}}>
+					   <WeaveTree style={ {flex:"1"} }
+								  hideRoot = {true}
+								  hideLeaves = {true}
+								  onSelect={this.onHierarchySelected}
+								  root={this.rootTreeNode}
+								  ref={ (c) => { this.tree = c; } }/>
+					</div>
+					<div style={{display:"flex"}}>
+						{
+							this.state.categoryNode
+							?	<WeaveTree
+									style={ {flex:"1"} }
+									multipleSelection={ true }
+									initialSelectedItems={ this.selectedNodes }
+									hideRoot={true}
+									hideBranches={true}
+									root={this.state.categoryNode}
+									onSelect={this.setColumn}
+									ref={ (c) => { this.leafTree = c; } }
+								/>
+							:	null
+						}
+					</div>
+				</HDividedBox>
+				{
+					Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.categoryNode
+					?
+						<HBox className="weave-padded-hbox" style={ constrollerStyle } >
+							<Button onClick={ this.handleSelectAll }>Select All</Button>
+							<Button onClick={ this.addSelected }>Add Selected</Button>
+						</HBox>
+					:	null
+				}
+				{/*
+					Weave.IS(this.state.selectedAttribute, ILinkableHashMap)
+					?	<VBox>
+							<SelectableAttributesList label={ this.state.attributeName } showAsList={true} columns={ this.state.selectedAttribute as ILinkableHashMap}></SelectableAttributesList>
+						</VBox>
+					:	null
+				*/}
+			</VBox>
+		);
+	};
 }
