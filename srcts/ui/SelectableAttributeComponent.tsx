@@ -249,14 +249,15 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 			options = this.getColumnReferenceDropdownOptions([node]);
 		}
 
-		options.push({ value: null, label: Weave.lang("(None)") });
+		options.unshift({ value: null, label: "(None)"});
 
 		return (
-			<ComboBox
+			<ComboBox 
 				ref={(c:ComboBox) => this.comboBox = c}
 				valueEqualityFunc={AttributeDropdown.nodeEqualityFunc}
-				style={this.props.style}
-				value={node}
+				style={ this.props.style }
+				valueIncludesLabel={true}
+				value={node ? {label: node.getLabel(), value: node} : {label: "(None)", value: null}}
 				onClick={clickHandler}
 				options={options}
 				onChange={this.onChange}

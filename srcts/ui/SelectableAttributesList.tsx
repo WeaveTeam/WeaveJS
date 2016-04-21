@@ -77,9 +77,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 		this.columns.removeAllObjects();
 	};
 
-	setSelected =(values:IWeaveTreeNode[]):void=>
+	setSelected =(selectedOptions:IWeaveTreeNode[]):void=>
 	{
-		ColumnUtils.replaceColumnsInHashMap(this.columns, values);
+		console.log(selectedOptions);
+		ColumnUtils.replaceColumnsInHashMap(this.columns, selectedOptions);
 	};
 
     handleSelectAll =():void =>
@@ -104,10 +105,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         return AttributeSelector.openInstance(this.props.attributeName, this.props.attributes);
     };
 
-	private static nodeEqualityFunc(a:IColumnReference & IWeaveTreeNode, b:IColumnReference & IWeaveTreeNode):boolean
+	private static nodeEqualityFunc(a:IColumnReference&IWeaveTreeNode, b:IColumnReference&IWeaveTreeNode):boolean
 	{
 		if (a && b)
-			return a.equals(b);
+			return a.equals(b)
 		else
 			return (a === b);
 	}
@@ -132,7 +133,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
 
         var selectedObjects:IAttributeColumn[];
-        var columnList: IWeaveTreeNode[] = [];
+        var columnList: {label: string, value: IWeaveTreeNode}[] = [];
 	    var options: {label:string, value:IWeaveTreeNode&IColumnReference}[] = [];
 	    let siblings:IWeaveTreeNode[] = [];
         var columns = this.columns.getObjects(IColumnWrapper); // TODO - this does not consider if hash map contains non-IColumnWrapper columns
@@ -145,7 +146,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 			let node = ColumnUtils.hack_findHierarchyNode(column);
 			if (!node)
 				return;
-            columnList.push(node);
+			columnList.push({label: node.getLabel(), value: node});
 			var columnSiblings = HierarchyUtils.findSiblingNodes(node.getDataSource(), node.getColumnMetadata());
 	        columnSiblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
 		        if (!_.includes(siblings, siblingNode))
@@ -160,7 +161,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 		{
 			return (
 				<VBox style={listStyle} className="weave-padded-vbox">
-					<List selectedValues={columnList} options={options} onChange={ this.select }/>
+					<List selectedValues={columnList.map((option) => option.value)} options={options} onChange={ this.select }/>
 					<HBox className="weave-padded-hbox" style={controllerStyle}>
 				    	<Button onClick={ this.handleSelectAll }>{Weave.lang("Select all")}</Button>
 						<Button onClick={ this.removeSelected }>{Weave.lang("Remove selected")}</Button>
@@ -172,17 +173,17 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 		{
 			return (
 				<HBox style={_.merge({flex: 1}, this.props.style)}>
-					<ComboBox
-						type="multiple"
-						style={{
-							borderBottomRightRadius: 0,
-							borderTopRightRadius: 0
-						}}
-	                    value={ columnList }
-                        placeholder="(None)"
-	                    options={ options }
-	                    valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
-	                    onChange={this.setSelected}
+					<ComboBox type="multiple"
+						  valueIncludesLabel={true}
+						  style={{
+							  borderBottomRightRadius: 0,
+							  borderTopRightRadius: 0
+						  }}
+	                      value={ columnList }
+                          placeholder="(None)"
+	                      options={ options }
+	                      valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
+	                      onChange={this.setSelected}
 					/>
 					<Button
 						onClick={ this.launchAttributeSelector }
