@@ -31,15 +31,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	constructor(props:WeaveToolEditorProps)
 	{
 		super(props);
-		this.weaveRoot = Weave.getRoot(this.props.tool);
-		this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.tool.constructor as new (..._: any[]) => any)
-		this.toolName = this.weaveRoot.getName(this.props.tool);
-		//todo : find a better way to get linked children
-		this.mapping_crumb_children[this.displayName] = this.props.tool.renderEditor(this.linktoToolEditorCrumbFunction);
-		this.state = {
-			activeCrumb: this.displayName
-		};
-		this.crumbOrder[0] = this.displayName;
+		this.handleNewTool(props.tool);
 	}
 
 	openSessionStateEditor=()=>
@@ -66,17 +58,24 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			//reset
 			this.mapping_crumb_children = {};
 			this.crumbOrder = [];
-
-			//set new
-			this.weaveRoot = Weave.getRoot(nextProps.tool);
-			this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(nextProps.tool.constructor as new (..._: any[]) => any)
-			this.toolName = this.weaveRoot.getName(nextProps.tool);
-			this.mapping_crumb_children[this.displayName] = nextProps.tool.renderEditor(this.linktoToolEditorCrumbFunction);
-			this.setState({
-				activeCrumb: this.displayName
-			});
-			this.crumbOrder[0] = this.displayName;
+			
+			this.handleNewTool(nextProps.tool);
 		}
+	}
+	
+	private handleNewTool(tool:IVisTool)
+	{
+		this.weaveRoot = Weave.getRoot(tool);
+		this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(tool.constructor as new (..._: any[]) => any)
+		this.toolName = this.weaveRoot.getName(tool);
+		var state = {
+			activeCrumb: this.displayName
+		};
+		if (this.state)
+			this.setState(state);
+		else
+			this.state = state;
+		this.crumbOrder[0] = this.displayName;
 	}
 
 	crumbClick=(crumbTitle:string, index:number)=>
@@ -98,6 +97,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 	render()
 	{
+		this.mapping_crumb_children[this.displayName] = this.props.tool.renderEditor(this.linktoToolEditorCrumbFunction);
+		
 		var crumbStyle:React.CSSProperties = {
 			alignItems:"center"
 		};
@@ -166,11 +167,14 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		}
 
 		return (
-			<VBox className={ classNames("weave-padded-vbox", this.props.className) } style={ this.props.style }>
+			<VBox
+				className={ classNames("weave-padded-vbox", this.props.className) }
+				style={ this.props.style }
+				onMouseEnter={() => Weave.beta && this.forceUpdate()}
+			>
 				<HBox
 					className="weave-padded-hbox"
 					style={ {alignItems: "center", borderBottom: "1px solid lightgrey", margin: 8} }
-					onMouseEnter={() => Weave.beta && this.forceUpdate()}
 				>
 					{backButtonUI}
 					<HBox className="weave-padded-hbox" style={ crumbStyle }>

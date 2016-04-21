@@ -102,7 +102,6 @@ export default class C3Histogram extends AbstractC3Tool
     private idToRecord:{[id:string]: Record};
     private keyToIndex:{[key:string]: number};
     private heightColumnNames:string[];
-    private showXAxisLabel:boolean = false;
     private histData:{[key:string]: number}[];
     private keys:{x?:string, value:string[]};
 	private records:Record[];
@@ -464,8 +463,6 @@ export default class C3Histogram extends AbstractC3Tool
         {
             changeDetected = true;
             var xLabel:string = Weave.lang(this.xAxisName.value || this.binnedColumn.getMetadata('title'));
-            if (!this.showXAxisLabel)
-                xLabel = " ";
             var yLabel:string = Weave.lang(this.getYAxisLabel.bind(this)());
 
             if (this.records)
@@ -616,10 +613,18 @@ export default class C3Histogram extends AbstractC3Tool
 						Weave.lang("Aggregation method"),
 						<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
 					],
-					[ 
-						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, 
-						Weave.lang("Horizontal Bars")
-					],
+				],
+				(
+					Weave.beta
+					?	[
+							[ 
+								<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, 
+								Weave.lang("Horizontal Bars (beta)")
+							],
+						]
+					:	[]
+				),
+				[
 					[
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>,
 						Weave.lang("Show Value Labels")
