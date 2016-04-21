@@ -38,7 +38,7 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 		return (
 			<ComboBox style={{width: "100%"}}
 			          ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
-			          options={[({label: "None", value: ""} as ComboBoxOption)].concat(weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
+			          options={[({label: "(None)", value: "string"} as ComboBoxOption)].concat(weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
 					return {label:keyType, value:keyType} as ComboBoxOption;
 				}))}
 			          allowAdditions={true}
