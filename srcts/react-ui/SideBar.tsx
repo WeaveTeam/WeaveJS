@@ -75,7 +75,6 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 
 		if (this.props.location == "left" || this.props.location == "right" || !this.props.location)
 		{
-			defaultStyle.minWidth = 340;
 			defaultStyle.flexDirection = "column";
 			if (this.props.location == "right")
 			{
