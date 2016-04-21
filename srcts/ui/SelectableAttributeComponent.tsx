@@ -169,14 +169,14 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 
     onChange = (columnReference: IColumnReference & IWeaveTreeNode) => 
     {
-        if (columnReference)
-        {
-            let internalReferencedColumn = this.props.attribute.requestLocalObject(ReferencedColumn) as ReferencedColumn;
-            internalReferencedColumn.setColumnReference(columnReference.getDataSource(), columnReference.getColumnMetadata());
-        }
-        else
-        {
-            this.props.attribute.removeObject();
+        if (this.comboBox && ReactUtils.hasFocus(this.comboBox)) {
+            if (columnReference) {
+                let internalReferencedColumn = this.props.attribute.requestLocalObject(ReferencedColumn) as ReferencedColumn;
+                internalReferencedColumn.setColumnReference(columnReference.getDataSource(), columnReference.getColumnMetadata());
+            }
+            else {
+                this.props.attribute.removeObject();
+            }
         }
     }
 
@@ -188,6 +188,8 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
             return (a === b);
     }
 
+    private comboBox: ComboBox;
+
     render():JSX.Element{
 
         let currentColumnNode = ColumnUtils.hack_findHierarchyNode(this.props.attribute);
@@ -196,25 +198,36 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
         let header:JSX.Element;
         if (currentColumnNode)
         {
-            clickHandler = null;
-            options = 
-                HierarchyUtils.findSiblingNodes(currentColumnNode.getDataSource(), currentColumnNode.getColumnMetadata())
-                .map((node) =>
-                {
-                    let colRef = Weave.AS(node, IColumnReference);
-                    if (!colRef) return null;
-                    let metadata = colRef.getColumnMetadata() as any;
-                    if (!metadata) return null;
-                    let title:string = metadata[ColumnMetadata.TITLE];
-                    return {value: colRef, label: title};
-                }).filter(_.identity);
+            let parentNode = HierarchyUtils.findParentNode(currentColumnNode.getDataSource().getHierarchyRoot(), currentColumnNode.getDataSource(), currentColumnNode.getColumnMetadata());
+            if (parentNode && parentNode.getChildren())
+            {
+                let siblings = parentNode.getChildren();    
+                header = (
+                    <span style={{ fontWeight: "bold", fontSize: "small" }}>
+                        {parentNode.getLabel() }</span>)
 
-            header = (<span style={{fontWeight: "bold", fontSize: "small"}}>{HierarchyUtils.findParentNode(currentColumnNode.getDataSource().getHierarchyRoot(),currentColumnNode.getDataSource(),currentColumnNode.getColumnMetadata()).getLabel()}</span>)
+                clickHandler = null;
+                options = 
+                    siblings
+                    .map((node) =>
+                    {
+                        let colRef = Weave.AS(node, IColumnReference);
+                        if (!colRef) return null;
+                        let metadata = colRef.getColumnMetadata() as any;
+                        if (!metadata) return null;
+                        let title:string = metadata[ColumnMetadata.TITLE];
+                        return {value: colRef, label: title};
+                    }).filter(_.identity);
+            }
+            else
+            {
+                [{ value: currentColumnNode, label: "Currently selected" }];
+            }
         }
 
         options.push({ value: null, label: Weave.lang("(None)") });
 
-        return <ComboBox valueEqualityFunc={AttributeDropdown.nodeEqualityFunc}
+        return <ComboBox ref={(c:ComboBox) => this.comboBox = c} valueEqualityFunc={AttributeDropdown.nodeEqualityFunc}
                          style={ this.props.style }
                          value={currentColumnNode}
                          onClick={clickHandler}
