@@ -97,6 +97,12 @@ export default class GeometryLayer extends AbstractFeatureLayer
 				{ dataProjection: OpenLayersMapTool.getProjection(this.inputProjection),
 				featureProjection: OpenLayersMapTool.getProjection(this.outputProjection)});
 
+			if (geometry.getExtent().some(_.isNaN))
+			{
+				console.error("Dropping feature", id, "due to containing NaN coordinates. Possibly misconfigured projection?");
+				continue;
+			}
+
 			let feature = new ol.Feature({geometry});
 			feature.setId(id);
 
