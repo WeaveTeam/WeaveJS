@@ -32,8 +32,8 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 	get selectableAttributes()
 	{
 		return super.selectableAttributes
-			.set("Latitude", this.dataY)
-			.set("Longitude", this.dataX);
+			.set("Latitude / Y", this.dataY)
+			.set("Longitude / X", this.dataX);
 	}
 
 	constructor()
