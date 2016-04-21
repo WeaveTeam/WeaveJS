@@ -80,7 +80,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 				        title={ Weave.lang("Edit layer") }
 				        style={ {alignSelf: "flex-end", whiteSpace: "nowrap"} }
 				        onClick={ this.onEditLayerClick.bind(this,layer) }>
-					{" > "}
+					<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
 				</button>
 			</HBox>
 	}
@@ -113,11 +113,11 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		if (!this.state.openedLayer)
 		{
 			var layerTypes:(new()=>AbstractLayer)[] = [TileLayer, GeometryLayer, LabelLayer, ScatterPlotLayer, ImageGlyphLayer];
-
+			
 			return (
 				<VBox style={{minHeight: 200, flex: 1}} className="weave-padded-vbox">
 					<label>{Weave.lang("Layers")}</label>
-					<HBox className="weave-padded-hbox">
+					<HBox>
 						<MenuButton showIcon={false} style={{flex: "1", alignItems: "center", justifyContent: "center"}} menu={layerTypes.map((layerClass) => ({
 								label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
 								click: (e:React.MouseEvent) => {
