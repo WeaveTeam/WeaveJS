@@ -270,11 +270,11 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 				this.panelTitle
 			],
 			[
-				"X Axis Title",
+				"X axis title",
 				this.xAxisName
 			],
 			[
-				"Y Axis Title",
+				"Y axis title",
 				this.yAxisName
 			]
 		].map((row:[string, LinkableString]) => {

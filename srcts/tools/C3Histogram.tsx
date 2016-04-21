@@ -530,8 +530,8 @@ export default class C3Histogram extends AbstractC3Tool
     get selectableAttributes()
     {
         return super.selectableAttributes
-            .set("Group By", this.binnedColumn.internalDynamicColumn)
-            .set("Height values (Optional)", this.columnToAggregate);
+            .set("Group by", this.binnedColumn.internalDynamicColumn)
+            .set("Height values (optional)", this.columnToAggregate);
         //TODO handle remaining attributes
     }
 
@@ -585,13 +585,13 @@ export default class C3Histogram extends AbstractC3Tool
 								this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 						}}
 					/>,
-					Weave.lang("Link to global Color Column")
+					Weave.lang("Link to global color column")
 				]
 			] as React.ReactChild[][]).concat(
 				this.getSelectableAttributesEditor(linkFunction),
 				[
 					[
-						Weave.lang("Color Theme"),
+						Weave.lang("Color theme"),
 						<ColorRampEditor ref={(colorRampEditor:ColorRampEditor) => {
 											 Weave.getCallbacks(this.fill.color).addGroupedCallback(colorRampEditor, () => {
 												 if (colorRampEditor)
@@ -606,7 +606,7 @@ export default class C3Histogram extends AbstractC3Tool
 
 					],
 					[
-						Weave.lang("Binning Method"),
+						Weave.lang("Binning method"),
 						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 					],
 					[ 
@@ -619,7 +619,7 @@ export default class C3Histogram extends AbstractC3Tool
 					?	[
 							[ 
 								<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, 
-								Weave.lang("Horizontal Bars (beta)")
+								Weave.lang("Horizontal bars (beta)")
 							],
 						]
 					:	[]
@@ -627,7 +627,7 @@ export default class C3Histogram extends AbstractC3Tool
 				[
 					[
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>,
-						Weave.lang("Show Value Labels")
+						Weave.lang("Show value labels")
 					]
 				],
 				this.getTitlesEditor(),

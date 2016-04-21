@@ -359,7 +359,7 @@ export default class C3LineChart extends AbstractC3Tool
     {
         return super.selectableAttributes
             .set("Color", this.line.color)
-            .set("Y Columns", this.columns);
+            .set("Y columns", this.columns);
     }
 
 
@@ -367,9 +367,9 @@ export default class C3LineChart extends AbstractC3Tool
     {
         var columns = this.columns.getObjects() as IAttributeColumn[];
         if (columns.length == 0)
-            return Weave.lang('Line Chart');
+            return Weave.lang('Line chart');
 
-        return Weave.lang("Line Chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+        return Weave.lang("Line chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
     }
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes

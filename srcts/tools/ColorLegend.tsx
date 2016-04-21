@@ -409,7 +409,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	get selectableAttributes()
 	{
 		return new Map<string, (IColumnWrapper | ILinkableHashMap)>()
-			.set("Color Data", this.dynamicColorColumn);
+			.set("Color data", this.dynamicColorColumn);
 	}
 
 	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
@@ -439,15 +439,15 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(
 				[
 					[
-						Weave.lang("Shape Type"),
+						Weave.lang("Shape type"),
 						<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
 					],
 					[
-						Weave.lang("Color Theme"),
+						Weave.lang("Color theme"),
 						<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(1)}/>
 					],
 					[
-						Weave.lang("Binning Method"),
+						Weave.lang("Binning method"),
 						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
 					],
 					[ 
