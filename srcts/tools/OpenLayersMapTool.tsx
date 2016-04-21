@@ -244,7 +244,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
-	snapZoomToBaseMap = Weave.linkableChild(this, LinkableBoolean);
+	snapZoomToBaseMap = Weave.linkableChild(this, new LinkableBoolean(true));
 
 	maxZoomLevel = Weave.linkableChild(this, new LinkableNumber(18));
 	minZoomLevel = Weave.linkableChild(this, new LinkableNumber(0));
