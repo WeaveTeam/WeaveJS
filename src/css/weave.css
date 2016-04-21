@@ -550,12 +550,14 @@ div.weave-tree-view {
 .ui.button {
 	margin:0;
 	border:1px solid lightgrey;
-	background:none;
-	color:grey;
 }
 
 .ui.button:hover {
 	background: lightgrey;
+}
+
+.ui.button:active {
+	background-color: #E0E2E0;
 }
 
 /******* Dropdown *****/

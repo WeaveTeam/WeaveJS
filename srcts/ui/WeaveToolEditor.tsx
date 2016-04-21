@@ -154,13 +154,15 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 				}
 			</div>
 		);
+		
+		var buttonStyle:React.CSSProperties = {background: "none", borderColor: "rgba(0, 0, 0, 0)", padding: "8px"};
 
 		let backButtonUI:JSX.Element = null;
 		if (this.crumbOrder.length > 1)
 		{
 			let prevCrumbTitle:string = this.crumbOrder[this.crumbOrder.length - 2];
 			backButtonUI = (
-				<Button onClick={ this.stepBackInCrumbView } style={{borderColor: "rgba(0, 0, 0, 0)", padding: "8px"}}>
+				<Button onClick={ this.stepBackInCrumbView } style={buttonStyle}>
 					<i className="fa fa-chevron-left"/>
 				</Button>
 			);
@@ -185,7 +187,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						Weave.beta
 						?	<Button
 								onClick={ this.openSessionStateEditor }
-						        style={ {borderColor: "rgba(0, 0, 0, 0)", padding: 8} }
+						        style={buttonStyle}
 						        title="Edit session state"
 							>
 								<i className="fa fa-code"/>
@@ -194,7 +196,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 					}
 					<Button
 						onClick={ this.props.onCloseHandler } 
-					    style={ {borderColor: "rgba(0, 0, 0, 0)", padding: 8} } 
+					    style={buttonStyle}
 					    title="Close editor"
 					>
 						&#x2715;
