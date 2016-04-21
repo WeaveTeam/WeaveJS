@@ -62,7 +62,6 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
                 borderTopColor: 'lightgrey',
                 borderBottomColor: 'lightgrey',
                 borderRightColor:"lightgrey", //set alpha to 0
-                fontSize:'smaller',
                 backgroundColor:"#F8F8F8",
                 padding:"4 16 4 16"
             };

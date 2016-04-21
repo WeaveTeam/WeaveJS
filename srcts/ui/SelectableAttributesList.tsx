@@ -173,7 +173,6 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         // if(this.props.showLabelAsButton)
         // {
         //     labelStyle.borderColor = '#E6E6E6';
-        //     labelStyle.fontSize = "smaller";
         //     labelUI = <Button style={ labelStyle } onClick={ this.launchAttributeSelector }>{ Weave.lang(this.props.label) }</Button>;
         // }else
         // {
@@ -182,7 +181,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 		// 
         // let listUI:JSX.Element = <VBox className="weave-padded-vbox">
 	    //                              {/*<HBox style={listStyle}>
-        //                                 <List style={ {fontSize: 'smaller'}} selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
+        //                                 <List selectedValues= { selectedObjects } options={ columnList }  onChange={ this.select }/>
         //                             </HBox>*/}
         //                             <ComboBox type="multiple"
         //                                       value={ columnList }
@@ -191,7 +190,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         //                                       onChange={this.setSelected}
         //                             />
         //                             <HBox className="weave-padded-hbox" style={constrollerStyle}>
-        //                                 <Button style={ {fontSize:"smaller"} } onClick={ this.removeAll }>Remove All</Button>
+        //                                 <Button onClick={ this.removeAll }>Remove All</Button>
         //                             </HBox>
         //                         </VBox>
 		// 

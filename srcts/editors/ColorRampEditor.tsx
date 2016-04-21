@@ -126,7 +126,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 			],
 			{
 				table: {width: "100%"},
-				td: [{whiteSpace: "nowrap", fontSize: "smaller"}, {padding: 5, width: "100%"}]
+				td: [{whiteSpace: "nowrap"}, {padding: 5, width: "100%"}]
 			}
 		)*/
 	}

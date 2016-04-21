@@ -246,8 +246,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                 {
                     Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.leafNode ?
                         <HBox className="weave-padded-hbox" style={ constrollerStyle } >
-                            <Button style={ {fontSize:"smaller"} } onClick={ this.handleSelectAll }>Select All</Button>
-                            <Button style={ {fontSize:"smaller"} } onClick={ this.addSelected }>Add Selected</Button>
+                            <Button onClick={ this.handleSelectAll }>Select All</Button>
+                            <Button onClick={ this.addSelected }>Add Selected</Button>
                         </HBox>
                         : null}
 
