@@ -325,5 +325,5 @@ Weave.registerClass(
 	TileLayer,
 	["weavejs.layer.TileLayer", "weave.visualization.plotters::WMSPlotter"],
 	[weavejs.api.core.ILinkableObjectWithNewProperties],
-	"Base Map"
+	"Base map"
 );
