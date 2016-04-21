@@ -43,7 +43,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 
 	static open(colorColumn:ColorColumn)
 	{
-		if(ColorController.window)
+		if (ColorController.window)
 			PopupWindow.close(ColorController.window);
 
 		ColorController.window = PopupWindow.open({
@@ -61,7 +61,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 
 	handleFilterCheck = (value:boolean) =>
 	{
-		if(value)
+		if (value)
 			this.dataColumn.filter.targetPath = ["defaultSubsetKeyFilter"];
 		else
 			this.dataColumn.filter.targetPath = null;
@@ -71,34 +71,35 @@ export default class ColorController extends React.Component<ColorControllerProp
 	{
 		return (
 			<VBox style={{flex: 1}}>
-				<Tabs activeTabIndex={ColorController.activeTabIndex}
-					  onViewChange={(index) => ColorController.activeTabIndex = index}
-					  labels={this.tabLabels}
-					  tabs={[
-						  <VBox className="weave-container weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1}}>
-							  <HBox>
-							  	{Weave.lang("Color Data")}
-							  	<SelectableAttributeComponent attributes={this.attributes} attributeName="Color Data"/>
-							  </HBox>
-							  <BinningDefinitionEditor binnedColumn={this.binnedColumn}/>
-							  <HBox>
-							  	  <Checkbox style={{marginRight: 5}} onChange={this.handleFilterCheck}/>
-								  <span style={{alignSelf: "center"}}>
-								  	 {Weave.lang("Filter records prior to binning")}
-								  </span>
-							  </HBox>
-						  </VBox>,
-						  <VBox key={this.tabLabels[1]} style={{flex: 1, padding: 5}} className="weave-padded-vbox">
-							  <HBox>
-								  <Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})}/>
-								  <span>
-								  	{Weave.lang("Center color ramp at zero (when binning is disabled)")}
-								  </span>
-							  </HBox>
-							  <ColorRampEditor colorRamp={this.props.colorColumn.ramp}/>
-						  </VBox>
-					  ]}>
-				</Tabs>
+				<Tabs
+					activeTabIndex={ColorController.activeTabIndex}
+					onViewChange={(index) => ColorController.activeTabIndex = index}
+					labels={this.tabLabels}
+					tabs={[
+						<VBox className="weave-container weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1}}>
+							<HBox>
+								{Weave.lang("Color data")}
+								<SelectableAttributeComponent attributes={this.attributes} attributeName="Color Data"/>
+							</HBox>
+							<BinningDefinitionEditor binnedColumn={this.binnedColumn}/>
+							<HBox>
+								<Checkbox style={{marginRight: 5}} onChange={this.handleFilterCheck}/>
+								<span style={{alignSelf: "center"}}>
+									 {Weave.lang("Filter records prior to binning")}
+								</span>
+							</HBox>
+						</VBox>,
+						<VBox key={this.tabLabels[1]} style={{flex: 1, padding: 5}} className="weave-padded-vbox">
+							<HBox>
+								<Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})}/>
+								<span>
+									{Weave.lang("Center color ramp at zero (when binning is disabled)")}
+								</span>
+							</HBox>
+							<ColorRampEditor colorRamp={this.props.colorColumn.ramp}/>
+						</VBox>
+					]}
+				/>
 			</VBox>
 		);
 	}

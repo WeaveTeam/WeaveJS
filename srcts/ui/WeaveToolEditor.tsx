@@ -88,13 +88,13 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	}
 
 	stepBackInCrumbView = ()=>{
-		let index:number = this.crumbOrder.length-2; //prev index make it active
-		let activeCrumbTitle:string = this.crumbOrder[index ]
+		let index:number = this.crumbOrder.length - 2; //prev index make it active
+		let activeCrumbTitle:string = this.crumbOrder[index];
 		this.setState({
 			activeCrumb:activeCrumbTitle
 		});
 		this.crumbOrder = this.crumbOrder.slice(0, index + 1);
-	}
+	};
 
 	render()
 	{
@@ -106,7 +106,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		var crumbUI:JSX.Element = (
 			<div className="ui breadcrumb">
 				{
-					this.crumbOrder.map((crumb:string,index:number):JSX.Element[] => {
+					this.crumbOrder.map((crumb:string, index:number):JSX.Element[] => {
 						let styleObj:React.CSSProperties = {};
 						let elements:JSX.Element[];
 			
@@ -116,7 +116,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 							styleObj.color = "black";
 							styleObj["cursor"] = "none";
 							elements = [
-								<div key={String(index)}
+								<div
+									key={String(index)}
 									ref={String(index)}
 									style={styleObj}
 									className="active section"
@@ -132,7 +133,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 							styleObj.color = "grey";
 							styleObj["cursor"] = "pointer";
 							elements = [
-								<div key={String(index)}
+								<div
+									key={String(index)}
 									ref={String(index)}
 									style={styleObj}
 									className="section"
@@ -156,9 +158,11 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		if (this.crumbOrder.length > 1)
 		{
 			let prevCrumbTitle:string = this.crumbOrder[this.crumbOrder.length - 2];
-			backButtonUI = <Button onClick={ this.stepBackInCrumbView } style={{borderColor:"rgba(0, 0, 0, 0)",padding:"8px"}}>
-								<i className="fa fa-chevron-left"/>
-							</Button>
+			backButtonUI = (
+				<Button onClick={ this.stepBackInCrumbView } style={{borderColor: "rgba(0, 0, 0, 0)", padding: "8px"}}>
+					<i className="fa fa-chevron-left"/>
+				</Button>
+			);
 		}
 
 		return (
@@ -175,16 +179,20 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 					<span style={ {flex: "1"} }/>
 					{
 						Weave.beta
-						?	<Button onClick={ this.openSessionStateEditor } 
-						             style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} } 
-						             title="Click to view Sesssion State" >
+						?	<Button
+								onClick={ this.openSessionStateEditor }
+						        style={ {borderColor: "rgba(0, 0, 0, 0)", padding: 8} }
+						        title="Edit session state"
+							>
 								<i className="fa fa-code"/>
 							</Button>
 						:	null
 					}
-					<Button onClick={ this.props.onCloseHandler } 
-					        style={ {borderColor: "rgba(0, 0, 0, 0)", padding: "8px"} } 
-					        title="Click to close Editor">
+					<Button
+						onClick={ this.props.onCloseHandler } 
+					    style={ {borderColor: "rgba(0, 0, 0, 0)", padding: 8} } 
+					    title="Close editor"
+					>
 						&#x2715;
 					</Button>
 				</HBox>
