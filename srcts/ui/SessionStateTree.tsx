@@ -59,6 +59,7 @@ export default class SessionStateTree extends React.Component<ISessionTreeProps,
     {
         if(Weave.IS(child.dependency , filter))
         {
+            //if the filtered child's  parent is not added to trail, add it
             if(this.filteredArray.indexOf(rootParent)== -1)
                 this.filteredArray.push(rootParent);
             return true;
@@ -67,8 +68,8 @@ export default class SessionStateTree extends React.Component<ISessionTreeProps,
         if(child.children )
         {
             let filteredChildren:WeaveTreeItem[] = child.children.filter(function(weaveTreeItem:WeaveTreeItem,index:number){
-                if(!rootParent){
-                    var rootParentCopy:WeaveTreeItem = this.getWeaveTreeItemCopy(weaveTreeItem);
+                if(!rootParent){ // this scenario is for the root of the tree : copy of the entire tree is made before filtering
+                    var rootParentCopy:WeaveTreeItem = this.getWeaveTreeItemCopy(weaveTreeItem);// copy is important else the orginal sessionstate tree will be affected
                     return this.getChildrenTrailOfType(rootParentCopy,rootParentCopy,rootParentCopy,filter);
                 }else{
                     return this.getChildrenTrailOfType(weaveTreeItem,child,rootParent,filter);
@@ -160,22 +161,23 @@ class TreeNode extends React.Component<ITreeNodeProps, ISessionTreeState>
         let selectedTreeNode:TreeNode = this.props.manager.selectedTreeNode;
         let selectedTreeNodeAtCurrentDepth:TreeNode = this.props.manager.selectedTreeNodeAtEachDepth[this.props.depth];
 
-        if(selectedTreeNode)
+        if(selectedTreeNode)//found a opened node which was opened before
         {
-            if(this.props.manager.props.enableAccordion && (selectedTreeNode == selectedTreeNodeAtCurrentDepth) )
+            if(this.props.manager.props.enableAccordion && (selectedTreeNode == selectedTreeNodeAtCurrentDepth) )//found a opened node in same depth level
             {
+                // close the prev opened Node for accrodion mode
                 selectedTreeNode.setState({
                     open: false
                 });
             }
-            else if(selectedTreeNode.isLeafNode())
+            else if(selectedTreeNode.isLeafNode())//in normal mode we want only one leaf to shown as selected
             {
                 selectedTreeNode.setState({
                     open: false
                 });
             }
 
-            if(selectedTreeNodeAtCurrentDepth) // found another selected Node at current depth
+            if(selectedTreeNodeAtCurrentDepth) // found another opened Node at current depth
             {
                 if(this.props.manager.props.enableAccordion  || selectedTreeNodeAtCurrentDepth.isLeafNode()) {
                     selectedTreeNodeAtCurrentDepth.setState({
@@ -185,16 +187,16 @@ class TreeNode extends React.Component<ITreeNodeProps, ISessionTreeState>
             }
 
         }
-        this.setState({
+        this.setState({// toggle the current node open state
             open:!this.state.open
         });
 
-        if(!this.state.open)
+        if(!this.state.open)// if opened make this as actove node
         {
             this.props.manager.selectedTreeNode = this;
             this.props.manager.selectedTreeNodeAtEachDepth[this.props.depth] = this;
         }
-        else
+        else //if closed reset them
         {
             this.props.manager.selectedTreeNode = null;
             this.props.manager.selectedTreeNodeAtEachDepth[this.props.depth] = null;
@@ -229,7 +231,7 @@ class TreeNode extends React.Component<ITreeNodeProps, ISessionTreeState>
 
         if( this.props.filter)
         {
-            weaveTreeItems = this.props.manager.filteredArray;
+                weaveTreeItems = this.props.manager.filteredArray;
         }
 
         childrenUI = weaveTreeItems.map(function(weaveTreeItem:WeaveTreeItem,index:number){
