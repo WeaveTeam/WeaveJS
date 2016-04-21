@@ -50,12 +50,13 @@ export default class ToolsMenu implements MenuBarItemProps
 			WeaveUI.C3ScatterPlot,
 			WeaveUI.TableTool,
 			WeaveUI.DataFilterTool,
-			WeaveUI.AttributeMenuTool
+			WeaveUI.AttributeMenuTool,
+			WeaveUI.SessionStateMenuTool
 		];
 
 		return impls.map(impl => {
 			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
-			if (impl == WeaveUI.DataFilterTool)
+			if (ToolsMenu.isBeta(impl))
 			{
 				if (Weave.beta)
 					label += " (beta)";
@@ -67,5 +68,12 @@ export default class ToolsMenu implements MenuBarItemProps
 				click: this.createObject.bind(this, impl)
 			};
 		}).filter(item => !!item);
+	}
+	
+	static isBeta(impl:new(..._:any[])=>any):boolean
+	{
+		return impl == WeaveUI.C3Gauge
+			|| impl == WeaveUI.DataFilterTool
+			|| impl == WeaveUI.SessionStateMenuTool;
 	}
 }
