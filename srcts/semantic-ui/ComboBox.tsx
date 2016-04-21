@@ -55,12 +55,14 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	private statesEqual(prevState:ComboBoxState, currentState:ComboBoxState)
 	{
 		//check if included elements are the same, even if in a different order
+		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
 		if(this.props.type === "multiple"){
 			if(prevState.value.length !== currentState.value.length)
 				return false;
 			prevState.value.forEach( (item:any,index:number) => {
-				if(!_.includes(currentState.value,item))
+				if(!currentState.value.some( (val:any) => equalityFunc(val,item))) {
 					return false;
+				}
 			});
 			return true;
 		} else {
@@ -89,7 +91,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
-		//if (!_.isEqual(prevState.value, this.state.value)) {
 		if (!this.statesEqual(prevState,this.state)) {
 			let selector = ($(this.element) as any);
 			if (this.props.type === "multiple") {
@@ -99,7 +100,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					if (index >= 0)
 						indices.push(String(index));
 				});
-				selector.dropdown('set exactly', indices)
+				selector.dropdown('set exactly', indices);
 			}
 			else {
 				let index = this.getIndexFromValue(this.state.value);
