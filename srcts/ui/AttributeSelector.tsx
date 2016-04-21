@@ -1,6 +1,5 @@
 import * as React from "react";
 import {HBox, VBox,HDividedBox} from "../react-ui/FlexBox";
-import IconButton from "../react-ui/IconButton";
 import {ButtonGroupBar} from "../react-ui/ButtonGroupBar";
 import WeaveTree from "./WeaveTree";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
@@ -18,7 +17,6 @@ import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import SmartComponent from "./SmartComponent";
 import ControlPanel from "./ControlPanel";
 import Button from "../semantic-ui/Button";
-import ResizingDiv from "../react-ui/ResizingDiv";
 
 export interface IAttributeSelectorProps
 {
@@ -32,7 +30,7 @@ export interface IAttributeSelectorState
 {
     leafNode? : IWeaveTreeNode;
     selectedAttribute?: IColumnWrapper|ILinkableHashMap;
-    label?:string;
+    attributeName?:string;
 
 }
 
@@ -43,7 +41,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     private leafTree :WeaveTree;
     private weaveRoot: ILinkableHashMap;
     private searchFilter :string;
-    private items:{[label:string] : Function}={};
+    private attributeNames:string[];
     private selectedColumnRef :IColumnReference[] = [];
     private selectedNodes:IWeaveTreeNode[];
 
@@ -52,9 +50,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         super(props);
 
         //required for button bar
-        this.props.selectableAttributes.forEach((value, key)=>{
-            this.items[key] = this.handleSelectedAttribute.bind(this,key);
-        });
+        // get all labels for Button Bar
+        this.attributeNames = Array.from(this.props.selectableAttributes.keys());
 
         this.weaveRoot = Weave.getRoot(props.selectedAttribute);
         this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
@@ -62,27 +59,36 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         this.state = {
             leafNode : this.getSelectedNodeRoot(this.props.selectedAttribute),
             selectedAttribute:this.props.selectedAttribute,
-            label:this.props.label
+            attributeName:this.props.label
         };
 
         this.selectedNodes = this.getSelectedTreeNodesFor(this.props.selectedAttribute);//handles initial loading of selected items
     };
 
-    componentWillReceiveProps (nextProps :IAttributeSelectorProps){
-        if(nextProps.selectedAttribute != this.props.selectedAttribute){
+    componentWillReceiveProps (nextProps :IAttributeSelectorProps)
+    {
+        if(nextProps.selectedAttribute != this.props.selectedAttribute)
+        {
             this.weaveRoot = Weave.getRoot(nextProps.selectedAttribute);
             this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
         }
+
+        // if the selectableAttributes changed by parent update the items
+        if(nextProps.selectableAttributes != this.props.selectableAttributes)
+        {
+            this.attributeNames = Array.from(this.props.selectableAttributes.keys());
+        }
     }
 
-    handleSelectedAttribute = (name:string):void=>
+    handleSelectedAttribute = (event:React.MouseEvent,name:string = null,index:number = null):void=>
     {
         let selectedAttribute:IColumnWrapper|ILinkableHashMap = this.props.selectableAttributes.get(name);
 
         this.setState({
             selectedAttribute : selectedAttribute,
-            label:name
+            attributeName:name
         });
+
         this.selectedNodes = this.getSelectedTreeNodesFor(selectedAttribute);
     };
 
@@ -116,7 +122,9 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     };
 
     onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
-        this.setState({leafNode : selectedItems[0]});
+        this.setState({
+            leafNode : selectedItems[0]
+        });
     };
 
     setColumn =(selectedItems:Array<IWeaveTreeNode>):void =>{
@@ -161,8 +169,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         {
             selectableObjects.push(selectedAttribute);//single entry
         }
-        else
-        {//ILinkableHashMap
+        else if(Weave.IS(selectedAttribute, ILinkableHashMap))
+        {
             selectableObjects = (selectedAttribute as ILinkableHashMap).getObjects();
         }
 
@@ -203,7 +211,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 		if (this.rootTreeNode)
 			var ui:JSX.Element = Weave.IS(this.state.selectedAttribute, ILinkableHashMap) && this.state.leafNode
 				?	<VBox>
-						<SelectableAttributesList label={ this.state.label } showAsList={true} columns={ this.state.selectedAttribute as ILinkableHashMap}></SelectableAttributesList>
+						<SelectableAttributesList label={ this.state.attributeName } showAsList={true} columns={ this.state.selectedAttribute as ILinkableHashMap}></SelectableAttributesList>
 					</VBox>
 				:	null;
 
@@ -214,22 +222,24 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             marginLeft:"0"
         };
 
-        //var selectedNodes:IWeaveTreeNode[];
-        //selectedNodes = this.getSelectedTreeNodes();
-        //console.log("selected nodes", selectedNodes);
 
+        // weave tree contains absolute child inside so its important to have dispaly flex wrapper to pass on width height
         return (
-            <VBox className="weave-padded-vbox" style={ {border:"none",flex:1} }>
+            <VBox className="weave-padded-vbox" style={ {flex:1} }>
 
-                {Object.keys(this.items).length > 1 ? <ButtonGroupBar activeButton={ this.props.label } items={ this.items }></ButtonGroupBar> : ""}
+                {
+                    (this.attributeNames.length > 0) ? <ButtonGroupBar activeButton={ this.props.label }
+                                                                       items={ this.attributeNames }
+                                                                       clickHandler={this.handleSelectedAttribute}/> : null
+                }
 
                 <HDividedBox style={ {flex:1} } loadWithEqualWidthChildren={true}>
                        <div style={{display:"flex"}}>
                            <WeaveTree style={ {flex:"1"} }
                                       hideRoot = {true} hideLeaves = {true}
-                                    onSelect={this.onHierarchySelected}
-                                    root={this.rootTreeNode}
-                                    ref={ (c) => { this.tree = c; } }/>
+                                      onSelect={this.onHierarchySelected}
+                                      root={this.rootTreeNode}
+                                      ref={ (c) => { this.tree = c; } }/>
                        </div>
                         <div style={{display:"flex"}}>
                         {this.state.leafNode ? <WeaveTree style={ {flex:"1"} }

@@ -1,15 +1,20 @@
 import * as React from 'react';
-import {HBox, VBox} from "../react-ui/FlexBox";
-import IconButton from "../react-ui/IconButton";
+import * as _ from "lodash";
+
+import {HBox} from "../react-ui/FlexBox";
+import Button from "../semantic-ui/Button";
 import SmartComponent from "../ui/SmartComponent";
 
-//TODO make a general component by extracting style and accomodate only buttons without click handlers
+//TODO support vertical direction
 
 export interface IButtonGroupProps extends React.HTMLProps<ButtonGroupBar>{
-    items:{
-        [label:string] : Function;//label of button : function to call when the button is clicked
-    };
-    activeButton?:number|string;
+    items:string[]; //  array of string labels
+    activeButton?:number|string; // when called from parent either label or index can be sent
+    buttonStyle?:React.CSSProperties;
+    buttonClassName?:string;
+    activeButtonStyle?:React.CSSProperties;
+    activeButtonClassName?:string;
+    clickHandler?:Function;
 }
 
 export interface IButtonGroupState{
@@ -18,8 +23,10 @@ export interface IButtonGroupState{
 
 export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGroupState> {
 
-    constructor(props :IButtonGroupProps){
+    constructor(props :IButtonGroupProps)
+    {
         super(props);
+        // if there is no default active button set first button as Active Button
         this.state = {
             activeButton :  this.props.activeButton ? this.props.activeButton : 0
         }
@@ -29,6 +36,7 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
     {
         if(this.props.activeButton != nextProps.activeButton)
         {
+            // if active button changed by parent , update the internal state
             this.setState({
                 activeButton :  nextProps.activeButton
             })
@@ -37,65 +45,78 @@ export class ButtonGroupBar extends SmartComponent<IButtonGroupProps, IButtonGro
 
     private clickHandler = (label:string,index:number,event:React.MouseEvent):void=>
     {
-        if(this.props.items[label])
-            this.props.items[label](event,label,index);
+        // cant use onClick as we cant send the binded this from arrow function ot this binded manaually
+        /*if(this.props.onClick)
+        {
+            this.props.onClick.apply(null,[event,label,index])
+        }*/
+
+        if(this.props.clickHandler)
+         {
+            this.props.clickHandler(event,label,index)
+         }
 
         this.setState({
             activeButton :  index
         })
+
+
     };
 
 
 
     render():JSX.Element {
-        var barStyle:React.CSSProperties = {
-            justifyContent :'center'
-        };
+
+        // order in merge is important as props style is read only
+        var barStyle:React.CSSProperties = _.merge({},this.props.style,{
+            display:"inline-flex",
+            overflow:"hidden"
+        });
 
 
-
-        let keys = Object.keys(this.props.items);
         let buttons:JSX.Element[];
 
-        buttons = keys.map(function (label:string, index:number) {
-            var iconButtonStyle:React.CSSProperties = {
-                borderTopColor: 'lightgrey',
-                borderBottomColor: 'lightgrey',
-                borderRightColor:"lightgrey", //set alpha to 0
-                backgroundColor:"#F8F8F8",
-                padding:"4 16 4 16"
-            };
+        buttons = this.props.items.map(function (label:string, index:number) {
 
-            if(index == 0)//first child
-            {
-                iconButtonStyle.borderTopLeftRadius = 8;
-                iconButtonStyle.borderBottomLeftRadius = 8;
-                iconButtonStyle.borderTopRightRadius = 0;
-                iconButtonStyle.borderBottomRightRadius = 0;
-                iconButtonStyle.borderLeftColor = "lightgrey";
-            }
-            else if(index == keys.length - 1) //last child
-            {
-                iconButtonStyle.borderTopRightRadius = 8;
-                iconButtonStyle.borderBottomRightRadius = 8;
-                iconButtonStyle.borderTopLeftRadius = 0;
-                iconButtonStyle.borderBottomLeftRadius = 0;
-                iconButtonStyle.borderLeftColor = "none";
-            }
-            else
-            {
-                iconButtonStyle["borderRadius"] = 0;
-            }
+            var buttonStyle:React.CSSProperties =  {
+                borderRadius: 0,
+                border:"none"
+            };
+            buttonStyle = this.props.buttonStyle ? _.merge({},this.props.buttonStyle,buttonStyle):buttonStyle ;
+
+            let buttonClassName:string = this.props.buttonClassName ? this.props.buttonClassName : "weave-buttonGroupBar-button";
+
             if(index == this.state.activeButton || label == this.state.activeButton)
             {
-                iconButtonStyle.color = "white";
-                iconButtonStyle.borderColor = "grey";
-                iconButtonStyle.backgroundColor = "grey";
+                if(this.props.activeButtonStyle)
+                {
+                    buttonStyle = _.merge(buttonStyle,this.props.activeButtonStyle)
+                }
+                else
+                {
+                    buttonStyle.color = "white";
+                    buttonStyle.backgroundColor = "grey";
+                }
+
+                if(this.props.activeButtonClassName)
+                {
+                    buttonClassName = buttonClassName + " " + this.props.activeButtonClassName;
+                }
+
             }
-            return (<IconButton style={ iconButtonStyle } mouseOverStyle= { {color:"black",backgroundColor:"lightgrey" } }
-                                clickHandler={ this.clickHandler.bind(this,label,index) }
-                                key={ index }> {label} </IconButton>)
+
+            return (<Button  style={ buttonStyle }
+                             className={ buttonClassName }
+                             onClick={ this.clickHandler.bind(this,label,index) }
+                             key={ index }>
+                        {label}
+                    </Button>)
         }, this);
-        return ( <HBox style={ barStyle }>{buttons}</HBox>);
+
+        return ( <HBox style={ {justifyContent:"center"} }>
+                    <div className="weave-buttonGroupBar" style={ barStyle }>
+                        {buttons}
+                    </div>
+                </HBox>);
     }
 }

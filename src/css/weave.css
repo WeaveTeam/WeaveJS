@@ -516,6 +516,22 @@ div.weave-tree-view {
 	justify-content: flex-end;
 }
 
+/****** ButtonGroupBar ******/
+
+.weave-buttonGroupBar {
+	border-radius:16px;
+	border:1px solid grey;
+}
+
+.weave-buttonGroupBar-button {
+	padding:12px;
+}
+
+.weave-buttonGroupBar-button-active { /* addition or override to excisting weave-buttonGroupBar-button */
+	color:white;
+	background:grey;
+}
+
 /* Override Semantic ui CSS*/
 
 /******* Breadcrumb *******/
