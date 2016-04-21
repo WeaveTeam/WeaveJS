@@ -28,7 +28,7 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 		return super.selectableAttributes
 			.set("Image Size", this.imageSize)
 			.set("Image URL", this.imageURL)
-			.set("Image Alpha", this.dataAlpha)
+//			.set("Image Alpha", this.dataAlpha)
 			.set("Image Tint", this.dataColor);
 	}
 

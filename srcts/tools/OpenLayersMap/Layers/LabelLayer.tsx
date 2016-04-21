@@ -50,6 +50,7 @@ export default class LabelLayer extends AbstractGlyphLayer
 
 		this.styleResolutionDependent = true;
 
+		this.color.internalDynamicColumn.globalName = "defaultColorColumn";
 		this.size.addGroupedCallback(this, this.updateStyleData)
 		this.text.addGroupedCallback(this, this.updateStyleData)
 		this.color.addGroupedCallback(this, this.updateStyleData);
