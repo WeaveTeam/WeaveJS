@@ -55,36 +55,52 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 		this.filterOptions.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
 		this.filterOptions.unshift(ALL);
 	}
-		
+	
+	componentWillReceiveProps(props:ColorRampEditorProps):void
+	{
+		this.colorRamp = props.colorRamp;
+	}
+	
 	updateColorsAtIndex(index:number, color:string)
 	{
-		var colors = this.colorRamp.getColors() as number[];
-		colors[index] = StandardLib.asNumber(color);
-		this.colorRamp.setSessionState(colors)
+		if (this.colorRamp)
+		{
+			var colors = this.colorRamp.getColors() as number[];
+			colors[index] = StandardLib.asNumber(color);
+			this.colorRamp.setSessionState(colors)
+		}
 	}
 	
 	removeColorAtIndex(index:number)
 	{
-		var colors:number[] = this.colorRamp.getColors() as number[];
-		colors.splice(index, 1);
-		this.colorRamp.setSessionState(colors)
+		if (this.colorRamp)
+		{
+			var colors:number[] = this.colorRamp.getColors() as number[];
+			colors.splice(index, 1);
+			this.colorRamp.setSessionState(colors)
+		}
 	}
 	
 	addColor=()=>
 	{
-		var colors:number[] = this.colorRamp.getColors() as number[];
-		colors.push(StandardLib.asNumber("#FFFFFF"));
-		this.colorRamp.setSessionState(colors);
+		if (this.colorRamp)
+		{
+			var colors:number[] = this.colorRamp.getColors() as number[];
+			colors.push(StandardLib.asNumber("#FFFFFF"));
+			this.colorRamp.setSessionState(colors);
+		}
 	}
 	
 	reverseColors=()=>
 	{
-		this.colorRamp.reverse();
+		if (this.colorRamp)
+			this.colorRamp.reverse();
 	}
 	
 	handleColorRampSelectionChange = (newColors:number[]) =>
 	{
-		this.colorRamp.setSessionState(newColors);
+		if (this.colorRamp)
+			this.colorRamp.setSessionState(newColors);
 	}
 	
 	renderCompactView()
@@ -109,7 +125,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 		
 		return (
 			<HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
-				<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
+				<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp && this.colorRamp.getHexColors()}/>
 				<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
 			</HBox>
 		);
@@ -119,7 +135,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 				[ 
 					Weave.lang("Color Theme"),
 					<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
-						<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp.getHexColors()}/>
+						<ColorRampComponent style={{height: 20, marginRight: 5, flex: 1}} ramp={this.colorRamp && this.colorRamp.getHexColors()}/>
 						<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
 					</HBox>
 				],
@@ -133,8 +149,8 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 
 	renderFullView()
 	{
-		var colors:number[] = this.colorRamp.getColors() as number[];
-		var hexColors = this.colorRamp.getHexColors();
+		var colors:number[] = this.colorRamp ? this.colorRamp.getColors() : [];
+		var hexColors:string[] = this.colorRamp ? this.colorRamp.getHexColors() : [];
 		
 		var filteredRamps = this.state.selectedFilter == ALL ? ColorRamp.allColorRamps : ColorRamp.allColorRamps.filter((v) => v.tags.indexOf(this.state.selectedFilter) >= 0);
 		
@@ -153,7 +169,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 			}
 		})
 		return (
-			<VBox className="weave-padded-vbox" style={{flex: 1}}>
+			<VBox className="weave-padded-vbox" style={{flex: 1}} disabled={!this.colorRamp}>
 				<HBox className="weave-padded-hbox" style={{flex: 1}}>
 					<HBox style={{flex: .7, overflow: "auto"}}>
 						<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
@@ -161,7 +177,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 					<VBox style={{flex: .3}} className="weave-padded-vbox">
 						<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang("Customize")}</label>
 						<HBox style={{flex: 1, overflow: "auto"}} className="weave-padded-hbox">
-							<ColorRampComponent style={{width: 30}} direction="to bottom" ramp={hexColors}/>
+							<ColorRampComponent style={{width: 30}} direction="bottom" ramp={hexColors}/>
 							<List options={listOptions}/>
 						</HBox>
 					</VBox>

@@ -56,6 +56,11 @@ export default class C3Histogram extends AbstractC3Tool
     barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
 	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
 	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
+	
+	get colorColumn()
+	{
+		return Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
+	}
 
 	private setColorColumn():void
 	{
@@ -111,7 +116,7 @@ export default class C3Histogram extends AbstractC3Tool
     {
         super(props);
 		
-        this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
+        this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 		this.filteredKeySet.setSingleKeySource(this.fill.color);
 
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
@@ -541,15 +546,16 @@ export default class C3Histogram extends AbstractC3Tool
 	// TODO move this to BinningDefinitionEditor
 	openColorController(tabIndex:number)
 	{
-		ColorController.activeTabIndex = tabIndex;
-		ColorController.open(Weave.AS(this.fill.color.getInternalColumn(), ColorColumn));
+		if (this.colorColumn)
+		{
+			ColorController.activeTabIndex = tabIndex;
+			ColorController.open(this.colorColumn);
+		}
 	}
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linkFunction:Function):JSX.Element
 	{
-		
-		var cc = Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
@@ -562,10 +568,26 @@ export default class C3Histogram extends AbstractC3Tool
 			null,
 			([
 				[ 
-					<Checkbox ref={(checkBox:Checkbox) => this.linkColorCheckbox(checkBox)} 
-							  onChange={(value) => { 
-								  this.fill.color.internalDynamicColumn.globalName = value ? "defaultColorColumn" : null
-							  }}/>,
+					<Checkbox
+						ref={(ref:Checkbox) => {
+							if (ref)
+								this.fill.color.addGroupedCallback(ref, () => {
+									ref.setState({
+										value: !!this.fill.color.internalDynamicColumn.targetPath
+									});
+								});
+						}}
+						onChange={(value) => {
+							if (this.fill.color.internalDynamicColumn.targetPath)
+							{
+								weavejs.data.ColumnUtils.unlinkNestedColumns(this.fill.color);
+								if (this.colorColumn)
+									this.colorColumn.ramp.state = [0x808080];
+							}
+							else
+								this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
+						}}
+					/>,
 					Weave.lang("Link to global Color Column")
 				]
 			] as React.ReactChild[][]).concat(
@@ -574,15 +596,15 @@ export default class C3Histogram extends AbstractC3Tool
 					[
 						Weave.lang("Color Theme"),
 						<ColorRampEditor ref={(colorRampEditor:ColorRampEditor) => {
-											 cc.addGroupedCallback(colorRampEditor, () => {
-												 if(colorRampEditor)
+											 Weave.getCallbacks(this.fill.color).addGroupedCallback(colorRampEditor, () => {
+												 if (colorRampEditor)
 												 {
-													 colorRampEditor.colorRamp = cc.ramp;
+													 colorRampEditor.colorRamp = this.colorColumn && this.colorColumn.ramp;
 												 }
 											})
 										 }}
 										 compact={true}
-										 colorRamp={cc && cc.ramp}
+										 colorRamp={this.colorColumn && this.colorColumn.ramp}
 										 onButtonClick={() => this.openColorController(1)}/>
 
 					],
@@ -605,17 +627,8 @@ export default class C3Histogram extends AbstractC3Tool
 				],
 				this.getTitlesEditor(),
 				this.getMarginEditor()
-			), tableStyles);
-		}
-
-	linkColorCheckbox(ref:Checkbox)
-	{
-		this.fill.color.addGroupedCallback(ref, () => {
-			if(ref)
-				ref.setState({
-					value: !!this.fill.color.internalDynamicColumn.globalName
-				});
-		})
+			), tableStyles
+		);
 	}
 
     get deprecatedStateMapping()

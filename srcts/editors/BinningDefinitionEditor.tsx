@@ -50,7 +50,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	public hasPendingChanges():boolean { return false; }
 	public applyChanges():void { }
 
-	private _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.handleBinnedColumnChange.bind(this)));
+	private _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.handleBinnedColumnWatcher.bind(this)));
 
 	private get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }
 	public _simple:SimpleBinningDefinition = Weave.disposableChild(this, SimpleBinningDefinition);
@@ -60,6 +60,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	private _stdDev:StandardDeviationBinningDefinition = Weave.disposableChild(this, StandardDeviationBinningDefinition);
 	private _category:CategoryBinningDefinition = Weave.disposableChild(this, CategoryBinningDefinition);
 	private _jenks:NaturalJenksBinningDefinition = Weave.disposableChild(this, NaturalJenksBinningDefinition);
+	private _allBinDefs = [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks];
 
 	// TODO should Dictionary 2D be used ?
 	static binClassToBinLabel = new Map<typeof AbstractBinningDefinition, string>()
@@ -85,30 +86,34 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	{
 		super(props);
 		this._binnedColumnWatcher.target = props.binnedColumn;
+		for (var def of this._allBinDefs)
+			Weave.getCallbacks(def).addGroupedCallback(this, this.updateTargetBinningDef);
 	}
 	
-	handleBinnedColumnChange()
+	private handleBinnedColumnWatcher()
 	{
-		var binDef = this.binnedColumn.binningDefinition.target;
-		if (binDef)
-		{
-			for (var localDef of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
-			{
-				if (this.isRadioSelected(localDef))
-				{
-					Weave.linkState(binDef, localDef);
-				}
-			}
-		}
+		var targetDef = this.binnedColumn.binningDefinition.target;
+		for (var localDef of this._allBinDefs)
+			if (this.compareTargetBinningType(localDef))
+				Weave.copyState(targetDef, localDef);
 		this.forceUpdate();
+	}
+	
+	private updateTargetBinningDef()
+	{
+		var targetDef = this.binnedColumn.binningDefinition.target;
+		if (targetDef)
+			for (var localDef of this._allBinDefs)
+				if (this.compareTargetBinningType(localDef))
+					Weave.copyState(localDef, targetDef)
 	}
 
 	private linkOverride(property:"overrideInputMin"|"overrideInputMax")
 	{
-		for (var def of [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks])
+		for (var def of this._allBinDefs)
 		{
 			var abd:any = def;
-			if (abd[property] && this.isRadioSelected(def))
+			if (abd[property] && this.compareTargetBinningType(def))
 			{
 				return linkReactStateRef(this, {value: abd[property]}, 500);
 			}
@@ -151,7 +156,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		}
 	}
 
-	isRadioSelected(localDef:AbstractBinningDefinition):boolean
+	compareTargetBinningType(localDef:AbstractBinningDefinition):boolean
 	{
 		var binDef = this.binnedColumn.binningDefinition.target
 		if (localDef && binDef)
@@ -263,7 +268,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 								<HBox style={leftItemsStyle}>
 									<Checkbox
 										type="radio"
-										value={this.isRadioSelected(this._simple)}
+										value={this.compareTargetBinningType(this._simple)}
 										onChange={(value) => this.setBinningDefinition(value, this._simple)}
 									/> 
 									<span style={textStyle}>{Weave.lang("Equally spaced")}</span>
@@ -271,7 +276,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 								<HBox style={rightItemsStyle} className="weave-padded-hbox">
 									<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
 									<StatefulTextField
-										disabled={!this.isRadioSelected(this._simple)}
+										disabled={!this.compareTargetBinningType(this._simple)}
 										style={inputStyle}
 										type="number"
 										ref={this.linkBinningDefinition(this._simple.numberOfBins)}
@@ -286,7 +291,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 								<HBox style={leftItemsStyle}>
 									<Checkbox
 										type="radio" 
-										value={this.isRadioSelected(this._customSplit)}
+										value={this.compareTargetBinningType(this._customSplit)}
 										onChange={(value) => this.setBinningDefinition(value, this._customSplit)}
 									/> 
 									<span style={textStyle}>{Weave.lang("Custom breaks")}</span>
@@ -295,7 +300,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 									<StatefulTextField
 										type="text" 
 										ref={this.linkBinningDefinition(this._customSplit.splitValues)}
-										disabled={!this.isRadioSelected(this._customSplit)}
+										disabled={!this.compareTargetBinningType(this._customSplit)}
 										fluid={false}
 									/>
 									<HelpIcon style={helpStyle}>
@@ -308,7 +313,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 								<HBox style={leftItemsStyle}>
 									<Checkbox
 										type="radio"
-										value={this.isRadioSelected(this._quantile)}
+										value={this.compareTargetBinningType(this._quantile)}
 										onChange={(value) => this.setBinningDefinition(value, this._quantile)}
 									/> 
 									<span style={textStyle}>{Weave.lang("Quantile")}</span>
@@ -318,7 +323,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 									<StatefulTextField
 										style={inputStyle} 
 										type="text"
-										disabled={!this.isRadioSelected(this._quantile)}
+										disabled={!this.compareTargetBinningType(this._quantile)}
 										ref={linkReactStateRef(this, {value: this._quantile.refQuantile}, 500)}
 									/>
 									<HelpIcon style={helpStyle}>
@@ -331,7 +336,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 								<HBox style={leftItemsStyle}>
 									<Checkbox
 										type="radio"
-										value={this.isRadioSelected(this._equalInterval)}
+										value={this.compareTargetBinningType(this._equalInterval)}
 										onChange={(value) => this.setBinningDefinition(value, this._equalInterval)}
 									/>
 									<span style={textStyle}>{Weave.lang("Equally interval")}</span>
@@ -340,7 +345,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 									<span style={textStyle}>{Weave.lang("Data interval:")}</span>
 									<StatefulTextField
 										style={inputStyle}
-										disabled={!this.isRadioSelected(this._equalInterval)}
+										disabled={!this.compareTargetBinningType(this._equalInterval)}
 										type="text"
 										ref={this.linkBinningDefinition(this._equalInterval.dataInterval)}
 									/>
@@ -354,7 +359,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 								<HBox style={leftItemsStyle}>
 									<Checkbox
 										type="radio"
-										value={this.isRadioSelected(this._stdDev)}
+										value={this.compareTargetBinningType(this._stdDev)}
 										onChange={(value) => this.setBinningDefinition(value, this._stdDev)}
 									/>
 									<span style={textStyle}>{Weave.lang("Standard deviations")}</span>
@@ -370,7 +375,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 								<HBox style={leftItemsStyle}>
 									<Checkbox
 										type="radio"
-										value={this.isRadioSelected(this._jenks)}
+										value={this.compareTargetBinningType(this._jenks)}
 										onChange={(value) => this.setBinningDefinition(value, this._jenks)}
 									/> 
 									<span style={textStyle}>{Weave.lang("Natural breaks")}</span>
@@ -380,7 +385,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 									<StatefulTextField
 										style={inputStyle}
 										type="number"
-										disabled={!this.isRadioSelected(this._jenks)}
+										disabled={!this.compareTargetBinningType(this._jenks)}
 										ref={this.linkBinningDefinition(this._jenks.numOfBins)}
 									/>
 									<HelpIcon style={helpStyle}>
@@ -393,7 +398,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 								<HBox style={leftItemsStyle}>
 									<Checkbox
 										type="radio"
-										value={this.isRadioSelected(this._category)}
+										value={this.compareTargetBinningType(this._category)}
 										onChange={(value) => this.setBinningDefinition(value, this._category)}
 									/>
 									<span style={textStyle}>{Weave.lang("All Categories (string values)")}</span>

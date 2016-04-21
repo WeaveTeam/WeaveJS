@@ -43,9 +43,12 @@ export default class ColorController extends React.Component<ColorControllerProp
 
 	static open(colorColumn:ColorColumn)
 	{
+		if (!colorColumn)
+			return;
+		
 		if (ColorController.window)
 			PopupWindow.close(ColorController.window);
-
+		
 		ColorController.window = PopupWindow.open({
 			title: Weave.lang("Color Controller"),
 			content: <ColorController colorColumn={colorColumn}/>,
@@ -54,6 +57,8 @@ export default class ColorController extends React.Component<ColorControllerProp
 			height: 675,
 			onClose: ColorController.close
 		});
+		
+		Weave.getCallbacks(colorColumn).addDisposeCallback(ColorController.window, () => PopupWindow.close(ColorController.window));
 	}
 	
 	get binnedColumn():BinnedColumn { return this.props.colorColumn && this.props.colorColumn.getInternalColumn() as BinnedColumn };
