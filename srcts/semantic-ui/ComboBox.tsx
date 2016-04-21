@@ -56,11 +56,11 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	{
 		//check if included elements are the same, even if in a different order
 		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
-		if(this.props.type === "multiple"){
-			if(prevState.value.length !== currentState.value.length)
+		if (this.props.type === "multiple"){
+			if (prevState.value.length !== currentState.value.length)
 				return false;
 			prevState.value.forEach( (item:any,index:number) => {
-				if(!currentState.value.some( (val:any) => equalityFunc(val,item))) {
+				if (!currentState.value.some( (val:any) => equalityFunc(val,item))) {
 					return false;
 				}
 			});
@@ -77,7 +77,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		if (nextProps.selectFirstOnInvalid && this.getIndexFromValue(value) < 0)
 		{
 			let option = nextProps.options[0];
-			if(option)
+			if (option)
 				this.setState({value:(typeof option === "object") ? option.value : option});
 		}
 		else if (value !== undefined)
@@ -91,9 +91,11 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
-		if (!this.statesEqual(prevState,this.state)) {
+		if (!this.statesEqual(prevState,this.state))
+		{
 			let selector = ($(this.element) as any);
-			if (this.props.type === "multiple") {
+			if (this.props.type === "multiple")
+			{
 				let indices:string[] = [];
 				this.state.value.forEach((item:any) => {
 					let index:number = this.getIndexFromValue(item);
@@ -102,12 +104,16 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				});
 				selector.dropdown('set exactly', indices);
 			}
-			else {
+			else
+			{
 				let index = this.getIndexFromValue(this.state.value);
-				if (index >= 0) {
+				if (index >= 0)
+				{
 					let option = this.props.options[index];
 					selector.dropdown('set selected', (typeof option === "object") ? option.label : option);
-				} else {
+				}
+				else
+				{
 					selector.dropdown('clear');
 				}
 			}
@@ -122,26 +128,31 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		
 		selector.dropdown({
 			onChange: (selected:number|string, text:string) => {
-				if(this.props.onNew && text &&  (Number(index) < 0) )
+				if (this.props.onNew && text &&  (Number(index) < 0) )
 				{
 					this.props.onNew && this.props.onNew(text);
 				}
 				else
 				{
-					if(this.props.type !== "multiple") {
+					if (this.props.type !== "multiple") {
 						let option = this.props.options[selected as number];
 						let value:any = (typeof option === "object") ? option.value : option;
 						this.setState({value});
 						this.props.onChange && this.props.onChange(value);
-					} else {
-						if(selected !== "") {
+					}
+					else
+					{
+						if (selected !== "")
+						{
 							let indices:number[] = (selected as string).split(",").map(Number);
 							let values:any[] = indices.map((index) => {
 								let option = this.props.options[index];
 								return (typeof option === "object") ? option.value : option;
 							});
 							this.setState({value: values});
-						} else {
+						}
+						else
+						{
 							this.setState({value: []});
 						}
 					}
@@ -156,7 +167,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				let option = this.props.options[addedValue];
 				let value:any = (typeof option === "object") ? option.value : option;
 				let values:any = _.clone(this.state.value);
-				if(!_.includes(values,value)) {
+				if (!_.includes(values,value)) {
 					values.push(value);
 					this.setState({value:values});
 				}
@@ -175,7 +186,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		});
 		let index = this.getIndexFromValue(this.state.value);
 		let option = this.props.options[index];
-		if(this.props.type === "multiple")
+		if (this.props.type === "multiple")
 		{
 			let indices:string[] = [];
 			this.state.value.forEach((item:any) => {
@@ -183,9 +194,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				if (index >= 0)
 					indices.push(String(index));
 			});
-			selector.dropdown('set exactly', indices)
+			selector.dropdown('set exactly', indices);
 		}
-		else if(index >= 0)
+		else if (index >= 0)
 			selector.dropdown('set selected',(typeof option === "object") ? option.label:option);
 		else
 			selector.dropdown('clear');
