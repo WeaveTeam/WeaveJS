@@ -384,12 +384,12 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		else
 		{
 			//Continuous plot case
-			if(this.colorColumn)
+			if (this.colorColumn)
 			{
 				var dataColumn = this.colorColumn.internalDynamicColumn;
 				
 				return (
-					<VBox style={{flex: 1, marginLeft: 20}} className="weave-padded-vbox">
+					<VBox style={{flex: 1, marginLeft: 20, marginBottom: 8}} className="weave-padded-vbox">
 						<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</label>
 						<HBox style={{flex: 1, overflow: "auto"}} className="weave-padded-hbox">
 							<ColorRampComponent style={{width: 30}} direction="bottom" ramp={this.colorColumn ? this.colorColumn.ramp.getHexColors():[]}/>
