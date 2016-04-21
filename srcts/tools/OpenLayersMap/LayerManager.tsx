@@ -60,7 +60,8 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 				openedLayer: layer
 			});
 		}
-		e.stopPropagation()
+		if (e)
+			e.stopPropagation();
 	}
 
 
@@ -105,7 +106,6 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		return this.props.layers.getObjects().indexOf(this.state.selectedLayer);
 	}
 
-	/* TODO: Add drag-and-drop of layers. */
 	render():JSX.Element
 	{
 		let flex1: React.CSSProperties = { flex: 1 };
@@ -120,8 +120,11 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 					<HBox className="weave-padded-hbox">
 						<MenuButton showIcon={false} style={{flex: "1", alignItems: "center", justifyContent: "center"}} menu={layerTypes.map((layerClass) => ({
 								label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
-								click: () => this.setState({selectedLayer: this.props.layers.requestObject('', layerClass)})
-							}))}>
+								click: (e:React.MouseEvent) => {
+									let newLayer = this.props.layers.requestObject('', layerClass);
+									this.setState({selectedLayer: newLayer});
+									this.onEditLayerClick(newLayer, e);
+								}}))}>
 							<i className="fa fa-plus fa-fw"/>
 						</MenuButton>
 						<Button style={flex1} disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus fa-fw"/></Button>
