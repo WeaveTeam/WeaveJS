@@ -112,8 +112,11 @@ div.table-row-selected>div>div>div>div>div {
 .weave-disableBottomBorder .fixedDataTableLayout_header,
 .weave-disableBottomBorder .fixedDataTableLayout_hasBottomBorder {
 	border-style: none;
-} 
+}
 
+.fixedDataTableLayout_hasBottomBorder {
+	border-style: none;
+}
 
 /* weave custom css */
 .weave-app {
