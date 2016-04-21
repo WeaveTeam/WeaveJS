@@ -30,9 +30,9 @@ export default class Input extends React.Component<InputProps, InputState>
 
 		// since typescript doesn't support destructuring yet
 		// we manually remove children from props
-		for(var key in this.props)
+		for (var key in this.props)
 		{
-			if(key != "children")
+			if (key != "children")
 			{
 				(inputProps as any)[key] = (this.props as any)[key];
 			}
@@ -41,20 +41,6 @@ export default class Input extends React.Component<InputProps, InputState>
 		delete inputProps.className;
 		delete inputProps.style;
 
-		if(inputProps.disabled)
-		{
-			if(inputProps.style)
-			{
-				inputProps.style["cursor"] = "not-allowed";
-			}
-			else
-			{
-				inputProps.style = {
-					cursor: "not-allowed"
-				}
-			}
-		}
-		
 		return (
 			<div className={"ui input " + (this.props.fluid ? " fluid":"") + (this.props.className || "")}
 				 style={this.props.style}
