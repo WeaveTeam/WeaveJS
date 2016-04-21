@@ -59,7 +59,7 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 			return <div/>;
 
 		var defaultStyle:React.CSSProperties = {
-			background:"#f8f8f8",
+			background:"#f4f4f4",
 			display:"flex"
 		};
 
