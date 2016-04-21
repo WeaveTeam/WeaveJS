@@ -64,7 +64,10 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				Weave.lang("URL"),
-				<FileSelector targetUrl={ds.url} style={{width: "100%"}} accept="text/csv,.csv"/>
+				<FileSelector targetUrl={ds.url}
+							  placeholder={Weave.lang("http://www.example.com/example.csv")} 
+							  style={{width: "100%"}}
+							  accept="text/csv,.csv"/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
