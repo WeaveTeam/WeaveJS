@@ -6,6 +6,7 @@ import SmartComponent from "../ui/SmartComponent";
 import prefixer from "./VendorPrefixer";
 import CenteredIcon from "./CenteredIcon";
 import Button from "../semantic-ui/Button";
+import DOMUtils from "../utils/DOMUtils";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 const LEFT = "left";
@@ -54,7 +55,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	private minHeight:number = 240;
 	private element:HTMLElement;
 	private container:VBox;
-	private oldMousePos: {
+	private mouseDownOffset: {
 		x: number,
 		y: number
 	}
@@ -133,22 +134,16 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		PopupWindow.close(this);
 	}
 
-	private onDragStart(event:React.MouseEvent)
+	private onDragStart(event:MouseEvent)
 	{
 		this.dragging = true;
-		this.oldMousePos = {
-			x: event.clientX,
-			y: event.clientY
-		}
+		this.mouseDownOffset = DOMUtils.getOffsetPoint(this.element, event as any);
 	}
 	
 	private onResizeStart(event:React.MouseEvent, handle:Handle)
 	{
 		this.activeResizeHandle = handle;
-		this.oldMousePos = {
-			x: event.clientX,
-			y: event.clientY
-		}
+		this.mouseDownOffset = DOMUtils.getOffsetPoint(this.element, event as any);
 	}
 	
 	private handleClickOnWindow()
@@ -157,78 +152,72 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		PopupWindow.windowSet.add(this);
 		PopupWindow.alignWindows();
 	}
-	
+
 	private onDrag=(event:MouseEvent)=>
 	{
-		if(!this.activeResizeHandle && !this.dragging)
+		if (!this.activeResizeHandle && !this.dragging)
 			return;
-
-		// TODO: correctly handle the page offsets
-		var mouseDeltaX = event.clientX - this.oldMousePos.x;
-		var mouseDeltaY = event.clientY - this.oldMousePos.y;
-		this.oldMousePos.x = event.clientX;
-		this.oldMousePos.y = event.clientY;
+		
+		var mouseOffset = DOMUtils.getOffsetPoint(this.element, event)
+		var parentMouseOffset = DOMUtils.getOffsetPoint(this.element.parentElement, event);
+		var parentWidth = (this.element.offsetParent as HTMLElement).offsetWidth;
+		var parentHeight = (this.element.offsetParent as HTMLElement).offsetHeight;
+		var oldRight:number = this.state.left + this.state.width;
+		var oldBottom:number = this.state.top + this.state.height;
+		var edgeBuffer = 25;
+		
+		var mouseDeltaX = mouseOffset.x - this.mouseDownOffset.x;
+		var mouseDeltaY = mouseOffset.y - this.mouseDownOffset.y;
 		var newState:PopupWindowState = {};
-		var newLeft:number;
-		var newRight:number;
-		var newTop:number;
-		var newBottom:number;
-		var newWidth:number;
-		var newHeight:number;
 		
 		// don't resize if mouse goes out of screen
 
-		if(this.activeResizeHandle)
+		if (this.activeResizeHandle)
 		{
-			if(this.activeResizeHandle.indexOf(LEFT) >= 0 && event.clientX > 0)
+			if (this.activeResizeHandle.indexOf(LEFT) >= 0)
 			{
 				newState.left = this.state.left + mouseDeltaX;
-				newState.width = this.state.width - mouseDeltaX;
+				newState.left = Math.max(newState.left, oldRight - parentWidth);
+				newState.left = Math.min(newState.left, oldRight - this.minWidth, parentWidth - edgeBuffer);
+				newState.width = oldRight - newState.left;
 			}
 			
-			if(this.activeResizeHandle.indexOf(RIGHT) >= 0 && event.clientX < window.innerWidth)
-			{
-				newState.width = this.state.width + mouseDeltaX;
-			}
-			
-			if(this.activeResizeHandle.indexOf(TOP) >= 0 && event.clientY > 25)
+			if (this.activeResizeHandle.indexOf(TOP) >= 0)
 			{
 				newState.top = this.state.top + mouseDeltaY;
-				newState.height = this.state.height - mouseDeltaY;
+				newState.top = Math.max(newState.top, 0);
+				newState.top = Math.min(newState.top, oldBottom - this.minHeight, parentHeight - edgeBuffer);
+				newState.height = oldBottom - newState.top;
 			}
 			
-			if(this.activeResizeHandle.indexOf(BOTTOM) >= 0 && event.clientY < window.innerHeight)
+			if (this.activeResizeHandle.indexOf(RIGHT) >= 0)
+			{
+				newState.width = this.state.width + mouseDeltaX;
+				newState.width = Math.max(newState.width, this.minWidth, edgeBuffer - this.state.left);
+				newState.width = Math.min(newState.width, parentWidth);
+				this.mouseDownOffset.x += newState.width - this.state.width;
+			}
+			
+			if (this.activeResizeHandle.indexOf(BOTTOM) >= 0 && event.clientY < window.innerHeight)
 			{
 				newState.height = this.state.height + mouseDeltaY;
+				newState.height = Math.max(newState.height, this.minHeight);
+				newState.height = Math.min(newState.height, parentHeight);
+				this.mouseDownOffset.y += newState.height - this.state.height;
 			}
-			
-			if((!newState.width || newState.width > this.minWidth) && (!newState.height || newState.height > this.minHeight))
-				this.setState(newState);
-			
-			return;
 		}
-
-		if (this.dragging)
+		else if (this.dragging)
 		{
-			var right = this.state.left + this.element.clientWidth;
-			var bottom = this.state.top + this.element.clientHeight;
+			newState.left = this.state.left + mouseDeltaX;
+			newState.left = Math.max(newState.left, edgeBuffer - this.state.width);
+			newState.left = Math.min(newState.left, parentWidth - edgeBuffer);
 			
-			var newState:PopupWindowState = {};
-
-			var newLeft:number = this.state.left + mouseDeltaX;
-			var newTop:number = this.state.top + mouseDeltaY;
-
-			// check overflow left and right
-			if (newLeft < window.innerWidth - 25 && newLeft+this.element.clientWidth > 25)
-				newState.left = newLeft;
-
-			// check overflow left and right
-			if (newTop < window.innerHeight - 25 && newTop > 25)
-				newState.top = newTop;
-			
-			if(Object.keys(newState).length)
-				this.setState(newState);
+			newState.top = this.state.top + mouseDeltaY;
+			newState.top = Math.max(newState.top, 0);
+			newState.top = Math.min(newState.top, parentHeight - edgeBuffer);
 		}
+		
+		this.setState(newState);
 	}
 	
 	private onDragEnd=(event:MouseEvent)=>
@@ -254,7 +243,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 			left: 0
 		};
 		var className:string;
-		if(modal)
+		if (modal)
 		{
 			className = "weave-dialog-overlay";
 		}
@@ -264,14 +253,14 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	renderResizers():JSX.Element[]
 	{
 		return [
-			<div key={LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, LEFT)} style={{position: "absolute", left: 0, top: 0, width: 4, height: "100%", cursor: "ew-resize"}}/>,
-			<div key={RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, RIGHT)} style={{position: "absolute", right: 0, top: 0, width: 4, height: "100%", cursor: "ew-resize"}}/>,
-			<div key={TOP} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP)} style={{position: "absolute", left: 0, top: 0, width: "100%", height: 4, cursor: "ns-resize"}}/>,
-			<div key={BOTTOM} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM)} style={{position: "absolute", left: 0, bottom: 0, width: "100%", height: 4, cursor: "ns-resize"}}/>,
-			<div key={TOP_LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP_LEFT)} style={{position: "absolute", left: 0, top: 0, width: 4, height: 4, cursor: "nwse-resize"}}/>,
-			<div key={TOP_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event,  TOP_RIGHT)} style={{position: "absolute", right: 0, top: 0, width: 4, height: 4, cursor: "nesw-resize"}}/>,
-			<div key={BOTTOM_LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event,  BOTTOM_LEFT)} style={{position: "absolute", left: 0, bottom: 0, width: 4, height: 4, cursor: "nesw-resize"}}/>,
-			<div key={BOTTOM_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM_RIGHT)} style={{position: "absolute", bottom: 0, right: 0, width: 4, height: 4, cursor: "nwse-resize"}}/>
+			<div key={LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, LEFT)} style={{position: "absolute", left: 0, top: 0, width: 8, height: "100%", cursor: "ew-resize"}}/>,
+			<div key={RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, RIGHT)} style={{position: "absolute", right: 0, top: 0, width: 8, height: "100%", cursor: "ew-resize"}}/>,
+			<div key={TOP} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP)} style={{position: "absolute", left: 0, top: 0, width: "100%", height: 8, cursor: "ns-resize"}}/>,
+			<div key={BOTTOM} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM)} style={{position: "absolute", left: 0, bottom: 0, width: "100%", height: 8, cursor: "ns-resize"}}/>,
+			<div key={TOP_LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP_LEFT)} style={{position: "absolute", left: 0, top: 0, width: 16, height: 16, cursor: "nwse-resize"}}/>,
+			<div key={TOP_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP_RIGHT)} style={{position: "absolute", right: 0, top: 0, width: 8, height: 8, cursor: "nesw-resize"}}/>,
+			<div key={BOTTOM_LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM_LEFT)} style={{position: "absolute", left: 0, bottom: 0, width: 16, height: 16, cursor: "nesw-resize"}}/>,
+			<div key={BOTTOM_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM_RIGHT)} style={{position: "absolute", bottom: 0, right: 0, width: 16, height: 16, cursor: "nwse-resize"}}/>
 		];
 	}
 
@@ -297,10 +286,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 					</div>
 					{
 						!this.props.modal
-						? 
-							<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
-						:
-							''
+						?	<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
+						:	null
 					}
 				</HBox>
 				<HBox className="weave-window-content" style={{flex: 1, overflow: "auto"}}>
@@ -309,21 +296,17 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 				</HBox>
 				{
 					this.props.modal
-					?
-						<HBox className="weave-window-footer">
+					?	<HBox className="weave-window-footer">
 						{
 							this.props.footerContent
-							?
-								this.props.footerContent
-							:
-								<HBox style={prefixer({flex: 1, justifyContent: "flex-end"})}>
+							?	this.props.footerContent
+							:	<HBox style={prefixer({flex: 1, justifyContent: "flex-end"})}>
 									<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
 									<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
 								</HBox>
 						}
 						</HBox>
-					:
-						null
+					:	null
 				}
 				{
 					this.props.resizable && this.renderResizers()
