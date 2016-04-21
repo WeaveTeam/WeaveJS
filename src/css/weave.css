@@ -538,6 +538,18 @@ div.weave-tree-view {
 	background: lightgrey;
 }
 
+.ui.selection.dropdown .menu {
+	border-top-style: dashed;
+	border-bottom-style: solid;
+	border-top-width: 1!important;
+}
+
+.ui.upward.selection.dropdown .menu {
+	border-top-style: solid;
+	border-bottom-style: dashed;
+	border-bottom-width: 1!important;
+}
+
 /******* grid *********/
 
 .ui.grid {
