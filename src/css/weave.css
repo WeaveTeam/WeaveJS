@@ -58,11 +58,13 @@ input[type=number]::-webkit-outer-spin-button {
 
 .rc-slider-track {
 	background-color: #D0D0D0;
+	 z-index: 0;
 }
 
 .rc-slider-handle {
 	border-color: #9A9A9A;
 	background-color: #D0D0D0;
+	z-index: 0;	
 }
 
 .rc-slider-handle:hover {
@@ -71,6 +73,11 @@ input[type=number]::-webkit-outer-spin-button {
 
 .rc-slider-mark {
 	font-size: inherit;
+	z-index: 0;
+}
+
+.rc-slider-step {
+	z-index: 0;
 }
 
 .rc-slider-mark-text {
