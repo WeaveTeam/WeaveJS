@@ -204,8 +204,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[<span className="weave-sidebar-label">{Weave.lang("Override extent")}</span>,
 				<HBox>
-					<Button onClick={this.setOverrideExtent}>{Weave.lang("Use current zoom")}</Button>
-					<Button onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</Button>
+					<Button style={ {borderBottomRightRadius:0,borderTopRightRadius:0,borderRight:"none"} } onClick={this.setOverrideExtent}>{Weave.lang("Use current zoom")}</Button>
+					<Button style={ {borderBottomLeftRadius:0,borderTopLeftRadius:0} } onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</Button>
 				</HBox>
 			],
 			[<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}/>, Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.")]
