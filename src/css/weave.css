@@ -514,6 +514,18 @@ div.weave-tree-view {
 
 /* Override Semantic ui CSS*/
 
+/******* Breadcrumb *******/
+
+.ui.breadcrumb {
+    line-height: normal;
+}
+
+/******* Menu *******/
+
+.ui.dropdown .menu>.item {
+    line-height: normal;
+}
+
 /******* Button *******/
 .ui.button {
 	margin:0;
