@@ -158,6 +158,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 				<HBox style={{flex: 1}}>
 					<ComboBox type="multiple"
 	                      value={ columnList }
+                          placeholder="(None)"
 	                      options={ options }
 	                      valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
 	                      onChange={this.setSelected}

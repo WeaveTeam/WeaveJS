@@ -11,6 +11,7 @@ import SliderOption from "../../react-ui/RCSlider/RCSlider";
 import ComboBox from '../../semantic-ui/ComboBox';
 import {ComboBoxOption} from "../../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../../utils/WeaveReactUtils";
+import StatefulTextField from "../../ui/StatefulTextField";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -44,6 +45,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	}
 
 	//session properties
+	public panelTitle = Weave.linkableChild(this, new LinkableString('Attribute Menu Tool'));
 	public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST), this.forceUpdate, true);
 	public selectedAttribute = Weave.linkableChild(this, new LinkableString, this.forceUpdate, true);
@@ -61,7 +63,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	get title():string
 	{
-		return Weave.lang('Attribute Menu Tool');
+		return this.panelTitle.value;
 	}
 
 	get selectableAttributes()
@@ -289,6 +291,18 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		];
 	}
 
+	renderTitleEditor():React.ReactChild[][]
+	{
+		return[
+			[
+				Weave.lang("Title"),
+				<StatefulTextField
+					className="ui input fluid"
+					ref={ linkReactStateRef(this, { value:this.props.attributeMenuTool.panelTitle }) }
+				/>
+			]
+		]
+	}
 
 	render ()
 	{
@@ -305,9 +319,9 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				{
 					this.openTools && this.openTools.length > 0
 					?	ReactUtils.generateTable(null,
-						this.toolConfigs.concat(renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction)),
+						this.toolConfigs.concat(renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction).concat(this.renderTitleEditor())),
 						tableStyles)
-					:	null
+					:	<div>{ 'Select a visualization from the Visualizations menu' }</div>
 				}
 			</VBox>
 		);
