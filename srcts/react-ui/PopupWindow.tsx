@@ -6,7 +6,7 @@ import SmartComponent from "../ui/SmartComponent";
 import prefixer from "./VendorPrefixer";
 import CenteredIcon from "./CenteredIcon";
 import Button from "../semantic-ui/Button";
-import DOMUtils from "../utils/DOMUtils";
+import MouseUtils from "../utils/MouseUtils";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 const LEFT = "left";
@@ -137,13 +137,13 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	private onDragStart(event:MouseEvent)
 	{
 		this.dragging = true;
-		this.mouseDownOffset = DOMUtils.getOffsetPoint(this.element, event as any);
+		this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
 	}
 	
 	private onResizeStart(event:React.MouseEvent, handle:Handle)
 	{
 		this.activeResizeHandle = handle;
-		this.mouseDownOffset = DOMUtils.getOffsetPoint(this.element, event as any);
+		this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
 	}
 	
 	private handleClickOnWindow()
@@ -158,8 +158,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		if (!this.activeResizeHandle && !this.dragging)
 			return;
 		
-		var mouseOffset = DOMUtils.getOffsetPoint(this.element, event)
-		var parentMouseOffset = DOMUtils.getOffsetPoint(this.element.parentElement, event);
+		var mouseOffset = MouseUtils.getOffsetPoint(this.element, event)
+		var parentMouseOffset = MouseUtils.getOffsetPoint(this.element.parentElement, event);
 		var parentWidth = (this.element.offsetParent as HTMLElement).offsetWidth;
 		var parentHeight = (this.element.offsetParent as HTMLElement).offsetHeight;
 		var oldRight:number = this.state.left + this.state.width;

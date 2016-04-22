@@ -14,6 +14,7 @@ import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import PanelOverlay from "./PanelOverlay";
 import MiscUtils from "./utils/MiscUtils";
 import DOMUtils from "./utils/DOMUtils";
+import MouseUtils from "./utils/MouseUtils";
 
 const LEFT:string = "left";
 const RIGHT:string = "right";

@@ -58,27 +58,6 @@ export default class DOMUtils
 
 		return result;
 	}
-
-	static addPointClickListener(target:HTMLElement, listener:(event:MouseEvent)=>void, pixelThreshold:number = 1):void
-	{
-		var _listener = listener as any;
-		_listener.onMouseDown = function(event:MouseEvent):void {
-			_listener.mouseDownEvent = event;
-		};
-		_listener.onClick = function(event:MouseEvent):void {
-			var mde:MouseEvent = _listener.mouseDownEvent;
-			if (Math.abs(mde.clientX - event.clientX) <= pixelThreshold && Math.abs(mde.clientY - event.clientY) <= pixelThreshold)
-				listener(event);
-		};
-		target.addEventListener('mousedown', _listener.onMouseDown);
-		target.addEventListener('click', _listener.onClick);
-	}
-
-	static removePointClickListener(target:HTMLElement, listener:any):void
-	{
-		target.removeEventListener('mousedown', listener.onMouseDown);
-		target.removeEventListener('click', listener.onClick);
-	}
 	
 	static eventFire(el:HTMLElement|Document, etype:string):void {
 		var elt:any = el as any;
@@ -110,14 +89,5 @@ export default class DOMUtils
 			descendant = descendant.offsetParent as HTMLElement;
 		}
 		return null;
-	}
-	
-	static getOffsetPoint(relativeTo:HTMLElement, event:MouseEvent):{x:number, y:number}
-	{
-		var rect = relativeTo.getBoundingClientRect();
-		return {
-			x: (event.clientX - rect.left) * (relativeTo.offsetWidth / rect.width),
-			y: (event.clientY - rect.top) * (relativeTo.offsetHeight / rect.height)
-		};
 	}
 }

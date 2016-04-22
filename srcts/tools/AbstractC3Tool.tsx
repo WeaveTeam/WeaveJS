@@ -9,6 +9,7 @@ import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import * as jquery from "jquery";
 import DOMUtils from "../utils/DOMUtils";
+import MouseUtils from "../utils/MouseUtils";
 import ReactUtils from "../utils/ReactUtils";
 import ToolTip from "./ToolTip";
 
@@ -113,7 +114,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		super.componentDidMount();
 		
 		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
-        DOMUtils.addPointClickListener(this.element, this.handlePointClick);
+        MouseUtils.addPointClickListener(this.element, this.handlePointClick);
 		this.validateSize();
 		this.handleChange();
 	}
@@ -121,7 +122,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	componentWillUnmount()
 	{
 		ReactUtils.closePopup(this.toolTip);
-		DOMUtils.removePointClickListener(this.element, this.handlePointClick);
+		MouseUtils.removePointClickListener(this.element, this.handlePointClick);
 		if (this.chart)
 		{
 			this.chart.destroy();

@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import prefixer from "../react-ui/VendorPrefixer";
 import ReactUtils from "../utils/ReactUtils";
-import DOMUtils from "../utils/DOMUtils";
+import MouseUtils from "../utils/MouseUtils";
 import Resizer from "./Resizer";
 import ResizerOverlay from "./ResizerOverlay";
 
@@ -144,7 +144,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		var newState:LayoutState = _.cloneDeep(this.state);
 
 		var element = ReactDOM.findDOMNode(this) as HTMLElement;
-		var offsetPoint = DOMUtils.getOffsetPoint(element, event);
+		var offsetPoint = MouseUtils.getOffsetPoint(element, event);
 		this.resizers.forEach((resizer, index) => {
 			if (resizer.state && resizer.state.active)
 			{
