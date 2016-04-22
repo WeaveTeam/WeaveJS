@@ -1,6 +1,7 @@
 import * as React from "react";
 import RCSlider from "./RCSlider";
 import {SliderOption} from "./RCSlider";
+import {HBox} from "../FlexBox";
 
 export interface HSliderProps extends React.Props<HSlider>
 {
@@ -12,6 +13,8 @@ export interface HSliderProps extends React.Props<HSlider>
     type:string;
     reversed?:boolean;
     onChange?:(selectedValue:[string]) => void;
+	style?:React.CSSProperties;
+	className?:string;
 }
 
 export default class HSlider extends React.Component<HSliderProps, any>
@@ -23,6 +26,6 @@ export default class HSlider extends React.Component<HSliderProps, any>
 
     render()
     {
-        return <RCSlider {...this.props}/>;
+        return <HBox style={{flex: 1}} className="weave-hslider"><RCSlider {...this.props}/></HBox>;
     }
 }

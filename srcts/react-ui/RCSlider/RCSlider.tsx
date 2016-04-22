@@ -16,7 +16,9 @@ export interface SliderProps
     options?:SliderOption[];
     selectedValues:any[];
     onChange:Function;
-	vertical:boolean
+	vertical:boolean;
+	className:string;
+	style:React.CSSProperties;
 }
 
 export default class RCSlider extends React.Component<any, any>
@@ -119,6 +121,8 @@ export default class RCSlider extends React.Component<any, any>
                            value={this.valueToIndex.get((this.props.selectedValues || [])[0])}
                            onChange={this.onChange}
 						   vertical={this.props.vertical}
+						   style={this.props.style}
+						   className={this.props.className}
                     />;
 
         }
