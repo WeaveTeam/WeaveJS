@@ -7,6 +7,8 @@ import * as c3 from "c3";
 import {ChartAPI, ChartConfiguration} from "c3";
 import ToolTip from "./ToolTip";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import StatefulTextField from "../ui/StatefulTextField";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -15,6 +17,7 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import SolidFillStyle = weavejs.geom.SolidFillStyle;
 import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import LinkableNumber = weavejs.core.LinkableNumber;
+import LinkableString = weavejs.core.LinkableString;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
@@ -217,6 +220,23 @@ export default class C3PieChart extends AbstractC3Tool
                 { super.renderEditor(linkFunction) }
               </VBox>);
     };
+
+    getTitlesEditor():React.ReactChild[][]
+    {
+        return [
+            [
+                "Title",
+                this.panelTitle,
+                this.defaultPanelTitle
+            ]
+        ].map((row:[string, LinkableString]) => {
+
+            return [
+                Weave.lang(row[0]),
+                <StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+            ]
+        });
+    }
 
 	get deprecatedStateMapping()
 	{

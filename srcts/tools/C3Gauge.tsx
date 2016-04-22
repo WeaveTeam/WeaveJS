@@ -3,6 +3,8 @@ import AbstractC3Tool from "./AbstractC3Tool";
 import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import StatefulTextField from "../ui/StatefulTextField";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -15,6 +17,7 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
 import StandardLib = weavejs.util.StandardLib;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 declare type Record = {
@@ -159,6 +162,23 @@ export default class C3Gauge extends AbstractC3Tool
 				}
 			</VBox>
 		)
+	}
+
+	getTitlesEditor():React.ReactChild[][]
+	{
+		return [
+			[
+				"Title",
+				this.panelTitle,
+				this.defaultPanelTitle
+			]
+		].map((row:[string, LinkableString]) => {
+
+			return [
+				Weave.lang(row[0]),
+				<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+			]
+		});
 	}
 
     get defaultPanelTitle():string
