@@ -18,6 +18,7 @@ import ColorController from "../editors/ColorController";
 import ColorRampEditor from "../editors/ColorRampEditor";
 import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
 import Button from "../semantic-ui/Button";
+import DynamicComponent from "../ui/DynamicComponent";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -613,18 +614,10 @@ export default class C3Histogram extends AbstractC3Tool
 						Weave.lang("Aggregation method"),
 						<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
 					],
-				],
-				(
-					Weave.beta
-					?	[
-							[ 
-								<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, 
-								Weave.lang("Horizontal bars (beta)")
-							],
-						]
-					:	[]
-				),
-				[
+					Weave.beta && [
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, 
+						Weave.lang("Horizontal bars (beta)")
+					],
 					[
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>,
 						Weave.lang("Show value labels")

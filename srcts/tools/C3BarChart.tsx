@@ -565,20 +565,17 @@ export default class C3BarChart extends AbstractC3Tool
 		
 		return ReactUtils.generateTable(
 			null,
-			this.getSelectableAttributesEditor(linkFunction).concat(
+			[].concat(
+				this.getSelectableAttributesEditor(linkFunction),
 				[
 					[ 
 						Weave.lang("Grouping mode"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> 
 					],
-					(
-						Weave.beta
-						?	[ 
-								<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>,
-								Weave.lang("Horizontal bars (beta)")
-							]
-						:	[]
-					),
+					Weave.beta && [ 
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>,
+						Weave.lang("Horizontal bars (beta)")
+					],
 					[
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>,
 						Weave.lang("Show value labels")

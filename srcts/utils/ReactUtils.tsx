@@ -190,7 +190,7 @@ export default class ReactUtils
 		var tableBody = body && (
 			<tbody style={styles.tbody} className={classes.tbody}>
 				{
-					body.map((row, index) => {
+					body.filter(_.identity).map((row, index) => {
 						return (
 							<tr key={index} style={styles.tr} className={classes.tr}>
 								{
