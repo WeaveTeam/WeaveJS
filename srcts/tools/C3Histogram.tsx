@@ -593,18 +593,16 @@ export default class C3Histogram extends AbstractC3Tool
 				[
 					[
 						Weave.lang("Color theme"),
-						<ColorRampEditor ref={(colorRampEditor:ColorRampEditor) => {
-											 Weave.getCallbacks(this.fill.color).addGroupedCallback(colorRampEditor, () => {
-												 if (colorRampEditor)
-												 {
-													 colorRampEditor.colorRamp = this.colorColumn && this.colorColumn.ramp;
-												 }
-											})
-										 }}
-										 compact={true}
-										 colorRamp={this.colorColumn && this.colorColumn.ramp}
-										 onButtonClick={() => this.openColorController(1)}/>
-
+						<DynamicComponent
+							dependencies={[this.fill.color]}
+							render={() => 
+								<ColorRampEditor
+									compact={true}
+									colorRamp={this.colorColumn && this.colorColumn.ramp}
+									onButtonClick={() => this.openColorController(1)}
+								/>
+							}
+						/>
 					],
 					[
 						Weave.lang("Binning method"),
