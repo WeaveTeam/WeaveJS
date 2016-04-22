@@ -36,6 +36,7 @@ export interface IDataSourceEditorProps {
 export interface IDataSourceEditorState {
 	selectedNode?: IWeaveTreeNode;
 	showPreviewView?: boolean;
+	dataSourceLabel?:string;
 };
 
 export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
@@ -54,8 +55,15 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		this.componentWillReceiveProps(props);
 		this.state = {
 			selectedNode: props.dataSource.getHierarchyRoot(),
-			showPreviewView: false
+			showPreviewView: false,
+			dataSourceLabel:this.props.dataSource.getLabel()
 		}
+	}
+
+	updateDataSourceLabel(event:any)
+	{
+		this.setState({dataSourceLabel : event.target.value});
+		this.props.dataSource.setLabel(this.state.dataSourceLabel)
 	}
 	
 	componentWillReceiveProps(props:IDataSourceEditorProps)
@@ -74,9 +82,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			[
 				<span>{Weave.lang("Label")}</span>,
 				<Input type="text" style={{width: "100%", userSelect: false}}
-								   disabled={true}
-								   title="Renaming data sources is not supported yet"
-								   value={this.props.dataSource.getLabel()}/>
+				                   value={ this.props.dataSource.getLabel() }
+                                   onChange={ this.updateDataSourceLabel.bind(this) }/>
 			]
 		];
 	}
