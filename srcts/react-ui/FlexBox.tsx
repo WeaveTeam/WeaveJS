@@ -180,7 +180,6 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 		var childrenUI:any[]  = [];
 		// storing childCount is important, to make sure resizer is not added after last child
 		var childCount:number = React.Children.count(this.props.children);
-
 		React.Children.forEach(this.props.children,function(child:ReactNode , index:number){
 			if(!child)// this case happen in react Composite element based on a condition sometimes null or empty string will come in place of react element
 				return
@@ -192,32 +191,36 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			};
 
 
-			//set left child width 
-			if(this.state.dragging)
-			{
-				// if index is not there undefined comes, browser ignores one without the value
-				// and browser Layout mechanism set the width values
-				childStyle.width = (this.state.activeResizerIndex == index) ?  this.state.resizingLeftChildWidth : this.leftChildWidths[index];
-				//if(!isNaN(this.childHeight))
-					//childStyle.height = this.childHeight;
+			if(childCount - 1 == index){ //last child takes rest of the space
+				//let containerWidth:number = (this.getDOMNode()).getBoundingClientRect().width
+				childStyle.flex  = 1;
 			}
-			else 
+			else
 			{
-				childStyle.width = this.leftChildWidths[index];
-				//if(!isNaN(this.childHeight))
+				//set left child width
+				if(this.state.dragging)
+				{
+					// if index is not there undefined comes, browser ignores one without the value
+					// and browser Layout mechanism set the width values
+					childStyle.width = (this.state.activeResizerIndex == index) ?  this.state.resizingLeftChildWidth : this.leftChildWidths[index];
+					//if(!isNaN(this.childHeight))
 					//childStyle.height = this.childHeight;
-			}
+				}
+				else
+				{
+					childStyle.width = this.leftChildWidths[index];
+					//if(!isNaN(this.childHeight))
+					//childStyle.height = this.childHeight;
+				}
 
-			if(this.props.space)
-			{
-				if(childCount - 1 != index){ //margin right is ignored in last child
+				if(this.props.space)
+				{
 					childStyle.marginRight = String(this.props.space/2) + "px";
 				}
+
 			}
 
-			if(childCount - 1 == index){ //last child takes rest of the space
-				childStyle.flex = 1;
-			}
+
 
 			var childRef:string = "child"+index;
 			// make sure the child Style overflow property is set along with calculated width
