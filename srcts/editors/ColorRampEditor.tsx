@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {VBox, HBox} from "../react-ui/FlexBox";
 import ColorRampList from "../ui/ColorRampList";
-import ColorRampComponent from "../react-ui/ColorRamp";
+import ColorRampComponent from "../react-ui/ColorRampComponent";
 import ColorPicker from "../react-ui/ColorPicker";
 import List from "../react-ui/List";
 import CenteredIcon from "../react-ui/CenteredIcon";

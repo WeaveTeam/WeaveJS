@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IRow, IColumnTitles} from "../tools/FixedDataTable";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import ColorRamp from "../react-ui/ColorRamp";
+import ColorRampComponent from "../react-ui/ColorRampComponent";
 
 import StandardLib = weavejs.util.StandardLib;
 
@@ -79,7 +79,7 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 			var row:IRow = {};
 			var rampRow = (
 				<HBox style={{flex: 1}}>
-					<ColorRamp style={{flex: 1}} ramp={colorRampConfig.colors.map(StandardLib.getHexColor)}/>
+					<ColorRampComponent style={{flex: 1}} ramp={colorRampConfig.colors.map(StandardLib.getHexColor)}/>
 					<HBox style={{flex: 1, paddingLeft: 10}}>{colorRampConfig.name}</HBox>
 				</HBox>
 			);

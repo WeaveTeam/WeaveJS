@@ -13,7 +13,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import Menu from "../react-ui/Menu";
 import {MenuItemProps, IGetMenuItems} from "../react-ui/Menu";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-import ColorRampComponent from "../react-ui/ColorRamp";
+import ColorRampComponent from "../react-ui/ColorRampComponent";
 import Input from "../semantic-ui/Input";
 import ComboBox from "../semantic-ui/ComboBox";
 import ColorRampEditor from "../editors/ColorRampEditor";

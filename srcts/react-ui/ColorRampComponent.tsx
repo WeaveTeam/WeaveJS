@@ -1,19 +1,19 @@
 import * as React from "react";
 import * as _ from "lodash";
 
-export interface ColorRampProps extends React.HTMLProps<HTMLDivElement>
+export interface ColorRampComponentProps extends React.HTMLProps<HTMLDivElement>
 {
 	ramp: string[];
 	direction?:"left"|"right"|"top"|"bottom";
 }
 
-export interface ColorRampState
+export interface ColorRampComponentState
 {
 }
 
-export default class ColorRamp extends React.Component<ColorRampProps, ColorRampState>
+export default class ColorRampComponent extends React.Component<ColorRampComponentProps, ColorRampComponentState>
 {
-	constructor(props:ColorRampProps)
+	constructor(props:ColorRampComponentProps)
 	{
 		super(props);
 	}
