@@ -543,8 +543,7 @@ div.weave-tree-view {
 
 .weave-ToolEditor-Header .ui.button:hover { /* inline style will override hover state */
 	color: black;
-	font-weight: bolder;
-	background-color: transparent;
+	background-color: rgba(0, 0, 0, 0.12);
 }
 
 
