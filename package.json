@@ -58,7 +58,6 @@
     "proj4": "^2.3.14",
     "react-addons-update": "0.14.7",
     "react-color": "^2.0.0",
-    "swfobject-amd": "^2.3.1",
     "typescript": "^1.8.0"
   }
 }
