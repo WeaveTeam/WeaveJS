@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ReactUtils from "../utils/ReactUtils";
+import MouseUtils from "../utils/MouseUtils";
 import * as jquery from "jquery";
 
 // loads jquery from the es6 default module.
@@ -648,8 +649,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		view.setCenter(center);
 		let resolution = 1 / scale;
-		
-		view.setResolution(view.constrainResolution(resolution));
+		if (!MouseUtils.mouseButtonDown)
+			resolution = view.constrainResolution(resolution);
+
+		view.setResolution(resolution);
 
 		_.defer(() => {
 			view.on("change:center", this.updateCenter_olToWeave, this);
