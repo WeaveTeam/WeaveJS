@@ -634,8 +634,9 @@ div.weave-tree-view {
 	background-color: lightgrey;
 }
 
-.ui.button:active {
-	background-color: #E0E2E0;
+.ui.button:focus {
+	background-color: #ECECEC;
+	border-color: #85B7D9;
 }
 
 /******* Dropdown *****/
