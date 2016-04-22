@@ -234,8 +234,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		var HBoxJustify:React.CSSProperties = {
 			justifyContent: "space-between",
 			alignItems: "center",
-			padding: 0,
-			flex: 1
+			padding: 0
 		};
 
 		var leftItemsStyle:React.CSSProperties = {
@@ -261,172 +260,169 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 			<HBox className="weave-padded-hbox" style={{flex: 1}}>
 				<VBox style={{flex: 1, overflow: "auto"}} className="weave-container">
 					{Weave.lang("Binning type:")}
-					<HBox style={{flex: 1}}>
-						<VBox className="weave-padded-vbox" style={{flex: 1}}>
-							
-							<HBox className="weave-padded-hbox" style={HBoxJustify}>
-								<HBox style={leftItemsStyle}>
-									<Checkbox
-										type="radio"
-										value={this.compareTargetBinningType(this._simple)}
-										onChange={(value) => this.setBinningDefinition(value, this._simple)}
-									/> 
-									<span style={textStyle}>{Weave.lang("Equally spaced")}</span>
-								</HBox>
-								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
-									<StatefulTextField
-										disabled={!this.compareTargetBinningType(this._simple)}
-										style={inputStyle}
-										type="number"
-										ref={this.linkBinningDefinition(this._simple.numberOfBins)}
-									/>
-									<HelpIcon style={helpStyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
-									</HelpIcon>
-								</HBox>
+					<VBox className="weave-padded-vbox" style={{flex: 1, justifyContent: "space-around", minHeight:350}}>
+						<HBox className="weave-padded-hbox" style={HBoxJustify}>
+							<HBox style={leftItemsStyle}>
+								<Checkbox
+									type="radio"
+									value={this.compareTargetBinningType(this._simple)}
+									onChange={(value) => this.setBinningDefinition(value, this._simple)}
+								/>
+								<span style={textStyle}>{Weave.lang("Equally spaced")}</span>
 							</HBox>
-							
-							<HBox className="weave-padded-hbox" style={HBoxJustify}>
-								<HBox style={leftItemsStyle}>
-									<Checkbox
-										type="radio" 
-										value={this.compareTargetBinningType(this._customSplit)}
-										onChange={(value) => this.setBinningDefinition(value, this._customSplit)}
-									/> 
-									<span style={textStyle}>{Weave.lang("Custom breaks")}</span>
-								</HBox>
-								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<StatefulTextField
-										type="text" 
-										ref={this.linkBinningDefinition(this._customSplit.splitValues)}
-										disabled={!this.compareTargetBinningType(this._customSplit)}
-										fluid={false}
-									/>
-									<HelpIcon style={helpStyle}>
-										{Weave.lang('Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]')}
-									</HelpIcon>
-								</HBox>
+							<HBox style={rightItemsStyle} className="weave-padded-hbox">
+								<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
+								<StatefulTextField
+									disabled={!this.compareTargetBinningType(this._simple)}
+									style={inputStyle}
+									type="number"
+									ref={this.linkBinningDefinition(this._simple.numberOfBins)}
+								/>
+								<HelpIcon style={helpStyle}>
+									{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+								</HelpIcon>
 							</HBox>
-							
-							<HBox className="weave-padded-hbox" style={HBoxJustify}>
-								<HBox style={leftItemsStyle}>
-									<Checkbox
-										type="radio"
-										value={this.compareTargetBinningType(this._quantile)}
-										onChange={(value) => this.setBinningDefinition(value, this._quantile)}
-									/> 
-									<span style={textStyle}>{Weave.lang("Quantile")}</span>
-								</HBox>
-								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<span style={textStyle}>{Weave.lang("Reference quantile:")}</span>
-									<StatefulTextField
-										style={inputStyle} 
-										type="text"
-										disabled={!this.compareTargetBinningType(this._quantile)}
-										ref={linkReactStateRef(this, {value: this._quantile.refQuantile}, 500)}
-									/>
-									<HelpIcon style={helpStyle}>
-										{Weave.lang('Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order')}
-									</HelpIcon>
-								</HBox>
+						</HBox>
+
+						<HBox className="weave-padded-hbox" style={HBoxJustify}>
+							<HBox style={leftItemsStyle}>
+								<Checkbox
+									type="radio"
+									value={this.compareTargetBinningType(this._customSplit)}
+									onChange={(value) => this.setBinningDefinition(value, this._customSplit)}
+								/>
+								<span style={textStyle}>{Weave.lang("Custom breaks")}</span>
 							</HBox>
-							
-							<HBox className="weave-padded-hbox" style={HBoxJustify}>
-								<HBox style={leftItemsStyle}>
-									<Checkbox
-										type="radio"
-										value={this.compareTargetBinningType(this._equalInterval)}
-										onChange={(value) => this.setBinningDefinition(value, this._equalInterval)}
-									/>
-									<span style={textStyle}>{Weave.lang("Equally interval")}</span>
-								</HBox>
-								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<span style={textStyle}>{Weave.lang("Data interval:")}</span>
-									<StatefulTextField
-										style={inputStyle}
-										disabled={!this.compareTargetBinningType(this._equalInterval)}
-										type="text"
-										ref={this.linkBinningDefinition(this._equalInterval.dataInterval)}
-									/>
-									<HelpIcon style={helpStyle}>
-										{Weave.lang('Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]')}
-									</HelpIcon>
-								</HBox>
+							<HBox style={rightItemsStyle} className="weave-padded-hbox">
+								<StatefulTextField
+									type="text"
+									ref={this.linkBinningDefinition(this._customSplit.splitValues)}
+									disabled={!this.compareTargetBinningType(this._customSplit)}
+									fluid={false}
+								/>
+								<HelpIcon style={helpStyle}>
+									{Weave.lang('Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]')}
+								</HelpIcon>
 							</HBox>
-							
-							<HBox className="weave-padded-hbox" style={HBoxJustify}>
-								<HBox style={leftItemsStyle}>
-									<Checkbox
-										type="radio"
-										value={this.compareTargetBinningType(this._stdDev)}
-										onChange={(value) => this.setBinningDefinition(value, this._stdDev)}
-									/>
-									<span style={textStyle}>{Weave.lang("Standard deviations")}</span>
-								</HBox>
-								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<HelpIcon style={helpStyle}>
-										{Weave.lang('Six bins will be created for standard deviations above and below the mean value.')}
-									</HelpIcon>
-								</HBox>
+						</HBox>
+
+						<HBox className="weave-padded-hbox" style={HBoxJustify}>
+							<HBox style={leftItemsStyle}>
+								<Checkbox
+									type="radio"
+									value={this.compareTargetBinningType(this._quantile)}
+									onChange={(value) => this.setBinningDefinition(value, this._quantile)}
+								/>
+								<span style={textStyle}>{Weave.lang("Quantile")}</span>
 							</HBox>
-							
-							<HBox className="weave-padded-hbox" style={HBoxJustify}>
-								<HBox style={leftItemsStyle}>
-									<Checkbox
-										type="radio"
-										value={this.compareTargetBinningType(this._jenks)}
-										onChange={(value) => this.setBinningDefinition(value, this._jenks)}
-									/> 
-									<span style={textStyle}>{Weave.lang("Natural breaks")}</span>
-								</HBox>
-								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
-									<StatefulTextField
-										style={inputStyle}
-										type="number"
-										disabled={!this.compareTargetBinningType(this._jenks)}
-										ref={this.linkBinningDefinition(this._jenks.numOfBins)}
-									/>
-									<HelpIcon style={helpStyle}>
-										{Weave.lang('The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization')}
-									</HelpIcon>
-								</HBox>
+							<HBox style={rightItemsStyle} className="weave-padded-hbox">
+								<span style={textStyle}>{Weave.lang("Reference quantile:")}</span>
+								<StatefulTextField
+									style={inputStyle}
+									type="text"
+									disabled={!this.compareTargetBinningType(this._quantile)}
+									ref={linkReactStateRef(this, {value: this._quantile.refQuantile}, 500)}
+								/>
+								<HelpIcon style={helpStyle}>
+									{Weave.lang('Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order')}
+								</HelpIcon>
 							</HBox>
-							
-							<HBox className="weave-padded-hbox" style={HBoxJustify}>
-								<HBox style={leftItemsStyle}>
-									<Checkbox
-										type="radio"
-										value={this.compareTargetBinningType(this._category)}
-										onChange={(value) => this.setBinningDefinition(value, this._category)}
-									/>
-									<span style={textStyle}>{Weave.lang("All Categories (string values)")}</span>
-								</HBox>
-								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<HelpIcon style={helpStyle}>
-										{Weave.lang('One bin will be created for each unique string value in the column.')}
-									</HelpIcon>
-								</HBox>
+						</HBox>
+
+						<HBox className="weave-padded-hbox" style={HBoxJustify}>
+							<HBox style={leftItemsStyle}>
+								<Checkbox
+									type="radio"
+									value={this.compareTargetBinningType(this._equalInterval)}
+									onChange={(value) => this.setBinningDefinition(value, this._equalInterval)}
+								/>
+								<span style={textStyle}>{Weave.lang("Equally interval")}</span>
 							</HBox>
-							
-							<HBox className="weave-padded-hbox" style={HBoxJustify}>
-								<HBox style={leftItemsStyle}>
-									<Checkbox
-										type="radio"
-										value={!this.binnedColumn.binningDefinition.target}
-										onChange={(value) => this.setBinningDefinition(value, null)}
-									/>
-									<span style={textStyle}>{Weave.lang("None")}</span>
-								</HBox>
-								<HBox style={rightItemsStyle} className="weave-padded-hbox">
-									<HelpIcon style={helpStyle}>
-										{Weave.lang('The data will not be binned.')}
-									</HelpIcon>
-								</HBox>
+							<HBox style={rightItemsStyle} className="weave-padded-hbox">
+								<span style={textStyle}>{Weave.lang("Data interval:")}</span>
+								<StatefulTextField
+									style={inputStyle}
+									disabled={!this.compareTargetBinningType(this._equalInterval)}
+									type="text"
+									ref={this.linkBinningDefinition(this._equalInterval.dataInterval)}
+								/>
+								<HelpIcon style={helpStyle}>
+									{Weave.lang('Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]')}
+								</HelpIcon>
 							</HBox>
-						</VBox>
-					</HBox>
+						</HBox>
+
+						<HBox className="weave-padded-hbox" style={HBoxJustify}>
+							<HBox style={leftItemsStyle}>
+								<Checkbox
+									type="radio"
+									value={this.compareTargetBinningType(this._stdDev)}
+									onChange={(value) => this.setBinningDefinition(value, this._stdDev)}
+								/>
+								<span style={textStyle}>{Weave.lang("Standard deviations")}</span>
+							</HBox>
+							<HBox style={rightItemsStyle} className="weave-padded-hbox">
+								<HelpIcon style={helpStyle}>
+									{Weave.lang('Six bins will be created for standard deviations above and below the mean value.')}
+								</HelpIcon>
+							</HBox>
+						</HBox>
+
+						<HBox className="weave-padded-hbox" style={HBoxJustify}>
+							<HBox style={leftItemsStyle}>
+								<Checkbox
+									type="radio"
+									value={this.compareTargetBinningType(this._jenks)}
+									onChange={(value) => this.setBinningDefinition(value, this._jenks)}
+								/>
+								<span style={textStyle}>{Weave.lang("Natural breaks")}</span>
+							</HBox>
+							<HBox style={rightItemsStyle} className="weave-padded-hbox">
+								<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
+								<StatefulTextField
+									style={inputStyle}
+									type="number"
+									disabled={!this.compareTargetBinningType(this._jenks)}
+									ref={this.linkBinningDefinition(this._jenks.numOfBins)}
+								/>
+								<HelpIcon style={helpStyle}>
+									{Weave.lang('The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization')}
+								</HelpIcon>
+							</HBox>
+						</HBox>
+
+						<HBox className="weave-padded-hbox" style={HBoxJustify}>
+							<HBox style={leftItemsStyle}>
+								<Checkbox
+									type="radio"
+									value={this.compareTargetBinningType(this._category)}
+									onChange={(value) => this.setBinningDefinition(value, this._category)}
+								/>
+								<span style={textStyle}>{Weave.lang("All Categories (string values)")}</span>
+							</HBox>
+							<HBox style={rightItemsStyle} className="weave-padded-hbox">
+								<HelpIcon style={helpStyle}>
+									{Weave.lang('One bin will be created for each unique string value in the column.')}
+								</HelpIcon>
+							</HBox>
+						</HBox>
+
+						<HBox className="weave-padded-hbox" style={HBoxJustify}>
+							<HBox style={leftItemsStyle}>
+								<Checkbox
+									type="radio"
+									value={!this.binnedColumn.binningDefinition.target}
+									onChange={(value) => this.setBinningDefinition(value, null)}
+								/>
+								<span style={textStyle}>{Weave.lang("None")}</span>
+							</HBox>
+							<HBox style={rightItemsStyle} className="weave-padded-hbox">
+								<HelpIcon style={helpStyle}>
+									{Weave.lang('The data will not be binned.')}
+								</HelpIcon>
+							</HBox>
+						</HBox>
+					</VBox>
 				</VBox>
 				<VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto"}}>
 					{
