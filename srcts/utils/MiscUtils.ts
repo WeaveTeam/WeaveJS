@@ -176,4 +176,16 @@ export default class MiscUtils
 			return str;
 		}
 	}
+	
+	public static _pickBy(obj:{[key:string]:any}, predicate:(value:any, key:string)=>boolean):typeof obj
+	{
+		var result:{[key:string]:any} = {};
+		for (var key in obj)
+		{
+			var value = obj[key];
+			if (predicate(value, key))
+				result[key] = value;
+		}
+		return result;
+	}
 }
