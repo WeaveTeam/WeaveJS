@@ -76,7 +76,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	
 	setSessionState=(state:LayoutState):void=>
 	{
-		state = _.pick(state, 'id', 'children', 'flex', 'direction', 'maximize');
+		state = MiscUtils._pickBy(_.pick(state, 'id', 'children', 'flex', 'direction', 'maximize'), _.negate(_.isUndefined));
 		state = this.simplifyState(state);
 		state.flex = 1;
 		this.linkableState.state = state;
