@@ -3,9 +3,7 @@ import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
 import FixedDataTable from "../tools/FixedDataTable";
-import * as fs from 'fuse.js';
 import * as _ from 'lodash';
-var Fuse = (fs as any)["default"] as typeof fs;
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
