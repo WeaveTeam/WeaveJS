@@ -25,13 +25,14 @@ export interface CheckboxState
 export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxState>
 {
 	element:Element;
+	selector:any;
 
 	constructor(props:CheckboxProps)
 	{
 		super(props);
 		this.state = {
 			value: !!props.value
-		}
+		};
 	}
 
 	static defaultProps:CheckboxProps = {
@@ -40,39 +41,42 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	
 	componentWillReceiveProps(nextProps:CheckboxProps)
 	{
-		this.setState({
-			value: !!nextProps.value
-		});
+		if(nextProps.value !== undefined && nextProps.value !== null)
+			this.setState({
+				value: nextProps.value
+			});
 	}
 
 	componentDidUpdate(prevProps:CheckboxProps, prevState:CheckboxState)
 	{
 		if(this.state.value)
-			($(this.element) as any).checkbox("set checked")
+			this.selector.checkbox("set checked");
 		else
-			($(this.element) as any).checkbox("set unchecked")
+			this.selector.checkbox("set unchecked");
 	}
 	
-	handleChange=(event:React.MouseEvent)=>
+	handleChange=()=>
 	{
-		if (this.props.stopPropagation)
-			event.stopPropagation();
-
+		var value = _.clone(this.state.value);
 		this.setState({
-			value: !this.state.value
-		})
-
-		this.props.onChange && this.props.onChange(!this.state.value);
-	}
+			value:!value
+		});
+		this.props.onChange && this.props.onChange(!value);
+	};
 
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
-		($(this.element) as any).checkbox();
+		this.selector = ($(this.element) as any);
+
+		this.selector.checkbox({
+			onChange: this.handleChange
+		});
+
 		if(this.state.value)
-			($(this.element) as any).checkbox("set checked")
+			this.selector.checkbox("set checked");
 		else
-			($(this.element) as any).checkbox("set unchecked")
+			this.selector.checkbox("set unchecked");
 	}
 
 	render()
@@ -81,7 +85,7 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 		delete props.children;
 
 		return (
-			<div className={"ui " + this.props.type + " checkbox " + (this.props.className || "")} onClick={this.handleChange}>
+			<div className={"ui " + this.props.type + " checkbox " + (this.props.className || "")}>
 				<input {...props as any} type="checkbox" value={String(this.state.value)} title={this.props.title} name={this.props.name}/>
 				{this.props.label ? <label>{this.props.label}</label>:null}
 			</div>
