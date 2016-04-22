@@ -108,6 +108,7 @@ div.table-row-selected>div>div>div>div>div {
 
 .public_fixedDataTableCell_cellContent {
 	white-space: nowrap;
+	padding: 4px;
 }
 
 .weave-disableBottomBorder .fixedDataTableLayout_header,
@@ -118,6 +119,7 @@ div.table-row-selected>div>div>div>div>div {
 .fixedDataTableLayout_hasBottomBorder {
 	border-style: none;
 }
+
 
 /* weave custom css */
 .weave-app {
