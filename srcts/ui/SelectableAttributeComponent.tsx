@@ -93,11 +93,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 	render():JSX.Element
 	{
-		var selectableUI:JSX.Element[][] = [];
-		var listUI:JSX.Element[] = [];
-		let alwaysDefinedCol:boolean;
-		let defaultValue:any;
-
 		let attribute_ilhm_or_icw = this.props.attributes.get(this.props.attributeName);
 
 		if (Weave.IS(attribute_ilhm_or_icw, IColumnWrapper))
@@ -213,6 +208,25 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 	}
 
 	private comboBox: ComboBox;
+	private lastActiveParentNode:IWeaveTreeNode;
+
+	getColumnReferenceDropdownOptions(nodes:IWeaveTreeNode[]):{value: IColumnReference, label: string}[]
+	{
+		return(
+			nodes.map(
+				(node) => {
+					let colRef = Weave.AS(node, IColumnReference);
+					if (!colRef)
+						return null;
+					let metadata = colRef.getColumnMetadata() as any;
+					if (!metadata)
+						return null;
+					let title:string = metadata[ColumnMetadata.TITLE];
+					return {value: colRef, label: title};
+				}
+			).filter(_.identity)
+		);
+	}
 
 	render():JSX.Element
 	{
@@ -229,18 +243,23 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 			{
 				header = <span style={{ fontWeight: "bold", fontSize: "small" }}>{ parentNode.getLabel() }</span>;
 				clickHandler = null;
-				options = siblingNodes.map(
-					(node) => {
-						let colRef = Weave.AS(node, IColumnReference);
-						if (!colRef)
-							return null;
-						let metadata = colRef.getColumnMetadata() as any;
-						if (!metadata)
-							return null;
-						let title:string = metadata[ColumnMetadata.TITLE];
-						return {value: colRef, label: title};
-					}
-				).filter(_.identity);
+				options = this.getColumnReferenceDropdownOptions(siblingNodes);
+			}
+			else
+			{
+				[{ value: node, label: "Currently selected" }];
+			}
+
+			this.lastActiveParentNode = parentNode;
+		}
+		else//when option is cleared last active parent node used to populate drop down option
+		{
+			let siblingNodes = this.lastActiveParentNode && this.lastActiveParentNode.getChildren();
+			if (siblingNodes)
+			{
+				header = <span style={{ fontWeight: "bold", fontSize: "small" }}>{ this.lastActiveParentNode.getLabel() }</span>;
+				clickHandler = null;
+				options = this.getColumnReferenceDropdownOptions(siblingNodes);
 			}
 			else
 			{
