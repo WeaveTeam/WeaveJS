@@ -144,11 +144,14 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 
 		return (
-			<HBox className="weave-padded-hbox" style={ {flex:1} }>
+			<HBox className="weave-padded-hbox" style={ {flex:1, overflow:'auto'} }>
 				<VBox className="weave-padded-vbox">
 					{
 						this.props.dataMenu
-						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } showIcon={false} style={{width: "100%"}}><i className="fa fa-database fa-fw" style={{paddingRight: 5}}/>{Weave.lang('New Data Source')}</MenuButton>
+						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } showIcon={false} style={{width: "100%"}}>
+								<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
+								{Weave.lang('New Data Source')}
+							</MenuButton>
 						: 	null
 					}
 					<VBox className="weave-container" style={ {flex: 1, width: 250, padding: 0} }>
@@ -156,11 +159,11 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 							options={listOptions}
 							multiple={false}
 							selectedValues={ [dataSource] }
-							onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0]; this.forceUpdate() }}
+							onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0]; this.forceUpdate(); }}
 						/>
 					</VBox>
 				</VBox>
-				<VBox style={ {flex: 1} }>
+				<VBox style={ {flex: 1, overflow:'auto'} }>
 					{editorJsx}
 				</VBox>
 			</HBox>

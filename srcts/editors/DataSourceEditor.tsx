@@ -176,7 +176,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		return (
 			<VBox style={{flex: 1}}>
 				<HBox className="weave-padded-hbox" style={{flex: 1, border: "none"}}>
-					<VBox style={{flex: 1}}>
+					<VBox style={{flex: 1, overflow: 'auto'}}>
 						<WeaveTree
 							root={this.props.dataSource.getHierarchyRoot()}
 							hideLeaves={true}
@@ -184,10 +184,13 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 							onSelect={(selectedItems) => this.showColumns(selectedItems)}
 						/>
 					</VBox>
-					<VBox className="weave-padded-vbox" style={{flex: 1}}>
+					<VBox className="weave-padded-vbox" style={{flex: 1, overflow: 'auto'}}>
 						{
 							this.props.toolsMenu
-								?	<MenuButton menu={ this.props.toolsMenu.getVisualizationItems() } style={{width: "100%"}}>{Weave.lang('Create a visualization')}</MenuButton>
+								?	<MenuButton menu={ this.props.toolsMenu.getVisualizationItems() } style={{width: "100%"}} showIcon={false}>
+										<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>
+										{Weave.lang('Create a visualization')}
+									</MenuButton>
 								: 	null
 						}
 						<WeaveTree
