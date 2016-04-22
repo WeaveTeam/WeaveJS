@@ -50,6 +50,11 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableNumber = weavejs.core.LinkableNumber;
+import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+import IColumnReference = weavejs.api.data.IColumnReference;
+import ColumnUtils = weavejs.data.ColumnUtils;
+import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+import DataType = weavejs.api.data.DataType;
 
 import Bounds2D = weavejs.geom.Bounds2D;
 
@@ -295,9 +300,48 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
-	initSelectableAttributes()
+	static isGeomColumnOrRef(column: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)):boolean
 	{
+		let iac = Weave.AS(column, weavejs.api.data.IAttributeColumn);
+		let icr = Weave.AS(column, weavejs.api.data.IColumnReference);
+
+		let dataType: string;
+		if (iac) {
+			dataType = iac.getMetadata(ColumnMetadata.DATA_TYPE);
+			if (dataType == DataType.GEOMETRY) {
+				return true;
+			}
+		}
+		else if (icr) {
+			let metadata: { [property: string]: string } = icr.getColumnMetadata() as any;
+			if (metadata) {
+				dataType = metadata[ColumnMetadata.DATA_TYPE];
+			}
+			if (dataType == DataType.GEOMETRY) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	initSelectableAttributes(input: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)[]): void
+	{	
 		this.layers.requestObject('', TileLayer);
+		let geoColumns = input.filter(OpenLayersMapTool.isGeomColumnOrRef);
+		let nonGeoColumns = input.filter(_.negate(OpenLayersMapTool.isGeomColumnOrRef));
+
+		if (geoColumns.length)
+		{
+			let geoColumn = geoColumns[0];
+			let geoLayer = this.layers.requestObject('', GeometryLayer) as GeometryLayer;
+			if (geoLayer) ColumnUtils.initSelectableAttribute(geoLayer.geometryColumn, geoColumns[0]);
+			let selectableAttributes = geoLayer.selectableAttributes;
+			let colorDataColumn = (Weave.getWeave(this).getObject(["defaultColorDataColumn"]) as weavejs.data.column.DynamicColumn);
+			if (!colorDataColumn.getInternalColumn() && nonGeoColumns[0])
+			{
+				ColumnUtils.initSelectableAttribute(colorDataColumn, nonGeoColumns[0]);
+			}
+		}
 	}
 
 	get deprecatedStateMapping():Object
