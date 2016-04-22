@@ -210,7 +210,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		let width = node.offsetWidth;
 		body.removeChild(div);
 
-		return width;
+		return width * 1.5;
 	}
 
 	private longestRowJSX:React.ReactChild;
