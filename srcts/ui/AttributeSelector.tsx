@@ -15,6 +15,7 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import IDataSource = weavejs.api.data.IDataSource;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import SmartComponent from "./SmartComponent";
+import DynamicComponent from "./DynamicComponent";
 import ControlPanel from "./ControlPanel";
 import Button from "../semantic-ui/Button";
 
@@ -251,16 +252,19 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 					<div style={{display:"flex"}}>
 						{
 							this.state.categoryNode
-							?	<WeaveTree
-									style={ {flex:"1"} }
-									multipleSelection={ true }
-									initialSelectedItems={ this.selectedNodes }
-									hideRoot={true}
-									hideBranches={true}
-									root={this.state.categoryNode}
-									onSelect={this.setColumn}
-									ref={ (c) => { this.leafTree = c; } }
-								/>
+                                ? <DynamicComponent dependencies={[this.rootTreeNode]}
+                                    render={
+                                        () =>
+                                            <WeaveTree
+                                                style={ { flex: "1" } }
+                                                multipleSelection={ true }
+                                                initialSelectedItems={ this.selectedNodes }
+                                                hideRoot={true}
+                                                hideBranches={true}
+                                                root={this.state.categoryNode}
+                                                onSelect={this.setColumn}
+                                                ref={ (c) => { this.leafTree = c; } }
+                                                />}/>
 							:	null
 						}
 					</div>
