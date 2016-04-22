@@ -89,6 +89,62 @@ input[type=number]::-webkit-outer-spin-button {
 	background-color: #D0D0D0;
 }
 
+.weave-vslider .rc-slider-vertical {
+    width: 2px;
+	z-index: 0;
+}
+
+.weave-vslider .rc-slider-dot {
+	position: absolute;
+	bottom: -3px;
+	margin-left: -4px;
+	width: 8px;
+	height: 1px;
+	border: 1px solid #D0D0D0;
+	/* background-color: #fff; */
+	cursor: pointer;
+	/* border-radius: 50%; */
+	vertical-align: middle;
+}
+
+.weave-vslider .rc-slider-dot-active {
+	border-color: #D0D0D0;
+}
+
+.weave-vslider .rc-slider {
+	background-color: #D0D0D0;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-dot {
+    left: 1px;
+    margin-bottom: -1px;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-track {
+	width: 2px;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-dot:last-child {
+	margin-bottom: -1px;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-dot {
+	margin-bottom: -1px;
+}
+
+.weave-vslider .rc-slider-track {
+	position: absolute;
+	left: 0;
+	height: 2px;
+	border-radius: 6px;
+	background-color: #D0D0D0;
+	z-index: 0;
+}
+
+.weave-vslider .rc-slider-vertical .rc-slider-handle {
+	margin-left: -6px;
+}
+
 /* react fixed data table */
 div.table-row-probed>div>div>div>div>div {
 	background-color: rgba(153, 214, 255, 0.4)

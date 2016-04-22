@@ -1,6 +1,7 @@
 import * as React from "react";
 import RCSlider from "./RCSlider";
 import {SliderOption} from "./RCSlider";
+import {VBox} from "../FlexBox";
 
 export interface VSliderProps extends React.Props<VSlider>
 {
@@ -23,6 +24,6 @@ export default class VSlider extends React.Component<VSliderProps, any>
 
     render()
     {
-        return <RCSlider vertical={true} {...this.props}/>;
+        return <VBox style={{flex: 1}} className="weave-vslider"><RCSlider vertical={true} {...this.props}/></VBox>;
     }
 }
