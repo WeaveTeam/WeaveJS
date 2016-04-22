@@ -29,6 +29,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	style?: CSSProperties;
 	onGearClick?:(tool:WeaveTool)=>void;
 	onMaximizeClick?:(tool:WeaveTool)=>void;
+	isMaximized?: (tool: WeaveTool) => boolean;
 	onPopoutClick?:(tool:WeaveTool)=>void;
 	onPopinClick?:(tool:WeaveTool)=>void;
 	onCloseClick?:(tool:WeaveTool)=>void;
@@ -143,6 +144,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					highlighted={this.state.highlightTitle}
 					onGearClick={this.onGearClick}
 					onMaximizeClick={this.onMaximizeClick}
+					maximized={this.props.isMaximized && this.props.isMaximized(this)}
 					onPopoutClick={this.props.onPopoutClick && this.onPopoutClick}
 					onPopinClick={this.props.onPopinClick && this.onPopinClick}
 					onCloseClick={this.onCloseClick}
@@ -164,6 +166,7 @@ interface ITitleBarProps extends React.Props<TitleBar>
 	titleBarHeight:number;
 	title:string;
 	highlighted:boolean;
+	maximized:boolean;
 	onGearClick:React.MouseEventHandler;
 	onMaximizeClick:React.MouseEventHandler;
 	onPopoutClick:React.MouseEventHandler;
@@ -189,7 +192,8 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 			className = "weave-tool-title-bar-hovered";
 		if (this.props.highlighted)
 			className += " weave-tool-title-bar-highlighted";
-		
+		var maximizeClassName = "fa fa-fw fa-" + (this.props.maximized ? "compress" : "expand");
+
 		return(
 			<HBox className={className} style={{height: this.props.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart}>
 				<CenteredIcon onClick={this.props.onGearClick}
@@ -200,7 +204,7 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 				</HBox>
 
 				<CenteredIcon onClick={this.props.onMaximizeClick}
-							  iconProps={{className: "fa fa-expand fa-fw"}}/>
+							  iconProps={{ className: maximizeClassName }}/>
 				{
 					Weave.beta
 					?	<CenteredIcon

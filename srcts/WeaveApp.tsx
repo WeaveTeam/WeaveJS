@@ -134,6 +134,19 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		});
 	}
 
+	isMaximized=(tool:WeaveTool):boolean=>
+	{
+		var path = tool.props.path;
+		var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
+		if (!layout)
+			return false;
+		var state = _.cloneDeep(layout.getSessionState());
+		var obj = MiscUtils.findDeep(state, { id: path });
+		if (!obj)
+			return false;
+		return obj.maximized;
+	}
+
 	handleMaximizeClick=(tool:WeaveTool):void=>
 	{
 		var path = tool.props.path;
@@ -232,6 +245,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{...panelProps}
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={this.handleMaximizeClick}
+				isMaximized={this.isMaximized}
 				onPopoutClick={this.handlePopoutClick}
 				onCloseClick={this.handleCloseClick}
 			/>
