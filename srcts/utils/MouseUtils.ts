@@ -46,6 +46,7 @@ export default class MouseUtils
 var canRelyOnButtonsProp = false;
 var mouseEventTypes = ['click', 'dblclick', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'wheel'];
 var dragEventTypes = ['dragstart', 'drag', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'drop', 'dragend'];
+var buttonToButtonsMapping = [1, 4, 2];
 
 mouseEventTypes.forEach(eventType => document.addEventListener(
 	eventType,
@@ -56,8 +57,14 @@ mouseEventTypes.forEach(eventType => document.addEventListener(
 			canRelyOnButtonsProp = true;
 			MouseUtils.mouseButtonDown = event.buttons
 		}
+		else if (eventType == 'mousedown')
+		{
+			MouseUtils.mouseButtonDown |= buttonToButtonsMapping[event.button];
+		}
 		else if (eventType == 'mouseup')
-			MouseUtils.mouseButtonDown = 0;
+		{
+			MouseUtils.mouseButtonDown &= ~buttonToButtonsMapping[event.button];
+		}
 	},
 	true
 ));
@@ -72,7 +79,9 @@ dragEventTypes.forEach(eventType => document.addEventListener(
 			MouseUtils.mouseButtonDown = event.buttons
 		}
 		else if (eventType == 'dragend' || eventType == 'drop')
-			MouseUtils.mouseButtonDown = 0;
+		{
+			MouseUtils.mouseButtonDown &= ~buttonToButtonsMapping[event.button];
+		}
 	},
 	true
 ));
