@@ -169,15 +169,27 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 		{
 			return (
 				<HBox style={_.merge({flex: 1}, this.props.style)}>
-					<ComboBox type="multiple"
-	                      value={ columnList }
-                          placeholder="(None)"
-	                      options={ options }
-	                      valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
-	                      onChange={this.setSelected}
+					<ComboBox
+						type="multiple"
+						style={{
+							borderBottomRightRadius: 0,
+							borderTopRightRadius: 0
+						}}
+	                    value={ columnList }
+                        placeholder="(None)"
+	                    options={ options }
+	                    valueEqualityFunc={SelectableAttributesList.nodeEqualityFunc}
+	                    onChange={this.setSelected}
 					/>
-					<Button onClick={ this.launchAttributeSelector }
-					        title={"Click to explore other DataSources for " + this.props.label}>
+					<Button
+						onClick={ this.launchAttributeSelector }
+						style={{
+							borderBottomLeftRadius: 0,
+							borderTopLeftRadius: 0,
+							borderLeft: "none"
+						}}
+				        title={"Click to explore other DataSources for " + this.props.label}
+					>
 						<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
 					</Button>
 				</HBox>
