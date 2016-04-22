@@ -175,6 +175,12 @@ declare module __global__ {
          */
         static linkableChild<T extends ILinkableObject>(linkableParent: Object, linkableChildOrType: (new () => T) | T, callback?: Function, useGroupedCallback?: boolean): T;
         /**
+         * Shortcut for WeaveAPI.SessionManager.newLinkableChild() and WeaveAPI.SessionManager.registerLinkableChild() except the child will not be included in the session state.
+         * @see weave.api.core.ISessionManager#newLinkableChild()
+         * @see weave.api.core.ISessionManager#registerLinkableChild()
+         */
+        static privateLinkableChild<T extends ILinkableObject>(linkableParent: Object, linkableChildOrType: (new () => T) | T, callback?: Function, useGroupedCallback?: boolean): T;
+        /**
          * Shortcut for WeaveAPI.SessionManager.disposeObject()
          * @copy weave.api.core.ISessionManager#disposeObject()
          */
