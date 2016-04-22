@@ -10,6 +10,7 @@ import Input from "../semantic-ui/Input";
 export interface StatefulTextFieldProps extends React.HTMLProps<StatefulTextField> {
 	selectOnFocus?:boolean;
 	fluid?:boolean;
+	placeholder?:string;
 }
 
 export interface StatefulTextFieldState {
@@ -54,6 +55,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 					onSubmit={this.handleInputChange}
 					onFocus={this.handleSelectOnFocus}
 					value={this.state.value}
+			       placeholder={this.props.placeholder}
 			/>
 		);
 	}

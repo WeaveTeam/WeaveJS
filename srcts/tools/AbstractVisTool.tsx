@@ -112,6 +112,16 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return "";
 	}
 
+	get defaultXAxisLabel():string
+	{
+		return "";
+	}
+
+	get defaultYAxisLabel():string
+	{
+		return "";
+	}
+
 	get selectableAttributes():Map<string, (IColumnWrapper|ILinkableHashMap)>
 	{
 		return new Map<string, (IColumnWrapper | ILinkableHashMap)>();
@@ -267,21 +277,24 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return [
 			[
 				"Title",
-				this.panelTitle
+				this.panelTitle,
+				this.defaultPanelTitle
 			],
 			[
 				"X axis title",
-				this.xAxisName
+				this.xAxisName,
+				this.defaultXAxisLabel
 			],
 			[
 				"Y axis title",
-				this.yAxisName
+				this.yAxisName,
+				this.defaultYAxisLabel
 			]
 		].map((row:[string, LinkableString]) => {
 			
 			return [
 				Weave.lang(row[0]),
-				<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>
+				<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
 			]
 		});
 	}

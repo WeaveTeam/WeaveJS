@@ -69,7 +69,7 @@ export default class C3BarChart extends AbstractC3Tool
 
     get yLabelColumn():IAttributeColumn
     {
-        return this.heightColumns.getObjects(IAttributeColumn)[0] || this.sortColumn;
+        return this.heightColumns.getObjects(IAttributeColumn)[0]|| this.sortColumn;
     }
 	
     private RECORD_FORMAT = {
@@ -420,6 +420,22 @@ export default class C3BarChart extends AbstractC3Tool
         });
     }
 
+	get defaultXAxisLabel():string
+	{
+		if(!this.showXAxisLabel.value)
+			return "";
+		return Weave.lang("Sorted by " + this.sortColumn.getMetadata('title'));
+	}
+
+	get defaultYAxisLabel():string
+	{
+		var columns = this.heightColumns.getObjects() as IAttributeColumn[];
+		if (columns.length == 0)
+			return Weave.lang('');
+
+		return Weave.lang("{0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+	}
+
     protected validate(forced:boolean = false):boolean
     {
         var changeDetected:boolean = false;
@@ -443,8 +459,8 @@ export default class C3BarChart extends AbstractC3Tool
         {
             changeDetected = true;
 			
-            var xLabel:string = Weave.lang(this.xAxisName.value || "Sorted by " + this.sortColumn.getMetadata('title'));
-            var yLabel:string = Weave.lang(this.yAxisName.value || (this.heightColumnsLabels ? this.heightColumnsLabels.join(", ") : ""));
+            var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
+            var yLabel:string = Weave.lang(this.yAxisName.value) || this.defaultYAxisLabel;
 
             if (!this.showXAxisLabel.value)
             {
@@ -581,7 +597,7 @@ export default class C3BarChart extends AbstractC3Tool
 						Weave.lang("Show value labels")
 					],
 					[
-						<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/>, 
+						<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/>,
 						Weave.lang("Show X axis title")
 					]
 				],

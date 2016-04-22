@@ -227,8 +227,8 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin);
 		if (axisChanged)
 		{
-			var xLabel:string = Weave.lang(this.xAxisName.value || this.dataX.getMetadata('title'));
-			var yLabel:string = Weave.lang(this.yAxisName.value || this.dataY.getMetadata('title'));
+			var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
+			var yLabel:string = Weave.lang(this.yAxisName.value) || this.defaultYAxisLabel;
 
 			if (weavejs.WeaveAPI.Locale.reverseLayout)
 			{
@@ -343,6 +343,16 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	get defaultPanelTitle():string
 	{
 		return Weave.lang("Scatter plot {0} -vs- {1}", weavejs.data.ColumnUtils.getTitle(this.dataX), weavejs.data.ColumnUtils.getTitle(this.dataY));
+	}
+
+	get defaultXAxisLabel():string
+	{
+		return Weave.lang(this.dataX.getMetadata('title'));
+	}
+
+	get defaultYAxisLabel():string
+	{
+		return Weave.lang(this.dataY.getMetadata('title'));
 	}
 
 	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes

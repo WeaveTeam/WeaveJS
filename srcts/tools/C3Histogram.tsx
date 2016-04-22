@@ -263,7 +263,30 @@ export default class C3Histogram extends AbstractC3Tool
         //this.forceUpdate();
     }
 
+	get defaultXAxisLabel():string
+	{
+		return Weave.lang(this.binnedColumn.getMetadata('title'));
+	}
 
+	get defaultYAxisLabel():string
+	{
+		if (this.columnToAggregate.getInternalColumn())
+		{
+			switch(this.aggregationMethod.value)
+			{
+				case COUNT:
+					return Weave.lang("Number of records");
+				case SUM:
+					return Weave.lang("Sum of {0}", Weave.lang(this.columnToAggregate.getMetadata('title')));
+				case MEAN:
+					return Weave.lang("Mean of {0}", Weave.lang(this.columnToAggregate.getMetadata('title')));
+			}
+		}
+		else
+		{
+			return Weave.lang("Number of records");
+		}
+	}
 
     private getYAxisLabel():string
     {
@@ -274,22 +297,7 @@ export default class C3Histogram extends AbstractC3Tool
         }
         else
         {
-            if (this.columnToAggregate.getInternalColumn())
-            {
-                switch(this.aggregationMethod.value)
-                {
-                    case COUNT:
-                        return Weave.lang("Number of records");
-                    case SUM:
-                        return Weave.lang("Sum of {0}", Weave.lang(this.columnToAggregate.getMetadata('title')));
-                    case MEAN:
-                        return Weave.lang("Mean of {0}", Weave.lang(this.columnToAggregate.getMetadata('title')));
-                }
-            }
-            else
-            {
-                return Weave.lang("Number of records");
-            }
+            return this.defaultYAxisLabel;
         }
     }
 
@@ -463,7 +471,7 @@ export default class C3Histogram extends AbstractC3Tool
         if (axisChange)
         {
             changeDetected = true;
-            var xLabel:string = Weave.lang(this.xAxisName.value || this.binnedColumn.getMetadata('title'));
+            var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
             var yLabel:string = Weave.lang(this.getYAxisLabel.bind(this)());
 
             if (this.records)
@@ -538,7 +546,10 @@ export default class C3Histogram extends AbstractC3Tool
 
     get defaultPanelTitle():string
     {
-        return Weave.lang("Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
+	    if(this.binnedColumn.numberOfBins)
+		    return Weave.lang("Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
+
+	    return Weave.lang("Histogram");
     }
 	
 	// TODO move this to BinningDefinitionEditor

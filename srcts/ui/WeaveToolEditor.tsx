@@ -8,6 +8,7 @@ import Button from "../semantic-ui/Button";
 import classNames from "../modules/classnames";
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import LinkableWatcher = weavejs.core.LinkableWatcher;
 
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
@@ -22,6 +23,9 @@ export interface WeaveToolEditorState
 
 export default class WeaveToolEditor extends React.Component<WeaveToolEditorProps, WeaveToolEditorState>
 {
+	private toolWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(weavejs.api.ui.IVisTool, null, this.forceUpdate.bind(this)));
+	public get tool():IVisTool { return this.toolWatcher.target as IVisTool; }
+	public set tool(value:IVisTool) { this.toolWatcher.target = value; }
 	private weaveRoot:ILinkableHashMap;
 	private toolName:string;
 	private displayName:string;
@@ -39,7 +43,6 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		SessionStateEditor.openInstance(this.toolName, this.weaveRoot);
 	}
 
-
 	//todo : find a better way to get linked children
 	linktoToolEditorCrumbFunction=(title:string,ui:React.ReactChild):void=>
 	{
@@ -53,7 +56,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 	componentWillReceiveProps(nextProps:WeaveToolEditorProps)
 	{
-		if (this.props.tool !== nextProps.tool)
+		if (this.tool !== nextProps.tool)
 		{
 			//reset
 			this.mapping_crumb_children = {};
@@ -68,6 +71,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		this.weaveRoot = Weave.getRoot(tool);
 		this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(tool.constructor as new (..._: any[]) => any)
 		this.toolName = this.weaveRoot.getName(tool);
+		this.tool = tool;
 		var state = {
 			activeCrumb: this.displayName
 		};
@@ -97,7 +101,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 	render()
 	{
-		this.mapping_crumb_children[this.displayName] = this.props.tool.renderEditor(this.linktoToolEditorCrumbFunction);
+		if(this.tool)
+			this.mapping_crumb_children[this.displayName] = this.tool.renderEditor(this.linktoToolEditorCrumbFunction);
 		
 		var crumbStyle:React.CSSProperties = {
 			alignItems:"center"
