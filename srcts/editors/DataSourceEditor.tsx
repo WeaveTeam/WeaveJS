@@ -203,14 +203,14 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
 	
-		var nodes = this.state.selectedNode && this.state.selectedNode.getChildren();
+		let nodes = this.state.selectedNode && this.state.selectedNode.getChildren();
 		weavejs.data.ColumnUtils.firstDataSet = nodes && nodes.filter(node => Weave.IS(node, IColumnReference)) as any;
-		var initialSelectedNode = nodes && nodes[0] && Weave.IS(nodes[0], IColumnReference) && nodes[0];
+		let initialSelectedNode = nodes && nodes[0] && Weave.IS(nodes[0], IColumnReference) && nodes[0];
 
 		return (
 			<VBox style={{flex: 1}}>
 				<HBox className="weave-padded-hbox" style={{flex: 1, border: "none"}}>
-					<VBox style={{flex: 1, overflow: 'auto'}}>
+					<VBox style={{flex: root.hasChildBranches() ? 1:0, overflow: 'auto'}}>
 						<WeaveTree
 							root={this.props.dataSource.getHierarchyRoot()}
 							hideLeaves={true}
