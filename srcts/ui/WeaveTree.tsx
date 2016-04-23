@@ -62,7 +62,12 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	}
 
 	componentDidUpdate(prevProps: IWeaveTreeProps, prevState: IWeaveTreeState) {
-		let nodeComp = (a: IWeaveTreeNode, b: IWeaveTreeNode) => a.equals(b);
+		let nodeComp = (a: IWeaveTreeNode, b: IWeaveTreeNode) => {
+			if (a && b)
+				return a.equals(b);
+			else
+				return (a === b);
+		};
 		if (this.props.onSelect && WeaveTree.arrayChanged(prevState.selectedItems, this.state.selectedItems, nodeComp)) {
 			this.props.onSelect(this.state.selectedItems);
 		}
