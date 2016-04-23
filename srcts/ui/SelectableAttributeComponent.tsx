@@ -234,37 +234,23 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 		let options:{value: IColumnReference, label: string}[] = [];
 		let clickHandler = this.props.clickHandler;
 		let header:JSX.Element;
-		if (node)
-		{
-			let rootNode = node.getDataSource().getHierarchyRoot();
-			let parentNode = HierarchyUtils.findParentNode(rootNode, node.getDataSource(), node.getColumnMetadata());
-			let siblingNodes = parentNode && parentNode.getChildren();	
-			if (siblingNodes)
-			{
-				header = <span style={{ fontWeight: "bold", fontSize: "small" }}>{ parentNode.getLabel() }</span>;
-				clickHandler = null;
-				options = this.getColumnReferenceDropdownOptions(siblingNodes);
-			}
-			else
-			{
-				[{ value: node, label: "Currently selected" }];
-			}
-
+		
+		let rootNode = node && node.getDataSource().getHierarchyRoot();
+		let parentNode = rootNode && HierarchyUtils.findParentNode(rootNode, node.getDataSource(), node.getColumnMetadata());
+		if (parentNode)
 			this.lastActiveParentNode = parentNode;
-		}
-		else//when option is cleared last active parent node used to populate drop down option
+		else
+			parentNode = this.lastActiveParentNode;
+		let siblingNodes = parentNode && parentNode.getChildren();	
+		if (siblingNodes)
 		{
-			let siblingNodes = this.lastActiveParentNode && this.lastActiveParentNode.getChildren();
-			if (siblingNodes)
-			{
-				header = <span style={{ fontWeight: "bold", fontSize: "small" }}>{ this.lastActiveParentNode.getLabel() }</span>;
-				clickHandler = null;
-				options = this.getColumnReferenceDropdownOptions(siblingNodes);
-			}
-			else
-			{
-				[{ value: node, label: "Currently selected" }];
-			}
+			header = <span style={{ fontWeight: "bold", fontSize: "small" }}>{ parentNode.getLabel() }</span>;
+			clickHandler = null;
+			options = this.getColumnReferenceDropdownOptions(siblingNodes);
+		}
+		else if (node)
+		{
+			options = [{ value: node, label: Weave.lang(node.getColumnMetadata()[weavejs.api.data.ColumnMetadata.TITLE]) }];
 		}
 
 		options.push({ value: null, label: Weave.lang("(None)") });

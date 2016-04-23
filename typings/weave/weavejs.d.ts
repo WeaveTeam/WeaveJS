@@ -2187,7 +2187,9 @@ declare module weavejs.api.data {
          * For standard metadata property names, refer to the ColumnMetadata class.
          * @return An Object mapping metadata property names to values, or null if there is no column referenced.
          */
-        getColumnMetadata(): Object;
+        getColumnMetadata(): {
+            [name: string]: string;
+        };
     }
     var IColumnReference: new (..._: any[]) => IColumnReference;
 }
@@ -3945,6 +3947,12 @@ declare module weavejs.core {
         addTreeCallback(relevantContext: Object, groupedCallback: Function, triggerCallbackNow?: boolean): void;
         removeTreeCallback(relevantContext: Object, groupedCallback: Function): void;
         copySessionState(source: ILinkableObject, destination: ILinkableObject): void;
+        /**
+         * Generates an object {"": "undefined"} that can be serialized to JSON for representing a value of <code>undefined</code>.
+         */
+        /**
+         * Tests if a value matches the format which encodeUndefined() returns.
+         */
         static DEPRECATED_STATE_MAPPING: string;
         /**
          * Uses DynamicState.traverseState() to traverse a state and copy portions of the state to ILinkableObjects.
@@ -5704,7 +5712,9 @@ declare module weavejs.data.hierarchy {
          */
         equals(other: IWeaveTreeNode): boolean;
         getDataSource(): IDataSource;
-        getColumnMetadata(): Object;
+        getColumnMetadata(): {
+            [name: string]: string;
+        };
         findPathToNode(descendant: IWeaveTreeNode): any[];
     }
 }
@@ -5750,45 +5760,17 @@ declare module weavejs.data.hierarchy {
          * Gets the Entity associated with this node.
          */
         getEntity(): Entity;
-        /**
-         * @inheritDoc
-         */
         equals(other: IWeaveTreeNode): boolean;
-        /**
-         * @inheritDoc
-         */
         getDataSource(): IDataSource;
-        /**
-         * @inheritDoc
-         */
-        getColumnMetadata(): Object;
-        /**
-         * @inheritDoc
-         */
+        getColumnMetadata(): {
+            [name: string]: string;
+        };
         getLabel(): string;
-        /**
-         * @inheritDoc
-         */
         isBranch(): boolean;
-        /**
-         * @inheritDoc
-         */
         hasChildBranches(): boolean;
-        /**
-         * @inheritDoc
-         */
         getChildren(): any[];
-        /**
-         * @inheritDoc
-         */
         addChildAt(child: IWeaveTreeNode, index: number): boolean;
-        /**
-         * @inheritDoc
-         */
         removeChild(child: IWeaveTreeNode): boolean;
-        /**
-         * @inheritDoc
-         */
         findPathToNode(descendant: IWeaveTreeNode): any[];
     }
 }
@@ -6722,7 +6704,9 @@ declare module weavejs.data.source {
         hasChildBranches(): boolean;
         getChildren(): any[];
         getDataSource(): IDataSource;
-        getColumnMetadata(): Object;
+        getColumnMetadata(): {
+            [name: string]: string;
+        };
     }
 }
 declare module weavejs.data.source {
