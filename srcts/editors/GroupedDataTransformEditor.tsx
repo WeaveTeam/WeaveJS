@@ -30,21 +30,21 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 
 			[
-				<div>
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Group by")}
 					<HelpIcon>
 						{Weave.lang('The keyType of the "Group by" column should match the keyType of each column to be transformed. The values in this column will be treated as foreign keys which map to aggregated values in the transformed columns.')}
 					</HelpIcon>
-				</div>, 
+				</HBox>, 
 				<SelectableAttributeComponent attributeName="Group by" attributes={ groupByMap }/>
 			],
 			[
-				<div>
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Group keyType")}
 					<HelpIcon>
 						{Weave.lang('Specifies the keyType of the foreign keys referenced by the "Group by" column. By default, the dataType of the "Group by" column is used as the foreign keyType.')}
 					</HelpIcon>
-				</div>,
+				</HBox>,
 				<KeyTypeInput keyTypeProperty={ds.groupKeyType}/>
 			],
 			[

@@ -32,17 +32,17 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
-				<span>
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Foreign key mapping")}
 					<HelpIcon>
 						{Weave.lang("Each value in this column will be used as the key to look up records in the data columns")}
 					</HelpIcon>
-				</span>, 
+				</HBox>, 
 				<SelectableAttributeComponent attributeName="Foreign key mapping" attributes={ keyMap }/>
 			],
 			[
-				<span>{Weave.lang("Data to transform")}</span>,
-				<SelectableAttributesList label="" showAsList={true} columns={ds.dataColumns as LinkableHashMap}/>
+				Weave.lang("Data to transform"),
+				<SelectableAttributesList label="" showAsList={false} columns={ds.dataColumns as LinkableHashMap}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)
