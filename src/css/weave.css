@@ -326,7 +326,7 @@ div.table-row-selected>div>div>div>div>div {
 	font-weight: 300;
 }
 
-.weave-footer.weave-window-footer {
+.weave-window-footer {
 	border-top-width: 1px;
 	border-top-color: #E6E6E6;
 	background-color: #D5D5D5;
@@ -623,7 +623,6 @@ div.weave-tree-view {
 
 /******* Button *******/
 .ui.button {
-	margin:0;
 	border:1px solid lightgrey;
 	background-color:#ECECEC;
 	color:black;
