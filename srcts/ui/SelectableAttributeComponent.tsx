@@ -222,7 +222,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 					if (!metadata)
 						return null;
 					let title:string = metadata[ColumnMetadata.TITLE];
-					return {value: colRef, label: title};
+					return {value: colRef, label: Weave.lang(title)};
 				}
 			).filter(_.identity)
 		);
@@ -250,7 +250,7 @@ class AttributeDropdown extends React.Component<IAttributeDropdownProps, IAttrib
 		}
 		else if (node)
 		{
-			options = [{ value: node, label: Weave.lang(node.getColumnMetadata()[weavejs.api.data.ColumnMetadata.TITLE]) }];
+			options = this.getColumnReferenceDropdownOptions([node]);
 		}
 
 		options.push({ value: null, label: Weave.lang("(None)") });
