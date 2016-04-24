@@ -284,11 +284,11 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 						this.props.title
 					}
 					</div>
-					{
+					{/*
 						!this.props.modal
 						?	<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
 						:	null
-					}
+					*/}
 				</HBox>
 				<HBox className="weave-window-content" style={{flex: 1, overflow: "auto"}}>
 					{ this.state.content || this.props.content }
@@ -299,16 +299,16 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 					?	<HBox className="weave-window-footer">
 							this.props.footerContent
 						</HBox>
-					: (
-						this.props.modal
-						?	<HBox className="weave-window-footer">
-								<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
-									<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
-									<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
-								</HBox>
+					:	<HBox className="weave-window-footer">
+							<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
+								<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
+								{
+									this.props.modal
+									?	<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
+									:	null
+								}
 							</HBox>
-						:	null
-					)
+						</HBox>
 				}
 				{
 					this.props.resizable && this.renderResizers()
