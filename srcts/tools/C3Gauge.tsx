@@ -59,6 +59,8 @@ export default class C3Gauge extends AbstractC3Tool
 		(this.binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value = 3;
 		this.binningDefinition.generateBinClassifiersForColumn(this.meterColumn);
 		Weave.linkableChild(this, this.binningDefinition.asyncResultCallbacks);
+	    this.margin.left = Weave.linkableChild(this, new LinkableNumber(0));
+	    this.margin.right = Weave.linkableChild(this, new LinkableNumber(0));
 
         this.keyToIndex = {};
 
@@ -162,6 +164,23 @@ export default class C3Gauge extends AbstractC3Tool
 				}
 			</VBox>
 		)
+	}
+
+	getMarginEditor():React.ReactChild[][]
+	{
+		return [
+			[
+				Weave.lang("Margins"),
+				<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
+					<StatefulTextField type="number" disabled={true} style={{textAlign: "center", flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.left})}/>
+					<VBox className="weave-padded-vbox" style={{flex: 1}}>
+						<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.top})}/>
+						<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.bottom})}/>
+					</VBox>
+					<StatefulTextField type="number" disabled={true} style={{textAlign: "center", flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.right})}/>
+				</HBox>
+			]
+		];
 	}
 
 	getTitlesEditor():React.ReactChild[][]
