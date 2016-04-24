@@ -21,17 +21,14 @@ import Button from "../semantic-ui/Button";
 
 export interface IAttributeSelectorProps
 {
-    label? : string;
-    selectedAttribute : IColumnWrapper|ILinkableHashMap;
-    showLabelAsButton?:boolean;
-    selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>;
+    attributeName? : string;
+    attributes:Map<string,(IColumnWrapper|ILinkableHashMap)>;
 }
 
 export interface IAttributeSelectorState
 {
     categoryNode? : IWeaveTreeNode;
-    selectedAttribute?: IColumnWrapper|ILinkableHashMap;
-    attributeName?:string;
+    selectedAttributeName?:string;
 
 }
 
@@ -46,48 +43,54 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     private selectedColumnRef :IColumnReference[] = [];
     private selectedNodes:IWeaveTreeNode[];
 
+	private get selectedAttribute()
+	{
+		return this.props.attributes.get(this.state.selectedAttributeName);
+	}
     constructor(props:IAttributeSelectorProps)
     {
         super(props);
 
         //required for button bar
         // get all labels for Button Bar
-        this.attributeNames = Array.from(this.props.selectableAttributes.keys());
+		var attribute = this.props.attributes.get(this.props.attributeName);
+        this.attributeNames = Array.from(this.props.attributes.keys());
 
-        this.weaveRoot = Weave.getRoot(props.selectedAttribute);
+        this.weaveRoot = Weave.getRoot(attribute);
         this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
 
         this.state = {
-            categoryNode : this.getSelectedNodeRoot(this.props.selectedAttribute),
-            selectedAttribute:this.props.selectedAttribute,
-            attributeName:this.props.label
+            categoryNode : this.getSelectedNodeRoot(attribute),
+            selectedAttributeName: this.props.attributeName
         };
 
-        this.selectedNodes = this.getSelectedTreeNodesFor(this.props.selectedAttribute);//handles initial loading of selected items
+        this.selectedNodes = this.getSelectedTreeNodesFor(attribute);//handles initial loading of selected items
     };
 
-    componentWillReceiveProps (nextProps :IAttributeSelectorProps)
+    componentWillReceiveProps (nextProps:IAttributeSelectorProps)
     {
-        if(nextProps.selectedAttribute != this.props.selectedAttribute)
+		var attribute = this.props.attributes.get(this.props.attributeName);
+		var nextAttribute = nextProps.attributes.get(this.props.attributeName);
+		
+        if(attribute != nextAttribute)
         {
-            this.weaveRoot = Weave.getRoot(nextProps.selectedAttribute);
+            this.weaveRoot = Weave.getRoot(nextAttribute);
             this.rootTreeNode  = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);
         }
 
-        // if the selectableAttributes changed by parent update the items
-        if(nextProps.selectableAttributes != this.props.selectableAttributes)
+        // if the attributes changed by parent update the items
+        if(nextProps.attributes != this.props.attributes)
         {
-            this.attributeNames = Array.from(this.props.selectableAttributes.keys());
+            this.attributeNames = Array.from(this.props.attributes.keys());
         }
     }
 
-    handleSelectedAttribute = (event:React.MouseEvent,name:string = null,index:number = null):void=>
+    handleSelectedAttribute = (event:React.MouseEvent, name:string = null, index:number = null):void=>
     {
-        let selectedAttribute:IColumnWrapper|ILinkableHashMap = this.props.selectableAttributes.get(name);
+        let selectedAttribute:IColumnWrapper|ILinkableHashMap = this.props.attributes.get(name);
 
         this.setState({
-            selectedAttribute : selectedAttribute,
-            attributeName:name
+            selectedAttributeName: name
         });
 
         this.selectedNodes = this.getSelectedTreeNodesFor(selectedAttribute);
@@ -101,7 +104,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             var meta = ref && ref.getColumnMetadata();
             if (meta)
             {
-                var lhm = Weave.AS(this.state.selectedAttribute, ILinkableHashMap);
+                var lhm = Weave.AS(this.selectedAttribute, ILinkableHashMap);
                 if (lhm)
                     lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
             }
@@ -137,10 +140,10 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             var meta = ref.getColumnMetadata();
             if (meta)
             {
-                if (Weave.IS(this.state.selectedAttribute, IColumnWrapper))
+                if (Weave.IS(this.selectedAttribute, IColumnWrapper))
 				{
 					//if selectable attribute is a single column
-                    let dc = ColumnUtils.hack_findInternalDynamicColumn(this.state.selectedAttribute as IColumnWrapper);
+                    let dc = ColumnUtils.hack_findInternalDynamicColumn(this.selectedAttribute as IColumnWrapper);
                     if (dc)
                         dc.requestLocalObject(ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
                 }
@@ -199,11 +202,11 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             return;
     };
 
-    static openInstance(label:string, selectedAttribute:IColumnWrapper|ILinkableHashMap, selectableAttributes:Map<string, IColumnWrapper|ILinkableHashMap>):ControlPanel{
-        let weave = Weave.getWeave(selectedAttribute);
+    static openInstance(attributeName:string, attributes:Map<string, IColumnWrapper|ILinkableHashMap>):ControlPanel{
+        let weave = Weave.getWeave(attributes.get(attributeName));
         return ControlPanel.openInstance<IAttributeSelectorProps>(weave, AttributeSelector,
                                         {title:Weave.lang('Attribute Selector')},
-                                        {label, selectedAttribute, selectableAttributes});
+                                        {attributeName, attributes});
     }
     
 
@@ -221,24 +224,23 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             <VBox className="weave-padded-vbox" style={ {flex:1} }>
 				{
 					(this.attributeNames.length > 0)
-					?	<ButtonGroupBar activeButton={ this.props.label }
+					?	<ButtonGroupBar activeButton={ this.props.attributeName }
 							items={ this.attributeNames }
 							clickHandler={this.handleSelectedAttribute}
 						/>
 					:	null
 				}
 				{
-					Weave.IS(this.state.selectedAttribute, ILinkableHashMap)
+					Weave.IS(this.selectedAttribute, ILinkableHashMap)
 					?	<SelectableAttributesList
 							style={{flex: null}}
-							label={ this.state.attributeName }
-							showAsList={false}
-							columns={ this.state.selectedAttribute as ILinkableHashMap}
+							attributeName={ this.state.selectedAttributeName }
+							attributes={ this.props.attributes}
 						/>
 					:	null
 				}
 				{
-					Weave.IS(this.state.selectedAttribute, ILinkableHashMap) ? "WORK IN PROGRESS" : null
+					Weave.IS(this.selectedAttribute, ILinkableHashMap) ? "WORK IN PROGRESS" : null
 				}
                 <HDividedBox style={ {flex:1} } loadWithEqualWidthChildren={true}>
 				   <div style={{display:"flex"}}>
@@ -270,7 +272,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 					</div>
 				</HDividedBox>
 				{
-					Weave.IS(this.state.selectedAttribute, LinkableHashMap) && this.state.categoryNode
+					Weave.IS(this.selectedAttribute, LinkableHashMap) && this.state.categoryNode
 					?
 						<HBox className="weave-padded-hbox" style={ constrollerStyle } >
 							<Button onClick={ this.handleSelectAll }>Select All</Button>

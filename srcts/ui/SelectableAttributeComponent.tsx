@@ -58,23 +58,22 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		});
 	}
 	
-	launchAttributeSelector=(label:string, attribute:IColumnWrapper|ILinkableHashMap):ControlPanel=>
+	launchAttributeSelector=(attributeName:string):ControlPanel=>
 	{
 		if (this.props.linkToToolEditorCrumb)
 		{
 			this.props.linkToToolEditorCrumb(
 				"Attributes",
 				<AttributeSelector
-					label={ label }
-					selectedAttribute={ attribute }
-					selectableAttributes={ this.props.attributes }
+					attributeName={ attributeName }
+					attributes={ this.props.attributes }
 				/>
 			);
 			return null;
 		}
 		else
 		{
-			return AttributeSelector.openInstance(label, attribute, this.props.attributes);
+			return AttributeSelector.openInstance(attributeName, this.props.attributes);
 		}
 
 	};
@@ -134,12 +133,9 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
 			return (
 				<SelectableAttributesList
-					key={this.props.attributeName} 
-					showAsList={false}
-					label={this.props.attributeName} 
-					columns={attribute} 
+					attributeName={this.props.attributeName} 
+					attributes={this.props.attributes}
 					linkToToolEditorCrumb={this.props.linkToToolEditorCrumb}
-					selectableAttributes={this.props.attributes}
 				/>
 			);
 		}

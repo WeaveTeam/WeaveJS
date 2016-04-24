@@ -16,16 +16,17 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 
-export interface ISelectableAttributesListProps{
-    columns : ILinkableHashMap;
-	showAsList: boolean;
-    label:string;
+export interface ISelectableAttributesListProps
+{
+	attributeName:string;
+	attributes: Map<string, (IColumnWrapper|ILinkableHashMap)>;
+	showAsList?: boolean;
     linkToToolEditorCrumb?:Function;
-    selectableAttributes? : Map<string, (IColumnWrapper|ILinkableHashMap)>;
 	style?:React.CSSProperties;
 }
 
-export interface ISelectableAttributesListState{
+export interface ISelectableAttributesListState
+{
     selectAll:boolean;
 }
 
@@ -38,18 +39,22 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
             selectAll :false
         };
 
-        Weave.getCallbacks(this.props.columns).addGroupedCallback(this, this.forceUpdate);
+        Weave.getCallbacks(this.props.attributes.get(this.props.attributeName)).addGroupedCallback(this, this.forceUpdate);
     }
 	
     private selectedColumn:IAttributeColumn;
 
+	private get columns()
+	{
+		return this.props.attributes.get(this.props.attributeName) as ILinkableHashMap;
+	}
     removeSelected = ():void =>
 	{
         if (this.state.selectAll)
-            this.props.columns.removeAllObjects();
+            this.columns.removeAllObjects();
         else{
-            var colName = this.props.columns.getName(this.selectedColumn);
-            this.props.columns.removeObject(colName);
+            var colName = this.columns.getName(this.selectedColumn);
+            this.columns.removeObject(colName);
         }
     };
 
@@ -59,7 +64,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 		var meta = ref && ref.getColumnMetadata();
 		if (meta)
 		{
-			var lhm = Weave.AS(this.props.columns, ILinkableHashMap);
+			var lhm = Weave.AS(this.columns, ILinkableHashMap);
 			if (lhm)
 			{
 				lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
@@ -69,12 +74,12 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
 	removeAll =():void=>
 	{
-		this.props.columns.removeAllObjects();
+		this.columns.removeAllObjects();
 	};
 
 	setSelected =(values:IWeaveTreeNode[]):void=>
 	{
-		ColumnUtils.replaceColumnsInHashMap(this.props.columns, values);
+		ColumnUtils.replaceColumnsInHashMap(this.columns, values);
 	};
 
     handleSelectAll =():void =>
@@ -93,12 +98,10 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 	{
         if (this.props.linkToToolEditorCrumb)
         {
-            this.props.linkToToolEditorCrumb( "Attribute Selector",<AttributeSelector label={  this.props.label }
-                                                                             selectedAttribute={ this.props.columns }
-                                                                             selectableAttributes = { this.props.selectableAttributes }/>);
+            this.props.linkToToolEditorCrumb( "Attribute Selector", <AttributeSelector attributeName={this.props.attributeName} attributes={this.props.attributes}/>);
             return null;
         }
-        return AttributeSelector.openInstance(this.props.label, this.props.columns, this.props.selectableAttributes);
+        return AttributeSelector.openInstance(this.props.attributeName, this.props.attributes);
     };
 
 	private static nodeEqualityFunc(a:IColumnReference & IWeaveTreeNode, b:IColumnReference & IWeaveTreeNode):boolean
@@ -111,7 +114,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 
     componentWillUnmount()
 	{
-        Weave.getCallbacks(this.props.columns).removeCallback(this,this.forceUpdate);
+        Weave.getCallbacks(this.columns).removeCallback(this, this.forceUpdate);
     }
 
     render(): JSX.Element {
@@ -132,7 +135,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         var columnList: IWeaveTreeNode[] = [];
 	    var options: {label:string, value:IWeaveTreeNode&IColumnReference}[] = [];
 	    let siblings:IWeaveTreeNode[] = [];
-        var columns = this.props.columns.getObjects(IAttributeColumn);
+        var columns = this.columns.getObjects(IAttributeColumn);
 
         //When all options are selected, needed only for restyling the list and re-render
         if (this.state.selectAll)
@@ -188,7 +191,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 							borderTopLeftRadius: 0,
 							borderLeft: "none"
 						}}
-				        title={"Click to explore other DataSources for " + this.props.label}
+				        title={Weave.lang("Click to explore other DataSources for " + this.props.attributeName)}
 					>
 						<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
 					</Button>
