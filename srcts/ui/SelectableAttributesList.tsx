@@ -143,8 +143,8 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 			if (!node)
 				return;
             columnList.push(node);
-			var siblings = HierarchyUtils.findSiblingNodes(column.getDataSource(), node.getColumnMetadata());
-	        siblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
+			var columnSiblings = HierarchyUtils.findSiblingNodes(column.getDataSource(), node.getColumnMetadata());
+	        columnSiblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
 		        if (!_.includes(siblings, siblingNode))
 				{
 			        siblings.push(siblingNode);
