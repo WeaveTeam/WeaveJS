@@ -12,6 +12,7 @@ export interface StatefulTextFieldProps extends React.HTMLProps<StatefulTextFiel
 	fluid?:boolean;
 	disabled?:boolean;
 	placeholder?:string;
+	disable?:boolean
 }
 
 export interface StatefulTextFieldState {
