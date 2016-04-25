@@ -2,7 +2,7 @@ import * as React from "react";
 import {HBox, VBox,HDividedBox} from "../react-ui/FlexBox";
 import {ButtonGroupBar} from "../react-ui/ButtonGroupBar";
 import WeaveTree from "./WeaveTree";
-import SelectableAttributesList from "../ui/SelectableAttributesList";
+import SelectableAttributeComponent from "./SelectableAttributeComponent";
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
@@ -232,8 +232,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 				}
 				{
 					Weave.IS(this.selectedAttribute, ILinkableHashMap)
-					?	<SelectableAttributesList
-							style={{flex: null}}
+					?	<SelectableAttributeComponent
 							attributeName={ this.state.selectedAttributeName }
 							attributes={ this.props.attributes}
 						/>

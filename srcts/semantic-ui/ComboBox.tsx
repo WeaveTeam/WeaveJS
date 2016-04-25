@@ -35,6 +35,7 @@ export interface ComboBoxState
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
 {
 	element:Element;
+	
 	static defaultProps:ComboBoxProps = {
 		fluid:true
 	};
@@ -56,12 +57,12 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			if(Array.isArray(props.value))
 			{
 				value = props.value.map((val:any) => val.value);
-				options = _.union(props.value, options);
+				options = _.uniq(_.union(props.value, options), "value")
 			}
 			else
 			{
 				value = props.value && props.value.value;
-				options = _.union([props.value], options);
+				options = _.uniq(_.union([props.value], options), "value");
 			}
 		}
 		return {
@@ -88,7 +89,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	private getIndexFromValue(value:any):number
 	{
 		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
-
 		return this.state.options && this.state.options.findIndex((option) => {
 			return equalityFunc(option.value, value);
 		});
@@ -101,9 +101,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
+		let selector = ($(this.element) as any);
 		if (!_.isEqual(prevState.value, this.state.value))
 		{
-			let selector = ($(this.element) as any);
 			
 			if (this.props.type === "multiple")
 			{
@@ -137,7 +137,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	{
 		this.element = ReactDOM.findDOMNode(this);
 		let selector = ($(this.element) as any);
-		
 		selector.dropdown({
 			onChange: (selected:number|string, text:string) => {
 				if (this.props.onNew && text &&  (Number(selected) < 0) )
@@ -191,7 +190,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			direction: this.props.direction || 'auto',
 			allowAdditions: this.props.allowAdditions || false
 		});
-		
+		selector.dropdown("refresh");
 		if (this.props.type === "multiple")
 		{
 			let indices:string[] = [];
