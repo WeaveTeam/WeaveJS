@@ -443,7 +443,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		ColorController.open(this.colorColumn);
 	}
 	
-	renderEditor(linkFunction:Function = null):JSX.Element
+	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
@@ -455,7 +455,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		
 		return ReactUtils.generateTable(
 			null,
-			renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(
+			renderSelectableAttributes(this.selectableAttributes, linktoToolEditorCrumbFunction).concat(
 				this.getTitlesEditor(),
 				[
 					[
@@ -468,7 +468,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					],
 					[
 						Weave.lang("Binning method"),
-						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(0)}/>
 					],
 					[ 
 						Weave.lang("Layout"),
