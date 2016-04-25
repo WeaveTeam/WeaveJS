@@ -9,7 +9,8 @@ import FixedDataTable from "./FixedDataTable";
 import {IRow} from "./FixedDataTable";
 import ReactUtils from "../utils/ReactUtils";
 import PrintUtils from "../utils/PrintUtils";
-
+import StatefulTextField from "../ui/StatefulTextField";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -198,10 +199,27 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 		return ReactUtils.generateTable(
 			null,
-			renderSelectableAttributes(this.selectableAttributes, linkFunction),
+			renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(this.getTitlesEditor()),
 			tableStyles
 		);
 	};
+
+	getTitlesEditor():React.ReactChild[][]
+	{
+		return [
+			[
+				"Title",
+				this.panelTitle,
+				this.defaultPanelTitle
+			]
+		].map((row:[string, LinkableString]) => {
+
+			return [
+				Weave.lang(row[0]),
+				<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+			]
+		});
+	}
 
 	render()
 	{
