@@ -25,11 +25,12 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let dataSource = (this.props.dataSource as GeoJSONDataSource);
-		/* TODO: Update to use new typings. */
-		let propertyIds = ((dataSource as any).getPropertyNames() as string[]).map((id:string)=>({label: id.toString(), value: id}));
+		let propertyIds = dataSource.getPropertyNames().map((id:string)=>({label: id.toString(), value: id}));
+
 		propertyIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
+			this.getLabelEditor(dataSource.label),
 			[
 				Weave.lang("GeoJSON URL"),
 				<FileSelector style={{width: "100%"}}

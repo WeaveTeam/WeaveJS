@@ -29,7 +29,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 		attributes.set("Data to transform", ds.dataColumns as LinkableHashMap);
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
-
+			this.getLabelEditor(ds.label),
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Group by")}

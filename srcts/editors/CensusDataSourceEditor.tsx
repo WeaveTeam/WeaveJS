@@ -169,6 +169,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		let dataset = _.first(this.getDataset(ds.dataSet.value));
 		let datasetLabel: string = dataset ? dataset.title : "";
 		return [
+			this.getLabelEditor(ds.label),
 			[
 				Weave.lang("API Key"),
 				<StatefulTextField style={{width: "100%"}}

@@ -62,6 +62,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		});
 		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
+			this.getLabelEditor(ds.label),
 			[
 				Weave.lang("URL"),
 				<FileSelector targetUrl={ds.url}

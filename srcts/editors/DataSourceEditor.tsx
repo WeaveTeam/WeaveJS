@@ -12,6 +12,7 @@ import Tabs from "../react-ui/Tabs";
 import Input from "../semantic-ui/Input";
 import MenuButton from '../react-ui/MenuButton';
 import ToolsMenu from "../menus/ToolsMenu";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import WeaveAPI = weavejs.WeaveAPI;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -87,16 +88,18 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	{
 		return this.columnWatcher.target as IAttributeColumn;
 	}
+
+	getLabelEditor(labelLinkableString:weavejs.core.LinkableString):[React.ReactChild, React.ReactChild]
+	{
+		return [
+			<span>{Weave.lang("Label") }</span>, 
+			<StatefulTextField placeholder={this.props.dataSource.getLabel()} style={{ width: "100%", userSelect: false }} ref={linkReactStateRef(this, {value: labelLinkableString}, 500)}/>
+		];
+	}
 	
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		return [
-			[
-				<span>{Weave.lang("Label")}</span>,
-				<Input type="text" style={{width: "100%", userSelect: false}}
-				                   value={ this.props.dataSource.getLabel() }
-                                   onChange={ this.updateDataSourceLabel.bind(this) }/>
-			]
 		];
 	}
 	/*

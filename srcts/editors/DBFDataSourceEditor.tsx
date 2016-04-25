@@ -26,6 +26,7 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 	{
 		let dataSource = this.props.dataSource as DBFDataSource;
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
+			this.getLabelEditor(dataSource.label),
 			[
 				Weave.lang("DBF URL"),
 				<FileSelector style={{width: "100%"}}

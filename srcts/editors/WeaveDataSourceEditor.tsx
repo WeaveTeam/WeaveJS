@@ -57,6 +57,7 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
+			this.getLabelEditor(ds.label),
 			[
 				"",
 				<HBox style={{flex: 1, justifyContent: "flex-end"}}><a target="_blank" href={consoleUri}>{Weave.lang("Open Admin Console") + " " }</a></HBox>

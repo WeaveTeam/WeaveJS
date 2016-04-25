@@ -43,6 +43,7 @@ export default class CKANDataSourceEditor extends DataSourceEditor
 		}
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
+			this.getLabelEditor(ds.label),
 			[
 				Weave.lang("Source URL *"), 
 				<StatefulTextField selectOnFocus={true} style={{width: "100%"}} ref={linkReactStateRef(this, { value: ds.url})}/>
