@@ -83,17 +83,19 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	handleSelection = (selectedValue:any):void =>
 	{
-		if(!selectedValue)
+		if (!selectedValue)
 			return;
 
 		var tool = this.toolWatcher.target as IVisTool;
+		if (!tool)
+			return;
 		var targetAttribute = tool.selectableAttributes.get(this.targetAttribute.state as string);
 
 		var targetAttributeColumn:DynamicColumn;//attribute which will be set
 		var selectedColumn:IColumnWrapper = selectedValue instanceof Array ? selectedValue[0] as IColumnWrapper : selectedValue as IColumnWrapper;//attribute option chosen from tool; used to set target attribute
 
 
-		if(Weave.IS(targetAttribute, IColumnWrapper))
+		if (Weave.IS(targetAttribute, IColumnWrapper))
 		{
 			targetAttributeColumn = ColumnUtils.hack_findInternalDynamicColumn(targetAttribute as IColumnWrapper);
 		}
@@ -107,9 +109,9 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 		this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to rerender
 
-		if(targetAttributeColumn)
+		if (targetAttributeColumn)
 		{
-			if(selectedColumn)
+			if (selectedColumn)
 				targetAttributeColumn.requestLocalObjectCopy(selectedColumn);
 		}
 	};
@@ -243,7 +245,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 	getTargetToolAttributeOptions():string[]
 	{
-		//if(this.tool) console.log('targetattroptions',Array.from(this.tool.selectableAttributes.keys())as string[]);
+		//if (this.tool) console.log('targetattroptions',Array.from(this.tool.selectableAttributes.keys())as string[]);
 		return(this.tool ? Array.from(this.tool.selectableAttributes.keys())as string[] : []);
 	}
 
