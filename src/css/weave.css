@@ -333,11 +333,13 @@ div.table-row-selected>div>div>div>div>div {
 .weave-window-footer {
 	border-top: 1px solid;
 	border-top-color: #E6E6E6;
-	padding: 4px 8px 4px 8px;
+	padding: 4px;
 }
 
 .weave-window-footer .ui.button {
 	margin-right: 8px;
+	padding:12px;
+	border-radius:2px;
 }
 
 /* tabs */
