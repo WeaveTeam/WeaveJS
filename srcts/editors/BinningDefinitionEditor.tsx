@@ -27,12 +27,15 @@ import EqualIntervalBinningDefinition = weavejs.data.bin.EqualIntervalBinningDef
 import StandardDeviationBinningDefinition = weavejs.data.bin.StandardDeviationBinningDefinition;
 import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
 import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
+import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
+import SmartComponent from "../ui/SmartComponent";
 
 export interface BinningDefinitionEditorProps
 {
 	binnedColumn:BinnedColumn;
 	compact?:boolean;
 	onButtonClick?:React.MouseEventHandler;
+	linktoToolEditorCrumb?:Function;
 }
 
 export interface BinningDefinitionEditorState
@@ -42,27 +45,8 @@ export interface BinningDefinitionEditorState
 
 export default class BinningDefinitionEditor extends React.Component<BinningDefinitionEditorProps, BinningDefinitionEditorState>
 {
-	
-	public setTarget(object:ILinkableObject):void
-	{
-		this._binnedColumnWatcher.target = object as BinnedColumn;
-	}
-	public hasPendingChanges():boolean { return false; }
-	public applyChanges():void { }
 
-	private _binnedColumnWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(BinnedColumn, null, this.handleBinnedColumnWatcher.bind(this)));
-
-	private get binnedColumn():BinnedColumn { return this._binnedColumnWatcher.target as BinnedColumn; }
-	public _simple:SimpleBinningDefinition = Weave.disposableChild(this, SimpleBinningDefinition);
-	private _customSplit:CustomSplitBinningDefinition = Weave.disposableChild(this, CustomSplitBinningDefinition);
-	private _quantile:QuantileBinningDefinition = Weave.disposableChild(this, QuantileBinningDefinition);
-	private _equalInterval:EqualIntervalBinningDefinition = Weave.disposableChild(this, EqualIntervalBinningDefinition);
-	private _stdDev:StandardDeviationBinningDefinition = Weave.disposableChild(this, StandardDeviationBinningDefinition);
-	private _category:CategoryBinningDefinition = Weave.disposableChild(this, CategoryBinningDefinition);
-	private _jenks:NaturalJenksBinningDefinition = Weave.disposableChild(this, NaturalJenksBinningDefinition);
-	private _allBinDefs = [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks];
-
-	// TODO should Dictionary 2D be used ?
+	// mapping of readable Names with Class Names for UI
 	static binClassToBinLabel = new Map<typeof AbstractBinningDefinition, string>()
 		.set(SimpleBinningDefinition, "Equally spaced")
 		.set(CustomSplitBinningDefinition, "Custom breaks")
@@ -71,8 +55,96 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		.set(StandardDeviationBinningDefinition, "Standard deviations")
 		.set(NaturalJenksBinningDefinition, "Natural breaks")
 		.set(CategoryBinningDefinition, "All Categories (string values)");
+	
+	
+	constructor(props:BinningDefinitionEditorProps)
+	{
+		super(props);
 
-	binLabelToBin = new Map<string, AbstractBinningDefinition>()
+	}
+
+
+	onBinButtonClick=(event:React.MouseEvent)=>{
+		// render for Weave Tool editor
+		if(this.props.linktoToolEditorCrumb)
+		{
+			this.props.linktoToolEditorCrumb("Binning Definition" ,
+											<BinningDefinitionSelector column={this.props.binnedColumn}
+											                           linktoToolEditorCrumb= {this.props.linktoToolEditorCrumb} />);
+
+		}
+		else if(this.props.onButtonClick)
+		{
+			this.props.onButtonClick(event);
+		}
+	}
+
+	renderCompactView() // render for Weave Tool Editor
+	{
+		var binDef = this.props.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
+		var binLabel:string = binDef ? BinningDefinitionEditor.binClassToBinLabel.get(binDef.constructor as typeof AbstractBinningDefinition) : "None";
+	
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+			]
+		};
+
+		//todo replace with statefull textfield readonly true for binlabel
+		return (
+			<HBox className="weave-padded-hbox" style={ { alignItems: "center"} }>
+				<span style={{flex:1}}>{binLabel}</span>
+				<Button onClick={this.onBinButtonClick}>
+					<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
+				</Button>
+			</HBox>
+		);
+
+	}
+
+	renderFullView() // render for PopUp
+	{
+		return ( <BinningDefinitionSelector column={this.props.binnedColumn} linktoToolEditorCrumb= {this.props.linktoToolEditorCrumb} />);
+	}
+	
+	render()
+	{
+		return this.props.compact ? this.renderCompactView() : this.renderFullView();
+	}
+
+
+}
+
+interface BinningDefinitionSelectorProps
+{
+	column:BinnedColumn;
+	linktoToolEditorCrumb?:Function;
+}
+
+interface BinningDefinitionSelectorState
+{
+	
+}
+
+// internal component which re-renders when binnig defintion of target binned column changes
+
+class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelectorProps, BinningDefinitionSelectorState>{
+
+	private _simple:SimpleBinningDefinition = Weave.disposableChild(this, SimpleBinningDefinition);
+	private _customSplit:CustomSplitBinningDefinition = Weave.disposableChild(this, CustomSplitBinningDefinition);
+	private _quantile:QuantileBinningDefinition = Weave.disposableChild(this, QuantileBinningDefinition);
+	private _equalInterval:EqualIntervalBinningDefinition = Weave.disposableChild(this, EqualIntervalBinningDefinition);
+	private _stdDev:StandardDeviationBinningDefinition = Weave.disposableChild(this, StandardDeviationBinningDefinition);
+	private _category:CategoryBinningDefinition = Weave.disposableChild(this, CategoryBinningDefinition);
+	private _jenks:NaturalJenksBinningDefinition = Weave.disposableChild(this, NaturalJenksBinningDefinition);
+
+	private _allBinDefs = [this._simple, this._customSplit, this._quantile, this._equalInterval, this._stdDev, this._category, this._jenks];
+
+
+
+	private binLabelToBin = new Map<string, AbstractBinningDefinition>()
 		.set("Equally spaced", this._simple)
 		.set("Custom breaks", this._customSplit)
 		.set("Quantile", this._quantile)
@@ -81,27 +153,62 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		.set("Natural breaks", this._jenks)
 		.set("All Categories (string values)", this._category)
 		.set("None", null);
-	
-	constructor(props:BinningDefinitionEditorProps)
+
+
+
+	constructor(props:BinningDefinitionSelectorProps)
 	{
-		super(props);
-		this._binnedColumnWatcher.target = props.binnedColumn;
+		super(props)
 		for (var def of this._allBinDefs)
 			Weave.getCallbacks(def).addGroupedCallback(this, this.updateTargetBinningDef);
+		
+
+		// render again if binningDefinition changes
+		if(this.props.column){
+			this.props.column.binningDefinition.addGroupedCallback(this,this.forceUpdate);
+			this.handleBinnedColumnChange(this.props.column);
+		}
 	}
-	
-	private handleBinnedColumnWatcher()
+
+	componentWillReceiveProps(nextProps:BinningDefinitionSelectorProps)
 	{
-		var targetDef = this.binnedColumn.binningDefinition.target;
+		if(this.props.column !== nextProps.column)
+		{
+
+			if(this.props.column)
+				this.props.column.binningDefinition.removeCallback(this,this.forceUpdate);
+
+			if(nextProps.column)
+			{
+				nextProps.column.binningDefinition.addGroupedCallback(this,this.forceUpdate);
+				this.handleBinnedColumnChange(nextProps.column);
+			}
+
+		}
+	}
+
+	private handleBinnedColumnChange(binnedColumn:BinnedColumn)
+	{
+		let selectedBinDefn:AbstractBinningDefinition = binnedColumn.binningDefinition.target as AbstractBinningDefinition;
 		for (var localDef of this._allBinDefs)
 			if (this.compareTargetBinningType(localDef))
-				Weave.copyState(targetDef, localDef);
-		this.forceUpdate();
+				Weave.copyState(selectedBinDefn, localDef);
 	}
-	
+
+
+	private compareTargetBinningType(localDef:AbstractBinningDefinition):boolean
+	{
+		let selectedBinDefn:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+		if(localDef == null && selectedBinDefn == null) // scenario arises when we None option is selected
+			return true;
+		if (localDef && selectedBinDefn)
+			return localDef.constructor == selectedBinDefn.constructor;
+		return false; // can only get here if the binDef is null
+	}
+
 	private updateTargetBinningDef()
 	{
-		var targetDef = this.binnedColumn.binningDefinition.target;
+		var targetDef = this.props.column.binningDefinition.target;
 		if (targetDef)
 			for (var localDef of this._allBinDefs)
 				if (this.compareTargetBinningType(localDef))
@@ -119,335 +226,199 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 			}
 		}
 	}
-	
+
+	setBinningDefinition( localDef:AbstractBinningDefinition)
+	{
+		let selectedBinDefn:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+
+		if ( localDef)
+		{
+			if(selectedBinDefn && localDef.constructor == selectedBinDefn.constructor)
+			{
+				return;
+			}
+			else
+			{
+				this.props.column.binningDefinition.requestLocalObjectCopy(localDef);
+				// requestLocalObjectCopy will give selectedBinDefn.
+				selectedBinDefn = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+				Weave.linkState(selectedBinDefn, localDef);
+			}
+		}
+		else
+		{
+			this.props.column.binningDefinition.target = null;
+		}
+	}
+
 	private linkBinningDefinition(value:LinkableString|LinkableNumber)
 	{
 		return linkReactStateRef(this, {value}, 500);
 	}
-	
+
 	private hasOverrideMinAndMax()
 	{
-		var binDef:AbstractBinningDefinition = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
+		var binDef:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
 		return binDef && binDef.overrideInputMin && binDef.overrideInputMax;
 	}
 
-	setBinningDefinition(value:boolean, localDef:AbstractBinningDefinition)
-	{
-		// if we are clicking on the already selected binning definition
-		// we keep it selected
-		var binDef = this.binnedColumn.binningDefinition.target;
-		
-		if (!value && binDef && localDef && localDef.constructor == binDef.constructor)
-		{
-				this.forceUpdate(); // trigger a render because no session state change
-				return;				// and we need to update the checkboxes to reflect correct value
+	private getBinDefRenderProps(binDef:AbstractBinningDefinition):any{
+		let renderObj:any = {
+			sessionObjectToLink:null,
+			sessionObjectLabel:"",
+			helpMessage:""
 		}
 
-		else if (value && localDef)
+		if(binDef instanceof SimpleBinningDefinition)
 		{
-			this.binnedColumn.binningDefinition.requestLocalObjectCopy(localDef);
-			binDef = this.binnedColumn.binningDefinition.target;
-			Weave.linkState(binDef, localDef);
+			renderObj.sessionObjectToLink  = (binDef as SimpleBinningDefinition).numberOfBins;
+			renderObj.sessionObjectLabel = "Number of Bins:";
+			renderObj.helpMessage = 'Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]';
 		}
-		
-		if (value && !localDef)
+		else if(binDef instanceof EqualIntervalBinningDefinition)
 		{
-			this.binnedColumn.binningDefinition.target = null;
+			renderObj.sessionObjectToLink  = (binDef as EqualIntervalBinningDefinition).dataInterval;
+			renderObj.sessionObjectLabel = "Data interval:";
+			renderObj.helpMessage = 'Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]';
 		}
-	}
+		else if(binDef instanceof QuantileBinningDefinition)
+		{
+			renderObj.sessionObjectToLink  = (binDef as QuantileBinningDefinition).refQuantile;
+			renderObj.sessionObjectLabel = "Reference Quantile:";
+			renderObj.helpMessage = 'Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order'
+		}
+		else if(binDef instanceof NaturalJenksBinningDefinition)
+		{
+			renderObj.sessionObjectToLink  = (binDef as NaturalJenksBinningDefinition).numOfBins;
+			renderObj.sessionObjectLabel = "Number of bins:";
+			renderObj.helpMessage = 'The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization';
+		}
+		else if(binDef instanceof CustomSplitBinningDefinition)
+		{
+			renderObj.sessionObjectToLink  = (binDef as CustomSplitBinningDefinition).splitValues;
+			renderObj.helpMessage = 'Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]';
+		}
+		else if(binDef instanceof StandardDeviationBinningDefinition)
+		{
+			renderObj.helpMessage = 'Six bins will be created for standard deviations above and below the mean value.';
+		}
 
-	compareTargetBinningType(localDef:AbstractBinningDefinition):boolean
-	{
-		var binDef = this.binnedColumn.binningDefinition.target
-		if (localDef && binDef)
-			return localDef.constructor == binDef.constructor;
-		return false; // can only get here if the binDef is null
-	}
+		return renderObj;
 
-	componentWillReceiveProps(nextProps:BinningDefinitionEditorProps)
-	{
-		this._binnedColumnWatcher.target = nextProps.binnedColumn;
 	}
 	
-	renderCompactView()
-	{
-		var binDef = this.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
-		var binLabel:string = binDef ? BinningDefinitionEditor.binClassToBinLabel.get(binDef.constructor as typeof AbstractBinningDefinition) : "None";
+
+	render () {
+
 
 		var options = Array.from(this.binLabelToBin.keys()) as string[];
+
+		let selectedBinUI:JSX.Element;
+		let sessionUILabel:JSX.Element;
+		let sessionUI:JSX.Element;
+		let selectedBinDefn:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+		let selectedDefinitionName = selectedBinDefn ? BinningDefinitionEditor.binClassToBinLabel.get(selectedBinDefn.constructor as typeof AbstractBinningDefinition) : "None"
 		
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
-			td: [
-				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
-			]
-		};
-		
-		// [
-		// 	<span className="weave-sidebar-label">{Weave.lang("Binning Method")}</span>,
-		// 	<HBox className="weave-padded-hbox">
-		// 		<ComboBox style={{flex: 1}} 
-		// 				  options={options} 
-		// 				  value={binLabel}
-		// 				  onChange={(binLabel) => this.setBinningDefinition(true, this.binLabelToBin.get(binLabel))}/>
-		// 		<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
-		// 	</HBox>
-		// ],
-		// [
-		// 	<span className="weave-sidebar-label">{Weave.lang("Bin names")}</span>,
-		// 	<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
-		// ]
-		
-		return (
-			<HBox className="weave-padded-hbox">
-				<ComboBox style={{flex: 1}} 
-						  options={options} 
-						  value={binLabel}
-						  onChange={(binLabel) => this.setBinningDefinition(true, this.binLabelToBin.get(binLabel))}/>
-				<Button onClick={this.props.onButtonClick}>{Weave.lang("Edit")}</Button>
-			</HBox>
-		);
-		
-		// ReactUtils.generateTable(
-		// 	null,
-		// 	[
-		// 		[
-		// 			Weave.lang("Binning Method"),
-		// 			
-		// 		],
-		// 		[
-		// 			Weave.lang("Bin names"),
-		// 			<VBox style={{height: 150}}><BinNamesList showHeaderRow={false} binningDefinition={binDef}/></VBox>
-		// 		]
-		// 	],
-		// 	tableStyles
-		// );
-	}
+		if (this.props.linktoToolEditorCrumb) 
+		{
+			let renderProps:any = this.getBinDefRenderProps(selectedBinDefn);
+			sessionUILabel = renderProps.sessionObjectLabel ? <span style={ {whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span> : null;
+			sessionUI = renderProps.sessionObjectToLink ? <StatefulTextField style={ {width: 60} }
+			                                                                 type="text"
+			                                                                 ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}/> : null;
+			
+			selectedBinUI = <HBox className="weave-padded-hbox"  style={ {alignItems: "center"} }>
+								{sessionUILabel}
+								{sessionUI}
+								<HelpIcon style={ {fontSize: "initial"} }> { Weave.lang(renderProps.helpMessage) } </HelpIcon>
+							</HBox>;
 
-	renderFullView()
-	{
-		var textStyle:React.CSSProperties = {
-			whiteSpace: "nowrap"
-		};
-
-		var HBoxJustify:React.CSSProperties = {
-			justifyContent: "space-between",
-			alignItems: "center",
-			padding: 0
-		};
-
-		var leftItemsStyle:React.CSSProperties = {
-			justifyContent: "flex-start",
-			alignItems: "center"
-		};
-
-		var rightItemsStyle:React.CSSProperties = {
-			justifyContent: "flex-end",
-			alignItems: "center",
-			fontSize: "smaller"
-		};
-		
-		var helpStyle:React.CSSProperties = {
-			fontSize: "initial"
-		};
-		
-		var inputStyle:React.CSSProperties = {
-			width: 60
-		};
-
-		return (
-			<HBox className="weave-padded-hbox" style={{flex: 1}}>
-				<VBox style={{flex: 1, overflow: "auto"}} className="weave-container">
-					{Weave.lang("Binning type:")}
-					<VBox className="weave-padded-vbox" style={{flex: 1, justifyContent: "space-around", minHeight:350}}>
-						<HBox className="weave-padded-hbox" style={HBoxJustify}>
-							<HBox style={leftItemsStyle}>
-								<Checkbox
-									type="radio"
-									value={this.compareTargetBinningType(this._simple)}
-									onChange={(value) => this.setBinningDefinition(value, this._simple)}
-								/>
-								<span style={textStyle}>{Weave.lang("Equally spaced")}</span>
-							</HBox>
-							<HBox style={rightItemsStyle} className="weave-padded-hbox">
-								<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
-								<StatefulTextField
-									disabled={!this.compareTargetBinningType(this._simple)}
-									style={inputStyle}
-									type="number"
-									ref={this.linkBinningDefinition(this._simple.numberOfBins)}
-								/>
-								<HelpIcon style={helpStyle}>
-									{Weave.lang('Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]')}
-								</HelpIcon>
-							</HBox>
-						</HBox>
-
-						<HBox className="weave-padded-hbox" style={HBoxJustify}>
-							<HBox style={leftItemsStyle}>
-								<Checkbox
-									type="radio"
-									value={this.compareTargetBinningType(this._customSplit)}
-									onChange={(value) => this.setBinningDefinition(value, this._customSplit)}
-								/>
-								<span style={textStyle}>{Weave.lang("Custom breaks")}</span>
-							</HBox>
-							<HBox style={rightItemsStyle} className="weave-padded-hbox">
-								<StatefulTextField
-									type="text"
-									ref={this.linkBinningDefinition(this._customSplit.splitValues)}
-									disabled={!this.compareTargetBinningType(this._customSplit)}
-									fluid={false}
-								/>
-								<HelpIcon style={helpStyle}>
-									{Weave.lang('Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]')}
-								</HelpIcon>
-							</HBox>
-						</HBox>
-
-						<HBox className="weave-padded-hbox" style={HBoxJustify}>
-							<HBox style={leftItemsStyle}>
-								<Checkbox
-									type="radio"
-									value={this.compareTargetBinningType(this._quantile)}
-									onChange={(value) => this.setBinningDefinition(value, this._quantile)}
-								/>
-								<span style={textStyle}>{Weave.lang("Quantile")}</span>
-							</HBox>
-							<HBox style={rightItemsStyle} className="weave-padded-hbox">
-								<span style={textStyle}>{Weave.lang("Reference quantile:")}</span>
-								<StatefulTextField
-									style={inputStyle}
-									type="text"
-									disabled={!this.compareTargetBinningType(this._quantile)}
-									ref={linkReactStateRef(this, {value: this._quantile.refQuantile}, 500)}
-								/>
-								<HelpIcon style={helpStyle}>
-									{Weave.lang('Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order')}
-								</HelpIcon>
-							</HBox>
-						</HBox>
-
-						<HBox className="weave-padded-hbox" style={HBoxJustify}>
-							<HBox style={leftItemsStyle}>
-								<Checkbox
-									type="radio"
-									value={this.compareTargetBinningType(this._equalInterval)}
-									onChange={(value) => this.setBinningDefinition(value, this._equalInterval)}
-								/>
-								<span style={textStyle}>{Weave.lang("Equally interval")}</span>
-							</HBox>
-							<HBox style={rightItemsStyle} className="weave-padded-hbox">
-								<span style={textStyle}>{Weave.lang("Data interval:")}</span>
-								<StatefulTextField
-									style={inputStyle}
-									disabled={!this.compareTargetBinningType(this._equalInterval)}
-									type="text"
-									ref={this.linkBinningDefinition(this._equalInterval.dataInterval)}
-								/>
-								<HelpIcon style={helpStyle}>
-									{Weave.lang('Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]')}
-								</HelpIcon>
-							</HBox>
-						</HBox>
-
-						<HBox className="weave-padded-hbox" style={HBoxJustify}>
-							<HBox style={leftItemsStyle}>
-								<Checkbox
-									type="radio"
-									value={this.compareTargetBinningType(this._stdDev)}
-									onChange={(value) => this.setBinningDefinition(value, this._stdDev)}
-								/>
-								<span style={textStyle}>{Weave.lang("Standard deviations")}</span>
-							</HBox>
-							<HBox style={rightItemsStyle} className="weave-padded-hbox">
-								<HelpIcon style={helpStyle}>
-									{Weave.lang('Six bins will be created for standard deviations above and below the mean value.')}
-								</HelpIcon>
-							</HBox>
-						</HBox>
-
-						<HBox className="weave-padded-hbox" style={HBoxJustify}>
-							<HBox style={leftItemsStyle}>
-								<Checkbox
-									type="radio"
-									value={this.compareTargetBinningType(this._jenks)}
-									onChange={(value) => this.setBinningDefinition(value, this._jenks)}
-								/>
-								<span style={textStyle}>{Weave.lang("Natural breaks")}</span>
-							</HBox>
-							<HBox style={rightItemsStyle} className="weave-padded-hbox">
-								<span style={textStyle}>{Weave.lang("Number of bins:")}</span>
-								<StatefulTextField
-									style={inputStyle}
-									type="number"
-									disabled={!this.compareTargetBinningType(this._jenks)}
-									ref={this.linkBinningDefinition(this._jenks.numOfBins)}
-								/>
-								<HelpIcon style={helpStyle}>
-									{Weave.lang('The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization')}
-								</HelpIcon>
-							</HBox>
-						</HBox>
-
-						<HBox className="weave-padded-hbox" style={HBoxJustify}>
-							<HBox style={leftItemsStyle}>
-								<Checkbox
-									type="radio"
-									value={this.compareTargetBinningType(this._category)}
-									onChange={(value) => this.setBinningDefinition(value, this._category)}
-								/>
-								<span style={textStyle}>{Weave.lang("All Categories (string values)")}</span>
-							</HBox>
-							<HBox style={rightItemsStyle} className="weave-padded-hbox">
-								<HelpIcon style={helpStyle}>
-									{Weave.lang('One bin will be created for each unique string value in the column.')}
-								</HelpIcon>
-							</HBox>
-						</HBox>
-
-						<HBox className="weave-padded-hbox" style={HBoxJustify}>
-							<HBox style={leftItemsStyle}>
-								<Checkbox
-									type="radio"
-									value={!this.binnedColumn.binningDefinition.target}
-									onChange={(value) => this.setBinningDefinition(value, null)}
-								/>
-								<span style={textStyle}>{Weave.lang("None")}</span>
-							</HBox>
-							<HBox style={rightItemsStyle} className="weave-padded-hbox">
-								<HelpIcon style={helpStyle}>
-									{Weave.lang('The data will not be binned.')}
-								</HelpIcon>
-							</HBox>
+			return <VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto"}}>
+						<ComboBox options={options}
+						          value={selectedDefinitionName}
+						          onChange={(binLabel) => this.setBinningDefinition(this.binLabelToBin.get(binLabel))}/>
+						{selectedBinUI}
+						{
+							this.hasOverrideMinAndMax() ?
+								<HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
+									<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range:")}</span>
+									<StatefulTextField type="number" style={{flex: 1}}
+									                   ref={this.linkOverride("overrideInputMin")} placeholder="min"/>
+									<StatefulTextField type="number" style={{flex: 1}}
+									                   ref={this.linkOverride("overrideInputMax")} placeholder="max"/>
+								</HBox>
+								: null
+						}
+						<HBox style={ {flex: 1} }>
+							<BinNamesList binningDefinition={selectedBinDefn as AbstractBinningDefinition}/>
 						</HBox>
 					</VBox>
+
+		}
+		else {
+			let binUIs:JSX.Element[] = [];
+			for (let [key, binDefn] of this.binLabelToBin.entries()) {
+
+				let isSelected:boolean = this.compareTargetBinningType(binDefn);
+				
+				let renderProps:any = this.getBinDefRenderProps(binDefn);
+				sessionUILabel = renderProps.sessionObjectLabel ?<span style={ {whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span> : null;
+				sessionUI = renderProps.sessionObjectToLink ? <StatefulTextField style={ {width: 60} }
+				                                                                 disable={!isSelected}
+				                                                                 type="text"
+				                                                                 ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}/> : null;
+
+
+				
+				let binUI:JSX.Element = <HBox className="weave-padded-hbox"
+				                              key={key}
+				                              style={ {alignItems: "center"} }>
+											<HBox style={ {alignItems: "center"} }>
+												<Checkbox type="radio"
+												          name="binningDefinitions"
+												          value={ isSelected }
+												          label={ Weave.lang(key) }
+												          onChange = {(value)=> value ? this.setBinningDefinition(binDefn):null}
+												/>
+
+											</HBox>
+											<span style={ {flex:1} }></span>
+											{sessionUILabel}
+											{sessionUI}
+											<HelpIcon style={ {fontSize: "initial"} }> { Weave.lang(renderProps.helpMessage) } </HelpIcon>
+										</HBox>;
+				binUIs.push(binUI)
+			}
+
+			return <HBox className="weave-padded-hbox" style={{flex: 1}}>
+				<VBox style={{flex: 1, overflow: "auto"}} className="weave-container">
+					{Weave.lang("Binning type:")}
+
+					<HBox style={{flex: 1}}>
+						<VBox className="weave-padded-vbox" style={{flex: 1}}>
+							{binUIs}
+						</VBox>
+					</HBox>
 				</VBox>
 				<VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto"}}>
 					{
 						this.hasOverrideMinAndMax()
-						?	<HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
-								<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range:")}</span>
-								<StatefulTextField type="number" style={{flex: 1}} ref={this.linkOverride("overrideInputMin")} placeholder="min"/>
-								<StatefulTextField type="number" style={{flex: 1}} ref={this.linkOverride("overrideInputMax")} placeholder="max"/>
-							</HBox>
-						:	null
-					}
+							?    <HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
+									<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range:")}</span>
+									<StatefulTextField type="number" style={{flex: 1}}
+									                   ref={this.linkOverride("overrideInputMin")} placeholder="min"/>
+									<StatefulTextField type="number" style={{flex: 1}}
+									                   ref={this.linkOverride("overrideInputMax")} placeholder="max"/>
+								</HBox>
+							:    null
+						}
 					<HBox style={{flex: 1}}>
-						<BinNamesList binningDefinition={this.binnedColumn.binningDefinition.target as AbstractBinningDefinition}/>
+						<BinNamesList binningDefinition={selectedBinDefn}/>
 					</HBox>
-					{/*<HBox style={{alignItems: "center"}}>
-						<Checkbox/>
-						<span style={textStyle}>{Weave.lang("Edit and override names")}</span>
-					</HBox>*/}
 				</VBox>
 			</HBox>
-		)
-	}
-	
-	render()
-	{
-		return this.props.compact ? this.renderCompactView() : this.renderFullView();
+		}
 	}
 }
+
+

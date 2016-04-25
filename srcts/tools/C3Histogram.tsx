@@ -562,8 +562,10 @@ export default class C3Histogram extends AbstractC3Tool
 		}
 	}
 
-    //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(linkFunction:Function):JSX.Element
+
+
+    //todo:(linktoToolEditorCrumbFunction)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(linktoToolEditorCrumbFunction:Function):JSX.Element
 	{
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
@@ -576,7 +578,8 @@ export default class C3Histogram extends AbstractC3Tool
 		return ReactUtils.generateTable(
 			null,
 			([
-				[ 
+				[
+					null,
 					<Checkbox
 						ref={(ref:Checkbox) => {
 							if (ref)
@@ -596,11 +599,12 @@ export default class C3Histogram extends AbstractC3Tool
 							else
 								this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 						}}
-					/>,
-					Weave.lang("Link to global color column")
+					    label={Weave.lang("Link to global color column")}
+					/>
+					
 				]
 			] as React.ReactChild[][]).concat(
-				this.getSelectableAttributesEditor(linkFunction),
+				this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction),
 				[
 					[
 						Weave.lang("Color theme"),
@@ -617,19 +621,20 @@ export default class C3Histogram extends AbstractC3Tool
 					],
 					[
 						Weave.lang("Binning method"),
-						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} onButtonClick={() => this.openColorController(0)}/>
+						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(0)}/>
 					],
 					[ 
 						Weave.lang("Aggregation method"),
 						<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
 					],
 					Weave.beta && [
-						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/>, 
-						Weave.lang("Horizontal bars (beta)")
+						null,
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/> 
+						
 					],
 					[
-						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/>,
-						Weave.lang("Show value labels")
+						null,
+						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
 					]
 				],
 				this.getTitlesEditor(),
