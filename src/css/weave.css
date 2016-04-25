@@ -326,11 +326,18 @@ div.table-row-selected>div>div>div>div>div {
 	font-weight: 300;
 }
 
+.weave-footer .ui.button {
+	margin-right: 8px;
+}
+
 .weave-window-footer {
-	border-top-width: 1px;
+	border-top: 1px solid;
 	border-top-color: #E6E6E6;
-	background-color: #D5D5D5;
 	padding: 4px 8px 4px 8px;
+}
+
+.weave-window-footer .ui.button {
+	margin-right: 8px;
 }
 
 /* tabs */
@@ -627,6 +634,7 @@ div.weave-tree-view {
 	background-color:#ECECEC;
 	color:black;
 	font-weight: normal;
+	margin:0;/* important to override semantic ui default margin-right value. for special cases use inline style to set */
 }
 
 .ui.button:hover {

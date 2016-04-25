@@ -236,10 +236,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 						</HBox>
 					</span>
 				<HBox>
-					<Button	onClick={this.setOverrideExtent}>
+					<Button	onClick={this.setOverrideExtent} style={ {borderTopRightRadius:0 , borderBottomRightRadius:0} }>
 							{Weave.lang("Use current zoom") }
 					</Button>
-					<Button	onClick={this.clearOverrideExtent}>
+					<Button	onClick={this.clearOverrideExtent} style={ {borderTopLeftRadius:0 , borderBottomLeftRadius:0} }>
 							{Weave.lang("Use data bounds")}
 					</Button>
 				</HBox>
