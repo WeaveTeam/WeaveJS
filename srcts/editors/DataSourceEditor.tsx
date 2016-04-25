@@ -68,12 +68,6 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		this.componentWillReceiveProps(props);
 	}
 
-	updateDataSourceLabel(event:any)
-	{
-		this.setState({dataSourceLabel : event.target.value});
-		this.props.dataSource.setLabel(this.state.dataSourceLabel)
-	}
-	
 	componentWillReceiveProps(props:IDataSourceEditorProps)
 	{
 		this.dataSourceWatcher.target = props.dataSource;
