@@ -38,7 +38,6 @@ export interface IDataSourceEditorState {
 	selectedNode?: IWeaveTreeNode;
 	selectedColumn?: IWeaveTreeNode;
 	showPreviewView?: boolean;
-	dataSourceLabel?:string;
 };
 
 export default class DataSourceEditor extends React.Component<IDataSourceEditorProps, IDataSourceEditorState> 
@@ -61,7 +60,6 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		this.state = {
 			selectedNode: selectedNode,
 			selectedColumn: initialSelectedNode,
-			dataSourceLabel:this.props.dataSource.getLabel(),
 			showPreviewView: false
 		};
 
