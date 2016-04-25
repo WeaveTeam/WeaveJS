@@ -95,6 +95,16 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			});
 	};
 
+	overrideExtentDefined = ():boolean => {
+		let bounds = Weave.getState(this.extentOverride) as any;
+		for (let key of Object.keys(bounds))
+		{
+			let value = bounds[key];
+			if (isNaN(value)) return false;
+		}
+		return true;
+	}
+
 	private static projectionDbPromise:WeavePromise = 
 		weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
 	private static projectionDbLoadAttempted:boolean = false;
@@ -183,8 +193,12 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 
 
-
-
+		let renderNumberEditor = (linkableNumber:LinkableNumber, flex:number)=>
+		{
+			var style: React.CSSProperties = { textAlign: "center", flex, minWidth: 60 };
+			return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, { value: linkableNumber }) }/>;	
+		}
+		
 		let editorFields = [
 			[<span className="weave-sidebar-label">{Weave.lang("Title")}</span>,
 				<HBox>
@@ -209,11 +223,27 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
 				</HBox>
 			],
-			[<span className="weave-sidebar-label">{Weave.lang("Override extent")}</span>,
+			[<span className="weave-sidebar-label">{Weave.lang("Zoom/Pan Boundaries")}</span>,
+				<VBox>
+					<span style={{display: this.overrideExtentDefined() ? null : "none" }}>
+						<HBox className="weave-padded-hbox" style={{ alignItems: 'center' }}>
+							{ renderNumberEditor(this.extentOverride.xMin, 1) }
+							<VBox className="weave-padded-vbox" style={{ flex: 1 }}>
+								{ renderNumberEditor(this.extentOverride.yMax, null) }
+								{ renderNumberEditor(this.extentOverride.yMin, null) }
+							</VBox>
+							{ renderNumberEditor(this.extentOverride.yMin, 1) }
+						</HBox>
+					</span>
 				<HBox>
-					<Button style={ {borderBottomRightRadius:0,borderTopRightRadius:0,borderRight:"none"} } onClick={this.setOverrideExtent}>{Weave.lang("Use current zoom")}</Button>
-					<Button style={ {borderBottomLeftRadius:0,borderTopLeftRadius:0} } onClick={this.clearOverrideExtent}>{Weave.lang("Reset")}</Button>
+					<Button	onClick={this.setOverrideExtent}>
+							{Weave.lang("Use current zoom") }
+					</Button>
+					<Button	onClick={this.clearOverrideExtent}>
+							{Weave.lang("Use data bounds")}
+					</Button>
 				</HBox>
+				</VBox>
 			],
 			[<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}/>, Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.")]
 		];
