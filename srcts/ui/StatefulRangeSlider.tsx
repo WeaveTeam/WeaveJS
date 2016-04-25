@@ -5,6 +5,7 @@ import * as ReactDOM from "react-dom";
 
 export interface StatefulRangeSliderProps extends React.HTMLProps<StatefulRangeSlider> {
 	style?: React.CSSProperties;
+	valueFormat?: (value: number)=>string;
 }
 
 export interface StatefulRangeSliderState {
@@ -26,9 +27,13 @@ export default class StatefulRangeSlider extends React.Component<StatefulRangeSl
 	render(): JSX.Element {
 		var props = _.clone(this.props);
 		delete props.children;
+		let valueString = this.props.valueFormat ? this.props.valueFormat(this.state.value) : "";
 
 		return (
-			<input {...props as any} onChange={this.handleInputChange} type="range" value={this.state.value !== undefined && this.state.value.toString()}/>
+			<span>
+				<input {...props as any} onChange={this.handleInputChange} type="range" value={this.state.value !== undefined && this.state.value.toString()}/>
+				{valueString}
+			</span>
 		);
 	}
 }

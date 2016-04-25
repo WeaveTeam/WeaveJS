@@ -69,7 +69,7 @@ export default class AbstractLayer implements ILinkableObject
 		{
 			return [
 				Weave.lang(key),
-				<StatefulRangeSlider min={0} max={1} step={0.01} style={{ display: "inline", width: "50px" }} ref={linkReactStateRef(this, { value }) }/>
+				<StatefulRangeSlider valueFormat={(value) => " " + Math.round(value * 100) + "%"} min={0} max={1} step={0.01} style={{ display: "inline", width: "50px", verticalAlign: "middle" }} ref={linkReactStateRef(this, { value }) }/>
 			]
 		}
 
