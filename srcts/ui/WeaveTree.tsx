@@ -211,6 +211,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		node.style.display = "inline-block";
 		node.style.width = null;
 		let width = node.offsetWidth;
+		ReactDOM.unmountComponentAtNode(div);
 		body.removeChild(div);
 
 		return width * 1.5;
