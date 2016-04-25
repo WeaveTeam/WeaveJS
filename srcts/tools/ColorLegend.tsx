@@ -24,7 +24,6 @@ import StatefulTextField from "../ui/StatefulTextField";
 import BinNamesList from "../ui/BinNamesList";
 import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
 import PrintUtils from "../utils/PrintUtils";
-import ContextMenu from "../menus/ContextMenu";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -124,7 +123,17 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;;
+	}
+
+	get defaultPanelTitle():string
+	{
+		var column = this.colorColumn;
+		var title = this.colorColumn.getMetadata("title");
+		if(title == null)
+			return Weave.lang('Color Legend');
+
+		return Weave.lang("Color Legend of {0}", title);
 	}
 	
 	get numberOfBins():number
@@ -447,6 +456,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		return ReactUtils.generateTable(
 			null,
 			renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(
+				this.getTitlesEditor(),
 				[
 					[
 						Weave.lang("Shape type"),
@@ -471,6 +481,23 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			),
 			tableStyles
 		);
+	}
+
+	getTitlesEditor():React.ReactChild[][]
+	{
+		return [
+			[
+				"Title",
+				this.panelTitle,
+				this.defaultPanelTitle
+			]
+		].map((row:[string, LinkableString]) => {
+
+			return [
+				Weave.lang(row[0]),
+				<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+			]
+		});
 	}
 
 	get deprecatedStateMapping():Object
