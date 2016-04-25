@@ -75,7 +75,6 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 	
 	componentWillReceiveProps(props:IDataSourceEditorProps)
 	{
-		console.log("componentWillReceiveProps");
 		this.dataSourceWatcher.target = props.dataSource;
 		var selectedNode = props.dataSource.getHierarchyRoot();
 		var nodes = selectedNode && selectedNode.getChildren();
