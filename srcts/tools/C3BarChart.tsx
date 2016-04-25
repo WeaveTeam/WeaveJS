@@ -112,7 +112,6 @@ export default class C3BarChart extends AbstractC3Tool
         super(props);
 
 		this.colorColumn.internalDynamicColumn.globalName = "defaultColorColumn";
-		this.filteredKeySet.setColumnKeySources([this.sortColumn]);
         this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
@@ -276,6 +275,7 @@ export default class C3BarChart extends AbstractC3Tool
     private dataChanged():void
 	{
 		var columns = this.heightColumns.getObjects(IAttributeColumn);
+		this.filteredKeySet.setColumnKeySources(columns);
 		this.RECORD_FORMAT.heights = _.zipObject(this.heightColumns.getNames(), columns) as any;
 		this.RECORD_FORMAT.heights.xLabel = this.labelColumn;
 		this.RECORD_DATATYPE.heights = _.zipObject(this.heightColumns.getNames(), columns.map(() => Number)) as any;
@@ -530,10 +530,10 @@ export default class C3BarChart extends AbstractC3Tool
     get selectableAttributes()
     {
         return super.selectableAttributes
-            .set("Label", this.labelColumn)
-            .set("Sort", this.sortColumn)
-            .set("Color", this.colorColumn)
-            .set("Height", this.heightColumns);
+	        .set("Height", this.heightColumns)
+	        .set("Sort", this.sortColumn)
+	        .set("Color", this.colorColumn)
+            .set("Label", this.labelColumn);
     }
 
     get defaultPanelTitle():string
