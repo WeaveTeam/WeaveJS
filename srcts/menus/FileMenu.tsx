@@ -164,7 +164,7 @@ export default class FileMenu implements MenuBarItemProps
 	loadUrl(url:string)
 	{
 		this.fileName = String(url).split('/').pop();
-		return WeaveArchive.loadUrl(this.weave, this.fileName);
+		return WeaveArchive.loadUrl(this.weave, String(url));
 	}
 
 	private dropExtension(fileName:string)
