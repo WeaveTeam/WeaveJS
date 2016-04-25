@@ -91,7 +91,13 @@ export default class WeaveComponentRenderer extends SmartComponent<IWeaveCompone
 		var ComponentClass = LinkablePlaceholder.getClass(this.watcher.target) as React.ComponentClass<any> & typeof ILinkableObject;
 		if (!React.Component.isPrototypeOf(ComponentClass))
 			ComponentClass = null;
-		
+
+		/* To force React to create a new component */
+		if (this.state.target !== this.watcher.target)
+		{
+			this.key++;
+		}
+
 		this.setState({
 			actualType: ComponentClass,
 			target: this.watcher.target
