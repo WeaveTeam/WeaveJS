@@ -54,7 +54,6 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	private minWidth:number = 320;
 	private minHeight:number = 240;
 	private element:HTMLElement;
-	private container:VBox;
 	private mouseDownOffset: {
 		x: number,
 		y: number
@@ -105,7 +104,6 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	
 	componentDidMount()
 	{
-		this.element = ReactDOM.findDOMNode(this.container) as HTMLElement;
 		var top = this.props.top || (window.innerHeight - this.element.clientHeight) / 2;
 		var left = this.props.left || (window.innerWidth - this.element.clientWidth) / 2; 
 		this.setState({
@@ -258,7 +256,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 			<div key={TOP} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP)} style={{position: "absolute", left: 0, top: 0, width: "100%", height: 8, cursor: "ns-resize"}}/>,
 			<div key={BOTTOM} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM)} style={{position: "absolute", left: 0, bottom: 0, width: "100%", height: 8, cursor: "ns-resize"}}/>,
 			<div key={TOP_LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP_LEFT)} style={{position: "absolute", left: 0, top: 0, width: 16, height: 16, cursor: "nwse-resize"}}/>,
-			<div key={TOP_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP_RIGHT)} style={{position: "absolute", right: 0, top: 0, width: 8, height: 8, cursor: "nesw-resize"}}/>,
+			<div key={TOP_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, TOP_RIGHT)} style={{position: "absolute", right: 0, top: 0, width: 16, height: 16, cursor: "nesw-resize"}}/>,
 			<div key={BOTTOM_LEFT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM_LEFT)} style={{position: "absolute", left: 0, bottom: 0, width: 16, height: 16, cursor: "nesw-resize"}}/>,
 			<div key={BOTTOM_RIGHT} onMouseDown={(event:React.MouseEvent) => this.onResizeStart(event, BOTTOM_RIGHT)} style={{position: "absolute", bottom: 0, right: 0, width: 16, height: 16, cursor: "nwse-resize"}}/>
 		];
@@ -277,45 +275,45 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		};
 
 		var popupWindow = (
-			<VBox className="weave-app weave-window" onMouseDown={() => this.handleClickOnWindow()} ref={(c:VBox) => this.container = c} style={windowStyle}>
-				<HBox className="weave-header weave-window-header" onMouseDown={this.onDragStart.bind(this)}>
-					<div style={{flex: 1}}>
-					{
-						this.props.title
-					}
-					</div>
-					{/*
-						!this.props.modal
-						?	<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
-						:	null
-					*/}
-				</HBox>
-				<VBox className="weave-padded-vbox weave-window-content" style={{display: 'block', flex: 1}}>
-					<VBox style={{flex: 1, overflow: "auto"}}>
-						{ this.state.content || this.props.content }
-						{ this.props.children }
-					</VBox>
-					{
-						this.props.footerContent
-						?	<HBox className="weave-window-footer">
-								this.props.footerContent
-							</HBox>
-						:	<HBox className="weave-window-footer">
-								<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
-									<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
-									{
-										this.props.modal
-										?	<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
-										:	null
-									}
+			<div style={windowStyle} ref={(div:HTMLDivElement) => this.element = div} >
+				<VBox className="weave-app weave-window" onMouseDown={() => this.handleClickOnWindow()} style={{width: "100%", height: "100%"}}>
+					<HBox className="weave-header weave-window-header" onMouseDown={this.onDragStart.bind(this)}>
+						<div style={{flex: 1}}>
+						{
+							this.props.title
+						}
+						</div>
+						{/*
+							!this.props.modal
+							?	<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
+							:	null
+						*/}
+					</HBox>
+					<VBox className="weave-padded-vbox weave-window-content" style={{display: 'block', flex: 1}}>
+						<VBox style={{flex: 1, overflow: "auto"}}>
+							{ this.state.content || this.props.content }
+							{ this.props.children }
+						</VBox>
+						{
+							this.props.footerContent
+							?	<HBox className="weave-window-footer">
+									this.props.footerContent
 								</HBox>
-							</HBox>
-					}
-					{
-						this.props.resizable && this.renderResizers()
-					}
+							:	<HBox className="weave-window-footer">
+									<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
+										<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
+										{
+											this.props.modal
+											?	<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
+											:	null
+										}
+									</HBox>
+								</HBox>
+						}
+					</VBox>
 				</VBox>
-			</VBox>
+				{ this.props.resizable && this.renderResizers() }
+			</div>
 		);
 		
 		return (
