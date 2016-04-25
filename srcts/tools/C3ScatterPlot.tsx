@@ -336,7 +336,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			.set("X", this.dataX)
 			.set("Y", this.dataY)
 			.set("Color", this.fill.color)
-			.set("Radius", this.radius);
+			.set("Size", this.radius);
 			// TODO handle remaining attributes
 	}
 
