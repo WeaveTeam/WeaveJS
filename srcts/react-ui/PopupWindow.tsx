@@ -290,29 +290,31 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 						:	null
 					*/}
 				</HBox>
-				<HBox className="weave-window-content" style={{flex: 1, overflow: "auto"}}>
-					{ this.state.content || this.props.content }
-					{ this.props.children }
-				</HBox>
-				{
-					this.props.footerContent
-					?	<HBox className="weave-window-footer">
-							this.props.footerContent
-						</HBox>
-					:	<HBox className="weave-window-footer">
-							<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
-								<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
-								{
-									this.props.modal
-									?	<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
-									:	null
-								}
+				<VBox className="weave-padded-vbox weave-window-content" style={{display: 'block', flex: 1}}>
+					<VBox style={{flex: 1, overflow: "auto"}}>
+						{ this.state.content || this.props.content }
+						{ this.props.children }
+					</VBox>
+					{
+						this.props.footerContent
+						?	<HBox className="weave-window-footer">
+								this.props.footerContent
 							</HBox>
-						</HBox>
-				}
-				{
-					this.props.resizable && this.renderResizers()
-				}
+						:	<HBox className="weave-window-footer">
+								<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
+									<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
+									{
+										this.props.modal
+										?	<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
+										:	null
+									}
+								</HBox>
+							</HBox>
+					}
+					{
+						this.props.resizable && this.renderResizers()
+					}
+				</VBox>
 			</VBox>
 		);
 		
