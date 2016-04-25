@@ -114,7 +114,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				}
 				else
 				{
-					selector.dropdown('clear');
+					//clear dropdown if option isn't found and we are not allowing new items
+					if(!this.props.onNew)
+						selector.dropdown('clear');
 				}
 			}
 			this.props.onChange && this.props.onChange(this.state.value);
@@ -198,8 +200,10 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		}
 		else if (index >= 0)
 			selector.dropdown('set selected',(typeof option === "object") ? option.label:option);
-		else
-			selector.dropdown('clear');
+		else {
+			if(!this.props.onNew)
+				selector.dropdown('clear');
+		}
 	}
 
 	render()
