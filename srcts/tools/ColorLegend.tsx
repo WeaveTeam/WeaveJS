@@ -23,6 +23,8 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import BinNamesList from "../ui/BinNamesList";
 import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
+import PrintUtils from "../utils/PrintUtils";
+import ContextMenu from "../menus/ContextMenu";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -189,9 +191,17 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		ReactUtils.closePopup(this.toolTip);
 	}
 
-	getMenuItems()
+	getMenuItems():MenuItemProps[]
 	{
-		return AbstractVisTool.getMenuItems(this);
+		let menuItems:MenuItemProps[] = AbstractVisTool.getMenuItems(this);
+
+		if(Weave.beta)
+			menuItems.push({
+				label: Weave.lang("Print Tool (Beta)"),
+				click: PrintUtils.printTool.bind(null, ReactDOM.findDOMNode(this))
+			});
+
+		return menuItems;
 	}
 	
 	getInteractionStyle(bin:number):CSSProperties

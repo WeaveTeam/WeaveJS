@@ -1,12 +1,14 @@
 import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "./IVisTool";
 import * as _ from "lodash";
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import AbstractVisTool from "./AbstractVisTool";
 import Menu, {MenuItemProps} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
 import FixedDataTable from "./FixedDataTable";
 import {IRow} from "./FixedDataTable";
 import ReactUtils from "../utils/ReactUtils";
+import PrintUtils from "../utils/PrintUtils";
 
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
@@ -111,6 +113,12 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				click: () => this.fixedDataTable.moveSelectedToTop()
 			});
 		}
+
+		if(Weave.beta)
+			menuItems.push({
+				label: Weave.lang("Print Tool (Beta)"),
+				click: PrintUtils.printTool.bind(null, ReactDOM.findDOMNode(this))
+			});
 
 		return menuItems;
 	}

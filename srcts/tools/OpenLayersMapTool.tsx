@@ -5,6 +5,7 @@ import * as ReactDOM from "react-dom";
 import ReactUtils from "../utils/ReactUtils";
 import MouseUtils from "../utils/MouseUtils";
 import * as jquery from "jquery";
+import PrintUtils from "../utils/PrintUtils";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -798,6 +799,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				menuItems = menuItems.concat(AbstractVisTool.getMenuItems(layer));
 			}
 		}
+
+		if(Weave.beta)
+			menuItems.push({
+				label: Weave.lang("Print Tool (Beta)"),
+				click: PrintUtils.printCanvasTool.bind(null, this.element)
+			});
+
 		return menuItems;
 	}
 

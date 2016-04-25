@@ -12,6 +12,8 @@ import DOMUtils from "../utils/DOMUtils";
 import MouseUtils from "../utils/MouseUtils";
 import ReactUtils from "../utils/ReactUtils";
 import ToolTip from "./ToolTip";
+import Menu, {MenuItemProps} from "../react-ui/Menu";
+import PrintUtils from "../utils/PrintUtils";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -133,6 +135,19 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
     componentDidUpdate():void
 	{
 		this.validateSize();
+	}
+
+	getMenuItems():MenuItemProps[]
+	{
+		let menuItems:MenuItemProps[] = AbstractVisTool.getMenuItems(this);
+
+		if(Weave.beta)
+			menuItems.push({
+				label: Weave.lang("Print Tool (Beta)"),
+				click: PrintUtils.printTool.bind(null, this.element)
+			});
+
+		return menuItems;
 	}
 	
 	validateSize()
