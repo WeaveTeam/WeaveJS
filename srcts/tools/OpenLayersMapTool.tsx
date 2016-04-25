@@ -217,7 +217,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
 				</HBox>
 			],
-			[<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })}/>, Weave.lang("Show zoom slider")],
+			[null,<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })} label={Weave.lang("Show zoom slider")}/>],
 			[<span className="weave-sidebar-label">{Weave.lang("Projection SRS")}</span>,
 				<HBox>
 					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
@@ -245,7 +245,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				</HBox>
 				</VBox>
 			],
-			[<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}/>, Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.")]
+			[null,<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})} label={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }/>]
 		];
 
 		return (

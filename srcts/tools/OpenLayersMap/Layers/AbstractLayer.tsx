@@ -98,8 +98,8 @@ export default class AbstractLayer implements ILinkableObject
 		else
 		{
 			return [
-				Weave.lang(key),
-				<Checkbox key={key} ref={linkReactStateRef(this, { value: lv }) }/>
+				null,
+				<Checkbox key={key} ref={linkReactStateRef(this, { value: lv }) } label={Weave.lang(key)}/>
 			];
 		}		
 	}

@@ -1,17 +1,17 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import $ from "../modules/jquery";
 import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
+import FormEvent = __React.FormEvent;
 
 export interface CheckboxProps extends React.Props<Checkbox>
 {
 	type?: string;
-	label?: string;
+	label: string; // important to set them to avoid using jquery // else we have to let jquery to use dom selector to set " set checked"
 	name?: string;
 	style?: React.CSSProperties;
 	stopPropagation?: boolean;
-	onChange?: (value:boolean) => void;
+	onChange?: (value:boolean,event:FormEvent) => void;
 	className?:string;
 	value?:boolean;
 	title?:string;
@@ -31,12 +31,13 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	{
 		super(props);
 		this.state = {
-			value: !!props.value
+			value: props.value
 		};
 	}
 
 	static defaultProps:CheckboxProps = {
-		type: ""
+		type: "",
+		label:""
 	};
 	
 	componentWillReceiveProps(nextProps:CheckboxProps)
@@ -47,37 +48,19 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 			});
 	}
 
-	componentDidUpdate(prevProps:CheckboxProps, prevState:CheckboxState)
-	{
-		if(this.state.value)
-			this.selector.checkbox("set checked");
-		else
-			this.selector.checkbox("set unchecked");
-	}
 	
-	handleChange=()=>
+	
+	handleChange=(event:FormEvent)=>
 	{
-		var value = _.clone(this.state.value);
 		this.setState({
-			value:!value
+			value:!this.state.value
 		});
-		this.props.onChange && this.props.onChange(!value);
+		this.props.onChange && this.props.onChange(!this.state.value,event);
 	};
 
-	componentDidMount()
-	{
-		this.element = ReactDOM.findDOMNode(this);
-		this.selector = ($(this.element) as any);
 
-		this.selector.checkbox({
-			onChange: this.handleChange
-		});
 
-		if(this.state.value)
-			this.selector.checkbox("set checked");
-		else
-			this.selector.checkbox("set unchecked");
-	}
+	
 
 	render()
 	{
@@ -85,8 +68,14 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 		delete props.children;
 
 		return (
-			<div className={"ui " + this.props.type + " checkbox " + (this.props.className || "")}>
-				<input {...props as any} type="checkbox" value={String(this.state.value)} title={this.props.title} name={this.props.name}/>
+			<div className={"ui " + this.props.type + " checkbox " + (this.state.value? "checked ": "")  +(this.props.className || "")}>
+				<input {...props as any} type={this.props.type ? this.props.type :  "checkbox"}
+				                         value={String(this.state.value)}
+				                         checked={this.state.value}
+				                         title={this.props.title}
+				                         name={this.props.name}
+				                         onChange={this.handleChange}
+				                         />
 				{this.props.label ? <label>{this.props.label}</label>:null}
 			</div>
 		);

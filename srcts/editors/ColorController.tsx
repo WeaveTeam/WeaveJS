@@ -87,20 +87,10 @@ export default class ColorController extends React.Component<ColorControllerProp
 								<SelectableAttributeComponent attributes={this.attributes} attributeName="Color Data"/>
 							</HBox>
 							<BinningDefinitionEditor binnedColumn={this.binnedColumn}/>
-							<HBox>
-								<Checkbox style={{marginRight: 5}} onChange={this.handleFilterCheck}/>
-								<span style={{alignSelf: "center"}}>
-									 {Weave.lang("Filter records prior to binning")}
-								</span>
-							</HBox>
+							<Checkbox style={{marginRight: 5}} onChange={this.handleFilterCheck} label={Weave.lang("Filter records prior to binning")}/>
 						</VBox>,
 						<VBox key={this.tabLabels[1]} style={{flex: 1, padding: 5}} className="weave-padded-vbox">
-							<HBox>
-								<Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})}/>
-								<span>
-									{Weave.lang("Center color ramp at zero (when binning is disabled)")}
-								</span>
-							</HBox>
+							<Checkbox style={{marginRight: 5}} ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})} label={Weave.lang("Center color ramp at zero (when binning is disabled)")}/>
 							<ColorRampEditor colorRamp={this.props.colorColumn.ramp}/>
 						</VBox>
 					]}

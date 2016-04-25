@@ -74,8 +74,8 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		return <HBox key={index} style={ {alignItems: "center", padding: "4px"} }
 		             className={layer == this.state.selectedLayer ? "weave-list-Item-selected" : "weave-list-Item"}
 		             onClick={() => {if (this.state.selectedLayer != layer) this.setState({selectedLayer: layer});}}>
-				<Checkbox title={ Weave.lang("Show layer") } ref={ linkReactStateRef(this, { value: layer.visible }) } stopPropagation={true}/>
-				<span style={ {flex:1} }>{ layer.getDescription() }</span>
+				<Checkbox title={ Weave.lang("Show layer") } ref={ linkReactStateRef(this, { value: layer.visible }) } stopPropagation={true} label={ layer.getDescription() }/>
+				<span style={ {flex:1} }></span>
 				<button className="ui button"
 				        title={ Weave.lang("Edit layer") }
 				        style={ {alignSelf: "flex-end", whiteSpace: "nowrap"} }
