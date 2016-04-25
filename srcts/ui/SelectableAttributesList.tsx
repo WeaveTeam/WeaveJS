@@ -67,7 +67,7 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
 			var lhm = Weave.AS(this.columns, ILinkableHashMap);
 			if (lhm)
 			{
-				lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
+				lhm.requestObject(null, ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
 			}
 		}
 	};
@@ -135,18 +135,18 @@ export default class SelectableAttributesList extends React.Component<ISelectabl
         var columnList: IWeaveTreeNode[] = [];
 	    var options: {label:string, value:IWeaveTreeNode&IColumnReference}[] = [];
 	    let siblings:IWeaveTreeNode[] = [];
-        var columns = this.columns.getObjects(IAttributeColumn);
+        var columns = this.columns.getObjects(IColumnWrapper); // TODO - this does not consider if hash map contains non-IColumnWrapper columns
 
         //When all options are selected, needed only for restyling the list and re-render
         if (this.state.selectAll)
             selectedObjects = columns;
 
-        columns.forEach((column:ReferencedColumn)=>{
-	        let node:IWeaveTreeNode&IColumnReference = column.getHierarchyNode();
+        columns.forEach((column:IColumnWrapper)=>{
+			let node = ColumnUtils.hack_findHierarchyNode(column);
 			if (!node)
 				return;
             columnList.push(node);
-			var columnSiblings = HierarchyUtils.findSiblingNodes(column.getDataSource(), node.getColumnMetadata());
+			var columnSiblings = HierarchyUtils.findSiblingNodes(node.getDataSource(), node.getColumnMetadata());
 	        columnSiblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
 		        if (!_.includes(siblings, siblingNode))
 				{
