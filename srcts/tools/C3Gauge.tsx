@@ -61,6 +61,8 @@ export default class C3Gauge extends AbstractC3Tool
 		Weave.linkableChild(this, this.binningDefinition.asyncResultCallbacks);
 	    this.margin.left = Weave.linkableChild(this, new LinkableNumber(0));
 	    this.margin.right = Weave.linkableChild(this, new LinkableNumber(0));
+	    this.margin.top = Weave.linkableChild(this, new LinkableNumber(10));
+	    this.margin.bottom = Weave.linkableChild(this, new LinkableNumber(10));
 
         this.keyToIndex = {};
 
@@ -99,6 +101,12 @@ export default class C3Gauge extends AbstractC3Tool
             }
         });
     }
+
+	protected updateConfigMargin()
+	{
+		this.c3Config.padding.top = this.margin.top.value;
+		this.c3Config.padding.bottom = this.margin.bottom.value;
+	}
 
     protected validate(forced:boolean = false):boolean
     {
