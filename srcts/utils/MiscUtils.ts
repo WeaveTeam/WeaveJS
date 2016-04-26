@@ -54,10 +54,23 @@ export default class MiscUtils
 	 *
 	 * @returns returns an object with the matching properties
 	 */
-	static findDeep(root:any, match:any):any
+	static findDeep(root:any, match:any/*, matchArrayLength:boolean = true*/):any
 	{
 		if (typeof match !== "function")
-			match = _.matches(match);
+		{
+			// for lodash 4.0.0
+			// * @param matchArrayLength Specifies whether or not array length should be considered when comparing objects.
+			/*if (matchArrayLength)
+				match = (obj:any) => _.isMatchWith(obj, match, (obj:any, src:any) => {
+					var objIsArray = Array.isArray(obj);
+					var srcIsArray = Array.isArray(src);
+					if (objIsArray || srcIsArray)
+						if (!objIsArray || !srcIsArray || obj.length != src.length)
+							return false;
+				});
+			else*/
+				match = _.matches(match);
+		}
 
 		if (match(root))
 			return root;
