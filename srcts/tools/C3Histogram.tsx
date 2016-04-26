@@ -585,6 +585,47 @@ export default class C3Histogram extends AbstractC3Tool
 							null,
 							[
 								[
+									Weave.lang('Height values (optional)'),
+									<SelectableAttributeComponent attributeName={"Height values (optional)"}
+								                              attributes={ new Map<string, (IColumnWrapper|ILinkableHashmap)>()
+												                                            .set("Height values (optional)", this.columnToAggregate)
+											                                             }
+								                              linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
+								]
+							],
+							{}, tableCellClassNames
+						)
+					}
+					{
+						ReactUtils.generateTable(
+							null,
+							[
+								[
+									null,
+									<Checkbox
+										ref={(ref:Checkbox) => {
+									if (ref)
+										this.fill.color.addGroupedCallback(ref, () => {
+											ref.setState({
+												value: !!this.fill.color.internalDynamicColumn.targetPath
+											});
+										});
+								}}
+										onChange={(value) => {
+									if (this.fill.color.internalDynamicColumn.targetPath)
+									{
+										weavejs.data.ColumnUtils.unlinkNestedColumns(this.fill.color);
+										if (this.colorColumn)
+											this.colorColumn.ramp.state = [0x808080];
+									}
+									else
+										this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
+								}}
+										label={Weave.lang("Link to global color column")}
+									/>
+
+								],
+								[
 									Weave.lang("Color theme"),
 									<DynamicComponent
 										dependencies={[this.fill.color]}
