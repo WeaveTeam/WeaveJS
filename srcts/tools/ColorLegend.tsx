@@ -455,6 +455,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		return ReactUtils.generateTable(
 			null,
 			renderSelectableAttributes(this.selectableAttributes, linktoToolEditorCrumbFunction).concat(
+				ReactUtils.generateEmptyRow(),
 				this.getTitlesEditor(),
 				[
 					[

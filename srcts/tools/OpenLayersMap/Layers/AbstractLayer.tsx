@@ -132,7 +132,7 @@ export default class AbstractLayer implements ILinkableObject
 		
 		return ReactUtils.generateTable(
 			null,
-			renderSelectableAttributes(this.selectableAttributes, linkToToolEditorCrumbFunction).concat(this.renderEditableFields()),
+			renderSelectableAttributes(this.selectableAttributes, linkToToolEditorCrumbFunction).concat(ReactUtils.generateEmptyRow(),this.renderEditableFields()),
 			{},tableCellClassNames
 		);
 	}

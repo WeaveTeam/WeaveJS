@@ -582,6 +582,7 @@ export default class C3BarChart extends AbstractC3Tool
 			null,
 			[].concat(
 				this.getSelectableAttributesEditor(linkFunction),
+				ReactUtils.generateEmptyRow(),
 				[
 					[ 
 						Weave.lang("Grouping mode"),
@@ -601,7 +602,9 @@ export default class C3BarChart extends AbstractC3Tool
 						<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={Weave.lang("Show X axis title")}/>
 					]
 				],
+				ReactUtils.generateEmptyRow(),
 				this.getTitlesEditor(),
+				ReactUtils.generateEmptyRow(),
 				this.getMarginEditor()
 			),
 			{},tableCellClassNames

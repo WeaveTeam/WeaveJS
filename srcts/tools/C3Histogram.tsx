@@ -611,7 +611,9 @@ export default class C3Histogram extends AbstractC3Tool
 					
 				]
 			] as React.ReactChild[][]).concat(
+				ReactUtils.generateEmptyRow(),
 				this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction),
+				ReactUtils.generateEmptyRow(),
 				[
 					[
 						Weave.lang("Color theme"),
@@ -644,7 +646,9 @@ export default class C3Histogram extends AbstractC3Tool
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
 					]
 				],
+				ReactUtils.generateEmptyRow(),
 				this.getTitlesEditor(),
+				ReactUtils.generateEmptyRow(),
 				this.getMarginEditor()
 			), {},tableCellClassNames
 		);

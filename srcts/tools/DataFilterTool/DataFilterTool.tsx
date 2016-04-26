@@ -355,7 +355,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		
 		return ReactUtils.generateTable(
 			null,
-			renderSelectableAttributes(this.props.selectableAttributes, this.props.linkToToolEditorCrumb).concat(editorConfigs),
+			renderSelectableAttributes(this.props.selectableAttributes, this.props.linkToToolEditorCrumb).concat(ReactUtils.generateEmptyRow(),editorConfigs),
 			{},tableCellClassNames
 		);
 	}

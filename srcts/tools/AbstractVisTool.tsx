@@ -299,6 +299,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		});
 	}
 
+	
 	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
 		var tableCellClassNames = {
@@ -310,10 +311,12 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		
 		return ReactUtils.generateTable(
 			null,
-			this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction).concat(this.getTitlesEditor(), this.getMarginEditor()),
+			this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction).concat(ReactUtils.generateEmptyRow(),this.getTitlesEditor(),ReactUtils.generateEmptyRow(), this.getMarginEditor()),
 			{},tableCellClassNames
 		);
 	}
+	
+	
 
 	
 
