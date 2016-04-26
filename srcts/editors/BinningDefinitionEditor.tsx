@@ -393,7 +393,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 				let renderProps:any = this.getBinDefRenderProps(binDefn);
 				sessionUILabel = renderProps.sessionObjectLabel ?<span style={ {whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span> : null;
 				sessionUI = renderProps.sessionObjectToLink ? <StatefulTextField style={ {width: 60} }
-				                                                                 disable={!isSelected}
+				                                                                 disabled={!isSelected}
 				                                                                 type="text"
 				                                                                 ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}/> : null;
 
