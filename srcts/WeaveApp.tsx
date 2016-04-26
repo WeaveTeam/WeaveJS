@@ -142,7 +142,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (!layout)
 			return false;
 		var state = _.cloneDeep(layout.getSessionState());
-		var obj = MiscUtils.findDeep(state, { id: path });
+		var obj = FlexibleLayout.findStateNode(state, path);
 		if (!obj)
 			return false;
 		return obj.maximized;
@@ -155,7 +155,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (!layout)
 			return;
 		var state = _.cloneDeep(layout.getSessionState());
-		var obj = MiscUtils.findDeep(state, {id: path});
+		var obj = FlexibleLayout.findStateNode(state, path);
 		if (!obj)
 			return;
 		obj.maximized = !obj.maximized;
@@ -351,7 +351,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (layout)
 		{
 			var state = _.cloneDeep(layout.getSessionState());
-			var node = MiscUtils.findDeep(state, {id: path}) as LayoutState;
+			var node = FlexibleLayout.findStateNode(state, path);
 			if (node)
 			{
 				delete node.id;

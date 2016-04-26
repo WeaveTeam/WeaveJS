@@ -16,10 +16,16 @@ import MiscUtils from "./utils/MiscUtils";
 import DOMUtils from "./utils/DOMUtils";
 import MouseUtils from "./utils/MouseUtils";
 
-const LEFT:string = "left";
-const RIGHT:string = "right";
-const TOP:string = "top";
-const BOTTOM:string = "bottom";
+export enum DropZone {
+	NONE,
+	LEFT,
+	TOP,
+	RIGHT,
+	BOTTOM,
+	CENTER
+};
+
+const OUTER_PANEL_ID:WeavePathArray = []; // special value to indicate dragging over outer drop zone
 
 declare type Point = {
 	x?: number;
@@ -54,14 +60,15 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 {
 	private linkableState = Weave.linkableChild(this, LinkableVariable, this.forceUpdate, true);
 	private nextState:Object;
-	private reactLayout:Layout;
+	private rootLayout:Layout;
 	private layoutRect:ClientRect;
 	private overlay:PanelOverlay;
 	private panelDragged:WeavePathArray;
 	private panelOver:WeavePathArray;
-	private dropZone:string; //todo - change to enum
+	private dropZone:DropZone = DropZone.NONE;
 	private prevClientWidth:number;
 	private prevClientHeight:number;
+	private outerZoneThickness:number = 8;
 	
 	constructor(props:IFlexibleLayoutProps)
 	{
@@ -95,21 +102,21 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	frameHandler():void
 	{
 		// reposition on resize
-		var rect:ClientRect = Object(this.getLayoutPosition(this.reactLayout));
+		var rect:ClientRect = Object(this.getLayoutPosition(this.rootLayout));
 		if (this.layoutRect.width != rect.width || this.layoutRect.height != rect.height)
 			this.repositionPanels();
 	}
 
 	onDragStart(panelDragged:WeavePathArray, event:React.MouseEvent):void
 	{
-		var layout = this.reactLayout.getComponentFromId(panelDragged);
-		if (!layout || layout.state.maximized)
+		var layout = this.rootLayout.getComponentFromId(panelDragged);
+		if (!layout || layout === this.rootLayout || layout.state.maximized)
 			return;
 		
 		this.panelDragged = panelDragged;
 
 		// hack because dataTransfer doesn't exist on type event
-		(event as any).dataTransfer.setDragImage(this.reactLayout.getElementFromId(panelDragged), 0, 0);
+		(event as any).dataTransfer.setDragImage(this.rootLayout.getElementFromId(panelDragged), 0, 0);
 		(event as any).dataTransfer.setData('text/html', null);
 	}
 
@@ -129,7 +136,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		{
 			this.updateLayout();
 			this.panelDragged = null;
-			this.dropZone = null;
+			this.dropZone = DropZone.NONE;
 			this.hideOverlay();
 		}
 	}
@@ -139,23 +146,23 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		if (!this.panelDragged)
 			return;
 		
+		var dropZone:DropZone;
+		[dropZone, panelOver] = this.getDropZone(panelOver, event);
+		
+		// hide the overlay if hovering over the panel being dragged
 		if (this.panelDragged === panelOver)
 		{
-			// hide the overlay if hovering over the panel being dragged
 			this.panelOver = null;
+			this.dropZone = DropZone.NONE;
 			this.hideOverlay();
 			return;
 		}
 		
-		var panelOverChanged = this.panelOver === panelOver;
-		
-		this.panelOver = panelOver;
-		
-		var dropZone = this.getDropZone(event);
-		
-		if (!panelOverChanged && this.dropZone === dropZone)
+		// stop if nothing changed
+		if (this.panelOver === panelOver && this.dropZone === dropZone)
 			return;
 
+		this.panelOver = panelOver;
 		this.dropZone = dropZone;
 		
 		var rect = this.getLayoutPosition(panelOver);
@@ -169,21 +176,21 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			overlayStyle.height = rect.height;
 		}
 
-		if (dropZone === LEFT)
+		if (dropZone === DropZone.LEFT)
 		{
 			overlayStyle.width = rect.width / 2;
 		}
-		else if (dropZone === RIGHT)
+		else if (dropZone === DropZone.RIGHT)
 		{
 			overlayStyle.left = rect.left + rect.width / 2;
 			overlayStyle.width = rect.width / 2;
 		}
-		else if (dropZone === BOTTOM)
+		else if (dropZone === DropZone.BOTTOM)
 		{
 			overlayStyle.top = rect.top + rect.height / 2;
 			overlayStyle.height = rect.height / 2;
 		}
-		else if (dropZone === TOP)
+		else if (dropZone === DropZone.TOP)
 		{
 			overlayStyle.height = rect.height / 2;
 		}
@@ -193,12 +200,33 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		});
 	}
 
-	getDropZone(event:React.MouseEvent):string
+	getDropZone(panelOver:WeavePathArray, event:React.MouseEvent):[DropZone, WeavePathArray]
 	{
-		if (!this.panelDragged || this.panelDragged === this.panelOver)
-			return null;
+		if (!this.panelDragged)
+			return [DropZone.NONE, panelOver];
 		
-		var panelNode = this.reactLayout.getElementFromId(this.panelOver);
+		// check for outer drop zones
+		var rootNode = ReactDOM.findDOMNode(this.rootLayout);
+		var rootRect = rootNode.getBoundingClientRect();
+		var panelNode:typeof rootNode = null;
+		
+//		if (
+//			event.clientX <= rootRect.left + this.outerZoneThickness
+//			|| event.clientX >= rootRect.left + rootRect.width - this.outerZoneThickness 
+//			|| event.clientY <= rootRect.top + this.outerZoneThickness
+//			|| event.clientY >= rootRect.top + rootRect.height - this.outerZoneThickness
+//		) {
+//			panelOver = OUTER_PANEL_ID;
+//			panelNode = rootNode;
+//		}
+//		else
+//		{
+			panelNode = this.rootLayout.getElementFromId(panelOver);
+//		}
+		
+		if (this.panelDragged === panelOver)
+			return [DropZone.NONE, panelOver];
+		
 		var rect = panelNode.getBoundingClientRect();
 
 		var center:Point = {
@@ -206,29 +234,28 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			y: (rect.bottom - rect.top) / 2
 		};
 
-		var mousePosRelativeToCenter:Point = {
+		var delta:Point = {
 			x: event.clientX - (rect.left + center.x),
 			y: event.clientY - (rect.top + center.y)
 		};
 
-		var mouseNorm:Point = {
-			x: (mousePosRelativeToCenter.x) / (rect.width / 2),
-			y: (mousePosRelativeToCenter.y) / (rect.height / 2)
+		var deltaNorm:Point = {
+			x: (delta.x) / (rect.width / 2),
+			y: (delta.y) / (rect.height / 2)
 		};
 
-		var mousePolarCoord:Point = {
-			r: Math.sqrt(mouseNorm.x * mouseNorm.x + mouseNorm.y * mouseNorm.y),
-			theta: Math.atan2(mouseNorm.y, mouseNorm.x)
+		var polarNorm:Point = {
+			r: Math.sqrt(deltaNorm.x * deltaNorm.x + deltaNorm.y * deltaNorm.y),
+			theta: Math.atan2(deltaNorm.y, deltaNorm.x)
 		};
 
-		var zones:string[] = [RIGHT, BOTTOM, LEFT, TOP];
+		if (polarNorm.r < 0.34)
+			return [DropZone.CENTER, panelOver];
+		
+		var zoneIndex:number = Math.round((polarNorm.theta / (2 * Math.PI) * 4) + 4) % 4;
 
-		var zoneIndex:number = Math.round((mousePolarCoord.theta / (2 * Math.PI) * 4) + 4) % 4;
-
-		if (mousePolarCoord.r < 0.34)
-			return "center";
-		else
-			return zones[zoneIndex];
+		var dropZone = [DropZone.RIGHT, DropZone.BOTTOM, DropZone.LEFT, DropZone.TOP][zoneIndex];
+		return [dropZone, panelOver];
 	}
 
 	simplifyState(state:LayoutState):LayoutState
@@ -279,17 +306,27 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 		return state;
 	}
-
+	
 	updateLayout():void
 	{
 		if (!this.panelDragged || !this.panelOver || !this.dropZone || (this.panelDragged === this.panelOver))
 			return;
 
 		var newState:LayoutState = _.cloneDeep(this.getSessionState());
-		var src:LayoutState = MiscUtils.findDeep(newState, {id: this.panelDragged});
-		var dest:LayoutState = MiscUtils.findDeep(newState, {id: this.panelOver});
+		var src:LayoutState = FlexibleLayout.findStateNode(newState, this.panelDragged);
+		var dest:LayoutState = (
+			this.panelOver == OUTER_PANEL_ID
+			?	newState
+			:	FlexibleLayout.findStateNode(newState, this.panelOver)
+		);
+		
+		if (!src || !dest)
+		{
+			console.error("Unexpected error - could not find matching nodes", newState, src, dest);
+			return;
+		}
 
-		if (this.dropZone === "center")
+		if (this.dropZone === DropZone.CENTER)
 		{
 			var srcId = src.id;
 			src.id = dest.id;
@@ -299,10 +336,10 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		{
 			if (weavejs.WeaveAPI.Locale.reverseLayout)
 			{
-				if (this.dropZone === LEFT)
-					this.dropZone = RIGHT;
-				else if (this.dropZone === RIGHT)
-					this.dropZone = LEFT;
+				if (this.dropZone === DropZone.LEFT)
+					this.dropZone = DropZone.RIGHT;
+				else if (this.dropZone === DropZone.RIGHT)
+					this.dropZone = DropZone.LEFT;
 			}
 
 			var srcParentArray:LayoutState[] = MiscUtils.findDeep(newState, (obj:LayoutState) => {
@@ -312,7 +349,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			srcParentArray.splice(srcParentArray.indexOf(src), 1);
 
 			delete dest.id;
-			dest.direction = (this.dropZone === TOP || this.dropZone === BOTTOM) ? VERTICAL : HORIZONTAL;
+			dest.direction = (this.dropZone === DropZone.TOP || this.dropZone === DropZone.BOTTOM) ? VERTICAL : HORIZONTAL;
 			dest.children = [
 				{
 					id: this.panelDragged,
@@ -324,7 +361,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 				}
 			];
 			
-			if (this.dropZone === BOTTOM || this.dropZone === RIGHT)
+			if (this.dropZone === DropZone.BOTTOM || this.dropZone === DropZone.RIGHT)
 				dest.children.reverse();
 		}
 		this.setSessionState(newState);
@@ -354,18 +391,20 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	
 	getLayoutPosition(layoutOrId:Layout | WeavePathArray):ClientRect
 	{
-		var node = layoutOrId instanceof Layout ? ReactDOM.findDOMNode(layoutOrId) : this.reactLayout.getElementFromId(layoutOrId);
+		if (layoutOrId === OUTER_PANEL_ID)
+			layoutOrId = this.rootLayout;
+		var node = layoutOrId instanceof Layout ? ReactDOM.findDOMNode(layoutOrId) : this.rootLayout.getElementFromId(layoutOrId);
 		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, node as HTMLElement);
 	}
 	
 	repositionPanels=(layout:Layout = null):void=>
 	{
 		if (!layout)
-			layout = this.reactLayout;
+			layout = this.rootLayout;
 		if (!layout)
 			return;
 		
-		if (layout == this.reactLayout)
+		if (layout == this.rootLayout)
 			this.layoutRect = Object(this.getLayoutPosition(layout));
 		
 		var div:Div = this.refs[JSON.stringify(layout.state.id)] as Div;
@@ -395,14 +434,17 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 				this.repositionPanels(child);
 	}
 	
+	public static findStateNode(state:LayoutState, id:WeavePathArray):LayoutState
+	{
+		return MiscUtils.findDeep(state, (node:LayoutState) => node && _.isEqual(node.id, id));
+	}
+	
 	private static _tempState:LayoutState;
 	private static _tempObj:LayoutState = {};
 	private static sortIds(id1:WeavePathArray, id2:WeavePathArray):number
 	{
-		FlexibleLayout._tempObj.id = id1;
-		var obj1:LayoutState = MiscUtils.findDeep(FlexibleLayout._tempState, FlexibleLayout._tempObj);
-		FlexibleLayout._tempObj.id = id2;
-		var obj2:LayoutState = MiscUtils.findDeep(FlexibleLayout._tempState, FlexibleLayout._tempObj);
+		var obj1:LayoutState = FlexibleLayout.findStateNode(FlexibleLayout._tempState, id1);
+		var obj2:LayoutState = FlexibleLayout.findStateNode(FlexibleLayout._tempState, id2);
 		var value1:number = obj1 && obj1.maximized ? 1 : 0;
 		var value2:number = obj2 && obj2.maximized ? 1 : 0;
 		if (value1 < value2)
@@ -424,7 +466,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		}
 		
 		var components:JSX.Element[] = null;
-		if (this.reactLayout)
+		if (this.rootLayout)
 		{
 			FlexibleLayout._tempState = newState;
 			components = this.getLayoutIds(newState).sort(FlexibleLayout.sortIds).map(path => {
@@ -453,7 +495,8 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		var layout = Layout.renderLayout({
 			key: "layout",
 			ref: (layout:Layout) => {
-				if (this.reactLayout = layout)
+				this.rootLayout = layout;
+				if (layout)
 					this.repositionPanels();
 			},
 			state: newState,
