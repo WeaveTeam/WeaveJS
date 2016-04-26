@@ -10,7 +10,7 @@ import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
 
-export default class ToolsMenu implements MenuBarItemProps
+export default class ChartsMenu implements MenuBarItemProps
 {
 	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
 	{
@@ -24,16 +24,11 @@ export default class ToolsMenu implements MenuBarItemProps
 	get menu():MenuItemProps[]
 	{
 		return [].concat(
-			{
-				label: Weave.lang("Color Controller"),
-				click: () => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)
-			},
-			{},
-			this.getVisualizationItems()
+			this.getCreateObjectItems()
 		);
 	}
 	
-	getVisualizationItems()
+	getCreateObjectItems()
 	{
 		var registry = weavejs.WeaveAPI.ClassRegistry;
 		var impls = registry.getImplementations(IVisTool);
@@ -48,15 +43,12 @@ export default class ToolsMenu implements MenuBarItemProps
 			WeaveUI.OpenLayersMapTool,
 			WeaveUI.C3PieChart,
 			WeaveUI.C3ScatterPlot,
-			WeaveUI.TableTool,
-			WeaveUI.DataFilterTool,
-			WeaveUI.AttributeMenuTool,
-			WeaveUI.SessionStateMenuTool
+			WeaveUI.TableTool
 		];
 
 		return impls.map(impl => {
 			var label = Weave.lang(registry.getDisplayName(impl));
-			if (ToolsMenu.isBeta(impl))
+			if (ChartsMenu.isBeta(impl))
 			{
 				if (Weave.beta)
 					label += " (beta)";
@@ -72,8 +64,6 @@ export default class ToolsMenu implements MenuBarItemProps
 	
 	static isBeta(impl:new(..._:any[])=>any):boolean
 	{
-		return impl == WeaveUI.C3Gauge
-			|| impl == WeaveUI.DataFilterTool
-			|| impl == WeaveUI.SessionStateMenuTool;
+		return impl == WeaveUI.C3Gauge;
 	}
 }

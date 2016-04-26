@@ -134,7 +134,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
-				editorJsx = <EditorClass dataSource={dataSource} toolsMenu={ this.props.dataMenu.toolsMenu }/>;
+				editorJsx = <EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu }/>;
 			else
 				editorJsx = <span>{Weave.lang("Editor not yet implemented for this data source type.")}</span>;
 		}

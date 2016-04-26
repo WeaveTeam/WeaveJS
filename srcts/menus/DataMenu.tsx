@@ -8,7 +8,7 @@ import IDataSource_File = weavejs.api.data.IDataSource_File;
 import IDataSource_Service = weavejs.api.data.IDataSource_Service;
 import FileMenu from "./FileMenu";
 import FileInput from "../react-ui/FileInput";
-import ToolsMenu from "./ToolsMenu";
+import ChartsMenu from "./ChartsMenu";
 
 export default class DataMenu implements MenuBarItemProps
 {
@@ -16,13 +16,13 @@ export default class DataMenu implements MenuBarItemProps
 	{
 		this.weave = weave;
 		this.fileMenu = new FileMenu(weave);
-		this.toolsMenu = new ToolsMenu(weave, createObject);
+		this.chartsMenu = new ChartsMenu(weave, createObject);
 		this.createObject = createObject;
 	}
 
 	label:string = "Data";
 	weave:Weave;
-	toolsMenu:ToolsMenu;//menu to be passed for creating visualizations from tha datasource manager
+	chartsMenu:ChartsMenu;//menu to be passed for creating visualizations from tha datasource manager
 	fileMenu:FileMenu; // temp solution
 	createObject:(type:new(..._:any[])=>any)=>void;
 	

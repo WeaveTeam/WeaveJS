@@ -6,7 +6,8 @@ import PopupWindow from "./react-ui/PopupWindow";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import SystemMenu from "./menus/SystemMenu";
 import DataMenu from './menus/DataMenu';
-import ToolsMenu from './menus/ToolsMenu';
+import ChartsMenu from './menus/ChartsMenu';
+import ControllersMenu from './menus/ControllersMenu';
 import SessionHistorySlider from "./editors/SessionHistorySlider";
 
 export interface WeaveMenuBarProps extends React.HTMLProps<WeaveMenuBar>
@@ -25,13 +26,15 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 {
 	systemMenu:SystemMenu;
 	dataMenu:DataMenu;
-	toolsMenu:ToolsMenu;
+	chartsMenu:ChartsMenu;
+	controllersMenu:ControllersMenu;
 	constructor(props:WeaveMenuBarProps)
 	{
 		super(props);
 		this.systemMenu = new SystemMenu(props.weave);
 		this.dataMenu = new DataMenu(props.weave, props.createObject);
-		this.toolsMenu = new ToolsMenu(props.weave, props.createObject);
+		this.chartsMenu = new ChartsMenu(props.weave, props.createObject);
+		this.controllersMenu = new ControllersMenu(props.weave, props.createObject);
 	}
 	
 	render():JSX.Element
@@ -42,7 +45,8 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 				config={[
 					this.systemMenu,
 					this.dataMenu,
-					this.toolsMenu
+					this.chartsMenu,
+					this.controllersMenu
 				]}
 				children={<SessionHistorySlider stateLog={this.props.weave.history}/>}
 			/>

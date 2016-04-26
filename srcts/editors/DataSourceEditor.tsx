@@ -11,7 +11,7 @@ import {IColumnTitles} from "../tools/FixedDataTable";
 import Tabs from "../react-ui/Tabs";
 import Input from "../semantic-ui/Input";
 import MenuButton from '../react-ui/MenuButton';
-import ToolsMenu from "../menus/ToolsMenu";
+import ChartsMenu from "../menus/ChartsMenu";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import WeaveAPI = weavejs.WeaveAPI;
@@ -31,7 +31,7 @@ export type View = typeof PREVIEW | typeof METADATA | typeof BROWSE;
 
 export interface IDataSourceEditorProps {
 	dataSource: IDataSource;
-	toolsMenu: ToolsMenu;
+	chartsMenu: ChartsMenu;
 };
 
 export interface IDataSourceEditorState {
@@ -203,8 +203,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 		return (
 			<VBox style={{flex: 1}}>
-				<HBox className="weave-padded-hbox" style={{flex: 1, border: "none"}}>
-					<VBox style={{flex: root.hasChildBranches() ? 1:0, overflow: 'auto'}}>
+				<HBox className={root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
+					<VBox style={{flex: root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
 						<WeaveTree
 							root={this.props.dataSource.getHierarchyRoot()}
 							hideLeaves={true}
@@ -214,10 +214,10 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 					</VBox>
 					<VBox className="weave-padded-vbox" style={{flex: 1, overflow: 'auto'}}>
 						{
-							this.props.toolsMenu
-								?	<MenuButton menu={ this.props.toolsMenu.getVisualizationItems() } style={{width: "100%"}} showIcon={false}>
+							this.props.chartsMenu
+								?	<MenuButton menu={ this.props.chartsMenu.getCreateObjectItems() } style={{width: "100%"}} showIcon={false}>
 										<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>
-										{Weave.lang('Create a visualization')}
+										{Weave.lang('Create a chart')}
 									</MenuButton>
 								: 	null
 						}
