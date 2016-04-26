@@ -29,6 +29,8 @@ declare type Record = {
     label:string
 };
 
+const recordNumberLimit = 360;
+
 export default class C3PieChart extends AbstractC3Tool
 {
     data = Weave.linkableChild(this, DynamicColumn);
@@ -163,6 +165,10 @@ export default class C3PieChart extends AbstractC3Tool
         if (dataChanged)
 		{
             this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+
+            //minimizing the number of records drawn
+            if(this.records.length > recordNumberLimit)
+                this.records = this.records.slice(0, recordNumberLimit);
 
             this.keyToIndex = {};
 
