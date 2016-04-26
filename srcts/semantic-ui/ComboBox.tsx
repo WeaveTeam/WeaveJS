@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import ReactUtils from "../utils/ReactUtils";
 import $ from "../modules/jquery";
 import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
@@ -167,18 +168,21 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				let option = this.state.options[addedValue];
 				let value:any = option && option.value;
 				let values:any = _.clone(this.state.value);
-				if (!_.includes(values, value)) {
+				if (ReactUtils.hasFocus(this) && !_.includes(values, value)) {
 					values.push(value);
 					this.setState({value:values});
+					this.props.onAdded && this.props.onAdded(value);
 				}
-				this.props.onAdded && this.props.onAdded(value);
 			},
 			onRemove: (removedValue:number, removedText:string) => {
 				let option = this.state.options[removedValue];
 				let value:any = option && option.value;
-				let values:any = _.without(this.state.value, value);
-				this.setState({value:values});
-				this.props.onRemoved && this.props.onRemoved(value);
+				if(ReactUtils.hasFocus(this))
+				{
+					let values:any = _.without(this.state.value, value);
+					this.setState({value:values});
+					this.props.onRemoved && this.props.onRemoved(value);
+				}
 			},
 			context: this.props.context || window,
 			direction: this.props.direction || 'auto',
