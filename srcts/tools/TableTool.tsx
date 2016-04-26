@@ -191,8 +191,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	renderEditor(linkFunction:Function):JSX.Element {
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 

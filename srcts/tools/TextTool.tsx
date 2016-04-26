@@ -55,8 +55,8 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 	{
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 

@@ -447,8 +447,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	{
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 		

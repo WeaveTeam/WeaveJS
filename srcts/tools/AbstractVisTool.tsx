@@ -304,8 +304,8 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 		

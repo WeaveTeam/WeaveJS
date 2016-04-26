@@ -148,8 +148,8 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 		

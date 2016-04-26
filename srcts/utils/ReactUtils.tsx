@@ -178,7 +178,7 @@ export default class ReactUtils
 	static generateEmptyRow():React.ReactChild[][]
 	{
 		// empty cell classname attached only to left cell, as left cell css doesn't contain Padding/margin/Border values.
-		return [[<div className="empty-cell"/>,null]]
+		return [[<div className="weave-empty-cell"/>,null]]
 	}
 	static generateTable(header:React.ReactChild[], body:React.ReactChild[][], styles:DynamicTableStyles = {}, classes:DynamicTableClassNames = {}):JSX.Element
 	{

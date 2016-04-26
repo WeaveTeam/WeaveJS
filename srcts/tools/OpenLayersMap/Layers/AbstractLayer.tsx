@@ -125,8 +125,8 @@ export default class AbstractLayer implements ILinkableObject
 
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 		

@@ -577,8 +577,8 @@ export default class C3Histogram extends AbstractC3Tool
 	{
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 

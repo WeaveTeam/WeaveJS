@@ -310,8 +310,8 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	{
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 

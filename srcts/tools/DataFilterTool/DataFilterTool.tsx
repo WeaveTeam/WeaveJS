@@ -348,8 +348,8 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 		

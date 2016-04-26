@@ -344,7 +344,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 			let isMinMaxUI :boolean = this.hasOverrideMinAndMax() ;
 
 			var tableCellClassName:DynamicTableClassNames = {
-				td: ["left-cell","right-cell"]
+				td: ["weave-left-cell","weave-right-cell"]
 			};
 
 			return <VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto" ,border:"none"}}>

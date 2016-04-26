@@ -581,20 +581,20 @@ div.weave-tree-view {
 	font-size: inherit;
 }
 
-.weave-ToolEditor .left-cell{
+.weave-ToolEditor .weave-left-cell{
 	white-space: nowrap;
 	text-align: right;
 	padding-right: 6px;
 }
 
-.weave-ToolEditor .right-cell{
+.weave-ToolEditor .weave-right-cell{
 	width: 100%;
 	padding-top: 2px;
 	padding-bottom: 2px;
 	padding-left: 6px;
 }
 
-.weave-ToolEditor .empty-cell{
+.weave-ToolEditor .weave-empty-cell{
 	height:20px;
 }
 

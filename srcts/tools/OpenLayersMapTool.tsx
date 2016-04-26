@@ -185,8 +185,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		var tableCellClassNames = {
 			td: [
-				"left-cell",
-				"right-cell"
+				"weave-left-cell",
+				"weave-right-cell"
 			]
 		};
 
