@@ -1,29 +1,25 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
-import ReactChild = __React.ReactChild;
 
 export interface AccordionProps  extends React.HTMLProps<Accordion>
 {
-	activeChild?: number;
-	titles:string[]
+	activeChild?: number; // index of child
+	titles:string[] // titles for Each Child
 }
 
 export interface AccordionState
 {
-	activeChild: number;
+	activeChild: number; // index of child
 }
 
 export default class Accordion extends SmartComponent<AccordionProps, AccordionState>
 {
-	element:Element;
-	selector:any;
 
 	constructor(props:AccordionProps)
 	{
 		super(props);
-		this.state = {
+		this.state = { // if not activeChild default 
 			activeChild: props.activeChild ? props.activeChild : 0
 		};
 	}
@@ -41,7 +37,7 @@ export default class Accordion extends SmartComponent<AccordionProps, AccordionS
 
 	handleClick=(childID: number, event:React.MouseEvent)=>
 	{
-		this.setState({
+		this.setState({ // will render with new active child
 			activeChild:childID
 		});
 		this.props.onClick && this.props.onClick.call(this,[childID,event]);
@@ -53,8 +49,9 @@ export default class Accordion extends SmartComponent<AccordionProps, AccordionS
 
 	render()
 	{
-		let childrenUI:React.ReactChild[]  = [];
+		let childrenUI:React.ReactChild[]  = []; 
 
+		// for each child in props.children - two children are created with title and Content  as in Semantic UI 
 		React.Children.forEach(this.props.children,function(child:React.ReactNode , index:number){
 			let activeStatus:string = this.state.activeChild == index ? "active" : ""
 			let accordionTitle:string = this.props.titles[index];
