@@ -27,6 +27,7 @@ import WeavePath = weavejs.path.WeavePath;
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import WeaveToolEditor from "./ui/WeaveToolEditor";
+import IColumnReference = weavejs.api.data.IColumnReference;
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -288,6 +289,27 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 
+	//sorts the array of column refs by numeric columns
+	//TODO put this function elsewhere?
+	prioritizeNumericColumns(columnRefs:IColumnReference[]) : IColumnReference[]{
+		var sortedRefs = _.sortBy(columnRefs, function(ref){
+			let meta:{[key:string]:string} = ref.getColumnMetadata();
+			let dataType = meta && meta["dataType"];
+			//console.log("meta " , meta, 'has dataType', dataType);
+			switch(dataType)
+			{
+				case 'number' :
+					return 0;
+				default :
+					return 1;
+				case 'geometry' :
+					return 2;
+			}
+		} );
+		console.log("sortedREfs", sortedRefs.reverse());
+		return sortedRefs.reverse();
+	}
+
 	private handlePlaceholderDispose(path:WeavePathArray, placeholder:LinkablePlaceholder<any>)
 	{
 		// hack
@@ -295,8 +317,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var instance = placeholder.getInstance();
 		if (instance[INIT])
 		{
-			var refs = ColumnUtils.findFirstDataSet(this.props.weave.root);
-			instance[INIT](refs);
+			var refs = ColumnUtils.findFirstDataSet(this.props.weave.root).concat();
+			var sortedRefs = this.prioritizeNumericColumns(refs);
+			instance[INIT](sortedRefs);
 		}
 		this.forceUpdate();
 	}
