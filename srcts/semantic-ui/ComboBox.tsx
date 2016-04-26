@@ -157,13 +157,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 							});
 							this.setState({value: values});
 						}
-						else
-						{
-							this.setState({value: []});
-						}
 					}
-
-
 				}
 			},
 			onClick: (index:number) => {
@@ -190,7 +184,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			direction: this.props.direction || 'auto',
 			allowAdditions: this.props.allowAdditions || false
 		});
-		selector.dropdown("refresh");
 		if (this.props.type === "multiple")
 		{
 			let indices:string[] = [];

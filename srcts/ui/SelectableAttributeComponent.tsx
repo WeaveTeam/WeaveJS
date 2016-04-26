@@ -91,7 +91,10 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	
 	setColumnInHashmap=(selectedOptions:IWeaveTreeNode[]):void=>
 	{
-		ColumnUtils.replaceColumnsInHashMap(this.columnsHashmap, selectedOptions);
+		if (this.comboBox && ReactUtils.hasFocus(this.comboBox))
+		{
+			ColumnUtils.replaceColumnsInHashMap(this.columnsHashmap, selectedOptions);
+		}
 	};
 	
 	private get columnsHashmap()
@@ -139,7 +142,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 					}
 				});
 			}
-			options.push({ value: null, label: "(None)"});
 			return (
 				
 				<HBox style={ {flex: 1} }>
@@ -166,9 +168,12 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		}
 		else if (Weave.IS(attribute_ilhm_or_icw, ILinkableHashMap))
 		{
-			let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
+			let attribute = Weave.AS(attribute_ilhm_or_icw, ILinkableHashMap);
+			
 			var value: {label: string, value: IWeaveTreeNode}[] = [];
+
 			var options: {label:string, value:IWeaveTreeNode&IColumnReference}[] = [];
+
 			let siblings:IWeaveTreeNode[] = [];
 			var columns = this.columnsHashmap.getObjects(IColumnWrapper); // TODO - this does not consider if hash map contains non-IColumnWrapper columns
 			
@@ -177,17 +182,12 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 				if (!node)
 					return;
 				value.push({label: node.getLabel(), value: node});
-				
 				var columnSiblings = HierarchyUtils.findSiblingNodes(node.getDataSource(), node.getColumnMetadata());
 		        columnSiblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
-			        if (!_.includes(siblings, siblingNode))
-					{
-				        siblings.push(siblingNode);
-				        options.push({label:siblingNode.getLabel(), value: siblingNode});
-			        }
+					options.push({label:siblingNode.getLabel(), value: siblingNode});
 		        });
 	        });
-						
+			
 			if (this.props.showAsList)
 			{
 				var listStyle:React.CSSProperties = {
@@ -213,6 +213,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 				return (
 					<HBox style={{flex: 1}}>
 						<ComboBox 
+							ref={(c:ComboBox) => this.comboBox = c}
 							type="multiple"
 							valueIncludesLabel={true}
 							style={{
