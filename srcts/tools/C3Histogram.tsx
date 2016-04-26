@@ -579,7 +579,7 @@ export default class C3Histogram extends AbstractC3Tool
 			]
 		};
 
-		return <Accordion titles={["Data", "Bin/Color Ramp" , "Title","Margins"]}>
+		return <Accordion titles={["Data", "Bin / ColorRamp / Aggregation" , "Title","Margins"]}>
 					{
 						ReactUtils.generateTable(
 							null,
@@ -591,6 +591,7 @@ export default class C3Histogram extends AbstractC3Tool
 										render={() =>
 											<ColorRampEditor
 												compact={true}
+												linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
 												colorRamp={this.colorColumn && this.colorColumn.ramp}
 												onButtonClick={() => this.openColorController(0)}
 											/>
@@ -599,15 +600,10 @@ export default class C3Histogram extends AbstractC3Tool
 								],
 								[
 									Weave.lang("Binning method"),
-									<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(1)}/>
-								],
-								[
-									Weave.lang('Height values (optional)'),
-									<SelectableAttributeComponent attributeName={"Height values (optional)"}
-									                              attributes={ new Map<string, (IColumnWrapper|ILinkableHashmap)>()
-									                                            .set("Height values (optional)", this.columnToAggregate)
-								                                             }
-									                              linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
+									<BinningDefinitionEditor compact={true}
+									                         binnedColumn={this.binnedColumn}
+									                         linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+									                         onButtonClick={() => this.openColorController(1)}/>
 								],
 								[
 									Weave.lang("Aggregation method"),
