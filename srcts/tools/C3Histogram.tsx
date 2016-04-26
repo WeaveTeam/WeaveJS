@@ -65,7 +65,7 @@ export default class C3Histogram extends AbstractC3Tool
 
 	private setColorColumn():void
 	{
-		var colorBinCol:BinnedColumn = this.internalColorColumn ? this.internalColorColumn.getInternalColumn() as BinnedColumn : null;
+		var colorBinCol:BinnedColumn = this.internalColorColumn ? Weave.AS(this.internalColorColumn.getInternalColumn(), BinnedColumn) : null;
 		if (!colorBinCol)
 			return;
 		
@@ -77,14 +77,19 @@ export default class C3Histogram extends AbstractC3Tool
 
 	private setBinnedColumn():void
 	{
-		var colorBinCol:BinnedColumn = this.internalColorColumn ? this.internalColorColumn.getInternalColumn() as BinnedColumn : null;
+		var colorBinCol:BinnedColumn = this.internalColorColumn ? Weave.AS(this.internalColorColumn.getInternalColumn(), BinnedColumn) : null;
 		if (!colorBinCol)
 			return;
 		
+		// if there is a binning definition, copy it - otherwise, only copy the internal column
 		if (colorBinCol.binningDefinition.internalObject)
 			Weave.copyState(colorBinCol, this.binnedColumn);
 		else
 			Weave.copyState(colorBinCol.internalDynamicColumn, this.binnedColumn.internalDynamicColumn);
+		
+		var filteredColumn = Weave.AS(this.binnedColumn.getInternalColumn(), FilteredColumn);
+		if (filteredColumn)
+			Weave.linkState(this.filteredKeySet.keyFilter, filteredColumn.filter);
 	}
 
 	private get RECORD_FORMAT() {
@@ -111,27 +116,30 @@ export default class C3Histogram extends AbstractC3Tool
 	get internalColorColumn():ColorColumn {
 		return Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
 	}
+	
+	static linkedByDefault:boolean = false;
 
     constructor(props:IVisToolProps)
     {
         super(props);
 		
-        this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 		this.filteredKeySet.setSingleKeySource(this.fill.color);
 
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
-
-		// don't lock the ColorColumn, so linking to global ColorColumn is possible
-		var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn, false);
-		_colorColumn.ramp.setSessionState([0x808080]);
-
-		var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn, true);
 		
-		// the data inside the binned column needs to be filtered by the subset
-		var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn, true);
-		Weave.linkState(this.filteredKeySet.keyFilter, filteredColumn.filter);
+		if (C3Histogram.linkedByDefault)
+		{
+	        this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
+		}
+		else
+		{
+			var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn);
+			_colorColumn.ramp.setSessionState([0x808080]);
+			var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn);
+			var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn);
+		}
 
         this.idToRecord = {};
         this.keyToIndex = {};
@@ -272,7 +280,7 @@ export default class C3Histogram extends AbstractC3Tool
 	{
 		if (this.columnToAggregate.getInternalColumn())
 		{
-			switch(this.aggregationMethod.value)
+			switch (this.aggregationMethod.value)
 			{
 				case COUNT:
 					return Weave.lang("Number of records");
@@ -345,7 +353,7 @@ export default class C3Histogram extends AbstractC3Tool
                 (d: any, i:number, oi:number): string => {
                     let selected = _.intersection(selectedBinIndices,[i]).length;
                     let probed = _.intersection(probedBinIndices,[i]).length;
-                    if(probed && selected)
+                    if (probed && selected)
                         return "white";
                     else
                         return "black";
@@ -505,7 +513,7 @@ export default class C3Histogram extends AbstractC3Tool
 		    this.c3Config.axis.rotated = this.horizontalMode.value;
 	    }
 
-        if(Weave.detectChange(this, this.barWidthRatio))
+        if (Weave.detectChange(this, this.barWidthRatio))
         {
             changeDetected = true;
             (this.c3Config.bar.width as {ratio:number}).ratio = this.barWidthRatio.value;
@@ -546,7 +554,7 @@ export default class C3Histogram extends AbstractC3Tool
 
     get defaultPanelTitle():string
     {
-	    if(this.binnedColumn.numberOfBins)
+	    if (this.binnedColumn.numberOfBins)
 		    return Weave.lang("Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
 
 	    return Weave.lang("Histogram");
