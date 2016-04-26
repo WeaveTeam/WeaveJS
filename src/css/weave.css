@@ -465,6 +465,9 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 /* help icon */
+.weave-help-icon {
+	color: #808080;
+}
 .weave-help-icon:hover {
 	border-color: rgba(0,0,0,.05)
 }
@@ -484,8 +487,6 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 /* lists */
-
-
 .weave-tree-view-icon {
 	color: #808080;
 }
