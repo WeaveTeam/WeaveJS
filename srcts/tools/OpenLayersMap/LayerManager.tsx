@@ -71,10 +71,10 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		/* Stop propagation is necessary because otherwise state linkage breaks when the selectedLayer changes. */
 		// layer description style set to flex value 1 to take up the remaining space
 
-		return <HBox key={index} style={ {alignItems: "center", padding: "4px"} }
+		return <HBox key={"layerItem" + index} style={ {alignItems: "center", padding: "4px"} }
 		             className={layer == this.state.selectedLayer ? "weave-list-Item-selected" : "weave-list-Item"}
-		             onClick={() => {if (this.state.selectedLayer != layer) this.setState({selectedLayer: layer});}}>
-				<Checkbox title={ Weave.lang("Show layer") } ref={ linkReactStateRef(this, { value: layer.visible }) } stopPropagation={true} label={ layer.getDescription() }/>
+		             onMouseDown={() => {if (this.state.selectedLayer != layer) this.setState({selectedLayer: layer});}}>
+				<Checkbox title={ Weave.lang("Show layer") } ref={ linkReactStateRef(this, { value: layer.visible }) } label={ layer.getDescription() }/>
 				<span style={ {flex:1} }></span>
 				<button className="ui button"
 				        title={ Weave.lang("Edit layer") }

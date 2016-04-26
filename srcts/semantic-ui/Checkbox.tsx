@@ -10,7 +10,6 @@ export interface CheckboxProps extends React.Props<Checkbox>
 	label: string; // important to set them to avoid using jquery // else we have to let jquery to use dom selector to set " set checked"
 	name?: string;
 	style?: React.CSSProperties;
-	stopPropagation?: boolean;
 	onChange?: (value:boolean,event:FormEvent) => void;
 	className?:string;
 	value?:boolean;
