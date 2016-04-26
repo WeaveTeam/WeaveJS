@@ -238,5 +238,5 @@ Weave.registerClass(
 	C3Gauge,
 	["weavejs.tool.C3Gauge", "weave.visualization.tools::GaugeTool"],
 	[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
-	"Gauge Tool"
+	"Gauge"
 );
