@@ -139,8 +139,8 @@ export default class RCSlider extends React.Component<any, any>
 
 			if(this.options.length) 
 			{
-				this.min = Math.min.apply(null, this.options);
-				this.max = Math.max.apply(null, this.options);
+				this.min = Math.min.apply(Math, this.options);
+				this.max = Math.max.apply(Math, this.options);
 			}
 			else
 			{
