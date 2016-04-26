@@ -55,7 +55,7 @@ export default class ToolsMenu implements MenuBarItemProps
 		];
 
 		return impls.map(impl => {
-			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
+			var label = Weave.lang(registry.getDisplayName(impl));
 			if (ToolsMenu.isBeta(impl))
 			{
 				if (Weave.beta)

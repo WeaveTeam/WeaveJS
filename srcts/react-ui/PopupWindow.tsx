@@ -301,7 +301,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 								</HBox>
 							:	<HBox className="weave-window-footer">
 									<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
-										<Button onClick={this.onOk.bind(this)}>{Weave.lang("Ok")}</Button>
+										<Button onClick={this.onOk.bind(this)}>{Weave.lang(this.props.modal ? "Ok" : "Done")}</Button>
 										{
 											this.props.modal
 											?	<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>

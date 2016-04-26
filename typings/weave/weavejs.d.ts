@@ -2287,11 +2287,6 @@ declare module weavejs.api.data {
          */
         getLabel(): string;
         /**
-         * Overrides the label in the root hierarchy node, or resets it if given a value of null.
-         * @param value The new label, or null to reset it to the default.
-         */
-        setLabel(value: string): void;
-        /**
          * When explicitly triggered, this will force the hierarchy to be refreshed.
          * This should not be used to determine when the hierarchy is updated.
          * For that purpose, add a callback directly to the IDataSource instead.
@@ -3303,7 +3298,7 @@ declare module weavejs.core {
          * @return An Array of filtered Arrays corresponding to the given interfaces, including a final
          *         Array containing the remaining classes that did not implement any of the given interfaces.
          */
-        static partitionClassList(classes: Array<new (..._: any[]) => any>, ...interfaces: Array<new () => any>): typeof classes;
+        static partitionClassList(classes: Array<new (..._: any[]) => any>, ...interfaces: Array<new () => any>): Array<typeof classes>;
     }
 }
 declare module weavejs.core {
@@ -5818,7 +5813,6 @@ declare module weavejs.data.hierarchy {
         static getInstance(root: ILinkableHashMap): IDataSource;
         constructor(root?: ILinkableHashMap);
         getLabel(): string;
-        setLabel(value: string): void;
         /**
          * The metadata property name used to identify a column appearing in root.
          */
@@ -6326,7 +6320,6 @@ declare module weavejs.data.source {
          */
         label: LinkableString;
         getLabel(): string;
-        setLabel(value: string): void;
         hierarchyRefresh: ICallbackCollection;
         /**
          * Sets _rootNode to null and triggers callbacks.

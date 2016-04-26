@@ -4,6 +4,8 @@ import {MenuBarItemProps} from "../react-ui/MenuBar";
 import {MenuItemProps} from "../react-ui/Menu";
 import DataSourceManager from "../ui/DataSourceManager";
 import IDataSource = weavejs.api.data.IDataSource;
+import IDataSource_File = weavejs.api.data.IDataSource_File;
+import IDataSource_Service = weavejs.api.data.IDataSource_Service;
 import FileMenu from "./FileMenu";
 import FileInput from "../react-ui/FileInput";
 import ToolsMenu from "./ToolsMenu";
@@ -53,21 +55,29 @@ export default class DataMenu implements MenuBarItemProps
 		
 		// filter out those data sources without editors
 		impls = impls.filter(impl => DataSourceManager.editorRegistry.has(impl));
+	
+		var items:MenuItemProps[] = [];
+		for (var partition of weavejs.core.ClassRegistryImpl.partitionClassList(impls, IDataSource_File, IDataSource_Service))
+		{
+			if (items.length)
+				items.push({});
+			partition.forEach(impl => {
+				var label = Weave.lang(registry.getDisplayName(impl));
+				items.push({
+					get shown() {
+						return Weave.beta || !DataMenu.isBeta(impl);
+					},
+					get label() {
+						if (DataMenu.isBeta(impl))
+							return label + " (beta)";
+						return label;
+					},
+					click: this.createObject.bind(this, impl)
+				});
+			});
+		}
 		
-		return impls.map(impl => {
-			var label = Weave.lang('+ {0}', registry.getDisplayName(impl));
-			return {
-				get shown() {
-					return Weave.beta || !DataMenu.isBeta(impl);
-				},
-				get label() {
-					if (DataMenu.isBeta(impl))
-						return label + " (beta)";
-					return label;
-				},
-				click: this.createObject.bind(this, impl)
-			}
-		});
+		return items;
 	}
 
 	static isBeta(impl:new()=>IDataSource):boolean
