@@ -140,7 +140,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let selector = ($(this.element) as any);
 		selector.dropdown({
 			onChange: (selected:number|string, text:string) => {
-				if (this.props.onNew && text &&  (Number(selected) < 0) )
+				if (this.props.onNew && text /*&& this.props.allowAdditions*/)
 				{
 					this.props.onNew && this.props.onNew(text);
 				}
