@@ -142,6 +142,11 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 					}
 				});
 			}
+			options.push({
+				value: null,
+				label: "(None)"
+			});
+
 			return (
 				
 				<HBox style={ {flex: 1} }>
@@ -172,21 +177,35 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			
 			var value: {label: string, value: IWeaveTreeNode}[] = [];
 
-			var options: {label:string, value:IWeaveTreeNode&IColumnReference}[] = [];
+			var options: {label:string, value:IWeaveTreeNode}[] = [];
 
 			let siblings:IWeaveTreeNode[] = [];
 			var columns = this.columnsHashmap.getObjects(IColumnWrapper); // TODO - this does not consider if hash map contains non-IColumnWrapper columns
 			
-			columns.forEach((column:IColumnWrapper)=>{
-				let node = ColumnUtils.hack_findHierarchyNode(column);
-				if (!node)
-					return;
-				value.push({label: node.getLabel(), value: node});
-				var columnSiblings = HierarchyUtils.findSiblingNodes(node.getDataSource(), node.getColumnMetadata());
-		        columnSiblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
-					options.push({label:siblingNode.getLabel(), value: siblingNode});
-		        });
-	        });
+			if(columns.length)
+			{
+				columns.forEach((column:IColumnWrapper, index:number)=>{
+					let node = ColumnUtils.hack_findHierarchyNode(column);
+					if(node)
+						this.lastActiveNode = node;
+					if (!this.lastActiveNode)
+						return;
+					value.push({label: node.getLabel(), value: node});
+					var columnSiblings = HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), node.getColumnMetadata());
+					columnSiblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
+						options.push({label:siblingNode.getLabel(), value: siblingNode});
+					});
+				});
+			}
+			else if(this.lastActiveNode)
+			{
+				options = HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), this.lastActiveNode.getColumnMetadata()).map((node) => {
+					return {
+						value: node,
+						label: node.getLabel()
+					}
+				});
+			}
 			
 			if (this.props.showAsList)
 			{
