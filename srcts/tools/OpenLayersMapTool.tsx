@@ -183,11 +183,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			(value) => { return { label: Weave.lang(_.startCase(value.vertical) + " " + _.startCase(value.horizontal)), value} }
 		);
 
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
+		var tableCellClassNames = {
 			td: [
-				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+				"left-cell",
+				"right-cell"
 			]
 		};
 
@@ -265,7 +264,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		return (
 			<VBox style={{flex: 1}}>
-				{ReactUtils.generateTable(null, editorFields, tableStyles)}
+				{ReactUtils.generateTable(null, editorFields, {},tableCellClassNames)}
 				<br/>
 				<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
 			</VBox>

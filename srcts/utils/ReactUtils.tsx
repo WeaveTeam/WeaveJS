@@ -28,7 +28,7 @@ export interface DynamicTableClassNames {
 	tbody?:string;
 	th?:string;
 	tr?:string;
-	td?:string;
+	td?:string|string[];
 }
 
 export default class ReactUtils
@@ -195,8 +195,9 @@ export default class ReactUtils
 							<tr key={index} style={styles.tr} className={classes.tr}>
 								{
 									row.map((cell, index) => {
-										let style = Array.isArray(styles.td) ? (styles.td as React.CSSProperties[])[index] : styles.td;
-										return <td key={index} style={style} className={classes.td}>{cell}</td>
+										let style:React.CSSProperties = Array.isArray(styles.td) ? (styles.td as React.CSSProperties[])[index] : styles.td;
+										let className:string = Array.isArray(classes.td) ? (classes.td as string)[index] : classes.td as string;
+										return <td key={index} style={style} className={className}>{cell}</td>
 									})
 								}
 							</tr>

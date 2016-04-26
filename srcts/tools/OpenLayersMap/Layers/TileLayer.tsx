@@ -144,20 +144,19 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 				
 			]
 		}
-		
-		
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
+
+
+		var tableCellClassNames = {
 			td: [
-				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+				"left-cell",
+				"right-cell"
 			]
 		};
 		
 		return ReactUtils.generateTable(
 			null,
 			editorFields.concat(this.props.editableFields),
-			tableStyles
+			{},tableCellClassNames
 		);
 	}
 }

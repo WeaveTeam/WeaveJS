@@ -308,11 +308,10 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 	render ()
 	{
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
+		var tableCellClassNames = {
 			td: [
-				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+				"left-cell",
+				"right-cell"
 			]
 		};
 
@@ -322,7 +321,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 					this.openTools && this.openTools.length > 0
 					?	ReactUtils.generateTable(null,
 						this.toolConfigs.concat(renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction).concat(this.renderTitleEditor())),
-						tableStyles)
+						{},tableCellClassNames)
 					:	<div>{ 'Select a visualization from the Visualizations menu' }</div>
 				}
 			</VBox>

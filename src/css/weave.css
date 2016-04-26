@@ -571,6 +571,28 @@ div.weave-tree-view {
 
 /****** Tool Editor ******/
 
+.weave-ToolEditor {
+
+}
+
+.weave-ToolEditor table{
+	width: 100%;
+	font-size: inherit;
+}
+
+.weave-ToolEditor .left-cell{
+	white-space: nowrap;
+	text-align: right;
+	padding-right: 8px;
+}
+
+.weave-ToolEditor .right-cell{
+	width: 100%;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	padding-left: 8px;
+}
+
 .weave-ToolEditor-Header {
 	align-items: center;
 	border-bottom: 1px solid lightgrey;

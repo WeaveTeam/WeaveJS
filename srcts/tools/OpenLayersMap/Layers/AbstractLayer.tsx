@@ -122,19 +122,18 @@ export default class AbstractLayer implements ILinkableObject
 		/*for (let [key, value] of this.selectableAttributes) {
 			attributeList.push(<SelectableAttributeComponent key={key} attribute={value} label={Weave.lang(key)}/>)
 		}*/
-		
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
+
+		var tableCellClassNames = {
 			td: [
-				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+				"left-cell",
+				"right-cell"
 			]
 		};
 		
 		return ReactUtils.generateTable(
 			null,
 			renderSelectableAttributes(this.selectableAttributes, linkToToolEditorCrumbFunction).concat(this.renderEditableFields()),
-			tableStyles
+			{},tableCellClassNames
 		);
 	}
 

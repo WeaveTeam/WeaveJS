@@ -301,18 +301,17 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
+		var tableCellClassNames = {
 			td: [
-				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+				"left-cell",
+				"right-cell"
 			]
 		};
 		
 		return ReactUtils.generateTable(
 			null,
 			this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction).concat(this.getTitlesEditor(), this.getMarginEditor()),
-			tableStyles
+			{},tableCellClassNames
 		);
 	}
 

@@ -575,11 +575,10 @@ export default class C3Histogram extends AbstractC3Tool
     //todo:(linktoToolEditorCrumbFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linktoToolEditorCrumbFunction:Function):JSX.Element
 	{
-		var tableStyles = {
-			table: { width: "100%", fontSize: "inherit"},
+		var tableCellClassNames = {
 			td: [
-				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 4, paddingTop: 4, width: "100%", paddingLeft: 8}
+				"left-cell",
+				"right-cell"
 			]
 		};
 
@@ -647,7 +646,7 @@ export default class C3Histogram extends AbstractC3Tool
 				],
 				this.getTitlesEditor(),
 				this.getMarginEditor()
-			), tableStyles
+			), {},tableCellClassNames
 		);
 	}
 
