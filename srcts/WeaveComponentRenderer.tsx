@@ -92,11 +92,9 @@ export default class WeaveComponentRenderer extends SmartComponent<IWeaveCompone
 		if (!React.Component.isPrototypeOf(ComponentClass))
 			ComponentClass = null;
 
-		/* To force React to create a new component */
-		if (this.state.target !== this.watcher.target)
-		{
+		// To force React to create a new component
+		if (Weave.wasDisposed(this.state.target))
 			this.key++;
-		}
 
 		this.setState({
 			actualType: ComponentClass,
