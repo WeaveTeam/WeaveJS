@@ -18,7 +18,7 @@ export default class ToolsMenu implements MenuBarItemProps
 		this.createObject = createObject;
 	}
 
-	label:string = "Visualizations";
+	label:string = "Charts";
 	weave:Weave;
 	createObject:(type:new(..._:any[])=>any)=>void;
 	get menu():MenuItemProps[]

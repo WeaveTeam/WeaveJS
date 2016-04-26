@@ -30,21 +30,20 @@ export default class DataMenu implements MenuBarItemProps
 	{
 		return [].concat(
 			{
-				shown: Weave.beta,
-				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)... (not implemented yet)")}</FileInput>
+				label: Weave.lang('Manage data...'),
+				click: () => DataSourceManager.openInstance(this)
 			},
+//			{},
+//			{
+//				shown: Weave.beta,
+//				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)... (not implemented yet)")}</FileInput>
+//			},
+			{},
 			{
 				enabled: this.getColumnsToExport().length > 0,
 				label: Weave.lang("Export CSV"),
 				click: this.exportCSV
-			},
-			{},
-			{
-				label: Weave.lang('Manage or browse data'),
-				click: () => DataSourceManager.openInstance(this)
-			},
-			{},
-			this.getDataSourceItems()
+			}
 		);
 	}
 

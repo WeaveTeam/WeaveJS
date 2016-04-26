@@ -150,7 +150,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						this.props.dataMenu
 						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } showIcon={false} style={{width: "100%"}}>
 								<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
-								{Weave.lang('New Data Source')}
+								{Weave.lang('Add')}
 							</MenuButton>
 						: 	null
 					}
@@ -173,6 +173,6 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	static openInstance(dataMenu:DataMenu, selected:IDataSource = null):ControlPanel
 	{
 		DataSourceManager.selected = selected;
-		return ControlPanel.openInstance(dataMenu.weave, DataSourceManager, {title: Weave.lang("Manage data sources")}, {dataMenu});
+		return ControlPanel.openInstance(dataMenu.weave, DataSourceManager, {title: Weave.lang("Data Sources")}, {dataMenu});
 	}
 }

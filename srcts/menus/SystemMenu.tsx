@@ -21,10 +21,10 @@ export default class SystemMenu implements MenuBarItemProps
 	{
 		return [
 			{
-				label: <FileInput onChange={this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes().join(',')}>{Weave.lang("Open...")}</FileInput>
+				label: <FileInput onChange={this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes().join(',')}>{Weave.lang("Open session...")}</FileInput>
 			},
 			{
-				label: Weave.lang("Save as..."),
+				label: Weave.lang("Save session as..."),
 				click: this.fileMenu.saveFile
 			},
 			{},
