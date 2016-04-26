@@ -147,7 +147,7 @@ export default class List extends React.Component<IListProps, IListState>
 
                         return (
                             <HBox key={index} style={_.merge(style, this.props.style)} className={ className }  onClick={this.handleChange.bind(this, value) }>
-                                <span style={{ flex: 1, overflow: "hidden"}}>{String(this.labels[index] || value)}</span>
+                                <span style={{ flex: 1, overflow: "hidden"}}>{this.labels[index] || String(value)}</span>
                             </HBox>
                         );
                     })
