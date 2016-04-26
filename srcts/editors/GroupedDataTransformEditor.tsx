@@ -7,6 +7,7 @@ import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import HelpIcon from "../react-ui/HelpIcon";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import SelectableAttributesList from "../ui/SelectableAttributesList";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 import KeyTypeInput from "../ui/KeyTypeInput";
@@ -49,7 +50,7 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Data to transform"),
-				<SelectableAttributeComponent attributeName="Data to transform" attributes={attributes}/>
+				<SelectableAttributesList attributeName="Data to transform" attributes={attributes}/>
 			]
 		];
 		return super.editorFields.concat(editorFields)

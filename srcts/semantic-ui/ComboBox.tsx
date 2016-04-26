@@ -1,16 +1,14 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import ReactUtils from "../utils/ReactUtils";
 import $ from "../modules/jquery";
 import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
 
-export type ComboBoxOption = { label: string, value: any };
+export type ComboBoxOption = (string | { label: string, value: any });
 
 export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 {
-	options?: (string | { label: string, value: any })[];
-	valueIncludesLabel?:boolean;
+	options?:ComboBoxOption[];
 	value?:any;
 	onChange?:(value:any)=>void;
 	onNew?:(value:any)=>void;
@@ -29,8 +27,7 @@ export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 
 export interface ComboBoxState
 {
-	value?: any; // value is always the value property of an option or an array of value property
-	options?: ComboBoxOption[]; // always a {value: any, label: string} array
+	value: any;
 }
 
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
@@ -40,89 +37,81 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	static defaultProps:ComboBoxProps = {
 		fluid:true
 	};
-	
+
 	constructor(props:ComboBoxProps)
 	{
 		super(props);
-		
-		this.state = this.normalizeState(props);
-	}
-	
-	normalizeState(props:ComboBoxProps):ComboBoxState
-	{
-		var options:ComboBoxOption[] = props.options.map(this.getOption);
-
-		var value:any = props.value;
-		if(props.valueIncludesLabel)
-		{
-			if(Array.isArray(props.value))
-			{
-				value = props.value.map((val:any) => val.value);
-				options = _.uniq(_.union(props.value, options), "value")
-			}
-			else
-			{
-				value = props.value && props.value.value;
-				options = _.uniq(_.union([props.value], options), "value");
-			}
-		}
-		return {
-			value: value,
-			options: options
-		}
-	}
-
-	getOption(option:(string | { label: string, value: any })):ComboBoxOption
-	{
-		if(typeof option === "object" && option)
-		{
-			return option;
-		}
-		else
-		{
-			return {
-				label: option as string,
-				value: option as string
-			}
+		this.state = {
+			value: this.props.value === undefined ? null : this.props.value
 		}
 	}
 	
 	private getIndexFromValue(value:any):number
 	{
 		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
-		return this.state.options && this.state.options.findIndex((option) => {
-			return equalityFunc(option.value, value);
-		});
+		return this.props.options.findIndex((option) => (typeof option === "object") ? equalityFunc(option.value, value) : equalityFunc(option, value) );
 	}
 
+	private statesEqual(prevState:ComboBoxState, currentState:ComboBoxState)
+	{
+		//check if included elements are the same, even if in a different order
+		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
+		if (this.props.type === "multiple"){
+			if (prevState.value.length !== currentState.value.length)
+				return false;
+			prevState.value.forEach( (item:any,index:number) => {
+				if (!currentState.value.some( (val:any) => equalityFunc(val,item))) {
+					return false;
+				}
+			});
+			return true;
+		} else {
+			return _.isEqual(prevState.value, currentState.value)
+		}
+	}
+	
 	componentWillReceiveProps(nextProps: ComboBoxProps)
 	{
-		this.setState(this.normalizeState(nextProps));
+		var value = nextProps.value;
+
+		if (nextProps.selectFirstOnInvalid && this.getIndexFromValue(value) < 0)
+		{
+			let option = nextProps.options[0];
+			if (option)
+				this.setState({value:(typeof option === "object") ? option.value : option});
+		}
+		else if (value !== undefined)
+		{
+			this.setState({value});
+		}
+		else {
+			this.setState({value:null});
+		}
 	}
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
 	{
-		let selector = ($(this.element) as any);
-		if (!_.isEqual(prevState.value, this.state.value))
+		if (!this.statesEqual(prevState,this.state))
 		{
-			
+			let selector = ($(this.element) as any);
 			if (this.props.type === "multiple")
 			{
 				let indices:string[] = [];
-
 				this.state.value.forEach((item:any) => {
 					let index:number = this.getIndexFromValue(item);
-					if(index >= 0)
+					if (index >= 0)
 						indices.push(String(index));
 				});
 				selector.dropdown('set exactly', indices);
 			}
-
 			else
 			{
-				let  index = this.getIndexFromValue(this.state.value);
+				let index = this.getIndexFromValue(this.state.value);
 				if (index >= 0)
-					selector.dropdown('set selected', this.state.options[index].label);
+				{
+					let option = this.props.options[index];
+					selector.dropdown('set selected', (typeof option === "object") ? option.label : option);
+				}
 				else
 				{
 					//clear dropdown if option isn't found and we are not allowing new items
@@ -138,56 +127,67 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	{
 		this.element = ReactDOM.findDOMNode(this);
 		let selector = ($(this.element) as any);
+		
 		selector.dropdown({
 			onChange: (selected:number|string, text:string) => {
-				if (this.props.onNew && text /*&& this.props.allowAdditions*/)
+				if (this.props.onNew && text &&  (Number(index) < 0) )
 				{
 					this.props.onNew && this.props.onNew(text);
 				}
 				else
 				{
 					if (this.props.type !== "multiple") {
-						let value:any = this.state.options[selected as number] && this.state.options[selected as number].value;
+						let option = this.props.options[selected as number];
+						let value:any = (typeof option === "object") ? option.value : option;
 						this.setState({value});
-					} else {
-						if(selected !== "") {
+						this.props.onChange && this.props.onChange(value);
+					}
+					else
+					{
+						if (selected !== "")
+						{
 							let indices:number[] = (selected as string).split(",").map(Number);
-							
 							let values:any[] = indices.map((index) => {
-								return this.state.options[index] && this.state.options[index].value;
+								let option = this.props.options[index];
+								return (typeof option === "object") ? option.value : option;
 							});
 							this.setState({value: values});
 						}
+						else
+						{
+							this.setState({value: []});
+						}
 					}
+
+
 				}
 			},
 			onClick: (index:number) => {
 				this.props.onClick && this.props.onClick(null);
 			},
 			onAdd: (addedValue:number, addedText:string) => {
-				let option = this.state.options[addedValue];
-				let value:any = option && option.value;
+				let option = this.props.options[addedValue];
+				let value:any = (typeof option === "object") ? option.value : option;
 				let values:any = _.clone(this.state.value);
-				if (ReactUtils.hasFocus(this) && !_.includes(values, value)) {
+				if (!_.includes(values,value)) {
 					values.push(value);
 					this.setState({value:values});
-					this.props.onAdded && this.props.onAdded(value);
 				}
+				this.props.onAdded && this.props.onAdded(value);
 			},
 			onRemove: (removedValue:number, removedText:string) => {
-				let option = this.state.options[removedValue];
-				let value:any = option && option.value;
-				if(ReactUtils.hasFocus(this))
-				{
-					let values:any = _.without(this.state.value, value);
-					this.setState({value:values});
-					this.props.onRemoved && this.props.onRemoved(value);
-				}
+				let option = this.props.options[removedValue];
+				let value:any = (typeof option === "object") ? option.value : option;
+				let values:any = _.without(this.state.value,value);
+				this.setState({value:values});
+				this.props.onRemoved && this.props.onRemoved(value);
 			},
 			context: this.props.context || window,
 			direction: this.props.direction || 'auto',
 			allowAdditions: this.props.allowAdditions || false
 		});
+		let index = this.getIndexFromValue(this.state.value);
+		let option = this.props.options[index];
 		if (this.props.type === "multiple")
 		{
 			let indices:string[] = [];
@@ -198,9 +198,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			});
 			selector.dropdown('set exactly', indices);
 		}
-		let index = this.getIndexFromValue(this.state.value);
-		if(index >= 0)
-			selector.dropdown('set selected', this.state.options[index].label);
+		else if (index >= 0)
+			selector.dropdown('set selected',(typeof option === "object") ? option.label:option);
 		else {
 			if(!this.props.onNew)
 				selector.dropdown('clear');
@@ -221,7 +220,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					: null
 				}
 				{
-					this.state.options && this.state.options.map((option, index) => <div className="item" style={this.props.optionStyle} key={index} data-value={index}>{Weave.lang(option.label)}</div>)
+					this.props.options.map((option, index) => <div className="item" style={this.props.optionStyle} key={index} data-value={index}>{typeof option === "object" ? option && (option.label || option.value) : option}</div>)
 				}
 				</div>
 			</div>

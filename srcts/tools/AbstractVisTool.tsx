@@ -15,6 +15,7 @@ import ReactUtils from "../utils/ReactUtils";
 import classNames from "../modules/classnames";
 import {CSSProperties} from "react";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import SelectableAttributesList from "../ui/SelectableAttributesList";
 
 import Accordion from "../semantic-ui/Accordion";
 
