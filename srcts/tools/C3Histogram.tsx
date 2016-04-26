@@ -20,6 +20,7 @@ import ColorRampEditor from "../editors/ColorRampEditor";
 import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
 import Button from "../semantic-ui/Button";
 import DynamicComponent from "../ui/DynamicComponent";
+import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -36,6 +37,8 @@ import DynamicColumn = weavejs.data.column.DynamicColumn;
 import SimpleBinningDefinition = weavejs.data.bin.SimpleBinningDefinition;
 import StandardLib = weavejs.util.StandardLib;
 import LinkableNumber = weavejs.core.LinkableNumber;
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
 
 declare type Record = {
     id: weavejs.api.data.IQualifiedKey,
@@ -589,13 +592,6 @@ export default class C3Histogram extends AbstractC3Tool
 					{
 						ReactUtils.generateTable(
 							null,
-							this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction),
-							{}, tableCellClassNames
-						)
-					}
-					{
-						ReactUtils.generateTable(
-							null,
 							[
 								[
 									Weave.lang("Color theme"),
@@ -638,6 +634,14 @@ export default class C3Histogram extends AbstractC3Tool
 								[
 									Weave.lang("Binning method"),
 									<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(0)}/>
+								],
+								[
+									Weave.lang('Height values (optional)'),
+									<SelectableAttributeComponent attributeName={"Height values (optional)"}
+									                              attributes={ new Map<string, (IColumnWrapper|ILinkableHashmap)>()
+									                                            .set("Height values (optional)", this.columnToAggregate)
+								                                             }
+									                              linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
 								],
 								[
 									Weave.lang("Aggregation method"),
