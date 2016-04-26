@@ -718,3 +718,11 @@ div.weave-tree-view {
 	padding-right: 8px;
 	vertical-align: middle;
 }
+
+/****** Accordion *******/
+.ui.styled.accordion {
+	border-radius: 2px;
+	background: none;
+	width:100%;
+	box-shadow:none;
+}

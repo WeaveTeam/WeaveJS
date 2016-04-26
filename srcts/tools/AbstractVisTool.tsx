@@ -16,6 +16,9 @@ import classNames from "../modules/classnames";
 import {CSSProperties} from "react";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 
+import Accordion from "../semantic-ui/Accordion";
+
+
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import KeySet = weavejs.data.key.KeySet;
@@ -275,17 +278,17 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		// 			<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>]
 		return [
 			[
-				"Title",
+				"Chart",
 				this.panelTitle,
 				this.defaultPanelTitle
 			],
 			[
-				"X axis title",
+				"X axis",
 				this.xAxisName,
 				this.defaultXAxisLabel
 			],
 			[
-				"Y axis title",
+				"Y axis",
 				this.yAxisName,
 				this.defaultYAxisLabel
 			]
@@ -307,12 +310,32 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 				"weave-right-cell"
 			]
 		};
-		
-		return ReactUtils.generateTable(
-			null,
-			this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction).concat(ReactUtils.generateEmptyRow(),this.getTitlesEditor(),ReactUtils.generateEmptyRow(), this.getMarginEditor()),
-			{},tableCellClassNames
-		);
+
+		return <Accordion titles={["Data", "Titles" , "Margins"]}>
+
+						{
+							ReactUtils.generateTable(
+								null,
+								this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction),
+								{}, tableCellClassNames
+							)
+						}
+						{
+							ReactUtils.generateTable(
+								null,
+								 this.getTitlesEditor(),
+								{}, tableCellClassNames
+							)
+						}
+						{
+							ReactUtils.generateTable(
+								null,
+								this.getMarginEditor(),
+								{}, tableCellClassNames
+							)
+						}
+
+				</Accordion>
 	}
 	
 	

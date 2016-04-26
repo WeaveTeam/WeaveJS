@@ -13,6 +13,7 @@ import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 import Checkbox from "../semantic-ui/Checkbox";
 import ComboBox from "../semantic-ui/ComboBox";
+import Accordion from "../semantic-ui/Accordion";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ColorController from "../editors/ColorController";
 import ColorRampEditor from "../editors/ColorRampEditor";
@@ -575,6 +576,8 @@ export default class C3Histogram extends AbstractC3Tool
     //todo:(linktoToolEditorCrumbFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linktoToolEditorCrumbFunction:Function):JSX.Element
 	{
+
+
 		var tableCellClassNames = {
 			td: [
 				"weave-left-cell",
@@ -582,7 +585,95 @@ export default class C3Histogram extends AbstractC3Tool
 			]
 		};
 
-		return ReactUtils.generateTable(
+		return <Accordion titles={["Data", "Bin/Color Ramp" , "Title","Margins"]}>
+					{
+						ReactUtils.generateTable(
+							null,
+							this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction),
+							{}, tableCellClassNames
+						)
+					}
+					{
+						ReactUtils.generateTable(
+							null,
+							[
+								[
+									Weave.lang("Color theme"),
+									<DynamicComponent
+										dependencies={[this.fill.color]}
+										render={() =>
+											<ColorRampEditor
+												compact={true}
+												colorRamp={this.colorColumn && this.colorColumn.ramp}
+												onButtonClick={() => this.openColorController(1)}
+											/>
+										}
+									/>
+								],
+								[
+									null,
+									<Checkbox
+										ref={(ref:Checkbox) => {
+									if (ref)
+										this.fill.color.addGroupedCallback(ref, () => {
+											ref.setState({
+												value: !!this.fill.color.internalDynamicColumn.targetPath
+											});
+										});
+								}}
+										onChange={(value) => {
+									if (this.fill.color.internalDynamicColumn.targetPath)
+									{
+										weavejs.data.ColumnUtils.unlinkNestedColumns(this.fill.color);
+										if (this.colorColumn)
+											this.colorColumn.ramp.state = [0x808080];
+									}
+									else
+										this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
+								}}
+										label={Weave.lang("Link to global color column")}
+									/>
+
+								],
+								[
+									Weave.lang("Binning method"),
+									<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(0)}/>
+								],
+								[
+									Weave.lang("Aggregation method"),
+									<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
+								],
+								Weave.beta && [
+									null,
+									<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
+
+								],
+								[
+									null,
+									<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
+								]
+							] as React.ReactChild[][],
+							{}, tableCellClassNames
+						)
+					}
+					{
+						ReactUtils.generateTable(
+							null,
+							this.getTitlesEditor(),
+							{}, tableCellClassNames
+						)
+					}
+					{
+						ReactUtils.generateTable(
+							null,
+							this.getMarginEditor(),
+							{}, tableCellClassNames
+						)
+					}
+
+				</Accordion>;
+
+		/*return ReactUtils.generateTable(
 			null,
 			([
 				[
@@ -651,7 +742,7 @@ export default class C3Histogram extends AbstractC3Tool
 				ReactUtils.generateEmptyRow(),
 				this.getMarginEditor()
 			), {},tableCellClassNames
-		);
+		);*/
 	}
 
     get deprecatedStateMapping()
