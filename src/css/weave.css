@@ -464,27 +464,21 @@ div.table-row-selected>div>div>div>div>div {
 	background-color: rgb(224, 224, 224)
 }
 
-.weave-tooltip {
-	box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
-	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
-	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
-	border-radius: 2px;
-	background-color: #000000;
-	color: whitesmoke;
-	padding: 8px;
-	font-size: smaller;
-	user-select: none;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	z-index: 2147483647; /* max z-index tooltip should show on top of all elements */
-}
-
 /* help icon */
 .weave-help-icon:hover {
 	border-color: rgba(0,0,0,.05)
 }
 
 .weave-help-tooltip {
+	box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 6px, rgba(0, 0, 0, 0.12) 0px 1px 4px;
+	border-radius: 2px;
+	padding: 8px;
+	font-size: smaller;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
 	background-color: #FCF8E3;
 	color: #333;
 }

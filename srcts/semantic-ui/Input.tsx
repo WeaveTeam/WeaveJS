@@ -1,5 +1,4 @@
 import * as React from "react";
-import ToolTip from "../react-ui/ToolTip";
 import classNames from "../modules/classnames";
 
 export interface InputProps extends React.HTMLProps<Input>
@@ -52,9 +51,7 @@ export default class Input extends React.Component<InputProps, InputState>
 
 		return (
 			<div className={inputClass}
-				 style={this.props.style}
-				 onMouseEnter={(event) => this.props.title && ToolTip.open(this.props.title, event)}
-				 onMouseLeave={this.props.title && ToolTip.close}>
+				 style={this.props.style}>
 				<input {...inputProps} ref={(c) => this.inputElement = c}/>
 				{
 					this.props.children
