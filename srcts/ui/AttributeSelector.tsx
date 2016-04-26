@@ -206,8 +206,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 				}
 				{
 					Weave.IS(this.selectedAttribute, ILinkableHashMap)
-					?	<SelectableAttributesList
-							style={{flex: null}}
+					?	<SelectableAttributeComponent
 							attributeName={ this.state.selectedAttributeName }
 							attributes={ this.props.attributes}
 						/>
