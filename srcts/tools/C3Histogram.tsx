@@ -601,7 +601,7 @@ export default class C3Histogram extends AbstractC3Tool
 											<ColorRampEditor
 												compact={true}
 												colorRamp={this.colorColumn && this.colorColumn.ramp}
-												onButtonClick={() => this.openColorController(1)}
+												onButtonClick={() => this.openColorController(0)}
 											/>
 										}
 									/>
@@ -633,7 +633,7 @@ export default class C3Histogram extends AbstractC3Tool
 								],
 								[
 									Weave.lang("Binning method"),
-									<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(0)}/>
+									<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(1)}/>
 								],
 								[
 									Weave.lang('Height values (optional)'),

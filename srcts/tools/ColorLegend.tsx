@@ -464,11 +464,11 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					],
 					[
 						Weave.lang("Color theme"),
-						<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(1)}/>
+						<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(0)}/>
 					],
 					[
 						Weave.lang("Binning method"),
-						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(0)}/>
+						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(1)}/>
 					],
 					[ 
 						Weave.lang("Layout"),
