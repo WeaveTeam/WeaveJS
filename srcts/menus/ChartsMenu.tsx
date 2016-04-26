@@ -38,6 +38,7 @@ export default class ChartsMenu implements MenuBarItemProps
 			WeaveUI.C3BarChart,
 			WeaveUI.ColorLegend,
 			WeaveUI.C3Gauge,
+			WeaveUI.C3ColorHistogram,
 			WeaveUI.C3Histogram,
 			WeaveUI.C3LineChart,
 			WeaveUI.OpenLayersMapTool,

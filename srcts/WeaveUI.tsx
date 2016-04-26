@@ -11,6 +11,7 @@ import ColorLegend from "./tools/ColorLegend";
 import C3BarChart from "./tools/C3BarChart";
 import C3Gauge from "./tools/C3Gauge";
 import C3Histogram from "./tools/C3Histogram";
+import C3ColorHistogram from "./tools/C3ColorHistogram";
 import C3LineChart from "./tools/C3LineChart";
 import C3ScatterPlot from "./tools/C3ScatterPlot";
 import C3PieChart from "./tools/C3PieChart";
@@ -67,6 +68,7 @@ export
 	C3BarChart,
 	C3Gauge,
 	C3Histogram,
+	C3ColorHistogram,
 	C3LineChart,
 	C3ScatterPlot,
 	C3PieChart,

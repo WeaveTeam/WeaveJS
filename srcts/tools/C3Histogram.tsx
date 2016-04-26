@@ -121,8 +121,6 @@ export default class C3Histogram extends AbstractC3Tool
 		return Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
 	}
 	
-	static linkedByDefault:boolean = false;
-
     constructor(props:IVisToolProps)
     {
         super(props);
@@ -133,17 +131,10 @@ export default class C3Histogram extends AbstractC3Tool
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 		
-		if (C3Histogram.linkedByDefault)
-		{
-	        this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
-		}
-		else
-		{
-			var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn);
-			_colorColumn.ramp.setSessionState([0x808080]);
-			var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn);
-			var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn);
-		}
+		var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn);
+		_colorColumn.ramp.setSessionState([0x808080]);
+		var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn);
+		var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn);
 
         this.idToRecord = {};
         this.keyToIndex = {};
@@ -607,31 +598,6 @@ export default class C3Histogram extends AbstractC3Tool
 									/>
 								],
 								[
-									null,
-									<Checkbox
-										ref={(ref:Checkbox) => {
-									if (ref)
-										this.fill.color.addGroupedCallback(ref, () => {
-											ref.setState({
-												value: !!this.fill.color.internalDynamicColumn.targetPath
-											});
-										});
-								}}
-										onChange={(value) => {
-									if (this.fill.color.internalDynamicColumn.targetPath)
-									{
-										weavejs.data.ColumnUtils.unlinkNestedColumns(this.fill.color);
-										if (this.colorColumn)
-											this.colorColumn.ramp.state = [0x808080];
-									}
-									else
-										this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
-								}}
-										label={Weave.lang("Link to global color column")}
-									/>
-
-								],
-								[
 									Weave.lang("Binning method"),
 									<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(1)}/>
 								],
@@ -782,7 +748,7 @@ export default class C3Histogram extends AbstractC3Tool
 
 Weave.registerClass(
 	C3Histogram,
-	["weavejs.tool.C3Histogram", "weave.visualization.tools::HistogramTool", "weave.visualization.tools::ColormapHistogramTool"],
+	["weavejs.tool.C3Histogram", "weave.visualization.tools::HistogramTool"],
 	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
 	"Histogram"
 );
