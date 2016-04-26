@@ -200,30 +200,28 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 		
 		let editorFields = [
-			[<span className="weave-sidebar-label">{Weave.lang("Title")}</span>,
+			[
+				<span className="weave-sidebar-label">{Weave.lang("Title")}</span>,
 				<HBox>
 					<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) } placeholder={this.defaultPanelTitle}/>
 				</HBox>
 			],
-			[<span className="weave-sidebar-label">{Weave.lang("Control location")}</span>,
+			[
+				<span className="weave-sidebar-label">{Weave.lang("Control location")}</span>,
 				<HBox>
 					<ComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
 				</HBox>
 			],
-			[<span className="weave-sidebar-label">{Weave.lang("Zoom range")}</span>,
+			[
+				<span className="weave-sidebar-label">{Weave.lang("Zoom range")}</span>,
 				<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
 					{"-"}
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
 				</HBox>
 			],
-			[null,<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })} label={Weave.lang("Show zoom slider")}/>],
-			[<span className="weave-sidebar-label">{Weave.lang("Projection SRS")}</span>,
-				<HBox>
-					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
-				</HBox>
-			],
-			[<span className="weave-sidebar-label">{Weave.lang("Zoom/Pan Boundaries")}</span>,
+			[
+				<span className="weave-sidebar-label">{Weave.lang("Zoom/Pan Boundaries")}</span>,
 				<VBox>
 					<span style={{display: this.overrideExtentDefined() ? null : "none" }}>
 						<HBox className="weave-padded-hbox" style={{ alignItems: 'center' }}>
@@ -235,17 +233,34 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 							{ renderNumberEditor(this.extentOverride.yMin, 1) }
 						</HBox>
 					</span>
-				<HBox>
-					<Button	onClick={this.setOverrideExtent} style={ {borderTopRightRadius:0 , borderBottomRightRadius:0} }>
+					<HBox>
+						<Button	onClick={this.setOverrideExtent} style={ {borderTopRightRadius:0 , borderBottomRightRadius:0} }>
 							{Weave.lang("Use current zoom") }
-					</Button>
-					<Button	onClick={this.clearOverrideExtent} style={ {borderTopLeftRadius:0 , borderBottomLeftRadius:0} }>
+						</Button>
+						<Button	onClick={this.clearOverrideExtent} style={ {borderTopLeftRadius:0 , borderBottomLeftRadius:0} }>
 							{Weave.lang("Use data bounds")}
-					</Button>
-				</HBox>
+						</Button>
+					</HBox>
 				</VBox>
 			],
-			[null,<Checkbox ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})} label={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }/>]
+			[
+				null,
+				<Checkbox
+					ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}
+					label={ Weave.lang("Snap zoom to base map") }
+					title={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }
+				/>
+			],
+			[
+				null,
+				<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })} label={Weave.lang("Show zoom slider")}/>
+			],
+			[
+				<span className="weave-sidebar-label">{Weave.lang("Projection SRS")}</span>,
+				<HBox>
+					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
+				</HBox>
+			]
 		];
 
 		return (
