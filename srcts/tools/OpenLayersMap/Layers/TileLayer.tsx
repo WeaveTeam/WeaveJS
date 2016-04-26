@@ -184,6 +184,10 @@ export default class TileLayer extends AbstractLayer
 		super();
 
 		this.olLayer = new ol.layer.Tile();
+	}
+
+	onLayerReady() {
+		super.onLayerReady();
 
 		this.provider.addGroupedCallback(this, this.onProviderChange);
 		this.provider.addGroupedCallback(this, this.updateTileSource);

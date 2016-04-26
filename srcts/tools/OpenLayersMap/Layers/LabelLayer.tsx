@@ -50,7 +50,13 @@ export default class LabelLayer extends AbstractGlyphLayer
 
 		this.styleResolutionDependent = true;
 
-		this.color.internalDynamicColumn.globalName = "defaultColorColumn";
+		//this.color.internalDynamicColumn.globalName = "defaultColorColumn";
+	}
+
+	onLayerReady()
+	{
+		super.onLayerReady();
+
 		this.size.addGroupedCallback(this, this.updateStyleData)
 		this.text.addGroupedCallback(this, this.updateStyleData)
 		this.color.addGroupedCallback(this, this.updateStyleData);
@@ -59,6 +65,12 @@ export default class LabelLayer extends AbstractGlyphLayer
 
 	updateStyleData():void 
 	{
+		if (!this.parent || !this.parent.map)
+		{
+			console.log("Label layer needs map to be ready to perform overlap checking; delaying style update.");
+			weavejs.WeaveAPI.Scheduler.callLater(this, this.updateStyleData);
+			return;
+		}
 		let map = this.parent.map;
 
 		let records: Array<LabelRecord> = [];

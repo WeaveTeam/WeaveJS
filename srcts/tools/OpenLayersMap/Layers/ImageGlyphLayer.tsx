@@ -37,11 +37,16 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 		super();
 		this.imageGlyphCache = new ImageGlyphCache(this);
 		this.dataAlpha.defaultValue.state = 1.0;
+	}
+
+	onLayerReady()
+	{
+		super.onLayerReady();
+
 		this.imageSize.addGroupedCallback(this, this.updateStyleData);
 		this.imageURL.addGroupedCallback(this, this.updateStyleData);
 		this.dataAlpha.addGroupedCallback(this, this.updateStyleData);
 		this.dataColor.addGroupedCallback(this, this.updateStyleData, true);
-
 	}
 
 	getToolTipColumns(): IAttributeColumn[] 

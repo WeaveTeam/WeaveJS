@@ -66,12 +66,18 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		this.selectionFilter.targetPath = ["defaultSelectionKeySet"];
 		this.probeFilter.targetPath = ["defaultProbeKeySet"];
-	
-		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
-		this.debounced_updateMetaStyles = _.debounce(this.updateMetaStyles.bind(this), 0);
 
 		this.olLayer = new ol.layer.Vector();
 		this.source = new ol.source.Vector({wrapX: false});
+
+		this.updateMetaStyle = this.updateMetaStyle_unbound.bind(this);
+		this.debounced_updateMetaStyles = _.debounce(this.updateMetaStyles.bind(this), 0);
+	}
+
+	onLayerReady()
+	{
+		super.onLayerReady();
+
 
 		/* Every feature that is added should register a handler to automatically recompute the metastyles when the styles change. */
 		this.source.on("addfeature", this.onFeatureAdd, this);

@@ -39,19 +39,23 @@ export default class GeometryLayer extends AbstractFeatureLayer
 	{
 		super();
 		this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
+		this.filteredKeySet.setColumnKeySources([this.geometryColumn]);
+		
 		this.geoJsonParser = new ol.format.GeoJSON();
+	}
+
+	onLayerReady()
+	{
+		super.onLayerReady();
 
 		this.geometryColumn.addGroupedCallback(this, this.updateGeometryData);
 
-		/* TODO: Register a callback on the parent's projection. */
-		// this.projectionPath.addCallback(this, this.updateGeometryData);
 
 		Weave.getCallbacks(this.filteredKeySet).removeCallback(this, this.updateMetaStyles);
 
 		Weave.getCallbacks(this.fill).addGroupedCallback(this, this.updateStyleData);
 		Weave.getCallbacks(this.line).addGroupedCallback(this, this.updateStyleData);
 
-		this.filteredKeySet.setColumnKeySources([this.geometryColumn]);
 
 		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateGeometryData, true);
 	}

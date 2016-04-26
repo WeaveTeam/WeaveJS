@@ -105,8 +105,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return true;
 	}
 
-	private static projectionDbPromise:WeavePromise = 
-		weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
+	private static projectionDbPromise: WeavePromise = weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
+	/*
+	// For debugging projection database delays
+	private static projectionDbPromise:WeavePromise = new WeavePromise(null, (resolve:Function, reject:Function) => {
+		setTimeout(() => resolve(weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"))), 1000)
+	});
+	*/
+
 	private static projectionDbLoadAttempted:boolean = false;
 
 	static get projectionDbReadyOrFailed():boolean
@@ -464,10 +470,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
-	componentDidMount():void
+	initializeMap():void
 	{
 		Menu.registerMenuSource(this);
-		
+
 		this.map = new ol.Map({
 			interactions: ol.interaction.defaults({ dragPan: false }),
 			controls: [],
@@ -502,13 +508,12 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		this.controlLocation.addGroupedCallback(this, this.updateControlPositions);
 		for (let lb of [
-				this.showZoomSlider,
-				this.showMouseModeControls,
-				this.showPanButtons,
-				this.showZoomExtentButton,
-				this.showZoomButtons
-			])
-		{
+			this.showZoomSlider,
+			this.showMouseModeControls,
+			this.showPanButtons,
+			this.showZoomExtentButton,
+			this.showZoomButtons
+		]) {
 			lb.addGroupedCallback(this, this.updateControls_weaveToOl);
 		}
 		this.updateControls_weaveToOl();
@@ -528,8 +533,19 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		this.layers.childListCallbacks.addImmediateCallback(this, this.updatePlotters_weaveToOl, true);
 		Weave.getCallbacks(this.zoomBounds).addGroupedCallback(this, this.updateZoomAndCenter_weaveToOl, true);
-		
+
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
+	}
+
+	componentDidMount():void
+	{
+		if (!OpenLayersMapTool.projectionDbReadyOrFailed)
+		{
+			console.log("Projection database not ready; delaying initialization of map");
+			weavejs.WeaveAPI.Scheduler.callLater(this, this.componentDidMount);
+			return;
+		}
+		this.initializeMap();
 	}
 
 	updateViewParameters_weaveToOl():void

@@ -39,16 +39,17 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 	constructor()
 	{
 		super();
+		this.filteredKeySet.setColumnKeySources([this.dataX, this.dataY]);
+	}
 
-		/* TODO: Register a callback on the parent's projection. */
-		// this.projectionPath.addCallback(this, this.updateGeometryData);
+	onLayerReady()
+	{
+		super.onLayerReady();
 
 		this.sourceProjection.addGroupedCallback(this, this.updateLocations);
 
 		this.dataX.addGroupedCallback(this, this.updateLocations);
 		this.dataY.addGroupedCallback(this, this.updateLocations, true);
-
-		this.filteredKeySet.setColumnKeySources([this.dataX, this.dataY]);
 	}
 
 	_getFeatureIds()

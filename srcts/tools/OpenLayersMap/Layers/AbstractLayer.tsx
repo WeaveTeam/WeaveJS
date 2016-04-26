@@ -150,36 +150,18 @@ export default class AbstractLayer implements ILinkableObject
 
 	constructor()
 	{
-		WeaveAPI.Scheduler.callLater(this, this.registerUpdateProjection);
 	}
 
-	registerUpdateProjection():void
+	onLayerReady():void
 	{
 		let parent = Weave.getAncestor(this, OpenLayersMapTool);
-		if (!parent)
-		{
-			WeaveAPI.Scheduler.callLater(this, this.registerUpdateProjection);
-			return;
-		}
-
 		this.projectionSRS = parent.projectionSRS;
 		this.projectionSRS.addGroupedCallback(this, this.updateProjection, true);
 	}
 
 	/*abstract*/ updateProjection(): void {}
 
-	private _parent: OpenLayersMapTool = null;
-
-	get parent(): OpenLayersMapTool
-	{
-		return this._parent;
-	}
-
-	set parent(mapTool: OpenLayersMapTool)
-	{
-		this._parent = mapTool;
-	}
-
+	parent: OpenLayersMapTool = null;
 
 	private _source: ol.source.Source;
 
@@ -206,25 +188,33 @@ export default class AbstractLayer implements ILinkableObject
 
 	/* Handles initial apply of linked properties, adding/removing from map */
 
+	private addAndConfigureLayer()
+	{
+		let value = this.olLayer;
+		this.parent.map.addLayer(value);
+
+		this.opacity.addGroupedCallback(this, () => value.set("opacity", this.opacity.value), true);
+		this.visible.addGroupedCallback(this, () => value.set("visible", this.visible.value), true);
+		this.selectable.addGroupedCallback(this, () => value.set("selectable", this.selectable.value), true);
+		let index = this.parent.layers.getObjects().indexOf(this);
+		value.setZIndex(index + 2);
+
+		value.set("layerObject", this); /* Need to store this backref */
+		this.onLayerReady();
+	}
+
 	set olLayer(value:ol.layer.Layer)
 	{
-		if (!this.parent)
-		{
-			WeaveAPI.Scheduler.callLater(this, () => { this.olLayer = value });
+		if (!this.parent || !this.parent.map) {
+			console.log("Delaying configuration of layer until map is ready.");
+			WeaveAPI.Scheduler.callLater(this, ()=>{this.olLayer = value});
 			return;
 		}
+
 		if (value)
 		{
 			this._olLayer = value;
-			this.parent.map.addLayer(value);
-
-			this.opacity.addGroupedCallback(this, () => value.set("opacity", this.opacity.value), true);
-			this.visible.addGroupedCallback(this, () => value.set("visible", this.visible.value), true);
-			this.selectable.addGroupedCallback(this, () => value.set("selectable", this.selectable.value), true);
-			let index = this.parent.layers.getObjects().indexOf(this);
-			value.setZIndex(index + 2);
-
-			value.set("layerObject", this); /* Need to store this backref */
+			this.addAndConfigureLayer();
 		}
 	}
 
