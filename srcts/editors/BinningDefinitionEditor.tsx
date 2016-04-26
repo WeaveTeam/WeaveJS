@@ -12,6 +12,9 @@ import BinNamesList from "../ui/BinNamesList";
 import ReactUtils from "../utils/ReactUtils";
 import Button from "../semantic-ui/Button";
 import ComboBox from "../semantic-ui/ComboBox";
+import SmartComponent from "../ui/SmartComponent";
+import {DynamicTableClassNames} from "../utils/ReactUtils";
+import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -28,8 +31,8 @@ import StandardDeviationBinningDefinition = weavejs.data.bin.StandardDeviationBi
 import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
 import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
 import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
-import SmartComponent from "../ui/SmartComponent";
-import {DynamicTableClassNames} from "../utils/ReactUtils";
+import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
 
 export interface BinningDefinitionEditorProps
 {
@@ -361,6 +364,12 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 						{
 							ReactUtils.generateTable( null,
 							[
+								[
+									Weave.lang("Group by"),
+									<SelectableAttributeComponent attributeName={ 'Group by' }
+									                              attributes={ new Map<string, (IColumnWrapper|ILinkableHashmap)>().set('Group by', this.props.column.internalDynamicColumn ) }
+									                              linkToToolEditorCrumb={ this.props.linktoToolEditorCrumb }/>
+								],
 								[
 									sessionUILabel ,
 									sessionUI
