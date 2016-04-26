@@ -306,7 +306,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					return 2;
 			}
 		} );
-		console.log("sortedREfs", sortedRefs.reverse());
 		return sortedRefs.reverse();
 	}
 
