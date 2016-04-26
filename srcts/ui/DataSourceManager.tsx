@@ -95,6 +95,16 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	refreshDataSource(dataSource:IDataSource)
 	{
 		dataSource.hierarchyRefresh.triggerCallbacks();
+		
+		// TEMPORARY SOLUTION until all data sources behave correctly - force creating a new copy
+		var root = this.props.dataMenu.weave.root;
+		var name = root.getName(dataSource);
+		if (name)
+		{
+			var names = root.getNames();
+			root.requestObjectCopy(name, dataSource);
+			root.setNameOrder(names);
+		}
 	}
 
 	removeDataSource(dataSource:IDataSource)
