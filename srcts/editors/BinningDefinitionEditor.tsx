@@ -29,6 +29,7 @@ import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
 import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
 import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
 import SmartComponent from "../ui/SmartComponent";
+import {DynamicTableClassNames} from "../utils/ReactUtils";
 
 export interface BinningDefinitionEditorProps
 {
@@ -256,10 +257,25 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 		return linkReactStateRef(this, {value}, 500);
 	}
 
-	private hasOverrideMinAndMax()
+	private hasOverrideMinAndMax():boolean
 	{
 		var binDef:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
-		return binDef && binDef.overrideInputMin && binDef.overrideInputMax;
+		if(binDef)
+		{
+			if(binDef.overrideInputMin && binDef.overrideInputMax)
+			{
+				return true
+			}
+			else
+			{
+				return false;
+			}
+
+		}else
+		{
+			return false
+		}
+		
 	}
 
 	private getBinDefRenderProps(binDef:AbstractBinningDefinition):any{
@@ -313,9 +329,8 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 
 		var options = Array.from(this.binLabelToBin.keys()) as string[];
 
-		let selectedBinUI:JSX.Element;
-		let sessionUILabel:JSX.Element;
-		let sessionUI:JSX.Element;
+		let sessionUILabel:React.ReactChild;
+		let sessionUI:React.ReactChild;
 		let selectedBinDefn:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
 		let selectedDefinitionName = selectedBinDefn ? BinningDefinitionEditor.binClassToBinLabel.get(selectedBinDefn.constructor as typeof AbstractBinningDefinition) : "None"
 		
@@ -323,32 +338,46 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 		{
 			let renderProps:any = this.getBinDefRenderProps(selectedBinDefn);
 			sessionUILabel = renderProps.sessionObjectLabel ? <span style={ {whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span> : null;
-			sessionUI = renderProps.sessionObjectToLink ? <StatefulTextField style={ {width: 60} }
-			                                                                 type="text"
+			sessionUI = renderProps.sessionObjectToLink ? <StatefulTextField type="text"
 			                                                                 ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}/> : null;
-			
-			selectedBinUI = <HBox className="weave-padded-hbox"  style={ {alignItems: "center"} }>
-								{sessionUILabel}
-								{sessionUI}
-								<HelpIcon style={ {fontSize: "initial"} }> { Weave.lang(renderProps.helpMessage) } </HelpIcon>
-							</HBox>;
 
-			return <VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto"}}>
-						<ComboBox options={options}
-						          value={selectedDefinitionName}
-						          onChange={(binLabel) => this.setBinningDefinition(this.binLabelToBin.get(binLabel))}/>
-						{selectedBinUI}
+			let isMinMaxUI :boolean = this.hasOverrideMinAndMax() ;
+
+			var tableCellClassName:DynamicTableClassNames = {
+				td: ["left-cell","right-cell"]
+			};
+
+			return <VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto" ,border:"none"}}>
+						<HBox className="weave-padded-hbox"  style={ {alignItems: "center"} }>
+							<ComboBox style={ {flex:1} }
+							          options={options}
+							          value={selectedDefinitionName}
+							          onChange={(binLabel) => this.setBinningDefinition(this.binLabelToBin.get(binLabel))}/>
+							<HelpIcon style={ {fontSize: "initial"} }>
+								{ Weave.lang(renderProps.helpMessage) }
+							</HelpIcon>
+						</HBox>
+
 						{
-							this.hasOverrideMinAndMax() ?
-								<HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
-									<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range:")}</span>
-									<StatefulTextField type="number" style={{flex: 1}}
-									                   ref={this.linkOverride("overrideInputMin")} placeholder="min"/>
-									<StatefulTextField type="number" style={{flex: 1}}
-									                   ref={this.linkOverride("overrideInputMax")} placeholder="max"/>
-								</HBox>
-								: null
+							ReactUtils.generateTable( null,
+							[
+								[
+									sessionUILabel ,
+									sessionUI
+								],
+								[
+									isMinMaxUI ? <span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range:")}</span> : null,
+									isMinMaxUI ? <HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
+													<StatefulTextField type="number" style={{flex: 1}}
+													                   ref={this.linkOverride("overrideInputMin")} placeholder="min"/>
+													<StatefulTextField type="number" style={{flex: 1}}
+													                   ref={this.linkOverride("overrideInputMax")} placeholder="max"/>
+												</HBox> : null
+	
+								]
+							] as React.ReactChild[][],{},tableCellClassName)
 						}
+
 						<HBox style={ {flex: 1} }>
 							<BinNamesList binningDefinition={selectedBinDefn as AbstractBinningDefinition}/>
 						</HBox>
