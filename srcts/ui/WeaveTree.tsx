@@ -46,6 +46,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		}
 		if (!_.isEqual(nextProps.initialSelectedItems, this.props.initialSelectedItems))//TODO does not work with _.IsEqual
             this.setState({ selectedItems: nextProps.initialSelectedItems || [] });
+        if (!_.isEqual(nextProps.initialOpenItems, this.props.initialOpenItems))
+			this.setState({ openItems: nextProps.initialOpenItems });
 	}
 
 	getOpen(node: IWeaveTreeNode): boolean {
