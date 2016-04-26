@@ -4,11 +4,13 @@ import {MenuItemProps} from "../react-ui/Menu";
 import PopupWindow from "../react-ui/PopupWindow";
 import IVisTool = weavejs.api.ui.IVisTool;
 import * as WeaveUI from "../WeaveUI";
+import MouseoverController from "../editors/MouseoverController";
 
 import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
 export default class ControllersMenu implements MenuBarItemProps
 {
@@ -27,6 +29,10 @@ export default class ControllersMenu implements MenuBarItemProps
 			{
 				label: Weave.lang("Color Controller"),
 				click: () => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)
+			},
+			{
+				label: Weave.lang("Mouseover Controller"),
+				click: () => MouseoverController.open(this.weave, this.weave.getObject("Probe Header Columns") as ILinkableHashMap,this.weave.getObject("Probed Columns") as ILinkableHashMap)
 			},
 			{},
 			this.getCreateObjectItems()
