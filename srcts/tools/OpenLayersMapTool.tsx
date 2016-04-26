@@ -200,19 +200,19 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		
 		let editorFields = [
 			[
-				<span className="weave-sidebar-label">{Weave.lang("Title")}</span>,
+				Weave.lang("Title"),
 				<HBox>
 					<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) } placeholder={this.defaultPanelTitle}/>
 				</HBox>
 			],
 			[
-				<span className="weave-sidebar-label">{Weave.lang("Control location")}</span>,
+				Weave.lang("Control location"),
 				<HBox>
 					<ComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
 				</HBox>
 			],
 			[
-				<span className="weave-sidebar-label">{Weave.lang("Zoom range")}</span>,
+				Weave.lang("Zoom range"),
 				<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
 					<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
 					{"-"}
@@ -220,7 +220,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				</HBox>
 			],
 			[
-				<span className="weave-sidebar-label">{Weave.lang("Zoom/Pan Boundaries")}</span>,
+				Weave.lang("Zoom/Pan Boundaries"),
 				<VBox>
 					<span style={{display: this.overrideExtentDefined() ? null : "none" }}>
 						<HBox className="weave-padded-hbox" style={{ alignItems: 'center' }}>
@@ -255,7 +255,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })} label={Weave.lang("Show zoom slider")}/>
 			],
 			[
-				<span className="weave-sidebar-label">{Weave.lang("Projection SRS")}</span>,
+				Weave.lang("Projection SRS"),
 				<HBox>
 					<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
 				</HBox>
