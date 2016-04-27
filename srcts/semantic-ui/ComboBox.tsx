@@ -84,9 +84,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		{
 			this.setState({value});
 		}
-		else {
-			this.setState({value:null});
-		}
 	}
 
 	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
