@@ -223,7 +223,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         return (
             <VBox className="weave-padded-vbox" style={ {flex:1} }>
 				{
-					(this.attributeNames.length > 0)
+					(this.attributeNames.length > 1)
 					?	<ButtonGroupBar activeButton={ this.props.attributeName }
 							items={ this.attributeNames }
 							clickHandler={this.handleSelectedAttribute}
@@ -240,7 +240,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 					:	null
 				}
 				{
-					Weave.IS(this.selectedAttribute, ILinkableHashMap) ? "WORK IN PROGRESS" : null
+					Weave.IS(this.selectedAttribute, ILinkableHashMap) ? "STILL BUGGY" : null
 				}
                 <HDividedBox style={ {flex:1} } loadWithEqualWidthChildren={true}>
 				   <div style={{display:"flex"}}>
