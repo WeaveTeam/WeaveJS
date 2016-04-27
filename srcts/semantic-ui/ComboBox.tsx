@@ -108,19 +108,21 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		this.element = ReactDOM.findDOMNode(this);
 		let selector = ($(this.element) as any);
 		selector.dropdown({
-			onChange: (selected:number|string, text:string) => {
+			onChange: (selected:string, text:string) => {
 				if (this.props.onNew && text) {
 					this.props.onNew && this.props.onNew(text);
 				}
 				else {
 					if (this.props.type !== "multiple") {
-						let value:any = this.state.options[selected as number] && this.state.options[selected as number].value;
+						let index = Number(selected.substr(2));
+						let value:any = this.state.options[index] && this.state.options[index].value;
 						this.setState({value});
 					} else {
 						if (selected !== "") {
-							let indices:number[] = (selected as string).split(",").map(Number);
+							let __indices:string[] = (selected as string).split(",");
 
-							let values:any[] = indices.map((index) => {
+							let values:any[] = __indices.map((__index) => {
+								let index = Number(__index.substr(2));
 								return this.state.options[index] && this.state.options[index].value;
 							});
 							this.setState({value: values});
@@ -131,8 +133,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			onClick: (index:number) => {
 				this.props.onClick && this.props.onClick(null);
 			},
-			onAdd: (addedValue:number, addedText:string) => {
-				let option = this.state.options[addedValue];
+			onAdd: (addedValue:string, addedText:string) => {
+				let index = Number(addedValue.substr(2));
+				let option = this.state.options[index];
 				let value:any = option && option.value;
 				let values:any = _.clone(this.state.value);
 				if (ReactUtils.hasFocus(this) && !_.includes(values, value)) {
@@ -141,8 +144,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					this.props.onAdded && this.props.onAdded(value);
 				}
 			},
-			onRemove: (removedValue:number, removedText:string) => {
-				let option = this.state.options[removedValue];
+			onRemove: (removedValue:string, removedText:string) => {
+				let index = Number(removedValue.substr(2));
+				let option = this.state.options[index];
 				let value:any = option && option.value;
 				if (ReactUtils.hasFocus(this)) {
 					let values:any = _.without(this.state.value, value);
@@ -152,7 +156,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			},
 			context: this.props.context || window,
 			direction: this.props.direction || 'auto',
-			allowAdditions: this.props.allowAdditions || false
+			allowAdditions: this.props.allowAdditions || false,
+			match: "text"
 		});
 
 		if (this.props.type === "multiple") {
@@ -160,7 +165,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			this.state.value.forEach((item:any) => {
 				let index:number = this.getIndexFromValue(item);
 				if (index >= 0)
-					indices.push(String(index));
+					indices.push("__"+index);
 			});
 			selector.dropdown('set exactly', indices);
 		}
@@ -169,7 +174,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			//single selection
 			let index = this.getIndexFromValue(this.state.value);
 			if (index >= 0)
-				selector.dropdown('set exactly', String(index));
+				selector.dropdown('set exactly', "__"+index);
 			else {
 				if (!this.props.onNew)
 					selector.dropdown('clear');
@@ -192,7 +197,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					: null
 				}
 				{
-					this.state.options && this.state.options.map((option, index) => <div className="item" style={this.props.optionStyle} key={index} data-value={index}>{Weave.lang(option.label)}</div>)
+					//We are using __ index because semantic UI will misbehave when data-value and labels collide
+					this.state.options && this.state.options.map((option, index) => <div className="item" style={this.props.optionStyle} key={index} data-value={"__"+index}>{Weave.lang(option.label)}</div>)
 				}
 				</div>
 			</div>
