@@ -295,7 +295,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 	renderTitleEditor():React.ReactChild[][]
 	{
-		return[
+		return [
 			[
 				Weave.lang("Title"),
 				<StatefulTextField
@@ -303,25 +303,28 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 					ref={ linkReactStateRef(this, { value:this.props.attributeMenuTool.panelTitle }) }
 				/>
 			]
-		]
+		];
 	}
 
 	render ()
 	{
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-
 		return (
 			<VBox>
 				{
 					this.openTools && this.openTools.length > 0
-					?	ReactUtils.generateTable(null,
-						this.toolConfigs.concat(renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction).concat(this.renderTitleEditor())),
-						{},tableCellClassNames)
+					?	ReactUtils.generateTable({
+							body: [].concat(
+								this.toolConfigs,
+								renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction),
+								this.renderTitleEditor()
+							),
+							classes: {
+								td: [
+									"weave-left-cell",
+									"weave-right-cell"
+								]
+							}
+						})
 					:	<div>{ 'Select a visualization from the Visualizations menu' }</div>
 				}
 			</VBox>

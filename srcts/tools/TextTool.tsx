@@ -53,30 +53,29 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 
 	renderEditor():JSX.Element
 	{
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-
 		return (
 			<VBox style={{flex:1}}>
 				{
 					super.renderEditor()
 				}
 				<HBox>
-					{ReactUtils.generateTable(
-						null,
-						[["Text", this.htmlText]].map((row:[string, LinkableString]) => [
-							Weave.lang(row[0]),
-							<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>
-						]),
-						{},tableCellClassNames
-					)}
+					{ReactUtils.generateTable({
+						body: [
+							[
+								Weave.lang("Text"),
+								<StatefulTextField ref={ linkReactStateRef(this, {value: this.htmlText}) }/>
+							]
+						],
+						classes: {
+							td: [
+								"weave-left-cell",
+								"weave-right-cell"
+							]
+						}
+					})}
 				</HBox>
 			</VBox>
-		)
+		);
 	}
 
 	get deprecatedStateMapping()

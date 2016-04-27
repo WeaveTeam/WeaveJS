@@ -145,19 +145,18 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 			]
 		}
 
-
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-		
-		return ReactUtils.generateTable(
-			null,
-			editorFields.concat(this.props.editableFields),
-			{},tableCellClassNames
-		);
+		return ReactUtils.generateTable({
+			body: [].concat(
+				editorFields,
+				this.props.editableFields
+			),
+			classes: {
+				td: [
+					"weave-left-cell",
+					"weave-right-cell"
+				]
+			}
+		});
 	}
 }
 

@@ -99,7 +99,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		//todo replace with statefull textfield readonly true for binlabel
 		return (
 			<HBox className="weave-padded-hbox" style={ { alignItems: "center"} }>
-				<span style={{flex:1}}>{binLabel}</span>
+				<span style={{flex: 1, textAlign: "right"}}>{binLabel}</span>
 				<Button onClick={this.onBinButtonClick}>
 					<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
 				</Button>
@@ -346,12 +346,8 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 
 			let isMinMaxUI :boolean = this.hasOverrideMinAndMax() ;
 
-			var tableCellClassName:DynamicTableClassNames = {
-				td: ["weave-left-cell","weave-right-cell"]
-			};
-
-			return <VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto" ,border:"none"}}>
-						<HBox className="weave-padded-hbox"  style={ {alignItems: "center"} }>
+			return <VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto", border: "none"}}>
+						<HBox className="weave-padded-hbox" style={ {alignItems: "center"} }>
 							<ComboBox style={ {flex:1} }
 							          options={options}
 							          value={selectedDefinitionName}
@@ -361,9 +357,8 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 							</HelpIcon>
 						</HBox>
 
-						{
-							ReactUtils.generateTable( null,
-							[
+						{ReactUtils.generateTable({
+							body: [
 								[
 									Weave.lang("Group by"),
 									<SelectableAttributeComponent attributeName={ 'Group by' }
@@ -384,8 +379,11 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 												</HBox> : null
 	
 								]
-							] as React.ReactChild[][],{},tableCellClassName)
-						}
+							],
+							classes: {
+								td: ["weave-left-cell", "weave-right-cell"]
+							}
+						})}
 
 						<HBox style={ {flex: 1} }>
 							<BinNamesList binningDefinition={selectedBinDefn as AbstractBinningDefinition}/>

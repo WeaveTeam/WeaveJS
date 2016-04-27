@@ -229,30 +229,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	getMarginEditor():React.ReactChild[][]
 	{
-		// let marginCellsUI:JSX.Element = (
-		// 	<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
-		// 		{ this.renderNumberEditor(this.margin.left, 1) }
-		// 		<VBox className="weave-padded-vbox" style={{flex: 1}}>
-		// 			{ this.renderNumberEditor(this.margin.top, null) }
-		// 			{ this.renderNumberEditor(this.margin.bottom, null) }
-		// 		</VBox>
-		// 		{ this.renderNumberEditor(this.margin.right, 1) }
-		// 	</HBox>
-		// );
-		// 
-		// let marginUI:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[<span className="weave-sidebar-label">{ Weave.lang("Margins") }</span>,marginCellsUI]]);
-		// //div wrapper is must if this dom becomes child of flexBox display has to be block for overflow to work correctly
-		// return (
-		// 	<div>
-		// 		<VBox className="weave-padded-vbox" >
-		// 			{ renderSelectableAttributes(this, linktoToolEditorCrumbFunction) }
-		// 			<br/>
-		// 			{marginUI}
-		// 			<br/>
-		// 			{this.renderTitleEditors()}
-		// 		</VBox>
-		// 	</div>
-		// );
 		return [
 			[
 				Weave.lang("Margins"),
@@ -270,26 +246,19 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	
 	getTitlesEditor():React.ReactChild[][]
 	{
-		// var gridUIs:JSX.Element[][] = [
-		// 	["Title", this.panelTitle],
-		// 	["X Axis Title", this.xAxisName],
-		// 	["Y Axis Title", this.yAxisName]
-		// ].map((row:[string, LinkableString]) => {
-		// 	return [<span className="weave-sidebar-label">{Weave.lang(row[0])}</span>,
-		// 			<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>]
 		return [
 			[
-				"Chart",
+				Weave.lang("Chart"),
 				this.panelTitle,
 				this.defaultPanelTitle
 			],
 			[
-				"X axis",
+				Weave.lang("X axis"),
 				this.xAxisName,
 				this.defaultXAxisLabel
 			],
 			[
-				"Y axis",
+				Weave.lang("Y axis"),
 				this.yAxisName,
 				this.defaultYAxisLabel
 			]
@@ -304,94 +273,12 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-
-		return <Accordion titles={["Data", "Titles" , "Margins"]}>
-
-						{
-							ReactUtils.generateTable(
-								null,
-								this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction),
-								{}, tableCellClassNames
-							)
-						}
-						{
-							ReactUtils.generateTable(
-								null,
-								 this.getTitlesEditor(),
-								{}, tableCellClassNames
-							)
-						}
-						{
-							ReactUtils.generateTable(
-								null,
-								this.getMarginEditor(),
-								{}, tableCellClassNames
-							)
-						}
-
-				</Accordion>
+		return Accordion.render(
+			["Data", this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction)],
+			["Titles", this.getTitlesEditor()],
+			["Margins", this.getMarginEditor()]
+		);
 	}
-
-	
-
-	// renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
-	// {
-	// 	var labelStyle:React.CSSProperties = {
-	// 		textAlign: 'right',
-	// 		display:"flex",
-	// 		justifyContent: "flex-end",
-	// 	};
-	// 
-	// 	let marginCellsUI:JSX.Element = (
-	// 		<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
-	// 			{ this.renderNumberEditor(this.margin.left, 1) }
-	// 			<VBox className="weave-padded-vbox" style={{flex: 1}}>
-	// 				{ this.renderNumberEditor(this.margin.top, null) }
-	// 				{ this.renderNumberEditor(this.margin.bottom, null) }
-	// 			</VBox>
-	// 			{ this.renderNumberEditor(this.margin.right, 1) }
-	// 		</HBox>
-	// 	);
-	// 
-	// 	let marginUI:JSX.Element = ReactUtils.generateGridLayout(["four","twelve"],[[<span style={labelStyle}>{  }</span>,marginCellsUI]]);
-	// 	//div wrapper is must if this dom becomes child of flexBox display has to be block for overflow to work correctly
-	// 	return (
-	// 		<div>
-	// 			<VBox className="weave-padded-vbox" >
-	// 				{ renderSelectableAttributes(this, linktoToolEditorCrumbFunction) }
-	// 				<br/>
-	// 				{marginUI}
-	// 				<br/>
-	// 				{this.renderTitleEditors()}
-	// 			</VBox>
-	// 		</div>
-	// 	);
-	// }
-
-	// renderTitleEditors=():JSX.Element=>
-	// {
-	// 	var labelStyle:React.CSSProperties = {
-	// 		textAlign: 'right',
-	// 		display:"flex",
-	// 		justifyContent: "flex-end"
-	// 	};
-	// 	var gridUIs:JSX.Element[][] = [
-	// 		["Title", this.panelTitle],
-	// 		["X Axis Title", this.xAxisName],
-	// 		["Y Axis Title", this.yAxisName]
-	// 	].map((row:[string, LinkableString]) => {
-	// 		return [<span style={ labelStyle }>{Weave.lang(row[0])}</span>,
-	// 				<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]}) }/>]
-	// 	});
-	// 
-	// 	return ReactUtils.generateGridLayout(["four","twelve"],gridUIs);
-	// }
 
 	get deprecatedStateMapping():Object
 	{

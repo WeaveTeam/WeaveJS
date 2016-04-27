@@ -188,19 +188,17 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	}
 
 	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(linkFunction:Function):JSX.Element {
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-
-		return ReactUtils.generateTable(
-			null,
-			renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(this.getTitlesEditor()),
-			{},tableCellClassNames
-		);
+	renderEditor(linkFunction:Function):JSX.Element
+	{
+		return ReactUtils.generateTable({
+			body: renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(this.getTitlesEditor()),
+			classes: {
+				td: [
+					"weave-left-cell",
+					"weave-right-cell"
+				]
+			}
+		});
 	};
 
 	getTitlesEditor():React.ReactChild[][]

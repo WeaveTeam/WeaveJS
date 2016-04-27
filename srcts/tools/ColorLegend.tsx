@@ -445,16 +445,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	
 	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-		
-		return ReactUtils.generateTable(
-			null,
-			renderSelectableAttributes(this.selectableAttributes, linktoToolEditorCrumbFunction).concat(
+		return ReactUtils.generateTable({
+			body: [].concat(
+				renderSelectableAttributes(this.selectableAttributes, linktoToolEditorCrumbFunction),
 				this.getTitlesEditor(),
 				[
 					[
@@ -478,8 +471,13 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					]
 				]
 			),
-			{},tableCellClassNames
-		);
+			classes: {
+				td: [
+					"weave-left-cell",
+					"weave-right-cell"
+				]
+			}
+		});
 	}
 
 	getTitlesEditor():React.ReactChild[][]

@@ -151,7 +151,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 
 	renderEditor(linkToToolEditorCrumb:Function = null):JSX.Element{
 
-		if(!this.filter.target) // scenario arises when tool opened from menu
+		if (!this.filter.target) // scenario arises when tool opened from menu
 			this.initLater();
 		return <DataFilterEditor filterEditor={ this.filterEditor }  linkToToolEditorCrumb={linkToToolEditorCrumb} selectableAttributes={ this.selectableAttributes }  />
 	}
@@ -239,12 +239,13 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 	onFilterOptionChange = (event:Event)=>
 	{
 		var value:string | boolean = (event.target as HTMLInputElement).value;
-		if(this.props.filterEditor.target){
-			if(this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
+		if (this.props.filterEditor.target)
+		{
+			if (this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
 			{
 				(this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state = value as string;
 			}
-			if(this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
+			if (this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
 			{
 				var forceDiscreteValues:LinkableBoolean  = (this.props.filterEditor.target as NumericRangeDataFilterEditor).forceDiscreteValues;
 				forceDiscreteValues.state = value as boolean;
@@ -261,7 +262,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 	//UI event handler for attribute menu layout
 	handleFilterTypeChange = (selectedItem:string):void =>
 	{
-		if(selectedItem)
+		if (selectedItem)
 		{
 			var filterEditorItem:any = this.filterEditorMap[selectedItem];
 
@@ -273,7 +274,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 	// event listener for Filter Options
 	handleContinuousFilterOptionChange = (isSelected:boolean)=>
 	{
-		if(this.props.filterEditor.target)
+		if (this.props.filterEditor.target)
 		{
 			var forceDiscreteValues:LinkableBoolean  = (this.props.filterEditor.target as NumericRangeDataFilterEditor).forceDiscreteValues;
 			forceDiscreteValues.state = isSelected;
@@ -283,7 +284,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 	// event listener for Filter Options
 	handleDiscreteFilterOptionChange = (selectedItem:string)=>
 	{
-		if(this.props.filterEditor.target)
+		if (this.props.filterEditor.target)
 		{
 			(this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state = selectedItem as string;
 		}
@@ -303,7 +304,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 
 		let filterEditorItem:any = null;
 		// session props are used to identify the respective UI
-		if(this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
+		if (this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
 		{
 			selectedFilter = FILTER_TYPE.CONTINUOUS;
 			filterEditorItem = this.filterEditorMap[FILTER_TYPE.CONTINUOUS]
@@ -316,19 +317,19 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 				/>
 			]
 		}
-		else if(this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
+		else if (this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
 		{
 			selectedFilter = FILTER_TYPE.DISCRETE;
 			filterEditorItem = this.filterEditorMap[FILTER_TYPE.DISCRETE]
 			selectedOption = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;
-			filterOptionUI =  [
+			filterOptionUI = [
 				<span style={labelStyle}>{ Weave.lang("Layout") }</span>,
 				<ComboBox className="weave-sidebar-dropdown"
 				          value={ selectedOption }
 				          options={ filterEditorItem.options }
 				          onChange={ this.handleDiscreteFilterOptionChange }
 				/>
-			]
+			];
 		}
 
 		var filterEditorMapKeys:string[] = Object.keys(this.filterEditorMap);
@@ -344,20 +345,17 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 				/>
 
 			]
-		]
+		];
 
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-		
-		return ReactUtils.generateTable(
-			null,
-			renderSelectableAttributes(this.props.selectableAttributes, this.props.linkToToolEditorCrumb).concat(editorConfigs),
-			{},tableCellClassNames
-		);
+		return ReactUtils.generateTable({
+			body: renderSelectableAttributes(this.props.selectableAttributes, this.props.linkToToolEditorCrumb).concat(editorConfigs),
+			classes: {
+				td: [
+					"weave-left-cell",
+					"weave-right-cell"
+				]
+			}
+		});
 	}
 
 }

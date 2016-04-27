@@ -174,8 +174,18 @@ export default class ReactUtils
 				</div>;
 	}
 	
-	static generateTable(header:React.ReactChild[], body:React.ReactChild[][], styles:DynamicTableStyles = {}, classes:DynamicTableClassNames = {}):JSX.Element
+	static generateTable(params:{
+			header?:React.ReactChild[],
+			body:React.ReactChild[][],
+			styles?:DynamicTableStyles,
+			classes?:DynamicTableClassNames,
+			props?:React.HTMLProps<HTMLTableElement>
+		}):JSX.Element
 	{
+		var {header, body, styles, classes, props} = params;
+		styles = styles || {};
+		classes = classes || {};
+
 		var tableHead = header && (
 			<thead style={styles.thead} className={classes.thead}>
 		  		{

@@ -72,7 +72,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		var selectedNode = props.dataSource.getHierarchyRoot();
 		var nodes = selectedNode && selectedNode.getChildren();
 		var initialSelectedNode = nodes && nodes[0] && Weave.IS(nodes[0], IColumnReference) && nodes[0];
-		if(!DataSourceEditor.nodeEqualityFunc(initialSelectedNode,this.state.selectedColumn))
+		if (!DataSourceEditor.nodeEqualityFunc(initialSelectedNode,this.state.selectedColumn))
 			this.updateColumnTarget([initialSelectedNode]);
 	}
 	
@@ -94,12 +94,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		return [
 		];
 	}
-	/*
-	shouldComponentUpdate()
-	{
-		return Weave.detectChange(this, this.column);
-	}
-	*/
+
 	renderFields():JSX.Element
 	{
 		let dataSource = this.props.dataSource;
@@ -112,7 +107,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 			]
 		};
 
-		return ReactUtils.generateTable(null, this.editorFields, tableStyles);
+		return ReactUtils.generateTable({body: this.editorFields, styles: tableStyles});
 	}
 	
 	showColumns(selectedItems:IWeaveTreeNode[])
@@ -120,7 +115,7 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 
 		var nodes = selectedItems && selectedItems.length && selectedItems[0].getChildren();
 		var initialSelectedNode = nodes && nodes[0] && Weave.IS(nodes[0], IColumnReference) && nodes[0];
-		if(initialSelectedNode)
+		if (initialSelectedNode)
 			this.updateColumnTarget([initialSelectedNode]);
 
 		this.setState({
@@ -135,7 +130,8 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		{
 			var meta = ref.getColumnMetadata();
 			this.columnWatcher.target = ref.getDataSource().getAttributeColumn(meta);
-		} else
+		}
+		else
 		{
 			// clear column if the tree selection was removed
 			this.columnWatcher.target = null;

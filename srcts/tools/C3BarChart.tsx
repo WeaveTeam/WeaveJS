@@ -571,16 +571,8 @@ export default class C3BarChart extends AbstractC3Tool
 	// 					[ <span className="weave-sidebar-label">{Weave.lang("Grouping Mode")}</span>, <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
 	renderEditor(linkFunction:Function = null):JSX.Element
 	{
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-		
-		return ReactUtils.generateTable(
-			null,
-			[].concat(
+		return ReactUtils.generateTable({
+			body: [].concat(
 				this.getSelectableAttributesEditor(linkFunction),
 				[
 					[ 
@@ -604,8 +596,13 @@ export default class C3BarChart extends AbstractC3Tool
 				this.getTitlesEditor(),
 				this.getMarginEditor()
 			),
-			{},tableCellClassNames
-		);
+			classes: {
+				td: [
+					"weave-left-cell",
+					"weave-right-cell"
+				]
+			}
+		});
 	}
 
 	public get deprecatedStateMapping():Object

@@ -190,114 +190,95 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			(value) => { return { label: Weave.lang(_.startCase(value.vertical) + " " + _.startCase(value.horizontal)), value} }
 		);
 
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-
-
-
 		let renderNumberEditor = (linkableNumber:LinkableNumber, flex:number)=>
 		{
 			var style: React.CSSProperties = { textAlign: "center", flex, minWidth: 60 };
 			return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, { value: linkableNumber }) }/>;	
 		}
 
-		
-		return <Accordion titles={["Titles","Controls","Zoom","Layers"]}>
-					{
-						ReactUtils.generateTable(
-							null,
-							[
-								[
-									Weave.lang("Title"),
-									<HBox>
-										<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) } placeholder={this.defaultPanelTitle}/>
-									</HBox>
-								]
-							]  as React.ReactChild[][],
-							{},tableCellClassNames)
-					}
-					{
-						ReactUtils.generateTable(
-							null,
-							[
-								[
-									Weave.lang("Control location"),
-									<HBox>
-										<ComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
-									</HBox>
-								],
-								[
-									Weave.lang("Projection SRS"),
-									<HBox>
-										<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
-									</HBox>
-								]
-							]  as React.ReactChild[][],
-							{},tableCellClassNames)
-					}
-					{
-						ReactUtils.generateTable(
-							null,
-							[
-								[
-									Weave.lang("Zoom range"),
-									<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
-										<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
-										{"-"}
-										<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
-									</HBox>
-								],
-								[
-									<span style={ {whiteSpace:"normal"} }> {Weave.lang("Zoom/Pan Boundaries")}</span>,
-									<VBox>
-										<span style={{display: this.overrideExtentDefined() ? null : "none" }}>
-											<HBox className="weave-padded-hbox" style={{ alignItems: 'center' }}>
-												{ renderNumberEditor(this.extentOverride.xMin, 1) }
-												<VBox className="weave-padded-vbox" style={{ flex: 1 }}>
-													{ renderNumberEditor(this.extentOverride.yMax, null) }
-													{ renderNumberEditor(this.extentOverride.yMin, null) }
-												</VBox>
-												{ renderNumberEditor(this.extentOverride.yMin, 1) }
-											</HBox>
-										</span>
-										<HBox>
-											<Button	onClick={this.setOverrideExtent} style={ {borderTopRightRadius:0 , borderBottomRightRadius:0} }>
-												{Weave.lang("Use current zoom") }
-											</Button>
-											<Button	onClick={this.clearOverrideExtent} style={ {borderTopLeftRadius:0 , borderBottomLeftRadius:0} }>
-												{Weave.lang("Use data bounds")}
-											</Button>
-										</HBox>
+		return Accordion.render(
+			[
+				Weave.lang("Titles"),
+				[
+					[
+						Weave.lang("Title"),
+						<HBox>
+							<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) } placeholder={this.defaultPanelTitle}/>
+						</HBox>
+					]
+				],
+			],
+			[
+				Weave.lang("Controls"),
+				[
+					[
+						Weave.lang("Control location"),
+						<HBox>
+							<ComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
+						</HBox>
+					],
+					[
+						Weave.lang("Projection SRS"),
+						<HBox>
+							<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
+						</HBox>
+					]
+				]
+			],
+			[
+				Weave.lang("Zoom"),
+				[
+					[
+						Weave.lang("Zoom range"),
+						<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
+							<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
+							{"-"}
+							<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
+						</HBox>
+					],
+					[
+						<span style={ {whiteSpace:"normal"} }> {Weave.lang("Zoom/Pan Boundaries")}</span>,
+						<VBox>
+							<span style={{display: this.overrideExtentDefined() ? null : "none" }}>
+								<HBox className="weave-padded-hbox" style={{ alignItems: 'center' }}>
+									{ renderNumberEditor(this.extentOverride.xMin, 1) }
+									<VBox className="weave-padded-vbox" style={{ flex: 1 }}>
+										{ renderNumberEditor(this.extentOverride.yMax, null) }
+										{ renderNumberEditor(this.extentOverride.yMin, null) }
 									</VBox>
-								],
-								[
-									null,
-									<Checkbox
-										ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}
-										label={ Weave.lang("Snap zoom to base map") }
-										title={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }
-									/>
-								],
-								[
-									null,
-									<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })} label={Weave.lang("Show zoom slider")}/>
-								]
-							]  as React.ReactChild[][],
-							{},tableCellClassNames)
-					}
-
-					<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
-
-				</Accordion>
-
-
+									{ renderNumberEditor(this.extentOverride.yMin, 1) }
+								</HBox>
+							</span>
+							<HBox>
+								<Button	onClick={this.setOverrideExtent} style={ {borderTopRightRadius:0 , borderBottomRightRadius:0} }>
+									{Weave.lang("Use current zoom") }
+								</Button>
+								<Button	onClick={this.clearOverrideExtent} style={ {borderTopLeftRadius:0 , borderBottomLeftRadius:0} }>
+									{Weave.lang("Use data bounds")}
+								</Button>
+							</HBox>
+						</VBox>
+					],
+					[
+						null,
+						<Checkbox
+							ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}
+							label={ Weave.lang("Snap zoom to base map") }
+							title={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }
+						/>
+					],
+					[
+						null,
+						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })} label={Weave.lang("Show zoom slider")}/>
+					]
+				]
+			],
+			[
+				Weave.lang("Layers"),
+				<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
+			]
+		);
 	}
-
-
 
 	static DEFAULT_PROJECTION:string = "EPSG:4326";
 

@@ -566,169 +566,73 @@ export default class C3Histogram extends AbstractC3Tool
 		}
 	}
 
-
-
     //todo:(linktoToolEditorCrumbFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linktoToolEditorCrumbFunction:Function):JSX.Element
 	{
-
-
-		var tableCellClassNames = {
-			td: [
-				"weave-left-cell",
-				"weave-right-cell"
-			]
-		};
-
-		return <Accordion titles={["Data", "Binning / Coloring", "Titles", "Margins"]}>
-					{
-						ReactUtils.generateTable(
-							null,
-							[
-								[
-									Weave.lang("Group by"),
-									<SelectableAttributeComponent
-										attributeName={"Group by"}
-										attributes={this.selectableAttributes}
-						  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
-									/>
-								],
-								[
-									Weave.lang('Height values (optional)'),
-									<SelectableAttributeComponent
-										attributeName={"Height values (optional)"}
-										attributes={this.selectableAttributes}
-						  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
-									/>
-								],
-								[
-									Weave.lang("Aggregation method"),
-									<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
-								],
-								Weave.beta && [
-									null,
-									<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
-								],
-								[
-									null,
-									<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
-								]
-							],
-							{}, tableCellClassNames
-						)
-					}
-					{
-						ReactUtils.generateTable(
-							null,
-							[
-								[
-									Weave.lang("Binning method"),
-									<BinningDefinitionEditor compact={true}
-									                         binnedColumn={this.binnedColumn}
-									                         linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
-									                         onButtonClick={() => this.openColorController(1)}/>
-								],
-								[
-									Weave.lang("Color theme"),
-									<DynamicComponent
-										dependencies={[this.fill.color]}
-										render={() =>
-											<ColorRampEditor
-												compact={true}
-												linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
-												colorRamp={this.colorColumn && this.colorColumn.ramp}
-												onButtonClick={() => this.openColorController(0)}
-											/>
-										}
-									/>
-								]
-							] as React.ReactChild[][],
-							{}, tableCellClassNames
-						)
-					}
-					{
-						ReactUtils.generateTable(
-							null,
-							this.getTitlesEditor(),
-							{}, tableCellClassNames
-						)
-					}
-					{
-						ReactUtils.generateTable(
-							null,
-							this.getMarginEditor(),
-							{}, tableCellClassNames
-						)
-					}
-
-				</Accordion>;
-
-		/*return ReactUtils.generateTable(
-			null,
-			([
-				[
-					null,
-					<Checkbox
-						ref={(ref:Checkbox) => {
-							if (ref)
-								this.fill.color.addGroupedCallback(ref, () => {
-									ref.setState({
-										value: !!this.fill.color.internalDynamicColumn.targetPath
-									});
-								});
-						}}
-						onChange={(value) => {
-							if (this.fill.color.internalDynamicColumn.targetPath)
-							{
-								weavejs.data.ColumnUtils.unlinkNestedColumns(this.fill.color);
-								if (this.colorColumn)
-									this.colorColumn.ramp.state = [0x808080];
-							}
-							else
-								this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
-						}}
-					    label={Weave.lang("Link to global color column")}
-					/>
-					
-				]
-			] as React.ReactChild[][]).concat(
-				this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction),
+		var linkedColor:Boolean = !!this.fill.color.internalDynamicColumn.targetPath;
+		return Accordion.render(
+			[
+				Weave.lang("Data"),
 				[
 					[
-						Weave.lang("Color theme"),
-						<DynamicComponent
-							dependencies={[this.fill.color]}
-							render={() => 
-								<ColorRampEditor
-									compact={true}
-									colorRamp={this.colorColumn && this.colorColumn.ramp}
-									onButtonClick={() => this.openColorController(1)}
-								/>
-							}
+						Weave.lang("Group by"),
+						<SelectableAttributeComponent
+							attributeName={"Group by"}
+							attributes={this.selectableAttributes}
+			  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
 						/>
 					],
 					[
-						Weave.lang("Binning method"),
-						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(0)}/>
+						Weave.lang('Height values (optional)'),
+						<SelectableAttributeComponent
+							attributeName={"Height values (optional)"}
+							attributes={this.selectableAttributes}
+			  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
+						/>
 					],
-					[ 
+					[
 						Weave.lang("Aggregation method"),
 						<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
 					],
 					Weave.beta && [
 						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/> 
-						
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
 					],
 					[
 						null,
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
 					]
-				],
-				this.getTitlesEditor(),
-				this.getMarginEditor()
-			), {},tableCellClassNames
-		);*/
+				]
+			],
+			[
+				Weave.lang(linkedColor ? "Binning / Coloring" : "Binning"),
+				[
+					[
+						Weave.lang("Binning method"),
+						<BinningDefinitionEditor compact={true}
+						                         binnedColumn={this.binnedColumn}
+						                         linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+						                         onButtonClick={() => this.openColorController(1)}/>
+					],
+					linkedColor && [
+						Weave.lang("Color theme"),
+						<DynamicComponent
+							dependencies={[this.fill.color]}
+							render={() =>
+								<ColorRampEditor
+									compact={true}
+									linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+									colorRamp={this.colorColumn && this.colorColumn.ramp}
+									onButtonClick={() => this.openColorController(0)}
+								/>
+							}
+						/>
+					]
+				]
+			],
+			[Weave.lang("Titles"), this.getTitlesEditor()],
+			[Weave.lang("Margins"), this.getMarginEditor()]
+		);
 	}
 
     get deprecatedStateMapping()
