@@ -206,6 +206,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 					:	null
 				}
 				<SelectableAttributeComponent key={this.selectableAttributeComponentKey++}
+                        hideButton
 						style={{flex: null}}
 						attributeName={ this.state.selectedAttributeName }
 						attributes={ this.props.attributes}

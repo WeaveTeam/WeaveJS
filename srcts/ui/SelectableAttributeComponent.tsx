@@ -32,6 +32,7 @@ export interface ISelectableAttributeComponentProps
 	linkToToolEditorCrumb?:Function
 	showAsList?:boolean;
 	style?: React.CSSProperties;
+	hideButton?: boolean;
 }
 
 export interface ISelectableAttributeComponentState
@@ -107,20 +108,20 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	{
 		let attribute_ilhm_or_icw = this.props.attributes.get(this.props.attributeName);
 
+		let dropDownStyle: React.CSSProperties = this.props.hideButton ? {} : {
+			borderBottomRightRadius: 0,
+			borderTopRightRadius: 0
+		};
+
+		let buttonStyle: React.CSSProperties = {
+			borderBottomLeftRadius: 0,
+			borderTopLeftRadius: 0,
+			borderLeft: "none"
+		};
+
 		if (Weave.IS(attribute_ilhm_or_icw, IColumnWrapper))
 		{
 			let attribute = attribute_ilhm_or_icw as IColumnWrapper;
-
-			let dropDownStyle:React.CSSProperties = {
-				borderBottomRightRadius:0,
-				borderTopRightRadius:0
-			};
-
-			let buttonStyle:React.CSSProperties = {
-				borderBottomLeftRadius:0,
-				borderTopLeftRadius:0,
-				borderLeft:"none"
-			};
 			
 			let node = ColumnUtils.hack_findHierarchyNode(attribute);
 	
@@ -162,13 +163,13 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 						optionStyle={{marginLeft:10}}
 						header={header}
 					/>
-					<Button
+					{this.props.hideButton ? null : <Button
 						onClick={ () => this.launchAttributeSelector(this.props.attributeName) }
 						style={buttonStyle}
 						title={"Click to explore other DataSources for " + this.props.attributeName}
-					>
-						<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
-					</Button>
+						>
+						<i className="fa fa-angle-right" aria-hidden="true" style={ { fontWeight: "bold" } }/>
+					</Button>}
 				</HBox>
 			);
 		}
@@ -233,10 +234,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 							ref={(c:ComboBox) => this.comboBox = c}
 							type="multiple"
 							valueIncludesLabel={true}
-							style={{
-							  borderBottomRightRadius: 0,
-							  borderTopRightRadius: 0
-							}}
+							style={dropDownStyle}
 		                    value={value}
 	                        placeholder={Weave.lang("(None)")}
 		                    options={ Array.from(nodes.keys()).map( (node) => {
@@ -244,17 +242,13 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
                             })}
 		                    onChange={this.setColumnInHashmap}
 						/>
-						<Button
+						{ this.props.hideButton ? null : <Button
 							onClick={ () => this.launchAttributeSelector(this.props.attributeName) }
-							style={{
-								borderBottomLeftRadius: 0,
-								borderTopLeftRadius: 0,
-								borderLeft: "none"
-							}}
-					        title={Weave.lang("Click to explore other DataSources for " + this.props.attributeName)}
-						>
-							<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
-						</Button>
+							style={buttonStyle}
+							title={Weave.lang("Click to explore other DataSources for " + this.props.attributeName) }
+							>
+							<i className="fa fa-angle-right" aria-hidden="true" style={ { fontWeight: "bold" } }/>
+						</Button>}
 					</HBox>
 				);
 			}
