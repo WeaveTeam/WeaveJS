@@ -198,12 +198,18 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		return Accordion.render(
 			[
-				Weave.lang("Titles"),
+				Weave.lang("Display"),
 				[
 					[
 						Weave.lang("Title"),
 						<HBox>
 							<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) } placeholder={this.defaultPanelTitle}/>
+						</HBox>
+					],
+					[
+						Weave.lang("Projection SRS"),
+						<HBox>
+							<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, { value: this.projectionSRS }) }/>
 						</HBox>
 					]
 				],
@@ -218,15 +224,21 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 						</HBox>
 					],
 					[
-						Weave.lang("Projection SRS"),
-						<HBox>
-							<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, {value: this.projectionSRS })}/>
-						</HBox>
-					]
+						null,
+						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomButtons }) } label={Weave.lang("Show zoom buttons") }/>
+					],
+					[
+						null,
+						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider }) } label={Weave.lang("Show zoom slider") }/>
+					],
+					[
+						null,
+						<Checkbox ref={linkReactStateRef(this, { value: this.showMouseModeControls }) } label={Weave.lang("Show mouse mode selector") }/>
+					],
 				]
 			],
 			[
-				Weave.lang("Zoom"),
+				Weave.lang("Zoom/Pan Behavior"),
 				[
 					[
 						Weave.lang("Zoom range"),
@@ -237,7 +249,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 						</HBox>
 					],
 					[
-						<span style={ {whiteSpace:"normal"} }> {Weave.lang("Zoom/Pan Boundaries")}</span>,
+						<span style={ {whiteSpace:"normal"} }> {Weave.lang("Pan Boundary")}</span>,
 						<VBox>
 							<span style={{display: this.overrideExtentDefined() ? null : "none" }}>
 								<HBox className="weave-padded-hbox" style={{ alignItems: 'center' }}>
@@ -266,10 +278,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 							label={ Weave.lang("Snap zoom to base map") }
 							title={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }
 						/>
-					],
-					[
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider })} label={Weave.lang("Show zoom slider")}/>
 					]
 				]
 			],
