@@ -113,12 +113,12 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					this.props.onNew && this.props.onNew(text);
 				}
 				else {
-					if (this.props.type !== "multiple") {
-						let index = Number(selected.substr(2));
-						let value:any = this.state.options[index] && this.state.options[index].value;
-						this.setState({value});
-					} else {
-						if (selected !== "") {
+					if (selected !== "") {
+						if (this.props.type !== "multiple") {
+							let index = Number(selected.substr(2));
+							let value:any = this.state.options[index] && this.state.options[index].value;
+							this.setState({value});
+						} else {
 							let __indices:string[] = (selected as string).split(",");
 
 							let values:any[] = __indices.map((__index) => {
