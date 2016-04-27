@@ -177,7 +177,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			
 			var value: {label: string, value: IWeaveTreeNode}[] = [];
 
-			var options: {label:string, value:IWeaveTreeNode}[] = [];
+			var nodes = new Set<IWeaveTreeNode>();
 
 			let siblings:IWeaveTreeNode[] = [];
 			var columns = this.columnsHashmap.getObjects(IColumnWrapper); // TODO - this does not consider if hash map contains non-IColumnWrapper columns
@@ -193,17 +193,14 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 					value.push({label: node.getLabel(), value: node});
 					var columnSiblings = HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), node.getColumnMetadata());
 					columnSiblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
-						options.push({label:siblingNode.getLabel(), value: siblingNode});
+						nodes.add(siblingNode);
 					});
 				});
 			}
 			else if(this.lastActiveNode)
 			{
-				options = HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), this.lastActiveNode.getColumnMetadata()).map((node) => {
-					return {
-						value: node,
-						label: node.getLabel()
-					}
+				HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), this.lastActiveNode.getColumnMetadata()).forEach((node) => {
+					nodes.add(node);
 				});
 			}
 			
@@ -241,7 +238,9 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 							}}
 		                    value={value}
 	                        placeholder={Weave.lang("(None)")}
-		                    options={ options }
+		                    options={ Array.from(nodes.keys()).map( (node) => {
+		                        return {label: node.getLabel(), value: node}
+                            })}
 		                    onChange={this.setColumnInHashmap}
 						/>
 						<Button
