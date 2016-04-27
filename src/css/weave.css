@@ -598,8 +598,7 @@ div.weave-tree-view {
 .weave-ToolEditor-Header {
 	align-items: center;
 	border-bottom: 1px solid lightgrey;
-	margin: 8px;/* this ensures border bottom will be disconnected seperator */
-	padding:2px;
+	margin: 0px 8px;/* this ensures border bottom will be disconnected seperator */
 }
 
 .weave-ToolEditor-Header .ui.button { /* inline style will override hover state */
@@ -726,4 +725,13 @@ div.weave-tree-view {
 	background: none;
 	width:100%;
 	box-shadow:none;
+}
+
+.ui.styled.accordion .title {
+	padding: 0px;
+	padding-top: 1em;
+}
+
+.ui.styled.accordion .content {
+	padding: .5em 1em 1em;
 }

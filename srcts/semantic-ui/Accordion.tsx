@@ -4,6 +4,7 @@ import SmartComponent from "../ui/SmartComponent";
 
 export interface AccordionProps  extends React.HTMLProps<Accordion>
 {
+	collapsible?: boolean;
 	activeChild?: number; // index of child
 	titles:string[] // titles for Each Child
 }
@@ -52,31 +53,29 @@ export default class Accordion extends SmartComponent<AccordionProps, AccordionS
 		let childrenUI:React.ReactChild[]  = []; 
 
 		// for each child in props.children - two children are created with title and Content  as in Semantic UI 
-		React.Children.forEach(this.props.children,function(child:React.ReactNode , index:number){
-			let activeStatus:string = this.state.activeChild == index ? "active" : ""
+		React.Children.forEach(this.props.children, (child:React.ReactNode , index:number) => {
+			let activeStatus:string = !this.props.collapsible || this.state.activeChild == index ? "active" : ""
 			let accordionTitle:string = this.props.titles[index];
-
-			let childTitleUI:React.ReactChild = <div className={"title " + activeStatus}
-			                                         key={"title" + index}
-			                                         onClick={this.handleClick.bind(this,index)}>
-														<i className="dropdown icon"></i>
-														{Weave.lang(accordionTitle)}
-												</div>
-			childrenUI.push(childTitleUI);
-
-			let childContentUI:React.ReactChild =  <div className={"content " + activeStatus} key={"content" + index}>
-														{child}
-													</div>
-			childrenUI.push(childContentUI);
-
-		}.bind(this));
+			childrenUI.push(
+				<div
+					className={"title " + activeStatus}
+					key={"title" + index}
+					onClick={this.props.collapsible ? this.handleClick.bind(this,index) : null}
+				>
+					{this.props.collapsible ? <i className="dropdown icon"/> : null}
+					{Weave.lang(accordionTitle)}
+				</div>,
+				<div className={"content " + activeStatus} key={"content" + index}>
+					{child}
+				</div>
+			);
+		});
 
 
 		return (
 			<div className="ui styled accordion">
 				{childrenUI}
 			</div>
-
 		);
 	}
 }
