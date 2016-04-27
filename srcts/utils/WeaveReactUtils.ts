@@ -120,7 +120,7 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 	let mapValue = (value:any):any => {
 		if (Weave.isLinkable(value))
 		{
-			Weave.getCallbacks(value).addGroupedCallback(localContext, updateReactState);
+			Weave.getCallbacks(value).addGroupedCallback(localContext, updateReactState, false, false); // don't delay while busy
 			return {
 				get $set() {
 					var state = Weave.getState(value);
