@@ -206,7 +206,6 @@ export default class AbstractLayer implements ILinkableObject
 	set olLayer(value:ol.layer.Layer)
 	{
 		if (!this.parent || !this.parent.map) {
-			console.log("Delaying configuration of layer until map is ready.");
 			WeaveAPI.Scheduler.callLater(this, ()=>{this.olLayer = value});
 			return;
 		}

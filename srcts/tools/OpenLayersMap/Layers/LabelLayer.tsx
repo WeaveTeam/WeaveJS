@@ -65,9 +65,9 @@ export default class LabelLayer extends AbstractGlyphLayer
 
 	updateStyleData():void 
 	{
+		/* Do we actually need this check? */
 		if (!this.parent || !this.parent.map)
 		{
-			console.log("Label layer needs map to be ready to perform overlap checking; delaying style update.");
 			weavejs.WeaveAPI.Scheduler.callLater(this, this.updateStyleData);
 			return;
 		}
