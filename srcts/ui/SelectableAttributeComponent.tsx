@@ -31,6 +31,7 @@ export interface ISelectableAttributeComponentProps
 	attributes: Map<string, IColumnWrapper|ILinkableHashMap>
 	linkToToolEditorCrumb?:Function
 	showAsList?:boolean;
+	style?: React.CSSProperties;
 }
 
 export interface ISelectableAttributeComponentState
@@ -227,7 +228,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			else
 			{
 				return (
-					<HBox style={{flex: 1}}>
+					<HBox style={_.merge({flex: 1}, this.props.style)}>
 						<ComboBox 
 							ref={(c:ComboBox) => this.comboBox = c}
 							type="multiple"

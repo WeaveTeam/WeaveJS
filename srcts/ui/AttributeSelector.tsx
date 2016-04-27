@@ -207,13 +207,11 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 				{
 					Weave.IS(this.selectedAttribute, ILinkableHashMap)
 					?	<SelectableAttributeComponent
+							style={{flex: null}}
 							attributeName={ this.state.selectedAttributeName }
 							attributes={ this.props.attributes}
 						/>
 					:	null
-				}
-				{
-					Weave.IS(this.selectedAttribute, ILinkableHashMap) ? "STILL BUGGY" : null
 				}
                 <HierarchyExplorer ref={(c) => {if (c) this.hierarchyExplorer = c} } root={this.rootNode} onSelect={this.setColumn} initialSelectedItems={this.getSelectedTreeNodes()}/>
 				{
