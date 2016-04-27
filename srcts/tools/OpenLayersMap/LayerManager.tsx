@@ -116,7 +116,6 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 			
 			return (
 				<VBox style={{minHeight: 200, flex: 1}} className="weave-padded-vbox">
-					<label>{Weave.lang("Layers")}</label>
 					<HBox>
 						<MenuButton showIcon={false}
 						            style={{flex: "1", alignItems: "center", justifyContent: "center", borderBottomRightRadius:0,borderTopRightRadius:0}} menu={layerTypes.map((layerClass) => ({
