@@ -583,7 +583,11 @@ div.weave-tree-view {
 /****** Tool Editor ******/
 
 .weave-ToolEditor {
+	font-size: small;
+}
 
+.weave-ToolEditor .ui.button{
+	font-size: small;
 }
 
 .weave-ToolEditor table{
