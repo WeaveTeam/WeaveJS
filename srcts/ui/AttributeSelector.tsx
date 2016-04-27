@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import {HBox, VBox,HDividedBox} from "../react-ui/FlexBox";
 import {ButtonGroupBar} from "../react-ui/ButtonGroupBar";
 import WeaveTree from "./WeaveTree";
+import HierarchyExplorer from "./HierarchyExplorer";
 import SelectableAttributesList from "../ui/SelectableAttributesList";
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -35,9 +36,6 @@ export interface IAttributeSelectorState
 export default class AttributeSelector extends SmartComponent<IAttributeSelectorProps,IAttributeSelectorState>
 {
     private rootNode: IWeaveTreeNode;
-    private folderTree: WeaveTree;
-    private columnTree: WeaveTree;
-
 
     constructor(props:IAttributeSelectorProps)
     {
@@ -55,12 +53,6 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         return Weave.IS(this.selectedAttribute, ILinkableHashMap);
     }
 
-    private get categoryNode()
-    {
-        if (this.folderTree) return this.folderTree.state.selectedItems[0];
-        return null;
-    }
-
 	private get selectedAttribute()
 	{
 		return this.props.attributes.get(this.state.selectedAttributeName);
@@ -68,8 +60,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 
     private get selectedColumnRefs():IColumnReference[]
     {
-        if (!this.columnTree || !this.columnTree.state.selectedItems) return [];
-        return this.columnTree.state.selectedItems.map((value)=>Weave.AS(value, IColumnReference));
+        if (!this.hierarchyExplorer || !this.hierarchyExplorer.selectedItems) return [];
+        return this.hierarchyExplorer.selectedItems.map((value)=>Weave.AS(value, IColumnReference));
     }
 
     componentWillReceiveProps (nextProps:IAttributeSelectorProps)
@@ -131,15 +123,10 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     };
 
     handleSelectAll=():void=>{
-        if(this.categoryNode){
-            this.columnTree.setState({
-                selectedItems:this.categoryNode.getChildren() as IWeaveTreeNode[]
-            });
+        if (this.hierarchyExplorer.selectedFolder)
+        {
+            this.hierarchyExplorer.selectedItems = this.hierarchyExplorer.selectedFolder.getChildren();
         }
-    };
-
-    onHierarchySelected=(selectedItems:Array<IWeaveTreeNode>):void=>{
-        this.forceUpdate();
     };
 
     setColumn=(selectedItems:Array<IWeaveTreeNode>):void =>{
@@ -194,7 +181,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                                         {attributeName, attributes});
     }
     
-
+    private hierarchyExplorer: HierarchyExplorer;
     render():JSX.Element
     {
         let controllerStyle:React.CSSProperties = {
@@ -204,45 +191,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
             marginLeft: "0"
         };
 
-        let attribute = this.props.attributes.get(this.state.selectedAttributeName);
-
-        let selectedColumnNodes = this.getSelectedTreeNodes();
-        let paths = selectedColumnNodes.map((value)=>((HierarchyUtils.findPathToNode(this.rootNode, value) || []).filter(_.identity) as IWeaveTreeNode[]));
-        
-        let firstPath = paths[0];        
-        let selectedFolderNodes:IWeaveTreeNode[] = [];
-        if (firstPath)
-        {
-            selectedFolderNodes = [firstPath[firstPath.length - 2]];
-        }
-        else
-        {
-            selectedFolderNodes = [this.rootNode.getChildren()[0]];
-        }
-
-        let openFolderNodes = _.uniq(_.flatten(paths.map((path) => (path.length > 1) ? path.slice(0, path.length - 2) : path)));
-
         let attributeNames: string[] = Array.from(this.props.attributes.keys());
-
-        let folderTreeRender = () =>
-            <WeaveTree style={ { flex: "1" } }
-                hideRoot = {true}
-                hideLeaves = {true}
-                initialSelectedItems = {selectedFolderNodes}
-                initialOpenItems = {openFolderNodes}
-                multipleSelection = {false}
-                onSelect={this.onHierarchySelected}
-                root={this.rootNode}
-                ref={ (c) => { this.folderTree = c; } }/>;
-        let columnTreeRender = () => <WeaveTree
-                style={ { flex: "1" } }
-                multipleSelection={ this.usingHashMap }
-                initialSelectedItems={selectedColumnNodes}
-                hideRoot={true}
-                hideBranches={true}
-                root={this.categoryNode || selectedFolderNodes[0] /* If the state for the folderTree isn't ready, use the selection we just computed. */}
-                onSelect={this.setColumn}
-                ref={ (c) => { this.columnTree = c; } }/>;
 
         // weave tree contains absolute child inside so its important to have dispaly flex wrapper to pass on width height
         return (
@@ -267,26 +216,13 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 				{
 					Weave.IS(this.selectedAttribute, ILinkableHashMap) ? "STILL BUGGY" : null
 				}
-                <HDividedBox style={ {flex:1} } loadWithEqualWidthChildren={true}>
-				   <div style={{display:"flex"}}>
-                       <DynamicComponent dependencies={[this.rootNode]}
-                            render={folderTreeRender}/>
-
-					</div>
-					<div style={{display:"flex"}}>
-                        {
-                                this.categoryNode || selectedFolderNodes[0]
-                                    ? <DynamicComponent dependencies={[this.rootNode]} render={columnTreeRender}/>
-							:	null
-						}
-					</div>
-				</HDividedBox>
+                <HierarchyExplorer ref={(c) => {if (c) this.hierarchyExplorer = c} } root={this.rootNode} onSelect={this.setColumn} initialSelectedItems={this.getSelectedTreeNodes()}/>
 				{
-					this.usingHashMap && (this.categoryNode || selectedFolderNodes[0])
+					this.usingHashMap
 					?
 						<HBox className="weave-padded-hbox" style={ controllerStyle } >
-                            <Button disabled={!this.categoryNode} onClick={this.handleSelectAll}>Select All</Button>
-							<Button disabled={!(this.columnTree && this.columnTree.state.selectedItems.length)} onClick={this.addSelected}>Add Selected</Button>
+                            <Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedFolder)} onClick={this.handleSelectAll}>Select All</Button>
+							<Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedItems.length)} onClick={this.addSelected}>Add Selected</Button>
 						</HBox>
 					:	null
 				}
