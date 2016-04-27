@@ -231,7 +231,7 @@ export default class C3PieChart extends AbstractC3Tool
     {
         return [
             [
-                "Title",
+                "Chart",
                 this.panelTitle,
                 this.defaultPanelTitle
             ]
