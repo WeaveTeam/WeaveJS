@@ -42,7 +42,7 @@ export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStat
 		if (component)
 		{
 			linkReactState(context, component, mapping, delay);
-			_previouslyLinkedRefs.add(component);
+			//_previouslyLinkedRefs.add(component);
 		}
 		else if (prevComponent)
 		{
