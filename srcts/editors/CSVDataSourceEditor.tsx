@@ -45,6 +45,8 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 
 	componentWillReceiveProps(nextProps:IDataSourceEditorProps)
 	{
+		super.componentWillReceiveProps(nextProps);
+		
 		let ds = (nextProps.dataSource as CSVDataSource);
 		if (this.props.dataSource)
 		{
