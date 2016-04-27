@@ -173,13 +173,7 @@ export default class ReactUtils
 					</div>
 				</div>;
 	}
-
-	// to create empty row between rows in table
-	static generateEmptyRow():React.ReactChild[][]
-	{
-		// empty cell classname attached only to left cell, as left cell css doesn't contain Padding/margin/Border values.
-		return [[<div className="weave-empty-cell"/>,null]]
-	}
+	
 	static generateTable(header:React.ReactChild[], body:React.ReactChild[][], styles:DynamicTableStyles = {}, classes:DynamicTableClassNames = {}):JSX.Element
 	{
 		var tableHead = header && (

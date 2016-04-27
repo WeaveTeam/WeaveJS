@@ -302,7 +302,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		});
 	}
 
-	
 	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
 		var tableCellClassNames = {
@@ -338,8 +337,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 				</Accordion>
 	}
-	
-	
 
 	
 

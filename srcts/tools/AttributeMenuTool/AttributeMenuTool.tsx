@@ -320,7 +320,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				{
 					this.openTools && this.openTools.length > 0
 					?	ReactUtils.generateTable(null,
-						this.toolConfigs.concat(renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction).concat(ReactUtils.generateEmptyRow(),this.renderTitleEditor())),
+						this.toolConfigs.concat(renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction).concat(this.renderTitleEditor())),
 						{},tableCellClassNames)
 					:	<div>{ 'Select a visualization from the Visualizations menu' }</div>
 				}

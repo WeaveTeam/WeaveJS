@@ -198,7 +198,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 		return ReactUtils.generateTable(
 			null,
-			renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(ReactUtils.generateEmptyRow(),this.getTitlesEditor()),
+			renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(this.getTitlesEditor()),
 			{},tableCellClassNames
 		);
 	};
