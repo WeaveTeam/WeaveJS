@@ -181,6 +181,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
                                         {attributeName, attributes});
     }
     
+    private selectableAttributeComponentKey = 0;
     private hierarchyExplorer: HierarchyExplorer;
     render():JSX.Element
     {
@@ -204,15 +205,11 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 						/>
 					:	null
 				}
-				{
-					Weave.IS(this.selectedAttribute, ILinkableHashMap)
-					?	<SelectableAttributeComponent
-							style={{flex: null}}
-							attributeName={ this.state.selectedAttributeName }
-							attributes={ this.props.attributes}
-						/>
-					:	null
-				}
+				<SelectableAttributeComponent key={this.selectableAttributeComponentKey++}
+						style={{flex: null}}
+						attributeName={ this.state.selectedAttributeName }
+						attributes={ this.props.attributes}
+					/>
                 <HierarchyExplorer ref={(c) => {if (c) this.hierarchyExplorer = c} } root={this.rootNode} onSelect={this.setColumn} initialSelectedItems={this.getSelectedTreeNodes()}/>
 				{
 					this.usingHashMap

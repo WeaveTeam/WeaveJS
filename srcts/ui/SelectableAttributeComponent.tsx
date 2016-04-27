@@ -150,7 +150,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 			return (
 				
-				<HBox style={ {flex: 1} }>
+				<HBox style={ _.merge({ flex: 1 }, this.props.style) } >
 					<ComboBox
 						ref={(c:ComboBox) => this.comboBox = c}
 						title={Weave.lang("Change column")}
