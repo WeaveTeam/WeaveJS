@@ -201,9 +201,26 @@ export default class ReactUtils
 							<tr key={index} style={styles.tr} className={classes.tr}>
 								{
 									row.map((cell, index) => {
+										if (cell === undefined)
+											return null;
+										
 										let style:React.CSSProperties = Array.isArray(styles.td) ? (styles.td as React.CSSProperties[])[index] : styles.td;
 										let className:string = Array.isArray(classes.td) ? (classes.td as string)[index] : classes.td as string;
-										return <td key={index} style={style} className={className}>{cell}</td>
+										
+										let colSpan:number = 1;
+										for (let next = index + 1; next < row.length; next++)
+											if (row[next] === undefined)
+												colSpan++;
+										
+										return (
+											<td
+												key={index}
+												style={style}
+												className={className}
+												colSpan={colSpan}
+												children={cell}
+											/>
+										);
 									})
 								}
 							</tr>
