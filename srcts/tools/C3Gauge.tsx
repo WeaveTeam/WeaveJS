@@ -195,7 +195,7 @@ export default class C3Gauge extends AbstractC3Tool
 	{
 		return [
 			[
-				"Title",
+				"Chart",
 				this.panelTitle,
 				this.defaultPanelTitle
 			]
