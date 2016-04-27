@@ -100,59 +100,26 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		this.setState(this.normalizeState(nextProps));
 	}
 
-	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
-	{
-		let selector = ($(this.element) as any);
-		if (!_.isEqual(prevState.value, this.state.value))
-		{
-			
-			if (this.props.type === "multiple")
-			{
-				let indices:string[] = [];
-
-				this.state.value.forEach((item:any) => {
-					let index:number = this.getIndexFromValue(item);
-					if(index >= 0)
-						indices.push(String(index));
-				});
-				selector.dropdown('set exactly', indices);
-			}
-
-			else
-			{
-				let  index = this.getIndexFromValue(this.state.value);
-				if (index >= 0)
-					selector.dropdown('set selected', this.state.options[index].label);
-				else
-				{
-					//clear dropdown if option isn't found and we are not allowing new items
-					if(!this.props.onNew)
-						selector.dropdown('clear');
-				}
-			}
-			this.props.onChange && this.props.onChange(this.state.value);
-		}
+	componentDidMount() {
+		this.forceUpdate();
 	}
 	
-	componentDidMount()
-	{
+	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState) {
 		this.element = ReactDOM.findDOMNode(this);
 		let selector = ($(this.element) as any);
 		selector.dropdown({
 			onChange: (selected:number|string, text:string) => {
-				if (this.props.onNew && text /*&& this.props.allowAdditions*/)
-				{
+				if (this.props.onNew && text) {
 					this.props.onNew && this.props.onNew(text);
 				}
-				else
-				{
+				else {
 					if (this.props.type !== "multiple") {
 						let value:any = this.state.options[selected as number] && this.state.options[selected as number].value;
 						this.setState({value});
 					} else {
-						if(selected !== "") {
+						if (selected !== "") {
 							let indices:number[] = (selected as string).split(",").map(Number);
-							
+
 							let values:any[] = indices.map((index) => {
 								return this.state.options[index] && this.state.options[index].value;
 							});
@@ -170,17 +137,16 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				let values:any = _.clone(this.state.value);
 				if (ReactUtils.hasFocus(this) && !_.includes(values, value)) {
 					values.push(value);
-					this.setState({value:values});
+					this.setState({value: values});
 					this.props.onAdded && this.props.onAdded(value);
 				}
 			},
 			onRemove: (removedValue:number, removedText:string) => {
 				let option = this.state.options[removedValue];
 				let value:any = option && option.value;
-				if(ReactUtils.hasFocus(this))
-				{
+				if (ReactUtils.hasFocus(this)) {
 					let values:any = _.without(this.state.value, value);
-					this.setState({value:values});
+					this.setState({value: values});
 					this.props.onRemoved && this.props.onRemoved(value);
 				}
 			},
@@ -188,8 +154,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			direction: this.props.direction || 'auto',
 			allowAdditions: this.props.allowAdditions || false
 		});
-		if (this.props.type === "multiple")
-		{
+
+		if (this.props.type === "multiple") {
 			let indices:string[] = [];
 			this.state.value.forEach((item:any) => {
 				let index:number = this.getIndexFromValue(item);
@@ -198,13 +164,18 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			});
 			selector.dropdown('set exactly', indices);
 		}
-		let index = this.getIndexFromValue(this.state.value);
-		if(index >= 0)
-			selector.dropdown('set selected', this.state.options[index].label);
-		else {
-			if(!this.props.onNew)
-				selector.dropdown('clear');
+		else
+		{
+			//single selection
+			let index = this.getIndexFromValue(this.state.value);
+			if (index >= 0)
+				selector.dropdown('set exactly', String(index));
+			else {
+				if (!this.props.onNew)
+					selector.dropdown('clear');
+			}
 		}
+		this.props.onChange && this.props.onChange(this.state.value);
 	}
 
 	render()
