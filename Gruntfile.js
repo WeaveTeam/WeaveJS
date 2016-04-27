@@ -1,6 +1,6 @@
 /*global module */
 
-var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'openlayers', 'jszip', 'swfobject-amd'];
+var libraries = ['react', 'react-dom', 'jquery', 'lodash', 'd3', 'c3', 'openlayers', 'jszip'];
 var libraries_colon = libraries.map(function (d) { return d + ":"});
 
 module.exports = function (grunt) {
