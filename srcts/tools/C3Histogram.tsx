@@ -131,10 +131,11 @@ export default class C3Histogram extends AbstractC3Tool
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 		
-		var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn);
+		// don't lock the ColorColumn, so linking to global ColorColumn is possible
+		var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn, false);
 		_colorColumn.ramp.setSessionState([0x808080]);
-		var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn);
-		var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn);
+		var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn, true);
+		var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn, true);
 
         this.idToRecord = {};
         this.keyToIndex = {};
@@ -579,18 +580,38 @@ export default class C3Histogram extends AbstractC3Tool
 			]
 		};
 
-		return <Accordion titles={["Data", "Bin / ColorRamp / Aggregation" , "Title","Margins"]}>
+		return <Accordion titles={["Data", "Binning / Coloring", "Titles", "Margins"]}>
 					{
 						ReactUtils.generateTable(
 							null,
 							[
 								[
+									Weave.lang("Group by"),
+									<SelectableAttributeComponent
+										attributeName={"Group by"}
+										attributes={this.selectableAttributes}
+						  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
+									/>
+								],
+								[
 									Weave.lang('Height values (optional)'),
-									<SelectableAttributeComponent attributeName={"Height values (optional)"}
-								                              attributes={ new Map<string, (IColumnWrapper|ILinkableHashmap)>()
-												                                            .set("Height values (optional)", this.columnToAggregate)
-											                                             }
-								                              linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
+									<SelectableAttributeComponent
+										attributeName={"Height values (optional)"}
+										attributes={this.selectableAttributes}
+						  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
+									/>
+								],
+								[
+									Weave.lang("Aggregation method"),
+									<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
+								],
+								Weave.beta && [
+									null,
+									<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
+								],
+								[
+									null,
+									<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
 								]
 							],
 							{}, tableCellClassNames
@@ -601,29 +622,11 @@ export default class C3Histogram extends AbstractC3Tool
 							null,
 							[
 								[
-									null,
-									<Checkbox
-										ref={(ref:Checkbox) => {
-									if (ref)
-										this.fill.color.addGroupedCallback(ref, () => {
-											ref.setState({
-												value: !!this.fill.color.internalDynamicColumn.targetPath
-											});
-										});
-								}}
-										onChange={(value) => {
-									if (this.fill.color.internalDynamicColumn.targetPath)
-									{
-										weavejs.data.ColumnUtils.unlinkNestedColumns(this.fill.color);
-										if (this.colorColumn)
-											this.colorColumn.ramp.state = [0x808080];
-									}
-									else
-										this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
-								}}
-										label={Weave.lang("Link to global color column")}
-									/>
-
+									Weave.lang("Binning method"),
+									<BinningDefinitionEditor compact={true}
+									                         binnedColumn={this.binnedColumn}
+									                         linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+									                         onButtonClick={() => this.openColorController(1)}/>
 								],
 								[
 									Weave.lang("Color theme"),
@@ -638,26 +641,6 @@ export default class C3Histogram extends AbstractC3Tool
 											/>
 										}
 									/>
-								],
-								[
-									Weave.lang("Binning method"),
-									<BinningDefinitionEditor compact={true}
-									                         binnedColumn={this.binnedColumn}
-									                         linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
-									                         onButtonClick={() => this.openColorController(1)}/>
-								],
-								[
-									Weave.lang("Aggregation method"),
-									<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
-								],
-								Weave.beta && [
-									null,
-									<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
-
-								],
-								[
-									null,
-									<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
 								]
 							] as React.ReactChild[][],
 							{}, tableCellClassNames
