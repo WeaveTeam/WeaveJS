@@ -1,5 +1,6 @@
 import * as React from "react";
-import {HBox,VBox,HDividedBox} from '../react-ui/FlexBox';
+import {HBox,VBox} from "../react-ui/FlexBox";
+import {HDividedBox} from "../react-ui/DividedBox";
 import SessionStateTree from './SessionStateTree';
 import IconButton from "../react-ui/IconButton";
 import LinkableDynamicObjectComponent from "./LinkableDynamicObjectComponent";

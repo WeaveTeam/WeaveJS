@@ -1,5 +1,5 @@
 import * as React from "react";
-import {HBox, VBox, HDividedBox} from "../react-ui/FlexBox";
+import {HBox, VBox} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
 import List from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";

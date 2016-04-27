@@ -1,7 +1,8 @@
 import * as React from "react";
 import ResizingDiv from "./ResizingDiv";
 import SideBar from "./SideBar";
-import {HBox,VBox,HDividedBox} from "./FlexBox";
+import {HBox,VBox} from "./FlexBox";
+import {HDividedBox} from "./DividedBox";
 import SmartComponent from "../ui/SmartComponent";
 
 export interface SideBarContainerProps extends React.Props<SideBarContainer>

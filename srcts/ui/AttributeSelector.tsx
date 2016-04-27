@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
-import {HBox, VBox,HDividedBox} from "../react-ui/FlexBox";
+import {HBox, VBox} from "../react-ui/FlexBox";
 import {ButtonGroupBar} from "../react-ui/ButtonGroupBar";
 import WeaveTree from "./WeaveTree";
 import HierarchyExplorer from "./HierarchyExplorer";
