@@ -4,7 +4,6 @@ import {HBox,VBox} from "../react-ui/FlexBox";
 import {HDividedBox} from "../react-ui/DividedBox";
 import {ButtonGroupBar} from "../react-ui/ButtonGroupBar";
 import WeaveTree from "./WeaveTree";
-import SelectableAttributesList from "../ui/SelectableAttributesList";
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
