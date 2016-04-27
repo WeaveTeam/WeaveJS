@@ -268,19 +268,13 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		if (state.children === undefined)
 			delete state.children;
 		
-		var children:LayoutState[] = state.children;
-
-		if (!children)
+		if (!state.children)
 			return state;
 
-		if (children.length === 1)
-			return this.simplifyState(children[0]);
-
 		var simpleChildren:LayoutState[] = [];
-
-		for (var i = 0; i < children.length; i++)
+		for (var i = 0; i < state.children.length; i++)
 		{
-			var child:LayoutState = this.simplifyState(children[i]);
+			var child:LayoutState = this.simplifyState(state.children[i]);
 			if (child.children && (child.direction === state.direction || !child.children.length))
 			{
 				var childChildren:LayoutState[] = child.children;
@@ -297,12 +291,15 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			}
 		}
 		state.children = simpleChildren;
-		var totalSizeChildren:number = _.sum(_.map(state.children, "flex"));
-
+		
 		//Scale flex values between 0 and 1 so they sum to 1, avoiding an apparent
 		//flex bug where space is lost if sum of flex values is less than 1.
+		var totalSizeChildren:number = _.sum(_.map(state.children, "flex"));
 		for (var i = 0; i < state.children.length; i++)
 			state.children[i].flex = StandardLib.normalize(state.children[i].flex || 1, 0, totalSizeChildren);
+
+		if (state.children.length === 1)
+			return this.simplifyState(state.children[0]);
 
 		return state;
 	}
