@@ -33,7 +33,7 @@ export function unlinkReactState(component:ReactComponent):void
 		(component.componentWillUpdate as any)[UNLINK]();
 }
 
-const _previouslyLinkedRefs:WeakSet<ReactComponent> = new WeakSet<ReactComponent>();
+const map_ref_mapping = new WeakMap<ReactComponent, LinkReactStateMapping>();
 
 export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(component:ReactComponent)=>void
 {
@@ -42,7 +42,7 @@ export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStat
 		if (component)
 		{
 			linkReactState(context, component, mapping, delay);
-			//_previouslyLinkedRefs.add(component);
+			map_ref_mapping.set(component, mapping);
 		}
 		else if (prevComponent)
 		{
@@ -62,7 +62,7 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 	let localContext = Weave.disposableChild(context, {});
 	let reactState = component.state != null ? component.state : {};
 	let reactUpdateSpec:any;
-	let authority = _previouslyLinkedRefs.has(component) ? updateWeaveState : updateReactState;
+	let authority = _.isEqual(map_ref_mapping.get(component), mapping) ? updateWeaveState : updateReactState;
 
 	function updateReactState(callingLater:boolean = false):void
 	{
