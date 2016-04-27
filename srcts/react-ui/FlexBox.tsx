@@ -53,8 +53,9 @@ export interface IHDividedBoxState {
 //todo option to disable live dragging
 export interface IHDividedBoxProps extends React.HTMLProps<HDividedBox> {
 	loadWithEqualWidthChildren?:boolean;
-	space?:number;
+	childMinWidth?:number; // default value 10px
 	resizerStyle?:React.CSSProperties;
+	resizerSize?:number;
 }
 export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBoxState>
 {
@@ -84,11 +85,12 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			this.leftChildWidths[index] = String(100/childCount) + "%";
 		}.bind(this));
 
-		this.childHeight = 100
 	}
 
-	//temp solution to handle child which has only one child that is abolute,
-	private childHeight:number = NaN
+	// caching the widths of all left child
+	// this ensures when we switch resizer the width is maintained
+	private leftChildWidths:number[] = [];
+	private containerWidth:number = NaN;
 
 	state:IHDividedBoxState = {
 		activeResizerIndex:NaN,
@@ -102,6 +104,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 	{
 		// as resizer index is same as left child index , easy to identify from refs
 		var leftChild:Element = ReactDOM.findDOMNode(this.refs["child" + index]);
+		this.containerWidth = ReactDOM.findDOMNode(this).getBoundingClientRect().width;
 		this.setState({
 			mouseXPos:event.clientX,
 			activeResizerIndex:index,
@@ -143,9 +146,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 	}
 
 
-	// caching the widths of all left child
-	// this ensures when we switch resizer the width is maintained
-	private leftChildWidths:number[] = [];
+
 
 	private resizerMouseUpHandler = (event:MouseEvent):void =>
 	{
@@ -154,6 +155,8 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			//cache the width of left child for released resizer
 			this.leftChildWidths[this.state.activeResizerIndex] =  this.state.resizingLeftChildWidth;
 		}
+
+		//this.containerWidth = NaN;
 
 		// reset all values to avoid conflicts in next resizing event
 		this.setState({
@@ -173,13 +176,13 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 		event.preventDefault();
 	}
 
-	
-	
+
 	render()
 	{
 		var childrenUI:any[]  = [];
 		// storing childCount is important, to make sure resizer is not added after last child
 		var childCount:number = React.Children.count(this.props.children);
+		let leftChildWidthSum:number = 0;
 		React.Children.forEach(this.props.children,function(child:ReactNode , index:number){
 			if(!child)// this case happen in react Composite element based on a condition sometimes null or empty string will come in place of react element
 				return
@@ -190,34 +193,33 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 				overflow:"auto"
 			};
 
+			if(childCount - 1 == index)//last child takes rest of the space of the container
+			{
 
-			if(childCount - 1 == index){ //last child takes rest of the space
-				//let containerWidth:number = (this.getDOMNode()).getBoundingClientRect().width
-				childStyle.flex  = 1;
+				if(isNaN(this.containerWidth)) // when render called from constructor for first time
+				{
+					childStyle.flex = 1;
+				}
+				else // when mousedown sets the containerWidth
+				{
+					// setting flex 1 instead of width wont work, if parent has flexible size, while resizing
+					// flex 1 will work if parent get fixed width in DOM tree
+					childStyle.width  = this.containerWidth - leftChildWidthSum;
+				}
 			}
 			else
 			{
 				//set left child width
 				if(this.state.dragging)
 				{
-					// if index is not there undefined comes, browser ignores one without the value
-					// and browser Layout mechanism set the width values
 					childStyle.width = (this.state.activeResizerIndex == index) ?  this.state.resizingLeftChildWidth : this.leftChildWidths[index];
-					//if(!isNaN(this.childHeight))
-					//childStyle.height = this.childHeight;
 				}
 				else
 				{
 					childStyle.width = this.leftChildWidths[index];
-					//if(!isNaN(this.childHeight))
-					//childStyle.height = this.childHeight;
 				}
 
-				if(this.props.space)
-				{
-					childStyle.marginRight = String(this.props.space/2) + "px";
-				}
-
+				leftChildWidthSum = leftChildWidthSum + childStyle.width;
 			}
 
 
@@ -240,19 +242,18 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			if(childCount - 1 !== index) // resizer not required for last child
 			{
 				let resizerStyle:React.CSSProperties = this.props.resizerStyle?this.props.resizerStyle:{};
-				if(this.props.space)
-				{
-					resizerStyle.marginRight = String(this.props.space/2) + "px";
-				}
+
 				// index matches with left child
-				var ref:string = "resizer"+index;
-				var resizerUI:JSX.Element = <Resizer key={ref}
+				let ref:string = "resizer"+index;
+				let resizerUI:JSX.Element = <Resizer key={ref}
 													 ref={ref}
+													 size={this.props.resizerSize}
 													 style={resizerStyle}
 													 type={VERTICAL}
 													 onMouseDown = { this.resizerMouseDownHandler.bind(this,index) }/>;
 
 				childrenUI.push(resizerUI);
+				leftChildWidthSum = leftChildWidthSum + (this.props.resizerSize?this.props.resizerSize :1);
 			}
 			
 		}.bind(this));
@@ -269,6 +270,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 interface IResizerProps extends React.HTMLProps<Resizer>
 {
 	type:string;
+	size?:number;
 }
 
 const VERTICAL="vertical";
@@ -279,34 +281,47 @@ class Resizer extends React.Component<IResizerProps, {}> {
 
 	render(){
 
-		var styleObj:React.CSSProperties = _.merge({
+		// background-clip: padding-box
+		// this ensures the cursor comes when it reached the padding region
+		var styleObj:React.CSSProperties = _.merge({},this.props.style,{
 			boxSizing: "border-box",
-			background:"#fff",
-			opacity: .1,
-			backgroundClip: "padding-box",
-		},this.props.style);
-		
+			backgroundClip:"padding-box"
+		});
 
+
+		// setting padding and margin with equal positive and negative values, will ensure the resize-cursor is visible when its 4 px near the resizer
+		// positive and negative negates the 4px layout for rendering Engine, but cursor will become visible when its 4px near
 		if(this.props.type === VERTICAL){
 			_.merge(styleObj, {
-				width: "11px",
-				margin: "0 -5px",
-				borderLeft: "5px solid rgba(255, 255, 255, 0)",
-				borderRight: "5px solid rgba(255, 255, 255, 0)",
+				paddingLeft:"4px",
+				marginLeft:"-4px",
+				paddingRight:"4px",
+				marginRight:"-4px",
 				cursor: "col-resize"
 			});
 		}else if(this.props.type === HORIZONTAL){
 			_.merge(styleObj, {
-				height: "11px",
-				margin: "-5px 0",
-				borderTop: "5px solid rgba(255, 255, 255, 0)",
-				borderBottom: "5px solid rgba(255, 255, 255, 0)",
+				paddingTop:"4px",
+				marginTop:"-4px",
+				paddingBottom:"4px",
+				marginBottom:"-4px",
 				cursor: "row-resize"
 			});
 		}
+		if(this.props.size)
+		{
+			if(this.props.type === VERTICAL)
+			{
+				styleObj.width = 1;
+			}
+			else if(this.props.type === HORIZONTAL)
+			{
+				styleObj.height = 1;
+			}
+		}
 
-		
-		return <span style={ styleObj } onMouseDown={this.props.onMouseDown}/>
+		let className:string =  this.props.className ? this.props.className : "weave-hDividedBox-resizer"
+		return <span style={ styleObj } onMouseDown={this.props.onMouseDown} className={className}/>
 	}
 
 }
