@@ -299,7 +299,11 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			state.children[i].flex = StandardLib.normalize(state.children[i].flex || 1, 0, totalSizeChildren);
 
 		if (state.children.length === 1)
-			return this.simplifyState(state.children[0]);
+		{
+			var flex = state.flex;
+			state = this.simplifyState(state.children[0]);
+			state.flex = flex;
+		}
 
 		return state;
 	}
