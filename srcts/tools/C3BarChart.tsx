@@ -24,6 +24,7 @@ import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import Accordion from "../semantic-ui/Accordion";
 
 declare type Record = {
     id: IQualifiedKey,
@@ -546,63 +547,33 @@ export default class C3BarChart extends AbstractC3Tool
     }
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-    // renderEditor(linkFunction:Function):JSX.Element
-    // {
-	// 
-	//     // 16 columns -  leave one column to avoid scrollbar - [3 + 12]
-    //     return (
-    //         <VBox className="weave-padded-vbox">
-    //             {
-    //                 super.renderEditor(linkFunction)
-    //             }
-    //             <br/>
-	// 			{ReactUtils.generateGridLayout(
-	// 				["four","twelve"],
-	// 				[
-	// 					[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })}/></span>,<span >{Weave.lang("Horizontal Bars")}</span>  ],
-	// 					[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })}/></span>,<span >{Weave.lang("Show Value Labels")}</span> ],
-	// 					[ <span className="weave-sidebar-label" ><Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })}/></span>, <span >{Weave.lang("Show X Axis Title")}</span> ]
-	// 				]
-	// 			)}
-    //             <br/>
-	// 			{ReactUtils.generateGridLayout(
-	// 				["four","twelve"],
-	// 				[
-	// 					[ <span className="weave-sidebar-label">{Weave.lang("Grouping Mode")}</span>, <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> ]
-	renderEditor(linkFunction:Function = null):JSX.Element
+  renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
-		return ReactUtils.generateTable({
-			body: [].concat(
-				this.getSelectableAttributesEditor(linkFunction),
-				[
-					[ 
-						Weave.lang("Grouping mode"),
-						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/> 
-					],
-					Weave.beta && [
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
-					],
-					[
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
+		return Accordion.render(
+			[Weave.lang("Data"), this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction)],
+			[Weave.lang("Display"), [
+										[
+											Weave.lang("Grouping mode"),
+											<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
+										],
+										Weave.beta && [
+											null,
+											<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
+										],
+										[
+											null,
+											<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
 
-					],
-					[
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={Weave.lang("Show X axis title")}/>
-					]
-				],
-				this.getTitlesEditor(),
-				this.getMarginEditor()
-			),
-			classes: {
-				td: [
-					"weave-left-cell",
-					"weave-right-cell"
-				]
-			}
-		});
+										],
+										[
+											null,
+											<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={Weave.lang("Show X axis title")}/>
+										]
+									]
+			],
+			[Weave.lang("Titles"), this.getTitlesEditor()],
+			[Weave.lang("Margins"), this.getMarginEditor()]
+		);
 	}
 
 	public get deprecatedStateMapping():Object
