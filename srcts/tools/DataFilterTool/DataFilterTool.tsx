@@ -5,6 +5,10 @@ import NumericRangeDataFilterEditor from "./NumericRangeDataFilterEditor";
 import DiscreteValuesDataFilterEditor from "./DiscreteValuesDataFilterEditor";
 import SelectableAttributeComponent from "../../ui/SelectableAttributeComponent";
 import {HBox, VBox} from "../../react-ui/FlexBox";
+import ReactUtils from "../../utils/ReactUtils";
+import ComboBox from "../../semantic-ui/ComboBox";
+import Checkbox from "../../semantic-ui/Checkbox";
+
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnStatistics = weavejs.api.data.IColumnStatistics;
@@ -21,12 +25,6 @@ import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import WeaveAPI = weavejs.WeaveAPI;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-import ReactUtils from "../../utils/ReactUtils";
-import ComboBox from "../../semantic-ui/ComboBox";
-import Checkbox from "../../semantic-ui/Checkbox";
-
-
-
 
 export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 {
@@ -346,6 +344,11 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 
 			]
 		];
+		
+		if(filterOptionUI)
+		{
+			editorConfigs.push(filterOptionUI)
+		}
 
 		return ReactUtils.generateTable({
 			body: renderSelectableAttributes(this.props.selectableAttributes, this.props.linkToToolEditorCrumb).concat(editorConfigs),

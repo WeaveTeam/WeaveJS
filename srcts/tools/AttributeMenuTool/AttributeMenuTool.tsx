@@ -47,12 +47,23 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	//session properties
 	public panelTitle = Weave.linkableChild(this, new LinkableString('Attribute Menu Tool'));
 	public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );
-	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST), this.forceUpdate, true);
+	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 	public selectedAttribute = Weave.linkableChild(this, new LinkableString, this.forceUpdate, true);
 
 	public targetToolPath = Weave.linkableChild(this, new LinkableVariable(Array), this.setToolWatcher.bind(this));
 	public targetAttribute = Weave.linkableChild(this, new LinkableString);
 	toolWatcher = Weave.privateLinkableChild(this, new LinkableWatcher());
+
+
+	verifyLayoutMode(value:string):boolean
+	{
+		return [
+			LAYOUT_LIST,
+			LAYOUT_COMBO,
+			LAYOUT_VSLIDER,
+			LAYOUT_HSLIDER,
+		].indexOf(value) >= 0;
+	}
 
 	//callback for targetToolPath
 	setToolWatcher():void
@@ -149,7 +160,15 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 					</VBox>
 				);
 			case LAYOUT_COMBO:
-				return (<ComboBox options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection } value={ selectedAttribute } placeholder="Select an attribute" />); //have to return a valid react component, otherwise invariant violation
+				return (
+					<VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
+						<ComboBox options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection } value={ selectedAttribute } placeholder="Select an attribute"/>
+					</VBox>
+				);
+			default:
+				return (
+					<div/> // returns div by default but we should never get here, layoutMode.value needs verfiier function
+				)
 		}
 	}
 }

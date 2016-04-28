@@ -89,18 +89,20 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 		switch (this.layoutMode.value)
 		{
 			case LAYOUT_CHECKBOXLIST:
-				return <CheckBoxList options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+				return <VBox style={{flex: 1, padding: 10}}>
+							<CheckBoxList options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+						</VBox>
 				
 			case LAYOUT_LIST:
 				return <List options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 				
 			case LAYOUT_HSLIDER:
-				return <HBox style={{flex: 1, alignItems:"center", padding: 10}}>
+				return <HBox style={{flex: 1, padding: 25}}>
 							<HSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 						</HBox>;
 			
 			case LAYOUT_VSLIDER:
-				return <VBox style={{flex: 1, alignItems:"center", padding: 10}}>
+				return <VBox style={{flex: 1, padding: 25}}>
 							<VSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
 						</VBox>;
 				
