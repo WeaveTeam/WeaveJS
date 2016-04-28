@@ -4,6 +4,7 @@ import reactUpdate from "react-addons-update";
 import {HBox,VBox} from "../react-ui/FlexBox";
 import * as _ from "lodash";
 import * as jquery from "jquery";
+import SvgPathSegPolyFill from 'SvgPathSegPolyFill';
 
 import {linkReactStateRef} from "./WeaveReactUtils";
 
@@ -80,7 +81,7 @@ export default class ReactUtils
 				});
 			}
 
-
+			SvgPathSegPolyFill.loadPolyFillOnWindow(popoutWindow);
 			ReactDOM.render(jsx, container);
 		};
 

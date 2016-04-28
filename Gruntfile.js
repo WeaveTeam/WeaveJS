@@ -69,7 +69,7 @@ module.exports = function (grunt) {
                         extensions: ['.jsx']
                     }
                 },
-                files: [{'dist/index.js': 'src/index.js'}/*, {'dist/test.min.js': 'src/test.js'}*/]
+                files: [{'dist/index.js': 'src/index.js'}, {'dist/svgPathSegPolyFill.js': 'src/svgPathSegPolyFill.js'}]
             },
             // generates a non minified output without the libs but with source maps
             dev: {
@@ -97,6 +97,7 @@ module.exports = function (grunt) {
         },
         copy: {
             main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
+            svgPathSegPolyFill :{expand:true, flatten:true, cwd:'src/',src:'svgPathSegPolyFill.js', dest:'dist/' },
             css: {expand: true, flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/'},
             olcss: {expand: true, flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
             fontawesomecss: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
