@@ -188,10 +188,12 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 				columns.forEach((column:IColumnWrapper, index:number)=>{
 					let node = ColumnUtils.hack_findHierarchyNode(column);
 					if(node)
+					{
 						this.lastActiveNode = node;
+						value.push({label: node.getLabel(), value: node});
+					}
 					if (!this.lastActiveNode)
 						return;
-					value.push({label: node.getLabel(), value: node});
 					var columnSiblings = HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), node.getColumnMetadata());
 					columnSiblings.forEach( (siblingNode:IWeaveTreeNode&IColumnReference) => {
 						nodes.add(siblingNode);
