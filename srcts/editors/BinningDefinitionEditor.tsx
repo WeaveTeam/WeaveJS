@@ -37,6 +37,7 @@ import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
 export interface BinningDefinitionEditorProps
 {
 	binnedColumn:BinnedColumn;
+	compact?:boolean;
 	onButtonClick?:React.MouseEventHandler;
 	linktoToolEditorCrumb?:Function;
 }
@@ -85,63 +86,35 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	{
 		var binDef = this.props.binnedColumn.binningDefinition.target as AbstractBinningDefinition;
 		var binLabel:string = binDef ? BinningDefinitionEditor.binClassToBinLabel.get(binDef.constructor as typeof AbstractBinningDefinition) : "None";
-
-		// overriding few semantic ui label properties
-		let labelStyle:React.CSSProperties = {
-			flex:1,
-			background:"white",
-			marginRight:0,
-			fontWeight:"normal",
-			color:"black",
-			lineHeight:"normal",
-			fontSize:"inherit",
-			borderBottomRightRadius: 0,
-			borderTopRightRadius: 0,
-			border:"1px solid lightgrey"
+	
+		var tableStyles = {
+			table: { width: "100%", fontSize: "inherit"},
+			td: [
+				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
+				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+			]
 		};
 
-		let buttonStyle: React.CSSProperties = {
-			borderBottomLeftRadius: 0,
-			borderTopLeftRadius: 0,
-			borderLeft: "none"
-		};
-
-		return ReactUtils.generateTable({
-			body: [
-				[
-					Weave.lang("Group by"),
-					<SelectableAttributeComponent attributeName={ 'Group by' }
-					                              attributes={ new Map<string, (IColumnWrapper|ILinkableHashmap)>().set('Group by', this.props.binnedColumn.internalDynamicColumn ) }
-					                              linkToToolEditorCrumb={ this.props.linktoToolEditorCrumb }/>
-				],
-				[
-					Weave.lang('Method'),
-					<HBox className="weave-padded-hbox" style={ { alignItems: "center"} }>
-						<span className="ui large label" style={labelStyle}>{binLabel}</span>
-						<Button onClick={this.onBinButtonClick} style={buttonStyle}>
-							<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
-						</Button>
-					</HBox>
-
-				]
-			] as React.ReactChild[][],
-			classes: {
-				td: ["weave-left-cell", "weave-right-cell"]
-			}
-		});
-
-
+		//todo replace with statefull textfield readonly true for binlabel
+		return (
+			<HBox className="weave-padded-hbox" style={ { alignItems: "center"} }>
+				<span style={{flex: 1, textAlign: "right"}}>{binLabel}</span>
+				<Button onClick={this.onBinButtonClick}>
+					<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
+				</Button>
+			</HBox>
+		);
 
 	}
 
 	renderFullView() // render for PopUp
 	{
-		return <BinningDefinitionSelector column={this.props.binnedColumn}  />;
+		return <BinningDefinitionSelector column={this.props.binnedColumn} linktoToolEditorCrumb={this.props.linktoToolEditorCrumb} />;
 	}
 	
 	render()
 	{
-		return this.props.linktoToolEditorCrumb ? this.renderCompactView() : this.renderFullView();
+		return this.props.compact ? this.renderCompactView() : this.renderFullView();
 	}
 }
 
@@ -336,7 +309,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 		{
 			let renderProps:any = this.getBinDefRenderProps(selectedBinDefn);
 			return (
-				<VBox className="weave-padded-vbox" style={{flex:1}}>
+				<VBox className="weave-padded-vbox">
 					{ReactUtils.generateTable({
 						body: [
 							[
@@ -384,7 +357,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 									/>
 								</HBox>
 							]
-						] as React.ReactChild[][],
+						],
 						classes: {
 							td: ["weave-left-cell", "weave-right-cell"]
 						}

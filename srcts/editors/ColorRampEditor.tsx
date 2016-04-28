@@ -18,6 +18,7 @@ import StandardLib = weavejs.util.StandardLib;
 export interface ColorRampEditorProps extends React.Props<ColorRampEditor>
 {
 		colorRamp:ColorRamp;
+		compact?:boolean;
 		onButtonClick?:React.MouseEventHandler;
 		linktoToolEditorCrumb?:Function;
 }
@@ -88,7 +89,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 	
 	render()
 	{
-		return this.props.linktoToolEditorCrumb ? this.renderCompactView() : this.renderFullView();
+		return this.props.compact ? this.renderCompactView() : this.renderFullView();
 	}
 }
 
