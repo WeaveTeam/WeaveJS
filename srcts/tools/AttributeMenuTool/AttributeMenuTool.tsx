@@ -94,12 +94,11 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		var targetAttributeColumn:DynamicColumn;//attribute which will be set
 		var selectedColumn:IColumnWrapper = selectedValue instanceof Array ? selectedValue[0] as IColumnWrapper : selectedValue as IColumnWrapper;//attribute option chosen from tool; used to set target attribute
 
-
 		if (Weave.IS(targetAttribute, IColumnWrapper))
 		{
 			targetAttributeColumn = ColumnUtils.hack_findInternalDynamicColumn(targetAttribute as IColumnWrapper);
 		}
-		else//ILinkableHashMap take the first object and force it into a column
+		else if (Weave.IS(targetAttribute, ILinkableHashMap))
 		{
 			var hm = targetAttribute as ILinkableHashMap;
 			ColumnUtils.forceFirstColumnDynamic(hm);
