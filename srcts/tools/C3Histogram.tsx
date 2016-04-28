@@ -588,7 +588,6 @@ export default class C3Histogram extends AbstractC3Tool
 							dependencies={[this.fill.color]}
 							render={() =>
 								<ColorRampEditor
-									compact={true}
 									linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
 									colorRamp={this.colorColumn && this.colorColumn.ramp}
 									onButtonClick={() => this.openColorController(0)}
