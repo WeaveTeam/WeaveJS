@@ -458,7 +458,9 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-menuitem-label {
-	white-space: nowrap
+	white-space: nowrap;
+	display: flex;
+	flex:1;
 }
 
 .weave-menuitem-label-padding-left {
@@ -466,6 +468,16 @@ div.table-row-selected>div>div>div>div>div {
 }
 .weave-menuitem-label-padding-right {
 	padding-right: 5px;
+}
+
+.weave-menuitem-nopadding {
+	padding: 0!important;
+}
+
+.weave-menuitem-padding {
+	flex:1;
+	padding: .71428571rem 1.14285714rem!important;
+	cursor: pointer;
 }
 
 .weave-menu-divider {

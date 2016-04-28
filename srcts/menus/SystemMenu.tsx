@@ -21,7 +21,8 @@ export default class SystemMenu implements MenuBarItemProps
 	{
 		return [
 			{
-				label: <FileInput onChange={this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes().join(',')}>{Weave.lang("Open session...")}</FileInput>
+				label: <FileInput onChange={this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes().join(',')}><span className="weave-menuitem-padding">{Weave.lang("Open session...")}</span></FileInput>,
+				itemStyleOverride: {padding: "0!important"}
 			},
 			{
 				label: Weave.lang("Save session as..."),

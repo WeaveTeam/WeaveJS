@@ -13,7 +13,8 @@ export interface MenuItemProps
 	click?:Function;
 	enabled?:boolean;
 	shown?:boolean;
-	menu?:MenuItemProps[]
+	menu?:MenuItemProps[];
+	itemStyleOverride?:React.CSSProperties;
 }
 
 export interface MenuProps extends React.HTMLProps<Menu>
@@ -116,6 +117,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			<div className={menuItemClass}
 				onClick={click}
 				key={index}
+			     style={props.itemStyleOverride}
 			>
 				<HBox>
 					<div>{props.leftIcon}</div>
