@@ -586,22 +586,21 @@ div.weave-tree-view {
 	font-size: small;
 }
 
-.weave-ToolEditor .ui.button{
+.weave-ToolEditor .ui.button {
 	font-size: small;
 }
 
-.weave-ToolEditor table{
+.weave-ToolEditor table {
 	width: 100%;
 	font-size: inherit;
 }
 
-.weave-ToolEditor .weave-left-cell{
+.weave-ToolEditor .weave-left-cell {
 	white-space: nowrap;
 	text-align: right;
-	padding-right: 8px;
 }
 
-.weave-ToolEditor .weave-right-cell{
+.weave-ToolEditor .weave-right-cell {
 	width: 100%;
 	padding-top: 4px;
 	padding-bottom: 4px;
