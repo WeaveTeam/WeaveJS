@@ -90,7 +90,9 @@ export default class AbstractFilterEditor
 
 	onChange(selectedValues:Object)
 	{
-		this.filter.values.state = selectedValues;
+		var filter = this.filter;
+		if (filter)
+			filter.values.state = selectedValues;
 	}
 
 	get deprecatedStateMapping():Object
