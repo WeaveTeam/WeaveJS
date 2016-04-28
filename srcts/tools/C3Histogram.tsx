@@ -67,34 +67,41 @@ export default class C3Histogram extends AbstractC3Tool
 	{
 		return Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
 	}
-
+	private _callbackRecursion:boolean = false;
 	private setColorColumn():void
 	{
-		var colorBinCol:BinnedColumn = this.internalColorColumn ? Weave.AS(this.internalColorColumn.getInternalColumn(), BinnedColumn) : null;
-		if (!colorBinCol)
+		if(this._callbackRecursion)
 			return;
-		
-		if (colorBinCol.binningDefinition.internalObject)
-			Weave.copyState(this.binnedColumn, colorBinCol);
-		else
-			Weave.copyState(this.binnedColumn.internalDynamicColumn, colorBinCol.internalDynamicColumn);
+		this._callbackRecursion = true; // helps prevents both call backs from calling each other
+		var colorBinCol:BinnedColumn = this.internalColorColumn ? Weave.AS(this.internalColorColumn.getInternalColumn(), BinnedColumn) : null;
+		if (colorBinCol) {
+			if (colorBinCol.binningDefinition.internalObject)
+				Weave.copyState(this.binnedColumn, colorBinCol);
+			else
+				Weave.copyState(this.binnedColumn.internalDynamicColumn, colorBinCol.internalDynamicColumn);
+		}
+		this._callbackRecursion = false;
 	}
 
 	private setBinnedColumn():void
 	{
-		var colorBinCol:BinnedColumn = this.internalColorColumn ? Weave.AS(this.internalColorColumn.getInternalColumn(), BinnedColumn) : null;
-		if (!colorBinCol)
+		if(this._callbackRecursion)
 			return;
-		
-		// if there is a binning definition, copy it - otherwise, only copy the internal column
-		if (colorBinCol.binningDefinition.internalObject)
-			Weave.copyState(colorBinCol, this.binnedColumn);
-		else
-			Weave.copyState(colorBinCol.internalDynamicColumn, this.binnedColumn.internalDynamicColumn);
-		
-		var filteredColumn = Weave.AS(this.binnedColumn.getInternalColumn(), FilteredColumn);
-		if (filteredColumn)
-			Weave.linkState(this.filteredKeySet.keyFilter, filteredColumn.filter);
+		this._callbackRecursion = true;
+		var colorBinCol:BinnedColumn = this.internalColorColumn ? Weave.AS(this.internalColorColumn.getInternalColumn(), BinnedColumn) : null;
+		if (colorBinCol)
+		{
+			// if there is a binning definition, copy it - otherwise, only copy the internal column
+			if (colorBinCol.binningDefinition.internalObject)
+				Weave.copyState(colorBinCol, this.binnedColumn);
+			else
+				Weave.copyState(colorBinCol.internalDynamicColumn, this.binnedColumn.internalDynamicColumn);
+			
+			var filteredColumn = Weave.AS(this.binnedColumn.getInternalColumn(), FilteredColumn);
+			if (filteredColumn)
+				Weave.linkState(this.filteredKeySet.keyFilter, filteredColumn.filter);
+		}
+		this._callbackRecursion = false;
 	}
 
 	private get RECORD_FORMAT() {
