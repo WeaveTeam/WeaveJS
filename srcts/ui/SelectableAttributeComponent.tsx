@@ -9,6 +9,8 @@ import ComboBox from '../semantic-ui/ComboBox';
 import List from '../react-ui/List';
 import ControlPanel from "./ControlPanel";
 import ReactUtils from "../utils/ReactUtils";
+import {createWatcher} from "../utils/WeaveReactUtils";
+import DynamicComponent from "./DynamicComponent";
 
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
@@ -17,6 +19,7 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import IDataSource = weavejs.api.data.IDataSource;
 import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
+import ILinkableObject = weavejs.api.core.ILinkableObject;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 import ListOption from "../react-ui/List";
@@ -44,13 +47,38 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	constructor (props:ISelectableAttributeComponentProps)
 	{
 		super(props);
+		this.componentWillReceiveProps(props);
 	}
 	private comboBox: ComboBox;
 	private lastActiveNode:IWeaveTreeNode & IColumnReference;
 
-	componentDidMount()
+	private static getDataSourceDependencies(attribute:IColumnWrapper|ILinkableHashMap):IDataSource[]
 	{
-		Weave.getCallbacks(this.props.attributes.get(this.props.attributeName)).addGroupedCallback(this, this.forceUpdate);
+		let dataSources: IDataSource[];
+
+		let ilhm = Weave.AS(attribute, ILinkableHashMap);
+		let icw = Weave.AS(attribute, IColumnWrapper);
+
+		if (icw)
+		{
+			dataSources = ColumnUtils.getDataSources(icw);
+		}
+		else if (ilhm)
+		{
+			dataSources =
+				_.flatten(
+					(ilhm.getObjects(IColumnWrapper) as IColumnWrapper[]).map(SelectableAttributeComponent.getDataSourceDependencies)
+				).filter(_.identity);
+		}
+		return dataSources;
+	}
+
+	componentWillReceiveProps(nextProps:ISelectableAttributeComponentProps)
+	{
+		let attribute = nextProps.attributes.get(nextProps.attributeName);
+		let dependencies = SelectableAttributeComponent.getDataSourceDependencies(attribute) as ILinkableObject[];
+		dependencies.push(attribute);
+		DynamicComponent.setDependencies(this, dependencies);
 	}
 	
 	launchAttributeSelector=(attributeName:string):ControlPanel=>
