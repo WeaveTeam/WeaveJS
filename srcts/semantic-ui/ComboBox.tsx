@@ -63,7 +63,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			else
 			{
 				value = props.value && props.value.value;
-				options = _.uniq(_.union([props.value], options), "value");
+				options = _.uniq(_.union(options, [props.value]), "value");
 			}
 		}
 		return {
