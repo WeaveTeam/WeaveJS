@@ -47,7 +47,7 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
-					{Weave.lang("Key Property")}
+					{Weave.lang("Key property")}
 					<HelpIcon>{Weave.lang("A property that can uniquely identify each row in the data. If there are no such properties, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
 				<ComboBox style={{width: "100%"}}
@@ -57,8 +57,8 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
-					{Weave.lang("Namespace")}
-					<HelpIcon>{Weave.lang("Namespaces are used to link tables using matching key columns.")}</HelpIcon>
+					{Weave.lang("Key namespace)}
+					<HelpIcon>{Weave.lang("Key namespaces are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
 				<KeyTypeInput style={{width: "100%"}}
 							  keyTypeProperty={dataSource.keyType}/>

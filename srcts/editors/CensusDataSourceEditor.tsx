@@ -171,14 +171,14 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 		return [
 			this.getLabelEditor(ds.label),
 			[
-				Weave.lang("API Key"),
+				Weave.lang("API key"),
 				<StatefulTextField style={{width: "100%"}}
 								   ref={linkReactStateRef(this, { content: ds.apiKey }) }/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
-					{Weave.lang("Namespace")}
-					<HelpIcon>{Weave.lang("Namespaces are used to link tables using matching key columns.")}</HelpIcon>
+					{Weave.lang("Key namespace")}
+					<HelpIcon>{Weave.lang("Key namespaces are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
 				<KeyTypeInput style={{width: "100%"}}
 							  keyTypeProperty={ds.keyType}/>
@@ -191,7 +191,7 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 				          options={datasets || [{value: dataset, label: datasetLabel}]}/>
 			],
 			[
-				Weave.lang("Geographic Scope"),
+				Weave.lang("Geographic scope"),
 				<ComboBox style={{width: "100%"}}
 				          ref={linkReactStateRef(this, {value: ds.geographicScope })}
 				          selectFirstOnInvalid
