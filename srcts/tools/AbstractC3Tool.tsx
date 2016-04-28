@@ -152,9 +152,11 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	
 	validateSize()
 	{
-		if (!this.element)
+		if (!this.element || !this.chart)
 			return;
-        if (this.c3Config.size.width != this.element.clientWidth || this.c3Config.size.height != this.element.clientHeight)
+		var chartWidth = this.chart.internal && this.chart.internal.config && this.chart.internal.config.size_width;
+		var chartHeight = this.chart.internal && this.chart.internal.config && this.chart.internal.config.size_height;
+        if (chartWidth != this.element.clientWidth || chartHeight != this.element.clientHeight)
 		{
             this.c3Config.size = { width: this.element.clientWidth, height: this.element.clientHeight };
 			if (this.chart)
