@@ -16,27 +16,15 @@ export interface DynamicComponentState
 
 export default class DynamicComponent extends React.Component<DynamicComponentProps, DynamicComponentState>
 {
-	private deps = new Set<ILinkableObject>();
-
 	constructor(props:DynamicComponentProps)
 	{
 		super(props);
-		this.componentWillReceiveProps(props);
+		DynamicComponent.setDependencies(this, props.dependencies);
 	}
 	
 	componentWillReceiveProps(newProps:DynamicComponentProps)
 	{
-		var newDeps = new Set<ILinkableObject>(newProps.dependencies);
-
-		for (var dep of newDeps)
-			if (!this.deps.has(dep))
-				Weave.getCallbacks(dep).addGroupedCallback(this, this.forceUpdate);
-
-		for (var dep of this.deps)
-			if (!newDeps.has(dep))
-				Weave.getCallbacks(dep).removeCallback(this, this.forceUpdate);
-
-		this.deps = newDeps;
+		DynamicComponent.setDependencies(this, newProps.dependencies);
 	}
 	
 	render():JSX.Element
@@ -46,6 +34,25 @@ export default class DynamicComponent extends React.Component<DynamicComponentPr
 	
 	componentWillUnmount()
 	{
-		this.deps = null;
+		DynamicComponent.setDependencies(this, []);
+	}
+	
+	private static map_component_dependencies = new WeakMap<React.Component<any, any>, Set<ILinkableObject>>();
+	
+	static setDependencies(component:React.Component<any, any>, dependencies:ILinkableObject[]):void
+	{
+		var oldDeps = DynamicComponent.map_component_dependencies.get(component);
+		var newDeps = new Set<ILinkableObject>(dependencies);
+
+		for (let dep of newDeps)
+			if (!oldDeps || !oldDeps.has(dep))
+				Weave.getCallbacks(dep).addGroupedCallback(component, component.forceUpdate);
+
+		if (oldDeps)
+			for (let dep of oldDeps)
+				if (!newDeps.has(dep))
+					Weave.getCallbacks(dep).removeCallback(component, component.forceUpdate);
+		
+		DynamicComponent.map_component_dependencies.set(component, newDeps);
 	}
 }
