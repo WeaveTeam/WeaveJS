@@ -159,15 +159,15 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	handleProbe=(ids:string[]) =>
 	{
-		if(ids.length)
-			this.probeKeySet.replaceKeys(ids as any);
+		if(ids && ids.length)
+			this.probeKeySet.replaceKeys(ids && ids.map((id) => weavejs.WeaveAPI.QKeyManager.stringToQKey(id)));
 		else
 			this.probeKeySet.clearKeys();
 	};
 
 	handleSelection=(ids:string[]) =>
 	{
-		this.selectionKeySet.replaceKeys(ids as any);
+		this.selectionKeySet.replaceKeys(ids && ids.map((id) => weavejs.WeaveAPI.QKeyManager.stringToQKey(id)));
 	};
 
 	get selectableAttributes()
@@ -235,8 +235,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				columnTitles={this.state.columnTitles}
 				rows={this.state.data}
 				idProperty={this.idProperty}
-				selectedIds={this.selectionKeySet && this.selectionKeySet.keys as any}
-				probedIds={this.probeKeySet && this.probeKeySet.keys as any}
+				selectedIds={this.selectionKeySet && this.selectionKeySet.keys.map(String) as any}
+				probedIds={this.probeKeySet && this.probeKeySet.keys.map(String) as any}
 				onHover={this.handleProbe}
 				onSelection={this.handleSelection}
 				showIdColumn={this.showKeyColumn.value}
