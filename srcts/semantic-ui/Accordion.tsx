@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import SmartComponent from "../ui/SmartComponent";
@@ -81,19 +82,22 @@ export default class Accordion extends SmartComponent<AccordionProps, AccordionS
 				"weave-right-cell"
 			]
 		};
-		return <Accordion
-			titles={sections.map(([header, content]) => header)}
-			children={
-				sections.map(([header, content], index) => (
-					Array.isArray(content)
-					?	ReactUtils.generateTable({
-							body: content,
-							props: {key: index},
-							classes
-						})
-					:	content
-				))
-			}
-		/>;
+		sections = sections.filter(_.identity);
+		return (
+			<Accordion
+				titles={sections.map(([header, content]) => header)}
+				children={
+					sections.map(([header, content], index) => (
+						Array.isArray(content)
+						?	ReactUtils.generateTable({
+								body: content,
+								props: {key: index},
+								classes
+							})
+						:	content
+					))
+				}
+			/>
+		);
 	}
 }
