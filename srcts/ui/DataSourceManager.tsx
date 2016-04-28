@@ -160,7 +160,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						this.props.dataMenu
 						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } showIcon={false} style={{width: "100%"}}>
 								<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
-								{Weave.lang('Add')}
+								{Weave.lang('Add data')}
 							</MenuButton>
 						: 	null
 					}
