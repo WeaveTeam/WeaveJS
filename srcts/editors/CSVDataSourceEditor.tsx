@@ -60,7 +60,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
 		let columnIds:ComboBoxOption[] = ds.getColumnIds().map( (id, index) => {
-			return {label: id.toString(), value: id}
+			return {label: ds.getColumnTitle(id), value: id}
 		});
 		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
