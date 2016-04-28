@@ -6450,6 +6450,7 @@ declare module weavejs.data.source {
         metadata: LinkableVariable;
         url: LinkableFile;
         delimiter: LinkableString;
+        keysAreUnique: boolean;
         /**
          * Convenience function for setting session state of csvData.
          * @param rows
