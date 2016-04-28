@@ -263,17 +263,17 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		
 		return [
 			[
-				Weave.lang("Visualization Tool"),
+				Weave.lang("Chart"),
 				<ComboBox
 					className="weave-sidebar-dropdown"
-					placeholder="Select a visualization"
+					placeholder="Select a chart"
 					value={ toolName }
 					options={ this.openTools }
 					onChange={ this.handleTargetToolChange }
 				/>
 			],
 			[
-				Weave.lang("Visualization Attribute"),
+				Weave.lang("Attribute"),
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					placeholder="Select an attribute"
@@ -324,7 +324,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 								]
 							}
 						})
-					:	<div>{ 'Select a visualization from the Visualizations menu' }</div>
+					:	<div>{ 'Select a chart from the Charts menu' }</div>
 				}
 			</VBox>
 		);
