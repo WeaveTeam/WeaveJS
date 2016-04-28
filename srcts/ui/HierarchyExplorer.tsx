@@ -25,7 +25,9 @@ export interface IHierarchyExplorerProps
 {
 	initialSelectedItems: IWeaveTreeNode[];
 	root: IWeaveTreeNode;
-	onSelect: (selectedNodes: IWeaveTreeNode[])=>void;
+	onSelect: (selectedNodes: IWeaveTreeNode[]) => void;
+	onDoubleClick: (clickedNode: IWeaveTreeNode) => void;
+	skipSelections?: boolean; /* Don't use selectedItems for the right-hand pane, just open the left hand pane's items */
 }
 
 export interface IHierarchyExplorerState
@@ -87,8 +89,8 @@ export default class HierarchyExplorer extends SmartComponent<IHierarchyExplorer
 			<div style={{display: "flex"}}>
 				<DynamicComponent dependencies={[this.props.root]} render={() => {
 					return <WeaveTree ref={(c) => { if (c) this.columnTree = c } } hideRoot hideBranches
-						initialSelectedItems={
-							this.props.initialSelectedItems} root={this.selectedFolder} onSelect={this.props.onSelect}/>;
+						initialSelectedItems={this.props.skipSelections ? [] :
+							this.props.initialSelectedItems} root={this.selectedFolder} onSelect={this.props.onSelect} onDoubleClick={this.props.onDoubleClick}/>;
 				}}/>
 			</div>
 		</HDividedBox>;

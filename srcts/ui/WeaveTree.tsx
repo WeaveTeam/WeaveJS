@@ -24,6 +24,7 @@ export interface IWeaveTreeProps {
 	onExpand?: (openItems: Array<IWeaveTreeNode>) => void;
 	initialOpenItems?: Array<IWeaveTreeNode>;
 	initialSelectedItems?: Array<IWeaveTreeNode>;
+	onDoubleClick?: (item: IWeaveTreeNode) => void;
 };
 
 export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTreeState>
@@ -131,6 +132,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		let className = WeaveTree.CLASSNAME;
 		let iconClassName = WeaveTree.LEAF_ICON_CLASSNAME;
 		let iconClickFunc: React.MouseEventHandler = null;
+		let doubleClickFunc: React.MouseEventHandler;
 		let expanderClassName: string = WeaveTree.EXPANDER_HIDDEN_CLASS_NAME;
 
 		let isOpen = this.getOpen(node);
@@ -138,7 +140,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		/* If we are a branch, we still might not be expandable due to hiding leaves and not having any children who are also branches. */
 		let isExpandable = node.isBranch() && (!this.props.hideLeaves || node.hasChildBranches());
 
-		if (node.isBranch()) {
+		if (node.isBranch())
+		{
 			iconClassName = isOpen ? WeaveTree.OPEN_BRANCH_ICON_CLASSNAME : WeaveTree.BRANCH_ICON_CLASSNAME;
 		}
 
@@ -149,10 +152,16 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 			expanderClassName = isOpen ? WeaveTree.EXPANDER_OPEN_CLASS_NAME : WeaveTree.EXPANDER_CLOSED_CLASS_NAME;
 		}
+		else if (!node.isBranch() && this.props.onDoubleClick)
+		{
+			doubleClickFunc = (e: React.MouseEvent): void => {
+				this.props.onDoubleClick && this.props.onDoubleClick(node);
+			}
+		}
 
 		return <HBox key={index}
 			className={className}
-			onDoubleClick={ iconClickFunc }
+			onDoubleClick={ iconClickFunc || doubleClickFunc }
 			style={{ alignItems: "center", width: "100%" }}>
 			<HBox style={{ marginLeft: (depth || 0) * 16 + 5, whiteSpace: "nowrap" }}>
 				<span style={{ alignSelf: "stretch", display: "flex" }}>
@@ -265,6 +274,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			selectedIds={selectedIndices}
 			onSelection={this.onSelect}
 			showBottomBorder={false}
+			allowClear={false}
 		/>;
 	}
 }

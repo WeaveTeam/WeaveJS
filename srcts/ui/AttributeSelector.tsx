@@ -100,7 +100,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         }
     }
 
-    handleButtonBarClick = (event:React.MouseEvent, name:string = null, index:number = null):void=>
+    onButtonBarClick = (event:React.MouseEvent, name:string = null, index:number = null):void=>
     {
         let selectedAttribute:IColumnWrapper|ILinkableHashMap = this.props.attributes.get(name);
 
@@ -109,27 +109,36 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         });
     };
 
-    addSelected =():void=>
+    private addColumns(refs:IColumnReference[])
     {
-        for(let ref of this.selectedColumnRefs){
+        for (let ref of refs) {
             var meta = ref && ref.getColumnMetadata();
-            if (meta)
-            {
+            if (meta) {
                 var lhm = Weave.AS(this.selectedAttribute, ILinkableHashMap);
                 if (lhm)
                     lhm.requestObject(null, weavejs.data.column.ReferencedColumn).setColumnReference(ref.getDataSource(), meta);
             }
         }
+    }
+    onAddSelected =():void=>
+    {
+        this.addColumns(this.selectedColumnRefs);
     };
 
-    handleSelectAll=():void=>{
+    onSelectAll=():void=>{
         if (this.hierarchyExplorer.selectedFolder)
         {
             this.hierarchyExplorer.selectedItems = this.hierarchyExplorer.selectedFolder.getChildren();
         }
     };
 
-    setColumn=(selectedItems:Array<IWeaveTreeNode>):void =>{
+    onDoubleClick=(item:IWeaveTreeNode)=>
+    {
+        let ref = Weave.AS(item, IColumnReference);
+        if (ref) this.addColumns([ref]);
+    }
+
+    onSelectColumn=(selectedItems:Array<IWeaveTreeNode>):void =>{
 
         var ref = Weave.AS(selectedItems[0], weavejs.api.data.IColumnReference);
         if (ref && !this.usingHashMap)
@@ -201,7 +210,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 					(attributeNames.length > 1)
 					?	<ButtonGroupBar activeButton={ this.props.attributeName }
 							items={ attributeNames }
-							clickHandler={this.handleButtonBarClick}
+							clickHandler={this.onButtonBarClick}
 						/>
 					:	null
 				}
@@ -211,13 +220,13 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 						attributeName={ this.state.selectedAttributeName }
 						attributes={ this.props.attributes}
 					/>
-                <HierarchyExplorer ref={(c) => {if (c) this.hierarchyExplorer = c} } root={this.rootNode} onSelect={this.setColumn} initialSelectedItems={this.getSelectedTreeNodes()}/>
+                <HierarchyExplorer skipSelections={this.usingHashMap} ref={(c) => {if (c) this.hierarchyExplorer = c} } root={this.rootNode} onSelect={this.onSelectColumn} initialSelectedItems={this.getSelectedTreeNodes()} onDoubleClick={this.usingHashMap ? this.onDoubleClick : null}/>
 				{
 					this.usingHashMap
 					?
 						<HBox className="weave-padded-hbox" style={ controllerStyle } >
-                            <Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedFolder)} onClick={this.handleSelectAll}>Select All</Button>
-							<Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedItems.length)} onClick={this.addSelected}>Add Selected</Button>
+                            <Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedFolder)} onClick={this.onSelectAll}>Select All</Button>
+							<Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedItems.length)} onClick={this.onAddSelected}>Add Selected</Button>
 						</HBox>
 					:	null
 				}
