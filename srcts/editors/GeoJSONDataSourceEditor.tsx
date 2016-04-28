@@ -57,7 +57,7 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
-					{Weave.lang("Key namespace)}
+					{Weave.lang("Key namespace")}
 					<HelpIcon>{Weave.lang("Key namespaces are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
 				<KeyTypeInput style={{width: "100%"}}
