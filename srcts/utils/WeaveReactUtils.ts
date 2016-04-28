@@ -5,6 +5,7 @@ import ReactUtils from "./ReactUtils";
 import {ReactComponent} from "./ReactUtils";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
+import LinkableWatcher = weavejs.core.LinkableWatcher;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IDisposableObject = weavejs.api.core.IDisposableObject;
 
@@ -158,4 +159,9 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 	ReactUtils.onUnmount(component, unlinkReactState);
 	
 	authority();
+}
+
+export function createWatcher(component:ReactComponent, type:new(..._:any[])=>ILinkableObject):LinkableWatcher
+{
+	return Weave.disposableChild(component, new LinkableWatcher(type, null, component.forceUpdate));
 }
