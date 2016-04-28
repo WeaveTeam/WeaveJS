@@ -13,7 +13,7 @@ import LinkableWatcher = weavejs.core.LinkableWatcher;
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
 	tool:IVisTool;
-	onCloseHandler:(event: React.MouseEvent) => void;
+	onCloseHandler:() => void;
 }
 
 export interface WeaveToolEditorState
@@ -98,10 +98,16 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		});
 		this.crumbOrder = this.crumbOrder.slice(0, index + 1);
 	};
+	
+	componentWillUpdate()
+	{
+		if (!this.tool && this.props.onCloseHandler)
+			this.props.onCloseHandler();
+	}
 
 	render()
 	{
-		if(this.tool)
+		if (this.tool)
 			this.mapping_crumb_children[this.displayName] = this.tool.renderEditor(this.linktoToolEditorCrumbFunction);
 		
 		var crumbStyle:React.CSSProperties = {
@@ -192,7 +198,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						:	null
 					}
 					<Button
-						onClick={ this.props.onCloseHandler }
+						onClick={ () => this.props.onCloseHandler() }
 					    title="Close editor">
 						&#x2715;
 					</Button>
