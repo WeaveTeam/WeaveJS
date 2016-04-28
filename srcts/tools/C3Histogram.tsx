@@ -1,6 +1,7 @@
 import {IVisToolProps} from "./IVisTool";
 import AbstractC3Tool from "./AbstractC3Tool";
 import {VBox, HBox} from "../react-ui/FlexBox";
+import ColorPicker from "../react-ui/ColorPicker";
 import ReactUtils from "../utils/ReactUtils";
 import * as _ from "lodash";
 import * as d3 from "d3";
@@ -566,10 +567,19 @@ export default class C3Histogram extends AbstractC3Tool
 		}
 	}
 
+	updateColor( color:string)
+	{
+		if (this.colorColumn && this.colorColumn.ramp)
+		{
+			this.colorColumn.ramp.setSessionState([color])
+		}
+	}
+
     //todo:(linktoToolEditorCrumbFunction)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(linktoToolEditorCrumbFunction:Function):JSX.Element
 	{
 		var linkedColor:Boolean = !!this.fill.color.internalDynamicColumn.targetPath;
+		var hexColor:string  = this.colorColumn && this.colorColumn.ramp ? (this.colorColumn.ramp.state as string[])[0] : "#808080"
 		return Accordion.render(
 			[
 				Weave.lang("Binning"),
@@ -625,7 +635,12 @@ export default class C3Histogram extends AbstractC3Tool
 					[
 						null,
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
-					]
+					],
+					!linkedColor && [
+										Weave.lang("Color"),
+										<ColorPicker height={"14px"} hexColor={hexColor} onChange={(newColor:string) => this.updateColor( newColor)}/>
+									]
+
 				]
 			],
 			[Weave.lang("Titles"), this.getTitlesEditor()],

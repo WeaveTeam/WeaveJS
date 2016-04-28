@@ -6,6 +6,8 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 export interface ColorPickerProps extends React.Props<ColorPicker>
 {
 	hexColor?:string;
+	width?:string;
+	height?:string;
 	onChange?: (hexColor:string) => void;
 	onClose?: (hexColor:string) => void;
 }
@@ -79,17 +81,19 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 
 	render():JSX.Element {
 
+		// important to set display block if color has no width & height
+		// this enusres swatch size never goes zero
 		var swatchStyle:React.CSSProperties = {
 			padding: '5px',
 			background: '#fff',
 			borderRadius: '1px',
 			boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
-			display: 'inline-block',
+			display: this.props.width && this.props.height ? 'inline-block' : "block",
 			cursor: 'pointer'
 		};
 		var colorStyle:React.CSSProperties = {
-			width: '36px',
-			height: '14px',
+			width: this.props.width ? this.props.width:"100%",
+			height: this.props.height ? this.props.height:"100%",
 			borderRadius: '2px',
 			background: this.state.hexColor
 		};

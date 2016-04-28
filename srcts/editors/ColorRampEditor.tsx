@@ -355,7 +355,7 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 				label: (
 					<HBox style={{flex: 1, justifyContent: "space-between", verticalAlign: "middle"}}>
 						<HBox className="weave-padded-hbox">
-							<ColorPicker hexColor={hexColor} onClose={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
+							<ColorPicker height="14px" width="36px" hexColor={hexColor} onClose={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
 							<span style={{alignSelf: "center", fontFamily: "monospace"}}>{hexColor.toUpperCase()}</span>
 						</HBox>
 						<CenteredIcon iconProps={{className: "fa fa-times fa-fw"}} onClick={() => this.removeColorAtIndex(index)}/>
