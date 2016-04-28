@@ -682,6 +682,10 @@ div.weave-tree-view {
 	border-bottom-width: 1!important;
 }
 
+.ui.dropdown .menu>.header {
+	padding-left: 4;
+}
+
 /******* grid *********/
 
 .ui.grid {

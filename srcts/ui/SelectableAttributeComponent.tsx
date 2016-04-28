@@ -160,7 +160,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 						value={node ? {label: node.getLabel(), value: node} : {label: "(None)", value: null}}
 						options={options}
 						onChange={this.setColumn}
-						optionStyle={{marginLeft:10}}
 						header={header}
 					/>
 					{this.props.hideButton ? null : <Button
