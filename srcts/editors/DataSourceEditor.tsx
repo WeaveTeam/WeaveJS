@@ -170,13 +170,11 @@ export default class DataSourceEditor extends React.Component<IDataSourceEditorP
 		return (
 			<VBox style={{flex: 1}}>
 				<span style={{marginBottom: 5}}>{Weave.lang(rows ? "Selected column has {0} records":"", rows ? rows.length:0)}</span>
-				{
-					<FixedDataTable rows={rows}
-								 	columnIds={columnIds}
-								 	idProperty="id"
-								 	showIdColumn={true}
-								 	columnTitles={columnTitles}/>
-				}
+				<FixedDataTable rows={rows}
+							 	columnIds={columnIds}
+							 	idProperty="id"
+							 	showIdColumn={true}
+							 	columnTitles={columnTitles}/>
 			</VBox>
 		)
 	}

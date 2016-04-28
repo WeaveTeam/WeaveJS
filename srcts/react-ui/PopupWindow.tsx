@@ -105,10 +105,12 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	componentDidMount()
 	{
 		var top = this.props.top || (window.innerHeight - this.element.clientHeight) / 2;
-		var left = this.props.left || (window.innerWidth - this.element.clientWidth) / 2; 
+		var left = this.props.left || (window.innerWidth - this.element.clientWidth) / 2;
 		this.setState({
 			top: top,
 			left: left,
+			width: this.element.clientWidth,
+			height: this.element.clientHeight
 		});
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
@@ -207,7 +209,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		else if (this.dragging)
 		{
 			newState.left = this.state.left + mouseDeltaX;
-			newState.left = Math.max(newState.left, edgeBuffer - this.state.width);
+			newState.left = Math.max(newState.left, edgeBuffer - (this.state.width || 0));
 			newState.left = Math.min(newState.left, parentWidth - edgeBuffer);
 			
 			newState.top = this.state.top + mouseDeltaY;
