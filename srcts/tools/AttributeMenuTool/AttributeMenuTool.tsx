@@ -134,7 +134,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 			case LAYOUT_LIST:
 				return (
 					<VBox>
-						<List options={ this.options }  onChange={ this.handleSelection.bind(this) } selectedValues={ [selectedAttribute] }/>
+						<List options={ this.options }  onChange={ this.handleSelection } selectedValues={ [selectedAttribute] }/>
 					</VBox>
 				);
 			case LAYOUT_HSLIDER:
@@ -150,7 +150,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 					</VBox>
 				);
 			case LAYOUT_COMBO:
-				return (<ComboBox options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection.bind(this) } value={ selectedAttribute } placeholder="Select an attribute" />); //have to return a valid react component, otherwise invariant violation
+				return (<ComboBox options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection } value={ selectedAttribute } placeholder="Select an attribute" />); //have to return a valid react component, otherwise invariant violation
 		}
 	}
 }
