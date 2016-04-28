@@ -11,6 +11,7 @@ import ReactUtils from "../utils/ReactUtils";
 import PrintUtils from "../utils/PrintUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import Checkbox from "../semantic-ui/Checkbox";
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -142,6 +143,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		var format:any = _.zipObject(names, columns);
 		format[this.idProperty] = IQualifiedKey;
 		var records:IRow[] = ColumnUtils.getRecords(format, this.filteredKeySet.keys, String);
+		records.forEach(record => record[this.idProperty] = record[this.idProperty].toString());
+
 		var titles:string[] = columns.map(column => Weave.lang(column.getMetadata("title")));
 		var columnTitles = _.zipObject(names, titles) as { [columnId: string]: string; };
 		names.unshift(this.idProperty);
@@ -191,7 +194,14 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	renderEditor(linkFunction:Function):JSX.Element
 	{
 		return ReactUtils.generateTable({
-			body: renderSelectableAttributes(this.selectableAttributes, linkFunction).concat(this.getTitlesEditor()),
+			body: renderSelectableAttributes(this.selectableAttributes, linkFunction)
+				  .concat(this.getTitlesEditor())
+				  .concat([
+					  [
+    					  Weave.lang("Show Key Column"),
+    					  <Checkbox ref={linkReactStateRef(this, { value: this.showKeyColumn })} label={" "}/>
+    				  ]  
+				  ]),
 			classes: {
 				td: [
 					"weave-left-cell",
@@ -200,7 +210,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			}
 		});
 	};
-
+	
 	getTitlesEditor():React.ReactChild[][]
 	{
 		return [
