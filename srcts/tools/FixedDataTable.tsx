@@ -49,6 +49,7 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	width?:number;
 	height?:number;
 	showBottomBorder?:boolean;
+	allowClear?: boolean;
 }
 
 export interface IFixedDataTableState
@@ -178,7 +179,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		initialColumnWidth: 85,
 		allowResizing: true,
 		evenlyExpandRows: true,
-		showBottomBorder: true
+		showBottomBorder: true,
+		allowClear:true
 	};
 
 	constructor(props:IFixedDataTableProps)
@@ -345,7 +347,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			// if there was only one record selected
 			// and we are clicking on it again, then we want to
 			// clear the selection.
-			if (selectedIds.length == 1 && selectedIds[0] == id)
+			if (selectedIds.length == 1 && selectedIds[0] == id && this.props.allowClear)
 			{
 				selectedIds = [];
 				this.lastClicked = null;
