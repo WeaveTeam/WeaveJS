@@ -255,37 +255,40 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 		let renderObj:any = {
 			sessionObjectToLink:null,
 			sessionObjectLabel:"",
-			helpMessage:""
+			helpMessage:"",
+			style: {width: 60}
 		}
 
 		if (binDef instanceof SimpleBinningDefinition)
 		{
-			renderObj.sessionObjectToLink  = (binDef as SimpleBinningDefinition).numberOfBins;
-			renderObj.sessionObjectLabel = "Number of Bins";
+			renderObj.sessionObjectToLink = (binDef as SimpleBinningDefinition).numberOfBins;
+			renderObj.sessionObjectLabel = "Number of bins";
 			renderObj.helpMessage = 'Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]';
 		}
 		else if (binDef instanceof EqualIntervalBinningDefinition)
 		{
-			renderObj.sessionObjectToLink  = (binDef as EqualIntervalBinningDefinition).dataInterval;
+			renderObj.sessionObjectToLink = (binDef as EqualIntervalBinningDefinition).dataInterval;
 			renderObj.sessionObjectLabel = "Data interval";
 			renderObj.helpMessage = 'Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]';
 		}
 		else if (binDef instanceof QuantileBinningDefinition)
 		{
-			renderObj.sessionObjectToLink  = (binDef as QuantileBinningDefinition).refQuantile;
-			renderObj.sessionObjectLabel = "Reference Quantile";
+			renderObj.sessionObjectToLink = (binDef as QuantileBinningDefinition).refQuantile;
+			renderObj.sessionObjectLabel = "Reference quantile";
 			renderObj.helpMessage = 'Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order'
 		}
 		else if (binDef instanceof NaturalJenksBinningDefinition)
 		{
-			renderObj.sessionObjectToLink  = (binDef as NaturalJenksBinningDefinition).numOfBins;
+			renderObj.sessionObjectToLink = (binDef as NaturalJenksBinningDefinition).numOfBins;
 			renderObj.sessionObjectLabel = "Number of bins";
 			renderObj.helpMessage = 'The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization';
 		}
 		else if (binDef instanceof CustomSplitBinningDefinition)
 		{
-			renderObj.sessionObjectToLink  = (binDef as CustomSplitBinningDefinition).splitValues;
+			renderObj.sessionObjectToLink = (binDef as CustomSplitBinningDefinition).splitValues;
+			renderObj.sessionObjectLabel = "Break values";
 			renderObj.helpMessage = 'Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]';
+			renderObj.style = {flex: 1};
 		}
 		else if (binDef instanceof StandardDeviationBinningDefinition)
 		{
@@ -306,7 +309,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 		{
 			let renderProps:any = this.getBinDefRenderProps(selectedBinDefn);
 			return (
-				<VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto", border: "none"}}>
+				<VBox className="weave-padded-vbox">
 					{ReactUtils.generateTable({
 						body: [
 							[
@@ -331,7 +334,11 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 							],
 							renderProps.sessionObjectToLink && [
 								<span style={ {whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span>,
-								<StatefulTextField type="text" ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}/>
+								<StatefulTextField
+									style={{flex: 1}}
+									type="text"
+									ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}
+								/>
 							],
 							this.hasOverrideMinAndMax() && [
 								<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range")}</span>,
@@ -355,10 +362,13 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 							td: ["weave-left-cell", "weave-right-cell"]
 						}
 					})}
-
-					<HBox style={ {flex: 1} }>
-						<BinNamesList binningDefinition={selectedBinDefn as AbstractBinningDefinition}/>
-					</HBox>
+					{
+						selectedBinDefn
+						?	<HBox style={ {flex: 1} }>
+								<BinNamesList binningDefinition={selectedBinDefn as AbstractBinningDefinition}/>
+							</HBox>
+						:	null
+					}
 				</VBox>
 			);
 		}
@@ -388,9 +398,9 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 					{
 						renderProps.sessionObjectToLink
 						?	[
-								<span style={ {whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span>,
+								<span style={ {opacity: isSelected ? 1 : 0.5, whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span>,
 								<StatefulTextField
-									style={ {width: 60} }
+									style={ renderProps.style }
 									disabled={!isSelected}
 									type="text"
 									ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}

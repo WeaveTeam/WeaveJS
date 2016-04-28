@@ -572,49 +572,17 @@ export default class C3Histogram extends AbstractC3Tool
 		var linkedColor:Boolean = !!this.fill.color.internalDynamicColumn.targetPath;
 		return Accordion.render(
 			[
-				Weave.lang("Data"),
-				[
-					[
-						Weave.lang("Group by"),
-						<SelectableAttributeComponent
-							attributeName={"Group by"}
-							attributes={this.selectableAttributes}
-			  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
-						/>
-					],
-					[
-						Weave.lang('Height values (optional)'),
-						<SelectableAttributeComponent
-							attributeName={"Height values (optional)"}
-							attributes={this.selectableAttributes}
-			  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
-						/>
-					],
-					[
-						Weave.lang("Aggregation method"),
-						<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
-					],
-					Weave.beta && [
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
-					],
-					[
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
-					]
-				]
+				Weave.lang("Binning"),
+				<BinningDefinitionEditor
+					binnedColumn={this.binnedColumn}
+					linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+					onButtonClick={() => this.openColorController(1)}
+				/>
 			],
-			[
-				Weave.lang(linkedColor ? "Binning / Coloring" : "Binning"),
+			linkedColor && [
+				Weave.lang("Coloring"),
 				[
 					[
-						Weave.lang("Binning method"),
-						<BinningDefinitionEditor compact={true}
-						                         binnedColumn={this.binnedColumn}
-						                         linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
-						                         onButtonClick={() => this.openColorController(1)}/>
-					],
-					linkedColor && [
 						Weave.lang("Color theme"),
 						<DynamicComponent
 							dependencies={[this.fill.color]}
@@ -627,6 +595,36 @@ export default class C3Histogram extends AbstractC3Tool
 								/>
 							}
 						/>
+					]
+				]
+			],
+			[
+				Weave.lang("Aggregation"),
+				[
+					[
+						Weave.lang('Height values (optional)'),
+						<SelectableAttributeComponent
+							attributeName={"Height values (optional)"}
+							attributes={this.selectableAttributes}
+			  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
+						/>
+					],
+					[
+						Weave.lang("Aggregation method"),
+						<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
+					],
+				]
+			],
+			[
+				Weave.lang("Display"),
+				[
+					Weave.beta && [
+						null,
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
+					],
+					[
+						null,
+						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
 					]
 				]
 			],
