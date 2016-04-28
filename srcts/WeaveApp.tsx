@@ -17,6 +17,8 @@ import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
 import ReactUtils from "./utils/ReactUtils";
+import WeaveProgressBar from "./ui/WeaveProgressBar";
+import WeaveToolEditor from "./ui/WeaveToolEditor";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -26,7 +28,6 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import WeavePath = weavejs.path.WeavePath;
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
-import WeaveToolEditor from "./ui/WeaveToolEditor";
 import IColumnReference = weavejs.api.data.IColumnReference;
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -397,6 +398,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}
 			>
+				<WeaveProgressBar/>
 				<SideBarContainer barSize={.3} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
 					<WeaveComponentRenderer
 						weave={weave}

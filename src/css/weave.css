@@ -387,7 +387,6 @@ div.table-row-selected>div>div>div>div>div {
 
 /* menubar */
 .weave-menubar {
-	border-bottom-style: solid;
 	user-select: none;
 	-webkit-user-select: none;
 	-moz-user-select: none;
@@ -624,8 +623,18 @@ div.weave-tree-view {
 	background-color: rgba(0, 0, 0, 0.12);
 }
 
+/* Weave Progress Bar */
+.weave-progress-bar-background {
+	background-color: #E6E6E6;
+}
 
-
+.weave-progress-bar {
+	background-color: #80CCFF;
+	transition-duration: 200ms;
+	-webkit-transition: width .1s ease, background-color .1s ease;
+	-moz-transition: width .1s ease, background-color .1s ease;
+	transition: width .1s ease, background-color .1s ease;
+}
 /* Override Semantic ui CSS*/
 
 /******* Breadcrumb *******/
