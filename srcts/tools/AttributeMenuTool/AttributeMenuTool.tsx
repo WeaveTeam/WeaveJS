@@ -45,7 +45,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	}
 
 	//session properties
-	public panelTitle = Weave.linkableChild(this, new LinkableString('Attribute Menu Tool'));
+	public panelTitle = Weave.linkableChild(this, LinkableString);
 	public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 	public selectedAttribute = Weave.linkableChild(this, new LinkableString, this.forceUpdate, true);
