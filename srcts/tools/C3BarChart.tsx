@@ -557,17 +557,17 @@ export default class C3BarChart extends AbstractC3Tool
 											<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
 										],
 										Weave.beta && [
-											null,
-											<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
+											Weave.lang("Horizontal bars (beta)"),
+											<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={" "}/>
 										],
 										[
-											null,
-											<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
+											Weave.lang("Show value labels"),
+											<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
 
 										],
 										[
-											null,
-											<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={Weave.lang("Show X axis title")}/>
+											Weave.lang("Show X axis title"),
+											<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={" "}/>
 										]
 									]
 			],

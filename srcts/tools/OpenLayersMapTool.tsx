@@ -201,7 +201,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				Weave.lang("Display"),
 				[
 					[
-						Weave.lang("Chart Title"),
+						Weave.lang("Chart title"),
 						<HBox>
 							<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) } placeholder={this.defaultPanelTitle}/>
 						</HBox>
@@ -224,21 +224,21 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 						</HBox>
 					],
 					[
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomButtons }) } label={Weave.lang("Show zoom buttons") }/>
+						Weave.lang("Show zoom buttons"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomButtons }) } label={" "}/>
 					],
 					[
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider }) } label={Weave.lang("Show zoom slider") }/>
+						Weave.lang("Show zoom slider"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider }) } label={" "}/>
 					],
 					[
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.showMouseModeControls }) } label={Weave.lang("Show mouse mode selector") }/>
+						Weave.lang("Show mouse mode selector"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showMouseModeControls }) } label={" "}/>
 					],
 				]
 			],
 			[
-				Weave.lang("Zoom/Pan Behavior"),
+				Weave.lang("Zoom and pan behavior"),
 				[
 					[
 						Weave.lang("Zoom range"),
@@ -272,10 +272,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 						</VBox>
 					],
 					[
-						null,
+						Weave.lang("Snap zoom to base map"),
 						<Checkbox
 							ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}
-							label={ Weave.lang("Snap zoom to base map") }
+							label={" "}
 							title={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }
 						/>
 					]

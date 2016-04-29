@@ -551,7 +551,7 @@ export default class C3Histogram extends AbstractC3Tool
     get selectableAttributes()
     {
         return super.selectableAttributes
-            .set("Group by", this.binnedColumn.internalDynamicColumn)
+            .set("Group by", this.binnedColumn)
             .set("Height values (optional)", this.columnToAggregate);
         //TODO handle remaining attributes
     }
@@ -636,18 +636,17 @@ export default class C3Histogram extends AbstractC3Tool
 				Weave.lang("Display"),
 				[
 					Weave.beta && [
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={Weave.lang("Horizontal bars (beta)")}/>
+						Weave.lang("Horizontal bars (beta)"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={" "}/>
 					],
 					[
-						null,
-						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={Weave.lang("Show value labels")}/>
+						Weave.lang("Show value labels"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
 					],
 					!linkedColor && [
-										Weave.lang("Color"),
-										<ColorPicker height={"14px"} hexColor={hexColor} onChange={(newColor:string) => this.updateColor( newColor)}/>
-									]
-
+						Weave.lang("Color"),
+						<ColorPicker height={"14px"} hexColor={hexColor} onChange={(newColor:string) => this.updateColor( newColor)}/>
+					]
 				]
 			],
 			[Weave.lang("Titles"), this.getTitlesEditor()],
