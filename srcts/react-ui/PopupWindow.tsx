@@ -306,7 +306,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 										<Button onClick={this.onOk.bind(this)}>{Weave.lang(this.props.modal ? "Ok" : "Done")}</Button>
 										{
 											this.props.modal
-											?	<Button onClick={this.onCancel.bind(this)}>{Weave.lang("Cancel")}</Button>
+											?	<Button onClick={this.onCancel.bind(this)} style={{marginLeft: 8}}>{Weave.lang("Cancel")}</Button>
 											:	null
 										}
 									</HBox>

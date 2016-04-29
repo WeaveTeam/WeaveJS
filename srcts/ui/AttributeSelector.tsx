@@ -197,8 +197,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
         let controllerStyle:React.CSSProperties = {
             justifyContent: 'flex-end',
             background: "#F8F8F8",
-            padding: "4px",
-            marginLeft: "0"
+            padding: "4px"
         };
 
         let attributeNames: string[] = Array.from(this.props.attributes.keys());
@@ -225,8 +224,8 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 					this.usingHashMap
 					?
 						<HBox className="weave-padded-hbox" style={ controllerStyle } >
-                            <Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedFolder)} onClick={this.onSelectAll}>Select All</Button>
-							<Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedItems.length)} onClick={this.onAddSelected}>Add Selected</Button>
+                            <Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedFolder)} onClick={this.onSelectAll}>{Weave.lang("Select All")}</Button>
+							<Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedItems.length)} style={{marginLeft: 8}} onClick={this.onAddSelected}>{Weave.lang("Add Selected")}</Button>
 						</HBox>
 					:	null
 				}
