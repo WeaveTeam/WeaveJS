@@ -11,27 +11,27 @@ export type CheckBoxOption = {
 
 export interface ICheckBoxListProps extends React.Props<CheckBoxList>
 {
-    options:CheckBoxOption[];
-    onChange?:(selectedValues:any[]) => void;
-    selectedValues?:any[];
-    labelPosition?:string;
+	options:CheckBoxOption[];
+	onChange?:(selectedValues:any[]) => void;
+	selectedValues?:any[];
+	labelPosition?:string;
 }
 
 export interface ICheckBoxListState
 {
-    checkboxStates:boolean[];
+	checkboxStates:boolean[];
 }
 
 export default class CheckBoxList extends React.Component<ICheckBoxListProps, ICheckBoxListState>
 {
-    private checkboxes:HTMLElement[];
+	private checkboxes:HTMLElement[];
 	
 	private values:any[] = [];
 	private labels:string[] = [];
 
-    constructor(props:ICheckBoxListProps)
+	constructor(props:ICheckBoxListProps)
 	{
-        super(props);
+		super(props);
 
 		if(!props.options)
 		{
@@ -60,9 +60,9 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
 		}
 		this.values = _.pluck(this.props.options, "value");
 		this.labels = _.pluck(this.props.options, "label");
-    }
+	}
 
-    componentWillReceiveProps(nextProps:ICheckBoxListProps)
+	componentWillReceiveProps(nextProps:ICheckBoxListProps)
 	{
 		this.values = _.pluck(this.props.options, "value");
 		this.labels = _.pluck(this.props.options, "label");
@@ -85,51 +85,54 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
 				});
 			}
 		}
-    }
+	}
 
-    handleChange(checkboxState:boolean, index:number)
+	handleChange(checkboxState:boolean, index:number)
 	{
-        var checkboxStates:boolean[] = this.state.checkboxStates.concat();
-        checkboxStates[index] = checkboxState;
+		var checkboxStates:boolean[] = this.state.checkboxStates.concat();
+		checkboxStates[index] = checkboxState;
 
-        var selectedValues:string[] = [];
-        checkboxStates.forEach((checkboxState:boolean, index:number) => {
-            if (checkboxState)
-            {
-                selectedValues.push(this.props.options[index].value);
-            }
-        });
+		var selectedValues:string[] = [];
+		checkboxStates.forEach((checkboxState:boolean, index:number) => {
+			if (checkboxState)
+			{
+				selectedValues.push(this.props.options[index].value);
+			}
+		});
 
-        if (this.props.onChange)
-            this.props.onChange(selectedValues);
+		if (this.props.onChange)
+			this.props.onChange(selectedValues);
 
-        this.setState({
-            checkboxStates
-        });
-    }
+		this.setState({
+			checkboxStates
+		});
+	}
 
-    render():JSX.Element
+	render():JSX.Element
 	{
-        var labelPosition:string = this.props.labelPosition || "right";
+		var labelPosition:string = this.props.labelPosition || "right";
 
-        return (
-            <div style={{flex: 1, alignItems: "center", overflow: "auto"}}>
-                {
-                    this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
-                        var checkboxItem:React.ReactChild[] = [
-                            <Checkbox key={"checkbox"} value={checkBoxState} onChange={(value:boolean) => this.handleChange(value, index)} label={" "}/>,
-							this.labels[index]
-                        ];
-                        return (
-                            <HBox key={index} style={{height: 30, paddingLeft: 10}}>
-                                {
-                                    labelPosition == "right" ? checkboxItem : checkboxItem.reverse()
-                                }
-                            </HBox>
-                        );
-                    })
-                }
-            </div>
-        );
-    }
+		return (
+			<div style={{flex: 1, alignItems: "center", overflow: "auto"}}>
+				{
+					this.state.checkboxStates.map((checkBoxState:boolean, index:number) => {
+						var label = this.labels[index];
+						var checkbox = (
+							<Checkbox
+								key={"checkbox"}
+								value={checkBoxState}
+								onChange={(value:boolean) => this.handleChange(value, index)}
+								label={labelPosition == "right" ? label : " "}
+							/>
+						);
+						return (
+							<HBox key={index} style={{height: 30, paddingLeft: 10}}>
+								{ labelPosition == "right" ? checkbox : [label, checkbox] }
+							</HBox>
+						);
+					})
+				}
+			</div>
+		);
+	}
 }
