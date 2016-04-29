@@ -10,7 +10,7 @@ import CenteredIcon from "../react-ui/CenteredIcon";
 import Button from "../semantic-ui/Button";
 import ComboBox from "../semantic-ui/ComboBox";
 import ReactUtils from "../utils/ReactUtils";
-import {createWatcher} from "../utils/WeaveReactUtils";
+import {forceUpdateWatcher} from "../utils/WeaveReactUtils";
 
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -33,7 +33,7 @@ const ALL:string = "All";
 // ColorRampEditor -> ColorRampSelector -> ColorRampCustomizer
 export default class ColorRampEditor extends React.Component<ColorRampEditorProps, ColorRampEditorState>
 {
-	private colorRampWatcher = createWatcher(this, ColorRamp);
+	private colorRampWatcher = forceUpdateWatcher(this, ColorRamp);
 	public get colorRamp():ColorRamp { return this.colorRampWatcher.target as ColorRamp; }
 	public set colorRamp(value:ColorRamp) { this.colorRampWatcher.target = value; }
 	

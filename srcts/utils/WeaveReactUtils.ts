@@ -161,7 +161,10 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 	authority();
 }
 
-export function createWatcher(component:ReactComponent, type:new(..._:any[])=>ILinkableObject):LinkableWatcher
+/**
+ * Shortcut for boilerplate code that creates a LinkableWatcher which calls forceUpdate() on a component.
+ */
+export function forceUpdateWatcher(component:ReactComponent, type:new(..._:any[])=>ILinkableObject):LinkableWatcher
 {
 	return Weave.disposableChild(component, new LinkableWatcher(type, null, component.forceUpdate.bind(component)));
 }

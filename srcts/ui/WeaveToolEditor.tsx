@@ -6,6 +6,7 @@ import SessionStateEditor from "../ui/SessionStateEditor";
 import {IVisTool} from "../tools/IVisTool";
 import Button from "../semantic-ui/Button";
 import classNames from "../modules/classnames";
+import {forceUpdateWatcher} from "../utils/WeaveReactUtils";
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -23,7 +24,7 @@ export interface WeaveToolEditorState
 
 export default class WeaveToolEditor extends React.Component<WeaveToolEditorProps, WeaveToolEditorState>
 {
-	private toolWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(weavejs.api.ui.IVisTool, null, this.forceUpdate.bind(this)));
+	private toolWatcher = forceUpdateWatcher(this, weavejs.api.ui.IVisTool);
 	public get tool():IVisTool { return this.toolWatcher.target as IVisTool; }
 	public set tool(value:IVisTool) { this.toolWatcher.target = value; }
 	private weaveRoot:ILinkableHashMap;
