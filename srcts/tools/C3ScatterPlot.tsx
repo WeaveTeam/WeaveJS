@@ -355,13 +355,13 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		return Weave.lang(this.dataY.getMetadata('title'));
 	}
 
-	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(linkFunction:Function):JSX.Element
+	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(pushCrumb:Function):JSX.Element
 	{
 		return (
 			<VBox>
 				{
-					super.renderEditor(linkFunction)
+					super.renderEditor(pushCrumb)
 				}
 			</VBox>
 		)

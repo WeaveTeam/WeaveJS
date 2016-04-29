@@ -49,11 +49,11 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	public panelTitle = Weave.linkableChild(this, LinkableString);
 	public choices = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn), this.forceUpdate, true );
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
-	public selectedAttribute = Weave.linkableChild(this, new LinkableString, this.forceUpdate, true);
+	public selectedAttribute = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
 
 	public targetToolPath = Weave.linkableChild(this, new LinkableVariable(Array), this.setToolWatcher.bind(this));
-	public targetAttribute = Weave.linkableChild(this, new LinkableString);
-	toolWatcher = Weave.privateLinkableChild(this, new LinkableWatcher());
+	public targetAttribute = Weave.linkableChild(this, LinkableString);
+	toolWatcher = Weave.privateLinkableChild(this, LinkableWatcher);
 
 
 	verifyLayoutMode(value:string):boolean
@@ -84,7 +84,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		return new Map<string, IColumnWrapper | ILinkableHashMap>().set("Choices", this.choices);
 	}
 
-	get options()
+	get options():{label: string, value: IAttributeColumn}[]
 	{
 		return this.choices.getObjects(IAttributeColumn).map(column => {
 			return {
@@ -100,12 +100,12 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 			return;
 
 		var tool = this.toolWatcher.target as IVisTool;
-		if (!tool)
+		if (!tool || !tool.selectableAttributes)
 			return;
-		var targetAttribute = tool.selectableAttributes.get(this.targetAttribute.state as string);
+		var targetAttribute = tool.selectableAttributes.get(this.targetAttribute.value);
 
 		var targetAttributeColumn:DynamicColumn;//attribute which will be set
-		var selectedColumn:IColumnWrapper = selectedValue instanceof Array ? selectedValue[0] as IColumnWrapper : selectedValue as IColumnWrapper;//attribute option chosen from tool; used to set target attribute
+		var selectedColumn:IColumnWrapper = Array.isArray(selectedValue) ? selectedValue[0] as IColumnWrapper : selectedValue as IColumnWrapper;
 
 		if (Weave.IS(targetAttribute, IColumnWrapper))
 		{
@@ -115,8 +115,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		{
 			var hm = targetAttribute as ILinkableHashMap;
 			ColumnUtils.forceFirstColumnDynamic(hm);
-			var firstColumn = hm.getObjects(IAttributeColumn)[0];
-			targetAttributeColumn = ColumnUtils.hack_findInternalDynamicColumn(firstColumn as IColumnWrapper);
+			targetAttributeColumn = hm.getObjects(DynamicColumn)[0];
 		}
 
 		this.selectedAttribute.state = this.choices.getName(selectedColumn);//for the list UI to rerender
@@ -128,11 +127,11 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		}
 	};
 
-	renderEditor(linkFunction :Function = null):JSX.Element
+	renderEditor(pushCrumb :Function = null):JSX.Element
 	{
 		return (
 			<VBox>
-				<AttributeMenuTargetEditor attributeMenuTool={ this } linkFunction={ linkFunction }/>
+				<AttributeMenuTargetEditor attributeMenuTool={ this } pushCrumb={ pushCrumb }/>
 			</VBox>
 		);
 	}
@@ -187,7 +186,7 @@ Weave.registerClass(
 interface IAttributeMenuTargetEditorProps
 {
 	attributeMenuTool:AttributeMenuTool;
-	linkFunction : Function;
+	pushCrumb : Function;
 }
 
 interface IAttributMenuToolEditorState
@@ -266,8 +265,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 	getTargetToolAttributeOptions():string[]
 	{
-		//if (this.tool) console.log('targetattroptions',Array.from(this.tool.selectableAttributes.keys())as string[]);
-		return(this.tool ? Array.from(this.tool.selectableAttributes.keys())as string[] : []);
+		return this.tool ? weavejs.util.JS.mapKeys(this.tool.selectableAttributes) : [];
 	}
 
 	getTargetToolPath= ():string =>
@@ -341,7 +339,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 					ReactUtils.generateTable({
 							body: [].concat(
 								this.toolConfigs,
-								renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction),
+								renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.pushCrumb),
 								this.renderTitleEditor()
 							),
 							classes: {

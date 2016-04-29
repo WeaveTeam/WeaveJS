@@ -220,10 +220,10 @@ export default class C3PieChart extends AbstractC3Tool
         return Weave.lang("Pie Chart of {0}", weavejs.data.ColumnUtils.getTitle(this.data));
     }
 
-    //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-    renderEditor(linkFunction:Function) :JSX.Element{
+    //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+    renderEditor(pushCrumb:Function) :JSX.Element{
         return(<VBox>
-                { super.renderEditor(linkFunction) }
+                { super.renderEditor(pushCrumb) }
               </VBox>);
     };
 

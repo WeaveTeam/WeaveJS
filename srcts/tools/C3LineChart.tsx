@@ -372,10 +372,10 @@ export default class C3LineChart extends AbstractC3Tool
         return Weave.lang("Line chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
     }
 
-    //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-    renderEditor(linkFunction:Function):JSX.Element{
+    //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+    renderEditor(pushCrumb:Function):JSX.Element{
         return (<VBox>
-            {super.renderEditor(linkFunction)}
+            {super.renderEditor(pushCrumb)}
         </VBox>);
     };
 

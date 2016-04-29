@@ -190,11 +190,11 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
 	}
 
-	//todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(linkFunction:Function):JSX.Element
+	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(pushCrumb:Function):JSX.Element
 	{
 		return ReactUtils.generateTable({
-			body: renderSelectableAttributes(this.selectableAttributes, linkFunction)
+			body: renderSelectableAttributes(this.selectableAttributes, pushCrumb)
 				  .concat(this.getTitlesEditor())
 				  .concat([
 					  [

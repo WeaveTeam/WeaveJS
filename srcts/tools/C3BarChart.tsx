@@ -550,7 +550,7 @@ export default class C3BarChart extends AbstractC3Tool
         return Weave.lang("Bar Chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
     }
 
-    //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
+    //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(pushCrumb:Function = null):JSX.Element
 	{
 		return Accordion.render(
