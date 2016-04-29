@@ -313,7 +313,7 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 			renderObj.sessionObjectToLink = (binDef as CustomSplitBinningDefinition).splitValues;
 			renderObj.sessionObjectLabel = "Break values";
 			renderObj.helpMessage = 'Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]';
-			renderObj.style = {flex: 1};
+			renderObj.style = {flex: 5};
 		}
 		else if (binDef instanceof StandardDeviationBinningDefinition)
 		{
@@ -446,7 +446,7 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 				<VBox style={{flex: 1, overflow: "auto"}} className="weave-container">
 					{Weave.lang("Binning type:")}
 					<HBox style={{flex: 1}}>
-						<VBox className="weave-padded-vbox" style={{flex: 1}}>
+						<VBox className="weave-padded-vbox" style={{flex: 1, justifyContent: "space-between"}}>
 							{binUIs}
 						</VBox>
 					</HBox>
