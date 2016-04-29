@@ -51,6 +51,26 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	}
 	private comboBox: ComboBox;
 	private lastActiveNode:IWeaveTreeNode & IColumnReference;
+	
+	static findSelectableAttributes(attribute:IColumnWrapper|ILinkableHashMap, defaultLabel:string = "Data"):[string, Map<string, IColumnWrapper|ILinkableHashMap>]
+	{
+		var SA = 'selectableAttributes';
+	
+		var ancestor:ILinkableObject = attribute;
+		while (ancestor && !((ancestor as any)[SA] instanceof Map)) // HACK
+			ancestor = Weave.getOwner(ancestor);
+		
+		if (ancestor)
+		{
+			var map = (ancestor as any)[SA] as Map<string, IColumnWrapper|ILinkableHashMap>;
+			if (map)
+				for (var [key, value] of map.entries())
+					if (value === attribute)
+						return [key, map];
+		}
+		
+		return [defaultLabel, new Map<string, IColumnWrapper|ILinkableHashMap>().set(defaultLabel, attribute)];
+	}
 
 	private static getDataSourceDependencies(attribute:IColumnWrapper|ILinkableHashMap):IDataSource[]
 	{
