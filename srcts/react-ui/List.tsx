@@ -129,8 +129,10 @@ export default class List extends React.Component<IListProps, IListState>
     }
 
     render(): JSX.Element {
+        //order in merge is important as props.style is readonly and overlfow "auto" is compulsory
+        let styleObj:React.CSSProperties = _.merge({},this.props.style,{overflow: "auto"});
         return (
-            <div style={{overflow: "auto", width: "100%"}}>
+            <div style={styleObj} className={"weave-list " + this.props.className}>
                 {
                     this.values.map((value: any, index: number) => {
                         var selected: boolean = this.state.selectedValues.indexOf(value) >= 0;
