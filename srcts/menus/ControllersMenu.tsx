@@ -27,11 +27,11 @@ export default class ControllersMenu implements MenuBarItemProps
 	{
 		return [].concat(
 			{
-				label: Weave.lang("Color Settings"),
+				label: Weave.lang("Color settings"),
 				click: () => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)
 			},
 			{
-				label: Weave.lang("Mouseover Settings"),
+				label: Weave.lang("Mouseover settings"),
 				click: () => MouseoverController.open(this.weave, this.weave.getObject("Probe Header Columns") as ILinkableHashMap,this.weave.getObject("Probed Columns") as ILinkableHashMap)
 			},
 			{},
