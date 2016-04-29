@@ -342,7 +342,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 
 	get defaultPanelTitle():string
 	{
-		return Weave.lang("Scatter plot {0} -vs- {1}", weavejs.data.ColumnUtils.getTitle(this.dataX), weavejs.data.ColumnUtils.getTitle(this.dataY));
+		return Weave.lang("Scatter Plot of {0} -vs- {1}", weavejs.data.ColumnUtils.getTitle(this.dataX), weavejs.data.ColumnUtils.getTitle(this.dataY));
 	}
 
 	get defaultXAxisLabel():string
@@ -403,5 +403,5 @@ Weave.registerClass(
 	C3ScatterPlot,
 	["weavejs.tool.C3ScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
 	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
-	"Scatterplot"
+	"Scatter Plot"
 );
