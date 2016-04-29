@@ -29,6 +29,7 @@ import WeavePath = weavejs.path.WeavePath;
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
+import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
 import WeaveArchive = weavejs.core.WeaveArchive;
 
