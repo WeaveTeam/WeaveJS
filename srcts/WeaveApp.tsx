@@ -339,7 +339,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			{
 				state = {
 					children: [state, {id: path}],
-					direction: state.direction == 'horizontal' ? 'vertical' : 'horizontal'
+					direction: state.direction == 'horizontal' ? 'horizontal' : 'vertical'
 				};
 			}
 			layout.setSessionState(state);
@@ -399,7 +399,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onContextMenu={ContextMenu.open}
 			>
 				<WeaveProgressBar/>
-				<SideBarContainer barSize={.3} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
+				<SideBarContainer barSize={.4} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
