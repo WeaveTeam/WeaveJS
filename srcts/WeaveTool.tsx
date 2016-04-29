@@ -196,7 +196,7 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
 
 		return(
-			<HBox className={className} style={{height: this.props.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart}>
+			<HBox className={className} style={{height: this.props.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart} onDoubleClick={this.props.onMaximizeClick}>
 				<CenteredIcon title={Weave.lang("Configure")} onClick={this.props.onGearClick}
 							  iconProps={{className: "fa fa-cog fa-fw"}}/>
 
