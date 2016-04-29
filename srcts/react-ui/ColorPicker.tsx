@@ -2,6 +2,7 @@ import * as React from "react";
 import ReactColorPicker from "../modules/react-color";
 import ReactUtils from "../utils/ReactUtils";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import Button from "../semantic-ui/Button";
 
 export interface ColorPickerProps extends React.Props<ColorPicker>
 {
@@ -10,6 +11,8 @@ export interface ColorPickerProps extends React.Props<ColorPicker>
 	height?:string;
 	onChange?: (hexColor:string) => void;
 	onClose?: (hexColor:string) => void;
+	buttonMode?:boolean;
+	buttonLabel?:string|React.ReactChild;
 }
 
 export interface ColorPickerState
@@ -97,13 +100,24 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 			borderRadius: '2px',
 			background: this.state.hexColor
 		};
+		let ui:JSX.Element = null;
 
-		return (
-			<div>
-				<div ref={(elt:Element) => this.element = elt as HTMLElement} style={swatchStyle} onClick={ this.handleClick }>
-					<div style={colorStyle}></div>
+		if(this.props.buttonMode)
+		{
+			let label:string | React.ReactChild = this.props.buttonLabel ? this.props.buttonLabel  : "Add color";
+			ui = <div ref={(elt:Element) => this.element = elt as HTMLElement}>
+					<Button  onClick={ this.handleClick }>{label}</Button>
 				</div>
-			</div>
-		);
+		}
+		else
+		{
+			ui = <div>
+					<div ref={(elt:Element) => this.element = elt as HTMLElement} style={swatchStyle} onClick={ this.handleClick }>
+						<div style={colorStyle}></div>
+					</div>
+				</div>
+		}
+
+		return (ui);
 	}
 }

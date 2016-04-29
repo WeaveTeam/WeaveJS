@@ -294,8 +294,15 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 		if (this.props.colorRamp)
 		{
 			var colors = this.props.colorRamp.getColors() as number[];
-			colors[index] = StandardLib.asNumber(color);
+			if(index != null){
+				colors[index] = StandardLib.asNumber(color);
+			}
+			else
+			{
+				colors.push(StandardLib.asNumber(color));
+			}
 			this.props.colorRamp.setSessionState(colors)
+
 		}
 	}
 
@@ -357,10 +364,14 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 				<VBox className="weave-padded-vbox">
 					<HBox style={{overflow: "auto"}} className="weave-padded-hbox">
 						<ColorRampComponent style={{width: 30}} direction="bottom" ramp={hexColors}/>
-						<List options={listOptions}/>
+						<List style={ {flex:1} } options={listOptions}/>
 					</HBox>
 					<div style={{alignSelf:"flex-end"}}>
-						<Button onClick={this.addColor}>{Weave.lang("Add color")}</Button>
+						<HBox>
+							<ColorPicker  buttonMode={true} buttonLabel="Insert" onClose={(newColor:string) => this.updateColorsAtIndex(null, newColor)}/>
+							<ColorPicker  buttonMode={true} buttonLabel="Add" onClose={(newColor:string) => this.updateColorsAtIndex(null, newColor)}/>
+						</HBox>
+
 					</div>
 				</VBox>
 			);
@@ -370,7 +381,7 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 			return (
 				<HBox style={{overflow: "auto"}} className="weave-padded-hbox">
 					<ColorRampComponent style={{width: 30}} direction="bottom" ramp={hexColors}/>
-					<List options={listOptions}/>
+					<List style={ {flex:1} }  options={listOptions}/>
 				</HBox>
 			);
 		}
