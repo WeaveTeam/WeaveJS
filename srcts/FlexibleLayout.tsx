@@ -210,19 +210,19 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		var rootRect = rootNode.getBoundingClientRect();
 		var panelNode:typeof rootNode = null;
 		
-//		if (
-//			event.clientX <= rootRect.left + this.outerZoneThickness
-//			|| event.clientX >= rootRect.left + rootRect.width - this.outerZoneThickness 
-//			|| event.clientY <= rootRect.top + this.outerZoneThickness
-//			|| event.clientY >= rootRect.top + rootRect.height - this.outerZoneThickness
-//		) {
-//			panelOver = OUTER_PANEL_ID;
-//			panelNode = rootNode;
-//		}
-//		else
-//		{
+		if (
+			event.clientX <= rootRect.left + this.outerZoneThickness
+			|| event.clientX >= rootRect.left + rootRect.width - this.outerZoneThickness 
+			|| event.clientY <= rootRect.top + this.outerZoneThickness
+			|| event.clientY >= rootRect.top + rootRect.height - this.outerZoneThickness
+		) {
+			panelOver = OUTER_PANEL_ID;
+			panelNode = rootNode;
+		}
+		else
+		{
 			panelNode = this.rootLayout.getElementFromId(panelOver);
-//		}
+		}
 		
 		if (this.panelDragged === panelOver)
 			return [DropZone.NONE, panelOver];
@@ -315,11 +315,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 		var newState:LayoutState = _.cloneDeep(this.getSessionState());
 		var src:LayoutState = FlexibleLayout.findStateNode(newState, this.panelDragged);
-		var dest:LayoutState = (
-			this.panelOver == OUTER_PANEL_ID
-			?	newState
-			:	FlexibleLayout.findStateNode(newState, this.panelOver)
-		);
+		var dest:LayoutState = this.panelOver == OUTER_PANEL_ID ? {} : FlexibleLayout.findStateNode(newState, this.panelOver);
 		
 		if (!src || !dest)
 		{
@@ -348,19 +344,35 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			});
 
 			srcParentArray.splice(srcParentArray.indexOf(src), 1);
-
-			delete dest.id;
+			
 			dest.direction = (this.dropZone === DropZone.TOP || this.dropZone === DropZone.BOTTOM) ? VERTICAL : HORIZONTAL;
-			dest.children = [
-				{
-					id: this.panelDragged,
-					flex: 0.5
-				},
-				{
-					id: this.panelOver,
-					flex: 0.5
-				}
-			];
+			
+			if (this.panelOver == OUTER_PANEL_ID)
+			{
+				newState.flex = 0.5;
+				dest.children = [
+					{
+						id: this.panelDragged,
+						flex: 0.5
+					},
+					newState
+				];
+				newState = dest;
+			}
+			else
+			{
+				delete dest.id;
+				dest.children = [
+					{
+						id: this.panelDragged,
+						flex: 0.5
+					},
+					{
+						id: this.panelOver,
+						flex: 0.5
+					}
+				];
+			}
 			
 			if (this.dropZone === DropZone.BOTTOM || this.dropZone === DropZone.RIGHT)
 				dest.children.reverse();
