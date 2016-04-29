@@ -42,7 +42,7 @@ export default class DynamicComponent extends React.Component<DynamicComponentPr
 	static setDependencies(component:React.Component<any, any>, dependencies:ILinkableObject[]):void
 	{
 		var oldDeps = DynamicComponent.map_component_dependencies.get(component);
-		var newDeps = new Set<ILinkableObject>(dependencies);
+		var newDeps = new Set<ILinkableObject>(dependencies && dependencies.filter(_.identity));
 
 		for (let dep of newDeps)
 			if (!oldDeps || !oldDeps.has(dep))
