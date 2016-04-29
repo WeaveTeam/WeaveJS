@@ -18,16 +18,16 @@ export interface IVisToolState
 export interface IVisTool extends ILinkableObject
 {
     title:string;
-	renderEditor(linktoToolEditorCrumbFunction:Function):JSX.Element;
+	renderEditor(pushCrumb:Function):JSX.Element;
     selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>;//TODO make this into an interface?
 }
 
-export function renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, linkToToolEditorCrumbFunction:Function):React.ReactChild[][]
+export function renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, pushCrumb:Function):React.ReactChild[][]
 {
 	return weavejs.util.JS.mapEntries(selectableAttributes).map(([key, value]) => {
 			return [
 				Weave.lang(key),
-				<SelectableAttributeComponent attributeName={key} attributes={ selectableAttributes } linkToToolEditorCrumb={ linkToToolEditorCrumbFunction }/>
+				<SelectableAttributeComponent attributeName={key} attributes={ selectableAttributes } pushCrumb={ pushCrumb }/>
 			]
 	})
 }

@@ -446,7 +446,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		ColorController.open(this.colorColumn);
 	}
 	
-	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
+	renderEditor(pushCrumb:Function = null):JSX.Element
 	{
 		return Accordion.render(
 			[
@@ -459,13 +459,13 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 								compact={true}
 								colorRamp={this.colorColumn.ramp}
 								onButtonClick={() => this.openColorController(0)}
-								linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+								pushCrumb={ pushCrumb }
 							/>
 						]
 					]}
 					attributeName="Color data"
 					attributes={this.selectableAttributes}
-					linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+					pushCrumb={ pushCrumb }
 				/>
 			],
 			[

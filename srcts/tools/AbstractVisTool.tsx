@@ -215,9 +215,9 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return AbstractVisTool.getMenuItems(this);
 	}
 	
-	getSelectableAttributesEditor(linktoToolEditorCrumbFunction:Function = null):React.ReactChild[][]
+	getSelectableAttributesEditor(pushCrumb:Function = null):React.ReactChild[][]
 	{
-		return renderSelectableAttributes(this.selectableAttributes, linktoToolEditorCrumbFunction);
+		return renderSelectableAttributes(this.selectableAttributes, pushCrumb);
 	}
 	
 	renderNumberEditor(linkableNumber:LinkableNumber, flex:number):JSX.Element
@@ -270,10 +270,10 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		});
 	}
 
-	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
+	renderEditor(pushCrumb:Function = null):JSX.Element
 	{
 		return Accordion.render(
-			["Data", this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction)],
+			["Data", this.getSelectableAttributesEditor(pushCrumb)],
 			["Titles", this.getTitlesEditor()],
 			["Margins", this.getMarginEditor()]
 		);

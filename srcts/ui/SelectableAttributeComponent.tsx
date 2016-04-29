@@ -32,7 +32,7 @@ export interface ISelectableAttributeComponentProps
 {
 	attributeName: string;
 	attributes: Map<string, IColumnWrapper|ILinkableHashMap>
-	linkToToolEditorCrumb?:Function
+	pushCrumb?:Function
 	showAsList?:boolean;
 	style?: React.CSSProperties;
 	hideButton?: boolean;
@@ -103,9 +103,9 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	
 	launchAttributeSelector=(attributeName:string):ControlPanel=>
 	{
-		if (this.props.linkToToolEditorCrumb)
+		if (this.props.pushCrumb)
 		{
-			this.props.linkToToolEditorCrumb(
+			this.props.pushCrumb(
 				"Attributes",
 				<AttributeSelector
 					attributeName={ attributeName }
@@ -173,9 +173,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			
 			let node = ColumnUtils.hack_findHierarchyNode(attribute);
 	
-			if(node) {
+			if (node)
 				this.lastActiveNode = node;
-			}
 	
 			let options:{value:IWeaveTreeNode, label: string}[] = [];
 			
@@ -183,7 +182,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			let parentNode = rootNode && HierarchyUtils.findParentNode(rootNode, node.getDataSource(), node.getColumnMetadata());
 			let header = <span style={{ fontWeight: "bold", fontSize: "small" }}>{ parentNode && parentNode.getLabel() }</span>;
 
-			if(this.lastActiveNode)
+			if (this.lastActiveNode)
 			{
 				options = HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), this.lastActiveNode.getColumnMetadata()).map((node) => {
 					return {
@@ -198,7 +197,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			});
 
 			return (
-				
 				<HBox style={ _.merge({ flex: 1 }, this.props.style) } >
 					<ComboBox
 						ref={(c:ComboBox) => this.comboBox = c}
@@ -231,11 +229,11 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			let siblings:IWeaveTreeNode[] = [];
 			var columns = this.columnsHashmap.getObjects(IColumnWrapper); // TODO - this does not consider if hash map contains non-IColumnWrapper columns
 			
-			if(columns.length)
+			if (columns.length)
 			{
 				columns.forEach((column:IColumnWrapper, index:number)=>{
 					let node = ColumnUtils.hack_findHierarchyNode(column);
-					if(node)
+					if (node)
 					{
 						this.lastActiveNode = node;
 						value.push({label: node.getLabel(), value: node});
@@ -248,7 +246,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 					});
 				});
 			}
-			else if(this.lastActiveNode)
+			else if (this.lastActiveNode)
 			{
 				HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), this.lastActiveNode.getColumnMetadata()).forEach((node) => {
 					nodes.add(node);

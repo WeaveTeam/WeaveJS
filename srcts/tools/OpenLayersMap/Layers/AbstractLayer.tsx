@@ -114,8 +114,8 @@ export default class AbstractLayer implements ILinkableObject
 		return fieldList;
 	}
 
-	//todo:find a better way to pass linkToToolEditorCrumbFunction
-	renderEditor(linkToToolEditorCrumbFunction:Function = null): JSX.Element {
+	//todo:find a better way to pass pushCrumb
+	renderEditor(pushCrumb:Function = null): JSX.Element {
 		let attributeList: JSX.Element;
 		let idx = 0;
 
@@ -125,7 +125,7 @@ export default class AbstractLayer implements ILinkableObject
 
 		return ReactUtils.generateTable({
 			body: [].concat(
-				renderSelectableAttributes(this.selectableAttributes, linkToToolEditorCrumbFunction),
+				renderSelectableAttributes(this.selectableAttributes, pushCrumb),
 				this.renderEditableFields()
 			),
 			classes: {

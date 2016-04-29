@@ -21,7 +21,7 @@
 // 	attributeName:string;
 // 	attributes: Map<string, (IColumnWrapper|ILinkableHashMap)>;
 // 	showAsList?: boolean;
-//     linkToToolEditorCrumb?:Function;
+//     pushCrumb?:Function;
 // 	style?:React.CSSProperties;
 // }
 // 
@@ -63,9 +63,9 @@
 // 
 //     launchAttributeSelector=():ControlPanel=>
 // 	{
-//         if (this.props.linkToToolEditorCrumb)
+//         if (this.props.pushCrumb)
 //         {
-//             this.props.linkToToolEditorCrumb( "Attribute Selector", <AttributeSelector attributeName={this.props.attributeName} attributes={this.props.attributes}/>);
+//             this.props.pushCrumb( "Attribute Selector", <AttributeSelector attributeName={this.props.attributeName} attributes={this.props.attributes}/>);
 //             return null;
 //         }
 //         return AttributeSelector.openInstance(this.props.attributeName, this.props.attributes);

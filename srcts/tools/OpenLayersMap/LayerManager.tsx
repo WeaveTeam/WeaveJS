@@ -8,7 +8,6 @@ import LabelLayer from "./Layers/LabelLayer";
 import ScatterPlotLayer from "./Layers/ScatterPlotLayer";
 import ImageGlyphLayer from "./Layers/ImageGlyphLayer";
 
-
 import {VBox, HBox} from "../../react-ui/FlexBox";
 import ReactUtils from "../../utils/ReactUtils";
 import Checkbox from "../../semantic-ui/Checkbox";
@@ -20,17 +19,20 @@ import MenuButton from "../../react-ui/MenuButton";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 
-export interface ILayerManagerState {
+export interface ILayerManagerState
+{
 	selectedLayer?: AbstractLayer;
 	openedLayer?: AbstractLayer;
 }
 
-export interface  ILayerManagerProps extends React.HTMLProps<LayerManager> {
+export interface  ILayerManagerProps extends React.HTMLProps<LayerManager>
+{
 	layers: LinkableHashMap;
-	linktoToolEditorCrumb?: Function;
+	pushCrumb?: Function;
 }
 
-export default class LayerManager extends React.Component<ILayerManagerProps, ILayerManagerState> {
+export default class LayerManager extends React.Component<ILayerManagerProps, ILayerManagerState>
+{
 	constructor(props:ILayerManagerProps)
 	{
 		super(props);
@@ -39,7 +41,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 
 	state: ILayerManagerState = {
 		selectedLayer: null,
-		openedLayer: null,
+		openedLayer: null
 	};
 
 	componentWillReceiveProps(nextProps:ILayerManagerProps)
@@ -47,11 +49,11 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		nextProps.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 	}
 
-	onEditLayerClick=(layer:AbstractLayer,e: React.MouseEvent) =>{
-
-		if(this.props.linktoToolEditorCrumb)
+	onEditLayerClick=(layer:AbstractLayer,e: React.MouseEvent) =>
+	{
+		if (this.props.pushCrumb)
 		{
-			this.props.linktoToolEditorCrumb(Weave.lang("{0} layer",this.props.layers.getName(layer)),layer.renderEditor(this.props.linktoToolEditorCrumb));
+			this.props.pushCrumb(Weave.lang("{0} layer", this.props.layers.getName(layer)), layer.renderEditor(this.props.pushCrumb));
 		}
 		else
 		{
@@ -63,8 +65,6 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		if (e)
 			e.stopPropagation();
 	}
-
-
 
 	generateItem=(layer:AbstractLayer, index:number):JSX.Element=>
 	{
@@ -85,24 +85,28 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 			</HBox>
 	}
 
-	moveSelectedUp=()=>{
+	moveSelectedUp=()=>
+	{
 		let names = this.props.layers.getNames();
 		[names[this.selectionIndex], names[this.selectionIndex + 1]] = [names[this.selectionIndex + 1], names[this.selectionIndex]];
 		this.props.layers.setNameOrder(names);
 	};
 
-	moveSelectedDown=()=>{
+	moveSelectedDown=()=>
+	{
 		let names = this.props.layers.getNames();
 		[names[this.selectionIndex], names[this.selectionIndex - 1]] = [names[this.selectionIndex - 1], names[this.selectionIndex]];
 		this.props.layers.setNameOrder(names);
 	};
 
-	removeSelected=()=>{
+	removeSelected=()=>
+	{
 		let selectedName = this.props.layers.getName(this.state.selectedLayer);
 		this.props.layers.removeObject(selectedName);
 	}
 
-	get selectionIndex():number {
+	get selectionIndex():number
+	{
 		return this.props.layers.getObjects().indexOf(this.state.selectedLayer);
 	}
 

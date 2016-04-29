@@ -582,8 +582,8 @@ export default class C3Histogram extends AbstractC3Tool
 		}
 	}
 
-    //todo:(linktoToolEditorCrumbFunction)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(linktoToolEditorCrumbFunction:Function):JSX.Element
+    //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(pushCrumb:Function):JSX.Element
 	{
 		var linkedColor:Boolean = !!this.fill.color.internalDynamicColumn.targetPath;
 		var hexColor:string  = this.colorColumn && this.colorColumn.ramp ? (this.colorColumn.ramp.state as string[])[0] : "#808080"
@@ -592,7 +592,7 @@ export default class C3Histogram extends AbstractC3Tool
 				Weave.lang("Binning"),
 				<BinningDefinitionEditor
 					binnedColumn={this.binnedColumn}
-					linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+					pushCrumb={ pushCrumb }
 					onButtonClick={() => this.openColorController(1)}
 				/>
 			],
@@ -606,7 +606,7 @@ export default class C3Histogram extends AbstractC3Tool
 							render={() =>
 								<ColorRampEditor
 									compact={true}
-									linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+									pushCrumb={ pushCrumb }
 									colorRamp={this.colorColumn && this.colorColumn.ramp}
 									onButtonClick={() => this.openColorController(0)}
 								/>
@@ -623,7 +623,7 @@ export default class C3Histogram extends AbstractC3Tool
 						<SelectableAttributeComponent
 							attributeName={"Height values (optional)"}
 							attributes={this.selectableAttributes}
-			  				linkToToolEditorCrumb={ linktoToolEditorCrumbFunction }
+			  				pushCrumb={ pushCrumb }
 						/>
 					],
 					[

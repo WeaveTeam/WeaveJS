@@ -147,11 +147,11 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 	}
 
 
-	renderEditor(linkToToolEditorCrumb:Function = null):JSX.Element{
+	renderEditor(pushCrumb:Function = null):JSX.Element{
 
 		if (!this.filter.target) // scenario arises when tool opened from menu
 			this.initLater();
-		return <DataFilterEditor filterEditor={ this.filterEditor }  linkToToolEditorCrumb={linkToToolEditorCrumb} selectableAttributes={ this.selectableAttributes }  />
+		return <DataFilterEditor filterEditor={ this.filterEditor }  pushCrumb={pushCrumb} selectableAttributes={ this.selectableAttributes }  />
 	}
 
 	render():JSX.Element
@@ -196,7 +196,7 @@ export interface IDataFilterEditorState {
 export interface IDataFilterEditorProps {
 	filterEditor:LinkableDynamicObject,
 	selectableAttributes:Map<string, (IColumnWrapper | LinkableHashMap)>
-	linkToToolEditorCrumb?:Function
+	pushCrumb?:Function
 }
 
 
@@ -351,7 +351,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		}
 
 		return ReactUtils.generateTable({
-			body: renderSelectableAttributes(this.props.selectableAttributes, this.props.linkToToolEditorCrumb).concat(editorConfigs),
+			body: renderSelectableAttributes(this.props.selectableAttributes, this.props.pushCrumb).concat(editorConfigs),
 			classes: {
 				td: [
 					"weave-left-cell",

@@ -46,9 +46,11 @@ declare type RecordHeightsFormat<T> = { xLabel: T } & {[columnName:string]: T};
 const GROUP:string = 'group';
 const STACK:string = 'stack';
 const PERCENT_STACK:string = 'percentStack';
-const GROUPING_MODES:ComboBoxOption[] = [{label: "Grouped Bars", value: GROUP},
-													{label: "Stacked Bars", value: STACK},
-													{label: "100% Stacked Bars", value: PERCENT_STACK}];
+const GROUPING_MODES:ComboBoxOption[] = [
+	{label: "Grouped Bars", value: GROUP},
+	{label: "Stacked Bars", value: STACK},
+	{label: "100% Stacked Bars", value: PERCENT_STACK}
+];
 
 export default class C3BarChart extends AbstractC3Tool
 {
@@ -423,7 +425,7 @@ export default class C3BarChart extends AbstractC3Tool
 
 	get defaultXAxisLabel():string
 	{
-		if(!this.showXAxisLabel.value)
+		if (!this.showXAxisLabel.value)
 			return "";
 		return Weave.lang("Sorted by " + this.sortColumn.getMetadata('title'));
 	}
@@ -440,14 +442,16 @@ export default class C3BarChart extends AbstractC3Tool
     protected validate(forced:boolean = false):boolean
     {
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.heightColumns,
-														  this.labelColumn,
-														  this.sortColumn,
-														  this.margin,
-														  this.overrideBounds,
-														  this.xAxisName,
-														  this.yAxisName,
-			 											  this.showXAxisLabel
+        var axisChange:boolean = Weave.detectChange(
+			this,
+			this.heightColumns,
+			this.labelColumn,
+			this.sortColumn,
+			this.margin,
+			this.overrideBounds,
+			this.xAxisName,
+			this.yAxisName,
+ 			this.showXAxisLabel
 		);
 		var dataChange = axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet, this.showValueLabels);
 		if (dataChange)
@@ -547,29 +551,31 @@ export default class C3BarChart extends AbstractC3Tool
     }
 
     //todo:(linkFunction)find a better way to link to sidebar UI for selectbleAttributes
-  renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
+	renderEditor(pushCrumb:Function = null):JSX.Element
 	{
 		return Accordion.render(
-			[Weave.lang("Data"), this.getSelectableAttributesEditor(linktoToolEditorCrumbFunction)],
-			[Weave.lang("Display"), [
-										[
-											Weave.lang("Grouping mode"),
-											<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
-										],
-										Weave.beta && [
-											Weave.lang("Horizontal bars (beta)"),
-											<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={" "}/>
-										],
-										[
-											Weave.lang("Show value labels"),
-											<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
-
-										],
-										[
-											Weave.lang("Show X axis title"),
-											<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={" "}/>
-										]
-									]
+			[Weave.lang("Data"), this.getSelectableAttributesEditor(pushCrumb)],
+			[
+				Weave.lang("Display"),
+				[
+					[
+						Weave.lang("Grouping mode"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
+					],
+					Weave.beta && [
+						Weave.lang("Horizontal bars (beta)"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={" "}/>
+					],
+					[
+						Weave.lang("Show value labels"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
+	
+					],
+					[
+						Weave.lang("Show X axis title"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={" "}/>
+					]
+				]
 			],
 			[Weave.lang("Titles"), this.getTitlesEditor()],
 			[Weave.lang("Margins"), this.getMarginEditor()]

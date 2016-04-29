@@ -44,7 +44,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	}
 
 	//todo : find a better way to get linked children
-	linktoToolEditorCrumbFunction=(title:string,ui:React.ReactChild):void=>
+	pushCrumb=(title:string,ui:React.ReactChild):void=>
 	{
 		this.mapping_crumb_children[title] = ui;
 		this.setState({
@@ -108,7 +108,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	render()
 	{
 		if (this.tool)
-			this.mapping_crumb_children[this.displayName] = this.tool.renderEditor(this.linktoToolEditorCrumbFunction);
+			this.mapping_crumb_children[this.displayName] = this.tool.renderEditor(this.pushCrumb);
 		
 		var crumbStyle:React.CSSProperties = {
 			alignItems:"center"

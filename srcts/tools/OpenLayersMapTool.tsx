@@ -179,8 +179,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return true;
 	}
 
-	//todo:(linktoToolEditorCrumbFunction)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(linktoToolEditorCrumbFunction:Function): JSX.Element {
+	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(pushCrumb:Function): JSX.Element {
 		let controlLocationOpts = [
 			{ vertical: "top", horizontal: "left" },
 			{ vertical: "top", horizontal: "right" },
@@ -283,7 +283,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			],
 			[
 				Weave.lang("Layers"),
-				<LayerManager layers={this.layers} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }/>
+				<LayerManager layers={this.layers} pushCrumb={ pushCrumb }/>
 			]
 		);
 	}
@@ -869,7 +869,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			}
 		}
 
-		if(Weave.beta)
+		if (Weave.beta)
 			menuItems.push({
 				label: Weave.lang("Print Tool (Beta)"),
 				click: PrintUtils.printCanvasTool.bind(null, this.element)
@@ -963,7 +963,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
-	public static selectableLayerFilter(layer: ol.layer.Base): boolean {
+	public static selectableLayerFilter(layer: ol.layer.Base): boolean
+	{
 		return layer.get("selectable");
 	}
 }

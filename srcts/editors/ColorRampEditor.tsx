@@ -10,6 +10,7 @@ import CenteredIcon from "../react-ui/CenteredIcon";
 import Button from "../semantic-ui/Button";
 import ComboBox from "../semantic-ui/ComboBox";
 import ReactUtils from "../utils/ReactUtils";
+import {createWatcher} from "../utils/WeaveReactUtils";
 
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -17,27 +18,24 @@ import StandardLib = weavejs.util.StandardLib;
 
 export interface ColorRampEditorProps extends React.Props<ColorRampEditor>
 {
-		colorRamp:ColorRamp;
-		compact?:boolean;
-		onButtonClick?:React.MouseEventHandler;
-		linktoToolEditorCrumb?:Function;
+	colorRamp:ColorRamp;
+	compact?:boolean;
+	onButtonClick?:React.MouseEventHandler;
+	pushCrumb?:Function;
 }
 
 export interface ColorRampEditorState 
 {
-
 }
 
 const ALL:string = "All";
 // Three Classes are used (all three classes depends on colorRamp, which is passed from ColorRampEditor)
-//  ColorRampEditor ->  ColorRampSelector -> ColorRampCustomizer
+// ColorRampEditor -> ColorRampSelector -> ColorRampCustomizer
 export default class ColorRampEditor extends React.Component<ColorRampEditorProps, ColorRampEditorState>
 {
-	private colorRampWatcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(ColorRamp, null, this.forceUpdate.bind(this)));
+	private colorRampWatcher = createWatcher(this, ColorRamp);
 	public get colorRamp():ColorRamp { return this.colorRampWatcher.target as ColorRamp; }
 	public set colorRamp(value:ColorRamp) { this.colorRampWatcher.target = value; }
-
-
 	
 	constructor(props:ColorRampEditorProps)
 	{
@@ -47,7 +45,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 
 	componentWillReceiveProps(nextProps:ColorRampEditorProps):void
 	{
-		if(this.props.colorRamp !== nextProps.colorRamp)
+		if (this.props.colorRamp !== nextProps.colorRamp)
 		{
 			this.colorRamp = nextProps.colorRamp
 		}
@@ -55,13 +53,11 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 
 	private onButtonClick = (event:React.MouseEvent)=>
 	{
-		if(this.props.linktoToolEditorCrumb)
+		if (this.props.pushCrumb)
 		{
-			this.props.linktoToolEditorCrumb("Color Ramp" ,
-				<ColorRampSelector colorRamp={this.colorRamp} linktoToolEditorCrumb= {this.props.linktoToolEditorCrumb} />);
-
+			this.props.pushCrumb("Color Ramp", <ColorRampSelector colorRamp={this.colorRamp} pushCrumb= {this.props.pushCrumb} />);
 		}
-		else if(this.props.onButtonClick)
+		else if (this.props.onButtonClick)
 		{
 			this.props.onButtonClick(event);
 		}
@@ -73,9 +69,11 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 		return (
 			<HBox className="weave-padded-hbox">
 				<ColorRampComponent style={{ flex: 1 , border:"none"}} ramp={this.colorRamp && this.colorRamp.getHexColors()} direction="right"/>
-				<Button onClick={this.onButtonClick}
-				        title="Click to change the color ramp"
-				        style={ { borderTopLeftRadius:0, borderBottomLeftRadius:0} }>
+				<Button
+					onClick={this.onButtonClick}
+					title="Click to change the color ramp"
+					style={ { borderTopLeftRadius: 0, borderBottomLeftRadius: 0} }
+				>
 					<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
 				</Button>
 			</HBox>
@@ -84,7 +82,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 
 	renderFullView()
 	{
-		return <ColorRampSelector colorRamp={this.colorRamp}/>
+		return <ColorRampSelector colorRamp={this.colorRamp}/>;
 	}
 	
 	render()
@@ -93,191 +91,188 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 	}
 }
 
+interface ColorRampSelectorProps extends React.Props<ColorRampSelector>
+{
+	colorRamp:ColorRamp;
+	pushCrumb?:Function;
+}
 
-
-
-interface ColorRampSelectorProps extends React.Props<ColorRampSelector> 
-{ 
-	colorRamp:ColorRamp; 
-	linktoToolEditorCrumb?:Function;
- }
-
-   interface ColorRampSelectorState { 
-	  selectedFilter:string;
-  }
+interface ColorRampSelectorState
+{
+	selectedFilter:string;
+}
 
 // Component to change the ramp
- class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRampSelectorState> {
-	 private filterOptions:string[];
+class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRampSelectorState>
+{
+	private filterOptions:string[];
 
-	 constructor(props:ColorRampSelectorProps) {
-		 super(props);
-		 if (this.props.colorRamp)
-			 this.props.colorRamp.addGroupedCallback(this, this.forceUpdate);
+	constructor(props:ColorRampSelectorProps)
+	{
+		super(props);
+		if (this.props.colorRamp)
+			this.props.colorRamp.addGroupedCallback(this, this.forceUpdate);
 
-		 this.state = {
-			 selectedFilter: ALL
-		 };
+		this.state = {
+			selectedFilter: ALL
+		};
 
-		 this.filterOptions = [];
-		 var tagsLookup:{[tag:string]:string} = {};
-		 for (var ramp of ColorRamp.allColorRamps)
-			 for (var tag of ramp.tags.split(","))
-				 if (!tagsLookup[tag])
-					 this.filterOptions.push(tagsLookup[tag] = tag);
+		this.filterOptions = [];
+		var tagsLookup:{[tag:string]:string} = {};
+		for (var ramp of ColorRamp.allColorRamps)
+			for (var tag of ramp.tags.split(","))
+				if (!tagsLookup[tag])
+					this.filterOptions.push(tagsLookup[tag] = tag);
 
-		 this.filterOptions.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
-		 this.filterOptions.unshift(ALL);
-	 }
+		this.filterOptions.sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+		this.filterOptions.unshift(ALL);
+	}
 
-	 componentWillReceiveProps(nextProps:ColorRampSelectorProps):void
-	 {
-		 if(this.props.colorRamp !== nextProps.colorRamp) 
-		 { 
-			 if(this.props.colorRamp) 
-				 this.props.colorRamp.removeCallback(this, this.forceUpdate); 
-			 if(nextProps.colorRamp) 
-				 nextProps.colorRamp.addGroupedCallback(this, this.forceUpdate); 
-		 } 
-	 }
+	componentWillReceiveProps(nextProps:ColorRampSelectorProps):void
+	{
+		if (this.props.colorRamp !== nextProps.colorRamp)
+		{
+			if (this.props.colorRamp)
+				this.props.colorRamp.removeCallback(this, this.forceUpdate);
+			if (nextProps.colorRamp)
+				nextProps.colorRamp.addGroupedCallback(this, this.forceUpdate);
+		}
+	}
 
+	reverseColors=()=>
+	{
+		if (this.props.colorRamp)
+			this.props.colorRamp.reverse();
+	}
 
+	addColor=()=>
+	{
+		if (this.props.colorRamp)
+		{
+			var colors:number[] = this.props.colorRamp.getColors() as number[];
+			colors.push(StandardLib.asNumber("#FFFFFF"));
+			this.props.colorRamp.setSessionState(colors);
+		}
+	}
 
-	 reverseColors=()=> 	{ 
-		 if (this.props.colorRamp) 
-			 this.props.colorRamp.reverse(); 
-	 }
+	handleColorRampSelectionChange = (newColors:number[]) =>
+	{
+		if (this.props.colorRamp)
+			this.props.colorRamp.setSessionState(newColors);
+	}
 
-	 addColor=()=>
-	 {
-		 if (this.props.colorRamp)
-		 {
-			 var colors:number[] = this.props.colorRamp.getColors() as number[];
-			 colors.push(StandardLib.asNumber("#FFFFFF"));
-			 this.props.colorRamp.setSessionState(colors);
-		 }
-	 }
+	private onCustomizeButtonClick = (event:React.MouseEvent) =>
+	{
+		if (this.props.pushCrumb)
+		{
+			this.props.pushCrumb("Customize" , <ColorRampCustomizer colorRamp={this.props.colorRamp} pushCrumb={this.props.pushCrumb}/>)
+		}
+	}
 
-	 handleColorRampSelectionChange = (newColors:number[]) => 
-	 { 
-		 if (this.props.colorRamp) 
-			 this.props.colorRamp.setSessionState(newColors); 
-	 }
+	// this ensures parent(colorRampEditor colorRamp) callback wont call render again
+	shouldComponentUpdate(nextProps:ColorRampSelectorProps)
+	{
+		return this.props.colorRamp !== nextProps.colorRamp;
+	}
 
-	 private onCustomizeButtonClick = (event:React.MouseEvent) => {
-		 if(this.props.linktoToolEditorCrumb)
-		 {
-			 this.props.linktoToolEditorCrumb("Customize" , <ColorRampCustomizer colorRamp={this.props.colorRamp}
-			                                                                     linktoToolEditorCrumb={this.props.linktoToolEditorCrumb}/>)
-		 }
-	 }
+	render()
+	{
+		var colors:number[] = this.props.colorRamp ? this.props.colorRamp.getColors() : [];
+		var hexColors:string[] = this.props.colorRamp ? this.props.colorRamp.getHexColors() : [];
 
-	 // this ensures parent(colorRampEditor colorRamp) callback wont call render again
-	 shouldComponentUpdate(nextProps:ColorRampSelectorProps){
-		 if(this.props.colorRamp !== nextProps.colorRamp)
-		 {
-			 return true
-		 }
-		 else
-		 {
-			 return false
-		 }
-	 }
+		var filteredRamps = (
+			this.state.selectedFilter == ALL
+			?	ColorRamp.allColorRamps
+			:	ColorRamp.allColorRamps.filter((v) => v.tags.indexOf(this.state.selectedFilter) >= 0)
+		);
 
-	 render() 
-	 {
-		 var colors:number[] = this.props.colorRamp ? this.props.colorRamp.getColors() : [];
-		 var hexColors:string[] = this.props.colorRamp ? this.props.colorRamp.getHexColors() : [];
-
-		 var filteredRamps = this.state.selectedFilter == ALL ?
-			 ColorRamp.allColorRamps :
-			 ColorRamp.allColorRamps.filter((v) => v.tags.indexOf(this.state.selectedFilter) >= 0);
-
-
-
-
-		 if(this.props.linktoToolEditorCrumb)
-		 {
+		if (this.props.pushCrumb)
+		{
 			return (
-					<VBox className="weave-padded-vbox" style={{flex: 1}} disabled={!this.props.colorRamp}>
-						<VBox className="weave-padded-vbox">
-							<HBox style={{overflow: "auto"}} className="weave-padded-hbox">
-								<ColorRampComponent style={{flex: 1,  border:"none" }}  direction="right" ramp={hexColors}/>
-								<Button onClick={this.reverseColors}
-								        title="Click to reverse colors"
-								        style={ { borderRadius:0, borderLeft:"none"} }>
-									{'↓↑'}
-								</Button>
-								<Button onClick={this.onCustomizeButtonClick}
-								        title="Click to customize colors"
-								        style={ { borderTopLeftRadius:0, borderBottomLeftRadius:0,borderLeft:"none"} } >
-									<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
-								</Button>
-							</HBox>
-						</VBox>
-						
-						<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
-						<HBox style={{alignItems: "center"}} className="weave-padded-hbox">
-							{Weave.lang("Filter: ")}
-							<ComboBox fluid={false}
-							          value={this.state.selectedFilter}
-							          options={this.filterOptions}
-							          onChange={(value:string) => { this.setState({ selectedFilter: value}) }} direction="upward"/>
+				<VBox className="weave-padded-vbox" style={{flex: 1}} disabled={!this.props.colorRamp}>
+					<VBox className="weave-padded-vbox">
+						<HBox style={{overflow: "auto"}} className="weave-padded-hbox">
+							<ColorRampComponent style={{flex: 1, border:"none" }} direction="right" ramp={hexColors}/>
+							<Button
+								onClick={this.reverseColors}
+								title="Click to reverse colors"
+								style={ { borderRadius:0, borderLeft:"none"} }
+							>
+								{'↓↑'}
+							</Button>
+							<Button
+								onClick={this.onCustomizeButtonClick}
+								title="Click to customize colors"
+								style={ { borderTopLeftRadius:0, borderBottomLeftRadius:0,borderLeft:"none"} }
+							>
+								<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
+							</Button>
 						</HBox>
-
-
 					</VBox>
+					
+					<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
+					<HBox style={{alignItems: "center"}} className="weave-padded-hbox">
+						{Weave.lang("Filter: ")}
+						<ComboBox
+							fluid={false}
+							value={this.state.selectedFilter}
+							options={this.filterOptions}
+							onChange={(value:string) => { this.setState({ selectedFilter: value}) }} direction="upward"
+						/>
+					</HBox>
+				</VBox>
 			);
-		 }
-		 else
-		 {
-			 return (
-				 <VBox className="weave-padded-vbox" style={{flex: 1}} disabled={!this.props.colorRamp}>
-					 <HBox className="weave-padded-hbox" style={{flex: 1}}>
-						 <HBox style={{flex: .7, overflow: "auto"}}>
-							 <ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
-						 </HBox>
-						 <VBox style={{flex: .3}} className="weave-padded-vbox">
-							 <label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang("Customize")}</label>
-							 <ColorRampCustomizer colorRamp={this.props.colorRamp} />
-						 </VBox>
-					 </HBox>
-					 <HBox className="weave-padded-hbox">
-						 <HBox style={{flex: .7, alignItems: "center"}} className="weave-padded-hbox">
-							 {Weave.lang("Filter: ")}
-							 <ComboBox fluid={false}
-							           value={this.state.selectedFilter}
-							           options={this.filterOptions}
-							           onChange={(value:string) => { this.setState({ selectedFilter: value}) }} direction="upward"/>
-						 </HBox>
-						 <HBox style={{flex: .3, justifyContent: "space-between"}}>
-							 <CenteredIcon onClick={this.reverseColors}>{'↓↑'}</CenteredIcon>
-							 <Button onClick={this.addColor}>{Weave.lang("Add color")}</Button>
-						 </HBox>
-					 </HBox>
-				 </VBox>
-			 );
-
-		 }
-
-	 }  
-
- }
+		}
+		else
+		{
+			return (
+				<VBox className="weave-padded-vbox" style={{flex: 1}} disabled={!this.props.colorRamp}>
+					<HBox className="weave-padded-hbox" style={{flex: 1}}>
+						<HBox style={{flex: .7, overflow: "auto"}}>
+							<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
+						</HBox>
+						<VBox style={{flex: .3}} className="weave-padded-vbox">
+							<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang("Customize")}</label>
+							<ColorRampCustomizer colorRamp={this.props.colorRamp} />
+						</VBox>
+					</HBox>
+					<HBox className="weave-padded-hbox">
+						<HBox style={{flex: .7, alignItems: "center"}} className="weave-padded-hbox">
+							{Weave.lang("Filter: ")}
+							<ComboBox
+								fluid={false}
+								value={this.state.selectedFilter}
+								options={this.filterOptions}
+								onChange={(value:string) => { this.setState({ selectedFilter: value}) }}
+								direction="upward"
+							/>
+						</HBox>
+						<HBox style={{flex: .3, justifyContent: "space-between"}}>
+							<CenteredIcon onClick={this.reverseColors}>{'↓↑'}</CenteredIcon>
+							<Button onClick={this.addColor}>{Weave.lang("Add color")}</Button>
+						</HBox>
+					</HBox>
+				</VBox>
+			);
+		}
+	}
+}
 
 interface ColorRampCustomizerProps extends React.Props<ColorRampCustomizer>
 {
 	colorRamp:ColorRamp;
-	linktoToolEditorCrumb?:Function;
+	pushCrumb?:Function;
 }
 
-interface ColorRampCustomizerState {
-
+interface ColorRampCustomizerState
+{
 }
 
 // Component to customize the selected ramp
-class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, ColorRampCustomizerState> {
-
-	constructor(props:ColorRampCustomizerProps) {
+class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, ColorRampCustomizerState>
+{
+	constructor(props:ColorRampCustomizerProps)
+	{
 		super(props);
 		if (this.props.colorRamp)
 			this.props.colorRamp.addGroupedCallback(this, this.forceUpdate);
@@ -285,11 +280,11 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 
 	componentWillReceiveProps(nextProps:ColorRampCustomizerProps):void
 	{
-		if(this.props.colorRamp !== nextProps.colorRamp)
+		if (this.props.colorRamp !== nextProps.colorRamp)
 		{
-			if(this.props.colorRamp)
+			if (this.props.colorRamp)
 				this.props.colorRamp.removeCallback(this, this.forceUpdate);
-			if(nextProps.colorRamp)
+			if (nextProps.colorRamp)
 				nextProps.colorRamp.addGroupedCallback(this, this.forceUpdate);
 		}
 	}
@@ -324,24 +319,16 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 		}
 	}
 
-
 	handleColorRampSelectionChange = (newColors:number[]) =>
 	{
 		if (this.props.colorRamp)
 			this.props.colorRamp.setSessionState(newColors);
 	}
 
-
 	// this ensures parent(colorRampSelector colorRamp) callback wont call render again
-	shouldComponentUpdate(nextProps:ColorRampCustomizerProps){
-		if(this.props.colorRamp !== nextProps.colorRamp)
-		{
-			return true
-		}
-		else
-		{
-			return false
-		}
+	shouldComponentUpdate(nextProps:ColorRampCustomizerProps)
+	{
+		return this.props.colorRamp !== nextProps.colorRamp;
 	}
 
 	render()
@@ -362,9 +349,9 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 					</HBox>
 				)
 			}
-		})
+		});
 
-		if(this.props.linktoToolEditorCrumb) // for Weave Tool Editor
+		if (this.props.pushCrumb) // for Weave Tool Editor
 		{
 			return (
 				<VBox className="weave-padded-vbox">
@@ -386,9 +373,6 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 					<List options={listOptions}/>
 				</HBox>
 			);
-
 		}
-
 	}
-
 }

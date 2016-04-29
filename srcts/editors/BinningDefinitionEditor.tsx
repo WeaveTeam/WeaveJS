@@ -40,7 +40,7 @@ export interface BinningDefinitionEditorProps
 	binnedColumn:BinnedColumn;
 	compact?:boolean;
 	onButtonClick?:React.MouseEventHandler;
-	linktoToolEditorCrumb?:Function;
+	pushCrumb?:Function;
 	insertTableRows?:React.ReactChild[][];
 }
 
@@ -68,15 +68,15 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	onBinButtonClick=(event:React.MouseEvent)=>
 	{
 		// render for Weave Tool editor
-		if (this.props.linktoToolEditorCrumb)
+		if (this.props.pushCrumb)
 		{
 			var [attributeName, attributes] = SelectableAttributeComponent.findSelectableAttributes(this.props.binnedColumn);
-			this.props.linktoToolEditorCrumb(
+			this.props.pushCrumb(
 				"Binning",
 				<BinningDefinitionSelector
 					attributeName={attributeName}
 					attributes={attributes}
-					linktoToolEditorCrumb={this.props.linktoToolEditorCrumb}
+					pushCrumb={this.props.pushCrumb}
 				/>
 			);
 		}
@@ -117,7 +117,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 			<BinningDefinitionSelector
 				attributeName={attributeName}
 				attributes={attributes}
-				linktoToolEditorCrumb={this.props.linktoToolEditorCrumb}
+				pushCrumb={this.props.pushCrumb}
 				insertTableRows={this.props.insertTableRows}
 			/>
 		);
@@ -133,7 +133,7 @@ export interface BinningDefinitionSelectorProps
 {
 	attributeName: string;
 	attributes: Map<string, IColumnWrapper|ILinkableHashMap>;
-	linktoToolEditorCrumb?: Function;
+	pushCrumb?: Function;
 	insertTableRows?: React.ReactChild[][];
 }
 
@@ -330,7 +330,7 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 		let selectedBinDefn:AbstractBinningDefinition = this.column.binningDefinition.target as AbstractBinningDefinition;
 		let selectedDefinitionName = selectedBinDefn ? BinningDefinitionEditor.binClassToBinLabel.get(selectedBinDefn.constructor as typeof AbstractBinningDefinition) : "None"
 		
-		if (this.props.linktoToolEditorCrumb) 
+		if (this.props.pushCrumb) 
 		{
 			let renderProps:any = this.getBinDefRenderProps(selectedBinDefn);
 			return (
@@ -343,7 +343,7 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 									Weave.lang(this.props.attributeName),
 									<SelectableAttributeComponent attributeName={ this.props.attributeName }
 																  attributes={ this.props.attributes }
-																  linkToToolEditorCrumb={ this.props.linktoToolEditorCrumb }/>
+																  pushCrumb={ this.props.pushCrumb }/>
 								],
 								[
 									Weave.lang('Binning method'),
