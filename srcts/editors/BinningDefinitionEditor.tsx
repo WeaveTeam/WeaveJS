@@ -17,6 +17,7 @@ import {DynamicTableClassNames} from "../utils/ReactUtils";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableNumber = weavejs.core.LinkableNumber;
@@ -40,6 +41,7 @@ export interface BinningDefinitionEditorProps
 	compact?:boolean;
 	onButtonClick?:React.MouseEventHandler;
 	linktoToolEditorCrumb?:Function;
+	insertTableRows?:React.ReactChild[][];
 }
 
 export interface BinningDefinitionEditorState
@@ -68,10 +70,12 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		// render for Weave Tool editor
 		if (this.props.linktoToolEditorCrumb)
 		{
+			var [attributeName, attributes] = SelectableAttributeComponent.findSelectableAttributes(this.props.binnedColumn);
 			this.props.linktoToolEditorCrumb(
 				"Binning",
 				<BinningDefinitionSelector
-					column={this.props.binnedColumn}
+					attributeName={attributeName}
+					attributes={attributes}
 					linktoToolEditorCrumb={this.props.linktoToolEditorCrumb}
 				/>
 			);
@@ -104,12 +108,19 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 				</Button>
 			</HBox>
 		);
-
 	}
 
 	renderFullView() // render for PopUp
 	{
-		return <BinningDefinitionSelector column={this.props.binnedColumn} linktoToolEditorCrumb={this.props.linktoToolEditorCrumb} />;
+		var [attributeName, attributes] = SelectableAttributeComponent.findSelectableAttributes(this.props.binnedColumn);
+		return (
+			<BinningDefinitionSelector
+				attributeName={attributeName}
+				attributes={attributes}
+				linktoToolEditorCrumb={this.props.linktoToolEditorCrumb}
+				insertTableRows={this.props.insertTableRows}
+			/>
+		);
 	}
 	
 	render()
@@ -118,19 +129,21 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 	}
 }
 
-interface BinningDefinitionSelectorProps
+export interface BinningDefinitionSelectorProps
 {
-	column:BinnedColumn;
-	linktoToolEditorCrumb?:Function;
+	attributeName: string;
+	attributes: Map<string, IColumnWrapper|ILinkableHashMap>;
+	linktoToolEditorCrumb?: Function;
+	insertTableRows?: React.ReactChild[][];
 }
 
-interface BinningDefinitionSelectorState
+export interface BinningDefinitionSelectorState
 {
 }
 
 // internal component which re-renders when binnig defintion of target binned column changes
 
-class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelectorProps, BinningDefinitionSelectorState>
+export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelectorProps, BinningDefinitionSelectorState>
 {
 	private _simple:SimpleBinningDefinition = Weave.disposableChild(this, SimpleBinningDefinition);
 	private _customSplit:CustomSplitBinningDefinition = Weave.disposableChild(this, CustomSplitBinningDefinition);
@@ -160,24 +173,36 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 			Weave.getCallbacks(def).addGroupedCallback(this, this.updateTargetBinningDef);
 
 		// render again if binningDefinition changes
-		if (this.props.column)
+		if (this.column)
 		{
-			this.props.column.binningDefinition.addGroupedCallback(this, this.forceUpdate);
-			this.handleBinnedColumnChange(this.props.column);
+			this.column.binningDefinition.addGroupedCallback(this, this.forceUpdate);
+			this.handleBinnedColumnChange(this.column);
 		}
+	}
+	
+	get column():BinnedColumn
+	{
+		return this.getColumn(this.props);
+	}
+	
+	getColumn(props:BinningDefinitionSelectorProps):BinnedColumn
+	{
+		var icw:IColumnWrapper = props.attributes.get(props.attributeName) as IColumnWrapper;
+		return Weave.AS(icw, BinnedColumn) || Weave.getDescendants(icw, BinnedColumn)[0]; // hacky
 	}
 
 	componentWillReceiveProps(nextProps:BinningDefinitionSelectorProps)
 	{
-		if (this.props.column !== nextProps.column)
+		var newColumn = this.getColumn(nextProps);
+		if (this.column !== newColumn)
 		{
-			if (this.props.column)
-				this.props.column.binningDefinition.removeCallback(this, this.forceUpdate);
+			if (this.column)
+				this.column.binningDefinition.removeCallback(this, this.forceUpdate);
 
-			if (nextProps.column)
+			if (newColumn)
 			{
-				nextProps.column.binningDefinition.addGroupedCallback(this, this.forceUpdate);
-				this.handleBinnedColumnChange(nextProps.column);
+				newColumn.binningDefinition.addGroupedCallback(this, this.forceUpdate);
+				this.handleBinnedColumnChange(newColumn);
 			}
 		}
 	}
@@ -192,7 +217,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 
 	private compareTargetBinningType(localDef:AbstractBinningDefinition):boolean
 	{
-		let selectedBinDefn:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+		let selectedBinDefn:AbstractBinningDefinition = this.column.binningDefinition.target as AbstractBinningDefinition;
 		if (localDef == null && selectedBinDefn == null) // scenario arises when we None option is selected
 			return true;
 		if (localDef && selectedBinDefn)
@@ -202,7 +227,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 
 	private updateTargetBinningDef()
 	{
-		var targetDef = this.props.column.binningDefinition.target;
+		var targetDef = this.column.binningDefinition.target;
 		if (targetDef)
 			for (var localDef of this._allBinDefs)
 				if (this.compareTargetBinningType(localDef))
@@ -223,19 +248,19 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 
 	setBinningDefinition(localDef:AbstractBinningDefinition)
 	{
-		let targetDef:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+		let targetDef:AbstractBinningDefinition = this.column.binningDefinition.target as AbstractBinningDefinition;
 		if (localDef)
 		{
 			if (targetDef && localDef.constructor == targetDef.constructor)
 				return;
-			this.props.column.binningDefinition.requestLocalObjectCopy(localDef);
+			this.column.binningDefinition.requestLocalObjectCopy(localDef);
 			// requestLocalObjectCopy will give selectedBinDefn.
-			targetDef = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+			targetDef = this.column.binningDefinition.target as AbstractBinningDefinition;
 			Weave.linkState(targetDef, localDef);
 		}
 		else
 		{
-			this.props.column.binningDefinition.target = null;
+			this.column.binningDefinition.target = null;
 		}
 	}
 
@@ -246,7 +271,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 
 	private hasOverrideMinAndMax():boolean
 	{
-		var binDef:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+		var binDef:AbstractBinningDefinition = this.column.binningDefinition.target as AbstractBinningDefinition;
 		return !!(binDef && binDef.overrideInputMin && binDef.overrideInputMax);
 	}
 
@@ -302,7 +327,7 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 	{
 		var options = Array.from(this.binLabelToBin.keys()) as string[];
 
-		let selectedBinDefn:AbstractBinningDefinition = this.props.column.binningDefinition.target as AbstractBinningDefinition;
+		let selectedBinDefn:AbstractBinningDefinition = this.column.binningDefinition.target as AbstractBinningDefinition;
 		let selectedDefinitionName = selectedBinDefn ? BinningDefinitionEditor.binClassToBinLabel.get(selectedBinDefn.constructor as typeof AbstractBinningDefinition) : "None"
 		
 		if (this.props.linktoToolEditorCrumb) 
@@ -311,53 +336,56 @@ class BinningDefinitionSelector extends SmartComponent<BinningDefinitionSelector
 			return (
 				<VBox className="weave-padded-vbox">
 					{ReactUtils.generateTable({
-						body: [
+						body: [].concat(
+							this.props.insertTableRows || [],
 							[
-								Weave.lang("Group by"),
-								<SelectableAttributeComponent attributeName={ 'Group by' }
-															  attributes={ new Map<string, (IColumnWrapper|ILinkableHashmap)>().set('Group by', this.props.column.internalDynamicColumn ) }
-															  linkToToolEditorCrumb={ this.props.linktoToolEditorCrumb }/>
-							],
-							[
-								Weave.lang('Binning method'),
-								<HBox className="weave-padded-hbox" style={ {alignItems: "center"} }>
-									<ComboBox
-										style={ {flex: 1} }
-										options={options}
-										value={selectedDefinitionName}
-										onChange={(binLabel) => this.setBinningDefinition(this.binLabelToBin.get(binLabel))}
-									/>
-									<HelpIcon style={ {fontSize: "initial"} }>
-										{ Weave.lang(renderProps.helpMessage) }
-									</HelpIcon>
-								</HBox>
-							],
-							renderProps.sessionObjectToLink && [
-								<span style={ {whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span>,
-								<StatefulTextField
-									style={{flex: 1}}
-									type="text"
-									ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}
-								/>
-							],
-							this.hasOverrideMinAndMax() && [
-								<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range")}</span>,
-								<HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
+								[
+									Weave.lang(this.props.attributeName),
+									<SelectableAttributeComponent attributeName={ this.props.attributeName }
+																  attributes={ this.props.attributes }
+																  linkToToolEditorCrumb={ this.props.linktoToolEditorCrumb }/>
+								],
+								[
+									Weave.lang('Binning method'),
+									<HBox className="weave-padded-hbox" style={ {alignItems: "center"} }>
+										<ComboBox
+											style={ {flex: 1} }
+											options={options}
+											value={selectedDefinitionName}
+											onChange={(binLabel) => this.setBinningDefinition(this.binLabelToBin.get(binLabel))}
+										/>
+										<HelpIcon style={ {fontSize: "initial"} }>
+											{ Weave.lang(renderProps.helpMessage) }
+										</HelpIcon>
+									</HBox>
+								],
+								renderProps.sessionObjectToLink && [
+									<span style={ {whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span>,
 									<StatefulTextField
-										type="number"
-										placeholder="min"
 										style={{flex: 1}}
-										ref={this.linkOverride("overrideInputMin")}
+										type="text"
+										ref={this.linkBinningDefinition(renderProps.sessionObjectToLink)}
 									/>
-									<StatefulTextField
-										type="number"
-										placeholder="max"
-										style={{flex: 1}}
-										ref={this.linkOverride("overrideInputMax")}
-									/>
-								</HBox>
+								],
+								this.hasOverrideMinAndMax() && [
+									<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range")}</span>,
+									<HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
+										<StatefulTextField
+											type="number"
+											placeholder="min"
+											style={{flex: 1}}
+											ref={this.linkOverride("overrideInputMin")}
+										/>
+										<StatefulTextField
+											type="number"
+											placeholder="max"
+											style={{flex: 1}}
+											ref={this.linkOverride("overrideInputMax")}
+										/>
+									</HBox>
+								]
 							]
-						],
+						),
 						classes: {
 							td: ["weave-left-cell", "weave-right-cell"]
 						}

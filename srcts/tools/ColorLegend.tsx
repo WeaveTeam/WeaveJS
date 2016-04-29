@@ -22,8 +22,9 @@ import ColorController from "../editors/ColorController";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import BinNamesList from "../ui/BinNamesList";
-import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
+import {BinningDefinitionSelector} from "../editors/BinningDefinitionEditor";
 import PrintUtils from "../utils/PrintUtils";
+import Accordion from "../semantic-ui/Accordion";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -62,10 +63,12 @@ const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
 const SHAPE_TYPE_LINE:string = "line";
 const SHAPE_TYPE_BOX:string = "box";
-const SHAPE_MODES:{label:string, value:any}[] = [{label: "Box", value: SHAPE_TYPE_BOX},
-												{label: "Circle", value: SHAPE_TYPE_CIRCLE},
-												{label: "Line", value: SHAPE_TYPE_LINE},
-												{label: "Square", value: SHAPE_TYPE_SQUARE}];
+const SHAPE_MODES:{label:string, value:any}[] = [
+	{label: "Circle", value: SHAPE_TYPE_CIRCLE},
+	{label: "Line", value: SHAPE_TYPE_LINE},
+	{label: "Square", value: SHAPE_TYPE_SQUARE},
+	{label: "Box", value: SHAPE_TYPE_BOX}
+];
 
 export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool, IInitSelectableAttributes
 {
@@ -354,9 +357,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 									element.push(
 										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
 											<HBox style={{
-												flex:1.0,
-												alignItems:"center",
-												justifyContent:"center",
+												flex: 1.0,
+												alignItems: "center",
+												justifyContent: "center",
 												backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 1.0)
 											}}>
 												<div style={{
@@ -445,56 +448,44 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	
 	renderEditor(linktoToolEditorCrumbFunction:Function = null):JSX.Element
 	{
-		return ReactUtils.generateTable({
-			body: [].concat(
-				renderSelectableAttributes(this.selectableAttributes, linktoToolEditorCrumbFunction),
-				this.getTitlesEditor(),
+		return Accordion.render(
+			[
+				Weave.lang("Data"),
+				<BinningDefinitionSelector
+					insertTableRows={[
+						[
+							Weave.lang("Color theme"),
+							<ColorRampEditor
+								compact={true}
+								colorRamp={this.colorColumn.ramp}
+								onButtonClick={() => this.openColorController(0)}
+								linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+							/>
+						]
+					]}
+					attributeName="Color data"
+					attributes={this.selectableAttributes}
+					linktoToolEditorCrumb={ linktoToolEditorCrumbFunction }
+				/>
+			],
+			[
+				Weave.lang("Display"),
 				[
+					[
+						Weave.lang("Chart title"),
+						<StatefulTextField ref={ linkReactStateRef(this, {value: this.panelTitle})} placeholder={this.defaultPanelTitle}/>
+					],
 					[
 						Weave.lang("Shape type"),
 						<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
 					],
-					[
-						Weave.lang("Color theme"),
-						<ColorRampEditor compact={true} colorRamp={this.colorColumn.ramp} onButtonClick={() => this.openColorController(0)}/>
-					],
-					[
-						Weave.lang("Binning method"),
-						<BinningDefinitionEditor compact={true} binnedColumn={this.binnedColumn} linktoToolEditorCrumb={ linktoToolEditorCrumbFunction } onButtonClick={() => this.openColorController(1)}/>
-					],
 					[ 
-						Weave.lang("Layout"),
-						<HBox className="weave-padded-hbox" style={{padding: 0, alignItems: "center"}}>
-							<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
-							{Weave.lang("Columns")}
-						</HBox>
+						Weave.lang("Number of columns"),
+						<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
 					]
 				]
-			),
-			classes: {
-				td: [
-					"weave-left-cell",
-					"weave-right-cell"
-				]
-			}
-		});
-	}
-
-	getTitlesEditor():React.ReactChild[][]
-	{
-		return [
-			[
-				"Title",
-				this.panelTitle,
-				this.defaultPanelTitle
 			]
-		].map((row:[string, LinkableString]) => {
-
-			return [
-				Weave.lang(row[0]),
-				<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
-			]
-		});
+		);
 	}
 
 	get deprecatedStateMapping():Object
