@@ -13,6 +13,7 @@ export interface ColorPickerProps extends React.Props<ColorPicker>
 	onClose?: (hexColor:string) => void;
 	buttonMode?:boolean;
 	buttonLabel?:string|React.ReactChild;
+	direction?:string;
 }
 
 export interface ColorPickerState
@@ -25,19 +26,23 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 	popup:React.ReactInstance;
 	element:HTMLElement;
 
+	static BOTTOM_LEFT:string = "bottom left";
+	static BOTTOM_RIGHT:string = "bottom right";
+	static TOP_LEFT:string = "top left";
+	static TOP_RIGHT:string = "top right";
+
 	constructor(props:ColorPickerProps) {
 		super(props);
 		this.state = {
 			hexColor: props.hexColor || '#FFFFFF',
 		};
-		this.handleClick = this.handleClick.bind(this);
 		this.handleClose = this.handleClose.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 	}
 	
 	componentWillReceiveProps(nextProps:ColorPickerProps)
 	{
-		if(nextProps.hexColor)
+		if(this.props.hexColor != nextProps.hexColor)
 			this.setState({hexColor: nextProps.hexColor});
 	}
 
@@ -45,14 +50,41 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 		if(this.popup)
 		{
 			this.handleClose();
-		} else
+		}
+		else
 		{
 			var clientRect = this.element.getBoundingClientRect();
 			var style:React.CSSProperties = {
-				position: "absolute",
-				top: clientRect.top+this.element.clientHeight,
-				left: clientRect.left
+				position: "absolute"
 			};
+
+			//:todo till till we find a way to automate , we have to set manually
+			let direction:string = this.props.direction ?  this.props.direction:ColorPicker.BOTTOM_RIGHT;
+			if(direction == ColorPicker.BOTTOM_LEFT)
+			{
+				style.top = clientRect.bottom ; //clientRect bottom  = top + height
+				// 225 - third party colorpicker width //hacky
+				style.left = clientRect.right - 225; // clientRect right  = left + width
+			}
+			else if(direction == ColorPicker.BOTTOM_RIGHT)
+			{
+				style.top = clientRect.bottom; // clientRect bottom  = top + height
+				style.left = clientRect.left;
+			}
+			else if(direction == ColorPicker.TOP_RIGHT)
+			{
+				// 241.750 - third party colorpicker height //hacky
+				style.top = clientRect.top - 241.750;
+				style.left = clientRect.left;
+			}
+			else if(direction == ColorPicker.TOP_LEFT)
+			{
+				// 241.750 - third party colorpicker height //hacky
+				style.top = clientRect.top - 241.750;
+				// 225 - third party colorpicker width //hacky
+				style.left = clientRect.right - 225;
+			}
+
 			this.popup = ReactUtils.openPopup(
 				<HBox style={style} onClick={(event:React.MouseEvent) => {event.nativeEvent.stopImmediatePropagation()}}>
 					<ReactColorPicker
@@ -64,6 +96,8 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 						type="sketch"
 					/>
 				</HBox>);
+
+
 			document.addEventListener("click", this.handleClose)
 		}
 	};
@@ -105,13 +139,15 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 		if(this.props.buttonMode)
 		{
 			let label:string | React.ReactChild = this.props.buttonLabel ? this.props.buttonLabel  : "Add color";
-			ui = <div ref={(elt:Element) => this.element = elt as HTMLElement}>
-					<Button  onClick={ this.handleClick }>{label}</Button>
+			ui = <div style={ {position:"relative"} }>
+					<div ref={(elt:Element) => this.element = elt as HTMLElement}>
+						<Button  onClick={ this.handleClick }>{label}</Button>
+					</div>
 				</div>
 		}
 		else
 		{
-			ui = <div>
+			ui = <div style={ {position:"relative"} }>
 					<div ref={(elt:Element) => this.element = elt as HTMLElement} style={swatchStyle} onClick={ this.handleClick }>
 						<div style={colorStyle}></div>
 					</div>

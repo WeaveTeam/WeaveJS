@@ -145,15 +145,13 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 			this.props.colorRamp.reverse();
 	}
 
-	addColor=()=>
+	addColor=(color:string)=>
 	{
-		if (this.props.colorRamp)
-		{
-			var colors:number[] = this.props.colorRamp.getColors() as number[];
-			colors.push(StandardLib.asNumber("#FFFFFF"));
-			this.props.colorRamp.setSessionState(colors);
-		}
+		var colors = this.props.colorRamp.getColors() as number[];
+		colors.push(StandardLib.asNumber(color));
+		this.props.colorRamp.setSessionState(colors)
 	}
+
 
 	handleColorRampSelectionChange = (newColors:number[]) =>
 	{
@@ -249,7 +247,7 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 						</HBox>
 						<HBox style={{flex: .3, justifyContent: "space-between"}}>
 							<CenteredIcon onClick={this.reverseColors}>{'↓↑'}</CenteredIcon>
-							<Button onClick={this.addColor}>{Weave.lang("Add color")}</Button>
+							<ColorPicker  buttonMode={true} direction={ColorPicker.TOP_LEFT} buttonLabel="Add color" onClose={(newColor:string) => this.addColor( newColor)}/>
 						</HBox>
 					</HBox>
 				</VBox>
@@ -316,16 +314,6 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 		}
 	}
 
-	addColor=()=>
-	{
-		if (this.props.colorRamp)
-		{
-			var colors:number[] = this.props.colorRamp.getColors() as number[];
-			colors.push(StandardLib.asNumber("#FFFFFF"));
-			this.props.colorRamp.setSessionState(colors);
-		}
-	}
-
 	handleColorRampSelectionChange = (newColors:number[]) =>
 	{
 		if (this.props.colorRamp)
@@ -368,8 +356,7 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 					</HBox>
 					<div style={{alignSelf:"flex-end"}}>
 						<HBox>
-							<ColorPicker  buttonMode={true} buttonLabel="Insert" onClose={(newColor:string) => this.updateColorsAtIndex(null, newColor)}/>
-							<ColorPicker  buttonMode={true} buttonLabel="Add" onClose={(newColor:string) => this.updateColorsAtIndex(null, newColor)}/>
+							<ColorPicker  buttonMode={true} buttonLabel="Add"  direction={ColorPicker.BOTTOM_LEFT} onClose={(newColor:string) => this.updateColorsAtIndex(null, newColor)}/>
 						</HBox>
 
 					</div>
