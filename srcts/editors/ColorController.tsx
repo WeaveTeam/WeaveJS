@@ -25,7 +25,7 @@ export interface ColorControllerState
 export default class ColorController extends React.Component<ColorControllerProps, ColorControllerState>
 {
 	
-	tabLabels = ["Color Scale", "Binning"]; // , "Color Specific Records"]
+	tabLabels = ["Color theme", "Binning"]; // , "Color Specific Records"]
 	attributes = new Map<string, IColumnWrapper>();
 	static window:PopupWindow;
 	static activeTabIndex:number = 0;
@@ -33,7 +33,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 	constructor(props:ColorControllerProps)
 	{
 		super(props);
-		this.attributes.set("Color Data", this.props.colorColumn);
+		this.attributes.set("Color data", this.props.colorColumn);
 	}
 	
 	static close(window:PopupWindow)
@@ -50,7 +50,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 			PopupWindow.close(ColorController.window);
 		
 		ColorController.window = PopupWindow.open({
-			title: Weave.lang("Color Controller"),
+			title: Weave.lang("Color settings"),
 			content: <ColorController colorColumn={colorColumn}/>,
 			resizable: true,
 			width: 920,
