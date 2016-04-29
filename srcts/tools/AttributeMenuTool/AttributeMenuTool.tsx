@@ -12,6 +12,7 @@ import ComboBox from '../../semantic-ui/ComboBox';
 import {ComboBoxOption} from "../../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 import StatefulTextField from "../../ui/StatefulTextField";
+import HelpIcon from "../../react-ui/HelpIcon";
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -69,6 +70,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	setToolWatcher():void
 	{
 		this.toolWatcher.targetPath = this.targetToolPath.state as string[];
+		this.handleSelection(this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn);
 		this.forceUpdate();
 	}
 
@@ -162,7 +164,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 			case LAYOUT_COMBO:
 				return (
 					<VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
-						<ComboBox options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection } value={ selectedAttribute } placeholder="Select an attribute"/>
+						<ComboBox placeholder={(Weave.lang("Select a column"))} options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection } value={ selectedAttribute }/>
 					</VBox>
 				);
 			default:
@@ -190,7 +192,7 @@ interface IAttributeMenuTargetEditorProps
 
 interface IAttributMenuToolEditorState
 {
-	openTools?:any[];
+	openToolNames?: string[];
 }
 
 class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEditorProps, IAttributMenuToolEditorState>
@@ -200,10 +202,13 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		super(props);
 		this.weaveRoot = Weave.getRoot(this.props.attributeMenuTool);
 
-		this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizTools,true);//will be called whenever a new tool is added
+		this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizToolNames,true); //will be called whenever a new tool is added
 
-		Weave.getCallbacks(this.props.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
-
+		Weave.getCallbacks(this.props.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate); //registering callbacks
+		
+		this.state = {
+			openToolNames: []
+		}
 		//this.props.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
 	}
 
@@ -211,31 +216,29 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	{
 		if (this.props.attributeMenuTool != nextProps.attributeMenuTool)
 		{
-			this.weaveRoot.childListCallbacks.removeCallback(this, this.getOpenVizTools);
+			this.weaveRoot.childListCallbacks.removeCallback(this, this.getOpenVizToolNames);
 			Weave.getCallbacks(this.props.attributeMenuTool.toolWatcher).removeCallback(this, this.forceUpdate);
 			//this.props.attributeMenuTool.targetAttribute.removeCallback(this, this.forceUpdate);
 
 			this.weaveRoot = Weave.getRoot(nextProps.attributeMenuTool);
-			this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizTools, true);//will be called whenever a new tool is added
-			Weave.getCallbacks(nextProps.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate);//registering callbacks
+			this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizToolNames, true); // will be called whenever a new tool is added
+			Weave.getCallbacks(nextProps.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate); // registering callbacks
 			//nextProps.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
 		}
 	}
 
-	state : {openTool:any[]};
-	private openTools:any [];//visualization tools open at the given time
 	private weaveRoot:ILinkableHashMap;
 
-	getOpenVizTools=():void =>
+	getOpenVizToolNames():void
 	{
-		this.openTools = [];
+		var openToolNames:string[] = [];
 
 		this.weaveRoot.getObjects().forEach((tool:any):void => {
 			// excluding AttributeMenuTool from the list
 			if (tool.selectableAttributes && Weave.className(tool) != Weave.className(this.props.attributeMenuTool))
-				this.openTools.push(this.weaveRoot.getName(tool));
+				openToolNames.push(this.weaveRoot.getName(tool));
 		});
-		this.setState({openTools: this.openTools});
+		this.setState({openToolNames});
 	};
 
 	//UI event handler for target Tool
@@ -282,20 +285,26 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		
 		return [
 			[
-				Weave.lang("Chart"),
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Chart")}
+					<HelpIcon>{Weave.lang("Select a chart to control.")}</HelpIcon>
+				</HBox>,
 				<ComboBox
 					className="weave-sidebar-dropdown"
-					placeholder="Select a chart"
+					placeholder={Weave.lang("Select a chart")}
 					value={ toolName }
-					options={ this.openTools }
+					options={ this.state.openToolNames }
 					onChange={ this.handleTargetToolChange }
 				/>
 			],
 			[
-				Weave.lang("Attribute"),
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("Attribute")}
+					<HelpIcon>{Weave.lang("Attribute of the chart to be controlled. Values selected in the Attribute Controller will change this attribute for the selected chart.")}</HelpIcon>
+				</HBox>,
 				<ComboBox
 					className="weave-sidebar-dropdown"
-					placeholder="Select an attribute"
+					placeholder={Weave.lang("Select an attribute")}
 					ref={ linkReactStateRef(this, { value: this.props.attributeMenuTool.targetAttribute })}
 					options={ this.getTargetToolAttributeOptions() }
 				/>
@@ -329,8 +338,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		return (
 			<VBox>
 				{
-					this.openTools && this.openTools.length > 0
-					?	ReactUtils.generateTable({
+					ReactUtils.generateTable({
 							body: [].concat(
 								this.toolConfigs,
 								renderSelectableAttributes(this.props.attributeMenuTool.selectableAttributes, this.props.linkFunction),
@@ -343,7 +351,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 								]
 							}
 						})
-					:	<div>{ 'Select a chart from the Charts menu' }</div>
 				}
 			</VBox>
 		);

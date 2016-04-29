@@ -55,15 +55,19 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 		let values:any = this.filter ? this.filter.values.state : [];
 		if (this.forceDiscreteValues.value)
 		{
-			return <HBox style={{flex: 1, alignItems: "center", padding: 10}}>
+			return (
+				<HBox style={{flex: 1, padding: 25}}>
 					<HSlider type="numeric-discrete" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-				</HBox>;
+				</HBox>
+			);
 		}
 		else
 		{
-			return <HBox style={{flex: 1, alignItems: "center", padding: 10}}>
+			return (
+				<HBox style={{flex: 1, padding: 25}}>
 					<HSlider type="numeric" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-				</HBox>;
+				</HBox>
+			);
 		}
 	}
 }

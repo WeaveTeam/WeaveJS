@@ -108,7 +108,7 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 				
 			case LAYOUT_COMBO:
 				return <VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
-							<ComboBox style={{textAlign: "center"}} options={this.options} value={ values && values[0]} onChange={(value) => this.onChange([value])}/>
+							<ComboBox style={{textAlign: "center"}} placeholder={(Weave.lang("Select a value"))} options={this.options} value={ values && values[0]} onChange={(value) => this.onChange([value])}/>
 						</VBox>;
 		}
 	}
