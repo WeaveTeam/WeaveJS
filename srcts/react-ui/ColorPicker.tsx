@@ -36,6 +36,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 		this.state = {
 			hexColor: props.hexColor || '#FFFFFF',
 		};
+		this.handleClick = this.handleClick.bind(this);
 		this.handleClose = this.handleClose.bind(this);
 		this.handleChange = this.handleChange.bind(this);
 	}
@@ -58,24 +59,61 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 				position: "absolute"
 			};
 
-			//:todo till till we find a way to automate , we have to set manually
+			//:todo automate based on the mentioned container,currenlty just checks for window
+			let isAbove:boolean = window.innerHeight <= clientRect.bottom + 241.750;
+			let isLeft:boolean = window.innerWidth <= clientRect.left + 200;
+			
 			let direction:string = this.props.direction ?  this.props.direction:ColorPicker.BOTTOM_RIGHT;
 			if(direction == ColorPicker.BOTTOM_LEFT)
 			{
-				style.top = clientRect.bottom ; //clientRect bottom  = top + height
+				if(isAbove)
+				{
+					// 241.750 - third party colorpicker height //hacky
+					style.top = clientRect.top - 241.750;
+				}
+				else
+				{
+					style.top = clientRect.bottom ; //clientRect bottom  = top + height
+				}
+
 				// 225 - third party colorpicker width //hacky
 				style.left = clientRect.right - 225; // clientRect right  = left + width
 			}
 			else if(direction == ColorPicker.BOTTOM_RIGHT)
 			{
-				style.top = clientRect.bottom; // clientRect bottom  = top + height
-				style.left = clientRect.left;
+				if(isAbove)
+				{
+					// 241.750 - third party colorpicker height //hacky
+					style.top = clientRect.top - 241.750;
+				}
+				else
+				{
+					style.top = clientRect.bottom ; //clientRect bottom  = top + height
+				}
+
+				if(isLeft)
+				{
+					// 225 - third party colorpicker width //hacky
+					style.left = clientRect.right - 225; // clientRect right  = left + width
+				}else
+				{
+					style.left = clientRect.left;
+				}
+
+
 			}
 			else if(direction == ColorPicker.TOP_RIGHT)
 			{
 				// 241.750 - third party colorpicker height //hacky
 				style.top = clientRect.top - 241.750;
-				style.left = clientRect.left;
+				if(isLeft)
+				{
+					// 225 - third party colorpicker width //hacky
+					style.left = clientRect.right - 225; // clientRect right  = left + width
+				}else
+				{
+					style.left = clientRect.left;
+				}
 			}
 			else if(direction == ColorPicker.TOP_LEFT)
 			{
