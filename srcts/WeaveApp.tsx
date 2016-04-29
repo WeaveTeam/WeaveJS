@@ -320,21 +320,23 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	//sorts the array of column refs by numeric columns
 	//TODO put this function elsewhere?
-	prioritizeNumericColumns(columnRefs:IColumnReference[]) : IColumnReference[]{
-		var sortedRefs = _.sortBy(columnRefs, function(ref){
-			let meta:{[key:string]:string} = ref.getColumnMetadata();
+	prioritizeNumericColumns(columnRefs:Array<IWeaveTreeNode&IColumnReference>) : IColumnReference[]
+	{
+		var sortedRefs = _.sortBy(columnRefs, function(item){
+			var ref = Weave.AS(item, IColumnReference);
+			let meta:{[key:string]:string} = ref && ref.getColumnMetadata();
 			let dataType = meta && meta["dataType"];
 			//console.log("meta " , meta, 'has dataType', dataType);
 			switch(dataType)
 			{
-				case 'number' :
+				case 'number':
 					return 0;
-				default :
+				default:
 					return 1;
-				case 'geometry' :
+				case 'geometry':
 					return 2;
 			}
-		} );
+		});
 		return sortedRefs.reverse();
 	}
 
