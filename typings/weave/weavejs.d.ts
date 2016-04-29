@@ -2027,9 +2027,9 @@ declare module weavejs.api.data {
          * This function will return the same IAttributeColumn for identical metadata values.
          * Use this function to avoid downloading duplicate column data.
          * @param dataSource The data source to request the column from if it is not already cached.
-         * @param metadata The metadata to be passed to dataSource.getAttributeColumn().
+         * @param metadata The metadata to be passed to dataSource.generateNewAttributeColumn().
          * @return The cached column object.
-         * @see weave.api.data.IDataSource#getAttributeColumn()
+         * @see weave.api.data.IDataSource#generateNewAttributeColumn()
          */
         getColumn(dataSource: IDataSource, metadata: Object): IAttributeColumn;
     }
@@ -2303,11 +2303,11 @@ declare module weavejs.api.data {
          */
         findHierarchyNode(metadata: Object): IWeaveTreeNode;
         /**
-         * Retrieves an IAttributeColumn from this IDataSource.
+         * Generates a new IAttributeColumn which will receive data from this IDataSource.
          * @param metadata Metadata used to identify a column in this IDataSource.
-         * @return An IAttributeColumn object that will be updated when the column data is available.
+         * @return A new IAttributeColumn object that will be updated when the column data is available.
          */
-        getAttributeColumn(metadata: Object): IAttributeColumn;
+        generateNewAttributeColumn(metadata: Object): IAttributeColumn;
     }
     var IDataSource: new (..._: any[]) => IDataSource;
 }
@@ -4395,11 +4395,11 @@ declare module weavejs.data {
         static getCommonMetadata(columns: any[], propertyName: string): string;
         static getAllCommonMetadata(columns: any[]): Object;
         static sortMetadataPropertyNames(names: any[]): void;
-        static firstDataSet: Array<IColumnReference>;
+        static firstDataSet: Array<IWeaveTreeNode & IColumnReference>;
         /**
          * Finds a set of columns from available data sources, preferring ones that are already in use.
          */
-        static findFirstDataSet(root: ILinkableHashMap): Array<IColumnReference>;
+        static findFirstDataSet(root: ILinkableHashMap): Array<IWeaveTreeNode & IColumnReference>;
         /**
          * This will initialize selectable attributes using a list of columns and/or column references.
          * @param selectableAttributes An Array of IColumnWrapper and/or ILinkableHashMaps to initialize.
@@ -5591,6 +5591,7 @@ declare module weavejs.data.column {
         isStillDownloading(): boolean;
         metadataTilesPerQuery: number;
         geometryTilesPerQuery: number;
+        requestAllMetadata(): void;
         requestGeometryDetail(dataBounds: Bounds2D, lowestImportance: number): void;
         requestGeometryDetailForZoomBounds(zoomBounds: ZoomBounds): void;
         static METADATA_REQUEST_MODE_ALL: string;
@@ -5820,7 +5821,7 @@ declare module weavejs.data.hierarchy {
         hierarchyRefresh: ICallbackCollection;
         getHierarchyRoot(): IWeaveTreeNode;
         findHierarchyNode(metadata: Object): IWeaveTreeNode;
-        getAttributeColumn(metadata: Object): IAttributeColumn;
+        generateNewAttributeColumn(metadata: Object): IAttributeColumn;
     }
 }
 declare module weavejs.data.hierarchy {
@@ -6366,7 +6367,7 @@ declare module weavejs.data.source {
          * @param metadata An object that contains all the information required to request the column from this IDataSource.
          * @return A ProxyColumn object that will be updated when the column data is ready.
          */
-        getAttributeColumn(metadata: Object): IAttributeColumn;
+        generateNewAttributeColumn(metadata: Object): IAttributeColumn;
         /**
          * This function will call requestColumnFromSource() if initializationComplete==true.
          * Otherwise, it will delay the column request again.
@@ -6379,7 +6380,7 @@ declare module weavejs.data.source {
          * This function will call handlePendingColumnRequest() on each pending column request.
          */
         /**
-         * Calls requestColumnFromSource() on all ProxyColumn objects created previously via getAttributeColumn().
+         * Calls requestColumnFromSource() on all ProxyColumn objects created previously via generateNewAttributeColumn().
          */
         /**
          * This function should be called when the IDataSource is no longer in use.
@@ -6476,7 +6477,7 @@ declare module weavejs.data.source {
          */
         getColumnTitle(id: Object): string;
         generateMetadataForColumnId(id: Object): Object;
-        getAttributeColumn(metadata: Object): IAttributeColumn;
+        generateNewAttributeColumn(metadata: Object): IAttributeColumn;
         /**
          * This function will get a column by name or index.
          * @param columnNameOrIndex The name or index of the CSV column to get.
@@ -6777,7 +6778,7 @@ declare module weavejs.data.source {
         /**
          * This gets called as a grouped callback when the session state changes.
          */
-        getAttributeColumn(metadata: Object): IAttributeColumn;
+        generateNewAttributeColumn(metadata: Object): IAttributeColumn;
         static ENTITY_ID: string;
     }
 }
@@ -9497,6 +9498,10 @@ declare module weavejs.util {
          * @see https://github.com/bestiejs/punycode.js
          */
         static guid(): string;
+        /**
+         * Converts a Uint8Array to a binary String
+         */
+        static byteArrayToString(byteArray: Uint8Array): string;
     }
 }
 declare module weavejs.util {

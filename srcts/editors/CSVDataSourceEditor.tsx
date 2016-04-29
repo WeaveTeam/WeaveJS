@@ -29,7 +29,6 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
-		this.componentWillReceiveProps(props);
 	}
 
 	onUrlChange()
@@ -42,12 +41,12 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			this.forceUpdate();
 		}
 	}
-
-	componentWillReceiveProps(nextProps:IDataSourceEditorProps)
+	
+	handleProps(props:IDataSourceEditorProps)
 	{
-		super.componentWillReceiveProps(nextProps);
+		super.handleProps(props);
 		
-		let ds = (nextProps.dataSource as CSVDataSource);
+		let ds = (props.dataSource as CSVDataSource);
 		if (this.props.dataSource)
 		{
 			let old_ds = (this.props.dataSource as CSVDataSource);
