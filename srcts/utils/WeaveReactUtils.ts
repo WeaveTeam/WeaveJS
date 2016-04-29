@@ -163,5 +163,5 @@ export function linkReactState(context:ILinkableObject, component:ReactComponent
 
 export function createWatcher(component:ReactComponent, type:new(..._:any[])=>ILinkableObject):LinkableWatcher
 {
-	return Weave.disposableChild(component, new LinkableWatcher(type, null, component.forceUpdate));
+	return Weave.disposableChild(component, new LinkableWatcher(type, null, component.forceUpdate.bind(component)));
 }

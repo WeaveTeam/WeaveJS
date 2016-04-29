@@ -9,7 +9,6 @@ import ComboBox from '../semantic-ui/ComboBox';
 import List from '../react-ui/List';
 import ControlPanel from "./ControlPanel";
 import ReactUtils from "../utils/ReactUtils";
-import {createWatcher} from "../utils/WeaveReactUtils";
 import DynamicComponent from "./DynamicComponent";
 
 import ColumnUtils = weavejs.data.ColumnUtils;
