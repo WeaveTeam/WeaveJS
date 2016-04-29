@@ -25,9 +25,20 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
 	render()
 	{
 		return (
-			<div {...this.props as any} className={classnames("weave-progress-bar-background", this.props.className)} style={_.merge({width: "100%", height: 3}, this.props.style)}>
-				<div className="weave-progress-bar" style={{width: ((this.props.progressValue || 0)/(this.props.total || 1) * 100)+"%", height: "100%"}}></div>
+			<div
+				{...this.props as any}
+				className={classnames("weave-progress-bar-background", this.props.className)}
+				style={_.merge({width: "100%", height: 2}, this.props.style)}
+			>
+				<div
+					className="weave-progress-bar"
+					style={{
+						visibility: this.props.visible ? "visible" : "hidden",
+						width: ((this.props.progressValue || 0) / (this.props.total || 1) * 100) + "%",
+						height: "100%"
+					}}
+				/>
 			</div>
-		)
+		);
 	}
 }
