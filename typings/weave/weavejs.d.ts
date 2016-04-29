@@ -6429,6 +6429,7 @@ declare module weavejs.data.source {
 }
 declare module weavejs.data.source {
     import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+    import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IDataSource_File = weavejs.api.data.IDataSource_File;
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -6441,7 +6442,7 @@ declare module weavejs.data.source {
      * @author adufilie
      * @author skolman
      */
-    class CSVDataSource extends AbstractDataSource implements IDataSource_File {
+    class CSVDataSource extends AbstractDataSource implements IDataSource_File, ILinkableObjectWithNewProperties {
         constructor();
         getLabel(): string;
         csvData: LinkableVariable;
@@ -6506,8 +6507,7 @@ declare module weavejs.data.source {
         getHierarchyRoot(): IWeaveTreeNode;
         static METADATA_COLUMN_INDEX: string;
         static METADATA_COLUMN_NAME: string;
-        keyColName: string;
-        csvDataString: string;
+        deprecatedStateMapping: Object;
         getColumnByName(name: string): IAttributeColumn;
     }
 }
