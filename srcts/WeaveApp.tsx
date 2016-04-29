@@ -29,6 +29,8 @@ import WeavePath = weavejs.path.WeavePath;
 import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
+import StandardLib = weavejs.util.StandardLib;
+import WeaveArchive = weavejs.core.WeaveArchive;
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -72,6 +74,32 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (!this.props.weave)
 			return null;
 		return this.props.weave.getObject(this.getRenderPath()) as React.Component<any, any>;
+	}
+
+	private _adminConsole: any;
+	private get adminConsole():any
+	{
+		if (!this._adminConsole)
+		{
+			if (window.opener) {
+				this._adminConsole = window.opener.document.getElementById("AdminConsole");
+			}
+		}
+		return this._adminConsole;
+	}
+
+	pingAdminConsole():boolean
+	{
+		return !!this.adminConsole;
+	}
+
+	saveWeaveFile(fileName:string, overwrite:boolean = false):void
+	{
+		if (this.adminConsole)
+		{
+			let archive = (StandardLib as any).byteArrayToString(WeaveArchive.createArchive(this.props.weave).serialize()) as string;
+			this.adminConsole.saveWeaveFile(btoa(archive), fileName, overwrite);
+		}
 	}
 
 	private createDefaultSessionElements()
