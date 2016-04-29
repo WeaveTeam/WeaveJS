@@ -22,6 +22,7 @@ export interface MouseoverControllerState
 
 }
 
+const HEADER_COLUMNS = "Header columns";
 export default class MouseoverController extends React.Component<MouseoverControllerProps, MouseoverControllerState>
 {
 	static window:PopupWindow;
@@ -30,7 +31,7 @@ export default class MouseoverController extends React.Component<MouseoverContro
 	constructor(props:MouseoverControllerProps)
 	{
 		super(props);
-		this.attributes.set("Header columns", props.probedHeaderColumns);
+		this.attributes.set(HEADER_COLUMNS, props.probedHeaderColumns);
 		this.attributes.set("Data columns", props.probedColumns);
 	}
 
@@ -70,7 +71,7 @@ export default class MouseoverController extends React.Component<MouseoverContro
 	{
 		return (
 			<VBox style={{flex: 1}}>
-				<AttributeSelector attributeName="Header Columns" attributes={this.attributes}/>
+				<AttributeSelector attributeName={HEADER_COLUMNS} attributes={this.attributes}/>
 			</VBox>
 		);
 	}
