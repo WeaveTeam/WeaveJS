@@ -272,6 +272,7 @@ div.table-row-selected>div>div>div>div>div {
 
 /**** container - FlexBox *****/
 .weave-padded-vbox > * {
+	flex-shrink: 0;
 	margin-top: 8px;
 }
 
@@ -281,6 +282,7 @@ div.table-row-selected>div>div>div>div>div {
 
 
 .weave-padded-hbox > * {
+	flex-shrink: 0;
 	margin-left: 8px;
 }
 .weave-padded-hbox > *:nth-child(1) {
