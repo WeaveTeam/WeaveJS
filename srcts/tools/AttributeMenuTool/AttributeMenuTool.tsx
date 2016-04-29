@@ -301,7 +301,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				/>
 			],
 			[
-				Weave.lang("Menu Layout"),
+				Weave.lang("Layout mode"),
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					ref={ linkReactStateRef(this, { value: this.props.attributeMenuTool.layoutMode })}
