@@ -70,7 +70,7 @@ export default class ControllersMenu implements MenuBarItemProps
 	static isBeta(impl:new(..._:any[])=>any):boolean
 	{
 		return impl == WeaveUI.DataFilterTool
-			|| impl == WeaveUI.AttributeMenuTool
+//			|| impl == WeaveUI.AttributeMenuTool
 			|| impl == WeaveUI.SessionStateMenuTool;
 	}
 }
