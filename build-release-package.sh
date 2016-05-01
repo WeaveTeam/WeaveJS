@@ -15,6 +15,8 @@ cp -R ../dist/ ROOT/weave-html5
 cp -R ../../Weave/WeaveJS/bin/ ROOT/weavejs
 rm -Rf ROOT/weavejs/js-debug
 zip -r weave.zip ROOT
+cp ../LICENSES.md .
+zip weave.zip LICENSES.md
 mv weave.zip ../weave-release-`date +%Y%m%d`.zip
 popd
 rm -Rf tmp/
