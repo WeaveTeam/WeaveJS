@@ -37,7 +37,7 @@ export default class SystemMenu implements MenuBarItemProps
 				click: this.fileMenu.saveToServer
 			});
 		}
-		menu.concat([
+		return menu.concat([
 			{},
 			{
 				label: "Visit iweave.com",
@@ -58,6 +58,5 @@ export default class SystemMenu implements MenuBarItemProps
 				label: "Version: 2.0"
 			}
 		]);
-		return menu;
 	}
 }
