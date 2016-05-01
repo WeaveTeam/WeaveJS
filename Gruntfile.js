@@ -96,7 +96,7 @@ module.exports = function (grunt) {
 			}
         },
         copy: {
-            main: {expand: true, flatten: true, cwd: 'src/', src: '**/*.html', dest: 'dist/'},
+            main: {expand: true, flatten: true, cwd: 'src/', src: '**/index.html', dest: 'dist/'},
             css: {expand: true, flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/'},
             olcss: {expand: true, flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
             fontawesomecss: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
