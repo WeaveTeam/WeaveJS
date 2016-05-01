@@ -101,8 +101,7 @@ module.exports = function (grunt) {
             olcss: {expand: true, flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
             fontawesomecss: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
             fontawesomefont: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
-            images: {expand: true, flatten: true, cwd: 'img/', src: '*', dest: 'dist/img/'},
-			semantic: {expand: true, cwd: 'src/semantic', src: '**', dest: 'dist/semantic/'},
+	    semantic: {expand: true, cwd: 'src/semantic', src: '**', dest: 'dist/semantic/'},
             weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"},
             projdb: {expand: true, flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"}
         },
@@ -119,10 +118,10 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
-
+    grunt.registerTask('distcopy', ['copy:main', 'copy:olcss', 'copy:css', 'copy:fontawesomecss', 'copy:fontawesomefont', 'copy:semantic', 'copy:projdb']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);
     grunt.registerTask('distlibs', ['browserify:distlibs']);
     grunt.registerTask('default', ['ts', 'babel', 'browserify:dev', 'copy']);
     grunt.registerTask('all', ['clean', 'ts', 'babel', 'distlibs', 'copy']);
-    grunt.registerTask('distall', ['clean', 'ts', 'babel', 'browserify:dist', 'copy']);
+    grunt.registerTask('distall', ['clean', 'ts', 'babel', 'browserify:dist', 'browserify:distlibs', 'distcopy']);
 };
