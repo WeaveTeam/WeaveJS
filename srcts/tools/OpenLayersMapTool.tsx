@@ -4,11 +4,9 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ReactUtils from "../utils/ReactUtils";
 import MouseUtils from "../utils/MouseUtils";
-import * as jquery from "jquery";
+import $ from "../modules/jquery";
+import proj4 from "../modules/proj4";
 import PrintUtils from "../utils/PrintUtils";
-
-// loads jquery from the es6 default module.
-var $:JQueryStatic = (jquery as any)["default"];
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
 import AbstractLayer from "./OpenLayersMap/Layers/AbstractLayer";
