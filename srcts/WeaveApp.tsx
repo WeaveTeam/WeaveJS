@@ -104,12 +104,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
 	
+	urlParams:{ file: string, editable: boolean };
+	
 	componentDidMount()
 	{
 		this.createDefaultSessionElements();
 		if (this.props.readUrlParams)
 		{
-			var urlParams = MiscUtils.getUrlParams();
+			this.urlParams = MiscUtils.getUrlParams();
+			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.menuBar.systemMenu.fileMenu.pingAdminConsole();
 
 			try
 			{
@@ -120,10 +123,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				console.error(e);
 			}
 			
-			if (urlParams.file)
+			if (this.urlParams.file)
 			{
 				// read content from url
-				this.menuBar.systemMenu.fileMenu.loadUrl(urlParams.file);
+				this.menuBar.systemMenu.fileMenu.loadUrl(this.urlParams.file);
 			}
 			else if (weaveExternalTools && weaveExternalTools[window.name])
 			{
@@ -387,6 +390,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				tool.setState({ highlightTitle: _.isEqual(nextState.toolPathToEdit, tool.props.path) });
 		}
 	}
+		
+	get enableMenuBar():LinkableBoolean
+	{
+		return this.props.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+	}
 	
 	render():JSX.Element
 	{
@@ -397,8 +405,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 		
 		// backwards compatibility hack
-		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
-		DynamicComponent.setDependencies(this, [enableMenuBar]);
+		DynamicComponent.setDependencies(this, [this.enableMenuBar]);
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
 		if (toolToEdit && toolToEdit.renderEditor) // hack
@@ -425,9 +432,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					/>
 				</SideBarContainer>
 				{
-					!enableMenuBar || enableMenuBar.value
+					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
 					?	<WeaveMenuBar
-							style={prefixer({order: -1})}
+							style={prefixer({order: -1, opacity: this.enableMenuBar && this.enableMenuBar.value ? 1 : 0.5 })}
 							weave={weave}
 							ref={(c:WeaveMenuBar) => this.menuBar = c}
 							createObject={this.createObject}

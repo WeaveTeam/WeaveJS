@@ -30,7 +30,7 @@ export default class SystemMenu implements MenuBarItemProps
 			}
 		];
 		
-		if(this.fileMenu.pingAdminConsole())
+		if (this.fileMenu.pingAdminConsole())
 		{
 			menu.push({
 				label: Weave.lang("Save to server"),
