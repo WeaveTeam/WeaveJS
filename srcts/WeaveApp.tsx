@@ -7,6 +7,7 @@ import SideBarContainer from "./react-ui/SideBarContainer";
 import {HBox, VBox} from "./react-ui/FlexBox";
 import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
+import DynamicComponent from "./ui/DynamicComponent";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./FlexibleLayout";
 import {LayoutState} from "./react-flexible-layout/Layout";
@@ -397,6 +398,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		// backwards compatibility hack
 		var enableMenuBar = weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+		DynamicComponent.setDependencies(this, [enableMenuBar]);
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
 		if (toolToEdit && toolToEdit.renderEditor) // hack
