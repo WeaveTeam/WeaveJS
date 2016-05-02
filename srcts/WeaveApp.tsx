@@ -434,7 +434,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{
 					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
 					?	<WeaveMenuBar
-							style={prefixer({order: -1, opacity: this.enableMenuBar && this.enableMenuBar.value ? 1 : 0.5 })}
+							style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
 							weave={weave}
 							ref={(c:WeaveMenuBar) => this.menuBar = c}
 							createObject={this.createObject}
