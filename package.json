@@ -1,5 +1,5 @@
 {
-  "name": "weave-html5",
+  "name": "WeaveJS",
   "version": "0.0.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
   "main": "lib/WeaveUI.js",
@@ -12,7 +12,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/WeaveTeam/weave-html5.git"
+    "url": "https://github.com/WeaveTeam/WeaveJS.git"
   },
   "keywords": [
     "visualization",
