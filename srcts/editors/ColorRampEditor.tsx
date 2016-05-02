@@ -145,10 +145,17 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 			this.props.colorRamp.reverse();
 	}
 
-	addColor=(color:string)=>
+	addColor=(color:string,eventType:string)=>
 	{
 		var colors = this.props.colorRamp.getColors() as number[];
-		colors.push(StandardLib.asNumber(color));
+		if(eventType == "onClick")
+		{
+			colors.push(StandardLib.asNumber(color));
+		}
+		else if(eventType == "onChange"){
+			colors[colors.length -1] = StandardLib.asNumber(color);
+		}
+
 		this.props.colorRamp.setSessionState(colors)
 	}
 
@@ -247,7 +254,9 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 						</HBox>
 						<HBox style={{flex: .3, justifyContent: "space-between"}}>
 							<CenteredIcon onClick={this.reverseColors}>{'↓↑'}</CenteredIcon>
-							<ColorPicker  buttonMode={true} direction={ColorPicker.TOP_LEFT} buttonLabel="Add color" onClose={(newColor:string) => this.addColor( newColor)}/>
+							<ColorPicker  buttonMode={true} direction={ColorPicker.TOP_LEFT} buttonLabel="Add color"
+							              onChange={(newColor:string) => this.addColor( newColor,"onChange")}
+							              onClick={(newColor:string) => this.addColor( newColor,"onClick")}/>
 						</HBox>
 					</HBox>
 				</VBox>
@@ -285,6 +294,20 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 			if (nextProps.colorRamp)
 				nextProps.colorRamp.addGroupedCallback(this, this.forceUpdate);
 		}
+	}
+
+	addColor=(color:string,eventType:string)=>
+	{
+		var colors = this.props.colorRamp.getColors() as number[];
+		if(eventType == "onClick")
+		{
+			colors.push(StandardLib.asNumber(color));
+		}
+		else if(eventType == "onChange"){
+			colors[colors.length -1] = StandardLib.asNumber(color);
+		}
+
+		this.props.colorRamp.setSessionState(colors)
 	}
 
 	updateColorsAtIndex(index:number, color:string)
@@ -337,7 +360,7 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 				label: (
 					<HBox style={{flex: 1, justifyContent: "space-between", verticalAlign: "middle"}}>
 						<HBox className="weave-padded-hbox">
-							<ColorPicker height="14px" width="36px" hexColor={hexColor} onClose={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
+							<ColorPicker hexColor={hexColor} onChange={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
 							<span style={{alignSelf: "center", fontFamily: "monospace"}}>{hexColor.toUpperCase()}</span>
 						</HBox>
 						<CenteredIcon iconProps={{className: "fa fa-times fa-fw"}} onClick={() => this.removeColorAtIndex(index)}/>
@@ -350,16 +373,19 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 		{
 			return (
 				<VBox className="weave-padded-vbox">
+					<div style={{alignSelf:"flex-end"}}>
+						<HBox>
+							<ColorPicker  buttonMode={true} buttonLabel="Add color"  direction={ColorPicker.BOTTOM_LEFT}
+							              onChange={(newColor:string) => this.addColor( newColor, "onChange")}
+							              onClick={(newColor:string) => this.addColor( newColor, "onClick")}/>
+						</HBox>
+
+					</div>
 					<HBox style={{overflow: "auto"}} className="weave-padded-hbox">
 						<ColorRampComponent style={{width: 30}} direction="bottom" ramp={hexColors}/>
 						<List style={ {flex:1} } options={listOptions}/>
 					</HBox>
-					<div style={{alignSelf:"flex-end"}}>
-						<HBox>
-							<ColorPicker  buttonMode={true} buttonLabel="Add"  direction={ColorPicker.BOTTOM_LEFT} onClose={(newColor:string) => this.updateColorsAtIndex(null, newColor)}/>
-						</HBox>
 
-					</div>
 				</VBox>
 			);
 		}

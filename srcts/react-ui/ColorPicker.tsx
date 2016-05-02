@@ -11,6 +11,7 @@ export interface ColorPickerProps extends React.Props<ColorPicker>
 	height?:string;
 	onChange?: (hexColor:string) => void;
 	onClose?: (hexColor:string) => void;
+	onClick?: (hexColor:string) => void;
 	buttonMode?:boolean;
 	buttonLabel?:string|React.ReactChild;
 	direction?:string;
@@ -135,8 +136,8 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 					/>
 				</HBox>);
 
-
-			document.addEventListener("click", this.handleClose)
+			document.addEventListener("click", this.handleClose);
+			this.props.onClick && this.props.onClick(this.state.hexColor);
 		}
 	};
 
