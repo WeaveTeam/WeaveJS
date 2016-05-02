@@ -197,26 +197,36 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 
 		return(
 			<HBox className={className} style={{height: this.props.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart} onDoubleClick={this.props.onMaximizeClick}>
-				<CenteredIcon title={Weave.lang("Configure")} onClick={this.props.onGearClick}
-							  iconProps={{className: "fa fa-cog fa-fw"}}/>
-
+				{
+					this.props.showControls
+					?	[
+							<CenteredIcon title={Weave.lang("Configure")} onClick={this.props.onGearClick}
+										  iconProps={{className: "fa fa-cog fa-fw"}}/>,
+							<div style={{width: 28, height: 24}}/>,
+							Weave.beta ? <div style={{width: 28, height: 24}}/> : null
+						]
+					:	null
+				}
 				<HBox style={{flex: 1, alignSelf: "stretch", cursor: "move", overflow: "hidden", visibility: "visible"}}>
 					<span className="weave-tool-title-bar-text" style={{width: "100%", paddingTop: 5, paddingBottom: 5, textAlign: "center", textOverflow: "ellipsis"}}>{this.props.title}</span>
 				</HBox>
-
-				<CenteredIcon title={maximizeTitleText} onClick={this.props.onMaximizeClick}
-							  iconProps={{ className: maximizeClassName }}/>
 				{
-					Weave.beta
-					?	<CenteredIcon
-							title={this.props.onPopoutClick ? Weave.lang("Display in new window") : Weave.lang("Restore to main window")}
-							onClick={this.props.onPopoutClick || this.props.onPopinClick}
-							iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
-						/>
-					:	null
+					this.props.showControls 
+					?	[
+							<CenteredIcon key={1} title={maximizeTitleText} onClick={this.props.onMaximizeClick}
+										  iconProps={{ className: maximizeClassName }}/>,
+							Weave.beta 
+							?	<CenteredIcon key={2}
+										title={this.props.onPopoutClick ? Weave.lang("Display in new window") : Weave.lang("Restore to main window")}
+										onClick={this.props.onPopoutClick || this.props.onPopinClick}
+										iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
+									/>
+							:	null,
+							<CenteredIcon key={3} title={Weave.lang("Close")} onClick={this.props.onCloseClick}
+										  iconProps={{className: "fa fa-times fa-fw"}}/>
+				    ]
+					: null
 				}
-				<CenteredIcon title={Weave.lang("Close")} onClick={this.props.onCloseClick}
-							  iconProps={{className: "fa fa-times fa-fw"}}/>
 			</HBox>
 		);
 	}
