@@ -200,10 +200,10 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 				{
 					this.props.showControls
 					?	[
-							<CenteredIcon title={Weave.lang("Configure")} onClick={this.props.onGearClick}
+							<CenteredIcon key="0" title={Weave.lang("Configure")} onClick={this.props.onGearClick}
 										  iconProps={{className: "fa fa-cog fa-fw"}}/>,
-							<div style={{width: 28, height: 24}}/>,
-							Weave.beta ? <div style={{width: 28, height: 24}}/> : null
+							<div key="1" style={{width: 28, height: 24}}/>,
+							Weave.beta ? <div key="2" style={{width: 28, height: 24}}/> : null
 						]
 					:	null
 				}
@@ -213,16 +213,16 @@ class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
 				{
 					this.props.showControls 
 					?	[
-							<CenteredIcon key={1} title={maximizeTitleText} onClick={this.props.onMaximizeClick}
+							<CenteredIcon key="0" title={maximizeTitleText} onClick={this.props.onMaximizeClick}
 										  iconProps={{ className: maximizeClassName }}/>,
 							Weave.beta 
-							?	<CenteredIcon key={2}
+							?	<CenteredIcon key="1"
 										title={this.props.onPopoutClick ? Weave.lang("Display in new window") : Weave.lang("Restore to main window")}
 										onClick={this.props.onPopoutClick || this.props.onPopinClick}
 										iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
 									/>
 							:	null,
-							<CenteredIcon key={3} title={Weave.lang("Close")} onClick={this.props.onCloseClick}
+							<CenteredIcon key="2" title={Weave.lang("Close")} onClick={this.props.onCloseClick}
 										  iconProps={{className: "fa fa-times fa-fw"}}/>
 				    ]
 					: null
