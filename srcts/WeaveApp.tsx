@@ -109,7 +109,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (this.props.readUrlParams)
 		{
 			var urlParams = MiscUtils.getUrlParams();
-			var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
+
+			try
+			{
+				var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
+			}
+			catch (e)
+			{
+				console.error(e);
+			}
 			
 			if (urlParams.file)
 			{
