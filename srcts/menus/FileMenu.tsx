@@ -265,12 +265,18 @@ export default class FileMenu implements MenuBarItemProps
 	private _adminConsole: any;
 	private get adminConsole():any
 	{
-		if (!this._adminConsole)
-		{
-			if (window.opener) {
-				this._adminConsole = window.opener.document.getElementById("AdminConsole");
-			}
+		try {
+			if (!this._adminConsole) {
+				if (window.opener) {
+					this._adminConsole = window.opener.document.getElementById("AdminConsole");
+				}
+			}			
 		}
+		catch (e)
+		{
+			console.error(e);
+		}
+
 		return this._adminConsole;
 	}
 
