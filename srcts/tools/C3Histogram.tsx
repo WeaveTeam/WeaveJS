@@ -591,6 +591,7 @@ export default class C3Histogram extends AbstractC3Tool
 			[
 				Weave.lang("Binning"),
 				<BinningDefinitionEditor
+					showNoneOption={false}
 					binnedColumn={this.binnedColumn}
 					pushCrumb={ pushCrumb }
 					onButtonClick={() => this.openColorController(1)}

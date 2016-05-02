@@ -35,8 +35,12 @@ import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
 
+// temporary hack
+function Weave_linkState(a:any, b:any) { if (a != b) Weave.linkState(a, b); }
+
 export interface BinningDefinitionEditorProps
 {
+	showNoneOption?:boolean;
 	binnedColumn:BinnedColumn;
 	compact?:boolean;
 	onButtonClick?:React.MouseEventHandler;
@@ -74,6 +78,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 			this.props.pushCrumb(
 				"Binning",
 				<BinningDefinitionSelector
+					showNoneOption={this.props.showNoneOption}
 					attributeName={attributeName}
 					attributes={attributes}
 					pushCrumb={this.props.pushCrumb}
@@ -115,6 +120,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		var [attributeName, attributes] = SelectableAttributeComponent.findSelectableAttributes(this.props.binnedColumn);
 		return (
 			<BinningDefinitionSelector
+				showNoneOption={this.props.showNoneOption}
 				attributeName={attributeName}
 				attributes={attributes}
 				pushCrumb={this.props.pushCrumb}
@@ -131,6 +137,7 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 
 export interface BinningDefinitionSelectorProps
 {
+	showNoneOption?: boolean;
 	attributeName: string;
 	attributes: Map<string, IColumnWrapper|ILinkableHashMap>;
 	pushCrumb?: Function;
@@ -164,6 +171,12 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 		.set("Natural breaks", this._jenks)
 		.set("All categories (string values)", this._category)
 		.set("None", null);
+	
+	static defaultProps:BinningDefinitionSelectorProps = {
+		showNoneOption: true,
+		attributeName: undefined,
+		attributes: undefined
+	};
 
 	constructor(props:BinningDefinitionSelectorProps)
 	{
@@ -245,7 +258,7 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 			}
 		}
 	}
-
+	
 	setBinningDefinition(localDef:AbstractBinningDefinition)
 	{
 		let targetDef:AbstractBinningDefinition = this.column.binningDefinition.target as AbstractBinningDefinition;
@@ -286,35 +299,35 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 
 		if (binDef instanceof SimpleBinningDefinition)
 		{
-			Weave.linkState(binDef, this._simple);
+			Weave_linkState(binDef, this._simple);
 			renderObj.sessionObjectToLink = (binDef as SimpleBinningDefinition).numberOfBins;
 			renderObj.sessionObjectLabel = "Number of bins";
 			renderObj.helpMessage = 'Example: If your data is between 0 and 100 and you specify 4 bins, the following bins will be created: [0,25] [25,50] [50,75] [75,100]';
 		}
 		else if (binDef instanceof EqualIntervalBinningDefinition)
 		{
-			Weave.linkState(binDef, this._equalInterval);
+			Weave_linkState(binDef, this._equalInterval);
 			renderObj.sessionObjectToLink = (binDef as EqualIntervalBinningDefinition).dataInterval;
 			renderObj.sessionObjectLabel = "Data interval";
 			renderObj.helpMessage = 'Example: If your data is between 0 and 100 and you specify an interval of 25, four bins will be created: [0,25] [25,50] [50,75] [75,100]';
 		}
 		else if (binDef instanceof QuantileBinningDefinition)
 		{
-			Weave.linkState(binDef, this._quantile);
+			Weave_linkState(binDef, this._quantile);
 			renderObj.sessionObjectToLink = (binDef as QuantileBinningDefinition).refQuantile;
 			renderObj.sessionObjectLabel = "Reference quantile";
 			renderObj.helpMessage = 'Example: If you specify 0.25, four bins will be created that each contain 25% of your data in sorted order'
 		}
 		else if (binDef instanceof NaturalJenksBinningDefinition)
 		{
-			Weave.linkState(binDef, this._jenks);
+			Weave_linkState(binDef, this._jenks);
 			renderObj.sessionObjectToLink = (binDef as NaturalJenksBinningDefinition).numOfBins;
 			renderObj.sessionObjectLabel = "Number of bins";
 			renderObj.helpMessage = 'The Jenks optimization method, also called the Jenks natural breaks classification method, is a data classification method designed to determine the best arrangement of values into different classes. See http://en.wikipedia.org/wiki/Jenks_natural_breaks_optimization';
 		}
 		else if (binDef instanceof CustomSplitBinningDefinition)
 		{
-			Weave.linkState(binDef, this._customSplit);
+			Weave_linkState(binDef, this._customSplit);
 			renderObj.sessionObjectToLink = (binDef as CustomSplitBinningDefinition).splitValues;
 			renderObj.sessionObjectLabel = "Break values";
 			renderObj.helpMessage = 'Enter comma-separated custom break values for dividing the data into bins. Example: 0,50,100 will create two bins: [0,50] and [50,100]';
@@ -322,7 +335,7 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 		}
 		else if (binDef instanceof StandardDeviationBinningDefinition)
 		{
-			Weave.linkState(binDef, this._stdDev);
+			Weave_linkState(binDef, this._stdDev);
 			renderObj.helpMessage = 'Six bins will be created for standard deviations above and below the mean value.';
 		}
 
@@ -332,6 +345,8 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 	render ()
 	{
 		var options = Array.from(this.binLabelToBin.keys()) as string[];
+		if (!this.props.showNoneOption)
+			options = options.filter(key => !!this.binLabelToBin.get(key));
 
 		let selectedBinDefn:AbstractBinningDefinition = this.column.binningDefinition.target as AbstractBinningDefinition;
 		let selectedDefinitionName = selectedBinDefn ? BinningDefinitionEditor.binClassToBinLabel.get(selectedBinDefn.constructor as typeof AbstractBinningDefinition) : "None"
@@ -410,6 +425,9 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 		let binUIs:JSX.Element[] = [];
 		for (let [key, binDefn] of this.binLabelToBin.entries())
 		{
+			if (!binDefn && !this.props.showNoneOption)
+				continue;
+			
 			let isSelected:boolean = this.compareTargetBinningType(binDefn);
 			
 			let renderProps:any = this.getBinDefRenderProps(binDefn);
@@ -432,8 +450,9 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 					{
 						renderProps.sessionObjectToLink
 						?	[
-								<span style={ {opacity: isSelected ? 1 : 0.5, whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span>,
+								<span key="0" style={ {opacity: isSelected ? 1 : 0.5, whiteSpace: "nowrap"} }> { Weave.lang(renderProps.sessionObjectLabel) } </span>,
 								<StatefulTextField
+									key="1"
 									style={ renderProps.style }
 									disabled={!isSelected}
 									type="text"
