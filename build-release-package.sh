@@ -11,9 +11,9 @@ mkdir -p tmp
 pushd tmp
 cp ../../Weave/weave.zip .
 mkdir ROOT
-cp -R ../dist/ ROOT/weave-html5
-cp -R ../../Weave/WeaveJS/bin/ ROOT/weavejs
-rm -Rf ROOT/weavejs/js-debug
+cp -R ../dist/ ROOT/weavejs/
+cp -R ../../Weave/WeaveJS/bin/ ROOT/weavejs-core
+rm -Rf ROOT/weavejs-core/js-debug
 zip -r weave.zip ROOT
 cp ../LICENSES.md .
 zip weave.zip LICENSES.md
