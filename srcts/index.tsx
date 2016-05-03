@@ -1,17 +1,18 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import $ from "jquery";
-import WeaveApp from "../lib/WeaveApp";
-import {MiscUtils} from "../lib/WeaveUI.js";
-window.proj4 = require("proj4");
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import $ from "./modules/jquery";
+import WeaveApp from "./WeaveApp";
+import MiscUtils from "./utils/MiscUtils";
+
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
-window.weave = new Weave;
+(window as any).weave = new Weave();
 var urlParams = MiscUtils.getUrlParams();
+
 $(() => {
-	window.weaveApp = ReactDOM.render(
+	(window as any).weaveApp = ReactDOM.render(
 		<WeaveApp
 			readUrlParams={true}
-			weave={weave}
+			weave={(window as any).weave}
 			renderPath={weavejs.WeaveAPI.CSVParser.parseCSVRow(urlParams.layout)}
 			style={{width: "100%", height: "100%"}}
 		/>,
