@@ -127,8 +127,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		if (!proj && !OpenLayersMapTool.projectionDbLoadAttempted)
 		{
 			let result = OpenLayersMapTool.projectionDbPromise.getResult();
-			if (result)
+			var proj4:any = (window as any).proj4;
+			if (!proj4)
 			{
+				console.error("proj4 unavailable");
+			}
+			else if (result)
+			{
+				
 				try 
 				{
 					let zip = new weavejs.core.WeaveArchive.JSZip(result);
@@ -138,7 +144,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 					{
 						let projDef = db[newProjName];
 						if (projDef)
-							((window as any).proj4 as any).defs(newProjName, projDef);
+							proj4.defs(newProjName, projDef);
 					}
 				}
 				catch (error)
