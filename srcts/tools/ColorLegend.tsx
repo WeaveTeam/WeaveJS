@@ -116,6 +116,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			whiteSpace: "nowrap"
 		};
 		this.textStyle = {
+			display: "flex",
+			flexDirection: "row",
 			flex:0.8,
 			alignItems:"center",
 			justifyContent:"flex-start",
@@ -265,141 +267,141 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			for (var j:number = 0; j < maxColumns; j++)
 			{
 				var elements:JSX.Element[] = [];
-				switch (shapeType)
+				if (shapeType == SHAPE_TYPE_BOX)
 				{
-					//handle circle/square/line in same switch logic
-					case SHAPE_TYPE_CIRCLE :
-					case SHAPE_TYPE_SQUARE :
-					case SHAPE_TYPE_LINE:
+					var element:JSX.Element[] = [];
+					var elements:JSX.Element[] = [];
+					for (var i = 0; i < this.numberOfBins + extraBins; i++)
 					{
-						var element:JSX.Element[] = [];
-						for (var i = 0; i < totalBins; i++)
+						if (i % maxColumns == j)
 						{
-							if (i % maxColumns == j)
+							if (i < this.numberOfBins)
 							{
-
-								if (i < this.numberOfBins)
-								{
-									//get shape Element
-									var shapeElement:JSX.Element;
-									//handle different cases for circle/square/line
-									switch (shapeType)
-									{
-										case SHAPE_TYPE_CIRCLE :
-											shapeElement = <circle cx="50%" cy="50%" r="45%" style={{
-														fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
-														stroke: "black",
-														strokeOpacity: 0.5
-													}}/>;
-											break;
-										case SHAPE_TYPE_SQUARE :
-											shapeElement = <rect x="5%" y="5%" width="90%" height="90%" style={{
-														fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
-														stroke: "black",
-														strokeOpacity: 0.5
-													}}/>;
-											break;
-										case SHAPE_TYPE_LINE :
-											shapeElement = <line x1="5%" y1="50%" x2="95%" y2="50%" style={{
-														stroke: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
-														strokeWidth: 5
-													}}/>;
-											break;
-									}
-
-									element.push(
-										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
-											{weavejs.WeaveAPI.Locale.reverseLayout ?
-											<HBox style={this.textStyle}>
-												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
-											</HBox>:null}
-											<HBox style={{flex:0.2, minWidth:10, padding:"0px 0px 0px 0px"}}>
-												<svg viewBox="0 0 100 100" width="100%">
-													{
-														shapeElement
-													}
-												</svg>
-											</HBox>
-											{weavejs.WeaveAPI.Locale.reverseLayout ?
-												null:<HBox style={this.textStyle}>
-												<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
-											</HBox>}
-										</HBox>
-									);
-								}
-								else
-								{
-									element.push(
-										<HBox key={i} style={this.getInteractionStyle(i)}/>
-									);
-								}
-							}
-						}
-
-						elements.push(
-							<VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </VBox>
-						);
-
-						finalElements[j] = elements;
-					}
-						break;
-					case SHAPE_TYPE_BOX :
-					{
-						var element:JSX.Element[] = [];
-						var elements:JSX.Element[] = [];
-						for (var i = 0; i < this.numberOfBins + extraBins; i++)
-						{
-							if (i % maxColumns == j)
-							{
-
-								if (i < this.numberOfBins)
-								{
-									element.push(
-										<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
-											<HBox style={{
-												flex: 1.0,
-												alignItems: "center",
-												justifyContent: "center",
-												backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 1.0)
+								element.push(
+									<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
+										<HBox style={{
+											flex: 1.0,
+											alignItems: "center",
+											justifyContent: "center",
+											backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 1.0)
+										}}>
+											<div style={{
+												stroke: "black",
+												strokeOpacity: 0.5,
+												backgroundColor: "#FFF"
 											}}>
-												<div style={{
-															stroke: "black",
-															strokeOpacity: 0.5,
-															backgroundColor: "#FFF"
-														}}>
-													<span style={prefixerStyle}>{ Weave.lang(textLabelFunction(i)) }</span>
-												</div>
-											</HBox>
+												<span style={prefixerStyle}>{ Weave.lang(textLabelFunction(i)) }</span>
+											</div>
 										</HBox>
-									);
-								}
-								else
-								{
-									element.push(
-										<HBox key={i} style={this.getInteractionStyle(i)}/>
-									);
-								}
+									</HBox>
+								);
+							}
+							else
+							{
+								element.push(
+									<HBox key={i} style={this.getInteractionStyle(i)}/>
+								);
 							}
 						}
-
-						elements.push(
-							<VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </VBox>
-						);
-
-						finalElements[j] = elements;
 					}
+
+					elements.push(
+						<VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </VBox>
+					);
+
+					finalElements[j] = elements;
+				}
+				else
+				{
+					var element:JSX.Element[] = [];
+					for (var i = 0; i < totalBins; i++)
+					{
+						if (i % maxColumns == j)
+						{
+
+							if (i < this.numberOfBins)
+							{
+								//get shape Element
+								var shapeElement:JSX.Element;
+								//handle different cases for circle/square/line
+								switch (shapeType)
+								{
+									case SHAPE_TYPE_CIRCLE :
+										shapeElement = <circle cx="50%" cy="50%" r="45%" style={{
+													fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
+													stroke: "black",
+													strokeOpacity: 0.5
+												}}/>;
+										break;
+									case SHAPE_TYPE_SQUARE :
+										shapeElement = <rect x="5%" y="5%" width="90%" height="90%" style={{
+													fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
+													stroke: "black",
+													strokeOpacity: 0.5
+												}}/>;
+										break;
+									case SHAPE_TYPE_LINE :
+										shapeElement = <line x1="5%" y1="50%" x2="95%" y2="50%" style={{
+													stroke: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
+													strokeWidth: 5
+												}}/>;
+										break;
+								}
+	
+								var row = [
+									<HBox key="0" style={{flex:0.2, minWidth: 10}}>
+										<svg viewBox="0 0 100 100" width="100%">
+											{ shapeElement }
+										</svg>
+									</HBox>,
+									<div key="1" style={this.textStyle}>
+										<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
+									</div>
+								];
+
+								element.push(
+									<HBox
+										key={i}
+										style={this.getInteractionStyle(i)}
+										onClick={this.handleClick.bind(this, i)}
+										onMouseMove={this.handleProbe.bind(this, i, true)}
+										onMouseOut={this.handleProbe.bind(this, i, false)}
+									>
+										{
+											weavejs.WeaveAPI.Locale.reverseLayout
+											?	row.reverse()
+											:	row
+										}
+									</HBox>
+								);
+							}
+							else
+							{
+								element.push(
+									<HBox key={i} style={this.getInteractionStyle(i)}/>
+								);
+							}
+						}
+					}
+
+					elements.push(
+						<VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </VBox>
+					);
+
+					finalElements[j] = elements;
 				}
 			}
 
 			return (
 				<VBox style={{flex: 1, padding: "0px 5px 0px 5px", overflow: "hidden"}} ref={(vbox:VBox) => this.element = ReactDOM.findDOMNode(vbox) as HTMLElement}>
-					{this.showLegendName.value ?
-						<HBox style={{flex: 0.1, alignItems:"center"}}>
-							<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
-						</HBox>
-						: null
+					{
+						this.showLegendName.value
+						?	<HBox style={{flex: 0.1, alignItems:"center"}}>
+								<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
+							</HBox>
+						:	null
 					}
-					<HBox style={{flex: 0.9}}> { finalElements } </HBox>
+					<HBox style={{ flex: this.showLegendName.value ? 0.9 : 1.0 }}> { finalElements } </HBox>
 				</VBox>
 			);
 		}
