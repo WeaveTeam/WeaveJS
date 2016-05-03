@@ -125,14 +125,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		if (!proj && !OpenLayersMapTool.projectionDbLoadAttempted)
 		{
 			let result = OpenLayersMapTool.projectionDbPromise.getResult();
-			var proj4:any = (window as any).proj4;
-			if (!proj4)
+			if (result)
 			{
-				console.error("proj4 unavailable");
-			}
-			else if (result)
-			{
-				
 				try 
 				{
 					let zip = new weavejs.core.WeaveArchive.JSZip(result);
