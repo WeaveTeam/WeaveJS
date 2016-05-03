@@ -5,10 +5,18 @@ import WeaveApp from "./WeaveApp";
 import MiscUtils from "./utils/MiscUtils";
 
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
-(window as any).weave = new Weave();
-var urlParams = MiscUtils.getUrlParams();
+
+var domId = "weaveElt";
 
 $(() => {
+	if (typeof Symbol === 'undefined')
+	{
+		ReactDOM.render(<span>Browser not supported</span>, document.getElementById(domId));
+		return;
+	}
+	
+	var urlParams = MiscUtils.getUrlParams();
+	(window as any).weave = new Weave();
 	(window as any).weaveApp = ReactDOM.render(
 		<WeaveApp
 			readUrlParams={true}
@@ -16,6 +24,6 @@ $(() => {
 			renderPath={weavejs.WeaveAPI.CSVParser.parseCSVRow(urlParams.layout)}
 			style={{width: "100%", height: "100%"}}
 		/>,
-		document.getElementById("weaveElt")
+		document.getElementById(domId)
 	);
 });
