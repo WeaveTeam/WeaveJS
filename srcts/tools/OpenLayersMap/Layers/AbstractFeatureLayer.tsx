@@ -66,6 +66,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		this.selectionFilter.targetPath = ["defaultSelectionKeySet"];
 		this.probeFilter.targetPath = ["defaultProbeKeySet"];
+		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 
 		this.olLayer = new ol.layer.Vector();
 		this.source = new ol.source.Vector({wrapX: false});
