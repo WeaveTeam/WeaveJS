@@ -6,7 +6,7 @@ import AbstractVisTool from "./AbstractVisTool";
 import Menu, {MenuItemProps} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
 import FixedDataTable from "./FixedDataTable";
-import {IRow} from "./FixedDataTable";
+import {IRow, SortTypes, SortDirection} from "./FixedDataTable";
 import ReactUtils from "../utils/ReactUtils";
 import PrintUtils from "../utils/PrintUtils";
 import StatefulTextField from "../ui/StatefulTextField";
@@ -130,8 +130,18 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		var columns = this.columns.getObjects(IAttributeColumn);
 		var names:string[] = this.columns.getNames();
 
-		var sortDirections = new Array<number>(columns.length);
-		sortDirections[this.sortFieldIndex.value] = this.sortInDescendingOrder.value ? -1 : 1;
+		var sortDirections = columns.map((column, index) => {
+			if(this.sortFieldIndex.value == index)
+			{
+				if(this.sortInDescendingOrder.value)
+				{
+					return -1;
+				}
+				return 1;
+			}
+			return 0;
+		});
+
 		this.filteredKeySet.setColumnKeySources(columns, sortDirections);
 
 		if (weavejs.WeaveAPI.Locale.reverseLayout)
@@ -227,9 +237,42 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			]
 		});
 	}
+	
+	onSort = (columnKey:string, sortDirection:SortDirection) =>
+	{
+		this.sortFieldIndex.value = this.columns.getNames().indexOf(columnKey);
+		this.sortInDescendingOrder.value = sortDirection == SortTypes.DESC;
+	}
+
+	sortFunction = (indexA:number, indexB:number, columnKey:string) =>
+	{
+		if(this.state.data)
+		{
+			var valueA = this.state.data[indexA][columnKey];
+			var valueB = this.state.data[indexB][columnKey];
+			var column = this.columns.getObject(columnKey) as IAttributeColumn;
+			var dataType = "string";
+			if(column)
+				dataType = column.getMetadata("dataType");
+			
+			switch(dataType)
+			{
+				case "number":
+					valueA = Number(valueA);
+					valueB = Number(valueB);
+			}
+			if(valueA > valueB)
+				return 1;
+			if(valueA < valueB)
+				return -1;
+			return 0;
+		}
+		return 0;
+	}
 
 	render()
 	{
+		var columnNames = this.columns.getNames(IAttributeColumn);
 		return (
 			<FixedDataTable
 				columnTitles={this.state.columnTitles}
@@ -237,6 +280,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				idProperty={this.idProperty}
 				selectedIds={this.selectionKeySet && this.selectionKeySet.keys.map(String) as any}
 				probedIds={this.probeKeySet && this.probeKeySet.keys.map(String) as any}
+				sortId={columnNames[this.sortFieldIndex.value]}
+				sortDirection={this.sortInDescendingOrder.value == true ? SortTypes.DESC : SortTypes.ASC}
 				onHover={this.handleProbe}
 				onSelection={this.handleSelection}
 				showIdColumn={this.showKeyColumn.value}
@@ -246,6 +291,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				initialColumnWidth={this.columnWidth.value}
 				evenlyExpandRows={true}
 				allowResizing={true}
+				onSortCallback={this.onSort}
 				ref={(c:FixedDataTable) => this.fixedDataTable = c}
 			/>
 		);

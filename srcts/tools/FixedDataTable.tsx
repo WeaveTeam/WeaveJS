@@ -8,6 +8,7 @@ import CellProps = FixedDataTable.CellProps;
 import ResizingDiv, {ResizingDivState} from "../react-ui/ResizingDiv";
 import SmartComponent from "../ui/SmartComponent";
 
+export declare type SortDirection = "ASC"|"DESC"|"NONE";
 export interface IColumnTitles
 {
 	[columnId: string] : string
@@ -50,13 +51,27 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	height?:number;
 	showBottomBorder?:boolean;
 	allowClear?: boolean;
+	sortId?:string;
+	sortDirection?: SortDirection;
+	/** 
+	 *	a callback function that will be called if you want to sort the data
+	 *  manually. if this function is provided, the sortFunction will not be used
+	 **/
+	onSortCallback?: (columnKey:string, sortDirection:SortDirection) => void;
+
+	/** 
+	 *  a sort function that will be called if you want to sort the data
+	 *  manually, otherwise the table will be sorted by default using plain value
+	 *  comparison
+	 **/
+	sortFunction?: (rowIndexA:number, rowIndexB:number, columnKey:string) => number;
 }
 
 export interface IFixedDataTableState
 {
 	columnWidths?:IColumnWidths;
 	sortId?:string;
-	sortDirection?:string;
+	sortDirection?:SortDirection;
 	width?:number;
 	height?:number;
 	sortIndices?:number[];
@@ -66,8 +81,8 @@ export interface IFixedDataTableState
 
 export interface ISortHeaderProps extends React.Props<SortHeaderCell>
 {
-	onSortChange?: (columnKey:string, sortDirection:string) => void;
-	sortDirection?: string;
+	onSortChange?: (columnKey:string, sortDirection:SortDirection) => void;
+	sortDirection?: SortDirection;
 	columnKey: string;
 }
 
@@ -87,9 +102,9 @@ export interface ITextCellState
 
 }
 
-const SortTypes = {
-	ASC: 'ASC',
-	DESC: 'DESC',
+export const SortTypes = {
+	ASC: 'ASC' as 'ASC',
+	DESC: 'DESC' as 'DESC',
 };
 
 
@@ -117,22 +132,34 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 		super(props);
 
 	}
-
-	render():JSX.Element {
-		var upArrow:JSX.Element = (
+	static UpArrow(props:{}) {
+		return (
 			<span style={{alignSelf: "stretch", display: "flex", cursor: "pointer"}}>
 				<i className="fa fa-play fa-fw fa-rotate-270" style={{alignSelf: "center",fontSize: "60%", paddingRight: 2}}/>
 			</span>
 		);
-		var downArrow:JSX.Element = (
+	}
+	
+	static DownArrow(props:{}) {
+		return (
 			<span style={{alignSelf: "stretch", display: "flex", cursor: "pointer"}}>
 				<i className="fa fa-play fa-fw fa-rotate-90" style={{alignSelf: "center",fontSize: "60%", paddingRight: 2}}/>
 			</span>
 		);
+	}
+
+	render():JSX.Element {
+
+		var sortArrow:React.ReactChild = "";
+		if(this.props.sortDirection == SortTypes.DESC)
+			sortArrow = <SortHeaderCell.DownArrow/>;
+		if(this.props.sortDirection == SortTypes.ASC)
+			sortArrow = <SortHeaderCell.UpArrow/>;
+		
 		return (
 			<Cell {...this.props}>
 				<HBox style={{whiteSpace: "nowrap", overflow: "ellipsis"}} onClick={this.onSortChange}>
-					{this.props.sortDirection ? (this.props.sortDirection === SortTypes.DESC ? downArrow : upArrow) : ''} {this.props.children}
+					{sortArrow} {this.props.children}
 				</HBox>
 			</Cell>
 		);
@@ -152,7 +179,7 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 		}
 	};
 
-	reverseSortDirection=(sortDirection:string) =>
+	reverseSortDirection=(sortDirection:SortDirection) =>
 	{
 		return sortDirection === SortTypes.DESC ? SortTypes.ASC : SortTypes.DESC;
 	}
@@ -180,7 +207,21 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		allowResizing: true,
 		evenlyExpandRows: true,
 		showBottomBorder: true,
-		allowClear:true
+		allowClear:true,
+		sortFunction: function(indexA:number, indexB:number, columnKey:string):number {
+			var valueA = this.props.rows[indexA][columnKey];
+			var valueB = this.props.rows[indexB][columnKey];
+			valueA = typeof valueA == "string" ? valueA: (valueA as any).value;
+			valueB = typeof valueB == "string" ? valueB: (valueB as any).value;
+			var sortVal = 0;
+			if (valueA > valueB) {
+				sortVal = 1;
+			}
+			if (valueA < valueB) {
+				sortVal = -1;
+			}
+			return sortVal;
+		}
 	};
 
 	constructor(props:IFixedDataTableProps)
@@ -197,6 +238,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			sortIndices,
 			selectedIds: props.selectedIds || [],
 			probedIds: props.probedIds || [],
+			sortId: props.sortId,
+			sortDirection: props.sortDirection,
 			width: props.width,
 			height: props.height
 		};
@@ -368,7 +411,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		this.forceUpdate();
 	};
 
-	updateSortDirection=(columnKey:string, sortDirection:string) =>
+	updateSortDirection=(columnKey:string, sortDirection:SortDirection) =>
 	{
 		var sortIndices:number[] = this.state.sortIndices;
 		this.sortColumnIndices(columnKey,sortDirection,sortIndices);
@@ -379,25 +422,22 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		})
 	};
 
-	sortColumnIndices=(columnKey:string, sortDirection:string, sortIndices:number[]) =>
+	sortColumnIndices=(columnKey:string, sortDirection:SortDirection, sortIndices:number[]) =>
 	{
-		sortIndices.sort((indexA:number, indexB:number) => {
-			var valueA = this.props.rows[indexA][columnKey];
-			var valueB = this.props.rows[indexB][columnKey];
-			valueA = typeof valueA == "string" ? valueA: (valueA as any).value;
-			valueB = typeof valueB == "string" ? valueB: (valueB as any).value;
-			var sortVal = 0;
-			if (valueA > valueB) {
-				sortVal = 1;
-			}
-			if (valueA < valueB) {
-				sortVal = -1;
-			}
-			if (sortVal !== 0 && sortDirection === SortTypes.ASC) {
-				sortVal = sortVal * -1;
-			}
-			return sortVal;
-		});
+		if(this.props.onSortCallback)
+		{
+			this.props.onSortCallback(columnKey, sortDirection);
+		}
+		else
+		{
+			sortIndices.sort((indexA:number, indexB:number) => {
+				var sortVal = this.props.sortFunction(indexA, indexB, columnKey);
+				if (sortVal !== 0 && sortDirection === SortTypes.ASC) {
+					sortVal = sortVal * -1;
+				}
+				return sortVal;
+			});
+		}
 	};
 
 	componentWillReceiveProps(nextProps:IFixedDataTableProps)
@@ -413,8 +453,16 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		if(nextProps.selectedIds)
 			newState.selectedIds = nextProps.selectedIds.concat([]);
 		
+		if(nextProps.sortId)
+		{
+			newState.sortId = nextProps.sortId;
+		}
+		
+		if(nextProps.sortDirection)
+		{
+			newState.sortDirection = nextProps.sortDirection;
+		}
 		this.setState(newState);
-		this.forceUpdate(); // why is this being done
 	}
 	
 	handleResize=(newSize:ResizingDivState) => {
@@ -461,7 +509,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 											header={
 												<SortHeaderCell
 													onSortChange={this.updateSortDirection}
-													sortDirection={id == this.state.sortId ? this.state.sortDirection : ""}
+													sortDirection={id == this.state.sortId ? this.state.sortDirection : "NONE"}
 													columnKey={id}
 												>
 													{this.props.columnTitles ? this.props.columnTitles[id]:id}
