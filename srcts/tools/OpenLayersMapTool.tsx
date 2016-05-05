@@ -104,7 +104,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return true;
 	}
 
-	private static projectionDbPromise: WeavePromise = weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
+	private static projectionDbPromise = weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
 	/*
 	// For debugging projection database delays
 	private static projectionDbPromise:WeavePromise = new WeavePromise(null, (resolve:Function, reject:Function) => {

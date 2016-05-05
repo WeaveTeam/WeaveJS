@@ -2757,7 +2757,7 @@ declare module weavejs.api.net {
          * @param methodParameters Either an Array or an Object to use as a list of parameters.
          * @return An AsyncToken that you can add responders to.
          */
-        invokeAsyncMethod(methodName: string, methodParameters?: Object): WeavePromise;
+        invokeAsyncMethod(methodName: string, methodParameters?: Object): WeavePromise<any>;
     }
     var IAsyncService: new (..._: any[]) => IAsyncService;
 }
@@ -2771,7 +2771,7 @@ declare module weavejs.api.net {
          * @param urlRequest A URLRequest object.
          * @return A WeavePromise
          */
-        request(relevantContext: Object, urlRequest: URLRequest): WeavePromise;
+        request(relevantContext: Object, urlRequest: URLRequest): WeavePromise<any>;
         /**
          * This will save a file in memory so that it can be accessed later via getURL().
          * @param name The file name.
@@ -2876,20 +2876,20 @@ declare module weavejs.api.net {
          * @param insertAtIndex Specifies insertion index for sort order.
          * @return RPC token for an entity ID.
          */
-        newEntity(metadata: EntityMetadata, parentId: number, insertAtIndex: number): WeavePromise;
+        newEntity(metadata: EntityMetadata, parentId: number, insertAtIndex: number): WeavePromise<number>;
         /**
          * Updates the metadata for an existing entity.
          * @param entityId An entity ID.
          * @param diff Specifies the changes to make to the metadata.
          * @return RPC token.
          */
-        updateEntity(entityId: number, diff: EntityMetadata): WeavePromise;
+        updateEntity(entityId: number, diff: EntityMetadata): WeavePromise<void>;
         /**
          * Removes entities and their children recursively.
          * @param entityIds A list of entity IDs to remove.
          * @return RPC token for an Array of entity IDs that were removed.
          */
-        removeEntities(entityIds: any[]): WeavePromise;
+        removeEntities(entityIds: any[]): WeavePromise<number[]>;
         /**
          * Adds a parent-child relationship to the server-side entity hierarchy table.
          * @param parentId The ID of the parent entity.
@@ -2897,14 +2897,14 @@ declare module weavejs.api.net {
          * @param insertAtIndex Specifies insertion index for sort order.
          * @return RPC token for an Array of entity IDs whose relationships have changed as a result of adding the parent-child relationship.
          */
-        addChild(parentId: number, childId: number, insertAtIndex: number): WeavePromise;
+        addChild(parentId: number, childId: number, insertAtIndex: number): WeavePromise<number[]>;
         /**
          * Removes a parent-child relationship from the server-side entity hierarchy table.
          * @param parentId The ID of the parent entity.
          * @param childId The ID of the child entity.
          * @return RPC token.
          */
-        removeChild(parentId: number, childId: number): WeavePromise;
+        removeChild(parentId: number, childId: number): WeavePromise<void>;
     }
     var IWeaveEntityManagementService: new (..._: any[]) => IWeaveEntityManagementService;
 }
@@ -2925,13 +2925,13 @@ declare module weavejs.api.net {
          * @param publicMetadata Public metadata search criteria.
          * @return RPC token for an Array of EntityHierarchyInfo objects.
          */
-        getHierarchyInfo(publicMetadata: Object): WeavePromise;
+        getHierarchyInfo(publicMetadata: Object): WeavePromise<weavejs.api.net.beans.EntityHierarchyInfo[]>;
         /**
          * Gets an Array of Entity objects.
          * @param ids A list of entity IDs.
          * @return RPC token for an Array of Entity objects.
          */
-        getEntities(ids: any[]): WeavePromise;
+        getEntities(ids: any[]): WeavePromise<weavejs.api.net.beans.Entity[]>;
         /**
          * Gets an Array of entity IDs with matching metadata.
          * @param publicMetadata Public metadata to search for.
@@ -2940,14 +2940,14 @@ declare module weavejs.api.net {
          *                       and multi-character matching, respectively.
          * @return RPC token for an Array of IDs.
          */
-        findEntityIds(publicMetadata: Object, wildcardFields: any[]): WeavePromise;
+        findEntityIds(publicMetadata: Object, wildcardFields: any[]): WeavePromise<number[]>;
         /**
          * Finds matching values for a public metadata field.
          * @param feildName The name of the public metadata field to search.
          * @param valueSearch A search string.
          * @return RPC token for an Array of matching values for the specified public metadata field.
          */
-        findPublicFieldValues(fieldName: string, valueSearch: string): WeavePromise;
+        findPublicFieldValues(fieldName: string, valueSearch: string): WeavePromise<string[]>;
     }
     var IWeaveEntityService: new (..._: any[]) => IWeaveEntityService;
 }
@@ -2963,11 +2963,11 @@ declare module weavejs.api.net {
         /**
          * @return A WeavePromise which returns a JSByteArray
          */
-        getMetadataTiles(tileIDs: any[]): WeavePromise;
+        getMetadataTiles(tileIDs: any[]): WeavePromise<weavejs.util.JSByteArray>;
         /**
          * @return A WeavePromise which returns a JSByteArray
          */
-        getGeometryTiles(tileIDs: any[]): WeavePromise;
+        getGeometryTiles(tileIDs: any[]): WeavePromise<weavejs.util.JSByteArray>;
     }
     var IWeaveGeometryTileService: new (..._: any[]) => IWeaveGeometryTileService;
 }
@@ -3769,7 +3769,7 @@ declare module weavejs.core {
     import WeavePromise = weavejs.util.WeavePromise;
     class Locale implements ILocale {
         reverseLayout: boolean;
-        loadFromUrl(jsonUrl: string): WeavePromise;
+        loadFromUrl(jsonUrl: string): WeavePromise<void>;
         data: Object;
         getText(text: string): string;
     }
@@ -3942,12 +3942,6 @@ declare module weavejs.core {
         addTreeCallback(relevantContext: Object, groupedCallback: Function, triggerCallbackNow?: boolean): void;
         removeTreeCallback(relevantContext: Object, groupedCallback: Function): void;
         copySessionState(source: ILinkableObject, destination: ILinkableObject): void;
-        /**
-         * Generates an object {"": "undefined"} that can be serialized to JSON for representing a value of <code>undefined</code>.
-         */
-        /**
-         * Tests if a value matches the format which encodeUndefined() returns.
-         */
         static DEPRECATED_STATE_MAPPING: string;
         /**
          * Uses DynamicState.traverseState() to traverse a state and copy portions of the state to ILinkableObjects.
@@ -4117,7 +4111,7 @@ declare module weavejs.core {
         /**
          * Loads a WeaveArchive from file content.
          */
-        static loadUrl(weave: Weave, fileUrl: string): WeavePromise;
+        static loadUrl(weave: Weave, fileUrl: string): WeavePromise<void>;
         /**
          * Loads a WeaveArchive from file content.
          */
@@ -4141,7 +4135,7 @@ declare module weavejs.data {
          * Creates a cache dump and modifies the session state so data sources are non-functional.
          * @return A WeavePromise that returns a cache dump that can later be passed to restoreCache();
          */
-        convertToCachedDataSources(root: ILinkableHashMap): WeavePromise;
+        convertToCachedDataSources(root: ILinkableHashMap): WeavePromise<any>;
         /**
          * Restores the cache from a dump created by convertToLocalDataSources().
          * @param cacheData The cache dump.
@@ -6174,13 +6168,6 @@ declare module weavejs.data.key {
     }
 }
 declare module weavejs.data.key {
-    import WeavePromise = weavejs.util.WeavePromise;
-    class QKeyGetter extends WeavePromise {
-        constructor(manager?: QKeyManager, relevantContext?: Object);
-        asyncStart(keyType: string, keyStrings: Array<string>, outputKeys?: Array<weavejs.api.data.IQualifiedKey>): QKeyGetter;
-    }
-}
-declare module weavejs.data.key {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
     import IQualifiedKey = weavejs.api.data.IQualifiedKey;
     import IQualifiedKeyManager = weavejs.api.data.IQualifiedKeyManager;
@@ -6245,7 +6232,7 @@ declare module weavejs.data.key {
          * @param keyStrings An Array of localName values.
          * @return A WeavePromise that produces an Array of IQualifiedKeys.
          */
-        getQKeysPromise(relevantContext: Object, keyType: string, keyStrings: Array<string>): WeavePromise;
+        getQKeysPromise(relevantContext: Object, keyType: string, keyStrings: Array<string>): WeavePromise<IQualifiedKey[]>;
         /**
          * Get a list of all previoused key types.
          *
@@ -6526,15 +6513,19 @@ declare module weavejs.data.source {
     import WeavePromise = weavejs.util.WeavePromise;
     class CensusApi implements ILinkableObject {
         static BASE_URL: string;
-        getDatasets(): WeavePromise;
-        getVariables(dataSetIdentifier: string): WeavePromise;
-        getGeographies(dataSetIdentifier: string): WeavePromise;
+        getDatasets(): WeavePromise<any>;
+        getVariables(dataSetIdentifier: string): WeavePromise<any>;
+        getGeographies(dataSetIdentifier: string): WeavePromise<any>;
         /**
          *
          * @param metadata
          * @return An object containing three fields, "keys," "values," and "metadata"
          */
-        getColumn(metadata: Object): WeavePromise;
+        getColumn(metadata: Object): WeavePromise<{
+            keys: any;
+            values: any;
+            metadata: any;
+        }>;
     }
 }
 declare module weavejs.data.source {
@@ -7853,7 +7844,7 @@ declare module weavejs.net {
         /**
          * If <code>invokeImmediately</code> was set to false in the constructor, this will invoke a deferred request.
          */
-        invokeDeferred(promise: WeavePromise): void;
+        invokeDeferred(promise: WeavePromise<any>): void;
     }
 }
 declare module weavejs.net {
@@ -7914,7 +7905,7 @@ declare module weavejs.net {
          * @return RPC token for an Array of EntityHierarchyInfo objects.
          * @see weavejs.api.net.IWeaveEntityService#getHierarchyInfo()
          */
-        getHierarchyInfo(publicMetadata: Object): WeavePromise;
+        getHierarchyInfo(publicMetadata: Object): WeavePromise<EntityHierarchyInfo[]>;
         /**
          * Gets an Array of Entity objects which have previously been cached via getHierarchyInfo().
          * Entities of type 'table' and 'hierarchy' get cached automatically.
@@ -7964,7 +7955,7 @@ declare module weavejs.net {
          * @return The cached Object.
          */
         getJsonObject(url: string): Object;
-        getJsonPromise(url: string): WeavePromise;
+        getJsonPromise(url: string): WeavePromise<any>;
     }
 }
 declare module weavejs.net {
@@ -8019,7 +8010,7 @@ declare module weavejs.net {
          * @param methodParameters The parameters to use when calling the method.
          * @return A WeavePromise generated for the call.
          */
-        invokeAsyncMethod(methodName: string, methodParameters?: Object): WeavePromise;
+        invokeAsyncMethod(methodName: string, methodParameters?: Object): WeavePromise<any>;
         /**
          * This function may be overrided to give different servlet URLs for different methods.
          * @param methodName The method.
@@ -8075,7 +8066,7 @@ declare module weavejs.net {
     import IURLRequestUtils = weavejs.api.net.IURLRequestUtils;
     import WeavePromise = weavejs.util.WeavePromise;
     class URLRequestUtils implements IURLRequestUtils {
-        request(relevantContext: Object, urlRequest: URLRequest): WeavePromise;
+        request(relevantContext: Object, urlRequest: URLRequest): WeavePromise<any>;
         static LOCAL_FILE_URL_SCHEME: string;
         saveLocalFile(weaveRoot: ILinkableHashMap, fileName: string, byteArray: Uint8Array): string;
         getLocalFile(weaveRoot: ILinkableHashMap, fileName: string): Uint8Array;
@@ -8086,6 +8077,11 @@ declare module weavejs.net {
 declare module weavejs.net {
     import IWeaveEntityService = weavejs.api.net.IWeaveEntityService;
     import IWeaveGeometryTileService = weavejs.api.net.IWeaveGeometryTileService;
+    import Entity = weavejs.api.net.beans.Entity;
+    import EntityHierarchyInfo = weavejs.api.net.beans.EntityHierarchyInfo;
+    import AttributeColumnData = weavejs.net.beans.AttributeColumnData;
+    import GeometryStreamMetadata = weavejs.net.beans.GeometryStreamMetadata;
+    import TableData = weavejs.net.beans.TableData;
     import WeavePromise = weavejs.util.WeavePromise;
     /**
      * This is a wrapper class for making asynchronous calls to a Weave data servlet.
@@ -8127,21 +8123,28 @@ declare module weavejs.net {
         authenticate(user: string, pass: string): void;
         getServerInfo(): Object;
         entityServiceInitialized: boolean;
-        getHierarchyInfo(publicMetadata: Object): WeavePromise;
-        getEntities(ids: any[]): WeavePromise;
-        findEntityIds(publicMetadata: Object, wildcardFields: any[]): WeavePromise;
-        findPublicFieldValues(fieldName: string, valueSearch: string): WeavePromise;
-        getColumn(columnId: Object, minParam: number, maxParam: number, sqlParams: any[]): WeavePromise;
-        getTable(id: number, sqlParams: any[]): WeavePromise;
-        getGeometryStreamTileDescriptors(columnId: number): WeavePromise;
-        getGeometryStreamMetadataTiles(columnId: number, tileIDs: any[]): WeavePromise;
-        getGeometryStreamGeometryTiles(columnId: number, tileIDs: any[]): WeavePromise;
+        getHierarchyInfo(publicMetadata: Object): WeavePromise<EntityHierarchyInfo[]>;
+        getEntities(ids: any[]): WeavePromise<Entity[]>;
+        findEntityIds(publicMetadata: Object, wildcardFields: any[]): WeavePromise<number[]>;
+        findPublicFieldValues(fieldName: string, valueSearch: string): WeavePromise<string[]>;
+        getColumn(columnId: Object, minParam: number, maxParam: number, sqlParams: any[]): WeavePromise<AttributeColumnData>;
+        getTable(id: number, sqlParams: any[]): WeavePromise<TableData>;
+        getGeometryStreamTileDescriptors(columnId: number): WeavePromise<GeometryStreamMetadata>;
+        getGeometryStreamMetadataTiles(columnId: number, tileIDs: any[]): WeavePromise<weavejs.util.JSByteArray>;
+        getGeometryStreamGeometryTiles(columnId: number, tileIDs: any[]): WeavePromise<weavejs.util.JSByteArray>;
         createTileService(columnId: number): IWeaveGeometryTileService;
-        getRows(keys: any[]): WeavePromise;
+        getRows(keys: any[]): WeavePromise<{
+            attributeColumnMetadata: {
+                [key: string]: string;
+            }[];
+            keyType: string;
+            recordKeys: string[];
+            recordData: any[][];
+        }>;
         /**
          * Deprecated. Use getColumn() instead.
          */
-        getColumnFromMetadata(metadata: Object): WeavePromise;
+        getColumnFromMetadata(metadata: Object): WeavePromise<AttributeColumnData>;
     }
 }
 declare module weavejs.net.beans {
@@ -9264,6 +9267,10 @@ declare module weavejs.util {
 }
 declare module weavejs.util {
     class StandardLib {
+        /**
+         * This must be set externally.
+         */
+        static lodash: Object;
         static formatNumber(number: number, precision?: number): string;
         /**
          * This function will cast a value of any type to a Number,
@@ -9606,40 +9613,40 @@ declare module weavejs.util {
      *
      * Adds support for <code>depend(...linkableObjects)</code>
      */
-    class WeavePromise implements IDisposableObject {
+    class WeavePromise<T> implements IDisposableObject {
         static _callNewHandlersSeparately: boolean;
         /**
          * @param relevantContext This parameter may be null.  If the relevantContext object is disposed, the promise will be disabled.
          * @param resolver A function like function(resolve:Function, reject:Function):void which carries out the promise.
          *                 If no resolver is given, setResult() or setError() should be called externally.
          */
-        constructor(relevantContext?: Object, resolver?: Function);
+        constructor(relevantContext?: Object, resolver?: (resolve: (value?: T) => void, reject: (error?: any) => void) => void);
         /**
          * @return This WeavePromise
          */
-        setResult(result: Object): WeavePromise;
-        getResult(): Object;
+        setResult(result: T): WeavePromise<T>;
+        getResult(): T;
         /**
          * @return This WeavePromise
          */
-        setError(error: Object): WeavePromise;
+        setError(error: Object): WeavePromise<T>;
         getError(): Object;
-        then(onFulfilled?: Function, onRejected?: Function): WeavePromise;
-        depend(...linkableObjects: any[]): WeavePromise;
-        getPromise(): Object;
+        then<U>(onFulfilled?: (value: T) => (U | Promise<U> | WeavePromise<U>), onRejected?: (error: any) => (U | Promise<U> | WeavePromise<U>)): WeavePromise<U>;
+        depend(...linkableObjects: any[]): WeavePromise<T>;
+        getPromise(): Promise<T>;
         dispose(): void;
     }
 }
 declare module weavejs.util {
-    class WeavePromiseHandler {
-        onFulfilled: Function;
-        onRejected: Function;
-        next: WeavePromise;
+    class WeavePromiseHandler<T, U> {
+        onFulfilled: (value: T) => (U | Promise<U> | WeavePromise<U>);
+        onRejected: (error: any) => (U | Promise<U> | WeavePromise<U>);
+        next: WeavePromise<U>;
         /**
          * Used as a flag to indicate that this handler has not been called yet
          */
         isNew: boolean;
-        constructor(onFulfilled?: Function, onRejected?: Function, next?: WeavePromise);
+        constructor(onFulfilled?: (value: T) => (U | Promise<U> | WeavePromise<U>), onRejected?: (error: any) => (U | Promise<U> | WeavePromise<U>), next?: WeavePromise<T>);
         onResult(result: Object): void;
         onError(error: Object): void;
     }
