@@ -248,7 +248,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	{
 		document.removeEventListener("mouseup", this.onDragEnd, true);
 		document.removeEventListener("mousemove", this.onDrag, true);
-		document.removeEventListener("keypress", this.onKeyPress);
+		document.removeEventListener("keyup", this.onKeyPress);
 	}
 
 	renderOverlay(modal:boolean)
