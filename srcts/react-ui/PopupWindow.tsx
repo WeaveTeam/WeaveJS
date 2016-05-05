@@ -17,6 +17,8 @@ const TOP_LEFT = "top-left";
 const TOP_RIGHT = "top-right";
 const BOTTOM_RIGHT = "bottom-right";
 const BOTTOM_LEFT = "bottom-left";
+const ENTER_KEYCODE = 13;
+const ESC_KEYCODE = 27;
 
 type Handle = typeof LEFT | typeof RIGHT |
 				 typeof TOP | typeof BOTTOM |
@@ -114,6 +116,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		});
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
+		document.addEventListener("keyup", this.onKeyPress);
 	}
 
 	private onOk()
@@ -151,6 +154,20 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		PopupWindow.windowSet.delete(this);
 		PopupWindow.windowSet.add(this);
 		PopupWindow.alignWindows();
+	}
+	
+	onKeyPress =(event:KeyboardEvent)=> {
+		var code = event.keyCode;
+		
+		var activeWindow = Array.from(PopupWindow.windowSet.keys()).pop();
+		if(this == activeWindow)
+		{
+			if(code == ENTER_KEYCODE)
+			this.onOk();
+			
+			if(code == ESC_KEYCODE)
+			this.onCancel();
+		}
 	}
 
 	private onDrag=(event:MouseEvent)=>
@@ -231,6 +248,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	{
 		document.removeEventListener("mouseup", this.onDragEnd, true);
 		document.removeEventListener("mousemove", this.onDrag, true);
+		document.removeEventListener("keypress", this.onKeyPress);
 	}
 
 	renderOverlay(modal:boolean)
