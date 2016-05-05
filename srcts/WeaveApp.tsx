@@ -18,6 +18,7 @@ import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
 import ReactUtils from "./utils/ReactUtils";
+import {forceUpdateWatcher} from "./utils/WeaveReactUtils";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
 
@@ -50,6 +51,8 @@ export interface WeaveAppState
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
+	enableMenuBarWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
+	
 	menuBar:WeaveMenuBar;
 
 	static defaultProps:WeaveAppProps = {
@@ -393,7 +396,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 	get enableMenuBar():LinkableBoolean
 	{
-		return this.props.weave.getObject('WeaveProperties', 'enableMenuBar') as LinkableBoolean;
+		return enableMenuBarWatcher.target as LinkableBoolean;
 	}
 	
 	render():JSX.Element
@@ -405,7 +408,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 		
 		// backwards compatibility hack
-		DynamicComponent.setDependencies(this, [this.enableMenuBar]);
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
 		if (toolToEdit && toolToEdit.renderEditor) // hack
