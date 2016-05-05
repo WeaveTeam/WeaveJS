@@ -5,7 +5,7 @@
   "main": "lib/WeaveUI.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc && babel -d lib outts",
+    "compile": "tsc && babel -d lib outts && browserifyinc --cachefile browserifycache.json lib/index.js > dist/index.js",
     "postinstall": "cd lib || npm run compile",
     "_compile": "grunt ts && grunt babel",
     "_prepublish": "npm run compile"
@@ -43,6 +43,7 @@
   "dependencies": {
     "babel": "^6.1.18",
     "babel-cli": "^6.4.5",
+    "browserify-incremental": "^3.1.1",
     "c3": "https://github.com/WeaveTeam/c3.git",
     "classnames": "^2.2.3",
     "d3": "^3.5.9",
@@ -54,8 +55,8 @@
     "lodash": "^3.10.1",
     "moment": "^2.11.2",
     "openlayers": "^3.13.0",
-    "rc-slider": "^3.6.2",
     "proj4": "^2.3.14",
+    "rc-slider": "^3.6.2",
     "react-addons-update": "0.14.7",
     "react-color": "^2.0.0",
     "typescript": "^1.8.0"
