@@ -41,15 +41,19 @@ import DOMUtils from "./utils/DOMUtils";
 import ReactUtils from "./utils/ReactUtils";
 import * as WeaveReactUtils from "./utils/WeaveReactUtils";
 
-import * as JSZip from "jszip";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as lodash from "lodash";
+import * as JSZip from "jszip";
 import * as moment from "moment";
 
+weavejs.util.StandardLib.lodash = lodash;
 weavejs.core.WeaveArchive.JSZip = (JSZip as any)['default'];
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 
 import * as jquery from "jquery";
+
+// global jQuery needed for semantic
 (window as any).jQuery = (jquery as any)["default"];
 (window as any).$ = (jquery as any)["default"];
 
