@@ -5,7 +5,7 @@
   "main": "lib/WeaveUI.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "compile": "tsc && babel -d lib outts && browserifyinc --cachefile browserifycache.json lib/index.js > dist/index.js",
+    "compile": "tsc && babel -d lib outts && browserifyinc --debug --cachefile browserifycache.json lib/index.js > dist/index.js",
     "postinstall": "cd lib || npm run compile",
     "_compile": "grunt ts && grunt babel",
     "_prepublish": "npm run compile"
