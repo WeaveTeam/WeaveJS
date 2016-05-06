@@ -151,6 +151,14 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		return this.props.attributes.get(this.props.attributeName) as ILinkableHashMap;
 	}
 	
+	getTreeNode (colWrapper:IColumnWrapper)
+    {
+        let dsources = ColumnUtils.getDataSources(colWrapper) as IDataSource[];
+        let dsource = dsources[0];
+        let metadata = ColumnMetadata.getAllMetadata(colWrapper);
+        return dsource && dsource.findHierarchyNode(metadata) as IWeaveTreeNode&IColumnReference;
+    }
+	
 	render():JSX.Element
 	{
 		let attribute_ilhm_or_icw = this.props.attributes.get(this.props.attributeName);
@@ -170,11 +178,11 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		{
 			let attribute = attribute_ilhm_or_icw as IColumnWrapper;
 			
-			let node = ColumnUtils.hack_findHierarchyNode(attribute);
+			let node = this.getTreeNode(attribute);
 	
 			if (node)
 				this.lastActiveNode = node;
-	
+				
 			let options:{value:IWeaveTreeNode, label: string}[] = [];
 			
 			let rootNode = node && node.getDataSource().getHierarchyRoot();
@@ -226,12 +234,12 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			var nodes = new Set<IWeaveTreeNode>();
 
 			let siblings:IWeaveTreeNode[] = [];
-			var columns = this.columnsHashmap.getObjects(IColumnWrapper); // TODO - this does not consider if hash map contains non-IColumnWrapper columns
+			var columns = this.columnsHashmap.getObjects(IColumnWrapper);
 			
 			if (columns.length)
 			{
 				columns.forEach((column:IColumnWrapper, index:number)=>{
-					let node = ColumnUtils.hack_findHierarchyNode(column);
+					let node = this.getTreeNode(column);
 					if (node)
 					{
 						this.lastActiveNode = node;
