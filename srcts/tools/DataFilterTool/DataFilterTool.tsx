@@ -149,7 +149,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 
 	renderEditor(pushCrumb:Function = null):JSX.Element{
 
-		if (!this.filter.target) // scenario arises when tool opened from menu
+		if (!this.filter.target) // scenario arises when 'tool opened from menu
 			this.initLater();
 		return <DataFilterEditor filterEditor={ this.filterEditor }  pushCrumb={pushCrumb} selectableAttributes={ this.selectableAttributes }  />
 	}

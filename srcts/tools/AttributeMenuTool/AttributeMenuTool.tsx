@@ -13,6 +13,7 @@ import {ComboBoxOption} from "../../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../../utils/WeaveReactUtils";
 import StatefulTextField from "../../ui/StatefulTextField";
 import HelpIcon from "../../react-ui/HelpIcon";
+import MenuLayoutComponent from '../../ui/MenuLayoutComponent';
 
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -140,7 +141,12 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	{
 		let selectedAttribute = this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn;//get object from name
 
-		switch (this.layoutMode.value)
+		return(<MenuLayoutComponent options={ this.options}
+		                     displayMode={ this.layoutMode.value }
+		                     onChange={ this.handleSelection }
+		                     selectedItems={ [selectedAttribute] }
+		/>);
+		/*switch (this.layoutMode.value)
 		{
 			case LAYOUT_LIST:
 				return (
@@ -170,7 +176,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 				return (
 					<div/> // returns div by default but we should never get here, layoutMode.value needs verfiier function
 				)
-		}
+		}*/
 	}
 }
 
