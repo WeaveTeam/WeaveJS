@@ -396,7 +396,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 	get enableMenuBar():LinkableBoolean
 	{
-		return enableMenuBarWatcher.target as LinkableBoolean;
+		return this.enableMenuBarWatcher.target as LinkableBoolean;
 	}
 	
 	render():JSX.Element
