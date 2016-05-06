@@ -36,7 +36,7 @@ export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
 		}];
 	}
 
-	onChange(selectedValues:number[]) 
+	onChange = (selectedValues:number[]) =>
 	{
 		this.filter.values.state = selectedValues;
 	}

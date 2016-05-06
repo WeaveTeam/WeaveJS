@@ -88,13 +88,6 @@ export default class AbstractFilterEditor
 
 	}
 
-	onChange(selectedValues:Object)
-	{
-		var filter = this.filter;
-		if (filter)
-			filter.values.state = selectedValues;
-	}
-
 	get deprecatedStateMapping():Object
 	{
 		return {
