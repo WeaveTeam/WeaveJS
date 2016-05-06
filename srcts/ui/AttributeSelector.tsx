@@ -61,8 +61,16 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     private get selectedColumnRefs():IColumnReference[]
     {
         if (!this.hierarchyExplorer || !this.hierarchyExplorer.selectedItems) return [];
-        return this.hierarchyExplorer.selectedItems.map((value)=>Weave.AS(value, IColumnReference));
+        return this.hierarchyExplorer.selectedItems.map((value)=>Weave.AS(value, IColumnReference)).filter(_.identity);
     }
+	
+	componentDidMount()
+	{
+		// manually trigger a second render because
+		// this.hierarchyExplorer is null during the first
+		// render
+		this.forceUpdate();
+	}
 
     componentWillReceiveProps (nextProps:IAttributeSelectorProps)
     {
@@ -128,7 +136,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
     onSelectAll=():void=>{
         if (this.hierarchyExplorer.selectedFolder)
         {
-            this.hierarchyExplorer.selectedItems = this.hierarchyExplorer.selectedFolder.getChildren();
+            this.hierarchyExplorer.selectedItems = this.hierarchyExplorer.selectedFolder.getChildren().filter((node) => !node.isBranch());
         }
     };
 
@@ -225,7 +233,7 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 					?
 						<HBox className="weave-padded-hbox" style={ controllerStyle } >
                             <Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedFolder)} onClick={this.onSelectAll}>{Weave.lang("Select All")}</Button>
-							<Button disabled={!(this.hierarchyExplorer && this.hierarchyExplorer.selectedItems.length)} style={{marginLeft: 8}} onClick={this.onAddSelected}>{Weave.lang("Add Selected")}</Button>
+							<Button disabled={!(this.selectedColumnRefs.length)} style={{marginLeft: 8}} onClick={this.onAddSelected}>{Weave.lang("Add Selected")}</Button>
 						</HBox>
 					:	null
 				}
