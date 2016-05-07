@@ -174,8 +174,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	
 			let options:{value:IWeaveTreeNode, label: string}[] = [];
 			
-			let dataSource = node.getDataSource();
-			let rootNode = node && dataSource && dataSource.getHierarchyRoot();
+			let dataSource = node && node.getDataSource();
+			let rootNode = dataSource && dataSource.getHierarchyRoot();
 			let parentNode = rootNode && HierarchyUtils.findParentNode(rootNode, dataSource, node.getColumnMetadata());
 			let header = <span style={{ fontWeight: "bold", fontSize: "small" }}>{ parentNode && parentNode.getLabel() }</span>;
 
