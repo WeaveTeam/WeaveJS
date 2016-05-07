@@ -83,10 +83,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		}
 		else if (ilhm)
 		{
-			dataSources =
-				_.flatten(
-					(ilhm.getObjects(IColumnWrapper) as IColumnWrapper[]).map(SelectableAttributeComponent.getDataSourceDependencies)
-				).filter(_.identity);
+			dataSources = _.flatten(ilhm.getObjects(IAttributeColumn).map(ColumnUtils.getDataSources)).filter(_.identity);
 		}
 		return dataSources;
 	}

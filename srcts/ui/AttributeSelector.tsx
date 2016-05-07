@@ -171,29 +171,21 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 		}
 	};
 
-	getTreeNode(colWrapper:IColumnWrapper)
-	{
-		let dsources = ColumnUtils.getDataSources(colWrapper) as IDataSource[];
-		let dsource = dsources[0];
-		let metadata = ColumnMetadata.getAllMetadata(colWrapper);
-		return dsource && dsource.findHierarchyNode(metadata);
-	}
-
 	getSelectedTreeNodes():IWeaveTreeNode[]
 	{
 		let selectedAttribute = this.props.attributes.get(this.state.selectedAttributeName);
-		let wrappers:IColumnWrapper[] = [];
+		let columns:IAttributeColumn[] = [];
 
 		if (this.usingHashMap)
 		{
-			wrappers = (selectedAttribute as ILinkableHashMap).getObjects() as ReferencedColumn[];
+			columns = (selectedAttribute as ILinkableHashMap).getObjects(IAttributeColumn);
 		}
 		else // we're a single attribute column.
 		{
-			wrappers.push(selectedAttribute as IColumnWrapper);//single entry
+			columns.push(selectedAttribute as IColumnWrapper);//single entry
 		}
 
-		return wrappers.map(this.getTreeNode).filter(_.identity);
+		return columns.map(column => ColumnUtils.hack_findHierarchyNode(column)).filter(_.identity);
 	};
 
 	static openInstance(attributeName:string, attributes:Map<string, IColumnWrapper|ILinkableHashMap>):ControlPanel
