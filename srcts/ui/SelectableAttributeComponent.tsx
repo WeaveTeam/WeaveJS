@@ -231,7 +231,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			if (columns.length)
 			{
 				columns.forEach((column:IAttributeColumn, index:number)=>{
-					let node = ColumnUtils.hack_findHierarchyNode(Weave.AS(column, IColumnWrapper), true);
+					let node = ColumnUtils.hack_findHierarchyNode(column, true);
 					if (node)
 					{
 						this.lastActiveNode = node;
