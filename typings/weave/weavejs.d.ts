@@ -5819,6 +5819,7 @@ declare module weavejs.data.hierarchy {
     }
 }
 declare module weavejs.data.hierarchy {
+    import IColumnReference = weavejs.api.data.IColumnReference;
     import IDataSource = weavejs.api.data.IDataSource;
     import IDataSource_File = weavejs.api.data.IDataSource_File;
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -5839,12 +5840,12 @@ declare module weavejs.data.hierarchy {
          *         Returns null if the descendant is unreachable from this node.
          * @see weave.api.data.IWeaveTreeNode#equals()
          */
-        static findPathToNode(root: IWeaveTreeNode, descendant: IWeaveTreeNode): any[];
+        static findPathToNode(root: IWeaveTreeNode, descendant: IWeaveTreeNode): Array<IWeaveTreeNode>;
         /**
          * Traverses an entire hierarchy and returns all nodes that
          * implement IColumnReference and have column metadata.
          */
-        static getAllColumnReferenceDescendants(source: IDataSource_File): any[];
+        static getAllColumnReferenceDescendants(source: IDataSource_File): Array<IColumnReference>;
     }
 }
 declare module weavejs.data.hierarchy {
