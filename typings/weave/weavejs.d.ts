@@ -2301,7 +2301,7 @@ declare module weavejs.api.data {
          * @param metadata Metadata used to identify a node in the hierarchy, which may or may not reference a column.
          * @return The hierarchy node corresponding to the metadata or null if there is no corresponding node.
          */
-        findHierarchyNode(metadata: Object): IWeaveTreeNode;
+        findHierarchyNode(metadata: Object): IWeaveTreeNode & weavejs.api.data.IColumnReference;
         /**
          * Generates a new IAttributeColumn which will receive data from this IDataSource.
          * @param metadata Metadata used to identify a column in this IDataSource.
@@ -5814,7 +5814,7 @@ declare module weavejs.data.hierarchy {
         static NAME: string;
         hierarchyRefresh: ICallbackCollection;
         getHierarchyRoot(): IWeaveTreeNode;
-        findHierarchyNode(metadata: Object): IWeaveTreeNode;
+        findHierarchyNode(metadata: Object): IWeaveTreeNode & weavejs.api.data.IColumnReference;
         generateNewAttributeColumn(metadata: Object): IAttributeColumn;
     }
 }
@@ -6349,7 +6349,7 @@ declare module weavejs.data.source {
          * may result in traversing the entire hierarchy, causing many remote procedure calls if
          * the hierarchy is stored remotely.
          */
-        findHierarchyNode(metadata: Object): IWeaveTreeNode;
+        findHierarchyNode(metadata: Object): IWeaveTreeNode & weavejs.api.data.IColumnReference;
         /**
          * This function creates a new ProxyColumn object corresponding to the metadata and queues up the request for the column.
          * @param metadata An object that contains all the information required to request the column from this IDataSource.
