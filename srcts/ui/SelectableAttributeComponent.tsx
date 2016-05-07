@@ -46,7 +46,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	constructor (props:ISelectableAttributeComponentProps)
 	{
 		super(props);
-		this.componentWillReceiveProps(props);
 	}
 	private comboBox: ComboBox;
 	private lastActiveNode:IWeaveTreeNode & IColumnReference;
@@ -146,7 +145,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	render():JSX.Element
 	{
 		// set dependencies to make sure we re-render when necessary
-		let attribute = nextProps.attributes.get(nextProps.attributeName);
+		let attribute = this.props.attributes.get(this.props.attributeName);
 		let dependencies = SelectableAttributeComponent.getDataSourceDependencies(attribute) as ILinkableObject[];
 		dependencies.push(attribute);
 		DynamicComponent.setDependencies(this, dependencies);
@@ -175,8 +174,9 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	
 			let options:{value:IWeaveTreeNode, label: string}[] = [];
 			
-			let rootNode = node && node.getDataSource().getHierarchyRoot();
-			let parentNode = rootNode && HierarchyUtils.findParentNode(rootNode, node.getDataSource(), node.getColumnMetadata());
+			let dataSource = node.getDataSource();
+			let rootNode = node && dataSource && dataSource.getHierarchyRoot();
+			let parentNode = rootNode && HierarchyUtils.findParentNode(rootNode, dataSource, node.getColumnMetadata());
 			let header = <span style={{ fontWeight: "bold", fontSize: "small" }}>{ parentNode && parentNode.getLabel() }</span>;
 
 			if (this.lastActiveNode)
