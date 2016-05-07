@@ -9,21 +9,23 @@ import Button from "../semantic-ui/Button";
 import MouseUtils from "../utils/MouseUtils";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
-const LEFT = "left";
-const RIGHT = "right";
-const TOP = "top";
-const BOTTOM = "bottom";
-const TOP_LEFT = "top-left";
-const TOP_RIGHT = "top-right";
-const BOTTOM_RIGHT = "bottom-right";
-const BOTTOM_LEFT = "bottom-left";
+const LEFT:"left" = "left";
+const RIGHT:"right" = "right";
+const TOP:"top" = "top";
+const BOTTOM:"bottom" = "bottom";
+const TOP_LEFT:"top-left" = "top-left";
+const TOP_RIGHT:"top-right" = "top-right";
+const BOTTOM_RIGHT:"bottom-right" = "bottom-right";
+const BOTTOM_LEFT:"bottom-left" = "bottom-left";
 const ENTER_KEYCODE = 13;
 const ESC_KEYCODE = 27;
 
-type Handle = typeof LEFT | typeof RIGHT |
-				 typeof TOP | typeof BOTTOM |
-				 typeof TOP_LEFT | typeof TOP_RIGHT |
-				 typeof BOTTOM_RIGHT | typeof BOTTOM_LEFT;
+type Handle = (
+	typeof LEFT | typeof RIGHT |
+	typeof TOP | typeof BOTTOM |
+	typeof TOP_LEFT | typeof TOP_RIGHT |
+	typeof BOTTOM_RIGHT | typeof BOTTOM_LEFT
+);
 
 export interface PopupWindowProps extends React.Props<PopupWindow>
 {
@@ -77,7 +79,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	
 	static defaultProps = {
 		resizable: true
-	}
+	};
 
 	static open(props:PopupWindowProps):PopupWindow
 	{
@@ -97,7 +99,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	static alignWindows()
 	{
 		var index = 0;
-		for( var popupWindow of PopupWindow.windowSet)
+		for (var popupWindow of PopupWindow.windowSet)
 		{
 			popupWindow.setState({ zIndex: index});
 			index++;
@@ -156,17 +158,18 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		PopupWindow.alignWindows();
 	}
 	
-	onKeyPress =(event:KeyboardEvent)=> {
+	onKeyPress =(event:KeyboardEvent)=>
+	{
 		var code = event.keyCode;
 		
-		var activeWindow = Array.from(PopupWindow.windowSet.keys()).pop();
-		if(this == activeWindow)
-		{
-			if(code == ENTER_KEYCODE)
+		if (code == ENTER_KEYCODE && this.props.modal && ReactUtils.hasFocus(this))
 			this.onOk();
-			
-			if(code == ESC_KEYCODE)
-			this.onCancel();
+		
+		if (code == ESC_KEYCODE)
+		{
+			var activeWindow = Array.from(PopupWindow.windowSet.keys()).pop();
+			if (this == activeWindow)
+				this.onCancel();
 		}
 	}
 
