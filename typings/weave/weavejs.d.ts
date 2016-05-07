@@ -4261,7 +4261,7 @@ declare module weavejs.data {
         static deriveStringFromNumber(column: IAttributeColumn, number: number): string;
         static hack_findNonWrapperColumn(column: IAttributeColumn): IAttributeColumn;
         static hack_findInternalDynamicColumn(columnWrapper: IColumnWrapper): DynamicColumn;
-        static hack_findHierarchyNode(columnWrapper: IColumnWrapper): IWeaveTreeNode & IColumnReference;
+        static hack_findHierarchyNode(column: IAttributeColumn, createFakeNodeIfNotFound?: boolean): IWeaveTreeNode & IColumnReference;
         /**
          * Gets an array of QKey objects from <code>column</code> which meet the criteria
          * <code>min &lt;= getNumber(column, key) &lt;= max</code>, where key is a <code>QKey</code>

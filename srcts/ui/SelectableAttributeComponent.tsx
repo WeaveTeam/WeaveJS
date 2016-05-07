@@ -170,7 +170,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		{
 			let attribute = attribute_ilhm_or_icw as IColumnWrapper;
 			
-			let node = ColumnUtils.hack_findHierarchyNode(attribute);
+			let node = ColumnUtils.hack_findHierarchyNode(attribute, true);
 	
 			if (node)
 				this.lastActiveNode = node;
@@ -219,19 +219,19 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		}
 		else if (Weave.IS(attribute_ilhm_or_icw, ILinkableHashMap))
 		{
-			let attribute = Weave.AS(attribute_ilhm_or_icw, ILinkableHashMap);
+			let attribute = attribute_ilhm_or_icw as ILinkableHashMap;
 			
 			var value: {label: string, value: IWeaveTreeNode}[] = [];
 
 			var nodes = new Set<IWeaveTreeNode>();
 
 			let siblings:IWeaveTreeNode[] = [];
-			var columns = this.columnsHashmap.getObjects(IColumnWrapper); // TODO - this does not consider if hash map contains non-IColumnWrapper columns
+			var columns = this.columnsHashmap.getObjects(IAttributeColumn);
 			
 			if (columns.length)
 			{
-				columns.forEach((column:IColumnWrapper, index:number)=>{
-					let node = ColumnUtils.hack_findHierarchyNode(column);
+				columns.forEach((column:IAttributeColumn, index:number)=>{
+					let node = ColumnUtils.hack_findHierarchyNode(Weave.AS(column, IColumnWrapper), true);
 					if (node)
 					{
 						this.lastActiveNode = node;
