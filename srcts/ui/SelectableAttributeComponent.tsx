@@ -92,14 +92,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		return dataSources;
 	}
 
-	componentWillReceiveProps(nextProps:ISelectableAttributeComponentProps)
-	{
-		let attribute = nextProps.attributes.get(nextProps.attributeName);
-		let dependencies = SelectableAttributeComponent.getDataSourceDependencies(attribute) as ILinkableObject[];
-		dependencies.push(attribute);
-		DynamicComponent.setDependencies(this, dependencies);
-	}
-	
 	launchAttributeSelector=(attributeName:string):ControlPanel=>
 	{
 		if (this.props.pushCrumb)
@@ -153,6 +145,12 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	
 	render():JSX.Element
 	{
+		// set dependencies to make sure we re-render when necessary
+		let attribute = nextProps.attributes.get(nextProps.attributeName);
+		let dependencies = SelectableAttributeComponent.getDataSourceDependencies(attribute) as ILinkableObject[];
+		dependencies.push(attribute);
+		DynamicComponent.setDependencies(this, dependencies);
+		
 		let attribute_ilhm_or_icw = this.props.attributes.get(this.props.attributeName);
 
 		let dropDownStyle: React.CSSProperties = this.props.hideButton ? {} : {
