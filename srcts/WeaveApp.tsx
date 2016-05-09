@@ -19,6 +19,7 @@ import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
 import ReactUtils from "./utils/ReactUtils";
 import {forceUpdateWatcher} from "./utils/WeaveReactUtils";
+import {dragAndDropHandler} from "./menus/DragAndDropHandler";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
 
@@ -431,6 +432,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						defaultType={FlexibleLayout}
 						style={{width: "100%", height: "100%"}}
 						props={{itemRenderer: this.renderTool}}
+						{...dragAndDropHandler((file:File) => this.menuBar && this.menuBar.systemMenu.fileMenu.handleOpenedFile(file))}
 					/>
 				</SideBarContainer>
 				{
