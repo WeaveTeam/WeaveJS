@@ -29,7 +29,7 @@ declare type Record = {
     label:string
 };
 
-const recordNumberLimit = 360;
+const recordsToBeDisplayed = 360;
 
 export default class C3PieChart extends AbstractC3Tool
 {
@@ -166,9 +166,12 @@ export default class C3PieChart extends AbstractC3Tool
 		{
             this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
-            //minimizing the number of records drawn
-            if(this.records.length > recordNumberLimit)
-                this.records = this.records.slice(0, recordNumberLimit);
+            //minimizing the number of records displayed
+            if(this.records.length > recordsToBeDisplayed)
+            {
+                this.records = this.records.slice(0, recordsToBeDisplayed);
+                this.records = _.sortBy(this.records, 'data');
+            }
 
             this.keyToIndex = {};
 
