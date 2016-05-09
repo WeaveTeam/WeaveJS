@@ -42,23 +42,23 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 	public layoutMode:LinkableString = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate);
 	public values:LinkableVariable = Weave.linkableChild(this, LinkableVariable);
 
-	constructor(props:FilterEditorProps) 
+	constructor(props:FilterEditorProps)
 	{
 		super(props);
 		this.options = [];
 	}
 
 
-	
+
 	verifyLayoutMode(value:string):boolean
 	{
 		return [
-			LAYOUT_LIST,
-			LAYOUT_COMBO,
-			LAYOUT_VSLIDER,
-			LAYOUT_HSLIDER,
-			LAYOUT_CHECKBOXLIST
-		].indexOf(value) >= 0;
+				LAYOUT_LIST,
+				LAYOUT_COMBO,
+				LAYOUT_VSLIDER,
+				LAYOUT_HSLIDER,
+				LAYOUT_CHECKBOXLIST
+			].indexOf(value) >= 0;
 	}
 
 	get deprecatedStateMapping():Object
@@ -70,12 +70,11 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 
 	onChange = (selectedValues:Object) =>
 	{
-		console.log('selected value', selectedValues);
 		var filter = this.filter;
 		if (filter)
-			filter.values.state = selectedValues;
-	}
-	
+			filter.values.state = Array.isArray(selectedValues) ? selectedValues : [selectedValues];//combobox doesnt return an array
+	};
+
 	getChoices():FilterOption[]
 	{
 		var dataType = DataType.getClass(this.column.getMetadata(ColumnMetadata.DATA_TYPE));
@@ -87,48 +86,20 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 		return _.sortByOrder(_.uniq(this.options, "value"), ["value"], ["asc"]);
 	}
 
-	render():JSX.Element 
+	render():JSX.Element
 	{
 		if (Weave.detectChange(this, this.column))
 		{
 			this.options = this.getChoices();
 		}
 		let values:any = this.filter ? this.filter.values.state : [];
-		if (!Array.isArray(values))
-			values = [values];
-		console.log("values", values);
 
-		/*return(<MenuLayoutComponent options={ this.options}
+
+		return(<MenuLayoutComponent options={ this.options}
 		                            displayMode={ this.layoutMode.value }
 		                            onChange={ this.onChange }
 		                            selectedItems={ values }
-		/>);*/
-
-		switch (this.layoutMode.value)
-		{
-			case LAYOUT_CHECKBOXLIST:
-				return <VBox style={{flex: 1, padding: 10}}>
-							<CheckBoxList options={this.options} selectedValues={values} onChange={this.onChange}/>
-						</VBox>
-
-			case LAYOUT_LIST:
-				return <List options={this.options} selectedValues={values} onChange={this.onChange}/>
-
-			case LAYOUT_HSLIDER:
-				return <HBox style={{flex: 1, padding: 25}}>
-							<HSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange}/>
-						</HBox>;
-
-			case LAYOUT_VSLIDER:
-				return <VBox style={{flex: 1, padding: 25}}>
-							<VSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange}/>
-						</VBox>;
-
-			case LAYOUT_COMBO:
-				return <VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
-							<ComboBox style={{textAlign: "center"}} placeholder={(Weave.lang("Select a value"))} options={this.options} value={ values[0]} onChange={ this.onChange}/>
-						</VBox>;
-		}
+		/>);
 	}
 }
 
