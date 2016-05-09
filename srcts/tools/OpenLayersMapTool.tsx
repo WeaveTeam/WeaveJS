@@ -6,6 +6,7 @@ import ReactUtils from "../utils/ReactUtils";
 import MouseUtils from "../utils/MouseUtils";
 import $ from "../modules/jquery";
 import proj4 from "../modules/proj4";
+import JSZip from "../modules/jszip";
 import PrintUtils from "../utils/PrintUtils";
 
 import {IVisTool, IVisToolProps, IVisToolState} from "./IVisTool";
@@ -107,7 +108,18 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return true;
 	}
 
-	private static projectionDbPromise = weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"));
+	static readProjDatabase():WeavePromise<Object>
+	{
+		return weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip")).then(
+			(result: Uint8Array) => JSZip().loadAsync(result)
+		).then(
+			(zip: JSZip) => zip.file("ProjDatabase.json").async("string")
+		).then(
+			JSON.parse
+		);
+	}
+
+	private static projectionDbPromise = OpenLayersMapTool.readProjDatabase();
 	/*
 	// For debugging projection database delays
 	private static projectionDbPromise:WeavePromise = new WeavePromise(null, (resolve:Function, reject:Function) => {
@@ -132,9 +144,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			{
 				try 
 				{
-					let zip = new weavejs.core.WeaveArchive.JSZip(result);
-					let content:string = zip.file("ProjDatabase.json").asText();
-					let db:{[name:string]: string} = JSON.parse(content);
+					let db = result as { [name: string]: string };
 					for (let newProjName of Object.keys(db))
 					{
 						let projDef = db[newProjName];

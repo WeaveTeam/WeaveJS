@@ -21,6 +21,7 @@ import ReactUtils from "./utils/ReactUtils";
 import {forceUpdateWatcher} from "./utils/WeaveReactUtils";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
+import WeaveArchive from "./WeaveArchive";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -34,7 +35,7 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
-import WeaveArchive = weavejs.core.WeaveArchive;
+
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -137,7 +138,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				// read content from flash
 				var ownerPath:WeavePath = weaveExternalTools[window.name].path;
 				var content:Uint8Array = atob(ownerPath.getValue('btoa(Weave.createWeaveFileContent())') as string) as any;
-				weavejs.core.WeaveArchive.loadFileContent(this.props.weave, content);
+				WeaveArchive.setWeaveSessionFromContent(this.props.weave, content);
 				this.forceUpdate();
 			}
 		}

@@ -8,7 +8,7 @@ import {ICheckBoxListProps} from "../react-ui/CheckBoxList";
 import CheckBoxList from "../react-ui/CheckBoxList";
 import * as FileSaver from "filesaver.js";
 import Input from "../semantic-ui/Input";
-import WeaveArchive = weavejs.core.WeaveArchive;
+import WeaveArchive from "../WeaveArchive";
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IDataSource = weavejs.api.data.IDataSource;
@@ -74,9 +74,6 @@ export default class FileMenu implements MenuBarItemProps
 			{
 				option.call(this, selectedOptions.indexOf(option) >= 0);
 			}
-			var archive:WeaveArchive  = WeaveArchive.createArchive(this.weave)
-			var uint8Array:Uint8Array = archive.serialize();
-			var arrayBuffer:ArrayBuffer  = uint8Array.buffer;
 			onSave((filenameInput.value && filenameInput.value + ".weave") || defaultFileName);
 		};
 		
@@ -171,7 +168,7 @@ export default class FileMenu implements MenuBarItemProps
 		
 		if (!dataFilesOnly && ext == 'weave')
 		{
-            WeaveArchive.loadFileContent(this.weave, fileContent);
+            WeaveArchive.setWeaveSessionFromContent(this.weave, fileContent);
 			return;
 		}
 		
@@ -259,7 +256,7 @@ export default class FileMenu implements MenuBarItemProps
 	loadUrl(url:string)
 	{
 		this.fileName = String(url).split('/').pop();
-		return WeaveArchive.loadUrl(this.weave, String(url));
+		WeaveArchive.loadUrl(this.weave, String(url));
 	}
 	
 	private _adminConsole: any;
@@ -289,8 +286,14 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		if (this.adminConsole)
 		{
-			let archive = StandardLib.byteArrayToString(WeaveArchive.createArchive(this.weave).serialize()) as string;
-			this.adminConsole.saveWeaveFile(btoa(archive), newFileName, overwrite);
+			var promise = WeaveArchive.serialize(this.weave);
+			promise.then(
+				(result: Uint8Array)=>
+				{
+					let archive = StandardLib.byteArrayToString(result);
+					this.adminConsole.saveWeaveFile(btoa(archive), newFileName, overwrite);
+				}
+			);
 		}
 	}
 	
@@ -300,10 +303,14 @@ export default class FileMenu implements MenuBarItemProps
 	}
 
 	private _saveFile = (newFilename:string) => {
-		var archive:WeaveArchive  = WeaveArchive.createArchive(this.weave)
-		var uint8Array:Uint8Array = archive.serialize();
-		var arrayBuffer:ArrayBuffer  = uint8Array.buffer;
-		FileSaver.saveAs(new Blob([arrayBuffer]), newFilename);
+		var promise = WeaveArchive.serialize(this.weave);
+		promise.then(
+			(result:Uint8Array)=>
+			{
+				var arrayBuffer: ArrayBuffer = result.buffer;
+				FileSaver.saveAs(new Blob([arrayBuffer]), newFilename);
+			}
+		);
 	}
 
     public saveFile=()=>
