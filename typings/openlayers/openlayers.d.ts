@@ -4053,6 +4053,13 @@ declare module ol {
          */
         function transformExtent(extent: Extent, source: ProjectionLike, destination: ProjectionLike): Extent;
 
+		/**
+		 * Register proj4. If not explicitly registered, it will be assumed that proj4js will be loaded in the global namespace.
+		 * @param proj4 The proj4 module
+		 * @returns void.
+		 */
+		function setProj4(proj4:Proj4): void;
+
         class Projection {
             constructor(options: olx.Projection);
             getExtent():ol.Extent;

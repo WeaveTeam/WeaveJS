@@ -1,4 +1,9 @@
 declare module "proj4" {
+    export = proj4;
+}
+declare type Proj4 = typeof proj4;
+
+declare module proj4 {
     export class Proj {
         constructor(srs: string);
     }

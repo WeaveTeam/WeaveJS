@@ -72,6 +72,9 @@ function isAlignment(obj:any):boolean
 import URLRequest = weavejs.net.URLRequest;
 import WeavePromise = weavejs.util.WeavePromise;
 
+// set ol proj4
+ol.proj.setProj4(proj4);
+
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
 {
 
