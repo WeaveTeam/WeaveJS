@@ -19,7 +19,8 @@ export default class SystemMenu implements MenuBarItemProps
 	
 	get menu():MenuItemProps[]
 	{
-		var menu:MenuItemProps[] = [
+		
+		return [
 			{
 				label: <FileInput onChange={this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes().join(',')}><span className="weave-menuitem-padding">{Weave.lang("Open session...")}</span></FileInput>,
 				itemStyleOverride: {padding: "0!important"}
@@ -27,17 +28,12 @@ export default class SystemMenu implements MenuBarItemProps
 			{
 				label: Weave.lang("Save session as..."),
 				click: this.fileMenu.saveFile
-			}
-		];
-		
-		if (this.fileMenu.pingAdminConsole())
-		{
-			menu.push({
+			},
+			this.fileMenu.pingAdminConsole() 
+			? {
 				label: Weave.lang("Save to server"),
 				click: this.fileMenu.saveToServer
-			});
-		}
-		return menu.concat([
+			} : {},
 			{},
 			{
 				label: "Visit iweave.com",
@@ -57,6 +53,6 @@ export default class SystemMenu implements MenuBarItemProps
 				enabled: false,
 				label: "Version: 2.0"
 			}
-		]);
+		];
 	}
 }

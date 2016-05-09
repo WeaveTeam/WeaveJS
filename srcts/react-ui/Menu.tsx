@@ -32,6 +32,7 @@ export interface MenuState
 
 const REACT_COMPONENT = "reactComponent";
 const GET_MENU_ITEMS = "getMenuItems";
+const SEPARATOR = {};
 
 export interface IGetMenuItems
 {
@@ -55,6 +56,10 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		this.state = {
 			hovered: -1,
 		};
+	}
+
+	static defaultProps:MenuItemProps = {
+		shown: true
 	}
 
 	static registerMenuSource(component:React.Component<any, any>)
@@ -86,14 +91,39 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		if(this.element.style.visibility == "hidden")
 			this.forceUpdate();
 	}
+	
+	renderMenuItems(menu:MenuItemProps[])
+	{
+		var filteredMenu:MenuItemProps[] = [];
+		
+		// remove hidden menu elements
+		filteredMenu = menu.filter(menuItem => menuItem.shown);
+	
+		// remove redundant separators
+		filteredMenu = menu.filter((menuItem, index) => {
+			var item = menuItem;
+			var next_item = menu[index + 1];
+			return !(_.isEqual(item, SEPARATOR) && _.isEqual(next_item, SEPARATOR));
+		});
+
+		// remove the first item if it is a separator
+		if(_.isEqual(filteredMenu[0], SEPARATOR))
+			filteredMenu.shift();
+		
+		// remove the last item if it is a separtor
+		if(_.isEqual(menu[menu.length - 1], SEPARATOR))
+			filteredMenu.pop();
+		
+		return filteredMenu.map((menuItem, index) => {
+			if(_.isEqual(menuItem, SEPARATOR))
+				return renderDivider(index);
+			else
+				return this.renderMenuItem(index, menuItem)
+		});
+	}
 
 	renderMenuItem(index:number, props:MenuItemProps):JSX.Element
 	{
-
-		var shown = props.hasOwnProperty('shown') ? !!props.shown : true; // default true
-		if (!shown)
-			return null;
-
 		var enabled = props.hasOwnProperty('enabled') ? !!props.enabled : true; // default true
 
 		var labelClass = classNames({
@@ -174,14 +204,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		return (
 			<div className="menu" style={_.merge(menuStyle, this.props.style)} {...otherProps}>
 				{this.props.header ? (<div className="header">{this.props.header}</div>):null}
-				{
-					this.props.menu && this.props.menu.map((menuItem, index) => {
-						if (_.isEqual(menuItem, {}))
-							return renderDivider(index);
-						else
-							return this.renderMenuItem(index, menuItem);
-					}).filter(item => !!item)
-				}
+				{this.renderMenuItems(this.props.menu)}
 			</div>
 		);
 	}
@@ -379,7 +402,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			<VBox className="weave-menu" style={_.merge(menuStyle, this.props.style)} onMouseEnter={() => this.setState({hovered: -1})} {...otherProps}>
 				{
 					this.props.menu.map((menuItem, index) => {
-						if (_.isEqual(menuItem, {}))
+						if (_.isEqual(menuItem, SEPARATOR))
 							return renderDivider(index);
 						else
 							return this.renderMenuItem(index, menuItem);
