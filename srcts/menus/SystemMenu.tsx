@@ -29,11 +29,11 @@ export default class SystemMenu implements MenuBarItemProps
 				label: Weave.lang("Save session as..."),
 				click: this.fileMenu.saveFile
 			},
-			this.fileMenu.pingAdminConsole() 
-			? {
+			{
 				label: Weave.lang("Save to server"),
-				click: this.fileMenu.saveToServer
-			} : {},
+				click: this.fileMenu.saveToServer,
+				shown: this.fileMenu.pingAdminConsole()
+			},
 			{},
 			{
 				label: "Visit iweave.com",
