@@ -211,7 +211,7 @@ export default class ReactUtils
 											return null;
 										
 										let style:React.CSSProperties = Array.isArray(styles.td) ? (styles.td as React.CSSProperties[])[index] : styles.td;
-										let className:string = Array.isArray(classes.td) ? (classes.td as string)[index] : classes.td as string;
+										let className:string = Array.isArray(classes.td) ? classes.td[index] : classes.td as string;
 										
 										let colSpan:number = 1;
 										for (let next = index + 1; next < row.length; next++)
