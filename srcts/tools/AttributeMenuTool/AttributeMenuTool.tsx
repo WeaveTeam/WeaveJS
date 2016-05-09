@@ -146,37 +146,6 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		                     onChange={ this.handleSelection }
 		                     selectedItems={ [selectedAttribute] }
 		/>);
-		/*switch (this.layoutMode.value)
-		{
-			case LAYOUT_LIST:
-				return (
-					<VBox>
-						<List options={ this.options }  onChange={ this.handleSelection } selectedValues={ [selectedAttribute] }/>
-					</VBox>
-				);
-			case LAYOUT_HSLIDER:
-				return (
-					<HBox style={{ flex: 1, padding: 25}}>
-						<HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type="categorical"/>
-					</HBox>
-				);
-			case LAYOUT_VSLIDER:
-				return (
-					<VBox style={{ flex: 1, padding: 25 }}>
-						<VSlider options={ this.options } onChange={ this.handleSelection } selectedValues={ [selectedAttribute] } type="categorical"/>
-					</VBox>
-				);
-			case LAYOUT_COMBO:
-				return (
-					<VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
-						<ComboBox placeholder={(Weave.lang("Select a column"))} options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection } value={ selectedAttribute }/>
-					</VBox>
-				);
-			default:
-				return (
-					<div/> // returns div by default but we should never get here, layoutMode.value needs verfiier function
-				)
-		}*/
 	}
 }
 
