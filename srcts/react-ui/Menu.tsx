@@ -58,10 +58,6 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		};
 	}
 
-	static defaultProps:MenuItemProps = {
-		shown: true
-	}
-
 	static registerMenuSource(component:React.Component<any, any>)
 	{
 		(ReactDOM.findDOMNode(component) as any)[REACT_COMPONENT] = component;
@@ -97,12 +93,12 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		var filteredMenu:MenuItemProps[] = [];
 		
 		// remove hidden menu elements
-		filteredMenu = menu.filter(menuItem => menuItem.shown);
+		filteredMenu = menu.filter(menuItem => menuItem.hasOwnProperty('shown') ? !!menuItem.shown : true);
 	
 		// remove redundant separators
-		filteredMenu = menu.filter((menuItem, index) => {
+		filteredMenu = filteredMenu.filter((menuItem, index, array) => {
 			var item = menuItem;
-			var next_item = menu[index + 1];
+			var next_item = array[index + 1];
 			return !(_.isEqual(item, SEPARATOR) && _.isEqual(next_item, SEPARATOR));
 		});
 
@@ -111,7 +107,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			filteredMenu.shift();
 		
 		// remove the last item if it is a separtor
-		if(_.isEqual(menu[menu.length - 1], SEPARATOR))
+		if(_.isEqual(filteredMenu[filteredMenu.length - 1], SEPARATOR))
 			filteredMenu.pop();
 		
 		return filteredMenu.map((menuItem, index) => {
