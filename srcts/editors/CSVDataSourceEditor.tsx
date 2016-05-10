@@ -25,7 +25,7 @@ import {ComboBoxOption} from "../semantic-ui/ComboBox";
 
 export default class CSVDataSourceEditor extends DataSourceEditor
 {
-	private _dataSourceNode:ColumnTreeNode
+	private _dataSourceNode:ColumnTreeNode;
 	constructor(props:IDataSourceEditorProps)
 	{
 		super(props);
@@ -58,6 +58,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
+		let keysAreUnique:boolean = ds.keysAreUnique;
 		let columnIds:ComboBoxOption[] = ds.getColumnIds().map( (id, index) => {
 			return {label: ds.getColumnTitle(id), value: id}
 		});
@@ -74,7 +75,13 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Key column")}
-					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
+					<HelpIcon className={keysAreUnique ? "":"fa-exclamation-triangle"} style={{color:keysAreUnique? null:"red"}}>
+						<VBox>
+							{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}
+							{keysAreUnique ? null: <br/>}
+							{keysAreUnique ? null:Weave.lang("Warning: You have chosen a key column that is not unique.")}
+						</VBox>
+					</HelpIcon>
 				</HBox>,
 				<ComboBox style={{width: "100%"}}
 				          ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
