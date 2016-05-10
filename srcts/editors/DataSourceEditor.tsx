@@ -60,8 +60,15 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	
 	handleProps(props:IDataSourceEditorProps)
 	{
-		this.dataSourceWatcher.target = props.dataSource;
-		this.setSelection(props, this.state.selectedBranch, this.state.selectedLeaf);
+		if (this.dataSourceWatcher.target != props.dataSource)
+		{
+			this.dataSourceWatcher.target = props.dataSource;
+			this.setSelection(props, null, null);
+		}
+		else
+		{
+			this.setSelection(props, this.state.selectedBranch, this.state.selectedLeaf);
+		}
 	}
 	
 	componentWillReceiveProps(props:IDataSourceEditorProps)
