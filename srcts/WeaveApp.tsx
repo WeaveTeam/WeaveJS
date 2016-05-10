@@ -21,6 +21,7 @@ import ReactUtils from "./utils/ReactUtils";
 import {forceUpdateWatcher} from "./utils/WeaveReactUtils";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
+import Dropzone from "./modules/Dropzone";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -417,33 +418,43 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			                             className="weave-ToolEditor"/>
 		
 		return (
-			<VBox
-				className="weave-app"
-				{...this.props as React.HTMLAttributes}
-				style={_.merge({flex: 1}, this.props.style)}
-				onContextMenu={ContextMenu.open}
+			<Dropzone 
+				style={{width: "100%", height: "100%"}}
+				activeStyle={{border: "2px solid green"}}
+				onDrop={(files:File[]) => {
+					if(this.menuBar)
+					  files.map((file) => this.menuBar.systemMenu.fileMenu.handleOpenedFile(file));
+				}}
+				disableClick={true}
 			>
-				<WeaveProgressBar/>
-				<SideBarContainer barSize={.4} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
-					<WeaveComponentRenderer
-						weave={weave}
-						path={renderPath}
-						defaultType={FlexibleLayout}
-						style={{width: "100%", height: "100%"}}
-						props={{itemRenderer: this.renderTool}}
-					/>
-				</SideBarContainer>
-				{
-					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
-					?	<WeaveMenuBar
-							style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
+				<VBox
+					className="weave-app"
+					{...this.props as React.HTMLAttributes}
+					style={_.merge({flex: 1}, this.props.style)}
+					onContextMenu={ContextMenu.open}
+				>
+					<WeaveProgressBar/>
+					<SideBarContainer barSize={.4} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
+						<WeaveComponentRenderer
 							weave={weave}
-							ref={(c:WeaveMenuBar) => this.menuBar = c}
-							createObject={this.createObject}
+							path={renderPath}
+							defaultType={FlexibleLayout}
+							style={{width: "100%", height: "100%"}}
+							props={{itemRenderer: this.renderTool}}
 						/>
-					:	null
-				}
-			</VBox>
+					</SideBarContainer>
+					{
+						!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
+						?	<WeaveMenuBar
+								style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
+								weave={weave}
+								ref={(c:WeaveMenuBar) => this.menuBar = c}
+								createObject={this.createObject}
+							/>
+						:	null
+					}
+				</VBox>
+			</Dropzone>
 		);
 	}
 }

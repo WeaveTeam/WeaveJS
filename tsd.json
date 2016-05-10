@@ -12,7 +12,7 @@
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
     },
     "react/react.d.ts": {
-      "commit": "dade4414712ce84e3c63393f1aae407e9e7e6af7"
+      "commit": "741430a178043bfca40e3a343b8b6f7610104093"
     },
     "lodash/lodash.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
@@ -43,6 +43,9 @@
     },
     "fixed-data-table/fixed-data-table.d.ts": {
       "commit": "7de6c3dd94feaeb21f20054b9f30d5dabc5efabd"
+    },
+    "react-dropzone/react-dropzone.d.ts": {
+      "commit": "741430a178043bfca40e3a343b8b6f7610104093"
     }
   }
 }
