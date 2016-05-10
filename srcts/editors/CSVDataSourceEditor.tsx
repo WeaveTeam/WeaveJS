@@ -75,17 +75,16 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Key column")}
-					<HelpIcon className={keysAreUnique ? "":"fa-exclamation-triangle"} style={{color:keysAreUnique? null:"red"}}>
+					<HelpIcon className={keysAreUnique ? "":"fa-exclamation-triangle"} style={{color:keysAreUnique? null:"#A34341"}}>
 						<VBox>
-							{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}
-							{keysAreUnique ? null: <br/>}
-							{keysAreUnique ? null:Weave.lang("Warning: You have chosen a key column that is not unique.")}
+							{keysAreUnique ? Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\""):Weave.lang("Warning: You have chosen a key column that is not unique.")}
 						</VBox>
 					</HelpIcon>
 				</HBox>,
 				<ComboBox style={{width: "100%"}}
 				          ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
 				          options={columnIds}
+				          className={keysAreUnique ? "":"error"}
 				/>
 			],
 			[
