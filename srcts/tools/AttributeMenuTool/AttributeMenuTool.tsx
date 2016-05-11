@@ -59,12 +59,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	verifyLayoutMode(value:string):boolean
 	{
-		return [
-			LAYOUT_LIST,
-			LAYOUT_COMBO,
-			LAYOUT_VSLIDER,
-			LAYOUT_HSLIDER,
-		].indexOf(value) >= 0;
+		return menuOptions.indexOf(value) >= 0;
 	}
 
 	//callback for targetToolPath
