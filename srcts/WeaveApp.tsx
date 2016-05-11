@@ -24,6 +24,7 @@ import WeaveToolEditor from "./ui/WeaveToolEditor";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import LinkableWatcher = weavejs.core.LinkableWatcher;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import ColumnUtils = weavejs.data.ColumnUtils;
@@ -51,7 +52,7 @@ export interface WeaveAppState
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
-	enableMenuBarWatcher = forceUpdateWatcher(this, LinkableBoolean);
+	enableMenuBarWatcher:LinkableWatcher;
 	
 	menuBar:WeaveMenuBar;
 
@@ -313,11 +314,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	//TODO put this function elsewhere?
 	prioritizeNumericColumns(columnRefs:Array<IWeaveTreeNode&IColumnReference>) : IColumnReference[]
 	{
-		var sortedRefs = _.sortBy(columnRefs, function(item){
+		var sortedRefs = _.sortBy(columnRefs, function(item) {
 			var ref = Weave.AS(item, IColumnReference);
 			let meta:{[key:string]:string} = ref && ref.getColumnMetadata();
 			let dataType = meta && meta["dataType"];
-			//console.log("meta " , meta, 'has dataType', dataType);
 			switch(dataType)
 			{
 				case 'number':
@@ -394,9 +394,22 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 		
+	componentWillUnmount()
+	{
+		Weave.dispose(this.enableMenuBarWatcher);
+	}
+		
 	get enableMenuBar():LinkableBoolean
 	{
-		this.enableMenuBarWatcher.target = this.props.weave.getObject('WeaveProperties', 'enableMenuBar');
+		// temporary hack until LinkableWatcher can be reused for multiple instances of Weave
+		if (this.props.weave != Weave.getWeave(this.enableMenuBarWatcher))
+		{
+			Weave.dispose(this.enableMenuBarWatcher);
+			this.enableMenuBarWatcher = Weave.disposableChild(this.props.weave, LinkableWatcher);
+			this.enableMenuBarWatcher.targetPath = ['WeaveProperties', 'enableMenuBar'];
+			Weave.getCallbacks(this.enableMenuBarWatcher).addGroupedCallback(this, this.forceUpdate);
+		}
+		
 		return this.enableMenuBarWatcher.target as LinkableBoolean;
 	}
 	
