@@ -34,8 +34,8 @@ export default class AbstractFilterEditor
 	public showToggle = Weave.linkableChild(this, new LinkableBoolean(true));
 	public showToggleLabel = Weave.linkableChild(this, new LinkableBoolean(false));
 	
-	private filterWatcher = Weave.linkableChild(this, new LinkableWatcher(ColumnDataFilter), this.handleFilter);
-	private statsWatcher = Weave.linkableChild(this, new LinkableWatcher(IColumnStatistics), this.handleColumn);
+	private filterWatcher = Weave.privateLinkableChild(this, new LinkableWatcher(ColumnDataFilter), this.handleFilter);
+	private statsWatcher = Weave.privateLinkableChild(this, new LinkableWatcher(IColumnStatistics), this.handleColumn);
 
 	protected options:FilterOption[];
 
