@@ -19,6 +19,7 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -50,7 +51,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		super(props);
 
 		this.choices.addGroupedCallback(this, this.choiceChanged);
-		this.selectedChoice.addGroupedCallback(this, this.choiceChanged);
+		this.selectedChoice.addGroupedCallback(this, this.forceUpdate,true);
 		this.targets.addGroupedCallback(this, this.choiceChanged);
 
 		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
@@ -76,18 +77,25 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		this.targets.resumeCallbacks();
 	}
 
-	choiceChanged()
+	handleSelection = (selectedValue:any):void =>
 	{
-		let choice: LinkableVariable = this.choices.getObject(this.selectedChoice.value) as LinkableVariable;
+		if (!selectedValue)
+			return;
 
-		this.setTargetStates(choice.state);
+		var selection = Array.isArray(selectedValue) ? selectedValue[0] : selectedValue;//combobox returns only one selection, rest all return [] of selections
+		this.selectedChoice.value = this.choices.getName(selection);// will cause tool menu layout to re-render
 
-		this.forceUpdate();
-	}
+		this.setTargetStates(selection.state);
+	};
 
-	handleItemClick(value:string):void 
+	get options():{ label:string, value:LinkableVariable}[]
 	{
-		this.selectedChoice.value = value;
+		return this.choices.getObjects(ILinkableVariable).map(choice => {
+			return {
+				label: this.choices.getName(choice),
+				value: choice
+			};
+		});
 	}
 
 	renderEditor():JSX.Element
@@ -112,11 +120,10 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	render()
 	{
-		console.log("selected choice", this.selectedChoice.state);
 		return(
 			<MenuLayoutComponent options={ this.options }
 			                    displayMode={ this.layoutMode.value }
-			                    onChange={ this.handleItemClick }
+			                    onChange={ this.handleSelection }
 			                    selectedItems={ [this.selectedChoice] }
 			/>
 		);
