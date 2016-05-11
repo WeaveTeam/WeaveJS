@@ -51,7 +51,7 @@ export interface WeaveAppState
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
-	enableMenuBarWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
+	enableMenuBarWatcher = forceUpdateWatcher(this, LinkableBoolean);
 	
 	menuBar:WeaveMenuBar;
 
@@ -396,6 +396,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 	get enableMenuBar():LinkableBoolean
 	{
+		this.enableMenuBarWatcher.target = this.props.weave.getObject('WeaveProperties', 'enableMenuBar');
 		return this.enableMenuBarWatcher.target as LinkableBoolean;
 	}
 	
