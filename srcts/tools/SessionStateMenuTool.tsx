@@ -12,6 +12,7 @@ import List from "../react-ui/List";
 import MiscUtils from "../utils/MiscUtils";
 import ComboBox from "../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import MenuLayoutComponent from "../ui/MenuLayoutComponent";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -19,14 +20,25 @@ import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
+const LAYOUT_LIST:string = "List";
+const LAYOUT_COMBO:string = "ComboBox";
+const LAYOUT_VSLIDER:string = "VSlider";
+const LAYOUT_HSLIDER:string = "HSlider";
+const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];//todo add the verify callback
+
 export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps, IVisToolState>
 {
 	selectedChoice = Weave.linkableChild(this, LinkableString);
-	layoutMode = Weave.linkableChild(this, LinkableString);
+	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
 	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
+
+	verifyLayoutMode(value:string):boolean
+	{
+		return menuOptions.indexOf(value) >= 0;
+	}
 
 	get title():string
 	{
@@ -82,9 +94,6 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	{
 		return (
 			<VBox>
-				{
-					super.renderEditor()
-				}
 				<HBox>
 					<label>
 						{Weave.lang("Choices")}
@@ -103,31 +112,14 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	render()
 	{
-		if (this.layoutMode.value === "ComboBox")
-		{
-			return (
-				<VBox style={{flex: 1, alignItems: "center"}}>
-					<ComboBox ref={linkReactStateRef(this, { value: this.selectedChoice })} options={this.choices.getNames()}/>
-				</VBox>
-			);
-		}
-		else
-		{
-			var listOptions = this.choices.getNames().map((name:string) => {
-				 return {
-					  value: name
-				 };
-			})
-			return (
-				<List options={listOptions} 
-					  selectedValues={[this.selectedChoice.value]}
-					  allowClear={false}
-					  multiple={false}
-			    	  onChange={(selectedValues) => {
-						  this.selectedChoice.value = selectedValues[0];
-					  }}/>
-			);
-		}
+		console.log("selected choice", this.selectedChoice.state);
+		return(
+			<MenuLayoutComponent options={ this.options }
+			                    displayMode={ this.layoutMode.value }
+			                    onChange={ this.handleItemClick }
+			                    selectedItems={ [this.selectedChoice] }
+			/>
+		);
 	}
 }
 
