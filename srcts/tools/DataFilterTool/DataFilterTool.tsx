@@ -233,25 +233,6 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		this.props.filterEditor.requestLocalObject(filterEditorItem.editorClass, false);
 	}
 
-	// event listener for Filter Options
-	onFilterOptionChange = (event:Event)=>
-	{
-		var value:string | boolean = (event.target as HTMLInputElement).value;
-		if (this.props.filterEditor.target)
-		{
-			if (this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
-			{
-				(this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state = value as string;
-			}
-			if (this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
-			{
-				var forceDiscreteValues:LinkableBoolean  = (this.props.filterEditor.target as NumericRangeDataFilterEditor).forceDiscreteValues;
-				forceDiscreteValues.state = value as boolean;
-			}
-		}
-
-	}
-
 	componentWillUnmount():void
 	{
 		Weave.getCallbacks(this.props.filterEditor).removeCallback(this, this.forceUpdate);
