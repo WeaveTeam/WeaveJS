@@ -1,10 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import prefixer from "../react-ui/VendorPrefixer";
+import prefixer from "../VendorPrefixer";
 import Resizer from "./Resizer"
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
-import MouseUtils from "../utils/MouseUtils";
+import MouseUtils from "../../utils/MouseUtils";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 

@@ -1,4 +1,4 @@
-import prefixer from "../react-ui/VendorPrefixer";
+import prefixer from "../VendorPrefixer";
 import * as _ from "lodash";
 import * as React from "react";
 import * as ReactDOM from "react-dom";

@@ -10,7 +10,7 @@ import WeaveMenuBar from "./WeaveMenuBar";
 import DynamicComponent from "./ui/DynamicComponent";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./layouts/FlexibleLayout";
-import {LayoutState} from "./react-flexible-layout/Layout";
+import {LayoutState} from "./react-ui/flexible-layout/Layout";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
 import {WeavePathArray, PanelProps} from "./layouts/FlexibleLayout";

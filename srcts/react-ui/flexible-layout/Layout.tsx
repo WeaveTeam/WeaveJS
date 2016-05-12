@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import prefixer from "../react-ui/VendorPrefixer";
-import ReactUtils from "../utils/ReactUtils";
-import MouseUtils from "../utils/MouseUtils";
+import prefixer from "../VendorPrefixer";
+import ReactUtils from "../../utils/ReactUtils";
+import MouseUtils from "../../utils/MouseUtils";
 import Resizer from "./Resizer";
 import ResizerOverlay from "./ResizerOverlay";
 
