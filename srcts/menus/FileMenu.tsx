@@ -14,6 +14,8 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IDataSource = weavejs.api.data.IDataSource;
 import StandardLib = weavejs.util.StandardLib;
 
+var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;
+
 export default class FileMenu implements MenuBarItemProps
 {
 	constructor(weave:Weave)
@@ -131,6 +133,18 @@ export default class FileMenu implements MenuBarItemProps
 			{},
 		];
 	}
+	
+	/**
+	 * This function will update the progress given a meta object file name and a percentage progress 
+	 *
+	 * @param meta The meta object containing the percentage and file name
+	 */
+	updatePropgressIndicator=(meta:{percent:number, currentFile:string})=>
+	{
+		if(!ProgressIndicator.hasTask(meta.currentFile))
+			ProgressIndicator.addTask(meta.currentFile, meta.percent/100);
+		ProgressIndicator.updateTask(meta.currentFile, meta.percent/100);
+	}
 
     openFile=(e:any)=>
 	{
@@ -168,7 +182,7 @@ export default class FileMenu implements MenuBarItemProps
 		
 		if (!dataFilesOnly && ext == 'weave')
 		{
-            WeaveArchive.setWeaveSessionFromContent(this.weave, fileContent);
+            WeaveArchive.setWeaveSessionFromContent(this.weave, fileContent, this.updatePropgressIndicator);
 			return;
 		}
 		
@@ -256,7 +270,7 @@ export default class FileMenu implements MenuBarItemProps
 	loadUrl(url:string)
 	{
 		this.fileName = String(url).split('/').pop();
-		WeaveArchive.loadUrl(this.weave, String(url));
+		WeaveArchive.loadUrl(this.weave, String(url), this.updatePropgressIndicator);
 	}
 	
 	private _adminConsole: any;
@@ -286,7 +300,7 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		if (this.adminConsole)
 		{
-			var promise = WeaveArchive.serialize(this.weave);
+			var promise = WeaveArchive.serialize(this.weave, this.updatePropgressIndicator);
 			promise.then(
 				(result: Uint8Array)=>
 				{
@@ -303,7 +317,7 @@ export default class FileMenu implements MenuBarItemProps
 	}
 
 	private _saveFile = (newFilename:string) => {
-		var promise = WeaveArchive.serialize(this.weave);
+		var promise = WeaveArchive.serialize(this.weave, this.updatePropgressIndicator);
 		promise.then(
 			(result:Uint8Array)=>
 			{
