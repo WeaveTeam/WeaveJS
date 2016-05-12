@@ -37,6 +37,8 @@ export interface PopupWindowProps extends React.Props<PopupWindow>
 	left?:number;
 	width?:number;
 	height?:number;
+	onResize?:(width:number, height:number)=>void;
+	onDrag?:(top:number, left:number)=>void;
 	footerContent?:JSX.Element;
 	onOk?:Function;
 	onCancel?:Function;
@@ -225,6 +227,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 				newState.height = Math.min(newState.height, parentHeight);
 				this.mouseDownOffset.y += newState.height - this.state.height;
 			}
+			this.props.onResize && this.props.onResize(newState.width, newState.height);
 		}
 		else if (this.dragging)
 		{
@@ -235,8 +238,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 			newState.top = this.state.top + mouseDeltaY;
 			newState.top = Math.max(newState.top, 0);
 			newState.top = Math.min(newState.top, parentHeight - edgeBuffer);
+			this.props.onDrag && this.props.onDrag(newState.top, newState.left);
 		}
-		
 		this.setState(newState);
 	}
 	
