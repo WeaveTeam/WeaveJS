@@ -90,9 +90,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	private get binningDefinition() { var bc = this.binnedColumn ; return bc ? bc.binningDefinition.target as IBinningDefinition : null; }
 	private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
 	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
-	
-	private spanStyle:CSSProperties;
-	private textStyle:CSSProperties;
+
 	private toolTip:ToolTip;
 
 	constructor(props:IVisToolProps)
@@ -107,22 +105,11 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 		this.dynamicColorColumn.targetPath = ['defaultColorColumn'];
 
-		this.state = {selected:[], probed:[]};
-		this.spanStyle = {
-			padding: 5,
-			userSelect: "none",
-			textOverflow: "ellipsis",
-			overflow: "hidden",
-			whiteSpace: "nowrap"
+		this.state = {
+			selected:[],
+			probed:[]
 		};
-		this.textStyle = {
-			display: "flex",
-			flexDirection: "row",
-			flex:0.8,
-			alignItems:"center",
-			justifyContent:"flex-start",
-			overflow: "hidden"
-		}
+
 
 	}
 	
@@ -217,7 +204,9 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 		return menuItems;
 	}
-	
+
+	private cellBorderWidth:number = 1;
+	private cellPadding:number = 2;
 	getInteractionStyle(bin:number):CSSProperties
 	{
 		var probed:boolean = this.getProbedBins().indexOf(bin) >= 0;
@@ -230,14 +219,18 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			borderAlpha = 0.5;
 		else
 			borderAlpha = 0;
-		
+
+		// important to have flexShrink  = 0 for flexItem
+		// else the scrollbar won't appear when user choose fixed value for Size
 		return {
-			flex: 1.0,
 			borderColor: MiscUtils.rgba(0, 0, 0, borderAlpha),
 			borderStyle: "solid",
-			borderWidth: 1,
-			padding: "2px",
-			overflow: "hidden"
+			borderWidth: this.cellBorderWidth,
+			padding: this.cellPadding,
+			overflow: "hidden",
+			alignItems: "center",
+			flexShrink: isNaN(this.shapeSize.value) ? 1 : 0,
+			minWidth:0
 		};
 	}
 
@@ -246,164 +239,164 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		if (this.numberOfBins)
 		{
 			//Binned plot case
-			var width:number = this.element ? this.element.clientWidth : 200;
-			var height:number = this.element ? this.element.clientHeight : 300;
 			var shapeSize:number = this.shapeSize.value;
 			var shapeType:string = this.shapeType.value;
 			var maxColumns:number = this.maxColumns.value;
 			var columnFlex:number = 1.0/maxColumns;
-			var columnFlexPercent:string = String(columnFlex*100)+"%";
-			var extraBins:number = this.numberOfBins % maxColumns == 0 ? 0 : maxColumns - this.numberOfBins % maxColumns;
-			var totalBins:number = this.numberOfBins + extraBins;
-			var yScale:Function = d3.scale.linear().domain([0, this.numberOfBins + 1]).range([0, height]);
-			var yMap:Function = (d:number):number => { return yScale(d); };
 
-			shapeSize = _.max([1, _.min([shapeSize, height / this.numberOfBins])]);
-			var r:number = (shapeSize / 100 * height / this.numberOfBins) / 2;
-			var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
-			var finalElements:any[] = [];
-			var prefixerStyle:{} = prefixer(this.spanStyle);
+			// empty  cells to match the Column division
+			var extraCells:number = this.numberOfBins % maxColumns == 0 ? 0 :  maxColumns - (this.numberOfBins % maxColumns);
+			var totalCells:number = this.numberOfBins + extraCells;
 
-			for (var j:number = 0; j < maxColumns; j++)
+			if(isNaN(shapeSize))
 			{
-				var elements:JSX.Element[] = [];
-				if (shapeType == SHAPE_TYPE_BOX)
+				// shape size dynamically grow with container resize
+				shapeSize = _.max( [1, _.min([shapeSize, this.element.clientHeight / this.numberOfBins]) ] ) ;
+				shapeSize = (shapeSize - (2 * this.cellBorderWidth + 2 * this.cellPadding )) / 2;
+			}
+
+
+			var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
+			var textStyle:{} = prefixer({
+				paddingLeft: 4,
+				userSelect: "none",
+				textOverflow: "ellipsis",
+				overflow: "hidden",
+				whiteSpace: "nowrap",
+				minWidth:0, /* important to give min-width / width/ max-width else flex item won't go behind intrinsic width */
+				flex:"0.8 0" /* important to give flex value for text, else text width will alter the shape size */
+
+			});
+
+			// Array of Legend Container based on number of Columns in Session
+			let columns:JSX.Element[] = [];
+
+
+			for (var colIndex:number = 0; colIndex < maxColumns; colIndex++)
+			{
+				// Array of Legend UI based on number of bins
+				var rows:JSX.Element[] = [];
+
+
+				// on each column loop - respective cells are picked
+				for (var cellIndex = 0; cellIndex < totalCells; cellIndex++)
 				{
-					var element:JSX.Element[] = [];
-					var elements:JSX.Element[] = [];
-					for (var i = 0; i < this.numberOfBins + extraBins; i++)
+					// respective cells for col index are picked here
+					// for example say there are 8 cells and maxColumns 3,
+					// col[0] gets cells - 0,3 and 6,
+					// col[1] gets cells - 1,4 and 7,
+					// col[2] gets cells - 2,5 and 8
+					if (cellIndex % maxColumns == colIndex)
 					{
-						if (i % maxColumns == j)
+						// Legend UI are created only for cell-index which are less that bins count
+						if (cellIndex < this.numberOfBins)
 						{
-							if (i < this.numberOfBins)
+							// get the shape Element
+							var shapeElement:JSX.Element[] = null;
+							let shapeColor:string = MiscUtils.rgb_a( this.colorColumn.ramp.getColor(cellIndex, 0, this.numberOfBins - 1), 1.0 );
+							let shapeStyle:React.CSSProperties = {
+								backgroundColor:shapeColor
+							};
+
+
+							if(shapeType == SHAPE_TYPE_BOX)
 							{
-								element.push(
-									<HBox key={i} style={this.getInteractionStyle(i)} onClick={this.handleClick.bind(this, i)} onMouseMove={this.handleProbe.bind(this, i, true)} onMouseOut={this.handleProbe.bind(this, i, false)}>
-										<HBox style={{
-											flex: 1.0,
-											alignItems: "center",
-											justifyContent: "center",
-											backgroundColor: MiscUtils.rgb_a(this.colorColumn.ramp.getColor(i, 0, this.numberOfBins - 1), 1.0)
-										}}>
-											<div style={{
-												stroke: "black",
-												strokeOpacity: 0.5,
-												backgroundColor: "#FFF"
-											}}>
-												<span style={prefixerStyle}>{ Weave.lang(textLabelFunction(i)) }</span>
-											</div>
-										</HBox>
-									</HBox>
-								);
+								_.merge(shapeStyle, { flex:"1 0", alignItems:"center", justifyContent:"center", height:shapeSize } );
+								shapeElement =  [
+													<HBox key={"box"} style={shapeStyle}>
+														<div style={ {stroke: "black",strokeOpacity: 0.5,backgroundColor: "#FFF"} }>
+															<span style={textStyle}> { Weave.lang(textLabelFunction(cellIndex)) } </span>
+														</div>
+													</HBox>
+												];
 							}
-							else
+							else //handle different cases for circle/square/line
 							{
-								element.push(
-									<HBox key={i} style={this.getInteractionStyle(i)}/>
-								);
-							}
-						}
-					}
+								let shapeContainerStyle:React.CSSProperties = {
+									width:shapeSize,
+									height:shapeSize
+								};
 
-					elements.push(
-						<VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </VBox>
-					);
+								shapeStyle.width = "100%";
 
-					finalElements[j] = elements;
-				}
-				else
-				{
-					var element:JSX.Element[] = [];
-					for (var i = 0; i < totalBins; i++)
-					{
-						if (i % maxColumns == j)
-						{
-
-							if (i < this.numberOfBins)
-							{
-								//get shape Element
-								var shapeElement:JSX.Element;
-								//handle different cases for circle/square/line
 								switch (shapeType)
 								{
 									case SHAPE_TYPE_CIRCLE :
-										shapeElement = <circle cx="50%" cy="50%" r="45%" style={{
-													fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
-													stroke: "black",
-													strokeOpacity: 0.5
-												}}/>;
+										_.merge(shapeStyle,{ paddingTop:"100%", borderRadius:"50%" });
 										break;
 									case SHAPE_TYPE_SQUARE :
-										shapeElement = <rect x="5%" y="5%" width="90%" height="90%" style={{
-													fill: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
-													stroke: "black",
-													strokeOpacity: 0.5
-												}}/>;
+										_.merge(shapeStyle,{ paddingTop:"100%" });
 										break;
 									case SHAPE_TYPE_LINE :
-										shapeElement = <line x1="5%" y1="50%" x2="95%" y2="50%" style={{
-													stroke: this.colorColumn.ramp.getHexColor(i, 0, this.numberOfBins - 1),
-													strokeWidth: 5
-												}}/>;
+										shapeContainerStyle.display = "flex";
+										shapeContainerStyle.alignItems = "center";
+										_.merge(shapeStyle,{ height:4 });
 										break;
 								}
-	
-								var row = [
-									<HBox key="0" style={{flex:0.2, minWidth: 10}}>
-										<svg viewBox="0 0 100 100" width="100%">
-											{ shapeElement }
-										</svg>
-									</HBox>,
-									<div key="1" style={this.textStyle}>
-										<span style={ prefixerStyle }>{ Weave.lang(textLabelFunction(i)) }</span>
-									</div>
-								];
 
-								element.push(
-									<HBox
-										key={i}
-										style={this.getInteractionStyle(i)}
-										onClick={this.handleClick.bind(this, i)}
-										onMouseMove={this.handleProbe.bind(this, i, true)}
-										onMouseOut={this.handleProbe.bind(this, i, false)}
-									>
-										{
-											weavejs.WeaveAPI.Locale.reverseLayout
-											?	row.reverse()
-											:	row
-										}
-									</HBox>
-								);
+
+
+								// shape needs wrapper to enusure the shape maintains an aspect ratio = 1
+								// container gets absolute values
+								// shape is set to use 100percent using width and padding-top
+								shapeElement =  [
+													<div key={shapeType} style={shapeContainerStyle}>
+														<div style={shapeStyle}></div>
+													</div>,
+													<span key={"label"} style={textStyle}>{ Weave.lang(textLabelFunction(cellIndex)) }</span>
+												];
+
 							}
-							else
-							{
-								element.push(
-									<HBox key={i} style={this.getInteractionStyle(i)}/>
-								);
-							}
+
+							rows.push(
+										<HBox key={cellIndex}
+										      style={this.getInteractionStyle(cellIndex)}
+										      onClick={this.handleClick.bind(this, cellIndex)}
+										      onMouseMove={this.handleProbe.bind(this, cellIndex, true)}
+										      onMouseOut={this.handleProbe.bind(this, cellIndex, false)}>
+											{shapeElement}
+										</HBox>
+									);
 						}
+						else
+						{
+							// pushing empty row is important
+							// we kept column Vbox Justify-content value = space-around
+							// if number of flexItem in each column aren't equal cell wont align row wise
+							// setting height value is important to match the other cell height
+							var cellHeight:number = shapeSize + (2 * this.cellPadding) + (2 * this.cellBorderWidth);
+							rows.push(<HBox key={cellIndex} style={ {height:cellHeight} } />)
+						}
+
 					}
 
-					elements.push(
-						<VBox key={i} style={{width: columnFlexPercent, flex: columnFlex, padding: "5px"}}> { element } </VBox>
-					);
 
-					finalElements[j] = elements;
 				}
+
+				// min width value is required
+				// flex items will refuse to go below the minimum intrinsic width
+				// unless we specify either width /minwidth /maxwidth
+				columns[colIndex] = <VBox key={colIndex} style={ { flex:columnFlex  , minWidth:0, padding: "4px", justifyContent:"space-around"} }>
+										{ rows }
+									</VBox> ;
+
 			}
 
-			return (
-				<VBox style={{flex: 1, padding: "0px 5px 0px 5px", overflow: "hidden"}} ref={(vbox:VBox) => this.element = ReactDOM.findDOMNode(vbox) as HTMLElement}>
-					{
-						this.showLegendName.value
-						?	<HBox style={{flex: 0.1, alignItems:"center"}}>
-								<span style={prefixerStyle}>{Weave.lang(this.dynamicColorColumn.getMetadata('title'))}</span>
-							</HBox>
-						:	null
-					}
-					<HBox style={{ flex: this.showLegendName.value ? 0.9 : 1.0 }}> { finalElements } </HBox>
-				</VBox>
-			);
+			// if user specifies fixed Size, scrollbar has to be provided
+			var overflowValue:string = isNaN(this.shapeSize.value)  ? "hidden": "auto";
+
+			return (<VBox style={ {flex: 1, padding: "0px 5px 0px 5px", overflow: "hidden"} } ref={(vbox:VBox) => this.element = ReactDOM.findDOMNode(vbox) as HTMLElement}>
+						{
+							this.showLegendName.value
+							?	<HBox style={{flex: 0.1, alignItems:"center"}}>
+									<span style={ textStyle }>{ Weave.lang(this.dynamicColorColumn.getMetadata('title')) }</span>
+								</HBox>
+							:	null
+						}
+						<HBox style={ {flex: this.showLegendName.value ? 0.9 : 1.0 ,  overflowY: overflowValue, overflowX:"hidden"} }>
+							{ columns }
+						</HBox>
+					</VBox> );
 		}
 		else
 		{
@@ -480,6 +473,10 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					[
 						Weave.lang("Shape type"),
 						<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
+					],
+					[
+						Weave.lang("Shape Size"),
+						<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.shapeSize})}/>
 					],
 					[ 
 						Weave.lang("Number of columns"),
