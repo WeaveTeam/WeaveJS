@@ -22,6 +22,7 @@ import {forceUpdateWatcher} from "./utils/WeaveReactUtils";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
 import WeaveArchive from "./WeaveArchive";
+import WindowLayout from "./layouts/WindowLayout";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -443,9 +444,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
-						defaultType={FlexibleLayout}
+						defaultType={WindowLayout}
 						style={{width: "100%", height: "100%"}}
-						props={{itemRenderer: this.renderTool}}
+						props={{/*itemRenderer: this.renderTool*/}}
 					/>
 				</SideBarContainer>
 				{
