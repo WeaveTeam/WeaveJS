@@ -19,7 +19,7 @@ export default class WeaveArchive {
 	files = new Map<string, Uint8Array>();
 	objects = new Map<string, Object>();
 
-	constructor(weave?:Weave)
+	/*private*/ constructor(weave?:Weave)
 	{
 		if (weave)
 		{
@@ -36,17 +36,17 @@ export default class WeaveArchive {
 		}
 	}
 
-	jsonOnFulfilled(fileName:string, result:string):void
+	private jsonOnFulfilled(fileName:string, result:string):void
 	{
 		this.objects.set(fileName, JSON.parse(result));
 	}
 
-	amfOnFulfilled(fileName:string, result:Uint8Array):void
+	private amfOnFulfilled(fileName:string, result:Uint8Array):void
 	{
 		this.objects.set(fileName, (new JSByteArray(result)).readObject());
 	}
 
-	fileOnFulfilled(fileName:string, result:Uint8Array):void
+	private fileOnFulfilled(fileName:string, result:Uint8Array):void
 	{
 		this.files.set(fileName, result);
 	}
@@ -57,12 +57,12 @@ export default class WeaveArchive {
 		return archive.deserialize(byteArray, updateCallback);
 	}
 
-	deserialize(byteArray: Uint8Array, updateCallback?: UpdateCallback): Promise<WeaveArchive>
+	private deserialize(byteArray: Uint8Array, updateCallback?: UpdateCallback): Promise<WeaveArchive>
 	{
 		let zip = (new JSZip());
 		return (new JSZip()).loadAsync(byteArray, {}).then(
 			(zip) => {
-				let promises: Array<Promise<{}>> = [];
+				let promises: Array<Promise<void>> = [];
 				for (let filePath in zip.files)
 				{
 					let file = zip.files[filePath];
@@ -70,20 +70,20 @@ export default class WeaveArchive {
 					if (file.dir) continue;
 
 					let fileName = filePath.substr(filePath.indexOf('/') + 1);
-					let promise: Promise<{}>;
+					let promise: Promise<void>;
 					let updateCallbackWrapper = updateCallback ? (meta:{percent: number, currentFile: string}) => { meta.currentFile = fileName; updateCallback(meta); } : null;
 
 					if (filePath.indexOf(WeaveArchive.FOLDER_JSON + '/') == 0)
 					{
-						promise = file.async("string", updateCallbackWrapper).then(this.jsonOnFulfilled.bind(this, fileName));
+						promise = file.async("string", updateCallbackWrapper).then((result) => this.jsonOnFulfilled(fileName, result as string));
 					}
 					else if (filePath.indexOf(WeaveArchive.FOLDER_AMF + '/') == 0)
 					{
-						promise = file.async("Uint8Array", updateCallbackWrapper).then(this.amfOnFulfilled.bind(this, fileName));
+						promise = file.async("Uint8Array", updateCallbackWrapper).then((result) => this.amfOnFulfilled(fileName, result as Uint8Array));
 					}
 					else
 					{
-						promise = file.async("Uint8Array", updateCallbackWrapper).then(this.fileOnFulfilled.bind(this, fileName));
+						promise = file.async("Uint8Array", updateCallbackWrapper).then((result) => this.fileOnFulfilled(fileName, result as Uint8Array));
 					}
 					promises.push(promise);
 				}
@@ -92,7 +92,7 @@ export default class WeaveArchive {
 		);
 	}
 
-	serialize(updateCallback?: UpdateCallback): Promise<Uint8Array>
+	private serialize(updateCallback?: UpdateCallback): Promise<Uint8Array>
 	{
 		let zip = new JSZip();
 		let name: string;
@@ -128,7 +128,7 @@ export default class WeaveArchive {
 	static ARCHIVE_COLUMN_CACHE_AMF = "column-cache.amf";
 	static ARCHIVE_COLUMN_CACHE_JSON = "column-cache.json";
 
-	setSessionFromArchive(weave:Weave)
+	private setSessionFromArchive(weave:Weave)
 	{
 		let historyJSON = this.objects.get(WeaveArchive.ARCHIVE_HISTORY_JSON);
 		let historyAMF = this.objects.get(WeaveArchive.ARCHIVE_HISTORY_AMF);
@@ -157,15 +157,14 @@ export default class WeaveArchive {
 		}
 	}
 
-	static setWeaveSessionFromContent(weave:Weave, byteArray: Uint8Array)
+	static setWeaveSessionFromContent(weave:Weave, byteArray: Uint8Array, updateCallback?: UpdateCallback)
 	{
-		WeaveArchive.deserialize(byteArray).then((archive) => archive.setSessionFromArchive(weave));
+		return WeaveArchive.deserialize(byteArray, updateCallback).then((archive) => archive.setSessionFromArchive(weave));
 	}
 
 	static loadUrl(weave: Weave, url: string, updateCallback?: UpdateCallback): WeavePromise<void>
 	{
 		return WeaveAPI.URLRequestUtils.request(weave.root, new URLRequest(url))
-			.then((result) => WeaveArchive.deserialize(result, updateCallback))
-			.then((zip) => zip.setSessionFromArchive(weave));
+			.then((result) => WeaveArchive.setWeaveSessionFromContent(weave, result, updateCallback));
 	}
 }
