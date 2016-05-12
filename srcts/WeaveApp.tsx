@@ -438,7 +438,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						path={renderPath}
 						defaultType={WindowLayout}
 						style={{width: "100%", height: "100%"}}
-						props={{/*itemRenderer: this.renderTool*/}}
+						props={{itemRenderer: this.renderTool}}
 					/>
 				</SideBarContainer>
 				{
