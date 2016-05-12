@@ -4,17 +4,17 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import * as WeaveUI from "./WeaveUI";
-import Layout from "./react-flexible-layout/Layout";
-import {HBox, VBox} from "./react-ui/FlexBox";
-import Div from "./react-ui/Div";
-import {HORIZONTAL, VERTICAL, LayoutState} from "./react-flexible-layout/Layout";
-import WeaveComponentRenderer from "./WeaveComponentRenderer";
+import * as WeaveUI from "../WeaveUI";
+import Layout from "../react-flexible-layout/Layout";
+import {HBox, VBox} from "../react-ui/FlexBox";
+import Div from "../react-ui/Div";
+import {HORIZONTAL, VERTICAL, LayoutState} from "../react-flexible-layout/Layout";
+import WeaveComponentRenderer from "../WeaveComponentRenderer";
 
-import PanelOverlay from "./PanelOverlay";
-import MiscUtils from "./utils/MiscUtils";
-import DOMUtils from "./utils/DOMUtils";
-import MouseUtils from "./utils/MouseUtils";
+import PanelOverlay from "../PanelOverlay";
+import MiscUtils from "../utils/MiscUtils";
+import DOMUtils from "../utils/DOMUtils";
+import MouseUtils from "../utils/MouseUtils";
 
 export enum DropZone {
 	NONE,

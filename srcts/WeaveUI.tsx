@@ -1,7 +1,7 @@
 import WeaveApp from "./WeaveApp";
 import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
-import FlexibleLayout from "./FlexibleLayout";
+import FlexibleLayout from "./layouts/FlexibleLayout";
 
 import WeaveDataSourceEditor from "./editors/WeaveDataSourceEditor";
 

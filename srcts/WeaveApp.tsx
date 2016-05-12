@@ -9,11 +9,11 @@ import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
 import DynamicComponent from "./ui/DynamicComponent";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
-import FlexibleLayout from "./FlexibleLayout";
+import FlexibleLayout from "./layouts/FlexibleLayout";
 import {LayoutState} from "./react-flexible-layout/Layout";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
-import {WeavePathArray, PanelProps} from "./FlexibleLayout";
+import {WeavePathArray, PanelProps} from "./layouts/FlexibleLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
@@ -439,7 +439,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onContextMenu={ContextMenu.open}
 			>
 				<WeaveProgressBar/>
-				<SideBarContainer barSize={.4} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
+			<SideBarContainer barSize={.4} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
