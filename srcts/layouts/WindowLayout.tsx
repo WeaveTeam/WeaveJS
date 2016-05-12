@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as _ from "lodash";
-import DraggableWindow from "../react-ui/DraggableWindow";
-import {PopupWindowProps} from "../react-ui/DraggableWindow";
+// import DraggableWindow from "../react-ui/DraggableWindow";
+// import {PopupWindowProps} from "../react-ui/DraggableWindow";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "../react-ui/VendorPrefixer";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
@@ -12,7 +12,8 @@ export type PanelProps = {
 	onDragStart:React.DragEventHandler,
 	onDragEnd:React.DragEventHandler,
 	onDragOver:React.DragEventHandler,
-	onReposition?:(top:number, left: number, width:number, height:number)=>void
+	onReposition?:(left:number, top: number, width:number, height:number)=>void
+	style?:React.CSSProperties,
 };
 
 export declare type WeavePathArray = string[];
@@ -26,7 +27,7 @@ export interface WindowState
 {
 	/* id for the window */
 	id: WeavePathArray;
-	style: React.CSSProperties // technically only needs top, left, width and height but we may want to experiment with other things
+	style: React.CSSProperties // technically only needs left, top, width and height but we may want to experiment with other things
 } 
 
 export default class WindowLayout extends React.Component<IWindowLayoutProps, {}> implements weavejs.api.core.ILinkableVariable
@@ -39,14 +40,14 @@ export default class WindowLayout extends React.Component<IWindowLayoutProps, {}
 		super(props);
 	}
 	
-	setSessionState()
+	setSessionState(state:WindowState[])
 	{
-		return this.linkableState;
+		this.linkableState.state = state;
 	}
 	
 	getSessionState()
 	{
-		return this.linkableState;
+		return this.linkableState.state;
 	}
 	
 	getLayoutIds(event:React.DragEvent)
@@ -69,9 +70,9 @@ export default class WindowLayout extends React.Component<IWindowLayoutProps, {}
 		
 	}
 	
-	onReposition(path:WeavePathArray, top:number, left: number, width:number, height:number)
+	onReposition(path:WeavePathArray, left:number, top: number, width:number, height:number)
 	{
-		
+
 	}
 	
 	private generateStyle()
@@ -90,24 +91,25 @@ export default class WindowLayout extends React.Component<IWindowLayoutProps, {}
 	render()
 	{
 		var weave = Weave.getWeave(this);
-
 		return (
 			<div>
 				{
 					this.linkableState.state &&
-						(this.linkableState.state as WindowState[]).map(state => {
+						(this.linkableState.state as WindowState[]).map((state, index) => (
 							this.props.itemRenderer
 							?	this.props.itemRenderer(state.id, {
 									onDragOver: this.onDragOver.bind(this, state.id),
 									onDragStart: this.onDragStart.bind(this, state.id),
 									onDragEnd: this.onDragEnd.bind(this),
-									onReposition: this.onReposition.bind(this, state.id)
+									onReposition: this.onReposition.bind(this, state.id),
+									style: _.merge({position: "absolute"}, state.style)
 								})
 							:	<WeaveComponentRenderer
+									key={index}
 									weave={weave}
 									path={state.id}
 									style={state.style}/>
-						})
+						))
 				}
 			</div>
 		);
