@@ -44,7 +44,8 @@ export default class ChartsMenu implements MenuBarItemProps
 			WeaveUI.OpenLayersMapTool,
 			WeaveUI.C3PieChart,
 			WeaveUI.C3ScatterPlot,
-			WeaveUI.TableTool
+			WeaveUI.TableTool,
+			WeaveUI.TextTool
 		];
 
 		return impls.map(impl => {

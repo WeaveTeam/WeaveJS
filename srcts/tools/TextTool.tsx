@@ -20,8 +20,9 @@ import LinkableString = weavejs.core.LinkableString
 import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
-export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolState>
+export default class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 {
 	htmlText = Weave.linkableChild(this, new LinkableString(""));
 	padding = Weave.linkableChild(this, new LinkableNumber(4));
@@ -48,32 +49,59 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;
 	}
 
-	renderEditor():JSX.Element
+	get selectableAttributes()
+	{
+		return new Map<string, IColumnWrapper | ILinkableHashMap>();
+	}
+
+	get defaultPanelTitle():string
+	{
+		return Weave.lang("Text Tool");
+	}
+
+	getTitlesEditor():React.ReactChild[][]
+	{
+		return [
+			[
+				Weave.lang("Chart"),
+				this.panelTitle,
+				this.defaultPanelTitle
+			]
+		].map((row:[string, LinkableString]) => {
+
+			return [
+				Weave.lang(row[0]),
+				<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+			]
+		});
+	}
+
+	renderEditor(pushCrumb:Function = null):JSX.Element
 	{
 		return (
-			<VBox style={{flex:1}}>
-				{
-					super.renderEditor()
-				}
-				<HBox>
-					{ReactUtils.generateTable({
-						body: [
+			<VBox>
+			{
+				ReactUtils.generateTable({
+					body: [].concat(
+						this.getTitlesEditor(),
+						[
 							[
 								Weave.lang("Text"),
 								<StatefulTextField ref={ linkReactStateRef(this, {value: this.htmlText}) }/>
 							]
-						],
-						classes: {
-							td: [
-								"weave-left-cell",
-								"weave-right-cell"
-							]
-						}
-					})}
-				</HBox>
+						]
+					),
+					classes: {
+						td: [
+							"weave-left-cell",
+							"weave-right-cell"
+						]
+					}
+				})
+			}
 			</VBox>
 		);
 	}
@@ -92,7 +120,7 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 	{
 		$(this.element).empty();
 		//parse html, stripping out <script> tags
-		let htmlElements:any[] = $.parseHTML(this.htmlText.value,null,false);
+		let htmlElements:any[] = $.parseHTML(MiscUtils.stringWithMacros(this.htmlText.value,this),null,false);
 		if(htmlElements) {
 			htmlElements.forEach((element:any) => {
 				if(element.outerHTML)
@@ -113,6 +141,6 @@ export default class TextTool extends AbstractVisTool<IVisToolProps, IVisToolSta
 Weave.registerClass(
 	TextTool,
 	["weavejs.tool.Text", "weave.ui::TextTool"],
-	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
 	"Text"
 );
