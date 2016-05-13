@@ -131,16 +131,6 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		}
 	}
 
-	private onReposition=(position:DraggableDivState)=>
-	{
-		this.setState(position);
-	}
-	
-	private onDragEnd=(event:React.DragEvent)=>
-	{
-		this.forceUpdate(); // removes the overlay
-	}
-
 	componentWillUnmount()
 	{
 		document.removeEventListener("keyup", this.onKeyPress);
@@ -157,9 +147,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		};
 		var className:string;
 		if (modal)
-		{
 			className = "weave-dialog-overlay";
-		}
 		return <div style={style} className={className}/>;
 	}
 	
@@ -168,25 +156,34 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 		var windowStyle:React.CSSProperties = {	
 			zIndex: this.state.zIndex,
-			top: this.props.top || window.innerHeight / 2,
-			left: this.props.left || window.innerWidth / 2
+			top: this.props.top,
+			left: this.props.left,
+			width: this.props.width,
+			height: this.props.height,
+			minWidth: this.minWidth,
+			minHeight: this.minHeight
 		}
 	
 		var popupWindow = (
-			<DraggableDiv onDragEnd={(event) => this.onDragEnd(event)} style={windowStyle} ref={(c:DraggableDiv) => this.element = ReactDOM.findDOMNode(c) as HTMLElement} >
-				<VBox className="weave-app weave-window" onMouseDown={() => this.handleClickOnWindow()} style={{width: "100%", height: "100%"}}>
-					<HBox className="weave-header weave-window-header">
-						<div style={{flex: 1}}>
-						{
-							this.props.title
-						}
-						</div>
-						{/*
-							!this.props.modal
-							?	<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
-							:	null
-						*/}
-					</HBox>
+			<DraggableDiv style={windowStyle} 
+						  className="weave-app weave-window"
+						  onMouseDown={() => this.handleClickOnWindow()}
+						  ref={(c:DraggableDiv) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}
+						  header={
+							  <HBox className="weave-header weave-window-header">
+								  <div style={{flex: 1}}>
+								  {
+									  this.props.title
+								  }
+								  </div>
+								  {/*
+									  !this.props.modal
+									  ?	<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
+									  :	null
+								  */}
+							  </HBox>
+						  }>
+				<VBox style={{flex: 1}}>
 					<VBox className="weave-padded-vbox weave-window-content" style={{display: 'block', flex: 1}}>
 						<VBox style={{flex: 1, overflow: "auto"}}>
 							{ this.state.content || this.props.content }
