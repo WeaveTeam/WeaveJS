@@ -30,7 +30,8 @@ type Handle = (
 export interface DraggableDivProps extends React.HTMLProps<DraggableDiv>
 {
 	onReposition?:(position:DraggableDivState)=>void;
-	header?:React.ReactChild;
+	resizable?:boolean;
+	movable?:boolean;
 }
 
 export interface DraggableDivState
@@ -48,36 +49,53 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		x: number,
 		y: number
 	}
-	private dragging:boolean;
+	private moving:boolean;
 	private activeResizeHandle:Handle;
 
 	constructor(props:DraggableDivProps)
 	{
 		super(props);
+		var style = props.style || {};
+		this.setState({
+			top: style.top,
+			left: style.left,
+			width: style.width,
+			height: style.height
+		});
+		
 	}
 	
+	static defaultProps:DraggableDivProps =	{
+		resizable: true,
+		movable: true
+	}
+
 	componentDidMount()
 	{
 		// if initial width height are provided
 		// use it otherwise default to element position
 		var style = this.props.style || {};
-
 		this.setState({
-			top: style.top || (window.innerHeight - this.element.clientHeight) / 2,
-			left: style.left || (window.innerWidth - this.element.clientWidth) / 2,
-			width: style.width || this.element.clientWidth,
-			height: style.height || this.element.clientHeight
+			top: style.top !== undefined ? this.element.clientTop : (window.innerHeight - this.element.clientHeight) / 2,
+			left: style.left !== undefined ? this.element.clientLeft : (window.innerWidth - this.element.clientWidth) / 2,
+			width: this.element.clientWidth,
+			height: this.element.clientHeight
 		});
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
 	}
 	
-	private onDragStart=(event:React.MouseEvent)=>
+	private onDragStart=(event:React.DragEvent)=>
 	{
-		this.dragging = true;
-		this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
-		if(this.props.onMouseDown)
-			this.props.onMouseDown(event);
+		if(this.props.movable)
+		{
+			event.preventDefault();
+			event.stopPropagation();
+			this.moving = true;
+			this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
+		}
+		if(this.props.onDragStart)
+			this.props.onDragStart(event);
 	}
 	
 	private onResizeStart(event:React.MouseEvent, handle:Handle)
@@ -88,7 +106,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	
 	private onDrag=(event:MouseEvent)=>
 	{
-		if (!this.activeResizeHandle && !this.dragging)
+		if (!this.activeResizeHandle && !this.moving)
 			return;
 		
 		var mouseOffset = MouseUtils.getOffsetPoint(this.element, event as MouseEvent)
@@ -141,7 +159,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 				this.mouseDownOffset.y += newState.height - this.state.height;
 			}
 		}
-		else if (this.dragging)
+		else if (this.moving)
 		{
 			newState.left = this.state.left + mouseDeltaX;
 			newState.left = Math.max(newState.left, edgeBuffer - (this.state.width || 0));
@@ -157,7 +175,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	
 	private onDragEnd=(event:MouseEvent)=>
 	{
-		this.dragging = false;
+		this.moving = false;
 		this.activeResizeHandle = null;
 	}
 
@@ -184,16 +202,10 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	render():JSX.Element
 	{
 		var style = _.merge({position: "absolute"}, this.props.style, this.state);
-	
 		return (
-			<VBox {...this.props} onMouseDown={this.props.header ? null : this.onDragStart} style={style} ref={(c:VBox) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}>
-				{
-					this.props.header
-					? <div onMouseDown={this.onDragStart}>{this.props.header}</div>
-					: null
-				}
+			<VBox draggable={true} {...this.props} onDragStart={this.onDragStart} style={style} ref={(c:VBox) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}>
 				{this.props.children}
-				{this.renderResizers()}
+				{this.props.resizable ? this.renderResizers() : null}
 			</VBox>
 		);
 	}

@@ -17,6 +17,7 @@ import ReactUtils from "./utils/ReactUtils";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import SmartComponent from "./ui/SmartComponent";
 import classNames from "./modules/classnames";
+import DraggableDiv from "./react-ui/DraggableDiv";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -134,7 +135,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		if (this.props.onCloseClick)
 			this.props.onCloseClick(this);
 	};
-
+	
 	render():JSX.Element
 	{
 		return (

@@ -493,7 +493,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 							?	this.props.itemRenderer(path, {
 									onDragOver: this.onDragOver.bind(this, path),
 									onDragStart: this.onDragStart.bind(this, path),
-									onDragEnd: this.onDragEnd.bind(this)
+									onDragEnd: this.onDragEnd.bind(this),
 								})
 							:	<WeaveComponentRenderer
 									weave={weave}
