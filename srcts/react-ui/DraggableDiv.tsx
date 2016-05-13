@@ -1,5 +1,6 @@
 import * as ReactDOM from "react-dom";
 import * as React from "react";
+import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
 import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
@@ -76,10 +77,10 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		// use it otherwise default to element position
 		var style = this.props.style || {};
 		this.setState({
-			top: style.top !== undefined ? this.element.clientTop : (window.innerHeight - this.element.clientHeight) / 2,
-			left: style.left !== undefined ? this.element.clientLeft : (window.innerWidth - this.element.clientWidth) / 2,
-			width: this.element.clientWidth,
-			height: this.element.clientHeight
+			top: style.top !== undefined ? this.element.offsetTop : (window.innerHeight - this.element.offsetHeight) / 2,
+			left: style.left !== undefined ? this.element.offsetLeft : (window.innerWidth - this.element.offsetWidth) / 2,
+			width: this.element.offsetWidth,
+			height: this.element.offsetHeight
 		});
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
@@ -151,7 +152,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 				this.mouseDownOffset.x += newState.width - this.state.width;
 			}
 			
-			if (this.activeResizeHandle.indexOf(BOTTOM) >= 0 && (event as MouseEvent).clientY < window.innerHeight)
+			if (this.activeResizeHandle.indexOf(BOTTOM) >= 0)
 			{
 				newState.height = this.state.height + mouseDeltaY;
 				newState.height = Math.max(newState.height, minHeight);

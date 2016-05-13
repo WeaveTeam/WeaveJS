@@ -79,7 +79,10 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	
 	updateTitle():void
 	{
-		var title:string = (this.watcher && this.watcher.target ? (this.watcher.target as IVisTool).title : '') || this.props.path[this.props.path.length - 1];
+		var path = this.props.path;
+		var title:string = this.watcher && this.watcher.target ? (this.watcher.target as IVisTool).title : '';
+		if (!title && path)
+			title = path[path.length - 1];
 		if (this.state.title != title)
 			this.setState({title});
 	}
