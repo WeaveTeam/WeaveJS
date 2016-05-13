@@ -30,6 +30,7 @@ type Handle = (
 export interface DraggableDivProps extends React.HTMLProps<DraggableDiv>
 {
 	onReposition?:(position:DraggableDivState)=>void;
+	header?:React.ReactChild;
 }
 
 export interface DraggableDivState
@@ -60,20 +61,23 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		// if initial width height are provided
 		// use it otherwise default to element position
 		var style = this.props.style || {};
+
 		this.setState({
-			top: style.top || this.element.offsetTop,
-			left: style.left || this.element.offsetLeft,
-			width: style.width || this.element.offsetWidth,
-			height: style.height || this.element.offsetHeight
+			top: style.top || (window.innerHeight - this.element.clientHeight) / 2,
+			left: style.left || (window.innerWidth - this.element.clientWidth) / 2,
+			width: style.width || this.element.clientWidth,
+			height: style.height || this.element.clientHeight
 		});
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
 	}
-
-	private onDragStart(event:MouseEvent)
+	
+	private onDragStart=(event:React.MouseEvent)=>
 	{
 		this.dragging = true;
 		this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
+		if(this.props.onMouseDown)
+			this.props.onMouseDown(event);
 	}
 	
 	private onResizeStart(event:React.MouseEvent, handle:Handle)
@@ -82,7 +86,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
 	}
 	
-	private onDrag=(event:MouseEvent|React.DragEvent)=>
+	private onDrag=(event:MouseEvent)=>
 	{
 		if (!this.activeResizeHandle && !this.dragging)
 			return;
@@ -146,7 +150,6 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			newState.top = this.state.top + mouseDeltaY;
 			newState.top = Math.max(newState.top, 0);
 			newState.top = Math.min(newState.top, parentHeight - edgeBuffer);
-			this.props.onDrag && this.props.onDrag(event as React.DragEvent);
 		}
 		this.props.onReposition && this.props.onReposition(newState);
 		this.setState(newState);
@@ -180,19 +183,18 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 
 	render():JSX.Element
 	{
-		delete this.props.ref;
-		delete this.props.key;
-
-		var style = _.merge({position: "absolute"}, this.props.style);
-
-		if(this.state)
-			style = _.merge(style, this.state)
+		var style = _.merge({position: "absolute"}, this.props.style, this.state);
 	
 		return (
-			<div {...this.props as any} style={style} ref={(c) => this.element = c}>
+			<VBox {...this.props} onMouseDown={this.props.header ? null : this.onDragStart} style={style} ref={(c:VBox) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}>
+				{
+					this.props.header
+					? <div onMouseDown={this.onDragStart}>{this.props.header}</div>
+					: null
+				}
 				{this.props.children}
 				{this.renderResizers()}
-			</div>
+			</VBox>
 		);
 	}
 }
