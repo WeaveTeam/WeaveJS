@@ -13,7 +13,7 @@ import FlexibleLayout from "./layouts/FlexibleLayout";
 import {LayoutState} from "./react-ui/flexible-layout/Layout";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
-import {WeavePathArray, PanelProps} from "./layouts/FlexibleLayout";
+import {PanelProps} from "./layouts/FlexibleLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
@@ -23,6 +23,7 @@ import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
 import WeaveArchive from "./WeaveArchive";
 import WindowLayout from "./layouts/WindowLayout";
+import {AbstractLayout, WeavePathArray} from "./layouts/AbstractLayout";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -350,6 +351,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	addToLayout(path:WeavePathArray)
 	{
+		var layout = this.props.weave.getObject(this.getRenderPath());
+		if (layout instanceof AbstractLayout)
+			(layout as AbstractLayout).addItem(path);
+
+		/*
 		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
 		if (layout)
 		{
@@ -368,10 +374,16 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 			layout.setSessionState(state);
 		}
+		*/
 	}
 
 	removeFromLayout(path:WeavePathArray)
 	{
+		var layout = this.props.weave.getObject(this.getRenderPath());
+		if (layout instanceof AbstractLayout)
+			(layout as AbstractLayout).removeItem(path);
+	
+		/*
 		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
 		if (layout)
 		{
@@ -384,6 +396,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				layout.setSessionState(state);
 			}
 		}
+		*/
 	}
 	
 	componentWillUpdate(nextProps:WeaveAppProps, nextState:WeaveAppState)

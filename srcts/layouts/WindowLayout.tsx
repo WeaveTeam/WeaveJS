@@ -3,24 +3,11 @@ import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "../react-ui/VendorPrefixer";
 import DraggableDiv from "../react-ui/DraggableDiv";
+import {DraggableDivState} from "../react-ui/DraggableDiv";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
+import {AbstractLayout, ILayoutProps, WeavePathArray} from "./AbstractLayout";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
-
-export type PanelProps = {
-	onDragStart:React.DragEventHandler,
-	onDragEnd:React.DragEventHandler,
-	onDragOver:React.DragEventHandler,
-	onReposition?:(left:number, top: number, width:number, height:number)=>void
-	style?:React.CSSProperties,
-};
-
-export declare type WeavePathArray = string[];
-
-export interface IWindowLayoutProps extends React.HTMLProps<WindowLayout>
-{
-	itemRenderer: (id:WeavePathArray, panelProps?:PanelProps) => JSX.Element;
-}
 
 export interface WindowState
 {
@@ -29,49 +16,69 @@ export interface WindowState
 	style: React.CSSProperties // technically only needs left, top, width and height but we may want to experiment with other things
 } 
 
-export default class WindowLayout extends React.Component<IWindowLayoutProps, {}> implements weavejs.api.core.ILinkableVariable
+export default class WindowLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
 {
-	
-	private linkableState = Weave.linkableChild(this, LinkableVariable, this.forceUpdate, true);
+	private linkableState = Weave.linkableChild(this, new LinkableVariable(Array), this.forceUpdate, true);
 
-	constructor(props:IWindowLayoutProps)
+	constructor(props:ILayoutProps)
 	{
 		super(props);
 	}
 	
-	setSessionState(state:WindowState[])
+	setSessionState(state:WindowState[]):void
 	{
-		this.linkableState.state = state;
+		state = Weave.AS(state, Array) || [];
+		this.linkableState.state = state.map(item => _.pick(item, 'id', 'style'));
 	}
 	
-	getSessionState()
+	getSessionState():WindowState[]
 	{
-		return this.linkableState.state;
+		return (this.linkableState.state || []) as WindowState[];
 	}
 	
-	getLayoutIds(event:React.DragEvent)
+	onReposition(path:WeavePathArray, position:DraggableDivState)
 	{
-		
+		this.setSessionState(this.getSessionState().map(item => (
+			_.isEqual(item.id, path)
+			?	{
+					id: item.id,
+					style: _.merge({}, item.style, position)
+				}
+			:	item
+		)));
 	}
 	
-	onDragOver(path:WeavePathArray, event:React.DragEvent)
+	addItem(id:WeavePathArray):void
 	{
-		
+		this.setSessionState(this.getSessionState().concat({id, style: {}}));
 	}
 	
-	onDragStart(path:WeavePathArray, event:React.DragEvent)
+	removeItem(id:WeavePathArray):void
 	{
-		
+		this.setSessionState(this.getSessionState().filter(item => !_.isEqual(id, item.id)));
 	}
 	
-	onDragEnd(path:WeavePathArray, event:React.DragEvent)
+	componentDidMount():void
 	{
-		
+		this.repositionPanels();
 	}
-	
-	onReposition(path:WeavePathArray, left:number, top: number, width:number, height:number)
-	{
 
+	componentDidUpdate():void
+	{
+		this.repositionPanels();
+	}
+	
+	frameHandler():void
+	{
+		// reposition on resize
+		var rect:ClientRect = Object(this.getLayoutPosition(this.rootLayout));
+		if (this.layoutRect.width != rect.width || this.layoutRect.height != rect.height)
+			this.repositionPanels();
+	}
+	
+	repositionPanels():void
+	{
+		//TODO
 	}
 	
 	render()
@@ -85,8 +92,7 @@ export default class WindowLayout extends React.Component<IWindowLayoutProps, {}
 		return (
 			<div {...this.props as React.HTMLAttributes} style={style}>
 			{
-				this.linkableState.state &&
-				(this.linkableState.state as WindowState[]).map((state, index) => {
+				this.getSessionState().map((state, index) => {
 					var key = JSON.stringify(state.id);
 					return (
 						<DraggableDiv
@@ -94,20 +100,17 @@ export default class WindowLayout extends React.Component<IWindowLayoutProps, {}
 							ref={key} 
 							style={_.merge({ minWidth: 25, minHeight: 25}, state.style)} 
 							draggable={!this.props.itemRenderer}
+							onReposition={this.onReposition.bind(this, state.id)}
 						>
 						{
 							this.props.itemRenderer
-							?	this.props.itemRenderer(state.id, {
-									onDragOver: this.onDragOver.bind(this, state.id),
-									onDragStart: this.onDragStart.bind(this, state.id),
-									onDragEnd: this.onDragEnd.bind(this),
-									onReposition: this.onReposition.bind(this, state.id)
-								})
+							?	this.props.itemRenderer(state.id)
 							:	<WeaveComponentRenderer
-							key={index}
-							weave={weave}
-							path={state.id}
-							style={state.style}/>
+									key={index}
+									weave={weave}
+									path={state.id}
+									style={state.style}
+								/>
 							
 						}
 						</DraggableDiv>
