@@ -37,8 +37,8 @@ export default class MouseUtils
 			event = MouseUtils.mouseEvent;
 		var rect = relativeTo.getBoundingClientRect();
 		return {
-			x: (event.clientX - rect.left) * (relativeTo.offsetWidth / rect.width),
-			y: (event.clientY - rect.top) * (relativeTo.offsetHeight / rect.height)
+			x: (event.clientX - rect.left) * (relativeTo.offsetWidth / rect.width || 1),
+			y: (event.clientY - rect.top) * (relativeTo.offsetHeight / rect.height || 1)
 		};
 	}
 }

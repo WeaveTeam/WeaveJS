@@ -165,24 +165,20 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		}
 	
 		var popupWindow = (
-			<DraggableDiv style={windowStyle} 
-						  className="weave-app weave-window"
-						  onMouseDown={() => this.handleClickOnWindow()}
-						  ref={(c:DraggableDiv) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}
-						  header={
-							  <HBox className="weave-header weave-window-header">
-								  <div style={{flex: 1}}>
-								  {
-									  this.props.title
-								  }
-								  </div>
-								  {/*
-									  !this.props.modal
-									  ?	<CenteredIcon onClick={this.onClose.bind(this)} iconProps={{className: "fa fa-times fa-fw"}}/>
-									  :	null
-								  */}
-							  </HBox>
-						  }>
+			<DraggableDiv 
+				style={windowStyle} 
+				className="weave-app weave-window"
+				draggable={false}
+				onMouseDown={() => this.handleClickOnWindow()}
+				ref={(c:DraggableDiv) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}
+			>
+				<HBox className="weave-header weave-window-header" draggable={true}>
+					<div style={{flex: 1}}>
+						{
+							this.props.title
+						}
+					</div>
+				</HBox>
 				<VBox style={{flex: 1}}>
 					<VBox className="weave-padded-vbox weave-window-content" style={{display: 'block', flex: 1}}>
 						<VBox style={{flex: 1, overflow: "auto"}}>
