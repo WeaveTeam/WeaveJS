@@ -249,7 +249,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			theta: Math.atan2(deltaNorm.y, deltaNorm.x)
 		};
 
-		if (polarNorm.r < 0.34)
+		if (Math.abs(deltaNorm.x) <= .4 && Math.abs(deltaNorm.y) <= .4)
 			return [DropZone.CENTER, panelOver];
 		
 		var zoneIndex:number = Math.round((polarNorm.theta / (2 * Math.PI) * 4) + 4) % 4;
