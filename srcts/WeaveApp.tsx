@@ -260,12 +260,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var tool = this.props.weave.getObject(path);
 		if (_.isEqual(path, this.state.toolPathToEdit))
 			console.log('editing', path.join(','));
+
 		return (
 			<WeaveTool
 				ref={this.handleWeaveTool}
 				weave={this.props.weave}
 				path={path}
-				style={{width: "100%", height: "100%"}}
+				style={{width: "100%", height: "100%", left: 0, top: 0}}
 				{...panelProps}
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={this.handleMaximizeClick}

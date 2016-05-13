@@ -17,6 +17,7 @@ import ReactUtils from "./utils/ReactUtils";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import SmartComponent from "./ui/SmartComponent";
 import classNames from "./modules/classnames";
+import DraggableDiv from "./react-ui/DraggableDiv";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -121,20 +122,21 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		if (this.props.onCloseClick)
 			this.props.onCloseClick(this);
 	};
-
+	
 	render():JSX.Element
 	{
 		return (
-			<VBox style={this.props.style} 
-				  className="weave-tool"
-				  onDragOver={this.props.onDragOver}
-				  onDragEnd={this.props.onDragEnd}
-				  onMouseOver={() => {
-						this.setState({ showControls: true });
-				  }}
-			      onMouseLeave={() => {
-						this.setState({ showControls: false });
-				  }}>
+			<VBox 
+				style={this.props.style}
+				className="weave-tool"
+				onDragOver={this.props.onDragOver}
+				onDragEnd={this.props.onDragEnd}
+				onMouseOver={() => {
+					this.setState({ showControls: true });
+				}}
+			    onMouseLeave={() => {
+					this.setState({ showControls: false });
+				}}>
 				<TitleBar
 					ref={(c:TitleBar) => this.titleBar = c }
 					showControls={this.state.showControls}
