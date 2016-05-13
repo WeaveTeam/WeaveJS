@@ -124,7 +124,7 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		return [
 			{
-				label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes().join(',')}>{Weave.lang("Open...")}</FileInput>
+				label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes().join(',')}><span className="weave-menuitem-padding">{Weave.lang("Open...")}</span></FileInput>
 			},
 			{
 				label: Weave.lang("Save As..."),

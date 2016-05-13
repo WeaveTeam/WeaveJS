@@ -20,7 +20,8 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 		if(this.props.onChange)
 			this.props.onChange(e);
 		// simulate the click event we previously stopped
-		DOMUtils.eventFire(ReactDOM.findDOMNode(this) as HTMLElement, "click");
+		//Todo: I Think this is no longer necessary and can be removed
+		//DOMUtils.eventFire(ReactDOM.findDOMNode(this) as HTMLElement, "click");
 	};
 	
 	handleClick=(e:React.MouseEvent)=>
@@ -29,6 +30,16 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 							 // which causes the file menu to be unmounted
 	};
 
+	componentDidMount()
+	{
+		var element:Element = ReactDOM.findDOMNode(this);
+		$(element.querySelector('.ui.button,.weave-menuitem-padding'))
+			.on('click', function(e) {
+				$(element.querySelector('input')).click();
+			})
+		;
+	}
+
 	render()
 	{
 		var style = this.props.style || {};
@@ -36,12 +47,12 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 		var props = _.clone(this.props);
 		delete props.children;
 		return (
-			<span style={{position: "relative", display:"flex", flex:1}} className={this.props.className}>
-				<input type="file" onClick={this.handleClick } {...props as any} onChange={this.onChange} style={{ position: "absolute", width: "100%", height: "100%", opacity: 0, overflow: "hidden", cursor: "pointer" }}/>
+			<div style={{position: "relative", display:"flex", flex:1}} className={"ui fluid action input " +this.props.className}>
+				<input type="file" onClick={this.handleClick } {...props as any} onChange={this.onChange} style={{display:"none"}}/>
 				{
 					this.props.children
 				}
-			</span>
+			</div>
 		)
 	}
 	
