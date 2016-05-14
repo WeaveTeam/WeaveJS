@@ -58,13 +58,38 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		this.setSessionState(this.getSessionState().filter(item => !_.isEqual(id, item.id)));
 	}
 	
+	componentDidMount():void
+	{
+		this.repositionPanels();
+	}
+
+	componentDidUpdate():void
+	{
+		this.repositionPanels();
+	}
+	
 	frameHandler():void
 	{
-		this.forceUpdate();
 		// reposition on resize
 		// var rect:ClientRect = Object(this.getLayoutPosition(this.rootLayout));
 		// if (this.layoutRect.width != rect.width || this.layoutRect.height != rect.height)
-		// 	this.repositionPanels();
+		this.repositionPanels();
+	}
+	
+	repositionPanels():void
+	{
+		//TODO
+		this.getSessionState().map(state => {
+			var ddiv = this.refs[JSON.stringify(state.id)] as DraggableDiv;
+			var style = state.style || {};
+			if(ddiv)
+				ddiv.setState({
+					top: style.top,
+					left: style.left,
+					width: style.width,
+					height: style.height
+				});
+		})
 	}
 	
 	render()
