@@ -70,20 +70,38 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		resizable: true,
 		movable: true
 	}
+	
+	componentDidUpdate()
+	{
+		if(this.props.onReposition)
+			this.props.onReposition(this.state);
+	}
 
 	componentDidMount()
 	{
 		// if initial width height are provided
 		// use it otherwise default to element position
 		var style = this.props.style || {};
-		this.setState({
+		var newState = {
 			top: style.top !== undefined ? this.element.offsetTop : (window.innerHeight - this.element.offsetHeight) / 2,
 			left: style.left !== undefined ? this.element.offsetLeft : (window.innerWidth - this.element.offsetWidth) / 2,
 			width: this.element.offsetWidth,
 			height: this.element.offsetHeight
-		});
+		}
+		this.setState(newState);
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
+	}
+	
+	componentWillReceiveProps(props:DraggableDivProps)
+	{
+		var style = props.style;
+		this.setState({
+			top: style.top || this.state.top,
+			left: style.left || this.state.left,
+			width: style.width || this.state.width,
+			height: style.height || this.state.height
+		});
 	}
 	
 	private onDragStart=(event:React.DragEvent)=>
@@ -170,7 +188,6 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			newState.top = Math.max(newState.top, 0);
 			newState.top = Math.min(newState.top, parentHeight - edgeBuffer);
 		}
-		this.props.onReposition && this.props.onReposition(newState);
 		this.setState(newState);
 	}
 	
