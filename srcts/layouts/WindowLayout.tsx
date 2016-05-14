@@ -36,6 +36,13 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		return (this.linkableState.state || []) as WindowState[];
 	}
 	
+	reorderPanels(topWindowState:WindowState):void
+	{
+		var state = this.getSessionState().filter(item => !_.isEqual(topWindowState.id, item.id)) as WindowState[];
+		state.push(topWindowState);
+		this.setSessionState(state);
+	}
+
 	onReposition(path:WeavePathArray, position:DraggableDivState)
 	{
 		this.setSessionState(this.getSessionState().map(item => (
@@ -109,7 +116,8 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 						<DraggableDiv
 							key={key}
 							ref={key} 
-							style={_.merge({ minWidth: 25, minHeight: 25}, state.style)} 
+							style={_.merge({minWidth: 25, minHeight: 25, zIndex: index}, state.style)}
+							onMouseDown={(event) => this.reorderPanels(state)}
 							draggable={!this.props.itemRenderer}
 							onReposition={this.onReposition.bind(this, state.id)}
 						>
