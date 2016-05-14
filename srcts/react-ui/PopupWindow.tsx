@@ -32,10 +32,6 @@ export interface PopupWindowProps extends React.HTMLProps<PopupWindow>
 export interface PopupWindowState
 {
 	content?:JSX.Element;
-	top?:number;
-	left?:number;
-	width?:number;
-	height?:number;
 	zIndex?: number;
 }
 
@@ -92,17 +88,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	componentDidMount()
 	{
 		// re-render now that this.element has been set in the ref callback function
-		this.setState({
-			top: this.props.top || (window.innerHeight - this.element.clientHeight) / 2,
-			left: this.props.left || (window.innerWidth - this.element.clientWidth) / 2,
-			width: this.props.width || this.element.clientWidth,
-			height: this.props.height || this.element.clientHeight
-		});
-	}
-	
-	onReposition=(position:DraggableDivState)=>
-	{
-		this.setState(position);
+		this.forceUpdate();
 	}
 
 	private onOk()
@@ -170,17 +156,20 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 		var windowStyle:React.CSSProperties = {	
 			zIndex: this.state.zIndex,
+			top: this.props.top,
+			left: this.props.left,
+			width: this.props.width,
+			height: this.props.height,
 			minWidth: this.minWidth,
 			minHeight: this.minHeight
 		}
 	
 		var popupWindow = (
 			<DraggableDiv 
-				style={_.merge(windowStyle, this.state)} 
+				style={windowStyle} 
 				className="weave-app weave-window"
 				draggable={false}
 				onMouseDown={() => this.handleClickOnWindow()}
-				onReposition={this.onReposition}
 				ref={(c:DraggableDiv) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}
 			>
 				<HBox className="weave-header weave-window-header" draggable={true}>
