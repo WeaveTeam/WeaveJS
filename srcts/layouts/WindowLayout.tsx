@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
+import classNames from "../modules/classnames";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "../react-ui/VendorPrefixer";
 import DraggableDiv from "../react-ui/DraggableDiv";
@@ -123,6 +124,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 							ref={key}
 							liveDragging={false}
 							liveResizing={false}
+							className={classNames("weave-app", "weave-window")}
 							style={_.merge({minWidth: 150, minHeight: 100}, state.style)}
 							onMouseDown={(event) => this.reorderPanels(index)}
 							draggable={!this.props.itemRenderer}
