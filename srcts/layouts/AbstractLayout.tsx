@@ -2,7 +2,8 @@ import * as React from "react";
 import SmartComponent from "../ui/SmartComponent";
 
 export type LayoutPanelProps = {
-	onReposition?:(position:{left:number, top:number, width:number, height:number})=>void
+	isMaximized:boolean;
+	isMinimized?:boolean;
 };
 
 export declare type WeavePathArray = string[];
@@ -16,5 +17,6 @@ export abstract class AbstractLayout extends SmartComponent<ILayoutProps, {}>
 {
 	abstract addPanel(id:WeavePathArray):void;
 	abstract removePanel(id:WeavePathArray):void;
-	abstract maximizePanel(id:WeavePathArray, maximize:boolean):void;
+	abstract toggleMaximize(id:WeavePathArray):void;
+	//abstract toggleMinimize(id:WeavePathArray):void;
 }
