@@ -7849,6 +7849,71 @@ declare module weavejs.net {
     }
 }
 declare module weavejs.net {
+    import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
+    class Admin {
+        static instance: Admin;
+        static service: WeaveAdminService;
+        static entityCache: EntityCache;
+        service: WeaveAdminService;
+        /**
+         * This is an entity id on which editors should focus, or -1 if none.
+         * It will be set to the newest entity that was created by the administrator.
+         * After an editor has focused on the entity, clearFocusEntityId() should be called.
+         */
+        getFocusEntityId(): number;
+        setFocusEntityId(id: number): void;
+        clearFocusEntityId(): void;
+        entityCache: EntityCache;
+        databaseConfigExists: boolean;
+        currentUserIsSuperuser: boolean;
+        userHasAuthenticated: boolean;
+        connectionNames: any[];
+        weaveFileNames: any[];
+        privateWeaveFileNames: any[];
+        keyTypes: any[];
+        databaseConfigInfo: DatabaseConfigInfo;
+        /**
+         * An Array of WeaveFileInfo objects.
+         * @see weave.services.beans.WeaveFileInfo
+         */
+        uploadedCSVFiles: any[];
+        /**
+         * An Array of WeaveFileInfo objects.
+         * @see weave.services.beans.WeaveFileInfo
+         */
+        uploadedShapeFiles: any[];
+        constructor();
+        activeConnectionName: string;
+        activePassword: string;
+        getSuggestedPropertyValues(propertyName: string): any[];
+    }
+}
+declare module weavejs.net {
+    import IDisposableObject = weavejs.api.core.IDisposableObject;
+    import ILinkableObjectWithBusyStatus = weavejs.api.core.ILinkableObjectWithBusyStatus;
+    import AMF3Servlet = weavejs.net.AMF3Servlet;
+    import WeavePromise = weavejs.util.WeavePromise;
+    /**
+     * this class contains functions that handle a queue of remote procedure calls
+     *
+     * @author adufilie
+     */
+    class AsyncInvocationQueue implements ILinkableObjectWithBusyStatus, IDisposableObject {
+        static debug: boolean;
+        /**
+         * @param paused When set to true, no queries will be executed until begin() is called.
+         */
+        constructor(paused?: boolean);
+        isBusy(): boolean;
+        dispose(): void;
+        /**
+         * If the 'paused' constructor parameter was set to true, use this function to start invoking queued queries.
+         */
+        begin(): void;
+        addToQueue(query: WeavePromise<any>, service: AMF3Servlet): void;
+    }
+}
+declare module weavejs.net {
     import IDisposableObject = weavejs.api.core.IDisposableObject;
     import ILinkableObject = weavejs.api.core.ILinkableObject;
     import IWeaveEntityService = weavejs.api.net.IWeaveEntityService;
@@ -8076,6 +8141,94 @@ declare module weavejs.net {
     }
 }
 declare module weavejs.net {
+    import JSByteArray = weavejs.util.JSByteArray;
+    import WeavePromise = weavejs.util.WeavePromise;
+    import IWeaveEntityManagementService = weavejs.api.net.IWeaveEntityManagementService;
+    import EntityMetadata = weavejs.api.net.beans.EntityMetadata;
+    import CallbackCollection = weavejs.core.CallbackCollection;
+    import LinkableBoolean = weavejs.core.LinkableBoolean;
+    import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
+    /**
+     * The functions in this class correspond directly to Weave servlet functions written in Java.
+     * This object uses a queue to guarantee that asynchronous servlet calls will execute in the order they are requested.
+     * @author adufilie
+     * @see WeaveServices/src/weave/servlets/AdminService.java
+     * @see WeaveServices/src/weave/servlets/DataService.java
+     */
+    class WeaveAdminService implements IWeaveEntityManagementService {
+        static WEAVE_AUTHENTICATION_EXCEPTION: string;
+        static messageLog: any[];
+        static messageLogCallbacks: CallbackCollection;
+        static messageDisplay(messageTitle: string, message: string, showPopup: boolean): void;
+        static clearMessageLog(): void;
+        /**
+         * @param url The URL pointing to where a WeaveServices.war has been deployed.  Example: http://example.com/WeaveServices
+         */
+        constructor(url?: string);
+        initialized: boolean;
+        migrationProgress: string;
+        entityServiceInitialized: boolean;
+        authenticated: LinkableBoolean;
+        user: string;
+        pass: string;
+        initializeAdminService(): void;
+        /**
+         * @param method A pointer to a function of this WeaveAdminService.
+         * @param captureHandler Receives the parameters of the RPC call with the 'this' pointer set to the WeavePromise object.
+         * @param resultHandler A ResultEvent handler:  function(event:ResultEvent, parameters:Array = null):void
+         * @param faultHandler A FaultEvent handler:  function(event:FaultEvent, parameters:Array = null):void
+         */
+        addHook(method: Function, captureHandler: Function, resultHandler: Function, faultHandler?: Function): void;
+        /**
+         * Prevents the default error display if a fault occurs.
+         * @param query A WeavePromise<any> that was generated by this service.
+         */
+        hideFaultMessage(query: WeavePromise<any>): void;
+        getVersion(): WeavePromise<any>;
+        checkDatabaseConfigExists(): WeavePromise<any>;
+        authenticate(user: string, pass: string): WeavePromise<any>;
+        keepAlive(): WeavePromise<any>;
+        getWeaveFileNames(showAllFiles: boolean): WeavePromise<any>;
+        saveWeaveFile(fileContent: JSByteArray, fileName: string, overwriteFile: boolean): WeavePromise<any>;
+        removeWeaveFile(fileName: string): WeavePromise<any>;
+        getWeaveFileInfo(fileName: string): WeavePromise<any>;
+        getConnectionNames(): WeavePromise<any>;
+        getConnectionInfo(userToGet: string): WeavePromise<any>;
+        saveConnectionInfo(info: ConnectionInfo, configOverwrite: boolean): WeavePromise<any>;
+        removeConnectionInfo(connectionNameToRemove: string): WeavePromise<any>;
+        getDatabaseConfigInfo(): WeavePromise<any>;
+        setDatabaseConfigInfo(connectionName: string, password: string, schema: string, idFields: any[]): WeavePromise<any>;
+        newEntity(metadata: EntityMetadata, parentId: number, insertAtIndex: number): WeavePromise<any>;
+        updateEntity(entityId: number, diff: EntityMetadata): WeavePromise<any>;
+        removeEntities(entityIds: any[]): WeavePromise<any>;
+        addChild(parentId: number, childId: number, insertAtIndex: number): WeavePromise<any>;
+        removeChild(parentId: number, childId: number): WeavePromise<any>;
+        getHierarchyInfo(publicMetadata: Object): WeavePromise<any>;
+        getEntities(entityIds: any[]): WeavePromise<any>;
+        findEntityIds(publicMetadata: Object, wildcardFields: any[]): WeavePromise<any>;
+        findPublicFieldValues(fieldName: string, valueSearch: string): WeavePromise<any>;
+        getSQLSchemaNames(): WeavePromise<any>;
+        getSQLTableNames(schemaName: string): WeavePromise<any>;
+        getSQLColumnNames(schemaName: string, tableName: string): WeavePromise<any>;
+        uploadFile(fileName: string, bytes: Uint8Array): WeavePromise<any>;
+        getUploadedCSVFiles(): WeavePromise<any>;
+        getUploadedSHPFiles(): WeavePromise<any>;
+        getCSVColumnNames(csvFiles: string): WeavePromise<any>;
+        getDBFColumnNames(dbfFileNames: any[]): WeavePromise<any>;
+        checkKeyColumnsForSQLImport(schemaName: string, tableName: string, keyColumns: any[]): WeavePromise<any>;
+        checkKeyColumnsForCSVImport(csvFileName: string, keyColumns: any[]): WeavePromise<any>;
+        checkKeyColumnsForDBFImport(dbfFileNames: any[], keyColumns: any[]): WeavePromise<any>;
+        importCSV(csvFile: string, csvKeyColumn: string, csvSecondaryKeyColumn: string, sqlSchema: string, sqlTable: string, sqlOverwrite: boolean, configDataTableName: string, configKeyType: string, nullValues: string, filterColumnNames: any[], configAppend: boolean): WeavePromise<any>;
+        importSQL(schemaName: string, tableName: string, keyColumnName: string, secondaryKeyColumnName: string, configDataTableName: string, keyType: string, filterColumns: any[], configAppend: boolean): WeavePromise<any>;
+        importSHP(configfileNameWithoutExtension: string, keyColumns: any[], sqlSchema: string, sqlTablePrefix: string, sqlOverwrite: boolean, configTitle: string, configKeyType: string, configProjection: string, nullValues: string, importDBFAsDataTable: boolean, configAppend: boolean): WeavePromise<any>;
+        importDBF(fileNameWithoutExtension: string, sqlSchema: string, sqlTableName: string, sqlOverwrite: boolean, nullValues: string): WeavePromise<any>;
+        testAllQueries(tableId: number): WeavePromise<any>;
+        getKeyTypes(): WeavePromise<any>;
+        ping(): string;
+        getAttributeColumn(metadata: Object): WeavePromise<any>;
+    }
+}
+declare module weavejs.net {
     import IWeaveEntityService = weavejs.api.net.IWeaveEntityService;
     import IWeaveGeometryTileService = weavejs.api.net.IWeaveGeometryTileService;
     import Entity = weavejs.api.net.beans.Entity;
@@ -8164,6 +8317,38 @@ declare module weavejs.net.beans {
     }
 }
 declare module weavejs.net.beans {
+    class ConnectionInfo {
+        name: string;
+        pass: string;
+        folderName: string;
+        connectString: string;
+        is_superuser: boolean;
+        /**
+         * This is a list of supported DBMS values.
+         */
+        static dbmsList: any[];
+        static MYSQL: string;
+        static POSTGRESQL: string;
+        static SQLSERVER: string;
+        static ORACLE: string;
+        static SQLITE: string;
+        static DIRECTORY_SERVICE_CONNECTION_NAME: string;
+        /**
+         * This function will get the default port for a DBMS.
+         * @param dbms A supported DBMS.
+         * @return The default port for the dbms.
+         */
+        static getDefaultPort(dbms: string): number;
+    }
+}
+declare module weavejs.net.beans {
+    class DatabaseConfigInfo {
+        connection: string;
+        schema: string;
+        idFields: Array<string>;
+    }
+}
+declare module weavejs.net.beans {
     import JSByteArray = weavejs.util.JSByteArray;
     class GeometryStreamMetadata {
         id: number;
@@ -8178,6 +8363,15 @@ declare module weavejs.net.beans {
         keyColumns: any[];
         columns: Object;
         derived_qkeys: any[];
+    }
+}
+declare module weavejs.net.beans {
+    import JSByteArray = weavejs.util.JSByteArray;
+    class WeaveFileInfo {
+        lastModified: number;
+        fileSize: number;
+        thumb: JSByteArray;
+        fileName: string;
     }
 }
 declare module weavejs.path {
@@ -9626,6 +9820,8 @@ declare module weavejs.util {
          * @return This WeavePromise
          */
         setResult(result: T): WeavePromise<T>;
+        static asPromise<T>(obj: Object): Promise<T>;
+        static isThenable(obj: Object): boolean;
         getResult(): T;
         /**
          * @return This WeavePromise
