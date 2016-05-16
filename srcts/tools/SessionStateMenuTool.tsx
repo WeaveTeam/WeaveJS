@@ -20,6 +20,7 @@ import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableVariable = weavejs.api.core.ILinkableVariable;
+import ReactUtils from "../utils/ReactUtils";
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -29,7 +30,7 @@ const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_
 
 export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps, IVisToolState>
 {
-	selectedChoice = Weave.linkableChild(this, LinkableString);
+	public selectedChoice = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
 	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
@@ -50,9 +51,8 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	{
 		super(props);
 
-		this.choices.addGroupedCallback(this, this.choiceChanged);
-		this.selectedChoice.addGroupedCallback(this, this.forceUpdate,true);
-		this.targets.addGroupedCallback(this, this.choiceChanged);
+		//this.choices.addGroupedCallback(this, this.choiceChanged);
+		//this.targets.addGroupedCallback(this, this.forceUpdate);
 
 		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
 	}
@@ -83,7 +83,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 			return;
 
 		var selection = Array.isArray(selectedValue) ? selectedValue[0] : selectedValue;//combobox returns only one selection, rest all return [] of selections
-		this.selectedChoice.value = this.choices.getName(selection);// will cause tool menu layout to re-render
+		this.selectedChoice.value = this.choices.getName(selection);
 
 		this.setTargetStates(selection.state);
 	};
@@ -102,29 +102,19 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	{
 		return (
 			<VBox>
-				<HBox>
-					<label>
-						{Weave.lang("Choices")}
-						{/*Todo: need selectors and ui for adding choices*/}
-					</label>
-				</HBox>
-				<HBox>
-					<label>
-						{Weave.lang("Targets")}
-						{/*Todo: need selectors and ui for adding targets*/}
-					</label>
-				</HBox>
+				<SessionStateMenuToolEditor sessionStateMenuTool={ this }/>
 			</VBox>
 		)
 	}
 
 	render()
 	{
+		var selectedChoice = this.choices.getObject(this.selectedChoice.value) as ILinkableVariable;
 		return(
 			<MenuLayoutComponent options={ this.options }
 			                    displayMode={ this.layoutMode.value }
-			                    onChange={ this.handleSelection }
-			                    selectedItems={ [this.selectedChoice] }
+			                    onChange={ this.handleSelection.bind(this) }
+			                    selectedItems={ [selectedChoice] }
 			/>
 		);
 	}
@@ -136,3 +126,64 @@ Weave.registerClass(
 	[weavejs.api.ui.IVisTool_Utility/*, weavejs.api.core.ILinkableObjectWithNewProperties*/],
 	"Session State Menu Tool"
 );
+
+
+//EDITOR for the Session state Menu tool
+interface ISessionStateMenuToolEditorProps
+{
+	sessionStateMenuTool:SessionStateMenuTool;
+	//pushCrumb:Function
+}
+
+interface ISessionStateMenuToolEditorState
+{
+
+}
+
+class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEditorProps, ISessionStateMenuToolEditorState>
+{
+	constructor(props:ISessionStateMenuToolEditorProps)
+	{
+		super(props);
+		this.state = {
+
+		}
+	}
+
+	get editorConfigs():React.ReactChild[][]
+	{
+		return[
+			//targets[],
+			//choices[],
+			[
+				Weave.lang("Layout mode"),
+				<ComboBox
+					className="weave-sidebar-dropdown"
+					ref={ linkReactStateRef(this, { value: this.props.sessionStateMenuTool.layoutMode })}
+					options={ menuOptions }
+				/>
+			]//layout
+		];
+	}
+
+	render()
+	{
+		return (
+			<VBox>
+				{
+					ReactUtils.generateTable({
+						body: [].concat(
+							this.editorConfigs
+							),
+						classes: {
+							td: [
+								"weave-left-cell",
+								"weave-right-cell"
+								]
+							}
+						})
+					}
+			</VBox>
+		);
+	}
+}
