@@ -107,7 +107,7 @@ export default class WeaveArchive {
 		folder = zip.folder(WeaveArchive.FOLDER_JSON);
 		for (let [name, object] of this.objects)
 		{
-			folder.file(name, JSON.stringify(object, null));
+			folder.file(name, JSON.stringify(object, null, '\t'));
 		}
 
 		return zip.generateAsync({ compression: "DEFLATE", type: 'uint8array' }, updateCallback);
