@@ -41,16 +41,17 @@ export interface DraggableDivProps extends React.HTMLProps<DraggableDiv>
 
 export interface DraggableDivState
 {
-	top:number;
-	left:number;
-	width:number;
-	height:number;
+	top?:number;
+	left?:number;
+	width?:number;
+	height?:number;
 }
 
 // return a new style object 
 // each time because react doesn't
 // allow mutating style
-function getOverlayStyle() {
+function getOverlayStyle()
+{
 	return {
 		visibility: "hidden",
 		position: "absolute",
