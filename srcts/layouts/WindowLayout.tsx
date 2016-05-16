@@ -13,9 +13,9 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 
 export interface WindowState
 {
-	/* id for the window */
-	id: WeavePathArray;
-	style: React.CSSProperties // technically only needs left, top, width and height but we may want to experiment with other things
+	id?: WeavePathArray;
+	position?: DraggableDivState;
+	maximized?: boolean;
 } 
 
 export default class WindowLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
@@ -31,7 +31,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	setSessionState(state:WindowState[]):void
 	{
 		state = Weave.AS(state, Array) || [];
-		this.linkableState.state = state.map(item => _.pick(item, 'id', 'style'));
+		this.linkableState.state = state.map(item => _.pick(item, 'id', 'position'));
 	}
 	
 	getSessionState():WindowState[]
@@ -39,37 +39,55 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		return (this.linkableState.state || []) as WindowState[];
 	}
 	
-	reorderPanels(index:number):void
+	bringPanelForward(id:WeavePathArray):void
 	{
-		var state = this.getSessionState()
-		var topPanelState = state.splice(index, 1)[0];
-		state.push(topPanelState)
+		var panelState:WindowState = null;
+		var state = this.getSessionState().filter(item => {
+			if (_.isEqual(id, item.id))
+			{
+				panelState = item;
+				return false;
+			}
+			return true;
+		});
+		
+		if (!panelState)
+			return;
+		
+		state.push(panelState);
 		this.setSessionState(state);
 	}
 
-	onReposition(path:WeavePathArray, position:DraggableDivState)
+	onReposition(id:WeavePathArray, position:DraggableDivState)
 	{
-		this.setSessionState(this.getSessionState().map(item => (
-			_.isEqual(item.id, path)
-			?	{
-					id: item.id,
-					style: _.merge({}, item.style, position)
-				}
-			:	item
-		)));
+		this.updatePanelState(id, {position});
 	}
 	
-	addItem(id:WeavePathArray):void
+	addPanel(id:WeavePathArray):void
 	{
-		this.setSessionState(this.getSessionState().concat({id, style: {
+		this.setSessionState(this.getSessionState().concat({id, position: {
 			width: 300,
 			height: 200
 		}}));
 	}
 	
-	removeItem(id:WeavePathArray):void
+	removePanel(id:WeavePathArray):void
 	{
 		this.setSessionState(this.getSessionState().filter(item => !_.isEqual(id, item.id)));
+	}
+	
+	maximizePanel(id:WeavePathArray, maximized:boolean):void
+	{
+		this.updatePanelState(id, {maximized});
+	}
+	
+	updatePanelState(id:WeavePathArray, diff:WindowState):void
+	{
+		this.setSessionState(this.getSessionState().map(item => (
+			_.isEqual(item.id, id)
+			?	_.merge({}, item, diff) as WindowState
+			:	item
+		)));
 	}
 	
 	componentDidMount():void
@@ -94,15 +112,15 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	{
 		this.getSessionState().map(state => {
 			var ddiv = this.refs[JSON.stringify(state.id)] as DraggableDiv;
-			var style = state.style || {};
+			var pos = state.position || {};
 			// only set the state for ddiv that have changed
 			// saves render
 			if(ddiv)
 				ddiv.setState({
-					top: style.top,
-					left: style.left,
-					width: style.width,
-					height: style.height
+					top: pos.top,
+					left: pos.left,
+					width: pos.width,
+					height: pos.height
 				});
 		})
 	}
@@ -128,19 +146,19 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 								liveResizing={false}
 								getExternalOverlay={() => this.overlay}
 								className={classNames("weave-app", "weave-window")}
-								style={_.merge({minWidth: 150, minHeight: 100}, state.style)}
-								onMouseDown={(event) => this.reorderPanels(index)}
-								draggable={!this.props.itemRenderer}
+								style={_.merge({minWidth: 150, minHeight: 100}, state.position)}
+								onMouseDown={(event) => this.bringPanelForward(state.id)}
+								draggable={!this.props.panelRenderer}
 								onReposition={this.onReposition.bind(this, state.id)}
 							>
 							{
-								this.props.itemRenderer
-								?	this.props.itemRenderer(state.id)
+								this.props.panelRenderer
+								?	this.props.panelRenderer(state.id)
 								:	<WeaveComponentRenderer
 										key={index}
 										weave={weave}
 										path={state.id}
-										style={state.style}
+										style={state.position}
 									/>
 								
 							}
@@ -156,6 +174,6 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 
 Weave.registerClass(
 	WindowLayout,
-	'weave.ui.WindowLayout',
+	'weavejs.layout.WindowLayout',
 	[weavejs.api.core.ILinkableVariable]
 );

@@ -239,7 +239,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					weave={this.props.weave}
 					path={path}
 					style={{ width: "100%", height: "100%" }}
-					props={{itemRenderer: this.renderTool}}
+					props={{panelRenderer: this.renderTool}}
 				/>
 			</WeaveTool>
 		);
@@ -359,7 +359,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		var layout = this.props.weave.getObject(this.getRenderPath());
 		if (layout instanceof AbstractLayout)
-			(layout as AbstractLayout).addItem(path);
+			(layout as AbstractLayout).addPanel(path);
 
 		/*
 		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
@@ -387,7 +387,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		var layout = this.props.weave.getObject(this.getRenderPath());
 		if (layout instanceof AbstractLayout)
-			(layout as AbstractLayout).removeItem(path);
+			(layout as AbstractLayout).removePanel(path);
 	
 		/*
 		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
@@ -452,7 +452,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						path={renderPath}
 						defaultType={WindowLayout}
 						style={{width: "100%", height: "100%"}}
-						props={{itemRenderer: this.renderTool}}
+						props={{panelRenderer: this.renderTool}}
 					/>
 				</SideBarContainer>
 				{
