@@ -34,6 +34,7 @@ export interface DraggableDivProps extends React.HTMLProps<DraggableDiv>
 	onReposition?:(position:DraggableDivState)=>void;
 	liveMoving?:boolean;
 	liveResizing?:boolean;
+	getExternalOverlay?:()=>Div;
 	resizable?:boolean;
 	movable?:boolean;
 }
@@ -42,8 +43,8 @@ export interface DraggableDivState
 {
 	top:number;
 	left:number;
-	width: number;
-	height: number;
+	width:number;
+	height:number;
 }
 
 // return a new style object 
@@ -60,7 +61,7 @@ function getOverlayStyle() {
 export default class DraggableDiv extends SmartComponent<DraggableDivProps, DraggableDivState>
 {
 	private element:HTMLElement;
-	private overlay:Div;
+	private internalOverlay:Div;
 	private overlayStyle:React.CSSProperties = getOverlayStyle();
 
 	private mouseDownOffset: {
@@ -108,12 +109,28 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		document.addEventListener("mousemove", this.onDrag, true);
 	}
 	
+	get externalOverlay():Div
+	{
+		return this.props.getExternalOverlay ? this.props.getExternalOverlay() : null;
+	}
+	
+	get overlay():Div
+	{
+		return this.externalOverlay || this.internalOverlay;
+	}
+	
+	updateOverlayStyle(...styles:React.CSSProperties[])
+	{
+		this.overlayStyle = _.merge.apply(_, [{}, this.overlayStyle].concat(styles));
+		this.overlay.setState({ style: this.overlayStyle });
+	}
+	
 	private onDragStart=(event:React.DragEvent)=>
 	{
 		if (this.props.movable)
 		{
 			if (!this.props.liveMoving)
-				_.merge(this.overlayStyle, this.state);
+				this.updateOverlayStyle(this.state);
 			
 			event.preventDefault();
 			event.stopPropagation();
@@ -129,7 +146,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	private onResizeStart(event:React.MouseEvent, handle:Handle)
 	{
 		if (!this.props.liveResizing)
-			_.merge(this.overlayStyle, this.state);
+			this.updateOverlayStyle(this.state);
 		this.activeResizeHandle = handle;
 		this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
 	}
@@ -217,8 +234,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		}
 		else
 		{
-			_.merge(this.overlayStyle, newState, {visibility: "visible"});
-			this.overlay.setState({ style: this.overlayStyle });
+			this.updateOverlayStyle(newState, {visibility: "visible"});
 		}
 	}
 	
@@ -230,15 +246,14 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			var newState = _.pick(this.overlayStyle, "left", "top", "width", "height") as DraggableDivState;
 			this.setState(newState);
 			
-			this.overlayStyle.visibility = "hidden";
-			this.overlay.setState({ style: this.overlayStyle });
+			this.updateOverlayStyle({visibility: "hidden"});
 			
 			if (this.props.onReposition)
 				this.props.onReposition(newState);
-			
-			this.moving = false;
-			this.activeResizeHandle = null;
 		}
+		
+		this.moving = false;
+		this.activeResizeHandle = null;
 	}
 
 	componentWillUnmount()
@@ -276,11 +291,11 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			</VBox>
 		);
 
-		if (this.props.liveMoving || this.props.liveResizing)
+		if (!this.props.getExternalOverlay && (this.props.liveMoving || this.props.liveResizing))
 			return (
 				<div>
 					{ content }
-					<Div ref={(c:Div) => { this.overlay = c; }} style={this.overlayStyle}/>
+					<Div ref={(c:Div) => { this.internalOverlay = c; }} style={this.overlayStyle}/>
 				</div>
 			);
 

@@ -7,6 +7,7 @@ import DraggableDiv from "../react-ui/DraggableDiv";
 import {DraggableDivState} from "../react-ui/DraggableDiv";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
 import {AbstractLayout, ILayoutProps, WeavePathArray} from "./AbstractLayout";
+import Div from "../react-ui/Div";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 
@@ -20,6 +21,7 @@ export interface WindowState
 export default class WindowLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
 {
 	private linkableState = Weave.linkableChild(this, new LinkableVariable(Array), this.forceUpdate, true);
+	private overlay:Div;
 
 	constructor(props:ILayoutProps)
 	{
@@ -115,36 +117,38 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 
 		return (
 			<div {...this.props as React.HTMLAttributes} style={style}>
-			{
-				this.getSessionState().map((state, index) => {
-					var key = JSON.stringify(state.id);
-					return (
-						<DraggableDiv
-							key={key}
-							ref={key}
-							liveMoving={true}
-							liveResizing={false}
-							className={classNames("weave-app", "weave-window")}
-							style={_.merge({minWidth: 150, minHeight: 100}, state.style)}
-							onMouseDown={(event) => this.reorderPanels(index)}
-							draggable={!this.props.itemRenderer}
-							onReposition={this.onReposition.bind(this, state.id)}
-						>
-						{
-							this.props.itemRenderer
-							?	this.props.itemRenderer(state.id)
-							:	<WeaveComponentRenderer
-									key={index}
-									weave={weave}
-									path={state.id}
-									style={state.style}
-								/>
-							
-						}
-						</DraggableDiv>
-					);
-				})
-			}
+				{
+					this.getSessionState().map((state, index) => {
+						var key = JSON.stringify(state.id);
+						return (
+							<DraggableDiv
+								key={key}
+								ref={key}
+								liveMoving={true}
+								liveResizing={false}
+								getExternalOverlay={() => this.overlay}
+								className={classNames("weave-app", "weave-window")}
+								style={_.merge({minWidth: 150, minHeight: 100}, state.style)}
+								onMouseDown={(event) => this.reorderPanels(index)}
+								draggable={!this.props.itemRenderer}
+								onReposition={this.onReposition.bind(this, state.id)}
+							>
+							{
+								this.props.itemRenderer
+								?	this.props.itemRenderer(state.id)
+								:	<WeaveComponentRenderer
+										key={index}
+										weave={weave}
+										path={state.id}
+										style={state.style}
+									/>
+								
+							}
+							</DraggableDiv>
+						);
+					})
+				}
+				<Div ref={(c:Div) => { this.overlay = c; }} style={{position: "absolute", visibility: "hidden"}}/>
 			</div>
 		);
 	}	
