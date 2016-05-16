@@ -122,7 +122,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 						<DraggableDiv
 							key={key}
 							ref={key}
-							liveDragging={false}
+							liveMoving={true}
 							liveResizing={false}
 							className={classNames("weave-app", "weave-window")}
 							style={_.merge({minWidth: 150, minHeight: 100}, state.style)}
