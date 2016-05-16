@@ -12,7 +12,9 @@ import List from "../react-ui/List";
 import MiscUtils from "../utils/MiscUtils";
 import ComboBox from "../semantic-ui/ComboBox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import Tabs from "../react-ui/Tabs";
 import MenuLayoutComponent from "../ui/MenuLayoutComponent";
+import ReactUtils from "../utils/ReactUtils";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -20,7 +22,6 @@ import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableVariable = weavejs.api.core.ILinkableVariable;
-import ReactUtils from "../utils/ReactUtils";
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -150,19 +151,53 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		}
 	}
 
+	//contains the target tab view, target paths that map to the menu items
+	renderTargetItems():JSX.Element
+	{
+		return(
+			<div>Targets</div>
+		);
+	}
+
+	//contains the menu items tab view, entries which map to the targets in the target view
+	renderMenuItems():JSX.Element{
+		return(
+			<div>MenuItems</div>
+		);
+	}
+
+	//renders the Entire tab component
+	renderTargetsAndMenuItems():JSX.Element
+	{
+		var tabs = new Map<string, JSX.Element>()
+			.set("Targets", this.renderTargetItems())
+			.set("Menu Items", this.renderMenuItems());
+		var activeTabIndex = 0;
+
+		return (
+			<Tabs
+				labels={Array.from(tabs.keys())}
+				activeTabIndex={activeTabIndex}
+				tabs={Array.from(tabs.values())}
+				onViewChange={() => this.forceUpdate()}
+			/>
+		);
+	}
+
 	get editorConfigs():React.ReactChild[][]
 	{
 		return[
-			//targets[],
-			//choices[],
-			[
+			[//targets and menu items tab component
+				this.renderTargetsAndMenuItems()
+			],
+			[//layout
 				Weave.lang("Layout mode"),
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					ref={ linkReactStateRef(this, { value: this.props.sessionStateMenuTool.layoutMode })}
 					options={ menuOptions }
 				/>
-			]//layout
+			]
 		];
 	}
 
