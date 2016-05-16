@@ -150,10 +150,41 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	constructor(props:ISessionStateMenuToolEditorProps)
 	{
 		super(props);
-		this.state = {
-
-		}
+		this.state = {}
 	}
+
+	//clean up states for associated choices (called whenever targets are added or removed)
+	tidySavedStates():void
+	{
+		this.props.sessionStateMenuTool.choices.getObjects().forEach((choice:LinkableVariable)=>
+		{
+			let updated:Boolean = false;
+			let choiceState:{[key:string]: LinkableDynamicObject[]} = (choice.getSessionState() || {}) as {[key:string]: LinkableDynamicObject[]};
+
+			for(let targetName in choiceState)
+			{
+				if(!this.props.sessionStateMenuTool.targets.getObject(targetName))
+				{
+					delete choiceState[targetName];//remove the associated LinkableDynamicObject
+					updated = true;
+				}
+			}
+
+			if(updated)
+				choice.setSessionState(choiceState);//update the new state for that choice
+		});
+	};
+
+	//removes the target from the target list
+	removeSelectedTarget =(target:LinkableDynamicObject): void =>
+	{
+		if(target)
+		{
+			var name:string = this.props.sessionStateMenuTool.targets.getName(target);
+			this.props.sessionStateMenuTool.targets.removeObject(name);
+		}
+		this.tidySavedStates();
+	};
 
 	//renders the target list UI
 	getTargetList():JSX.Element[]
@@ -163,7 +194,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 				<HBox key={index} style={{justifyContent: "space-between", alignItems:"center"}}>
 					<span style={{overflow: "hidden"}}>{target.targetPath.join(', ')}</span>
 					<HBox>
-						<CenteredIcon onClick={ ()=>{} }
+						<CenteredIcon onClick={ ()=>{this.removeSelectedTarget(target)} }
 						              iconProps={{ className: "fa fa-times", title: "Delete this target" }}/>
 					</HBox>
 				</HBox>
