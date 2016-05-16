@@ -32,7 +32,7 @@ type Handle = (
 export interface DraggableDivProps extends React.HTMLProps<DraggableDiv>
 {
 	onReposition?:(position:DraggableDivState)=>void;
-	liveDragging?:boolean;
+	liveMoving?:boolean;
 	liveResizing?:boolean;
 	resizable?:boolean;
 	movable?:boolean;
@@ -61,8 +61,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 {
 	private element:HTMLElement;
 	private overlay:Div;
-
-	private lastMoveEvent:MouseEvent;
+	private overlayStyle:React.CSSProperties = getOverlayStyle();
 
 	private mouseDownOffset: {
 		x: number,
@@ -87,7 +86,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	static defaultProps:DraggableDivProps =	{
 		resizable: true,
 		movable: true,
-		liveDragging: true,
+		liveMoving: true,
 		liveResizing: true
 	}
 
@@ -102,7 +101,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			width: this.element.offsetWidth,
 			height: this.element.offsetHeight
 		};
-		if(this.props.onReposition)
+		if (this.props.onReposition)
 			this.props.onReposition(newState);
 		this.setState(newState);
 		document.addEventListener("mouseup", this.onDragEnd, true);
@@ -111,94 +110,33 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	
 	private onDragStart=(event:React.DragEvent)=>
 	{
-		if(this.props.movable)
+		if (this.props.movable)
 		{
+			if (!this.props.liveMoving)
+				_.merge(this.overlayStyle, this.state);
+			
 			event.preventDefault();
 			event.stopPropagation();
+			
 			this.moving = true;
 			this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
 		}
-		if(this.props.onDragStart)
+		
+		if (this.props.onDragStart)
 			this.props.onDragStart(event);
 	}
 	
 	private onResizeStart(event:React.MouseEvent, handle:Handle)
 	{
+		if (!this.props.liveResizing)
+			_.merge(this.overlayStyle, this.state);
 		this.activeResizeHandle = handle;
 		this.mouseDownOffset = MouseUtils.getOffsetPoint(this.element, event as any);
 	}
 	
-	update(newState:DraggableDivState)
+	private shouldLiveUpdate():boolean
 	{
-		if(this.props.onReposition)
-			this.props.onReposition(newState);
-		this.setState(newState);
-	}
-	
-	private updatePosition(event:MouseEvent)
-	{
-		var mouseOffset = MouseUtils.getOffsetPoint(this.element)
-		var parentMouseOffset = MouseUtils.getOffsetPoint(this.element.parentElement);
-		var parentWidth = (this.element.offsetParent as HTMLElement).offsetWidth;
-		var parentHeight = (this.element.offsetParent as HTMLElement).offsetHeight;
-		var oldRight:number = this.state.left + this.state.width;
-		var oldBottom:number = this.state.top + this.state.height;
-		var edgeBuffer = 25;
-		
-		var mouseDeltaX = mouseOffset.x - this.mouseDownOffset.x;
-		var mouseDeltaY = mouseOffset.y - this.mouseDownOffset.y;
-		var newState:DraggableDivState = _.clone(this.state);
-		var style = this.props.style || {};
-		var minWidth:number = Number(style.minWidth) || 0;
-		var minHeight:number = Number(style.minHeight) || 0;
-		// don't resize if mouse goes out of screen
-
-		if(this.activeResizeHandle)
-		{
-			if (this.activeResizeHandle.indexOf(LEFT) >= 0)
-			{
-				newState.left = this.state.left + mouseDeltaX;
-				newState.left = Math.max(newState.left, oldRight - parentWidth);
-				newState.left = Math.min(newState.left, oldRight - minWidth, parentWidth - edgeBuffer);
-				newState.width = oldRight - newState.left;
-			}
-			
-			if (this.activeResizeHandle.indexOf(TOP) >= 0)
-			{
-				newState.top = this.state.top + mouseDeltaY;
-				newState.top = Math.max(newState.top, 0);
-				newState.top = Math.min(newState.top, oldBottom - minHeight, parentHeight - edgeBuffer);
-				newState.height = oldBottom - newState.top;
-			}
-			
-			if (this.activeResizeHandle.indexOf(RIGHT) >= 0)
-			{
-				newState.width = this.state.width + mouseDeltaX;
-				newState.width = Math.max(newState.width, minWidth, edgeBuffer - this.state.left);
-				newState.width = Math.min(newState.width, parentWidth);
-				this.mouseDownOffset.x += newState.width - this.state.width;
-			}
-			
-			if (this.activeResizeHandle.indexOf(BOTTOM) >= 0)
-			{
-				newState.height = this.state.height + mouseDeltaY;
-				newState.height = Math.max(newState.height, minHeight);
-				newState.height = Math.min(newState.height, parentHeight);
-				this.mouseDownOffset.y += newState.height - this.state.height;
-			}
-		}
-		else if(this.moving)
-		{
-			newState.left = this.state.left + mouseDeltaX;
-			newState.left = Math.max(newState.left, edgeBuffer - (this.state.width || 0));
-			newState.left = Math.min(newState.left, parentWidth - edgeBuffer);
-			
-			newState.top = this.state.top + mouseDeltaY;
-			newState.top = Math.max(newState.top, 0);
-			newState.top = Math.min(newState.top, parentHeight - edgeBuffer);
-		}
-		
-		return newState;
+		return (this.activeResizeHandle && this.props.liveResizing) || (this.moving && this.props.liveMoving);
 	}
 	
 	private onDrag=(event:MouseEvent)=>
@@ -206,37 +144,107 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		if (!this.activeResizeHandle && !this.moving)
 			return;
 		
-		var newState = this.updatePosition(event);
-		if(this.props.liveResizing || this.props.liveDragging)
-			this.update(newState)
+		var element = this.shouldLiveUpdate() ? this.element : ReactDOM.findDOMNode(this.overlay) as HTMLElement;
+		var oldState = this.shouldLiveUpdate() ? this.state : this.overlayStyle as DraggableDivState;
+		var mouseOffset = MouseUtils.getOffsetPoint(element)
+		var parentMouseOffset = MouseUtils.getOffsetPoint(element.parentElement);
+		var parentWidth = (element.offsetParent as HTMLElement).offsetWidth;
+		var parentHeight = (element.offsetParent as HTMLElement).offsetHeight;
+		var oldRight:number = oldState.left + oldState.width;
+		var oldBottom:number = oldState.top + oldState.height;
+		var edgeBuffer = 25;
+		
+		var mouseDeltaX = mouseOffset.x - this.mouseDownOffset.x;
+		var mouseDeltaY = mouseOffset.y - this.mouseDownOffset.y;
+		var newState:DraggableDivState = _.clone(oldState);
+		var style = this.props.style || {};
+		var minWidth:number = Number(style.minWidth) || 0;
+		var minHeight:number = Number(style.minHeight) || 0;
+
+		if (this.activeResizeHandle)
+		{
+			if (this.activeResizeHandle.indexOf(LEFT) >= 0)
+			{
+				newState.left = oldState.left + mouseDeltaX;
+				newState.left = Math.max(newState.left, oldRight - parentWidth);
+				newState.left = Math.min(newState.left, oldRight - minWidth, parentWidth - edgeBuffer);
+				newState.width = oldRight - newState.left;
+			}
+			
+			if (this.activeResizeHandle.indexOf(TOP) >= 0)
+			{
+				newState.top = oldState.top + mouseDeltaY;
+				newState.top = Math.max(newState.top, oldBottom - parentHeight, 0);
+				newState.top = Math.min(newState.top, oldBottom - minHeight, parentHeight - edgeBuffer);
+				newState.height = oldBottom - newState.top;
+			}
+			
+			if (this.activeResizeHandle.indexOf(RIGHT) >= 0)
+			{
+				newState.width = oldState.width + mouseDeltaX;
+				newState.width = Math.max(newState.width, minWidth, edgeBuffer - oldState.left);
+				newState.width = Math.min(newState.width, parentWidth);
+				this.mouseDownOffset.x += newState.width - oldState.width;
+			}
+			
+			if (this.activeResizeHandle.indexOf(BOTTOM) >= 0)
+			{
+				newState.height = oldState.height + mouseDeltaY;
+				newState.height = Math.max(newState.height, minHeight);
+				newState.height = Math.min(newState.height, parentHeight);
+				this.mouseDownOffset.y += newState.height - oldState.height;
+			}
+		}
+		else if (this.moving)
+		{
+			// code below makes sure the top of the div always appears on-screen
+			
+			newState.left = oldState.left + mouseDeltaX;
+			newState.left = Math.max(newState.left, edgeBuffer - (oldState.width || 0));
+			newState.left = Math.min(newState.left, parentWidth - edgeBuffer);
+			
+			newState.top = oldState.top + mouseDeltaY;
+			newState.top = Math.max(newState.top, 0);
+			newState.top = Math.min(newState.top, parentHeight - edgeBuffer);
+		}
+		
+		if (this.shouldLiveUpdate())
+		{
+			this.setState(newState);
+			
+			if (this.props.onReposition)
+				this.props.onReposition(newState);
+		}
 		else
 		{
-			this.lastMoveEvent = event;
-			this.overlay.setState({
-				style: _.merge(getOverlayStyle(), { visibility: "visible"}, newState)
-			});
+			_.merge(this.overlayStyle, newState, {visibility: "visible"});
+			this.overlay.setState({ style: this.overlayStyle });
 		}
-	}
-	
-	private hideOverlay()
-	{
-		this.overlay.setState({
-			style: getOverlayStyle()
-		});
 	}
 	
 	private onDragEnd=(event:MouseEvent)=>
 	{
-		this.hideOverlay();
-		this.update(this.updatePosition(this.lastMoveEvent));
-		this.moving = false;
-		this.activeResizeHandle = null;
+		// if live update is disabled, we reposition when drag ends
+		if ((this.moving || this.activeResizeHandle) && !this.shouldLiveUpdate())
+		{
+			var newState = _.pick(this.overlayStyle, "left", "top", "width", "height") as DraggableDivState;
+			this.setState(newState);
+			
+			this.overlayStyle.visibility = "hidden";
+			this.overlay.setState({ style: this.overlayStyle });
+			
+			if (this.props.onReposition)
+				this.props.onReposition(newState);
+			
+			this.moving = false;
+			this.activeResizeHandle = null;
+		}
 	}
 
 	componentWillUnmount()
 	{
 		document.removeEventListener("mouseup", this.onDragEnd, true);
-		document.removeEventListener("mousemove", this.onDrag as any /*TODO*/, true);
+		document.removeEventListener("mousemove", this.onDrag, true);
 	}
 
 	renderResizers():JSX.Element[]
@@ -255,15 +263,27 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 
 	render():JSX.Element
 	{
-		var style = _.merge({position: "absolute"}, this.props.style, this.state);
-		return (
-			<div>
-				<VBox draggable={true} {...this.props} onDragStart={this.onDragStart} style={style} ref={(c:VBox) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}>
-					{this.props.children}
-					{this.props.resizable ? this.renderResizers() : null}
-				</VBox>
-				<Div ref={(c:Div) => { this.overlay = c}} style={_.merge(getOverlayStyle())}/>
-			</div>
+		var content = (
+			<VBox
+				draggable={true}
+				{...this.props}
+				onDragStart={this.onDragStart}
+				style={_.merge({position: "absolute"}, this.props.style, this.state)}
+				ref={(c:VBox) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}
+			>
+				{this.props.children}
+				{this.props.resizable ? this.renderResizers() : null}
+			</VBox>
 		);
+
+		if (this.props.liveMoving || this.props.liveResizing)
+			return (
+				<div>
+					{ content }
+					<Div ref={(c:Div) => { this.overlay = c; }} style={this.overlayStyle}/>
+				</div>
+			);
+
+		return content;
 	}
 }
