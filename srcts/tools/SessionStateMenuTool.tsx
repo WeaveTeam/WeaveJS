@@ -158,9 +158,9 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	//renders the target list UI
 	getTargetList():JSX.Element[]
 	{
-		return this.props.sessionStateMenuTool.targets.getObjects().map((target:LinkableDynamicObject)=>{
+		return this.props.sessionStateMenuTool.targets.getObjects().map((target:LinkableDynamicObject, index:number)=>{
 			return(
-				<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
+				<HBox key={index} style={{justifyContent: "space-between", alignItems:"center"}}>
 					<span style={{overflow: "hidden"}}>{target.targetPath.join(', ')}</span>
 					<HBox>
 						<CenteredIcon onClick={ ()=>{} }
@@ -172,14 +172,18 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	}
 
 	//contains the target tab view, target paths that map to the menu items
+	//TODO fix bad styling
 	renderTargetItems():JSX.Element
 	{
 		return(
 			<VBox className="weave-padded-vbox weave-container" style={ {flex: 1, border: "1px"} }>
-
 				<HBox style={ {alignItems: 'center'} }>
 					{ Weave.lang("Add target") }
+
 					<Input style={ {flexGrow: 0.5} } placeholder={ Weave.lang("Paste path here") }/>
+
+					<CenteredIcon onClick={ ()=>{} }
+					              iconProps={{ className: "fa fa-plus", title: "Add this target" }}/>
 				</HBox>
 
 				{ this.getTargetList() }
@@ -232,6 +236,8 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 
 	render()
 	{
+		let targetCount = (this.props.sessionStateMenuTool.targets.getNames() as string[]).length;
+
 		return (
 			<VBox>
 				{
@@ -247,6 +253,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 							}
 						})
 					}
+				{ targetCount == 0 ? Weave.lang("This menu tool will have no effect unless you add at least one target.") : null }
 			</VBox>
 		);
 	}
