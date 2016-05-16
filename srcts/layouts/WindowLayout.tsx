@@ -15,7 +15,7 @@ export interface WindowState
 {
 	id?: WeavePathArray;
 	position?: DraggableDivState;
-	maximized?: boolean;
+	isMaximized?: boolean;
 } 
 
 export default class WindowLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
@@ -31,7 +31,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	setSessionState(state:WindowState[]):void
 	{
 		state = Weave.AS(state, Array) || [];
-		this.linkableState.state = state.map(item => _.pick(item, 'id', 'position'));
+		this.linkableState.state = state.map(item => _.pick(item, 'id', 'position', 'isMaximized'));
 	}
 	
 	getSessionState():WindowState[]
@@ -39,6 +39,18 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		return (this.linkableState.state || []) as WindowState[];
 	}
 	
+	findPanelState(id:WeavePathArray):WindowState
+	{
+		var panelState:WindowState = null;
+		this.getSessionState().forEach(item => {
+			if (_.isEqual(id, item.id))
+			{
+				panelState = item;
+			}
+		});
+		return panelState;
+	}
+
 	bringPanelForward(id:WeavePathArray):void
 	{
 		var panelState:WindowState = null;
@@ -76,9 +88,16 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		this.setSessionState(this.getSessionState().filter(item => !_.isEqual(id, item.id)));
 	}
 	
-	maximizePanel(id:WeavePathArray, maximized:boolean):void
+	toggleMaximize(id:WeavePathArray):void
 	{
-		this.updatePanelState(id, {maximized});
+		var panelState:WindowState = this.findPanelState(id);
+		
+		if (!panelState)
+			return;
+		
+		this.updatePanelState(id, {
+			isMaximized: !panelState.isMaximized
+		});
 	}
 	
 	updatePanelState(id:WeavePathArray, diff:WindowState):void
@@ -153,7 +172,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 							>
 							{
 								this.props.panelRenderer
-								?	this.props.panelRenderer(state.id)
+								?	this.props.panelRenderer(state.id, {isMaximized: state.isMaximized})
 								:	<WeaveComponentRenderer
 										key={index}
 										weave={weave}

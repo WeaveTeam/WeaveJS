@@ -42,6 +42,8 @@ declare type PolarPoint = {
 export declare type WeavePathArray = string[];
 
 export type PanelProps = {
+	maximized:boolean;
+	minmized?:boolean;
 	onDragStart:React.DragEventHandler,
 	onDragEnd:React.DragEventHandler,
 	onDragOver:React.DragEventHandler
@@ -99,6 +101,20 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		this.repositionPanels();
 	}
 	
+	toggleMaximize(id:WeavePathArray)
+	{
+		var path = id;
+		var layout = Weave.AS(this.rootLayout.getComponentFromId(path), FlexibleLayout);
+		if (!layout)
+			return;
+		var state = _.cloneDeep(layout.getSessionState());
+		var obj = FlexibleLayout.findStateNode(state, path);
+		if (!obj)
+			return;
+		obj.maximized = !obj.maximized;
+		layout.setSessionState(state);
+	}
+
 	frameHandler():void
 	{
 		// reposition on resize
@@ -491,6 +507,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 						children={
 							this.props.panelRenderer
 							?	this.props.panelRenderer(path, {
+									maximized: newState.maximized,
 									onDragOver: this.onDragOver.bind(this, path),
 									onDragStart: this.onDragStart.bind(this, path),
 									onDragEnd: this.onDragEnd.bind(this),
