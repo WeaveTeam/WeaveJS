@@ -11,8 +11,11 @@ import ResizingDiv from "../react-ui/ResizingDiv";
 import List from "../react-ui/List";
 import MiscUtils from "../utils/MiscUtils";
 import ComboBox from "../semantic-ui/ComboBox";
+import CenteredIcon from "../react-ui/CenteredIcon";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import Tabs from "../react-ui/Tabs";
+import Input from "../semantic-ui/Input";
+import StatefulTextField from "../ui/StatefulTextField";
 import MenuLayoutComponent from "../ui/MenuLayoutComponent";
 import ReactUtils from "../utils/ReactUtils";
 
@@ -91,7 +94,8 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	get options():{ label:string, value:LinkableVariable}[]
 	{
-		return this.choices.getObjects(ILinkableVariable).map(choice => {
+		return this.choices.getObjects(ILinkableVariable).map(choice =>
+		{
 			return {
 				label: this.choices.getName(choice),
 				value: choice
@@ -101,7 +105,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	renderEditor():JSX.Element
 	{
-		return (
+		return(
 			<VBox>
 				<SessionStateMenuToolEditor sessionStateMenuTool={ this }/>
 			</VBox>
@@ -151,11 +155,35 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		}
 	}
 
+	//renders the target list UI
+	getTargetList():JSX.Element[]
+	{
+		return this.props.sessionStateMenuTool.targets.getObjects().map((target:LinkableDynamicObject)=>{
+			return(
+				<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
+					<span style={{overflow: "hidden"}}>{target.targetPath.join(', ')}</span>
+					<HBox>
+						<CenteredIcon onClick={ ()=>{} }
+						              iconProps={{ className: "fa fa-times", title: "Delete this target" }}/>
+					</HBox>
+				</HBox>
+			);
+		});
+	}
+
 	//contains the target tab view, target paths that map to the menu items
 	renderTargetItems():JSX.Element
 	{
 		return(
-			<div>Targets</div>
+			<VBox className="weave-padded-vbox weave-container" style={ {flex: 1, border: "1px"} }>
+
+				<HBox style={ {alignItems: 'center'} }>
+					{ Weave.lang("Add target") }
+					<Input style={ {flexGrow: 0.5} } placeholder={ Weave.lang("Paste path here") }/>
+				</HBox>
+
+				{ this.getTargetList() }
+			</VBox>
 		);
 	}
 
@@ -174,7 +202,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 			.set("Menu Items", this.renderMenuItems());
 		var activeTabIndex = 0;
 
-		return (
+		return(
 			<Tabs
 				labels={Array.from(tabs.keys())}
 				activeTabIndex={activeTabIndex}
@@ -187,7 +215,8 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	get editorConfigs():React.ReactChild[][]
 	{
 		return[
-			[//targets and menu items tab component
+			[
+				Weave.lang("tabs"),//TODO get rid of fitting it to table
 				this.renderTargetsAndMenuItems()
 			],
 			[//layout
