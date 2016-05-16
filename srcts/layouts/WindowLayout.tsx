@@ -94,7 +94,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 			var style = state.style || {};
 			// only set the state for ddiv that have changed
 			// saves render
-			if(ddiv && !_.isEqual(ddiv.state, state.style))
+			if(ddiv)
 				ddiv.setState({
 					top: style.top,
 					left: style.left,
