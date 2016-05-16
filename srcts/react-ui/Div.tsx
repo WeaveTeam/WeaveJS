@@ -4,10 +4,10 @@ import * as ReactDOM from "react-dom";
 /**
  * Provides a way to render a div separately by setting its state.
  */
-export default class Div extends React.Component<React.HTMLProps<HTMLDivElement>, React.HTMLAttributes>
+export default class Div extends React.Component<React.HTMLProps<Div>, React.HTMLAttributes>
 {
 	render()
 	{
-		return <div {...this.props} {...this.state}/>;
+		return <div {...this.props as any} {...this.state}/>;
 	}
 }

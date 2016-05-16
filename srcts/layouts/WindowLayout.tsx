@@ -36,10 +36,11 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		return (this.linkableState.state || []) as WindowState[];
 	}
 	
-	reorderPanels(topWindowState:WindowState):void
+	reorderPanels(index:number):void
 	{
-		var state = this.getSessionState().filter(item => !_.isEqual(topWindowState.id, item.id)) as WindowState[];
-		state.push(topWindowState);
+		var state = this.getSessionState()
+		var topPanelState = state.splice(index, 1)[0];
+		state.push(topPanelState)
 		this.setSessionState(state);
 	}
 
@@ -57,7 +58,10 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	
 	addItem(id:WeavePathArray):void
 	{
-		this.setSessionState(this.getSessionState().concat({id, style: {}}));
+		this.setSessionState(this.getSessionState().concat({id, style: {
+			width: 300,
+			height: 200
+		}}));
 	}
 	
 	removeItem(id:WeavePathArray):void
@@ -85,11 +89,12 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	
 	repositionPanels():void
 	{
-		//TODO
 		this.getSessionState().map(state => {
 			var ddiv = this.refs[JSON.stringify(state.id)] as DraggableDiv;
 			var style = state.style || {};
-			if(ddiv)
+			// only set the state for ddiv that have changed
+			// saves render
+			if(ddiv && !_.isEqual(ddiv.state, state.style))
 				ddiv.setState({
 					top: style.top,
 					left: style.left,
@@ -115,9 +120,11 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 					return (
 						<DraggableDiv
 							key={key}
-							ref={key} 
-							style={_.merge({minWidth: 25, minHeight: 25, zIndex: index}, state.style)}
-							onMouseDown={(event) => this.reorderPanels(state)}
+							ref={key}
+							liveDragging={false}
+							liveResizing={false}
+							style={_.merge({minWidth: 150, minHeight: 100}, state.style)}
+							onMouseDown={(event) => this.reorderPanels(index)}
 							draggable={!this.props.itemRenderer}
 							onReposition={this.onReposition.bind(this, state.id)}
 						>
