@@ -177,7 +177,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 Weave.registerClass(
 	AttributeMenuTool,
-	["weave.ui::AttributeMenuTool", "weavejs.tool.AttributeMenu"],
+	["weavejs.tool.AttributeMenu", "weave.ui::AttributeMenuTool"],
 	[weavejs.api.ui.IVisTool],
 	"Attribute Menu Tool"
 );
