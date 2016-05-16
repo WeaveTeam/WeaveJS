@@ -46,6 +46,17 @@ export interface DraggableDivState
 	height: number;
 }
 
+// return a new style object 
+// each time because react doesn't
+// allow mutating style
+function getOverlayStyle() {
+	return {
+		visibility: "hidden",
+		position: "absolute",
+		backgroundColor: "rgba(0, 0, 0, 0.2)"
+	}
+}
+
 export default class DraggableDiv extends SmartComponent<DraggableDivProps, DraggableDivState>
 {
 	private element:HTMLElement;
@@ -202,11 +213,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		{
 			this.lastMoveEvent = event;
 			this.overlay.setState({
-				style: _.merge({
-					visibility: "visible",
-					position: "absolute",
-					backgroundColor: "rgba(0, 0, 0, 0.2)"
-				}, newState)
+				style: _.merge(getOverlayStyle(), { visibility: "visible"}, newState)
 			});
 		}
 	}
@@ -214,9 +221,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	private hideOverlay()
 	{
 		this.overlay.setState({
-			style: {
-				visibility: "hidden"
-			}
+			style: getOverlayStyle()
 		});
 	}
 	
@@ -257,7 +262,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 					{this.props.children}
 					{this.props.resizable ? this.renderResizers() : null}
 				</VBox>
-				<Div ref={(c:Div) => { this.overlay = c}} style={{position: "absolute", visibility: "hidden", backgroundColor: "rgba(0, 0, 0, 0.2)"}}/>
+				<Div ref={(c:Div) => { this.overlay = c}} style={_.merge(getOverlayStyle())}/>
 			</div>
 		);
 	}
