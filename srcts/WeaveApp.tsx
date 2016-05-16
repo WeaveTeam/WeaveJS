@@ -165,31 +165,25 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		});
 	}
 
-	isMaximized=(tool:WeaveTool):boolean=>
-	{
-		var path = tool.props.path;
-		var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
-		if (!layout)
-			return false;
-		var state = _.cloneDeep(layout.getSessionState());
-		var obj = FlexibleLayout.findStateNode(state, path);
-		if (!obj)
-			return false;
-		return obj.maximized;
-	}
+	// isMaximized=(tool:WeaveTool):boolean=>
+	// {
+	// 	var path = tool.props.path;
+	// 	var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
+	// 	if (!layout)
+	// 		return false;
+	// 	var state = _.cloneDeep(layout.getSessionState());
+	// 	var obj = FlexibleLayout.findStateNode(state, path);
+	// 	if (!obj)
+	// 		return false;
+	// 	return obj.maximized;
+	// }
 
 	handleMaximizeClick=(tool:WeaveTool):void=>
 	{
 		var path = tool.props.path;
-		var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
-		if (!layout)
-			return;
-		var state = _.cloneDeep(layout.getSessionState());
-		var obj = FlexibleLayout.findStateNode(state, path);
-		if (!obj)
-			return;
-		obj.maximized = !obj.maximized;
-		layout.setSessionState(state);
+		var layout = this.props.weave.getObject(this.getRenderPath());
+		if (layout instanceof AbstractLayout)
+			(layout as AbstractLayout).toggleMaximize(path);
 	}
 	
 	handlePopoutClick=(tool:WeaveTool):void=>
@@ -277,7 +271,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{...panelProps}
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={this.handleMaximizeClick}
-				isMaximized={this.isMaximized}
 				onPopoutClick={this.handlePopoutClick}
 				onCloseClick={this.handleCloseClick}
 			/>

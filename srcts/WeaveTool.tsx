@@ -23,6 +23,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
 	weave:Weave;
 	path:string[];
+	isMaximized?:boolean;
 	onDragStart:React.DragEventHandler;
 	onDragEnd:React.DragEventHandler;
 	onDragOver:React.DragEventHandler;
@@ -30,7 +31,6 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	style?: CSSProperties;
 	onGearClick?:(tool:WeaveTool)=>void;
 	onMaximizeClick?:(tool:WeaveTool)=>void;
-	isMaximized?: (tool: WeaveTool) => boolean;
 	onPopoutClick?:(tool:WeaveTool)=>void;
 	onPopinClick?:(tool:WeaveTool)=>void;
 	onCloseClick?:(tool:WeaveTool)=>void;
@@ -164,7 +164,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					highlighted={this.state.highlightTitle}
 					onGearClick={this.onGearClick}
 					onMaximizeClick={this.onMaximizeClick}
-					maximized={this.props.isMaximized && this.props.isMaximized(this)}
+					maximized={this.props.isMaximized}
 					onPopoutClick={this.props.onPopoutClick && this.onPopoutClick}
 					onPopinClick={this.props.onPopinClick && this.onPopinClick}
 					onCloseClick={this.onCloseClick}
