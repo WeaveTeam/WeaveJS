@@ -49,7 +49,7 @@ export type PanelProps = {
 
 export interface IFlexibleLayoutProps extends React.HTMLProps<FlexibleLayout>
 {
-	itemRenderer: (id:WeavePathArray, panelProps?:PanelProps) => JSX.Element;
+	panelRenderer: (id:WeavePathArray, panelProps?:PanelProps) => JSX.Element;
 }
 
 export interface IFlexibleLayoutState extends LayoutState
@@ -489,8 +489,8 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 						key={key}
 						ref={key}
 						children={
-							this.props.itemRenderer
-							?	this.props.itemRenderer(path, {
+							this.props.panelRenderer
+							?	this.props.panelRenderer(path, {
 									onDragOver: this.onDragOver.bind(this, path),
 									onDragStart: this.onDragStart.bind(this, path),
 									onDragEnd: this.onDragEnd.bind(this),
@@ -533,6 +533,6 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 
 Weave.registerClass(
 	FlexibleLayout,
-	'weave.ui.FlexibleLayout',
+	'weavejs.layout.FlexibleLayout',
 	[weavejs.api.core.ILinkableVariable]
 );
