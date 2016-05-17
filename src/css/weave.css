@@ -347,39 +347,39 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-tab-label-container.bottom {
-	border-top: 1px solid #ddd;
+    border-top: 1px solid #ddd;
 }
 .weave-tab-label { /* border left , will come from left child,first child gets from Container, border-bottom comes from label container */
-	padding-left: 8px;
-	padding-right: 8px;
-	padding-top: 5px;
-	padding-bottom: 5px;
-	border-right: 1px solid #ddd;
-	cursor: default;
-	background: #F8F8F8;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-right: 1px solid #ddd;
+    cursor: default;
+    background: #F8F8F8;
 }
 .weave-tab-label.top {
-	border-top: 1px solid #ddd;
+    border-top: 1px solid #ddd;
 }
 
 .weave-tab-label.bottom {
-	border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
 
 .weave-tab-label-active { /* todo: border bottom white is not right way has to match backgroundcolor */
-	border-right: 1px solid #ddd;
-	background: none;
+    border-right: 1px solid #ddd;
+    background: none;
 }
 .weave-tab-label-active.top {
-	margin-bottom: -1px; /* to cover the label container border*/
-	border-bottom: 1px solid white;
-	border-top: 1px solid #ddd;
+    margin-bottom: -1px; /* to cover the label container border*/
+    border-bottom: 1px solid white;
+    border-top: 1px solid #ddd;
 }
 
 .weave-tab-label-active.bottom {
-	margin-top: -1px; /* to cover the label container border*/
-	border-bottom: 1px solid #ddd;
-	border-top: 1px solid white;
+    margin-top: -1px; /* to cover the label container border*/
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid white;
 }
 
 .weave-tab-content { /* border left , comes from container to cover label region too , top comes from label to distinct the active label */
@@ -388,11 +388,11 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-tab-content.top {
-	border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
 }
 
 .weave-tab-content.bottom {
-	border-top: 1px solid #ddd;
+    border-top: 1px solid #ddd;
 }
 
 /* menus */
@@ -563,10 +563,12 @@ div.table-row-selected>div>div>div>div>div {
 	background-color: rgba(153, 214, 255, 0.4);
 	cursor:pointer;
 }
+
 .weave-tree-view.selected {
 	background-color: #80CCFF;
 	cursor:pointer;
 }
+
 .weave-tree-view.selected:hover {
 	background-color: #99D6FF;
 	cursor:pointer;
