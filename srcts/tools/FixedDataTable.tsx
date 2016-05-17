@@ -111,16 +111,18 @@ export const SortTypes = {
 export class TextCell extends React.Component<ITextCellProps, ITextCellState>
 {
 
-	constructor(props:ITextCellProps) {
+	constructor(props:ITextCellProps)
+	{
 		super(props);
-
 	}
 
-	render():JSX.Element {
+	render():JSX.Element
+	{
 		const {rowIndex, columnKey, data, sortIndices} = this.props;
+		var value = data[sortIndices[rowIndex]];
 		return (
 			<Cell {...this.props}>
-				{data[sortIndices[rowIndex]] && data[sortIndices[rowIndex]][columnKey]}
+				{value && value[columnKey]}
 			</Cell>
 		);
 	}
@@ -128,11 +130,12 @@ export class TextCell extends React.Component<ITextCellProps, ITextCellState>
 
 export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeaderState>
 {
-	constructor(props:ISortHeaderProps) {
+	constructor(props:ISortHeaderProps)
+	{
 		super(props);
-
 	}
-	static UpArrow(props:{}) {
+	static UpArrow(props:{})
+	{
 		return (
 			<span style={{alignSelf: "stretch", display: "flex", cursor: "pointer"}}>
 				<i className="fa fa-play fa-fw fa-rotate-270" style={{alignSelf: "center",fontSize: "60%", paddingRight: 2}}/>
@@ -140,7 +143,8 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 		);
 	}
 	
-	static DownArrow(props:{}) {
+	static DownArrow(props:{})
+	{
 		return (
 			<span style={{alignSelf: "stretch", display: "flex", cursor: "pointer"}}>
 				<i className="fa fa-play fa-fw fa-rotate-90" style={{alignSelf: "center",fontSize: "60%", paddingRight: 2}}/>
@@ -148,12 +152,12 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 		);
 	}
 
-	render():JSX.Element {
-
+	render():JSX.Element
+	{
 		var sortArrow:React.ReactChild = "";
-		if(this.props.sortDirection == SortTypes.DESC)
+		if (this.props.sortDirection == SortTypes.DESC)
 			sortArrow = <SortHeaderCell.DownArrow/>;
-		if(this.props.sortDirection == SortTypes.ASC)
+		if (this.props.sortDirection == SortTypes.ASC)
 			sortArrow = <SortHeaderCell.UpArrow/>;
 		
 		return (
@@ -169,7 +173,8 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 	{
 		e.preventDefault();
 
-		if (this.props.onSortChange) {
+		if (this.props.onSortChange)
+		{
 			this.props.onSortChange(
 				this.props.columnKey,
 				this.props.sortDirection ?
@@ -214,12 +219,10 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			valueA = typeof valueA == "string" ? valueA: (valueA as any).value;
 			valueB = typeof valueB == "string" ? valueB: (valueB as any).value;
 			var sortVal = 0;
-			if (valueA > valueB) {
+			if (valueA > valueB)
 				sortVal = 1;
-			}
-			if (valueA < valueB) {
+			if (valueA < valueB)
 				sortVal = -1;
-			}
 			return sortVal;
 		}
 	};
@@ -230,7 +233,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		var sortIndices:number[] = this.props.rows.map((row, index) => index);
 		var headerIndices:number[] = [];
 
-		if(props.selectedIds && props.probedIds)
+		if (props.selectedIds && props.probedIds)
 			this.lastClicked = props.selectedIds.length - 1;
 
 		this.state = {
@@ -245,11 +248,15 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		};
 	}
 
-	moveSelectedToTop():void {
+	moveSelectedToTop():void
+	{
 		//get sort index of selected records
 		var sortIndices:number[] = this.state.sortIndices;
 		var selectedIndices:number[] = this.state.selectedIds.map( (id:string,index:number) => {
-			return sortIndices.indexOf(_.findIndex(this.props.rows.map((row:IRow) => {return row[this.props.idProperty] }), id));
+			return sortIndices.indexOf(
+				_.findIndex(this.props.rows.map((row:IRow) => {
+					return row[this.props.idProperty]
+				}), id));
 		});
 		//splice found indices to front of sort list
 		selectedIndices.forEach( (value) => {
@@ -281,10 +288,10 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	{
 		var id:string = this.getValue(index, this.props.idProperty);
 
-		if(!this.props.enableHover)
+		if (!this.props.enableHover)
 			return "";
 
-		if(!this.props.enableSelection)
+		if (!this.props.enableSelection)
 			return "";
 
 		if (this.props.enableHover && this.props.enableSelection && _.includes(this.state.probedIds, id) && _.includes(this.state.selectedIds, id))
@@ -322,9 +329,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			probedIds
 		});
 
-		if(this.props.onHover){
+		if (this.props.onHover)
 			this.props.onHover(probedIds);
-		}
 	};
 
 	onMouseLeave=(event:React.MouseEvent, index:number):void =>
@@ -433,7 +439,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 	sortColumnIndices=(columnKey:string, sortDirection:SortDirection, sortIndices:number[]) =>
 	{
-		if(this.props.onSortCallback)
+		if (this.props.onSortCallback)
 		{
 			this.props.onSortCallback(columnKey, sortDirection);
 		}
@@ -441,9 +447,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		{
 			sortIndices.sort((indexA:number, indexB:number) => {
 				var sortVal = this.props.sortFunction(indexA, indexB, columnKey);
-				if (sortVal !== 0 && sortDirection === SortTypes.ASC) {
+				if (sortVal !== 0 && sortDirection === SortTypes.ASC)
 					sortVal = sortVal * -1;
-				}
 				return sortVal;
 			});
 		}
@@ -453,28 +458,29 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	{
 		var newState:IFixedDataTableState = {};
 
-		if(nextProps.rows.length !== this.state.sortIndices.length)
+		if (nextProps.rows.length !== this.state.sortIndices.length)
 			newState.sortIndices = nextProps.rows.map((row, index) => index);
 
-		if(nextProps.probedIds)
+		if (nextProps.probedIds)
 			newState.probedIds = nextProps.probedIds.concat([]);
 		
-		if(nextProps.selectedIds)
+		if (nextProps.selectedIds)
 			newState.selectedIds = nextProps.selectedIds.concat([]);
 		
-		if(nextProps.sortId)
+		if (nextProps.sortId)
 		{
 			newState.sortId = nextProps.sortId;
 		}
 		
-		if(nextProps.sortDirection)
+		if (nextProps.sortDirection)
 		{
 			newState.sortDirection = nextProps.sortDirection;
 		}
 		this.setState(newState);
 	}
 	
-	handleResize=(newSize:ResizingDivState) => {
+	handleResize=(newSize:ResizingDivState) =>
+	{
 		this.setState({
 			width: newSize.width,
 			height: newSize.height
@@ -489,7 +495,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		};
 		var evenWidth:number;
 
-		if(this.props.evenlyExpandRows && this.state.width > 0)
+		if (this.props.evenlyExpandRows && this.state.width > 0)
 			evenWidth = Math.max(this.state.width / (this.props.columnIds.length - (this.props.showIdColumn ? 0:1)), this.props.initialColumnWidth);
 
 		return (
@@ -510,7 +516,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 					>
 						{
 							this.props.columnIds.map((id:string,index:number) => {
-								if(this.props.showIdColumn || id != this.props.idProperty){
+								if (this.props.showIdColumn || id != this.props.idProperty){
 									return (
 										<Column
 											key={index}
