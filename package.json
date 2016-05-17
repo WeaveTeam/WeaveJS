@@ -59,6 +59,7 @@
     "rc-slider": "^3.6.2",
     "react-addons-update": "0.14.7",
     "react-color": "^2.0.0",
+    "react-dropzone": "^3.4.0",
     "typescript": "^1.8.0"
   }
 }
