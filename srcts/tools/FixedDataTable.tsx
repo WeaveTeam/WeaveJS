@@ -51,6 +51,7 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	height?:number;
 	showBottomBorder?:boolean;
 	allowClear?: boolean;
+	multiple?: boolean;
 	sortId?:string;
 	sortDirection?: SortDirection;
 	/** 
@@ -208,6 +209,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		evenlyExpandRows: true,
 		showBottomBorder: true,
 		allowClear:true,
+		multiple:true,
 		sortFunction: function(indexA:number, indexB:number, columnKey:string):number {
 			var valueA = this.props.rows[indexA][columnKey];
 			var valueB = this.props.rows[indexB][columnKey];
@@ -342,7 +344,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		var keyLocation:number = selectedIds.indexOf(id);
 
 		// multiple selection
-		if ((event .ctrlKey || event.metaKey))
+		if ((event .ctrlKey || event.metaKey) && this.props.multiple)
 		{
 			// if the record is already in the selection
 			// we remove it
@@ -358,7 +360,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		}
 
 		// shift selection
-		else if (event.shiftKey)
+		else if (event.shiftKey && this.props.multiple)
 		{
 			selectedIds = [];
 			if (this.lastClicked == null)

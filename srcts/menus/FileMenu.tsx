@@ -50,12 +50,12 @@ export default class FileMenu implements MenuBarItemProps
 			var wp = this.weave.requestObject(['WeaveProperties'], LinkableHashMap);
 			var enableMenuBar = wp.requestObject('enableMenuBar', LinkableBoolean);
 			enableMenuBar.value = checked;
-		}
+		};
 		
 		var setSaveHistory = (checked:boolean) =>
 		{
 			//console.log("Save history");
-		}
+		};
 		
 
 		var checkboxListOptions = [
@@ -144,14 +144,14 @@ export default class FileMenu implements MenuBarItemProps
 		if(!ProgressIndicator.hasTask(meta.currentFile))
 			ProgressIndicator.addTask(meta.currentFile, meta.percent/100);
 		ProgressIndicator.updateTask(meta.currentFile, meta.percent/100);
-	}
+	};
 
     openFile=(e:any)=>
 	{
 		var files = e.target.files as FileList;
 		for (let i = 0; i < files.length; i++)
 			this.handleOpenedFile(files[i]);
-    }
+    };
 	
 	/**
 	 * TEMPORARY SOLUTION until we have a place to register file type handlers
@@ -166,14 +166,14 @@ export default class FileMenu implements MenuBarItemProps
 		return types;
 	}
 	
-	handleOpenedFile(file:File, dataFilesOnly:Boolean = false)
+	handleOpenedFile=(file:File, dataFilesOnly:Boolean = false)=>
 	{
 		let reader:FileReader = new FileReader();
 		reader.onload = (event:any) => {
 			this.handleOpenedFileContent(file.name, event.target.result, dataFilesOnly);
 		};
 		reader.readAsArrayBuffer(file);
-	}
+	};
 	
 	private handleOpenedFileContent(fileName:string, fileContent:Uint8Array, dataFilesOnly:Boolean = false):void
 	{
@@ -267,11 +267,12 @@ export default class FileMenu implements MenuBarItemProps
 		return results[0];
 	}
 	
-	loadUrl(url:string)
+	loadUrl=(url:string)=>
 	{
 		this.fileName = String(url).split('/').pop();
+		console.log("File Name", this.fileName, "URL", url);
 		WeaveArchive.loadUrl(this.weave, String(url), this.updatePropgressIndicator);
-	}
+	};
 	
 	private _adminConsole: any;
 	private get adminConsole():any
@@ -309,12 +310,12 @@ export default class FileMenu implements MenuBarItemProps
 				}
 			);
 		}
-	}
+	};
 	
 	public saveToServer=()=>
 	{
 		this.saveDialog(this.fileName, this._saveToServer);
-	}
+	};
 
 	private _saveFile = (newFilename:string) => {
 		var promise = WeaveArchive.serialize(this.weave, this.updatePropgressIndicator);
@@ -325,7 +326,7 @@ export default class FileMenu implements MenuBarItemProps
 				FileSaver.saveAs(new Blob([arrayBuffer]), newFilename);
 			}
 		);
-	}
+	};
 
     public saveFile=()=>
 	{
