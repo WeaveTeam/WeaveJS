@@ -774,3 +774,23 @@ div.weave-tree-view {
 .ui.styled.accordion .content {
 	padding: .5em 0em 1em 1em;
 }
+
+.weave-dropzone-file {
+	width: 100%;
+	height: 100%;
+	background: whitesmoke;
+	border: dashed black 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-dropzone-file-error {
+	width: 100%;
+	height: 100%;
+	background: #FFF6F6;
+	border: dashed #E0B4B4 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}

@@ -6,7 +6,8 @@ import ReactUtils from "../utils/ReactUtils";
 
 export interface IFileInfoViewProps extends React.Props<FileInfoView>
 {
-	fileInfo:WeaveFileInfo;
+	fileInfo?:WeaveFileInfo;
+	className:string;
 }
 
 export interface IFileInfoViewState
@@ -14,6 +15,10 @@ export interface IFileInfoViewState
 }
 
 export default class FileInfoView extends React.Component<IFileInfoViewProps, IFileInfoViewState> {
+
+	defaultProps:IFileInfoViewProps = {
+		className: ""
+	};
 
 	constructor(props:IFileInfoViewProps)
 	{
@@ -27,7 +32,7 @@ export default class FileInfoView extends React.Component<IFileInfoViewProps, IF
 			table: { width: "100%", fontSize: "inherit"}
 		};
 		return (
-			<VBox style={{flex: 1, alignItems: "center"}}>
+			<VBox className={this.props.className} style={{flex: 1, alignItems: "center"}}>
 				{ReactUtils.generateTable({
 					body: [
 						[
@@ -53,8 +58,8 @@ export default class FileInfoView extends React.Component<IFileInfoViewProps, IF
 				})}
 				<div style={{marginTop: 25}}>
 					{this.props.fileInfo && (thumbnail ? <img src={URL.createObjectURL(thumbnail)}/>:<div>{Weave.lang("Thumbnail Unavailable")}</div>)}
-
 				</div>
+				{this.props.children}
 			</VBox>
 		)
 	}
