@@ -100,7 +100,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		this.repositionPanels();
 	}
 	
-	toggleMaximize(id:WeavePathArray)
+	maximizePanel(id:WeavePathArray, maximized:boolean):void
 	{
 		var path = id;
 		var layout = Weave.AS(this.rootLayout.getComponentFromId(path), FlexibleLayout);
@@ -110,7 +110,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		var obj = FlexibleLayout.findStateNode(state, path);
 		if (!obj)
 			return;
-		obj.maximized = !obj.maximized;
+		obj.maximized = maximized;
 		layout.setSessionState(state);
 	}
 
