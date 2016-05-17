@@ -209,8 +209,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		showBottomBorder: true,
 		allowClear:true,
 		sortFunction: function(indexA:number, indexB:number, columnKey:string):number {
-			var valueA = this.props.rows[indexA][columnKey];
-			var valueB = this.props.rows[indexB][columnKey];
+			var valueA = this.getValue(indexA, columnKey);
+			var valueB = this.getValue(indexB, columnKey);
 			valueA = typeof valueA == "string" ? valueA: (valueA as any).value;
 			valueB = typeof valueB == "string" ? valueB: (valueB as any).value;
 			var sortVal = 0;
@@ -267,10 +267,19 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 		this.forceUpdate();
 	}
+	
+	getValue(index:number, property:string):string
+	{
+		var row = this.props.rows[this.state.sortIndices[index]];
+		if (!row)
+			return "";
+		
+		return row[this.props.idProperty] as string;
+	}
 
 	getRowClass=(index: number):string =>
 	{
-		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty] as string;
+		var id:string = this.getValue(index, this.props.idProperty);
 
 		if(!this.props.enableHover)
 			return "";
@@ -306,7 +315,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	onMouseEnter=(event:React.MouseEvent, index:number):void =>
 	{
 		//mouse entering, so set the keys
-		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty] as string;
+		var id:string = this.getValue(index, this.props.idProperty);
 		var probedIds:string[] = [id];
 
 		this.setState({
@@ -332,7 +341,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		//console.log("Down",event,index);
 		
 		var selectedIds:string[] = this.state.selectedIds;
-		var id:string = this.props.rows[this.state.sortIndices[index]][this.props.idProperty] as string;
+		var id:string = this.getValue(index, this.props.idProperty);
 
 		// in single selection mode,
 		// or ctrl/cmd selcection mode
@@ -379,7 +388,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 				for (var i:number = start; i <= end; i++)
 				{
-					selectedIds.push(this.props.rows[this.state.sortIndices[i]][this.props.idProperty] as string);
+					selectedIds.push(this.getValue(this.state.sortIndices[i], this.props.idProperty));
 				}
 			}
 		}
