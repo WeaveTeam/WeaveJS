@@ -79,11 +79,8 @@ export default class DOMUtils
 		while (descendant)
 		{
 			if (descendant == ancestor)
-			{
-				rect.right = rect.left + rect.width;
-				rect.bottom = rect.top + rect.height;
 				return rect;
-			}
+			
 			rect.left += descendant.offsetLeft;
 			rect.top += descendant.offsetTop;
 			descendant = descendant.offsetParent as HTMLElement;
