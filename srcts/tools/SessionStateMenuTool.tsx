@@ -25,6 +25,7 @@ import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableVariable = weavejs.api.core.ILinkableVariable;
+import WeaveAPI = weavejs.WeaveAPI;
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -160,7 +161,23 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		{
 			let updated:Boolean = false;
 			let choiceState:{[key:string]: LinkableDynamicObject[]} = (choice.getSessionState() || {}) as {[key:string]: LinkableDynamicObject[]};
+			let name:string;
 
+			//update the choice state when targets are ADDED
+			let targets = this.props.sessionStateMenuTool.targets;
+			for(let wrapper of targets.getObjects())
+			{
+				if(!wrapper.target)
+					continue;
+				name = targets.getName(wrapper);
+				if(!choiceState.hasOwnProperty(name))
+				{
+					choiceState[name] = WeaveAPI.SessionManager.getSessionState(wrapper.target) as  LinkableDynamicObject[];
+					updated = true;
+				}
+			}
+
+			//update the choice state when targets are REMOVED
 			for(let targetName in choiceState)
 			{
 				if(!this.props.sessionStateMenuTool.targets.getObject(targetName))
