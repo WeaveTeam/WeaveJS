@@ -8,7 +8,7 @@ import ReactUtils from "../utils/ReactUtils";
 
 export interface IEditableTextCellProps
 {
-
+	textContent?:string
 }
 
 export interface IEditableTextCellState
@@ -48,7 +48,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 	disableEditMode =(event:MouseEvent):void =>
 	{
 		//check if the click target is not within the element and the editable mode is on
-		if(!ReactDOM.findDOMNode(this).contains(event.target as HTMLElement) && this.state.editMode)
+		if(!this.element.contains(event.target as HTMLElement) && this.state.editMode)
 		{
 			this.setState({
 				editMode :false
@@ -77,8 +77,8 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 				<Input value={ this.state.textContent } onChange={ this.handleEditableContent }/>
 
 				:
-				<div style={ {border:'1px solid #C0C0C0', padding:'10', minHeight:'30px'} }>
-					{ this.state.textContent }
+				<div style={ {border:'1px solid #C0C0C0', padding:'10',height:'35px'} }>
+					{ this.state.textContent ? this.state.textContent : 'Double click to edit and rename'}
 				</div>
 				}
 			</VBox>
