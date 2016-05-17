@@ -10,10 +10,10 @@ import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
 
 import Admin = weavejs.net.Admin;
+import WeaveAdminService = weavejs.net.WeaveAdminService;
 
 export interface ISqlImportProps extends React.HTMLProps<SqlImport>
 {
-
 }
 
 export interface ISqlImportState
@@ -25,19 +25,22 @@ export interface ISqlImportState
 	keyColumn?: string;
 	keyColumnValid?: boolean;
 	keyType?: string;
-	useFilteredKeyColumns?: boolean;
 	filteredKeyColumns?: string[];
 	schemaOptions?: string[];
 	tableOptions?: string[];
 	columnOptions?: string[];
 	keyTypeSuggestions?: string[];
+	errors?: string[];
 }
 
 export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImportState>
 {
+	private service:WeaveAdminService;
+
 	constructor(props:ISqlImportProps)
 	{
 		super(props);
+		this.service = weavejs.net.Admin.service;
 
 		this.state = {
 			append: false,
@@ -47,55 +50,75 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			keyColumn: null,
 			keyColumnValid: null,
 			keyType: null,
-			useFilteredKeyColumns: false,
 			filteredKeyColumns: [],
 			schemaOptions: [],
 			tableOptions: [],
 			columnOptions: [],
-			keyTypeSuggestions: []
+			keyTypeSuggestions: [],
+			errors: []
 		};
 	}
 
 	updateSchemas = () => {
 		weavejs.net.Admin.service.getSQLSchemaNames().then(
-			(schemaNames: string[]) => this.setState({ schemaOptions: schemaNames })
+			(schemaNames: string[]) => this.setState({ schemaOptions: schemaNames }),
+			this.handleError
 		);
 	}
 
 	updateTables=(schema:string)=>
 	{
 		if (schema)
-			weavejs.net.Admin.service.getSQLTableNames(schema).then(
-				(tableOptions: string[]) => this.setState({ tableOptions })
+			this.service.getSQLTableNames(schema).then(
+				(tableOptions: string[]) => this.setState({ tableOptions }),
+				this.handleError
 			);
 	}
 
 	updateColumns=(schema:string, table:string)=>
 	{
 		if (schema && table)
-			weavejs.net.Admin.service.getSQLColumnNames(schema, table).then(
-				(columnOptions: string[]) => this.setState({columnOptions})
+			this.service.getSQLColumnNames(schema, table).then(
+				(columnOptions: string[]) => this.setState({columnOptions}),
+				this.handleError
 			);
+	}
+
+	updateKeyTypeSuggestions=()=>
+	{
+		this.service.getKeyTypes().then(
+			(keyTypeSuggestions:string[])=> this.setState({keyTypeSuggestions}),
+			this.handleError
+		)
+	}
+
+	handleError=(error:any):void=>
+	{
+		this.setState({ errors: this.state.errors.concat([error.toString()]) });
 	}
 
 	testKeyColumn=()=>
 	{
 		if (this.state.schema && this.state.table && this.state.keyColumn)
-			weavejs.net.Admin.service.checkKeyColumnsForSQLImport(
+			this.service.checkKeyColumnsForSQLImport(
 				this.state.schema, this.state.table, [this.state.keyColumn]
 			).then(
 				()=>this.setState({keyColumnValid: true}),
-				()=>this.setState({keyColumnValid: false})
+				(error) => {
+					this.setState({ keyColumnValid: false });
+					this.handleError(error);
+				}
 			)
 	}
 
 	onImportClick=()=>
 	{
-		console.log(this.state);
-	}
-
-	onCancelClick=()=>
-	{
+		/* TODO: Feedback: on success, close the dialog, on failure update a status widget with the error message. */
+		this.service.importSQL(
+			this.state.schema, this.state.table, this.state.keyColumn,
+			null /*secondaryKeyColumnName, deprecated */, this.state.displayName,
+			this.state.keyType, this.state.filteredKeyColumns, this.state.append
+		).then(null, this.handleError);
 	}
 
 	static window: PopupWindow;
@@ -137,6 +160,26 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	static close()
 	{
 		SqlImport.window = null;
+	}
+
+	renderErrors():JSX.Element
+	{
+		if (this.state.errors.length)
+		{
+			return <div className="ui warning message">
+				<i className="close icon" onClick={()=>{this.setState({errors: []})}}></i>
+				<div className="header">
+					{Weave.lang("Server Error") }
+				</div>
+				<ul className="list">
+					{this.state.errors.map((message, idx) => (<li key={idx}>{message}</li>)) }
+				</ul>
+			</div>;
+		}
+		else
+		{
+			return <div/>;
+		}
 	}
 
 	render():JSX.Element
@@ -191,12 +234,12 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 					],
 					[
 						Weave.lang("Key namespace"),
-						<ComboBox allowAdditions= { true} value= { this.state.keyType } options= { this.state.keyTypeSuggestions } onChange= {(value) => this.setState({ keyType: value }) }/>
+						<ComboBox allowAdditions= { true} value= { this.state.keyType } options= { this.state.keyTypeSuggestions } onChange= {(value) => this.setState({ keyType: value }) }/>,
+						<Button title={Weave.lang("Refresh") } onClick={this.updateKeyTypeSuggestions}><i className="fa fa-refresh"/></Button>
 					],
-					[<Checkbox label={Weave.lang("Generate filtered column queries.") } value={this.state.useFilteredKeyColumns} onChange={(value) => this.setState({ useFilteredKeyColumns: value }) }/>, undefined],
 					[
 						Weave.lang("Filter columns"),
-						<ComboBox type="multiple" disabled={!this.state.useFilteredKeyColumns} value={this.state.filteredKeyColumns} options={this.state.columnOptions} onChange={(value) => this.setState({ filteredKeyColumns: value }) }/>
+						<ComboBox type="multiple" value={this.state.filteredKeyColumns} options={this.state.columnOptions} onChange={(value) => this.setState({ filteredKeyColumns: value }) }/>
 					]
 				]
 			]
@@ -204,9 +247,9 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 
 		return <VBox className="weave-ToolEditor">
 			{accordion}
+			{this.renderErrors()}
 			<HBox>
 				<Button onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
-				<Button onClick={this.onCancelClick}>{Weave.lang("Cancel") }</Button>
 			</HBox>
 		</VBox>
 	}
