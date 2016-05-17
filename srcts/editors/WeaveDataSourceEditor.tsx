@@ -5,6 +5,8 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import Button from "../semantic-ui/Button";
+import SqlImport from "../ui/admin/SqlImport";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
@@ -73,6 +75,10 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 				<StatefulTextField style={{width: "100%"}}
 								   ref={linkReactStateRef(this, { value: ds.rootId }, 500) } 
 								   placeholder={Weave.lang("Hierarchy ID") }/>
+			],
+			[
+				Weave.lang("Import data"),
+				<Button onClick={SqlImport.open}>{Weave.lang("Import from SQL...")}</Button>
 			]
 		];
 		return super.editorFields.concat(editorFields)
