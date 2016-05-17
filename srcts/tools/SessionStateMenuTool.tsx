@@ -9,6 +9,7 @@ import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import List from "../react-ui/List";
+import EditableTextCell from '../react-ui/EditableTextCell';
 import MiscUtils from "../utils/MiscUtils";
 import ComboBox from "../semantic-ui/ComboBox";
 import CenteredIcon from "../react-ui/CenteredIcon";
@@ -18,6 +19,7 @@ import Input from "../semantic-ui/Input";
 import StatefulTextField from "../ui/StatefulTextField";
 import MenuLayoutComponent from "../ui/MenuLayoutComponent";
 import ReactUtils from "../utils/ReactUtils";
+import {ListOption} from "../react-ui/List";
 
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -241,8 +243,19 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 
 	//contains the menu items tab view, entries which map to the targets in the target view
 	renderMenuItems():JSX.Element{
+
+		var menuItems:ListOption[] = this.props.sessionStateMenuTool.choices.getObjects().map((choice) =>
+		{
+			return({
+				label: (
+					<EditableTextCell textContent={ this.props.sessionStateMenuTool.choices.getName(choice) }/>
+				),
+				value:choice
+			});
+		});
+
 		return(
-			<div>MenuItems</div>
+			<List options={ menuItems }/>
 		);
 	}
 
