@@ -11,7 +11,7 @@ export interface CenteredIconState
 	
 }
 
-export default class CenteredICon extends React.Component<CenteredIconProps, CenteredIconState>
+export default class CenteredIcon extends React.Component<CenteredIconProps, CenteredIconState>
 {
 	
 	constructor(props:CenteredIconProps)

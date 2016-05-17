@@ -336,39 +336,65 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 /* tabs */
+.weave-tab-icon {
+	color: #808080
+}
 .weave-tab-container {
 	border-left: 1px solid #ddd;
 }
 
-.weave-tab-label-container {
+.weave-tab-label-container.top {
 	border-bottom: 1px solid #ddd;
 }
 
+.weave-tab-label-container.bottom {
+    border-top: 1px solid #ddd;
+}
 .weave-tab-label { /* border left , will come from left child,first child gets from Container, border-bottom comes from label container */
-	padding-left: 8;
-	padding-right: 8;
-	padding-top: 5;
-	padding-bottom: 5;
-	cursor: default;
-	border-top: 1px solid #ddd;
-	border-right: 1px solid #ddd;
-	background: #F8F8F8;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-right: 1px solid #ddd;
+    cursor: default;
+    background: #F8F8F8;
+}
+.weave-tab-label.top {
+    border-top: 1px solid #ddd;
+}
+
+.weave-tab-label.bottom {
+    border-bottom: 1px solid #ddd;
 }
 
 .weave-tab-label-active { /* todo: border bottom white is not right way has to match backgroundcolor */
-	margin-bottom: -1px; /* to cover the label container border*/
-	border-bottom: 1px solid white;
-	border-right: 1px solid #ddd;
-	border-top: 1px solid #ddd;
-	background: none;
+    border-right: 1px solid #ddd;
+    background: none;
+}
+.weave-tab-label-active.top {
+    margin-bottom: -1px; /* to cover the label container border*/
+    border-bottom: 1px solid white;
+    border-top: 1px solid #ddd;
+}
+
+.weave-tab-label-active.bottom {
+    margin-top: -1px; /* to cover the label container border*/
+    border-bottom: 1px solid #ddd;
+    border-top: 1px solid white;
 }
 
 .weave-tab-content { /* border left , comes from container to cover label region too , top comes from label to distinct the active label */
 	padding: 8px;
 	border-right: 1px solid #ddd;
-	border-bottom: 1px solid #ddd;
 }
 
+.weave-tab-content.top {
+    border-bottom: 1px solid #ddd;
+}
+
+.weave-tab-content.bottom {
+    border-top: 1px solid #ddd;
+}
 
 /* menus */
 .weave-menu {
@@ -396,7 +422,7 @@ div.table-row-selected>div>div>div>div>div {
 	border-bottom-width: 2px;
 	border-bottom-color: #E6E6E6;
 	background-color: #F8F8F8;
-	
+
 	/*box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
 	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
 	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;*/
@@ -551,7 +577,7 @@ div.table-row-selected>div>div>div>div>div {
 */
 
 span.weave-tree-view.open {
-	
+
 }
 /* The pane for the weave-tree-view */
 div.weave-tree-view {
