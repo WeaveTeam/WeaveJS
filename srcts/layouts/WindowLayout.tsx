@@ -1,8 +1,10 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import classNames from "../modules/classnames";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "../react-ui/VendorPrefixer";
+import MiscUtils from "../utils/MiscUtils";
 import DraggableDiv from "../react-ui/DraggableDiv";
 import {DraggableDivState} from "../react-ui/DraggableDiv";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
@@ -15,7 +17,7 @@ export interface WindowState
 {
 	id?: WeavePathArray;
 	position?: DraggableDivState;
-	isMaximized?: boolean;
+	maximized?: boolean;
 } 
 
 export default class WindowLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
@@ -31,7 +33,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	setSessionState(state:WindowState[]):void
 	{
 		state = Weave.AS(state, Array) || [];
-		this.linkableState.state = state.map(item => _.pick(item, 'id', 'position', 'isMaximized'));
+		this.linkableState.state = state.map(item => MiscUtils._pickDefined(item, 'id', 'position', 'maximized'));
 	}
 	
 	getSessionState():WindowState[]
@@ -88,16 +90,9 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		this.setSessionState(this.getSessionState().filter(item => !_.isEqual(id, item.id)));
 	}
 	
-	toggleMaximize(id:WeavePathArray):void
+	maximizePanel(id:WeavePathArray, maximized:boolean):void
 	{
-		var panelState:WindowState = this.findPanelState(id);
-		
-		if (!panelState)
-			return;
-		
-		this.updatePanelState(id, {
-			isMaximized: !panelState.isMaximized
-		});
+		this.updatePanelState(id, {maximized});
 	}
 	
 	updatePanelState(id:WeavePathArray, diff:WindowState):void
@@ -129,19 +124,26 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	
 	repositionPanels():void
 	{
-		this.getSessionState().map(state => {
+		var element = ReactDOM.findDOMNode(this) as HTMLDivElement;
+		
+		this.getSessionState().forEach(state => {
 			var ddiv = this.refs[JSON.stringify(state.id)] as DraggableDiv;
 			var pos = state.position || {};
-			// only set the state for ddiv that have changed
-			// saves render
-			if(ddiv)
+			if (!ddiv)
+				return;
+			
+			if (state.maximized)
+			{
+				ddiv.setState({left: 0, top: 0, width: element.offsetWidth, height: element.offsetHeight});
+			}
+			else
 				ddiv.setState({
-					top: pos.top,
 					left: pos.left,
+					top: pos.top,
 					width: pos.width,
 					height: pos.height
 				});
-		})
+		});
 	}
 	
 	render()
@@ -157,29 +159,31 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 				{
 					this.getSessionState().map((state, index) => {
 						var key = JSON.stringify(state.id);
+						var style = _.merge({minWidth: 150, minHeight: 100}, state.position);
 						return (
 							<DraggableDiv
 								key={key}
 								ref={key}
 								liveMoving={true}
 								liveResizing={false}
+								movable={!state.maximized}
+								resizable={!state.maximized}
 								getExternalOverlay={() => this.overlay}
 								className={classNames("weave-app", "weave-window")}
-								style={_.merge({minWidth: 150, minHeight: 100}, state.position)}
+								style={style}
 								onMouseDown={(event) => this.bringPanelForward(state.id)}
 								draggable={!this.props.panelRenderer}
 								onReposition={this.onReposition.bind(this, state.id)}
 							>
 							{
 								this.props.panelRenderer
-								?	this.props.panelRenderer(state.id, {isMaximized: state.isMaximized})
+								?	this.props.panelRenderer(state.id, {maximized: state.maximized})
 								:	<WeaveComponentRenderer
 										key={index}
 										weave={weave}
 										path={state.id}
 										style={state.position}
 									/>
-								
 							}
 							</DraggableDiv>
 						);

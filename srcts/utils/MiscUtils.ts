@@ -190,6 +190,11 @@ export default class MiscUtils
 		}
 	}
 	
+	public static _pickDefined(obj:{[key:string]:any}, ...keys:string[]):typeof obj
+	{
+		return MiscUtils._pickBy(_.pick(obj, keys), _.negate(_.isUndefined));
+	}
+	
 	public static _pickBy(obj:{[key:string]:any}, predicate:(value:any, key:string)=>boolean):typeof obj
 	{
 		var result:{[key:string]:any} = {};

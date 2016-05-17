@@ -43,7 +43,6 @@ export declare type WeavePathArray = string[];
 
 export type PanelProps = {
 	maximized:boolean;
-	minmized?:boolean;
 	onDragStart:React.DragEventHandler,
 	onDragEnd:React.DragEventHandler,
 	onDragOver:React.DragEventHandler
@@ -85,7 +84,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	
 	setSessionState=(state:LayoutState):void=>
 	{
-		state = MiscUtils._pickBy(_.pick(state, 'id', 'children', 'flex', 'direction', 'maximize'), _.negate(_.isUndefined));
+		state = MiscUtils._pickDefined(state, 'id', 'children', 'flex', 'direction', 'maximize');
 		state = this.simplifyState(state);
 		state.flex = 1;
 		this.linkableState.state = state;
