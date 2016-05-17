@@ -13,7 +13,7 @@ import FlexibleLayout from "./layouts/FlexibleLayout";
 import {LayoutState} from "./react-ui/flexible-layout/Layout";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
-import {PanelProps} from "./layouts/FlexibleLayout";
+import {LayoutPanelProps} from "./layouts/AbstractLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
@@ -164,26 +164,28 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			toolPathToEdit: path
 		});
 	}
-
-	// isMaximized=(tool:WeaveTool):boolean=>
-	// {
-	// 	var path = tool.props.path;
-	// 	var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
-	// 	if (!layout)
-	// 		return false;
-	// 	var state = _.cloneDeep(layout.getSessionState());
-	// 	var obj = FlexibleLayout.findStateNode(state, path);
-	// 	if (!obj)
-	// 		return false;
-	// 	return obj.maximized;
-	// }
-
+	
+	/*
+	isMaximized=(tool:WeaveTool):boolean=>
+	{
+		var path = tool.props.path;
+		var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
+		if (!layout)
+			return false;
+		var state = _.cloneDeep(layout.getSessionState());
+		var obj = FlexibleLayout.findStateNode(state, path);
+		if (!obj)
+			return false;
+		return obj.maximized;
+	}
+	*/
+	
 	handleMaximizeClick=(tool:WeaveTool):void=>
 	{
 		var path = tool.props.path;
 		var layout = this.props.weave.getObject(this.getRenderPath());
 		if (layout instanceof AbstractLayout)
-			(layout as AbstractLayout).toggleMaximize(path);
+			(layout as AbstractLayout).maximizePanel(path, !tool.props.maximized);
 	}
 	
 	handlePopoutClick=(tool:WeaveTool):void=>
@@ -256,7 +258,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 
-	renderTool=(path:WeavePathArray, panelProps:PanelProps)=>
+	renderTool=(path:WeavePathArray, panelProps:LayoutPanelProps)=>
 	{
 		var tool = this.props.weave.getObject(path);
 		if (_.isEqual(path, this.state.toolPathToEdit))
@@ -268,7 +270,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				weave={this.props.weave}
 				path={path}
 				style={{width: "100%", height: "100%", left: 0, top: 0}}
-				{...panelProps}
+				maximized={panelProps.maximized}
 				onGearClick={this.handleGearClick}
 				onMaximizeClick={this.handleMaximizeClick}
 				onPopoutClick={this.handlePopoutClick}
