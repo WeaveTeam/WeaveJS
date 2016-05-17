@@ -9,9 +9,11 @@ import FixedDataTable from "../tools/FixedDataTable";
 import {IRow, IColumnTitles} from "../tools/FixedDataTable";
 import FileInfoView from "./FileInfoView";
 import Button from "../semantic-ui/Button";
+import FileInput from "../react-ui/FileInput";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
+var URLRequestUtils = weavejs.WeaveAPI.URLRequestUtils;
 
 
 export interface IOpenFileProps {
@@ -35,31 +37,48 @@ export class LocalFileOpen extends React.Component<IOpenFileProps, IOpenFileStat
 		}
 	}
 
+	handleFileChange=(event:React.FormEvent)=>
+	{
+		let file = (event.target as HTMLInputElement).files[0] as File;
+		this.props.openFileHandler(file);
+		PopupWindow.close(FileDialog.window);
+	};
+
 	render():JSX.Element
 	{
 		return (
-			<VBox className="weave-container" style={{flex: 1, alignItems: "center"}}>
-				<Dropzone
-					style={{width: "100%", height: "100%", background: this.state.rejected ? "#FFF6F6":"whitesmoke", border: this.state.rejected ? "dashed #E0B4B4 1px":"dashed black 1px", display: "flex", justifyContent: "center", alignItems: "center"}}
-					activeStyle={{border: "8px solid #CCC"}}
-				    onDropAccepted={(files:File[]) => {
-						files.map((file) => {
-							this.props.openFileHandler(file);
-						});
-						PopupWindow.close(FileDialog.window);
-					}}
-				    onDropRejected={(files:File[]) => {
-						this.setState({
-							rejected: true
-						})
-					}}
-				    accept=".weave"
-				>
-					<VBox style={{flex: 1, alignItems: "center"}}>
-						<span>{Weave.lang("Drag weave session here or click to select")}</span>
-						{this.state.rejected ? <span>{Weave.lang("The specified file could not be uploaded. Only files with the following extensions are allowed: weave")}</span>:""}
-					</VBox>
-				</Dropzone>
+			<VBox style={{flex: 1, alignItems: "center", marginLeft: 20, marginRight: 20}}>
+				<FileInput onChange={this.handleFileChange} accept={".weave"}>
+					<Button className="fluid" style={{width:"100%", justifyContent: "center", borderRadius: ".28571429rem"}}>
+						{Weave.lang("Open a local session")}
+					</Button>
+				</FileInput>
+				<div className="ui horizontal divider">{Weave.lang("Or")}</div>
+				<VBox style={{flex: 1, alignItems: "center", width: "100%"}}>
+					<Dropzone
+						style={{}}
+						className={this.state.rejected ? "weave-dropzone-file-error":"weave-dropzone-file"}
+						activeStyle={{border: "8px solid #CCC"}}
+					    onDropAccepted={(files:File[]) => {
+							files.map((file) => {
+								this.props.openFileHandler(file);
+							});
+							PopupWindow.close(FileDialog.window);
+						}}
+					    onDropRejected={(files:File[]) => {
+							this.setState({
+								rejected: true
+							})
+						}}
+					    accept=".weave"
+					    disableClick={true}
+					>
+						<VBox style={{flex: 1, alignItems: "center"}}>
+							<span>{Weave.lang("Drag weave session here")}</span>
+							{this.state.rejected ? <span>{Weave.lang("The specified file could not be uploaded. Only files with the following extensions are allowed: weave")}</span>:""}
+						</VBox>
+					</Dropzone>
+				</VBox>
 			</VBox>
 		);
 	}
@@ -100,8 +119,8 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 		};
 
 		return (
-			<HBox className="weave-container" style={ {flex: 1} }>
-				<VBox className="weave-container" style={{flex: 1}}>
+			<HBox style={{flex: 1, marginLeft: 20, marginRight: 20}}>
+				<VBox style={{flex: 1}}>
 					<FixedDataTable rows={rows}
 					                columnIds={columnIds}
 					                idProperty="filename"
@@ -117,16 +136,17 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 					                }}
 					/>
 				</VBox>
-				<VBox className="weave-container" style={ {flex: 1, padding: 0} }>
-					<FileInfoView fileInfo={this.state.fileInfo}/>
-					{this.state.fileInfo ? <Button
-						onClick={() => {
+				<VBox style={ {flex: 1, paddingLeft: 20} }>
+					<FileInfoView className="weave-container" fileInfo={this.state.fileInfo}>
+						{this.state.fileInfo ? <VBox style={{flex: 1, justifyContent: "flex-end"}}><Button
+							onClick={() => {
 				                    this.props.openUrlHandler("/" + this.state.fileInfo.fileName);
 				                    PopupWindow.close(FileDialog.window);
 						}}
-					>
-						{Weave.lang("Load Session")}
-					</Button>:null}
+						>
+							{Weave.lang("Load Session")}
+						</Button></VBox>:null}
+					</FileInfoView>
 				</VBox>
 			</HBox>
 		);

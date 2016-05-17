@@ -47,7 +47,7 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 		var props = _.clone(this.props);
 		delete props.children;
 		return (
-			<div style={{position: "relative", display:"flex", flex:1}} className={"ui fluid action input " +this.props.className}>
+			<div style={{position: "relative", display:"flex"}} className={"ui fluid action input " +this.props.className}>
 				<input type="file" onClick={this.handleClick } {...props as any} onChange={this.onChange} style={{display:"none"}}/>
 				{
 					this.props.children
