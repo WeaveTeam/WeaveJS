@@ -216,8 +216,8 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		sortFunction: function(indexA:number, indexB:number, columnKey:string):number {
 			var valueA = this.getValue(indexA, columnKey);
 			var valueB = this.getValue(indexB, columnKey);
-			valueA = typeof valueA == "string" ? valueA: (valueA as any).value;
-			valueB = typeof valueB == "string" ? valueB: (valueB as any).value;
+			valueA = typeof valueA == "string" ? valueA : valueA && (valueA as any).value;
+			valueB = typeof valueB == "string" ? valueB : valueA && (valueB as any).value;
 			var sortVal = 0;
 			if (valueA > valueB)
 				sortVal = 1;
@@ -278,20 +278,14 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	getValue(index:number, property:string):string
 	{
 		var row = this.props.rows[this.state.sortIndices[index]];
-		if (!row)
-			return "";
-		
-		return row[this.props.idProperty] as string;
+		return row && row[this.props.idProperty] as string;
 	}
 
 	getRowClass=(index: number):string =>
 	{
 		var id:string = this.getValue(index, this.props.idProperty);
 
-		if (!this.props.enableHover)
-			return "";
-
-		if (!this.props.enableSelection)
+		if (!id || !this.props.enableHover || !this.props.enableSelection)
 			return "";
 
 		if (this.props.enableHover && this.props.enableSelection && _.includes(this.state.probedIds, id) && _.includes(this.state.selectedIds, id))
@@ -323,7 +317,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	{
 		//mouse entering, so set the keys
 		var id:string = this.getValue(index, this.props.idProperty);
-		var probedIds:string[] = [id];
+		var probedIds:string[] = id ? [id] : [];
 
 		this.setState({
 			probedIds
@@ -348,6 +342,9 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		
 		var selectedIds:string[] = this.state.selectedIds;
 		var id:string = this.getValue(index, this.props.idProperty);
+		
+		if (!id)
+			return;
 
 		// in single selection mode,
 		// or ctrl/cmd selcection mode
@@ -357,7 +354,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		var keyLocation:number = selectedIds.indexOf(id);
 
 		// multiple selection
-		if ((event .ctrlKey || event.metaKey))
+		if ((event.ctrlKey || event.metaKey))
 		{
 			// if the record is already in the selection
 			// we remove it
@@ -394,7 +391,9 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 				for (var i:number = start; i <= end; i++)
 				{
-					selectedIds.push(this.getValue(this.state.sortIndices[i], this.props.idProperty));
+					id = this.getValue(this.state.sortIndices[i], this.props.idProperty);
+					if (id)
+						selectedIds.push(id);
 				}
 			}
 		}
