@@ -29,8 +29,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 	}
 
 	private element:HTMLElement;
-	private inputElement:HTMLInputElement;
-	
+
 	handleEditableContent =(event:any):void =>
 	{
 		let textEntered = event.target.value as string;
@@ -43,18 +42,13 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 	{
 		this.setState({
 			editMode : true
-		}, () => {
-			if(this.inputElement)
-				this.inputElement.focus();
-				this.inputElement.select();
 		});
-
-
 	};
 
 	disableEditMode =(event:MouseEvent):void =>
 	{
-		if(!ReactDOM.findDOMNode(this).contains(event.target as HTMLElement) && this.state.editMode)//dont disable anywhere but component itself)
+		//check if the click target is not within the element and the editable mode is on
+		if(!ReactDOM.findDOMNode(this).contains(event.target as HTMLElement) && this.state.editMode)
 		{
 			this.setState({
 				editMode :false
@@ -78,22 +72,14 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 	render():JSX.Element
 	{
 		return(
-			<VBox style={ {height: '30px', backgroundColor:'aqua'} } onDoubleClick={ this.enableEditMode }>
+			<VBox onDoubleClick={ this.enableEditMode }>
 				{ (this.state.editMode) ?
-				<Input
-					value={ this.state.textContent }
-					onChange={ this.handleEditableContent }
-					/*ref={(c:Input) => {
-								if(c && c.inputElement)
-								{
-									console.log("selecting");
-									this.inputElement = c.inputElement;
-								}
-							}}*/
-				/>
+				<Input value={ this.state.textContent } onChange={ this.handleEditableContent }/>
 
-				: this.state.textContent
-
+				:
+				<div style={ {border:'1px solid #C0C0C0', padding:'10', minHeight:'30px'} }>
+					{ this.state.textContent }
+				</div>
 				}
 			</VBox>
 		);
