@@ -24,7 +24,17 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 		super(props);
 		this.state = {
 			editMode: false,
-			textContent: null
+			textContent: props.textContent
+		}
+	}
+
+	componentWillReceiveProps(nextProps:IEditableTextCellProps)
+	{
+		if(nextProps.textContent != this.props.textContent)
+		{
+			this.setState({
+				textContent : nextProps.textContent
+			});
 		}
 	}
 
@@ -58,7 +68,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 
 	componentDidMount()
 	{
-		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
+		this.element = ReactDOM.findDOMNode(this) as HTMLElement;//done so that findDomNode needs to be invoked only once
 		document.addEventListener('mousedown', this.disableEditMode);
 
 	}
@@ -77,7 +87,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 				<Input value={ this.state.textContent } onChange={ this.handleEditableContent }/>
 
 				:
-				<div style={ {border:'1px solid #C0C0C0', padding:'10',height:'35px'} }>
+				<div>
 					{ this.state.textContent ? this.state.textContent : 'Double click to edit and rename'}
 				</div>
 				}
