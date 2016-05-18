@@ -51,7 +51,7 @@ export default class FileInfoView extends React.Component<IFileInfoViewProps, IF
 				{this.props.fileInfo ?
 					<VBox style={{flex:1, width: "100%", alignItems: "center", justifyContent: "space-between"}}>
 						<div style={{flex:1}}>
-							{this.props.fileInfo && (Weave.lang("Modified") + " " + FormatUtils.defaultFuzzyTimeAgo(date) + " " + Weave.lang("ago"))}
+							{this.props.fileInfo && (Weave.lang("Modified") + " " + FormatUtils.defaultFuzzyTimeAgoFormatting(date) + " " + Weave.lang("ago"))}
 						</div>
 						{this.props.children}
 					</VBox>:<div/>
