@@ -24,7 +24,7 @@ export interface TabsState
 
 export default class Tabs extends React.Component<TabsProps, TabsState>
 {
-	
+
 	constructor(props:TabsProps)
 	{
 		super(props);
@@ -61,8 +61,8 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 								{label}
 								{
 									this.props.onTabClose
-									?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
-									:   null
+										?   <CenteredIcon className="weave-tab-icon" onClick={(event) => this.props.onTabClose(index, event)} title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
+										:   null
 								}
 							</HBox>
 						);
@@ -70,18 +70,18 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 				}
 				{
 					this.props.onTabAdd
-					?   <HBox className={classNames("weave-tab-label", this.props.location)}
-					          onClick={this.props.onTabAdd}
-						>
-							<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")} iconProps={{ className: "fa fa-plus" }}/>
-						</HBox>
-					:   null
+						?   <HBox className={classNames("weave-tab-label", this.props.location)}
+						          onClick={this.props.onTabAdd}
+					>
+						<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")} iconProps={{ className: "fa fa-plus" }}/>
+					</HBox>
+						:   null
 				}
 			</HBox>,
 			<VBox key="content" className={classNames("weave-tab-content", this.props.location)} style={{flex: 1, overflow: "auto"}}>
-			{
-				this.props.tabs[this.state.activeTabIndex]
-			}
+				{
+					this.props.tabs[this.state.activeTabIndex]
+				}
 			</VBox>
 		];
 

@@ -57,7 +57,7 @@ input[type=number]::-webkit-outer-spin-button {
 	height: 2px;
 	border-radius: 6px;
 	background-color: #D0D0D0;
-	 z-index: 0;
+	z-index: 0;
 }
 
 .weave-hslider .rc-slider-dot {
@@ -90,7 +90,7 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .weave-vslider .rc-slider-vertical {
-    width: 2px;
+	width: 2px;
 	z-index: 0;
 }
 
@@ -116,8 +116,8 @@ input[type=number]::-webkit-outer-spin-button {
 }
 
 .weave-vslider .rc-slider-vertical .rc-slider-dot {
-    left: 1px;
-    margin-bottom: -1px;
+	left: 1px;
+	margin-bottom: -1px;
 }
 
 .weave-vslider .rc-slider-vertical .rc-slider-track {
@@ -241,15 +241,15 @@ div.table-row-selected>div>div>div>div>div {
 	padding: 5px;
 	border-radius:4px;
 	color:grey;
- }
+}
 
- .weave-icon:hover {
- 	background-color: rgba(0,0,0,.05);
- }
+.weave-icon:hover {
+	background-color: rgba(0,0,0,.05);
+}
 
- .weave-icon:active {
- 	background-color: #CCCCCC;
- }
+.weave-icon:active {
+	background-color: #CCCCCC;
+}
 
 .weave-icon-button-mouse-over{
 	padding: 5px;
@@ -348,39 +348,39 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-tab-label-container.bottom {
-    border-top: 1px solid #ddd;
+	border-top: 1px solid #ddd;
 }
 .weave-tab-label { /* border left , will come from left child,first child gets from Container, border-bottom comes from label container */
-    padding-left: 8px;
-    padding-right: 8px;
-    padding-top: 5px;
-    padding-bottom: 5px;
-    border-right: 1px solid #ddd;
-    cursor: default;
-    background: #F8F8F8;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	border-right: 1px solid #ddd;
+	cursor: default;
+	background: #F8F8F8;
 }
 .weave-tab-label.top {
-    border-top: 1px solid #ddd;
+	border-top: 1px solid #ddd;
 }
 
 .weave-tab-label.bottom {
-    border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 }
 
 .weave-tab-label-active { /* todo: border bottom white is not right way has to match backgroundcolor */
-    border-right: 1px solid #ddd;
-    background: none;
+	border-right: 1px solid #ddd;
+	background: none;
 }
 .weave-tab-label-active.top {
-    margin-bottom: -1px; /* to cover the label container border*/
-    border-bottom: 1px solid white;
-    border-top: 1px solid #ddd;
+	margin-bottom: -1px; /* to cover the label container border*/
+	border-bottom: 1px solid white;
+	border-top: 1px solid #ddd;
 }
 
 .weave-tab-label-active.bottom {
-    margin-top: -1px; /* to cover the label container border*/
-    border-bottom: 1px solid #ddd;
-    border-top: 1px solid white;
+	margin-top: -1px; /* to cover the label container border*/
+	border-bottom: 1px solid #ddd;
+	border-top: 1px solid white;
 }
 
 .weave-tab-content { /* border left , comes from container to cover label region too , top comes from label to distinct the active label */
@@ -389,11 +389,11 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-tab-content.top {
-    border-bottom: 1px solid #ddd;
+	border-bottom: 1px solid #ddd;
 }
 
 .weave-tab-content.bottom {
-    border-top: 1px solid #ddd;
+	border-top: 1px solid #ddd;
 }
 
 /* menus */
@@ -680,13 +680,13 @@ div.weave-tree-view {
 /******* Breadcrumb *******/
 
 .ui.breadcrumb {
-    line-height: normal;
+	line-height: normal;
 }
 
 /******* Menu *******/
 
 .ui.dropdown .menu>.item {
-    line-height: normal;
+	line-height: normal;
 }
 
 /******* Button *******/
@@ -755,7 +755,7 @@ div.weave-tree-view {
 	-ms-flex-align: center;
 	align-items: center;
 	padding: 0;
-	 margin: 0;
+	margin: 0;
 }
 
 .ui.grid>* {
