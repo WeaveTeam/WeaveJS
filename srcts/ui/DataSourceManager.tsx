@@ -122,15 +122,12 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 				label: (
 					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
 						<span style={{overflow: "hidden"}}>{dataSource.getLabel()}</span>
-
 						<HBox>
 							<CenteredIcon onClick={()=>this.refreshDataSource(dataSource)}
 							              iconProps={{ className: "fa fa-refresh", title: "Refresh this datasource" }}/>
-
 							<CenteredIcon onClick={()=>this.removeDataSource(dataSource)}
 							              iconProps={{ className: "fa fa-times", title: "Delete this datasource" }}/>
 						</HBox>
-
 					</HBox>
 				),
 				value: dataSource
@@ -151,33 +148,41 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		else
 		{
 			editorJsx = <span>{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}</span>;
-		}
-
-		return (
-			<HBox className="weave-padded-hbox" style={ {flex:1, overflow:'auto'} }>
-				<VBox className="weave-padded-vbox">
-					{
-						this.props.dataMenu
-						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } showIcon={false} style={{width: "100%"}}>
-								<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
-								{Weave.lang('Add data')}
-							</MenuButton>
-						: 	null
-					}
-					<VBox className="weave-container" style={ {flex: 1, width: 250, padding: 0} }>
-						<List
-							options={listOptions}
-							multiple={false}
-							selectedValues={ [dataSource] }
-							onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0]; this.forceUpdate(); }}
-						/>
+			return (
+				<HBox className="weave-padded-hbox" style={ {flex:1, overflow:'auto'} }>
+					<VBox className="weave-padded-vbox" style={{width: 250}}>
+						<VBox style={{flex: 1, overflow: "auto"}}>
+							<label>{Weave.lang("Connected sources")}</label>
+							<VBox>
+								<List
+									options={listOptions}
+									multiple={false}
+									selectedValues={ [dataSource] }
+									onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0]; this.forceUpdate(); }}
+								/>
+							</VBox>
+						</VBox>
+						<div style={{height: "1px", width: "100%"}}/>
+						<label>{Weave.lang("Add more...")}</label>
+						<VBox>
+							{
+								this.props.dataMenu.getDataSourceItems().map((dsItem, index) => {
+									return dsItem.shown
+										?   <HBox key={index} style={{justifyContent: "space-between"}}>
+												{Weave.lang(dsItem.label as string)}
+												<CenteredIcon onClick={() => dsItem.click()} className="" iconProps={{ className:"fa fa-plus" }}/>
+											</HBox>
+										:   null
+								})
+							}
+						</VBox>
 					</VBox>
-				</VBox>
-				<VBox style={ {flex: 1, overflow:'auto'} }>
-					{editorJsx}
-				</VBox>
-			</HBox>
-		);
+					<VBox style={ {flex: 1, overflow:'auto'} }>
+						{editorJsx}
+					</VBox>
+				</HBox>
+			);
+		}
 	}
 
 	static openInstance(dataMenu:DataMenu, selected:IDataSource = null):ControlPanel
