@@ -129,24 +129,18 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 					                columnTitles={columnTitles}
 					                multiple={false}
 					                onSelection={(selectedFiles:string[]) => {
-										weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then( (fileInfo:WeaveFileInfo) => {
-											this.setState({
-												fileInfo
+					                    if(selectedFiles[0])
+											weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then( (fileInfo:WeaveFileInfo) => {
+												this.setState({
+													fileInfo
+												});
 											});
-										});
 					                }}
 					/>
 				</VBox>
 				<VBox style={ {flex: 1, paddingLeft: 20} }>
 					<FileInfoView className="weave-container" fileInfo={this.state.fileInfo}>
-						{this.state.fileInfo ? <HBox style={{justifyContent: "flex-end"}}>
-							<Button
-								onClick={() => {
-									console.log("Need to construct url and copy to clipboard here");
-								}}
-						    >
-								{Weave.lang("Copy URL")}
-							</Button>
+						{this.state.fileInfo ?
 							<Button
 								onClick={() => {
 				                    this.props.openUrlHandler("/" + this.state.fileInfo.fileName);
@@ -154,8 +148,7 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 								}}
 							>
 								{Weave.lang("Load Session")}
-							</Button>
-						</HBox>:null}
+							</Button>:null}
 					</FileInfoView>
 				</VBox>
 			</HBox>
@@ -227,7 +220,7 @@ export default class FileDialog extends React.Component<IFileDialogProps, IFileD
 	};
 
 	handleError=(formErrors:any,fields:any) => {
-		
+
 	};
 
 	render():JSX.Element
