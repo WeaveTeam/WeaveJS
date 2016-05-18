@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import {HBox,VBox} from "../../react-ui/FlexBox";
 import Checkbox from "../../semantic-ui/Checkbox";
 import ComboBox from "../../semantic-ui/ComboBox";
@@ -9,11 +10,15 @@ import PopupWindow from "../../react-ui/PopupWindow";
 import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
 
+import WeaveDataSource = weavejs.data.source.WeaveDataSource;
+
 import Admin = weavejs.net.Admin;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
 
 export interface ISqlImportProps extends React.HTMLProps<SqlImport>
 {
+	dataSource: WeaveDataSource;
+	selectIdFunc: (id: number) => void;
 }
 
 export interface ISqlImportState
@@ -30,6 +35,7 @@ export interface ISqlImportState
 	tableOptions?: string[];
 	columnOptions?: string[];
 	keyTypeSuggestions?: string[];
+	importInProgress?: boolean;
 	errors?: string[];
 }
 
@@ -40,7 +46,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	constructor(props:ISqlImportProps)
 	{
 		super(props);
-		this.service = weavejs.net.Admin.service;
+
+		this.service = new WeaveAdminService(SqlImport.getBaseUrl(props.dataSource.url.value));
 
 		this.state = {
 			append: false,
@@ -55,8 +62,32 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			tableOptions: [],
 			columnOptions: [],
 			keyTypeSuggestions: [],
+			importInProgress: false,
 			errors: []
 		};
+
+		this.updateKeyTypeSuggestions();
+	}
+
+	private static getBaseUrl(serviceUrl:string):string
+	{
+		if (!serviceUrl) return "/WeaveServices";
+		/* TODO: Use a proper URL parsing library to get the base URL */
+		let pathComponents = serviceUrl.split('/');
+		pathComponents.pop();
+		return pathComponents.join('/');
+	}
+
+	componentWillReceiveProps(nextProps:ISqlImportProps)
+	{
+		if (this.props && this.props.dataSource !== nextProps.dataSource)
+		{
+			Weave.getCallbacks(nextProps.dataSource)
+		}
+	}
+
+	updateService = () => {
+
 	}
 
 	updateSchemas = () => {
@@ -114,15 +145,28 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	onImportClick=()=>
 	{
 		/* TODO: Feedback: on success, close the dialog, on failure update a status widget with the error message. */
+		this.setState({ importInProgress: true });
 		this.service.importSQL(
 			this.state.schema, this.state.table, this.state.keyColumn,
 			null /*secondaryKeyColumnName, deprecated */, this.state.displayName,
 			this.state.keyType, this.state.filteredKeyColumns, this.state.append
-		).then(null, this.handleError);
+		).then(
+			(newId: number) => {
+				this.setState({ importInProgress: false });
+				let ds = this.props.dataSource;
+				ds.hierarchyRefresh.triggerCallbacks();
+				this.props.selectIdFunc(newId);
+				PopupWindow.close(SqlImport.window);
+			},
+			(error:any)=> {
+				this.setState({ importInProgress: false });
+				this.handleError(error);
+			}
+		);
 	}
 
 	static window: PopupWindow;
-	static open()
+	static open(ds:WeaveDataSource, selectIdFunc?: (id:number)=>void)
 	{
 		if (SqlImport.window)
 			PopupWindow.close(SqlImport.window);
@@ -130,11 +174,11 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 		SqlImport.window = PopupWindow.open(
 			{
 				title: Weave.lang("Import from SQL"),
-				content: <SqlImport/>,
+				content: <SqlImport dataSource={ds} selectIdFunc={selectIdFunc || _.noop}/>,
 				resizable: true,
 				width: 920,
 				height: 675,
-				onClose: SqlImport.close
+				onClose: () => {SqlImport.window = null}
 			});
 	}
 
@@ -155,11 +199,6 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 				this.updateColumns(this.state.schema, this.state.table);
 			}
 		}
-	}
-
-	static close()
-	{
-		SqlImport.window = null;
 	}
 
 	renderErrors():JSX.Element
@@ -249,7 +288,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			{accordion}
 			{this.renderErrors()}
 			<HBox>
-				<Button onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
+				<Button disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
 			</HBox>
 		</VBox>
 	}
