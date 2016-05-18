@@ -136,9 +136,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	renderEditor():JSX.Element
 	{
 		return(
-			<VBox>
-				<SessionStateMenuToolEditor sessionStateMenuTool={ this }/>
-			</VBox>
+			<SessionStateMenuToolEditor sessionStateMenuTool={ this }/>
 		)
 	}
 
@@ -257,7 +255,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	{
 		return(
 			<VBox className="weave-padded-vbox weave-container" style={ {flex: 1, border: "1px"} }>
-				<HBox style={ {alignItems: 'center'} }>
+				<HBox className="weave-padded-hbox" style={ {alignItems: 'center'} }>
 					{ Weave.lang("Add target") }
 
 					<Input style={ {flexGrow: 0.5} } placeholder={ Weave.lang("Paste path here") }/>
@@ -311,10 +309,6 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	{
 		return[
 			[
-				Weave.lang("tabs"),//TODO get rid of fitting it to table
-				this.renderTargetsAndMenuItems()
-			],
-			[
 				Weave.lang("Auto-update active menu item"),
 				<CheckBox ref={ linkReactStateRef(this, {value: this.props.sessionStateMenuTool.autoRecord}) } label={" "}/>
 			],
@@ -334,7 +328,8 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		let targetCount = (this.props.sessionStateMenuTool.targets.getNames() as string[]).length;
 
 		return (
-			<VBox>
+			<VBox style={{flex:"1 0"}}>
+				{ this.renderTargetsAndMenuItems() }
 				{
 					ReactUtils.generateTable({
 						body: [].concat(
@@ -347,7 +342,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 								]
 							}
 						})
-					}
+				}
 				{ targetCount == 0 ? Weave.lang("This menu tool will have no effect unless you add at least one target.") : null }
 			</VBox>
 		);
