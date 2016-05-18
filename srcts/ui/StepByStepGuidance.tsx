@@ -80,21 +80,21 @@ export default class StepByStepGuidance extends React.Component<StepByStepGuidan
 				      onClick={this.openDataSource}>
 					<i className="fa fa-database"></i>
 					<br/>
-					<span> Start with <span style={ {color:"orange"} }> Data</span></span>
+					<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
 				</VBox>
 				<VBox key="charts"
 				      className="weave-guidance-item"
 				      style={itemStyle}>
-					<i className="fa fa-line-chart"></i>
+					<i className="fa fa-code"></i>
 					<br/>
-					<span> Start with <span style={ {color:"orange"} }> Chart</span></span>
+					<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
 				</VBox>
 				<VBox key="tutorials"
 				      className="weave-guidance-item"
 				      style={itemStyle}>
 					<i className="fa fa-book"></i>
 					<br/>
-					<span> Start with <span style={ {color:"orange"} }> Tutorials</span></span>
+					<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Tutorials</span></span>
 				</VBox>
 
 			</div>);

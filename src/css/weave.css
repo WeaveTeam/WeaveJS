@@ -683,8 +683,8 @@ div.weave-tree-view {
 }
 
 .weave-guidance-overlay{
-	background-color:black;
-	opacity:.7;
+	background-image: linear-gradient( 0deg, rgb(44,48,65) 0%, rgb(70,130,180) 100%);
+	opacity:1;
 }
 
 .weave-guidance-item {
@@ -696,8 +696,8 @@ div.weave-tree-view {
 }
 
 .weave-guidance-item i.fa{
-	border: 4px solid orange;
-	color: orange;
+	border: 4px solid rgb(236, 131, 89);
+	color: rgb(236, 131, 89);
 	width: 128px;
 	height: 128px;
 	padding: 42px;
