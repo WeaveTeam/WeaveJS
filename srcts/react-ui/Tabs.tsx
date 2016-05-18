@@ -24,7 +24,7 @@ export interface TabsState
 
 export default class Tabs extends React.Component<TabsProps, TabsState>
 {
-	
+
 	constructor(props:TabsProps)
 	{
 		super(props);
