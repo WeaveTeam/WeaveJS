@@ -234,18 +234,21 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	};
 
 	//renders the target list UI
-	getTargetList():JSX.Element[]
+	getTargetList():ListOption[]
 	{
 		return this.props.sessionStateMenuTool.targets.getObjects().map((target:LinkableDynamicObject, index:number)=>{
-			return(
-				<HBox key={index} style={{justifyContent: "space-between", alignItems:"center"}}>
-					<span style={{overflow: "hidden"}}>{target.targetPath.join(', ')}</span>
-					<HBox>
-						<CenteredIcon onClick={ ()=>{this.removeSelectedTarget(target)} }
-						              iconProps={{ className: "fa fa-times", title: "Delete this target" }}/>
+			return({
+				label:(
+					<HBox key={index} style={{justifyContent: "space-between", alignItems:"center"}}>
+						<span style={{overflow: "hidden"}}>{target.targetPath.join(', ')}</span>
+						<HBox>
+							<CenteredIcon onClick={ ()=>{this.removeSelectedTarget(target)} }
+							              iconProps={{ className: "fa fa-times", title: "Delete this target" }}/>
+						</HBox>
 					</HBox>
-				</HBox>
-			);
+				),
+				value:target
+			});
 		});
 	}
 
@@ -264,7 +267,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 					              iconProps={{ className: "fa fa-plus", title: "Add this target" }}/>
 				</HBox>
 
-				{ this.getTargetList() }
+				<List options={ this.getTargetList() }/>
 			</VBox>
 		);
 	}
