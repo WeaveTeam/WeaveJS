@@ -12,6 +12,7 @@ import List from "../react-ui/List";
 import EditableTextCell from '../react-ui/EditableTextCell';
 import MiscUtils from "../utils/MiscUtils";
 import ComboBox from "../semantic-ui/ComboBox";
+import CheckBox from "../semantic-ui/Checkbox";
 import CenteredIcon from "../react-ui/CenteredIcon";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import Tabs from "../react-ui/Tabs";
@@ -28,6 +29,7 @@ import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 import WeaveAPI = weavejs.WeaveAPI;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -39,9 +41,10 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 {
 	public selectedChoice = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
+	public autoRecord = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
+
 	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
 	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
-
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
 	verifyLayoutMode(value:string):boolean
@@ -84,6 +87,19 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		this.targets.resumeCallbacks();
 	}
 
+	getTargetStates = ():{[key:string]: LinkableDynamicObject[]} =>
+	{
+		let states = {} as {[key:string]: LinkableDynamicObject[]};
+		for (let wrapper of this.targets.getObjects())
+		{
+			if(!wrapper.target)
+				continue;
+			var targetName:string = this.targets.getName(wrapper);
+			states[targetName] = WeaveAPI.SessionManager.getSessionState(wrapper.target) as LinkableDynamicObject[];
+		}
+		return states;
+	};
+
 	handleSelection = (selectedValue:any):void =>
 	{
 		if (!selectedValue)
@@ -94,6 +110,17 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 		this.setTargetStates(selection.state);
 	};
+
+	recordSelectedChoice = ():void =>
+	{
+		var selectedName = this.selectedChoice.value;//current selected choice in the menu tab
+		if(selectedName)//if there is a current seletion
+		{
+			var choice:LinkableVariable = this.choices.requestObject(selectedName, LinkableVariable, false);//get its corresponding choice object
+			choice.setSessionState(this.getTargetStates());//update it session state
+		}
+	};
+
 
 	get options():{ label:string, value:LinkableVariable}[]
 	{
@@ -117,6 +144,9 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	render()
 	{
+		if(this.autoRecord.value)
+			this.recordSelectedChoice();
+
 		var selectedChoice = this.choices.getObject(this.selectedChoice.value) as ILinkableVariable;
 		return(
 			<MenuLayoutComponent options={ this.options }
@@ -283,6 +313,10 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 			[
 				Weave.lang("tabs"),//TODO get rid of fitting it to table
 				this.renderTargetsAndMenuItems()
+			],
+			[
+				Weave.lang("Auto-update active menu item"),
+				<CheckBox ref={ linkReactStateRef(this, {value: this.props.sessionStateMenuTool.autoRecord}) } label={" "}/>
 			],
 			[//layout
 				Weave.lang("Layout mode"),
