@@ -233,6 +233,13 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		this.tidySavedStates();
 	};
 
+	//allows user to edit and rename choices in the menu items tab
+	handleRename =(newName:string):void =>
+	{
+		console.log("newName", newName);
+		//this.props.sessionStateMenuTool.selectedChoice.value = newName;
+	};
+
 	//renders the target list UI
 	getTargetList():ListOption[]
 	{
@@ -281,7 +288,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		{
 			return({
 				label: (
-					<EditableTextCell textContent={ ssmt.choices.getName(choice) }/>
+					<EditableTextCell textContent={ ssmt.choices.getName(choice) } onChange={ this.handleRename } />
 				),
 				value:choice
 			});

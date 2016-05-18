@@ -9,6 +9,7 @@ import ReactUtils from "../utils/ReactUtils";
 export interface IEditableTextCellProps
 {
 	textContent?:string
+	onChange?:(newName:string)=> void
 }
 
 export interface IEditableTextCellState
@@ -43,6 +44,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 	handleEditableContent =(event:any):void =>
 	{
 		let textEntered = event.target.value as string;
+		this.props.onChange.call(this, textEntered);
 		this.setState({
 			textContent : textEntered
 		});
@@ -70,7 +72,6 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 	{
 		this.element = ReactDOM.findDOMNode(this) as HTMLElement;//done so that findDomNode needs to be invoked only once
 		document.addEventListener('mousedown', this.disableEditMode);
-
 	}
 
 	componentWillUnmount()
