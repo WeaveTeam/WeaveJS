@@ -275,18 +275,26 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	//contains the menu items tab view, entries which map to the targets in the target view
 	renderMenuItems():JSX.Element{
 
-		var menuItems:ListOption[] = this.props.sessionStateMenuTool.choices.getObjects().map((choice) =>
+		let ssmt = this.props.sessionStateMenuTool;
+		var selectedOption:any;
+		var menuItems:ListOption[] = ssmt.choices.getObjects().map((choice) =>
 		{
 			return({
 				label: (
-					<EditableTextCell textContent={ this.props.sessionStateMenuTool.choices.getName(choice) }/>
+					<EditableTextCell textContent={ ssmt.choices.getName(choice) }/>
 				),
 				value:choice
 			});
 		});
 
+		//constructing the selected choice, should correspond to the selected choice in the Tool menu
+		if(ssmt.selectedChoice.value)
+		{
+			selectedOption = ssmt.choices.getObject(ssmt.selectedChoice.value);
+		}
+
 		return(
-			<List options={ menuItems }/>
+			<List options={ menuItems } selectedValues={ [selectedOption] } onChange={ ssmt.handleSelection}/>
 		);
 	}
 
