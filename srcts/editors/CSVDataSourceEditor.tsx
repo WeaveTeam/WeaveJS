@@ -5,6 +5,7 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import GuidanceToolTip from "../react-ui/GuidanceToolTip";
 import FileSelector from "../ui/FileSelector";
 import FixedDataTable from "../tools/FixedDataTable";
 import DataSourceEditor from "./DataSourceEditor";
@@ -63,14 +64,19 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			return {label: ds.getColumnTitle(id), value: id}
 		});
 		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
+
+
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			this.getLabelEditor(ds.label),
 			[
 				Weave.lang("URL"),
-				<FileSelector targetUrl={ds.url}
-							  placeholder={Weave.lang("http://www.example.com/example.csv")} 
-							  style={{width: "100%"}}
-							  accept="text/csv,.csv"/>
+				<VBox>
+					<FileSelector targetUrl={ds.url}
+				                    placeholder={Weave.lang("http://www.example.com/example.csv")}
+				                    style={ {width: "100%"} }
+				                    accept="text/csv,.csv"/>
+					{ds.url.value ? null :  <GuidanceToolTip location="bottom">Next: Add CSV File</GuidanceToolTip> }
+				</VBox>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>

@@ -704,6 +704,22 @@ div.weave-tree-view {
 	border-radius: 50%;
 	font-size: 40px;
 }
+
+.weave-guidance-toolTip {
+	padding: 8px;
+	background-color: black;
+	color:white;
+	z-index:1;
+	min-width: 100px;
+	max-width: 300px;
+	border-radius: 4px;
+	box-shadow: 0 2px 8px rgba(0,0,0,.4);
+}
+
+.weave-guidance-toolTip-arrow {
+	border: 8px solid black;
+}
+
 /* Override Semantic ui CSS*/
 
 /******* Breadcrumb *******/
