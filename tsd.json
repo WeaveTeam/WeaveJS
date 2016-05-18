@@ -46,6 +46,9 @@
     },
     "react-dropzone/react-dropzone.d.ts": {
       "commit": "741430a178043bfca40e3a343b8b6f7610104093"
+    },
+    "clipboard/clipboard.d.ts": {
+      "commit": "56295f5058cac7ae458540423c50ac2dcf9fc711"
     }
   }
 }
