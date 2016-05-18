@@ -10,6 +10,7 @@ import {IRow, IColumnTitles} from "../tools/FixedDataTable";
 import FileInfoView from "./FileInfoView";
 import Button from "../semantic-ui/Button";
 import FileInput from "../react-ui/FileInput";
+import Login from "../ui/admin/Login";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
@@ -138,14 +139,23 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 				</VBox>
 				<VBox style={ {flex: 1, paddingLeft: 20} }>
 					<FileInfoView className="weave-container" fileInfo={this.state.fileInfo}>
-						{this.state.fileInfo ? <VBox style={{flex: 1, justifyContent: "flex-end"}}><Button
-							onClick={() => {
+						{this.state.fileInfo ? <HBox style={{justifyContent: "flex-end"}}>
+							<Button
+								onClick={() => {
+									console.log("Need to construct url and copy to clipboard here");
+								}}
+						    >
+								{Weave.lang("Copy URL")}
+							</Button>
+							<Button
+								onClick={() => {
 				                    this.props.openUrlHandler("/" + this.state.fileInfo.fileName);
 				                    PopupWindow.close(FileDialog.window);
-						}}
-						>
-							{Weave.lang("Load Session")}
-						</Button></VBox>:null}
+								}}
+							>
+								{Weave.lang("Load Session")}
+							</Button>
+						</HBox>:null}
 					</FileInfoView>
 				</VBox>
 			</HBox>
@@ -201,6 +211,25 @@ export default class FileDialog extends React.Component<IFileDialogProps, IFileD
 		});
 	}
 
+	authenticateForm=(event:any,fields:any) => {
+		PopupWindow.close(Login.window);
+		weavejs.net.Admin.service.authenticate(fields.username,fields.password).then(() => {
+			this.getWeaveFiles();
+		});
+	};
+
+	getWeaveFiles=() => {
+		weavejs.net.Admin.service.getWeaveFileNames(true).then( (fileNames:string[]) => {
+			this.setState({
+				fileNames
+			});
+		});
+	};
+
+	handleError=(formErrors:any,fields:any) => {
+		
+	};
+
 	render():JSX.Element
 	{
 		let editorJsx:JSX.Element;
@@ -234,23 +263,10 @@ export default class FileDialog extends React.Component<IFileDialogProps, IFileD
 							if(FileDialog.selected === "Weave Server"){
 								if(weavejs.net.Admin.service.authenticated.value)
 								{
-									console.log("Already Authenticated");
-									weavejs.net.Admin.service.getWeaveFileNames(true).then( (fileNames:string[]) => {
-										this.setState({
-											fileNames
-										});
-									});
+									this.getWeaveFiles();
 								} else {
-									weavejs.net.Admin.service.authenticate("zach","zach").then(() => {
-										weavejs.net.Admin.service.getWeaveFileNames(true).then( (fileNames:string[]) => {
-											this.setState({
-												fileNames
-											});
-										});
-									});
+									Login.open(this.authenticateForm,this.handleError);
 								}
-
-
 							} else {
 								this.setState({
 									fileNames:[]
