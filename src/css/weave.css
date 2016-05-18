@@ -676,6 +676,34 @@ div.weave-tree-view {
 	-moz-transition: width .1s ease, background-color .1s ease;
 	transition: width .1s ease, background-color .1s ease;
 }
+
+.weave-guidance {
+	padding-left: 20%;
+	padding-right: 20%;
+}
+
+.weave-guidance-overlay{
+	background-color:black;
+	opacity:.7;
+}
+
+.weave-guidance-item {
+	color: white;
+	align-items: center;
+	font-size: 18px;
+	cursor: pointer;
+
+}
+
+.weave-guidance-item i.fa{
+	border: 4px solid orange;
+	color: orange;
+	width: 128px;
+	height: 128px;
+	padding: 42px;
+	border-radius: 50%;
+	font-size: 40px;
+}
 /* Override Semantic ui CSS*/
 
 /******* Breadcrumb *******/
