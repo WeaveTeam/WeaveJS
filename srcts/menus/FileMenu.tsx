@@ -270,7 +270,6 @@ export default class FileMenu implements MenuBarItemProps
 	loadUrl=(url:string)=>
 	{
 		this.fileName = String(url).split('/').pop();
-		console.log("File Name", this.fileName, "URL", url);
 		WeaveArchive.loadUrl(this.weave, String(url), this.updatePropgressIndicator);
 	};
 	
