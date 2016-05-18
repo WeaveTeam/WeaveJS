@@ -91,7 +91,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					<FileSelector targetUrl={ds.url}
 					              placeholder={Weave.lang("http://www.example.com/example.csv")}
 					              style={ {width: "100%"} }
-					              accept="text/csv,.csv"/>
+					              accept={acceptExtension}/>
 					{ds.url.value ? null :  <GuidanceToolTip location="bottom">Next: Add CSV File</GuidanceToolTip> }
 				</VBox>
 			],
