@@ -37,6 +37,8 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
+import WeaveLayoutManager from "./layouts/WeaveLayoutManager";
+import DataMenu from "./menus/DataMenu";
 
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -56,12 +58,12 @@ export interface WeaveAppState
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
 	enableMenuBarWatcher:LinkableWatcher;
-	
 	menuBar:WeaveMenuBar;
+	dataMenu:DataMenu;
+	layoutManager:WeaveLayoutManager;
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
-		renderPath: ['Layout'],
 		readUrlParams: false
 	};
 
@@ -71,20 +73,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.state = {
 			toolPathToEdit: null
 		}
+		this.dataMenu = new DataMenu(this.props.weave, this.createObject);
 	}
-	
-	getRenderPath():string[]
-	{
-		return this.props.renderPath || WeaveApp.defaultProps.renderPath;
-	}
-	
-	getRenderedComponent():React.Component<any, any>
-	{
-		if (!this.props.weave)
-			return null;
-		return this.props.weave.getObject(this.getRenderPath()) as React.Component<any, any>;
-	}
-
 
 	private createDefaultSessionElements()
 	{
@@ -110,9 +100,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		let fc = bc.internalDynamicColumn.requestGlobalObject(DEFAULT_COLOR_DATA_COLUMN, weavejs.data.column.FilteredColumn, true);
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
-	
+
 	urlParams:{ file: string, editable: boolean };
-	
+
 	componentDidMount()
 	{
 		this.createDefaultSessionElements();
@@ -129,7 +119,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			{
 				console.error(e);
 			}
-			
+
 			if (this.urlParams.file)
 			{
 				// read content from url
@@ -145,12 +135,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 		}
 	}
-	
+
 	handleSideBarClose=()=>
 	{
 		this.setState({ toolPathToEdit: null });
 	}
-	
+
 	handleGearClick=(tool:WeaveTool):void=>
 	{
 		var path = tool.props.path;
@@ -158,92 +148,91 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			toolPathToEdit: path
 		});
 	}
-	
+
 	/*
-	isMaximized=(tool:WeaveTool):boolean=>
-	{
-		var path = tool.props.path;
-		var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
-		if (!layout)
-			return false;
-		var state = _.cloneDeep(layout.getSessionState());
-		var obj = FlexibleLayout.findStateNode(state, path);
-		if (!obj)
-			return false;
-		return obj.maximized;
-	}
-	*/
-	
+	 isMaximized=(tool:WeaveTool):boolean=>
+	 {
+	 var path = tool.props.path;
+	 var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
+	 if (!layout)
+	 return false;
+	 var state = _.cloneDeep(layout.getSessionState());
+	 var obj = FlexibleLayout.findStateNode(state, path);
+	 if (!obj)
+	 return false;
+	 return obj.maximized;
+	 }
+	 */
+
 	handleMaximizeClick=(tool:WeaveTool):void=>
 	{
 		var path = tool.props.path;
-		var layout = this.props.weave.getObject(this.getRenderPath());
+		var layout = this.layoutManager.activeLayout;
 		if (layout instanceof AbstractLayout)
 			(layout as AbstractLayout).maximizePanel(path, !tool.props.maximized);
 	}
-	
+
 	handlePopoutClick=(tool:WeaveTool):void=>
 	{
-		var path = tool.props.path;
-		var popoutWindow:Window;
-		var onBeforeUnLoad:Function = () => { };
-		var onLoad:Function = () => { };
-		var options:any = { transferStyle: true };
-		var isMaximized:boolean = false, screenWidth:number, screenHeight:number;
-
-		this.removeFromLayout(path);
-		var content:JSX.Element = (
-			<WeaveTool
-				weave={this.props.weave}
-				path={path}
-				style={{width: "100%", height: "100%"}}
-				onGearClick={this.handleGearClick}
-				onMaximizeClick={() => {
-					if (isMaximized)
-					{
-						isMaximized = false;
-						popoutWindow.resizeTo(screenWidth, screenHeight);
-					}
-					else
-					{
-						isMaximized = true;
-						screenWidth = popoutWindow.innerWidth;
-						screenHeight = popoutWindow.innerHeight;
-						popoutWindow.moveTo(0,0);
-						popoutWindow.resizeTo(screen.availWidth, screen.availHeight);
-					}
-				}}
-				onPopinClick={() => {
-					this.addToLayout(path);
-					popoutWindow.close();
-				}}
-				onCloseClick={(tool:WeaveTool) => {
-					this.handleCloseClick(tool);
-					popoutWindow.close();
-				}}
-				onDragEnd={() => {}}
-				onDragStart={() => {}}
-				onDragOver={() => {}}
-			>
-				<WeaveComponentRenderer
-					weave={this.props.weave}
-					path={path}
-					style={{ width: "100%", height: "100%" }}
-					props={{panelRenderer: this.renderTool}}
-				/>
-			</WeaveTool>
-		);
-		popoutWindow = ReactUtils.openPopout(content, onLoad, onBeforeUnLoad, options);
-
+		// var path = tool.props.path;
+		// var popoutWindow:Window;
+		// var onBeforeUnLoad:Function = () => { };
+		// var onLoad:Function = () => { };
+		// var options:any = { transferStyle: true };
+		// var isMaximized:boolean = false, screenWidth:number, screenHeight:number;
+		//
+		// this.removeFromLayout(path);
+		// var content:JSX.Element = (
+		// 	<WeaveTool
+		// 		weave={this.props.weave}
+		// 		path={path}
+		// 		style={{width: "100%", height: "100%"}}
+		// 		onGearClick={this.handleGearClick}
+		// 		onMaximizeClick={() => {
+		// 			if (isMaximized)
+		// 			{
+		// 				isMaximized = false;
+		// 				popoutWindow.resizeTo(screenWidth, screenHeight);
+		// 			}
+		// 			else
+		// 			{
+		// 				isMaximized = true;
+		// 				screenWidth = popoutWindow.innerWidth;
+		// 				screenHeight = popoutWindow.innerHeight;
+		// 				popoutWindow.moveTo(0,0);
+		// 				popoutWindow.resizeTo(screen.availWidth, screen.availHeight);
+		// 			}
+		// 		}}
+		// 		onPopinClick={() => {
+		// 			this.addToLayout(path);
+		// 			popoutWindow.close();
+		// 		}}
+		// 		onCloseClick={(tool:WeaveTool) => {
+		// 			this.handleCloseClick(tool);
+		// 			popoutWindow.close();
+		// 		}}
+		// 		onDragEnd={() => {}}
+		// 		onDragStart={() => {}}
+		// 		onDragOver={() => {}}
+		// 	>
+		// 		<WeaveComponentRenderer
+		// 			weave={this.props.weave}
+		// 			path={path}
+		// 			style={{ width: "100%", height: "100%" }}
+		// 			props={{panelRenderer: this.renderTool}}
+		// 		/>
+		// 	</WeaveTool>
+		// );
+		// popoutWindow = ReactUtils.openPopout(content, onLoad, onBeforeUnLoad, options);
 	}
-	
+
 	handleCloseClick=(tool:WeaveTool)=>
 	{
 		var weave = this.props.weave;
 		var path = tool.props.path;
 		this.removeFromLayout(path);
 		weave.removeObject(path);
-	
+
 		if (_.isEqual(path, this.state.toolPathToEdit))
 		{
 			this.setState({
@@ -290,15 +279,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		weave.requestObject(path, type);
 		var instance = weave.getObject(path);
 		var resultType = LinkablePlaceholder.getClass(instance);
-		
+
 		if (resultType != type)
 			return;
-		
+
 		if (Weave.IS(instance, IDataSource))
 		{
 			DataSourceManager.openInstance(this.menuBar.dataMenu, instance as IDataSource);
 		}
-		
+
 		if (React.Component.isPrototypeOf(type))
 		{
 			var placeholder = Weave.AS(instance, LinkablePlaceholder);
@@ -346,54 +335,54 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	addToLayout(path:WeavePathArray)
 	{
-		var layout = this.props.weave.getObject(this.getRenderPath());
+		var layout = this.layoutManager.activeLayout;
 		if (layout instanceof AbstractLayout)
 			(layout as AbstractLayout).addPanel(path);
 
 		/*
-		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
-		if (layout)
-		{
-			var state = layout.getSessionState();
-			// check if the current layout is empty
-			if (!state.id && (state.children && !state.children.length))
-			{
-				state = {id: path};
-			}
-			else
-			{
-				state = {
-					children: [state, {id: path}],
-					direction: state.direction == 'horizontal' ? 'horizontal' : 'vertical'
-				};
-			}
-			layout.setSessionState(state);
-		}
-		*/
+		 var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
+		 if (layout)
+		 {
+		 var state = layout.getSessionState();
+		 // check if the current layout is empty
+		 if (!state.id && (state.children && !state.children.length))
+		 {
+		 state = {id: path};
+		 }
+		 else
+		 {
+		 state = {
+		 children: [state, {id: path}],
+		 direction: state.direction == 'horizontal' ? 'horizontal' : 'vertical'
+		 };
+		 }
+		 layout.setSessionState(state);
+		 }
+		 */
 	}
 
 	removeFromLayout(path:WeavePathArray)
 	{
-		var layout = this.props.weave.getObject(this.getRenderPath());
+		var layout = this.layoutManager.activeLayout;
 		if (layout instanceof AbstractLayout)
 			(layout as AbstractLayout).removePanel(path);
-	
+
 		/*
-		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
-		if (layout)
-		{
-			var state = _.cloneDeep(layout.getSessionState());
-			var node = FlexibleLayout.findStateNode(state, path);
-			if (node)
-			{
-				delete node.id;
-				node.children = [];
-				layout.setSessionState(state);
-			}
-		}
-		*/
+		 var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
+		 if (layout)
+		 {
+		 var state = _.cloneDeep(layout.getSessionState());
+		 var node = FlexibleLayout.findStateNode(state, path);
+		 if (node)
+		 {
+		 delete node.id;
+		 node.children = [];
+		 layout.setSessionState(state);
+		 }
+		 }
+		 */
 	}
-	
+
 	componentWillUpdate(nextProps:WeaveAppProps, nextState:WeaveAppState)
 	{
 		for (var tool of this.toolSet)
@@ -404,12 +393,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				tool.setState({ highlightTitle: _.isEqual(nextState.toolPathToEdit, tool.props.path) });
 		}
 	}
-		
+
 	componentWillUnmount()
 	{
 		Weave.dispose(this.enableMenuBarWatcher);
 	}
-		
+
 	get enableMenuBar():LinkableBoolean
 	{
 		// temporary hack until LinkableWatcher can be reused for multiple instances of Weave
@@ -420,18 +409,16 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			this.enableMenuBarWatcher.targetPath = ['WeaveProperties', 'enableMenuBar'];
 			Weave.getCallbacks(this.enableMenuBarWatcher).addGroupedCallback(this, this.forceUpdate);
 		}
-		
+
 		return this.enableMenuBarWatcher.target as LinkableBoolean;
 	}
-	
+
 	render():JSX.Element
 	{
 		var weave = this.props.weave;
-		var renderPath = this.getRenderPath();
-		
+
 		if (!weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
-		
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
@@ -440,7 +427,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			                             onCloseHandler={this.handleSideBarClose}
 			                             style={ {flex:1} }
 			                             className="weave-ToolEditor"/>
-		
+
 		return (
 			<VBox
 				className="weave-app"
@@ -449,24 +436,24 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onContextMenu={ContextMenu.open}
 			>
 				<WeaveProgressBar/>
-			<SideBarContainer barSize={.4} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
-					<WeaveComponentRenderer
+				<SideBarContainer barSize={.4} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
+					<WeaveLayoutManager
+						ref={(c:WeaveLayoutManager) => this.layoutManager = c}
 						weave={weave}
-						path={renderPath}
-						defaultType={WindowLayout}
-						style={{width: "100%", height: "100%"}}
-						props={{panelRenderer: this.renderTool}}
+						dataMenu={this.dataMenu}
+						panelRenderer={this.renderTool}
+						style={{width: "100%", height: "100%", backgroundColor: "white"}}
 					/>
 				</SideBarContainer>
 				{
 					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
-					?	<WeaveMenuBar
-							style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
-							weave={weave}
-							ref={(c:WeaveMenuBar) => this.menuBar = c}
-							createObject={this.createObject}
-						/>
-					:	null
+						?	<WeaveMenuBar
+								style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
+								weave={weave}
+								ref={(c:WeaveMenuBar) => this.menuBar = c}
+								createObject={this.createObject}
+							/>
+						:	null
 				}
 			</VBox>
 		);

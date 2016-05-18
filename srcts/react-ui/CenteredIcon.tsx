@@ -8,19 +8,19 @@ export interface CenteredIconProps extends React.HTMLProps<HTMLSpanElement>
 
 export interface CenteredIconState
 {
-	
+
 }
 
-export default class CenteredICon extends React.Component<CenteredIconProps, CenteredIconState>
+export default class CenteredIcon extends React.Component<CenteredIconProps, CenteredIconState>
 {
-	
+
 	constructor(props:CenteredIconProps)
 	{
 		super(props)
 	}
 
 
-	render() 
+	render()
 	{
 		return (
 			<span className="weave-icon"  {...this.props} style={_.merge(this.props.style||{}, {alignSelf: "stretch", display: "flex", cursor: "pointer"})}>
