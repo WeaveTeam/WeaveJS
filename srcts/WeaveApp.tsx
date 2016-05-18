@@ -255,9 +255,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	renderTool=(path:WeavePathArray, panelProps:LayoutPanelProps)=>
 	{
 		var tool = this.props.weave.getObject(path);
-		if (_.isEqual(path, this.state.toolPathToEdit))
-			console.log('editing', path.join(','));
-
 		return (
 			<WeaveTool
 				ref={this.handleWeaveTool}
