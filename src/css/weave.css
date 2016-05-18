@@ -1,4 +1,3 @@
-
 html {
 	font-family: sans-serif;
 }
@@ -564,12 +563,10 @@ div.table-row-selected>div>div>div>div>div {
 	background-color: rgba(153, 214, 255, 0.4);
 	cursor:pointer;
 }
-
 .weave-tree-view.selected {
 	background-color: #80CCFF;
 	cursor:pointer;
 }
-
 .weave-tree-view.selected:hover {
 	background-color: #99D6FF;
 	cursor:pointer;
