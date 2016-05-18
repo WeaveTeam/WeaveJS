@@ -46,6 +46,7 @@
     "browserify-incremental": "^3.1.1",
     "c3": "https://github.com/WeaveTeam/c3.git",
     "classnames": "^2.2.3",
+    "clipboard": "^1.5.10",
     "d3": "^3.5.9",
     "filesaver.js": "^0.2.0",
     "fixed-data-table": "^0.6.0",
