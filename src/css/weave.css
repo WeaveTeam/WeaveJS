@@ -585,6 +585,7 @@ div.weave-tree-view {
 }
 
 .weave-list-Item{
+	padding:5px;
 	cursor:pointer;
 	background-color: #FFFFFF;
 }

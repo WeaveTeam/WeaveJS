@@ -131,14 +131,14 @@ export default class List extends React.Component<IListProps, IListState>
     render(): JSX.Element {
         //order in merge is important as props.style is readonly and overlfow "auto" is compulsory
         let styleObj:React.CSSProperties = _.merge({},this.props.style,{overflow: "auto"});
+        let listClassName:string = "weave-list " + this.props.className ? this.props.className : "";
         return (
-            <div style={styleObj} className={"weave-list " + this.props.className}>
+            <div style={styleObj} className={listClassName}>
                 {
                     this.values.map((value: any, index: number) => {
                         var selected: boolean = this.state.selectedValues.indexOf(value) >= 0;
 
                         var style: React.CSSProperties = {
-                            padding: 5,
 							alignItems: "center",
 							whiteSpace: "nowrap"
                         };
@@ -148,7 +148,7 @@ export default class List extends React.Component<IListProps, IListState>
                             'weave-list-Item-selected': selected });
 
                         return (
-                            <HBox key={index} style={_.merge(style, this.props.style)} className={ className }  onClick={this.handleChange.bind(this, value) }>
+                            <HBox key={index} style={style}  className={ className }  onClick={this.handleChange.bind(this, value) }>
                                 <span style={{ flex: 1, overflow: "hidden"}}>{this.labels[index] || String(value)}</span>
                             </HBox>
                         );

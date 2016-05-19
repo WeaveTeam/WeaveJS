@@ -170,7 +170,7 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 	{
 		if (this.props.pushCrumb)
 		{
-			this.props.pushCrumb("Customize" , <ColorRampCustomizer colorRamp={this.props.colorRamp} pushCrumb={this.props.pushCrumb}/>)
+			this.props.pushCrumb("Customize" , <ColorRampCustomizer style={ {border:"1px solid lightgrey"} } colorRamp={this.props.colorRamp} pushCrumb={this.props.pushCrumb}/>)
 		}
 	}
 
@@ -236,7 +236,7 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 						<HBox style={{flex: .7, overflow: "auto"}}>
 							<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
 						</HBox>
-						<VBox style={{flex: .3}} className="weave-padded-vbox">
+						<VBox style={{flex: .3, padding:"4px", border:"1px solid lightgrey"}} className="weave-padded-vbox">
 							<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang("Customize")}</label>
 							<ColorRampCustomizer colorRamp={this.props.colorRamp} />
 						</VBox>
@@ -252,7 +252,7 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 								direction="upward"
 							/>
 						</HBox>
-						<HBox style={{flex: .3, justifyContent: "space-between"}}>
+						<HBox style={{flex: .3, justifyContent: "space-between", overflow:"auto"}}>
 							<CenteredIcon onClick={this.reverseColors}>{'↓↑'}</CenteredIcon>
 							<ColorPicker  buttonMode={true} direction={ColorPicker.TOP_LEFT} buttonLabel="Add color"
 							              onChange={(newColor:string) => this.addColor( newColor,"onChange")}
@@ -265,7 +265,7 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 	}
 }
 
-interface ColorRampCustomizerProps extends React.Props<ColorRampCustomizer>
+interface ColorRampCustomizerProps extends React.HTMLProps<ColorRampCustomizer>
 {
 	colorRamp:ColorRamp;
 	pushCrumb?:Function;
@@ -358,9 +358,10 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 			return {
 				value: index,
 				label: (
-					<HBox style={{flex: 1, justifyContent: "space-between", verticalAlign: "middle"}}>
-						<HBox className="weave-padded-hbox">
-							<ColorPicker hexColor={hexColor} onChange={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
+					<HBox style={{flex: "1 0", justifyContent: "space-between", verticalAlign: "middle"}}>
+						<HBox  className="weave-padded-hbox" style={ {alignItems:"center"} }>
+							<ColorPicker hexColor={hexColor}
+							             onChange={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
 							<span style={{alignSelf: "center", fontFamily: "monospace"}}>{hexColor.toUpperCase()}</span>
 						</HBox>
 						<CenteredIcon iconProps={{className: "fa fa-times fa-fw"}} onClick={() => this.removeColorAtIndex(index)}/>
@@ -369,10 +370,12 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 			}
 		});
 
+		let styleObj:React.CSSProperties = this.props.style ? _.merge({},this.props.style,{overflow: "auto",padding:"4px"}) : {overflow: "auto",padding:"4px"}
+
 		if (this.props.pushCrumb) // for Weave Tool Editor
 		{
 			return (
-				<VBox className="weave-padded-vbox">
+				<VBox  className="weave-padded-vbox">
 					<div style={{alignSelf:"flex-end"}}>
 						<HBox>
 							<ColorPicker  buttonMode={true} buttonLabel="Add color"  direction={ColorPicker.BOTTOM_LEFT}
@@ -381,9 +384,9 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 						</HBox>
 
 					</div>
-					<HBox style={{overflow: "auto"}} className="weave-padded-hbox">
+					<HBox style={ styleObj } className="weave-padded-hbox">
 						<ColorRampComponent style={{width: 30}} direction="bottom" ramp={hexColors}/>
-						<List style={ {flex:1} } options={listOptions}/>
+						<List style={ {flex:"1 0" } } options={listOptions}/>
 					</HBox>
 
 				</VBox>
@@ -392,9 +395,9 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 		else // for popUp
 		{
 			return (
-				<HBox style={{overflow: "auto"}} className="weave-padded-hbox">
+				<HBox style={styleObj} className="weave-padded-hbox">
 					<ColorRampComponent style={{width: 30}} direction="bottom" ramp={hexColors}/>
-					<List style={ {flex:1} }  options={listOptions}/>
+					<List style={ {flex:"1 0"} }  options={listOptions}/>
 				</HBox>
 			);
 		}

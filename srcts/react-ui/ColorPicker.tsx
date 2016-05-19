@@ -1,25 +1,27 @@
 import * as React from "react";
 import ReactColorPicker from "../modules/react-color";
 import ReactUtils from "../utils/ReactUtils";
-import {HBox, VBox} from "../react-ui/FlexBox";
+import {HBox, VBox} from "./FlexBox";
 import Button from "../semantic-ui/Button";
 
+//React.props used rather than using React.HTMLProps as onChange has different signature
 export interface ColorPickerProps extends React.Props<ColorPicker>
 {
 	hexColor?:string;
-	width?:string;
-	height?:string;
 	onChange?: (hexColor:string) => void;
 	onClose?: (hexColor:string) => void;
 	onClick?: (hexColor:string) => void;
 	buttonMode?:boolean;
 	buttonLabel?:string|React.ReactChild;
 	direction?:string;
+	style?:React.CSSProperties, // has to mention as they are not part of React.props in typescript
+	className?:string // has to mention as they are not part of React.props in typescript
 }
 
 export interface ColorPickerState
 {
 	hexColor?:string;
+	buttonLabel?:string|React.ReactChild;
 }
 
 export default class ColorPicker extends React.Component<ColorPickerProps, ColorPickerState>
@@ -36,6 +38,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 		super(props);
 		this.state = {
 			hexColor: props.hexColor || '#FFFFFF',
+			buttonLabel:props.buttonLabel
 		};
 		this.handleClick = this.handleClick.bind(this);
 		this.handleClose = this.handleClose.bind(this);
@@ -46,15 +49,20 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 	{
 		if(this.props.hexColor != nextProps.hexColor)
 			this.setState({hexColor: nextProps.hexColor});
+
+		if(this.props.buttonLabel != nextProps.buttonLabel)
+			this.setState({buttonLabel: nextProps.buttonLabel});
 	}
 
 	handleClick=(event:React.MouseEvent) =>{
 		if(this.popup)
 		{
 			this.handleClose();
+
 		}
 		else
 		{
+
 			var clientRect = this.element.getBoundingClientRect();
 			var style:React.CSSProperties = {
 				position: "absolute"
@@ -138,11 +146,15 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 
 			document.addEventListener("click", this.handleClose);
 			this.props.onClick && this.props.onClick(this.state.hexColor);
+			this.setState({buttonLabel: "close"});
 		}
 	};
 
 	handleClose=() => {
 		if(this.popup) {
+			this.setState({
+				buttonLabel: this.props.buttonLabel ? this.props.buttonLabel  : "Add color"
+			});
 			ReactUtils.closePopup(this.popup);
 			this.popup = null;
 			document.removeEventListener("click", this.handleClose);
@@ -160,25 +172,35 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 		// important to set display block if color has no width & height
 		// this enusres swatch size never goes zero
 		var swatchStyle:React.CSSProperties = {
-			padding: '5px',
+			padding: '4px',
 			background: '#fff',
 			borderRadius: '1px',
 			boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
-			display: this.props.width && this.props.height ? 'inline-block' : "block",
+			display: this.props.style && this.props.style.width && this.props.style.height ? 'inline-block' : "block",
+			width:"100%",
+			height:"100%",
 			cursor: 'pointer'
 		};
+		// as color Style is child of SwatchStyle
+		// the size 100% is minus padding border margin values of Swatch style
 		var colorStyle:React.CSSProperties = {
-			width: this.props.width ? this.props.width:"100%",
-			height: this.props.height ? this.props.height:"100%",
 			borderRadius: '2px',
+			width:"100%",
+			height:"100%",
 			background: this.state.hexColor
 		};
 		let ui:JSX.Element = null;
 
+		let styleObject:React.CSSProperties = this.props.style ? this.props.style : {};
+
 		if(this.props.buttonMode)
 		{
-			let label:string | React.ReactChild = this.props.buttonLabel ? this.props.buttonLabel  : "Add color";
-			ui = <div style={ {position:"relative"} }>
+			// Button Size has to be the width and height, user cannot explicitly set when button mode is used
+			styleObject.width =  null;
+			styleObject.height = null;
+
+			let label:string | React.ReactChild = this.state.buttonLabel ? this.state.buttonLabel  : "Add color";
+			ui = <div style={ styleObject }>
 					<div ref={(elt:Element) => this.element = elt as HTMLElement}>
 						<Button  onClick={ this.handleClick }>{label}</Button>
 					</div>
@@ -186,8 +208,16 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 		}
 		else
 		{
-			ui = <div style={ {position:"relative"} }>
-					<div ref={(elt:Element) => this.element = elt as HTMLElement} style={swatchStyle} onClick={ this.handleClick }>
+			// if width and height aren't specified the width and height values are passed from prev parent
+			// and parent with more than one child wont split those values equally as overflow property of parent has to be considered
+			// and eventually each child will take parents complete size.
+			styleObject.width = styleObject.width ? styleObject.width : "30px";
+			styleObject.height = styleObject.height ? styleObject.height : "20px";
+
+			ui = <div style={ styleObject }>
+					<div ref={(elt:Element) => this.element = elt as HTMLElement}
+					     style={swatchStyle}
+					     onClick={ this.handleClick }>
 						<div style={colorStyle}></div>
 					</div>
 				</div>

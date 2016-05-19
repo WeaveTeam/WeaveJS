@@ -652,7 +652,7 @@ export default class C3Histogram extends AbstractC3Tool
 					],
 					!linkedColor && [
 						Weave.lang("Color"),
-						<ColorPicker height={"14px"} hexColor={hexColor} onChange={(newColor:string) => this.updateColor( newColor)}/>
+						<ColorPicker style={ {height:"32px"} } hexColor={hexColor} onChange={(newColor:string) => this.updateColor( newColor)}/>
 					]
 				]
 			],
