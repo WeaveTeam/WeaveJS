@@ -80,9 +80,16 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	addPanel(id:WeavePathArray):void
 	{
 		this.setSessionState(this.getSessionState().concat({id, position: {
-			width: 300,
-			height: 200
+			left: this.fudgePercent(5, 3),
+			top: this.fudgePercent(5, 3),
+			width: "50%",
+			height: "50%"
 		}}));
+	}
+	
+	fudgePercent(n:number, delta:number):string
+	{
+		return Math.round(n - delta + Math.random() * 2 * delta) + '%';
 	}
 	
 	removePanel(id:WeavePathArray):void
@@ -128,21 +135,28 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		
 		this.getSessionState().forEach(state => {
 			var ddiv = this.refs[JSON.stringify(state.id)] as DraggableDiv;
-			var pos = state.position || {};
+			var pos = state.position;
 			if (!ddiv)
 				return;
 			
 			if (state.maximized)
 			{
-				ddiv.setState({left: 0, top: 0, width: element.offsetWidth, height: element.offsetHeight});
+				ddiv.setState({
+					left: 0,
+					top: 0,
+					width: element.offsetWidth,
+					height: element.offsetHeight
+				});
 			}
 			else
+			{
 				ddiv.setState({
-					left: pos.left,
-					top: pos.top,
-					width: pos.width,
-					height: pos.height
+					left: pos ? pos.left : 0,
+					top: pos ? pos.top : 0,
+					width: pos ? pos.width : "100%",
+					height: pos ? pos.height : "100%"
 				});
+			}
 		});
 	}
 	
@@ -159,7 +173,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 				{
 					this.getSessionState().map((state, index) => {
 						var key = JSON.stringify(state.id);
-						var style = _.merge({minWidth: 150, minHeight: 100}, state.position);
+						var style = _.merge({minWidth: "5%", minHeight: "5%"}, state.position);
 						return (
 							<DraggableDiv
 								key={key}
