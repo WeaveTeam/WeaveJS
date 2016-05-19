@@ -874,9 +874,12 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 		for (let layer of this.layers.getObjects(AbstractFeatureLayer as any) as Array<AbstractFeatureLayer>)
 		{
-			if (layer instanceof AbstractFeatureLayer)
+			/* TODO: Instead of only using first visible and selectable layer, coalesce based on vistoolgroup/keyset configs 
+				and present menu items that are grouped by vistoolgroup. */
+			if (layer instanceof AbstractFeatureLayer && layer.visible.value && layer.selectable.value)
 			{
 				menuItems = menuItems.concat(AbstractVisTool.getMenuItems(layer));
+				break;
 			}
 		}
 
