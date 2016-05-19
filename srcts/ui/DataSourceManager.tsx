@@ -146,7 +146,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 			else
 				editorJsx = <span>{Weave.lang("Editor not yet implemented for this data source type.")}</span>;
 		}
-		else {
+		else
+		{
 			editorJsx = <span>{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}</span>;
 		}
 

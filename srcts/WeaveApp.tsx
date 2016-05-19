@@ -62,7 +62,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 {
 	enableMenuBarWatcher:LinkableWatcher;
 	menuBar:WeaveMenuBar;
-	dataMenu:DataMenu;
 	layoutManager:WeaveLayoutManager;
 	layoutManager:WeaveLayoutManager;
 
