@@ -39,8 +39,6 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
 import WeaveLayoutManager from "./layouts/WeaveLayoutManager";
 import DataMenu from "./menus/DataMenu";
-import WeaveLayoutManager from "./layouts/WeaveLayoutManager";
-import DataMenu from "./menus/DataMenu";
 import LayoutsMenu from "./menus/LayoutsMenu";
 
 
@@ -62,7 +60,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 {
 	enableMenuBarWatcher:LinkableWatcher;
 	menuBar:WeaveMenuBar;
-	layoutManager:WeaveLayoutManager;
 	layoutManager:WeaveLayoutManager;
 
 	layoutsMenu:LayoutsMenu;
