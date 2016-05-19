@@ -94,14 +94,14 @@ export default class WeaveLayoutManager extends React.Component<WeaveLayoutManag
 		{
 			weaveRoot.removeObject(weaveRoot.getName(this.layouts[layoutIndexOrInstance as number - 1]));
 			this.tabs.setState({
-				activeTabIndex: this.layouts.length - 2
+				activeTabIndex: layoutIndexOrInstance as number - 1
 			});
 		}
 		else {
 			let index = this.layouts.indexOf(layoutIndexOrInstance as AbstractLayout);
 			weaveRoot.removeObject(weaveRoot.getName(layoutIndexOrInstance as AbstractLayout))
 			this.tabs.setState({
-				activeTabIndex: index - 2,
+				activeTabIndex: index, // offset is compensated here
 			})
 		}
 	}
