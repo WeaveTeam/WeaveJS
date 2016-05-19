@@ -775,6 +775,11 @@ div.weave-tree-view {
 	padding: .5em 0em 1em 1em;
 }
 
+/****** Dimmer ********/
+.ui.dimmer {
+	background-color: rgba(0,0,0,.5);
+}
+
 .weave-dropzone-file {
 	width: 100%;
 	height: 100%;
