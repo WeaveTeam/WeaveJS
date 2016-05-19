@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
 import List from "../react-ui/List";
@@ -11,6 +12,7 @@ import FileInfoView from "./FileInfoView";
 import Button from "../semantic-ui/Button";
 import FileInput from "../react-ui/FileInput";
 import Login from "../ui/admin/Login";
+import SmartComponent from "./SmartComponent";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
@@ -20,12 +22,12 @@ var URLRequestUtils = weavejs.WeaveAPI.URLRequestUtils;
 export interface IOpenFileProps {
 	openUrlHandler:(url:string) => void;
 	openFileHandler:(file:File) => void;
-	fileNames:string[];
 }
 
 export interface IOpenFileState {
 	rejected?:boolean;
 	fileInfo?:WeaveFileInfo;
+	fileNames?:string[];
 }
 
 export class LocalFileOpen extends React.Component<IOpenFileProps, IOpenFileState> {
@@ -87,18 +89,58 @@ export class LocalFileOpen extends React.Component<IOpenFileProps, IOpenFileStat
 
 export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFileState> {
 
+	element:Element;
+	dimmerSelector:any;
 	constructor(props:IOpenFileProps)
 	{
 		super(props);
 		this.state = {
-			fileInfo:null
+			fileInfo:null,
+			fileNames:[]
 		}
+	}
+
+	authenticateForm=(event:any,fields:any) => {
+		Login.close();
+		weavejs.net.Admin.service.authenticate(fields.username,fields.password).then(() => {
+			this.getWeaveFiles();
+		},(error:any) => {
+			Login.open(this.dimmerSelector);
+		});
+	};
+
+	getWeaveFiles=() => {
+		weavejs.net.Admin.service.getWeaveFileNames(true).then( (fileNames:string[]) => {
+			this.setState({
+				fileNames
+			});
+		},(error:any) => {
+			Login.open(this.dimmerSelector);
+		});
+	};
+
+	handleCancel=() => {
+		Login.close();
+		this.setState({
+			fileNames: []
+		});
+	};
+
+	handleError=(formErrors:any,fields:any) => {
+
+	};
+
+	componentDidMount()
+	{
+		this.element = ReactDOM.findDOMNode(this);
+		this.dimmerSelector = ($(this.element).find(".weave-server-file-view") as any);
+		this.getWeaveFiles();
 	}
 
 	render():JSX.Element
 	{
 
-		let fileList:ListOption[] = this.props.fileNames.map((file:any) => {
+		let fileList:ListOption[] = this.state.fileNames.map((file:any) => {
 			return {
 				label: (
 					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
@@ -120,38 +162,46 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 		};
 
 		return (
-			<HBox style={{flex: 1, marginLeft: 20, marginRight: 20}}>
-				<VBox style={{flex: 1}}>
-					<FixedDataTable rows={rows}
-					                columnIds={columnIds}
-					                idProperty="filename"
-					                showIdColumn={true}
-					                columnTitles={columnTitles}
-					                multiple={false}
-					                onSelection={(selectedFiles:string[]) => {
-					                    if(selectedFiles[0])
-											weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then( (fileInfo:WeaveFileInfo) => {
-												this.setState({
-													fileInfo
-												});
-											});
-					                }}
-					/>
-				</VBox>
-				<VBox style={ {flex: 1, paddingLeft: 20} }>
-					<FileInfoView className="weave-container" fileInfo={this.state.fileInfo}>
-						{this.state.fileInfo ?
-							<Button
-								onClick={() => {
-				                    this.props.openUrlHandler("/" + this.state.fileInfo.fileName);
-				                    PopupWindow.close(FileDialog.window);
-								}}
-							>
-								{Weave.lang("Load Session")}
-							</Button>:null}
-					</FileInfoView>
-				</VBox>
-			</HBox>
+			<VBox style={{flex:1}}>
+				<HBox className="weave-server-file-view" style={{flex: 1, marginLeft: 20, marginRight: 20}}>
+					<VBox style={{flex: 1}}>
+						<FixedDataTable rows={rows}
+						                columnIds={columnIds}
+						                idProperty="filename"
+						                showIdColumn={true}
+						                columnTitles={columnTitles}
+						                multiple={false}
+						                onSelection={(selectedFiles:string[]) => {
+						                    if(selectedFiles[0])
+												weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then(
+													(fileInfo:WeaveFileInfo) => {
+														this.setState({
+															fileInfo
+														});
+													},
+													(error:any) => {
+														Login.open(this.dimmerSelector);
+													}
+												);
+						                }}
+						/>
+					</VBox>
+					<VBox style={ {flex: 1, paddingLeft: 20} }>
+						<FileInfoView className="weave-container" fileInfo={this.state.fileInfo}>
+							{this.state.fileInfo ?
+								<Button
+									onClick={() => {
+					                    this.props.openUrlHandler("/" + this.state.fileInfo.fileName);
+					                    PopupWindow.close(FileDialog.window);
+									}}
+								>
+									{Weave.lang("Load Session")}
+								</Button>:null}
+						</FileInfoView>
+					</VBox>
+				</HBox>
+				<Login onLogin={this.authenticateForm} onCancel={this.handleCancel} onFailure={this.handleError}/>
+			</VBox>
 		);
 	}
 }
@@ -164,14 +214,14 @@ export interface IFileDialogProps extends React.Props<FileDialog>
 
 export interface IFileDialogState
 {
-	fileNames:string[];
+	selected?:string;
 }
 
-export default class FileDialog extends React.Component<IFileDialogProps, IFileDialogState> {
+export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDialogState> {
 	static window:PopupWindow;
 	static listItems:{[key:string]:string}[] = [{label: "My Computer" , iconClass:"fa fa-desktop"}, {label: "Weave Server", iconClass: "fa fa-server"}];
 	static activeListIndex:number = 0;
-	static selected:string;
+	element:Element;
 
 	static storageRegistry = new Map< String, React.ComponentClass<IOpenFileProps>>()
 		.set("My Computer", LocalFileOpen)
@@ -180,8 +230,7 @@ export default class FileDialog extends React.Component<IFileDialogProps, IFileD
 	constructor(props:IFileDialogProps)
 	{
 		super(props);
-		FileDialog.selected = "My Computer";
-		this.state = {fileNames: []};
+		this.state = {selected: "My Computer"};
 	}
 
 	static close(window:PopupWindow)
@@ -204,32 +253,18 @@ export default class FileDialog extends React.Component<IFileDialogProps, IFileD
 		});
 	}
 
-	authenticateForm=(event:any,fields:any) => {
-		PopupWindow.close(Login.window);
-		weavejs.net.Admin.service.authenticate(fields.username,fields.password).then(() => {
-			this.getWeaveFiles();
-		});
-	};
-
-	getWeaveFiles=() => {
-		weavejs.net.Admin.service.getWeaveFileNames(true).then( (fileNames:string[]) => {
-			this.setState({
-				fileNames
-			});
-		});
-	};
-
-	handleError=(formErrors:any,fields:any) => {
-
-	};
+	componentDidMount()
+	{
+		this.element = ReactDOM.findDOMNode(this);
+	}
 
 	render():JSX.Element
 	{
 		let editorJsx:JSX.Element;
-		let fileSource = FileDialog.selected;
+		let fileSource = this.state.selected;
 		let EditorClass = FileDialog.storageRegistry.get(fileSource);
 		if (EditorClass)
-			editorJsx = <EditorClass openFileHandler={this.props.openFileHandler} openUrlHandler={this.props.openUrlHandler} fileNames={this.state.fileNames}/>;
+			editorJsx = <EditorClass openFileHandler={this.props.openFileHandler} openUrlHandler={this.props.openUrlHandler}/>;
 		let listOptions:ListOption[] = FileDialog.listItems.map((fileSource:any) => {
 			return {
 				label: (
@@ -252,19 +287,9 @@ export default class FileDialog extends React.Component<IFileDialogProps, IFileD
 						multiple={false}
 						selectedValues={ [fileSource] }
 						onChange={ (selectedValues:string[]) => {
-							FileDialog.selected = selectedValues[0];
-							if(FileDialog.selected === "Weave Server"){
-								if(weavejs.net.Admin.service.authenticated.value)
-								{
-									this.getWeaveFiles();
-								} else {
-									Login.open(this.authenticateForm,this.handleError);
-								}
-							} else {
-								this.setState({
-									fileNames:[]
-								})
-							}
+							this.setState({
+								selected: selectedValues[0]
+							})
 						}}
 					/>
 				</VBox>
