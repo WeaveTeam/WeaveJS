@@ -113,8 +113,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		if (this.selectionKeySet && this.selectionKeySet.keys.length)
 		{
 			menuItems.push({
-				shown: Weave.beta,
-				label: Weave.lang("Move selected to top (Beta)"),
+				label: Weave.lang("Move selected to top"),
 				click: () => this.fixedDataTable.moveSelectedToTop()
 			});
 		}
