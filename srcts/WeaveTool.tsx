@@ -86,7 +86,8 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	updateAltText():void
 	{
 		var path = this.props.path;
-		var altText:string = this.watcher && this.watcher.target ? (this.watcher.target as IVisTool).altText.value : '';
+		var altTextLinkable = this.watcher && this.watcher.target && (this.watcher.target as IVisTool).altText;
+		var altText = altTextLinkable ? altTextLinkable.value : '';
 		if (this.state.altText != altText)
 			this.setState({altText});
 	}
