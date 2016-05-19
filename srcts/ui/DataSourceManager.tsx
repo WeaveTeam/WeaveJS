@@ -48,6 +48,7 @@ export interface IDataSourceManagerProps
 
 export interface IDataSourceManagerState
 {
+	selected:IDataSource;
 }
 
 export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
@@ -61,19 +62,19 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(WeaveDataSource, WeaveDataSourceEditor)
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
-		.set(GroupedDataTransform, GroupedDataTransformEditor)
+		.set(GroupedDataTransform, GroupedDataTransformEditor);
 //
-
-	static selected:IDataSource;
-
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
+		this.state = {
+			selected: this.props.dataMenu.weave.root.getObjects(IDataSource)[0]
+		}
 	}
 
 	componentDidMount()
 	{
-		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.updateDataSources,true );
+		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.updateDataSources, true);
 	}
 
 	componentWillUnmount()
@@ -138,7 +139,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		});
 
 		let editorJsx:JSX.Element;
-		let dataSource = DataSourceManager.selected;
+		let dataSource = this.state.selected;
 
 		if (dataSource && !Weave.wasDisposed(dataSource))
 		{
@@ -169,7 +170,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 							options={listOptions}
 							multiple={false}
 							selectedValues={ [dataSource] }
-							onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0]; this.forceUpdate(); }}
+							onChange={ (selectedValues:IDataSource[]) => { this.setState({ selected: selectedValues[0] }); }}
 						/>
 					</VBox>
 				</VBox>
@@ -178,11 +179,5 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 				</VBox>
 			</HBox>
 		);
-	}
-
-	static openInstance(dataMenu:DataMenu, selected:IDataSource = null):ControlPanel
-	{
-		DataSourceManager.selected = selected;
-		return ControlPanel.openInstance(dataMenu.weave, DataSourceManager, {title: Weave.lang("Data Sources")}, {dataMenu});
 	}
 }

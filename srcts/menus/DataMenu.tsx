@@ -9,15 +9,17 @@ import IDataSource_Service = weavejs.api.data.IDataSource_Service;
 import FileMenu from "./FileMenu";
 import FileInput from "../react-ui/FileInput";
 import ChartsMenu from "./ChartsMenu";
+import WeaveLayoutManager from "../layouts/WeaveLayoutManager";
 
 export default class DataMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void, openDataSourceManagerCallback:Function)
 	{
 		this.weave = weave;
 		this.fileMenu = new FileMenu(weave);
 		this.chartsMenu = new ChartsMenu(weave, createObject);
 		this.createObject = createObject;
+		this.openDataSourceManagerCallback = openDataSourceManagerCallback;
 	}
 
 	label:string = "Data";
@@ -25,13 +27,14 @@ export default class DataMenu implements MenuBarItemProps
 	chartsMenu:ChartsMenu;//menu to be passed for creating visualizations from tha datasource manager
 	fileMenu:FileMenu; // temp solution
 	createObject:(type:new(..._:any[])=>any)=>void;
-	
+	openDataSourceManagerCallback:Function; // callback function passed that will open the data source manager
+
 	get menu():MenuItemProps[]
 	{
 		return [].concat(
 			{
 				label: Weave.lang('Manage data...'),
-				click: () => DataSourceManager.openInstance(this)
+				click: () => this.openDataSourceManagerCallback()
 			},
 //			{},
 //			{

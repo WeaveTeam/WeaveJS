@@ -39,6 +39,7 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
 import WeaveLayoutManager from "./layouts/WeaveLayoutManager";
 import DataMenu from "./menus/DataMenu";
+import LayoutsMenu from "./menus/LayoutsMenu";
 
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -59,8 +60,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 {
 	enableMenuBarWatcher:LinkableWatcher;
 	menuBar:WeaveMenuBar;
-	dataMenu:DataMenu;
 	layoutManager:WeaveLayoutManager;
+
+	layoutsMenu:LayoutsMenu;
+	dataMenu:DataMenu;
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
@@ -73,7 +76,17 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.state = {
 			toolPathToEdit: null
 		}
-		this.dataMenu = new DataMenu(this.props.weave, this.createObject);
+		this.dataMenu = new DataMenu(this.props.weave, this.createObject, () => {
+			if(this.layoutManager)
+				this.layoutManager.openDataSourceManager();
+		});
+		this.layoutsMenu = new LayoutsMenu(this.props.weave, (layoutType:typeof AbstractLayout) => {
+			if(this.layoutManager)
+				this.layoutManager.addLayout(layoutType)
+		}, () => {
+			if(this.layoutManager)
+				(this as any).layoutManager.removeLayout(this.layoutManager.activeLayout)
+		});
 	}
 
 	private createDefaultSessionElements()
@@ -282,7 +295,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		if (Weave.IS(instance, IDataSource))
 		{
-			DataSourceManager.openInstance(this.menuBar.dataMenu, instance as IDataSource);
+			this.layoutManager.openDataSourceManager();
 		}
 
 		if (React.Component.isPrototypeOf(type))
@@ -447,6 +460,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						?	<WeaveMenuBar
 								style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
 								weave={weave}
+								dataMenu={this.dataMenu}
+								layoutsMenu={this.layoutsMenu}
 								ref={(c:WeaveMenuBar) => this.menuBar = c}
 								createObject={this.createObject}
 							/>
