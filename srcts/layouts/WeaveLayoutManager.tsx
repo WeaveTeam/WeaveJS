@@ -143,7 +143,7 @@ export default class WeaveLayoutManager extends React.Component<WeaveLayoutManag
 						].concat(this.layouts.map(layout => (
 					        <WeaveComponentRenderer
 					            weave={this.props.weave}
-								path={Weave.getPath(layout).getPath()}
+								path={[weaveRoot.getName(layout)]}
 								props={{panelRenderer: this.props.panelRenderer}}
 								defaultType={WindowLayout}
 					        />
