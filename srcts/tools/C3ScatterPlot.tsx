@@ -6,6 +6,10 @@ import FormatUtils from "../utils/FormatUtils";
 import * as React from "react";
 import * as c3 from "c3";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import ChartUtils from "../utils/ChartUtils";
+import ComboBox from "../semantic-ui/ComboBox";
+import Accordion from "../semantic-ui/Accordion";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -39,6 +43,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	radius = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
+	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
 
 	private get radiusNorm() { return this.radius.getInternalColumn() as NormalizedColumn; }
 	private get radiusData() { return this.radiusNorm.internalDynamicColumn; }
@@ -124,7 +129,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 								return String(FormatUtils.defaultNumberFormatting(num));
 							}
 						},
-						rotate: -45,
+						rotate: this.xAxisLabelAngle.value,
 						culling: {
 							max: null
 						},
@@ -224,7 +229,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			
 			this.c3Config.data.json = {x: _.map(this.records, 'point.x'), y: _.map(this.records, 'point.y')};
 		}
-		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin);
+		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin, this.xAxisLabelAngle);
 		if (axisChanged)
 		{
 			var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
@@ -235,14 +240,14 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				this.c3Config.data.axes = {'y': 'y2'};
 				this.c3Config.axis.y2 = this.c3ConfigYAxis;
 				this.c3Config.axis.y = {show: false};
-				this.c3Config.axis.x.tick.rotate = 45;
+				this.c3Config.axis.x.tick.rotate = -1*this.xAxisLabelAngle.value;
 			}
 			else
 			{
 				this.c3Config.data.axes = {'y': 'y'};
 				this.c3Config.axis.y = this.c3ConfigYAxis;
 				delete this.c3Config.axis.y2;
-				this.c3Config.axis.x.tick.rotate = -45;
+				this.c3Config.axis.x.tick.rotate = this.xAxisLabelAngle.value;
 			}
 
 			this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
@@ -358,13 +363,20 @@ export default class C3ScatterPlot extends AbstractC3Tool
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(pushCrumb:Function):JSX.Element
 	{
-		return (
-			<VBox>
-				{
-					super.renderEditor(pushCrumb)
-				}
-			</VBox>
-		)
+		return Accordion.render(
+			[Weave.lang("Data"), this.getSelectableAttributesEditor(pushCrumb)],
+			[
+				Weave.lang("Display"),
+				[
+					[
+						Weave.lang("X axis label angle"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+					]
+				]
+			],
+			[Weave.lang("Titles"), this.getTitlesEditor()],
+			[Weave.lang("Margins"), this.getMarginEditor()]
+		);
 	}
 
 	public get deprecatedStateMapping():Object

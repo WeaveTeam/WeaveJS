@@ -9,6 +9,10 @@ import {ChartConfiguration, ChartAPI} from "c3";
 import {MouseEvent} from "react";
 import ToolTip from "./ToolTip";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import ChartUtils from "../utils/ChartUtils";
+import ComboBox from "../semantic-ui/ComboBox";
+import Accordion from "../semantic-ui/Accordion";
+import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -19,6 +23,7 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import LinkableString = weavejs.core.LinkableString;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import LinkableNumber = weavejs.core.LinkableNumber;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -31,6 +36,7 @@ export default class C3LineChart extends AbstractC3Tool
     columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
     line = Weave.linkableChild(this, SolidLineStyle);
     curveType = Weave.linkableChild(this, LinkableString);
+    xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
 
     private RECORD_FORMAT = {
         id: IQualifiedKey,
@@ -126,7 +132,7 @@ export default class C3LineChart extends AbstractC3Tool
                             max: null
                         },
                         multiline: false,
-                        rotate: -45,
+                        rotate: this.xAxisLabelAngle.value,
                         format: (d:number):string => {
                             if (weavejs.WeaveAPI.Locale.reverseLayout)
                             {
@@ -185,7 +191,7 @@ export default class C3LineChart extends AbstractC3Tool
     protected validate(forced:boolean = false):boolean
     {
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds, this.xAxisName, this.yAxisName, this.margin);
+        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds, this.xAxisName, this.yAxisName, this.margin, this.xAxisLabelAngle);
 		var dataChanged:boolean = axisChange || Weave.detectChange(this, this.curveType, this.line, this.filteredKeySet);
         if (dataChanged)
         {
@@ -243,7 +249,7 @@ export default class C3LineChart extends AbstractC3Tool
                     this.c3Config.data.axes = axes;
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
-                    this.c3Config.axis.x.tick.rotate = 45;
+                    this.c3Config.axis.x.tick.rotate = -1*this.xAxisLabelAngle.value;
                 }
                 else
                 {
@@ -253,7 +259,7 @@ export default class C3LineChart extends AbstractC3Tool
                     this.c3Config.data.axes = axes;
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
-                    this.c3Config.axis.x.tick.rotate = -45;
+                    this.c3Config.axis.x.tick.rotate = this.xAxisLabelAngle.value;
                 }
             }
 
@@ -374,9 +380,20 @@ export default class C3LineChart extends AbstractC3Tool
 
     //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
     renderEditor(pushCrumb:Function):JSX.Element{
-        return (<VBox>
-            {super.renderEditor(pushCrumb)}
-        </VBox>);
+	    return Accordion.render(
+		    [Weave.lang("Data"), this.getSelectableAttributesEditor(pushCrumb)],
+		    [
+			    Weave.lang("Display"),
+			    [
+				    [
+					    Weave.lang("X axis label angle"),
+					    <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+				    ]
+			    ]
+		    ],
+		    [Weave.lang("Titles"), this.getTitlesEditor()],
+		    [Weave.lang("Margins"), this.getMarginEditor()]
+	    );
     };
 
     get deprecatedStateMapping()

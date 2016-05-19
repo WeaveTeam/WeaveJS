@@ -11,6 +11,8 @@ import Checkbox from "../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import {ComboBoxOption} from "../semantic-ui/ComboBox";
+import Accordion from "../semantic-ui/Accordion";
+import ChartUtils from "../utils/ChartUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -24,7 +26,6 @@ import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-import Accordion from "../semantic-ui/Accordion";
 
 declare type Record = {
     id: IQualifiedKey,
@@ -63,6 +64,7 @@ export default class C3BarChart extends AbstractC3Tool
     horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
     showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
     showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
+	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
 	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8));
 
     private verifyGroupingMode(mode:string):boolean
@@ -161,7 +163,7 @@ export default class C3BarChart extends AbstractC3Tool
                     },
 					height: this.margin.bottom.value,
                     tick: {
-                        rotate: -45,
+                        rotate: this.xAxisLabelAngle.value,
                         culling: {
                             max: null
                         },
@@ -451,7 +453,8 @@ export default class C3BarChart extends AbstractC3Tool
 			this.overrideBounds,
 			this.xAxisName,
 			this.yAxisName,
- 			this.showXAxisLabel
+ 			this.showXAxisLabel,
+	        this.xAxisLabelAngle
 		);
 		var dataChange = axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet, this.showValueLabels);
 		if (dataChange)
@@ -483,7 +486,7 @@ export default class C3BarChart extends AbstractC3Tool
                     this.c3Config.data.axes = axes;
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
-                    this.c3Config.axis.x.tick.rotate = 45;
+                    this.c3Config.axis.x.tick.rotate = -1*this.xAxisLabelAngle.value;
                 }
                 else
                 {
@@ -493,7 +496,7 @@ export default class C3BarChart extends AbstractC3Tool
                     this.c3Config.data.axes = axes;
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
-                    this.c3Config.axis.x.tick.rotate = -45;
+                    this.c3Config.axis.x.tick.rotate = this.xAxisLabelAngle.value;
                 }
             }
 
@@ -574,6 +577,10 @@ export default class C3BarChart extends AbstractC3Tool
 					[
 						Weave.lang("Show X axis title"),
 						<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={" "}/>
+					],
+					[
+						Weave.lang("X axis label angle"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
 					]
 				]
 			],

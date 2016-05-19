@@ -22,6 +22,7 @@ import BinningDefinitionEditor from "../editors/BinningDefinitionEditor";
 import Button from "../semantic-ui/Button";
 import DynamicComponent from "../ui/DynamicComponent";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+import ChartUtils from "../utils/ChartUtils";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -62,6 +63,7 @@ export default class C3Histogram extends AbstractC3Tool
     barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
 	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
 	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
+	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
 	
 	get colorColumn()
 	{
@@ -200,7 +202,7 @@ export default class C3Histogram extends AbstractC3Tool
                         position: "outer-center"
                     },
                     tick: {
-                        rotate: -45,
+                        rotate: this.xAxisLabelAngle.value,
                         culling: {
                             max: null
                         },
@@ -474,7 +476,7 @@ export default class C3Histogram extends AbstractC3Tool
     protected validate(forced:boolean = false):boolean
     {
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin);
+        var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin, this.xAxisLabelAngle);
         if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fill, this.line, this.filteredKeySet, this.showValueLabels))
         {
             changeDetected = true;
@@ -494,14 +496,14 @@ export default class C3Histogram extends AbstractC3Tool
                     this.c3Config.data.axes = {[temp]:'y2'};
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
-                    this.c3Config.axis.x.tick.rotate = 45;
+                    this.c3Config.axis.x.tick.rotate = -1*this.xAxisLabelAngle.value;
                 }
                 else
                 {
                     this.c3Config.data.axes = {[temp]:'y'};
                     this.c3Config.axis.y = this.c3ConfigYAxis;
                     delete this.c3Config.axis.y2;
-                    this.c3Config.axis.x.tick.rotate = -45;
+                    this.c3Config.axis.x.tick.rotate = this.xAxisLabelAngle.value;
                 }
             }
 
@@ -643,6 +645,10 @@ export default class C3Histogram extends AbstractC3Tool
 					[
 						Weave.lang("Show value labels"),
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
+					],
+					[
+						Weave.lang("X axis label angle"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
 					],
 					!linkedColor && [
 						Weave.lang("Color"),
