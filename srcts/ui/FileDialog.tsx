@@ -28,6 +28,7 @@ export interface IOpenFileState {
 	rejected?:boolean;
 	fileInfo?:WeaveFileInfo;
 	fileNames?:string[];
+	allFiles?:boolean;
 }
 
 export class LocalFileOpen extends React.Component<IOpenFileProps, IOpenFileState> {
@@ -96,7 +97,8 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 		super(props);
 		this.state = {
 			fileInfo:null,
-			fileNames:[]
+			fileNames:[],
+			allFiles:true
 		}
 	}
 
@@ -110,7 +112,7 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 	};
 
 	getWeaveFiles=() => {
-		weavejs.net.Admin.service.getWeaveFileNames(true).then( (fileNames:string[]) => {
+		weavejs.net.Admin.service.getWeaveFileNames(this.state.allFiles).then( (fileNames:string[]) => {
 			this.setState({
 				fileNames
 			});
@@ -137,6 +139,11 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 		this.getWeaveFiles();
 	}
 
+	componentDidUpdate()
+	{
+		this.getWeaveFiles();
+	}
+
 	render():JSX.Element
 	{
 
@@ -158,7 +165,31 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 		});
 		let columnIds = ["filename"];
 		let columnTitles:IColumnTitles = {
-			filename: Weave.lang("Filename")
+			filename: (<div className="ui form">
+				<div className="inline fields">
+					<label>{Weave.lang("Filename")}</label>
+					<div className="field">
+						<div className="ui radio checkbox">
+							<input type="radio" checked={!this.state.allFiles} onChange={(e:any) => {
+									this.setState({
+										allFiles: false
+									});
+								}}/>
+							<label>{Weave.lang("My files")}</label>
+						</div>
+					</div>
+					<div className="field">
+						<div className="ui radio checkbox">
+							<input type="radio" checked={this.state.allFiles} onChange={(e:any) => {
+									this.setState({
+										allFiles: true
+									});
+								}}/>
+							<label>{Weave.lang("All files")}</label>
+						</div>
+					</div>
+				</div>
+			</div>)
 		};
 
 		return (
@@ -171,6 +202,7 @@ export class WeaveServerFileOpen extends React.Component<IOpenFileProps, IOpenFi
 						                showIdColumn={true}
 						                columnTitles={columnTitles}
 						                multiple={false}
+						                disableSort={true}
 						                onSelection={(selectedFiles:string[]) => {
 						                    if(selectedFiles[0])
 												weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then(

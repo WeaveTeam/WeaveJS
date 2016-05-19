@@ -11,7 +11,7 @@ import SmartComponent from "../ui/SmartComponent";
 export declare type SortDirection = "ASC"|"DESC"|"NONE";
 export interface IColumnTitles
 {
-	[columnId: string] : string
+	[columnId: string] : string | JSX.Element
 }
 
 export interface  IColumnWidths
@@ -37,6 +37,7 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	columnTitles?:IColumnTitles;
 	enableHover?:boolean;
 	enableSelection?:boolean;
+	disableSort?:boolean;
 	probedIds?:string[];
 	selectedIds?:string[];
 	onHover?:(id:string[]) => void;
@@ -84,7 +85,8 @@ export interface ISortHeaderProps extends React.Props<SortHeaderCell>
 {
 	onSortChange?: (columnKey:string, sortDirection:SortDirection) => void;
 	sortDirection?: SortDirection;
-	columnKey: string;
+	disableSort?: boolean;
+	columnKey?: string;
 }
 
 export interface ISortHeaderState
@@ -129,6 +131,10 @@ export class TextCell extends React.Component<ITextCellProps, ITextCellState>
 
 export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeaderState>
 {
+	defaultProps:ISortHeaderProps = {
+		disableSort: false
+	};
+
 	constructor(props:ISortHeaderProps) {
 		super(props);
 
@@ -170,7 +176,7 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 	{
 		e.preventDefault();
 
-		if (this.props.onSortChange) {
+		if (this.props.onSortChange && !this.props.disableSort) {
 			this.props.onSortChange(
 				this.props.columnKey,
 				this.props.sortDirection ?
@@ -202,6 +208,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		enableHover:true,
 		enableSelection:true,
 		showIdColumn:false,
+		disableSort:false,
 		rowHeight:30,
 		headerHeight:30,
 		initialColumnWidth: 85,
@@ -512,6 +519,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 												<SortHeaderCell
 													onSortChange={this.updateSortDirection}
 													sortDirection={id == this.state.sortId ? this.state.sortDirection : "NONE"}
+													disableSort={this.props.disableSort}
 													columnKey={id}
 												>
 													{this.props.columnTitles ? this.props.columnTitles[id]:id}
