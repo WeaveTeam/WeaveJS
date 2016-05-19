@@ -51,6 +51,7 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	height?:number;
 	showBottomBorder?:boolean;
 	allowClear?: boolean;
+	multiple?: boolean;
 	sortId?:string;
 	sortDirection?: SortDirection;
 	/** 
@@ -253,10 +254,10 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		//get sort index of selected records
 		var sortIndices:number[] = this.state.sortIndices;
 		var selectedIndices:number[] = this.state.selectedIds.map( (id:string,index:number) => {
-			return sortIndices.indexOf(
-				_.findIndex(this.props.rows.map((row:IRow) => {
-					return row[this.props.idProperty]
-				}), id));
+			let foundIndex:number = _.indexOf(this.props.rows.map((row:IRow) => {
+				return row[this.props.idProperty]
+			}), id);
+			return sortIndices.indexOf(foundIndex);
 		});
 		//splice found indices to front of sort list
 		selectedIndices.forEach( (value) => {
@@ -354,7 +355,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		var keyLocation:number = selectedIds.indexOf(id);
 
 		// multiple selection
-		if ((event.ctrlKey || event.metaKey))
+		if ((event.ctrlKey || event.metaKey) && this.props.multiple)
 		{
 			// if the record is already in the selection
 			// we remove it
@@ -370,7 +371,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		}
 
 		// shift selection
-		else if (event.shiftKey)
+		else if (event.shiftKey && this.props.multiple)
 		{
 			selectedIds = [];
 			if (this.lastClicked == null)

@@ -74,6 +74,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
 		this.columns.addGroupedCallback(this, this.dataChanged, true);
+		this.sortFieldIndex.addGroupedCallback(this, this.dataChanged, true);
+		this.sortInDescendingOrder.addGroupedCallback(this, this.dataChanged, true);
 		this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
 		this.selectionFilter.addGroupedCallback(this, this.forceUpdate);
 		this.probeFilter.addGroupedCallback(this, this.forceUpdate);
@@ -243,7 +245,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	{
 		this.sortFieldIndex.value = this.columns.getNames().indexOf(columnKey);
 		this.sortInDescendingOrder.value = sortDirection == SortTypes.DESC;
-	}
+	};
 
 	sortFunction = (indexA:number, indexB:number, columnKey:string) =>
 	{
