@@ -1,9 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {VBox} from  "../react-ui/FlexBox";
+import FileDialog from  "../ui/FileDialog";
 import DataSourceManager from  "./DataSourceManager";
 import ControlPanel  from "./ControlPanel";
 import DataMenu  from "../menus/DataMenu";
+import FileMenu from "../menus/FileMenu";
 
 
 export interface StepByStepGuidanceProps extends React.HTMLProps<StepByStepGuidance>
@@ -22,10 +24,12 @@ export default class StepByStepGuidance extends React.Component<StepByStepGuidan
 
 
 	private dataMenu:DataMenu = null;
+	private fileMenu:FileMenu = null;
 	constructor(props:StepByStepGuidanceProps)
 	{
 		super(props);
 		this.dataMenu = new DataMenu(props.weave, props.createObject);
+		this.fileMenu = new FileMenu(props.weave);
 		this.state = {
 			visible:true
 		}
@@ -36,8 +40,15 @@ export default class StepByStepGuidance extends React.Component<StepByStepGuidan
 		
 	}
 
-	openDataSource=()=>{
+	openDataSourceManager=()=>{
 		DataSourceManager.openInstance(this.dataMenu)
+		this.setState({
+			visible:false
+		})
+	}
+
+	openFileDialog=()=>{
+		FileDialog.open(this.fileMenu.loadUrl,this.fileMenu.handleOpenedFile)
 		this.setState({
 			visible:false
 		})
@@ -77,14 +88,15 @@ export default class StepByStepGuidance extends React.Component<StepByStepGuidan
 				<VBox key="data"
 				      className="weave-guidance-item"
 				      style={itemStyle}
-				      onClick={this.openDataSource}>
+				      onClick={this.openDataSourceManager}>
 					<i className="fa fa-database"></i>
 					<br/>
 					<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
 				</VBox>
 				<VBox key="charts"
 				      className="weave-guidance-item"
-				      style={itemStyle}>
+				      style={itemStyle}
+				      onClick={this.openFileDialog}>
 					<i className="fa fa-code"></i>
 					<br/>
 					<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
