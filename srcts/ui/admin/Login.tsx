@@ -75,7 +75,6 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 						<div className="ui compact right floated segment" style={{border: "none", background: "transparent", boxShadow: "none"}}>
 							<Button className="mini circular basic icon cancel"
 							     onClick={(e) => {
-							         console.log(e);
 							        this.props.onCancel && this.props.onCancel();
 								}}
 							>
