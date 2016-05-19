@@ -13,6 +13,7 @@ import EditableTextCell from '../react-ui/EditableTextCell';
 import MiscUtils from "../utils/MiscUtils";
 import ComboBox from "../semantic-ui/ComboBox";
 import CheckBox from "../semantic-ui/Checkbox";
+import Button from "../semantic-ui/Button";
 import CenteredIcon from "../react-ui/CenteredIcon";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import Tabs from "../react-ui/Tabs";
@@ -43,13 +44,19 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 	public autoRecord = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
 
-	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
+	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable), this.handleChoices);
 	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
 	panelTitle = Weave.linkableChild(this, LinkableString);
+
+	pendingApply:Boolean =false;
 
 	verifyLayoutMode(value:string):boolean
 	{
 		return menuOptions.indexOf(value) >= 0;
+	}
+
+	test(){
+		console.log("selectedChoice:", this.selectedChoice.value);
 	}
 
 	get title():string
@@ -63,7 +70,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 		//this.choices.addGroupedCallback(this, this.choiceChanged);
 		//this.targets.addGroupedCallback(this, this.forceUpdate);
-
+		this.selectedChoice.addImmediateCallback(this,this.test);
 		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
 	}
 
@@ -100,7 +107,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		return states;
 	};
 
-	handleSelection = (selectedValue:any):void =>
+	handleSelectedChoice = (selectedValue:any):void =>
 	{
 		if (!selectedValue)
 			return;
@@ -109,6 +116,15 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		this.selectedChoice.value = this.choices.getName(selection);
 
 		this.setTargetStates(selection.state);
+	};
+
+	//called whenever the choices are added or deleted
+	handleChoices =():void =>
+	{
+		if(WeaveAPI.SessionManager.getCallbackCollection(this).callbacksAreDelayed)
+		{
+			this.pendingApply
+		}
 	};
 
 	recordSelectedChoice = ():void =>
@@ -142,6 +158,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	render()
 	{
+		console.log("selected choice in tool render", this.selectedChoice.value);
 		if(this.autoRecord.value)
 			this.recordSelectedChoice();
 
@@ -149,7 +166,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		return(
 			<MenuLayoutComponent options={ this.options }
 			                    displayMode={ this.layoutMode.value }
-			                    onChange={ this.handleSelection.bind(this) }
+			                    onChange={ this.handleSelectedChoice.bind(this) }
 			                    selectedItems={ [selectedChoice] }
 			/>
 		);
@@ -233,6 +250,32 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		this.tidySavedStates();
 	};
 
+	//removes a choice from the choices in the menu items tab
+	removeSelectedChoice =(choice:ILinkableVariable):void =>
+	{
+		let ssmt = this.props.sessionStateMenuTool;
+		if(choice)
+		{
+			let allNames = ssmt.choices.getNames();
+			var  choiceName = ssmt.choices.getName(choice);//get the name of the choice being deleted
+			let deleteIndex = allNames.indexOf(choiceName);
+
+			if(deleteIndex < 0)
+				deleteIndex = allNames.length -1;
+
+			ssmt.choices.removeObject(choiceName);//remove the object
+
+			//to update the current selected choice; only if the deleted one WAS the selected one
+			if(choiceName == ssmt.selectedChoice.value)
+			{
+				let newAllNames = ssmt.choices.getNames();//get new list
+				let newSelectedName = newAllNames[Math.min(newAllNames.length -1, deleteIndex)];
+				ssmt.selectedChoice.value = newSelectedName;
+				console.log("new selected choice", ssmt.selectedChoice.value);
+			}
+		}
+	};
+
 	//allows user to edit and rename choices in the menu items tab
 	handleRename =(newName:string):void =>
 	{
@@ -248,10 +291,8 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 				label:(
 					<HBox key={index} style={{justifyContent: "space-between", alignItems:"center"}}>
 						<span style={{overflow: "hidden"}}>{target.targetPath.join(', ')}</span>
-						<HBox>
-							<CenteredIcon onClick={ ()=>{this.removeSelectedTarget(target)} }
+						<CenteredIcon onClick={ ()=>{this.removeSelectedTarget(target)} }
 							              iconProps={{ className: "fa fa-times", title: "Delete this target" }}/>
-						</HBox>
 					</HBox>
 				),
 				value:target
@@ -288,7 +329,16 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		{
 			return({
 				label: (
-					<EditableTextCell textContent={ ssmt.choices.getName(choice) } onChange={ this.handleRename } />
+					<HBox style={ {justifyContent:'space-between'} }  onClick={ ()=>{ ssmt.selectedChoice.value = ssmt.choices.getName(choice)} }>
+
+						<EditableTextCell
+							style ={{flex: "1 0"}}
+							textContent={ ssmt.choices.getName(choice) }
+							onChange={ this.handleRename }/>
+
+						<CenteredIcon onClick={ ()=>{this.removeSelectedChoice(choice)} }
+						              iconProps={{ className: "fa fa-times", title: "Delete this choice" }}/>
+					</HBox>
 				),
 				value:choice
 			});
@@ -301,7 +351,12 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		}
 
 		return(
-			<List options={ menuItems } selectedValues={ [selectedOption] } onChange={ ssmt.handleSelection}/>
+			<VBox>
+				<Button style={{alignSelf:'flex-end'}}>
+					{ 'Add Choice' }
+				</Button>
+				<List options={ menuItems } selectedValues={ [selectedOption] }/>
+			</VBox>
 		);
 	}
 
@@ -344,6 +399,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	render()
 	{
 		let targetCount = (this.props.sessionStateMenuTool.targets.getNames() as string[]).length;
+		console.log("selected choice in editor render", this.props.sessionStateMenuTool.selectedChoice.value);
 
 		return (
 			<VBox style={{flex:"1 0"}}>
