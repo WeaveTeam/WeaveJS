@@ -33,6 +33,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	selectionKeySet = Weave.linkableChild(this, DynamicKeySet);
 	probeKeySet = Weave.linkableChild(this, DynamicKeySet);
+	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 
 	private spanStyle:CSSProperties;
 

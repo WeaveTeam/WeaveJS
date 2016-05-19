@@ -30,6 +30,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 {
 	public filter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(ColumnDataFilter),this.handleFilterWatcher);
 	public filterEditor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(AbstractFilterEditor),this.handleEditor,true);
+	altText:LinkableString = Weave.linkableChild(this, LinkableString);
 
 	
 	constructor(props:IVisToolProps) 

@@ -82,7 +82,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	shapeType = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE));
 	showLegendName = Weave.linkableChild(this, new LinkableBoolean(true));
 	//lineStyle = Weave.linkableChild(this, SolidLineStyle);
-	
+	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
+
 	element:HTMLElement;
 	
 	private get colorColumn() { return this.dynamicColorColumn.target as ColorColumn; }

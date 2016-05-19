@@ -55,7 +55,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	public targetToolPath = Weave.linkableChild(this, new LinkableVariable(Array), this.setToolWatcher.bind(this));
 	public targetAttribute = Weave.linkableChild(this, LinkableString);
 	toolWatcher = Weave.privateLinkableChild(this, LinkableWatcher);
-
+	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 
 	verifyLayoutMode(value:string):boolean
 	{

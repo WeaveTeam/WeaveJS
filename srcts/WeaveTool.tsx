@@ -38,6 +38,7 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 export interface IWeaveToolState
 {
 	title?: string;
+	altText?:string;
 	showControls?: boolean;
 	highlightTitle?: boolean;
 }
@@ -62,8 +63,11 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		this.watcher = wcr.watcher;
 		
 		if (this.watcher)
+		{
 			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.updateTitle);
-		
+			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.updateAltText);
+		}
+
 		this.updateTitle();
 	};
 
@@ -77,6 +81,14 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		var title:string = (this.watcher && this.watcher.target ? (this.watcher.target as IVisTool).title : '') || this.props.path[this.props.path.length - 1];
 		if (this.state.title != title)
 			this.setState({title});
+	}
+
+	updateAltText():void
+	{
+		var path = this.props.path;
+		var altText:string = this.watcher && this.watcher.target ? (this.watcher.target as IVisTool).altText.value : '';
+		if (this.state.altText != altText)
+			this.setState({altText});
 	}
 	
 	onGearClick=():void=>
@@ -125,16 +137,19 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	render():JSX.Element
 	{
 		return (
-			<VBox style={this.props.style} 
-				  className="weave-tool"
-				  onDragOver={this.props.onDragOver}
-				  onDragEnd={this.props.onDragEnd}
-				  onMouseOver={() => {
-						this.setState({ showControls: true });
-				  }}
-			      onMouseLeave={() => {
-						this.setState({ showControls: false });
-				  }}>
+			<VBox
+				style={this.props.style}
+				className="weave-tool"
+				onDragOver={this.props.onDragOver}
+				onDragEnd={this.props.onDragEnd}
+				role="img"
+				onMouseOver={() => {
+					this.setState({ showControls: true });
+				}}
+			    onMouseLeave={() => {
+					this.setState({ showControls: false });
+				}}
+			>
 				<TitleBar
 					ref={(c:TitleBar) => this.titleBar = c }
 					showControls={this.state.showControls}

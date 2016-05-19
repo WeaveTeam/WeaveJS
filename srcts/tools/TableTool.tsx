@@ -61,6 +61,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
 	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
 
+	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 
 	idProperty:string = ''; // won't conflict with any column name
 

@@ -6,6 +6,7 @@ import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import ToolTip from "./ToolTip";
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import {IAltText} from "../accessibility/IAltText";
 
 export interface IVisToolProps
 {
@@ -15,7 +16,7 @@ export interface IVisToolState
 {
 }
 
-export interface IVisTool extends ILinkableObject
+export interface IVisTool extends ILinkableObject, IAltText
 {
     title:string;
 	renderEditor(pushCrumb:Function):JSX.Element;

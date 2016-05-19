@@ -81,6 +81,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 
 	protected get selectionKeySet()
 	{
@@ -242,7 +243,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			]
 		];
 	}
-	
+
 	getTitlesEditor():React.ReactChild[][]
 	{
 		return [
@@ -270,12 +271,23 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		});
 	}
 
+	getAltTextEditor():React.ReactChild[][]
+	{
+		return [
+			[
+				Weave.lang("Alt Text"),
+				<StatefulTextField ref={ linkReactStateRef(this, {value: this.altText})} placeholder={Weave.lang("Enter text description of chart")}/>
+			]
+		]
+	}
+
 	renderEditor(pushCrumb:Function = null):JSX.Element
 	{
 		return Accordion.render(
 			["Data", this.getSelectableAttributesEditor(pushCrumb)],
 			["Titles", this.getTitlesEditor()],
-			["Margins", this.getMarginEditor()]
+			["Margins", this.getMarginEditor()],
+			["Accessibility", this.getAltTextEditor()]
 		);
 	}
 
