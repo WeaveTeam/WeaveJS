@@ -434,7 +434,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onContextMenu={ContextMenu.open}>
 
 				<WeaveProgressBar/>
-				<SideBarContainer barSize={.4} leftSideBarChildren={ sideBarUI } onSideBarClose={this.handleSideBarClose}>
+
+				<SideBarContainer barSize={.4} leftChildren={ sideBarUI }>
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
