@@ -55,7 +55,7 @@ mouseEventTypes.forEach(eventType => document.addEventListener(
 		if (event.buttons || canRelyOnButtonsProp)
 		{
 			canRelyOnButtonsProp = true;
-			MouseUtils.mouseButtonDown = event.buttons
+			MouseUtils.mouseButtonDown = event.buttons;
 		}
 		else if (eventType == 'mousedown')
 		{
@@ -76,7 +76,7 @@ dragEventTypes.forEach(eventType => document.addEventListener(
 		if (event.buttons || canRelyOnButtonsProp)
 		{
 			canRelyOnButtonsProp = true;
-			MouseUtils.mouseButtonDown = event.buttons
+			MouseUtils.mouseButtonDown = event.buttons;
 		}
 		else if (eventType == 'dragend' || eventType == 'drop')
 		{
