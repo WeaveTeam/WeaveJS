@@ -3739,6 +3739,10 @@ declare module weavejs.core {
          */
         constructor(typeRestriction?: new (..._: any[]) => any, immediateCallback?: Function, groupedCallback?: Function);
         /**
+         * This is the root object to which targetPath is relative.
+         */
+        root: ILinkableObject;
+        /**
          * This is the linkable object currently being watched.
          * Setting this will unset the targetPath.
          */
