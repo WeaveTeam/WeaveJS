@@ -370,4 +370,67 @@ export default class ReactUtils
 		ReactUtils.map_callback_onWillUpdateRef.set(callback, ref);
 		return ref;
 	}
+
+	static getElement(instance:React.ReactInstance):Element
+	{
+		if (instance instanceof React.Component)
+			return ReactDOM.findDOMNode(instance);
+		else
+			return instance as Element;
+	}
+
+	private static map_element_componentSet = new WeakMap<Element, Set<React.Component<any, any>>>();
+
+	/**
+	 * Generates a ref function that makes it possible to use ReactUtils.findComponent() on the resulting DOM Element.
+	 */
+	static registerComponentRef<T extends React.ReactInstance>( component:ReactComponent, then?:(instance:T)=>void ):(instance:T)=>void
+	{
+		var componentSet:Set<React.Component<any,any>> = null;
+		return function(instance:T):void {
+			if (componentSet)
+				componentSet.delete(component);
+			
+			var element = ReactUtils.getElement(instance);
+			if (element)
+			{
+				componentSet = ReactUtils.map_element_componentSet.get(element);
+				if (!componentSet)
+				{
+					componentSet = new Set<React.Component<any, any>>();
+					ReactUtils.map_element_componentSet.set(element, componentSet);
+				}
+				componentSet.add(component);
+			}
+			else
+			{
+				componentSet = null;
+			}
+			
+			if (then)
+				then.call(this, instance);
+		};
+	}
+
+	/**
+	 * Returns the first ancestor React Component of a particular type which has been registered via ReactUtils.registerComponentRef().
+	 */
+	static findComponent<T extends React.Component<any,any>>(instance:React.ReactInstance, type?:new(..._:any[])=>T):T
+	{
+		var element = ReactUtils.getElement(instance);
+		if (!element)
+			return null;
+		var rcs = ReactUtils.map_element_componentSet.get(element);
+		if (rcs)
+		{
+			// get the last matching component that was added to the set 
+			var result:T = null;
+			for (var rc of rcs)
+				if (!type || rc instanceof type)
+					result = rc as T;
+			if (result)
+				return result;
+		}
+		return ReactUtils.findComponent(element.parentElement, type);
+	}
 }
