@@ -54,7 +54,7 @@ export interface WeaveAppState
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
-	enableMenuBarWatcher:LinkableWatcher;
+	enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 	
 	menuBar:WeaveMenuBar;
 
@@ -70,6 +70,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.state = {
 			toolPathToEdit: null
 		}
+		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
+	}
+	
+	componentWillReceiveProps(props:WeaveAppProps)
+	{
+		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 	}
 	
 	getRenderPath():string[]
@@ -396,22 +402,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 		
-	componentWillUnmount()
-	{
-		Weave.dispose(this.enableMenuBarWatcher);
-	}
-		
 	get enableMenuBar():LinkableBoolean
 	{
-		// temporary hack until LinkableWatcher can be reused for multiple instances of Weave
-		if (this.props.weave != Weave.getWeave(this.enableMenuBarWatcher))
-		{
-			Weave.dispose(this.enableMenuBarWatcher);
-			this.enableMenuBarWatcher = Weave.disposableChild(this.props.weave, LinkableWatcher);
-			this.enableMenuBarWatcher.targetPath = ['WeaveProperties', 'enableMenuBar'];
-			Weave.getCallbacks(this.enableMenuBarWatcher).addGroupedCallback(this, this.forceUpdate);
-		}
-		
 		return this.enableMenuBarWatcher.target as LinkableBoolean;
 	}
 	
