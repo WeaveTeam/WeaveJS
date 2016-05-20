@@ -8,20 +8,15 @@ import SmartComponent from "../ui/SmartComponent";
 export interface SideBarContainerProps extends React.Props<SideBarContainer>
 {
 	barSize:number;
-	mode?:string;
-	topSideBarChildren?:JSX.Element | JSX.Element[]; // important to support both Array and composite element
-	bottomSideBarChildren?:JSX.Element | JSX.Element[];
-	leftSideBarChildren?:JSX.Element | JSX.Element[];
-	rightSideBarChildren?:JSX.Element | JSX.Element[];
-	onSideBarClose?:()=>void
+	mode?:"scale"|"resize";
+	topChildren?:JSX.Element | JSX.Element[]; // important to support both Array and composite element
+	bottomChildren?:JSX.Element | JSX.Element[];
+	leftChildren?:JSX.Element | JSX.Element[];
+	rightChildren?:JSX.Element | JSX.Element[];
 }
 
 export interface SideBarContainerState
 {
-	openLeftSideBar?:boolean;
-	openRightSideBar?:boolean;
-	openTopSideBar?:boolean;
-	openBottomSideBar?:boolean;
 }
 
 /**
@@ -32,42 +27,6 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 	constructor(props:SideBarContainerProps)
 	{
 		super(props);
-
-		// side bars has to remain closed by default
-		// props values are not passed here
-		this.state = {
-			openLeftSideBar:false,
-			openRightSideBar:false,
-			openTopSideBar:false,
-			openBottomSideBar:false
-		}
-	}
-
-	sideBarCloseHandler(location:string, isOpen:boolean):void
-	{
-		var stateObj:any = {}
-		var loc:string = this.capitalizeFirstCharacter(location);
-		stateObj["open" + loc + "SideBar"] = isOpen;
-		this.setState(stateObj);
-		if (!isOpen && this.props.onSideBarClose)
-			this.props.onSideBarClose();
-	}
-
-
-	// util function to make first charter capitalized
-	private capitalizeFirstCharacter=(str:string):string=>
-	{
-		return str.charAt(0).toUpperCase() + str.slice(1);
-	}
-	
-	componentWillReceiveProps(nextProps:SideBarContainerProps)
-	{
-		var stateObject:SideBarContainerState = {};
-		stateObject.openLeftSideBar = nextProps.leftSideBarChildren ? true :false
-		stateObject.openRightSideBar = nextProps.rightSideBarChildren ? true :false
-		stateObject.openTopSideBar = nextProps.topSideBarChildren ? true :false
-		stateObject.openBottomSideBar = nextProps.bottomSideBarChildren ? true :false
-		this.setState(stateObject);
 	}
 
 	render()
@@ -77,7 +36,7 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 		var transformOriginValue:string = "";
 		var topOrBottomBarWidth:number = 1;
 
-		if (this.state.openLeftSideBar)
+		if (this.props.leftChildren)
 		{
 			if (this.props.mode == "scale")
 			{
@@ -87,21 +46,21 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 			topOrBottomBarWidth = 1 - barSize;
 		}
 
-		if (this.state.openRightSideBar)
+		if (this.props.rightChildren)
 		{
 			if (this.props.mode == "scale")
 			{
 				scaleValue = scaleValue - barSize;
-				transformOriginValue = this.state.openLeftSideBar?"center":"left";
+				transformOriginValue = this.props.leftChildren ? "center" : "left";
 			}
 			topOrBottomBarWidth = topOrBottomBarWidth - barSize;
 		}
 
 		if (this.props.mode == "scale")
 		{
-			if (this.state.openTopSideBar)
+			if (this.props.topChildren)
 			{
-				scaleValue = scaleValue < 1 ? scaleValue:scaleValue - barSize;
+				scaleValue = scaleValue < 1 ? scaleValue : scaleValue - barSize;
 				if (transformOriginValue != "center" ) // either left or right or none is opened
 				{
 					if (transformOriginValue == "") //none is opened
@@ -110,9 +69,9 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 						transformOriginValue = transformOriginValue + " bottom";
 				}
 			}
-			if (this.state.openBottomSideBar)
+			if (this.props.bottomChildren)
 			{
-				scaleValue = this.state.openTopSideBar ? 1 - 2 * barSize : scaleValue;
+				scaleValue = this.props.topChildren ? 1 - 2 * barSize : scaleValue;
 
 				if (transformOriginValue != "center") // either left or right or top or none is opened
 				{
@@ -122,7 +81,7 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 					}
 					else
 					{
-						if (this.state.openTopSideBar) // top is opened
+						if (this.props.topChildren) // top is opened
 							transformOriginValue = "center";
 						else //left or right opened
 							transformOriginValue = transformOriginValue + " top";
@@ -132,8 +91,8 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 		}
 
 		var wrapperStyle:React.CSSProperties = {
-			position:this.props.mode == "scale"?"absolute":"relative",
-			display:"flex",
+			position: this.props.mode == "scale" ? "absolute" : "relative",
+			display: "flex",
 			flex:1
 		}
 
@@ -143,28 +102,25 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 			wrapperStyle.transformOrigin  = transformOriginValue;
 		}
 
-
 		let leftSideBar:JSX.Element = null;
 		let rightSideBar:JSX.Element = null;
 		let topSideBar:JSX.Element = null;
 		let bottomSideBar:JSX.Element = null;
 		let sideBars:JSX.Element[] = [];
-
-		["left","right","top","bottom"].map((location:string, index:number) => {
-			var openStateValue:boolean = (this.state as any)["open" + this.capitalizeFirstCharacter(location) + "SideBar"];
-
-
-			if (!openStateValue) // don't render if sidebar is not open
-			{
-				return null
-			}
+		let locations:[string, JSX.Element | JSX.Element[]][] = [
+			['left', this.props.leftChildren],
+			['right', this.props.rightChildren],
+			['top', this.props.topChildren],
+			['bottom', this.props.bottomChildren]
+		];
+		
+		locations.map(([location, children]) => {
+			if (!children) // don't render if no children
+				return null;
 
 			var barStyle:React.CSSProperties = {
-				position:this.props.mode == "scale"?"absolute":"relative"
+				position:this.props.mode == "scale" ? "absolute" : "relative"
 			};
-
-			// important to support both array and Composite Element
-			var sideBarChildren:JSX.Element[] | JSX.Element = (this.props as any)[location + "SideBarChildren"];
 
 			var barPercentageSize:string = barSize * 100 + "%";
 
@@ -172,9 +128,9 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 				<SideBar
 					key={ location }
 					style={ barStyle }
-					open={ openStateValue }
+					open={ true }
 					location={ location }
-					children={ sideBarChildren }
+					children={ children }
 				/>
 			);
 
@@ -182,7 +138,7 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 			{
 				if (this.props.mode == "resize")
 					barStyle.maxWidth = barPercentageSize;
-				else if(this.props.mode == "scale")
+				else if (this.props.mode == "scale")
 					barStyle.width = barPercentageSize;
 				else
 					barStyle.flex = barSize;
@@ -205,12 +161,12 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 				barStyle.width = topOrBottomBarWidth * 100  + "%";
 				if (this.props.mode == "resize")
 					barStyle.maxHeight = barPercentageSize;
-				else if(this.props.mode == "scale")
+				else if (this.props.mode == "scale")
 					barStyle.height = barPercentageSize;
 				else
 					barStyle.flex = barSize;
 				
-				barStyle.left = this.state.openLeftSideBar ? barPercentageSize : "0";
+				barStyle.left = this.props.leftChildren ? barPercentageSize : "0";
 
 				if (this.props.mode != "scale")
 				{
