@@ -2,6 +2,12 @@ import Dictionary2D = weavejs.util.Dictionary2D;
 
 export default class DOMUtils
 {
+	static getWindow(element:Element):Window
+	{
+		var node = element as any;
+		return node && (node.ownerDocument && node.ownerDocument.defaultView || node.document && node || node.defaultView);
+	}	
+	
 	/**
 	 * This function returns the width of a text string, in pixels, based on its font style
 	 */
