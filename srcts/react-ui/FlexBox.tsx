@@ -14,7 +14,7 @@ export class HBox extends React.Component<React.HTMLProps<HBox>, {}>
 		return _.merge({}, style, { display: "flex", flexDirection: "row" });
 	}
 
-	render()
+	render():JSX.Element
 	{
 		return <div {...this.props as React.HTMLAttributes} style={HBox.style(this.props.style)}/>;
 	}
@@ -32,7 +32,7 @@ export class VBox extends React.Component<React.HTMLProps<VBox>, {}>
 		return _.merge({}, style, { display: "flex", flexDirection: "column" });
 	}
 
-	render()
+	render():JSX.Element
 	{
 		return <div {...this.props as React.HTMLAttributes} style={VBox.style(this.props.style)}/>;
 	}
