@@ -44,7 +44,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 	public autoRecord = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
 
-	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable), this.handleChoices);
+	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable)/*, this.handleChoices*/);
 	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
@@ -123,7 +123,10 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	{
 		if(WeaveAPI.SessionManager.getCallbackCollection(this).callbacksAreDelayed)
 		{
-			this.pendingApply
+			if(this.pendingApply)
+			{
+				this.pendingApply = false;
+			}
 		}
 	};
 
@@ -251,28 +254,41 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	};
 
 	//removes a choice from the choices in the menu items tab
-	removeSelectedChoice =(choice:ILinkableVariable):void =>
+	removeSelectedChoice =(choice:ILinkableVariable,event:React.MouseEvent):void =>
 	{
+		console.log((event.target as any === this.refs["deleteIcon"] as any),choice);
 		let ssmt = this.props.sessionStateMenuTool;
 		if(choice)
 		{
 			let allNames = ssmt.choices.getNames();
 			var  choiceName = ssmt.choices.getName(choice);//get the name of the choice being deleted
-			let deleteIndex = allNames.indexOf(choiceName);
+			let deleteIndex:number = allNames.indexOf(choiceName);
 
 			if(deleteIndex < 0)
 				deleteIndex = allNames.length -1;
 
-			ssmt.choices.removeObject(choiceName);//remove the object
+
 
 			//to update the current selected choice; only if the deleted one WAS the selected one
 			if(choiceName == ssmt.selectedChoice.value)
 			{
+				let count:number = allNames.length;
+				let newIndex:number = NaN;
+				if(count == deleteIndex) {
+					newIndex = deleteIndex -1;
+				}
+				else {
+					newIndex = deleteIndex + 1;
+				}
 				let newAllNames = ssmt.choices.getNames();//get new list
-				let newSelectedName = newAllNames[Math.min(newAllNames.length -1, deleteIndex)];
+				let newSelectedName = newAllNames[newIndex];
 				ssmt.selectedChoice.value = newSelectedName;
 				console.log("new selected choice", ssmt.selectedChoice.value);
 			}
+
+			ssmt.choices.removeObject(choiceName);//remove the object
+
+
 		}
 	};
 
@@ -320,6 +336,11 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		);
 	}
 
+	updateSelectedChoice(choice:LinkableVariable,event:React.MouseEvent){
+		console.log((event.target as any === this.refs["deleteIcon"] as any),choice);
+		this.props.sessionStateMenuTool.selectedChoice.value = this.props.sessionStateMenuTool.choices.getName(choice)
+	}
+
 	//contains the menu items tab view, entries which map to the targets in the target view
 	renderMenuItems():JSX.Element{
 
@@ -329,14 +350,14 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		{
 			return({
 				label: (
-					<HBox style={ {justifyContent:'space-between'} }  onClick={ ()=>{ ssmt.selectedChoice.value = ssmt.choices.getName(choice)} }>
+					<HBox ref="choiceItem" style={ {justifyContent:'space-between'} }  onClick={ this.updateSelectedChoice.bind(this,choice)}>
 
 						<EditableTextCell
 							style ={{flex: "1 0"}}
 							textContent={ ssmt.choices.getName(choice) }
 							onChange={ this.handleRename }/>
 
-						<CenteredIcon onClick={ ()=>{this.removeSelectedChoice(choice)} }
+						<CenteredIcon ref="deleteIcon" onClick={ this.removeSelectedChoice.bind(this,choice) }
 						              iconProps={{ className: "fa fa-times", title: "Delete this choice" }}/>
 					</HBox>
 				),
