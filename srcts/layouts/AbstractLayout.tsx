@@ -2,7 +2,7 @@ import * as React from "react";
 import SmartComponent from "../ui/SmartComponent";
 
 export type LayoutPanelProps = {
-	maximized:boolean;
+	maximized?:boolean;
 };
 
 export declare type WeavePathArray = string[];

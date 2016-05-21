@@ -4,12 +4,14 @@ import {MenuItemProps} from "../react-ui/Menu";
 import WindowLayout from "../layouts/WindowLayout";
 import FlexibleLayout from "../layouts/FlexibleLayout";
 import {AbstractLayout} from "../layouts/AbstractLayout";
+import TabLayout from "../layouts/TabLayout";
 
 export default class LayoutsMenu implements MenuBarItemProps
 {
 	layout_label_to_class:Map<string, AbstractLayout> = new Map()
 		.set("Window", WindowLayout)
-		.set("Flexible", FlexibleLayout as any);
+		.set("Flexible", FlexibleLayout as any)
+		.set("Tab", TabLayout);
 
 	addLayoutCallBack:Function;
 	removeLayoutCallback:Function;
