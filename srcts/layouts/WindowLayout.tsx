@@ -5,10 +5,11 @@ import classNames from "../modules/classnames";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "../react-ui/VendorPrefixer";
 import MiscUtils from "../utils/MiscUtils";
+import ReactUtils from "../utils/ReactUtils";
 import DraggableDiv from "../react-ui/DraggableDiv";
 import {DraggableDivState} from "../react-ui/DraggableDiv";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
-import {AbstractLayout, ILayoutProps, WeavePathArray} from "./AbstractLayout";
+import {AbstractLayout, LayoutProps, WeavePathArray} from "./AbstractLayout";
 import Div from "../react-ui/Div";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -25,7 +26,7 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 	private linkableState = Weave.linkableChild(this, new LinkableVariable(Array), this.forceUpdate, true);
 	private overlay:Div;
 
-	constructor(props:ILayoutProps)
+	constructor(props:LayoutProps)
 	{
 		super(props);
 	}
@@ -111,73 +112,37 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 		)));
 	}
 	
-	componentDidMount():void
-	{
-		this.repositionPanels();
-	}
-
-	componentDidUpdate():void
-	{
-		this.repositionPanels();
-	}
-	
-	frameHandler():void
-	{
-		// reposition on resize
-		// var rect:ClientRect = Object(this.getLayoutPosition(this.rootLayout));
-		// if (this.layoutRect.width != rect.width || this.layoutRect.height != rect.height)
-		this.repositionPanels();
-	}
-	
-	repositionPanels():void
-	{
-		var element = ReactDOM.findDOMNode(this) as HTMLDivElement;
-		
-		this.getSessionState().forEach(state => {
-			var ddiv = this.refs[JSON.stringify(state.id)] as DraggableDiv;
-			var pos = state.position;
-			if (!ddiv)
-				return;
-			
-			if (state.maximized)
-			{
-				ddiv.setState({
-					left: 0,
-					top: 0,
-					width: element.offsetWidth,
-					height: element.offsetHeight
-				});
-			}
-			else
-			{
-				ddiv.setState({
-					left: pos ? pos.left : 0,
-					top: pos ? pos.top : 0,
-					width: pos ? pos.width : "100%",
-					height: pos ? pos.height : "100%"
-				});
-			}
-		});
-	}
-	
-	render()
+	render():JSX.Element
 	{
 		var weave = Weave.getWeave(this);
-		var style = _.merge({flex: 1}, this.props.style, {
-			position: "relative",
-			overflow: "hidden"
-		});
-
 		return (
-			<div {...this.props as React.HTMLAttributes} style={style}>
+			<div
+				ref={ReactUtils.registerComponentRef(this)}
+				{...this.props as React.HTMLAttributes}
+				style={
+					_.merge({flex: 1}, this.props.style, {
+						position: "relative",
+						overflow: "hidden"
+					})
+				}
+			>
 				{
-					this.getSessionState().map((state, index) => {
+					this.getSessionState().map(state => {
 						var key = JSON.stringify(state.id);
-						var style = _.merge({minWidth: "5%", minHeight: "5%"}, state.position);
+						var style = {
+							left: 0,
+							top: 0,
+							width: "100%",
+							height: "100%",
+							minWidth: "5%",
+							minHeight: "5%"
+						};
+						if (!state.maximized)
+							_.merge(style, state.position);
+						
 						return (
 							<DraggableDiv
 								key={key}
-								ref={key}
 								liveMoving={true}
 								liveResizing={false}
 								movable={!state.maximized}
@@ -185,20 +150,15 @@ export default class WindowLayout extends AbstractLayout implements weavejs.api.
 								getExternalOverlay={() => this.overlay}
 								className={classNames("weave-app", "weave-window")}
 								style={style}
-								onMouseDown={(event) => this.bringPanelForward(state.id)}
+								onClick={(event) => this.bringPanelForward(state.id)}
 								draggable={!this.props.panelRenderer}
 								onReposition={this.onReposition.bind(this, state.id)}
 							>
-							{
-								this.props.panelRenderer
-								?	this.props.panelRenderer(state.id, {maximized: state.maximized})
-								:	<WeaveComponentRenderer
-										key={index}
-										weave={weave}
-										path={state.id}
-										style={state.position}
-									/>
-							}
+								{
+									this.props.panelRenderer
+									?	this.props.panelRenderer(state.id, {maximized: state.maximized}, this.props.panelRenderer)
+									:	<WeaveComponentRenderer weave={weave} path={state.id}/>
+								}
 							</DraggableDiv>
 						);
 					})

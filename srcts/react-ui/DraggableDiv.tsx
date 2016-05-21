@@ -2,29 +2,12 @@ import * as ReactDOM from "react-dom";
 import * as React from "react";
 import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
-import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
-import prefixer from "./VendorPrefixer";
-import CenteredIcon from "./CenteredIcon";
-import Button from "../semantic-ui/Button";
 import MouseUtils from "../utils/MouseUtils";
-import MiscUtils from "../utils/MiscUtils";
 import DOMUtils from "../utils/DOMUtils";
 import Div from "./Div";
 
 import Bounds2D = weavejs.geom.Bounds2D;
-
-const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
-const LEFT:"left" = "left";
-const RIGHT:"right" = "right";
-const TOP:"top" = "top";
-const BOTTOM:"bottom" = "bottom";
-const TOP_LEFT:"top-left" = "top-left";
-const TOP_RIGHT:"top-right" = "top-right";
-const BOTTOM_RIGHT:"bottom-right" = "bottom-right";
-const BOTTOM_LEFT:"bottom-left" = "bottom-left";
-const ENTER_KEYCODE = 13;
-const ESC_KEYCODE = 27;
 
 enum Handle {
 	LEFT = 1,
@@ -73,6 +56,12 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		this.setState(this.toDraggableDivState(props.style));
 	}
 	
+	componentWillReceiveProps(props:DraggableDivProps):void
+	{
+		// allow new props to override state
+		this.setState(_.merge({}, this.state, this.toDraggableDivState(props.style)) as DraggableDivState);
+	}
+	
 	static defaultProps:DraggableDivProps =	{
 		resizable: true,
 		movable: true,
@@ -83,20 +72,63 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 
 	componentDidMount()
 	{
-		// if initial width height are provided
-		// use it otherwise default to element position
+		// center div if left or top style is undefined
+		var parent = this.element.offsetParent as HTMLElement;
 		var style = this.props.style || {};
-		var newState:DraggableDivState = {
-			top: style.top !== undefined ? this.element.offsetTop : (window.innerHeight - this.element.offsetHeight) / 2,
-			left: style.left !== undefined ? this.element.offsetLeft : (window.innerWidth - this.element.offsetWidth) / 2,
-			width: this.element.offsetWidth,
-			height: this.element.offsetHeight
-		};
-		if (this.props.onReposition)
-			this.props.onReposition(newState);
+		var newState:DraggableDivState = _.clone(this.state)
+		if (style.top === undefined)
+			newState.top = (parent.offsetHeight - this.element.offsetHeight) / 2;
+		if (style.left === undefined)
+			newState.left = (parent.offsetWidth - this.element.offsetWidth) / 2;
 		this.setState(newState);
+		
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
+	}
+	
+	private onDragStart=(event:React.DragEvent)=>
+	{
+		if (this.props.movable)
+		{
+			if (!this.props.liveMoving)
+				this.updateOverlayStyle(this.state);
+			
+			event.preventDefault();
+			event.stopPropagation();
+			
+			this.mouseDownOffset = this.getMouseOffset();
+			this.mouseDownBounds = this.getOffsetBounds();
+			this.moving = true;
+		}
+		
+		if (this.props.onDragStart)
+			this.props.onDragStart(event);
+	}
+	
+	private onResizeStart(event:React.MouseEvent, handle:Handle)
+	{
+		if (!this.props.liveResizing)
+			this.updateOverlayStyle(this.state);
+		
+		this.mouseDownOffset = this.getMouseOffset();
+		this.mouseDownBounds = this.getOffsetBounds();
+		this.activeResizeHandle = handle;
+	}
+	
+	private onDrag=(event:MouseEvent)=>
+	{
+		if (this.activeResizeHandle || this.moving)
+			this.reposition();
+	}
+		
+	private onDragEnd=(event:MouseEvent)=>
+	{
+		// if live update is disabled, we reposition when drag ends
+		if (this.activeResizeHandle || this.moving)
+			this.reposition(true);
+		
+		this.moving = false;
+		this.activeResizeHandle = null;
 	}
 	
 	get externalOverlay():Div
@@ -133,35 +165,6 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		return bounds;
 	}
 	
-	private onDragStart=(event:React.DragEvent)=>
-	{
-		if (this.props.movable)
-		{
-			if (!this.props.liveMoving)
-				this.updateOverlayStyle(this.state);
-			
-			event.preventDefault();
-			event.stopPropagation();
-			
-			this.mouseDownOffset = this.getMouseOffset();
-			this.mouseDownBounds = this.getOffsetBounds();
-			this.moving = true;
-		}
-		
-		if (this.props.onDragStart)
-			this.props.onDragStart(event);
-	}
-	
-	private onResizeStart(event:React.MouseEvent, handle:Handle)
-	{
-		if (!this.props.liveResizing)
-			this.updateOverlayStyle(this.state);
-		
-		this.mouseDownOffset = this.getMouseOffset();
-		this.mouseDownBounds = this.getOffsetBounds();
-		this.activeResizeHandle = handle;
-	}
-	
 	private shouldLiveUpdate():boolean
 	{
 		return (this.activeResizeHandle && this.props.liveResizing) || (this.moving && this.props.liveMoving);
@@ -174,12 +177,9 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			part = Number(str.substr(0, str.length - 1)) * whole / 100;
 		return Number(part) || 0;
 	}
-	
-	private onDrag=(event:MouseEvent)=>
+
+	private reposition(forceLiveUpdate:Boolean = false):void
 	{
-		if (!this.activeResizeHandle && !this.moving)
-			return;
-		
 		var parent = this.element.offsetParent as HTMLElement;
 		var parentWidth = parent.offsetWidth;
 		var parentHeight = parent.offsetHeight;
@@ -195,19 +195,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		var oldBounds = this.mouseDownBounds;
 		var newBounds = oldBounds.cloneBounds();
 		
-		if (this.moving)
-		{
-			newBounds.xMin += mouseDeltaX;
-			newBounds.xMin = Math.max(newBounds.xMin, edgeBuffer - (oldBounds.getWidth() || 0));
-			newBounds.xMin = Math.min(newBounds.xMin, parentWidth - edgeBuffer);
-			newBounds.xMax = newBounds.xMin + oldBounds.getWidth(); // preserve width
-			
-			newBounds.yMin += mouseDeltaY;
-			newBounds.yMin = Math.max(newBounds.yMin, 0);
-			newBounds.yMin = Math.min(newBounds.yMin, parentHeight - edgeBuffer);
-			newBounds.yMax = newBounds.yMin + oldBounds.getHeight(); // preserve height
-		}
-		else if (this.activeResizeHandle)
+		if (this.activeResizeHandle)
 		{
 			if (this.activeResizeHandle & Handle.LEFT)
 			{
@@ -233,6 +221,18 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 				newBounds.yMax = Math.max(newBounds.yMax, oldBounds.yMin + minHeight);
 				newBounds.yMax = Math.min(newBounds.yMax, oldBounds.yMin + parentHeight);
 			}
+		}
+		else // move
+		{
+			newBounds.xMin += mouseDeltaX;
+			newBounds.xMin = Math.max(newBounds.xMin, edgeBuffer - (oldBounds.getWidth() || 0));
+			newBounds.xMin = Math.min(newBounds.xMin, parentWidth - edgeBuffer);
+			newBounds.xMax = newBounds.xMin + oldBounds.getWidth(); // preserve width
+			
+			newBounds.yMin += mouseDeltaY;
+			newBounds.yMin = Math.max(newBounds.yMin, 0);
+			newBounds.yMin = Math.min(newBounds.yMin, parentHeight - edgeBuffer);
+			newBounds.yMax = newBounds.yMin + oldBounds.getHeight(); // preserve height
 		}
 		
 		var newState:DraggableDivState;
@@ -273,9 +273,11 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			};
 		}
 		
-		if (this.shouldLiveUpdate())
+		if (this.shouldLiveUpdate() || forceLiveUpdate)
 		{
 			this.setState(newState);
+			
+			this.updateOverlayStyle({visibility: "hidden"});
 			
 			if (this.props.onReposition)
 				this.props.onReposition(newState);
@@ -286,24 +288,6 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		}
 	}
 	
-	private onDragEnd=(event:MouseEvent)=>
-	{
-		// if live update is disabled, we reposition when drag ends
-		if ((this.moving || this.activeResizeHandle) && !this.shouldLiveUpdate())
-		{
-			var newState = this.toDraggableDivState(this.overlayStyle);
-			this.setState(newState);
-			
-			this.updateOverlayStyle({visibility: "hidden"});
-			
-			if (this.props.onReposition)
-				this.props.onReposition(newState);
-		}
-		
-		this.moving = false;
-		this.activeResizeHandle = null;
-	}
-
 	componentWillUnmount()
 	{
 		document.removeEventListener("mouseup", this.onDragEnd, true);

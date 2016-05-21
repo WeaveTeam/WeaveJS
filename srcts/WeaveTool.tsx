@@ -18,22 +18,21 @@ import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import SmartComponent from "./ui/SmartComponent";
 import classNames from "./modules/classnames";
 import DraggableDiv from "./react-ui/DraggableDiv";
+import AbstractLayout from "./layouts/AbstractLayout";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
 	weave:Weave;
 	path:string[];
+	props?:any; // passed in to WeaveComponentRenderer
 	maximized?:boolean;
 	onDragStart?:React.DragEventHandler;
 	onDragEnd?:React.DragEventHandler;
 	onDragOver?:React.DragEventHandler;
-	onContextMenu?:React.MouseEventHandler;
 	style?: CSSProperties;
 	onGearClick?:(tool:WeaveTool)=>void;
-	onMaximizeClick?:(tool:WeaveTool)=>void;
 	onPopoutClick?:(tool:WeaveTool)=>void;
 	onPopinClick?:(tool:WeaveTool)=>void;
-	onCloseClick?:(tool:WeaveTool)=>void;
 }
 
 export interface IWeaveToolState
@@ -47,7 +46,6 @@ export interface IWeaveToolState
 export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
 {
 	private titleBarHeight:number = 25;
-	private titleBar:React.Component<ITitleBarProps, ITitleBarState>;
 	private watcher:LinkableWatcher;
 	
 	constructor(props:IWeaveToolProps)
@@ -117,27 +115,76 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	
 	onMaximizeClick=():void=>
 	{
-		if (this.props.onMaximizeClick)
-			this.props.onMaximizeClick(this);
+		var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AbstractLayout;
+		if (layout)
+			layout.maximizePanel(this.props.path, !this.props.maximized);
 	};
 	
-	onPopoutClick=():void=>
+	onPopoutPopinClick=():void=>
 	{
 		if (this.props.onPopoutClick)
 			this.props.onPopoutClick(this);
-	};
-
-	onPopinClick=():void=>
-	{
 		if (this.props.onPopinClick)
 			this.props.onPopinClick(this);
 	};
 
 	onCloseClick=():void=>
 	{
-		if (this.props.onCloseClick)
-			this.props.onCloseClick(this);
+		var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AbstractLayout;
+		if (layout)
+		{
+			this.props.weave.removeObject(this.props.path);
+			layout.removePanel(this.props.path);
+		}
 	};
+			
+	renderTitleBar():JSX.Element
+	{
+		var className = "weave-tool-title-bar";
+		if (this.state.showControls || this.state.highlightTitle)
+			className = "weave-tool-title-bar-hovered";
+		if (this.state.highlightTitle)
+			className += " weave-tool-title-bar-highlighted";
+		var maximizeClassName = "fa fa-fw fa-" + (this.props.maximized ? "compress" : "expand");
+		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
+
+		return (
+			<HBox className={className} style={{height: this.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart} onDoubleClick={this.onMaximizeClick}>
+				{
+					this.state.showControls
+					?	[
+							<CenteredIcon key="0" title={Weave.lang("Configure")} onClick={this.onGearClick}
+										  iconProps={{className: "fa fa-cog fa-fw"}}/>,
+							<div key="1" style={{width: 28, height: 24}}/>,
+							Weave.beta ? <div key="2" style={{width: 28, height: 24}}/> : null
+						]
+					:	null
+				}
+				<HBox style={{flex: 1, alignSelf: "stretch", cursor: "move", visibility: "visible", overflow: "hidden"}}>
+					<p className="weave-tool-title-bar-text" style={{width: "100%", padding: 5, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis"}}>
+						{Weave.lang(this.state.title)}
+					</p>
+				</HBox>
+				{
+					this.state.showControls 
+					?	[
+							<CenteredIcon key="0" title={maximizeTitleText} onClick={this.onMaximizeClick}
+										  iconProps={{ className: maximizeClassName }}/>,
+							Weave.beta 
+							?	<CenteredIcon key="1"
+										title={this.props.onPopoutClick ? Weave.lang("Display in new window") : Weave.lang("Restore to main window")}
+										onClick={this.onPopoutPopinClick}
+										iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
+									/>
+							:	null,
+							<CenteredIcon key="2" title={Weave.lang("Close")} onClick={this.onCloseClick}
+										  iconProps={{className: "fa fa-times fa-fw"}}/>
+				    ]
+					: null
+				}
+			</HBox>
+		);
+	}
 	
 	render():JSX.Element
 	{
@@ -155,99 +202,15 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					this.setState({ showControls: false });
 				}}
 			>
-				<TitleBar
-					ref={(c:TitleBar) => this.titleBar = c }
-					showControls={this.state.showControls}
-					onDragStart={this.props.onDragStart}
-					titleBarHeight={this.titleBarHeight}
-					title={Weave.lang(this.state.title)}
-					highlighted={this.state.highlightTitle}
-					onGearClick={this.onGearClick}
-					onMaximizeClick={this.onMaximizeClick}
-					maximized={this.props.maximized}
-					onPopoutClick={this.props.onPopoutClick && this.onPopoutClick}
-					onPopinClick={this.props.onPopinClick && this.onPopinClick}
-					onCloseClick={this.onCloseClick}
+				<div>{ this.renderTitleBar() }</div>
+				<WeaveComponentRenderer
+					ref={ReactUtils.onWillUpdateRef(this.handleTool)}
+					weave={this.props.weave}
+					path={this.props.path}
+					props={this.props.props}
+					style={{overflow: 'hidden'}}
 				/>
-				<WeaveComponentRenderer style={{overflow: 'hidden'}} weave={this.props.weave} path={this.props.path} ref={ReactUtils.onWillUpdateRef(this.handleTool)}/>
 			</VBox>
-		);
-	}
-
-	componentWillUnmount():void
-	{
-	}
-}
-
-interface ITitleBarProps extends React.Props<TitleBar>
-{
-	onDragStart:React.DragEventHandler;
-	showControls:boolean;
-	titleBarHeight:number;
-	title:string;
-	highlighted:boolean;
-	maximized:boolean;
-	onGearClick:React.MouseEventHandler;
-	onMaximizeClick:React.MouseEventHandler;
-	onPopoutClick:React.MouseEventHandler;
-	onPopinClick:React.MouseEventHandler;
-	onCloseClick:React.MouseEventHandler;
-}
-
-interface ITitleBarState
-{
-	
-}
-
-class TitleBar extends SmartComponent<ITitleBarProps, ITitleBarState>
-{
-	constructor(props:ITitleBarProps)
-	{
-		super(props);
-	}
-	render()
-	{
-		var className = "weave-tool-title-bar";
-		if (this.props.showControls || this.props.highlighted)
-			className = "weave-tool-title-bar-hovered";
-		if (this.props.highlighted)
-			className += " weave-tool-title-bar-highlighted";
-		var maximizeClassName = "fa fa-fw fa-" + (this.props.maximized ? "compress" : "expand");
-		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
-
-		return(
-			<HBox className={className} style={{height: this.props.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart} onDoubleClick={this.props.onMaximizeClick}>
-				{
-					this.props.showControls
-					?	[
-							<CenteredIcon key="0" title={Weave.lang("Configure")} onClick={this.props.onGearClick}
-										  iconProps={{className: "fa fa-cog fa-fw"}}/>,
-							<div key="1" style={{width: 28, height: 24}}/>,
-							Weave.beta ? <div key="2" style={{width: 28, height: 24}}/> : null
-						]
-					:	null
-				}
-				<HBox style={{flex: 1, alignSelf: "stretch", cursor: "move", overflow: "hidden", visibility: "visible"}}>
-					<span className="weave-tool-title-bar-text" style={{width: "100%", paddingTop: 5, paddingBottom: 5, textAlign: "center", textOverflow: "ellipsis"}}>{this.props.title}</span>
-				</HBox>
-				{
-					this.props.showControls 
-					?	[
-							<CenteredIcon key="0" title={maximizeTitleText} onClick={this.props.onMaximizeClick}
-										  iconProps={{ className: maximizeClassName }}/>,
-							Weave.beta 
-							?	<CenteredIcon key="1"
-										title={this.props.onPopoutClick ? Weave.lang("Display in new window") : Weave.lang("Restore to main window")}
-										onClick={this.props.onPopoutClick || this.props.onPopinClick}
-										iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
-									/>
-							:	null,
-							<CenteredIcon key="2" title={Weave.lang("Close")} onClick={this.props.onCloseClick}
-										  iconProps={{className: "fa fa-times fa-fw"}}/>
-				    ]
-					: null
-				}
-			</HBox>
 		);
 	}
 }

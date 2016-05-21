@@ -10,6 +10,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import Div from "../react-ui/Div";
 import {HORIZONTAL, VERTICAL, LayoutState} from "../react-ui/flexible-layout/Layout";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
+import {PanelRenderer} from "./AbstractLayout";
 
 import PanelOverlay from "../PanelOverlay";
 import MiscUtils from "../utils/MiscUtils";
@@ -50,7 +51,7 @@ export type PanelProps = {
 
 export interface IFlexibleLayoutProps extends React.HTMLProps<FlexibleLayout>
 {
-	panelRenderer: (id:WeavePathArray, panelProps?:PanelProps) => JSX.Element;
+	panelRenderer: PanelRenderer;
 }
 
 export interface IFlexibleLayoutState extends LayoutState
@@ -505,12 +506,16 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 						ref={key}
 						children={
 							this.props.panelRenderer
-							?	this.props.panelRenderer(path, {
-									maximized: newState.maximized,
-									onDragOver: this.onDragOver.bind(this, path),
-									onDragStart: this.onDragStart.bind(this, path),
-									onDragEnd: this.onDragEnd.bind(this),
-								})
+							?	this.props.panelRenderer(
+									path,
+									{
+										maximized: newState.maximized,
+										onDragOver: this.onDragOver.bind(this, path),
+										onDragStart: this.onDragStart.bind(this, path),
+										onDragEnd: this.onDragEnd.bind(this),
+									} as any,
+									this.props.panelRenderer
+								)
 							:	<WeaveComponentRenderer
 									weave={weave}
 									path={path}

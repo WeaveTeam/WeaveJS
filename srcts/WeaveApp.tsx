@@ -13,7 +13,7 @@ import FlexibleLayout from "./layouts/FlexibleLayout";
 import {LayoutState} from "./react-ui/flexible-layout/Layout";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
-import {LayoutPanelProps} from "./layouts/AbstractLayout";
+import {LayoutPanelProps, PanelRenderer} from "./layouts/AbstractLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
@@ -180,14 +180,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	}
 	*/
 	
-	handleMaximizeClick=(tool:WeaveTool):void=>
-	{
-		var path = tool.props.path;
-		var layout = this.props.weave.getObject(this.getRenderPath());
-		if (layout instanceof AbstractLayout)
-			(layout as AbstractLayout).maximizePanel(path, !tool.props.maximized);
-	}
-	
 	handlePopoutClick=(tool:WeaveTool):void=>
 	{
 		var path = tool.props.path;
@@ -204,27 +196,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				path={path}
 				style={{width: "100%", height: "100%"}}
 				onGearClick={this.handleGearClick}
-				onMaximizeClick={() => {
-					if (isMaximized)
-					{
-						isMaximized = false;
-						popoutWindow.resizeTo(screenWidth, screenHeight);
-					}
-					else
-					{
-						isMaximized = true;
-						screenWidth = popoutWindow.innerWidth;
-						screenHeight = popoutWindow.innerHeight;
-						popoutWindow.moveTo(0,0);
-						popoutWindow.resizeTo(screen.availWidth, screen.availHeight);
-					}
-				}}
 				onPopinClick={() => {
 					this.addToLayout(path);
-					popoutWindow.close();
-				}}
-				onCloseClick={(tool:WeaveTool) => {
-					this.handleCloseClick(tool);
 					popoutWindow.close();
 				}}
 				onDragEnd={() => {}}
@@ -243,22 +216,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	}
 	
-	handleCloseClick=(tool:WeaveTool)=>
-	{
-		var weave = this.props.weave;
-		var path = tool.props.path;
-		this.removeFromLayout(path);
-		weave.removeObject(path);
-	
-		if (_.isEqual(path, this.state.toolPathToEdit))
-		{
-			this.setState({
-				toolPathToEdit: null
-			});
-		}
-	}
-
-	renderTool=(path:WeavePathArray, panelProps:LayoutPanelProps)=>
+	renderTool=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer:PanelRenderer)=>
 	{
 		var tool = this.props.weave.getObject(path);
 		return (
@@ -266,12 +224,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				ref={this.handleWeaveTool}
 				weave={this.props.weave}
 				path={path}
+				props={{panelRenderer}}
 				style={{width: "100%", height: "100%", left: 0, top: 0}}
 				maximized={panelProps.maximized}
 				onGearClick={this.handleGearClick}
-				onMaximizeClick={this.handleMaximizeClick}
 				onPopoutClick={this.handlePopoutClick}
-				onCloseClick={this.handleCloseClick}
 			/>
 		);
 	}
