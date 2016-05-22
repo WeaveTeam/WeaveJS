@@ -142,7 +142,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
-				editorJsx = <VBox style={ { overflow:'auto'} }>
+				editorJsx = <VBox style={ { flex: 1, overflow:'auto'} }>
 					<EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu }/>
 				</VBox>;
 			else
