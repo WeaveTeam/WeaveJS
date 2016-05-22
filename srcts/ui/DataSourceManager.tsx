@@ -142,20 +142,30 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
-				editorJsx = <EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu }/>;
+				editorJsx = <VBox style={ { overflow:'auto'} }>
+					<EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu }/>
+				</VBox>;
 			else
-				editorJsx = <span>{Weave.lang("Editor not yet implemented for this data source type.")}</span>;
+				editorJsx = <VBox className="ui segment" style={{flex:1, overflow: "auto", justifyContent: "center", alignItems: "center"}}>
+					<div className="ui centered header">
+						{Weave.lang("Editor not yet implemented for this data source type.")}
+					</div>
+				</VBox>;
 		}
 		else
 		{
-			editorJsx = <span>{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}</span>;
+			editorJsx = <VBox className="ui segment" style={{flex:1, overflow: "auto", justifyContent: "center", alignItems: "center"}}>
+				<div className="ui centered header">
+					{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
+				</div>
+			</VBox>;
 		}
 
 		return (
 			<HBox className="ui horizontal segments" style={ {flex:1, overflow:'auto'} }>
 				<VBox style={{width: 250}}>
-					<VBox className="ui attached segment" style={{flex:1}}>
-						<VBox style={{flex: 1, overflow: "auto"}}>
+					<VBox className="ui vertical attached segments" style={{flex:1}}>
+						<VBox className="ui basic segment" style={{flex: 2, overflow: "auto"}}>
 							<div className="ui medium dividing header">{Weave.lang("Connected sources")}</div>
 							<VBox>
 								<List
@@ -166,9 +176,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 								/>
 							</VBox>
 						</VBox>
-						<div style={{height: "1px", width: "100%"}}/>
-						<div className="ui meadium dividing header">{Weave.lang("Add more...")}</div>
-						<VBox style={{flex: 1, overflow: "auto"}}>
+						<VBox className="ui segment" style={{flex: 1, overflow: "auto"}}>
+							<div className="ui meadium dividing header">{Weave.lang("Add more...")}</div>
 							{
 								this.props.dataMenu.getDataSourceItems().map((dsItem, index) => {
 									return dsItem.shown
@@ -182,9 +191,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						</VBox>
 					</VBox>
 				</VBox>
-				<VBox className="ui segment" style={ { overflow:'auto'} }>
-					{editorJsx}
-				</VBox>
+				{editorJsx}
 			</HBox>
 		);
 	}
