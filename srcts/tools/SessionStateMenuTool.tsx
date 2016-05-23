@@ -65,7 +65,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		super(props);
 
 		this.choices.addGroupedCallback(this, this.handleChoices);
-		//this.targets.addGroupedCallback(this, this.forceUpdate);
+		this.targets.addGroupedCallback(this, this.handleAutoRecord);
 		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
 	}
 
@@ -116,7 +116,6 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	//called whenever the choices are added or deleted
 	handleChoices =():void =>
 	{
-		console.log("in choices callback", this.selectedChoice.value);
 		if(WeaveAPI.SessionManager.getCallbackCollection(this).callbacksAreDelayed)
 		{
 			this.pendingApply = true;
@@ -129,6 +128,12 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 			this.setTargetStates(choice.getSessionState());
 		}
 		this.forceUpdate();
+	};
+
+	handleAutoRecord = ():void =>
+	{
+		if(this.autoRecord.value)
+			this.recordSelectedChoice();
 	};
 
 	recordSelectedChoice = ():void =>
@@ -193,7 +198,7 @@ interface ISessionStateMenuToolEditorProps
 
 interface ISessionStateMenuToolEditorState
 {
-
+	pathInput?:string;
 }
 
 class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEditorProps, ISessionStateMenuToolEditorState>
@@ -201,7 +206,9 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	constructor(props:ISessionStateMenuToolEditorProps)
 	{
 		super(props);
-		this.state = {}
+		this.state = {
+			pathInput:null
+		}
 	}
 
 	//clean up states for associated choices (called whenever targets are added or removed)
@@ -317,6 +324,43 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		this.tidySavedStates();
 	};
 
+	//adds a new target if valid to the target hashmap
+	addNewTargetPath= ():void =>
+	{
+		let ssmt = this.props.sessionStateMenuTool;
+
+		try
+		{
+			let path = JSON.parse(this.state.pathInput) as string[];
+			if(!path)
+				return;
+			let wrapper = ssmt.targets.requestObject(null, LinkableDynamicObject, false);//create new target object
+			wrapper.targetPath = path;//set its targetPath
+
+			if(wrapper.target)//if valid target is set and exists
+			{
+				this.setState({
+					pathInput: ""
+				});//reset for new entry
+				this.tidySavedStates();
+			}
+			else
+			{
+				ssmt.targets.removeObject(ssmt.targets.getName(wrapper));//remove the object created above
+				this.setState({
+					pathInput : "No target found"
+				});
+			}
+		}
+		catch(e)
+		{
+			this.setState({
+				pathInput: "Invalid path"
+			});
+			//console.log(e);
+		}
+	};
+
 	//renders the target list UI
 	getTargetList():ListOption[]
 	{
@@ -334,8 +378,17 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		});
 	}
 
+	handlePathInput =(event:any):void =>
+	{
+		this.setState({
+			pathInput : event.target.value
+		})
+	};
+
 	//contains the target tab view, target paths that map to the menu items
 	//TODO fix bad styling
+	//TODO enable add button when path is valid
+	//TODO add an interface for finding targets (crumbs?)
 	renderTargetItems():JSX.Element
 	{
 		return(
@@ -343,10 +396,15 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 				<HBox className="weave-padded-hbox" style={ {alignItems: 'center'} }>
 					{ Weave.lang("Add target") }
 
-					<Input style={ {flexGrow: 0.5} } placeholder={ Weave.lang("Paste path here") }/>
+					<Input style={ {flexGrow: 0.5} }
+					       placeholder={ Weave.lang("Paste path here") }
+					       value={ this.state.pathInput }
+					       onChange={ this.handlePathInput }
+					/>
 
-					<CenteredIcon onClick={ ()=>{} }
-					              iconProps={{ className: "fa fa-plus", title: "Add this target" }}/>
+					<Button  style={{alignSelf:'flex-end'}} onClick={ this.addNewTargetPath }>
+						{ 'Add' }
+					</Button>
 				</HBox>
 
 				<List options={ this.getTargetList() }/>
