@@ -7,6 +7,7 @@ import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import Button from "../semantic-ui/Button";
 import SqlImport from "../ui/admin/SqlImport";
+import ConnectionManager from "../ui/admin/ConnectionManager";
 import DataSourceEditor from "./DataSourceEditor";
 import {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
 
@@ -77,8 +78,12 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 								   placeholder={Weave.lang("Hierarchy ID") }/>
 			],
 			[
-				Weave.lang("Import data"),
+				Weave.lang("Import Data to Server"),
 				<Button onClick={()=>SqlImport.open(ds, null)}>{Weave.lang("Import from SQL...")}</Button>
+			],
+			[
+				Weave.lang("Manage Server"),
+				<Button onClick={() => ConnectionManager.open(ds, null) }>{Weave.lang("Manage users and connections") }</Button>
 			]
 		];
 		return super.editorFields.concat(editorFields)
