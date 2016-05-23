@@ -44,7 +44,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 	public autoRecord = Weave.linkableChild(this, new LinkableBoolean(false), this.forceUpdate);
 
-	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable)/*, this.handleChoices*/);
+	choices = Weave.linkableChild(this, new LinkableHashMap(LinkableVariable));
 	targets = Weave.linkableChild(this, new LinkableHashMap(LinkableDynamicObject));
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
@@ -53,10 +53,6 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	verifyLayoutMode(value:string):boolean
 	{
 		return menuOptions.indexOf(value) >= 0;
-	}
-
-	test(){
-		console.log("selectedChoice:", this.selectedChoice.value);
 	}
 
 	get title():string
@@ -68,9 +64,8 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	{
 		super(props);
 
-		//this.choices.addGroupedCallback(this, this.choiceChanged);
+		this.choices.addGroupedCallback(this, this.handleChoices);
 		//this.targets.addGroupedCallback(this, this.forceUpdate);
-		this.selectedChoice.addImmediateCallback(this,this.test);
 		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
 	}
 
@@ -107,7 +102,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		return states;
 	};
 
-	handleSelectedChoice = (selectedValue:any):void =>
+	handleChoiceSelection = (selectedValue:any):void =>
 	{
 		if (!selectedValue)
 			return;
@@ -123,11 +118,16 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	{
 		if(WeaveAPI.SessionManager.getCallbackCollection(this).callbacksAreDelayed)
 		{
-			if(this.pendingApply)
-			{
-				this.pendingApply = false;
-			}
+			this.pendingApply = true;
+			return;
 		}
+
+		var choice = this.choices.getObject(this.selectedChoice.value) as LinkableVariable;
+		if(choice && Weave.detectChange(this.handleChoices, choice))
+		{
+			this.setTargetStates(choice.getSessionState());
+		}
+		this.forceUpdate();
 	};
 
 	recordSelectedChoice = ():void =>
@@ -161,7 +161,6 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	render()
 	{
-		console.log("selected choice in tool render", this.selectedChoice.value);
 		if(this.autoRecord.value)
 			this.recordSelectedChoice();
 
@@ -169,7 +168,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		return(
 			<MenuLayoutComponent options={ this.options }
 			                    displayMode={ this.layoutMode.value }
-			                    onChange={ this.handleSelectedChoice.bind(this) }
+			                    onChange={ this.handleChoiceSelection.bind(this) }
 			                    selectedItems={ [selectedChoice] }
 			/>
 		);
@@ -256,38 +255,26 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	//removes a choice from the choices in the menu items tab
 	removeSelectedChoice =(choice:ILinkableVariable,event:React.MouseEvent):void =>
 	{
-		console.log((event.target as any === this.refs["deleteIcon"] as any),choice);
 		let ssmt = this.props.sessionStateMenuTool;
 		if(choice)
 		{
 			let allNames = ssmt.choices.getNames();
+			//using choice name instead of selected choice because in case the one being deleted is not the currently selected one
 			var  choiceName = ssmt.choices.getName(choice);//get the name of the choice being deleted
 			let deleteIndex:number = allNames.indexOf(choiceName);
 
 			if(deleteIndex < 0)
 				deleteIndex = allNames.length -1;
 
-
+			ssmt.choices.removeObject(choiceName);//remove the object
 
 			//to update the current selected choice; only if the deleted one WAS the selected one
 			if(choiceName == ssmt.selectedChoice.value)
 			{
-				let count:number = allNames.length;
-				let newIndex:number = NaN;
-				if(count == deleteIndex) {
-					newIndex = deleteIndex -1;
-				}
-				else {
-					newIndex = deleteIndex + 1;
-				}
 				let newAllNames = ssmt.choices.getNames();//get new list
-				let newSelectedName = newAllNames[newIndex];
+				let newSelectedName = newAllNames[Math.min(newAllNames.length -1, deleteIndex)];
 				ssmt.selectedChoice.value = newSelectedName;
-				console.log("new selected choice", ssmt.selectedChoice.value);
 			}
-
-			ssmt.choices.removeObject(choiceName);//remove the object
-
 
 		}
 	};
@@ -337,8 +324,8 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	}
 
 	updateSelectedChoice(choice:LinkableVariable,event:React.MouseEvent){
-		console.log((event.target as any === this.refs["deleteIcon"] as any),choice);
-		this.props.sessionStateMenuTool.selectedChoice.value = this.props.sessionStateMenuTool.choices.getName(choice)
+		if(!Weave.wasDisposed(choice))
+			this.props.sessionStateMenuTool.selectedChoice.value = this.props.sessionStateMenuTool.choices.getName(choice)
 	}
 
 	//contains the menu items tab view, entries which map to the targets in the target view
@@ -420,7 +407,6 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	render()
 	{
 		let targetCount = (this.props.sessionStateMenuTool.targets.getNames() as string[]).length;
-		console.log("selected choice in editor render", this.props.sessionStateMenuTool.selectedChoice.value);
 
 		return (
 			<VBox style={{flex:"1 0"}}>
