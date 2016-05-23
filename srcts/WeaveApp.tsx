@@ -320,27 +320,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var layout = this.props.weave.getObject(this.getRenderPath());
 		if (layout instanceof AbstractLayout)
 			(layout as AbstractLayout).addPanel(path);
-
-		/*
-		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
-		if (layout)
-		{
-			var state = layout.getSessionState();
-			// check if the current layout is empty
-			if (!state.id && (state.children && !state.children.length))
-			{
-				state = {id: path};
-			}
-			else
-			{
-				state = {
-					children: [state, {id: path}],
-					direction: state.direction == 'horizontal' ? 'horizontal' : 'vertical'
-				};
-			}
-			layout.setSessionState(state);
-		}
-		*/
 	}
 
 	removeFromLayout(path:WeavePathArray)
@@ -349,20 +328,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (layout instanceof AbstractLayout)
 			(layout as AbstractLayout).removePanel(path);
 	
-		/*
-		var layout = Weave.AS(this.props.weave.getObject(this.getRenderPath()), FlexibleLayout);
-		if (layout)
-		{
-			var state = _.cloneDeep(layout.getSessionState());
-			var node = FlexibleLayout.findStateNode(state, path);
-			if (node)
-			{
-				delete node.id;
-				node.children = [];
-				layout.setSessionState(state);
-			}
-		}
-		*/
 	}
 	
 	componentWillUpdate(nextProps:WeaveAppProps, nextState:WeaveAppState)
@@ -410,7 +375,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
-						defaultType={TabLayout}
+						defaultType={WindowLayout}
 						style={{width: "100%", height: "100%"}}
 						props={{panelRenderer: this.renderTool}}
 					/>

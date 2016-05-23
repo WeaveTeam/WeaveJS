@@ -4,18 +4,13 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import * as WeaveUI from "../WeaveUI";
-import Layout from "../react-ui/flexible-layout/Layout";
-import {HBox, VBox} from "../react-ui/FlexBox";
+import Layout, {HORIZONTAL, VERTICAL, LayoutState} from "../react-ui/flexible-layout/Layout";
 import Div from "../react-ui/Div";
-import {HORIZONTAL, VERTICAL, LayoutState} from "../react-ui/flexible-layout/Layout";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
-import {PanelRenderer} from "./AbstractLayout";
-
+import {AbstractLayout, LayoutProps} from "./AbstractLayout";
 import PanelOverlay from "../PanelOverlay";
-import MiscUtils from "../utils/MiscUtils";
+import MiscUtils, {Structure} from "../utils/MiscUtils";
 import DOMUtils from "../utils/DOMUtils";
-import MouseUtils from "../utils/MouseUtils";
 
 export enum DropZone {
 	NONE,
@@ -49,18 +44,36 @@ export type PanelProps = {
 	onDragOver:React.DragEventHandler
 };
 
-export interface IFlexibleLayoutProps extends React.HTMLProps<FlexibleLayout>
-{
-	panelRenderer: PanelRenderer;
+function normalizeId(id:any){
+	if(Array.isArray(id))
+		return MiscUtils.normalizeStructure(id, ["string"]);
+	return null;
 }
 
-export interface IFlexibleLayoutState extends LayoutState
+function normalizeChildren(children:LayoutState[]):Structure
 {
+	if(Array.isArray(children))
+		return MiscUtils.normalizeStructure(children, children.map(child => ({
+			id: normalizeId,
+			children: normalizeChildren,
+			flex: "number",
+			direction: "string",
+			maximized: "boolean"
+		} as Structure)));
+	return null;
 }
 
-export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps, IFlexibleLayoutState> implements weavejs.api.core.ILinkableVariable
+var stateStructure:Structure = {
+	id: normalizeId,
+	children: normalizeChildren,
+	flex: "number",
+	direction: "string",
+	maximized: "boolean"
+};
+
+export default class FlexibleLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
 {
-	private linkableState = Weave.linkableChild(this, LinkableVariable, this.forceUpdate, true);
+	private linkableState = Weave.linkableChild(this, new LinkableVariable(MiscUtils.normalizeStructure({flex: 1}, stateStructure)), this.forceUpdate, true);
 	private nextState:Object;
 	private rootLayout:Layout;
 	private layoutRect:ClientRect;
@@ -72,7 +85,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	private prevClientHeight:number;
 	private outerZoneThickness:number = 8;
 	
-	constructor(props:IFlexibleLayoutProps)
+	constructor(props:LayoutProps)
 	{
 		super(props);
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.frameHandler, true);
@@ -80,15 +93,12 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	
 	getSessionState():LayoutState
 	{
-		return this.linkableState.state;
+		return this.linkableState.state as LayoutState;
 	}
 	
 	setSessionState=(state:LayoutState):void=>
 	{
-		state = MiscUtils._pickDefined(state, 'id', 'children', 'flex', 'direction', 'maximize');
-		state = this.simplifyState(state);
-		state.flex = 1;
-		this.linkableState.state = state;
+		this.linkableState.state = this.simplifyState(MiscUtils.normalizeStructure(state, stateStructure));
 	}
 
 	componentDidMount():void
@@ -100,7 +110,37 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	{
 		this.repositionPanels();
 	}
-	
+
+	addPanel(id:WeavePathArray):void
+	{
+		var state = this.getSessionState();
+		// check if the current layout is empty
+		if (!state.id && (state.children && !state.children.length))
+		{
+			state = {id};
+		}
+		else
+		{
+			state = {
+				children: [state, {id}],
+				direction: state.direction == 'horizontal' ? 'horizontal' : 'vertical'
+			};
+		}
+		this.setSessionState(state);
+	}
+
+	removePanel(id:WeavePathArray):void
+	{
+		var state = _.cloneDeep(this.getSessionState());
+		var node = FlexibleLayout.findStateNode(state, id);
+		if (node)
+		{
+			delete node.id;
+			node.children = [];
+			this.setSessionState(state);
+		}
+	}
+
 	maximizePanel(id:WeavePathArray, maximized:boolean):void
 	{
 		var path = id;
@@ -118,7 +158,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 	frameHandler():void
 	{
 		// reposition on resize
-		var rect:ClientRect = Object(this.getLayoutPosition(this.rootLayout));
+		var rect:ClientRect = Object(this.getLayoutPosition(this.rootLayout)) as ClientRect;
 		if (this.layoutRect.width != rect.width || this.layoutRect.height != rect.height)
 			this.repositionPanels();
 	}
@@ -224,7 +264,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 		// check for outer drop zones
 		var rootNode = ReactDOM.findDOMNode(this.rootLayout);
 		var rootRect = rootNode.getBoundingClientRect();
-		var panelNode:typeof rootNode = null;
+		var panelNode:Element = null;
 		
 		if (
 			event.clientX <= rootRect.left + this.outerZoneThickness
@@ -236,9 +276,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			panelNode = rootNode;
 		}
 		else
-		{
 			panelNode = this.rootLayout.getElementFromId(panelOver);
-		}
 		
 		if (this.panelDragged === panelOver)
 			return [DropZone.NONE, panelOver];
@@ -434,7 +472,7 @@ export default class FlexibleLayout extends React.Component<IFlexibleLayoutProps
 			return;
 		
 		if (layout == this.rootLayout)
-			this.layoutRect = Object(this.getLayoutPosition(layout));
+			this.layoutRect = Object(this.getLayoutPosition(layout)) as ClientRect;
 		
 		var div:Div = this.refs[JSON.stringify(layout.state.id)] as Div;
 		if (div instanceof Div)
