@@ -279,6 +279,24 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		}
 	};
 
+	//adds new choice to the choice hashmap
+	addNewChoice =(name:string = null): string =>
+	{
+		let ssmt = this.props.sessionStateMenuTool
+		if(!name)
+			name = ssmt.choices.generateUniqueName("Item");
+		ssmt.selectedChoice.value = name;
+		ssmt.recordSelectedChoice();
+		return name;
+	};
+
+	//adds new item to the choice menu items
+	addNewChoiceItem = () :void=>
+	{
+		let name:string = this.addNewChoice();//new item with default name
+		this.props.sessionStateMenuTool.choices.getObject(name);//this adds a new entry to the choices hashmap, thus triggering re render
+	};
+
 	//allows user to edit and rename choices in the menu items tab
 	handleRename =(newName:string):void =>
 	{
@@ -360,7 +378,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 
 		return(
 			<VBox>
-				<Button style={{alignSelf:'flex-end'}}>
+				<Button style={{alignSelf:'flex-end'}} onClick={ this.addNewChoiceItem }>
 					{ 'Add Choice' }
 				</Button>
 				<List options={ menuItems } selectedValues={ [selectedOption] }/>
