@@ -5,6 +5,7 @@ import * as ReactDOM from "react-dom";
 export interface GuidanceToolTipProps extends React.HTMLProps<GuidanceToolTip>
 {
 	location:string;
+	type: string;
 }
 
 export interface GuidanceToolTipState
@@ -14,6 +15,9 @@ export interface GuidanceToolTipState
 
 export default class GuidanceToolTip extends React.Component<GuidanceToolTipProps,GuidanceToolTipState>
 {
+	static START:string = "Start";
+	static NEXT:string = "Next";
+	static DONE:string = "Done";
 
 	constructor(props:GuidanceToolTipProps)
 	{
@@ -62,11 +66,12 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 		}
 
-
+		let typeUI:JSX.Element = <span style={{color:"orange"}}>{this.props.type} : </span>
 
 		return (
 			<div style={ {position:"relative"} }>
 				<div style={containerStyle} className="weave-guidance-toolTip">
+					{typeUI}
 					{this.props.children}
 					<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
 				</div>
@@ -74,3 +79,5 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			);
 	}
 }
+
+

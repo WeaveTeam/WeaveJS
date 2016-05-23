@@ -1,6 +1,7 @@
 import * as React from "react";
 import CenteredIcon from "./CenteredIcon";
 import {HBox, VBox} from "./FlexBox";
+import  GuidanceToolTip from "./GuidanceToolTip";
 import classNames from "../modules/classnames";
 
 const TOP:"top" = "top";
@@ -15,6 +16,8 @@ export interface TabsProps extends React.Props<Tabs>
 	onTabClose?:(index:number, event:React.MouseEvent) => void;
 	activeTabIndex?:number;
 	onViewChange?:(index:number) => void;
+	enableGuidance?:boolean;
+	guideToTab?:string;
 }
 
 export interface TabsState
@@ -36,7 +39,9 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 	static defaultProps:TabsProps = {
 		labels: [],
 		tabs: [],
-		location: "top"
+		location: "top",
+		enableGuidance:false,
+		guideToTab:""
 	};
 
 	changeTabView(index:number)
@@ -63,6 +68,11 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 									this.props.onTabClose
 									?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
 									:   null
+								}
+								{
+									this.props.enableGuidance && this.props.guideToTab == label && this.state.activeTabIndex != index
+										?   <GuidanceToolTip location="right" type={GuidanceToolTip.NEXT}> Click {label}</GuidanceToolTip>
+										: null
 								}
 							</HBox>
 						);

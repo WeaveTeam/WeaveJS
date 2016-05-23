@@ -35,6 +35,11 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	onUrlChange()
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
+		if(ds.url.value){
+			this.setState({
+				guideToTab:"Browse"
+			})
+		}
 		if (ds.keyType.value === null && ds.url.value)
 		{
 			ds.keyType.value = ds.url.value;
@@ -92,7 +97,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					              placeholder={Weave.lang("http://www.example.com/example.csv")}
 					              style={ {width: "100%"} }
 					              accept={acceptExtension}/>
-					{ds.url.value ? null :  <GuidanceToolTip location="bottom">Next: Add CSV File</GuidanceToolTip> }
+					{ds.url.value ? null :  <GuidanceToolTip location="bottom" type={GuidanceToolTip.NEXT}> Add CSV File</GuidanceToolTip> }
 				</VBox>
 			],
 			[

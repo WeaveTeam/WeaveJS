@@ -712,7 +712,7 @@ div.weave-tree-view {
 	color:white;
 	z-index:1;
 	min-width: 100px;
-	max-width: 300px;
+	max-width: 500px;
 	border-radius: 4px;
 	box-shadow: 0 2px 8px rgba(0,0,0,.4);
 }

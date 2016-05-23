@@ -11,6 +11,7 @@ import WeaveTree from "../ui/WeaveTree";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
 import Tabs from "../react-ui/Tabs";
+import GuidanceToolTip from "../react-ui/GuidanceToolTip";
 import Input from "../semantic-ui/Input";
 import MenuButton from '../react-ui/MenuButton';
 import ChartsMenu from "../menus/ChartsMenu";
@@ -41,6 +42,7 @@ export interface IDataSourceEditorState {
 	selectedBranch?: IWeaveTreeNode;
 	selectedLeaf?: IWeaveTreeNode;
 	showPreviewView?: boolean;
+	guideToTab?:string;
 };
 
 export default class DataSourceEditor extends SmartComponent<IDataSourceEditorProps, IDataSourceEditorState> 
@@ -172,6 +174,13 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 									</MenuButton>
 								: 	null
 						}
+						{
+							this.state.guideToTab == "Browse"
+								? <GuidanceToolTip location={"bottom"} type={GuidanceToolTip.DONE}> Add Chart</GuidanceToolTip>
+								: null
+
+							}
+
 						<WeaveTree
 							root={this.state.selectedBranch}
 							hideRoot={true}
@@ -285,6 +294,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 				activeTabIndex={activeTabIndex}
 				tabs={Array.from(tabs.values())}
 				onViewChange={() => this.forceUpdate()}
+				enableGuidance={true}
+				guideToTab={this.state.guideToTab}
 			/>
 		);
 	}

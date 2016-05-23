@@ -155,7 +155,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let guidanceUI:JSX.Element = null;
 		if(listOptions.length == 0 )
 		{
-			guidanceUI = <GuidanceToolTip location="right">Start Here</GuidanceToolTip>
+			guidanceUI = <GuidanceToolTip location="right" type={GuidanceToolTip.START}> Here</GuidanceToolTip>
 		}
 
 		return (
