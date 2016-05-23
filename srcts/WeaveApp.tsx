@@ -37,6 +37,7 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
+import TabLayout from "./layouts/TabLayout";
 
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -216,16 +217,26 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	}
 	
-	renderTool=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer:PanelRenderer)=>
+	renderTool=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
 	{
 		var tool = this.props.weave.getObject(path);
+
+		if(_.isEqual(path, this.props.renderPath))
+			return (
+				<WeaveComponentRenderer
+					weave={this.props.weave}
+					path={path}
+					props={{panelRenderer: this.renderTool}}
+				/>
+			);
+
 		return (
 			<WeaveTool
 				ref={this.handleWeaveTool}
 				weave={this.props.weave}
 				path={path}
-				props={{panelRenderer}}
-				style={{width: "100%", height: "100%", left: 0, top: 0}}
+				props={{panelRenderer: this.renderTool}}
+				style={{width: "100%", height: "100%", left: "0", top: "0"}}
 				maximized={panelProps.maximized}
 				onGearClick={this.handleGearClick}
 				onPopoutClick={this.handlePopoutClick}
@@ -399,7 +410,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
-						defaultType={WindowLayout}
+						defaultType={TabLayout}
 						style={{width: "100%", height: "100%"}}
 						props={{panelRenderer: this.renderTool}}
 					/>

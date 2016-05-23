@@ -2,6 +2,8 @@ import WeaveApp from "./WeaveApp";
 import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./layouts/FlexibleLayout";
+import WindowLayout from "./layouts/WindowLayout";
+import TabLayout from "./layouts/TabLayout";
 
 import WeaveDataSourceEditor from "./editors/WeaveDataSourceEditor";
 
@@ -61,7 +63,8 @@ export
 	WeaveMenuBar,
 	WeaveComponentRenderer,
 	FlexibleLayout,
-	
+	WindowLayout,
+	TabLayout,
 	WeaveDataSourceEditor,
 	
 	BarChartLegend,

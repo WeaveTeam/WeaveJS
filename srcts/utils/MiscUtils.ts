@@ -1,5 +1,10 @@
 import * as _ from "lodash";
 
+export declare type Structure = "string"|"boolean"|"number"|StructureFunction|StructureObject|StructureArray;
+export interface StructureObject {[key: string]: Structure};
+export interface StructureArray extends Array<Structure>{};
+export declare type StructureFunction = ((a:any)=>any);
+
 export default class MiscUtils
 {
 	/**
@@ -189,12 +194,12 @@ export default class MiscUtils
 			return str;
 		}
 	}
-	
+
 	public static _pickDefined(obj:{[key:string]:any}, ...keys:string[]):typeof obj
 	{
 		return MiscUtils._pickBy(_.pick(obj, keys), _.negate(_.isUndefined));
 	}
-	
+
 	public static _pickBy(obj:{[key:string]:any}, predicate:(value:any, key:string)=>boolean):typeof obj
 	{
 		var result:{[key:string]:any} = {};
@@ -205,5 +210,41 @@ export default class MiscUtils
 				result[key] = value;
 		}
 		return result;
+	}
+
+	// TODO needs documentation
+	public static normalizeStructure(object:any, structure:Structure):any
+	{
+		if(Array.isArray(structure))
+		{
+			var a = (Array.isArray(object) ? object : []) as StructureArray;
+			return _.map(a, item => MiscUtils.normalizeStructure(item, structure[0]));
+		}
+		else if(typeof(structure) == "object" && structure)
+		{
+			var o:any = {};
+			for(var key in structure as StructureObject)
+			{
+				o[key] = MiscUtils.normalizeStructure(object && object[key], (structure as StructureObject)[key]);
+			}
+			return o;
+		}
+		else if(typeof structure == "function")
+		{
+			return (structure as StructureFunction)(object);
+		}
+		else if(structure == "string")
+		{
+			return weavejs.util.StandardLib.asString(object);
+		}
+		else if(structure == "number")
+		{
+			return weavejs.util.StandardLib.asNumber(object);
+		}
+		else if(structure == "boolean")
+		{
+			return weavejs.util.StandardLib.asBoolean(object);
+		}
+		return object === undefined ? null : object;
 	}
 }
