@@ -172,9 +172,20 @@ export default class WeaveArchive {
 	 * @param byteArray A URL to load the session content from.
 	 * @param updateCallback A function to invoke as the archive is incrementally decompressed, which takes an object containing a "percent" field and a "fileName" field.
 	 */
-	static loadUrl(weave: Weave, url: string, updateCallback?: UpdateCallback): WeavePromise<void>
+	static loadUrl(weave: Weave, urlObject: any, updateCallback?: UpdateCallback): WeavePromise<void>
 	{
-		return WeaveAPI.URLRequestUtils.request(weave.root, new URLRequest(url))
+		let urlRequest:URLRequest;
+		if(typeof urlObject == 'string')
+		{
+			urlRequest = new URLRequest(urlObject);
+		}
+		else
+		{
+			urlRequest = new URLRequest(urlObject.url);
+			urlRequest.requestHeaders = urlObject.requestHeaders;
+		}
+		return WeaveAPI.URLRequestUtils.request(weave.root, urlRequest)
 			.then((result) => WeaveArchive.setWeaveSessionFromContent(weave, result, updateCallback));
+
 	}
 }
