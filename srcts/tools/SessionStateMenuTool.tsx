@@ -36,7 +36,7 @@ const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
 const LAYOUT_VSLIDER:string = "VSlider";
 const LAYOUT_HSLIDER:string = "HSlider";
-const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];//todo add the verify callback
+const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];
 
 export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps, IVisToolState>
 {
@@ -69,7 +69,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		this.layoutMode.addGroupedCallback(this, this.forceUpdate);
 	}
 
-	setTargetStates(states:any):void 
+	setTargetStates(states:any):void
 	{
 		if (!states)
 			return;
@@ -242,17 +242,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		});
 	};
 
-	//removes the target from the target list
-	removeSelectedTarget =(target:LinkableDynamicObject): void =>
-	{
-		if(target)
-		{
-			var name:string = this.props.sessionStateMenuTool.targets.getName(target);
-			this.props.sessionStateMenuTool.targets.removeObject(name);
-		}
-		this.tidySavedStates();
-	};
-
+	/*****************Choices*****************/
 	//removes a choice from the choices in the menu items tab
 	removeSelectedChoice =(choice:ILinkableVariable,event:React.MouseEvent):void =>
 	{
@@ -298,6 +288,12 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		this.props.sessionStateMenuTool.choices.getObject(name);//this adds a new entry to the choices hashmap, thus triggering re render
 	};
 
+	//reapplies the selected choice when choice items are deleted
+	updateSelectedChoice(choice:LinkableVariable,event:React.MouseEvent){
+		if(!Weave.wasDisposed(choice))
+			this.props.sessionStateMenuTool.selectedChoice.value = this.props.sessionStateMenuTool.choices.getName(choice)
+	}
+
 	//allows user to edit and rename choices in the menu items tab
 	handleRename =(newName:string):void =>
 	{
@@ -307,6 +303,18 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 
 		ssmt.selectedChoice.value = newName;//so that older selection is retained
 		ssmt.choices.renameObject(oldName, newName);
+	};
+
+	/*****************Targets*****************/
+	//removes the target from the target list
+	removeSelectedTarget =(target:LinkableDynamicObject): void =>
+	{
+		if(target)
+		{
+			var name:string = this.props.sessionStateMenuTool.targets.getName(target);
+			this.props.sessionStateMenuTool.targets.removeObject(name);
+		}
+		this.tidySavedStates();
 	};
 
 	//renders the target list UI
@@ -344,11 +352,6 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 				<List options={ this.getTargetList() }/>
 			</VBox>
 		);
-	}
-
-	updateSelectedChoice(choice:LinkableVariable,event:React.MouseEvent){
-		if(!Weave.wasDisposed(choice))
-			this.props.sessionStateMenuTool.selectedChoice.value = this.props.sessionStateMenuTool.choices.getName(choice)
 	}
 
 	//contains the menu items tab view, entries which map to the targets in the target view
