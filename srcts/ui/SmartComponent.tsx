@@ -14,7 +14,10 @@ export default class SmartComponent<P,S> extends React.Component<P, S>
 			this.state = {} as S;
 	}
 	
-	setState(newState: S | ((prevState: S, props: P) => S), callback?: () => any):void
+    setState(f: (prevState: S, props: P) => S, callback?: () => any): void;
+	setState(newState: S, callback?: () => any):void;
+	
+	setState(newState: any, callback?: () => any):void
 	{
 		if (this.context)
 		{
