@@ -470,6 +470,19 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		);
 	}
 
+	renderTitleEditor():React.ReactChild[][]
+	{
+		return [
+			[
+				Weave.lang("Title"),
+				<StatefulTextField
+					className="ui input fluid"
+					ref={ linkReactStateRef(this, { value:this.props.sessionStateMenuTool.panelTitle }) }
+				/>
+			]
+		];
+	}
+
 	get editorConfigs():React.ReactChild[][]
 	{
 		return[
@@ -493,12 +506,14 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		let targetCount = (this.props.sessionStateMenuTool.targets.getNames() as string[]).length;
 
 		return (
-			<VBox style={{flex:"1 0"}}>
+			<VBox className="weave-padded-vbox" style={{flex:"1 0"}}>
+				{ targetCount == 0 ? Weave.lang("This menu tool will have no effect unless you add at least one target.") : null }
 				{ this.renderTargetsAndMenuItems() }
 				{
 					ReactUtils.generateTable({
 						body: [].concat(
-							this.editorConfigs
+							this.editorConfigs,
+							this.renderTitleEditor()
 							),
 						classes: {
 							td: [
@@ -508,7 +523,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 							}
 						})
 				}
-				{ targetCount == 0 ? Weave.lang("This menu tool will have no effect unless you add at least one target.") : null }
+
 			</VBox>
 		);
 	}
