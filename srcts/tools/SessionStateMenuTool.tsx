@@ -116,6 +116,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	//called whenever the choices are added or deleted
 	handleChoices =():void =>
 	{
+		console.log("in choices callback", this.selectedChoice.value);
 		if(WeaveAPI.SessionManager.getCallbackCollection(this).callbacksAreDelayed)
 		{
 			this.pendingApply = true;
@@ -300,8 +301,12 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	//allows user to edit and rename choices in the menu items tab
 	handleRename =(newName:string):void =>
 	{
-		console.log("newName", newName);
-		//this.props.sessionStateMenuTool.selectedChoice.value = newName;
+		let ssmt = this.props.sessionStateMenuTool;
+		let choiceBeingEdited = ssmt.choices.getObject(ssmt.selectedChoice.value);//when item is double clicked to edit, it automatically becomes the selected choice
+		let oldName = ssmt.choices.getName(choiceBeingEdited);
+
+		ssmt.selectedChoice.value = newName;//so that older selection is retained
+		ssmt.choices.renameObject(oldName, newName);
 	};
 
 	//renders the target list UI
