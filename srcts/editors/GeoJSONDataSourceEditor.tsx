@@ -1,5 +1,5 @@
 import * as React from "react";
-import * as lodash from "lodash";
+import * as _ from "lodash";
 import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
@@ -26,17 +26,32 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 	{
 		let dataSource = (this.props.dataSource as GeoJSONDataSource);
 		let propertyIds = dataSource.getPropertyNames().map((id:string)=>({label: id.toString(), value: id}));
-
+		let validExtension:boolean;
+		let acceptExtension:string = ".geojson,application/vnd.geo+json";
+		if (dataSource.url.value)
+		{
+			let extension = dataSource.url.value.split('.').pop();
+			validExtension = _.includes(acceptExtension.split(','),"."+extension);
+		} else {
+			validExtension = true;
+		}
 		propertyIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			this.getLabelEditor(dataSource.label),
 			[
-				Weave.lang("GeoJSON URL"),
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("GeoJSON URL")}
+					<HelpIcon className={validExtension ? "":"fa-exclamation-triangle"} style={{color:validExtension? null:"#794B02"}}>
+						<VBox>
+							{validExtension ? Weave.lang("The URL of the GeoJSON file to be used"):Weave.lang("Warning: The file you have chosen has an extension that does not match the expected extension.")}
+						</VBox>
+					</HelpIcon>
+				</HBox>,
 				<FileSelector style={{width: "100%"}}
 							  targetUrl={dataSource.url} 
 							  placeholder={Weave.lang("http://www.example.com/example.geojson")} 
-							  accept=".geojson"/>
+							  accept=".geojson,application/vnd.geo+json"/>
 			],
 			[
 				Weave.lang("Projection"),

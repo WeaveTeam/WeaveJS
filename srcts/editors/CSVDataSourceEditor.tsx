@@ -59,6 +59,15 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
 		let keysAreUnique:boolean = ds.keysAreUnique;
+		let validExtension:boolean;
+		let acceptExtension:string = "text/csv,.csv";
+		if (ds.url.value)
+		{
+			let extension = ds.url.value.split('.').pop();
+			validExtension = _.includes(acceptExtension.split(','),"."+extension);
+		} else {
+			validExtension = true;
+		}
 		let columnIds:ComboBoxOption[] = ds.getColumnIds().map( (id, index) => {
 			return {label: ds.getColumnTitle(id), value: id}
 		});
@@ -66,11 +75,18 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			this.getLabelEditor(ds.label),
 			[
-				Weave.lang("URL"),
+				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
+					{Weave.lang("URL")}
+					<HelpIcon className={validExtension ? "":"fa-exclamation-triangle"} style={{color:validExtension? null:"#794B02"}}>
+						<VBox>
+							{validExtension ? Weave.lang("The URL of the file to be used"):Weave.lang("Warning: The file you have chosen has an extension that does not match the expected extension.")}
+						</VBox>
+					</HelpIcon>
+				</HBox>,
 				<FileSelector targetUrl={ds.url}
 							  placeholder={Weave.lang("http://www.example.com/example.csv")} 
 							  style={{width: "100%"}}
-							  accept="text/csv,.csv"/>
+							  accept={acceptExtension}/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>

@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import StatefulTextField from "../ui/StatefulTextField";
 import FileInput from "../react-ui/FileInput";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
@@ -21,7 +22,7 @@ export interface IFileSelectorProps extends React.HTMLProps<LinkableFileSelector
 
 export interface IFileSelectorState
 {
-
+	validExtension:boolean
 }
 
 export default class LinkableFileSelector extends React.Component<IFileSelectorProps, IFileSelectorState>
@@ -29,6 +30,18 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 	constructor(props:IFileSelectorProps)
 	{
 		super(props);
+
+		if (props.targetUrl.value)
+		{
+			let extension = props.targetUrl.value && props.targetUrl.value.split('.').pop();
+			this.state = {
+				validExtension: _.includes(this.props.accept.split(','),"."+extension)
+			};
+		} else {
+			this.state = {
+				validExtension: true
+			}
+		}
 	}
 	
 	handleFileChange=(event:React.FormEvent)=>
@@ -42,9 +55,24 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 			let buffer = reader.result as ArrayBuffer;
 			let fileName = URLRequestUtils.saveLocalFile(Weave.getRoot(this.props.targetUrl), file.name, new Uint8Array(buffer));
 			this.props.targetUrl.value = fileName;
-		}
+		};
 
 		reader.readAsArrayBuffer(file);
+	};
+
+	componentWillReceiveProps(nextProps:IFileSelectorProps)
+	{
+		if (nextProps.targetUrl.value)
+		{
+			let extension = nextProps.targetUrl.value.split('.').pop();
+			this.setState({
+				validExtension: _.includes(nextProps.accept.split(','),"."+extension)
+			});
+		} else {
+			this.setState({
+				validExtension: true
+			})
+		}
 	}
 
 	render():JSX.Element
@@ -57,7 +85,7 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 		return (
 			<HBox style={hBoxFlex}>
 				<StatefulTextField {...this.props}
-									className={"right labeled " + (this.props.className || "")}
+									className={"right labeled" + (this.state.validExtension ? "" : " warning") + (this.props.className ?  (" " + this.props.className):"")}
 									ref={linkReactStateRef(this, {value: this.props.targetUrl}, 500)}/>
 				<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
 					<Button style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: 0, whiteSpace: "nowrap", border: "1px solid #E0E1E2"}}>

@@ -807,6 +807,14 @@ div.weave-tree-view {
 	background-color: rgba(0,0,0,.5);
 }
 
+/****** Warning ******/
+.ui.input.warning input {
+	background-color: #FFFAF3;
+	border-color: #C9BA9B;
+	color: #794B02;
+	box-shadow: none;
+}
+
 .weave-dropzone-file {
 	width: 100%;
 	height: 100%;
