@@ -13,6 +13,7 @@ import Button from "../semantic-ui/Button";
 import FileInput from "../react-ui/FileInput";
 import Login from "../ui/admin/Login";
 import SmartComponent from "./SmartComponent";
+import GoogleDrive from "../external/GoogleDrive";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
@@ -249,6 +250,127 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 	}
 }
 
+
+export interface IOpenGoogleFileProps {
+	openUrlHandler:(url:string) => void;
+	openFileHandler:(file:File) => void;
+}
+
+export interface IOpenGoolgeFileState {
+	fileInfo?:GoogleFileInfo;
+	files?:any[];
+}
+
+export class GoogleFileInfo{
+	webContentLink:string;
+	webViewLink:string;
+	thumbnailLink:string;
+	iconLink:string;
+	id:string;
+	name:string;
+	modifiedTime:string;
+}
+
+export class GoogleDriveFileOpen extends SmartComponent<IOpenGoogleFileProps, IOpenGoolgeFileState> {
+
+	private googleDrive:GoogleDrive;
+	constructor(props:IOpenFileProps)
+	{
+
+		super(props);
+		this.googleDrive =  new GoogleDrive(this.updateWeaveFilesList);
+		this.state = {
+			files:[]
+		}
+
+	}
+
+
+
+	updateWeaveFilesList=(fileList:any[]) => {
+		this.setState({
+			files:fileList
+		})
+	};
+
+
+
+	extractFileInfo=(obj:any):GoogleFileInfo=>{
+
+		let fileInfo:GoogleFileInfo = new GoogleFileInfo();
+		fileInfo.webContentLink = obj.webContentLink;
+		fileInfo.webViewLink = obj.webViewLink;
+		fileInfo.thumbnailLink = obj.thumbnailLink;
+		fileInfo.iconLink = obj.iconLink;
+		fileInfo.id = obj.id;
+		fileInfo.name = obj.name;
+		fileInfo.modifiedTime = obj.modifiedTime;
+		return fileInfo;
+	}
+
+	render():JSX.Element
+	{
+
+		let fileList:ListOption[] = this.state.files.map((file:any) => {
+			return {
+				label: (
+					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
+						<span style={{overflow: "hidden"}}>{file.name}</span>
+					</HBox>
+				),
+				value: file.name
+			};
+		});
+
+		let rows:IRow[] = fileList.map((obj:ListOption,index:number) => {
+			return {
+				index:index,
+				filename: obj.value
+			} as IRow
+		});
+		let columnIds = ["index","filename"];
+		
+
+		return (
+			<VBox style={{flex:1}}>
+				<HBox className="weave-server-file-view" style={{flex: 1, marginLeft: 20, marginRight: 20}}>
+					<VBox style={{flex: 1}}>
+						<FixedDataTable rows={rows}
+						                columnIds={columnIds}
+						                idProperty="index"
+						                showIdColumn={true}
+						                multiple={false}
+						                disableSort={true}
+						                headerHeight={60}
+						                onSelection={(selectedFiles:any[]) => {
+						                    if(selectedFiles[0]){
+
+						                        this.setState({
+													fileInfo: this.extractFileInfo(this.state.files[selectedFiles[0]])
+												});
+						                    }
+						                }}
+						/>
+					</VBox>
+					<VBox style={ {flex: 1, paddingLeft: 20} }>
+						<FileInfoView className="weave-container" fileInfo={this.state.fileInfo}>
+							{this.state.fileInfo ?
+							<Button
+								onClick={() => {
+										this.googleDrive.loadWeaveFile(this.state.fileInfo.id, this.props.openUrlHandler);
+					                    PopupWindow.close(FileDialog.window);
+									}}
+							>
+								{Weave.lang("Load Session")}
+							</Button>:null}
+						</FileInfoView>
+					</VBox>
+				</HBox>
+			</VBox>
+		);
+	}
+}
+
 export interface IFileDialogProps extends React.Props<FileDialog>
 {
 	openUrlHandler:(url:string) => void;
@@ -262,13 +384,18 @@ export interface IFileDialogState
 
 export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDialogState> {
 	static window:PopupWindow;
-	static listItems:{[key:string]:string}[] = [{label: "My Computer" , iconClass:"fa fa-desktop"}, {label: "Weave Server", iconClass: "fa fa-server"}];
+	static listItems:{[key:string]:string}[] = [
+		{label: "My Computer" , iconClass:"fa fa-desktop"},
+		{label: "Weave Server", iconClass: "fa fa-server"},
+		{label: "Google Drive", iconClass: "fa fa-google"}
+	];
 	static activeListIndex:number = 0;
 	element:Element;
 
 	static storageRegistry = new Map< String, React.ComponentClass<IOpenFileProps>>()
 		.set("My Computer", LocalFileOpen)
-		.set("Weave Server", WeaveServerFileOpen);
+		.set("Weave Server", WeaveServerFileOpen)
+		.set("Google Drive", GoogleDriveFileOpen);
 
 	constructor(props:IFileDialogProps)
 	{
@@ -311,10 +438,8 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		let listOptions:ListOption[] = FileDialog.listItems.map((fileSource:any) => {
 			return {
 				label: (
-					<HBox className="weave-padded-hbox">
-						<HBox>
-							<CenteredIcon iconProps={{ className: fileSource.iconClass, title: fileSource.label }}/>
-						</HBox>
+					<HBox className="weave-padded-hbox" style={ {alignItems:"center"} }>
+						<CenteredIcon iconProps={{ className: fileSource.iconClass, title: fileSource.label }}/>
 						<span style={{overflow: "hidden"}}>{fileSource.label}</span>
 					</HBox>
 				),

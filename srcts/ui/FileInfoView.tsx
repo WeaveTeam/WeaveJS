@@ -7,10 +7,11 @@ import Button from "../semantic-ui/Button";
 import Clipboard from "../modules/clipboard";
 
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
+import {GoogleFileInfo} from "./FileDialog";
 
 export interface IFileInfoViewProps extends React.Props<FileInfoView>
 {
-	fileInfo?:WeaveFileInfo;
+	fileInfo?:WeaveFileInfo | GoogleFileInfo;
 	className:string;
 }
 
@@ -62,36 +63,63 @@ export default class FileInfoView extends React.Component<IFileInfoViewProps, IF
 
 	render():JSX.Element
 	{
-		let thumbnail:Blob = this.props.fileInfo && this.props.fileInfo.thumb && new Blob([this.props.fileInfo.thumb.data], { type: "image/jpeg" });
-		let date:Date = this.props.fileInfo && new Date(this.props.fileInfo.lastModified);
-		let copyURL:string = this.props.fileInfo && (window.location.origin + window.location.pathname + "?file=/" + this.props.fileInfo.fileName);
+		let imageUI:JSX.Element = null;
+		let copyUrlUI:JSX.Element = null;
+		let thumbNailStatusUI:JSX.Element = null;
+		let fileName:string = null;
+		let fileSizeInfo:string = null;
+		let modifiedDate:string = null;
+
+		if(this.props.fileInfo instanceof WeaveFileInfo)
+		{
+			let fileInfo:WeaveFileInfo = this.props.fileInfo as WeaveFileInfo;
+			let thumbnail:Blob = fileInfo && fileInfo.thumb && new Blob([fileInfo.thumb.data], { type: "image/jpeg" });
+			let date:Date = fileInfo && new Date(fileInfo.lastModified);
+			let copyURL:string = fileInfo && (window.location.origin + window.location.pathname + "?file=/" + fileInfo.fileName);
+			fileSizeInfo = Weave.lang("Weave Session") + (fileInfo && (" - " + FormatUtils.defaultFileSizeFormatting(fileInfo.fileSize)))
+			fileName = fileInfo && fileInfo.fileName;
+			modifiedDate = Weave.lang("Modified") + " " + FormatUtils.defaultFuzzyTimeAgoFormatting(date) + " " + Weave.lang("ago")
+			imageUI =  thumbnail ? <img className="ui image" src={URL.createObjectURL(thumbnail)}/> : null;
+			thumbNailStatusUI = thumbnail ? null:<i className="circular file outline icon" title={Weave.lang("Thumbnail Unavailable")}/>
+			copyUrlUI = <Button className="copyButton" data-clipboard-text={copyURL}>
+							{Weave.lang("Copy URL")}
+						</Button>
+		}
+		else if(this.props.fileInfo instanceof GoogleFileInfo)
+		{
+			let fileInfo:GoogleFileInfo = this.props.fileInfo as GoogleFileInfo;
+			let thumbnailPath:string = fileInfo && fileInfo.thumbnailLink;
+			let date:string = fileInfo && fileInfo.modifiedTime;
+			fileName = fileInfo && fileInfo.name;
+			modifiedDate = Weave.lang("Modified") + " " + date + " " + Weave.lang("ago");
+			imageUI = thumbnailPath ? <img className="ui image" src={thumbnailPath}/> : null
+			thumbNailStatusUI = thumbnailPath ? null:<i className="circular file outline icon" title={Weave.lang("Thumbnail Unavailable")}/>
+		}
+
+
+
 		return (
 			<VBox className={this.props.className} style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
 				{this.props.fileInfo ?
 					<VBox style={{flex: 1, marginTop:"50%", alignItems: "center"}}>
 						<VBox style={{flex: 1, display: "flex", justifyContent: "center"}}>
-							{this.props.fileInfo && (thumbnail ? <img className="ui image" src={URL.createObjectURL(thumbnail)}/>:null)}
+							{imageUI}
 						</VBox>
 						<div className="ui medium center aligned dividing icon header">
-							{this.props.fileInfo && (thumbnail ? null:<i className="circular file outline icon" title={Weave.lang("Thumbnail Unavailable")}/>)}
-							{this.props.fileInfo && this.props.fileInfo.fileName}
+							{thumbNailStatusUI}
+							{fileName}
 							<div className="sub header">
-								{Weave.lang("Weave Session") + (this.props.fileInfo && (" - " + FormatUtils.defaultFileSizeFormatting(this.props.fileInfo.fileSize)))}
+								{fileSizeInfo}
 							</div>
 						</div>
 				</VBox>:<div/>}
 				{this.props.fileInfo ?
 					<VBox style={{flex:1, width: "100%", alignItems: "center", justifyContent: "space-between"}}>
 						<div style={{flex:1}}>
-							{this.props.fileInfo && (Weave.lang("Modified") + " " + FormatUtils.defaultFuzzyTimeAgoFormatting(date) + " " + Weave.lang("ago"))}
+							{modifiedDate}
 						</div>
 						<HBox style={{justifyContent: "flex-end"}}>
-							<Button
-								className="copyButton"
-							    data-clipboard-text={copyURL}
-							>
-								{Weave.lang("Copy URL")}
-							</Button>
+							{copyUrlUI}
 							{this.props.children}
 						</HBox>
 					</VBox>:<div/>
