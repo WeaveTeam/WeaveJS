@@ -46,7 +46,6 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 	handleEditableContent =(event:any):void =>
 	{
 		let textEntered = event.target.value as string;
-		this.props.onChange.call(this, textEntered);
 		this.setState({
 			textContent : textEntered
 		});
@@ -67,7 +66,9 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 			this.setState({
 				editMode :false
 			});
+			this.props.onChange.call(this, this.state.textContent);//onChange called once element is no longer in focus
 		}
+
 	};
 
 	componentDidMount()
