@@ -1,9 +1,10 @@
 import * as _ from "lodash";
 
-export declare type Structure = "string"|"boolean"|"number"|StructureFunction|StructureObject|StructureArray;
+export declare type Structure = "string" | "boolean" | "number" | StructureFunction | StructureObject | StructureArray | StructureNullable;
+export declare type StructureFunction = ((a:any)=>any);
 export interface StructureObject {[key: string]: Structure};
 export interface StructureArray extends Array<Structure>{};
-export declare type StructureFunction = ((a:any)=>any);
+export interface StructureNullable {nullable: Structure};
 
 export default class MiscUtils
 {
@@ -211,40 +212,78 @@ export default class MiscUtils
 		}
 		return result;
 	}
+	
+	/**
+	 * Tests if a value is an object with a single property.
+	 * @param value An object to test.
+	 * @return The single property name, or null if the given value was not an object with a single property.
+	 */
+	public static testSinglePropertyObject(value:Object):string
+	{
+		if (typeof value != 'object' || !value)
+			return null;
+		
+		var result:string = null;
+		for (var key in value)
+		{
+			if (result == null)
+				result = key;
+			else
+				return null;
+		}
+		return result;
+	}
 
 	// TODO needs documentation
-	public static normalizeStructure(object:any, structure:Structure):any
+	public static normalizeStructure(value:any, structure:Structure):any
 	{
-		if(Array.isArray(structure))
+		var nullable = false;
+		while (MiscUtils.testSinglePropertyObject(structure) == 'nullable')
 		{
-			var a = (Array.isArray(object) ? object : []) as StructureArray;
+			nullable = true;
+			structure = (structure as StructureNullable).nullable;
+		}
+		
+		if (Array.isArray(structure))
+		{
+			var a:any[] = (Array.isArray(value) ? value : null);
+			if (!a && nullable)
+				return null;
 			return _.map(a, item => MiscUtils.normalizeStructure(item, structure[0]));
 		}
-		else if(typeof(structure) == "object" && structure)
+		else if (typeof(structure) == "object" && structure)
 		{
+			if (!value && nullable)
+				return null;
+			
 			var o:any = {};
-			for(var key in structure as StructureObject)
+			for (var key in structure as StructureObject)
 			{
-				o[key] = MiscUtils.normalizeStructure(object && object[key], (structure as StructureObject)[key]);
+				o[key] = MiscUtils.normalizeStructure(value && value[key], (structure as StructureObject)[key]);
 			}
 			return o;
 		}
-		else if(typeof structure == "function")
+		else if (typeof structure == "function")
 		{
-			return (structure as StructureFunction)(object);
+			return (structure as StructureFunction)(value);
 		}
-		else if(structure == "string")
+		else if (structure == "string")
 		{
-			return weavejs.util.StandardLib.asString(object);
+			return weavejs.util.StandardLib.asString(value);
 		}
-		else if(structure == "number")
+		else if (structure == "number")
 		{
-			return weavejs.util.StandardLib.asNumber(object);
+			return weavejs.util.StandardLib.asNumber(value);
 		}
-		else if(structure == "boolean")
+		else if (structure == "boolean")
 		{
-			return weavejs.util.StandardLib.asBoolean(object);
+			return weavejs.util.StandardLib.asBoolean(value);
 		}
-		return object === undefined ? null : object;
+		return value === undefined ? null : value;
+	}
+	
+	public static nullableStructure(structure:Structure):StructureNullable
+	{
+		return {nullable: structure};
 	}
 }
