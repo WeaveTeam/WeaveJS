@@ -10,6 +10,7 @@ import WeaveComponentRenderer from "../WeaveComponentRenderer";
 import {AbstractLayout, LayoutProps} from "./AbstractLayout";
 import PanelOverlay from "../PanelOverlay";
 import MiscUtils, {Structure} from "../utils/MiscUtils";
+import ReactUtils from "../utils/ReactUtils";
 import DOMUtils from "../utils/DOMUtils";
 
 export enum DropZone {
@@ -44,36 +45,18 @@ export type PanelProps = {
 	onDragOver:React.DragEventHandler
 };
 
-function normalizeId(id:any){
-	if(Array.isArray(id))
-		return MiscUtils.normalizeStructure(id, ["string"]);
-	return null;
-}
-
-function normalizeChildren(children:LayoutState[]):Structure
-{
-	if(Array.isArray(children))
-		return MiscUtils.normalizeStructure(children, children.map(child => ({
-			id: normalizeId,
-			children: normalizeChildren,
-			flex: "number",
-			direction: "string",
-			maximized: "boolean"
-		} as Structure)));
-	return null;
-}
-
-var stateStructure:Structure = {
-	id: normalizeId,
-	children: normalizeChildren,
+var stateStructure:any = {
+	id: MiscUtils.nullableStructure(["string"]),
+	children: null,
 	flex: "number",
 	direction: "string",
 	maximized: "boolean"
 };
+stateStructure.children = MiscUtils.nullableStructure([stateStructure]);
 
 export default class FlexibleLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
 {
-	private linkableState = Weave.linkableChild(this, new LinkableVariable(MiscUtils.normalizeStructure({flex: 1}, stateStructure)), this.forceUpdate, true);
+	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({flex: 1}, stateStructure)), this.forceUpdate, true);
 	private nextState:Object;
 	private rootLayout:Layout;
 	private layoutRect:ClientRect;
@@ -145,16 +128,13 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 
 	maximizePanel(id:WeavePathArray, maximized:boolean):void
 	{
-		var path = id;
-		var layout = Weave.AS(this.rootLayout.getComponentFromId(path), FlexibleLayout);
-		if (!layout)
-			return;
-		var state = _.cloneDeep(layout.getSessionState());
-		var obj = FlexibleLayout.findStateNode(state, path);
-		if (!obj)
-			return;
-		obj.maximized = maximized;
-		layout.setSessionState(state);
+		var state = _.cloneDeep(this.getSessionState());
+		var node = FlexibleLayout.findStateNode(state, id);
+		if (node)
+		{
+			node.maximized = maximized;
+			this.setSessionState(state);
+		}
 	}
 
 	frameHandler():void
@@ -436,18 +416,6 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 		this.setSessionState(newState);
 	}
 
-	getLayoutIds(state:LayoutState, output?:WeavePathArray[]):WeavePathArray[]
-	{
-		if (!output)
-			output = [];
-		if (state && state.id)
-			output.push(state.id as WeavePathArray);
-		if (state && state.children)
-			for (var child of state.children)
-				this.getLayoutIds(child, output);
-		return output;
-	}
-
 	generateLayoutState(ids:WeavePathArray[]):Object
 	{
 		// temporary solution - needs improvement
@@ -508,14 +476,22 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 		return MiscUtils.findDeep(state, (node:LayoutState) => node && _.isEqual(node.id, id));
 	}
 	
-	private static _tempState:LayoutState;
-	private static _tempObj:LayoutState = {};
-	private static sortIds(id1:WeavePathArray, id2:WeavePathArray):number
+	private static getLeafNodes(state:LayoutState, output?:LayoutState[]):LayoutState[]
 	{
-		var obj1:LayoutState = FlexibleLayout.findStateNode(FlexibleLayout._tempState, id1);
-		var obj2:LayoutState = FlexibleLayout.findStateNode(FlexibleLayout._tempState, id2);
-		var value1:number = obj1 && obj1.maximized ? 1 : 0;
-		var value2:number = obj2 && obj2.maximized ? 1 : 0;
+		if (!output)
+			output = [];
+		if (state && state.id)
+			output.push(state);
+		if (state && state.children)
+			for (var child of state.children)
+				FlexibleLayout.getLeafNodes(child, output);
+		return output;
+	}
+	
+	private static sortLeafNodes(node1:LayoutState, node2:LayoutState):number
+	{
+		var value1:number = node1.maximized ? 1 : 0;
+		var value2:number = node2.maximized ? 1 : 0;
 		if (value1 < value2)
 			return -1;
 		if (value1 > value2)
@@ -537,8 +513,8 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 		var components:JSX.Element[] = null;
 		if (this.rootLayout)
 		{
-			FlexibleLayout._tempState = newState;
-			components = this.getLayoutIds(newState).sort(FlexibleLayout.sortIds).map(path => {
+			components = FlexibleLayout.getLeafNodes(newState).sort(FlexibleLayout.sortLeafNodes).map(node => {
+				var path = node.id as WeavePathArray;
 				var key = JSON.stringify(path);
 				return (
 					<Div
@@ -549,7 +525,7 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 							?	this.props.panelRenderer(
 									path,
 									{
-										maximized: newState.maximized,
+										maximized: node.maximized,
 										onDragOver: this.onDragOver.bind(this, path),
 										onDragStart: this.onDragStart.bind(this, path),
 										onDragEnd: this.onDragEnd.bind(this),
@@ -583,7 +559,7 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 			overflow: "hidden" // don't let overflow expand the div size
 		});
 		return (
-			<div {...this.props as React.HTMLAttributes} style={style}>
+			<div ref={ReactUtils.registerComponentRef(this)} {...this.props as React.HTMLAttributes} style={style}>
 				{layout}
 				{components}
 				<PanelOverlay ref={(overlay:PanelOverlay) => this.overlay = overlay}/>
