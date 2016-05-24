@@ -41,8 +41,8 @@ const stateStructure:Structure = {
 			position: {
 				left: "string",
 				top: "string",
-				bottom: "string",
-				right: "string"
+				width: "string",
+				height: "string"
 			},
 			maximized: "boolean"
 		}
