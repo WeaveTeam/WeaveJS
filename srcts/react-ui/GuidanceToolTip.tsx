@@ -20,6 +20,27 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 	static NEXT:string = "Next";
 	static DONE:string = "Done";
 
+	static BOTTOM:string = "bottom";
+	static BOTTOM_LEFT:string = "bottom left";
+	static BOTTOM_RIGHT:string = "bottom right";
+	static BOTTOM_MIDDLE:string = "bottom middle";
+
+	static TOP:string = "top";
+	static TOP_LEFT:string = "top left";
+	static TOP_RIGHT:string = "top right";
+	static TOP_MIDDLE:string = "top middle";
+
+
+	static LEFT:string = "left";
+	static LEFT_TOP:string = "left top";
+	static LEFT_BOTTOM:string = "left bottom";
+	static LEFT_MIDDLE:string = "left middle";
+
+	static RIGHT:string = "right";
+	static RIGHT_TOP:string = "right top";
+	static RIGHT_BOTTOM:string = "right bottom";
+	static RIGHT_MIDDLE:string = "right middle";
+
 	constructor(props:GuidanceToolTipProps)
 	{
 		super(props);
@@ -49,29 +70,43 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 
 		let arrowStyle:React.CSSProperties = {
 			position:"absolute",
-			content:''
+			content:'',
+			borderColor:'transparent'
 		}
 
-		if(this.props.location == "bottom")
+		if(this.props.location.indexOf(GuidanceToolTip.BOTTOM) >= 0)
 		{
 			containerStyle.top = "8px";
 
-			arrowStyle.top =  "-12px";
-			arrowStyle.borderTopColor = "transparent";
-			arrowStyle.borderRightColor = "transparent";
+			arrowStyle.top = "-12px";
+
 			arrowStyle["borderBottomColor"] = "black";
-			arrowStyle.borderLeftColor = "transparent";
 		}
-		else if(this.props.location == "right")
+		 if(this.props.location.indexOf(GuidanceToolTip.TOP) >= 0)
+		{
+			containerStyle.bottom = "8px";
+
+			arrowStyle.bottom = "-12px";
+
+			arrowStyle.borderTopColor = "black";
+		}
+		 if(this.props.location.indexOf(GuidanceToolTip.RIGHT) >= 0)
 		{
 			containerStyle.left = "8px";
 
 			arrowStyle.top =  "8px";
 			arrowStyle.left =  "-12px";
-			arrowStyle.borderTopColor = "transparent";
+
 			arrowStyle.borderRightColor = "black";
-			arrowStyle["borderBottomColor"] = "transparent";
-			arrowStyle.borderLeftColor = "transparent";
+		}
+		 if(this.props.location.indexOf(GuidanceToolTip.LEFT) >= 0)
+		{
+			containerStyle.right = "8px";
+
+			arrowStyle.top =  "8px";
+			arrowStyle.right =  "-12px";
+
+			arrowStyle.borderLeftColor = "black";
 		}
 
 		let typeUI:JSX.Element = <span style={{color:"orange"}}>{this.props.type} : </span>;

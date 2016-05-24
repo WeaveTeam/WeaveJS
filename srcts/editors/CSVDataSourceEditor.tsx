@@ -97,7 +97,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					              placeholder={Weave.lang("http://www.example.com/example.csv")}
 					              style={ {width: "100%"} }
 					              accept={acceptExtension}/>
-					{ds.url.value ? null :  <GuidanceToolTip location="bottom" type={GuidanceToolTip.NEXT}> Add CSV File</GuidanceToolTip> }
+					{ds.url.value ? null :  <GuidanceToolTip location={GuidanceToolTip.BOTTOM_RIGHT} type={GuidanceToolTip.NEXT}> Add CSV File</GuidanceToolTip> }
 				</VBox>
 			],
 			[
