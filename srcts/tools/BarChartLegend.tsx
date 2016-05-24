@@ -55,7 +55,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || Weave.getRoot(this).getName(this);
+		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || Weave.getRoot(this).getName(this);
 	}
 
 	handleClick(label:number,temp:any):void 

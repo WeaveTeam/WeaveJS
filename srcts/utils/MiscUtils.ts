@@ -178,7 +178,7 @@ export default class MiscUtils
 		return queryParams;
 	}
 	
-	public static stringWithMacros(str:string, thisArg:any = null):string
+	public static evalTemplateString(str:string, thisArg:any = null):string
 	{
 		try
 		{

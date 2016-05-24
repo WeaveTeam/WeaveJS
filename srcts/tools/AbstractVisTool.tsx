@@ -107,7 +107,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;
+		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || this.defaultPanelTitle;
 	}
 
 	get defaultPanelTitle():string

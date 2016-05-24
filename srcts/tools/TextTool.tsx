@@ -50,7 +50,7 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;
+		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || this.defaultPanelTitle;
 	}
 
 	get selectableAttributes()
@@ -121,7 +121,7 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 	{
 		$(this.element).empty();
 		//parse html, stripping out <script> tags
-		let htmlElements:any[] = $.parseHTML(MiscUtils.stringWithMacros(this.htmlText.value,this),null,false);
+		let htmlElements:any[] = $.parseHTML(MiscUtils.evalTemplateString(this.htmlText.value,this),null,false);
 		if(htmlElements) {
 			htmlElements.forEach((element:any) => {
 				if(element.outerHTML)

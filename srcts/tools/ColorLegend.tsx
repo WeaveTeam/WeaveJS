@@ -116,7 +116,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;;
+		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || this.defaultPanelTitle;;
 	}
 
 	get defaultPanelTitle():string

@@ -91,7 +91,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 
 	get title()
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || Weave.getRoot(this).getName(this);
+		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || Weave.getRoot(this).getName(this);
 	}
 
 	private BOXWHISKER_RECORD_FORMAT = {

@@ -96,7 +96,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;
+		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || this.defaultPanelTitle;
 	}
 
 	componentDidMount()

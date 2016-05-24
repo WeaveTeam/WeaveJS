@@ -57,7 +57,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this);
+		return MiscUtils.evalTemplateString(this.panelTitle.value, this);
 	}
 
 	constructor(props:IVisToolProps)

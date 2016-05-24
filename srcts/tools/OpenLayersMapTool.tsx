@@ -345,7 +345,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	get title():string
 	{
-		return MiscUtils.stringWithMacros(this.panelTitle.value, this) || this.defaultPanelTitle;
+		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || this.defaultPanelTitle;
 	}
 
 	constructor(props:IVisToolProps)
