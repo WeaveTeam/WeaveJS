@@ -12,6 +12,7 @@ import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
 import List from "../../react-ui/List";
 import {ListOption} from "../../react-ui/List";
+import ConnectionEditor from "./ConnectionEditor";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
@@ -81,6 +82,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 			{
 				title: Weave.lang("Import from SQL"),
 				content: <ConnectionManager dataSource={ds}/>,
+				modal: true,
 				resizable: true,
 				width: 920,
 				height: 675,
@@ -150,32 +152,33 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 	render():JSX.Element
 	{
 		let options = this.state.connections.map(this.connectionToOption);
-		return <HBox className="weave-padded-hbox" style={ { flex: 1, overflow: 'auto' } }>
-			<VBox className="weave-padded-vbox">
-				<VBox className="weave-container" style={ { flex: 1, padding: 0 } }>
-					<List selectedValues={[this.state.selected]} options={options} 
-					onChange={(selectedValues: any[]) => this.setState({ selected: selectedValues[0] }) }/>
+		return <VBox className="weave-padded-vbox" style={ { flex: 1, overflow: 'auto' } }>
+			<HBox className="weave-padded-hbox" style={ { flex: 1 } }>
+				<VBox className="weave-padded-vbox" style={ {flex: 0.33 } }>
+					<VBox className="weave-container" style={ { flex: 1, padding: 0 } }>
+						<List selectedValues={[this.state.selected]} options={options} 
+						onChange={(selectedValues: any[]) => this.setState({ selected: selectedValues[0] }) }/>
+					</VBox>
+					<HBox>
+						<Button title={Weave.lang("Create new connection")} style={{flex:"1", borderTopRightRadius:0, borderBottomRightRadius:0}}
+							onClick={this.createNewConnection}>
+							<i className="fa fa-plus fa-fw"/>
+							{Weave.lang("New Connection")}
+						</Button>
+						<Button disabled={!this.state.selected} title={Weave.lang("Remove selected connection")} style={{ flex: "1", borderRadius: 0}}
+							onClick={this.removeSelectedConnection}>
+							<i className="fa fa-minus fa-fw"/>
+							{Weave.lang("Remove Connection") }
+						</Button>
+						<Button title={Weave.lang("Refresh connection names.")} style={{ flex: "1", borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}
+							onClick={this.updateConnections}>
+							<i className="fa fa-refresh fa-fw"/>
+						</Button>
+					</HBox>
 				</VBox>
-				<HBox>
-					<Button title={Weave.lang("Create new connection")} style={{flex:"1", borderTopRightRadius:0, borderBottomRightRadius:0}}
-						onClick={this.createNewConnection}>
-						<i className="fa fa-plus fa-fw"/>
-						{Weave.lang("New Connection")}
-					</Button>
-					<Button disabled={!this.state.selected} title={Weave.lang("Remove selected connection")} style={{ flex: "1", borderRadius: 0}}
-						onClick={this.removeSelectedConnection}>
-						<i className="fa fa-minus fa-fw"/>
-						{Weave.lang("Remove Connection") }
-					</Button>
-					<Button title={Weave.lang("Refresh connection names.")} style={{ flex: "1", borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }} 
-						onClick={this.updateConnections}>
-						<i className="fa fa-refresh fa-fw"/>
-					</Button>
-				</HBox>
-			</VBox>
-			<VBox>
-			</VBox>
-			{this.renderErrors()}
-		</HBox>
+				<ConnectionEditor service={this.service} connectionName={this.state.selected} handleError={this.handleError}/>
+			</HBox>
+		{ this.renderErrors() }
+		</VBox>
 	}
 }
