@@ -98,7 +98,9 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 	
 	setSessionState=(state:LayoutState):void=>
 	{
-		this.linkableState.state = this.simplifyState(MiscUtils.normalizeStructure(state, stateStructure));
+		state = this.simplifyState(MiscUtils.normalizeStructure(state, stateStructure));
+		state.flex = 1; // root layout should always 1
+		this.linkableState.state = state;
 	}
 
 	componentDidMount():void
