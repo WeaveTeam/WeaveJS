@@ -201,9 +201,4 @@ export default class MiscUtils
 		}
 		return result;
 	}
-
-	public static incrementalRange(start:number, increment:number, length:number):number[]
-	{
-		return Array.apply(0, Array(length)).map(function(val:any, i:number) { let item = (i*increment)+start; return item; });
-	}
 }
