@@ -402,7 +402,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 					       onChange={ this.handlePathInput }
 					/>
 
-					<Button  style={{alignSelf:'flex-end'}} onClick={ this.addNewTargetPath }>
+					<Button onClick={ this.addNewTargetPath }>
 						{ Weave.lang('Add') }
 					</Button>
 				</HBox>
