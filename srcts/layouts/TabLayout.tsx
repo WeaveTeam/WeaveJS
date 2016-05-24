@@ -21,20 +21,14 @@ export interface LayoutState
 	title: string;
 }
 
-function normalizeId(id:any){
-	if(Array.isArray(id))
-		return MiscUtils.normalizeStructure(id, ["string"]);
-	return null;
-}
-
 const stateStructure:Structure = {
 	panels: [
 		{
-			id: normalizeId,
+			id: MiscUtils.nullableStructure(["string"]),
 			label: "string"
 		}
 	],
-	activePanelId: normalizeId,
+	activePanelId: MiscUtils.nullableStructure(["string"]),
 	title: "string"
 };
 
