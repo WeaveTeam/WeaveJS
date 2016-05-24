@@ -139,7 +139,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	recordSelectedChoice = ():void =>
 	{
 		var selectedName = this.selectedChoice.value;//current selected choice in the menu tab
-		if(selectedName)//if there is a current seletion
+		if(selectedName)//if there is a current selection
 		{
 			var choice:LinkableVariable = this.choices.requestObject(selectedName, LinkableVariable, false);//get its corresponding choice object
 			choice.setSessionState(this.getTargetStates());//update it session state
@@ -280,7 +280,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	//adds new choice to the choice hashmap
 	addNewChoice =(name:string = null): string =>
 	{
-		let ssmt = this.props.sessionStateMenuTool
+		let ssmt = this.props.sessionStateMenuTool;
 		if(!name)
 			name = ssmt.choices.generateUniqueName("Item");
 		ssmt.selectedChoice.value = name;
@@ -348,14 +348,14 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 			{
 				ssmt.targets.removeObject(ssmt.targets.getName(wrapper));//remove the object created above
 				this.setState({
-					pathInput : "No target found"
+					pathInput : Weave.lang("No target found")
 				});
 			}
 		}
 		catch(e)
 		{
 			this.setState({
-				pathInput: "Invalid path"
+				pathInput: Weave.lang("Invalid path")
 			});
 			//console.log(e);
 		}
@@ -403,7 +403,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 					/>
 
 					<Button  style={{alignSelf:'flex-end'}} onClick={ this.addNewTargetPath }>
-						{ 'Add' }
+						{ Weave.lang('Add') }
 					</Button>
 				</HBox>
 
@@ -445,7 +445,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		return(
 			<VBox>
 				<Button style={{alignSelf:'flex-end'}} onClick={ this.addNewChoiceItem }>
-					{ 'Add Choice' }
+					{ Weave.lang('Add Choice') }
 				</Button>
 				<List options={ menuItems } selectedValues={ [selectedOption] }/>
 			</VBox>
