@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import MiscUtils from "../utils/MiscUtils";
 
 
 export interface GuidanceToolTipProps extends React.HTMLProps<GuidanceToolTip>
@@ -25,6 +26,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 		this.state = {
 			visible:true
 		}
+
 	}
 
 	componentWillReceiveProps(nextProps:GuidanceToolTipProps)
@@ -34,6 +36,12 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 
 
 	render() {
+
+		let urlParams:any = MiscUtils.getUrlParams();
+		if(Boolean(urlParams.skipGuidance)){
+			return <div/>;
+		}
+
 
 		let containerStyle:React.CSSProperties = {
 			position:"absolute",
@@ -66,9 +74,11 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 		}
 
-		let typeUI:JSX.Element = <span style={{color:"orange"}}>{this.props.type} : </span>
+		let typeUI:JSX.Element = <span style={{color:"orange"}}>{this.props.type} : </span>;
+
 
 		return (
+
 			<div style={ {position:"relative"} }>
 				<div style={containerStyle} className="weave-guidance-toolTip">
 					{typeUI}

@@ -116,7 +116,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
 	
-	urlParams:{ file: string, editable: boolean , skipIntro:boolean};
+	urlParams:{ file: string, editable: boolean , skipGuidance:boolean};
 	
 	componentDidMount()
 	{
@@ -444,7 +444,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						props={{itemRenderer: this.renderTool}}
 					/>
 
-					{ this.urlParams.file || this.urlParams.skipIntro ? null : <StepByStepGuidance weave={weave} createObject={this.createObject} /> }
+					{ this.urlParams.file || Boolean(this.urlParams.skipGuidance) ? null : <StepByStepGuidance weave={weave} createObject={this.createObject} /> }
 
 				</SideBarContainer>
 				{
