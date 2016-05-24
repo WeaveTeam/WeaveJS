@@ -42,7 +42,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	openSessionStateEditor=()=>
 	{
 		SessionStateEditor.openInstance(this.toolName, this.weaveRoot);
-	}
+	};
 
 	//todo : find a better way to get linked children
 	pushCrumb=(title:string,ui:React.ReactChild):void=>
@@ -52,7 +52,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			activeCrumb: title
 		});
 		this.crumbOrder.push(title);
-	}
+	};
 
 
 	componentWillReceiveProps(nextProps:WeaveToolEditorProps)
@@ -89,7 +89,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			activeCrumb:crumbTitle
 		});
 		this.crumbOrder = this.crumbOrder.slice(0, index + 1);
-	}
+	};
 
 	stepBackInCrumbView = ()=>{
 		let index:number = this.crumbOrder.length - 2; //prev index make it active
@@ -127,7 +127,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						if (this.state.activeCrumb == crumb && this.crumbOrder.length > 1)
 						{
 							styleObj.color = "black";
-							styleObj["cursor"] = "none";
+							//styleObj["cursor"] = "none"; causes error to disappear
 							elements = [
 								<div
 									key={String(index)}
