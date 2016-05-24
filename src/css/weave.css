@@ -367,17 +367,17 @@ div.table-row-selected>div>div>div>div>div {
     border-bottom: 1px solid #ddd;
 }
 
-.weave-tab-label-active { /* todo: border bottom white is not right way has to match backgroundcolor */
+.weave-tab-label.active { /* todo: border bottom white is not right way has to match backgroundcolor */
     border-right: 1px solid #ddd;
     background: none;
 }
-.weave-tab-label-active.top {
+.weave-tab-label.active.top {
     margin-bottom: -1px; /* to cover the label container border*/
     border-bottom: 1px solid white;
     border-top: 1px solid #ddd;
 }
 
-.weave-tab-label-active.bottom {
+.weave-tab-label.active.bottom {
     margin-top: -1px; /* to cover the label container border*/
     border-bottom: 1px solid #ddd;
     border-top: 1px solid white;

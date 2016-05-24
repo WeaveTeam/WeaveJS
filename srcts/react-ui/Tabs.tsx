@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import CenteredIcon from "./CenteredIcon";
 import {HBox, VBox} from "./FlexBox";
 import classNames from "../modules/classnames";
@@ -11,10 +12,21 @@ export interface TabsProps extends React.Props<Tabs>
 	labels:React.ReactChild[];
 	tabs:JSX.Element[];
 	location?:"top"|"bottom";
+	tabBarChildren?:React.ReactChild;
 	onTabAdd?:React.MouseEventHandler;
 	onTabClose?:(index:number, event:React.MouseEvent) => void;
 	activeTabIndex?:number;
 	onViewChange?:(index:number) => void;
+	className?:string;
+	style?:React.CSSProperties;
+	tabHeaderClassName?:string;
+	tabHeaderStyle?:React.CSSProperties;
+	tabContentClassName?:string;
+	tabContentStyle?:React.CSSProperties;
+	tabLabelClassName?:string;
+	tabLabelStyle?:React.CSSProperties;
+	tabBarClassName?:string;
+	tabBarStyle?:React.CSSProperties
 }
 
 export interface TabsState
@@ -50,12 +62,16 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 	render():JSX.Element
 	{
 		var content = [
-			<HBox key="tabs" className={classNames("weave-tab-label-container", this.props.location)}>
+			<HBox key="tabs"
+			      className={classNames(this.props.tabBarClassName|| "weave-tab-label-container", this.props.location)}
+			      style={this.props.tabBarStyle}
+			>
 				{
 					this.props.labels.map((label, index) => {
 						return (
 							<HBox key={index}
-							      className={classNames("weave-padded-hbox", "weave-tab-label", {"weave-tab-label-active": this.state.activeTabIndex == index}, this.props.location)}
+							      className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
+							      style={this.props.tabLabelStyle}
 							      onClick={() => this.changeTabView(index)}
 							>
 								{label}
@@ -70,15 +86,20 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 				}
 				{
 					this.props.onTabAdd
-					?   <HBox className={classNames("weave-tab-label", this.props.location)}
-					          onClick={this.props.onTabAdd}
+					?   <HBox
+							className={classNames(this.props.tabLabelClassName || "weave-tab-label", this.props.location)}
+							style={this.props.tabLabelStyle}
+					        onClick={this.props.onTabAdd}
 						>
 							<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")} iconProps={{ className: "fa fa-plus" }}/>
 						</HBox>
 					:   null
 				}
+				{
+					this.props.tabBarChildren
+				}
 			</HBox>,
-			<VBox key="content" className={classNames("weave-tab-content", this.props.location)} style={{flex: 1, overflow: "auto"}}>
+			<VBox key="content" className={classNames(this.props.tabContentClassName || "weave-tab-content", this.props.location)} style={{flex: 1, overflow: "auto"}}>
 			{
 				this.props.tabs[this.state.activeTabIndex]
 			}
@@ -89,7 +110,10 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 			content.reverse();
 
 		return (
-			<VBox className={classNames("weave-tab-container", this.props.location)} style={{flex: 1}}>
+			<VBox
+				className={classNames(this.props.className || "weave-tab-container", this.props.location)}
+			    style={_.merge({}, this.props.style, {flex: 1})}
+			>
 				{content}
 			</VBox>
 		);
