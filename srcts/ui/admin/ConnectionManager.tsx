@@ -176,7 +176,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 						</Button>
 					</HBox>
 				</VBox>
-				<ConnectionEditor service={this.service} connectionName={this.state.selected} handleError={this.handleError}/>
+				<ConnectionEditor refreshFunc={this.updateConnections} service={this.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={_.noop}/>
 			</HBox>
 		{ this.renderErrors() }
 		</VBox>

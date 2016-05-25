@@ -18,6 +18,8 @@ import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
+import WeavePromise = weavejs.util.WeavePromise;
+import StandardLib = weavejs.util.StandardLib;
 
 interface ILinkedInputProps {
 	field: string,
@@ -42,6 +44,8 @@ export interface IConnectionEditorProps {
 	service: WeaveAdminService;
 	connectionName: string;
 	handleError: (error: any) => void;
+	handleMessage: (message: string) => void;
+	refreshFunc: () => void;
 }
 
 export interface IConnectionEditorState {
@@ -63,19 +67,14 @@ export interface IConnectionEditorState {
 	dbShowPass?: boolean;
 }
 
-const MYSQL = "mysql";
-const POSTGRES = "postgresql";
-const SQLSERVER = "sqlserver";
-const ORACLE = "oracle";
-const SQLITE = "sqlite";
 const CUSTOM = "custom";
 
 const EDITOR_MODES:ComboBoxOption[] = [
-	{ label: Weave.lang("MySQL"), value: MYSQL},
-	{ label: Weave.lang("PostGreSQL"), value: POSTGRES},
-	{ label: Weave.lang("Microsoft SQL Server"), value: SQLSERVER},
-	{ label: Weave.lang("Oracle"), value: ORACLE},
-	{ label: Weave.lang("SQLite"), value: SQLITE},
+	{ label: Weave.lang("MySQL"), value: ConnectionInfo.MYSQL},
+	{ label: Weave.lang("PostGreSQL"), value: ConnectionInfo.POSTGRESQL},
+	{ label: Weave.lang("Microsoft SQL Server"), value: ConnectionInfo.SQLSERVER},
+	{ label: Weave.lang("Oracle"), value: ConnectionInfo.ORACLE},
+	{ label: Weave.lang("SQLite"), value: ConnectionInfo.SQLITE},
 	{ label: Weave.lang("Custom"), value: CUSTOM}
 ];
 
@@ -84,6 +83,9 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 	{
 		super(props);
 		this.state = {
+			name: "",
+			pass: "",
+			folderName: "",
 			editorMode: "custom",
 			showPass: false,
 			dbShowPass: false,
@@ -94,19 +96,36 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 	{
 		if (this.props.connectionName != nextProps.connectionName)
 		{
-			this.loadFromConnection();
+			this.loadFromConnection(nextProps.connectionName);
 		}
 	}
 
-	loadFromConnection=()=>
+	saveConnection=(overwrite:boolean)=>
 	{
-		this.props.service.getConnectionInfo(this.props.connectionName).then(
+		let info = new ConnectionInfo()
+		info.is_superuser = this.state.is_superuser;
+		info.name = this.state.name;
+		info.pass = this.state.pass;
+		info.folderName = this.state.folderName;
+		info.connectString = this.connectString;
+
+		let savePromise: WeavePromise<string>;
+
+		/* If we're editing the connection we have selected, bypass the overwrite confirmation dialog. */
+		savePromise = this.props.service.saveConnectionInfo(info, (info.name === this.props.connectionName) || overwrite);
+		savePromise.then(this.props.handleMessage, _.identity).then(()=>this.loadFromConnection(info.name), this.props.handleError);
+	}
+
+	loadFromConnection=(connectionName:string)=>
+	{
+		this.props.service.getConnectionInfo(connectionName).then(
 			(info)=>{
 				this.setState({
-					is_superuser: info.is_superuser,
-					name: info.name,
-					folderName: info.folderName,
-					connectString: info.connectString,
+					is_superuser: info ? info.is_superuser : false,
+					name: info ? info.name : "",
+					pass: info ? info.pass : "",
+					folderName: info ? info.folderName : "",
+					connectString: info ? info.connectString : "",
 					editorMode: CUSTOM
 				});
 			},
@@ -114,124 +133,191 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 		);
 	}
 
-	componentDidMount()
-	{
-
-	}
-
-	renderSQLiteConfiguration()
-	{
-
-	}
-
-	renderLinkedInput=(entry:string[]):[string, JSX.Element]=>
+	renderLinkedInput=(entry:[React.ReactChild, string, string, React.ReactChild]):[React.ReactChild, JSX.Element]=>
 	{
 		let [label, field, type, helpText] = entry;
 		let displayType = (type === "password") && !this.state.dbShowPass ? "password" : "text";
 
 		let showPassIcon: JSX.Element = null;
+		let leftColumn: React.ReactChild = label;
+
+		if (helpText)
+		{
+			leftColumn = <span>{label}<HelpIcon>{helpText}</HelpIcon></span>
+		}
 
 		if (type === "password")
 		{
 			let iconName = this.state.dbShowPass ? "fa fa-eye fa-lg" : "fa fa-eye-slash fa-lg";
-			showPassIcon = <button className="ui button" onClick={() => this.setState({ dbShowPass: !this.state.dbShowPass })}>
+			showPassIcon = <button title={this.state.dbShowPass ? Weave.lang("Hide password") : Weave.lang("Show password") } className="ui button" onClick={() => this.setState({ dbShowPass: !this.state.dbShowPass })}>
 				<i className={iconName}/>
 			</button>
 		}
 
-		return [Weave.lang(label), <Input className={type === "password" ? "action" : ""} key={field} fluid value={(this.state as any)[field]} type={displayType}
+		return [leftColumn, <Input className={type === "password" ? "action" : ""} key={field} fluid value={(this.state as any)[field]} type={displayType}
 			onChange={(evt) => this.setState({ [field]: (evt.target as HTMLInputElement).value }) }>
 			{showPassIcon}
 		</Input>];
 	}
 
+	get connectString():string
+	{
+		if (this.state.editorMode == CUSTOM)
+		{
+			return this.state.connectString;
+		}
+		else
+		{
+			return ConnectionEditor.getConnectString(
+				this.state.editorMode,
+				this.state.dbServerAddress,
+				this.state.dbServerPort,
+				this.state.dbDatabaseName,
+				this.state.dbUsername,
+				this.state.dbPassword,
+				this.state.dbDomain);
+		}
+	}
+
 	render():JSX.Element
 	{
-		let dbEditorDefs: string[][];
+
+		let connectionPropertyEditorDefs: [React.ReactChild, string, string, React.ReactChild][] = [
+			["Connection Name", "name", "text", null],
+			["Password", "pass", "password", null],
+			["Folder Name", "folderName", "text", "Specify the folder relative to the docroot to store configurations files created by this user."]
+		]
+
+		let connectionPropertyEditors = connectionPropertyEditorDefs.map(this.renderLinkedInput);
+
+		connectionPropertyEditors.unshift(
+			[<span>{Weave.lang("Superuser") }<HelpIcon>{Weave.lang("Grant this connection superuser privileges.") }</HelpIcon></span>, <Checkbox label=" "
+				value={this.state.is_superuser}
+				onChange={(value) => this.setState({ is_superuser: value }) }
+				/>]);
+
+		let dbEditorDefs: [React.ReactChild, string, string, React.ReactChild][];
 		switch (this.state.editorMode) {
-			case SQLITE:
+			case ConnectionInfo.SQLITE:
 				dbEditorDefs = [
-					["SQLite Database File", "dbServerAddress", "text"]
+					["SQLite Database File", "dbServerAddress", "text", null]
 				];
 				break;
-			case MYSQL:
-			case ORACLE:
-			case POSTGRES:
+			case ConnectionInfo.MYSQL:
+			case ConnectionInfo.ORACLE:
+			case ConnectionInfo.POSTGRESQL:
 				dbEditorDefs = [
-					["Server Address", "dbServerAddress", "text"],
-					["Server Port", "dbServerPort", "text"],
-					["Database Name", "dbDatabaseName", "text"],
-					["Username", "dbUsername", "text"],
-					["Password", "dbPassword", "password"]
+					["Server Address", "dbServerAddress", "text", null],
+					["Server Port", "dbServerPort", "text", null],
+					["Database Name", "dbDatabaseName", "text", null],
+					["Username", "dbUsername", "text", null],
+					["Password", "dbPassword", "password", null]
 				];
 				break;
-			case SQLSERVER:
+			case ConnectionInfo.SQLSERVER:
 				dbEditorDefs = [
-					["Server Address", "dbServerAddress", "text"],
-					["Server Port", "dbServerPort", "text"],
-					["Instance Name", "dbDatabaseName", "text"],
-					["Domain", "dbDomain", "text"],
-					["Username", "dbUsername", "text"],
-					["Password", "dbPassword", "password"]
+					["Server Address", "dbServerAddress", "text", null],
+					["Server Port", "dbServerPort", "text", null],
+					["Instance Name", "dbDatabaseName", "text", null],
+					["Domain", "dbDomain", "text", null],
+					["Username", "dbUsername", "text", null],
+					["Password", "dbPassword", "password", null]
 				];
 				break;
 			case CUSTOM:
 			default:
 				dbEditorDefs = [
-					["JDBC Connect String", "connectString", "password"]
+					["JDBC Connect String", "connectString", "password", null]
 				];
 		};
 
-		let dbEditor = dbEditorDefs.map(this.renderLinkedInput);
+		let dbEditors = dbEditorDefs.map(this.renderLinkedInput);
 
-		dbEditor.unshift([Weave.lang("Database Type"), <ComboBox options={EDITOR_MODES} 
+		dbEditors.unshift([Weave.lang("Database Type"), <ComboBox options={EDITOR_MODES} 
 			value={this.state.editorMode} onChange={(value) => this.setState({ editorMode: value }) }/>])
-
-		let accordion = Accordion.render([
-			Weave.lang("Connection Properties"),
-			[
-				[
-					<span>{Weave.lang("Superuser")}<HelpIcon>{Weave.lang("Grant this connection superuser privileges.")}</HelpIcon></span>,
-					<Checkbox label=""
-						value={!this.state.is_superuser}
-						onChange={(value) => this.setState({ is_superuser: !value })}
-						/>
-				],
-				[
-					<span>{Weave.lang("Connection Name")}<HelpIcon></HelpIcon></span>,
-					<Input type="text" value={this.state.name} onChange={(evt) => this.setState({name: (evt.target as HTMLInputElement).value})}/>
-				],
-				[
-					<span>{Weave.lang("Password")}<HelpIcon></HelpIcon></span>,					
-					<Input type={this.state.showPass ? "text" : "password"} value={this.state.pass} onChange={(evt) => this.setState({ pass: (evt.target as HTMLInputElement).value }) }/>
-				],
-				[
-					<span>{Weave.lang("Folder name")}
-						<HelpIcon>
-							{Weave.lang("Specify the folder relative to the docroot to store configuration files created by this user.") }
-						</HelpIcon>
-					</span>,
-					<Input value={this.state.folderName} onChange={(evt) => this.setState({ folderName: (evt.target as HTMLInputElement).value }) }/>
-				]
-			]
-		],
-		[
-			Weave.lang("Database Configuration"),
-			dbEditor
-		]);
 
 
 
 		return <VBox className="weave-ToolEditor" style={ { flex: 0.66 } }>
-			{accordion}
+			{Accordion.render(
+				[
+					Weave.lang("Connection Properties"),
+					connectionPropertyEditors
+				],
+				[
+					Weave.lang("Database Configuration"),
+					dbEditors
+				]
+			)}
 			<HBox>
-				<Button>
+				<Button onClick={() => this.saveConnection(false)}>
 					{Weave.lang("Save changes")}
 				</Button>
-				<Button onClick={this.loadFromConnection}>
+				<Button onClick={() => this.loadFromConnection(this.props.connectionName)}>
 					{Weave.lang("Discard changes")}
 				</Button>
 			</HBox>
 		</VBox>
+	}
+
+	/**
+	* @param dbms The name of a DBMS (MySQL, PostGreSQL, Microsoft SQL Server)
+	* @param ip The IP address of the DBMS.
+	* @param port The port the DBMS is on (optional, can be "" to use default).
+	* @param database The name of a database to connect to (can be "" for MySQL)
+	* @param user The username to use when connecting.
+	* @param pass The password associated with the username.
+	* @param domain The domain paramter for a SQLServer connection.
+	* @return A connect string that can be used in the getConnection() function.
+	*/
+	static getConnectString(dbms:string, ip:string, port:string, database:string, user:string, pass:string, domain:string):string
+	{
+		var host: string;
+		if (!port)
+			host = ip; // default port for specific dbms will be used
+		else
+			host = ip + ":" + port;
+
+		// in format strings: {0}=dbms,{1}=host,{2}=database,{3}=user,{4}=pass,{5}=domain
+
+		var format: string = null;
+		if (dbms == ConnectionInfo.SQLSERVER) 
+		{
+				dbms = "sqlserver"; // this will be put in the format string
+			if (user || pass)
+				format = "jdbc:jtds:{0}://{1}/;instance={2};domain={5};user={3};password={4}";
+			else
+				format = "jdbc:jtds:{0}://{1}/;instance={2};domain={5}";
+		}
+		else if (dbms == ConnectionInfo.SQLITE) {
+			format = "jdbc:{0}:{2}";
+			// jdbc:sqlite:C:\\path\\to\\file.db
+		}
+		else if (dbms == ConnectionInfo.ORACLE) {
+			if (user || pass)
+				format = "jdbc:{0}:thin:{3}/{4}@{1}:{2}";
+			else
+				format = "jdbc:{0}:thin:{1}:{2}";
+			//"jdbc:oracle:thin:<user>/<password>@<host>:<port>:<instance>"
+		}
+		else // MySQL or PostGreSQL
+		{
+			if (user || pass)
+				format = "jdbc:{0}://{1}/{2}?user={3}&password={4}";
+			else
+				format = "jdbc:{0}://{1}/{2}";
+		}
+
+		// MySQL connect string uses % as an escape character, so we must use URLEncoder.
+		// PostGreSQL does not support % as an escape character, and does not work with the & character.
+		if (dbms == ConnectionInfo.MYSQL) {
+			database = encodeURIComponent(database);
+			user = encodeURIComponent(user);
+			pass = encodeURIComponent(pass);
+		}
+
+		var result: string = StandardLib.substitute(format, dbms.toLowerCase(), host, database, user, pass, domain);
+
+		return result;
 	}
 }
