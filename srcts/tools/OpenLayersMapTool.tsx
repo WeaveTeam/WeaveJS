@@ -78,6 +78,154 @@ ol.proj.setProj4(proj4);
 
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
 {
+	public static selectableLayerFilter(layer: ol.layer.Base): boolean
+	{
+		return layer.get("selectable");
+	}
+
+	private static projectionDbPromise = OpenLayersMapTool.readProjDatabase();
+	/*
+	 // For debugging projection database delays
+	 private static projectionDbPromise:WeavePromise = new WeavePromise(null, (resolve:Function, reject:Function) => {
+	 setTimeout(() => resolve(weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"))), 1000)
+	 });
+	 */
+
+	private static projectionDbLoadAttempted:boolean = false;
+
+	static get projectionDbReadyOrFailed():boolean
+	{
+		return !!OpenLayersMapTool.projectionDbPromise.getResult() || !!OpenLayersMapTool.projectionDbPromise.getError();
+	}
+
+	static getProjection(projectionName:string):ol.proj.Projection
+	{
+		let proj = ol.proj.get(projectionName);
+		if (!proj && !OpenLayersMapTool.projectionDbLoadAttempted)
+		{
+			let result = OpenLayersMapTool.projectionDbPromise.getResult();
+			if (result)
+			{
+				try
+				{
+					let db = result as { [name: string]: string };
+					for (let newProjName of Object.keys(db))
+					{
+						let projDef = db[newProjName];
+						if (projDef)
+							proj4.defs(newProjName, projDef);
+					}
+				}
+				catch (error)
+				{
+					console.error("Failed to parse ProjDatabase.zip:", error);
+				}
+			}
+			else /*!result*/
+			{
+				let error = OpenLayersMapTool.projectionDbPromise.getError();
+
+				if (error)
+				{
+					console.error("ProjDatabase.zip not ready by the time it was needed.");
+					return null;
+				}
+				else
+				{
+					console.error("Failed to retrieve ProjDatabase.zip:", error);
+					return null;
+				}
+			}
+
+			OpenLayersMapTool.projectionDbLoadAttempted = true;
+			proj = ol.proj.get(projectionName);
+		}
+
+		return proj;
+	}
+
+	static readProjDatabase():WeavePromise<Object>
+	{
+		return weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip")).then(
+			(result: Uint8Array) => JSZip().loadAsync(result)
+		).then(
+			(zip: JSZip) => zip.file("ProjDatabase.json").async("string")
+		).then(
+			JSON.parse
+		);
+	}
+
+	static DEFAULT_PROJECTION:string = "EPSG:4326";
+
+	static projectionVerifier(value:string):boolean
+	{
+		return !!OpenLayersMapTool.getProjection(value);
+	}
+
+	static isGeomColumnOrRef(column: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)):boolean
+	{
+		let iac = Weave.AS(column, weavejs.api.data.IAttributeColumn);
+		let icr = Weave.AS(column, weavejs.api.data.IColumnReference);
+
+		let dataType: string;
+		if (iac) {
+			dataType = iac.getMetadata(ColumnMetadata.DATA_TYPE);
+			if (dataType == DataType.GEOMETRY) {
+				return true;
+			}
+		}
+		else if (icr) {
+			let metadata: { [property: string]: string } = icr.getColumnMetadata() as any;
+			if (metadata) {
+				dataType = metadata[ColumnMetadata.DATA_TYPE];
+			}
+			if (dataType == DataType.GEOMETRY) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static controlIndex = new Map<Function,number>()
+		.set(PanCluster, 0)
+		.set(CustomZoomToExtent, 1)
+		.set(ol.control.Zoom, 2)
+		.set(ol.control.ZoomSlider, 3)
+		.set(InteractionModeCluster, 4);
+
+	// TODO: Figure out why setting extent on the projections themselves breaks subsequent renders.
+	static estimatedExtentMap = new Map<string,ol.Extent>();
+	static getEstimatedExtent(proj:ol.proj.Projection):ol.Extent
+	{
+		let extentBounds:Bounds2D = new Bounds2D();
+		let IOTA = Number("1e-10");
+		if (!proj.getExtent())
+		{
+			let code = proj.getCode();
+			if (OpenLayersMapTool.estimatedExtentMap.get(code))
+				return OpenLayersMapTool.estimatedExtentMap.get(code);
+			for (let lat = -180; lat < 180; lat++)
+			{
+				for (let long = -90; long < 180; long++)
+				{
+					let coord:ol.Coordinate = [long, lat];
+					if (coord[0] == -180)
+						coord[0] += IOTA;
+					if (coord[0] == 180)
+						coord[0] -= IOTA;
+					if (coord[1] == -90)
+						coord[1] += IOTA;
+					if (coord[1] == 90)
+						coord[1] -= IOTA;
+
+					let projectedPoint = ol.proj.fromLonLat(coord, proj);
+					extentBounds.includeCoords(projectedPoint[0], projectedPoint[1]);
+				}
+			}
+			return OpenLayersMapTool.estimatedExtentMap.set(code, extentBounds.getCoords()).get(code);
+		}
+		return proj.getExtent();
+	}
 
 	setOverrideExtent = () => {
 		let bounds = new Bounds2D();
@@ -108,77 +256,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return true;
 	}
 
-	static readProjDatabase():WeavePromise<Object>
-	{
-		return weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip")).then(
-			(result: Uint8Array) => JSZip().loadAsync(result)
-		).then(
-			(zip: JSZip) => zip.file("ProjDatabase.json").async("string")
-		).then(
-			JSON.parse
-		);
-	}
-
-	private static projectionDbPromise = OpenLayersMapTool.readProjDatabase();
-	/*
-	// For debugging projection database delays
-	private static projectionDbPromise:WeavePromise = new WeavePromise(null, (resolve:Function, reject:Function) => {
-		setTimeout(() => resolve(weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"))), 1000)
-	});
-	*/
-
-	private static projectionDbLoadAttempted:boolean = false;
-
-	static get projectionDbReadyOrFailed():boolean
-	{
-		return !!OpenLayersMapTool.projectionDbPromise.getResult() || !!OpenLayersMapTool.projectionDbPromise.getError();
-	}
-
-	static getProjection(projectionName:string):ol.proj.Projection
-	{
-		let proj = ol.proj.get(projectionName);
-		if (!proj && !OpenLayersMapTool.projectionDbLoadAttempted)
-		{
-			let result = OpenLayersMapTool.projectionDbPromise.getResult();
-			if (result)
-			{
-				try 
-				{
-					let db = result as { [name: string]: string };
-					for (let newProjName of Object.keys(db))
-					{
-						let projDef = db[newProjName];
-						if (projDef)
-							proj4.defs(newProjName, projDef);
-					}
-				}
-				catch (error)
-				{
-					console.error("Failed to parse ProjDatabase.zip:", error);
-				}
-			}
-			else /*!result*/
-			{
-				let error = OpenLayersMapTool.projectionDbPromise.getError();
-
-				if (error)
-				{
-					console.error("ProjDatabase.zip not ready by the time it was needed.");	
-					return null;
-				}
-				else
-				{
-					console.error("Failed to retrieve ProjDatabase.zip:", error);
-					return null;
-				}
-			}
-
-			OpenLayersMapTool.projectionDbLoadAttempted = true;
-			proj = ol.proj.get(projectionName);
-		}
-
-		return proj;
-	}
 
 	overrideSet():boolean
 	{
@@ -208,6 +285,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 
 		return Accordion.render(
+			[
+				Weave.lang("Layers"),
+				<LayerManager layers={this.layers} pushCrumb={ pushCrumb } />
+			],
 			[
 				Weave.lang("Display"),
 				[
@@ -291,26 +372,17 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 						/>
 					]
 				]
-			],
-			[
-				Weave.lang("Layers"),
-				<LayerManager layers={this.layers} pushCrumb={ pushCrumb }/>
 			]
 		);
 	}
 
-	static DEFAULT_PROJECTION:string = "EPSG:4326";
+
 
 	map:ol.Map;
 
 	centerCallbackHandle:any;
 	resolutionCallbackHandle:any;
 	private element:Element;
-
-	static projectionVerifier(value:string):boolean
-	{
-		return !!OpenLayersMapTool.getProjection(value);
-	}
 
 	zoomBounds = Weave.linkableChild(this, ZoomBounds);
 	extentOverride = Weave.linkableChild(this, OverrideBounds);
@@ -371,29 +443,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
-	static isGeomColumnOrRef(column: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)):boolean
-	{
-		let iac = Weave.AS(column, weavejs.api.data.IAttributeColumn);
-		let icr = Weave.AS(column, weavejs.api.data.IColumnReference);
 
-		let dataType: string;
-		if (iac) {
-			dataType = iac.getMetadata(ColumnMetadata.DATA_TYPE);
-			if (dataType == DataType.GEOMETRY) {
-				return true;
-			}
-		}
-		else if (icr) {
-			let metadata: { [property: string]: string } = icr.getColumnMetadata() as any;
-			if (metadata) {
-				dataType = metadata[ColumnMetadata.DATA_TYPE];
-			}
-			if (dataType == DataType.GEOMETRY) {
-				return true;
-			}
-		}
-		return false;
-	}
 
 	initSelectableAttributes(input: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)[]): void
 	{	
@@ -557,16 +607,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.handleFrame);
 	}
 
-	componentDidMount():void
-	{
-		if (!OpenLayersMapTool.projectionDbReadyOrFailed)
-		{
-			console.log("Projection database not ready; delaying initialization of map");
-			weavejs.WeaveAPI.Scheduler.callLater(this, this.componentDidMount);
-			return;
-		}
-		this.initializeMap();
-	}
 
 	updateViewParameters_weaveToOl():void
 	{
@@ -632,12 +672,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.updateControlPositions();
 	}
 
-	private static controlIndex = new Map<Function,number>()
-		.set(PanCluster, 0)
-		.set(CustomZoomToExtent, 1)
-		.set(ol.control.Zoom, 2)
-		.set(ol.control.ZoomSlider, 3)
-		.set(InteractionModeCluster, 4);
+
 
 	private updateControlPositions():void
 	{
@@ -699,39 +734,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			}
 		}
 	}
-	// TODO: Figure out why setting extent on the projections themselves breaks subsequent renders.
-	static estimatedExtentMap = new Map<string,ol.Extent>();
-	static getEstimatedExtent(proj:ol.proj.Projection):ol.Extent
-	{
-		let extentBounds:Bounds2D = new Bounds2D();
-		let IOTA = Number("1e-10");
-		if (!proj.getExtent())
-		{
-			let code = proj.getCode();
-			if (OpenLayersMapTool.estimatedExtentMap.get(code))
-				return OpenLayersMapTool.estimatedExtentMap.get(code);
-			for (let lat = -180; lat < 180; lat++)
-			{
-				for (let long = -90; long < 180; long++)
-				{
-					let coord:ol.Coordinate = [long, lat];
-					if (coord[0] == -180)
-						coord[0] += IOTA;
-					if (coord[0] == 180)
-						coord[0] -= IOTA;
-					if (coord[1] == -90)
-						coord[1] += IOTA;
-					if (coord[1] == 90)
-						coord[1] -= IOTA;
 
-					let projectedPoint = ol.proj.fromLonLat(coord, proj);
-					extentBounds.includeCoords(projectedPoint[0], projectedPoint[1]);
-				}
-			}
-			return OpenLayersMapTool.estimatedExtentMap.set(code, extentBounds.getCoords()).get(code);
-		}
-		return proj.getExtent();
-	}
 
 	updateZoom_olToWeave():void
 	{
@@ -905,14 +908,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	}
 
 
-	render():JSX.Element 
-	{
-		return (
-			<ResizingDiv>
-				<div ref={(c:HTMLElement) => {this.element = c;}} style={{height:"100%", width: "100%"}}/>
-			</ResizingDiv>
-		);
-	}
+
 
 	getExtent():weavejs.geom.Bounds2D
 	{
@@ -977,11 +973,30 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
-	public static selectableLayerFilter(layer: ol.layer.Base): boolean
+	componentDidMount():void
 	{
-		return layer.get("selectable");
+		if (!OpenLayersMapTool.projectionDbReadyOrFailed)
+		{
+			console.log("Projection database not ready; delaying initialization of map");
+			weavejs.WeaveAPI.Scheduler.callLater(this, this.componentDidMount);
+			return;
+		}
+		this.initializeMap();
 	}
+
+	render():JSX.Element
+	{
+		return (
+			<ResizingDiv>
+				<div ref={(c:HTMLElement) => {this.element = c;}} style={{height:"100%", width: "100%"}}/>
+			</ResizingDiv>
+		);
+	}
+
+
 }
+
+
 
 Weave.registerClass(
 	OpenLayersMapTool,
