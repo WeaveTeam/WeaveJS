@@ -46,10 +46,12 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	constructor (props:ISelectableAttributeComponentProps)
 	{
 		super(props);
+		this.weaveRoot = Weave.getRoot(this.props.attributes.get(this.props.attributeName));//TODO right way to get root?
 	}
 	private comboBox: ComboBox;
 	private lastActiveNode:IWeaveTreeNode & IColumnReference;
-	
+	private weaveRoot:ILinkableHashMap;
+
 	static findSelectableAttributes(attribute:IColumnWrapper|ILinkableHashMap, defaultLabel:string = "Data"):[string, Map<string, IColumnWrapper|ILinkableHashMap>]
 	{
 		var SA = 'selectableAttributes';
@@ -124,7 +126,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 				dynamicColumn.removeObject();
 			}
 		}
-	}
+	};
 	
 	setColumnInHashmap=(selectedOptions:IWeaveTreeNode[]):void=>
 	{
@@ -137,6 +139,16 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	private get columnsHashmap()
 	{
 		return this.props.attributes.get(this.props.attributeName) as ILinkableHashMap;
+	}
+
+	componentDidMount()
+	{
+		Weave.getCallbacks(this.weaveRoot).addGroupedCallback(this, this.forceUpdate);
+	}
+
+	componentWillUnmount()
+	{
+		Weave.getCallbacks(this.weaveRoot).removeCallback(this, this.forceUpdate)
 	}
 	
 	render():JSX.Element
@@ -185,6 +197,17 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 					}
 				});
 			}
+
+			if(options.length == 0)// when the data is added AFTER the tool editor is rendered, we need to populate the options
+			{
+				options = ColumnUtils.findFirstDataSet(this.weaveRoot).concat().map((node)=>{
+					return({
+						value:node,
+						label:node.getLabel()
+					});
+				});
+			}
+
 			options.push({
 				value: null,
 				label: "(None)"
