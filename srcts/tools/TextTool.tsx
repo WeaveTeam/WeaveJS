@@ -121,7 +121,7 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 	{
 		$(this.element).empty();
 		//parse html, stripping out <script> tags
-		let htmlElements:any[] = $.parseHTML(MiscUtils.evalTemplateString(this.htmlText.value,this),null,false);
+		let htmlElements:any[] = $.parseHTML("<div>"+MiscUtils.evalTemplateString(this.htmlText.value,this)+"</div>",null,false);
 		if(htmlElements) {
 			htmlElements.forEach((element:any) => {
 				if(element.outerHTML)
