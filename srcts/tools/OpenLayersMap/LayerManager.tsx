@@ -29,6 +29,9 @@ export interface  ILayerManagerProps extends React.HTMLProps<LayerManager>
 {
 	layers: LinkableHashMap;
 	pushCrumb?: Function;
+	selectedLayer?: AbstractLayer; // required as parent can set the selectedLayer too, Case: Crumb Section
+	onLayerSelection?:Function; //selected layer is passed through this function
+
 }
 
 export default class LayerManager extends React.Component<ILayerManagerProps, ILayerManagerState>
@@ -36,17 +39,32 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 	constructor(props:ILayerManagerProps)
 	{
 		super(props);
-		this.componentWillReceiveProps(props);
+
+		if(props.layers){
+			props.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+		}
+		this.state = {
+			selectedLayer: this.props.selectedLayer ? this.props.selectedLayer : null,
+			openedLayer: null
+		}
 	}
 
-	state: ILayerManagerState = {
-		selectedLayer: null,
-		openedLayer: null
-	};
+
 
 	componentWillReceiveProps(nextProps:ILayerManagerProps)
 	{
-		nextProps.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+		if(this.props.layers != nextProps.layers)
+		{
+			this.props.layers.childListCallbacks.removeCallback(this,this.forceUpdate);
+			nextProps.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
+		}
+
+		if(this.props.selectedLayer != nextProps.selectedLayer)
+		{
+			this.setState({
+				selectedLayer: nextProps.selectedLayer
+			});
+		}
 	}
 
 	onEditLayerClick=(layer:AbstractLayer,e: React.MouseEvent) =>
@@ -73,7 +91,14 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 
 		return <HBox key={"layerItem" + index} style={ {alignItems: "center", padding: "4px"} }
 		             className={layer == this.state.selectedLayer ? "weave-list-Item-selected" : "weave-list-Item"}
-		             onMouseDown={() => {if (this.state.selectedLayer != layer) this.setState({selectedLayer: layer});}}>
+		             onMouseDown={ () => {
+		                                    if (this.state.selectedLayer != layer)
+		                                        this.setState({selectedLayer: layer});
+		                                    if(this.props.onLayerSelection)
+		                                        this.props.onLayerSelection(layer)
+		                                }
+		                             }
+				>
 				<Checkbox title={ Weave.lang("Show layer") } ref={ linkReactStateRef(this, { value: layer.visible }) } label={ layer.getDescription() }/>
 				<span style={ {flex:1} }></span>
 				<button className="ui button"

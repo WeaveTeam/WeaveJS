@@ -72,6 +72,7 @@ function isAlignment(obj:any):boolean
 
 import URLRequest = weavejs.net.URLRequest;
 import WeavePromise = weavejs.util.WeavePromise;
+import SmartComponent from "../ui/SmartComponent";
 
 // set ol proj4
 ol.proj.setProj4(proj4);
@@ -266,116 +267,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 		return true;
 	}
-
-	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(pushCrumb:Function): JSX.Element {
-		let controlLocationOpts = [
-			{ vertical: "top", horizontal: "left" },
-			{ vertical: "top", horizontal: "right" },
-			{ vertical: "bottom", horizontal: "left" },
-			{ vertical: "bottom", horizontal: "right" }
-		].map(
-			(value) => { return { label: Weave.lang(_.startCase(value.vertical) + " " + _.startCase(value.horizontal)), value} }
-		);
-
-		let renderNumberEditor = (linkableNumber:LinkableNumber, flex:number)=>
-		{
-			var style: React.CSSProperties = { textAlign: "center", flex, minWidth: 60 };
-			return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, { value: linkableNumber }) }/>;	
-		}
-
-		return Accordion.render(
-			[
-				Weave.lang("Layers"),
-				<LayerManager layers={this.layers} pushCrumb={ pushCrumb } />
-			],
-			[
-				Weave.lang("Display"),
-				[
-					[
-						Weave.lang("Chart title"),
-						<HBox>
-							<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.panelTitle }) } placeholder={this.defaultPanelTitle}/>
-						</HBox>
-					],
-					[
-						Weave.lang("Projection SRS"),
-						<HBox>
-							<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, { value: this.projectionSRS }) }/>
-						</HBox>
-					]
-				],
-			],
-			[
-				Weave.lang("Controls"),
-				[
-					[
-						Weave.lang("Control location"),
-						<HBox>
-							<ComboBox ref={linkReactStateRef(this, { value: this.controlLocation }) } options={controlLocationOpts}/>
-						</HBox>
-					],
-					[
-						Weave.lang("Show zoom buttons"),
-						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomButtons }) } label={" "}/>
-					],
-					[
-						Weave.lang("Show zoom slider"),
-						<Checkbox ref={linkReactStateRef(this, { value: this.showZoomSlider }) } label={" "}/>
-					],
-					[
-						Weave.lang("Show mouse mode selector"),
-						<Checkbox ref={linkReactStateRef(this, { value: this.showMouseModeControls }) } label={" "}/>
-					],
-				]
-			],
-			[
-				Weave.lang("Zoom and pan behavior"),
-				[
-					[
-						Weave.lang("Zoom range"),
-						<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
-							<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.minZoomLevel }) }/>
-							{"-"}
-							<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.maxZoomLevel }) }/>
-						</HBox>
-					],
-					[
-						<span style={ {whiteSpace:"normal"} }> {Weave.lang("Pan Boundary")}</span>,
-						<VBox>
-							<span style={{display: this.overrideExtentDefined() ? null : "none" }}>
-								<HBox className="weave-padded-hbox" style={{ alignItems: 'center' }}>
-									{ renderNumberEditor(this.extentOverride.xMin, 1) }
-									<VBox className="weave-padded-vbox" style={{ flex: 1 }}>
-										{ renderNumberEditor(this.extentOverride.yMax, null) }
-										{ renderNumberEditor(this.extentOverride.yMin, null) }
-									</VBox>
-									{ renderNumberEditor(this.extentOverride.yMin, 1) }
-								</HBox>
-							</span>
-							<HBox>
-								<Button	onClick={this.setOverrideExtent} style={ {borderTopRightRadius:0 , borderBottomRightRadius:0} }>
-									{Weave.lang("Use current zoom") }
-								</Button>
-								<Button	onClick={this.clearOverrideExtent} style={ {borderTopLeftRadius:0 , borderBottomLeftRadius:0} }>
-									{Weave.lang("Use data bounds")}
-								</Button>
-							</HBox>
-						</VBox>
-					],
-					[
-						Weave.lang("Snap zoom to base map"),
-						<Checkbox
-							ref={linkReactStateRef(this, {value: this.snapZoomToBaseMap})}
-							label={" "}
-							title={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }
-						/>
-					]
-				]
-			]
-		);
-	}
-
 
 
 	map:ol.Map;
@@ -973,6 +864,25 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
+	// added to remember the selectedLayer to pass it to editor
+	// Editor UI is changed dynamically based on active crumb in Editor
+	private selectedLayer:AbstractLayer;
+
+	// called from layerManager on MouseDown Event of listItem
+	updateSelectedLayer=(layer:AbstractLayer)=>
+	{
+		this.selectedLayer = layer;
+	}
+
+	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+	renderEditor(pushCrumb:Function): JSX.Element
+	{
+		return <OpenLayersMapToolEditor tool={this}
+		                                pushCrumb={pushCrumb}
+		                                selectedLayer={this.selectedLayer}
+		                                onLayerSelection={this.updateSelectedLayer}/>
+	}
+
 	componentDidMount():void
 	{
 		if (!OpenLayersMapTool.projectionDbReadyOrFailed)
@@ -1004,3 +914,132 @@ Weave.registerClass(
 	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
 	"Map"
 );
+
+
+export interface IOpenLayersMapToolEditorState {
+
+}
+
+export interface IOpenLayersMapToolEditorProps {
+	tool:OpenLayersMapTool,
+	pushCrumb:Function,
+	selectedLayer:AbstractLayer,
+	onLayerSelection:Function //selected layer is passed through this function
+}
+
+class OpenLayersMapToolEditor extends SmartComponent<IOpenLayersMapToolEditorProps,IOpenLayersMapToolEditorState>{
+
+
+
+	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+	render(){
+		let controlLocationOpts = [
+			{ vertical: "top", horizontal: "left" },
+			{ vertical: "top", horizontal: "right" },
+			{ vertical: "bottom", horizontal: "left" },
+			{ vertical: "bottom", horizontal: "right" }
+		].map(
+			(value) => { return { label: Weave.lang(_.startCase(value.vertical) + " " + _.startCase(value.horizontal)), value} }
+		);
+
+		let renderNumberEditor = (linkableNumber:LinkableNumber, flex:number)=>
+		{
+			var style: React.CSSProperties = { textAlign: "center", flex, minWidth: 60 };
+			return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, { value: linkableNumber }) }/>;
+		}
+
+		return Accordion.render(
+			[
+				Weave.lang("Layers"),
+				<LayerManager layers={this.props.tool.layers}
+				              pushCrumb={ this.props.pushCrumb }
+				              selectedLayer={this.props.selectedLayer}
+				              onLayerSelection={this.props.onLayerSelection}/>
+			],
+			[
+				Weave.lang("Display"),
+				[
+					[
+						Weave.lang("Chart title"),
+						<HBox>
+							<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.props.tool.panelTitle }) } placeholder={this.props.tool.defaultPanelTitle}/>
+						</HBox>
+					],
+					[
+						Weave.lang("Projection SRS"),
+						<HBox>
+							<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, { value: this.props.tool.projectionSRS }) }/>
+						</HBox>
+					]
+				],
+			],
+			[
+				Weave.lang("Controls"),
+				[
+					[
+						Weave.lang("Control location"),
+						<HBox>
+							<ComboBox ref={linkReactStateRef(this, { value: this.props.tool.controlLocation }) } options={controlLocationOpts}/>
+						</HBox>
+					],
+					[
+						Weave.lang("Show zoom buttons"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.props.tool.showZoomButtons }) } label={" "}/>
+					],
+					[
+						Weave.lang("Show zoom slider"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.props.tool.showZoomSlider }) } label={" "}/>
+					],
+					[
+						Weave.lang("Show mouse mode selector"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.props.tool.showMouseModeControls }) } label={" "}/>
+					],
+				]
+			],
+			[
+				Weave.lang("Zoom and pan behavior"),
+				[
+					[
+						Weave.lang("Zoom range"),
+						<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
+							<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.props.tool.minZoomLevel }) }/>
+							{"-"}
+							<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.props.tool.maxZoomLevel }) }/>
+						</HBox>
+					],
+					[
+						<span style={ {whiteSpace:"normal"} }> {Weave.lang("Pan Boundary")}</span>,
+						<VBox>
+							<span style={{display: this.props.tool.overrideExtentDefined() ? null : "none" }}>
+								<HBox className="weave-padded-hbox" style={{ alignItems: 'center' }}>
+									{ renderNumberEditor(this.props.tool.extentOverride.xMin, 1) }
+									<VBox className="weave-padded-vbox" style={{ flex: 1 }}>
+										{ renderNumberEditor(this.props.tool.extentOverride.yMax, null) }
+										{ renderNumberEditor(this.props.tool.extentOverride.yMin, null) }
+									</VBox>
+									{ renderNumberEditor(this.props.tool.extentOverride.yMin, 1) }
+								</HBox>
+							</span>
+							<HBox>
+								<Button	onClick={this.props.tool.setOverrideExtent} style={ {borderTopRightRadius:0 , borderBottomRightRadius:0} }>
+									{Weave.lang("Use current zoom") }
+								</Button>
+								<Button	onClick={this.props.tool.clearOverrideExtent} style={ {borderTopLeftRadius:0 , borderBottomLeftRadius:0} }>
+									{Weave.lang("Use data bounds")}
+								</Button>
+							</HBox>
+						</VBox>
+					],
+					[
+						Weave.lang("Snap zoom to base map"),
+						<Checkbox
+							ref={linkReactStateRef(this, {value: this.props.tool.snapZoomToBaseMap})}
+							label={" "}
+							title={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }
+						/>
+					]
+				]
+			]
+		);
+	}
+}
