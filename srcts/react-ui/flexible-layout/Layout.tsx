@@ -109,9 +109,10 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		this.resizers.forEach((resizer, index) => {
 			if (resizer.state && resizer.state.active)
 			{
+				var [begin, end] = this.getResizerRange(index);
 				this.overlay.setState({
 					active: true,
-					range: this.getResizerRange(index)
+					range: [begin + this.minSize, end + this.minSize]
 				});
 				this.overlay.onMouseMove(event);
 			}
@@ -134,9 +135,9 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 		var element1 = ReactDOM.findDOMNode(this.children[element1Index]) as HTMLElement;
 		var element2 = ReactDOM.findDOMNode(this.children[element2Index]) as HTMLElement;
 		if (this.state.direction === HORIZONTAL)
-			return [element1.offsetLeft + this.minSize, element2.offsetLeft + element2.offsetWidth - this.minSize];
+			return [element1.offsetLeft, element2.offsetLeft + element2.offsetWidth];
 		else
-			return [element1.offsetTop + this.minSize, element2.offsetTop + element2.offsetHeight - this.minSize];
+			return [element1.offsetTop, element2.offsetTop + element2.offsetHeight];
 	}
 
 	private onMouseUp=(event:MouseEvent):void=>
