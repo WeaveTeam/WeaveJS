@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 
 import prefixer from "./react-ui/VendorPrefixer";
@@ -166,49 +167,28 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		});
 	}
 	
-	/*
-	isMaximized=(tool:WeaveTool):boolean=>
-	{
-		var path = tool.props.path;
-		var layout = Weave.AS(this.getRenderedComponent(), FlexibleLayout);
-		if (!layout)
-			return false;
-		var state = _.cloneDeep(layout.getSessionState());
-		var obj = FlexibleLayout.findStateNode(state, path);
-		if (!obj)
-			return false;
-		return obj.maximized;
-	}
-	*/
-	
 	handlePopoutClick=(tool:WeaveTool):void=>
 	{
-		var path = tool.props.path;
+		var panelPath = tool.props.path;
 		var popoutWindow:Window;
 		var onBeforeUnLoad:Function = () => { };
 		var onLoad:Function = () => { };
 		var options:any = { transferStyle: true };
-		var isMaximized:boolean = false, screenWidth:number, screenHeight:number;
+		var screenWidth:number, screenHeight:number;
+		var layoutPath = Weave.getPath(ReactUtils.findComponent(tool, AbstractLayout as any)).getPath();
 
-		this.removeFromLayout(path);
+		this.removeFromLayout(panelPath);
 		var content:JSX.Element = (
 			<WeaveTool
 				weave={this.props.weave}
-				path={path}
+				path={panelPath}
 				style={{width: "100%", height: "100%"}}
 				onGearClick={this.handleGearClick}
 				onPopinClick={() => {
-					this.addToLayout(path);
+					this.addToLayout(layoutPath, panelPath);
 					popoutWindow.close();
 				}}
-			>
-				<WeaveComponentRenderer
-					weave={this.props.weave}
-					path={path}
-					style={{ width: "100%", height: "100%" }}
-					props={{panelRenderer: this.renderTool}}
-				/>
-			</WeaveTool>
+			/>
 		);
 		popoutWindow = ReactUtils.openPopout(content, onLoad, onBeforeUnLoad, options);
 
@@ -273,7 +253,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (placeholder)
 				Weave.getCallbacks(placeholder).addDisposeCallback(this, this.handlePlaceholderDispose.bind(this, path, placeholder));
 			this.setState({ toolPathToEdit: path });
-			this.addToLayout(path);
+			this.addToLayout(this.getRenderPath(), path);
 		}
 	}
 
@@ -312,19 +292,20 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.forceUpdate();
 	}
 
-	addToLayout(path:WeavePathArray)
+	addToLayout(layoutPath:WeavePathArray, panelPath:WeavePathArray)
 	{
-		var layout = this.props.weave.getObject(this.getRenderPath());
-		if (layout instanceof AbstractLayout)
-			(layout as AbstractLayout).addPanel(path);
+		var layout = Weave.AS(this.props.weave.getObject(layoutPath), AbstractLayout as any) as AbstractLayout;
+		if (layout)
+			layout.addPanel(panelPath);
 	}
 
-	removeFromLayout(path:WeavePathArray)
+	removeFromLayout(panelPath:WeavePathArray)
 	{
-		var layout = this.props.weave.getObject(this.getRenderPath());
-		if (layout instanceof AbstractLayout)
-			(layout as AbstractLayout).removePanel(path);
-	
+		var panel = Weave.AS(this.props.weave.getObject(panelPath), React.Component);
+		var element = panel && ReactDOM.findDOMNode(panel);
+		var layout = element && ReactUtils.findComponent(element.parentElement, AbstractLayout as any) as AbstractLayout;
+		if (layout)
+			layout.removePanel(panelPath);
 	}
 	
 	componentWillUpdate(nextProps:WeaveAppProps, nextState:WeaveAppState)
