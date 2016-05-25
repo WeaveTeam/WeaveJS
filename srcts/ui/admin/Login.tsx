@@ -32,13 +32,14 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 		($(Login.element) as any).modal('hide');
 	}
 
-	static open(context:any)
+	static open(context:Element)
 	{
+		
 		($(Login.element) as any)
 			.modal({
 				closable: false,
 				detachable: false,
-				context,
+				context: $(context),
 				transition: "fade"
 			})
 			.modal('show');
