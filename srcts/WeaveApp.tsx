@@ -372,7 +372,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					<WeaveComponentRenderer
 						weave={weave}
 						path={renderPath}
-						defaultType={WindowLayout}
+						defaultType={FlexibleLayout}
 						style={{width: "100%", height: "100%"}}
 						props={{panelRenderer: this.renderTool}}
 					/>
