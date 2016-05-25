@@ -24,26 +24,7 @@ export enum DropZone {
 
 const OUTER_PANEL_ID:WeavePathArray = []; // special value to indicate dragging over outer drop zone
 
-declare type Point = {
-	x?: number;
-	y?: number;
-	r?: number;
-	theta?: number;
-};
-
-declare type PolarPoint = {
-	x: number;
-	y: number;
-};
-
 export declare type WeavePathArray = string[];
-
-export type PanelProps = {
-	maximized:boolean;
-	onDragStart:React.DragEventHandler,
-	onDragEnd:React.DragEventHandler,
-	onDragOver:React.DragEventHandler
-};
 
 var stateStructure:any = {
 	id: MiscUtils.nullableStructure(["string"]),
@@ -258,29 +239,31 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 			panelNode = rootNode;
 		}
 		else
+		{
 			panelNode = this.rootLayout.getElementFromId(panelOver);
+		}
 		
 		if (this.panelDragged === panelOver)
 			return [DropZone.NONE, panelOver];
 		
 		var rect = panelNode.getBoundingClientRect();
 
-		var center:Point = {
+		var center = {
 			x: (rect.right - rect.left) / 2,
 			y: (rect.bottom - rect.top) / 2
 		};
 
-		var delta:Point = {
+		var delta = {
 			x: event.clientX - (rect.left + center.x),
 			y: event.clientY - (rect.top + center.y)
 		};
 
-		var deltaNorm:Point = {
+		var deltaNorm = {
 			x: (delta.x) / (rect.width / 2),
 			y: (delta.y) / (rect.height / 2)
 		};
 
-		var polarNorm:Point = {
+		var polarNorm = {
 			r: Math.sqrt(deltaNorm.x * deltaNorm.x + deltaNorm.y * deltaNorm.y),
 			theta: Math.atan2(deltaNorm.y, deltaNorm.x)
 		};
