@@ -517,27 +517,28 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 				var path = node.id as WeavePathArray;
 				var key = JSON.stringify(path);
 				return (
-					<Div
-						key={key}
-						ref={key}
-						children={
-							this.props.panelRenderer
-							?	this.props.panelRenderer(
-									path,
-									{
-										maximized: node.maximized,
-										onDragOver: this.onDragOver.bind(this, path),
-										onDragStart: this.onDragStart.bind(this, path),
-										onDragEnd: this.onDragEnd.bind(this),
-									} as any,
-									this.props.panelRenderer
-								)
-							:	<WeaveComponentRenderer
-									weave={weave}
-									path={path}
-									style={{width: "100%", height: "100%"}}/>
-						}
-					/>
+					<div
+						onDragOver={ this.onDragOver.bind(this, path) }
+						onDragStart={ this.onDragStart.bind(this, path) }
+						onDragEnd={ this.onDragEnd.bind(this) }
+					>
+						<Div
+							key={key}
+							ref={key}
+							children={
+								this.props.panelRenderer
+								?	this.props.panelRenderer(
+										path,
+										{ maximized: node.maximized },
+										this.props.panelRenderer
+									)
+								:	<WeaveComponentRenderer
+										weave={weave}
+										path={path}
+										style={{width: "100%", height: "100%"}}/>
+							}
+						/>
+					</div>
 				);
 			});
 		}
