@@ -15,10 +15,11 @@ const ESC_KEYCODE = 27;
 
 export interface PopupWindowProps extends React.HTMLProps<PopupWindow>
 {
-	title:string /*|JSX.Element*/;
+	title?:string /*|JSX.Element*/;
 	content?:any/*JSX.Element*/;
 	modal?:boolean;
 	resizable?:boolean;
+	draggable?:boolean;
 	top?:number;
 	left?:number;
 	width?:number;
@@ -45,7 +46,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		y: number
 	}
 
-	static windowSet = new Set<PopupWindow>(); 
+	static windowSet = new Set<PopupWindow>();
 
 	constructor(props:PopupWindowProps)
 	{
@@ -55,9 +56,10 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		};
 		document.addEventListener("keyup", this.onKeyPress);
 	}
-	
+
 	static defaultProps = {
-		resizable: true
+		resizable: true,
+		draggable: true
 	};
 
 	static open(props:PopupWindowProps):PopupWindow
@@ -68,13 +70,13 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		PopupWindow.alignWindows();
 		return popupWindow;
 	}
-	
+
 	static close(popupWindow:PopupWindow)
 	{
 		PopupWindow.windowSet.delete(popupWindow);
 		ReactUtils.closePopup(popupWindow);
 	}
-	
+
 	static alignWindows()
 	{
 		var index = 0;
@@ -84,7 +86,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 			index++;
 		}
 	}
-	
+
 	componentDidMount()
 	{
 		// re-render now that this.element has been set in the ref callback function
@@ -96,13 +98,13 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		this.props.onOk && this.props.onOk();
 		this.onClose();
 	}
-	
+
 	private onCancel()
 	{
 		this.props.onCancel && this.props.onCancel();
 		this.onClose();
 	}
-	
+
 	private onClose()
 	{
 		this.props.onClose && this.props.onClose();
@@ -115,14 +117,14 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		PopupWindow.windowSet.add(this);
 		PopupWindow.alignWindows();
 	}
-	
+
 	onKeyPress =(event:KeyboardEvent)=>
 	{
 		var code = event.keyCode;
-		
+
 		if (code == ENTER_KEYCODE && this.props.modal && ReactUtils.hasFocus(this))
 			this.onOk();
-		
+
 		if (code == ESC_KEYCODE)
 		{
 			var activeWindow = Array.from(PopupWindow.windowSet.keys()).pop();
@@ -150,11 +152,11 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 			className = "weave-dialog-overlay";
 		return <div style={style} className={className}/>;
 	}
-	
+
 	render():JSX.Element
 	{
 
-		var windowStyle:React.CSSProperties = {	
+		var windowStyle:React.CSSProperties = {
 			zIndex: this.state.zIndex,
 			top: this.props.top,
 			left: this.props.left,
@@ -163,22 +165,23 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 			minWidth: this.minWidth,
 			minHeight: this.minHeight
 		}
-	
+
 		var popupWindow = (
-			<DraggableDiv 
-				style={windowStyle} 
+			<DraggableDiv
+				style={windowStyle}
 				className="weave-app weave-window"
 				draggable={false}
+				resizable={this.props.resizable}
 				onMouseDown={() => this.handleClickOnWindow()}
 				ref={(c:DraggableDiv) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}
 			>
-				<HBox className="weave-header weave-window-header" draggable={true}>
+				{this.props.title ? <HBox className="weave-header weave-window-header" draggable={this.props.draggable}>
 					<div style={{flex: 1}}>
 						{
 							this.props.title
 						}
 					</div>
-				</HBox>
+				</HBox>:null}
 				<VBox style={{flex: 1}}>
 					<VBox className="weave-padded-vbox weave-window-content" style={{display: 'block', flex: 1}}>
 						<VBox style={{flex: 1, overflow: "auto"}}>
@@ -187,25 +190,25 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 						</VBox>
 						{
 							this.props.footerContent
-							?	<HBox className="weave-window-footer">
-									this.props.footerContent
-								</HBox>
-							:	<HBox className="weave-window-footer">
-									<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
-										<Button onClick={this.onOk.bind(this)}>{Weave.lang(this.props.modal ? "Ok" : "Done")}</Button>
-										{
-											this.props.modal
+								?	<HBox className="weave-window-footer">
+								{this.props.footerContent}
+							</HBox>
+								:	<HBox className="weave-window-footer">
+								<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
+									<Button onClick={this.onOk.bind(this)}>{Weave.lang(this.props.modal ? "Ok" : "Done")}</Button>
+									{
+										this.props.modal
 											?	<Button onClick={this.onCancel.bind(this)} style={{marginLeft: 8}}>{Weave.lang("Cancel")}</Button>
 											:	null
-										}
-									</HBox>
+									}
 								</HBox>
+							</HBox>
 						}
 					</VBox>
 				</VBox>
 			</DraggableDiv>
 		);
-		
+
 		return (
 			<div>
 				{this.props.modal ? this.renderOverlay(this.props.modal) : null}
