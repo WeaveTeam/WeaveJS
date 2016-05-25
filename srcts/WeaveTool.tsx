@@ -26,9 +26,6 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 	path:string[];
 	props?:any; // passed in to WeaveComponentRenderer
 	maximized?:boolean;
-	onDragStart?:React.DragEventHandler;
-	onDragEnd?:React.DragEventHandler;
-	onDragOver?:React.DragEventHandler;
 	style?: CSSProperties;
 	onGearClick?:(tool:WeaveTool)=>void;
 	onPopoutClick?:(tool:WeaveTool)=>void;
@@ -149,7 +146,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
 
 		return (
-			<HBox className={className} style={{height: this.titleBarHeight}} draggable={true} onDragStart={this.props.onDragStart} onDoubleClick={this.onMaximizeClick}>
+			<HBox className={className} style={{height: this.titleBarHeight}} draggable={true} onDoubleClick={this.onMaximizeClick}>
 				{
 					this.state.showControls
 					?	[
@@ -192,8 +189,6 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			<VBox
 				style={this.props.style}
 				className="weave-tool"
-				onDragOver={this.props.onDragOver}
-				onDragEnd={this.props.onDragEnd}
 				role="img"
 				onMouseOver={() => {
 					this.setState({ showControls: true });

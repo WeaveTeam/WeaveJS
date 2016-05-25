@@ -201,9 +201,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					this.addToLayout(path);
 					popoutWindow.close();
 				}}
-				onDragEnd={() => {}}
-				onDragStart={() => {}}
-				onDragOver={() => {}}
 			>
 				<WeaveComponentRenderer
 					weave={this.props.weave}
