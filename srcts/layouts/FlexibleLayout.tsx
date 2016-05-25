@@ -501,12 +501,12 @@ export default class FlexibleLayout extends AbstractLayout implements weavejs.ap
 				var key = JSON.stringify(path);
 				return (
 					<div
+						key={key}
 						onDragOver={ this.onDragOver.bind(this, path) }
 						onDragStart={ this.onDragStart.bind(this, path) }
 						onDragEnd={ this.onDragEnd.bind(this) }
 					>
 						<Div
-							key={key}
 							ref={key}
 							children={
 								this.props.panelRenderer
