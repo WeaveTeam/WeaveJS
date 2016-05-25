@@ -23,23 +23,19 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 	static BOTTOM:string = "bottom";
 	static BOTTOM_LEFT:string = "bottom left";
 	static BOTTOM_RIGHT:string = "bottom right";
-	static BOTTOM_MIDDLE:string = "bottom middle";
 
 	static TOP:string = "top";
 	static TOP_LEFT:string = "top left";
 	static TOP_RIGHT:string = "top right";
-	static TOP_MIDDLE:string = "top middle";
 
 
 	static LEFT:string = "left";
 	static LEFT_TOP:string = "left top";
 	static LEFT_BOTTOM:string = "left bottom";
-	static LEFT_MIDDLE:string = "left middle";
 
 	static RIGHT:string = "right";
 	static RIGHT_TOP:string = "right top";
 	static RIGHT_BOTTOM:string = "right bottom";
-	static RIGHT_MIDDLE:string = "right middle";
 
 	constructor(props:GuidanceToolTipProps)
 	{
@@ -59,69 +55,141 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 	render() {
 
 		let urlParams:any = MiscUtils.getUrlParams();
-		if(Boolean(urlParams.skipGuidance)){
+		if(Boolean(urlParams.skipGuidance))
+		{
 			return <div/>;
 		}
 
 
-		let containerStyle:React.CSSProperties = {
-			position:"absolute",
-		}
-
-		let arrowStyle:React.CSSProperties = {
-			position:"absolute",
-			content:'',
-			borderColor:'transparent'
-		}
-
-		if(this.props.location.indexOf(GuidanceToolTip.BOTTOM) >= 0)
-		{
-			containerStyle.top = "8px";
-
-			arrowStyle.top = "-12px";
-
-			arrowStyle["borderBottomColor"] = "black";
-		}
-		 if(this.props.location.indexOf(GuidanceToolTip.TOP) >= 0)
-		{
-			containerStyle.bottom = "8px";
-
-			arrowStyle.bottom = "-12px";
-
-			arrowStyle.borderTopColor = "black";
-		}
-		 if(this.props.location.indexOf(GuidanceToolTip.RIGHT) >= 0)
-		{
-			containerStyle.left = "8px";
-
-			arrowStyle.top =  "8px";
-			arrowStyle.left =  "-12px";
-
-			arrowStyle.borderRightColor = "black";
-		}
-		 if(this.props.location.indexOf(GuidanceToolTip.LEFT) >= 0)
-		{
-			containerStyle.right = "8px";
-
-			arrowStyle.top =  "8px";
-			arrowStyle.right =  "-12px";
-
-			arrowStyle.borderLeftColor = "black";
-		}
-
 		let typeUI:JSX.Element = <span style={{color:"orange"}}>{this.props.type} : </span>;
 
+		let relativeParentStyle:React.CSSProperties = {
+			position:"relative",
+			zIndex:1,
+			margin:0
 
-		return (
+		};
 
-			<div style={ {position:"relative"} }>
-				<div style={containerStyle} className="weave-guidance-toolTip">
-					{typeUI}
-					{this.props.children}
-					<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
-				</div>
-			</div>
-			);
+		let wrapperStyle:React.CSSProperties = {
+			position:"absolute"
+		};
+
+
+		let containerStyle:React.CSSProperties = {
+			whiteSpace:"nowrap"
+		};
+
+		let arrowStyle:React.CSSProperties = {
+			position:"absolute"
+		};
+
+		if(this.props.location == GuidanceToolTip.BOTTOM)
+		{
+			relativeParentStyle.width = "100%";
+
+			wrapperStyle.width = "100%";
+			wrapperStyle.display = "flex"; //important so that children takes size of its contents
+
+			containerStyle.top = "8px";
+			containerStyle.margin = "0 auto"; // container after getting its width from child will margin left and right equal space, thereby centers it
+			arrowStyle.top = "-16px";
+			arrowStyle.left = "50%";
+			arrowStyle.borderTopColor = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		else if(this.props.location == GuidanceToolTip.BOTTOM_RIGHT)
+		{
+			wrapperStyle.top = "8px";
+			wrapperStyle.right = "8px";
+
+			arrowStyle.top = "-16px";
+			arrowStyle.right = "8px";
+			arrowStyle.borderTopColor = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		else if(this.props.location == GuidanceToolTip.BOTTOM_LEFT)
+		{
+			wrapperStyle.top = "8px";
+			wrapperStyle.left = "8px";
+
+			arrowStyle.top = "-16px";
+			arrowStyle.left = "8px";
+			arrowStyle.borderTopColor = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		else if(this.props.location == GuidanceToolTip.TOP)
+		{
+			relativeParentStyle.width = "100%";
+
+			wrapperStyle.width = "100%";
+			wrapperStyle.display = "flex"; //important so that children takes size of its contents
+
+			containerStyle.bottom = "8px";
+			containerStyle.margin = "0 auto"; // container after getting its width from child will margin left and right equal space, thereby centers it
+
+			arrowStyle.bottom = "-16px";
+			arrowStyle.left = "50%";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		else if(this.props.location == GuidanceToolTip.TOP_RIGHT)
+		{
+			wrapperStyle.bottom = "8px";
+			wrapperStyle.right = "8px";
+
+			arrowStyle.bottom = "-16px";
+			arrowStyle.right = "8px";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		else if(this.props.location == GuidanceToolTip.TOP_LEFT)
+		{
+			wrapperStyle.bottom = "8px";
+			wrapperStyle.left = "8px";
+
+			arrowStyle.bottom = "-16px";
+			arrowStyle.left = "8px";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		else if(this.props.location == GuidanceToolTip.RIGHT)
+		{
+			wrapperStyle.left = "8px";
+
+			arrowStyle.top =  "8px";
+			arrowStyle.left =  "-16px";
+			arrowStyle.borderTopColor = "transparent";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			
+		}
+		else if(this.props.location == GuidanceToolTip.LEFT)
+		{
+			wrapperStyle.right = "8px";
+
+			arrowStyle.top =  "8px";
+			arrowStyle.right =  "-16px";
+			arrowStyle.borderTopColor = "transparent";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+
+		return (<div style={ relativeParentStyle }>
+					<div style={ wrapperStyle }>
+						<div style={containerStyle} className="weave-guidance-toolTip">
+							{typeUI}
+							{this.props.children}
+							<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
+						</div>
+					</div>
+
+				</div>);
 	}
 }
 
