@@ -63,18 +63,19 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 
 		let typeUI:JSX.Element = <span style={{color:"orange"}}>{this.props.type} : </span>;
 
+		// needs to be realtive as we want absolute children to behave respective to this relative parent position
 		let relativeParentStyle:React.CSSProperties = {
 			position:"relative",
 			zIndex:1,
 			margin:0
-
 		};
 
+		// wrapper has to be absolute to move the tooltip from parent position left | right | middle
 		let wrapperStyle:React.CSSProperties = {
 			position:"absolute"
 		};
 
-
+		
 		let containerStyle:React.CSSProperties = {
 			whiteSpace:"nowrap"
 		};
@@ -94,7 +95,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			containerStyle.margin = "0 auto"; // container after getting its width from child will margin left and right equal space, thereby centers it
 			arrowStyle.top = "-16px";
 			arrowStyle.left = "50%";
-			arrowStyle.borderTopColor = "transparent";
+			arrowStyle.borderTopColor = "transparent"; // 3 out 4 being transparent - creates a triangle
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
@@ -105,7 +106,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 
 			arrowStyle.top = "-16px";
 			arrowStyle.right = "8px";
-			arrowStyle.borderTopColor = "transparent";
+			arrowStyle.borderTopColor = "transparent"; // 3 out 4 being transparent - creates a triangle
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
@@ -114,25 +115,25 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			wrapperStyle.top = "8px";
 			wrapperStyle.left = "8px";
 
-			arrowStyle.top = "-16px";
+			arrowStyle.top = "-16px";// negative value ensures arrow is ahead of tooltip
 			arrowStyle.left = "8px";
-			arrowStyle.borderTopColor = "transparent";
+			arrowStyle.borderTopColor = "transparent";// 3 out 4 being transparent - creates a triangle
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
 		else if(this.props.location == GuidanceToolTip.TOP)
 		{
-			relativeParentStyle.width = "100%";
+			relativeParentStyle.width = "100%"; // gets parent width
 
-			wrapperStyle.width = "100%";
+			wrapperStyle.width = "100%"; //
 			wrapperStyle.display = "flex"; //important so that children takes size of its contents
 
 			containerStyle.bottom = "8px";
 			containerStyle.margin = "0 auto"; // container after getting its width from child will margin left and right equal space, thereby centers it
 
 			arrowStyle.bottom = "-16px";
-			arrowStyle.left = "50%";
-			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.left = "50%"; // brings to center
+			arrowStyle["borderBottomColor"] = "transparent";// 3 out 4 being transparent - creates a triangle
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
@@ -152,7 +153,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			wrapperStyle.bottom = "8px";
 			wrapperStyle.left = "8px";
 
-			arrowStyle.bottom = "-16px";
+			arrowStyle.bottom = "-16px"; // negative value ensures arrow is ahead of tooltip
 			arrowStyle.left = "8px";
 			arrowStyle["borderBottomColor"] = "transparent";
 			arrowStyle.borderLeftColor = "transparent";
@@ -163,7 +164,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			wrapperStyle.left = "8px";
 
 			arrowStyle.top =  "8px";
-			arrowStyle.left =  "-16px";
+			arrowStyle.left =  "-16px"; // negative value ensures arrow is ahead of tooltip
 			arrowStyle.borderTopColor = "transparent";
 			arrowStyle["borderBottomColor"] = "transparent";
 			arrowStyle.borderLeftColor = "transparent";
@@ -174,7 +175,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			wrapperStyle.right = "8px";
 
 			arrowStyle.top =  "8px";
-			arrowStyle.right =  "-16px";
+			arrowStyle.right =  "-16px";// negative value ensures arrow is ahead of tooltip
 			arrowStyle.borderTopColor = "transparent";
 			arrowStyle["borderBottomColor"] = "transparent";
 			arrowStyle.borderRightColor = "transparent";
