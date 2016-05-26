@@ -78,6 +78,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 
 	componentWillUnmount()
 	{
+		ColumnUtils.firstDataSet = null;
 	}
 
 	getLabelEditor(labelLinkableString:weavejs.core.LinkableString):[React.ReactChild, React.ReactChild]
@@ -243,8 +244,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		if (leaves.indexOf(leaf) < 0)
 			leaf = leaves[0];
 	
-		if (leaves && leaves.length)
-			weavejs.data.ColumnUtils.firstDataSet = leaves as any[];
+		weavejs.data.ColumnUtils.firstDataSet = leaves as any[];
 		
 		var ref = Weave.AS(leaf, IColumnReference);
 		this.column = weavejs.WeaveAPI.AttributeColumnCache.getColumn(ref && ref.getDataSource(), ref && ref.getColumnMetadata());
