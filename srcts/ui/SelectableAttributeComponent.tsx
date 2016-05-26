@@ -26,6 +26,7 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 
 export interface ISelectableAttributeComponentProps
 {
@@ -46,11 +47,34 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	constructor (props:ISelectableAttributeComponentProps)
 	{
 		super(props);
-		this.weaveRoot = Weave.getRoot(this.props.attributes.get(this.props.attributeName));//TODO right way to get root?
 	}
+
+	componentWillReceiveProps(nextProps:ISelectableAttributeComponentProps)
+	{
+		if(nextProps != this.props)
+		{
+			this.weaveRoot = Weave.getRoot(nextProps.attributes.get(nextProps.attributeName));
+
+			if(this.weaveRootTreeNode)//if it exists remove callback
+			{
+				Weave.getCallbacks(this.weaveRootTreeNode).removeCallback(this, this.forceUpdate);
+			}
+			this.weaveRootTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);//create new one
+			//TODO not triggering callback when datasource is modified?
+			Weave.getCallbacks(this.weaveRootTreeNode).addGroupedCallback(this, this.test);//add it to the new one
+		}
+	}
+
+	test=()=>//temporary test function to check if forceUpdate is called
+	{
+		console.log('calling test');
+		this.forceUpdate();
+	};
+
 	private comboBox: ComboBox;
 	private lastActiveNode:IWeaveTreeNode & IColumnReference;
 	private weaveRoot:ILinkableHashMap;
+	private weaveRootTreeNode:WeaveRootDataTreeNode;
 
 	static findSelectableAttributes(attribute:IColumnWrapper|ILinkableHashMap, defaultLabel:string = "Data"):[string, Map<string, IColumnWrapper|ILinkableHashMap>]
 	{
@@ -141,15 +165,15 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		return this.props.attributes.get(this.props.attributeName) as ILinkableHashMap;
 	}
 
-	componentDidMount()
+	/*componentDidMount()
 	{
-		Weave.getCallbacks(this.weaveRoot).addGroupedCallback(this, this.forceUpdate);
+		Weave.getCallbacks(this.weaveRootTreeNode).addGroupedCallback(this, this.forceUpdate);
 	}
 
 	componentWillUnmount()
 	{
-		Weave.getCallbacks(this.weaveRoot).removeCallback(this, this.forceUpdate)
-	}
+		Weave.getCallbacks(this.weaveRootTreeNode).removeCallback(this, this.forceUpdate)
+	}*/
 	
 	render():JSX.Element
 	{
