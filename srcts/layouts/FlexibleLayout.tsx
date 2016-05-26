@@ -127,17 +127,23 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 			this.repositionPanels();
 	}
 
-	onDragStart(panelDragged:WeavePathArray, event:React.MouseEvent):void
+	onDragStart(panelDragged:WeavePathArray, event:React.DragEvent):void
 	{
 		var layout = this.rootLayout.getComponentFromId(panelDragged);
 		if (!layout || layout === this.rootLayout || layout.state.maximized)
 			return;
-		
+
+		// this variable is used for knowing what's the drag
+		// data in dragOver because the dragOver event cannot
+		// read drag data.
 		this.panelDragged = panelDragged;
 
 		// hack because dataTransfer doesn't exist on type event
 		(event as any).dataTransfer.setDragImage(this.rootLayout.getElementFromId(panelDragged), 0, 0);
-		(event as any).dataTransfer.setData('text/html', null);
+		event.dataTransfer.setData('text/plain', JSON.stringify({
+			layout: Weave.findPath(Weave.getRoot(this), this),
+			panelDragged
+		}));
 	}
 
 	hideOverlay():void
@@ -150,34 +156,27 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		});
 	}
 
-	onDragEnd():void
+	onDrop(event:React.DragEvent):void
 	{
-		if (this.panelDragged && this.panelOver)
+		var dragData = AbstractLayout.readDragData(event);
+		var panelDragged = dragData.panelDragged;
+		var otherLayout = Weave.followPath(Weave.getRoot(this), dragData.layout) as AbstractLayout;
+		if (panelDragged)
 		{
-			this.updateLayout();
+			if(otherLayout && otherLayout != this)
+				otherLayout.removePanel(panelDragged);
+			this.updateLayout(panelDragged);
 			this.panelDragged = null;
 			this.dropZone = DropZone.NONE;
 			this.hideOverlay();
 		}
 	}
-	
-	readDragData(event:React.DragEvent):void
-	{
-		try
-		{
-			var str = event.dataTransfer.getData('text/plain');
-			this.panelDragged = Weave.AS(JSON.stringify(str), Array);
-		}
-		catch (e)
-		{
-			this.panelDragged = null;
-		}
-	}
 
 	onDragOver(panelOver:WeavePathArray, event:React.DragEvent):void
 	{
-		this.readDragData(event);
-		
+		event.preventDefault(); // allows the drop event to be triggered
+		event.dataTransfer.dropEffect = "move"; // hides the + icon browsers display
+
 		if (!this.panelDragged)
 			return;
 		
@@ -185,7 +184,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		[dropZone, panelOver] = this.getDropZone(panelOver);
 		
 		// hide the overlay if hovering over the panel being dragged
-		if (this.panelDragged === panelOver)
+		if (_.isEqual(this.panelDragged, panelOver))
 		{
 			this.panelOver = null;
 			this.dropZone = DropZone.NONE;
@@ -347,15 +346,15 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		return state;
 	}
 	
-	updateLayout():void
+	updateLayout(panelDragged:WeavePathArray):void
 	{
-		if (!this.panelDragged || !this.panelOver || !this.dropZone || (this.panelDragged === this.panelOver))
+		if (!panelDragged || !this.panelOver || !this.dropZone || _.isEqual(panelDragged, this.panelOver))
 			return;
 
 		var newState:LayoutState = _.cloneDeep(this.getSessionState());
-		var src:LayoutState = FlexibleLayout.findStateNode(newState, this.panelDragged);
-		var dest:LayoutState = this.panelOver == OUTER_PANEL_ID ? {} : FlexibleLayout.findStateNode(newState, this.panelOver);
-		
+		var src:LayoutState = FlexibleLayout.findStateNode(newState, panelDragged);
+		var dest:LayoutState = _.isEqual(this.panelOver, OUTER_PANEL_ID) ? {} : FlexibleLayout.findStateNode(newState, this.panelOver);
+
 		if (!src || !dest)
 		{
 			console.error("Unexpected error - could not find matching nodes", newState, src, dest);
@@ -383,15 +382,15 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 			});
 
 			srcParentArray.splice(srcParentArray.indexOf(src), 1);
-			
+
 			dest.direction = (this.dropZone === DropZone.TOP || this.dropZone === DropZone.BOTTOM) ? VERTICAL : HORIZONTAL;
-			
-			if (this.panelOver == OUTER_PANEL_ID)
+
+			if (_.isEqual(this.panelOver, OUTER_PANEL_ID))
 			{
 				newState.flex = 0.5;
 				dest.children = [
 					{
-						id: this.panelDragged,
+						id: panelDragged,
 						flex: 0.5
 					},
 					newState
@@ -403,7 +402,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 				delete dest.id;
 				dest.children = [
 					{
-						id: this.panelDragged,
+						id: panelDragged,
 						flex: 0.5
 					},
 					{
@@ -412,7 +411,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 					}
 				];
 			}
-			
+
 			if (this.dropZone === DropZone.BOTTOM || this.dropZone === DropZone.RIGHT)
 				dest.children.reverse();
 		}
@@ -428,10 +427,10 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 			children: ids.map(id => { return {id: id, flex: 1} })
 		});
 	}
-	
+
 	getLayoutPosition(layoutOrId:Layout | WeavePathArray):ClientRect
 	{
-		if (layoutOrId === OUTER_PANEL_ID)
+		if (_.isEqual(layoutOrId, OUTER_PANEL_ID))
 			layoutOrId = this.rootLayout;
 		var node = layoutOrId instanceof Layout ? ReactDOM.findDOMNode(layoutOrId) : this.rootLayout.getElementFromId(layoutOrId);
 		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, node as HTMLElement);
@@ -522,7 +521,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 						key={key}
 						onDragOver={ this.onDragOver.bind(this, path) }
 						onDragStart={ this.onDragStart.bind(this, path) }
-						onDragEnd={ this.onDragEnd.bind(this) }
+					    onDrop={this.onDrop.bind(this)}
 					>
 						<Div
 							ref={key}

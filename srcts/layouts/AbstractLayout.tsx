@@ -27,4 +27,28 @@ export abstract class AbstractLayout<P extends LayoutProps, S> extends SmartComp
 	abstract removePanel(id:WeavePathArray):void;
 	abstract maximizePanel(id:WeavePathArray, maximize:boolean):void;
 	abstract getPanelIds():WeavePathArray[];
+
+	static readDragData(event:React.DragEvent):LayoutDragData
+	{
+		try
+		{
+			var str = event.dataTransfer.getData('text/plain');
+			var obj = JSON.parse(str);
+			if(obj)
+			{
+				return {
+					panelDragged: Weave.AS(obj.panelDragged, Array),
+					layout: Weave.AS(obj.layout, Array) as WeavePathArray
+				}
+			}
+			else
+			{
+				return null;
+			}
+		}
+		catch (e)
+		{
+			return null;
+		}
+	}
 }
