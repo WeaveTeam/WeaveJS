@@ -102,12 +102,12 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 		}
 	}
 
-	authenticateForm=(event:any,fields:any) => {
+	authenticateForm=(fields:any) => {
 		Login.close();
 		weavejs.net.Admin.service.authenticate(fields.username,fields.password).then(() => {
 			this.getWeaveFiles();
 		},(error:any) => {
-			Login.open(this.dimmerSelector);
+			Login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
 		});
 	};
 
@@ -117,7 +117,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 				fileNames
 			});
 		},(error:any) => {
-			Login.open(this.dimmerSelector);
+			Login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
 		});
 	};
 
@@ -128,14 +128,10 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 		});
 	};
 
-	handleError=(formErrors:any,fields:any) => {
-
-	};
-
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
-		this.dimmerSelector = ($(this.element).find(".weave-server-file-view") as any);
+		this.dimmerSelector = null;//($(this.element).find(".weave-server-file-view") as any);
 		this.getWeaveFiles();
 	}
 
@@ -223,7 +219,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 														});
 													},
 													(error:any) => {
-														Login.open(this.dimmerSelector);
+														Login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
 													}
 												);
 						                }}
@@ -243,7 +239,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 						</FileInfoView>
 					</VBox>
 				</HBox>
-				<Login onLogin={this.authenticateForm} onCancel={this.handleCancel} onFailure={this.handleError}/>
+				<Login onLogin={this.authenticateForm}/>
 			</VBox>
 		);
 	}

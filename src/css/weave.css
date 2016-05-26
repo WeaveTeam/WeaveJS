@@ -815,6 +815,12 @@ div.weave-tree-view {
 	box-shadow: none;
 }
 
+/****** Modal *******/
+.ui.mini.modal {
+	width: 400px;
+	margin: 0 0 0 -200px;
+}
+
 .weave-dropzone-file {
 	width: 100%;
 	height: 100%;
