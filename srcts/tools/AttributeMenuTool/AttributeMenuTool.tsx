@@ -26,6 +26,8 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import WeaveAPI = weavejs.WeaveAPI;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
+import OpenLayersMapTool from "../OpenLayersMapTool";
+import AbstractLayer from "../OpenLayersMap/Layers/AbstractLayer";
 
 const LAYOUT_LIST:string = "List";
 const LAYOUT_COMBO:string = "ComboBox";
@@ -141,37 +143,6 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		                     onChange={ this.handleSelection }
 		                     selectedItems={ [selectedAttribute] }
 		/>);
-		/*switch (this.layoutMode.value)
-		{
-			case LAYOUT_LIST:
-				return (
-					<VBox>
-						<List options={ this.options }  onChange={ this.handleSelection } selectedValues={ [selectedAttribute] }/>
-					</VBox>
-				);
-			case LAYOUT_HSLIDER:
-				return (
-					<HBox style={{ flex: 1, padding: 25}}>
-						<HSlider options={ this.options } onChange={ this.handleSelection} selectedValues={ [selectedAttribute] } type="categorical"/>
-					</HBox>
-				);
-			case LAYOUT_VSLIDER:
-				return (
-					<VBox style={{ flex: 1, padding: 25 }}>
-						<VSlider options={ this.options } onChange={ this.handleSelection } selectedValues={ [selectedAttribute] } type="categorical"/>
-					</VBox>
-				);
-			case LAYOUT_COMBO:
-				return (
-					<VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
-						<ComboBox placeholder={(Weave.lang("Select a column"))} options={ this.options as ComboBoxOption[] } onChange={ this.handleSelection } value={ selectedAttribute }/>
-					</VBox>
-				);
-			default:
-				return (
-					<div/> // returns div by default but we should never get here, layoutMode.value needs verfiier function
-				)
-		}*/
 	}
 }
 
@@ -208,8 +179,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		
 		this.state = {
 			openToolNames: []
-		}
-		//this.props.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
+		};
 	}
 
 	componentWillReceiveProps(nextProps:IAttributeMenuTargetEditorProps)
@@ -218,12 +188,10 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		{
 			this.weaveRoot.childListCallbacks.removeCallback(this, this.getOpenVizToolNames);
 			Weave.getCallbacks(this.props.attributeMenuTool.toolWatcher).removeCallback(this, this.forceUpdate);
-			//this.props.attributeMenuTool.targetAttribute.removeCallback(this, this.forceUpdate);
 
 			this.weaveRoot = Weave.getRoot(nextProps.attributeMenuTool);
 			this.weaveRoot.childListCallbacks.addGroupedCallback(this, this.getOpenVizToolNames, true); // will be called whenever a new tool is added
 			Weave.getCallbacks(nextProps.attributeMenuTool.toolWatcher).addGroupedCallback(this, this.forceUpdate); // registering callbacks
-			//nextProps.attributeMenuTool.targetAttribute.addGroupedCallback(this, this.forceUpdate);
 		}
 	}
 
@@ -234,6 +202,21 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		var openToolNames:string[] = [];
 
 		this.weaveRoot.getObjects().forEach((tool:any):void => {
+			//handling map special case because right now only map tool has layers //TODO implement layer interface for checking?
+			if(tool instanceof OpenLayersMapTool)
+			{
+				//in case of the Map, not the tool but the layers have selectableAttributes
+				tool.layers.getObjects().forEach((layer:AbstractLayer)=>
+				{
+					if(layer.selectableAttributes.size > 0)
+					{
+						var name = this.weaveRoot.getName(tool) + ': ' + tool.layers.getName(layer);
+						openToolNames.push(name);
+					}
+				});
+			}
+
+
 			// excluding AttributeMenuTool from the list
 			if (tool.selectableAttributes && Weave.className(tool) != Weave.className(this.props.attributeMenuTool))
 				openToolNames.push(this.weaveRoot.getName(tool));
@@ -245,18 +228,6 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	handleTargetToolChange = (selectedItem:string):void =>
 	{
 		this.props.attributeMenuTool.targetToolPath.state = [selectedItem];
-	};
-
-	//UI event handler for target attribute (one of the selectable attributes of the target tool)
-	handleTargetAttributeChange =(selectedItem:string):void =>
-	{
-		//this.props.attributeMenuTool.targetAttribute.state = selectedItem ;
-	};
-
-	//UI event handler for attribute menu layout
-	handleMenuLayoutChange = (selectedItem:string):void =>
-	{
-		this.props.attributeMenuTool.layoutMode.state = selectedItem;// will re render the tool with new layout
 	};
 
 	get tool():IVisTool
