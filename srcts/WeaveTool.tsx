@@ -12,6 +12,7 @@ import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
 import PopupWindow from "./react-ui/PopupWindow";
 import ReactUtils from "./utils/ReactUtils";
+import MouseUtils from "./utils/MouseUtils";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import SmartComponent from "./ui/SmartComponent";
 import classNames from "./modules/classnames";
@@ -155,7 +156,17 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			}
 		}
 	};
-			
+	
+	onDragStart=(event:React.DragEvent)=>
+	{
+		var element = ReactDOM.findDOMNode(this) as HTMLElement;
+		var offset = MouseUtils.getOffsetPoint(element)
+		var dt = event.dataTransfer;
+		if ((dt as any).setDragImage)
+			(dt as any).setDragImage(element, offset.x, offset.y);
+		dt.setData('text/plain', JSON.stringify(this.props.path));
+	}
+	
 	renderTitleBar():JSX.Element
 	{
 		var showControls = this.state.hovered || this.state.dragging;
@@ -168,7 +179,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
 
 		return (
-			<HBox className={className} style={{height: this.titleBarHeight}} onDoubleClick={this.onMaximizeClick}>
+			<HBox className={className} style={{height: this.titleBarHeight}} onDragStart={this.onDragStart} onDoubleClick={this.onMaximizeClick}>
 				<HBox style={{display: showControls ? "flex" : "none"}}>
 					<CenteredIcon 
 						title={Weave.lang("Configure")}
