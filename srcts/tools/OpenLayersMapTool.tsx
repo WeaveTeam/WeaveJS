@@ -841,23 +841,14 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
-	// added to remember the selectedLayer to pass it to editor
-	// Editor UI is changed dynamically based on active crumb in Editor
-	private selectedLayer:AbstractLayer;
 
-	// called from layerManager on MouseDown Event of listItem
-	updateSelectedLayer=(layer:AbstractLayer)=>
-	{
-		this.selectedLayer = layer;
-	}
 
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor(pushCrumb:Function): JSX.Element
+	renderEditor(pushCrumb:Function): any
 	{
-		return <OpenLayersMapToolEditor tool={this}
-		                                pushCrumb={pushCrumb}
-		                                selectedLayer={this.selectedLayer}
-		                                onLayerSelection={this.updateSelectedLayer}/>
+		// ref is given the same names as crumb name to identify in crumb event
+		let displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.constructor as new (..._: any[]) => any)
+		return <OpenLayersMapToolEditor tool={this} ref={displayName} pushCrumb={pushCrumb}/>
 	}
 
 	componentDidMount():void
@@ -894,19 +885,31 @@ Weave.registerClass(
 
 
 export interface IOpenLayersMapToolEditorState {
-
+	selectedLayer:AbstractLayer
 }
 
 export interface IOpenLayersMapToolEditorProps {
 	tool:OpenLayersMapTool,
-	pushCrumb:Function,
-	selectedLayer:AbstractLayer,
-	onLayerSelection:Function //selected layer is passed through this function
+	pushCrumb:Function
 }
 
 class OpenLayersMapToolEditor extends SmartComponent<IOpenLayersMapToolEditorProps,IOpenLayersMapToolEditorState>{
 
+	// state object is stored in Editor mapped with crumb title
+	// so then when it mounted back , state object can re applied and maintained.
+	// todo: makes a Base class for all Editor Class with componentWillUnmount implemented
+	componentWillUnmount(){
+		let displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.tool.constructor as new (..._: any[]) => any)
+		this.props.pushCrumb(displayName,null,this.state);
+	}
 
+	// called from layerManager on MouseDown Event of listItem
+	updateSelectedLayer=(layer:AbstractLayer)=>
+	{
+		this.setState({
+			selectedLayer:layer
+		});
+	}
 
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	render(){
@@ -930,8 +933,8 @@ class OpenLayersMapToolEditor extends SmartComponent<IOpenLayersMapToolEditorPro
 				Weave.lang("Layers"),
 				<LayerManager layers={this.props.tool.layers}
 				              pushCrumb={ this.props.pushCrumb }
-				              selectedLayer={this.props.selectedLayer}
-				              onLayerSelection={this.props.onLayerSelection}/>
+				              selectedLayer={this.state.selectedLayer}
+				              onLayerSelection={this.updateSelectedLayer}/>
 			],
 			[
 				Weave.lang("Display"),

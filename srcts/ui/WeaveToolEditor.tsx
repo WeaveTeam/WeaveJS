@@ -22,6 +22,7 @@ export interface WeaveToolEditorState
 	activeCrumb:string
 }
 
+
 export default class WeaveToolEditor extends React.Component<WeaveToolEditorProps, WeaveToolEditorState>
 {
 	private toolWatcher = forceUpdateWatcher(this, weavejs.api.ui.IVisTool);
@@ -31,6 +32,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	private toolName:string;
 	private displayName:string;
 	private mapping_crumb_children:any = {};
+	private mapping_crumb_children_state:any = {};
 	private crumbOrder:string[] = [];
 
 	constructor(props:WeaveToolEditorProps)
@@ -45,14 +47,21 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	};
 
 	//todo : find a better way to get linked children
-	pushCrumb=(title:string,ui:React.ReactChild):void=>
+	pushCrumb=(title:string,uiObject:React.ReactChild , stateObject:any = null):void=>
 	{
-		this.mapping_crumb_children[title] = ui;
+		if(stateObject)
+		{
+			this.mapping_crumb_children_state[title] = stateObject;
+			return;
+		}
+
+		this.mapping_crumb_children[title] = uiObject;
 		this.setState({
 			activeCrumb: title
 		});
 		this.crumbOrder.push(title);
 	};
+
 
 
 	componentWillReceiveProps(nextProps:WeaveToolEditorProps)
@@ -61,6 +70,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		{
 			//reset
 			this.mapping_crumb_children = {};
+			this.mapping_crumb_children_state = {};
 			this.crumbOrder = [];
 			
 			this.handleNewTool(nextProps.tool);
@@ -83,12 +93,16 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		this.crumbOrder[0] = this.displayName;
 	}
 
+	// flag to know is editor component mounted due crumb click
+	private isCrumbClicked:boolean = false;
+
 	crumbClick=(crumbTitle:string, index:number)=>
 	{
 		this.setState({
 			activeCrumb:crumbTitle
 		});
 		this.crumbOrder = this.crumbOrder.slice(0, index + 1);
+		this.isCrumbClicked = true;
 	};
 
 	stepBackInCrumbView = ()=>{
@@ -98,13 +112,29 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			activeCrumb:activeCrumbTitle
 		});
 		this.crumbOrder = this.crumbOrder.slice(0, index + 1);
+		this.isCrumbClicked = true;
 	};
 	
 	componentWillUpdate()
 	{
-		if (!this.tool && this.props.onCloseHandler)
+		if (!this.tool && this.props.onCloseHandler) // this ensures when tool is removed close handler is called
 			this.props.onCloseHandler();
 	}
+
+	// Has to be handled here as this.refs[this.state.activeCrumb] will be availble only at this stage of the React Component cycle
+	componentDidUpdate()
+	{
+		if(this.isCrumbClicked && this.refs && this.refs[this.state.activeCrumb]) // if component go mounted due to crumb click
+		{
+			this.isCrumbClicked = false;
+			let stateObj:any = this.mapping_crumb_children_state[this.state.activeCrumb] ; // get the state object which was stored , while editor component was unmounted
+			if(stateObj)
+				(this.refs[this.state.activeCrumb] as any).setState(stateObj);
+		}
+	}
+
+
+
 
 	render()
 	{
