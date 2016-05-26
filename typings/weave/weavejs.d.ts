@@ -6724,6 +6724,21 @@ declare module weavejs.data.source {
     }
 }
 declare module weavejs.data.source {
+    import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+    import LinkableString = weavejs.core.LinkableString;
+    import DynamicColumn = weavejs.data.column.DynamicColumn;
+    import AbstractDataSource = weavejs.data.source.AbstractDataSource;
+    class SpatialJoinTransform extends AbstractDataSource implements ISelectableAttributes {
+        geometryColumn: DynamicColumn;
+        xColumn: DynamicColumn;
+        yColumn: DynamicColumn;
+        pointProjection: LinkableString;
+        getSelectableAttributes(): any[];
+        getSelectableAttributeNames(): any[];
+        constructor();
+    }
+}
+declare module weavejs.data.source {
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
     import IDataSourceWithAuthentication = weavejs.api.data.IDataSourceWithAuthentication;
     import IDataSource_Service = weavejs.api.data.IDataSource_Service;
@@ -9474,6 +9489,7 @@ declare module weavejs.util {
          * This must be set externally.
          */
         static lodash: Object;
+        static ol: Object;
         static formatNumber(number: number, precision?: number): string;
         /**
          * This function will cast a value of any type to a Number,
