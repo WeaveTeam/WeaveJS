@@ -10,7 +10,6 @@ import {forceUpdateWatcher} from "../utils/WeaveReactUtils";
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
-import ReactElement = __React.ReactElement;
 
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
@@ -92,6 +91,9 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		else
 			this.state = state;
 		this.crumbOrder[0] = this.displayName;
+
+		// Respective tool Editor is stored under display name
+		this.mapping_crumb_children[this.displayName] = this.tool.renderEditor(this.pushCrumb);
 	}
 
 	// flag to know is editor component mounted due crumb click
@@ -139,11 +141,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 	render()
 	{
-		if (this.tool && this.crumbOrder.length == 1){
-			this.mapping_crumb_children[this.displayName] = this.tool.renderEditor(this.pushCrumb);
-		}
 
-		
 		var crumbStyle:React.CSSProperties = {
 			alignItems:"center"
 		};
