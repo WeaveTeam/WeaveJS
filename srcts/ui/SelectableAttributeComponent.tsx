@@ -47,12 +47,13 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	constructor (props:ISelectableAttributeComponentProps)
 	{
 		super(props);
+		this.componentWillReceiveProps(props);
 	}
 
 	componentWillReceiveProps(nextProps:ISelectableAttributeComponentProps)
 	{
-		if(nextProps != this.props)
-		{
+		//if(nextProps != this.props)
+		//{
 			this.weaveRoot = Weave.getRoot(nextProps.attributes.get(nextProps.attributeName));
 
 			if(this.weaveRootTreeNode)//if it exists remove callback
@@ -62,7 +63,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			this.weaveRootTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);//create new one
 			//TODO not triggering callback when datasource is modified?
 			Weave.getCallbacks(this.weaveRootTreeNode).addGroupedCallback(this, this.test);//add it to the new one
-		}
+		//}
 	}
 
 	test=()=>//temporary test function to check if forceUpdate is called
@@ -290,6 +291,14 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			else if (this.lastActiveNode)
 			{
 				HierarchyUtils.findSiblingNodes(this.lastActiveNode.getDataSource(), this.lastActiveNode.getColumnMetadata()).forEach((node) => {
+					nodes.add(node);
+				});
+			}
+
+			// when the data is added AFTER the tool editor is rendered, we need to populate the options
+			if(nodes.size == 0)
+			{
+				ColumnUtils.findFirstDataSet(this.weaveRoot).concat().map((node)=>{
 					nodes.add(node);
 				});
 			}
