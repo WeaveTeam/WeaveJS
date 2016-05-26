@@ -163,7 +163,7 @@ interface IAttributeMenuTargetEditorProps
 
 interface IAttributMenuToolEditorState
 {
-	openToolNames?: string[];
+	openToolNames?: {label:string, value:any}[];
 }
 
 class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEditorProps, IAttributMenuToolEditorState>
@@ -199,11 +199,11 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 
 	getOpenVizToolNames():void
 	{
-		var openToolNames:string[] = [];
+		var openToolNames:{label:string, value:any}[] = [];
 
 		this.weaveRoot.getObjects().forEach((tool:any):void => {
 			//handling map special case because right now only map tool has layers //TODO implement layer interface for checking?
-			if(tool instanceof OpenLayersMapTool)
+			/*if(tool instanceof OpenLayersMapTool)
 			{
 				//in case of the Map, not the tool but the layers have selectableAttributes
 				tool.layers.getObjects().forEach((layer:AbstractLayer)=>
@@ -211,15 +211,20 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 					if(layer.selectableAttributes.size > 0)
 					{
 						var name = this.weaveRoot.getName(tool) + ': ' + tool.layers.getName(layer);
-						openToolNames.push(name);
+						openToolNames.push(Weave.findPath(this.weaveRoot, tool));
 					}
 				});
-			}
+			}*/
 
 
 			// excluding AttributeMenuTool from the list
 			if (tool.selectableAttributes && Weave.className(tool) != Weave.className(this.props.attributeMenuTool))
-				openToolNames.push(this.weaveRoot.getName(tool));
+			{
+				openToolNames.push({
+					label: this.weaveRoot.getName(tool),
+					value: Weave.findPath(this.weaveRoot, tool)
+				});
+			}
 		});
 		this.setState({openToolNames});
 	};
