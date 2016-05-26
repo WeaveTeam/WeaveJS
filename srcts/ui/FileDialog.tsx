@@ -92,6 +92,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 
 	element:Element;
 	dimmerSelector:any;
+	login:Login;
 	constructor(props:IOpenFileProps)
 	{
 		super(props);
@@ -103,11 +104,11 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 	}
 
 	authenticateForm=(fields:any) => {
-		Login.close();
 		weavejs.net.Admin.service.authenticate(fields.username,fields.password).then(() => {
+			this.login.close();
 			this.getWeaveFiles();
 		},(error:any) => {
-			Login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
+			this.login.invalid();
 		});
 	};
 
@@ -117,12 +118,12 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 				fileNames
 			});
 		},(error:any) => {
-			Login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
+			this.login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
 		});
 	};
 
 	handleCancel=() => {
-		Login.close();
+		this.login.close();
 		this.setState({
 			fileNames: []
 		});
@@ -219,7 +220,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 														});
 													},
 													(error:any) => {
-														Login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
+														this.login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
 													}
 												);
 						                }}
@@ -239,7 +240,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 						</FileInfoView>
 					</VBox>
 				</HBox>
-				<Login onLogin={this.authenticateForm}/>
+				<Login ref={(c:Login) => this.login = c} onLogin={this.authenticateForm}/>
 			</VBox>
 		);
 	}
