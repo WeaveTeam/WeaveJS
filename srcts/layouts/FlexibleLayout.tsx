@@ -10,6 +10,7 @@ import WeaveComponentRenderer from "../WeaveComponentRenderer";
 import {AbstractLayout, LayoutProps, AnyAbstractLayout} from "./AbstractLayout";
 import PanelOverlay from "../PanelOverlay";
 import MiscUtils, {Structure} from "../utils/MiscUtils";
+import MouseUtils from "../utils/MouseUtils";
 import ReactUtils from "../utils/ReactUtils";
 import DOMUtils from "../utils/DOMUtils";
 import {WeavePathArray} from "../utils/WeaveReactUtils";
@@ -159,14 +160,29 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 			this.hideOverlay();
 		}
 	}
-
-	onDragOver(panelOver:WeavePathArray, event:React.MouseEvent):void
+	
+	readDragData(event:React.DragEvent):void
 	{
+		try
+		{
+			var str = event.dataTransfer.getData('text/plain');
+			this.panelDragged = Weave.AS(JSON.stringify(str), Array);
+		}
+		catch (e)
+		{
+			this.panelDragged = null;
+		}
+	}
+
+	onDragOver(panelOver:WeavePathArray, event:React.DragEvent):void
+	{
+		this.readDragData(event);
+		
 		if (!this.panelDragged)
 			return;
 		
 		var dropZone:DropZone;
-		[dropZone, panelOver] = this.getDropZone(panelOver, event);
+		[dropZone, panelOver] = this.getDropZone(panelOver);
 		
 		// hide the overlay if hovering over the panel being dragged
 		if (this.panelDragged === panelOver)
@@ -219,7 +235,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		});
 	}
 
-	getDropZone(panelOver:WeavePathArray, event:React.MouseEvent):[DropZone, WeavePathArray]
+	getDropZone(panelOver:WeavePathArray):[DropZone, WeavePathArray]
 	{
 		if (!this.panelDragged)
 			return [DropZone.NONE, panelOver];
@@ -228,6 +244,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		var rootNode = ReactDOM.findDOMNode(this.rootLayout);
 		var rootRect = rootNode.getBoundingClientRect();
 		var panelNode:Element = null;
+		var event = MouseUtils.mouseEvent;
 		
 		if (
 			event.clientX <= rootRect.left + this.outerZoneThickness
