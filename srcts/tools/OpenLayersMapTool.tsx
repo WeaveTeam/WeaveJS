@@ -84,15 +84,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return layer.get("selectable");
 	}
 
-	private static projectionDbPromise = OpenLayersMapTool.readProjDatabase();
-	/*
-	 // For debugging projection database delays
-	 private static projectionDbPromise:WeavePromise = new WeavePromise(null, (resolve:Function, reject:Function) => {
-	 setTimeout(() => resolve(weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip"))), 1000)
-	 });
-	 */
-
-	private static projectionDbLoadAttempted:boolean = false;
+	private static projectionDbPromise = OpenLayersMapTool.loadProjDatabase();
 
 	static get projectionDbReadyOrFailed():boolean
 	{
@@ -102,50 +94,25 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	static getProjection(projectionName:string):ol.proj.Projection
 	{
 		let proj = ol.proj.get(projectionName);
-		if (!proj && !OpenLayersMapTool.projectionDbLoadAttempted)
+		if (!proj)
 		{
+			let error = OpenLayersMapTool.projectionDbPromise.getError();
 			let result = OpenLayersMapTool.projectionDbPromise.getResult();
+
+			if (!error && !result)
+				console.error("ProjDatabase.zip not ready by the time it was needed.");
+
+			if (error)
+				console.error("Failed to retrieve ProjDatabase.zip, and using a non-default projection:", error);
+
 			if (result)
-			{
-				try
-				{
-					let db = result as { [name: string]: string };
-					for (let newProjName of Object.keys(db))
-					{
-						let projDef = db[newProjName];
-						if (projDef)
-							proj4.defs(newProjName, projDef);
-					}
-				}
-				catch (error)
-				{
-					console.error("Failed to parse ProjDatabase.zip:", error);
-				}
-			}
-			else /*!result*/
-			{
-				let error = OpenLayersMapTool.projectionDbPromise.getError();
-
-				if (error)
-				{
-					console.error("ProjDatabase.zip not ready by the time it was needed.");
-					return null;
-				}
-				else
-				{
-					console.error("Failed to retrieve ProjDatabase.zip:", error);
-					return null;
-				}
-			}
-
-			OpenLayersMapTool.projectionDbLoadAttempted = true;
-			proj = ol.proj.get(projectionName);
+				console.error("Invalid projection selected:", projectionName);
 		}
 
 		return proj;
 	}
 
-	static readProjDatabase():WeavePromise<Object>
+	static loadProjDatabase():WeavePromise<boolean>
 	{
 		return weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip")).then(
 			(result: Uint8Array) => JSZip().loadAsync(result)
@@ -153,6 +120,16 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			(zip: JSZip) => zip.file("ProjDatabase.json").async("string")
 		).then(
 			JSON.parse
+		).then(
+			(db: { [name: string]: string }) =>
+			{
+				for (let newProjName of Object.keys(db)) {
+					let projDef = db[newProjName];
+					if (projDef)
+						proj4.defs(newProjName, projDef);
+				}
+				return true;
+			}
 		);
 	}
 
