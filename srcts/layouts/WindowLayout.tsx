@@ -152,6 +152,38 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 		this.setSessionState(state);
 	}
 
+	onDragStart(panelDragged:WeavePathArray, event:React.DragEvent)
+	{
+		// (event as any).dataTransfer.setDragImage(this.rootLayout.getElementFromId(panelDragged), 0, 0);
+		event.dataTransfer.setData('text/plain', JSON.stringify({
+			layout: Weave.findPath(Weave.getRoot(this), this),
+			panelDragged
+		}));
+		console.log("drag start", event);
+	}
+
+	onDrag(panelDragged:WeavePathArray, event:React.DragEvent)
+	{
+		console.log("dragging", event);
+	}
+
+	onDrop(event:React.DragEvent)
+	{
+		var dragData = AbstractLayout.readDragData(event);
+		var panelDragged = dragData.panelDragged;
+		var otherLayout = Weave.followPath(Weave.getRoot(this), dragData.layout) as AbstractLayout;
+
+		console.log(otherLayout);
+		console.log(ReactUtils.findComponent(Weave.followPath(Weave.getRoot(this), panelDragged) as AbstractLayout), AbstractLayout);
+		// remove the panel from the other layout;
+		// add it to this layout;
+		if(otherLayout && otherLayout != this)
+		{
+			otherLayout.removePanel(panelDragged);
+			this.addPanel(panelDragged);
+		}
+	}
+
 	render():JSX.Element
 	{
 		var weave = Weave.getWeave(this);
@@ -166,6 +198,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 						overflow: "hidden"
 					})
 				}
+			    onDrop={this.onDrop.bind(this)}
 			>
 				{
 					state.panels.map(state => {
@@ -186,6 +219,8 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 								key={key}
 								liveMoving={true}
 								liveResizing={false}
+								onDragStart={this.onDragStart.bind(this, state.id)}
+								onDrag={this.onDrag.bind(this, state.id)}
 								movable={!state.maximized}
 								resizable={!state.maximized}
 								getExternalOverlay={() => this.overlay}
