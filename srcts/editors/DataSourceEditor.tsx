@@ -243,8 +243,11 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		var leaf = newLeaf;
 		if (leaves.indexOf(leaf) < 0)
 			leaf = leaves[0];
-	
-		weavejs.data.ColumnUtils.firstDataSet = leaves as any[];
+
+		if(!branch.hasChildBranches())//tool config drop downs should have only columns as options
+			weavejs.data.ColumnUtils.firstDataSet = leaves as any[];
+		else
+			weavejs.data.ColumnUtils.firstDataSet = null;
 		
 		var ref = Weave.AS(leaf, IColumnReference);
 		this.column = weavejs.WeaveAPI.AttributeColumnCache.getColumn(ref && ref.getDataSource(), ref && ref.getColumnMetadata());
