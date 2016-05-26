@@ -10,6 +10,7 @@ import {forceUpdateWatcher} from "../utils/WeaveReactUtils";
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
+import ReactElement = __React.ReactElement;
 
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
@@ -124,27 +125,41 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	// Has to be handled here as this.refs[this.state.activeCrumb] will be availble only at this stage of the React Component cycle
 	componentDidUpdate()
 	{
-		if(this.isCrumbClicked && this.refs && this.refs[this.state.activeCrumb]) // if component go mounted due to crumb click
+		if(this.isCrumbClicked && this.activeEditor) // if component go mounted due to crumb click
 		{
 			this.isCrumbClicked = false;
 			let stateObj:any = this.mapping_crumb_children_state[this.state.activeCrumb] ; // get the state object which was stored , while editor component was unmounted
 			if(stateObj)
-				(this.refs[this.state.activeCrumb] as any).setState(stateObj);
+				(this.activeEditor as any).setState(stateObj);
 		}
 	}
 
 
-
+	private activeEditor:Element;
 
 	render()
 	{
-		if (this.tool)
+		if (this.tool && this.crumbOrder.length == 1){
 			this.mapping_crumb_children[this.displayName] = this.tool.renderEditor(this.pushCrumb);
+		}
+
 		
 		var crumbStyle:React.CSSProperties = {
 			alignItems:"center"
 		};
-		var editorUI:JSX.Element[] | JSX.Element = this.mapping_crumb_children[this.state.activeCrumb];
+
+		let originalEditorUI = this.mapping_crumb_children[this.state.activeCrumb];
+
+		// cloned to add ref function to get the reference of active editor
+		// which helep in setting the state back when it was mounted
+		let editorUI = React.cloneElement(originalEditorUI,{ref: (e:Element) =>{
+			if(typeof originalEditorUI.ref == 'function') // this ensures any ref attached in original Element still works
+			{
+				let refFunction:Function = originalEditorUI.ref as Function;
+				refFunction(e);
+			}
+			this.activeEditor = e;
+		}});
 
 		var crumbUI:JSX.Element = (
 			<div className="ui breadcrumb">
@@ -201,7 +216,6 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		let backButtonUI:JSX.Element = null;
 		if (this.crumbOrder.length > 1)
 		{
-			let prevCrumbTitle:string = this.crumbOrder[this.crumbOrder.length - 2];
 			backButtonUI = (
 				<Button onClick={ this.stepBackInCrumbView }>
 					<i className="fa fa-chevron-left"/>

@@ -846,9 +846,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(pushCrumb:Function): any
 	{
-		// ref is given the same names as crumb name to identify in crumb event
-		let displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.constructor as new (..._: any[]) => any)
-		return <OpenLayersMapToolEditor tool={this} ref={displayName} pushCrumb={pushCrumb}/>
+		return <OpenLayersMapToolEditor tool={this} pushCrumb={pushCrumb}/>
 	}
 
 	componentDidMount():void
