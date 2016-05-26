@@ -17,13 +17,13 @@ export default class Button extends React.Component<ButtonProps, ButtonState>
 	}
 	
 	static defaultProps:ButtonProps = {
-		colorClass: "primary"
+		colorClass: ""
 	}
 	
 	render()
 	{
 		return (
-			<button {...this.props} className={"ui " + (this.props.color ? this.props.color:"") + " button " + (this.props.className || "")}>
+			<button {...this.props} className={"ui " + this.props.colorClass + " button " + (this.props.className || "")}>
 				{
 					this.props.children
 				}
