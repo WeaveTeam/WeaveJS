@@ -47,8 +47,10 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as lodash from "lodash";
 import * as moment from "moment";
+import * as ol from "openlayers";
 
 weavejs.util.StandardLib.lodash = lodash;
+weavejs.util.StandardLib.ol = ol;
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 
 import * as jquery from "jquery";
