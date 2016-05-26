@@ -20,7 +20,7 @@ var URLRequestUtils = weavejs.WeaveAPI.URLRequestUtils;
 
 
 export interface IOpenFileProps {
-	openUrlHandler:(url:string) => void;
+	openUrlHandler:(url:string, pushHistory:boolean) => void;
 	openFileHandler:(file:File) => void;
 }
 
@@ -231,7 +231,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 							{this.state.fileInfo ?
 								<Button
 									onClick={() => {
-					                    this.props.openUrlHandler("/" + this.state.fileInfo.fileName);
+					                    this.props.openUrlHandler("/" + this.state.fileInfo.fileName, true);
 					                    PopupWindow.close(FileDialog.window);
 									}}
 								>

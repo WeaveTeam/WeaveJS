@@ -266,10 +266,22 @@ export default class FileMenu implements MenuBarItemProps
 			return this.weave.root.requestObject('', type);
 		return results[0];
 	}
+
+	static buildUrl=(url:String)=>
+	{
+		return `${window.location.protocol}//${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}` +
+			`${window.location.pathname}?file=${url}`;
+	}
 	
-	loadUrl=(url:string)=>
+	loadUrl=(url:string, pushHistory = false)=>
 	{
 		this.fileName = String(url).split('/').pop();
+
+		if (pushHistory)
+		{
+			history.pushState(null, "", FileMenu.buildUrl(url));
+		}
+
 		WeaveArchive.loadUrl(this.weave, String(url), this.updatePropgressIndicator);
 	};
 	
