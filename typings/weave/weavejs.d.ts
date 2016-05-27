@@ -2580,21 +2580,8 @@ declare module weavejs.api.data {
 }
 declare module weavejs.api.data {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
-    /**
-     * An object with a list of named DynamicColumn and/or ILinkableHashMap objects that an AttributeSelectorPanel can link to.
-     */
     interface ISelectableAttributes extends ILinkableObject {
-        /**
-         * This function should be defined with override by subclasses.
-         * @return An Array of names corresponding to the objects returned by getSelectableAttributes().
-         *         These names will be passed to lang() before being displayed to the user.
-         */
-        getSelectableAttributeNames(): Array<string>;
-        /**
-         * This function should be defined with override by subclasses.
-         * @return An Array of DynamicColumn and/or ILinkableHashMap objects that an AttributeSelectorPanel can link to.
-         */
-        getSelectableAttributes(): Array<(IColumnWrapper & weavejs.api.core.ILinkableDynamicObject) | weavejs.api.core.ILinkableHashMap>;
+        selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
     }
     var ISelectableAttributes: new (..._: any[]) => ISelectableAttributes;
 }
@@ -6604,8 +6591,7 @@ declare module weavejs.data.source {
         keyColumn: DynamicColumn;
         dataColumns: ILinkableHashMap;
         constructor();
-        getSelectableAttributeNames(): any[];
-        getSelectableAttributes(): any[];
+        selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
         getHierarchyRoot(): IWeaveTreeNode;
     }
 }
@@ -6703,16 +6689,14 @@ declare module weavejs.data.source {
 declare module weavejs.data.source {
     import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
     import ILinkableVariable = weavejs.api.core.ILinkableVariable;
-    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
     import DynamicColumn = weavejs.data.column.DynamicColumn;
-    import AbstractDataSource = weavejs.data.source.AbstractDataSource;
     class GroupedDataTransform extends AbstractDataSource implements ISelectableAttributes {
         static DATA_COLUMNNAME_META: string;
         constructor();
-        getSelectableAttributeNames(): any[];
-        getSelectableAttributes(): any[];
+        selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
         groupByColumn: DynamicColumn;
         groupKeyType: LinkableString;
         dataColumns: ILinkableHashMap;
@@ -6727,14 +6711,12 @@ declare module weavejs.data.source {
     import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
     import LinkableString = weavejs.core.LinkableString;
     import DynamicColumn = weavejs.data.column.DynamicColumn;
-    import AbstractDataSource = weavejs.data.source.AbstractDataSource;
     class SpatialJoinTransform extends AbstractDataSource implements ISelectableAttributes {
         geometryColumn: DynamicColumn;
         xColumn: DynamicColumn;
         yColumn: DynamicColumn;
         pointProjection: LinkableString;
-        getSelectableAttributes(): any[];
-        getSelectableAttributeNames(): any[];
+        selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
         constructor();
     }
 }
