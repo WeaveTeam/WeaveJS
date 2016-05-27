@@ -186,6 +186,6 @@ export default class GeometryLayer extends AbstractFeatureLayer
 Weave.registerClass(
 	GeometryLayer,
 	["weavejs.layer.GeometryLayer", "weave.visualization.plotters::GeometryPlotter"],
-	[weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 	"Geometries"
 );

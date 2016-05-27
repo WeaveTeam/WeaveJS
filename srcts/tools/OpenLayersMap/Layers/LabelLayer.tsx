@@ -194,6 +194,6 @@ export default class LabelLayer extends AbstractGlyphLayer
 Weave.registerClass(
 	LabelLayer,
 	["weavejs.layer.LabelLayer", "weave.visualization.plotters::TextGlyphPlotter"],
-	[weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 	"Labels"
 );
