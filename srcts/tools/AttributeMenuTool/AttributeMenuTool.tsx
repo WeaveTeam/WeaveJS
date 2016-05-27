@@ -201,16 +201,14 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	{
 		var openToolNames:{label:string, value:any}[] = [];
 
-		console.log("w", Weave.getDescendants(this.weaveRoot, weavejs.api.data.ISelectableAttributes));
-
-		Weave.getDescendants(this.weaveRoot, weavejs.api.data.ISelectableAttributes).forEach((tool:any):void => {
+		Weave.getDescendants(this.weaveRoot, weavejs.api.data.ISelectableAttributes).forEach((toolOrLayer:any):void => {
 
 			// excluding AttributeMenuTool from the list
-			if (tool.selectableAttributes && Weave.className(tool) != Weave.className(this.props.attributeMenuTool))
+			if (Weave.className(toolOrLayer) != Weave.className(this.props.attributeMenuTool))
 			{
 				openToolNames.push({
-					label: this.weaveRoot.getName(tool),
-					value: Weave.findPath(this.weaveRoot, tool)
+					label: Weave.findPath(this.weaveRoot, toolOrLayer).join(', '),
+					value: Weave.findPath(this.weaveRoot, toolOrLayer)
 				});
 			}
 		});
@@ -220,7 +218,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	//UI event handler for target Tool
 	handleTargetToolChange = (selectedItem:string):void =>
 	{
-		this.props.attributeMenuTool.targetToolPath.state = [selectedItem];
+		this.props.attributeMenuTool.targetToolPath.state = selectedItem;
 	};
 
 	get tool():IVisTool
