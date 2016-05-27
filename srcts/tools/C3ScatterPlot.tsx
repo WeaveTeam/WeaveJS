@@ -415,6 +415,6 @@ export default class C3ScatterPlot extends AbstractC3Tool
 Weave.registerClass(
 	C3ScatterPlot,
 	["weavejs.tool.C3ScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
-	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 	"Scatter Plot"
 );

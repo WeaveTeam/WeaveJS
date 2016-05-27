@@ -149,7 +149,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 Weave.registerClass(
 	AttributeMenuTool,
 	["weavejs.tool.AttributeMenu", "weave.ui::AttributeMenuTool"],
-	[weavejs.api.ui.IVisTool],
+	[weavejs.api.ui.IVisTool, weavejs.api.data.ISelectableAttributes],
 	"Attribute Menu Tool"
 );
 
@@ -201,21 +201,9 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	{
 		var openToolNames:{label:string, value:any}[] = [];
 
-		this.weaveRoot.getObjects().forEach((tool:any):void => {
-			//handling map special case because right now only map tool has layers //TODO implement layer interface for checking?
-			/*if(tool instanceof OpenLayersMapTool)
-			{
-				//in case of the Map, not the tool but the layers have selectableAttributes
-				tool.layers.getObjects().forEach((layer:AbstractLayer)=>
-				{
-					if(layer.selectableAttributes.size > 0)
-					{
-						var name = this.weaveRoot.getName(tool) + ': ' + tool.layers.getName(layer);
-						openToolNames.push(Weave.findPath(this.weaveRoot, tool));
-					}
-				});
-			}*/
+		console.log("w", Weave.getDescendants(this.weaveRoot, weavejs.api.data.ISelectableAttributes));
 
+		Weave.getDescendants(this.weaveRoot, weavejs.api.data.ISelectableAttributes).forEach((tool:any):void => {
 
 			// excluding AttributeMenuTool from the list
 			if (tool.selectableAttributes && Weave.className(tool) != Weave.className(this.props.attributeMenuTool))
