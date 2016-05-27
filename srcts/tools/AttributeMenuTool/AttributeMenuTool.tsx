@@ -46,6 +46,8 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	{
 		super(props);
 		this.state = {};
+
+		this.targetToolPath.addGroupedCallback(this, this.setToolWatcher)
 	}
 
 	//session properties
@@ -54,7 +56,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
 	public selectedAttribute = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
 
-	public targetToolPath = Weave.linkableChild(this, new LinkableVariable(Array), this.setToolWatcher.bind(this));
+	public targetToolPath = Weave.linkableChild(this, new LinkableVariable(Array));
 	public targetAttribute = Weave.linkableChild(this, LinkableString);
 	toolWatcher = Weave.privateLinkableChild(this, LinkableWatcher);
 	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
@@ -65,12 +67,13 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	}
 
 	//callback for targetToolPath
-	setToolWatcher():void
+	setToolWatcher =():void =>
 	{
 		this.toolWatcher.targetPath = this.targetToolPath.state as string[];
-		this.handleSelection(this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn);
+		if(this.selectedAttribute.state)
+			this.handleSelection(this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn);
 		this.forceUpdate();
-	}
+	};
 
 	get title():string
 	{
@@ -218,7 +221,8 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	//UI event handler for target Tool
 	handleTargetToolChange = (selectedItem:string):void =>
 	{
-		this.props.attributeMenuTool.targetToolPath.state = selectedItem;
+		if(selectedItem)
+			this.props.attributeMenuTool.targetToolPath.state = selectedItem;
 	};
 
 	get tool():IVisTool
@@ -231,18 +235,18 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 		return this.tool ? weavejs.util.JS.mapKeys(this.tool.selectableAttributes) : [];
 	}
 
-	getTargetToolPath= ():string =>
+	getTargetToolPath= ():string[] =>
 	{
 		let toolPath = this.props.attributeMenuTool.targetToolPath.state as string[];
-		return (toolPath[0] as string);
+		return toolPath;
 	};
 
 	get toolConfigs():React.ReactChild[][]
 	{
-		var toolName:string;
+		var toolPath:string[];
 
 		if (this.props.attributeMenuTool.targetToolPath.state)
-			toolName = this.getTargetToolPath();
+			toolPath = this.getTargetToolPath();
 		
 		return [
 			[
@@ -253,7 +257,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 				<ComboBox
 					className="weave-sidebar-dropdown"
 					placeholder={Weave.lang("Select a chart")}
-					value={ toolName }
+					value={ toolPath }
 					options={ this.state.openToolNames }
 					onChange={ this.handleTargetToolChange }
 				/>
