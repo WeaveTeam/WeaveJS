@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 
-import Tabs from "../react-ui/tabs";
+import Tabs from "../react-ui/Tabs";
 import DataSourceManager from "../ui/DataSourceManager";
 import DataMenu from "../menus/DataMenu";
 import {WeavePathArray} from "./AbstractLayout";
