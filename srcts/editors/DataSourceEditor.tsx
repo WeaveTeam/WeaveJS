@@ -197,7 +197,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let root = this.props.dataSource.getHierarchyRoot();
 		// <label style={ { fontWeight: "bold" } }> { Weave.lang("Edit {0}", this.props.dataSource.getLabel()) } </label>
 		return (
-			<VBox className="ui basic segment" style={ {flex: 1, border: "none"} }>
+			<VBox className="ui basic segment" style={ {border: "none"} }>
 				<div className="ui medium dividing header">{Weave.lang("Configure")}</div>
 				{
 					this.renderFields()

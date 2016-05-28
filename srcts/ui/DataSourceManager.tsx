@@ -162,10 +162,10 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 
 		return (
-			<HBox className="ui horizontal segments" style={ {flex:1, overflow:'auto'} }>
-				<VBox style={{width: 250}}>
-					<VBox className="ui vertical attached segments" style={{flex:1}}>
-						<VBox className="ui basic segment" style={{flex: 2, overflow: "auto"}}>
+			<HBox className="ui bottom attached segments" style={ {flex:1, overflow:'auto'} }>
+				<VBox style={{width: 250}} className="weave-data-source-manager-sidebar">
+					<VBox className="ui vertical inverted attached segments" style={{flex:1, justifyContent:"space-between"}}>
+						<VBox className="ui basic inverted segment" style={{flex:1, overflow: "auto"}}>
 							<div className="ui medium dividing header">{Weave.lang("Connected sources")}</div>
 							<VBox>
 								<List
@@ -176,15 +176,15 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 								/>
 							</VBox>
 						</VBox>
-						<VBox className="ui segment" style={{flex: 1, overflow: "auto"}}>
+						<VBox className="ui inverted segment" style={{overflow: "auto"}}>
 							<div className="ui meadium dividing header">{Weave.lang("Add more...")}</div>
 							{
 								this.props.dataMenu.getDataSourceItems().map((dsItem, index) => {
 									return dsItem.shown
-										?   <HBox key={index} style={{justifyContent: "space-between"}}>
-												{Weave.lang(dsItem.label as string)}
-												<CenteredIcon onClick={() => dsItem.click()} className="" iconProps={{ className:"fa fa-plus" }}/>
-											</HBox>
+										?   <HBox key={index} onClick={() => dsItem.click()} className="weave-data-source-item" style={{justifyContent: "space-between", padding: 5}}>
+										{Weave.lang(dsItem.label as string)}
+										<CenteredIcon className="" iconProps={{ className:"fa fa-plus" }}/>
+									</HBox>
 										:   null
 								})
 							}

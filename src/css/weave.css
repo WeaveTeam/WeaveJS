@@ -383,7 +383,7 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-tab-content { /* border left , comes from container to cover label region too , top comes from label to distinct the active label */
-	padding: 8px;
+	/*padding: 8px;*/
 	border-right: 1px solid #ddd;
 }
 
@@ -597,6 +597,21 @@ div.weave-tree-view {
 	background-color : #99D6FF;
 }
 
+div.ui.inverted.segment .weave-list-Item{
+	background-color: inherit;
+}
+
+div.ui.inverted.segment .weave-list-Item:hover{
+	color: white;
+}
+div.ui.inverted.segment .weave-list-Item-selected{
+	background-color: #C78A36;
+	color: white;
+}
+div.ui.inverted.segment .weave-list-Item-selected:hover{
+	background-color: rgb(222, 168, 94);
+}
+
 /* sidebar */
 .weave-sidebar-dropdown {
 	min-width: 0 !important;
@@ -805,6 +820,12 @@ div.weave-tree-view {
 	background-color: rgba(0,0,0,.5);
 }
 
+/****** Inverted Segment *******/
+.ui.inverted,.ui.inverted.segment {
+	background: rgba(60,64,63,0.9);
+	color: rgba(161,164,163,1.0);
+}
+
 .weave-dropzone-file {
 	width: 100%;
 	height: 100%;
@@ -823,4 +844,9 @@ div.weave-tree-view {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.weave-data-source-manager-sidebar .weave-data-source-item:hover {
+	color: white;
+	cursor: pointer;
 }
