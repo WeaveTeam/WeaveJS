@@ -8,24 +8,24 @@ import DataMenu  from "../menus/DataMenu";
 import FileMenu from "../menus/FileMenu";
 
 
-export interface StepByStepGuidanceProps extends React.HTMLProps<StepByStepGuidance>
+export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComponent>
 {
     weave:Weave;
 	createObject:(type:new(..._:any[])=>any)=>void;
 }
 
-export interface StepByStepGuidanceState
+export interface GetStartedComponentState
 {
 	visible:boolean
 }
 
-export default class StepByStepGuidance extends React.Component<StepByStepGuidanceProps, StepByStepGuidanceState>
+export default class GetStartedComponent extends React.Component<GetStartedComponentProps, GetStartedComponentState>
 {
 
 
 	private dataMenu:DataMenu = null;
 	private fileMenu:FileMenu = null;
-	constructor(props:StepByStepGuidanceProps)
+	constructor(props:GetStartedComponentProps)
 	{
 		super(props);
 		this.dataMenu = new DataMenu(props.weave, props.createObject);
@@ -35,7 +35,7 @@ export default class StepByStepGuidance extends React.Component<StepByStepGuidan
 		}
 	}
 
-	componentWillReceiveProps(nextProps:StepByStepGuidanceProps)
+	componentWillReceiveProps(nextProps:GetStartedComponentProps)
 	{
 		
 	}

@@ -8,7 +8,7 @@ import {HBox, VBox} from "./react-ui/FlexBox";
 import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
 import DynamicComponent from "./ui/DynamicComponent";
-import StepByStepGuidance from "./ui/StepByStepGuidance";
+import GetStartedComponent from "./ui/GetStartedComponent";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./layouts/FlexibleLayout";
 import {LayoutState} from "./react-ui/flexible-layout/Layout";
@@ -444,7 +444,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						props={{itemRenderer: this.renderTool}}
 					/>
 
-					{ this.urlParams.file || Boolean(this.urlParams.skipGuidance) ? null : <StepByStepGuidance weave={weave} createObject={this.createObject} /> }
+					{ this.urlParams.file || Boolean(this.urlParams.skipGuidance) ? null : <GetStartedComponent weave={weave} createObject={this.createObject} /> }
 
 				</SideBarContainer>
 				{
