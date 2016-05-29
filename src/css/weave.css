@@ -713,12 +713,12 @@ div.weave-tree-view {
 	z-index:1;
 	min-width: 100px;
 	max-width: 500px;
-	border-radius: 4px;
 	box-shadow: 0 2px 8px rgba(0,0,0,.4);
+	border: 1px solid #FFBE00;
 }
 
 .weave-guidance-toolTip-arrow {
-	border: 8px solid black;
+	border: 8px solid #FFBE00;
 }
 
 /* Override Semantic ui CSS*/

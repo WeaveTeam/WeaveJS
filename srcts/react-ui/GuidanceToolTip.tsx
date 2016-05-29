@@ -7,6 +7,7 @@ export interface GuidanceToolTipProps extends React.HTMLProps<GuidanceToolTip>
 {
 	location:string;
 	type: string;
+	onClose?:Function
 }
 
 export interface GuidanceToolTipState
@@ -51,6 +52,12 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 
 	}
 
+	closeHandler=()=>{
+		if(this.props.onClose){
+			this.props.onClose();
+		}
+	}
+
 
 	render() {
 
@@ -61,7 +68,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 		}
 
 
-		let typeUI:JSX.Element = <span style={{color:"orange"}}>{this.props.type} : </span>;
+		let typeUI:JSX.Element = <span style={{color:"#FFBE00"}}>{this.props.type} : </span>;
 
 		// needs to be realtive as we want absolute children to behave respective to this relative parent position
 		let relativeParentStyle:React.CSSProperties = {
@@ -181,12 +188,37 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderRightColor = "transparent";
 		}
 
+		let closeButtonUI:JSX.Element = null;
+		if(this.props.type === GuidanceToolTip.DONE)
+		{
+			let closeButtonStyle:React.CSSProperties = {
+				position:"absolute",
+				left:"50%",
+				padding:"2px",
+				paddingLeft:"6px",
+				paddingRight:"6px",
+				borderRadius:"50%",
+				background:"red",
+				border:"1px solid white",
+				color:"white",
+				cursor:"pointer"
+			};
+
+			closeButtonUI = <div style={{position:"relative"}}>
+								<div style={closeButtonStyle} onClick={this.closeHandler}>X</div>
+							</div>
+		}
+
+
+
 		return (<div style={ relativeParentStyle }>
+
 					<div style={ wrapperStyle }>
 						<div style={containerStyle} className="weave-guidance-toolTip">
 							{typeUI}
 							{this.props.children}
 							<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
+							{closeButtonUI}
 						</div>
 					</div>
 

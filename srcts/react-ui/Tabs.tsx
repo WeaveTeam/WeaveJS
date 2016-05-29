@@ -2,6 +2,7 @@ import * as React from "react";
 import CenteredIcon from "./CenteredIcon";
 import {HBox, VBox} from "./FlexBox";
 import  GuidanceToolTip from "./GuidanceToolTip";
+import  GuidanceContainer from "./GuidanceContainer";
 import classNames from "../modules/classnames";
 
 const TOP:"top" = "top";
@@ -58,22 +59,38 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 			<HBox key="tabs" className={classNames("weave-tab-label-container", this.props.location)}>
 				{
 					this.props.labels.map((label, index) => {
+						let labelUI:React.ReactChild | React.ReactChild[]= null;
+						if(this.props.enableGuidance && this.props.guideToTab == label && this.state.activeTabIndex != index)
+						{
+							labelUI =   <GuidanceContainer direction={GuidanceContainer.HORIZONTAL}
+							                          location={GuidanceToolTip.RIGHT}
+							                          type={GuidanceContainer.NEXT}
+							                          toolTip={"Click " +  label}>
+											<div style={{color:"white"}}>{label}
+											{
+												this.props.onTabClose
+													?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
+													:   null
+											}</div>
+
+										</GuidanceContainer>;
+						}
+						else
+						{
+							labelUI = [
+										label,
+										this.props.onTabClose
+											?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
+											:   null
+							          ]
+						}
+						
 						return (
 							<HBox key={index}
 							      className={classNames("weave-padded-hbox", "weave-tab-label", {"weave-tab-label-active": this.state.activeTabIndex == index}, this.props.location)}
 							      onClick={() => this.changeTabView(index)}
 							>
-								{label}
-								{
-									this.props.onTabClose
-									?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
-									:   null
-								}
-								{
-									this.props.enableGuidance && this.props.guideToTab == label && this.state.activeTabIndex != index
-										?   <GuidanceToolTip location="right" type={GuidanceToolTip.NEXT}> Click {label}</GuidanceToolTip>
-										: null
-								}
+								{labelUI}
 							</HBox>
 						);
 					})
