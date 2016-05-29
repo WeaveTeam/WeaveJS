@@ -1,5 +1,7 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import GuidanceToolTip from "../react-ui/GuidanceToolTip";
+import GuidanceContainer from "../react-ui/GuidanceContainer";
 import {ListOption} from "../react-ui/List";
 import List from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
@@ -39,6 +41,7 @@ import ForeignDataMappingTransformEditor from "../editors/ForeignDataMappingTran
 
 import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
+
 
 
 export interface IDataSourceManagerProps
@@ -148,22 +151,41 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 			else
 				editorJsx = <span>{Weave.lang("Editor not yet implemented for this data source type.")}</span>;
 		}
-		else
+		
+
+		let addButtonUI:JSX.Element = null;
+		if(this.props.dataMenu)
 		{
-			editorJsx = <span>{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}</span>;
+			if(listOptions.length == 0 )
+			{
+				addButtonUI = <GuidanceContainer direction={GuidanceContainer.HORIZONTAL}
+				                                 location={GuidanceToolTip.RIGHT}
+				                                 type={GuidanceContainer.START}
+				                                 toolTip="Here">
+									<MenuButton menu={ this.props.dataMenu.getDataSourceItems() }
+									            showIcon={false}
+									            style={{width: "100%"}}>
+										<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
+										{Weave.lang('Add data')}
+									</MenuButton>
+								</GuidanceContainer>
+			}
+			else
+			{
+				addButtonUI =   <MenuButton menu={ this.props.dataMenu.getDataSourceItems() }
+								            showIcon={false}
+								            style={{width: "100%"}}>
+									<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
+									{Weave.lang('Add data')}
+								</MenuButton>;
+			}
 		}
+
 
 		return (
 			<HBox className="weave-padded-hbox" style={ {flex:1, overflow:'auto'} }>
 				<VBox className="weave-padded-vbox">
-					{
-						this.props.dataMenu
-						?	<MenuButton menu={ this.props.dataMenu.getDataSourceItems() } showIcon={false} style={{width: "100%"}}>
-								<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
-								{Weave.lang('Add data')}
-							</MenuButton>
-						: 	null
-					}
+					{addButtonUI}
 					<VBox className="weave-container" style={ {flex: 1, width: 250, padding: 0} }>
 						<List
 							options={listOptions}

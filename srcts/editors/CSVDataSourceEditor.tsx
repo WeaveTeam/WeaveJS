@@ -5,6 +5,8 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import GuidanceToolTip from "../react-ui/GuidanceToolTip";
+import GuidanceContainer from "../react-ui/GuidanceContainer";
 import FileSelector from "../ui/FileSelector";
 import FixedDataTable from "../tools/FixedDataTable";
 import DataSourceEditor from "./DataSourceEditor";
@@ -34,6 +36,11 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	onUrlChange()
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
+		if(ds.url.value){
+			this.setState({
+				guideToTab:"Browse"
+			})
+		}
 		if (ds.keyType.value === null && ds.url.value)
 		{
 			ds.keyType.value = ds.url.value;
@@ -72,6 +79,8 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			return {label: ds.getColumnTitle(id), value: id}
 		});
 		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
+
+
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			this.getLabelEditor(ds.label),
 			[
@@ -83,10 +92,19 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 						</VBox>
 					</HelpIcon>
 				</HBox>,
-				<FileSelector targetUrl={ds.url}
-							  placeholder={Weave.lang("http://www.example.com/example.csv")} 
-							  style={{width: "100%"}}
-							  accept={acceptExtension}/>
+						ds.url.value ? <FileSelector targetUrl={ds.url}
+						                             placeholder={Weave.lang("http://www.example.com/example.csv")}
+						                             style={ {width: "100%"} }
+						                             accept={acceptExtension}/>
+							:  <GuidanceContainer direction={GuidanceContainer.VERTICAL}
+							                      location={GuidanceToolTip.BOTTOM_RIGHT}
+							                      type={GuidanceContainer.NEXT}
+							                      toolTip="Click to add CSV File">
+							<FileSelector targetUrl={ds.url}
+							              placeholder={Weave.lang("http://www.example.com/example.csv")}
+							              style={ {width: "100%"} }
+							              accept={acceptExtension}/>
+						</GuidanceContainer>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>

@@ -9,6 +9,7 @@ import {HBox, VBox} from "./react-ui/FlexBox";
 import PopupWindow from "./react-ui/PopupWindow";
 import WeaveMenuBar from "./WeaveMenuBar";
 import DynamicComponent from "./ui/DynamicComponent";
+import GetStartedComponent from "./ui/GetStartedComponent";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import FlexibleLayout from "./layouts/FlexibleLayout";
 import {LayoutState} from "./react-ui/flexible-layout/Layout";
@@ -119,7 +120,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
 	
-	urlParams:{ file: string, editable: boolean };
+	urlParams:{ file: string, editable: boolean , skipGuidance:boolean};
 	
 	componentDidMount()
 	{
@@ -340,15 +341,18 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			                             onCloseHandler={this.handleSideBarClose}
 			                             style={ {flex:1} }
 			                             className="weave-ToolEditor"/>
+
+		this.urlParams = MiscUtils.getUrlParams();
 		
 		return (
 			<VBox
 				className="weave-app"
 				{...this.props as React.HTMLAttributes}
 				style={_.merge({flex: 1}, this.props.style)}
-				onContextMenu={ContextMenu.open}
-			>
+				onContextMenu={ContextMenu.open}>
+
 				<WeaveProgressBar/>
+
 				<SideBarContainer barSize={.4} leftChildren={ sideBarUI }>
 					<WeaveComponentRenderer
 						weave={weave}
@@ -357,6 +361,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						style={{width: "100%", height: "100%"}}
 						props={{panelRenderer: this.renderTool}}
 					/>
+
+					{ this.urlParams.file || Boolean(this.urlParams.skipGuidance) ? null : <GetStartedComponent weave={weave} createObject={this.createObject} /> }
+
 				</SideBarContainer>
 				{
 					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
@@ -368,6 +375,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						/>
 					:	null
 				}
+
 			</VBox>
 		);
 	}

@@ -2,6 +2,8 @@ import * as React from "react";
 import * as _ from "lodash";
 import CenteredIcon from "./CenteredIcon";
 import {HBox, VBox} from "./FlexBox";
+import  GuidanceToolTip from "./GuidanceToolTip";
+import  GuidanceContainer from "./GuidanceContainer";
 import classNames from "../modules/classnames";
 
 const TOP:"top" = "top";
@@ -26,7 +28,9 @@ export interface TabsProps extends React.Props<Tabs>
 	tabLabelClassName?:string;
 	tabLabelStyle?:React.CSSProperties;
 	tabBarClassName?:string;
-	tabBarStyle?:React.CSSProperties
+	tabBarStyle?:React.CSSProperties;
+	enableGuidance?:boolean;
+	guideToTab?:string;
 }
 
 export interface TabsState
@@ -48,7 +52,9 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 	static defaultProps:TabsProps = {
 		labels: [],
 		tabs: [],
-		location: "top"
+		location: "top",
+		enableGuidance:false,
+		guideToTab:""
 	};
 
 	changeTabView(index:number)
@@ -68,18 +74,39 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 			>
 				{
 					this.props.labels.map((label, index) => {
+						let labelUI:React.ReactChild | React.ReactChild[]= null;
+						if(this.props.enableGuidance && this.props.guideToTab == label && this.state.activeTabIndex != index)
+						{
+							labelUI =   <GuidanceContainer direction={GuidanceContainer.HORIZONTAL}
+							                          location={GuidanceToolTip.RIGHT}
+							                          type={GuidanceContainer.NEXT}
+							                          toolTip={"Click " +  label}>
+											<div style={{color:"white"}}>{label}
+											{
+												this.props.onTabClose
+													?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
+													:   null
+											}</div>
+
+										</GuidanceContainer>;
+						}
+						else
+						{
+							labelUI = [
+										label,
+										this.props.onTabClose
+											?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
+											:   null
+							          ]
+						}
+						
 						return (
 							<HBox key={index}
 							      className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
 							      style={this.props.tabLabelStyle}
 							      onClick={() => this.changeTabView(index)}
 							>
-								{label}
-								{
-									this.props.onTabClose
-									?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
-									:   null
-								}
+								{labelUI}
 							</HBox>
 						);
 					})

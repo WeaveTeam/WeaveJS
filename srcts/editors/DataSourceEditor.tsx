@@ -11,6 +11,8 @@ import WeaveTree from "../ui/WeaveTree";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
 import Tabs from "../react-ui/Tabs";
+import GuidanceToolTip from "../react-ui/GuidanceToolTip";
+import GuidanceContainer from "../react-ui/GuidanceContainer";
 import Input from "../semantic-ui/Input";
 import MenuButton from '../react-ui/MenuButton';
 import ChartsMenu from "../menus/ChartsMenu";
@@ -41,6 +43,7 @@ export interface IDataSourceEditorState {
 	selectedBranch?: IWeaveTreeNode;
 	selectedLeaf?: IWeaveTreeNode;
 	showPreviewView?: boolean;
+	guideToTab?:string;
 };
 
 export default class DataSourceEditor extends SmartComponent<IDataSourceEditorProps, IDataSourceEditorState> 
@@ -153,6 +156,29 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	renderBrowseView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
+
+		let createChartButtonUI:JSX.Element = null;
+		if(this.props.chartsMenu)
+		{
+			let buttonUi:JSX.Element = <MenuButton menu={ this.props.chartsMenu.getCreateObjectItems() } style={{width: "100%"}} showIcon={false}>
+											<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>
+											{Weave.lang('Create a chart')}
+										</MenuButton>;
+			if(this.state.guideToTab == "Browse" )
+			{
+				createChartButtonUI = <GuidanceContainer direction={GuidanceContainer.VERTICAL}
+				                                 location={GuidanceToolTip.BOTTOM}
+				                                 type={GuidanceContainer.DONE}
+				                                 toolTip="Click to add Chart">
+										{buttonUi}
+									</GuidanceContainer>
+			}
+			else
+			{
+				createChartButtonUI =   buttonUi;
+			}
+		}
+
 		return (
 			<VBox style={{flex: 1}}>
 				<HBox className={root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
@@ -165,14 +191,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 						/>
 					</VBox>
 					<VBox className="weave-padded-vbox" style={{flex: 1, overflow: 'auto'}}>
-						{
-							this.props.chartsMenu
-								?	<MenuButton menu={ this.props.chartsMenu.getCreateObjectItems() } style={{width: "100%"}} showIcon={false}>
-										<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>
-										{Weave.lang('Create a chart')}
-									</MenuButton>
-								: 	null
-						}
+						{createChartButtonUI}
+
 						<WeaveTree
 							root={this.state.selectedBranch}
 							hideRoot={true}
@@ -288,6 +308,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 				activeTabIndex={activeTabIndex}
 				tabs={Array.from(tabs.values())}
 				onViewChange={() => this.forceUpdate()}
+				enableGuidance={true}
+				guideToTab={this.state.guideToTab}
 			/>
 		);
 	}
