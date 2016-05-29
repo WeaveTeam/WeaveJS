@@ -176,6 +176,6 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 Weave.registerClass(
 	ScatterPlotLayer,
 	["weavejs.layer.ScatterPlotLayer", "weave.visualization.plotters::ScatterPlotPlotter"],
-	[weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 	"Bubbles"
 );
