@@ -608,6 +608,7 @@ div.ui.inverted.segment .weave-list-Item-selected{
 	background-color: #C78A36;
 	color: white;
 }
+
 div.ui.inverted.segment .weave-list-Item-selected:hover{
 	background-color: rgb(222, 168, 94);
 }
@@ -818,6 +819,13 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 /****** Dimmer ********/
 .ui.dimmer {
 	background-color: rgba(0,0,0,.5);
+}
+
+/****** Modal *********/
+.ui.modal>.close {
+	top: 1.0535rem;
+	right: 1rem;
+	color: rgba(0,0,0,.87);
 }
 
 /****** Inverted Segment *******/

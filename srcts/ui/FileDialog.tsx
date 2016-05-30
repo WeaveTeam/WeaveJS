@@ -13,6 +13,7 @@ import Button from "../semantic-ui/Button";
 import FileInput from "../react-ui/FileInput";
 import Login from "../ui/admin/Login";
 import SmartComponent from "./SmartComponent";
+import ConfirmationDialog from "./ConfirmationDialog";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
@@ -44,8 +45,8 @@ export class LocalFileOpen extends React.Component<IOpenFileProps, IOpenFileStat
 	handleFileChange=(event:React.FormEvent)=>
 	{
 		let file = (event.target as HTMLInputElement).files[0] as File;
-		this.props.openFileHandler(file);
-		PopupWindow.close(FileDialog.window);
+		if (file)
+			FileDialog.openHandler(file, this.props.openFileHandler);
 	};
 
 	render():JSX.Element
@@ -65,9 +66,8 @@ export class LocalFileOpen extends React.Component<IOpenFileProps, IOpenFileStat
 						activeStyle={{border: "8px solid #CCC"}}
 					    onDropAccepted={(files:File[]) => {
 							files.map((file) => {
-								this.props.openFileHandler(file);
+								FileDialog.openHandler(file,this.props.openFileHandler);
 							});
-							PopupWindow.close(FileDialog.window);
 						}}
 					    onDropRejected={(files:File[]) => {
 							this.setState({
@@ -234,8 +234,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 							{this.state.fileInfo ?
 								<Button
 									onClick={() => {
-					                    this.props.openUrlHandler("/" + this.state.fileInfo.fileName);
-					                    PopupWindow.close(FileDialog.window);
+										FileDialog.openHandler("/" + this.state.fileInfo.fileName,this.props.openUrlHandler);
 									}}
 								>
 									{Weave.lang("Load Session")}
@@ -261,10 +260,10 @@ export interface IFileDialogState
 }
 
 export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDialogState> {
-	static window:PopupWindow;
 	static listItems:{[key:string]:string}[] = [{label: "My Computer" , iconClass:"fa fa-desktop"}, {label: "Weave Server", iconClass: "fa fa-server"}];
 	static activeListIndex:number = 0;
-	element:Element;
+	static element:Element;
+	static notificationSystem:any;
 
 	static storageRegistry = new Map< String, React.ComponentClass<IOpenFileProps>>()
 		.set("My Computer", LocalFileOpen)
@@ -276,29 +275,39 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		this.state = {selected: "My Computer"};
 	}
 
-	static close(window:PopupWindow)
+	static close()
 	{
-		FileDialog.window = null;
+		($(FileDialog.element) as any).modal('hide');
+	}
+	
+	static open()
+	{
+		($(FileDialog.element) as any)
+			.modal({
+				detachable: false,
+				transition: "fade",
+				allowMultiple: true,
+				onDeny: () => {
+					return false;
+				}
+			})
+			.modal('show');
 	}
 
-	static open(openUrl:(url:string) => void, openFile:(file:File) => void)
+	static openHandler(file:string|File,handler:Function)
 	{
-		if (FileDialog.window)
-			PopupWindow.close(FileDialog.window);
-
-		FileDialog.window = PopupWindow.open({
-			title: Weave.lang("File Picker"),
-			content: <FileDialog openUrlHandler={openUrl} openFileHandler={openFile}/>,
-			resizable: true,
-			width: 920,
-			height: 675,
-			onClose: FileDialog.close
-		});
-	}
+		ConfirmationDialog.open(
+			() => {
+				handler(file);
+				FileDialog.close();
+			},
+			() => {},
+			$(FileDialog.element));
+	};
 
 	componentDidMount()
 	{
-		this.element = ReactDOM.findDOMNode(this);
+		FileDialog.element = ReactDOM.findDOMNode(this);
 	}
 
 	render():JSX.Element
@@ -323,23 +332,35 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		});
 		
 		return (
-			<HBox style={{flex: 1}}>
-				<VBox className="weave-container" style={ {width: 150, padding: 0} }>
-					<List
-						options={listOptions}
-						multiple={false}
-						selectedValues={ [fileSource] }
-						onChange={ (selectedValues:string[]) => {
+			<div className="ui fullscreen modal">
+				<i className="close icon"/>
+				<div className="header">
+					{Weave.lang("Open a Weave Session")}
+				</div>
+				<div className="content">
+					<div style={{height: 675, flex: 1, overflow: "auto", display: "flex", flexDirection: "row"}}>
+						<VBox className="ui inverted segment" style={ {width: 150, padding: 0} }>
+							<List
+								options={listOptions}
+								multiple={false}
+								selectedValues={ [fileSource] }
+								onChange={ (selectedValues:string[]) => {
 							this.setState({
 								selected: selectedValues[0]
 							})
 						}}
-					/>
-				</VBox>
-				<VBox style={ {flex: 1, overflow:'auto'} }>
-					{editorJsx}
-				</VBox>
-			</HBox>
+							/>
+						</VBox>
+						<div className="ui basic segment" style={{display: "flex", flex: 1, marginTop: 0, paddingTop: 0}}>
+							{editorJsx}
+						</div>
+					</div>
+					<ConfirmationDialog title={Weave.lang("Load Session:")}
+					                    content={Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.")}
+					                    okButtonContent={Weave.lang("Load Session")}
+					                    cancelButtonContent={Weave.lang("Cancel")}/>
+				</div>
+			</div>
 		)
 	}
 }

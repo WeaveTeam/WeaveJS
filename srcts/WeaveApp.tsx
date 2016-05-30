@@ -24,6 +24,11 @@ import WeaveToolEditor from "./ui/WeaveToolEditor";
 import WeaveArchive from "./WeaveArchive";
 import WindowLayout from "./layouts/WindowLayout";
 import {AbstractLayout, WeavePathArray} from "./layouts/AbstractLayout";
+import WeaveLayoutManager from "./layouts/WeaveLayoutManager";
+import DataMenu from "./menus/DataMenu";
+import LayoutsMenu from "./menus/LayoutsMenu";
+import FileMenu from "./menus/FileMenu";
+import FileDialog from "./ui/FileDialog";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -37,9 +42,6 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
-import WeaveLayoutManager from "./layouts/WeaveLayoutManager";
-import DataMenu from "./menus/DataMenu";
-import LayoutsMenu from "./menus/LayoutsMenu";
 
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -61,9 +63,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	enableMenuBarWatcher:LinkableWatcher;
 	menuBar:WeaveMenuBar;
 	layoutManager:WeaveLayoutManager;
+	notificationSystem:any;
 
 	layoutsMenu:LayoutsMenu;
 	dataMenu:DataMenu;
+	fileMenu:FileMenu;
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
@@ -75,11 +79,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		super(props);
 		this.state = {
 			toolPathToEdit: null
-		}
+		};
 		this.dataMenu = new DataMenu(this.props.weave, this.createObject, () => {
 			if(this.layoutManager)
 				this.layoutManager.openDataSourceManager();
 		});
+		this.fileMenu = new FileMenu(this.props.weave);
 		this.layoutsMenu = new LayoutsMenu(this.props.weave, (layoutType:typeof AbstractLayout) => {
 			if(this.layoutManager)
 				this.layoutManager.addLayout(layoutType)
