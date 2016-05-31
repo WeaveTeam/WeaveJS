@@ -139,7 +139,7 @@ export default class FileMenu implements MenuBarItemProps
 	 *
 	 * @param meta The meta object containing the percentage and file name
 	 */
-	updatePropgressIndicator=(meta:{percent:number, currentFile:string})=>
+	updateProgressIndicator=(meta:{percent:number, currentFile:string})=>
 	{
 		if(!ProgressIndicator.hasTask(meta.currentFile))
 			ProgressIndicator.addTask(meta.currentFile, meta.percent/100);
@@ -182,7 +182,7 @@ export default class FileMenu implements MenuBarItemProps
 		
 		if (!dataFilesOnly && ext == 'weave')
 		{
-            WeaveArchive.setWeaveSessionFromContent(this.weave, fileContent, this.updatePropgressIndicator);
+            WeaveArchive.setWeaveSessionFromContent(this.weave, fileContent, this.updateProgressIndicator);
 			return;
 		}
 		
@@ -282,7 +282,7 @@ export default class FileMenu implements MenuBarItemProps
 			history.pushState(null, "", FileMenu.buildUrl(url));
 		}
 
-		WeaveArchive.loadUrl(this.weave, String(url), this.updatePropgressIndicator);
+		WeaveArchive.loadUrl(this.weave, String(url), this.updateProgressIndicator);
 	};
 	
 	private _adminConsole: any;
@@ -312,7 +312,7 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		if (this.adminConsole)
 		{
-			var promise = WeaveArchive.serialize(this.weave, this.updatePropgressIndicator);
+			var promise = WeaveArchive.serialize(this.weave, this.updateProgressIndicator);
 			promise.then(
 				(result: Uint8Array)=>
 				{
@@ -329,7 +329,7 @@ export default class FileMenu implements MenuBarItemProps
 	};
 
 	private _saveFile = (newFilename:string) => {
-		var promise = WeaveArchive.serialize(this.weave, this.updatePropgressIndicator);
+		var promise = WeaveArchive.serialize(this.weave, this.updateProgressIndicator);
 		promise.then(
 			(result:Uint8Array)=>
 			{
