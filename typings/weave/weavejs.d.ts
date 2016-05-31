@@ -3557,6 +3557,11 @@ declare module weavejs.core {
         getInstance(): T & ILinkableObject;
         setInstance(instance: T): void;
         /**
+         * Tells the LinkablePlaceholder that its current state should be ignored when it is later replaced with an instance.
+         */
+        invalidateState(): void;
+        setSessionState(value: Object): void;
+        /**
          * @return success flag
          */
         /**
