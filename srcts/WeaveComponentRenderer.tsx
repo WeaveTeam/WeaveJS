@@ -17,6 +17,7 @@ export interface IWeaveComponentRendererProps extends React.HTMLProps<WeaveCompo
 	path:typeof LinkableWatcher.prototype.targetPath,
 	defaultType?:React.ComponentClass<any>,
 	requestType?:React.ComponentClass<any>,
+	onCreate?:(instance:ILinkableObject) => void,
 	props?:any
 }
 
@@ -59,6 +60,21 @@ export default class WeaveComponentRenderer extends SmartComponent<IWeaveCompone
 		this.watcher.targetPath = props.path;
 		this.handleWatcher(props);
 	}
+	
+	requestObject(weave:Weave, path:typeof LinkableWatcher.prototype.targetPath, type:React.ComponentClass<any>):void
+	{
+		var wasEmpty = !this.watcher.target;
+		weave.requestObject(path, type);
+		var lp = Weave.AS(weave.getObject(path), LinkablePlaceholder);
+		if (wasEmpty && lp)
+		{
+			lp.invalidateState();
+			Weave.getCallbacks(lp).addDisposeCallback(this, () => {
+				if (this.props.onCreate && lp.getInstance() && this.props.weave === weave && _.isEqual(this.props.path, path))
+					this.props.onCreate(lp.getInstance());
+			});
+		}
+	}
 
 	handleWatcher(props:IWeaveComponentRendererProps = null):void
 	{
@@ -68,9 +84,9 @@ export default class WeaveComponentRenderer extends SmartComponent<IWeaveCompone
 		if (props.weave)
 		{
 			if (props.requestType)
-				props.weave.requestObject(props.path, props.requestType);
+				this.requestObject(props.weave, props.path, props.requestType);
 			else if (props.defaultType && !this.watcher.target)
-				props.weave.requestObject(props.path, props.defaultType);
+				this.requestObject(props.weave, props.path, props.defaultType);
 		}
 		
 		var ComponentClass = LinkablePlaceholder.getClass(this.watcher.target) as React.ComponentClass<any> & typeof ILinkableObject;
