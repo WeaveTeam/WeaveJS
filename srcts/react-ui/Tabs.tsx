@@ -15,8 +15,6 @@ export interface TabsProps extends React.Props<Tabs>
 	tabs:JSX.Element[];
 	location?:"top"|"bottom";
 	tabBarChildren?:React.ReactChild;
-	onTabAdd?:React.MouseEventHandler;
-	onTabClose?:(index:number, event:React.MouseEvent) => void;
 	activeTabIndex?:number;
 	onViewChange?:(index:number) => void;
 	className?:string;
@@ -80,13 +78,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 						                          location={GuidanceToolTip.RIGHT}
 						                          type={GuidanceContainer.NEXT}
 						                          toolTip={"Click " +  label}>
-										<div style={enableGuidance?{color:"white"}:null}>{label}
-										{
-											this.props.onTabClose
-												?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
-												:   null
-										}</div>
-
+										{label}
 									</GuidanceContainer>;
 
 						
@@ -100,17 +92,6 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 							</HBox>
 						);
 					})
-				}
-				{
-					this.props.onTabAdd
-					?   <HBox
-							className={classNames(this.props.tabLabelClassName || "weave-tab-label", this.props.location)}
-							style={this.props.tabLabelStyle}
-					        onClick={this.props.onTabAdd}
-						>
-							<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")} iconProps={{ className: "fa fa-plus" }}/>
-						</HBox>
-					:   null
 				}
 				{
 					this.props.tabBarChildren

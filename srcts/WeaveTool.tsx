@@ -18,7 +18,7 @@ import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import SmartComponent from "./ui/SmartComponent";
 import classNames from "./modules/classnames";
 import DraggableDiv from "./react-ui/DraggableDiv";
-import AbstractLayout from "./layouts/AbstractLayout";
+import {AbstractLayout, AnyAbstractLayout} from "./layouts/AbstractLayout";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -112,7 +112,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	
 	onMaximizeClick=():void=>
 	{
-		var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AbstractLayout;
+		var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AnyAbstractLayout;
 		if (layout)
 			layout.maximizePanel(this.props.path, !this.props.maximized);
 	};
@@ -127,7 +127,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 
 	onCloseClick=():void=>
 	{
-		var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AbstractLayout;
+		var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AnyAbstractLayout;
 		if (layout)
 		{
 			this.props.weave.removeObject(this.props.path);

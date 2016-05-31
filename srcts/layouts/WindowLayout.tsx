@@ -9,7 +9,7 @@ import ReactUtils from "../utils/ReactUtils";
 import DraggableDiv from "../react-ui/DraggableDiv";
 import {DraggableDivState} from "../react-ui/DraggableDiv";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
-import {AbstractLayout, LayoutProps, WeavePathArray} from "./AbstractLayout";
+import {AbstractLayout, LayoutProps, WeavePathArray, AnyAbstractLayout} from "./AbstractLayout";
 import Div from "../react-ui/Div";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -44,7 +44,7 @@ const stateStructure:Structure = {
 	title: "string"
 };
 
-export default class WindowLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
+export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 {
 	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({}, stateStructure)), this.forceUpdate, true);
 	private overlay:Div;

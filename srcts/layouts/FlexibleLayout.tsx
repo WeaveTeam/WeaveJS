@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import Layout, {HORIZONTAL, VERTICAL, LayoutState} from "../react-ui/flexible-layout/Layout";
 import Div from "../react-ui/Div";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
-import {AbstractLayout, LayoutProps} from "./AbstractLayout";
+import {AbstractLayout, LayoutProps, AnyAbstractLayout} from "./AbstractLayout";
 import PanelOverlay from "../PanelOverlay";
 import MiscUtils, {Structure} from "../utils/MiscUtils";
 import ReactUtils from "../utils/ReactUtils";
@@ -35,7 +35,7 @@ var stateStructure:any = {
 };
 stateStructure.children = MiscUtils.nullableStructure([stateStructure]);
 
-export default class FlexibleLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
+export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 {
 	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({flex: 1}, stateStructure)), this.forceUpdate, true);
 	private nextState:Object;

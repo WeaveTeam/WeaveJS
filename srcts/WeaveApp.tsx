@@ -1,21 +1,19 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-
 import prefixer from "./react-ui/VendorPrefixer";
-import {MenuItemProps} from "./react-ui/Menu";
 import SideBarContainer from "./react-ui/SideBarContainer";
-import {HBox, VBox} from "./react-ui/FlexBox";
-import PopupWindow from "./react-ui/PopupWindow";
+import {VBox, HBox} from "./react-ui/FlexBox";
 import WeaveMenuBar from "./WeaveMenuBar";
 import DynamicComponent from "./ui/DynamicComponent";
 import GetStartedComponent from "./ui/GetStartedComponent";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
-import FlexibleLayout from "./layouts/FlexibleLayout";
-import {LayoutState} from "./react-ui/flexible-layout/Layout";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
-import {LayoutPanelProps, PanelRenderer} from "./layouts/AbstractLayout";
+import {
+	LayoutPanelProps, PanelRenderer, AbstractLayout, WeavePathArray,
+	AnyAbstractLayout
+} from "./layouts/AbstractLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
@@ -24,8 +22,9 @@ import {forceUpdateWatcher} from "./utils/WeaveReactUtils";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
 import WeaveArchive from "./WeaveArchive";
-import WindowLayout from "./layouts/WindowLayout";
-import {AbstractLayout, WeavePathArray} from "./layouts/AbstractLayout";
+import TabLayout, {LayoutState} from "./layouts/TabLayout";
+import DataMenu from "./menus/DataMenu";
+import FileMenu from "./menus/FileMenu";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -39,7 +38,6 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
-import TabLayout from "./layouts/TabLayout";
 
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -64,7 +62,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
-		renderPath: ['Layout'],
+		renderPath: ['Tabs'],
 		readUrlParams: false
 	};
 
@@ -73,7 +71,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		super(props);
 		this.state = {
 			toolPathToEdit: null
-		}
+		};
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 	}
 	
@@ -93,7 +91,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			return null;
 		return this.props.weave.getObject(this.getRenderPath()) as React.Component<any, any>;
 	}
-
 
 	private createDefaultSessionElements()
 	{
@@ -125,27 +122,22 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	componentDidMount()
 	{
 		this.createDefaultSessionElements();
-		if (this.props.readUrlParams)
-		{
+		if (this.props.readUrlParams) {
 			this.urlParams = MiscUtils.getUrlParams();
 			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.menuBar.systemMenu.fileMenu.pingAdminConsole();
 
-			try
-			{
+			try {
 				var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
 			}
-			catch (e)
-			{
+			catch (e) {
 				console.error(e);
 			}
-			
-			if (this.urlParams.file)
-			{
+
+			if (this.urlParams.file) {
 				// read content from url
 				this.menuBar.systemMenu.fileMenu.loadUrl(this.urlParams.file);
 			}
-			else if (weaveExternalTools && weaveExternalTools[window.name])
-			{
+			else if (weaveExternalTools && weaveExternalTools[window.name]) {
 				// read content from flash
 				var ownerPath:WeavePath = weaveExternalTools[window.name].path;
 				var content:Uint8Array = atob(ownerPath.getValue('btoa(Weave.createWeaveFileContent())') as string) as any;
@@ -193,21 +185,38 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		);
 		popoutWindow = ReactUtils.openPopout(content, onLoad, onBeforeUnLoad, options);
 
-	}
-	
-	renderTool=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
-	{
-		var tool = this.props.weave.getObject(path);
+	};
 
-		if(_.isEqual(path, this.props.renderPath))
-			return (
+	openDataSourceManager=()=>
+	{
+	};
+
+	renderTab=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
+	{
+
+		// backwards compatibility hack
+		var sideBarUI:JSX.Element = null;
+		var toolToEdit = this.props.weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
+		if (toolToEdit && toolToEdit.renderEditor) // hack
+			sideBarUI = <WeaveToolEditor tool={toolToEdit}
+			                             onCloseHandler={this.handleSideBarClose}
+			                             style={ {flex:1} }
+			                             className="weave-ToolEditor"/>;
+		return(
+			<SideBarContainer barSize={.4} leftChildren={ sideBarUI }>
 				<WeaveComponentRenderer
 					weave={this.props.weave}
 					path={path}
+					style={{width: "100%", height: "100%"}}
 					props={{panelRenderer: this.renderTool}}
 				/>
-			);
+			</SideBarContainer>
+		);
+	};
 
+	renderTool=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
+	{
+		var tool = this.props.weave.getObject(path);
 		return (
 			<WeaveTool
 				ref={this.handleWeaveTool}
@@ -220,7 +229,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				onPopoutClick={this.handlePopoutClick}
 			/>
 		);
-	}
+	};
 
 	private toolSet = new Set<WeaveTool>();
 
@@ -228,7 +237,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		if (tool)
 			this.toolSet.add(tool);
-	}
+	};
 
 	// enableGuidance will be given when called from GetStartedComponent
 	createObject=(type:new(..._:any[])=>any,enableGuidance:boolean = false):void=>
@@ -248,7 +257,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		{
 			DataSourceManager.openInstance(this.menuBar.dataMenu, instance as IDataSource,enableGuidance);
 		}
-		
+
 		if (React.Component.isPrototypeOf(type))
 		{
 			var placeholder = Weave.AS(instance, LinkablePlaceholder);
@@ -257,7 +266,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			this.setState({ toolPathToEdit: path });
 			this.addToLayout(this.getRenderPath(), path);
 		}
-	}
+	};
 
 	//sorts the array of column refs by numeric columns
 	//TODO put this function elsewhere?
@@ -294,9 +303,62 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.forceUpdate();
 	}
 
+	get tabLayout():TabLayout
+	{
+		return this.props.weave.getObject(this.getRenderPath()) as TabLayout;
+	}
+
+	private initializeTabs=(tabLayout:TabLayout)=>
+	{
+		var tabLayoutState:LayoutState = tabLayout.getSessionState();
+		var panels = tabLayoutState && tabLayoutState.panels;
+		var activePanelId = tabLayoutState && tabLayoutState.activePanelId;
+		var title = tabLayoutState && tabLayoutState.title;
+
+		if(!panels || (panels && !panels.length))
+		{
+			var layouts = this.props.weave.root.getObjects(AbstractLayout as any, true).filter((obj:ILinkableObject) => {
+				if(LinkablePlaceholder.getClass(obj) == TabLayout)
+					return false;
+				return true;
+			});
+			panels = layouts.map((layout) => {
+				return {
+					id: Weave.findPath(this.props.weave.root, layout),
+					label: this.props.weave.root.getName(layout)
+				}
+			});
+		}
+		if(!activePanelId)
+		{
+			activePanelId = panels[0] && panels[0].id;
+		};
+
+		if(!title)
+		{
+			title = this.props.weave.root.getName(this.tabLayout);
+		}
+
+		tabLayout.setSessionState({
+			panels,
+			activePanelId,
+			title
+		});
+	};
+
+	addNewLayout=(type:typeof AbstractLayout, tabLayout:TabLayout)=>
+	{
+		
+	};
+
+	removeExisingLayout=(id:WeavePathArray, event:React.MouseEvent)=>
+	{
+
+	};
+
 	addToLayout(layoutPath:WeavePathArray, panelPath:WeavePathArray)
 	{
-		var layout = Weave.AS(this.props.weave.getObject(layoutPath), AbstractLayout as any) as AbstractLayout;
+		var layout = Weave.AS(this.props.weave.getObject(layoutPath), AbstractLayout as any) as AnyAbstractLayout;
 		if (layout)
 			layout.addPanel(panelPath);
 	}
@@ -305,7 +367,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		var panel = Weave.AS(this.props.weave.getObject(panelPath), React.Component);
 		var element = panel && ReactDOM.findDOMNode(panel);
-		var layout = element && ReactUtils.findComponent(element.parentElement, AbstractLayout as any) as AbstractLayout;
+		var layout = element && ReactUtils.findComponent(element.parentElement, AbstractLayout as any) as AnyAbstractLayout;
 		if (layout)
 			layout.removePanel(panelPath);
 	}
@@ -333,7 +395,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		if (!weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
-		
+
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
@@ -344,28 +406,35 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			                             className="weave-ToolEditor"/>
 
 		this.urlParams = MiscUtils.getUrlParams();
-		
+		// { this.urlParams.file || Boolean(this.urlParams.skipGuidance) ? null : <GetStartedComponent weave={weave} createObject={this.createObject} /> }
+
 		return (
 			<VBox
 				className="weave-app"
 				{...this.props as React.HTMLAttributes}
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}>
-
 				<WeaveProgressBar/>
-
-				<SideBarContainer barSize={.4} leftChildren={ sideBarUI }>
-					<WeaveComponentRenderer
-						weave={weave}
-						path={renderPath}
-						defaultType={FlexibleLayout}
-						style={{width: "100%", height: "100%"}}
-						props={{panelRenderer: this.renderTool}}
-					/>
-
-					{ this.urlParams.file || Boolean(this.urlParams.skipGuidance) ? null : <GetStartedComponent weave={weave} createObject={this.createObject} /> }
-
-				</SideBarContainer>
+				<WeaveComponentRenderer
+					weave={weave}
+					path={renderPath}
+					defaultType={TabLayout}
+					style={{width: "100%", height: "100%"}}
+					onCreate={this.initializeTabs}
+					props={ {
+						panelRenderer: this.renderTab,
+						leadingTabs: [
+							{
+								label: "Data Sources",
+								content: (
+									<HBox>{"Data Sources"}</HBox>
+								)
+							}
+						],
+						onAdd: this.addNewLayout,
+						onClose: this.removeExisingLayout
+					}}
+				/>
 				{
 					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
 					?	<WeaveMenuBar
@@ -376,7 +445,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						/>
 					:	null
 				}
-
 			</VBox>
 		);
 	}

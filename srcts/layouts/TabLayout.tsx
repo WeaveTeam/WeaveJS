@@ -3,9 +3,10 @@ import * as _ from "lodash";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
 import {AbstractLayout, LayoutProps, WeavePathArray} from "./AbstractLayout";
 import Tabs from "../react-ui/Tabs";
-import {VBox} from "../react-ui/FlexBox";
+import {VBox, HBox} from "../react-ui/FlexBox";
 import ReactUtils from "../utils/ReactUtils";
 import MiscUtils, {Structure} from "../utils/MiscUtils";
+import CenteredIcon from "../react-ui/CenteredIcon";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 
@@ -14,6 +15,17 @@ export interface PanelState
 	id: WeavePathArray,
 	label: string
 }
+
+export interface TabLayoutProps extends LayoutProps
+{
+	leadingTabs: {
+		label: React.ReactChild,
+		content: JSX.Element
+	}[];
+	onAdd: React.MouseEventHandler;
+	onClose: (panelId:WeavePathArray) => void;
+}
+
 export interface LayoutState
 {
 	panels: PanelState[];
@@ -32,11 +44,11 @@ const stateStructure:Structure = {
 	title: "string"
 };
 
-export default class TabLayout extends AbstractLayout implements weavejs.api.core.ILinkableVariable
+export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 {
 	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({}, stateStructure)), this.forceUpdate, true);
 
-	constructor(props:LayoutProps)
+	constructor(props:TabLayoutProps)
 	{
 		super(props);
 	}
@@ -63,9 +75,10 @@ export default class TabLayout extends AbstractLayout implements weavejs.api.cor
 	switchPanelToActive=(index:number):void=>
 	{
 		var state = this.getSessionState();
-		state.activePanelId = state.panels[index].id;
+		var activePanel = state.panels[index];
+		state.activePanelId = activePanel && activePanel.id;
 		this.setSessionState(state);
-	}
+	};
 
 	private getPanelIndex(id:WeavePathArray):number
 	{
@@ -104,7 +117,7 @@ export default class TabLayout extends AbstractLayout implements weavejs.api.cor
 	{
 		var weave = Weave.getWeave(this);
 		var state = this.getSessionState();
-		var activeTabIndex = this.getPanelIndex(state.activePanelId);
+		var activeTabIndex = this.getPanelIndex(state.activePanelId) + (this.props.leadingTabs ? this.props.leadingTabs.length : 0);
 
 		return (
 			<VBox
@@ -114,18 +127,34 @@ export default class TabLayout extends AbstractLayout implements weavejs.api.cor
 			>
 				<Tabs
 					location="bottom"
-					labels={state.panels.map(panel => panel.label)}
+					labels={
+						this.props.leadingTabs.map(tab => tab.label)
+						.concat(state.panels.map(panel => (
+							<HBox className="weave-padded-hbox">
+								{panel.label}
+							    <CenteredIcon
+							        onClick={() => this.props.onClose(panel.id)}
+							        className="weave-tab-icon"
+							        title={Weave.lang("Close")}
+							        iconProps={{ className:"fa fa-times-circle" }}
+							    />
+							</HBox>
+						)))
+					}
 					onViewChange={this.switchPanelToActive}
 					activeTabIndex={activeTabIndex}
-					tabs={state.panels.map(panel => (
-						this.props.panelRenderer
-						?	this.props.panelRenderer(panel.id, {}, this.props.panelRenderer)
-						:	<WeaveComponentRenderer
-								weave={weave}
-								path={panel.id}
-								style={{flex: 1}}
-							/>
-					))}
+					tabs={
+						this.props.leadingTabs.map(tab => tab.content)
+						.concat(state.panels.map(panel => (
+							this.props.panelRenderer
+							?	this.props.panelRenderer(panel.id, {}, this.props.panelRenderer)
+							:	<WeaveComponentRenderer
+									weave={weave}
+									path={panel.id}
+									style={{flex: 1}}
+								/>
+						)))
+					}
 				/>
 			</VBox>
 		);
