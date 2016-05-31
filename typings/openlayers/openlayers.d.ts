@@ -1876,7 +1876,19 @@ declare module ol {
      * Events emitted as map browser events are instances of this type. See ol.Map for which events trigger a map browser event.
      */
     class MapBrowserEvent extends MapEvent {
-
+        static EventType: {
+            SINGLECLICK: string,
+            CLICK: string,
+            DBLCLICK: string,
+            POINTERDRAG: string,
+            POINTERMOVE: string,
+            POINTERDOWN: string,
+            POINTERUP: string,
+            POINTEROUT: string,
+            POINTERENTER: string,
+            POINTERLEAVE: string,
+            POINTERCANCEL: string,
+        };
         /**
          * The coordinate of the original browser event
          */
@@ -1907,7 +1919,6 @@ declare module ol {
          */
         pixel: Pixel;
 
-
         // Methods
 
         /**
@@ -1935,6 +1946,11 @@ declare module ol {
          * The map where the event occurred.
          */
         map: Map;
+
+        /**
+         * The event type.
+         */
+        type: string;
     }
 
     /**
@@ -3533,7 +3549,7 @@ declare module ol {
 
     module interaction {
 
-        class DoubleClickZoom {
+        class DoubleClickZoom extends Interaction {
         }
 
         class DragAndDrop {
