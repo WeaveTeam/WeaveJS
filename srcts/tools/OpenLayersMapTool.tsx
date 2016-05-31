@@ -545,7 +545,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	private updateControlPositions():void
 	{
 		let controls = _.sortBy(this.map.getControls().getArray(), item => OpenLayersMapTool.controlIndex.get(item.constructor));
-		let maxWidth = _.max(controls, (control) => control.element.scrollWidth).element.scrollWidth;
+		let maxWidth: number = 0;
+		if (controls.length > 0)
+		{
+			maxWidth = _.max(controls, (control) => control.element.scrollWidth).element.scrollWidth;
+		}
 
 		let mapWidth = this.map.getSize()[0];
 		let mapHeight = this.map.getSize()[1];
@@ -959,6 +963,10 @@ class OpenLayersMapToolEditor extends SmartComponent<IOpenLayersMapToolEditorPro
 						<HBox>
 							<ComboBox ref={linkReactStateRef(this, { value: this.props.tool.controlLocation }) } options={controlLocationOpts}/>
 						</HBox>
+					],
+					[
+						Weave.lang("Show zoom to extent button"),
+						<Checkbox ref={linkReactStateRef(this, {value: this.props.tool.showZoomExtentButton}) } label={" "}/>
 					],
 					[
 						Weave.lang("Show zoom buttons"),
