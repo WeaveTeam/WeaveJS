@@ -51,6 +51,7 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import LinkableNumber = weavejs.core.LinkableNumber;
+import LinkableCallbackScript = weavejs.core.LinkableCallbackScript;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import ColumnUtils = weavejs.data.ColumnUtils;
@@ -245,7 +246,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return true;
 	}
 
-
 	map:ol.Map;
 
 	centerCallbackHandle:any;
@@ -283,6 +283,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	controlLocation = Weave.linkableChild(this, new LinkableVariable(null, isAlignment, {vertical: "top", horizontal: "left"}));
 
+	eventScript = Weave.linkableChild(this, new LinkableCallbackScript());
+	eventFilter = Weave.linkableChild(this, new LinkableVariable(Array, Array.isArray, []));
+
 	get title():string
 	{
 		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || this.defaultPanelTitle;
@@ -294,6 +297,9 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		/* Force the inclusion of the layers. */
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
+
+		this.eventScript.groupedCallback.value = false;
+		this.eventScript.delayWhilePlaceholders.value = true;
 
 		weavejs.WeaveAPI.Scheduler.callLater(this, this.initLater);
 	}
@@ -408,6 +414,56 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
+	/* For use by the event script */
+	inputEvent: string;
+	inputRecord: IQualifiedKey;
+	inputColumns: IAttributeColumn[];
+
+	handleGenericEvent=(event: ol.MapBrowserEvent):boolean=>
+	{
+		if (!_.contains(this.eventFilter.state as string[], event.type))
+		{
+			return true;
+		}
+
+		this.inputEvent = event.type;
+
+		if (event.pixel)
+		{
+			let olFeature: ol.Feature;
+			let olLayer:ol.layer.Layer;
+			event.map.forEachFeatureAtPixel(event.pixel,
+				(f, l) => { return [olFeature, olLayer] = [f, l] }
+			);
+
+			if (olFeature && olLayer)
+			{
+				this.inputRecord = olFeature.getId();
+				let layer: AbstractLayer = olLayer.get("layerObject");
+				this.inputColumns = Array.from(layer.selectableAttributes.values());
+			}
+			else
+			{
+				this.inputRecord = null;
+				this.inputColumns = [];
+			}
+		}
+		else
+		{
+			this.inputRecord = null;
+			this.inputColumns = [];
+		}
+
+		Weave.getCallbacks(this.eventScript).triggerCallbacks();
+		console.log(`${this.inputEvent}: ${this.inputRecord}, ${this.inputColumns}`);
+
+		this.inputEvent = null;
+		this.inputRecord = null;
+		this.inputColumns = [];
+
+		return false;
+	}
+
 	initializeMap():void
 	{
 		Menu.registerMenuSource(this);
@@ -426,7 +482,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let dragSelect = new DragSelection();
 		let probeInteraction = new ProbeInteraction(this);
 		let dragZoom = new CustomDragZoom();
-
+		
+		/* 
+		 * !!! Order here matters !!!
+		 * Most recently added interactions will get the first pass of the event;
+		 * interactions which greedily stop propagation should be added first.
+		 */
+		this.map.addInteraction(new ol.interaction.Interaction({ handleEvent: this.handleGenericEvent }));
 		this.map.addInteraction(dragPan);
 		this.map.addInteraction(dragSelect);
 		this.map.addInteraction(probeInteraction);
