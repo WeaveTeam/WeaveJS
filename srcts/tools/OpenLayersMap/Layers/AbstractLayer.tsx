@@ -7,6 +7,7 @@ import StatefulRangeSlider from "../../../ui/StatefulRangeSlider";
 import ComboBox from "../../../semantic-ui/ComboBox";
 import Checkbox from "../../../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../../../utils/WeaveReactUtils";
+import DynamicComponent from "../../../ui/DynamicComponent";
 import SelectableAttributeComponent from "../../../ui/SelectableAttributeComponent";
 import ReactUtils from "../../../utils/ReactUtils";
 import {renderSelectableAttributes} from "../../IVisTool";
@@ -20,13 +21,14 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
 import WeaveAPI = weavejs.WeaveAPI;
 
 
 export type EditableField = [
 	LinkableBoolean|LinkableString|LinkableNumber,
 	(string | {label: string, value: any })[]
-] | LinkableVariable;
+] | LinkableVariable | IFilteredKeySet;
 
 import Bounds2D = weavejs.geom.Bounds2D;
 
@@ -64,6 +66,16 @@ export default class AbstractLayer implements ILinkableObject
 			lv = value[0];
 			options = value[1];
 		}
+		else if (Weave.IS(value, IFilteredKeySet)) {
+			let fks = Weave.AS(value, IFilteredKeySet);
+			return [
+				Weave.lang(key),
+				<DynamicComponent dependencies={[fks]} render={()=>
+					<Checkbox key={key} label={" "} value={!fks.keyFilter.target}
+						onChange={(value) => { fks.keyFilter.targetPath = value ? null : ['defaultSubsetKeyFilter'] } }/>
+				}/>
+			]
+		}
 
 		if (key == "Opacity")
 		{
@@ -73,8 +85,7 @@ export default class AbstractLayer implements ILinkableObject
 			]
 		}
 
-		if (lv instanceof LinkableString || lv instanceof LinkableNumber)
-		{
+		if (lv instanceof LinkableString || lv instanceof LinkableNumber) {
 			if (typeof options[0] === typeof "") {
 				return [
 					Weave.lang(key),
@@ -87,21 +98,20 @@ export default class AbstractLayer implements ILinkableObject
 					<ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>
 				];
 			}
-			else
-			{
+			else {
 				return [
 					Weave.lang(key),
 					<StatefulTextField key={key} ref={linkReactStateRef(this, { value: lv }) }/>
 				];
 			}
 		}
-		else
-		{
+		else if (lv instanceof LinkableBoolean) {
 			return [
 				Weave.lang(key),
 				<Checkbox key={key} ref={linkReactStateRef(this, { value: lv }) } label={" "}/>
 			];
-		}		
+		}
+		else return ["",""];
 	}
 
 	renderEditableFields(): React.ReactChild[][]

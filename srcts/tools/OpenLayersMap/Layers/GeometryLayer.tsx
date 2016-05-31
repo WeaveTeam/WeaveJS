@@ -35,6 +35,11 @@ export default class GeometryLayer extends AbstractFeatureLayer
 			.set("Line Thickness", this.line.normalizedWeightColumn);
 	}
 
+	get editableFields()
+	{
+		return super.editableFields.set("Ignore subset", this.filteredKeySet);
+	}
+
 	constructor()
 	{
 		super();
