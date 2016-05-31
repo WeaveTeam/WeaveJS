@@ -52,6 +52,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 export interface WeaveAppState
 {
 	toolPathToEdit?:WeavePathArray;
+	initialTabForBlankSession?:string;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
@@ -117,7 +118,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
 	
-	urlParams:{ file: string, editable: boolean , skipGuidance:boolean};
+	urlParams:{ file: string, editable: boolean , skipBlankPageIntro:boolean};
 	
 	componentDidMount()
 	{
@@ -382,6 +383,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				tool.setState({ highlightTitle: _.isEqual(nextState.toolPathToEdit, tool.props.path) });
 		}
 	}
+
+	initialLoadingForBlankSession=(type:string):void=>{
+		this.setState({
+			initialTabForBlankSession:type
+		});
+		
+	};
 		
 	get enableMenuBar():LinkableBoolean
 	{
@@ -406,7 +414,63 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			                             className="weave-ToolEditor"/>
 
 		this.urlParams = MiscUtils.getUrlParams();
-		// { this.urlParams.file || Boolean(this.urlParams.skipGuidance) ? null : <GetStartedComponent weave={weave} createObject={this.createObject} /> }
+
+
+
+		let skipBlankPageIntro:boolean = Boolean(this.urlParams.file) || Boolean(this.urlParams.skipBlankPageIntro);
+		let blankPageIntroScreen:JSX.Element = skipBlankPageIntro ? null : <GetStartedComponent style={ {flex:1} }
+		                                                                                        weave={weave}
+		                                                                                        createObject={this.createObject}
+		                                                                                        loader={this.initialLoadingForBlankSession}/>
+
+		let weaveTabbedComponent:JSX.Element = null;
+		if(skipBlankPageIntro || this.state.initialTabForBlankSession == GetStartedComponent.DATA) // default - Data Source Manager Page
+		{
+			weaveTabbedComponent = <WeaveComponentRenderer
+										weave={weave}
+										path={renderPath}
+										defaultType={TabLayout}
+										style={{width: "100%", height: "100%"}}
+										onCreate={this.initializeTabs}
+										props={
+												{
+													panelRenderer: this.renderTab,
+													leadingTabs: [
+														{
+															label: "Data Sources",
+															content: (<HBox>{"Data Source Manager"}</HBox>)
+														}
+													],
+													onAdd: this.addNewLayout,
+													onClose: this.removeExisingLayout
+											    }
+											  }
+									/>;
+		}
+		else if(this.state.initialTabForBlankSession == GetStartedComponent.SESSION)
+		{
+			weaveTabbedComponent = <WeaveComponentRenderer
+										weave={weave}
+										path={renderPath}
+										defaultType={TabLayout}
+										style={{width: "100%", height: "100%"}}
+										onCreate={this.initializeTabs}
+										props={
+												{
+													panelRenderer: this.renderTab,
+													leadingTabs: [
+														{
+															label: "Sessions",
+															content: (<HBox>{"File Picker"}</HBox>)
+														}
+													],
+													onAdd: this.addNewLayout,
+													onClose: this.removeExisingLayout
+											    }
+											  }
+									/>;
+
+		}
 
 		return (
 			<VBox
@@ -415,26 +479,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}>
 				<WeaveProgressBar/>
-				<WeaveComponentRenderer
-					weave={weave}
-					path={renderPath}
-					defaultType={TabLayout}
-					style={{width: "100%", height: "100%"}}
-					onCreate={this.initializeTabs}
-					props={ {
-						panelRenderer: this.renderTab,
-						leadingTabs: [
-							{
-								label: "Data Sources",
-								content: (
-									<HBox>{"Data Sources"}</HBox>
-								)
-							}
-						],
-						onAdd: this.addNewLayout,
-						onClose: this.removeExisingLayout
-					}}
-				/>
+				{blankPageIntroScreen}
+				{weaveTabbedComponent}
+
 				{
 					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
 					?	<WeaveMenuBar

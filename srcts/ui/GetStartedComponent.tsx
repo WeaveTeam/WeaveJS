@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import * as _ from "lodash";
 import {HBox,VBox} from  "../react-ui/FlexBox";
 import FileDialog from  "../ui/FileDialog";
 import DataSourceManager from  "./DataSourceManager";
@@ -12,6 +13,7 @@ export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComp
 {
     weave:Weave;
 	createObject:(type:new(..._:any[])=>any,enableGuidance:boolean)=>void;
+	loader:(type:string)=>void;
 }
 
 export interface GetStartedComponentState
@@ -23,10 +25,13 @@ export interface GetStartedComponentState
 export default class GetStartedComponent extends React.Component<GetStartedComponentProps, GetStartedComponentState>
 {
 
+	static DATA:string = "data";
+	static SESSION:string = "session";
 
 	private dataMenu:DataMenu = null;
 	private fileMenu:FileMenu = null;
 	private enableGuidanceMode:boolean = false;
+
 	constructor(props:GetStartedComponentProps)
 	{
 		super(props);
@@ -52,14 +57,19 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	}
 
 	openDataSourceManager=(enableGuidance:boolean = false)=>{
-		DataSourceManager.openInstance(this.dataMenu,null,enableGuidance);
+		if(enableGuidance){ // temp till new datasoure manager is implemented
+			DataSourceManager.openInstance(this.dataMenu,null,enableGuidance);
+		}else if(this.props.loader)
+			this.props.loader("data");
+		//DataSourceManager.openInstance(this.dataMenu,null,enableGuidance);
 		this.setState({
 			visible:false
 		})
 	}
 
 	openFileDialog=()=>{
-		FileDialog.open(this.fileMenu.loadUrl,this.fileMenu.handleOpenedFile);
+		if(this.props.loader)  this.props.loader("session");
+		//FileDialog.open(this.fileMenu.loadUrl,this.fileMenu.handleOpenedFile);
 		this.setState({
 			visible:false
 		})
@@ -111,34 +121,38 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 							</VBox>
 		}
 
-		return (
-			<div style={containerStyle} className="weave-getstarted">
-				<div style={overlayStyle} className="weave-getstarted-overlay"></div>
-				<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative"} }>
-					<VBox key="data"
-					      className="weave-getstarted-item"
-					      onClick={()=>this.openDataSourceManager(false) }>
-						<i className="fa fa-database"></i>
-						<br/>
-						<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
-					</VBox>
-					<VBox key="charts"
-					      className="weave-getstarted-item"
-					      onClick={this.openFileDialog}>
-						<i className="fa fa-code"></i>
-						<br/>
-						<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
-					</VBox>
-					<VBox key="tutorials"
-					      className="weave-getstarted-item"
-					      onClick={this.enableGuidanceList}>
-						<i className="fa fa-book"></i>
-						<br/>
-						<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Guidance Tour</span></span>
-					</VBox>
-				</HBox>
-				{guidanceListUI}
+		let styleObj:React.CSSProperties = _.merge({},this.props.style,{position:"relative"})
 
+		return (
+			<div style={styleObj}>
+				<div style={containerStyle} className="weave-getstarted">
+					<div style={overlayStyle} className="weave-getstarted-overlay"></div>
+					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative"} }>
+						<VBox key="data"
+						      className="weave-getstarted-item"
+						      onClick={()=>this.openDataSourceManager(false) }>
+							<i className="fa fa-database"></i>
+							<br/>
+							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
+						</VBox>
+						<VBox key="charts"
+						      className="weave-getstarted-item"
+						      onClick={this.openFileDialog}>
+							<i className="fa fa-code"></i>
+							<br/>
+							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
+						</VBox>
+						<VBox key="tutorials"
+						      className="weave-getstarted-item"
+						      onClick={this.enableGuidanceList}>
+							<i className="fa fa-book"></i>
+							<br/>
+							<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Guidance Tour</span></span>
+						</VBox>
+					</HBox>
+					{guidanceListUI}
+
+				</div>
 			</div>);
 	}
 }
