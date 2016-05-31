@@ -472,6 +472,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 							/>
 						:	null
 				}
+				<FileDialog openUrlHandler={this.fileMenu.loadUrl} openFileHandler={this.fileMenu.handleOpenedFile}/>
 			</VBox>
 		);
 	}

@@ -301,7 +301,9 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 				handler(file);
 				FileDialog.close();
 			},
-			() => {},
+			() => {
+				ConfirmationDialog.close();
+			},
 			$(FileDialog.element));
 	};
 
