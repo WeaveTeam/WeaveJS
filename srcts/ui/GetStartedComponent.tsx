@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {VBox} from  "../react-ui/FlexBox";
+import {HBox,VBox} from  "../react-ui/FlexBox";
 import FileDialog from  "../ui/FileDialog";
 import DataSourceManager from  "./DataSourceManager";
 import ControlPanel  from "./ControlPanel";
@@ -16,7 +16,8 @@ export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComp
 
 export interface GetStartedComponentState
 {
-	visible:boolean
+	visible?:boolean
+	showGuidanceList?:boolean
 }
 
 export default class GetStartedComponent extends React.Component<GetStartedComponentProps, GetStartedComponentState>
@@ -31,7 +32,8 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		this.dataMenu = new DataMenu(props.weave, props.createObject);
 		this.fileMenu = new FileMenu(props.weave);
 		this.state = {
-			visible:true
+			visible:true,
+			showGuidanceList:false
 		}
 	}
 
@@ -54,6 +56,12 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		})
 	}
 
+	enableGuidanceList=()=>{
+		this.setState({
+			showGuidanceList:true
+		})
+	}
+
 	render() {
 		if(!this.state.visible)
 			return <div/>;
@@ -65,6 +73,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 			width:"100%",
 			height:"100%",
 			display:"flex",
+			flexDirection:"column",
 			alignItems: "center",
 			justifyContent: "space-around"
 		}
@@ -74,40 +83,46 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 			left:0,
 			top:0,
 			width:"100%",
-			height:"100%",
-			zIndex:0
+			height:"100%"
 		}
 
-		let itemStyle:React.CSSProperties = {
-			zIndex:1
+
+		let guidanceListUI:JSX.Element  = null;
+		if(this.state.showGuidanceList)
+		{
+			guidanceListUI = <VBox style={ {position:"relative"} } className="weave-guidance-list">
+								<span className="weave-guidance-list-item" onClick={this.openDataSourceManager}>CSV Data to Visualization</span>
+								<span className="weave-guidance-list-item" onClick={this.openFileDialog}>How to upload Local Weave File</span>
+							</VBox>
 		}
 
 		return (
-			<div style={containerStyle} className="weave-guidance">
-				<div style={overlayStyle} className="weave-guidance-overlay"></div>
-				<VBox key="data"
-				      className="weave-guidance-item"
-				      style={itemStyle}
-				      onClick={this.openDataSourceManager}>
-					<i className="fa fa-database"></i>
-					<br/>
-					<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
-				</VBox>
-				<VBox key="charts"
-				      className="weave-guidance-item"
-				      style={itemStyle}
-				      onClick={this.openFileDialog}>
-					<i className="fa fa-code"></i>
-					<br/>
-					<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
-				</VBox>
-				<VBox key="tutorials"
-				      className="weave-guidance-item"
-				      style={itemStyle}>
-					<i className="fa fa-book"></i>
-					<br/>
-					<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Tutorials</span></span>
-				</VBox>
+			<div style={containerStyle} className="weave-getstarted">
+				<div style={overlayStyle} className="weave-getstarted-overlay"></div>
+				<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative"} }>
+					<VBox key="data"
+					      className="weave-getstarted-item"
+					      onClick={this.openDataSourceManager}>
+						<i className="fa fa-database"></i>
+						<br/>
+						<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
+					</VBox>
+					<VBox key="charts"
+					      className="weave-getstarted-item"
+					      onClick={this.openFileDialog}>
+						<i className="fa fa-code"></i>
+						<br/>
+						<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
+					</VBox>
+					<VBox key="tutorials"
+					      className="weave-getstarted-item"
+					      onClick={this.enableGuidanceList}>
+						<i className="fa fa-book"></i>
+						<br/>
+						<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Guidance Tour</span></span>
+					</VBox>
+				</HBox>
+				{guidanceListUI}
 
 			</div>);
 	}
