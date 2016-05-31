@@ -11,7 +11,7 @@ export interface GuidanceContainerProps extends React.HTMLProps<GuidanceContaine
 	type?:string, // start | next | done
 	toolTip?:string,
 	enableToolTip?:boolean,//todo
-	enable?:boolean,//todo
+	enable?:boolean,
 	onClose?:Function
 }
 
@@ -61,7 +61,7 @@ export default class GuidanceContainer extends React.Component<GuidanceContainer
 		let urlParams:any = MiscUtils.getUrlParams();
 		let skipGuidance:boolean = Boolean(urlParams.skipGuidance);
 
-		if(this.state.close || skipGuidance)
+		if(this.state.close || skipGuidance || !this.props.enable)
 		{
 			return <div>{this.props.children}</div>
 		}

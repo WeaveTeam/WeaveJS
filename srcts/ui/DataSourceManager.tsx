@@ -156,29 +156,18 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let addButtonUI:JSX.Element = null;
 		if(this.props.dataMenu)
 		{
-			if(listOptions.length == 0 )
-			{
-				addButtonUI = <GuidanceContainer direction={GuidanceContainer.HORIZONTAL}
-				                                 location={GuidanceToolTip.RIGHT}
-				                                 type={GuidanceContainer.START}
-				                                 toolTip="Here">
-									<MenuButton menu={ this.props.dataMenu.getDataSourceItems() }
-									            showIcon={false}
-									            style={{width: "100%"}}>
-										<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
-										{Weave.lang('Add data')}
-									</MenuButton>
-								</GuidanceContainer>
-			}
-			else
-			{
-				addButtonUI =   <MenuButton menu={ this.props.dataMenu.getDataSourceItems() }
+			addButtonUI = <GuidanceContainer enable={listOptions.length == 0 ? true : false}
+			                                 direction={GuidanceContainer.HORIZONTAL}
+			                                 location={GuidanceToolTip.RIGHT}
+			                                 type={GuidanceContainer.START}
+			                                 toolTip="Here">
+								<MenuButton menu={ this.props.dataMenu.getDataSourceItems() }
 								            showIcon={false}
 								            style={{width: "100%"}}>
 									<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
 									{Weave.lang('Add data')}
-								</MenuButton>;
-			}
+								</MenuButton>
+							</GuidanceContainer>
 		}
 
 

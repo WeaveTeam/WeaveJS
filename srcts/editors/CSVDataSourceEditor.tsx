@@ -92,19 +92,16 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 						</VBox>
 					</HelpIcon>
 				</HBox>,
-						ds.url.value ? <FileSelector targetUrl={ds.url}
-						                             placeholder={Weave.lang("http://www.example.com/example.csv")}
-						                             style={ {width: "100%"} }
-						                             accept={acceptExtension}/>
-							:  <GuidanceContainer direction={GuidanceContainer.VERTICAL}
-							                      location={GuidanceToolTip.BOTTOM_RIGHT}
-							                      type={GuidanceContainer.NEXT}
-							                      toolTip="Click to add CSV File">
-							<FileSelector targetUrl={ds.url}
-							              placeholder={Weave.lang("http://www.example.com/example.csv")}
-							              style={ {width: "100%"} }
-							              accept={acceptExtension}/>
-						</GuidanceContainer>
+				<GuidanceContainer enable={ds.url.value ? false : true}
+				                   direction={GuidanceContainer.VERTICAL}
+				                   location={GuidanceToolTip.BOTTOM_RIGHT}
+				                   type={GuidanceContainer.NEXT}
+				                   toolTip="Click to add CSV File">
+					<FileSelector targetUrl={ds.url}
+					              placeholder={Weave.lang("http://www.example.com/example.csv")}
+					              style={ {width: "100%"} }
+					              accept={acceptExtension}/>
+				</GuidanceContainer>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>

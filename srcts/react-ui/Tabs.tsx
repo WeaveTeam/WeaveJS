@@ -75,30 +75,20 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 				{
 					this.props.labels.map((label, index) => {
 						let labelUI:React.ReactChild | React.ReactChild[]= null;
-						if(this.props.enableGuidance && this.props.guideToTab == label && this.state.activeTabIndex != index)
-						{
-							labelUI =   <GuidanceContainer direction={GuidanceContainer.HORIZONTAL}
-							                          location={GuidanceToolTip.RIGHT}
-							                          type={GuidanceContainer.NEXT}
-							                          toolTip={"Click " +  label}>
-											<div style={{color:"white"}}>{label}
-											{
-												this.props.onTabClose
-													?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
-													:   null
-											}</div>
+						let enableGuidance:boolean = this.props.enableGuidance && this.props.guideToTab == label && this.state.activeTabIndex != index;
+						labelUI =   <GuidanceContainer enable={enableGuidance} direction={GuidanceContainer.HORIZONTAL}
+						                          location={GuidanceToolTip.RIGHT}
+						                          type={GuidanceContainer.NEXT}
+						                          toolTip={"Click " +  label}>
+										<div style={enableGuidance?{color:"white"}:null}>{label}
+										{
+											this.props.onTabClose
+												?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
+												:   null
+										}</div>
 
-										</GuidanceContainer>;
-						}
-						else
-						{
-							labelUI = [
-										label,
-										this.props.onTabClose
-											?   <CenteredIcon className="weave-tab-icon" title={Weave.lang("Close")} iconProps={{ className:"fa fa-times-circle" }}/>
-											:   null
-							          ]
-						}
+									</GuidanceContainer>;
+
 						
 						return (
 							<HBox key={index}

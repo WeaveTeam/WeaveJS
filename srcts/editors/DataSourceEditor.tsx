@@ -37,6 +37,7 @@ export type View = typeof PREVIEW | typeof METADATA | typeof BROWSE;
 export interface IDataSourceEditorProps {
 	dataSource: IDataSource;
 	chartsMenu: ChartsMenu;
+	enableGuidance?:boolean;
 };
 
 export interface IDataSourceEditorState {
@@ -160,23 +161,16 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let createChartButtonUI:JSX.Element = null;
 		if(this.props.chartsMenu)
 		{
-			let buttonUi:JSX.Element = <MenuButton menu={ this.props.chartsMenu.getCreateObjectItems() } style={{width: "100%"}} showIcon={false}>
+			createChartButtonUI = <GuidanceContainer enable={this.state.guideToTab == "Browse" ? true :false} direction={GuidanceContainer.VERTICAL}
+			                                 location={GuidanceToolTip.BOTTOM}
+			                                 type={GuidanceContainer.DONE}
+			                                 toolTip="Click to add Chart">
+										<MenuButton menu={ this.props.chartsMenu.getCreateObjectItems() } style={{width: "100%"}} showIcon={false}>
 											<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>
 											{Weave.lang('Create a chart')}
-										</MenuButton>;
-			if(this.state.guideToTab == "Browse" )
-			{
-				createChartButtonUI = <GuidanceContainer direction={GuidanceContainer.VERTICAL}
-				                                 location={GuidanceToolTip.BOTTOM}
-				                                 type={GuidanceContainer.DONE}
-				                                 toolTip="Click to add Chart">
-										{buttonUi}
-									</GuidanceContainer>
-			}
-			else
-			{
-				createChartButtonUI =   buttonUi;
-			}
+										</MenuButton>
+								</GuidanceContainer>
+
 		}
 
 		return (
