@@ -42,6 +42,9 @@ import ForeignDataMappingTransformEditor from "../editors/ForeignDataMappingTran
 import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 
+import SpatialJoinTransform = weavejs.data.source.SpatialJoinTransform;
+import SpatialJoinTransformEditor from "../editors/SpatialJoinTransformEditor";
+
 
 
 export interface IDataSourceManagerProps
@@ -65,6 +68,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
 		.set(GroupedDataTransform, GroupedDataTransformEditor)
+		.set(SpatialJoinTransform, SpatialJoinTransformEditor)
 //
 
 	static selected:IDataSource;
