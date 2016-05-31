@@ -29,6 +29,8 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		return bounds;
 	}
 
+	inputProjection: string;
+
 	get selectionKeySet()
 	{
 		var keySet = this.selectionFilter.target as KeySet;

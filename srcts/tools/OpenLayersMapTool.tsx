@@ -671,8 +671,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	{
 		for (var name of this.layers.getNames())
 		{
-			var layer:GeometryLayer = this.layers.getObject(name) as GeometryLayer;
-			if (!(layer instanceof GeometryLayer))
+			var layer:AbstractFeatureLayer = this.layers.getObject(name) as AbstractFeatureLayer;
+			if (!(layer instanceof AbstractFeatureLayer))
 				continue;
 			for (var sgc of Weave.getDescendants(this.layers.getObject(name), weavejs.data.column.StreamedGeometryColumn))
 			{

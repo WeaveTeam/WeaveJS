@@ -42,6 +42,10 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 		this.filteredKeySet.setColumnKeySources([this.dataX, this.dataY]);
 	}
 
+	get inputProjection(): any {
+		return this.dataX.getMetadata('projection') || this.sourceProjection.value || this.outputProjection;
+	}
+
 	onLayerReady()
 	{
 		super.onLayerReady();
@@ -69,8 +73,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
 		var removedIds = _.difference(this._getFeatureIds(), recordIds);
 
-		var rawProjName = this.dataX.getMetadata("projection") || this.sourceProjection.value || "EPSG:4326";
-		var rawProj = OpenLayersMapTool.getProjection(rawProjName);
+		var rawProj = OpenLayersMapTool.getProjection(this.inputProjection);
 		var mapProj = OpenLayersMapTool.getProjection(this.outputProjection);
 
 		for (let id of removedIds)

@@ -44,6 +44,12 @@ export default class LabelLayer extends AbstractGlyphLayer
 			.set("Hide overlapping text", this.hideOverlappingText);
 	}
 
+	get deprecatedStateMapping() {
+		return _.merge(super.deprecatedStateMapping, {
+			geometryColumn: [{ internalDynamicColumn: this.dataX }, { internalDynamicColumn: this.dataY }]
+		});
+	}
+
 	constructor()
 	{
 		super();
@@ -193,7 +199,7 @@ export default class LabelLayer extends AbstractGlyphLayer
 
 Weave.registerClass(
 	LabelLayer,
-	["weavejs.layer.LabelLayer", "weave.visualization.plotters::TextGlyphPlotter"],
+	["weavejs.layer.LabelLayer", "weave.visualization.plotters::TextGlyphPlotter", "weave.visualization.plotters::GeometryLabelPlotter"],
 	[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 	"Labels"
 );
