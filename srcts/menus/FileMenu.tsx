@@ -141,9 +141,14 @@ export default class FileMenu implements MenuBarItemProps
 	 */
 	updateProgressIndicator=(meta:{percent:number, currentFile:string})=>
 	{
-		if(!ProgressIndicator.hasTask(meta.currentFile))
+		if(!ProgressIndicator.hasTask(meta.currentFile) && meta.percent < 100)
 			ProgressIndicator.addTask(meta.currentFile, meta.percent/100);
-		ProgressIndicator.updateTask(meta.currentFile, meta.percent/100);
+		else if( meta.percent == 100)
+			ProgressIndicator.removeTask(meta.currentFile);
+		else
+			ProgressIndicator.updateTask(meta.currentFile, meta.percent/100);
+
+
 	};
 
     openFile=(e:any)=>
