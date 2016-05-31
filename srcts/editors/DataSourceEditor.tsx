@@ -159,9 +159,10 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let root = this.props.dataSource.getHierarchyRoot();
 
 		let createChartButtonUI:JSX.Element = null;
+		let enableGuidance:boolean = this.props.enableGuidance && this.state.guideToTab == "Browse";
 		if(this.props.chartsMenu)
 		{
-			createChartButtonUI = <GuidanceContainer enable={this.state.guideToTab == "Browse" ? true :false} direction={GuidanceContainer.VERTICAL}
+			createChartButtonUI = <GuidanceContainer enable={enableGuidance} direction={GuidanceContainer.VERTICAL}
 			                                 location={GuidanceToolTip.BOTTOM}
 			                                 type={GuidanceContainer.DONE}
 			                                 toolTip="Click to add Chart">
@@ -302,7 +303,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 				activeTabIndex={activeTabIndex}
 				tabs={Array.from(tabs.values())}
 				onViewChange={() => this.forceUpdate()}
-				enableGuidance={true}
+				enableGuidance={this.props.enableGuidance}
 				guideToTab={this.state.guideToTab}
 			/>
 		);

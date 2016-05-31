@@ -12,7 +12,8 @@ import ChartsMenu from "./ChartsMenu";
 
 export default class DataMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	// optional parameter enableguidance for guidance mode
+	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any,enableGuidance?:boolean)=>void)
 	{
 		this.weave = weave;
 		this.fileMenu = new FileMenu(weave);

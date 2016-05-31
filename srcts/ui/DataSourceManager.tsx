@@ -47,6 +47,7 @@ import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 export interface IDataSourceManagerProps
 {
 	dataMenu:DataMenu;
+	enableGuidance?:boolean;
 }
 
 export interface IDataSourceManagerState
@@ -147,16 +148,17 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
-				editorJsx = <EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu }/>;
+				editorJsx = <EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu } enableGuidance={this.props.enableGuidance}/>;
 			else
 				editorJsx = <span>{Weave.lang("Editor not yet implemented for this data source type.")}</span>;
 		}
 		
 
 		let addButtonUI:JSX.Element = null;
+		let enableGuidance:boolean = this.props.enableGuidance && listOptions.length == 0;
 		if(this.props.dataMenu)
 		{
-			addButtonUI = <GuidanceContainer enable={listOptions.length == 0 ? true : false}
+			addButtonUI = <GuidanceContainer enable={enableGuidance}
 			                                 direction={GuidanceContainer.HORIZONTAL}
 			                                 location={GuidanceToolTip.RIGHT}
 			                                 type={GuidanceContainer.START}
@@ -191,9 +193,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		);
 	}
 
-	static openInstance(dataMenu:DataMenu, selected:IDataSource = null):ControlPanel
+	static openInstance(dataMenu:DataMenu, selected:IDataSource = null,enableGuidance:boolean = false):ControlPanel
 	{
 		DataSourceManager.selected = selected;
-		return ControlPanel.openInstance(dataMenu.weave, DataSourceManager, {title: Weave.lang("Data Sources")}, {dataMenu});
+		return ControlPanel.openInstance(dataMenu.weave, DataSourceManager, {title: Weave.lang("Data Sources")}, {dataMenu,enableGuidance});
 	}
 }

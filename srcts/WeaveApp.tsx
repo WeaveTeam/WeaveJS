@@ -230,7 +230,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			this.toolSet.add(tool);
 	}
 
-	createObject=(type:new(..._:any[])=>any):void=>
+	// enableGuidance will be given when called from GetStartedComponent
+	createObject=(type:new(..._:any[])=>any,enableGuidance:boolean = false):void=>
 	{
 		// need to generate path here instead of letting LinkableHashMap generate a name because async types can't be instantiated immediately
 		var weave = this.props.weave;
@@ -245,7 +246,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		if (Weave.IS(instance, IDataSource))
 		{
-			DataSourceManager.openInstance(this.menuBar.dataMenu, instance as IDataSource);
+			DataSourceManager.openInstance(this.menuBar.dataMenu, instance as IDataSource,enableGuidance);
 		}
 		
 		if (React.Component.isPrototypeOf(type))

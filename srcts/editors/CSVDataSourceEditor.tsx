@@ -80,6 +80,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		});
 		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
 
+		let enableGuidance:boolean = this.props.enableGuidance && !ds.url.value;
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			this.getLabelEditor(ds.label),
@@ -92,7 +93,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 						</VBox>
 					</HelpIcon>
 				</HBox>,
-				<GuidanceContainer enable={ds.url.value ? false : true}
+				<GuidanceContainer enable={enableGuidance}
 				                   direction={GuidanceContainer.VERTICAL}
 				                   location={GuidanceToolTip.BOTTOM_RIGHT}
 				                   type={GuidanceContainer.NEXT}
