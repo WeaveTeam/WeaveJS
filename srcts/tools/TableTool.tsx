@@ -247,32 +247,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.sortInDescendingOrder.value = sortDirection == SortTypes.DESC;
 	};
 
-	sortFunction = (indexA:number, indexB:number, columnKey:string) =>
-	{
-		if(this.state.data)
-		{
-			var valueA = this.state.data[indexA][columnKey];
-			var valueB = this.state.data[indexB][columnKey];
-			var column = this.columns.getObject(columnKey) as IAttributeColumn;
-			var dataType = "string";
-			if(column)
-				dataType = column.getMetadata("dataType");
-			
-			switch(dataType)
-			{
-				case "number":
-					valueA = Number(valueA);
-					valueB = Number(valueB);
-			}
-			if(valueA > valueB)
-				return 1;
-			if(valueA < valueB)
-				return -1;
-			return 0;
-		}
-		return 0;
-	}
-
 	render()
 	{
 		var columnNames = this.columns.getNames(IAttributeColumn);
@@ -304,6 +278,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 Weave.registerClass(
 	TableTool,
 	["weavejs.tool.TableTool", "weave.visualization.tools::TableTool", "weave.visualization.tools::AdvancedTableTool"],
-	[weavejs.api.ui.IVisTool_Utility, weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.ui.IVisTool_Utility, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 	"Table"
 );

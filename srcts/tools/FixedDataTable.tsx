@@ -451,7 +451,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		else
 		{
 			sortIndices.sort((indexA:number, indexB:number) => {
-				var sortVal = this.props.sortFunction(indexA, indexB, columnKey);
+				var sortVal = this.props.sortFunction.call(this, indexA, indexB, columnKey);//because 'this' in the sortFunction returns the props objects
 				if (sortVal !== 0 && sortDirection === SortTypes.ASC)
 					sortVal = sortVal * -1;
 				return sortVal;
