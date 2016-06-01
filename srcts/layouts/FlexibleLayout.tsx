@@ -287,8 +287,11 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 			delete state.children;
 		
 		if (!state.children)
+		{
+			if(!state.id)
+				state.children = [];
 			return state;
-
+		}
 		var simpleChildren:LayoutState[] = [];
 		for (var i = 0; i < state.children.length; i++)
 		{
@@ -303,7 +306,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 					simpleChildren.push(childChild);
 				}
 			}
-			else
+			else if(child.children || child.id)
 			{
 				simpleChildren.push(child);
 			}
