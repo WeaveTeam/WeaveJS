@@ -3300,6 +3300,20 @@ declare module weavejs.core {
     }
 }
 declare module weavejs.core {
+    class EventCallbackCollection<T> extends CallbackCollection {
+        constructor();
+        /**
+         * This is the event object.
+         */
+        event: T;
+        /**
+         * This function will run callbacks immediately, setting the event variable before each one.
+         * @param event
+         */
+        dispatch(event: T): void;
+    }
+}
+declare module weavejs.core {
     import ICallbackCollection = weavejs.api.core.ICallbackCollection;
     /**
      * @private
