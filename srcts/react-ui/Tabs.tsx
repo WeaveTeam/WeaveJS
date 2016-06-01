@@ -63,12 +63,14 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 			});
 	}
 
-	changeTabView(index:number)
-	{
-		this.setState({
-			activeTabIndex:index
-		});
-		this.props.onViewChange && this.props.onViewChange(index);
+	changeTabView(index:number) {
+		if (this.state.activeTabIndex != index)
+		{
+			this.setState({
+				activeTabIndex:index
+			});
+			this.props.onViewChange && this.props.onViewChange(index);
+		}
 	}
 
 	render():JSX.Element

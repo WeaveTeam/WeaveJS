@@ -115,9 +115,11 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		this.setSessionState(state);
 	}
 
-	removePanel(id:WeavePathArray):void
+	removePanel(id:WeavePathArray, event?:React.MouseEvent):void
 	{
-		console.log(id);
+		if(event)
+			event.stopPropagation();
+
 		var state = this.getSessionState();
 		var index = this.getPanelIndex(id);
 		state.panels = state.panels.filter((panel) => {
@@ -177,7 +179,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 							<HBox className="weave-padded-hbox">
 								{panel.label}
 							    <CenteredIcon
-							        onClick={() => this.props.onRemove(panel.id)}
+							        onClick={(event) => this.props.onRemove(panel.id, event)}
 							        className="weave-tab-icon"
 							        title={Weave.lang("Close")}
 							        iconProps={{ className:"fa fa-times-circle" }}
