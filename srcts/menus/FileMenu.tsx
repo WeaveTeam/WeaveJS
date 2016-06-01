@@ -277,14 +277,23 @@ export default class FileMenu implements MenuBarItemProps
 		return `${window.location.protocol}//${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}` +
 			`${window.location.pathname}?file=${url}`;
 	}
-	
+
+	handleHistoryEvent=(event:PopStateEvent)=>
+	{
+		if (event.state)
+		{
+			this.loadUrl(event.state);
+		}
+	}
+
 	loadUrl=(url:string, pushHistory = false)=>
 	{
 		this.fileName = String(url).split('/').pop();
 
 		if (pushHistory)
 		{
-			history.pushState(null, "", FileMenu.buildUrl(url));
+			history.pushState(url, "", FileMenu.buildUrl(url));
+			window.onpopstate = this.handleHistoryEvent;
 		}
 
 		WeaveArchive.loadUrl(this.weave, String(url), this.updateProgressIndicator);
