@@ -28,7 +28,7 @@ export interface TabLayoutProps extends LayoutProps
 		content: JSX.Element
 	}[];
 	onAdd: MenuItemProps|React.MouseEventHandler;
-	onRemove: (panelId:WeavePathArray) => void;
+	onRemove: (panelId:WeavePathArray, event?:React.MouseEvent) => void;
 }
 
 export interface LayoutState

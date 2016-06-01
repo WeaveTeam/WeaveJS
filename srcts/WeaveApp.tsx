@@ -377,14 +377,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		var weave = this.props.weave;
 		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type as any);
-		var path = [weave.root.generateUniqueName(baseName)];
+		var layoutName = weave.root.generateUniqueName(baseName);
+		var path = [layoutName];
 		weave.requestObject(path, type as any);
-		this.tabLayout.addPanel(path, baseName);
+		this.tabLayout.addPanel(path, layoutName);
 	};
 
-	removeExisingLayout=(id:WeavePathArray, event:React.MouseEvent)=>
+	removeExistingLayout=(id:WeavePathArray, event:React.MouseEvent)=>
 	{
-		this.tabLayout.removePanel(id);
+		this.tabLayout.removePanel(id, event);
 		this.props.weave.removeObject(id);
 	};
 
@@ -486,7 +487,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 								click: () => this.addNewLayout(FlexibleLayout)
 							}
 						],
-						onRemove: this.removeExisingLayout
+						onRemove: this.removeExistingLayout
 					}}
 				/>
 			);
