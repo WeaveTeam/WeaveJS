@@ -20,6 +20,9 @@ export interface SessionHistorySliderState
 	position?:number;
 }
 
+const Z_KEYCODE = 90;
+const Y_KEYCODE = 89;
+
 export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 {
 	private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog));
@@ -33,7 +36,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		}
 		Weave.getCallbacks(this._stateLogWatcher).addGroupedCallback(this, this.handleStateLogChange, true, false);
 	}
-	
+
 	componentWillReceiveProps(props:SessionHistorySliderProps)
 	{
 		this._stateLogWatcher.target = props.stateLog;
@@ -74,16 +77,38 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 		// // save current time as reference point
 		// _lastReplayTime = getTimer();
 	}
-	
+
+	handleKeyStroke=(event:KeyboardEvent)=>
+	{
+		event.preventDefault();
+		// ctrl-z and cmd-z
+		if((event.ctrlKey || event.metaKey) && event.keyCode == Z_KEYCODE)
+			this._stateLog.undo();
+
+		// ctrl-y and cmd-y and cmd-shift-z
+		if(((event.ctrlKey || event.metaKey) && event.keyCode == Y_KEYCODE) || (event.metaKey && event.shiftKey && event.keyCode == Z_KEYCODE))
+			this._stateLog.redo();
+	};
+
+	componentDidMount()
+	{
+		document.addEventListener("keydown", this.handleKeyStroke);
+	}
+
+	componentWillUnmount()
+	{
+		document.removeEventListener("keydown", this.handleKeyStroke);
+	}
+
 	play=()=>
 	{
 		
-	}
+	};
 
 	getPlayLabel=(a:number, b:string):string=>
 	{
 		return "";
-	}
+	};
 	
 	handleSlider(selectedValue:string[])
 	{
