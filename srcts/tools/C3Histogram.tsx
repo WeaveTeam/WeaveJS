@@ -55,10 +55,10 @@ declare type AggregationMethod = "count"|"sum"|"mean";
 
 export default class C3Histogram extends AbstractC3Tool
 {
-	binnedColumn = Weave.linkableChild(this, BinnedColumn, this.setColorColumn);
+	binnedColumn = Weave.linkableChild(this, BinnedColumn, this.setColorColumn, true);
 	columnToAggregate = Weave.linkableChild(this, DynamicColumn);
 	aggregationMethod = Weave.linkableChild(this, new LinkableString("count"));
-	fill = Weave.linkableChild(this, SolidFillStyle, this.setBinnedColumn);
+	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
     barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
 	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
@@ -140,6 +140,8 @@ export default class C3Histogram extends AbstractC3Tool
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
+
+	    Weave.getCallbacks(this.fill.color.internalDynamicColumn).addGroupedCallback(this, this.setBinnedColumn);
 		
 		// don't lock the ColorColumn, so linking to global ColorColumn is possible
 		var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn, false);
