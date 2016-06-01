@@ -181,7 +181,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 								getExternalOverlay={() => this.overlay}
 								className={classNames("weave-app", "weave-window")}
 								style={style}
-								onClick={(event) => this.bringPanelForward(state.id)}
+								onMouseDown={(event) => this.bringPanelForward(state.id)}
 								draggable={!this.props.panelRenderer}
 								onReposition={this.onReposition.bind(this, state.id)}
 							>
