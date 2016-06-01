@@ -53,6 +53,7 @@ const stateStructure:Structure = {
 export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 {
 	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({}, stateStructure)), this.forceUpdate, true);
+	private resetTimer:boolean;
 
 	constructor(props:TabLayoutProps)
 	{
@@ -89,6 +90,32 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		if(activePanelState)
 			return activePanelState.id;
 	}
+
+	onDragOverTab=(panel:PanelState)=> {
+		// delay before switching tab
+		this.resetTimer = false;
+		var state = this.getSessionState();
+		if(!_.isEqual(this.activePanel, panel.id))
+		{
+			setTimeout(() => {
+				if (!this.resetTimer)
+				{
+					state.activeTabIndex = this.getPanelIndex(panel.id);
+					this.setSessionState(state);
+				}
+			}, 500);
+		}
+	};
+
+	onDrop=(event:React.DragEvent)=>
+	{
+		console.log("drop layout", event.dataTransfer.getData("text/plain"));
+	};
+
+	onDragLeaveTab=()=>
+	{
+		this.resetTimer = true;
+	};
 
 	renamePanel(id:WeavePathArray, newLabel:string)
 	{
@@ -194,8 +221,12 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 					location="bottom"
 					labels={
 						this.props.leadingTabs.map(tab => tab.label)
-						.concat(state.panels.map(panel => (
-							<HBox className="weave-padded-hbox">
+						.concat(state.panels.map((panel) => (
+							<HBox
+								className="weave-padded-hbox"
+								onDragOver={(event) => this.onDragOverTab(panel)}
+								onDragLeave={this.onDragLeaveTab}
+							>
 								{/*<EditableTextCell onChange={(newName) => this.renamePanel(panel.id, newName)} textContent={panel.label}/>*/}
 								{panel.label}
 							    <CenteredIcon
