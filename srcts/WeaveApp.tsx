@@ -313,6 +313,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		return this.props.weave.getObject(this.getRenderPath()) as TabLayout;
 	}
+	
+	private getNonTabLayouts()
+	{
+		return this.props.weave.root.getObjects(AbstractLayout as any, true).filter((obj:ILinkableObject) => {
+			if(LinkablePlaceholder.getClass(obj) == TabLayout)
+				return false;
+			return true;
+		});
+	}
 
 	private initializeTabs=(tabLayout:TabLayout)=>
 	{
@@ -323,11 +332,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		if(!panels || (panels && !panels.length))
 		{
-			var layouts = this.props.weave.root.getObjects(AbstractLayout as any, true).filter((obj:ILinkableObject) => {
-				if(LinkablePlaceholder.getClass(obj) == TabLayout)
-					return false;
-				return true;
-			});
+			var layouts = this.getNonTabLayouts();
+			if (!layouts.length)
+			{
+				this.props.weave.root.requestObject('Layout', FlexibleLayout);
+				layouts = this.getNonTabLayouts();
+			}
 			panels = layouts.map((layout) => {
 				return {
 					id: Weave.findPath(this.props.weave.root, layout),
