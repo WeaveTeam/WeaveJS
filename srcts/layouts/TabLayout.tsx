@@ -177,7 +177,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 							<HBox className="weave-padded-hbox">
 								{panel.label}
 							    <CenteredIcon
-							        onClick={(event) => this.props.onRemove(panel.id, event)}
+							        onClick={() => this.props.onRemove(panel.id)}
 							        className="weave-tab-icon"
 							        title={Weave.lang("Close")}
 							        iconProps={{ className:"fa fa-times-circle" }}
