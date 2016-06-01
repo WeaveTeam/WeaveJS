@@ -43,7 +43,6 @@ import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 
 
-
 export interface IDataSourceManagerProps
 {
 	dataMenu:DataMenu;
@@ -52,6 +51,7 @@ export interface IDataSourceManagerProps
 
 export interface IDataSourceManagerState
 {
+	selected:IDataSource;
 }
 
 export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
@@ -65,19 +65,20 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(WeaveDataSource, WeaveDataSourceEditor)
 //		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
-		.set(GroupedDataTransform, GroupedDataTransformEditor)
+		.set(GroupedDataTransform, GroupedDataTransformEditor);
 //
-
-	static selected:IDataSource;
 
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
+		this.state = {
+			selected: this.props.dataMenu.weave.root.getObjects(IDataSource)[0]
+		}
 	}
 
 	componentDidMount()
 	{
-		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.updateDataSources,true );
+		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.updateDataSources, true);
 	}
 
 	componentWillUnmount()
@@ -126,15 +127,12 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 				label: (
 					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
 						<span style={{overflow: "hidden"}}>{dataSource.getLabel()}</span>
-
 						<HBox>
 							<CenteredIcon onClick={()=>this.refreshDataSource(dataSource)}
 							              iconProps={{ className: "fa fa-refresh", title: "Refresh this datasource" }}/>
-
 							<CenteredIcon onClick={()=>this.removeDataSource(dataSource)}
 							              iconProps={{ className: "fa fa-times", title: "Delete this datasource" }}/>
 						</HBox>
-
 					</HBox>
 				),
 				value: dataSource
@@ -142,60 +140,63 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		});
 
 		let editorJsx:JSX.Element;
-		let dataSource = DataSourceManager.selected;
+		let dataSource = this.state.selected;
 
 		if (dataSource && !Weave.wasDisposed(dataSource))
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
-				editorJsx = <EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu } enableGuidance={this.props.enableGuidance}/>;
+				editorJsx = <VBox style={ { flex: 1, overflow:'auto'} }>
+					<EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu }/>
+				</VBox>;
 			else
-				editorJsx = <span>{Weave.lang("Editor not yet implemented for this data source type.")}</span>;
+				editorJsx = <VBox className="ui segment" style={{flex:1, overflow: "auto", justifyContent: "center", alignItems: "center"}}>
+					<div className="ui centered header">
+						{Weave.lang("Editor not yet implemented for this data source type.")}
+					</div>
+				</VBox>;
 		}
-		
-
-		let addButtonUI:JSX.Element = null;
-		let enableGuidance:boolean = this.props.enableGuidance && listOptions.length == 0;
-		if(this.props.dataMenu)
+		else
 		{
-			addButtonUI = <GuidanceContainer enable={enableGuidance}
-			                                 direction={GuidanceContainer.HORIZONTAL}
-			                                 location={GuidanceToolTip.RIGHT}
-			                                 type={GuidanceContainer.START}
-			                                 toolTip="Here">
-								<MenuButton menu={ this.props.dataMenu.getDataSourceItems() }
-								            showIcon={false}
-								            style={{width: "100%"}}>
-									<i className="fa fa-database fa-fw" style={{paddingRight: 25}}/>
-									{Weave.lang('Add data')}
-								</MenuButton>
-							</GuidanceContainer>
+			editorJsx = <VBox className="ui segment" style={{flex:1, overflow: "auto", justifyContent: "center", alignItems: "center"}}>
+				<div className="ui centered header">
+					{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
+				</div>
+			</VBox>;
 		}
-
 
 		return (
-			<HBox className="weave-padded-hbox" style={ {flex:1, overflow:'auto'} }>
-				<VBox className="weave-padded-vbox">
-					{addButtonUI}
-					<VBox className="weave-container" style={ {flex: 1, width: 250, padding: 0} }>
-						<List
-							options={listOptions}
-							multiple={false}
-							selectedValues={ [dataSource] }
-							onChange={ (selectedValues:IDataSource[]) => { DataSourceManager.selected = selectedValues[0]; this.forceUpdate(); }}
-						/>
+			<HBox className="ui bottom attached segments" style={ {flex:1, overflow:'auto'} }>
+				<VBox style={{width: 250}} className="weave-data-source-manager-sidebar">
+					<VBox className="ui vertical inverted attached segments" style={{flex:1, justifyContent:"space-between"}}>
+						<VBox className="ui basic inverted segment" style={{flex:1, overflow: "auto"}}>
+							<div className="ui medium dividing header">{Weave.lang("Connected data sources")}</div>
+							<VBox>
+								<List
+									options={listOptions}
+									multiple={false}
+									selectedValues={ [dataSource] }
+									onChange={ (selectedValues:IDataSource[]) => { this.setState({ selected: selectedValues[0] });  }}
+								/>
+							</VBox>
+						</VBox>
+						<VBox className="ui inverted segment" style={{overflow: "auto"}}>
+							<div className="ui meadium dividing header">{Weave.lang("Add more data sources")}</div>
+							{
+								this.props.dataMenu.getDataSourceItems().map((dsItem, index) => {
+									return dsItem.shown
+										?   <HBox key={index} onClick={() => dsItem.click()} className="weave-data-source-item" style={{justifyContent: "space-between", padding: 5}}>
+										{Weave.lang(dsItem.label as string)}
+										<CenteredIcon className="" iconProps={{ className:"fa fa-plus" }}/>
+									</HBox>
+										:   null
+								})
+							}
+						</VBox>
 					</VBox>
 				</VBox>
-				<VBox style={ {flex: 1, overflow:'auto'} }>
-					{editorJsx}
-				</VBox>
+				{editorJsx}
 			</HBox>
 		);
-	}
-
-	static openInstance(dataMenu:DataMenu, selected:IDataSource = null,enableGuidance:boolean = false):ControlPanel
-	{
-		DataSourceManager.selected = selected;
-		return ControlPanel.openInstance(dataMenu.weave, DataSourceManager, {title: Weave.lang("Data Sources")}, {dataMenu,enableGuidance});
 	}
 }

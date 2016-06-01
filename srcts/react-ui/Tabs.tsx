@@ -55,6 +55,14 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 		guideToTab:""
 	};
 
+	componentWillReceiveProps(props:TabsProps)
+	{
+		if(props.activeTabIndex != null)
+			this.setState({
+				activeTabIndex: props.activeTabIndex
+			});
+	}
+
 	changeTabView(index:number)
 	{
 		this.setState({

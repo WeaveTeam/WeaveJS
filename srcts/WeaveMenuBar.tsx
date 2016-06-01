@@ -9,12 +9,15 @@ import DataMenu from './menus/DataMenu';
 import ChartsMenu from './menus/ChartsMenu';
 import ControllersMenu from './menus/ControllersMenu';
 import SessionHistorySlider from "./editors/SessionHistorySlider";
+import FileDialog from "./ui/FileDialog";
+import FileMenu from "./menus/FileMenu";
 
 export interface WeaveMenuBarProps extends React.HTMLProps<WeaveMenuBar>
 {
 	style:React.CSSProperties,
 	weave:Weave,
 	createObject:(type:new(..._:any[])=>any)=>void
+	dataMenu:DataMenu;
 }
 
 export interface WeaveMenuBarState
@@ -25,14 +28,14 @@ export interface WeaveMenuBarState
 export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
 {
 	systemMenu:SystemMenu;
-	dataMenu:DataMenu;
+	fileMenu:FileMenu;
 	chartsMenu:ChartsMenu;
 	controllersMenu:ControllersMenu;
 	constructor(props:WeaveMenuBarProps)
 	{
 		super(props);
 		this.systemMenu = new SystemMenu(props.weave);
-		this.dataMenu = new DataMenu(props.weave, props.createObject);
+		this.fileMenu = new FileMenu(props.weave);
 		this.chartsMenu = new ChartsMenu(props.weave, props.createObject);
 		this.controllersMenu = new ControllersMenu(props.weave, props.createObject);
 	}
@@ -44,11 +47,14 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 				style={this.props.style}
 				config={[
 					this.systemMenu,
-					this.dataMenu,
+					this.props.dataMenu,
 					this.chartsMenu,
 					this.controllersMenu
 				]}
-				children={<SessionHistorySlider stateLog={this.props.weave.history}/>}
+				children={
+					[<SessionHistorySlider key="historySlider" stateLog={this.props.weave.history}/>,
+					<FileDialog key="fileDialog" openUrlHandler={this.fileMenu.loadUrl} openFileHandler={this.fileMenu.handleOpenedFile}/>]
+				}
 			/>
 		);
 	}

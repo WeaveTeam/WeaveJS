@@ -1,4 +1,3 @@
-
 html {
 	font-family: sans-serif;
 }
@@ -57,7 +56,7 @@ input[type=number]::-webkit-outer-spin-button {
 	height: 2px;
 	border-radius: 6px;
 	background-color: #D0D0D0;
-	 z-index: 0;
+	z-index: 0;
 }
 
 .weave-hslider .rc-slider-dot {
@@ -240,15 +239,15 @@ div.table-row-selected>div>div>div>div>div {
 	padding: 5px;
 	border-radius:4px;
 	color:grey;
- }
+}
 
- .weave-icon:hover {
- 	background-color: rgba(0,0,0,.05);
- }
+.weave-icon:hover {
+	background-color: rgba(0,0,0,.05);
+}
 
- .weave-icon:active {
- 	background-color: #CCCCCC;
- }
+.weave-icon:active {
+	background-color: #CCCCCC;
+}
 
 .weave-icon-button-mouse-over{
 	padding: 5px;
@@ -379,7 +378,7 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-tab-content { /* border left , comes from container to cover label region too , top comes from label to distinct the active label */
-	padding: 8px;
+	/*padding: 8px;*/
 	border-right: 1px solid #ddd;
 }
 
@@ -586,6 +585,22 @@ div.weave-tree-view {
 }
 .weave-list-Item-selected:hover{
 	background-color : #99D6FF;
+}
+
+div.ui.inverted.segment .weave-list-Item{
+	background-color: inherit;
+}
+
+div.ui.inverted.segment .weave-list-Item:hover{
+	color: white;
+}
+div.ui.inverted.segment .weave-list-Item-selected{
+	background-color: #C78A36;
+	color: white;
+}
+
+div.ui.inverted.segment .weave-list-Item-selected:hover{
+	background-color: rgb(222, 168, 94);
 }
 
 /* sidebar */
@@ -800,7 +815,7 @@ div.weave-tree-view {
 	-ms-flex-align: center;
 	align-items: center;
 	padding: 0;
-	 margin: 0;
+	margin: 0;
 }
 
 .ui.grid>* {
@@ -850,6 +865,19 @@ div.weave-tree-view {
 	background-color: rgba(0,0,0,.5);
 }
 
+/****** Modal *********/
+.ui.modal>.close {
+	top: 1.0535rem;
+	right: 1rem;
+	color: rgba(0,0,0,.87);
+}
+
+/****** Inverted Segment *******/
+.ui.inverted,.ui.inverted.segment {
+	background: rgba(60,64,63,0.9);
+	color: rgba(161,164,163,1.0);
+}
+
 /****** Warning ******/
 .ui.input.warning input {
 	background-color: #FFFAF3;
@@ -888,4 +916,9 @@ div.weave-tree-view {
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.weave-data-source-manager-sidebar .weave-data-source-item:hover {
+	color: white;
+	cursor: pointer;
 }

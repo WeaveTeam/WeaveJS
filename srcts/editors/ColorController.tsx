@@ -81,11 +81,11 @@ export default class ColorController extends React.Component<ColorControllerProp
 					onViewChange={(index) => ColorController.activeTabIndex = index}
 					labels={this.tabLabels}
 					tabs={[
-						<VBox key={this.tabLabels[1]} style={ {flex: 1} } className="weave-padded-vbox">
+						<VBox key={this.tabLabels[1]} style={ {flex: 1, padding: 8} } className="weave-padded-vbox">
 							<Checkbox ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})} label={Weave.lang("Center color ramp at zero (when binning is disabled)")}/>
 							<ColorRampEditor colorRamp={this.props.colorColumn.ramp}/>
 						</VBox>,
-						<VBox className="weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1}}>
+						<VBox className="weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1, padding: 8}}>
 							<HBox className="weave-padded-hbox" style={ {alignItems: "center"} }>
 								{Weave.lang("Color data")}
 								<SelectableAttributeComponent attributes={this.attributes} attributeName="Color data"/>

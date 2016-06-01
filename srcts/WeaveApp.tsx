@@ -25,6 +25,8 @@ import WeaveArchive from "./WeaveArchive";
 import TabLayout, {LayoutState} from "./layouts/TabLayout";
 import DataMenu from "./menus/DataMenu";
 import FileMenu from "./menus/FileMenu";
+import WindowLayout from "./layouts/WindowLayout";
+import FlexibleLayout from "./layouts/FlexibleLayout";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -38,8 +40,6 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
-import WindowLayout from "./layouts/WindowLayout";
-import FlexibleLayout from "./layouts/FlexibleLayout";
 
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -62,6 +62,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 	
 	menuBar:WeaveMenuBar;
+	dataMenu:DataMenu;
+	dataSourceManager:DataSourceManager;
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
@@ -75,6 +77,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.state = {
 			toolPathToEdit: null
 		};
+		this.dataMenu = new DataMenu(this.props.weave, this.createObject, this.openDataSourceManager);
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 	}
 	
@@ -153,7 +156,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	handleSideBarClose=()=>
 	{
 		this.setState({ toolPathToEdit: null });
-	}
+	};
 	
 	handleGearClick=(tool:WeaveTool):void=>
 	{
@@ -161,7 +164,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.setState({
 			toolPathToEdit: path
 		});
-	}
+	};
 	
 	handlePopoutClick=(tool:WeaveTool):void=>
 	{
@@ -181,7 +184,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={{width: "100%", height: "100%"}}
 				onGearClick={this.handleGearClick}
 				onPopinClick={() => {
-					this.addToLayout(layoutPath, panelPath);
+					this.addToLayout(panelPath);
 					popoutWindow.close();
 				}}
 			/>
@@ -190,8 +193,18 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	};
 
-	openDataSourceManager=()=>
+	openDataSourceManager=(selectedDataSource?:IDataSource)=>
 	{
+		/* will set the active tab to the data source manager */
+		this.tabLayout.setState({
+			activeTabIndex: -1
+		});
+		if(selectedDataSource)
+		{
+			this.dataSourceManager.setState({
+				selected: selectedDataSource
+			})
+		}
 	};
 
 	renderTab=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
@@ -258,7 +271,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		if (Weave.IS(instance, IDataSource))
 		{
-			DataSourceManager.openInstance(this.menuBar.dataMenu, instance as IDataSource,enableGuidance);
+			this.openDataSourceManager(instance as IDataSource);
 		}
 
 		if (React.Component.isPrototypeOf(type))
@@ -268,9 +281,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				Weave.getCallbacks(placeholder).addDisposeCallback(this, this.handlePlaceholderDispose.bind(this, path, placeholder));
 			this.setState({ toolPathToEdit: path });
 
-			var layoutState = this.tabLayout.getSessionState();
-			if(layoutState.activePanelId)
-				this.addToLayout(layoutState.activePanelId, path);
+			this.addToLayout(path);
 		}
 	};
 
@@ -327,7 +338,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		var tabLayoutState:LayoutState = tabLayout.getSessionState();
 		var panels = tabLayoutState && tabLayoutState.panels;
-		var activePanelId = tabLayoutState && tabLayoutState.activePanelId;
+		var activeTabIndex = tabLayoutState && tabLayoutState.activeTabIndex;
 		var title = tabLayoutState && tabLayoutState.title;
 
 		if(!panels || (panels && !panels.length))
@@ -345,9 +356,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				}
 			});
 		}
-		if(!activePanelId)
+		if(!activeTabIndex)
 		{
-			activePanelId = panels[0] && panels[0].id;
+			activeTabIndex = 0;
 		};
 
 		if(!title)
@@ -357,7 +368,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		tabLayout.setSessionState({
 			panels,
-			activePanelId,
+			activeTabIndex,
 			title
 		});
 	};
@@ -377,11 +388,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.props.weave.removeObject(id);
 	};
 
-	addToLayout(layoutPath:WeavePathArray, panelPath:WeavePathArray)
+	addToLayout(panelPath:WeavePathArray)
 	{
-		var layout = Weave.AS(this.props.weave.getObject(layoutPath), AbstractLayout as any) as AnyAbstractLayout;
-		if (layout)
-			layout.addPanel(panelPath);
+		var activeLayout = this.props.weave.getObject(this.tabLayout.activePanel) as AnyAbstractLayout;
+		if (activeLayout)
+			activeLayout.addPanel(panelPath);
 	}
 
 	removeFromLayout(panelPath:WeavePathArray)
@@ -441,7 +452,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		let blankPageIntroScreen:JSX.Element = skipBlankPageIntro ? null : <GetStartedComponent style={ {flex:1} }
 		                                                                                        weave={weave}
 		                                                                                        createObject={this.createObject}
-		                                                                                        loader={this.initialLoadingForBlankSession}/>
+		                                                                                        loader={this.initialLoadingForBlankSession}
+		                                                                                        openDataSourceManagerCallback={this.openDataSourceManager}
+		/>
 
 		let weaveTabbedComponent:JSX.Element = null;
 		if(skipBlankPageIntro || this.state.loadInitialWeaveComponent)
@@ -459,7 +472,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 							{
 								label: "Data Sources",
 								content: (
-									<HBox>{"Data Sources"}</HBox>
+									<DataSourceManager ref={(c:DataSourceManager) => this.dataSourceManager = c} dataMenu={this.dataMenu}/>
 								)
 							}
 						],
@@ -496,6 +509,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 							weave={weave}
 							ref={(c:WeaveMenuBar) => this.menuBar = c}
 							createObject={this.createObject}
+					        dataMenu={this.dataMenu}
 						/>
 					:	null
 				}

@@ -46,15 +46,11 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 					selector.submit();
 					return false;
 				},
-				transition: "fade"
-			});
-		if (context)
-			($(this.element) as any)
-				.modal({
-					detachable: false,
-					context: $(context)
-				});
-		($(this.element) as any).modal('show');
+				detachable: false,
+				transition: "fade",
+				context,
+			})
+			.modal('show');
 	}
 	
 	invalid()

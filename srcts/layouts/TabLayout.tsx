@@ -34,7 +34,7 @@ export interface TabLayoutProps extends LayoutProps
 export interface LayoutState
 {
 	panels: PanelState[];
-	activePanelId: WeavePathArray;
+	activeTabIndex:number;
 	title: string;
 }
 
@@ -45,7 +45,7 @@ const stateStructure:Structure = {
 			label: "string"
 		}
 	],
-	activePanelId: MiscUtils.nullableStructure(["string"]),
+	activeTabIndex: "number",
 	title: "string"
 };
 
@@ -77,11 +77,22 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		return this.getSessionState().title;
 	}
 
+	get leadingTabsLength()
+	{
+		return this.props.leadingTabs ? this.props.leadingTabs.length : 0;
+	}
+
+	get activePanel() {
+		var state = this.getSessionState();
+		var activePanelState = state.panels[state.activeTabIndex];
+		if(activePanelState)
+			return activePanelState.id;
+	}
+
 	switchPanelToActive=(index:number):void=>
 	{
 		var state = this.getSessionState();
-		var activePanel = state.panels[index];
-		state.activePanelId = activePanel && activePanel.id;
+		state.activeTabIndex = index - this.leadingTabsLength;
 		this.setSessionState(state);
 	};
 
@@ -100,7 +111,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 			id,
 			label: label || id[id.length - 1] || "New Tab"
 		});
-		state.activePanelId = id;
+		state.activeTabIndex = this.getPanelIndex(id);
 		this.setSessionState(state);
 	}
 
@@ -114,8 +125,8 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		});
 		// if the removed panel was the active panel
 		// set the active panel to the one before it
-		if(_.isEqual(id, state.activePanelId))
-			state.activePanelId = state.panels[Math.min(index, state.panels.length - 1)].id;
+		if(_.isEqual(index, state.activeTabIndex))
+			state.activeTabIndex = Math.min(index, state.panels.length - 1);
 		this.setSessionState(state);
 	}
 
@@ -123,7 +134,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 	{
 		var weave = Weave.getWeave(this);
 		var state = this.getSessionState();
-		var activeTabIndex = this.getPanelIndex(state.activePanelId) + (this.props.leadingTabs ? this.props.leadingTabs.length : 0);
+		var activeTabIndex = state.activeTabIndex + this.leadingTabsLength;
 		var tabBarChildren:JSX.Element = null;
 
 		if(this.props.onAdd)
@@ -166,7 +177,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 							<HBox className="weave-padded-hbox">
 								{panel.label}
 							    <CenteredIcon
-							        onClick={() => this.props.onRemove(panel.id)}
+							        onClick={(event) => this.props.onRemove(panel.id, event)}
 							        className="weave-tab-icon"
 							        title={Weave.lang("Close")}
 							        iconProps={{ className:"fa fa-times-circle" }}

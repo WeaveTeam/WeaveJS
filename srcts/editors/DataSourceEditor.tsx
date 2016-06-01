@@ -28,6 +28,7 @@ import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import StreamedGeometryColumn = weavejs.data.column.StreamedGeometryColumn;
+import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 
 export const PREVIEW:"preview" = "preview";
 export const METADATA:"metadata" = "metadata";
@@ -154,7 +155,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 			return (a === b);
 	}
 	
-	renderBrowseView():JSX.Element
+	renderPreviewView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
 
@@ -175,7 +176,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		}
 
 		return (
-			<VBox style={{flex: 1}}>
+			<VBox className="ui segment" style={{flex: 1}}>
+				<div className="ui medium dividing header">{Weave.lang("Preview")}</div>
 				<HBox className={root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
 					<VBox style={{flex: root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
 						<WeaveTree
@@ -187,15 +189,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 					</VBox>
 					<VBox className="weave-padded-vbox" style={{flex: 1, overflow: 'auto'}}>
 						{createChartButtonUI}
-
-						<WeaveTree
-							root={this.state.selectedBranch}
-							hideRoot={true}
-							hideBranches={true}
-							initialSelectedItems={[this.state.selectedLeaf]}
-							onSelect={(selectedItems) => this.setSelection(this.props, this.state.selectedBranch, selectedItems && selectedItems[0])}
-						/>
-						<DynamicComponent dependencies={[this.column]} render={this.renderColumnPreview}/>
+						<DynamicComponent dependencies={[this.column]} render={this.renderTablePreview}/>
 					</VBox>
 				</HBox>
 			</VBox>
@@ -207,7 +201,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let root = this.props.dataSource.getHierarchyRoot();
 		// <label style={ { fontWeight: "bold" } }> { Weave.lang("Edit {0}", this.props.dataSource.getLabel()) } </label>
 		return (
-			<VBox className="weave-padded-vbox weave-container" style={ {flex: 1, border: "none"} }>
+			<VBox className="ui basic segment" style={ {border: "none"} }>
+				<div className="ui medium dividing header">{Weave.lang("Configure " + this.props.dataSource.getLabel())}</div>
 				{
 					this.renderFields()
 				}
@@ -215,13 +210,13 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		);
 	}
 	
-	renderTablePreview():JSX.Element
+	renderTablePreview=():JSX.Element =>
 	{
-		var leaves = this.state.selectedBranch.getChildren();
-		leaves = leaves.filter((n) => !n.isBranch());
+		var columnSiblings = this.state.selectedBranch.getChildren();
+		let leaves:IWeaveTreeNode[] = columnSiblings.filter((n) => !n.isBranch());
 		if (!leaves)
 			return;
-		
+
 		var columns:IAttributeColumn[] = [];
 		for (var leaf of leaves)
 		{
@@ -233,22 +228,20 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 					columns.push(weavejs.WeaveAPI.AttributeColumnCache.getColumn(columnRef.getDataSource(), meta));
 			}
 		}
-		
+
 		var names:string[] = columns.map(column => column.getMetadata("title"));
 		var format:any = _.zipObject(names, columns);
 		var columnTitles = _.zipObject(names, names);
 		var rows = ColumnUtils.getRecords(format, null, String);
-		
+
 		return (
-			<VBox>
-				<FixedDataTable rows={rows} 
-								columnIds={names} 
-								idProperty="id"
-								showIdColumn={true}
-								columnTitles={columnTitles as any}/>
-			</VBox>
+			<FixedDataTable rows={rows}
+							columnIds={names}
+							idProperty="id"
+							showIdColumn={true}
+							columnTitles={columnTitles as any}/>
 		);
-	}
+	};
 
 	setSelection(props:IDataSourceEditorProps, newBranch:IWeaveTreeNode, newLeaf:IWeaveTreeNode)
 	{
@@ -279,33 +272,11 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	
 	render():JSX.Element
 	{
-		var tabs = new Map<string, JSX.Element>()
-			.set("Configure", this.renderConfigureView())
-			.set("Browse", this.renderBrowseView());
-
-		let root = this.props.dataSource.getHierarchyRoot();
-
-		if (this.state.showPreviewView)
-		{
-			tabs.set("Preview", this.renderTablePreview());
-		}
-		
-		var activeTabIndex = 0;
-		
-		if (root.getChildren() && root.getChildren().length)
-		{
-			activeTabIndex = 1;
-		}
-
 		return (
-			<Tabs
-				labels={Array.from(tabs.keys())}
-				activeTabIndex={activeTabIndex}
-				tabs={Array.from(tabs.values())}
-				onViewChange={() => this.forceUpdate()}
-				enableGuidance={this.props.enableGuidance}
-				guideToTab={this.state.guideToTab}
-			/>
+			<VBox className="ui vertical segments" style={{flex:1}}>
+				{this.renderConfigureView()}
+				{this.renderPreviewView()}
+			</VBox>
 		);
 	}
 };
