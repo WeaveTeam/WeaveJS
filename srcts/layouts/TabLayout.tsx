@@ -14,6 +14,7 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import {MenuItemProps} from "../react-ui/Menu";
 import MenuButton from "../react-ui/MenuButton";
 import Dropdown from "../semantic-ui/Dropdown";
+import EditableTextCell from "../react-ui/EditableTextCell";
 
 export interface PanelState
 {
@@ -89,6 +90,18 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 			return activePanelState.id;
 	}
 
+	renamePanel(id:WeavePathArray, newLabel:string)
+	{
+		var state = this.getSessionState();
+		var panelToRename:PanelState = null;
+		state.panels.forEach((panel) => {
+			if (_.isEqual(id, panel.id))
+				panelToRename = panel;
+		});
+		panelToRename.label = newLabel;
+		this.setSessionState(state);
+	}
+
 	switchPanelToActive=(index:number):void=>
 	{
 		var state = this.getSessionState();
@@ -125,9 +138,15 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		state.panels = state.panels.filter((panel) => {
 			return !_.isEqual(id, panel.id);
 		});
+
+		// if the removed panel is before the active panel
+		// we decrement the index
+		if(index < state.activeTabIndex)
+			state.activeTabIndex -= 1;
+
 		// if the removed panel was the active panel
 		// set the active panel to the one before it
-		if(_.isEqual(index, state.activeTabIndex))
+		else if(index == state.activeTabIndex)
 			state.activeTabIndex = Math.min(index, state.panels.length - 1);
 		this.setSessionState(state);
 	}
@@ -138,7 +157,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		var state = this.getSessionState();
 		var activeTabIndex = state.activeTabIndex + this.leadingTabsLength;
 		var tabBarChildren:JSX.Element = null;
-
+		
 		if(this.props.onAdd)
 		{
 			if(Array.isArray(this.props.onAdd))
@@ -177,6 +196,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 						this.props.leadingTabs.map(tab => tab.label)
 						.concat(state.panels.map(panel => (
 							<HBox className="weave-padded-hbox">
+								{/*<EditableTextCell onChange={(newName) => this.renamePanel(panel.id, newName)} textContent={panel.label}/>*/}
 								{panel.label}
 							    <CenteredIcon
 							        onClick={(event) => this.props.onRemove(panel.id, event)}
