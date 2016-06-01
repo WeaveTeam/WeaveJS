@@ -6,10 +6,9 @@ import SmartComponent from '../ui/SmartComponent';
 import {VBox} from "./FlexBox";
 import ReactUtils from "../utils/ReactUtils";
 
-export interface IEditableTextCellProps extends React.Props<EditableTextCell>//not extending react.HTML properties because onChange and onClick have different signatures
+export interface IEditableTextCellProps extends React.Props<EditableTextCell>//not extending react.HTML properties because onChange have different signatures
 {
 	textContent?:string
-	onClick?:(choice:any)=>void
 	onChange?:(newName:string)=> void
 	style?:React.CSSProperties
 }
