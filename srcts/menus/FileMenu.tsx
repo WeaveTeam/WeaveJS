@@ -142,7 +142,7 @@ export default class FileMenu implements MenuBarItemProps
 	updateProgressIndicator=(meta:{percent:number, currentFile:string})=>
 	{
 		if(!ProgressIndicator.hasTask(meta.currentFile) && meta.percent < 100)
-			ProgressIndicator.addTask(meta.currentFile, meta.percent/100);
+			ProgressIndicator.addTask(meta.currentFile, null, "Extracting session " + meta.currentFile + ': ' + (meta.percent/100).toString());
 		else if( meta.percent == 100)
 			ProgressIndicator.removeTask(meta.currentFile);
 		else
