@@ -196,9 +196,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	openDataSourceManager=(selectedDataSource?:IDataSource)=>
 	{
 		/* will set the active tab to the data source manager */
-		this.tabLayout.setState({
-			activeTabIndex: -1
-		});
+		var state = this.tabLayout.getSessionState();
+		state.activeTabIndex = -1;
+		this.tabLayout.setSessionState(state);
 		if(selectedDataSource)
 		{
 			this.dataSourceManager.setState({
