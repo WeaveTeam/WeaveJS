@@ -54,7 +54,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 export interface WeaveAppState
 {
 	toolPathToEdit?:WeavePathArray;
-	initialTabForBlankSession?:string;
+	loadInitialWeaveComponent?:boolean;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
@@ -394,9 +394,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 
-	initialLoadingForBlankSession=(type:string):void=>{
+	initialLoadingForBlankSession=(loadWeaveApp:boolean):void=>{
 		this.setState({
-			initialTabForBlankSession:type
+			loadInitialWeaveComponent:loadWeaveApp
 		});
 		
 	};
@@ -434,7 +434,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		                                                                                        loader={this.initialLoadingForBlankSession}/>
 
 		let weaveTabbedComponent:JSX.Element = null;
-		if(skipBlankPageIntro || this.state.initialTabForBlankSession == GetStartedComponent.DATA) // default - Data Source Manager Page
+		if(skipBlankPageIntro || this.state.loadInitialWeaveComponent)
 		{
 			weaveTabbedComponent = (
 				<WeaveComponentRenderer
@@ -468,40 +468,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				/>
 			);
 		}
-		else if(this.state.initialTabForBlankSession == GetStartedComponent.SESSION)
-		{
-			weaveTabbedComponent = (
-				<WeaveComponentRenderer
-					weave={weave}
-					path={renderPath}
-					defaultType={TabLayout}
-					style={{width: "100%", height: "100%"}}
-					onCreate={this.initializeTabs}
-					props={ {
-						panelRenderer: this.renderTab,
-						leadingTabs: [
-							{
-								label: "Load File",
-								content: (
-									<HBox>{"File List"}</HBox>
-								)
-							}
-						],
-						onAdd: [
-							{
-								label: Weave.lang("Window Layout"),
-								click: () => this.addNewLayout(WindowLayout)
-							},
-							{
-								label: Weave.lang("Flexible Layout"),
-								click: () => this.addNewLayout(FlexibleLayout)
-							}
-						],
-						onRemove: this.removeExisingLayout
-					}}
-				/>
-			);
-		}
+
 
 		return (
 			<VBox

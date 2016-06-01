@@ -13,7 +13,7 @@ export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComp
 {
     weave:Weave;
 	createObject:(type:new(..._:any[])=>any,enableGuidance:boolean)=>void;
-	loader:(type:string)=>void;
+	loader:(loadApp:boolean)=>void;
 }
 
 export interface GetStartedComponentState
@@ -60,7 +60,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		if(enableGuidance){ // temp till new datasoure manager is implemented
 			DataSourceManager.openInstance(this.dataMenu,null,enableGuidance);
 		}else if(this.props.loader)
-			this.props.loader("data");
+			this.props.loader(true);
 		//DataSourceManager.openInstance(this.dataMenu,null,enableGuidance);
 		this.setState({
 			visible:false
@@ -68,8 +68,8 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	}
 
 	openFileDialog=()=>{
-		if(this.props.loader)  this.props.loader("session");
-		//FileDialog.open(this.fileMenu.loadUrl,this.fileMenu.handleOpenedFile);
+		if(this.props.loader)  this.props.loader(true);
+		FileDialog.open(this.fileMenu.loadUrl,this.fileMenu.handleOpenedFile);
 		this.setState({
 			visible:false
 		})
