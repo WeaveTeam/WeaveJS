@@ -9,6 +9,7 @@ import Accordion from "../../semantic-ui/Accordion";
 import PopupWindow from "../../react-ui/PopupWindow";
 import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
+import ServiceLogin from "./ServiceLogin";
 
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 
@@ -125,7 +126,15 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 
 	handleError=(error:any):void=>
 	{
-		this.setState({ errors: this.state.errors.concat([error.toString()]) });
+		if ((error.message as string).startsWith(WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION) ||
+			(error.message as string).startsWith("RemoteException: Incorrect username or password."))
+		{
+			if (this.login) this.login.open();
+		}
+		else
+		{
+			this.setState({ errors: this.state.errors.concat([error.toString()]) });	
+		}
 	}
 
 	testKeyColumn=()=>
@@ -223,9 +232,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 
 	render():JSX.Element
 	{
-
 		let validityButton: React.ReactChild;
-		console.log(this.state);
 
 		if (this.state.keyColumnValid === true)
 		{
@@ -290,6 +297,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			<HBox>
 				<Button disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
 			</HBox>
+			<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={()=>PopupWindow.close(SqlImport.window)} onSuccess={()=>this.updateSchemas()}/>
 		</VBox>
 	}
+	private login: ServiceLogin;
 }

@@ -13,6 +13,7 @@ import Input from "../../semantic-ui/Input";
 import List from "../../react-ui/List";
 import {ListOption} from "../../react-ui/List";
 import ConnectionEditor from "./ConnectionEditor";
+import ServiceLogin from "./ServiceLogin";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
@@ -98,7 +99,15 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 	}
 
 	handleError=(error:any): void => {
-		this.setState({ errors: this.state.errors.concat([error.toString()]) });
+		if ((error.message as string).startsWith(WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION) ||
+			(error.message as string).startsWith("RemoteException: Incorrect username or password."))
+		{
+			if (this.login) this.login.open();
+		}
+		else
+		{
+			this.setState({ errors: this.state.errors.concat([error.toString()]) });
+		}
 	}
 
 	updateConnections=()=>{
@@ -156,6 +165,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 			<HBox className="weave-padded-hbox" style={ { flex: 1 } }>
 				<VBox className="weave-padded-vbox" style={ {flex: 0.33 } }>
 					<VBox className="weave-container" style={ { flex: 1, padding: 0 } }>
+						<div>{this.service.user ? Weave.lang("Logged in as '{0}'.", this.service.user) : Weave.lang("Not logged in.")}</div>
 						<List selectedValues={[this.state.selected]} options={options} 
 						onChange={(selectedValues: any[]) => this.setState({ selected: selectedValues[0] }) }/>
 					</VBox>
@@ -177,8 +187,10 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 					</HBox>
 				</VBox>
 				<ConnectionEditor refreshFunc={this.updateConnections} service={this.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={_.noop}/>
+				<ServiceLogin service={this.service} onSuccess={_.noop} onCancel={() => PopupWindow.close(ConnectionManager.window)}/>
 			</HBox>
 		{ this.renderErrors() }
 		</VBox>
 	}
+	private login: ServiceLogin;
 }
