@@ -14,24 +14,23 @@ import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IDataSource = weavejs.api.data.IDataSource;
 import StandardLib = weavejs.util.StandardLib;
 
-var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;
-
 export default class FileMenu implements MenuBarItemProps
 {
 	constructor(weave:Weave)
 	{
 		this.weave = weave;
 	}
-	
+
 	weave:Weave;
 	label = "File";
 	bold = false;
 	fileName:string;
+	archive:WeaveArchive;
 	
 	/* stateless component */
 	saveDialog(fileName:string, onSave:(newFileName:string)=>void)
 	{
-		
+
 		function dropExtension(fileName:string)
 		{
 			if (!fileName)
@@ -39,7 +38,7 @@ export default class FileMenu implements MenuBarItemProps
 			var i = fileName.lastIndexOf(".weave");
 			return i < 0 ? fileName : fileName.substr(0, i);
 		}
-		
+
 		var defaultFileName:string = 'defaults.weave';
 		var filenameInput:HTMLInputElement;
 		if (!this.fileName)
@@ -51,12 +50,12 @@ export default class FileMenu implements MenuBarItemProps
 			var enableMenuBar = wp.requestObject('enableMenuBar', LinkableBoolean);
 			enableMenuBar.value = checked;
 		};
-		
+
 		var setSaveHistory = (checked:boolean) =>
 		{
 			//console.log("Save history");
 		};
-		
+
 
 		var checkboxListOptions = [
 			{
@@ -68,7 +67,7 @@ export default class FileMenu implements MenuBarItemProps
 //				label: Weave.lang("Save history")
 			}
 		];
-		
+
 		var allOptions:Array<(checked:boolean)=>void> = checkboxListOptions.map(opt => opt.value);
 		var selectedOptions:Array<(checked:boolean)=>void> = allOptions;
 		var onOk = () => {
@@ -78,7 +77,7 @@ export default class FileMenu implements MenuBarItemProps
 			}
 			onSave((filenameInput.value && filenameInput.value + ".weave") || defaultFileName);
 		};
-		
+
 		PopupWindow.open({
 			title: Weave.lang("Export session state"),
 			content: (
@@ -90,10 +89,10 @@ export default class FileMenu implements MenuBarItemProps
 							style={{flex: 1}}
 							ref={(c:Input) => {
 								if(c && c.inputElement)
-								{ 
-									filenameInput = c.inputElement; 
-									c.inputElement.select(); 
-									c.inputElement; 
+								{
+									filenameInput = c.inputElement;
+									c.inputElement.select();
+									c.inputElement;
 									c.inputElement.focus()
 								}
 							}}
@@ -110,7 +109,7 @@ export default class FileMenu implements MenuBarItemProps
 									  onChange={(newValues) => selectedOptions = newValues}/>
 					</VBox>
 					<HBox>
-						
+
 					</HBox>
 				</VBox>
 			),
@@ -133,9 +132,9 @@ export default class FileMenu implements MenuBarItemProps
 			{},
 		];
 	}
-	
+
 	/**
-	 * This function will update the progress given a meta object file name and a percentage progress 
+	 * This function will update the progress given a meta object file name and a percentage progress
 	 *
 	 * @param meta The meta object containing the percentage and file name
 	 */
@@ -157,7 +156,7 @@ export default class FileMenu implements MenuBarItemProps
 		for (let i = 0; i < files.length; i++)
 			this.handleOpenedFile(files[i]);
     };
-	
+
 	/**
 	 * TEMPORARY SOLUTION until we have a place to register file type handlers
 	 * Ideally this list would be dynamically generated.
@@ -170,7 +169,7 @@ export default class FileMenu implements MenuBarItemProps
 			types.unshift('.weave');
 		return types;
 	}
-	
+
 	handleOpenedFile=(file:File, dataFilesOnly:Boolean = false)=>
 	{
 		let reader:FileReader = new FileReader();
@@ -179,31 +178,34 @@ export default class FileMenu implements MenuBarItemProps
 		};
 		reader.readAsArrayBuffer(file);
 	};
-	
-	private handleOpenedFileContent(fileName:string, fileContent:Uint8Array, dataFilesOnly:Boolean = false):void
+
+	public handleOpenedFileContent(fileName:string, fileContent:Uint8Array, dataFilesOnly:Boolean = false):void
 	{
 		var ext:String = String(fileName.split('.').pop()).toLowerCase();
 		var dataSource:any;
-		
+
 		if (!dataFilesOnly && ext == 'weave')
 		{
-            WeaveArchive.setWeaveSessionFromContent(this.weave, fileContent, this.updateProgressIndicator);
+            WeaveArchive.deserialize(fileContent, this.updateProgressIndicator).then((archive) => {
+	            this.archive = archive;
+	            archive.setSessionFromArchive(this.weave);
+            });
 			return;
 		}
-		
+
 //		if (ext == 'zip')
 //		{
 //			var files:Object = weave.flascc.readZip(fileContent);
 //			for (var fileName:String in files)
 //				handleOpenedFile(fileName, files[fileName], true);
-//			
+//
 //			adsp = DraggablePanel.getStaticInstance(AddDataSourcePanel);
 //			if (adsp.parent)
 //				adsp.sendWindowToForeground();
-//			
+//
 //			return;
 //		}
-//		
+//
 //		function newDataSource(type:Class):any
 //		{
 //			return dataSource = WeaveAPI.globalHashMap.requestObject(fileName, type, false);
@@ -212,7 +214,7 @@ export default class FileMenu implements MenuBarItemProps
 //		{
 //			return WeaveAPI.URLRequestUtils.saveLocalFile(fileName, fileContent);
 //		}
-//		
+//
 //		if (ext == 'tsv' || ext == 'txt')
 //		{
 //			adsp = DraggablePanel.openStaticInstance(AddDataSourcePanel);
@@ -255,14 +257,14 @@ export default class FileMenu implements MenuBarItemProps
 //			geojson.url.value = getFileUrl();
 //			geojson.keyType.value = fileName;
 //		}
-//		
+//
 //		if (dataSource && !FileMenu.initTemplate(dataSource))
 //		{
 //			var dsm:DataSourceManager = DraggablePanel.openStaticInstance(DataSourceManager);
 //			dsm.selectDataSource(dataSource);
 //		}
 	}
-	
+
 	private findDataSource<T extends (new()=>IDataSource)>(type:new(..._:any[])=>T, filter:(dataSource:T)=>boolean, create:boolean = false):T
 	{
 		var results = Weave.getDescendants(this.weave.root, type).filter(filter);
@@ -298,7 +300,7 @@ export default class FileMenu implements MenuBarItemProps
 
 		WeaveArchive.loadUrl(this.weave, String(url), this.updateProgressIndicator);
 	};
-	
+
 	private _adminConsole: any;
 	private get adminConsole():any
 	{
@@ -307,7 +309,7 @@ export default class FileMenu implements MenuBarItemProps
 				if (window.opener) {
 					this._adminConsole = window.opener.document.getElementById("AdminConsole");
 				}
-			}			
+			}
 		}
 		catch (e)
 		{
@@ -336,7 +338,7 @@ export default class FileMenu implements MenuBarItemProps
 			);
 		}
 	};
-	
+
 	public saveToServer=()=>
 	{
 		this.saveDialog(this.fileName, this._saveToServer);
@@ -355,7 +357,9 @@ export default class FileMenu implements MenuBarItemProps
 
     public saveFile=()=>
 	{
-		
+
 		this.saveDialog(this.fileName, this._saveFile)
   	}
 }
+
+var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;

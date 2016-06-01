@@ -12,6 +12,7 @@ import PanelOverlay from "../PanelOverlay";
 import MiscUtils, {Structure} from "../utils/MiscUtils";
 import ReactUtils from "../utils/ReactUtils";
 import DOMUtils from "../utils/DOMUtils";
+import {WeavePathArray} from "../utils/WeaveReactUtils";
 
 export enum DropZone {
 	NONE,
@@ -23,8 +24,6 @@ export enum DropZone {
 };
 
 const OUTER_PANEL_ID:WeavePathArray = []; // special value to indicate dragging over outer drop zone
-
-export declare type WeavePathArray = string[];
 
 var stateStructure:any = {
 	id: MiscUtils.nullableStructure(["string"]),
@@ -486,13 +485,6 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	{
 		var weave:Weave = Weave.getWeave(this);
 		var newState:LayoutState = this.getSessionState();
-		if (weave && !newState.id && !newState.children)
-		{
-			var ids:WeavePathArray[] = weave.root.getNames(weavejs.api.ui.IVisTool, true).map(name => [name]);
-			newState = this.generateLayoutState(ids);
-			this.setSessionState(newState);
-		}
-		
 		var components:JSX.Element[] = null;
 		if (this.rootLayout)
 		{

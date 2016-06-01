@@ -11,14 +11,14 @@ import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
 import {
-	LayoutPanelProps, PanelRenderer, AbstractLayout, WeavePathArray,
+	LayoutPanelProps, PanelRenderer, AbstractLayout,
 	AnyAbstractLayout
 } from "./layouts/AbstractLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
 import ReactUtils from "./utils/ReactUtils";
-import {forceUpdateWatcher} from "./utils/WeaveReactUtils";
+import {forceUpdateWatcher, requestObject, WeavePathArray} from "./utils/WeaveReactUtils";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
 import WeaveArchive from "./WeaveArchive";
@@ -40,6 +40,7 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
+import DynamicState = weavejs.api.core.DynamicState;
 
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -147,7 +148,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				// read content from flash
 				var ownerPath:WeavePath = weaveExternalTools[window.name].path;
 				var content:Uint8Array = atob(ownerPath.getValue('btoa(Weave.createWeaveFileContent())') as string) as any;
-				WeaveArchive.setWeaveSessionFromContent(this.props.weave, content);
+				this.menuBar.fileMenu.handleOpenedFileContent("export.weave", content);
 				this.forceUpdate();
 			}
 		}
@@ -340,13 +341,38 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var panels = tabLayoutState && tabLayoutState.panels;
 		var activeTabIndex = tabLayoutState && tabLayoutState.activeTabIndex;
 		var title = tabLayoutState && tabLayoutState.title;
+		var defaultPath = ["Layout"];
 
 		if(!panels || (panels && !panels.length))
 		{
 			var layouts = this.getNonTabLayouts();
+
 			if (!layouts.length)
 			{
-				this.props.weave.root.requestObject('Layout', FlexibleLayout);
+				var archive = this.menuBar.fileMenu.archive;
+				var history = archive && archive.objects.get("history.amf") as {currentState: any};
+				if(history && history.currentState)
+					requestObject(this.props.weave, defaultPath, WindowLayout, (instance:WindowLayout) => {
+						var ids:WeavePathArray[] = this.props.weave.root.getNames(weavejs.api.ui.IVisTool, true).map(name => [name]);
+						instance.setSessionState({
+							panels: ids.map(id => {
+								var state = DynamicState.traverseState(history.currentState, id);
+								return {
+									id: id,
+									position: {
+										left: state.panelX,
+										top: state.panelY,
+										width: state.panelWidth,
+										height: state.panelHeight
+									},
+									maximized: state.maximized
+								};
+							}),
+							title: "Layout"
+						});
+					});
+				else
+					this.props.weave.requestObject(defaultPath, FlexibleLayout);
 				layouts = this.getNonTabLayouts();
 			}
 			panels = layouts.map((layout) => {
@@ -359,7 +385,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if(!activeTabIndex)
 		{
 			activeTabIndex = 0;
-		};
+		}
 
 		if(!title)
 		{

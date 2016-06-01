@@ -127,7 +127,7 @@ export default class WeaveArchive {
 	static ARCHIVE_COLUMN_CACHE_AMF = "column-cache.amf";
 	static ARCHIVE_COLUMN_CACHE_JSON = "column-cache.json";
 
-	private setSessionFromArchive(weave:Weave)
+	public setSessionFromArchive(weave:Weave)
 	{
 		let historyJSON = this.objects.get(WeaveArchive.ARCHIVE_HISTORY_JSON);
 		let historyAMF = this.objects.get(WeaveArchive.ARCHIVE_HISTORY_AMF);

@@ -9,11 +9,12 @@ import ReactUtils from "../utils/ReactUtils";
 import DraggableDiv from "../react-ui/DraggableDiv";
 import {DraggableDivState} from "../react-ui/DraggableDiv";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
-import {AbstractLayout, LayoutProps, WeavePathArray, AnyAbstractLayout} from "./AbstractLayout";
+import {AbstractLayout, LayoutProps, AnyAbstractLayout} from "./AbstractLayout";
 import Div from "../react-ui/Div";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
 import {Structure} from "../utils/MiscUtils";
+import {WeavePathArray} from "../utils/WeaveReactUtils";
 
 export interface PanelState
 {

@@ -8,6 +8,7 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IDisposableObject = weavejs.api.core.IDisposableObject;
+import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 
 // This makes Weave handle linkable React classes appropriately.
 Weave.registerAsyncClass(
@@ -25,6 +26,7 @@ Weave.registerAsyncClass(
 );
 
 export declare type LinkReactStateMapping = { [prop: string]: LinkReactStateMapping | ILinkableObject };
+export declare type WeavePathArray = string[];
 
 const UNLINK = "unlinkReactState";
 
@@ -170,4 +172,19 @@ export function forceUpdateWatcher(component:ReactComponent, type:new(..._:any[]
 	if (defaultPath)
 		watcher.targetPath = defaultPath;
 	return watcher;
+}
+
+export function requestObject<T extends ReactComponent>(weave:Weave, path:string[]/* TODO change to WeavePathArray */, type:new(..._:any[])=>T, onCreate:(instance:T) => void):void
+{
+	var wasEmpty = !weave.getObject(path);
+	weave.requestObject(path, type);
+	var lp = Weave.AS(weave.getObject(path), LinkablePlaceholder);
+	if (wasEmpty && lp)
+	{
+		lp.invalidateState();
+		Weave.getCallbacks(lp).addDisposeCallback(this, () => {
+			if (onCreate && lp.getInstance())
+				onCreate(lp.getInstance());
+		});
+	}
 }

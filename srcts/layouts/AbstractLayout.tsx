@@ -1,11 +1,10 @@
 import * as React from "react";
 import SmartComponent from "../ui/SmartComponent";
+import {WeavePathArray} from "../utils/WeaveReactUtils";
 
 export type LayoutPanelProps = {
 	maximized?:boolean;
 };
-
-export declare type WeavePathArray = string[];
 
 export declare type PanelRenderer = (id:WeavePathArray, panelProps?:LayoutPanelProps, panelRenderer?:PanelRenderer) => JSX.Element;
 

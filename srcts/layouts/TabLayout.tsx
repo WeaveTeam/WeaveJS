@@ -2,7 +2,7 @@ import * as React from "react";
 import * as _ from "lodash";
 
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
-import {AbstractLayout, LayoutProps, WeavePathArray} from "./AbstractLayout";
+import {AbstractLayout, LayoutProps} from "./AbstractLayout";
 import Tabs from "../react-ui/Tabs";
 import {VBox, HBox} from "../react-ui/FlexBox";
 import ReactUtils from "../utils/ReactUtils";
@@ -15,6 +15,7 @@ import {MenuItemProps} from "../react-ui/Menu";
 import MenuButton from "../react-ui/MenuButton";
 import Dropdown from "../semantic-ui/Dropdown";
 import EditableTextCell from "../react-ui/EditableTextCell";
+import {WeavePathArray} from "../utils/WeaveReactUtils";
 
 export interface PanelState
 {
