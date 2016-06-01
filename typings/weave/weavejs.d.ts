@@ -1465,6 +1465,20 @@ declare module weavejs.api.core {
 }
 declare module weavejs.api.core {
     /**
+     * Implement this interface to specify how to rewrite deprecated session state paths.
+     */
+    interface ILinkableObjectWithNewPaths extends ILinkableObject {
+        /**
+         * Receives a deprecated path and returns the new path.
+         * @param relativePath The deprecated path.
+         * @return The new path.
+         */
+        deprecatedPathRewrite(relativePath: Array<string | number>): Array<string | number>;
+    }
+    var ILinkableObjectWithNewPaths: new (..._: any[]) => ILinkableObjectWithNewPaths;
+}
+declare module weavejs.api.core {
+    /**
      * Implement this interface to detect when a full session state is missing properties or a session state contains extra properties.
      */
     interface ILinkableObjectWithNewProperties extends ILinkableObject {
@@ -3300,17 +3314,20 @@ declare module weavejs.core {
     }
 }
 declare module weavejs.core {
+    /**
+     * Manages callbacks that rely on event-related data.
+     */
     class EventCallbackCollection<T> extends CallbackCollection {
         constructor();
         /**
-         * This is the event object.
+         * This is the data that was dispatched.
          */
-        event: T;
+        data: T;
         /**
-         * This function will run callbacks immediately, setting the event variable before each one.
-         * @param event
+         * This function will run callbacks immediately, setting the data variable before each one.
+         * @param data
          */
-        dispatch(event: T): void;
+        dispatch(data: T): void;
     }
 }
 declare module weavejs.core {
@@ -3953,6 +3970,7 @@ declare module weavejs.core {
         removeTreeCallback(relevantContext: Object, groupedCallback: Function): void;
         copySessionState(source: ILinkableObject, destination: ILinkableObject): void;
         static DEPRECATED_STATE_MAPPING: string;
+        static DEPRECATED_PATH_REWRITE: string;
         /**
          * Uses DynamicState.traverseState() to traverse a state and copy portions of the state to ILinkableObjects.
          * @param state A session state

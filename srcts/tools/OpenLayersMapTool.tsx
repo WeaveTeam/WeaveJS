@@ -57,6 +57,7 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import DataType = weavejs.api.data.DataType;
+import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 
 import Bounds2D = weavejs.geom.Bounds2D;
 
@@ -64,6 +65,15 @@ interface Alignment
 {
 	vertical: "top" | "bottom";
 	horizontal: "left" | "right";
+}
+
+export interface MapEventData
+{
+	map:OpenLayersMapTool;
+	mapEvent:ol.MapBrowserEvent;
+	type:string;
+	key:IQualifiedKey;
+	layer:AbstractLayer;
 }
 
 function isAlignment(obj:any):boolean
@@ -283,9 +293,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	controlLocation = Weave.linkableChild(this, new LinkableVariable(null, isAlignment, {vertical: "top", horizontal: "left"}));
 
-	eventScript = Weave.linkableChild(this, new LinkableCallbackScript());
-	eventFilter = Weave.linkableChild(this, new LinkableVariable(Array, Array.isArray, []));
-
 	get title():string
 	{
 		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || this.defaultPanelTitle;
@@ -297,9 +304,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		/* Force the inclusion of the layers. */
 		GeometryLayer; TileLayer; ImageGlyphLayer; ScatterPlotLayer; LabelLayer;
-
-		this.eventScript.groupedCallback.value = false;
-		this.eventScript.delayWhilePlaceholders.value = true;
 
 		weavejs.WeaveAPI.Scheduler.callLater(this, this.initLater);
 	}
@@ -414,19 +418,19 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		}
 	}
 
-	/* For use by the event script */
-	inputEvent: string;
-	inputRecord: IQualifiedKey;
-	inputColumns: IAttributeColumn[];
-
+	/* Event scripting support */
+	events = Weave.linkableChild(this, new EventCallbackCollection<MapEventData>());
+	
+	private _stopEventPropagation:boolean = false;
+	
+	stopEventPropagation():void
+	{
+		this._stopEventPropagation = true;
+	}
+	
 	handleGenericEvent=(event: ol.MapBrowserEvent):boolean=>
 	{
-		if (!_.contains(this.eventFilter.state as string[], event.type))
-		{
-			return true;
-		}
-
-		this.inputEvent = event.type;
+		let eventData:MapEventData = {map: this, mapEvent: event, type: event.type, key: null, layer: null};
 
 		if (event.pixel)
 		{
@@ -438,30 +442,15 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 			if (olFeature && olLayer)
 			{
-				this.inputRecord = olFeature.getId();
-				let layer: AbstractLayer = olLayer.get("layerObject");
-				this.inputColumns = Array.from(layer.selectableAttributes.values());
-			}
-			else
-			{
-				this.inputRecord = null;
-				this.inputColumns = [];
+				eventData.key = olFeature.getId();
+				eventData.layer = olLayer.get("layerObject");
 			}
 		}
-		else
-		{
-			this.inputRecord = null;
-			this.inputColumns = [];
-		}
 
-		Weave.getCallbacks(this.eventScript).triggerCallbacks();
-		console.log(`${this.inputEvent}: ${this.inputRecord}, ${this.inputColumns}`);
+		this._stopEventPropagation = false;
+		this.events.dispatch(eventData);
 
-		this.inputEvent = null;
-		this.inputRecord = null;
-		this.inputColumns = [];
-
-		return false;
+		return !this._stopEventPropagation;
 	}
 
 	initializeMap():void
@@ -488,11 +477,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		 * Most recently added interactions will get the first pass of the event;
 		 * interactions which greedily stop propagation should be added first.
 		 */
-		this.map.addInteraction(new ol.interaction.Interaction({ handleEvent: this.handleGenericEvent }));
 		this.map.addInteraction(dragPan);
 		this.map.addInteraction(dragSelect);
 		this.map.addInteraction(probeInteraction);
 		this.map.addInteraction(dragZoom);
+		this.map.addInteraction(new ol.interaction.Interaction({ handleEvent: this.handleGenericEvent }));
 
 		this.interactionMode.addGroupedCallback(this, () => {
 			let interactionMode = this.interactionMode.value || "select";
