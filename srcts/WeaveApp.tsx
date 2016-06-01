@@ -38,6 +38,8 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
+import WindowLayout from "./layouts/WindowLayout";
+import FlexibleLayout from "./layouts/FlexibleLayout";
 
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
@@ -45,7 +47,7 @@ const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
 	weave:Weave;
-	renderPath?:string[];
+	renderPath?:WeavePathArray;
 	readUrlParams?:boolean;
 }
 
@@ -81,7 +83,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 	}
 	
-	getRenderPath():string[]
+	getRenderPath():WeavePathArray
 	{
 		return this.props.renderPath || WeaveApp.defaultProps.renderPath;
 	}
@@ -265,7 +267,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (placeholder)
 				Weave.getCallbacks(placeholder).addDisposeCallback(this, this.handlePlaceholderDispose.bind(this, path, placeholder));
 			this.setState({ toolPathToEdit: path });
-			this.addToLayout(this.getRenderPath(), path);
+
+			var layoutState = this.tabLayout.getSessionState();
+			if(layoutState.activePanelId)
+				this.addToLayout(layoutState.activePanelId, path);
 		}
 	};
 
@@ -347,14 +352,19 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		});
 	};
 
-	addNewLayout=(type:typeof AbstractLayout, tabLayout:TabLayout)=>
+	addNewLayout=(type?:typeof AbstractLayout)=>
 	{
-		
+		var weave = this.props.weave;
+		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type as any);
+		var path = [weave.root.generateUniqueName(baseName)];
+		weave.requestObject(path, type as any);
+		this.tabLayout.addPanel(path, baseName);
 	};
 
 	removeExisingLayout=(id:WeavePathArray, event:React.MouseEvent)=>
 	{
-
+		this.tabLayout.removePanel(id);
+		this.props.weave.removeObject(id);
 	};
 
 	addToLayout(layoutPath:WeavePathArray, panelPath:WeavePathArray)
@@ -426,50 +436,71 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		let weaveTabbedComponent:JSX.Element = null;
 		if(skipBlankPageIntro || this.state.initialTabForBlankSession == GetStartedComponent.DATA) // default - Data Source Manager Page
 		{
-			weaveTabbedComponent = <WeaveComponentRenderer
-										weave={weave}
-										path={renderPath}
-										defaultType={TabLayout}
-										style={{width: "100%", height: "100%"}}
-										onCreate={this.initializeTabs}
-										props={
-												{
-													panelRenderer: this.renderTab,
-													leadingTabs: [
-														{
-															label: "Data Sources",
-															content: (<HBox>{"Data Source Manager"}</HBox>)
-														}
-													],
-													onAdd: this.addNewLayout,
-													onClose: this.removeExisingLayout
-											    }
-											  }
-									/>;
+			weaveTabbedComponent = (
+				<WeaveComponentRenderer
+					weave={weave}
+					path={renderPath}
+					defaultType={TabLayout}
+					style={{width: "100%", height: "100%"}}
+					onCreate={this.initializeTabs}
+					props={ {
+						panelRenderer: this.renderTab,
+						leadingTabs: [
+							{
+								label: "Data Sources",
+								content: (
+									<HBox>{"Data Sources"}</HBox>
+								)
+							}
+						],
+						onAdd: [
+							{
+								label: Weave.lang("Window Layout"),
+								click: () => this.addNewLayout(WindowLayout)
+							},
+							{
+								label: Weave.lang("Flexible Layout"),
+								click: () => this.addNewLayout(FlexibleLayout)
+							}
+						],
+						onRemove: this.removeExisingLayout
+					}}
+				/>
+			);
 		}
 		else if(this.state.initialTabForBlankSession == GetStartedComponent.SESSION)
 		{
-			weaveTabbedComponent = <WeaveComponentRenderer
-										weave={weave}
-										path={renderPath}
-										defaultType={TabLayout}
-										style={{width: "100%", height: "100%"}}
-										onCreate={this.initializeTabs}
-										props={
-												{
-													panelRenderer: this.renderTab,
-													leadingTabs: [
-														{
-															label: "Sessions",
-															content: (<HBox>{"File Picker"}</HBox>)
-														}
-													],
-													onAdd: this.addNewLayout,
-													onClose: this.removeExisingLayout
-											    }
-											  }
-									/>;
-
+			weaveTabbedComponent = (
+				<WeaveComponentRenderer
+					weave={weave}
+					path={renderPath}
+					defaultType={TabLayout}
+					style={{width: "100%", height: "100%"}}
+					onCreate={this.initializeTabs}
+					props={ {
+						panelRenderer: this.renderTab,
+						leadingTabs: [
+							{
+								label: "Load File",
+								content: (
+									<HBox>{"File List"}</HBox>
+								)
+							}
+						],
+						onAdd: [
+							{
+								label: Weave.lang("Window Layout"),
+								click: () => this.addNewLayout(WindowLayout)
+							},
+							{
+								label: Weave.lang("Flexible Layout"),
+								click: () => this.addNewLayout(FlexibleLayout)
+							}
+						],
+						onRemove: this.removeExisingLayout
+					}}
+				/>
+			);
 		}
 
 		return (
@@ -481,7 +512,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				<WeaveProgressBar/>
 				{blankPageIntroScreen}
 				{weaveTabbedComponent}
-
 				{
 					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
 					?	<WeaveMenuBar

@@ -202,5 +202,6 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 Weave.registerClass(
 	WindowLayout,
 	'weavejs.layout.WindowLayout',
-	[weavejs.api.core.ILinkableVariable]
+	[weavejs.api.core.ILinkableVariable],
+	"Window Layout"
 );

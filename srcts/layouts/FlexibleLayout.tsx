@@ -555,5 +555,6 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 Weave.registerClass(
 	FlexibleLayout,
 	'weavejs.layout.FlexibleLayout',
-	[weavejs.api.core.ILinkableVariable]
+	[weavejs.api.core.ILinkableVariable],
+	'Flexible Layout'
 );
