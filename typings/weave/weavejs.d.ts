@@ -8228,6 +8228,7 @@ declare module weavejs.net {
         hideFaultMessage(query: WeavePromise<any>): void;
         getVersion(): WeavePromise<string>;
         checkDatabaseConfigExists(): WeavePromise<boolean>;
+        getAuthenticatedUser(): WeavePromise<string>;
         authenticate(user: string, pass: string): WeavePromise<boolean>;
         keepAlive(): WeavePromise<void>;
         getWeaveFileNames(showAllFiles: boolean): WeavePromise<string[]>;
