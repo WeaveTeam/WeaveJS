@@ -25,12 +25,13 @@ export interface PanelState
 
 export interface TabLayoutProps extends LayoutProps
 {
-	leadingTabs: {
+	leadingTabs?: {
 		label: React.ReactChild,
 		content: JSX.Element
 	}[];
 	onAdd: MenuItemProps|React.MouseEventHandler;
 	onRemove: (panelId:WeavePathArray, event?:React.MouseEvent) => void;
+	onTabDoubleLDoubleClick: (panelId:WeavePathArray) => void;
 }
 
 export interface LayoutState
@@ -185,7 +186,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		var state = this.getSessionState();
 		var activeTabIndex = state.activeTabIndex + this.leadingTabsLength;
 		var tabBarChildren:JSX.Element = null;
-		
+		var leadingTabs = this.props.leadingTabs || [];
 		if(this.props.onAdd)
 		{
 			if(Array.isArray(this.props.onAdd))
@@ -221,12 +222,13 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 				<Tabs
 					location="bottom"
 					labels={
-						this.props.leadingTabs.map(tab => tab.label)
+						leadingTabs.map(tab => tab.label)
 						.concat(state.panels.map((panel) => (
 							<HBox
 								className="weave-padded-hbox"
 								onDragOver={(event) => this.onDragOverTab(panel)}
 								onDragLeave={this.onDragLeaveTab}
+								onDoubleClick={() => this.props.onTabDoubleLDoubleClick(panel.id)}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.renamePanel(panel.id, newName)} textContent={panel.label}/>*/}
 								{panel.label}
@@ -242,7 +244,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 					onViewChange={this.switchPanelToActive}
 					activeTabIndex={activeTabIndex}
 					tabs={
-						this.props.leadingTabs.map(tab => tab.content)
+						leadingTabs.map(tab => tab.content)
 						.concat(state.panels.map(panel => (
 							this.props.panelRenderer
 							?	this.props.panelRenderer(panel.id, {}, this.props.panelRenderer)
@@ -263,5 +265,6 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 Weave.registerClass(
 	TabLayout,
 	'weavejs.layout.TabLayout',
-	[weavejs.api.core.ILinkableVariable]
+	[weavejs.api.core.ILinkableVariable],
+	'Tab Layout'
 );
