@@ -49,7 +49,6 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
 	pendingApply:Boolean =false;
-	static activeTabIndex:number = 0;
 
 	verifyLayoutMode(value:string):boolean
 	{
@@ -460,12 +459,11 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 			.set("Targets", this.renderTargetItems())
 			.set("Menu Items", this.renderMenuItems());
 
+		//need to maintain an active tab index only when the active tab is changed programmatically, not when mouse events change the active tab
 		return(
 			<Tabs
 				labels={Array.from(tabs.keys())}
-				activeTabIndex={SessionStateMenuTool.activeTabIndex}
 				tabs={Array.from(tabs.values())}
-				onViewChange={(index) => SessionStateMenuTool.activeTabIndex = index}
 			/>
 		);
 	}
