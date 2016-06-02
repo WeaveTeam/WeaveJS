@@ -62,15 +62,9 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			}
 			this.weaveRootTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);//create new one
 			//TODO not triggering callback when datasource is modified?
-			Weave.getCallbacks(this.weaveRootTreeNode).addGroupedCallback(this, this.test);//add it to the new one
+			Weave.getCallbacks(this.weaveRootTreeNode).addGroupedCallback(this, this.forceUpdate);//add it to the new one
 		//}
 	}
-
-	test=()=>//temporary test function to check if forceUpdate is called
-	{
-		console.log('calling test');
-		this.forceUpdate();
-	};
 
 	private comboBox: ComboBox;
 	private lastActiveNode:IWeaveTreeNode & IColumnReference;
