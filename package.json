@@ -5,6 +5,7 @@
   "main": "lib/WeaveUI.js",
   "scripts": {
     "test": "./node_modules/jshint/bin/jshint tests/hello.js",
+	"preinstall": "mkdir dist",
     "compile": "tsc && babel -d lib outts && browserifyinc --debug --cachefile browserifycache.json lib/index.js > dist/index.js",
     "postinstall": "cd lib || npm run compile",
     "_compile": "grunt ts && grunt babel",
