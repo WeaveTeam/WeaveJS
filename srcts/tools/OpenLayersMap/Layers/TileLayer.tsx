@@ -235,7 +235,7 @@ export default class TileLayer extends AbstractLayer
 						let params: any = {};
 						switch (serviceState.providerName)
 						{
-							case "Stamen WaterColor":
+							case "Stamen Watercolor":
 								providerName = "stamen";
 								params.layer = "watercolor";
 								break;
