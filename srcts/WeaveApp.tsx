@@ -360,13 +360,17 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 								var state = DynamicState.traverseState(history.currentState, id);
 								return {
 									id: id,
-									position: {
-										left: state.panelX,
-										top: state.panelY,
-										width: state.panelWidth,
-										height: state.panelHeight
-									},
-									maximized: state.maximized
+									position: (
+										state
+										?	{
+												left: state.panelX,
+												top: state.panelY,
+												width: state.panelWidth,
+												height: state.panelHeight
+											}
+										:	WindowLayout.generatePosition()
+									),
+									maximized: state && state.maximized
 								};
 							}),
 							title: "Layout"

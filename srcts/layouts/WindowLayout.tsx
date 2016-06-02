@@ -105,16 +105,21 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 	addPanel(id:WeavePathArray):void
 	{
 		var state = this.getSessionState();
-		state.panels = state.panels.concat({id, position: {
-			left: this.fudgePercent(5, 3),
-			top: this.fudgePercent(5, 3),
-			width: "50%",
-			height: "50%"
-		}});
+		state.panels = state.panels.concat({id, position: generatePosition()});
 		this.setSessionState(state);
 	}
+	
+	static generatePosition():DraggableDivState
+	{
+		return {
+			left: WindowLayout.fudgePercent(5, 3),
+			top: WindowLayout.fudgePercent(5, 3),
+			width: "50%",
+			height: "50%"
+		};
+	}
 
-	fudgePercent(n:number, delta:number):string
+	static fudgePercent(n:number, delta:number):string
 	{
 		return Math.round(n - delta + Math.random() * 2 * delta) + '%';
 	}
