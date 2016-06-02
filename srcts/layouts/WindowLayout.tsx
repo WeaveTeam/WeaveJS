@@ -105,7 +105,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 	addPanel(id:WeavePathArray):void
 	{
 		var state = this.getSessionState();
-		state.panels = state.panels.concat({id, position: generatePosition()});
+		state.panels = state.panels.concat({id, position: WindowLayout.generatePosition()});
 		this.setSessionState(state);
 	}
 	
