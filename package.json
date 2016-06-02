@@ -4,7 +4,7 @@
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
   "main": "lib/WeaveUI.js", 
   "scripts": {
-    "test": "./node_modules/jshint/bin/jshint tests/hello.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
 	"preinstall": "mkdir dist",
     "compile": "tsc && babel -d lib outts && browserifyinc --debug --cachefile browserifycache.json lib/index.js > dist/index.js",
     "postinstall": "cd lib || npm run compile",
