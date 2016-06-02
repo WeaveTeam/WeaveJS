@@ -15,6 +15,7 @@ export interface TabsProps extends React.Props<Tabs>
 	tabs:JSX.Element[];
 	location?:"top"|"bottom";
 	tabBarChildren?:React.ReactChild;
+	initialActiveTabIndex?:number;
 	activeTabIndex?:number;
 	onViewChange?:(index:number) => void;
 	className?:string;
@@ -43,7 +44,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 	{
 		super(props);
 		this.state = {
-			activeTabIndex: props.activeTabIndex || 0
+			activeTabIndex: props.initialActiveTabIndex || props.activeTabIndex || 0
 		}
 	}
 
