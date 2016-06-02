@@ -34,28 +34,29 @@ export default class GuidanceContainer extends React.Component<GuidanceContainer
 	// props.id is matched the ref callback to cache either mounted or unmounted state of the component
 	static getMountedTargetComponent=(mountedElement:any)=>
 	{
+		if(!GuidanceContainer.enableGuidance) {
+			return;
+		}
 		if(!mountedElement)
 		{
-			if(GuidanceContainer.stepComponentMap[mountedElement.props.id]){
+			/*if(GuidanceContainer.stepComponentMap[mountedElement.props.id]){
 				GuidanceContainer.stepComponentMap[mountedElement.props.id] = null; // when component is unmounted
-			}
+			}*/
 			return;
 		}
 
-		if(GuidanceContainer.enableGuidance)
+		if(GuidanceContainer.guidanceSteps && GuidanceContainer.guidanceSteps.length > 0) // if part of guidance steps
 		{
-			if(GuidanceContainer.guidanceSteps && GuidanceContainer.guidanceSteps.length > 0) // if part of guidance steps
+			if(GuidanceContainer.guidanceSteps.indexOf(mountedElement.props.id) > -1)
 			{
-				if(GuidanceContainer.guidanceSteps.indexOf(mountedElement.props.id) > -1)
+				GuidanceContainer.stepComponentMap[mountedElement.props.id] = mountedElement;
+				if(GuidanceContainer.guidanceSteps.indexOf(mountedElement.props.id) == 0) // if mounted component is part of first step
 				{
-					GuidanceContainer.stepComponentMap[mountedElement.props.id] = mountedElement;
-					if(GuidanceContainer.guidanceSteps.indexOf(mountedElement.props.id) == 0) // if mounted component is part of first step
-					{
-						GuidanceContainer.stepName.value = mountedElement.props.id; // se the state, which will call the callback registered in Guidance Container instance
-					}
+					GuidanceContainer.stepName.value = mountedElement.props.id; // se the state, which will call the callback registered in Guidance Container instance
 				}
 			}
 		}
+
 	};
 
 	// static method passed to target Component's Reference callback
@@ -63,18 +64,20 @@ export default class GuidanceContainer extends React.Component<GuidanceContainer
 	// move to nextstep
 	static targetComponentOnClick=(stepName:string)=>
 	{
-		if(GuidanceContainer.enableGuidance)
+		if(!GuidanceContainer.enableGuidance)
 		{
-			if(GuidanceContainer.guidanceSteps && GuidanceContainer.guidanceSteps.length > 0 && GuidanceContainer.guidanceSteps.indexOf(stepName) != -1)
-			{
-				let currentStepIndex:number = GuidanceContainer.guidanceSteps.indexOf(stepName); // get index of currentStep
-				let nextStepName:string = GuidanceContainer.guidanceSteps[currentStepIndex + 1]; // increment to find the next step
-				if(nextStepName)
-					GuidanceContainer.stepName.value = nextStepName; // setting the state will trigger callback in GuidanceContainer instance
-				else
-					GuidanceContainer.stepName.value = ""
-			}
+			return;
 		}
+		if(GuidanceContainer.guidanceSteps && GuidanceContainer.guidanceSteps.length > 0 && GuidanceContainer.guidanceSteps.indexOf(stepName) != -1)
+		{
+			let currentStepIndex:number = GuidanceContainer.guidanceSteps.indexOf(stepName); // get index of currentStep
+			let nextStepName:string = GuidanceContainer.guidanceSteps[currentStepIndex + 1]; // increment to find the next step
+			if(nextStepName)
+				GuidanceContainer.stepName.value = nextStepName; // setting the state will trigger callback in GuidanceContainer instance
+			else
+				GuidanceContainer.stepName.value = ""
+		}
+
 	};
 
 	constructor(props:GuidanceContainerProps)
