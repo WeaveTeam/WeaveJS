@@ -80,14 +80,20 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 
 	handleKeyStroke=(event:KeyboardEvent)=>
 	{
-		event.preventDefault();
 		// ctrl-z and cmd-z
 		if((event.ctrlKey || event.metaKey) && event.keyCode == Z_KEYCODE)
+		{
+			event.preventDefault();
 			this._stateLog.undo();
+		}
+
 
 		// ctrl-y and cmd-y and cmd-shift-z
 		if(((event.ctrlKey || event.metaKey) && event.keyCode == Y_KEYCODE) || (event.metaKey && event.shiftKey && event.keyCode == Z_KEYCODE))
+		{
+			event.preventDefault();
 			this._stateLog.redo();
+		}
 	};
 
 	componentDidMount()
