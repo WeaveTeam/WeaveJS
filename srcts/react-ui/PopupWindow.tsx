@@ -175,25 +175,28 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 				onMouseDown={() => this.handleClickOnWindow()}
 				ref={(c:DraggableDiv) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}
 			>
-				{this.props.title ? <HBox className="weave-header weave-window-header" draggable={this.props.draggable}>
-					<div style={{flex: 1}}>
-						{
-							this.props.title
-						}
-					</div>
-				</HBox>:null}
-				<VBox style={{flex: 1}}>
-					<VBox className="weave-padded-vbox weave-window-content" style={{display: 'block', flex: 1}}>
-						<VBox style={{flex: 1, overflow: "auto"}}>
-							{ this.state.content || this.props.content }
-							{ this.props.children }
-						</VBox>
-						{
-							this.props.footerContent
-								?	<HBox className="weave-window-footer">
+				{
+					this.props.title
+					?	<HBox className="weave-header weave-window-header" draggable={this.props.draggable}>
+							<div style={{flex: 1}}>
+								{
+									this.props.title
+								}
+							</div>
+						</HBox>
+					:	null
+				}
+				<VBox className="weave-padded-vbox weave-window-content" style={{flex: 1}}>
+					<VBox style={{flex: 1, overflow: "auto"}}>
+						{ this.state.content || this.props.content }
+						{ this.props.children }
+					</VBox>
+					{
+						this.props.footerContent
+						?	<HBox className="weave-window-footer">
 								{this.props.footerContent}
 							</HBox>
-								:	<HBox className="weave-window-footer">
+						:	<HBox className="weave-window-footer">
 								<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
 									<Button onClick={this.onOk.bind(this)}>{Weave.lang(this.props.modal ? "Ok" : "Done")}</Button>
 									{
@@ -203,8 +206,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 									}
 								</HBox>
 							</HBox>
-						}
-					</VBox>
+					}
 				</VBox>
 			</DraggableDiv>
 		);
