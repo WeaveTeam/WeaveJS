@@ -99,10 +99,6 @@ export default class GuidanceContainer extends React.Component<GuidanceContainer
 			let mountedElement = GuidanceContainer.stepComponentMap[nextStepName];
 			this.targetMountedNode =  ReactDOM.findDOMNode(mountedElement as any);
 		}
-		else
-		{
-			console.log(nextStepName,  " component not mounted yet or it may be unmounted");
-		}
 
 		this.setState({
 			activeStepName:nextStepName
