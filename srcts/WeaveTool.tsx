@@ -19,6 +19,7 @@ import SmartComponent from "./ui/SmartComponent";
 import classNames from "./modules/classnames";
 import DraggableDiv from "./react-ui/DraggableDiv";
 import {AbstractLayout, AnyAbstractLayout} from "./layouts/AbstractLayout";
+import MouseUtils from "./utils/MouseUtils";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -36,7 +37,8 @@ export interface IWeaveToolState
 {
 	title?: string;
 	altText?:string;
-	showControls?: boolean;
+	hovered?: boolean;
+	dragging?:boolean;
 	highlightTitle?: boolean;
 }
 
@@ -44,7 +46,8 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 {
 	private titleBarHeight:number = 25;
 	private watcher:LinkableWatcher;
-	
+	private clickState:boolean;
+
 	constructor(props:IWeaveToolProps)
 	{
 		super(props);
@@ -71,6 +74,14 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	{
 		this.updateTitle();
     }
+
+	componentDidUpdate():void
+	{
+		if(!MouseUtils.mouseButtonDown)
+			this.setState({
+				dragging: false
+			});
+	}
 	
 	updateTitle():void
 	{
@@ -93,52 +104,65 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	
 	onGearClick=():void=>
 	{
-		if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
+		if(MouseUtils.receivedMouseDown())
 		{
-			if (this.props.onGearClick)
+			if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
 			{
-				this.props.onGearClick(this);
-			}
-			else
-			{
-				PopupWindow.open({
-					title: Weave.lang("Settings for {0}", this.state.title),
-					modal: false,
-					content: (this.watcher.target as any).renderEditor()
-				});
+				if (this.props.onGearClick)
+				{
+					this.props.onGearClick(this);
+				}
+				else
+				{
+					PopupWindow.open({
+						title: Weave.lang("Settings for {0}", this.state.title),
+						modal: false,
+						content: (this.watcher.target as any).renderEditor()
+					});
+				}
 			}
 		}
 	};
 	
 	onMaximizeClick=():void=>
 	{
-		var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AnyAbstractLayout;
-		if (layout)
-			layout.maximizePanel(this.props.path, !this.props.maximized);
+		if(MouseUtils.receivedMouseDown())
+		{
+			var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AnyAbstractLayout;
+			if (layout)
+				layout.maximizePanel(this.props.path, !this.props.maximized);
+		}
 	};
 	
 	onPopoutPopinClick=():void=>
 	{
-		if (this.props.onPopoutClick)
-			this.props.onPopoutClick(this);
-		if (this.props.onPopinClick)
-			this.props.onPopinClick(this);
+		if(MouseUtils.receivedMouseDown())
+		{
+			if (this.props.onPopoutClick)
+				this.props.onPopoutClick(this);
+			if (this.props.onPopinClick)
+				this.props.onPopinClick(this);
+		}
 	};
 
-	onCloseClick=():void=>
+	onCloseClick=(event:React.MouseEvent):void=>
 	{
-		var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AnyAbstractLayout;
-		if (layout)
+		if(MouseUtils.receivedMouseDown())
 		{
-			this.props.weave.removeObject(this.props.path);
-			layout.removePanel(this.props.path);
+			var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AnyAbstractLayout;
+			if (layout)
+			{
+				this.props.weave.removeObject(this.props.path);
+				layout.removePanel(this.props.path);
+			}
 		}
 	};
 			
 	renderTitleBar():JSX.Element
 	{
+		var showControls = this.state.hovered || this.state.dragging;
 		var className = "weave-tool-title-bar";
-		if (this.state.showControls || this.state.highlightTitle)
+		if (showControls|| this.state.highlightTitle)
 			className = "weave-tool-title-bar-hovered";
 		if (this.state.highlightTitle)
 			className += " weave-tool-title-bar-highlighted";
@@ -146,39 +170,42 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
 
 		return (
-			<HBox className={className} style={{height: this.titleBarHeight}} draggable={true} onDoubleClick={this.onMaximizeClick}>
-				{
-					this.state.showControls
-					?	[
-							<CenteredIcon key="0" title={Weave.lang("Configure")} onClick={this.onGearClick}
-										  iconProps={{className: "fa fa-cog fa-fw"}}/>,
-							<div key="1" style={{width: 28, height: 24}}/>,
-							Weave.beta ? <div key="2" style={{width: 28, height: 24}}/> : null
-						]
-					:	null
-				}
-				<HBox style={{flex: 1, alignSelf: "stretch", cursor: "move", visibility: "visible", overflow: "hidden"}}>
+			<HBox className={className} style={{height: this.titleBarHeight}} onDoubleClick={this.onMaximizeClick}>
+				<HBox style={{display: showControls ? "flex" : "none"}}>
+					<CenteredIcon 
+						title={Weave.lang("Configure")}
+						onMouseUp={this.onGearClick}
+						iconProps={{className: "fa fa-cog fa-fw"}}
+					/>
+					<div style={{width: 28, height: 24}}/>
+					{Weave.beta ? <div style={{width: 28, height: 24}}/> : null}
+				</HBox>
+				<HBox draggable={true} style={{flex: 1, alignSelf: "stretch", cursor: "move", visibility: "visible", overflow: "hidden"}}>
 					<p className="weave-tool-title-bar-text" style={{width: "100%", padding: 5, textAlign: "center", overflow: "hidden", textOverflow: "ellipsis"}}>
 						{Weave.lang(this.state.title)}
 					</p>
 				</HBox>
-				{
-					this.state.showControls 
-					?	[
-							<CenteredIcon key="0" title={maximizeTitleText} onClick={this.onMaximizeClick}
-										  iconProps={{ className: maximizeClassName }}/>,
-							Weave.beta 
-							?	<CenteredIcon key="1"
-										title={this.props.onPopoutClick ? Weave.lang("Display in new window") : Weave.lang("Restore to main window")}
-										onClick={this.onPopoutPopinClick}
-										iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
-									/>
-							:	null,
-							<CenteredIcon key="2" title={Weave.lang("Close")} onClick={this.onCloseClick}
-										  iconProps={{className: "fa fa-times fa-fw"}}/>
-				    ]
-					: null
-				}
+				<HBox style={{display: showControls ? "flex" : "none", flexDirection: "row"}}>
+					<CenteredIcon
+						title={maximizeTitleText}
+						onMouseUp={this.onMaximizeClick}
+						iconProps={{ className: maximizeClassName }}
+					/>
+					{
+						Weave.beta
+					    ?	<CenteredIcon
+								title={this.props.onPopoutClick ? Weave.lang("Display in new window") : Weave.lang("Restore to main window")}
+								onClick={this.onPopoutPopinClick}
+								iconProps={{className: this.props.onPopoutClick ? "fa fa-external-link fa-fw" : "fa fa-level-down fa-fw fa-rotate-90"}}
+							/>
+						:	null
+					}
+					<CenteredIcon
+						title={Weave.lang("Close")}
+					    onMouseUp={this.onCloseClick}
+						iconProps={{className: "fa fa-times fa-fw"}}
+					/>
+				</HBox>
 			</HBox>
 		);
 	}
@@ -191,11 +218,14 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				className="weave-tool"
 				role="img"
 				onMouseOver={() => {
-					this.setState({ showControls: true });
+					this.setState({ hovered: true });
 				}}
 			    onMouseLeave={() => {
-					this.setState({ showControls: false });
+					this.setState({ hovered: false });
 				}}
+			    onDragStart={() => {
+			        this.setState({ dragging: true });
+			    }}
 			>
 				<div>{ this.renderTitleBar() }</div>
 				<WeaveComponentRenderer

@@ -30,6 +30,7 @@ export default class MouseUtils
 	 * The last mouse event.
 	 */
 	static mouseEvent:MouseEvent = new MouseEvent('mousemove');
+	static mouseDownEvent:MouseEvent = null;
 
 	static getOffsetPoint(relativeTo:HTMLElement, event:MouseEvent = null):{x:number, y:number}
 	{
@@ -40,6 +41,19 @@ export default class MouseUtils
 			x: (event.clientX - rect.left) * (relativeTo.offsetWidth / rect.width || 1),
 			y: (event.clientY - rect.top) * (relativeTo.offsetHeight / rect.height || 1)
 		};
+	}
+
+	/**
+	 * This function can be used to check if the user clicked on an element
+	 * even if the 'click' event doesn't get dispatched due to DOM changes
+	 * @param element the Element in question
+	 * @returns {boolean} return true if the element received the last 'mousedown' event.
+	 */
+	static receivedMouseDown(element:Element = null):boolean
+	{
+		if(!element)
+			element = MouseUtils.mouseEvent.target as Element;
+		return MouseUtils.mouseDownEvent && element && element.contains(MouseUtils.mouseDownEvent.target as Element);
 	}
 }
 
@@ -52,6 +66,8 @@ mouseEventTypes.forEach(eventType => document.addEventListener(
 	eventType,
 	function(event:MouseEvent) {
 		MouseUtils.mouseEvent = event;
+		if (event.type == 'mousedown')
+			MouseUtils.mouseDownEvent = event;
 		if (event.buttons || canRelyOnButtonsProp)
 		{
 			canRelyOnButtonsProp = true;
