@@ -2,7 +2,7 @@
   "name": "WeaveJS",
   "version": "0.0.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
-  "main": "lib/WeaveUI.js",
+  "main": "lib/WeaveUI.js", 
   "scripts": {
     "test": "./node_modules/jshint/bin/jshint tests/hello.js",
 	"preinstall": "mkdir dist",
