@@ -49,6 +49,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
 	pendingApply:Boolean =false;
+	static activeTabIndex:number = 0;
 
 	verifyLayoutMode(value:string):boolean
 	{
@@ -458,14 +459,13 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		var tabs = new Map<string, JSX.Element>()
 			.set("Targets", this.renderTargetItems())
 			.set("Menu Items", this.renderMenuItems());
-		var activeTabIndex = 0;
 
 		return(
 			<Tabs
 				labels={Array.from(tabs.keys())}
-				activeTabIndex={activeTabIndex}
+				activeTabIndex={SessionStateMenuTool.activeTabIndex}
 				tabs={Array.from(tabs.values())}
-				onViewChange={() => this.forceUpdate()}
+				onViewChange={(index) => SessionStateMenuTool.activeTabIndex = index}
 			/>
 		);
 	}
