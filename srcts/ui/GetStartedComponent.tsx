@@ -2,19 +2,13 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox,VBox} from  "../react-ui/FlexBox";
+import GuidanceContainer from  "../react-ui/GuidanceContainer";
 import FileDialog from  "../ui/FileDialog";
-import DataSourceManager from  "./DataSourceManager";
-import ControlPanel  from "./ControlPanel";
-import DataMenu  from "../menus/DataMenu";
-import FileMenu from "../menus/FileMenu";
 
 
 export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComponent>
 {
-    weave:Weave;
-	createObject:(type:new(..._:any[])=>any,enableGuidance:boolean)=>void;
-	openDataSourceManagerCallback:()=>void;
-	loader:(loadApp:boolean)=>void;
+	loader:(initialWeaveComponent:string)=>void;
 }
 
 export interface GetStartedComponentState
@@ -28,28 +22,17 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 
 	static DATA:string = "data";
 	static SESSION:string = "session";
+	static GUIDANCE:string = "guidance";
 
-	private dataMenu:DataMenu = null;
-	private fileMenu:FileMenu = null;
-	private enableGuidanceMode:boolean = false;
 
 	constructor(props:GetStartedComponentProps)
 	{
 		super(props);
-		this.fileMenu = new FileMenu(props.weave);
 		this.state = {
 			visible:true,
 			showGuidanceList:false
 		}
 	}
-
-	// wrapper function to supply guidance mode state
-	// createObject function is in WeaveApp
-	createObjectWithGuidanceModeState = (type:new(..._:any[])=>any)=>{
-		this.props.createObject(type,this.enableGuidanceMode);
-	}
-
-
 
 	componentWillReceiveProps(nextProps:GetStartedComponentProps)
 	{
@@ -57,30 +40,28 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	}
 
 	openDataSourceManager=(enableGuidance:boolean = false)=>{
-		if(enableGuidance){ // temp till new datasoure manager is implemented
-			//DataSourceManager.openInstance(this.dataMenu,null,enableGuidance);
-			this.openDataSourceManager();
-		}else if(this.props.loader)
-			this.props.loader(true);
-		//DataSourceManager.openInstance(this.dataMenu,null,enableGuidance);
+		GuidanceContainer.enableGuidance  = enableGuidance
+		 if(this.props.loader)
+			this.props.loader(enableGuidance ? GetStartedComponent.GUIDANCE : GetStartedComponent.DATA);
 		this.setState({
 			visible:false
 		})
-	}
+	};
 
 	openFileDialog=()=>{
-		if(this.props.loader)  this.props.loader(true);
+		if(this.props.loader)
+			this.props.loader(GetStartedComponent.SESSION);
 		FileDialog.open();
 		this.setState({
 			visible:false
 		})
-	}
+	};
 
 	enableGuidanceList=()=>{
 		this.setState({
 			showGuidanceList:true
 		})
-	}
+	};
 
 	render() {
 		if(!this.state.visible)
@@ -112,12 +93,8 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		{
 			guidanceListUI = <VBox style={ {position:"relative"} } className="weave-guidance-list">
 								<span className="weave-guidance-list-item"
-								      onClick={ ()=>{this.enableGuidanceMode =true;this.openDataSourceManager(true)} }>
+								      onClick={ ()=>{ GuidanceContainer.guidanceSteps = ["CSV file", "Open file","Create a chart"]; this.openDataSourceManager(true)} }>
 									CSV Data to Visualization
-								</span>
-								<span className="weave-guidance-list-item"
-								      onClick={this.openFileDialog}>
-									How to upload Local Weave File
 								</span>
 							</VBox>
 		}

@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {VBox, HBox} from "../react-ui/FlexBox";
+import GuidanceContainer from "../react-ui/GuidanceContainer";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
@@ -10,10 +11,6 @@ import StatefulTextField from "../ui/StatefulTextField";
 import WeaveTree from "../ui/WeaveTree";
 import FixedDataTable from "../tools/FixedDataTable";
 import {IColumnTitles} from "../tools/FixedDataTable";
-import Tabs from "../react-ui/Tabs";
-import GuidanceToolTip from "../react-ui/GuidanceToolTip";
-import GuidanceContainer from "../react-ui/GuidanceContainer";
-import Input from "../semantic-ui/Input";
 import MenuButton from '../react-ui/MenuButton';
 import ChartsMenu from "../menus/ChartsMenu";
 import {linkReactStateRef, forceUpdateWatcher} from "../utils/WeaveReactUtils";
@@ -163,15 +160,15 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let enableGuidance:boolean = this.props.enableGuidance && this.state.guideToTab == "Browse";
 		if(this.props.chartsMenu)
 		{
-			createChartButtonUI = <GuidanceContainer enable={enableGuidance} direction={GuidanceContainer.VERTICAL}
-			                                 location={GuidanceToolTip.BOTTOM}
-			                                 type={GuidanceContainer.DONE}
-			                                 toolTip="Click to add Chart">
-										<MenuButton menu={ this.props.chartsMenu.getCreateObjectItems() } style={{width: "100%"}} showIcon={false}>
-											<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>
-											{Weave.lang('Create a chart')}
-										</MenuButton>
-								</GuidanceContainer>
+			/* id, ref, onClick are added for Guidance , id and onClick argument has to match as they represent step name */
+			createChartButtonUI = <MenuButton id="Create a chart"
+			                                  ref={GuidanceContainer.getMountedTargetComponent}
+			                                  onClick={()=>GuidanceContainer.targetComponentOnClick("Create a chart")}
+			                                  menu={ this.props.chartsMenu.getCreateObjectItems() }
+			                                  style={{width: "100%"}} showIcon={false}>
+										<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>
+										{Weave.lang('Create a chart')}
+									</MenuButton>
 
 		}
 

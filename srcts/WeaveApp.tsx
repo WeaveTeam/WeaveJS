@@ -3,6 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import prefixer from "./react-ui/VendorPrefixer";
 import SideBarContainer from "./react-ui/SideBarContainer";
+import GuidanceContainer from "./react-ui/GuidanceContainer";
 import {VBox, HBox} from "./react-ui/FlexBox";
 import WeaveMenuBar from "./WeaveMenuBar";
 import DynamicComponent from "./ui/DynamicComponent";
@@ -55,7 +56,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 export interface WeaveAppState
 {
 	toolPathToEdit?:WeavePathArray;
-	loadInitialWeaveComponent?:boolean;
+	initialWeaveComponent?:string;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
@@ -391,6 +392,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		{
 			title = this.props.weave.root.getName(this.tabLayout);
 		}
+		if(this.state.initialWeaveComponent == GetStartedComponent.DATA || this.state.initialWeaveComponent == GetStartedComponent.GUIDANCE)
+		{
+			activeTabIndex = -1; // -1 used to open the leading tab , rather session tab
+		}
 
 		tabLayout.setSessionState({
 			panels,
@@ -442,9 +447,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 
-	initialLoadingForBlankSession=(loadWeaveApp:boolean):void=>{
+	initialLoadingForBlankSession=(initialComponentName:string):void=>{
 		this.setState({
-			loadInitialWeaveComponent:loadWeaveApp
+			initialWeaveComponent:initialComponentName
 		});
 		
 	};
@@ -477,15 +482,19 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		let skipBlankPageIntro:boolean = Boolean(this.urlParams.file) || Boolean(this.urlParams.skipBlankPageIntro);
 		let blankPageIntroScreen:JSX.Element = skipBlankPageIntro ? null : <GetStartedComponent style={ {flex:1} }
-		                                                                                        weave={weave}
-		                                                                                        createObject={this.createObject}
 		                                                                                        loader={this.initialLoadingForBlankSession}
-		                                                                                        openDataSourceManagerCallback={this.openDataSourceManager}
 		/>
 
 		let weaveTabbedComponent:JSX.Element = null;
-		if(skipBlankPageIntro || this.state.loadInitialWeaveComponent)
+		let guidanceComponent:JSX.Element = null;
+		if(skipBlankPageIntro || this.state.initialWeaveComponent)
 		{
+			if(this.state.initialWeaveComponent == GetStartedComponent.GUIDANCE )
+			{
+				guidanceComponent = <GuidanceContainer/>
+
+			}
+
 			weaveTabbedComponent = (
 				<WeaveComponentRenderer
 					weave={weave}
@@ -540,6 +549,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						/>
 					:	null
 				}
+				{guidanceComponent}
 			</VBox>
 		);
 	}

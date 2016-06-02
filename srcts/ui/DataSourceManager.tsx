@@ -1,8 +1,7 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import GuidanceToolTip from "../react-ui/GuidanceToolTip";
-import GuidanceContainer from "../react-ui/GuidanceContainer";
 import {ListOption} from "../react-ui/List";
+import GuidanceContainer from "../react-ui/GuidanceContainer";
 import List from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
 import MenuButton from "../react-ui/MenuButton";
@@ -46,7 +45,6 @@ import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 export interface IDataSourceManagerProps
 {
 	dataMenu:DataMenu;
-	enableGuidance?:boolean;
 }
 
 export interface IDataSourceManagerState
@@ -118,6 +116,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		root.removeObject(root.getName(dataSource));
 	}
 
+
+
 	render():JSX.Element
 	{
 		let root = this.props.dataMenu.weave.root;
@@ -183,12 +183,18 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						<VBox className="ui inverted segment" style={{overflow: "auto"}}>
 							<div className="ui meadium dividing header">{Weave.lang("Add more data sources")}</div>
 							{
+								/* id, ref, onClick are added for Guidance , id and onClick argument has to match as they represent step name */
 								this.props.dataMenu.getDataSourceItems().map((dsItem, index) => {
 									return dsItem.shown
-										?   <HBox key={index} onClick={() => dsItem.click()} className="weave-data-source-item" style={{justifyContent: "space-between", padding: 5}}>
-										{Weave.lang(dsItem.label as string)}
-										<CenteredIcon className="" iconProps={{ className:"fa fa-plus" }}/>
-									</HBox>
+										?   <HBox key={index}
+										          id={dsItem.label as string}
+										          ref={GuidanceContainer.getMountedTargetComponent}
+										          onClick={() => {dsItem.click();  GuidanceContainer.targetComponentOnClick(dsItem.label as string) } }
+										          className="weave-data-source-item"
+										          style={{justifyContent: "space-between", padding: 5}}>
+												{Weave.lang(dsItem.label as string)}
+												<CenteredIcon className="" iconProps={{ className:"fa fa-plus" }}/>
+											</HBox>
 										:   null
 								})
 							}

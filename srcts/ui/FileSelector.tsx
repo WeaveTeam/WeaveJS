@@ -18,6 +18,7 @@ export interface IFileSelectorProps extends React.HTMLProps<LinkableFileSelector
 	targetUrl: LinkableFile|LinkableString;
 	placeholder?:string;
 	accept?: string;
+	onFileChange?:()=>void;
 }
 
 export interface IFileSelectorState
@@ -58,6 +59,10 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 		};
 
 		reader.readAsArrayBuffer(file);
+		if(this.props.onFileChange)
+		{
+			this.props.onFileChange()
+		}
 	};
 
 	componentWillReceiveProps(nextProps:IFileSelectorProps)

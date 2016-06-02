@@ -5,7 +5,6 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import GuidanceToolTip from "../react-ui/GuidanceToolTip";
 import GuidanceContainer from "../react-ui/GuidanceContainer";
 import FileSelector from "../ui/FileSelector";
 import FixedDataTable from "../tools/FixedDataTable";
@@ -93,16 +92,15 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 						</VBox>
 					</HelpIcon>
 				</HBox>,
-				<GuidanceContainer enable={enableGuidance}
-				                   direction={GuidanceContainer.VERTICAL}
-				                   location={GuidanceToolTip.BOTTOM_RIGHT}
-				                   type={GuidanceContainer.NEXT}
-				                   toolTip="Click to add CSV File">
-					<FileSelector targetUrl={ds.url}
-					              placeholder={Weave.lang("http://www.example.com/example.csv")}
-					              style={ {width: "100%"} }
-					              accept={acceptExtension}/>
-				</GuidanceContainer>
+				/* id, ref, onFileChange are added for Guidance , id and onFileChange argument has to match as they represent step name */
+				<FileSelector targetUrl={ds.url}
+				              id="Open file"
+				              ref={GuidanceContainer.getMountedTargetComponent}
+				              onFileChange={()=>GuidanceContainer.targetComponentOnClick("Open file")}
+				              placeholder={Weave.lang("http://www.example.com/example.csv")}
+				              style={ {width: "100%"} }
+				              accept={acceptExtension}
+								/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>

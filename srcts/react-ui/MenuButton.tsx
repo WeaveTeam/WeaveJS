@@ -13,6 +13,7 @@ export interface MenuButtonProps extends React.HTMLProps<MenuButton>
 {
 	menu:MenuItemProps[];
 	showIcon?:boolean;
+	onClose?:()=>void;
 }
 
 export interface MenuButtonState
@@ -45,6 +46,9 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 		{
 			ReactUtils.closePopup(this.menu);
 			this.menu = null;
+		}
+		if(this.props.onClose){
+			this.props.onClose();
 		}
 	}
 

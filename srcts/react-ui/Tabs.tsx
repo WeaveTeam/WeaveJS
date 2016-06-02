@@ -2,8 +2,6 @@ import * as React from "react";
 import * as _ from "lodash";
 import CenteredIcon from "./CenteredIcon";
 import {HBox, VBox} from "./FlexBox";
-import  GuidanceToolTip from "./GuidanceToolTip";
-import  GuidanceContainer from "./GuidanceContainer";
 import classNames from "../modules/classnames";
 
 const TOP:"top" = "top";
@@ -28,8 +26,6 @@ export interface TabsProps extends React.Props<Tabs>
 	tabLabelStyle?:React.CSSProperties;
 	tabBarClassName?:string;
 	tabBarStyle?:React.CSSProperties;
-	enableGuidance?:boolean;
-	guideToTab?:string;
 }
 
 export interface TabsState
@@ -51,9 +47,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 	static defaultProps:TabsProps = {
 		labels: [],
 		tabs: [],
-		location: "top",
-		enableGuidance:false,
-		guideToTab:""
+		location: "top"
 	};
 
 	componentWillReceiveProps(props:TabsProps)
@@ -83,23 +77,13 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 			>
 				{
 					this.props.labels.map((label, index) => {
-						let labelUI:React.ReactChild | React.ReactChild[]= null;
-						let enableGuidance:boolean = this.props.enableGuidance && this.props.guideToTab == label && this.state.activeTabIndex != index;
-						labelUI =   <GuidanceContainer enable={enableGuidance} direction={GuidanceContainer.HORIZONTAL}
-						                          location={GuidanceToolTip.RIGHT}
-						                          type={GuidanceContainer.NEXT}
-						                          toolTip={"Click " +  label}>
-										{label}
-									</GuidanceContainer>;
-
-						
 						return (
 							<HBox key={index}
 							      className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
 							      style={this.props.tabLabelStyle}
 							      onClick={() => this.changeTabView(index)}
 							>
-								{labelUI}
+								{label}
 							</HBox>
 						);
 					})
