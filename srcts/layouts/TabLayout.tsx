@@ -130,10 +130,10 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		this.setSessionState(state);
 	}
 
-	switchPanelToActive=(index:number):void=>
+	switchPanelToActive=(indexFromTabsComponent:number):void=>
 	{
 		var state = this.getSessionState();
-		state.activeTabIndex = index - this.leadingTabsLength;
+		state.activeTabIndex = indexFromTabsComponent - this.leadingTabsLength;
 		this.setSessionState(state);
 	};
 
