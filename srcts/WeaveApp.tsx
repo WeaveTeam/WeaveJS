@@ -167,32 +167,34 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			toolPathToEdit: path
 		});
 	};
-	
-	handlePopoutClick=(tool:WeaveTool):void=>
-	{
-		var panelPath = tool.props.path;
-		var popoutWindow:Window;
-		var onBeforeUnLoad:Function = () => { };
-		var onLoad:Function = () => { };
-		var options:any = { transferStyle: true };
-		var screenWidth:number, screenHeight:number;
-		var layoutPath = Weave.getPath(ReactUtils.findComponent(tool, AbstractLayout as any)).getPath();
 
-		this.removeFromLayout(panelPath);
+	restoreTabs=(tabLayoutPath:WeavePathArray):void=>
+	{
+		console.log("restore tabs called", tabLayoutPath)
+	}
+
+	handlePopoutClick=(layoutPath:WeavePathArray, oldTabLayoutPath:WeavePathArray):void=>
+	{
+		var newTabLayoutPath = [this.props.weave.root.generateUniqueName("Tabs")];
+		var oldTabLayout = this.props.weave.getObject(oldTabLayoutPath) as any;
+		oldTabLayout.removePanel(layoutPath);
+
 		var content:JSX.Element = (
-			<WeaveTool
+			<WeaveComponentRenderer
 				weave={this.props.weave}
-				path={panelPath}
+				path={newTabLayoutPath}
+				defaultType={TabLayout}
 				style={{width: "100%", height: "100%"}}
-				onGearClick={this.handleGearClick}
-				onPopinClick={() => {
-					this.addToLayout(panelPath);
-					popoutWindow.close();
+				onCreate={(newTabLayout:TabLayout) => {
+					newTabLayout.addPanel(layoutPath)
 				}}
+				props={ { panelRenderer: this.renderTab } }
 			/>
 		);
-		popoutWindow = ReactUtils.openPopout(content, onLoad, onBeforeUnLoad, options);
 
+		var onLoad:Function = () => { };
+		var options:any = { transferStyle: true };
+		ReactUtils.openPopout(content, onLoad, this.restoreTabs, options);
 	};
 
 	openDataSourceManager=(selectedDataSource?:IDataSource)=>
@@ -244,7 +246,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={{width: "100%", height: "100%", left: "0", top: "0"}}
 				maximized={panelProps.maximized}
 				onGearClick={this.handleGearClick}
-				onPopoutClick={this.handlePopoutClick}
 			/>
 		);
 	};
@@ -418,7 +419,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.tabLayout.addPanel(path, layoutName);
 	};
 
-	removeExistingLayout=(id:WeavePathArray, event:React.MouseEvent)=>
+	removeExistingLayout=(id:WeavePathArray, event?:React.MouseEvent)=>
 	{
 		this.tabLayout.removePanel(id, event);
 		this.props.weave.removeObject(id);
@@ -526,7 +527,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 								click: () => this.addNewLayout(FlexibleLayout)
 							}
 						],
-						onRemove: this.removeExistingLayout
+						onRemove: this.removeExistingLayout,
+						onTabDoubleLDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
 					}}
 				/>
 			);
