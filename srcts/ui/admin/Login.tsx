@@ -9,6 +9,7 @@ import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 export interface ILoginProps extends React.Props<Login>
 {
 	onLogin?:(fields:any) => void;
+	onCancel?: () => void;
 }
 
 export interface ILoginState
@@ -33,14 +34,14 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 		($(this.element) as any).modal('hide');
 	}
 
-	open(context:Element, onLogin:Function, onCancel:Function)
+	open(context:Element)
 	{
 		let selector = $(this.form) as any;
 		($(this.element) as any)
 			.modal({
 				closable: false,
 				onDeny    : () => {
-					onCancel && onCancel();
+					this.props.onCancel && this.props.onCancel();
 				},
 				onApprove : () => {
 					selector.submit();

@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox,VBox} from "../../react-ui/FlexBox";
 import Checkbox from "../../semantic-ui/Checkbox";
@@ -192,6 +193,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	}
 
 	componentDidMount() {
+		this.element = ReactDOM.findDOMNode(this);
 		this.updateSchemas();
 	}
 
@@ -229,6 +231,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			return <div/>;
 		}
 	}
+
+	private element: Element;
 
 	render():JSX.Element
 	{
@@ -297,7 +301,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			<HBox>
 				<Button disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
 			</HBox>
-			<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={()=>PopupWindow.close(SqlImport.window)} onSuccess={()=>this.updateSchemas()}/>
+			<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={() => PopupWindow.close(SqlImport.window) } onSuccess={() => this.updateSchemas() } context={this.element}/>
 		</VBox>
 	}
 	private login: ServiceLogin;

@@ -11,9 +11,9 @@ import {IRow, IColumnTitles} from "../tools/FixedDataTable";
 import FileInfoView from "./FileInfoView";
 import Button from "../semantic-ui/Button";
 import FileInput from "../react-ui/FileInput";
-import Login from "../ui/admin/Login";
 import SmartComponent from "./SmartComponent";
 import ConfirmationDialog from "./ConfirmationDialog";
+import ServiceLogin from "../ui/admin/ServiceLogin";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
@@ -92,7 +92,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 
 	element:Element;
 	dimmerSelector:any;
-	login:Login;
+	login:ServiceLogin;
 	constructor(props:IOpenFileProps)
 	{
 		super(props);
@@ -103,13 +103,8 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 		}
 	}
 
-	authenticateForm=(fields:any) => {
-		weavejs.net.Admin.service.authenticate(fields.username,fields.password).then(() => {
-			this.login.close();
-			this.getWeaveFiles();
-		},(error:any) => {
-			this.login.invalid();
-		});
+	handleSuccess=(fields:any) => {
+		this.getWeaveFiles();
 	};
 
 	getWeaveFiles=() => {
@@ -118,12 +113,11 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 				fileNames
 			});
 		},(error:any) => {
-			this.login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
+			this.login.open();
 		});
 	};
 
 	handleCancel=() => {
-		this.login.close();
 		this.setState({
 			fileNames: []
 		});
@@ -132,7 +126,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
-		this.dimmerSelector = null;//FileDialog.element;//($(this.element).find(".weave-server-file-view") as any);
+		this.dimmerSelector = FileDialog.element;//($(this.element).find(".weave-server-file-view") as any);
 		this.getWeaveFiles();
 	}
 
@@ -220,7 +214,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 														});
 													},
 													(error:any) => {
-														this.login.open(this.dimmerSelector,this.authenticateForm,this.handleCancel);
+														this.login.open();
 													}
 												);
 						                }}
@@ -239,7 +233,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 						</FileInfoView>
 					</VBox>
 				</HBox>
-				<Login ref={(c:Login) => this.login = c} onLogin={this.authenticateForm}/>
+				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={weavejs.net.Admin.service} onSuccess={this.handleSuccess} onCancel={this.handleCancel} context={this.dimmerSelector}/>
 			</VBox>
 		);
 	}

@@ -10,6 +10,7 @@ import WeaveAdminService = weavejs.net.WeaveAdminService;
 export interface IServiceLoginProps extends React.Props<ServiceLogin> {
 	onSuccess?: (username:string) => void;
 	onCancel?: () => void;
+	context?: Element;
 	service: WeaveAdminService;
 }
 
@@ -23,7 +24,7 @@ export default class ServiceLogin extends React.Component<IServiceLoginProps, Ob
 	login: Login;
 
 	open=():void => {
-		this.login.open(null, this.handleLogin, this.handleCancel);
+		this.login.open(this.props.context);
 	}
 
 	handleLogin=(fields:{username:string, password:string}):void=>
@@ -47,7 +48,7 @@ export default class ServiceLogin extends React.Component<IServiceLoginProps, Ob
 
 	render():JSX.Element
 	{
-		return <Login ref={(c:Login) => { this.login = c } } onLogin={this.handleLogin}/>
+		return <Login ref={(c: Login) => { this.login = c } } onLogin={this.handleLogin} onCancel={this.handleCancel}/>
 	}
 }
 

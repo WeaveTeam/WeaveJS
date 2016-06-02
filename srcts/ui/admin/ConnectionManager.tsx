@@ -91,7 +91,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 			});
 	}
 
-	element: Element;
+	private element: Element;
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
@@ -143,8 +143,6 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		this.setState({ selected: null });
 	}
 
-	connectionSelector = ($(this.element) as any);
-
 	removeSelectedConnection = () => {
 		/* TODO: Use a prettier/async confirmation dialog, placeholder for now. */
 		if (window.confirm(Weave.lang("Are you sure you want to delete the connection {0}", this.state.selected)))
@@ -187,7 +185,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 					</HBox>
 				</VBox>
 				<ConnectionEditor refreshFunc={this.updateConnections} service={this.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={_.noop}/>
-				<ServiceLogin service={this.service} onSuccess={_.noop} onCancel={() => PopupWindow.close(ConnectionManager.window)}/>
+				<ServiceLogin service={this.service} onSuccess={_.noop} onCancel={() => PopupWindow.close(ConnectionManager.window) } context={this.element}/>
 			</HBox>
 		{ this.renderErrors() }
 		</VBox>
