@@ -126,8 +126,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
-		this.dimmerSelector = FileDialog.element;//($(this.element).find(".weave-server-file-view") as any);
-		this.getWeaveFiles();
+		this.forceUpdate();
 	}
 
 	componentDidUpdate()
@@ -137,6 +136,7 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 
 	render():JSX.Element
 	{
+		this.dimmerSelector = FileDialog.element;
 
 		let fileList:ListOption[] = this.state.fileNames.map((file:any) => {
 			return {
@@ -252,7 +252,6 @@ export interface IFileDialogState
 
 export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDialogState> {
 	static listItems:{[key:string]:string}[] = [{label: "My Computer" , iconClass:"fa fa-desktop"}, {label: "Weave Server", iconClass: "fa fa-server"}];
-	static activeListIndex:number = 0;
 	static element:Element;
 
 	static storageRegistry = new Map< String, React.ComponentClass<IOpenFileProps>>()
