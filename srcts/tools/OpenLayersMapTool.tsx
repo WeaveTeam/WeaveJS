@@ -375,11 +375,10 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			children: {
 				visualization: {
 					plotManager: [
+						{plotters: this.layers},
 						(pm:any, removeMissingDynamicObjects:boolean) => {
 							if (!pm)
 								return;
-							
-							Weave.setState(this.layers, pm.plotters, removeMissingDynamicObjects);
 							Weave.setState(this.layers, DynamicState.removeTypeFromState(pm.layerSettings), removeMissingDynamicObjects);
 						},
 						{
@@ -395,6 +394,15 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 				}
 			}
 		};
+	}
+
+	//returns new modified path
+	// for eg. instead of MapTool > children > visualization > plotManager > layerSettings (old path in Weave) use MapTool > layers (new path in WeaveJS)
+	static matchesLayerSettings = _.matches(["children", "visualization", "plotManager", "layerSettings"]);
+	deprecatedPathRewrite(relativePath:string[]):string[]{
+
+		if(OpenLayersMapTool.matchesLayerSettings(relativePath))
+		return ["layers"].concat(relativePath.slice(4));
 	}
 
 	updateCursor():void
@@ -932,7 +940,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 Weave.registerClass(
 	OpenLayersMapTool,
 	["weavejs.tool.Map", "weave.visualization.tools::MapTool"],
-	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.core.ILinkableObjectWithNewPaths],
 	"Map"
 );
 
