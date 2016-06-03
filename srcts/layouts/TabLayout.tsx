@@ -31,7 +31,7 @@ export interface TabLayoutProps extends LayoutProps
 	}[];
 	onAdd: MenuItemProps|React.MouseEventHandler;
 	onRemove: (panelId:WeavePathArray, event?:React.MouseEvent) => void;
-	onTabDoubleLDoubleClick: (panelId:WeavePathArray) => void;
+	onTabDoubleClick: (panelId:WeavePathArray) => void;
 }
 
 export interface LayoutState
@@ -246,7 +246,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								className="weave-padded-hbox"
 								onDragOver={(event) => this.onDragOverTab(panel)}
 								onDragLeave={this.onDragLeaveTab}
-								onDoubleClick={() => this.props.onTabDoubleLDoubleClick(panel.id)}
+								onDoubleClick={() => this.props.onTabDoubleClick && this.props.onTabDoubleClick(panel.id)}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.renamePanel(panel.id, newName)} textContent={panel.label}/>*/}
 								{panel.label}
