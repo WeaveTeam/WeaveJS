@@ -14,6 +14,7 @@ import {IColumnTitles} from "../tools/FixedDataTable";
 import MenuButton from '../react-ui/MenuButton';
 import ChartsMenu from "../menus/ChartsMenu";
 import {linkReactStateRef, forceUpdateWatcher} from "../utils/WeaveReactUtils";
+import HelpIcon from "../react-ui/HelpIcon";
 
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import IDataSource = weavejs.api.data.IDataSource;
@@ -86,7 +87,10 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	getLabelEditor(labelLinkableString:weavejs.core.LinkableString):[React.ReactChild, React.ReactChild]
 	{
 		return [
-			Weave.lang("Label"),
+			<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
+				{Weave.lang("Label")}
+				<HelpIcon>{Weave.lang("A label used to identify this data source")}</HelpIcon>
+			</HBox>,
 			<StatefulTextField placeholder={this.props.dataSource.getLabel()} style={{ width: "100%", userSelect: false }} ref={linkReactStateRef(this, {value: labelLinkableString}, 500)}/>
 		];
 	}
@@ -174,7 +178,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 
 		return (
 			<VBox className="ui segment" style={{flex: 1}}>
-				<div className="ui medium dividing header">{Weave.lang("Preview")}</div>
+				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Preview of") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Preview")}</div>
 				<HBox className={root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
 					<VBox style={{flex: root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
 						<WeaveTree
@@ -185,7 +189,6 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 						/>
 					</VBox>
 					<VBox className="weave-padded-vbox" style={{flex: 1, overflow: 'auto'}}>
-						{createChartButtonUI}
 						<DynamicComponent dependencies={[this.column]} render={this.renderTablePreview}/>
 					</VBox>
 				</HBox>
@@ -199,7 +202,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		// <label style={ { fontWeight: "bold" } }> { Weave.lang("Edit {0}", this.props.dataSource.getLabel()) } </label>
 		return (
 			<VBox className="ui basic segment" style={ {border: "none"} }>
-				<div className="ui medium dividing header">{Weave.lang("Configure " + this.props.dataSource.getLabel())}</div>
+				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Configure") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Configure")}</div>
 				{
 					this.renderFields()
 				}
@@ -227,16 +230,28 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		}
 
 		var names:string[] = columns.map(column => column.getMetadata("title"));
-		var format:any = _.zipObject(names, columns);
+		var format = _.assign({id: IQualifiedKey},_.zipObject(names, columns));
 		var columnTitles = _.zipObject(names, names);
 		var rows = ColumnUtils.getRecords(format, null, String);
+
+		rows = rows.map((row) => {
+			row.id = row.id.localName;
+			return row;
+		});
+
+
+		var keyType = this.column && this.column.getMetadata("keyType");
+		names.unshift("id");
+		_.assign(columnTitles, {id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key")});
 
 		return (
 			<FixedDataTable rows={rows}
 							columnIds={names}
 							idProperty="id"
 							showIdColumn={true}
-							columnTitles={columnTitles as any}/>
+							columnTitles={columnTitles as any}
+			                disableSort={true}
+			/>
 		);
 	};
 

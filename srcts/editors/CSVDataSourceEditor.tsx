@@ -82,13 +82,12 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		let enableGuidance:boolean = this.props.enableGuidance && !ds.url.value;
 
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
-			this.getLabelEditor(ds.label),
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
-					{Weave.lang("URL")}
+					{Weave.lang("Location")}
 					<HelpIcon className={validExtension ? "":"fa-exclamation-triangle"} style={{color:validExtension? null:"#794B02"}}>
 						<VBox>
-							{validExtension ? Weave.lang("The URL of the file to be used"):Weave.lang("Warning: The file you have chosen has an extension that does not match the expected extension.")}
+							{validExtension ? Weave.lang("The location of the CSV file for this data source"):Weave.lang("Warning: The file you have chosen has an extension that does not match the expected extension.")}
 						</VBox>
 					</HelpIcon>
 				</HBox>,
@@ -102,6 +101,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 				              accept={acceptExtension}
 								/>
 			],
+			this.getLabelEditor(ds.label),
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Key column")}
