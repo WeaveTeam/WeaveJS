@@ -29,6 +29,7 @@ import QKey = weavejs.data.key.QKey;
 import QKeyManager = weavejs.data.key.QKeyManager;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
+import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 
 export interface IDataTableState extends IVisToolState
 {
@@ -37,6 +38,11 @@ export interface IDataTableState extends IVisToolState
 	columnIds?:string[],
 	width?:number,
 	height?:number
+}
+
+export interface TableEventData {
+	key: IQualifiedKey;
+	column: IAttributeColumn;
 }
 
 export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool, IInitSelectableAttributes
@@ -247,6 +253,16 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.sortInDescendingOrder.value = sortDirection == SortTypes.DESC;
 	};
 
+	events = Weave.linkableChild(this, new EventCallbackCollection<TableEventData>());
+
+	handleCellDoubleClick = (rowId:string, columnKey:string)=>
+	{
+		let key: IQualifiedKey = weavejs.WeaveAPI.QKeyManager.stringToQKey(rowId);
+		let column: IAttributeColumn = this.columns.getObject(columnKey) as IAttributeColumn;
+
+		this.events.dispatch({ key, column });
+	}
+
 	render()
 	{
 		var columnNames = this.columns.getNames(IAttributeColumn);
@@ -261,6 +277,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				sortDirection={this.sortInDescendingOrder.value == true ? SortTypes.DESC : SortTypes.ASC}
 				onHover={this.handleProbe}
 				onSelection={this.handleSelection}
+				onCellDoubleClick={this.handleCellDoubleClick}
 				showIdColumn={this.showKeyColumn.value}
 				columnIds={this.state.columnIds}
 				rowHeight={this.rowHeight.value}

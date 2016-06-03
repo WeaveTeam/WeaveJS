@@ -42,6 +42,7 @@ export interface IFixedDataTableProps extends React.Props<FixedDataTable>
 	selectedIds?:string[];
 	onHover?:(id:string[]) => void;
 	onSelection?:(id:string[]) => void;
+	onCellDoubleClick?: (rowId: string, columnId: string) => void;
 	showIdColumn?:boolean;
 	rowHeight?:number;
 	headerHeight?:number;
@@ -98,6 +99,7 @@ export interface ITextCellProps extends CellProps
 {
 	data?:IRow[];
 	sortIndices?:number[];
+	onCellDoubleClick?: (rowIndex?: number, columnKey?: string|number) => void;
 }
 
 export interface ITextCellState
@@ -119,13 +121,19 @@ export class TextCell extends React.Component<ITextCellProps, ITextCellState>
 		super(props);
 	}
 
+	handleDoubleClick=(event:React.MouseEvent)=>
+	{
+		if (this.props.onCellDoubleClick)
+			this.props.onCellDoubleClick(this.props.rowIndex, this.props.columnKey);
+	}
+
 	render():JSX.Element
 	{
 		const {rowIndex, columnKey, data, sortIndices} = this.props;
 		var value = data[sortIndices[rowIndex]];
 		return (
 			<Cell {...this.props}>
-				{value && value[columnKey]}
+				<span onDoubleClick={this.handleDoubleClick}>{value && value[columnKey]}</span>
 			</Cell>
 		);
 	}
@@ -284,7 +292,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	getValue(index:number, property:string):string
 	{
 		var row = this.props.rows[this.state.sortIndices[index]];
-		return row && row[this.props.idProperty] as string;
+		return row && row[property] as string;
 	}
 
 	getRowClass=(index: number):string =>
@@ -540,6 +548,12 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 												<TextCell
 													data={this.props.rows}
 													sortIndices={this.state.sortIndices}
+													onCellDoubleClick={(rowIndex:number, columnKey:string|number) => {
+														this.props.onCellDoubleClick && this.props.onCellDoubleClick(
+															this.getValue(rowIndex, this.props.idProperty),
+															columnKey as string
+														)
+													}}
 													{...props}
 												/>)
 											}
