@@ -57,10 +57,29 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		})
 	};
 
-	enableInteractiveTourList=()=>{
+	enableInteractiveTourList=()=>
+	{
 		this.setState({
 			showInteractiveTourList:true
 		})
+	};
+
+	private items:any = {
+		csvToViz:{
+			steps:["CSV file", "Open file","Preview"],
+			contents:[
+				"Click on CSV file to load rows of data for visualization",
+				"Click on open a file button to load CSV file from your local machine",
+				"In this table you can see the downloaded data"
+			]
+		}
+	};
+
+	interactiveListItemClick=(itemName:string)=>
+	{
+		InteractiveTour.steps = this.items[itemName].steps ;
+		InteractiveTour.stepContents = this.items[itemName].contents ;
+		this.openDataSourceManager(true);
 	};
 
 	render() {
@@ -77,7 +96,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 			flexDirection:"column",
 			alignItems: "center",
 			justifyContent: "space-around"
-		}
+		};
 
 		let overlayStyle:React.CSSProperties = {
 			position:"absolute",
@@ -85,7 +104,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 			top:0,
 			width:"100%",
 			height:"100%"
-		}
+		};
 
 
 		let guidanceListUI:JSX.Element  = null;
@@ -93,8 +112,8 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		{
 			guidanceListUI = <VBox style={ {position:"relative"} } className="weave-guidance-list">
 								<span className="weave-guidance-list-item"
-								      onClick={ ()=>{ InteractiveTour.steps = ["CSV file", "Open file","Create a chart"]; this.openDataSourceManager(true)} }>
-									CSV Data to Visualization
+								      onClick={ ()=>this.interactiveListItemClick("csvToViz") }>
+									1. CSV Data to Visualization
 								</span>
 							</VBox>
 		}

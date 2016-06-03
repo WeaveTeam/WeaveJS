@@ -726,8 +726,6 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 	background-color: black;
 	color:white;
 	z-index:1;
-	min-width: 100px;
-	max-width: 500px;
 	box-shadow: 0 2px 8px rgba(0,0,0,.4);
 	border: 1px solid #FFBE00;
 }

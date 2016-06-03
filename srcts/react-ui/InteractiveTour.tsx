@@ -19,7 +19,7 @@ export interface InteractiveTourProps extends React.HTMLProps<InteractiveTour>
 
 export interface InteractiveTourState
 {
-	close?:boolean,
+	visible?:boolean,
 	activeStepName?:string
 	tooltipHeight?:number // used this at componentDidUpdate to re-render again to center the toolTip
 	tooltipWidth?:number // used this at componentDidUpdate to re-render again to center the toolTip
@@ -31,6 +31,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	static stepName:LinkableString = new LinkableString(); // callback are registered in InteractiveTour Instance
 	static enable:boolean = false; // set to true from click event of Guidance List element in GetStartedComponent
 	static steps:string[] = []; // props.id are supplied as string of Array. Array supplied in click event of Guidance List element in GetStartedComponent
+	static stepContents:string[] = [];
 	static stepComponentMap:any = {} // id mapped with component
 
 	// static method passed to target Component's Reference callback
@@ -88,8 +89,8 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		super(props);
 		InteractiveTour.stepName.addGroupedCallback(this,this.updateNextComponentName); // stepName change on target component Event listener
 		this.state = {
-			close:false,
-			activeStepName:"",
+			visible:true,
+			activeStepName:null,
 			tooltipHeight:null,
 			tooltipWidth:null
 		}
@@ -100,7 +101,8 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	// to draw highlighter and overlay
 	private targetMountedNode:any = null;
 
-	updateNextComponentName=()=>{
+	updateNextComponentName=()=>
+	{
 		let nextStepName:string = InteractiveTour.stepName.value;
 		if(InteractiveTour.stepComponentMap[nextStepName])
 		{
@@ -126,9 +128,14 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 	}
 
-	closeHandler=()=>{
-		this.setState({close:true});
-		if(this.props.onClose){
+	closeHandler=()=>
+	{
+		this.setState({
+			visible:false
+		});
+
+		if(this.props.onClose)
+		{
 			this.props.onClose();
 		}
 	};
@@ -136,159 +143,162 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 
 
-	render() {
-
-		if(this.state.activeStepName)
-		{
-
-			// todo : try react animation for tooltip mount and unmount when step change
-
-			let highlighterStyle:React.CSSProperties = {
-				position:"fixed",
-				pointerEvents:"none",// so that target component will receive events
-				boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.5)", //todo: move to css
-				border:"1px solid yellow" //todo: move to css
-			};
-
-			let mountedElementRect:ClientRect = this.targetMountedNode.getBoundingClientRect();
-			// duplicate component position to highlighter , and since pointer events is set to none, it will look like component is visible
-			highlighterStyle.left = mountedElementRect.left;
-			highlighterStyle.top = mountedElementRect.top;
-			highlighterStyle.width = mountedElementRect.width;
-			highlighterStyle.height = mountedElementRect.height;
-
-			// to overlay other regions in the screen, except the component
-			// we need to split the overlay to four components (top, bottom, right, left) to avoid overlapping on respective target
-			let leftOverlayStyle:React.CSSProperties = {
-				position:"fixed",
-				left:0,
-				top:0,
-				width: mountedElementRect.left,
-				height: "100%",
-				background:"transparent"
-			};
-
-			let rightOverlayStyle:React.CSSProperties = {
-				position:"fixed",
-				left:mountedElementRect.right,
-				top:0,
-				right: 0,
-				height: "100%",
-				background:"transparent"
-			};
-
-			let topOverlayStyle:React.CSSProperties = {
-				position:"fixed",
-				left:0,
-				top:0,
-				height: mountedElementRect.top,
-				width: "100%",
-				background:"transparent"
-			};
-
-			let bottomOverlayStyle:React.CSSProperties = {
-				position:"fixed",
-				left:0,
-				bottom:0,
-				top: mountedElementRect.bottom,
-				width: "100%",
-				background:"transparent"
-			};
-
-			let maxSpace:number = null;
-			let leftSpace:number = mountedElementRect.left;
-			let rightSpace:number = window.innerWidth - mountedElementRect.right;
-			let toolTipPosition:string = null;
-
-			toolTipPosition = rightSpace >= leftSpace ? InteractiveTourToolTip.RIGHT : InteractiveTourToolTip.LEFT;
-			maxSpace = rightSpace >= leftSpace ? rightSpace : leftSpace;
-
-			let topSpace:number = mountedElementRect.top;
-			toolTipPosition = maxSpace >= topSpace ? toolTipPosition : InteractiveTourToolTip.TOP;
-			maxSpace = maxSpace >= topSpace ? maxSpace : topSpace;
-
-
-			let bottomSpace:number =  window.innerHeight - mountedElementRect.bottom;
-			toolTipPosition = maxSpace >= bottomSpace ? toolTipPosition : InteractiveTourToolTip.BOTTOM;
-			maxSpace = maxSpace >= bottomSpace ? maxSpace : bottomSpace;
-
-
-			let toolTipPositionStyle:React.CSSProperties = { position:"absolute"}
-
-			if(toolTipPosition == InteractiveTourToolTip.LEFT)
-			{
-				toolTipPositionStyle.left = mountedElementRect.left;
-				toolTipPositionStyle.top = mountedElementRect.top + mountedElementRect.height / 2 ;
-				if(this.state.tooltipHeight)
-				{
-					toolTipPositionStyle.top = toolTipPositionStyle.top - (this.state.tooltipHeight / 2);
-				}
-				if(this.state.tooltipWidth)
-				{
-					toolTipPositionStyle.left = toolTipPositionStyle.left - this.state.tooltipWidth;
-				}
-			}
-			else if(toolTipPosition == InteractiveTourToolTip.RIGHT)
-			{
-				toolTipPositionStyle.left = mountedElementRect.right;
-				toolTipPositionStyle.top = mountedElementRect.top + mountedElementRect.height / 2;
-				if(this.state.tooltipHeight)
-				{
-					toolTipPositionStyle.top = toolTipPositionStyle.top - (this.state.tooltipHeight / 2)
-				}
-			}
-			else if(toolTipPosition == InteractiveTourToolTip.TOP)
-			{
-				toolTipPositionStyle.left = mountedElementRect.left + mountedElementRect.width / 2;
-				toolTipPositionStyle.top = mountedElementRect.top ;
-				if(this.state.tooltipWidth)
-				{
-					toolTipPositionStyle.left = toolTipPositionStyle.left - (this.state.tooltipWidth / 2)
-				}
-				if(this.state.tooltipHeight)
-				{
-					toolTipPositionStyle.top = toolTipPositionStyle.top - this.state.tooltipHeight;
-				}
-			}
-			else if(toolTipPosition == InteractiveTourToolTip.BOTTOM)
-			{
-				toolTipPositionStyle.left = mountedElementRect.left + mountedElementRect.width / 2;
-				toolTipPositionStyle.top = mountedElementRect.bottom;
-				if(this.state.tooltipWidth)
-				{
-					toolTipPositionStyle.left = toolTipPositionStyle.left - (this.state.tooltipWidth / 2)
-				}
-			}
-
-			let type:string = null;
-
-			if(InteractiveTour.steps.indexOf(this.state.activeStepName) == 0)
-				type = InteractiveTourToolTip.START;
-			else if(InteractiveTour.steps.indexOf(this.state.activeStepName) == InteractiveTour.steps.length -1)
-				type = InteractiveTourToolTip.DONE;
-			else
-				type = InteractiveTourToolTip.NEXT;
-
-			return  <div>
-						<div style={ leftOverlayStyle }/>
-						<div style={ rightOverlayStyle }/>
-						<div style={ topOverlayStyle }/>
-						<div style={ bottomOverlayStyle }/>
-						<div style={ highlighterStyle }/>
-						<InteractiveTourToolTip ref="toolTip"
-						                        style={toolTipPositionStyle}
-						                        location={toolTipPosition}
-						                        type={type}
-						                        onClose={this.closeHandler}>
-							Start Here
-						</InteractiveTourToolTip>
-					</div>
-
-		}
-		else
+	render()
+	{
+		if(!this.state.activeStepName || !this.state.visible)
 		{
 			return <div style={ {position:"fixed"} }/>
 		}
+
+		// todo : try react animation for tooltip mount and unmount when step change
+
+		let highlighterStyle:React.CSSProperties = {
+			position:"fixed",
+			pointerEvents:"none",// so that target component will receive events
+			boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 0, 0, 0.5)", //todo: move to css
+			border:"1px solid yellow" //todo: move to css
+		};
+
+		let mountedElementRect:ClientRect = this.targetMountedNode.getBoundingClientRect();
+		// duplicate component position to highlighter , and since pointer events is set to none, it will look like component is visible
+		highlighterStyle.left = mountedElementRect.left;
+		highlighterStyle.top = mountedElementRect.top;
+		highlighterStyle.width = mountedElementRect.width;
+		highlighterStyle.height = mountedElementRect.height;
+
+		// to overlay other regions in the screen, except the component
+		// we need to split the overlay to four components (top, bottom, right, left) to avoid overlapping on respective target
+		let leftOverlayStyle:React.CSSProperties = {
+			position:"fixed",
+			left:0,
+			top:0,
+			width: mountedElementRect.left,
+			height: "100%",
+			background:"transparent"
+		};
+
+		let rightOverlayStyle:React.CSSProperties = {
+			position:"fixed",
+			left:mountedElementRect.right,
+			top:0,
+			right: 0,
+			height: "100%",
+			background:"transparent"
+		};
+
+		let topOverlayStyle:React.CSSProperties = {
+			position:"fixed",
+			left:0,
+			top:0,
+			height: mountedElementRect.top,
+			width: "100%",
+			background:"transparent"
+		};
+
+		let bottomOverlayStyle:React.CSSProperties = {
+			position:"fixed",
+			left:0,
+			bottom:0,
+			top: mountedElementRect.bottom,
+			width: "100%",
+			background:"transparent"
+		};
+
+		let maxSpace:number = null;
+		let leftSpace:number = mountedElementRect.left;
+		let rightSpace:number = window.innerWidth - mountedElementRect.right;
+		let toolTipPosition:string = null;
+
+		toolTipPosition = rightSpace >= leftSpace ? InteractiveTourToolTip.RIGHT : InteractiveTourToolTip.LEFT;
+		maxSpace = rightSpace >= leftSpace ? rightSpace : leftSpace;
+
+		let topSpace:number = mountedElementRect.top;
+		toolTipPosition = maxSpace >= topSpace ? toolTipPosition : InteractiveTourToolTip.TOP;
+		maxSpace = maxSpace >= topSpace ? maxSpace : topSpace;
+
+
+		let bottomSpace:number =  window.innerHeight - mountedElementRect.bottom;
+		toolTipPosition = maxSpace >= bottomSpace ? toolTipPosition : InteractiveTourToolTip.BOTTOM;
+		maxSpace = maxSpace >= bottomSpace ? maxSpace : bottomSpace;
+
+
+		let toolTipPositionStyle:React.CSSProperties = { position:"absolute"};
+
+		if(toolTipPosition == InteractiveTourToolTip.LEFT)
+		{
+			toolTipPositionStyle.left = mountedElementRect.left;
+			toolTipPositionStyle.top = mountedElementRect.top + mountedElementRect.height / 2 ;
+			if(this.state.tooltipHeight)
+			{
+				toolTipPositionStyle.top = toolTipPositionStyle.top - (this.state.tooltipHeight / 2);
+			}
+			if(this.state.tooltipWidth)
+			{
+				toolTipPositionStyle.left = toolTipPositionStyle.left - this.state.tooltipWidth;
+			}
+		}
+		else if(toolTipPosition == InteractiveTourToolTip.RIGHT)
+		{
+			toolTipPositionStyle.left = mountedElementRect.right;
+			toolTipPositionStyle.top = mountedElementRect.top + mountedElementRect.height / 2;
+			if(this.state.tooltipHeight)
+			{
+				toolTipPositionStyle.top = toolTipPositionStyle.top - (this.state.tooltipHeight / 2)
+			}
+		}
+		else if(toolTipPosition == InteractiveTourToolTip.TOP)
+		{
+			toolTipPositionStyle.left = mountedElementRect.left + mountedElementRect.width / 2;
+			toolTipPositionStyle.top = mountedElementRect.top ;
+			if(this.state.tooltipWidth)
+			{
+				toolTipPositionStyle.left = toolTipPositionStyle.left - (this.state.tooltipWidth / 2)
+			}
+			if(this.state.tooltipHeight)
+			{
+				toolTipPositionStyle.top = toolTipPositionStyle.top - this.state.tooltipHeight;
+			}
+		}
+		else if(toolTipPosition == InteractiveTourToolTip.BOTTOM)
+		{
+			toolTipPositionStyle.left = mountedElementRect.left + mountedElementRect.width / 2;
+			toolTipPositionStyle.top = mountedElementRect.bottom;
+			if(this.state.tooltipWidth)
+			{
+				toolTipPositionStyle.left = toolTipPositionStyle.left - (this.state.tooltipWidth / 2)
+			}
+		}
+
+		let type:string = null;
+
+		if(InteractiveTour.steps.indexOf(this.state.activeStepName) == 0)
+			type = InteractiveTourToolTip.START;
+		else if(InteractiveTour.steps.indexOf(this.state.activeStepName) == InteractiveTour.steps.length -1)
+			type = InteractiveTourToolTip.DONE;
+		else
+			type = InteractiveTourToolTip.NEXT;
+
+		let currentStepIndex:number = InteractiveTour.steps.indexOf(this.state.activeStepName); // get index of currentStep
+		let contents:string = InteractiveTour.stepContents[currentStepIndex ];
+
+		return  <div>
+					<div style={ leftOverlayStyle }/>
+					<div style={ rightOverlayStyle }/>
+					<div style={ topOverlayStyle }/>
+					<div style={ bottomOverlayStyle }/>
+					<div style={ highlighterStyle }/>
+					<InteractiveTourToolTip ref="toolTip"
+					                        style={toolTipPositionStyle}
+					                        location={toolTipPosition}
+					                        type={type}
+					                        title={this.state.activeStepName}
+					                        onClose={this.closeHandler}>
+						{contents}
+					</InteractiveTourToolTip>
+				</div>
+
+
+
 
 	}
 
@@ -318,7 +328,10 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 {
 	location:string;
 	type: string;
-	onClose?:Function
+	onClose?:Function;
+	onNextClick?:Function;
+	title?:string;
+	enableFooter?:boolean;
 }
 
  interface InteractiveTourToolTipState
@@ -369,24 +382,26 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		}
 	};
 
+	 nextHandler=()=>{
+		 if(this.props.onNextClick){
+			 this.props.onNextClick();
+		 }
+	 };
+
 
 	render() {
 
-
-
-
-		let typeUI:JSX.Element = <span style={{color:"#FFBE00"}}>{this.props.type} : </span>;
-
-
 		let styleObject:React.CSSProperties = _.merge({},this.props.style,{
 			display:"flex",
-			alignItems: "center"
+			alignItems: "center",
+			minWidth:"200px",
+			maxWidth:"300px"
 		});
 
 
 
 		let containerStyle:React.CSSProperties = {
-			whiteSpace:"nowrap"
+			padding:"8px"
 		};
 
 		let arrowStyle:React.CSSProperties = {
@@ -396,7 +411,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		if(this.props.location == InteractiveTourToolTip.BOTTOM)
 		{
 			styleObject.flexDirection = "column";
-			containerStyle.margin = "0 auto"; // container after getting its width from child will margin left and right equal space, thereby centers it
 
 			arrowStyle.borderTopColor = "transparent"; // 3 out 4 being transparent - creates a triangle
 			arrowStyle.borderLeftColor = "transparent";
@@ -427,7 +441,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		else if(this.props.location == InteractiveTourToolTip.TOP)
 		{
 			styleObject.flexDirection = "column-reverse";
-			containerStyle.margin = "0 auto"; // container after getting its width from child will margin left and right equal space, thereby centers it
 
 			arrowStyle["borderBottomColor"] = "transparent";// 3 out 4 being transparent - creates a triangle
 			arrowStyle.borderLeftColor = "transparent";
@@ -473,13 +486,52 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			arrowStyle.borderRightColor = "transparent";
 		}
 
+		let tooltipHeader:React.CSSProperties = {
+			display:"flex",
+			alignItems:"center",
+			justifyContent:"space-between",
+			borderBottom:"1px solid #FFBE00",
+			paddingBottom:"8px"
+		};
 
+		let buttonStyle:React.CSSProperties = {
+			cursor:"pointer",
+			color:"#FFBE00"
+		};
+
+		let footerUI:JSX.Element = null;
+		if(this.props.enableFooter)
+		{
+			let tooltipFooter:React.CSSProperties = {
+				display:"flex",
+				alignItems:"center",
+				justifyContent:"space-between",
+				borderTop:"1px solid #FFBE00",
+				paddingTop:"8px"
+			};
+			footerUI =  <div style={tooltipFooter}>
+							<div style={buttonStyle} onClick={this.nextHandler}>Next</div>
+						</div>;
+		}
+
+		let contentStyle:React.CSSProperties = {
+			padding:"8px"
+		};
 
 		return (<div style={ styleObject }>
 					<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
 					<div style={containerStyle} className="weave-guidance-toolTip">
-						{typeUI}
-						{this.props.children}
+						<div style={tooltipHeader}>
+							<div>
+								<span style={{color:"#FFBE00"}}>{this.props.type} : </span>
+								{this.props.title}
+							</div>
+							<div style={buttonStyle} onClick={this.closeHandler}>&#x2715;</div>
+						</div>
+						<div style={contentStyle}>
+							{this.props.children}
+						</div>
+						{footerUI}
 					</div>
 				</div>);
 	}
