@@ -52,18 +52,14 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 
 	componentWillReceiveProps(nextProps:ISelectableAttributeComponentProps)
 	{
-		//if(nextProps != this.props)
-		//{
-			this.weaveRoot = Weave.getRoot(nextProps.attributes.get(nextProps.attributeName));
-
-			if(this.weaveRootTreeNode)//if it exists remove callback
-			{
-				Weave.getCallbacks(this.weaveRootTreeNode).removeCallback(this, this.forceUpdate);
-			}
-			this.weaveRootTreeNode = new weavejs.data.hierarchy.WeaveRootDataTreeNode(this.weaveRoot);//create new one
-			//TODO not triggering callback when datasource is modified?
-			Weave.getCallbacks(this.weaveRootTreeNode).addGroupedCallback(this, this.forceUpdate);//add it to the new one
-		//}
+		if (this.weaveRootTreeNode)
+			Weave.getCallbacks(this.weaveRootTreeNode).removeCallback(this, this.forceUpdate);
+		
+		this.weaveRoot = Weave.getRoot(nextProps.attributes.get(nextProps.attributeName));
+		this.weaveRootTreeNode = this.weaveRoot && new WeaveRootDataTreeNode(this.weaveRoot);
+		
+		if (this.weaveRootTreeNode)
+			Weave.getCallbacks(this.weaveRootTreeNode).addGroupedCallback(this, this.forceUpdate);
 	}
 
 	private comboBox: ComboBox;
