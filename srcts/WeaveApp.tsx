@@ -125,7 +125,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (this.props.readUrlParams) {
 			this.urlParams = MiscUtils.getUrlParams();
 			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.menus.fileMenu.pingAdminConsole();
-			this.urlParams.skipBlankPageIntro = StandardLib.asBoolean(this.urlParams.skipBlankPageIntro);
 
 			try {
 				var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
@@ -460,12 +459,21 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 
 
-		let skipBlankPageIntro:boolean = this.urlParams ? this.urlParams.skipBlankPageIntro : false;
+		// check in url params to skip BlankPageIntro
+		this.urlParams = MiscUtils.getUrlParams();
+		let skipBlankPageIntro:boolean = this.urlParams ? StandardLib.asBoolean(this.urlParams.skipBlankPageIntro) : false;
+
+		// check in loaded weave session state to skip BlankPageIntro
 		if(weave.root.getObjects(weavejs.data.source.AbstractDataSource).length > 0 || weave.root.getObjects(weavejs.core.LinkablePlaceholder).length > 0)
 		{
-			skipBlankPageIntro = true
+			skipBlankPageIntro = true;
 		}
 
+		// check in interaction event in GetStartedcomponent to skip BlankPageIntro
+		if(this.state.initialWeaveComponent)
+		{
+			skipBlankPageIntro = true;
+		}
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
@@ -473,24 +481,26 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			sideBarUI = <WeaveToolEditor tool={toolToEdit}
 			                             onCloseHandler={this.handleSideBarClose}
 			                             style={ {flex:1} }
-			                             className="weave-ToolEditor"/>
-
-		this.urlParams = MiscUtils.getUrlParams();
+			                             className="weave-ToolEditor"/>;
 
 
-		let blankPageIntroScreen:JSX.Element = skipBlankPageIntro ? null : <GetStartedComponent style={ {flex:1} }
-		                                                                                 loader={this.initialLoadingForBlankSession} /> ;
+		let weaveTabbedComponent:JSX.Element = null;
+		let menuBarUI:JSX.Element = null;
+		let progressBarUI:JSX.Element = null;
 
+		let blankPageIntroScreen:JSX.Element = null;
 		let interactiveTourComponent:JSX.Element = null;
 
-		let weaveTabbedComponent:JSX.Element = skipBlankPageIntro || this.state.initialWeaveComponent ? (
-			<WeaveComponentRenderer
-				weave={weave}
-				path={renderPath}
-				defaultType={TabLayout}
-				style={{width: "100%", height: "100%"}}
-				onCreate={this.initializeTabs}
-				props={ {
+		if(skipBlankPageIntro)
+		{
+			weaveTabbedComponent =  (
+				<WeaveComponentRenderer
+					weave={weave}
+					path={renderPath}
+					defaultType={TabLayout}
+					style={{width: "100%", height: "100%"}}
+					onCreate={this.initializeTabs}
+					props={ {
 						panelRenderer: this.renderTab,
 						leadingTabs: [
 							{
@@ -511,12 +521,25 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						onRemove: this.removeExistingLayout,
 						onTabDoubleLDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
 					}}
-			/>) : null;
+				/>);
 
-		if(!skipBlankPageIntro && this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
+			menuBarUI = !this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
+				?	<WeaveMenuBar
+						style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
+						weave={weave}
+						menus={this.menus}
+					/>
+				:	null;
+
+			progressBarUI = <WeaveProgressBar/>;
+		}
+		else
 		{
-			interactiveTourComponent = <InteractiveTour/>
-
+			blankPageIntroScreen =  <GetStartedComponent style={ {flex:1} } loader={this.initialLoadingForBlankSession} /> ;
+			if(this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
+			{
+				interactiveTourComponent = <InteractiveTour/>
+			}
 		}
 
 
@@ -526,18 +549,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{...this.props as React.HTMLAttributes}
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}>
-				<WeaveProgressBar/>
+				{progressBarUI}
 				{blankPageIntroScreen}
 				{weaveTabbedComponent}
-				{
-					!this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
-					?	<WeaveMenuBar
-							style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
-							weave={weave}
-					        menus={this.menus}
-						/>
-					:	null
-				}
+				{menuBarUI}
 				{interactiveTourComponent}
 			</VBox>
 		);
