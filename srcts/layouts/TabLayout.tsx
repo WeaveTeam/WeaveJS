@@ -221,8 +221,11 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 						className={classNames("weave-tab-label", "bottom")}
 						onClick={this.props.onAdd as React.MouseEventHandler}
 					>
-						<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")}
-						              iconProps={{ className: "fa fa-plus" }}/>
+						<CenteredIcon
+							className="weave-tab-icon"
+							title={Weave.lang("Add New...")}
+							iconProps={{ className: "fa fa-plus" }}
+						/>
 					</HBox>
 				);
 			}
@@ -247,12 +250,16 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 							>
 								{/*<EditableTextCell onChange={(newName) => this.renamePanel(panel.id, newName)} textContent={panel.label}/>*/}
 								{panel.label}
-							    <CenteredIcon
-							        onClick={(event) => this.props.onRemove(panel.id, event)}
-							        className="weave-tab-icon"
-							        title={Weave.lang("Close")}
-							        iconProps={{ className:"fa fa-times-circle" }}
-							    />
+								{
+									this.props.onRemove
+									?	<CenteredIcon
+											onClick={(event) => this.props.onRemove(panel.id, event)}
+											className="weave-tab-icon"
+											title={Weave.lang("Close")}
+											iconProps={{ className:"fa fa-times-circle" }}
+										/>
+									:	null
+								}
 							</HBox>
 						)))
 					}
@@ -270,7 +277,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								/>
 						)))
 					}
-				    tabBarChildren={tabBarChildren}
+					tabBarChildren={tabBarChildren}
 				/>
 			</VBox>
 		);
