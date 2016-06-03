@@ -181,7 +181,6 @@ export function requestObject<T extends ReactComponent>(weave:Weave, path:string
 	var lp = Weave.AS(weave.getObject(path), LinkablePlaceholder);
 	if (wasEmpty && lp)
 	{
-		lp.invalidateState();
 		Weave.getCallbacks(lp).addDisposeCallback(this, () => {
 			if (onCreate && lp.getInstance())
 				onCreate(lp.getInstance());

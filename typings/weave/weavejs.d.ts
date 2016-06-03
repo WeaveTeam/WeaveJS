@@ -3587,10 +3587,6 @@ declare module weavejs.core {
         getClass(): new (..._: any[]) => T;
         getInstance(): T & ILinkableObject;
         setInstance(instance: T): void;
-        /**
-         * Tells the LinkablePlaceholder that its current state should be ignored when it is later replaced with an instance.
-         */
-        invalidateState(): void;
         setSessionState(value: Object): void;
         /**
          * @return success flag
@@ -9686,6 +9682,10 @@ declare module weavejs.util {
          * @see Array#sortOn()
          */
         static sortOn(array: any, params: any, sortDirections?: any, inPlace?: boolean, returnSortedIndexArray?: boolean): any;
+        /**
+         * Guesses the appropriate Array.sort() mode based on the first non-undefined item property from an Array.
+         * @return Either Array.NUMERIC or 0.
+         */
         /**
          * This will return the type of item found in the Array if each item has the same type.
          * @param a An Array to check.

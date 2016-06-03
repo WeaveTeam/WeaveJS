@@ -68,7 +68,6 @@ export default class WeaveComponentRenderer extends SmartComponent<IWeaveCompone
 		var lp = Weave.AS(weave.getObject(path), LinkablePlaceholder);
 		if (wasEmpty && lp)
 		{
-			lp.invalidateState();
 			Weave.getCallbacks(lp).addDisposeCallback(this, () => {
 				if (this.props.onCreate && lp.getInstance() && this.props.weave === weave && _.isEqual(this.props.path, path))
 					this.props.onCreate(lp.getInstance());
