@@ -7,10 +7,10 @@ import FileDialog from "../ui/FileDialog";
 
 export default class SystemMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave)
+	constructor(weave:Weave, fileMenu:FileMenu)
 	{
 		this.weave = weave;
-		this.fileMenu = new FileMenu(weave);
+		this.fileMenu = fileMenu;
 	}
 
 	weave:Weave;

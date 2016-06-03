@@ -35,7 +35,6 @@ export type View = typeof PREVIEW | typeof METADATA | typeof BROWSE;
 
 export interface IDataSourceEditorProps {
 	dataSource: IDataSource;
-	chartsMenu: ChartsMenu;
 };
 
 export interface IDataSourceEditorState {
@@ -158,22 +157,6 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	renderPreviewView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
-
-		let createChartButtonUI:JSX.Element = null;
-		if(this.props.chartsMenu)
-		{
-			/* id, ref, onClick are added for Guidance , id and onClick argument has to match as they represent step name */
-			createChartButtonUI = <MenuButton id="Create a chart"
-			                                  ref={InteractiveTour.getMountedTargetComponent}
-			                                  onClick={()=>InteractiveTour.targetComponentOnClick("Create a chart")}
-			                                  menu={ this.props.chartsMenu.getCreateObjectItems() }
-			                                  style={{width: "100%"}} showIcon={false}>
-										<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>
-										{Weave.lang('Create a chart')}
-									</MenuButton>
-
-		}
-
 		return (
 			<VBox className="ui segment" style={{flex: 1}}>
 				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Preview of") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Preview")}</div>

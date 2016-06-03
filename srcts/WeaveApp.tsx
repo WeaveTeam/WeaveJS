@@ -6,15 +6,11 @@ import SideBarContainer from "./react-ui/SideBarContainer";
 import InteractiveTour from "./react-ui/InteractiveTour";
 import {VBox, HBox} from "./react-ui/FlexBox";
 import WeaveMenuBar from "./WeaveMenuBar";
-import DynamicComponent from "./ui/DynamicComponent";
 import GetStartedComponent from "./ui/GetStartedComponent";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
-import {
-	LayoutPanelProps, PanelRenderer, AbstractLayout,
-	AnyAbstractLayout
-} from "./layouts/AbstractLayout";
+import {LayoutPanelProps, PanelRenderer, AbstractLayout, AnyAbstractLayout} from "./layouts/AbstractLayout";
 import DataSourceManager from "./ui/DataSourceManager";
 import ContextMenu from "./menus/ContextMenu";
 import {IVisTool} from "./tools/IVisTool";
@@ -22,12 +18,10 @@ import ReactUtils from "./utils/ReactUtils";
 import {forceUpdateWatcher, requestObject, WeavePathArray} from "./utils/WeaveReactUtils";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
-import WeaveArchive from "./WeaveArchive";
-import TabLayout, {LayoutState} from "./layouts/TabLayout";
-import DataMenu from "./menus/DataMenu";
-import FileMenu from "./menus/FileMenu";
+import TabLayout from "./layouts/TabLayout";
 import WindowLayout from "./layouts/WindowLayout";
 import FlexibleLayout from "./layouts/FlexibleLayout";
+import WeaveMenus from "./menus/WeaveMenus";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -62,10 +56,7 @@ export interface WeaveAppState
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 {
 	enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
-	
-	menuBar:WeaveMenuBar;
-	dataMenu:DataMenu;
-	dataSourceManager:DataSourceManager;
+	menus:WeaveMenus;
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
@@ -80,7 +71,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			toolPathToEdit: null,
 			initialWeaveComponent:null
 		};
-		this.dataMenu = new DataMenu(this.props.weave, this.createObject, this.openDataSourceManager);
+		this.menus = new WeaveMenus(this.props.weave, this.createObject);
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 	}
 	
@@ -133,7 +124,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.createDefaultSessionElements();
 		if (this.props.readUrlParams) {
 			this.urlParams = MiscUtils.getUrlParams();
-			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.menuBar.systemMenu.fileMenu.pingAdminConsole();
+			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.menus.fileMenu.pingAdminConsole();
 
 			try {
 				var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
@@ -144,13 +135,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 			if (this.urlParams.file) {
 				// read content from url
-				this.menuBar.systemMenu.fileMenu.loadUrl(this.urlParams.file);
+				this.menus.fileMenu.loadUrl(this.urlParams.file);
 			}
 			else if (weaveExternalTools && weaveExternalTools[window.name]) {
 				// read content from flash
 				var ownerPath:WeavePath = weaveExternalTools[window.name].path;
 				var content:Uint8Array = atob(ownerPath.getValue('btoa(Weave.createWeaveFileContent())') as string) as any;
-				this.menuBar.fileMenu.handleOpenedFileContent("export.weave", content);
+				this.menus.fileMenu.handleOpenedFileContent("export.weave", content);
 				this.forceUpdate();
 			}
 		}
@@ -196,20 +187,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var onLoad:Function = () => { };
 		var options:any = { transferStyle: true };
 		ReactUtils.openPopout(content, onLoad, this.restoreTabs, options);
-	};
-
-	openDataSourceManager=(selectedDataSource?:IDataSource)=>
-	{
-		/* will set the active tab to the data source manager */
-		var state = this.tabLayout.getSessionState();
-		state.activeTabIndex = -1;
-		this.tabLayout.setSessionState(state);
-		if(selectedDataSource)
-		{
-			this.dataSourceManager.setState({
-				selected: selectedDataSource
-			})
-		}
 	};
 
 	renderTab=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
@@ -271,11 +248,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		
 		if (resultType != type)
 			return;
-		
-		if (Weave.IS(instance, IDataSource))
-		{
-			this.openDataSourceManager(instance as IDataSource);
-		}
 
 		if (React.Component.isPrototypeOf(type))
 		{
@@ -283,7 +255,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (placeholder)
 				Weave.getCallbacks(placeholder).addDisposeCallback(this, this.handlePlaceholderDispose.bind(this, path, placeholder));
 			this.setState({ toolPathToEdit: path });
-
+			
+			var tabLayout = this.tabLayout;
+			if (tabLayout.activeTabIndex < 0)
+				tabLayout.activeTabIndex = 0;
+			
 			this.addToLayout(path);
 		}
 	};
@@ -325,7 +301,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	get tabLayout():TabLayout
 	{
-		return this.props.weave.getObject(this.getRenderPath()) as TabLayout;
+		return Weave.AS(this.props.weave.getObject(this.getRenderPath()), TabLayout);
 	}
 	
 	private getNonTabLayouts()
@@ -339,21 +315,28 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	private initializeTabs=(tabLayout:TabLayout)=>
 	{
-		var tabLayoutState:LayoutState = tabLayout.getSessionState();
-		var panels = tabLayoutState && tabLayoutState.panels;
-		var activeTabIndex = tabLayoutState && tabLayoutState.activeTabIndex;
+		var tabLayoutState = tabLayout.getSessionState();
+		var tabs = tabLayoutState && tabLayoutState.tabs;
+		var activeTabIndex = tabLayoutState && tabLayoutState.activeTabIndex || -1;
 		var title = tabLayoutState && tabLayoutState.title;
 		var defaultPath = ["Layout"];
 
-		if(!panels || (panels && !panels.length))
+		if(!tabs || (tabs && !tabs.length))
 		{
 			var layouts = this.getNonTabLayouts();
-
-			if (!layouts.length)
+			if (layouts.length)
 			{
-				var archive = this.menuBar.fileMenu.archive;
+				// if there are existing layouts, select the first one
+				activeTabIndex = 0;
+			}
+			else
+			{
+				var archive = this.menus.fileMenu.archive;
 				var history = archive && archive.objects.get("history.amf") as {currentState: any};
 				if(history && history.currentState)
+				{
+					// create a window layout and select its tab
+					activeTabIndex = 0;
 					requestObject(this.props.weave, defaultPath, WindowLayout, (instance:WindowLayout) => {
 						var ids:WeavePathArray[] = this.props.weave.root.getNames(weavejs.api.ui.IVisTool, true).map(name => [name]);
 						instance.setSessionState({
@@ -377,20 +360,21 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 							title: "Layout"
 						});
 					});
+				}
 				else
+				{
+					// blank session, will default to data manager
 					this.props.weave.requestObject(defaultPath, FlexibleLayout);
+				}
 				layouts = this.getNonTabLayouts();
 			}
-			panels = layouts.map((layout) => {
+
+			tabs = layouts.map((layout) => {
 				return {
 					id: Weave.findPath(this.props.weave.root, layout),
 					label: this.props.weave.root.getName(layout)
 				}
 			});
-		}
-		if(!activeTabIndex)
-		{
-			activeTabIndex = 0;
 		}
 
 		if(!title)
@@ -403,7 +387,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 
 		tabLayout.setSessionState({
-			panels,
+			tabs,
 			activeTabIndex,
 			title
 		});
@@ -427,9 +411,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	addToLayout(panelPath:WeavePathArray)
 	{
-		var activeLayout = this.props.weave.getObject(this.tabLayout.activePanel) as AnyAbstractLayout;
+		var activeLayout = Weave.AS(this.props.weave.getObject(this.tabLayout.activePanel), AbstractLayout as any) as AnyAbstractLayout;
 		if (activeLayout)
 			activeLayout.addPanel(panelPath);
+		else
+			console.error('TODO - add panel when linkable placeholder is disposed');
 	}
 
 	removeFromLayout(panelPath:WeavePathArray)
@@ -504,9 +490,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						leadingTabs: [
 							{
 								label: "Data Sources",
-								content: (
-									<DataSourceManager ref={(c:DataSourceManager) => this.dataSourceManager = c} dataMenu={this.dataMenu}/>
-								)
+								content: <DataSourceManager weave={this.props.weave}/>
 							}
 						],
 						onAdd: [
@@ -545,9 +529,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					?	<WeaveMenuBar
 							style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
 							weave={weave}
-							ref={(c:WeaveMenuBar) => this.menuBar = c}
-							createObject={this.createObject}
-					        dataMenu={this.dataMenu}
+					        menus={this.menus}
 						/>
 					:	null
 				}

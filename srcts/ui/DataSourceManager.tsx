@@ -44,7 +44,7 @@ import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
 
 export interface IDataSourceManagerProps
 {
-	dataMenu:DataMenu;
+	weave:Weave;
 }
 
 export interface IDataSourceManagerState
@@ -70,29 +70,36 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	{
 		super(props);
 		this.state = {
-			selected: this.props.dataMenu.weave.root.getObjects(IDataSource)[0]
+			selected: this.props.weave.root.getObjects(IDataSource)[0]
 		}
 	}
 
 	componentDidMount()
 	{
-		this.props.dataMenu.weave.root.childListCallbacks.addGroupedCallback(this, this.updateDataSources, true);
+		this.props.weave.root.childListCallbacks.addGroupedCallback(this, this.updateDataSources, true);
 	}
 
 	componentWillUnmount()
 	{
-		this.props.dataMenu.weave.root.childListCallbacks.removeCallback(this, this.updateDataSources);
+		this.props.weave.root.childListCallbacks.removeCallback(this, this.updateDataSources);
 	}
 
 	updateDataSources()
 	{
-		let dataSources = this.props.dataMenu.weave.root.getObjects(IDataSource);
+		let dataSources = this.props.weave.root.getObjects(IDataSource);
 
 		dataSources.forEach((ds:IDataSource):void =>{
 			Weave.getCallbacks(ds).addGroupedCallback(this, this.forceUpdate);//adding callbacks to every datasource
 		});
-		
+
 		this.forceUpdate();
+	}
+
+	selectDataSource=(dataSource:IDataSource)=>
+	{
+		this.setState({
+			selected: dataSource
+		});
 	}
 
 	refreshDataSource(dataSource:IDataSource)
@@ -100,7 +107,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		dataSource.hierarchyRefresh.triggerCallbacks();
 		
 		// TEMPORARY SOLUTION until all data sources behave correctly - force creating a new copy
-		var root = this.props.dataMenu.weave.root;
+		var root = this.props.weave.root;
 		var name = root.getName(dataSource);
 		if (name)
 		{
@@ -112,7 +119,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 
 	removeDataSource(dataSource:IDataSource)
 	{
-		let root = this.props.dataMenu.weave.root;
+		let root = this.props.weave.root;
 		root.removeObject(root.getName(dataSource));
 	}
 
@@ -120,7 +127,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 
 	render():JSX.Element
 	{
-		let root = this.props.dataMenu.weave.root;
+		let root = this.props.weave.root;
 
 		let listOptions:ListOption[] = root.getObjects(IDataSource).map(dataSource => {
 			return {
@@ -147,7 +154,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
 				editorJsx = <VBox style={ { flex: 1, overflow:'auto'} }>
-					<EditorClass dataSource={dataSource} chartsMenu={ this.props.dataMenu.chartsMenu }/>
+					<EditorClass dataSource={dataSource}/>
 				</VBox>;
 			else
 				editorJsx = <VBox className="ui segment" style={{flex:1, overflow: "auto", justifyContent: "center", alignItems: "center"}}>
@@ -176,15 +183,14 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 									options={listOptions}
 									multiple={false}
 									selectedValues={ [dataSource] }
-									onChange={ (selectedValues:IDataSource[]) => { this.setState({ selected: selectedValues[0] });  }}
+									onChange={ (selectedValues:IDataSource[]) => { this.selectDataSource(selectedValues[0]);  }}
 								/>
 							</VBox>
 						</VBox>
 						<VBox className="ui inverted segment" style={{overflow: "auto"}}>
 							<div className="ui meadium dividing header">{Weave.lang("Add more data sources")}</div>
 							{
-								/* id, ref, onClick are added for Guidance , id and onClick argument has to match as they represent step name */
-								this.props.dataMenu.getDataSourceItems().map((dsItem, index) => {
+								DataMenu.getDataSourceItems(this.props.weave, this.selectDataSource).map((dsItem, index) => {
 									return dsItem.shown
 										?   <HBox key={index}
 										          id={dsItem.label as string}

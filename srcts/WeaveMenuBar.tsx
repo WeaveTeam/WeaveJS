@@ -11,13 +11,13 @@ import ControllersMenu from './menus/ControllersMenu';
 import SessionHistorySlider from "./editors/SessionHistorySlider";
 import FileDialog from "./ui/FileDialog";
 import FileMenu from "./menus/FileMenu";
+import WeaveMenus from "./menus/WeaveMenus";
 
 export interface WeaveMenuBarProps extends React.HTMLProps<WeaveMenuBar>
 {
 	style:React.CSSProperties,
 	weave:Weave,
-	createObject:(type:new(..._:any[])=>any)=>void
-	dataMenu:DataMenu;
+	menus:WeaveMenus;
 }
 
 export interface WeaveMenuBarState
@@ -30,14 +30,16 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 	systemMenu:SystemMenu;
 	fileMenu:FileMenu;
 	chartsMenu:ChartsMenu;
+	dataMenu:DataMenu;
 	controllersMenu:ControllersMenu;
 	constructor(props:WeaveMenuBarProps)
 	{
 		super(props);
-		this.systemMenu = new SystemMenu(props.weave);
-		this.fileMenu = new FileMenu(props.weave);
-		this.chartsMenu = new ChartsMenu(props.weave, props.createObject);
-		this.controllersMenu = new ControllersMenu(props.weave, props.createObject);
+		this.systemMenu = props.menus.systemMenu;
+		this.fileMenu = props.menus.fileMenu;
+		this.chartsMenu = props.menus.chartsMenu;
+		this.dataMenu = props.menus.dataMenu;
+		this.controllersMenu = props.menus.controllersMenu;
 	}
 	
 	render():JSX.Element
@@ -47,7 +49,7 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 				style={this.props.style}
 				config={[
 					this.systemMenu,
-					this.props.dataMenu,
+					this.dataMenu,
 					this.chartsMenu,
 					this.controllersMenu
 				]}

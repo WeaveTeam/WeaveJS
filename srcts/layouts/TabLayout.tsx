@@ -17,7 +17,7 @@ import Dropdown from "../semantic-ui/Dropdown";
 import EditableTextCell from "../react-ui/EditableTextCell";
 import {WeavePathArray} from "../utils/WeaveReactUtils";
 
-export interface PanelState
+export interface TabState
 {
 	id: WeavePathArray,
 	label: string
@@ -36,13 +36,13 @@ export interface TabLayoutProps extends LayoutProps
 
 export interface LayoutState
 {
-	panels: PanelState[];
+	tabs: TabState[];
 	activeTabIndex:number;
 	title: string;
 }
 
 const stateStructure:Structure = {
-	panels: [
+	tabs: [
 		{
 			id: MiscUtils.nullableStructure(["string"]),
 			label: "string"
@@ -62,18 +62,32 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		super(props);
 	}
 
+	getSessionState():LayoutState
+	{
+		return this.linkableState.state as LayoutState;
+	}
+
 	setSessionState(state:LayoutState):void
 	{
 		this.linkableState.state = MiscUtils.normalizeStructure(state, stateStructure);
 	}
-
-	maximizePanel() {
-		// do nothing because each panel is always maximized
+	
+	get activeTabIndex():number
+	{
+		var state = this.getSessionState();
+		return state.activeTabIndex == null ? -this.leadingTabsLength : state.activeTabIndex;
+	}
+	
+	set activeTabIndex(index:number)
+	{
+		var state = this.getSessionState();
+		state.activeTabIndex = MiscUtils.normalizeStructure(index, "number");
+		this.linkableState.state = state;
 	}
 
-	getSessionState():LayoutState
+	maximizePanel()
 	{
-		return this.linkableState.state as LayoutState;
+		// do nothing because each panel is always maximized
 	}
 
 	get title()
@@ -86,18 +100,20 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		return this.props.leadingTabs ? this.props.leadingTabs.length : 0;
 	}
 
-	get activePanel() {
+	get activePanel()
+	{
 		var state = this.getSessionState();
-		var activePanelState = state.panels[state.activeTabIndex];
-		if(activePanelState)
+		var activePanelState = state.tabs[state.activeTabIndex];
+		if (activePanelState)
 			return activePanelState.id;
 	}
 
-	onDragOverTab=(panel:PanelState)=> {
+	onDragOverTab=(panel:TabState)=>
+	{
 		// delay before switching tab
 		this.resetTimer = false;
 		var state = this.getSessionState();
-		if(!_.isEqual(this.activePanel, panel.id))
+		if (!_.isEqual(this.activePanel, panel.id))
 		{
 			setTimeout(() => {
 				if (!this.resetTimer)
@@ -122,8 +138,8 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 	renamePanel(id:WeavePathArray, newLabel:string)
 	{
 		var state = this.getSessionState();
-		var panelToRename:PanelState = null;
-		state.panels.forEach((panel) => {
+		var panelToRename:TabState = null;
+		state.tabs.forEach((panel) => {
 			if (_.isEqual(id, panel.id))
 				panelToRename = panel;
 		});
@@ -140,7 +156,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 
 	private getPanelIndex(id:WeavePathArray):number
 	{
-		var panels = this.getSessionState().panels;
+		var panels = this.getSessionState().tabs;
 		return _.findIndex(panels, (panel) => {
 			return _.isEqual(panel.id, id);
 		});
@@ -149,7 +165,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 	addPanel(id:WeavePathArray, label?:string):void
 	{
 		var state = this.getSessionState();
-		state.panels.push({
+		state.tabs.push({
 			id,
 			label: label || id[id.length - 1] || "New Tab"
 		});
@@ -159,24 +175,24 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 
 	removePanel(id:WeavePathArray, event?:React.MouseEvent):void
 	{
-		if(event)
+		if (event)
 			event.stopPropagation();
 
 		var state = this.getSessionState();
 		var index = this.getPanelIndex(id);
-		state.panels = state.panels.filter((panel) => {
+		state.tabs = state.tabs.filter((panel) => {
 			return !_.isEqual(id, panel.id);
 		});
 
 		// if the removed panel is before the active panel
 		// we decrement the index
-		if(index < state.activeTabIndex)
+		if (index < state.activeTabIndex)
 			state.activeTabIndex -= 1;
 
 		// if the removed panel was the active panel
 		// set the active panel to the one before it
-		else if(index == state.activeTabIndex)
-			state.activeTabIndex = Math.min(index, state.panels.length - 1);
+		else if (index == state.activeTabIndex)
+			state.activeTabIndex = Math.min(index, state.tabs.length - 1);
 		this.setSessionState(state);
 	}
 
@@ -184,12 +200,11 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 	{
 		var weave = Weave.getWeave(this);
 		var state = this.getSessionState();
-		var activeTabIndex = state.activeTabIndex + this.leadingTabsLength;
 		var tabBarChildren:JSX.Element = null;
 		var leadingTabs = this.props.leadingTabs || [];
-		if(this.props.onAdd)
+		if (this.props.onAdd)
 		{
-			if(Array.isArray(this.props.onAdd))
+			if (Array.isArray(this.props.onAdd))
 			{
 				tabBarChildren = (
 					<Dropdown style={{display: "flex"}} menu={this.props.onAdd as MenuItemProps[]}>
@@ -223,7 +238,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 					location="bottom"
 					labels={
 						leadingTabs.map(tab => tab.label)
-						.concat(state.panels.map((panel) => (
+						.concat(state.tabs.map((panel) => (
 							<HBox
 								className="weave-padded-hbox"
 								onDragOver={(event) => this.onDragOverTab(panel)}
@@ -242,10 +257,10 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 						)))
 					}
 					onViewChange={this.switchPanelToActive}
-					activeTabIndex={activeTabIndex}
+					activeTabIndex={leadingTabs.length + this.activeTabIndex}
 					tabs={
 						leadingTabs.map(tab => tab.content)
-						.concat(state.panels.map(panel => (
+						.concat(state.tabs.map(panel => (
 							this.props.panelRenderer
 							?	this.props.panelRenderer(panel.id, {}, this.props.panelRenderer)
 							:	<WeaveComponentRenderer

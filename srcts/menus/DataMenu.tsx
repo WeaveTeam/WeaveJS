@@ -12,29 +12,25 @@ import ChartsMenu from "./ChartsMenu";
 
 export default class DataMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void, openDataSourceManagerCallback:Function)
+	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
 	{
 		this.weave = weave;
-		this.fileMenu = new FileMenu(weave);
-		this.chartsMenu = new ChartsMenu(weave, createObject);
 		this.createObject = createObject;
-		this.openDataSourceManagerCallback = openDataSourceManagerCallback;
 	}
 
 	label:string = "Data";
 	weave:Weave;
-	chartsMenu:ChartsMenu;//menu to be passed for creating visualizations from tha datasource manager
-	fileMenu:FileMenu; // temp solution
 	createObject:(type:new(..._:any[])=>any)=>void;
-	openDataSourceManagerCallback:Function; // callback function passed that will open the data source manager
-	
+
 	get menu():MenuItemProps[]
 	{
 		return [].concat(
-			{
-				label: Weave.lang('Manage data...'),
-				click: () => this.openDataSourceManagerCallback()
-			},
+			// {
+			// 	label: Weave.lang('Manage data...'),
+			// 	click: () => {
+			//
+			//	}
+			// },
 //			{},
 //			{
 //				shown: Weave.beta,
@@ -49,7 +45,7 @@ export default class DataMenu implements MenuBarItemProps
 		);
 	}
 
-	getDataSourceItems()
+	static getDataSourceItems(weave:Weave, onCreateItem?:(dataSource:IDataSource)=>void)
 	{
 		var registry = weavejs.WeaveAPI.ClassRegistry;
 		var impls = registry.getImplementations(IDataSource);
@@ -73,7 +69,13 @@ export default class DataMenu implements MenuBarItemProps
 							return label + " (beta)";
 						return label;
 					},
-					click: this.createObject.bind(this, impl)
+					click: () => {
+						var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(impl);
+						var path = [weave.root.generateUniqueName(baseName)];
+						var dataSource = weave.requestObject(path, impl);
+						if(onCreateItem)
+							onCreateItem(dataSource);
+					}
 				});
 			});
 		}
