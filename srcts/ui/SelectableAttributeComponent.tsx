@@ -156,16 +156,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		return this.props.attributes.get(this.props.attributeName) as ILinkableHashMap;
 	}
 
-	/*componentDidMount()
-	{
-		Weave.getCallbacks(this.weaveRootTreeNode).addGroupedCallback(this, this.forceUpdate);
-	}
-
-	componentWillUnmount()
-	{
-		Weave.getCallbacks(this.weaveRootTreeNode).removeCallback(this, this.forceUpdate)
-	}*/
-	
 	render():JSX.Element
 	{
 		// set dependencies to make sure we re-render when necessary
@@ -213,7 +203,8 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 				});
 			}
 
-			if(options.length == 0)// when the data is added AFTER the tool editor is rendered, we need to populate the options
+			// when the data is added AFTER the tool editor is rendered, we need to populate the options
+			if (options.length == 0)
 			{
 				options = ColumnUtils.findFirstDataSet(this.weaveRoot).concat().map((node)=>{
 					return({
@@ -240,13 +231,17 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 						onChange={this.setColumn}
 						header={header}
 					/>
-					{this.props.hideButton ? null : <Button
-						onClick={ () => this.launchAttributeSelector(this.props.attributeName) }
-						style={buttonStyle}
-						title={"Click to explore other DataSources for " + this.props.attributeName}
-						>
-						<i className="fa fa-angle-right" aria-hidden="true" style={ { fontWeight: "bold" } }/>
-					</Button>}
+					{
+						this.props.hideButton
+						?	null
+						:	<Button
+								onClick={ () => this.launchAttributeSelector(this.props.attributeName) }
+								style={buttonStyle}
+								title={"Click to explore other DataSources for " + this.props.attributeName}
+							>
+								<i className="fa fa-angle-right" aria-hidden="true" style={ { fontWeight: "bold" } }/>
+							</Button>
+					}
 				</HBox>
 			);
 		}
@@ -286,7 +281,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			}
 
 			// when the data is added AFTER the tool editor is rendered, we need to populate the options
-			if(nodes.size == 0)
+			if (nodes.size == 0)
 			{
 				ColumnUtils.findFirstDataSet(this.weaveRoot).concat().map((node)=>{
 					nodes.add(node);
@@ -296,10 +291,10 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 			if (this.props.showAsList)
 			{
 				var listStyle:React.CSSProperties = {
-		            minHeight: '200px',
-		            overflow: 'auto',
-		            flex:1
-		        };
+					minHeight: '200px',
+					overflow: 'auto',
+					flex:1
+				};
 				
 				// <VBox style={listStyle} className="weave-padded-vbox">
 				// 	<List selectedValues={value.map((option) => option.value)} options={options}/>
@@ -322,20 +317,24 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 							type="multiple"
 							valueIncludesLabel={true}
 							style={dropDownStyle}
-		                    value={value}
-	                        placeholder={Weave.lang("(None)")}
-		                    options={ Array.from(nodes.keys()).map( (node) => {
-		                        return {label: node.getLabel(), value: node}
-                            })}
-		                    onChange={this.setColumnInHashmap}
+							value={value}
+							placeholder={Weave.lang("(None)")}
+							options={ Array.from(nodes.keys()).map( (node) => {
+								return {label: node.getLabel(), value: node}
+							})}
+							onChange={this.setColumnInHashmap}
 						/>
-						{ this.props.hideButton ? null : <Button
-							onClick={ () => this.launchAttributeSelector(this.props.attributeName) }
-							style={buttonStyle}
-							title={Weave.lang("Click to explore other DataSources for " + this.props.attributeName) }
-							>
-							<i className="fa fa-angle-right" aria-hidden="true" style={ { fontWeight: "bold" } }/>
-						</Button>}
+						{
+							this.props.hideButton
+							?	null
+							:	<Button
+									onClick={ () => this.launchAttributeSelector(this.props.attributeName) }
+									style={buttonStyle}
+									title={Weave.lang("Click to explore other DataSources for " + this.props.attributeName) }
+								>
+									<i className="fa fa-angle-right" aria-hidden="true" style={ { fontWeight: "bold" } }/>
+								</Button>
+						}
 					</HBox>
 				);
 			}

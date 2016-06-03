@@ -111,7 +111,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		root.requestObject(DEFAULT_SELECTION_KEYSET, weavejs.data.key.KeySet, true);
 		root.requestObject(DEFAULT_SUBSET_KEYFILTER, weavejs.data.key.KeyFilter, true);
 		/* default color column stuff */
-		let cc = root.requestObject("defaultColorColumn", weavejs.data.column.ColorColumn, true);
+		let cc = root.requestObject(DEFAULT_COLOR_COLUMN, weavejs.data.column.ColorColumn, true);
 		let bc = cc.internalDynamicColumn.requestGlobalObject(DEFAULT_COLOR_BIN_COLUMN, weavejs.data.column.BinnedColumn, true);
 		let fc = bc.internalDynamicColumn.requestGlobalObject(DEFAULT_COLOR_DATA_COLUMN, weavejs.data.column.FilteredColumn, true);
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
@@ -122,22 +122,27 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	componentDidMount()
 	{
 		this.createDefaultSessionElements();
-		if (this.props.readUrlParams) {
+		if (this.props.readUrlParams)
+		{
 			this.urlParams = MiscUtils.getUrlParams();
 			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.menus.fileMenu.pingAdminConsole();
 
-			try {
+			try
+			{
 				var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
 			}
-			catch (e) {
+			catch (e)
+			{
 				console.error(e);
 			}
 
-			if (this.urlParams.file) {
+			if (this.urlParams.file)
+			{
 				// read content from url
 				this.menus.fileMenu.loadUrl(this.urlParams.file);
 			}
-			else if (weaveExternalTools && weaveExternalTools[window.name]) {
+			else if (weaveExternalTools && weaveExternalTools[window.name])
+			{
 				// read content from flash
 				var ownerPath:WeavePath = weaveExternalTools[window.name].path;
 				var content:Uint8Array = atob(ownerPath.getValue('btoa(Weave.createWeaveFileContent())') as string) as any;
