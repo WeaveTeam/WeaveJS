@@ -165,7 +165,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 						<WeaveTree
 							root={root}
 							hideLeaves={true}
-							initialSelectedItems={[this.state.selectedBranch]}
+							initialSelectedItems={this.state.selectedBranch ? [this.state.selectedBranch] : []}
 							onSelect={(selectedItems) => this.setSelection(this.props, selectedItems && selectedItems[0], this.state.selectedLeaf)}
 						/>
 					</VBox>
@@ -193,7 +193,16 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	
 	renderTablePreview=():JSX.Element =>
 	{
-		var columnSiblings = this.state.selectedBranch.getChildren();
+		var columnSiblings: IWeaveTreeNode[];
+		if (this.state.selectedBranch)
+		{
+			columnSiblings = this.state.selectedBranch.getChildren();
+		}
+		else
+		{
+			columnSiblings = [];
+		}
+		
 		let leaves:IWeaveTreeNode[] = columnSiblings.filter((n) => !n.isBranch());
 		if (!leaves)
 			return;

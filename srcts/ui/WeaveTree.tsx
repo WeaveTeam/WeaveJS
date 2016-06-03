@@ -249,7 +249,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		let rows = this.lastEnumeration.map(
 			(row, index): { [columnId: string]: React.ReactChild } => {
 				let [depth, item] = row;
-				if (this.state.selectedItems.some(node => node.equals(item))) selectedIndices.push(index.toString());
+				if (this.state.selectedItems.filter(_.identity).some(node => node.equals(item))) selectedIndices.push(index.toString());
 				/* keep a running maximum node length */
 				let rowLengthHeuristic = item.getLabel().length + depth;
 				if (rowLengthHeuristic > maxRowLength)
