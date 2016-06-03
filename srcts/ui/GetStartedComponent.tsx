@@ -118,7 +118,14 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 							</VBox>
 		}
 
-		let styleObj:React.CSSProperties = _.merge({},this.props.style,{position:"relative"})
+		let styleObj:React.CSSProperties = _.merge({},this.props.style,{position:"relative"});
+
+		/*onClick={this.enableInteractiveTourList}*/
+
+		let disableStyle:React.CSSProperties = {
+			borderColor: "grey",
+			color: "grey"
+		};
 
 		return (
 			<div style={styleObj}>
@@ -135,16 +142,17 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						<VBox key="charts"
 						      className="weave-getstarted-item"
 						      onClick={this.openFileDialog}>
-							<i className="fa fa-code"></i>
+							<i className="fa fa-code" ></i>
 							<br/>
 							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
 						</VBox>
 						<VBox key="tutorials"
 						      className="weave-getstarted-item"
-						      onClick={this.enableInteractiveTourList}>
-							<i className="fa fa-book"></i>
+						      style={ {cursor:"default"} }
+						      >
+							<i className="fa fa-book" style={disableStyle}></i>
 							<br/>
-							<span> Start <span style={ {color:"rgb(236, 131, 89)"} }> Interactive Tour</span></span>
+							<span style={ disableStyle }> Start <span style={ disableStyle }> Interactive Tour</span></span>
 						</VBox>
 					</HBox>
 					{guidanceListUI}
