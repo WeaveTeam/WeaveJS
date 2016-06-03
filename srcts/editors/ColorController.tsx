@@ -28,7 +28,6 @@ export default class ColorController extends React.Component<ColorControllerProp
 	tabLabels = ["Color theme", "Binning"]; // , "Color Specific Records"]
 	attributes = new Map<string, IColumnWrapper>();
 	static window:PopupWindow;
-	static activeTabIndex:number = 0;
 
 	constructor(props:ColorControllerProps)
 	{
@@ -77,8 +76,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 		return (
 			<VBox style={{flex: 1}}>
 				<Tabs
-					activeTabIndex={ColorController.activeTabIndex}
-					onViewChange={(index) => ColorController.activeTabIndex = index}
+					initialActiveTabIndex={0}
 					labels={this.tabLabels}
 					tabs={[
 						<VBox key={this.tabLabels[1]} style={ {flex: 1, padding: 8} } className="weave-padded-vbox">

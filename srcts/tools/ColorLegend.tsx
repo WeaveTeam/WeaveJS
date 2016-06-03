@@ -435,13 +435,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
 	}
 	
-	// TODO
-	openColorController(tabIndex:number)
-	{
-		ColorController.activeTabIndex = tabIndex;
-		ColorController.open(this.colorColumn);
-	}
-	
 	renderEditor(pushCrumb:Function = null):JSX.Element
 	{
 		return Accordion.render(
@@ -454,7 +447,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 							<ColorRampEditor
 								compact={true}
 								colorRamp={this.colorColumn.ramp}
-								onButtonClick={() => this.openColorController(0)}
 								pushCrumb={ pushCrumb }
 							/>
 						]

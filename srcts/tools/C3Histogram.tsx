@@ -568,16 +568,6 @@ export default class C3Histogram extends AbstractC3Tool
 	    return Weave.lang("Histogram");
     }
 	
-	// TODO move this to BinningDefinitionEditor
-	openColorController(tabIndex:number)
-	{
-		if (this.colorColumn)
-		{
-			ColorController.activeTabIndex = tabIndex;
-			ColorController.open(this.colorColumn);
-		}
-	}
-
 	updateColor( color:string)
 	{
 		if (this.colorColumn && this.colorColumn.ramp)
@@ -598,7 +588,6 @@ export default class C3Histogram extends AbstractC3Tool
 					showNoneOption={false}
 					binnedColumn={this.binnedColumn}
 					pushCrumb={ pushCrumb }
-					onButtonClick={() => this.openColorController(1)}
 				/>
 			],
 			linkedColor && [
@@ -613,7 +602,6 @@ export default class C3Histogram extends AbstractC3Tool
 									compact={true}
 									pushCrumb={ pushCrumb }
 									colorRamp={this.colorColumn && this.colorColumn.ramp}
-									onButtonClick={() => this.openColorController(0)}
 								/>
 							}
 						/>
