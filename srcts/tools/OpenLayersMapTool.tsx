@@ -375,12 +375,6 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			children: {
 				visualization: {
 					plotManager: [
-						{plotters: this.layers},
-						(pm:any, removeMissingDynamicObjects:boolean) => {
-							if (!pm)
-								return;
-							Weave.setState(this.layers, DynamicState.removeTypeFromState(pm.layerSettings), removeMissingDynamicObjects);
-						},
 						{
 							zoomBounds: this.zoomBounds,
 							overrideXMin: this.extentOverride.xMin,
@@ -388,7 +382,15 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 							overrideXMax: this.extentOverride.xMax,
 							overrideYMax: this.extentOverride.yMax,
 							minZoomLevel: this.minZoomLevel,
-							maxZoomLevel: this.maxZoomLevel
+							maxZoomLevel: this.maxZoomLevel,
+							plotters: this.layers
+						},
+						// Use a separate mapping to make sure layerSettings state is applied after plotters state
+						// and remove types because we don't want the plotters to be removed.
+						{
+							layerSettings: (layerSettings:any, removeMissingDynamicObjects:boolean) => {
+								Weave.setState(this.layers, DynamicState.removeTypeFromState(layerSettings, false), removeMissingDynamicObjects);
+							}
 						}
 					]
 				}
@@ -396,13 +398,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		};
 	}
 
+	static matchesLayerSettings = _.matches(["children", "visualization", "plotManager", "layerSettings"]);
 	//returns new modified path
 	// for eg. instead of MapTool > children > visualization > plotManager > layerSettings (old path in Weave) use MapTool > layers (new path in WeaveJS)
-	static matchesLayerSettings = _.matches(["children", "visualization", "plotManager", "layerSettings"]);
-	deprecatedPathRewrite(relativePath:string[]):string[]{
-
-		if(OpenLayersMapTool.matchesLayerSettings(relativePath))
-		return ["layers"].concat(relativePath.slice(4));
+	deprecatedPathRewrite(relativePath:string[]):string[]
+	{
+		if (OpenLayersMapTool.matchesLayerSettings(relativePath))
+			return ["layers"].concat(relativePath.slice(4));
 	}
 
 	updateCursor():void

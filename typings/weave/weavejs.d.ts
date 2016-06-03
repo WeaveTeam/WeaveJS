@@ -987,9 +987,11 @@ declare module weavejs.api.core {
         /**
          * Converts DynamicState Arrays into Objects.
          * @param state The state to convert
+         * @param recursive Specifies whether or not to recursively remove types.
+         *                  If this is set to false, this function will only have an effect if the given state is a DynamicState Array.
          * @return The converted state
          */
-        static removeTypeFromState(state: Object): Object;
+        static removeTypeFromState(state: Object, recursive?: boolean): Object;
         /**
          * Sets or gets a value in a session state.
          * @param state The state to traverse
@@ -6742,6 +6744,7 @@ declare module weavejs.data.source {
 }
 declare module weavejs.data.source {
     import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+    import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     import LinkableString = weavejs.core.LinkableString;
     import DynamicColumn = weavejs.data.column.DynamicColumn;
     class SpatialJoinTransform extends AbstractDataSource implements ISelectableAttributes {
@@ -6751,6 +6754,7 @@ declare module weavejs.data.source {
         pointProjection: LinkableString;
         selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
         constructor();
+        getHierarchyRoot(): IWeaveTreeNode;
     }
 }
 declare module weavejs.data.source {
