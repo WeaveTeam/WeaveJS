@@ -22,6 +22,6 @@ export default class C3ColorHistogram extends C3Histogram
 Weave.registerClass(
 	C3ColorHistogram,
 	["weavejs.tool.C3ColorHistogram", "weave.visualization.tools::ColormapHistogramTool"],
-	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 	"Color Histogram"
 );
