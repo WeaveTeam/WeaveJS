@@ -86,7 +86,8 @@ export default class DataMenu implements MenuBarItemProps
 	static isBeta(impl:new()=>IDataSource):boolean
 	{
 		return impl == weavejs.data.source.CensusDataSource
-			|| impl == weavejs.data.source.GroupedDataTransform;
+			|| impl == weavejs.data.source.GroupedDataTransform
+			|| impl == weavejs.data.source.SpatialJoinTransform;
 	}
 	
 	getColumnsToExport=()=>
