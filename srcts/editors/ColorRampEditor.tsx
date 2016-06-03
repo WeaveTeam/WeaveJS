@@ -15,6 +15,7 @@ import {forceUpdateWatcher} from "../utils/WeaveReactUtils";
 import ColorRamp = weavejs.util.ColorRamp;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import StandardLib = weavejs.util.StandardLib;
+import SmartComponent from "../ui/SmartComponent";
 
 export interface ColorRampEditorProps extends React.Props<ColorRampEditor>
 {
@@ -103,7 +104,7 @@ interface ColorRampSelectorState
 }
 
 // Component to change the ramp
-class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRampSelectorState>
+class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRampSelectorState>
 {
 	private filterOptions:string[];
 
@@ -174,12 +175,6 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 		}
 	}
 
-	// this ensures parent(colorRampEditor colorRamp) callback wont call render again
-	shouldComponentUpdate(nextProps:ColorRampSelectorProps)
-	{
-		return this.props.colorRamp !== nextProps.colorRamp;
-	}
-
 	render()
 	{
 		var colors:number[] = this.props.colorRamp ? this.props.colorRamp.getColors() : [];
@@ -222,7 +217,8 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 							fluid={false}
 							value={this.state.selectedFilter}
 							options={this.filterOptions}
-							onChange={(value:string) => { this.setState({ selectedFilter: value}) }} direction="upward"
+							onChange={(value:string) => this.setState({ selectedFilter: value	}) }
+							direction="upward"
 						/>
 					</HBox>
 				</VBox>
@@ -248,7 +244,7 @@ class ColorRampSelector extends React.Component<ColorRampSelectorProps, ColorRam
 								fluid={false}
 								value={this.state.selectedFilter}
 								options={this.filterOptions}
-								onChange={(value:string) => { this.setState({ selectedFilter: value}) }}
+								onChange={(value:string) => this.setState({	selectedFilter: value })}
 								direction="upward"
 							/>
 						</HBox>
@@ -276,7 +272,7 @@ interface ColorRampCustomizerState
 }
 
 // Component to customize the selected ramp
-class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, ColorRampCustomizerState>
+class ColorRampCustomizer extends SmartComponent<ColorRampCustomizerProps, ColorRampCustomizerState>
 {
 	constructor(props:ColorRampCustomizerProps)
 	{
@@ -341,12 +337,6 @@ class ColorRampCustomizer extends React.Component<ColorRampCustomizerProps, Colo
 	{
 		if (this.props.colorRamp)
 			this.props.colorRamp.setSessionState(newColors);
-	}
-
-	// this ensures parent(colorRampSelector colorRamp) callback wont call render again
-	shouldComponentUpdate(nextProps:ColorRampCustomizerProps)
-	{
-		return this.props.colorRamp !== nextProps.colorRamp;
 	}
 
 	render()
