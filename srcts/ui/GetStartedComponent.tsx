@@ -23,6 +23,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	static DATA:string = "data";
 	static SESSION:string = "session";
 	static INTERACTIVETOUR:string = "interactive tour";
+	static enable:boolean = false;
 
 
 	constructor(props:GetStartedComponentProps)
@@ -64,7 +65,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	};
 
 	render() {
-		if(!this.state.visible)
+		if(!this.state.visible || !GetStartedComponent.enable)
 			return <div/>;
 
 		let containerStyle:React.CSSProperties = {

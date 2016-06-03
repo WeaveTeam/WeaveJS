@@ -125,7 +125,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
 	
-	urlParams:{ file: string, editable: boolean , skipBlankPageIntro:boolean};
+	urlParams:{ file: string, editable: boolean , showBlankPageIntro:boolean};
 	
 	componentDidMount()
 	{
@@ -484,14 +484,16 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 
 
-		let skipBlankPageIntro:boolean = Boolean(this.urlParams.file) || Boolean(this.urlParams.skipBlankPageIntro);
-		let blankPageIntroScreen:JSX.Element = skipBlankPageIntro ? null : <GetStartedComponent style={ {flex:1} }
-		                                                                                        loader={this.initialLoadingForBlankSession}
-		/>
+		//let showBlankPageIntro:boolean = Boolean(this.urlParams.file) || Boolean(this.urlParams.showBlankPageIntro);
+		let showBlankPageIntro:boolean = Boolean(this.urlParams.showBlankPageIntro);
+		let blankPageIntroScreen:JSX.Element = showBlankPageIntro ? <GetStartedComponent style={ {flex:1} }
+		                                                                                 loader={this.initialLoadingForBlankSession} />: null ;
+
 
 		let weaveTabbedComponent:JSX.Element = null;
 		let interactiveTourComponent:JSX.Element = null;
-		if(skipBlankPageIntro || this.state.initialWeaveComponent)
+		
+		if(!showBlankPageIntro)
 		{
 			if(this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
 			{
