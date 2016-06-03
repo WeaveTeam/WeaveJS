@@ -128,13 +128,18 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip")).then(
 			(result: Uint8Array) => JSZip().loadAsync(result)
 		).then(
-			(zip: JSZip) => zip.file("ProjDatabase.json").async("string")
+			(zip: JSZip) =>	zip.file("ProjDatabase.json").async("string")
 		).then(
 			JSON.parse
 		).then(
 			(db: { [name: string]: string }) =>
 			{
+				OpenLayersMapTool.projectionCollection = [];
+
 				for (let newProjName of Object.keys(db)) {
+
+					OpenLayersMapTool.projectionCollection.push(newProjName as string);//collecting all the available projections
+
 					let projDef = db[newProjName];
 					if (projDef)
 						proj4.defs(newProjName, projDef);
@@ -145,6 +150,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	}
 
 	static DEFAULT_PROJECTION:string = "EPSG:4326";
+	static projectionCollection:string[];//contains all the projections from ProjDatabase.json
 
 	static projectionVerifier(value:string):boolean
 	{
@@ -1009,7 +1015,11 @@ class OpenLayersMapToolEditor extends SmartComponent<IOpenLayersMapToolEditorPro
 					[
 						Weave.lang("Projection SRS"),
 						<HBox>
-							<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, { value: this.props.tool.projectionSRS }) }/>
+							<ComboBox
+								type="search"
+								fluid={ true }
+								ref={linkReactStateRef(this, { value: this.props.tool.projectionSRS }) }
+								options={ OpenLayersMapTool.projectionCollection }/>
 						</HBox>
 					]
 				],
