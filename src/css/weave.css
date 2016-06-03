@@ -589,18 +589,19 @@ div.weave-tree-view {
 
 div.ui.inverted.segment .weave-list-Item{
 	background-color: inherit;
+	padding: 5px 10px 5px 10px;
 }
 
 div.ui.inverted.segment .weave-list-Item:hover{
 	color: white;
 }
 div.ui.inverted.segment .weave-list-Item-selected{
-	background-color: #C78A36;
+	background-color: rgba(54, 119, 199, 0.6);
 	color: white;
 }
 
 div.ui.inverted.segment .weave-list-Item-selected:hover{
-	background-color: rgb(222, 168, 94);
+	background-color: rgba(117, 179, 255, 0.6)
 }
 
 /* sidebar */
@@ -921,4 +922,8 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 .weave-data-source-manager-sidebar .weave-data-source-item:hover {
 	color: white;
 	cursor: pointer;
+}
+
+.weave-data-source-item span {
+	padding: 0 10px 0 10px;
 }

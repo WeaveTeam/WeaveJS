@@ -65,10 +65,10 @@ export default class ConfirmationDialog extends React.Component<IConfirmationDia
 				</div>
 				<div className="actions">
 					<div className="ui buttons">
-						{this.props.okButtonContent ? <Button className="positive approve">
+						{this.props.okButtonContent ? <Button className="primary approve">
 							{this.props.okButtonContent}
 						</Button>:null}
-						{this.props.cancelButtonContent ? <Button className="negative deny">
+						{this.props.cancelButtonContent ? <Button className="secondary deny">
 							{this.props.cancelButtonContent}
 						</Button>:null}
 					</div>

@@ -11,7 +11,7 @@ import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 export interface IFileInfoViewProps extends React.Props<FileInfoView>
 {
 	fileInfo?:WeaveFileInfo;
-	className:string;
+	className?:string;
 }
 
 export interface IFileInfoViewState
@@ -67,34 +67,34 @@ export default class FileInfoView extends React.Component<IFileInfoViewProps, IF
 		let copyURL:string = this.props.fileInfo && (window.location.origin + window.location.pathname + "?file=/" + this.props.fileInfo.fileName);
 		return (
 			<VBox className={this.props.className} style={{flex: 1, alignItems: "center", justifyContent: "center"}}>
-				{this.props.fileInfo ?
-					<VBox style={{flex: 1, marginTop:"50%", alignItems: "center"}}>
-						<VBox style={{flex: 1, display: "flex", justifyContent: "center"}}>
-							{this.props.fileInfo && (thumbnail ? <img className="ui image" src={URL.createObjectURL(thumbnail)}/>:null)}
+				{
+					this.props.fileInfo
+					? (
+						<VBox className="weave-padded-vbox" style={{flex: 1, alignItems: "center"}}>
+							<VBox style={{flex: 1, justifyContent: "flex-end"}}>
+								{ thumbnail ? <img src={URL.createObjectURL(thumbnail)}/> : <i className="huge circular file outline icon" title={Weave.lang("Thumbnail Unavailable")}/> }
+							</VBox>
+							<VBox className="weave-padded-vbox" style={{flex: 1, justifyContent: "flex-start", alignItems: "center"}}>
+								<div className="ui medium center aligned dividing header">
+									{this.props.fileInfo && this.props.fileInfo.fileName}
+									<div className="sub header">
+										{Weave.lang("Weave Session") + (this.props.fileInfo && (" - " + FormatUtils.defaultFileSizeFormatting(this.props.fileInfo.fileSize)))}
+									</div>
+								</div>
+								{this.props.fileInfo && (Weave.lang("Modified") + " " + FormatUtils.defaultFuzzyTimeAgoFormatting(date) + " " + Weave.lang("ago"))}
+								<HBox className="weave-padded-hbox">
+									<Button
+										className="copyButton"
+										data-clipboard-text={copyURL}
+									>
+										{Weave.lang("Copy URL")}
+									</Button>
+									{this.props.children}
+								</HBox>
+							</VBox>
 						</VBox>
-						<div className="ui medium center aligned dividing icon header">
-							{this.props.fileInfo && (thumbnail ? null:<i className="circular file outline icon" title={Weave.lang("Thumbnail Unavailable")}/>)}
-							{this.props.fileInfo && this.props.fileInfo.fileName}
-							<div className="sub header">
-								{Weave.lang("Weave Session") + (this.props.fileInfo && (" - " + FormatUtils.defaultFileSizeFormatting(this.props.fileInfo.fileSize)))}
-							</div>
-						</div>
-				</VBox>:<div/>}
-				{this.props.fileInfo ?
-					<VBox style={{flex:1, width: "100%", alignItems: "center", justifyContent: "space-between"}}>
-						<div style={{flex:1}}>
-							{this.props.fileInfo && (Weave.lang("Modified") + " " + FormatUtils.defaultFuzzyTimeAgoFormatting(date) + " " + Weave.lang("ago"))}
-						</div>
-						<HBox style={{justifyContent: "flex-end"}}>
-							<Button
-								className="copyButton"
-							    data-clipboard-text={copyURL}
-							>
-								{Weave.lang("Copy URL")}
-							</Button>
-							{this.props.children}
-						</HBox>
-					</VBox>:<div/>
+					)
+					: null
 				}
 			</VBox>
 		)

@@ -238,7 +238,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 			<FixedDataTable rows={rows}
 							columnIds={names}
 							idProperty="id"
-							showIdColumn={true}
+							showIdColumn={!!columns.length}
 							columnTitles={columnTitles as any}
 			                disableSort={true}
 			/>

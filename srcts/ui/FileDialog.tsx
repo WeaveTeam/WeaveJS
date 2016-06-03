@@ -52,16 +52,10 @@ export class LocalFileOpen extends React.Component<IOpenFileProps, IOpenFileStat
 	render():JSX.Element
 	{
 		return (
-			<VBox style={{flex: 1, alignItems: "center", marginLeft: 20, marginRight: 20}}>
-				<FileInput onChange={this.handleFileChange} accept={".weave"}>
-					<Button className="large" style={{width:"100%", justifyContent: "center", borderRadius: ".28571429rem"}}>
-						{Weave.lang("Open a local session")}
-					</Button>
-				</FileInput>
-				<div className="ui horizontal divider">{Weave.lang("Or")}</div>
-				<VBox style={{flex: 1, alignItems: "center", width: "100%"}}>
+			<VBox style={{flex: 1, alignItems: "center", padding: 10}}>
+				<VBox style={{flex: 1, alignItems: "center"}}>
 					<Dropzone
-						style={{}}
+						style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1}}
 						className={this.state.rejected ? "weave-dropzone-file-error":"weave-dropzone-file"}
 						activeStyle={{border: "8px solid #CCC"}}
 					    onDropAccepted={(files:File[]) => {
@@ -75,10 +69,12 @@ export class LocalFileOpen extends React.Component<IOpenFileProps, IOpenFileStat
 							})
 						}}
 					    accept=".weave"
-					    disableClick={true}
+					    disableClick={false}
 					>
-						<VBox style={{flex: 1, alignItems: "center"}}>
-							<span className="ui centered header">{Weave.lang("Drag weave session here")}</span>
+						<span>{Weave.lang("Click to open a .weave file")}</span>
+						<div className="ui horizontal divider" style={{width: "50%"}}>{Weave.lang("Or")}</div>
+						<VBox style={{alignItems: "center"}}>
+							<span>{Weave.lang("Drag it here")}</span>
 							{this.state.rejected ? <span>{Weave.lang("The specified file could not be uploaded. Only files with the following extensions are allowed: weave")}</span>:""}
 						</VBox>
 					</Dropzone>
@@ -151,26 +147,31 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 
 		let rows:IRow[] = fileList.map((file:ListOption) => {
 			return {
-				filename: file.value
+				filename: file.value,
+				filelabel: (
+					<HBox className="weave-padded-hbox" >
+						<CenteredIcon iconProps={{className: "fa fa-file-text-o fa-fw"}}/>
+						{file.value}
+					</HBox>
+				)
 			} as IRow
 		});
-		let columnIds = ["filename"];
-		let columnTitles:IColumnTitles = {
-			filename: (<div className="ui form" style={{flex: 1}}>
+		let columnIds = ["filename","filelabel"];
+		let columnTitles:IColumnTitles = {};
+
+		let fileLocationForm:JSX.Element = (
+			<div className="ui form" style={{paddingLeft: "1rem"}}>
 				<div className="inline fields">
 					<div className="ui grid" style={{flex: 1}}>
-						<div className="four column row">
-							<div className="left floated column">
-								<label>{Weave.lang("Filename")}</label>
-							</div>
+						<div className="two column row">
 							<div className="right floated column">
 								<div className="field">
 									<div className="ui radio checkbox">
 										<input type="radio" checked={!this.state.allFiles} onChange={(e:any) => {
-									this.setState({
-										allFiles: false
-									});
-								}}/>
+										this.setState({
+											allFiles: false
+										});
+									}}/>
 										<label>{Weave.lang("My files")}</label>
 									</div>
 								</div>
@@ -179,10 +180,10 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 								<div className="field">
 									<div className="ui radio checkbox">
 										<input type="radio" checked={this.state.allFiles} onChange={(e:any) => {
-									this.setState({
-										allFiles: true
-									});
-								}}/>
+										this.setState({
+											allFiles: true
+										});
+									}}/>
 										<label>{Weave.lang("All files")}</label>
 									</div>
 								</div>
@@ -190,22 +191,25 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 						</div>
 					</div>
 				</div>
-			</div>)
-		};
+			</div>
+		);
 
 		return (
-			<VBox style={{flex:1}}>
-				<HBox className="weave-server-file-view" style={{flex: 1, marginLeft: 20, marginRight: 20}}>
+			<VBox style={{flex: 1, padding: 10}}>
+				<HBox className="weave-server-file-view" style={{flex: 1}}>
 					<VBox style={{flex: 1}}>
-						<FixedDataTable rows={rows}
-						                columnIds={columnIds}
-						                idProperty="filename"
-						                showIdColumn={true}
-						                columnTitles={columnTitles}
-						                multiple={false}
-						                disableSort={true}
-						                headerHeight={60}
-						                onSelection={(selectedFiles:string[]) => {
+						{fileLocationForm}
+						<VBox style={{flex: 1, border: "1px solid #D6D6D6"}}>
+							<FixedDataTable rows={rows}
+							                columnIds={columnIds}
+							                idProperty="filename"
+							                showIdColumn={false}
+							                columnTitles={columnTitles}
+							                multiple={false}
+							                disableSort={true}
+							                headerHeight={0}
+							                rowHeight={40}
+							                onSelection={(selectedFiles:string[]) => {
 						                    if(selectedFiles[0])
 												weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then(
 													(fileInfo:WeaveFileInfo) => {
@@ -218,15 +222,17 @@ export class WeaveServerFileOpen extends SmartComponent<IOpenFileProps, IOpenFil
 													}
 												);
 						                }}
-						/>
+							/>
+						</VBox>
 					</VBox>
 					<VBox style={ {flex: 1, paddingLeft: 20} }>
-						<FileInfoView className="weave-container" fileInfo={this.state.fileInfo}>
+						<FileInfoView fileInfo={this.state.fileInfo}>
 							{this.state.fileInfo ?
 								<Button
 									onClick={() => {
 					                    FileDialog.openHandler("/" + this.state.fileInfo.fileName,this.props.openUrlHandler);
 									}}
+								    style={{marginLeft: 8}}
 								>
 									{Weave.lang("Load Session")}
 								</Button>:null}
@@ -311,11 +317,11 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		let listOptions:ListOption[] = FileDialog.listItems.map((fileSource:any) => {
 			return {
 				label: (
-					<HBox className="weave-padded-hbox">
+					<HBox className="weave-padded-hbox" style={{padding: 15, alignItems: "center"}}>
 						<HBox>
-							<CenteredIcon iconProps={{ className: fileSource.iconClass, title: fileSource.label }}/>
+							<CenteredIcon iconProps={{ className: fileSource.iconClass, title: fileSource.label}} style={{fontSize: 26}}/>
 						</HBox>
-						<span style={{overflow: "hidden"}}>{fileSource.label}</span>
+						<span style={{overflow: "hidden", marginLeft: 20}}>{fileSource.label}</span>
 					</HBox>
 				),
 				value: fileSource.label
@@ -328,21 +334,21 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 				<div className="header">
 					{Weave.lang("Open a Weave Session")}
 				</div>
-				<div className="content">
+				<div className="content" style={{padding:0}}>
 					<div style={{height: 675, flex: 1, overflow: "auto", display: "flex", flexDirection: "row"}}>
-						<VBox className="ui inverted segment" style={ {width: 150, padding: 0} }>
+						<VBox className="ui attached inverted segment" style={ {width: 250, padding: 0, marginBottom: 0} }>
 							<List
 								options={listOptions}
 								multiple={false}
 								selectedValues={ [fileSource] }
 								onChange={ (selectedValues:string[]) => {
-							this.setState({
-								selected: selectedValues[0]
-							})
-						}}
+									this.setState({
+										selected: selectedValues[0]
+									})
+								}}
 							/>
 						</VBox>
-						<div className="ui basic segment" style={{display: "flex", flex: 1, marginTop: 0, paddingTop: 0}}>
+						<div className="ui basic segment" style={{display: "flex", flex: 1, marginTop: 0, padding: 0}}>
 							{editorJsx}
 						</div>
 					</div>
