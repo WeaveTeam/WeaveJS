@@ -211,18 +211,14 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 
 
 
-		return (<div style={ relativeParentStyle }>
-
-					<div style={ wrapperStyle }>
-						<div style={containerStyle} className="weave-guidance-toolTip">
-							{typeUI}
-							{this.props.children}
-							<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
-							{closeButtonUI}
-						</div>
-					</div>
-
-				</div>);
+		return (<div style={ wrapperStyle }>
+			<div style={containerStyle} className="weave-guidance-toolTip">
+				{typeUI}
+				{this.props.children}
+				<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
+				{closeButtonUI}
+			</div>
+		</div>);
 	}
 }
 

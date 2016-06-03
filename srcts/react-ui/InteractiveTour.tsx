@@ -1,7 +1,8 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import MiscUtils from "../utils/MiscUtils";
-import GuidanceToolTip from "./GuidanceToolTip";
+import * as _ from "lodash";
+
+
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;
 
@@ -20,6 +21,8 @@ export interface InteractiveTourState
 {
 	close?:boolean,
 	activeStepName?:string
+	tooltipHeight?:number // used this at componentDidUpdate to re-render again to center the toolTip
+	tooltipWidth?:number // used this at componentDidUpdate to re-render again to center the toolTip
 }
 
 export default class InteractiveTour extends React.Component<InteractiveTourProps,InteractiveTourState>
@@ -86,7 +89,9 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		InteractiveTour.stepName.addGroupedCallback(this,this.updateNextComponentName); // stepName change on target component Event listener
 		this.state = {
 			close:false,
-			activeStepName:""
+			activeStepName:"",
+			tooltipHeight:null,
+			tooltipWidth:null
 		}
 	}
 
@@ -105,7 +110,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 		this.setState({
 			activeStepName:nextStepName
-		})
+		});
 		
 		if(nextStepName == "") // empty string tell last step is reached , so disable the tour
 		{
@@ -136,8 +141,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		if(this.state.activeStepName)
 		{
 
-			// todo : add ToolTip back
-			// todo : automate ToolTip position around the component
 			// todo : try react animation for tooltip mount and unmount when step change
 
 			let highlighterStyle:React.CSSProperties = {
@@ -155,7 +158,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			highlighterStyle.height = mountedElementRect.height;
 
 			// to overlay other regions in the screen, except the component
-			// we neee to split the overlay to four components
+			// we need to split the overlay to four components (top, bottom, right, left) to avoid overlapping on respective target
 			let leftOverlayStyle:React.CSSProperties = {
 				position:"fixed",
 				left:0,
@@ -192,12 +195,93 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 				background:"transparent"
 			};
 
+			let maxSpace:number = null;
+			let leftSpace:number = mountedElementRect.left;
+			let rightSpace:number = window.innerWidth - mountedElementRect.right;
+			let toolTipPosition:string = null;
+
+			toolTipPosition = rightSpace >= leftSpace ? InteractiveTourToolTip.RIGHT : InteractiveTourToolTip.LEFT;
+			maxSpace = rightSpace >= leftSpace ? rightSpace : leftSpace;
+
+			let topSpace:number = mountedElementRect.top;
+			toolTipPosition = maxSpace >= topSpace ? toolTipPosition : InteractiveTourToolTip.TOP;
+			maxSpace = maxSpace >= topSpace ? maxSpace : topSpace;
+
+
+			let bottomSpace:number =  window.innerHeight - mountedElementRect.bottom;
+			toolTipPosition = maxSpace >= bottomSpace ? toolTipPosition : InteractiveTourToolTip.BOTTOM;
+			maxSpace = maxSpace >= bottomSpace ? maxSpace : bottomSpace;
+
+
+			let toolTipPositionStyle:React.CSSProperties = { position:"absolute"}
+
+			if(toolTipPosition == InteractiveTourToolTip.LEFT)
+			{
+				toolTipPositionStyle.left = mountedElementRect.left;
+				toolTipPositionStyle.top = mountedElementRect.top + mountedElementRect.height / 2 ;
+				if(this.state.tooltipHeight)
+				{
+					toolTipPositionStyle.top = toolTipPositionStyle.top - (this.state.tooltipHeight / 2);
+				}
+				if(this.state.tooltipWidth)
+				{
+					toolTipPositionStyle.left = toolTipPositionStyle.left - this.state.tooltipWidth;
+				}
+			}
+			else if(toolTipPosition == InteractiveTourToolTip.RIGHT)
+			{
+				toolTipPositionStyle.left = mountedElementRect.right;
+				toolTipPositionStyle.top = mountedElementRect.top + mountedElementRect.height / 2;
+				if(this.state.tooltipHeight)
+				{
+					toolTipPositionStyle.top = toolTipPositionStyle.top - (this.state.tooltipHeight / 2)
+				}
+			}
+			else if(toolTipPosition == InteractiveTourToolTip.TOP)
+			{
+				toolTipPositionStyle.left = mountedElementRect.left + mountedElementRect.width / 2;
+				toolTipPositionStyle.top = mountedElementRect.top ;
+				if(this.state.tooltipWidth)
+				{
+					toolTipPositionStyle.left = toolTipPositionStyle.left - (this.state.tooltipWidth / 2)
+				}
+				if(this.state.tooltipHeight)
+				{
+					toolTipPositionStyle.top = toolTipPositionStyle.top - this.state.tooltipHeight;
+				}
+			}
+			else if(toolTipPosition == InteractiveTourToolTip.BOTTOM)
+			{
+				toolTipPositionStyle.left = mountedElementRect.left + mountedElementRect.width / 2;
+				toolTipPositionStyle.top = mountedElementRect.bottom;
+				if(this.state.tooltipWidth)
+				{
+					toolTipPositionStyle.left = toolTipPositionStyle.left - (this.state.tooltipWidth / 2)
+				}
+			}
+
+			let type:string = null;
+
+			if(InteractiveTour.steps.indexOf(this.state.activeStepName) == 0)
+				type = InteractiveTourToolTip.START;
+			else if(InteractiveTour.steps.indexOf(this.state.activeStepName) == InteractiveTour.steps.length -1)
+				type = InteractiveTourToolTip.DONE;
+			else
+				type = InteractiveTourToolTip.NEXT;
+
 			return  <div>
 						<div style={ leftOverlayStyle }/>
 						<div style={ rightOverlayStyle }/>
 						<div style={ topOverlayStyle }/>
 						<div style={ bottomOverlayStyle }/>
 						<div style={ highlighterStyle }/>
+						<InteractiveTourToolTip ref="toolTip"
+						                        style={toolTipPositionStyle}
+						                        location={toolTipPosition}
+						                        type={type}
+						                        onClose={this.closeHandler}>
+							Start Here
+						</InteractiveTourToolTip>
 					</div>
 
 		}
@@ -206,25 +290,198 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			return <div style={ {position:"fixed"} }/>
 		}
 
-		/*
+	}
+
+	componentDidUpdate()
+	{
+		let mountedToolTip = this.refs["toolTip"];
+		let toolTipDOMNode = ReactDOM.findDOMNode(mountedToolTip as any);
+		let toolTipRect:ClientRect = toolTipDOMNode.getBoundingClientRect();
+
+		// if condition is important else infinte loop will happen calling render and componentDidUpdate again and again
+		if(this.state.tooltipHeight != toolTipRect.height || this.state.tooltipWidth != toolTipRect.width)
+		{
+			this.setState({// re-render again to center tooltip
+				tooltipHeight:toolTipRect.height,
+				tooltipWidth:toolTipRect.width
+			});
+		}
+
+
+	}
+
+
+
+}
+
+ interface InteractiveTourToolTipProps extends React.HTMLProps<InteractiveTourToolTip>
+{
+	location:string;
+	type: string;
+	onClose?:Function
+}
+
+ interface InteractiveTourToolTipState
+{
+
+}
+
+ class InteractiveTourToolTip extends React.Component<InteractiveTourToolTipProps,InteractiveTourToolTipState>
+{
+	static START:string = "Start";
+	static NEXT:string = "Next";
+	static DONE:string = "Done";
+
+	static BOTTOM:string = "bottom";
+	static BOTTOM_LEFT:string = "bottom left";
+	static BOTTOM_RIGHT:string = "bottom right";
+
+	static TOP:string = "top";
+	static TOP_LEFT:string = "top left";
+	static TOP_RIGHT:string = "top right";
+
+
+	static LEFT:string = "left";
+	static LEFT_TOP:string = "left top";
+	static LEFT_BOTTOM:string = "left bottom";
+
+	static RIGHT:string = "right";
+	static RIGHT_TOP:string = "right top";
+	static RIGHT_BOTTOM:string = "right bottom";
+
+	constructor(props:InteractiveTourToolTipProps)
+	{
+		super(props);
+		this.state = {
+			visible:true
+		}
+
+	}
+
+	componentWillReceiveProps(nextProps:InteractiveTourToolTipProps)
+	{
+
+	}
+
+	closeHandler=()=>{
+		if(this.props.onClose){
+			this.props.onClose();
+		}
+	};
+
+
+	render() {
 
 
 
 
-		 let direction:string = this.props.direction ? this.props.direction : "row";
+		let typeUI:JSX.Element = <span style={{color:"#FFBE00"}}>{this.props.type} : </span>;
 
-		 return (<div>
-		 {overLayUI}
-		 <div style={ {position:"relative",zIndex:1} }>
-		 <div style={ {display:"flex",flexDirection:direction} }>
-		 {this.props.children}
-		 <GuidanceToolTip location={this.props.location} type={this.props.type} onClose={this.closeHandler}>
-		 {this.props.toolTip}
-		 </GuidanceToolTip>
 
-		 </div>
-		 </div>
-		 </div>);*/
+		let styleObject:React.CSSProperties = _.merge({},this.props.style,{
+			display:"flex",
+			alignItems: "center"
+		});
+
+
+
+		let containerStyle:React.CSSProperties = {
+			whiteSpace:"nowrap"
+		};
+
+		let arrowStyle:React.CSSProperties = {
+			//position:""
+		};
+
+		if(this.props.location == InteractiveTourToolTip.BOTTOM)
+		{
+			styleObject.flexDirection = "column";
+			containerStyle.margin = "0 auto"; // container after getting its width from child will margin left and right equal space, thereby centers it
+
+			arrowStyle.borderTopColor = "transparent"; // 3 out 4 being transparent - creates a triangle
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		/*else if(this.props.location == InteractiveTourToolTip.BOTTOM_RIGHT)
+		{
+			//styleObject.top = "8px";
+			//styleObject.right = "8px";
+
+			//arrowStyle.top = "-16px";
+			//arrowStyle.right = "8px";
+			arrowStyle.borderTopColor = "transparent"; // 3 out 4 being transparent - creates a triangle
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		else if(this.props.location == InteractiveTourToolTip.BOTTOM_LEFT)
+		{
+			//styleObject.top = "8px";
+			//styleObject.left = "8px";
+
+			//arrowStyle.top = "-16px";// negative value ensures arrow is ahead of tooltip
+			//arrowStyle.left = "8px";
+			arrowStyle.borderTopColor = "transparent";// 3 out 4 being transparent - creates a triangle
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}*/
+		else if(this.props.location == InteractiveTourToolTip.TOP)
+		{
+			styleObject.flexDirection = "column-reverse";
+			containerStyle.margin = "0 auto"; // container after getting its width from child will margin left and right equal space, thereby centers it
+
+			arrowStyle["borderBottomColor"] = "transparent";// 3 out 4 being transparent - creates a triangle
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		/*else if(this.props.location == InteractiveTourToolTip.TOP_RIGHT)
+		{
+			//styleObject.bottom = "8px";
+			//styleObject.right = "8px";
+
+			//arrowStyle.bottom = "-16px";
+			//arrowStyle.right = "8px";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+		else if(this.props.location == InteractiveTourToolTip.TOP_LEFT)
+		{
+			//styleObject.bottom = "8px";
+			//styleObject.left = "8px";
+
+			//arrowStyle.bottom = "-16px"; // negative value ensures arrow is ahead of tooltip
+			//arrowStyle.left = "8px";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}*/
+		else if(this.props.location == InteractiveTourToolTip.RIGHT)
+		{
+			styleObject.flexDirection = "row";
+
+			arrowStyle.borderTopColor = "transparent";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderLeftColor = "transparent";
+
+		}
+		else if(this.props.location == InteractiveTourToolTip.LEFT)
+		{
+			styleObject.flexDirection = "row-reverse";
+
+			arrowStyle.borderTopColor = "transparent";
+			arrowStyle["borderBottomColor"] = "transparent";
+			arrowStyle.borderRightColor = "transparent";
+		}
+
+
+
+		return (<div style={ styleObject }>
+					<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
+					<div style={containerStyle} className="weave-guidance-toolTip">
+						{typeUI}
+						{this.props.children}
+					</div>
+				</div>);
 	}
 }
 

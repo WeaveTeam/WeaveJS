@@ -169,7 +169,10 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 							onSelect={(selectedItems) => this.setSelection(this.props, selectedItems && selectedItems[0], this.state.selectedLeaf)}
 						/>
 					</VBox>
-					<VBox className="weave-padded-vbox" style={{flex: 1, overflow: 'auto'}}>
+					<VBox className="weave-padded-vbox"
+					      style={{flex: 1, overflow: 'auto'}}
+					      id="Preview"
+					      ref={InteractiveTour.getMountedTargetComponent}>
 						<DynamicComponent dependencies={[this.column]} render={this.renderTablePreview}/>
 					</VBox>
 				</HBox>
