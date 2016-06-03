@@ -127,10 +127,13 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 			color: "grey"
 		};
 
+
+		// important for logo to have position relative as the container's one of the child is absolute
 		return (
 			<div style={styleObj}>
 				<div style={containerStyle} className="weave-getstarted">
 					<div style={overlayStyle} className="weave-getstarted-overlay"></div>
+					<h1 style={ {position:"relative"} } className="weave-getstarted-logo">Weave 2.1</h1>
 					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative"} }>
 						<VBox key="data"
 						      className="weave-getstarted-item"

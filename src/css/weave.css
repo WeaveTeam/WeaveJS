@@ -688,6 +688,11 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 	padding-right: 20%;
 }
 
+.weave-getstarted-logo { /* matched our iweave.com theme */
+	color: rgb(236, 131, 89);
+	font-size: 128px;
+}
+
 .weave-getstarted-overlay{
 	background-image: linear-gradient( 0deg, rgb(44,48,65) 0%, rgb(70,130,180) 100%);
 	opacity:1;
