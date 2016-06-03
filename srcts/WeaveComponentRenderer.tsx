@@ -63,14 +63,15 @@ export default class WeaveComponentRenderer extends SmartComponent<IWeaveCompone
 	
 	requestObject(weave:Weave, path:typeof LinkableWatcher.prototype.targetPath, type:React.ComponentClass<any>):void
 	{
-		var wasEmpty = !this.watcher.target;
+		var oldObject = weave.getObject(path);
 		weave.requestObject(path, type);
-		var lp = Weave.AS(weave.getObject(path), LinkablePlaceholder);
-		if (wasEmpty && lp)
+		var newObject = weave.getObject(path);
+		var lp = Weave.AS(newObject, LinkablePlaceholder);
+		if (oldObject != newObject && lp)
 		{
 			Weave.getCallbacks(lp).addDisposeCallback(this, () => {
-				if (this.props.onCreate && lp.getInstance() && this.props.weave === weave && _.isEqual(this.props.path, path))
-					this.props.onCreate(lp.getInstance());
+				if (this.props.onCreate && lp.getInstance() == this.generatedComponent)
+					this.props.onCreate(this.generatedComponent);
 			});
 		}
 	}

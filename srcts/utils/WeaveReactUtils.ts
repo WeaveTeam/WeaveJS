@@ -176,10 +176,11 @@ export function forceUpdateWatcher(component:ReactComponent, type:new(..._:any[]
 
 export function requestObject<T extends ReactComponent>(weave:Weave, path:string[]/* TODO change to WeavePathArray */, type:new(..._:any[])=>T, onCreate:(instance:T) => void):void
 {
-	var wasEmpty = !weave.getObject(path);
+	var oldObject = weave.getObject(path);
 	weave.requestObject(path, type);
-	var lp = Weave.AS(weave.getObject(path), LinkablePlaceholder);
-	if (wasEmpty && lp)
+	var newObject = weave.getObject(path);
+	var lp = Weave.AS(newObject, LinkablePlaceholder);
+	if (oldObject != newObject && lp)
 	{
 		Weave.getCallbacks(lp).addDisposeCallback(this, () => {
 			if (onCreate && lp.getInstance())
