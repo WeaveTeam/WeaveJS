@@ -166,7 +166,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 
 		return (
-			<HBox className="ui bottom attached segments" style={ {flex:1, overflow:'auto'} }>
+			<HBox className="ui bottom attached segments" style={ {flex:1, overflow:'auto'}}  onMouseEnter={() => this.forceUpdate()} >
 				<VBox style={{width: 250}} className="weave-data-source-manager-sidebar">
 					<VBox className="ui vertical inverted attached segments" style={{flex:1, justifyContent:"space-between"}}>
 						<VBox className="ui basic inverted segment" style={{flex:1, overflow: "auto"}}>
