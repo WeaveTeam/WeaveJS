@@ -6,7 +6,7 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;
 
 
-export interface GuidanceContainerProps extends React.HTMLProps<GuidanceContainer>
+export interface InteractiveTourProps extends React.HTMLProps<InteractiveTour>
 {
 	direction?:string, //row | column
 	location?:string, // column -> top | bottom (left | middle-default | right)  // row -> left | right (top | middle-default | bottom)
@@ -16,43 +16,43 @@ export interface GuidanceContainerProps extends React.HTMLProps<GuidanceContaine
 	onClose?:Function
 }
 
-export interface GuidanceContainerState
+export interface InteractiveTourState
 {
 	close?:boolean,
 	activeStepName?:string
 }
 
-export default class GuidanceContainer extends React.Component<GuidanceContainerProps,GuidanceContainerState>
+export default class InteractiveTour extends React.Component<InteractiveTourProps,InteractiveTourState>
 {
 
-	static stepName:LinkableString = new LinkableString(); // callback are registered in GuidanceContainer Instance
-	static enableGuidance:boolean = false; // set to true from click event of Guidance List element in GetStartedComponent
-	static guidanceSteps:string[] = []; // props.id are supplied as string of Array. Array supplied in click event of Guidance List element in GetStartedComponent
+	static stepName:LinkableString = new LinkableString(); // callback are registered in InteractiveTour Instance
+	static enable:boolean = false; // set to true from click event of Guidance List element in GetStartedComponent
+	static steps:string[] = []; // props.id are supplied as string of Array. Array supplied in click event of Guidance List element in GetStartedComponent
 	static stepComponentMap:any = {} // id mapped with component
 
 	// static method passed to target Component's Reference callback
 	// props.id is matched the ref callback to cache either mounted or unmounted state of the component
 	static getMountedTargetComponent=(mountedElement:any)=>
 	{
-		if(!GuidanceContainer.enableGuidance) {
+		if(!InteractiveTour.enable) {
 			return;
 		}
 		if(!mountedElement)
 		{
-			/*if(GuidanceContainer.stepComponentMap[mountedElement.props.id]){
-				GuidanceContainer.stepComponentMap[mountedElement.props.id] = null; // when component is unmounted
+			/*if(InteractiveTour.stepComponentMap[mountedElement.props.id]){
+				InteractiveTour.stepComponentMap[mountedElement.props.id] = null; // when component is unmounted
 			}*/
 			return;
 		}
 
-		if(GuidanceContainer.guidanceSteps && GuidanceContainer.guidanceSteps.length > 0) // if part of guidance steps
+		if(InteractiveTour.steps && InteractiveTour.steps.length > 0) // if part of guidance steps
 		{
-			if(GuidanceContainer.guidanceSteps.indexOf(mountedElement.props.id) > -1)
+			if(InteractiveTour.steps.indexOf(mountedElement.props.id) > -1)
 			{
-				GuidanceContainer.stepComponentMap[mountedElement.props.id] = mountedElement;
-				if(GuidanceContainer.guidanceSteps.indexOf(mountedElement.props.id) == 0) // if mounted component is part of first step
+				InteractiveTour.stepComponentMap[mountedElement.props.id] = mountedElement;
+				if(InteractiveTour.steps.indexOf(mountedElement.props.id) == 0) // if mounted component is part of first step
 				{
-					GuidanceContainer.stepName.value = mountedElement.props.id; // se the state, which will call the callback registered in Guidance Container instance
+					InteractiveTour.stepName.value = mountedElement.props.id; // se the state, which will call the callback registered in Guidance Container instance
 				}
 			}
 		}
@@ -64,26 +64,26 @@ export default class GuidanceContainer extends React.Component<GuidanceContainer
 	// move to nextstep
 	static targetComponentOnClick=(stepName:string)=>
 	{
-		if(!GuidanceContainer.enableGuidance)
+		if(!InteractiveTour.enable)
 		{
 			return;
 		}
-		if(GuidanceContainer.guidanceSteps && GuidanceContainer.guidanceSteps.length > 0 && GuidanceContainer.guidanceSteps.indexOf(stepName) != -1)
+		if(InteractiveTour.steps && InteractiveTour.steps.length > 0 && InteractiveTour.steps.indexOf(stepName) != -1)
 		{
-			let currentStepIndex:number = GuidanceContainer.guidanceSteps.indexOf(stepName); // get index of currentStep
-			let nextStepName:string = GuidanceContainer.guidanceSteps[currentStepIndex + 1]; // increment to find the next step
+			let currentStepIndex:number = InteractiveTour.steps.indexOf(stepName); // get index of currentStep
+			let nextStepName:string = InteractiveTour.steps[currentStepIndex + 1]; // increment to find the next step
 			if(nextStepName)
-				GuidanceContainer.stepName.value = nextStepName; // setting the state will trigger callback in GuidanceContainer instance
+				InteractiveTour.stepName.value = nextStepName; // setting the state will trigger callback in InteractiveTour instance
 			else
-				GuidanceContainer.stepName.value = ""
+				InteractiveTour.stepName.value = ""
 		}
 
 	};
 
-	constructor(props:GuidanceContainerProps)
+	constructor(props:InteractiveTourProps)
 	{
 		super(props);
-		GuidanceContainer.stepName.addGroupedCallback(this,this.updateNextComponentName); // stepName change on target component Event listener
+		InteractiveTour.stepName.addGroupedCallback(this,this.updateNextComponentName); // stepName change on target component Event listener
 		this.state = {
 			close:false,
 			activeStepName:""
@@ -96,22 +96,27 @@ export default class GuidanceContainer extends React.Component<GuidanceContainer
 	private targetMountedNode:any = null;
 
 	updateNextComponentName=()=>{
-		let nextStepName:string = GuidanceContainer.stepName.value;
-		if(GuidanceContainer.stepComponentMap[nextStepName])
+		let nextStepName:string = InteractiveTour.stepName.value;
+		if(InteractiveTour.stepComponentMap[nextStepName])
 		{
-			let mountedElement = GuidanceContainer.stepComponentMap[nextStepName];
+			let mountedElement = InteractiveTour.stepComponentMap[nextStepName];
 			this.targetMountedNode =  ReactDOM.findDOMNode(mountedElement as any);
 		}
 
 		this.setState({
 			activeStepName:nextStepName
 		})
+		
+		if(nextStepName == "") // empty string tell last step is reached , so disable the tour
+		{
+			InteractiveTour.enable = false;
+		}
 	};
 
 
 
 
-	componentWillReceiveProps(nextProps:GuidanceContainerProps)
+	componentWillReceiveProps(nextProps:InteractiveTourProps)
 	{
 
 	}
@@ -201,27 +206,9 @@ export default class GuidanceContainer extends React.Component<GuidanceContainer
 			return <div style={ {position:"fixed"} }/>
 		}
 
-		/*let urlParams:any = MiscUtils.getUrlParams();
-		 let skipGuidance:boolean = Boolean(urlParams.skipGuidance);
-
-		 if(this.state.close || skipGuidance || !this.props.enable)
-		 {
-		 return <div>{this.props.children}</div>
-		 }
+		/*
 
 
-		 let overlayStyle:React.CSSProperties = {
-		 position:"fixed",
-		 left:0,
-		 right:0,
-		 top:0,
-		 bottom:0,
-		 opacity:0.5,
-		 background:"black",
-		 zIndex:1
-		 };
-
-		 let overLayUI:JSX.Element  =  <div style={overlayStyle} />;
 
 
 		 let direction:string = this.props.direction ? this.props.direction : "row";

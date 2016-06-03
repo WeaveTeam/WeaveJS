@@ -1,7 +1,7 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
-import GuidanceContainer from "../react-ui/GuidanceContainer";
+import InteractiveTour from "../react-ui/InteractiveTour";
 import List from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
 import MenuButton from "../react-ui/MenuButton";
@@ -188,8 +188,8 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 									return dsItem.shown
 										?   <HBox key={index}
 										          id={dsItem.label as string}
-										          ref={GuidanceContainer.getMountedTargetComponent}
-										          onClick={() => {dsItem.click();  GuidanceContainer.targetComponentOnClick(dsItem.label as string) } }
+										          ref={InteractiveTour.getMountedTargetComponent}
+										          onClick={() => {dsItem.click();  InteractiveTour.targetComponentOnClick(dsItem.label as string) } }
 										          className="weave-data-source-item"
 										          style={{justifyContent: "space-between", padding: 5}}>
 												{Weave.lang(dsItem.label as string)}

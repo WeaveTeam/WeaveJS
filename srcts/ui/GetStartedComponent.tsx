@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox,VBox} from  "../react-ui/FlexBox";
-import GuidanceContainer from  "../react-ui/GuidanceContainer";
+import InteractiveTour from  "../react-ui/InteractiveTour";
 import FileDialog from  "../ui/FileDialog";
 
 
@@ -14,7 +14,7 @@ export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComp
 export interface GetStartedComponentState
 {
 	visible?:boolean;
-	showGuidanceList?:boolean;
+	showInteractiveTourList?:boolean;
 }
 
 export default class GetStartedComponent extends React.Component<GetStartedComponentProps, GetStartedComponentState>
@@ -22,7 +22,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 
 	static DATA:string = "data";
 	static SESSION:string = "session";
-	static GUIDANCE:string = "guidance";
+	static INTERACTIVETOUR:string = "interactive tour";
 
 
 	constructor(props:GetStartedComponentProps)
@@ -30,7 +30,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		super(props);
 		this.state = {
 			visible:true,
-			showGuidanceList:false
+			showInteractiveTourList:false
 		}
 	}
 
@@ -39,10 +39,10 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		
 	}
 
-	openDataSourceManager=(enableGuidance:boolean = false)=>{
-		GuidanceContainer.enableGuidance  = enableGuidance
+	openDataSourceManager=(enableInteractiveTour:boolean = false)=>{
+		InteractiveTour.enable  = enableInteractiveTour
 		 if(this.props.loader)
-			this.props.loader(enableGuidance ? GetStartedComponent.GUIDANCE : GetStartedComponent.DATA);
+			this.props.loader(enableInteractiveTour ? GetStartedComponent.INTERACTIVETOUR : GetStartedComponent.DATA);
 		this.setState({
 			visible:false
 		})
@@ -57,9 +57,9 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		})
 	};
 
-	enableGuidanceList=()=>{
+	enableInteractiveTourList=()=>{
 		this.setState({
-			showGuidanceList:true
+			showInteractiveTourList:true
 		})
 	};
 
@@ -89,11 +89,11 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 
 
 		let guidanceListUI:JSX.Element  = null;
-		if(this.state.showGuidanceList)
+		if(this.state.showInteractiveTourList)
 		{
 			guidanceListUI = <VBox style={ {position:"relative"} } className="weave-guidance-list">
 								<span className="weave-guidance-list-item"
-								      onClick={ ()=>{ GuidanceContainer.guidanceSteps = ["CSV file", "Open file","Create a chart"]; this.openDataSourceManager(true)} }>
+								      onClick={ ()=>{ InteractiveTour.steps = ["CSV file", "Open file","Create a chart"]; this.openDataSourceManager(true)} }>
 									CSV Data to Visualization
 								</span>
 							</VBox>
@@ -122,10 +122,10 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						</VBox>
 						<VBox key="tutorials"
 						      className="weave-getstarted-item"
-						      onClick={this.enableGuidanceList}>
+						      onClick={this.enableInteractiveTourList}>
 							<i className="fa fa-book"></i>
 							<br/>
-							<span> Start with <span style={ {color:"rgb(236, 131, 89)"} }> Guidance Tour</span></span>
+							<span> Start <span style={ {color:"rgb(236, 131, 89)"} }> Interactive Tour</span></span>
 						</VBox>
 					</HBox>
 					{guidanceListUI}

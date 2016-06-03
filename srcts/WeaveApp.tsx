@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import prefixer from "./react-ui/VendorPrefixer";
 import SideBarContainer from "./react-ui/SideBarContainer";
-import GuidanceContainer from "./react-ui/GuidanceContainer";
+import InteractiveTour from "./react-ui/InteractiveTour";
 import {VBox, HBox} from "./react-ui/FlexBox";
 import WeaveMenuBar from "./WeaveMenuBar";
 import DynamicComponent from "./ui/DynamicComponent";
@@ -258,8 +258,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			this.toolSet.add(tool);
 	};
 
-	// enableGuidance will be given when called from GetStartedComponent
-	createObject=(type:new(..._:any[])=>any,enableGuidance:boolean = false):void=>
+	createObject=(type:new(..._:any[])=>any):void=>
 	{
 		// need to generate path here instead of letting LinkableHashMap generate a name because async types can't be instantiated immediately
 		var weave = this.props.weave;
@@ -397,7 +396,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		{
 			title = this.props.weave.root.getName(this.tabLayout);
 		}
-		if(this.state.initialWeaveComponent == GetStartedComponent.DATA || this.state.initialWeaveComponent == GetStartedComponent.GUIDANCE)
+		if(this.state.initialWeaveComponent == GetStartedComponent.DATA || this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR)
 		{
 			activeTabIndex = -1; // -1 used to open the leading tab , rather session tab
 		}
@@ -491,12 +490,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		/>
 
 		let weaveTabbedComponent:JSX.Element = null;
-		let guidanceComponent:JSX.Element = null;
+		let interactiveTourComponent:JSX.Element = null;
 		if(skipBlankPageIntro || this.state.initialWeaveComponent)
 		{
-			if(this.state.initialWeaveComponent == GetStartedComponent.GUIDANCE )
+			if(this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
 			{
-				guidanceComponent = <GuidanceContainer/>
+				interactiveTourComponent = <InteractiveTour/>
 
 			}
 
@@ -555,7 +554,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						/>
 					:	null
 				}
-				{guidanceComponent}
+				{interactiveTourComponent}
 			</VBox>
 		);
 	}

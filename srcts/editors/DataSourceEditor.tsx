@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {VBox, HBox} from "../react-ui/FlexBox";
-import GuidanceContainer from "../react-ui/GuidanceContainer";
+import InteractiveTour from "../react-ui/InteractiveTour";
 import ResizingDiv from "../react-ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
@@ -36,7 +36,6 @@ export type View = typeof PREVIEW | typeof METADATA | typeof BROWSE;
 export interface IDataSourceEditorProps {
 	dataSource: IDataSource;
 	chartsMenu: ChartsMenu;
-	enableGuidance?:boolean;
 };
 
 export interface IDataSourceEditorState {
@@ -161,13 +160,12 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let root = this.props.dataSource.getHierarchyRoot();
 
 		let createChartButtonUI:JSX.Element = null;
-		let enableGuidance:boolean = this.props.enableGuidance && this.state.guideToTab == "Browse";
 		if(this.props.chartsMenu)
 		{
 			/* id, ref, onClick are added for Guidance , id and onClick argument has to match as they represent step name */
 			createChartButtonUI = <MenuButton id="Create a chart"
-			                                  ref={GuidanceContainer.getMountedTargetComponent}
-			                                  onClick={()=>GuidanceContainer.targetComponentOnClick("Create a chart")}
+			                                  ref={InteractiveTour.getMountedTargetComponent}
+			                                  onClick={()=>InteractiveTour.targetComponentOnClick("Create a chart")}
 			                                  menu={ this.props.chartsMenu.getCreateObjectItems() }
 			                                  style={{width: "100%"}} showIcon={false}>
 										<i className="fa fa-bar-chart fa-fw" style={{paddingRight: 25}}/>

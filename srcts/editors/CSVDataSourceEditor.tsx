@@ -5,7 +5,7 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
-import GuidanceContainer from "../react-ui/GuidanceContainer";
+import InteractiveTour from "../react-ui/InteractiveTour";
 import FileSelector from "../ui/FileSelector";
 import FixedDataTable from "../tools/FixedDataTable";
 import DataSourceEditor from "./DataSourceEditor";
@@ -79,8 +79,6 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		});
 		columnIds.unshift({label:Weave.lang("Auto-generated keys"), value: null});
 
-		let enableGuidance:boolean = this.props.enableGuidance && !ds.url.value;
-
 		let editorFields:[React.ReactChild, React.ReactChild][] = [
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
@@ -94,8 +92,8 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 				/* id, ref, onFileChange are added for Guidance , id and onFileChange argument has to match as they represent step name */
 				<FileSelector targetUrl={ds.url}
 				              id="Open file"
-				              ref={GuidanceContainer.getMountedTargetComponent}
-				              onFileChange={()=>GuidanceContainer.targetComponentOnClick("Open file")}
+				              ref={InteractiveTour.getMountedTargetComponent}
+				              onFileChange={()=>InteractiveTour.targetComponentOnClick("Open file")}
 				              placeholder={Weave.lang("http://www.example.com/example.csv")}
 				              style={ {width: "100%"} }
 				              accept={acceptExtension}
