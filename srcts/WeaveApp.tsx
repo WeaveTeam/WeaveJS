@@ -290,7 +290,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		// hack
 		var INIT = 'initSelectableAttributes';
 		var instance = placeholder.getInstance();
-		if (instance[INIT])
+		if (instance && instance[INIT])
 		{
 			var refs = ColumnUtils.findFirstDataSet(this.props.weave.root).concat();
 			var sortedRefs = this.prioritizeNumericColumns(refs);
