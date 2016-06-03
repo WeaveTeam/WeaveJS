@@ -224,7 +224,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		return (
 			<VBox className={ classNames(this.props.className) }
 			      style={ this.props.style }
-			      onMouseEnter={() => Weave.beta && this.forceUpdate()}>
+			      onMouseEnter={() => this.forceUpdate()}>
 				<HBox className="weave-ToolEditor-Header">
 					{backButtonUI}
 					<HBox className="weave-padded-hbox" style={ crumbStyle }>
