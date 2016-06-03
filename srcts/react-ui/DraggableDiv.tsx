@@ -200,7 +200,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			if (this.activeResizeHandle & Handle.LEFT)
 			{
 				newBounds.xMin += mouseDeltaX;
-				newBounds.xMin = Math.max(newBounds.xMin, oldBounds.xMax - parentWidth);
+				newBounds.xMin = Math.max(newBounds.xMin, oldBounds.xMax - parentWidth, 0);
 				newBounds.xMin = Math.min(newBounds.xMin, oldBounds.xMax - minWidth, parentWidth - edgeBuffer);
 			}
 			if (this.activeResizeHandle & Handle.TOP)
@@ -213,13 +213,13 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			{
 				newBounds.xMax += mouseDeltaX;
 				newBounds.xMax = Math.max(newBounds.xMax, oldBounds.xMin + minWidth, edgeBuffer);
-				newBounds.xMax = Math.min(newBounds.xMax, oldBounds.xMin + parentWidth);
+				newBounds.xMax = Math.min(newBounds.xMax, parentWidth);
 			}
 			if (this.activeResizeHandle & Handle.BOTTOM)
 			{
 				newBounds.yMax += mouseDeltaY;
 				newBounds.yMax = Math.max(newBounds.yMax, oldBounds.yMin + minHeight);
-				newBounds.yMax = Math.min(newBounds.yMax, oldBounds.yMin + parentHeight);
+				newBounds.yMax = Math.min(newBounds.yMax, parentHeight);
 			}
 		}
 		else // move
