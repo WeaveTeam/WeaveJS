@@ -18,7 +18,7 @@ import ReactUtils from "./utils/ReactUtils";
 import {forceUpdateWatcher, requestObject, WeavePathArray} from "./utils/WeaveReactUtils";
 import WeaveProgressBar from "./ui/WeaveProgressBar";
 import WeaveToolEditor from "./ui/WeaveToolEditor";
-import TabLayout from "./layouts/TabLayout";
+import TabLayout, {TabLayoutProps} from "./layouts/TabLayout";
 import WindowLayout from "./layouts/WindowLayout";
 import FlexibleLayout from "./layouts/FlexibleLayout";
 import WeaveMenus from "./menus/WeaveMenus";
@@ -524,8 +524,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 							}
 						],
 						onRemove: this.removeExistingLayout,
-						onTabDoubleLDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
-					}}
+						onTabDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
+					} as TabLayoutProps }
 				/>);
 
 			menuBarUI = !this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
