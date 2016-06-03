@@ -77,7 +77,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		super(props);
 		this.state = {
-			toolPathToEdit: null
+			toolPathToEdit: null,
+			initialWeaveComponent:null
 		};
 		this.dataMenu = new DataMenu(this.props.weave, this.createObject, this.openDataSourceManager);
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
@@ -489,26 +490,16 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		let blankPageIntroScreen:JSX.Element = showBlankPageIntro ? <GetStartedComponent style={ {flex:1} }
 		                                                                                 loader={this.initialLoadingForBlankSession} />: null ;
 
-
-		let weaveTabbedComponent:JSX.Element = null;
 		let interactiveTourComponent:JSX.Element = null;
-		
-		if(!showBlankPageIntro)
-		{
-			if(this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
-			{
-				interactiveTourComponent = <InteractiveTour/>
 
-			}
-
-			weaveTabbedComponent = (
-				<WeaveComponentRenderer
-					weave={weave}
-					path={renderPath}
-					defaultType={TabLayout}
-					style={{width: "100%", height: "100%"}}
-					onCreate={this.initializeTabs}
-					props={ {
+		let weaveTabbedComponent:JSX.Element = showBlankPageIntro && this.state.initialWeaveComponent == null ? null : (
+			<WeaveComponentRenderer
+				weave={weave}
+				path={renderPath}
+				defaultType={TabLayout}
+				style={{width: "100%", height: "100%"}}
+				onCreate={this.initializeTabs}
+				props={ {
 						panelRenderer: this.renderTab,
 						leadingTabs: [
 							{
@@ -531,8 +522,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						onRemove: this.removeExistingLayout,
 						onTabDoubleLDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
 					}}
-				/>
-			);
+			/>);
+
+		if(showBlankPageIntro && this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
+		{
+			interactiveTourComponent = <InteractiveTour/>
+
 		}
 
 
