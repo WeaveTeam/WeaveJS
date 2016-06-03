@@ -117,7 +117,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
 	
-	urlParams:{ file: string, editable: boolean , showBlankPageIntro:boolean};
+	urlParams:{ file: string, editable: boolean , skipBlankPageIntro:boolean};
 	
 	componentDidMount()
 	{
@@ -125,6 +125,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (this.props.readUrlParams) {
 			this.urlParams = MiscUtils.getUrlParams();
 			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.menus.fileMenu.pingAdminConsole();
+			this.urlParams.skipBlankPageIntro = StandardLib.asBoolean(this.urlParams.skipBlankPageIntro);
 
 			try {
 				var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
@@ -458,6 +459,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (!weave)
 			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
 
+
+		let skipBlankPageIntro:boolean = this.urlParams ? this.urlParams.skipBlankPageIntro : false;
+		if(weave.root.getObjects(weavejs.data.source.AbstractDataSource).length > 0 || weave.root.getObjects(weavejs.core.LinkablePlaceholder).length > 0)
+		{
+			skipBlankPageIntro = true
+		}
+
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
@@ -470,15 +478,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.urlParams = MiscUtils.getUrlParams();
 
 
-
-		//let showBlankPageIntro:boolean = Boolean(this.urlParams.file) || Boolean(this.urlParams.showBlankPageIntro);
-		let showBlankPageIntro:boolean = Boolean(this.urlParams.showBlankPageIntro);
-		let blankPageIntroScreen:JSX.Element = showBlankPageIntro ? <GetStartedComponent style={ {flex:1} }
-		                                                                                 loader={this.initialLoadingForBlankSession} />: null ;
+		let blankPageIntroScreen:JSX.Element = skipBlankPageIntro ? null : <GetStartedComponent style={ {flex:1} }
+		                                                                                 loader={this.initialLoadingForBlankSession} /> ;
 
 		let interactiveTourComponent:JSX.Element = null;
 
-		let weaveTabbedComponent:JSX.Element = showBlankPageIntro && this.state.initialWeaveComponent == null ? null : (
+		let weaveTabbedComponent:JSX.Element = skipBlankPageIntro || this.state.initialWeaveComponent ? (
 			<WeaveComponentRenderer
 				weave={weave}
 				path={renderPath}
@@ -506,9 +511,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 						onRemove: this.removeExistingLayout,
 						onTabDoubleLDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
 					}}
-			/>);
+			/>) : null;
 
-		if(showBlankPageIntro && this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
+		if(!skipBlankPageIntro && this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
 		{
 			interactiveTourComponent = <InteractiveTour/>
 
