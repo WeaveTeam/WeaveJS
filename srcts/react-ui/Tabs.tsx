@@ -72,7 +72,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 	{
 		var content = [
 			<HBox key="tabs"
-			      className={classNames(this.props.tabBarClassName|| "weave-tab-label-container", this.props.location)}
+			      className={classNames(this.props.tabBarClassName || "weave-tab-label-container", this.props.location)}
 			      style={this.props.tabBarStyle}
 			>
 				{

@@ -208,7 +208,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 			{
 				tabBarChildren = (
 					<Dropdown style={{display: "flex"}} menu={this.props.onAdd as MenuItemProps[]}>
-						<HBox className={classNames("weave-tab-label", "bottom")} style={{flex: 1}}>
+						<HBox className={classNames("weave-layout-tabs-label", "bottom")} style={{flex: 1}}>
 							<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")} iconProps={{ className: "fa fa-plus" }}/>
 						</HBox>
 					</Dropdown>
@@ -218,7 +218,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 			{
 				tabBarChildren = (
 					<HBox
-						className={classNames("weave-tab-label", "bottom")}
+						className={classNames("weave-layout-tabs-label", "bottom")}
 						onClick={this.props.onAdd as React.MouseEventHandler}
 					>
 						<CenteredIcon
@@ -234,11 +234,15 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		return (
 			<VBox
 				ref={ReactUtils.registerComponentRef(this)}
-				{...this.props}
 				style={_.merge({}, this.props.style, {flex: 1})}
 			>
 				<Tabs
+					{...this.props as any}
 					location="bottom"
+					tabContentClassName="weave-layout-tabs-content"
+					tabBarClassName="weave-layout-tabs-bar"
+					tabLabelClassName="weave-layout-tabs-label"
+					className=" "
 					labels={
 						leadingTabs.map(tab => tab.label)
 						.concat(state.tabs.map((panel) => (

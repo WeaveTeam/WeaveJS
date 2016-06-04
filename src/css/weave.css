@@ -413,9 +413,7 @@ div.table-row-selected>div>div>div>div>div {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 	cursor: default;
-	border-bottom: 2px solid #E6E6E6;
 	background-color: #F8F8F8;
-
 	/*box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
 	-webkit-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;
 	-moz-box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 1px, rgba(0, 0, 0, 0.12) 0px 0px 1px;*/
@@ -928,4 +926,29 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 
 .weave-data-source-item span {
 	padding: 0 10px 0 10px;
+}
+
+.weave-layout-tabs-content {
+	background: #ddd;
+	padding: 2px 4px 4px 4px;
+	border-right: none;
+	border-top: none;
+}
+
+.weave-layout-tabs-bar {
+	border-top: none;
+	background: #b0b0b0;
+}
+
+.weave-layout-tabs-label {
+	padding: 5px 8px 5px 8px
+}
+
+.weave-layout-tabs-label.active.bottom {
+	margin-top: 0;
+	border-bottom:none;
+	border-top: none;
+	background-color: #ddd;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
 }
