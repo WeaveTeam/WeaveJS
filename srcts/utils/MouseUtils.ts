@@ -25,7 +25,7 @@ export default class MouseUtils
 		target.removeEventListener('click', listener.onClick);
 	}
 	
-	static getOffsetPoint(relativeTo:HTMLElement, event:MouseEvent):{x:number, y:number}
+	static getOffsetPoint(relativeTo:HTMLElement, event:MouseEvent = null):{x:number, y:number}
 	{
 		if (!event)
 			event = MouseUtils.forElement(relativeTo).mouseEvent;
