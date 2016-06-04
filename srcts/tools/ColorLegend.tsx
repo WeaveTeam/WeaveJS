@@ -500,6 +500,6 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 Weave.registerClass(
 	ColorLegend,
 	["weavejs.tool.ColorLegend", "weave.visualization.tools::ColorBinLegendTool"],
-	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties],
+	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 	"Color Legend"
 );
