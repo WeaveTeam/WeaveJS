@@ -227,6 +227,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		evenlyExpandRows: true,
 		showBottomBorder: true,
 		allowClear:true,
+		multiple:true,
 		sortFunction: function(indexA:number, indexB:number, columnKey:string):number {
 			var valueA = this.getValue(indexA, columnKey);
 			var valueB = this.getValue(indexB, columnKey);
