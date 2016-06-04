@@ -146,15 +146,15 @@ input[type=number]::-webkit-outer-spin-button {
 
 /* react fixed data table */
 div.table-row-probed>div>div>div>div>div {
-	background-color: rgba(153, 214, 255, 0.4)
+	background-color: rgba(180, 225, 255, 0.4);
 }
 
 div.table-row-probed-selected>div>div>div>div>div {
-	background-color : #99D6FF;
+	background-color: rgba(117, 179, 255, 0.6);
 }
 
 div.table-row-selected>div>div>div>div>div {
-	background-color: #80CCFF;
+	background-color: rgba(109, 163, 228, 0.6);
 }
 
 .public_fixedDataTable_header, .public_fixedDataTable_header .public_fixedDataTableCell_main {
@@ -578,13 +578,13 @@ div.weave-tree-view {
 	background-color: #FFFFFF;
 }
 .weave-list-Item:hover{
-	background-color: rgba(153, 214, 255, 0.4);
+	background-color: rgba(180, 225, 255, 0.4);
 }
 .weave-list-Item-selected{
-	background-color: #80CCFF;
+	background-color: rgba(109, 163, 228, 0.6);
 }
 .weave-list-Item-selected:hover{
-	background-color : #99D6FF;
+	background-color: rgba(117, 179, 255, 0.6);
 }
 
 div.ui.inverted.segment .weave-list-Item{
@@ -675,7 +675,7 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 }
 
 .weave-progress-bar {
-	background-color: #80CCFF;
+	background-color: rgba(109, 163, 228, 0.6);
 	transition-duration: 200ms;
 	-webkit-transition: width .1s ease, background-color .1s ease;
 	-moz-transition: width .1s ease, background-color .1s ease;
