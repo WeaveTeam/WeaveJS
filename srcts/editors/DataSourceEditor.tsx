@@ -33,11 +33,13 @@ export const METADATA:"metadata" = "metadata";
 export const BROWSE:"browse" = "browse";
 export type View = typeof PREVIEW | typeof METADATA | typeof BROWSE;
 
-export interface IDataSourceEditorProps {
+export interface IDataSourceEditorProps
+{
 	dataSource: IDataSource;
 };
 
-export interface IDataSourceEditorState {
+export interface IDataSourceEditorState
+{
 	selectedBranch?: IWeaveTreeNode;
 	selectedLeaf?: IWeaveTreeNode;
 	showPreviewView?: boolean;
@@ -160,8 +162,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		return (
 			<VBox className="ui segment" style={{flex: 1}}>
 				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Preview of") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Preview")}</div>
-				<HBox className={root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
-					<VBox style={{flex: root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
+				<HBox className={root && root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
+					<VBox style={{flex: root && root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
 						<WeaveTree
 							root={root}
 							hideLeaves={true}
@@ -182,8 +184,6 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	
 	renderConfigureView():JSX.Element
 	{
-		let root = this.props.dataSource.getHierarchyRoot();
-		// <label style={ { fontWeight: "bold" } }> { Weave.lang("Edit {0}", this.props.dataSource.getLabel()) } </label>
 		return (
 			<VBox className="ui basic segment" style={ {border: "none"} }>
 				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Configure") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Configure")}</div>
@@ -196,15 +196,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	
 	renderTablePreview=():JSX.Element =>
 	{
-		var columnSiblings: IWeaveTreeNode[];
-		if (this.state.selectedBranch)
-		{
-			columnSiblings = this.state.selectedBranch.getChildren();
-		}
-		else
-		{
-			columnSiblings = [];
-		}
+		var columnSiblings: IWeaveTreeNode[] = this.state.selectedBranch && this.state.selectedBranch.getChildren() || [];
 		
 		let leaves:IWeaveTreeNode[] = columnSiblings.filter((n) => !n.isBranch());
 		if (!leaves)
@@ -252,15 +244,22 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	{
 		let root = props.dataSource.getHierarchyRoot();
 		var branch = newBranch || root;
-		var leaves = branch.getChildren() || [];
 		var leaf = newLeaf;
-		if (leaves.indexOf(leaf) < 0)
-			leaf = leaves[0];
-
-		if(!branch.hasChildBranches())//tool config drop downs should have only columns as options
+	
+		//firstDataSet should be set if there are leaves which are column refs and unset otherwise
+		var leaves = branch && branch.getChildren() || [];
+		leaves = leaves.filter(leaf => {
+			var ref = Weave.AS(leaf, IColumnReference);
+			return !!(ref && ref.getColumnMetadata());
+		});
+		if (leaves.length)
 			weavejs.data.ColumnUtils.firstDataSet = leaves as any[];
 		else
 			weavejs.data.ColumnUtils.firstDataSet = null;
+		
+		// select the first leaf by default
+		if (leaves.indexOf(leaf) < 0)
+			leaf = leaves[0];
 		
 		var ref = Weave.AS(leaf, IColumnReference);
 		this.column = weavejs.WeaveAPI.AttributeColumnCache.getColumn(ref && ref.getDataSource(), ref && ref.getColumnMetadata());
