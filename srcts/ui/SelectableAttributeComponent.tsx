@@ -120,7 +120,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 		}
 		else
 		{
-			return AttributeSelector.openInstance(attributeName, this.props.attributes);
+			return AttributeSelector.openInstance(this, attributeName, this.props.attributes);
 		}
 
 	};

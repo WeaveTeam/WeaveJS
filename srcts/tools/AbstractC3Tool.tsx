@@ -115,7 +115,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	{
 		super.componentDidMount();
 		
-		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
+		this.toolTip = ReactUtils.openPopup(this, <ToolTip/>) as ToolTip;
         MouseUtils.addPointClickListener(this.element, this.handlePointClick);
 		this.validateSize();
 		this.handleChange();

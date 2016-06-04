@@ -4,6 +4,7 @@ import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
 import SmartComponent from "../ui/SmartComponent";
 import MouseUtils from "../utils/MouseUtils";
+import ReactUtils from "../utils/ReactUtils";
 import DOMUtils from "../utils/DOMUtils";
 import Div from "./Div";
 
@@ -82,6 +83,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			newState.left = (parent.offsetWidth - this.element.offsetWidth) / 2;
 		this.setState(newState);
 		
+		var document = ReactUtils.getDocument(this);
 		document.addEventListener("mouseup", this.onDragEnd, true);
 		document.addEventListener("mousemove", this.onDrag, true);
 	}
@@ -290,6 +292,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	
 	componentWillUnmount()
 	{
+		var document = ReactUtils.getDocument(this);
 		document.removeEventListener("mouseup", this.onDragEnd, true);
 		document.removeEventListener("mousemove", this.onDrag, true);
 	}

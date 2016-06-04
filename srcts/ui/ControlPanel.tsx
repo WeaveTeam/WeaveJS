@@ -17,12 +17,13 @@ export default class ControlPanel extends PopupWindow
 	//TODO - ok/cancel buttons with targets like in Flash Weave	
 	
 	static d2d_weave_class_popup = new Dictionary2D<Weave, typeof React.Component, PopupWindow>(true, true);
-	static openInstance<P>(weave:Weave, ComponentType:new(..._:any[])=>React.Component<P, any>, popupProps:PopupWindowProps = null, componentProps:P = null):ControlPanel
+	static openInstance<P>(context:React.ReactInstance, weave:Weave, ComponentType:new(..._:any[])=>React.Component<P, any>, popupProps:PopupWindowProps = null, componentProps:P = null):ControlPanel
 	{
 		var popup = ControlPanel.d2d_weave_class_popup.get(weave, ComponentType);
 		if (popup)
 			PopupWindow.close(popup);
 		popup = PopupWindow.open(
+			context,
 			_.merge(
 				{
 					title: weavejs.WeaveAPI.ClassRegistry.getDisplayName(ComponentType),

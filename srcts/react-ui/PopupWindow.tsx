@@ -1,14 +1,13 @@
 import * as ReactDOM from "react-dom";
 import * as React from "react";
 import {HBox, VBox} from "./FlexBox";
-import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "./VendorPrefixer";
 import CenteredIcon from "./CenteredIcon";
 import Button from "../semantic-ui/Button";
 import MouseUtils from "../utils/MouseUtils";
-import DraggableDiv from "./DraggableDiv";
-import {DraggableDivState} from "./DraggableDiv";
+import ReactUtils from "../utils/ReactUtils";
+import DraggableDiv, {DraggableDivState} from "./DraggableDiv";
 
 const ENTER_KEYCODE = 13;
 const ESC_KEYCODE = 27;
@@ -54,7 +53,6 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		this.state = {
 			zIndex: 0,
 		};
-		document.addEventListener("keyup", this.onKeyPress);
 	}
 
 	static defaultProps = {
@@ -62,10 +60,10 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		draggable: true
 	};
 
-	static open(props:PopupWindowProps):PopupWindow
+	static open(context:React.ReactInstance, props:PopupWindowProps):PopupWindow
 	{
 		// set active window to non active
-		var popupWindow = ReactUtils.openPopup(<PopupWindow {...props}/>) as PopupWindow;
+		var popupWindow = ReactUtils.openPopup(context, <PopupWindow {...props}/>) as PopupWindow;
 		PopupWindow.windowSet.add(popupWindow);
 		PopupWindow.alignWindows();
 		return popupWindow;
@@ -89,6 +87,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	componentDidMount()
 	{
+		ReactUtils.getDocument(this).addEventListener("keyup", this.onKeyPress);
 		// re-render now that this.element has been set in the ref callback function
 		this.forceUpdate();
 	}
@@ -135,7 +134,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	componentWillUnmount()
 	{
-		document.removeEventListener("keyup", this.onKeyPress);
+		ReactUtils.getDocument(this).removeEventListener("keyup", this.onKeyPress);
 	}
 
 	renderOverlay(modal:boolean)

@@ -176,12 +176,13 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	}
 
 	static window: PopupWindow;
-	static open(ds:WeaveDataSource, selectIdFunc?: (id:number)=>void)
+	static open(context:React.ReactInstance, ds:WeaveDataSource, selectIdFunc?: (id:number)=>void)
 	{
 		if (SqlImport.window)
 			PopupWindow.close(SqlImport.window);
 
 		SqlImport.window = PopupWindow.open(
+			context,
 			{
 				title: Weave.lang("Import from SQL"),
 				content: <SqlImport dataSource={ds} selectIdFunc={selectIdFunc || _.noop}/>,
@@ -189,7 +190,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 				width: 920,
 				height: 675,
 				onClose: () => {SqlImport.window = null}
-			});
+			}
+		);
 	}
 
 	componentDidMount() {

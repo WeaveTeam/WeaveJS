@@ -40,7 +40,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 		ColorController.window = null;
 	}
 
-	static open(colorColumn:ColorColumn)
+	static open(context:React.ReactInstance, colorColumn:ColorColumn)
 	{
 		if (!colorColumn)
 			return;
@@ -48,7 +48,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 		if (ColorController.window)
 			PopupWindow.close(ColorController.window);
 		
-		ColorController.window = PopupWindow.open({
+		ColorController.window = PopupWindow.open(context, {
 			title: Weave.lang("Color settings"),
 			content: <ColorController colorColumn={colorColumn}/>,
 			resizable: true,

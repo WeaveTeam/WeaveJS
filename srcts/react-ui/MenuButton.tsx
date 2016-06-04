@@ -47,7 +47,8 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 			ReactUtils.closePopup(this.menu);
 			this.menu = null;
 		}
-		if(this.props.onClose){
+		if (this.props.onClose)
+		{
 			this.props.onClose();
 		}
 	}
@@ -63,7 +64,9 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 		else
 		{
 			this.menu = ReactUtils.openPopup(
-				<Menu menu={this.props.menu}
+				this,
+				<Menu
+					menu={this.props.menu}
 					xPos={clientRect.left} 
 					yPos={clientRect.top + this.element.clientHeight}
 					onClick={this.closeMenu}

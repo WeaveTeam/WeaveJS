@@ -1,14 +1,11 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import reactUpdate from "react-addons-update";
+import DOMUtils from "./DOMUtils";
 import {HBox,VBox} from "../react-ui/FlexBox";
 import * as _ from "lodash";
 import * as jquery from "jquery";
 import polyfill from "./polyfill";
-
-import {linkReactStateRef} from "./WeaveReactUtils";
-
-import LinkableString = weavejs.core.LinkableString;
 
 var $:JQueryStatic = (jquery as any)["default"];
 
@@ -92,8 +89,9 @@ export default class ReactUtils
 		return popoutWindow;
 	}
 	
-	static openPopup(jsx:JSX.Element, closeOnMouseDown:boolean = false):React.ReactInstance
+	static openPopup(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false):React.ReactInstance
 	{
+		var document = ReactUtils.getDocument(context);
 		var element = document.body.appendChild(document.createElement("div")) as Element;
 		var popup = ReactDOM.render(jsx, element);
 		var mousedownHandler:EventListener = null;
@@ -119,6 +117,8 @@ export default class ReactUtils
 		var [element, handler] = ReactUtils.map_popup_element.get(popup);
 		if (!element.parentNode)
 			return;
+		
+		var document = DOMUtils.getWindow(element).document;
 		if (handler)
 			document.removeEventListener("mousedown", handler);
 		ReactDOM.unmountComponentAtNode(element);
@@ -270,7 +270,7 @@ export default class ReactUtils
 	 */
 	static hasFocus(component:ReactComponent):boolean
 	{
-		return ReactDOM.findDOMNode(component).contains(document.activeElement);
+		return ReactDOM.findDOMNode(component).contains(ReactUtils.getDocument(component).activeElement);
 	}
 	
 	/**
@@ -369,6 +369,11 @@ export default class ReactUtils
 
 		ReactUtils.map_callback_onWillUpdateRef.set(callback, ref);
 		return ref;
+	}
+
+	static getDocument(instance:React.ReactInstance):Document
+	{
+		return DOMUtils.getWindow(ReactUtils.getElement(instance)).document;
 	}
 
 	static getElement(instance:React.ReactInstance):Element

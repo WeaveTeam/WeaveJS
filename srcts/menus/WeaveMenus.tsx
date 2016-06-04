@@ -1,3 +1,4 @@
+import * as React from "react";
 import SystemMenu from "./SystemMenu";
 import FileMenu from "./FileMenu";
 import ChartsMenu from "./ChartsMenu";
@@ -12,12 +13,12 @@ export default class WeaveMenus {
 	dataMenu:DataMenu;
 	controllersMenu:ControllersMenu;
 
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	constructor(context:React.ReactInstance, weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
 	{
-		this.fileMenu = new FileMenu(weave);
+		this.fileMenu = new FileMenu(context, weave);
 		this.systemMenu = new SystemMenu(weave, this.fileMenu);
 		this.chartsMenu = new ChartsMenu(weave, createObject);
 		this.dataMenu = new DataMenu(weave, createObject);
-		this.controllersMenu = new ControllersMenu(weave, createObject);
+		this.controllersMenu = new ControllersMenu(context, weave, createObject);
 	}
 }

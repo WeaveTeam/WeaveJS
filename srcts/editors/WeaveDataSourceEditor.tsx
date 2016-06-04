@@ -79,11 +79,11 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Import Data to Server"),
-				<Button onClick={()=>SqlImport.open(ds, null)}>{Weave.lang("Import from SQL...")}</Button>
+				<Button onClick={() => SqlImport.open(this, ds, null)}>{Weave.lang("Import from SQL...")}</Button>
 			],
 			[
 				Weave.lang("Manage Server"),
-				<Button onClick={() => ConnectionManager.open(ds, null) }>{Weave.lang("Manage users and connections") }</Button>
+				<Button onClick={() => ConnectionManager.open(this, ds, null) }>{Weave.lang("Manage users and connections") }</Button>
 			]
 		];
 		return super.editorFields.concat(editorFields)

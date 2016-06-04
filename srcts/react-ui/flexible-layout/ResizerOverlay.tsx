@@ -5,6 +5,7 @@ import prefixer from "../VendorPrefixer";
 import Resizer from "./Resizer"
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 import MouseUtils from "../../utils/MouseUtils";
+import ReactUtils from "../../utils/ReactUtils";
 
 const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 
@@ -45,12 +46,14 @@ export default class ResizerOverlay extends React.Component<IResizerOverlayProps
 
     componentDidMount():void
     {
-        document.addEventListener("mousemove", this.onMouseMove, true);
+        var document = ReactUtils.getDocument(this);
+		document.addEventListener("mousemove", this.onMouseMove, true);
         mouseevents.forEach(mouseevent => document.addEventListener(mouseevent, this.stopEventPropagation, true));
     }
 
     componentWillUnmount():void
     {
+        var document = ReactUtils.getDocument(this);
         document.removeEventListener("mousemove", this.onMouseMove)
         mouseevents.forEach(mouseevent => document.removeEventListener(mouseevent, this.stopEventPropagation));
     }

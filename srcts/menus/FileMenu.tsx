@@ -16,11 +16,13 @@ import StandardLib = weavejs.util.StandardLib;
 
 export default class FileMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave)
+	constructor(context:React.ReactInstance, weave:Weave)
 	{
+		this.context = context;
 		this.weave = weave;
 	}
 
+	context:React.ReactInstance;
 	weave:Weave;
 	label = "File";
 	bold = false;
@@ -78,7 +80,7 @@ export default class FileMenu implements MenuBarItemProps
 			onSave((filenameInput.value && filenameInput.value + ".weave") || defaultFileName);
 		};
 
-		PopupWindow.open({
+		PopupWindow.open(this.context, {
 			title: Weave.lang("Export session state"),
 			content: (
 				<VBox style={{width: 400, height: 200, padding: 20}}>

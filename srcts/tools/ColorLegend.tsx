@@ -185,7 +185,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	componentDidMount()
 	{
 		Menu.registerMenuSource(this);
-		this.toolTip = ReactUtils.openPopup(<ToolTip/>) as ToolTip;
+		this.toolTip = ReactUtils.openPopup(this, <ToolTip/>) as ToolTip;
 	}
 	
 	componentWillUnmount()

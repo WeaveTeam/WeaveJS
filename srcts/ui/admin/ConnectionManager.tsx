@@ -75,11 +75,12 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 	}
 
 	static window: PopupWindow;
-	static open(ds: WeaveDataSource, selectIdFunc?: (id: number) => void) {
+	static open(context:React.ReactInstance, ds: WeaveDataSource, selectIdFunc?: (id: number) => void) {
 		if (ConnectionManager.window)
 			PopupWindow.close(ConnectionManager.window);
 
 		ConnectionManager.window = PopupWindow.open(
+			context,
 			{
 				title: Weave.lang("Import from SQL"),
 				content: <ConnectionManager dataSource={ds}/>,
@@ -88,7 +89,8 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 				width: 920,
 				height: 675,
 				onClose: () => { ConnectionManager.window = null }
-			});
+			}
+		);
 	}
 
 	private element: Element;

@@ -50,6 +50,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 	componentDidMount():void
 	{
+		var document = ReactUtils.getDocument(this);
 		document.addEventListener("mouseup", this.onMouseUp);
 		document.addEventListener("mousedown", this.onMouseDown);
 		document.addEventListener("mousemove", this.onMouseMove);
@@ -62,6 +63,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 	componentWillUnmount():void
 	{
+		var document = ReactUtils.getDocument(this);
 		document.removeEventListener("mouseup", this.onMouseUp);
 		document.removeEventListener("mousedown", this.onMouseDown);
 		document.removeEventListener("mousemove", this.onMouseMove);

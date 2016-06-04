@@ -40,7 +40,7 @@ export default class MouseoverController extends React.Component<MouseoverContro
 		MouseoverController.window = null;
 	}
 
-	static open(weave:Weave,probeHeaderColumns:ILinkableHashMap, probedColumns:ILinkableHashMap)
+	static open(context:React.ReactInstance, weave:Weave, probeHeaderColumns:ILinkableHashMap, probedColumns:ILinkableHashMap)
 	{
 		if (!probeHeaderColumns)
 		{
@@ -57,7 +57,7 @@ export default class MouseoverController extends React.Component<MouseoverContro
 		if (MouseoverController.window)
 			PopupWindow.close(MouseoverController.window);
 
-		MouseoverController.window = PopupWindow.open({
+		MouseoverController.window = PopupWindow.open(context, {
 			title: Weave.lang("Mouseover settings"),
 			content: <MouseoverController probedHeaderColumns={probeHeaderColumns} probedColumns={probedColumns}/>,
 			resizable: true,

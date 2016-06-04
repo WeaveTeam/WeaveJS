@@ -14,25 +14,28 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
 export default class ControllersMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	constructor(context:React.ReactInstance, weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
 	{
+		this.context = context;
 		this.weave = weave;
 		this.createObject = createObject;
 	}
 
 	label:string = "Controllers";
+	context:React.ReactInstance;
 	weave:Weave;
 	createObject:(type:new(..._:any[])=>any)=>void;
+	
 	get menu():MenuItemProps[]
 	{
 		return [].concat(
 			{
 				label: Weave.lang("Color settings"),
-				click: () => ColorController.open(this.weave.getObject("defaultColorColumn") as ColorColumn)
+				click: () => ColorController.open(this.context, this.weave.getObject("defaultColorColumn") as ColorColumn)
 			},
 			{
 				label: Weave.lang("Mouseover settings"),
-				click: () => MouseoverController.open(this.weave, this.weave.getObject("Probe Header Columns") as ILinkableHashMap,this.weave.getObject("Probed Columns") as ILinkableHashMap)
+				click: () => MouseoverController.open(this.context, this.weave, this.weave.getObject("Probe Header Columns") as ILinkableHashMap, this.weave.getObject("Probed Columns") as ILinkableHashMap)
 			},
 			{},
 			this.getCreateObjectItems()

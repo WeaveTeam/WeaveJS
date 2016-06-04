@@ -188,10 +188,11 @@ export default class AttributeSelector extends SmartComponent<IAttributeSelector
 		return columns.map(column => ColumnUtils.hack_findHierarchyNode(column)).filter(_.identity);
 	};
 
-	static openInstance(attributeName:string, attributes:Map<string, IColumnWrapper|ILinkableHashMap>):ControlPanel
+	static openInstance(context:React.ReactInstance, attributeName:string, attributes:Map<string, IColumnWrapper|ILinkableHashMap>):ControlPanel
 	{
 		let weave = Weave.getWeave(attributes.get(attributeName));
 		return ControlPanel.openInstance(
+			context,
 			weave,
 			AttributeSelector,
 			{title: Weave.lang('Attribute Selector')},

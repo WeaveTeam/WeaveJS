@@ -6,6 +6,7 @@ import {MenuItemProps} from "./Menu";
 import Menu from "./Menu";
 import Dropdown from "../semantic-ui/Dropdown";
 import classNames from "../modules/classnames";
+import ReactUtils from "../utils/ReactUtils";
 import {DropdownProps} from "../semantic-ui/Dropdown";
 
 export interface MenuBarItemProps
@@ -41,7 +42,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	
 	componentDidMount()
 	{
-		document.addEventListener("mousedown", this.onDocumentMouseDown);
+		ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown);
 		// TODO Add touch events for mobile
 		this.element = ReactDOM.findDOMNode(this);
 	}
@@ -52,7 +53,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	
 	componentWillUnmount()
 	{
-		document.removeEventListener("mousedown", this.onDocumentMouseDown);
+		ReactUtils.getDocument(this).removeEventListener("mousedown", this.onDocumentMouseDown);
 	}
 
 	onDocumentMouseDown(event:MouseEvent)
@@ -221,6 +222,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	componentDidMount()
 	{
+		var document = ReactUtils.getDocument(this);
 		document.addEventListener("mousedown", this.onDocumentMouseDown);
 		// TODO Add touch events for mobile
 		this.element = ReactDOM.findDOMNode(this);
@@ -228,6 +230,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	componentWillUnmount()
 	{
+		var document = ReactUtils.getDocument(this);
 		document.removeEventListener("mousedown", this.onDocumentMouseDown);
 	}
 

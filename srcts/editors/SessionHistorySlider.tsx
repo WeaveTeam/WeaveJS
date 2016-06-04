@@ -1,5 +1,6 @@
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import ReactUtils from "../utils/ReactUtils";
 import HSlider from "../react-ui/RCSlider/HSlider";
 import RCSlider from "../react-ui/RCSlider/RCSlider";
 import {SliderOption} from "../react-ui/RCSlider/RCSlider";
@@ -98,12 +99,12 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 
 	componentDidMount()
 	{
-		document.addEventListener("keydown", this.handleKeyStroke);
+		ReactUtils.getDocument(this).addEventListener("keydown", this.handleKeyStroke);
 	}
 
 	componentWillUnmount()
 	{
-		document.removeEventListener("keydown", this.handleKeyStroke);
+		ReactUtils.getDocument(this).removeEventListener("keydown", this.handleKeyStroke);
 	}
 
 	play=()=>

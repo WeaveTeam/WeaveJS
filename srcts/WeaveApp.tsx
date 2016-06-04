@@ -71,7 +71,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			toolPathToEdit: null,
 			initialWeaveComponent:null
 		};
-		this.menus = new WeaveMenus(this.props.weave, this.createObject);
+		this.menus = new WeaveMenus(this, this.props.weave, this.createObject);
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 	}
 	
@@ -312,7 +312,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	private getNonTabLayouts()
 	{
 		return this.props.weave.root.getObjects(AbstractLayout as any, true).filter((obj:ILinkableObject) => {
-			if(LinkablePlaceholder.getClass(obj) == TabLayout)
+			if (LinkablePlaceholder.getClass(obj) == TabLayout)
 				return false;
 			return true;
 		});
@@ -326,7 +326,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var title = tabLayoutState && tabLayoutState.title;
 		var defaultPath = ["Layout"];
 
-		if(!tabs || (tabs && !tabs.length))
+		if (!tabs || (tabs && !tabs.length))
 		{
 			var layouts = this.getNonTabLayouts();
 			if (layouts.length)
@@ -338,7 +338,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			{
 				var archive = this.menus.fileMenu.archive;
 				var history = archive && archive.objects.get("history.amf") as {currentState: any};
-				if(history && history.currentState)
+				if (history && history.currentState)
 				{
 					// create a window layout and select its tab
 					activeTabIndex = 0;
@@ -382,11 +382,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			});
 		}
 
-		if(!title)
+		if (!title)
 		{
 			title = this.props.weave.root.getName(this.tabLayout);
 		}
-		if(this.state.initialWeaveComponent == GetStartedComponent.DATA || this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR)
+		if (this.state.initialWeaveComponent == GetStartedComponent.DATA || this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR)
 		{
 			activeTabIndex = -1; // -1 used to open the leading tab , rather session tab
 		}
@@ -469,13 +469,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		let skipBlankPageIntro:boolean = this.urlParams ? StandardLib.asBoolean(this.urlParams.skipBlankPageIntro) : false;
 
 		// check in loaded weave session state to skip BlankPageIntro
-		if(weave.root.getObjects(weavejs.data.source.AbstractDataSource).length > 0 || weave.root.getObjects(weavejs.core.LinkablePlaceholder).length > 0)
+		if (weave.root.getObjects(weavejs.api.data.IDataSource).length > 0 || weave.root.getObjects(weavejs.core.LinkablePlaceholder).length > 0)
 		{
 			skipBlankPageIntro = true;
 		}
 
 		// check in interaction event in GetStartedcomponent to skip BlankPageIntro
-		if(this.state.initialWeaveComponent)
+		if (this.state.initialWeaveComponent)
 		{
 			skipBlankPageIntro = true;
 		}
@@ -496,7 +496,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		let blankPageIntroScreen:JSX.Element = null;
 		let interactiveTourComponent:JSX.Element = null;
 
-		if(skipBlankPageIntro)
+		if (skipBlankPageIntro)
 		{
 			weaveTabbedComponent =  (
 				<WeaveComponentRenderer
@@ -541,7 +541,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		else
 		{
 			blankPageIntroScreen =  <GetStartedComponent style={ {flex:1} } loader={this.initialLoadingForBlankSession} /> ;
-			if(this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR )
+			if (this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR)
 			{
 				interactiveTourComponent = <InteractiveTour/>
 			}

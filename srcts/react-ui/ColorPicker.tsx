@@ -34,7 +34,8 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 	static TOP_LEFT:string = "top left";
 	static TOP_RIGHT:string = "top right";
 
-	constructor(props:ColorPickerProps) {
+	constructor(props:ColorPickerProps)
+	{
 		super(props);
 		this.state = {
 			hexColor: props.hexColor || '#FFFFFF',
@@ -47,22 +48,21 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 	
 	componentWillReceiveProps(nextProps:ColorPickerProps)
 	{
-		if(this.props.hexColor != nextProps.hexColor)
+		if (this.props.hexColor != nextProps.hexColor)
 			this.setState({hexColor: nextProps.hexColor});
 
-		if(this.props.buttonLabel != nextProps.buttonLabel)
+		if (this.props.buttonLabel != nextProps.buttonLabel)
 			this.setState({buttonLabel: nextProps.buttonLabel});
 	}
 
-	handleClick=(event:React.MouseEvent) =>{
-		if(this.popup)
+	handleClick=(event:React.MouseEvent) =>
+	{
+		if (this.popup)
 		{
 			this.handleClose();
-
 		}
 		else
 		{
-
 			var clientRect = this.element.getBoundingClientRect();
 			var style:React.CSSProperties = {
 				position: "absolute"
@@ -73,9 +73,9 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 			let isLeft:boolean = window.innerWidth <= clientRect.left + 200;
 			
 			let direction:string = this.props.direction ?  this.props.direction:ColorPicker.BOTTOM_RIGHT;
-			if(direction == ColorPicker.BOTTOM_LEFT)
+			if (direction == ColorPicker.BOTTOM_LEFT)
 			{
-				if(isAbove)
+				if (isAbove)
 				{
 					// 241.750 - third party colorpicker height //hacky
 					style.top = clientRect.top - 241.750;
@@ -88,9 +88,9 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 				// 225 - third party colorpicker width //hacky
 				style.left = clientRect.right - 225; // clientRect right  = left + width
 			}
-			else if(direction == ColorPicker.BOTTOM_RIGHT)
+			else if (direction == ColorPicker.BOTTOM_RIGHT)
 			{
-				if(isAbove)
+				if (isAbove)
 				{
 					// 241.750 - third party colorpicker height //hacky
 					style.top = clientRect.top - 241.750;
@@ -100,22 +100,23 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 					style.top = clientRect.bottom ; //clientRect bottom  = top + height
 				}
 
-				if(isLeft)
+				if (isLeft)
 				{
 					// 225 - third party colorpicker width //hacky
 					style.left = clientRect.right - 225; // clientRect right  = left + width
-				}else
+				}
+				else
 				{
 					style.left = clientRect.left;
 				}
 
 
 			}
-			else if(direction == ColorPicker.TOP_RIGHT)
+			else if (direction == ColorPicker.TOP_RIGHT)
 			{
 				// 241.750 - third party colorpicker height //hacky
 				style.top = clientRect.top - 241.750;
-				if(isLeft)
+				if (isLeft)
 				{
 					// 225 - third party colorpicker width //hacky
 					style.left = clientRect.right - 225; // clientRect right  = left + width
@@ -124,7 +125,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 					style.left = clientRect.left;
 				}
 			}
-			else if(direction == ColorPicker.TOP_LEFT)
+			else if (direction == ColorPicker.TOP_LEFT)
 			{
 				// 241.750 - third party colorpicker height //hacky
 				style.top = clientRect.top - 241.750;
@@ -133,6 +134,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 			}
 
 			this.popup = ReactUtils.openPopup(
+				this,
 				<HBox style={style} onClick={(event:React.MouseEvent) => {event.nativeEvent.stopImmediatePropagation()}}>
 					<ReactColorPicker
 						color={ this.state.hexColor }
@@ -144,20 +146,22 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 					/>
 				</HBox>);
 
-			document.addEventListener("click", this.handleClose);
+			ReactUtils.getDocument(this).addEventListener("click", this.handleClose);
 			this.props.onClick && this.props.onClick(this.state.hexColor);
 			this.setState({buttonLabel: "close"});
 		}
 	};
 
-	handleClose=() => {
-		if(this.popup) {
+	handleClose=() =>
+	{
+		if (this.popup)
+		{
 			this.setState({
 				buttonLabel: this.props.buttonLabel ? this.props.buttonLabel  : "Add color"
 			});
 			ReactUtils.closePopup(this.popup);
 			this.popup = null;
-			document.removeEventListener("click", this.handleClose);
+			ReactUtils.getDocument(this).removeEventListener("click", this.handleClose);
 		}
 		this.props.onClose && this.props.onClose(this.state.hexColor);
 	};
@@ -167,8 +171,8 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 		this.props.onChange && this.props.onChange('#' + color.hex);
 	};
 
-	render():JSX.Element {
-
+	render():JSX.Element
+	{
 		// important to set display block if color has no width & height
 		// this enusres swatch size never goes zero
 		var swatchStyle:React.CSSProperties = {
@@ -193,7 +197,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 
 		let styleObject:React.CSSProperties = this.props.style ? this.props.style : {};
 
-		if(this.props.buttonMode)
+		if (this.props.buttonMode)
 		{
 			// Button Size has to be the width and height, user cannot explicitly set when button mode is used
 			styleObject.width =  null;

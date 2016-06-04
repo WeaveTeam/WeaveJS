@@ -10,8 +10,6 @@ import prefixer from "./react-ui/VendorPrefixer";
 import CenteredIcon from "./react-ui/CenteredIcon";
 import {CSSProperties} from "react";
 import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
-import ToolTip from "./tools/ToolTip";
-import {IToolTipProps, IToolTipState} from "./tools/ToolTip";
 import PopupWindow from "./react-ui/PopupWindow";
 import ReactUtils from "./utils/ReactUtils";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
@@ -77,7 +75,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 
 	componentDidUpdate():void
 	{
-		if(!MouseUtils.mouseButtonDown)
+		if (!MouseUtils.forComponent(this).mouseButtonDown)
 			this.setState({
 				dragging: false
 			});
@@ -102,9 +100,9 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			this.setState({altText});
 	}
 	
-	onGearClick=():void=>
+	onGearClick=(event:React.MouseEvent):void=>
 	{
-		if(MouseUtils.receivedMouseDown())
+		if (MouseUtils.receivedMouseDown(event.target as Element))
 		{
 			if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
 			{
@@ -114,7 +112,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				}
 				else
 				{
-					PopupWindow.open({
+					PopupWindow.open(this, {
 						title: Weave.lang("Settings for {0}", this.state.title),
 						modal: false,
 						content: (this.watcher.target as any).renderEditor()
@@ -124,9 +122,9 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		}
 	};
 	
-	onMaximizeClick=():void=>
+	onMaximizeClick=(event:React.MouseEvent):void=>
 	{
-		if(MouseUtils.receivedMouseDown())
+		if (MouseUtils.receivedMouseDown(event.target as Element))
 		{
 			var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AnyAbstractLayout;
 			if (layout)
@@ -134,9 +132,9 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		}
 	};
 	
-	onPopoutPopinClick=():void=>
+	onPopoutPopinClick=(event:React.MouseEvent):void=>
 	{
-		if(MouseUtils.receivedMouseDown())
+		if (MouseUtils.receivedMouseDown(event.target as Element))
 		{
 			if (this.props.onPopoutClick)
 				this.props.onPopoutClick(this);
@@ -147,7 +145,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 
 	onCloseClick=(event:React.MouseEvent):void=>
 	{
-		if(MouseUtils.receivedMouseDown())
+		if (MouseUtils.receivedMouseDown(event.target as Element))
 		{
 			var layout = ReactUtils.findComponent(this, AbstractLayout as any) as AnyAbstractLayout;
 			if (layout)

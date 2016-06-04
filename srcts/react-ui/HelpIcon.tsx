@@ -45,6 +45,7 @@ export default class HelpIcon extends React.Component<HelpIconProps, HelpIconSta
 				className={"weave-help-icon fa fa-question-circle fa-fw" + (" " + this.props.className || "")}
 				onMouseEnter={(event) => {
 					this.popup = ReactUtils.openPopup(
+						this,
 						<HBox
 							style={{
 								position: "absolute",

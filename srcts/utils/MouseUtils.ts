@@ -1,3 +1,7 @@
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import DOMUtils from "./DOMUtils";
+
 export default class MouseUtils
 {
 	static addPointClickListener(target:HTMLElement, listener:(event:MouseEvent)=>void, pixelThreshold:number = 1):void
@@ -20,22 +24,11 @@ export default class MouseUtils
 		target.removeEventListener('mousedown', listener.onMouseDown);
 		target.removeEventListener('click', listener.onClick);
 	}
-
-	/**
-	 * A bitmask for mouse button state. left=1, right=2, middle=4
-	 */
-	static mouseButtonDown:number = 0;
 	
-	/**
-	 * The last mouse event.
-	 */
-	static mouseEvent:MouseEvent = new MouseEvent('mousemove');
-	static mouseDownEvent:MouseEvent = null;
-
 	static getOffsetPoint(relativeTo:HTMLElement, event:MouseEvent = null):{x:number, y:number}
 	{
 		if (!event)
-			event = MouseUtils.mouseEvent;
+			event = MouseUtils.forElement(relativeTo).mouseEvent;
 		var rect = relativeTo.getBoundingClientRect();
 		return {
 			x: (event.clientX - rect.left) * (relativeTo.offsetWidth / rect.width || 1),
@@ -49,70 +42,100 @@ export default class MouseUtils
 	 * @param element the Element in question
 	 * @returns {boolean} return true if the element received the last 'mousedown' event.
 	 */
-	static receivedMouseDown(element:Element = null):boolean
+	static receivedMouseDown(element:Element):boolean
 	{
-		if(!element)
-			element = MouseUtils.mouseEvent.target as Element;
-		return MouseUtils.mouseDownEvent && element && element.contains(MouseUtils.mouseDownEvent.target as Element);
+		var instance = MouseUtils.forElement(element);
+		return instance.mouseDownEvent && element && element.contains(instance.mouseDownEvent.target as Element);
 	}
-}
 
-var canRelyOnButtonsProp = false;
-var mouseEventTypes = ['click', 'dblclick', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'wheel'];
-var dragEventTypes = ['dragstart', 'drag', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'drop', 'dragend'];
-var buttonToButtonsMapping = [1, 4, 2];
+	private static map_window_MouseUtils = new WeakMap<Window, MouseUtils>();
+	
+	static forComponent(component:React.Component<any, any>):MouseUtils
+	{
+		return MouseUtils.forElement(ReactDOM.findDOMNode(component));
+	}
+	
+	static forElement(element:Element):MouseUtils
+	{
+		var window = DOMUtils.getWindow(element);
+		var instance = MouseUtils.map_window_MouseUtils.get(window);
+		if (!instance)
+		{
+			instance = new MouseUtils(window);
+			MouseUtils.map_window_MouseUtils.set(window, instance);
+		}
+		return instance;
+	}
+	
+	private static buttonToButtonsMapping = [1, 4, 2];
+	
+	//--------------------
 
-mouseEventTypes.forEach(eventType => document.addEventListener(
-	eventType,
-	function(event:MouseEvent) {
-		MouseUtils.mouseEvent = event;
+	constructor(window:Window)
+	{
+		var mouseEventTypes = ['click', 'dblclick', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'wheel'];
+		var dragEventTypes = ['dragstart', 'drag', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'drop', 'dragend'];
+		
+		mouseEventTypes.forEach(eventType => window.document.addEventListener(eventType, this.handleMouseEvent, true));
+		dragEventTypes.forEach(eventType => window.document.addEventListener(eventType, this.handleDragEvent, true));
+			
+		// for debugging
+		//mouseEventTypes.concat(dragEventTypes).forEach(eventType => window.document.addEventListener(eventType, this.debugEvent, true));
+	}
+	
+	/**
+	 * A bitmask for mouse button state. left=1, right=2, middle=4
+	 */
+	mouseButtonDown:number = 0;
+	
+	/**
+	 * The last mouse event.
+	 */
+	mouseEvent:MouseEvent = new MouseEvent('mousemove');
+	mouseDownEvent:MouseEvent = null;
+	
+	private canRelyOnButtonsProp = false;
+	
+	private handleMouseEvent=(event:MouseEvent)=>
+	{
+		this.mouseEvent = event;
 		if (event.type == 'mousedown')
-			MouseUtils.mouseDownEvent = event;
-		if (event.buttons || canRelyOnButtonsProp)
+			this.mouseDownEvent = event;
+		if (event.buttons || this.canRelyOnButtonsProp)
 		{
-			canRelyOnButtonsProp = true;
-			MouseUtils.mouseButtonDown = event.buttons;
+			this.canRelyOnButtonsProp = true;
+			this.mouseButtonDown = event.buttons;
 		}
-		else if (eventType == 'mousedown')
+		else if (event.type == 'mousedown')
 		{
-			MouseUtils.mouseButtonDown |= buttonToButtonsMapping[event.button];
+			this.mouseButtonDown |= MouseUtils.buttonToButtonsMapping[event.button];
 		}
-		else if (eventType == 'mouseup')
+		else if (event.type == 'mouseup')
 		{
-			MouseUtils.mouseButtonDown &= ~buttonToButtonsMapping[event.button];
+			this.mouseButtonDown &= ~MouseUtils.buttonToButtonsMapping[event.button];
 		}
-	},
-	true
-));
-
-dragEventTypes.forEach(eventType => document.addEventListener(
-	eventType,
-	function(event:MouseEvent) {
-		MouseUtils.mouseEvent = event;
-		if (event.buttons || canRelyOnButtonsProp)
+	}
+	
+	private handleDragEvent=(event:MouseEvent)=>
+	{
+		this.mouseEvent = event;
+		if (event.buttons || this.canRelyOnButtonsProp)
 		{
-			canRelyOnButtonsProp = true;
-			MouseUtils.mouseButtonDown = event.buttons;
+			this.canRelyOnButtonsProp = true;
+			this.mouseButtonDown = event.buttons;
 		}
-		else if (eventType == 'dragend' || eventType == 'drop')
+		else if (event.type == 'dragend' || event.type == 'drop')
 		{
-			MouseUtils.mouseButtonDown &= ~buttonToButtonsMapping[event.button];
+			this.mouseButtonDown &= ~MouseUtils.buttonToButtonsMapping[event.button];
 		}
-	},
-	true
-));
-
-/*
-// for debugging
-mouseEventTypes.concat(dragEventTypes).forEach(eventType => document.addEventListener(
-	eventType,
-	function(event:MouseEvent) {
+	}
+	
+	private debugEvent=(event:MouseEvent)=>
+	{
 		console.log(
-			eventType,
-			'MouseUtils.mouseButtonDown =', MouseUtils.mouseButtonDown,
+			event.type,
+			'mouseButtonDown =', this.mouseButtonDown,
 			Weave.stringify({x: event.clientX, y: event.clientY, button: event.button, buttons: event.buttons})
 		);
-	},
-	true
-));
-*/
+	}
+}

@@ -28,8 +28,6 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	private toolWatcher = forceUpdateWatcher(this, weavejs.api.ui.IVisTool);
 	public get tool():IVisTool { return this.toolWatcher.target as IVisTool; }
 	public set tool(value:IVisTool) { this.toolWatcher.target = value; }
-	private weaveRoot:ILinkableHashMap;
-	private toolName:string;
 	private displayName:string;
 	private mapping_crumb_children:any = {};
 	private mapping_crumb_children_state:any = {};
@@ -43,7 +41,9 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 	openSessionStateEditor=()=>
 	{
-		SessionStateEditor.openInstance(this.toolName, this.weaveRoot);
+		var weaveRoot = Weave.getRoot(this.tool);
+		var toolName = weaveRoot.getName(this.tool);
+		SessionStateEditor.openInstance(this, toolName, weaveRoot);
 	};
 
 	//todo : find a better way to get linked children
@@ -79,9 +79,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	
 	private handleNewTool(tool:IVisTool)
 	{
-		this.weaveRoot = Weave.getRoot(tool);
 		this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(tool.constructor as new (..._: any[]) => any)
-		this.toolName = this.weaveRoot.getName(tool);
 		this.tool = tool;
 		var state = {
 			activeCrumb: this.displayName

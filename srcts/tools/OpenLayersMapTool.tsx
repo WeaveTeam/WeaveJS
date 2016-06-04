@@ -710,7 +710,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 		view.setCenter(center);
 		let resolution = 1 / scale;
-		if (!MouseUtils.mouseButtonDown)
+		if (!MouseUtils.forComponent(this).mouseButtonDown)
 			resolution = view.constrainResolution(resolution);
 
 		view.setResolution(resolution);

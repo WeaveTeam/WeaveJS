@@ -13,7 +13,13 @@ export default class ContextMenu extends Menu
 	{
 		event.preventDefault();
 		var contextMenuItems = Menu.getMenuItems(event.target as HTMLElement);
-		return ReactUtils.openPopup(<div style={{top:event.clientY, left: event.clientX, position: 'absolute'}}><Dropdown menu={contextMenuItems} duration={0} open={true}/></div>, true) as Menu;
+		return ReactUtils.openPopup(
+			event.target as Element,
+			<div style={{top:event.clientY, left: event.clientX, position: 'absolute'}}>
+				<Dropdown menu={contextMenuItems} duration={0} open={true}/>
+			</div>,
+			true
+		) as Menu;
 	}
 	
 	render():JSX.Element
