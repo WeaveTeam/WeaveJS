@@ -185,7 +185,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	renderConfigureView():JSX.Element
 	{
 		return (
-			<VBox className="ui basic segment" style={ {border: "none"} }>
+			<VBox className="ui segment" style={ {border: "none"} }>
 				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Configure") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Configure")}</div>
 				{
 					this.renderFields()
