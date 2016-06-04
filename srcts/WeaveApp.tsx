@@ -22,6 +22,7 @@ import TabLayout, {TabLayoutProps} from "./layouts/TabLayout";
 import WindowLayout from "./layouts/WindowLayout";
 import FlexibleLayout from "./layouts/FlexibleLayout";
 import WeaveMenus from "./menus/WeaveMenus";
+import FileDialog from "./ui/FileDialog";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -45,6 +46,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 	weave:Weave;
 	renderPath?:WeavePathArray;
 	readUrlParams?:boolean;
+	landing?:string;
 }
 
 export interface WeaveAppState
@@ -117,7 +119,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
 	
-	urlParams:{ file: string, editable: boolean , skipBlankPageIntro:boolean};
+	urlParams:{ file: string, editable: boolean};
 	
 	componentDidMount()
 	{
@@ -149,6 +151,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				this.menus.fileMenu.handleOpenedFileContent("export.weave", content);
 				this.forceUpdate();
 			}
+		}
+		
+		if(this.props.landing == "FileDialog") {
+			FileDialog.open();
 		}
 	}
 	
@@ -326,6 +332,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var title = tabLayoutState && tabLayoutState.title;
 		var defaultPath = ["Layout"];
 
+		if (this.props.landing == "default")
+		{
+			activeTabIndex = -1; // -1 used to open the leading tab , rather than session tab
+		}
+
 		if (!tabs || (tabs && !tabs.length))
 		{
 			var layouts = this.getNonTabLayouts();
@@ -385,10 +396,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (!title)
 		{
 			title = this.props.weave.root.getName(this.tabLayout);
-		}
-		if (this.state.initialWeaveComponent == GetStartedComponent.DATA || this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR)
-		{
-			activeTabIndex = -1; // -1 used to open the leading tab , rather session tab
 		}
 
 		tabLayout.setSessionState({
@@ -466,19 +473,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		// check in url params to skip BlankPageIntro
 		this.urlParams = MiscUtils.getUrlParams();
-		let skipBlankPageIntro:boolean = this.urlParams ? StandardLib.asBoolean(this.urlParams.skipBlankPageIntro) : false;
-
-		// check in loaded weave session state to skip BlankPageIntro
-		if (weave.root.getObjects(weavejs.api.data.IDataSource).length > 0 || weave.root.getObjects(weavejs.core.LinkablePlaceholder).length > 0)
-		{
-			skipBlankPageIntro = true;
-		}
-
-		// check in interaction event in GetStartedcomponent to skip BlankPageIntro
-		if (this.state.initialWeaveComponent)
-		{
-			skipBlankPageIntro = true;
-		}
+		
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
@@ -496,56 +491,51 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		let blankPageIntroScreen:JSX.Element = null;
 		let interactiveTourComponent:JSX.Element = null;
 
-		if (skipBlankPageIntro)
-		{
-			weaveTabbedComponent =  (
-				<WeaveComponentRenderer
+		weaveTabbedComponent =  (
+			<WeaveComponentRenderer
+				weave={weave}
+				path={renderPath}
+				defaultType={TabLayout}
+				style={{width: "100%", height: "100%"}}
+				onCreate={this.initializeTabs}
+				props={ {
+					panelRenderer: this.renderTab,
+					leadingTabs: [
+						{
+							label: "Data Sources",
+							content: <DataSourceManager weave={this.props.weave}/>
+						}
+					],
+					onAdd: [
+						{
+							label: Weave.lang("Window Layout"),
+							click: () => this.addNewLayout(WindowLayout)
+						},
+						{
+							label: Weave.lang("Flexible Layout"),
+							click: () => this.addNewLayout(FlexibleLayout)
+						}
+					],
+					onRemove: this.removeExistingLayout,
+					onTabDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
+				} as TabLayoutProps }
+			/>);
+
+		menuBarUI = !this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
+			?	<WeaveMenuBar
+					style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
 					weave={weave}
-					path={renderPath}
-					defaultType={TabLayout}
-					style={{width: "100%", height: "100%"}}
-					onCreate={this.initializeTabs}
-					props={ {
-						panelRenderer: this.renderTab,
-						leadingTabs: [
-							{
-								label: "Data Sources",
-								content: <DataSourceManager weave={this.props.weave}/>
-							}
-						],
-						onAdd: [
-							{
-								label: Weave.lang("Window Layout"),
-								click: () => this.addNewLayout(WindowLayout)
-							},
-							{
-								label: Weave.lang("Flexible Layout"),
-								click: () => this.addNewLayout(FlexibleLayout)
-							}
-						],
-						onRemove: this.removeExistingLayout,
-						onTabDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
-					} as TabLayoutProps }
-				/>);
+					menus={this.menus}
+				/>
+			:	null;
 
-			menuBarUI = !this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
-				?	<WeaveMenuBar
-						style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
-						weave={weave}
-						menus={this.menus}
-					/>
-				:	null;
+		progressBarUI = <WeaveProgressBar/>;
 
-			progressBarUI = <WeaveProgressBar/>;
-		}
-		else
-		{
-			blankPageIntroScreen =  <GetStartedComponent style={ {flex:1} } loader={this.initialLoadingForBlankSession} /> ;
-			if (this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR)
-			{
-				interactiveTourComponent = <InteractiveTour/>
-			}
-		}
+
+		// if (this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR)
+		// {
+		// 	interactiveTourComponent = <InteractiveTour/>
+		// }
 
 
 		return (
@@ -555,7 +545,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}>
 				{progressBarUI}
-				{blankPageIntroScreen}
 				{weaveTabbedComponent}
 				{menuBarUI}
 				{interactiveTourComponent}

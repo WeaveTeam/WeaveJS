@@ -8,12 +8,13 @@ import FileDialog from  "../ui/FileDialog";
 
 export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComponent>
 {
-	loader:(initialWeaveComponent:string)=>void;
+	//loader:(initialWeaveComponent:string)=>void;
+	onChange:any;//(landing:string)=>void;
 }
 
 export interface GetStartedComponentState
 {
-	visible?:boolean;
+	//visible?:boolean;
 	showInteractiveTourList?:boolean;
 }
 
@@ -29,7 +30,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	{
 		super(props);
 		this.state = {
-			visible:true,
+			//visible:true,
 			showInteractiveTourList:false
 		}
 	}
@@ -39,23 +40,23 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		
 	}
 
-	openDataSourceManager=(enableInteractiveTour:boolean = false)=>{
-		InteractiveTour.enable  = enableInteractiveTour
-		 if(this.props.loader)
-			this.props.loader(enableInteractiveTour ? GetStartedComponent.INTERACTIVETOUR : GetStartedComponent.DATA);
-		this.setState({
-			visible:false
-		})
-	};
+	// openDataSourceManager=(enableInteractiveTour:boolean = false)=>{
+	// 	InteractiveTour.enable  = enableInteractiveTour;
+	// 	 if(this.props.loader)
+	// 		this.props.loader(enableInteractiveTour ? GetStartedComponent.INTERACTIVETOUR : GetStartedComponent.DATA);
+	// 	this.setState({
+	// 		visible:false
+	// 	})
+	// };
 
-	openFileDialog=()=>{
-		if(this.props.loader)
-			this.props.loader(GetStartedComponent.SESSION);
-		FileDialog.open();
-		this.setState({
-			visible:false
-		})
-	};
+	// openFileDialog=()=>{
+	// 	if(this.props.loader)
+	// 		this.props.loader(GetStartedComponent.SESSION);
+	// 	FileDialog.open();
+	// 	this.setState({
+	// 		visible:false
+	// 	})
+	// };
 
 	enableInteractiveTourList=()=>
 	{
@@ -79,12 +80,12 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	{
 		InteractiveTour.steps = this.items[itemName].steps ;
 		InteractiveTour.stepContents = this.items[itemName].contents ;
-		this.openDataSourceManager(true);
+		//this.openDataSourceManager(true);
 	};
 
 	render() {
-		if(!this.state.visible )
-			return <div/>;
+		// if(!this.state.visible )
+		// 	return <div/>;
 
 		let containerStyle:React.CSSProperties = {
 			position:"absolute",
@@ -137,14 +138,14 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative"} }>
 						<VBox key="data"
 						      className="weave-getstarted-item"
-						      onClick={()=>this.openDataSourceManager(false) }>
+						      onClick={()=>this.props.onChange("DataSourceManager") }>
 							<i className="fa fa-database"></i>
 							<br/>
 							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
 						</VBox>
 						<VBox key="charts"
 						      className="weave-getstarted-item"
-						      onClick={this.openFileDialog}>
+						      onClick={()=>this.props.onChange("FileDialog")}>
 							<i className="fa fa-code" ></i>
 							<br/>
 							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
