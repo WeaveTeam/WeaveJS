@@ -236,6 +236,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 							showIdColumn={!!columns.length}
 							columnTitles={columnTitles as any}
 			                disableSort={true}
+			                multiple={false}
 			/>
 		);
 	};
