@@ -73,6 +73,8 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 
 	componentDidMount()
 	{
+		MouseUtils.forComponent(this); // initializes MouseUtils document listeners so getOffsetPoint() will be correct the first time
+		
 		// center div if left or top style is undefined
 		var parent = this.element.offsetParent as HTMLElement;
 		var style = this.props.style || {};

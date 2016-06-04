@@ -25,10 +25,20 @@ export default class MouseUtils
 		target.removeEventListener('click', listener.onClick);
 	}
 	
-	static getOffsetPoint(relativeTo:HTMLElement, event:MouseEvent = null):{x:number, y:number}
+	static getOffsetPoint(relativeTo:HTMLElement, event:MouseEvent):{x:number, y:number}
 	{
 		if (!event)
 			event = MouseUtils.forElement(relativeTo).mouseEvent;
+		
+		if (!event)
+		{
+			console.error(
+				"Warning: MouseUtils.getOffsetPoint(element, null) will not be correct the first time it is called.",
+				"To work around this, call MouseUtils.forElement() first."
+			);
+			return {x: 0, y: 0};
+		}
+		
 		var rect = relativeTo.getBoundingClientRect();
 		return {
 			x: (event.clientX - rect.left) * (relativeTo.offsetWidth / rect.width || 1),
