@@ -42,6 +42,7 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 				closable: false,
 				onDeny    : () => {
 					this.props.onCancel && this.props.onCancel();
+					false;
 				},
 				onApprove : () => {
 					selector.submit();
@@ -124,13 +125,11 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 								<input ref={(c) => this.password = c} type="password" name="password" placeholder={Weave.lang("Password")}/>
 							</div>
 						</div>
-						<div className="ui error message"></div>
+						<Button colorClass="primary" className="right floated submit" style={{ marginBottom: 10}}>
+							{Weave.lang("Login")}
+						</Button>
+						<div className="ui error message" style={{marginTop: 60}}></div>
 					</div>
-				</div>
-				<div className="actions">
-					<Button colorClass="primary" className="approve">
-						{Weave.lang("Login")}
-					</Button>
 				</div>
 			</div>
 		)
