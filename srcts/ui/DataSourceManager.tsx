@@ -32,8 +32,8 @@ import CensusDataSourceEditor from "../editors/CensusDataSourceEditor";
 import CKANDataSource = weavejs.data.source.CKANDataSource;
 import CKANDataSourceEditor from "../editors/CKANDataSourceEditor";
 
-// import CachedDataSource = weavejs.data.source.CachedDataSource;
-// import CachedDataSourceEditor from "../editors/CachedDataSourceEditor";
+import CachedDataSource = weavejs.data.source.CachedDataSource;
+import CachedDataSourceEditor from "../editors/CachedDataSourceEditor";
 
 import SpatialJoinTransform = weavejs.data.source.SpatialJoinTransform;
 import SpatialJoinTransformEditor from "../editors/SpatialJoinTransformEditor";
@@ -64,11 +64,10 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(CensusDataSource, CensusDataSourceEditor)
 		.set(CKANDataSource, CKANDataSourceEditor)
 		.set(WeaveDataSource, WeaveDataSourceEditor)
-//		.set(CachedDataSource, CachedDataSourceEditor) // should have a button to restore the original data source
+		.set(CachedDataSource, CachedDataSourceEditor)
 		.set(SpatialJoinTransform, SpatialJoinTransformEditor)
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
 		.set(GroupedDataTransform, GroupedDataTransformEditor);
-//
 
 	constructor(props:IDataSourceManagerProps)
 	{
@@ -126,8 +125,6 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let root = this.props.weave.root;
 		root.removeObject(root.getName(dataSource));
 	}
-
-
 
 	render():JSX.Element
 	{
