@@ -34,11 +34,11 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 		($(this.element) as any).modal('hide');
 	}
 
-	open(context:Element)
+	open(context:Element, detachable:boolean = false)
 	{
 		let selector = $(this.form) as any;
-		($(this.element) as any)
-			.modal({
+		let loginSelector = ($(this.element) as any);
+		loginSelector.modal({
 				closable: false,
 				onDeny    : () => {
 					this.props.onCancel && this.props.onCancel();
@@ -48,11 +48,15 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 					selector.submit();
 					return false;
 				},
-				detachable: false,
+				detachable,
 				transition: "fade",
 				context,
-			})
-			.modal('show');
+			});
+		if(context)
+			loginSelector.modal({
+				context
+			});
+		loginSelector.modal('show');
 	}
 	
 	invalid()

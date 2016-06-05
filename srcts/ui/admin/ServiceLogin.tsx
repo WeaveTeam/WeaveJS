@@ -11,11 +11,13 @@ export interface IServiceLoginProps extends React.Props<ServiceLogin> {
 	onSuccess?: (username:string) => void;
 	onCancel?: () => void;
 	context?: Element;
+	detachable?: boolean;
 	service: WeaveAdminService;
 }
 
 
 export default class ServiceLogin extends React.Component<IServiceLoginProps, Object> {
+
 	constructor(props:IServiceLoginProps)
 	{
 		super(props);
@@ -24,7 +26,7 @@ export default class ServiceLogin extends React.Component<IServiceLoginProps, Ob
 	login: Login;
 
 	open=():void => {
-		this.login.open(this.props.context);
+		this.login.open(this.props.context,this.props.detachable);
 	}
 
 	handleLogin=(fields:{username:string, password:string}):void=>

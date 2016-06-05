@@ -303,7 +303,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			<HBox>
 				<Button disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
 			</HBox>
-			<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={() => PopupWindow.close(SqlImport.window) } onSuccess={() => this.updateSchemas() } context={this.element}/>
+			<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={() => PopupWindow.close(SqlImport.window) } onSuccess={() => this.updateSchemas()} detachable={true}/>
 		</VBox>
 	}
 	private login: ServiceLogin;
