@@ -35,6 +35,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 {
 
 	private service: WeaveAdminService;
+	private login: ServiceLogin;
 	constructor(props:IConnectionManagerProps)
 	{
 		super(props);
@@ -187,10 +188,9 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 					</HBox>
 				</VBox>
 				<ConnectionEditor refreshFunc={this.updateConnections} service={this.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={_.noop}/>
-				<ServiceLogin service={this.service} onSuccess={_.noop} onCancel={() => PopupWindow.close(ConnectionManager.window) } context={this.element}/>
+				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onSuccess={_.noop} onCancel={() => PopupWindow.close(ConnectionManager.window) } detachable={true}/>
 			</HBox>
 		{ this.renderErrors() }
 		</VBox>
 	}
-	private login: ServiceLogin;
 }

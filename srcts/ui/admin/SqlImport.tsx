@@ -44,6 +44,7 @@ export interface ISqlImportState
 export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImportState>
 {
 	private service:WeaveAdminService;
+	private login: ServiceLogin;
 
 	constructor(props:ISqlImportProps)
 	{
@@ -306,5 +307,4 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={() => PopupWindow.close(SqlImport.window) } onSuccess={() => this.updateSchemas()} detachable={true}/>
 		</VBox>
 	}
-	private login: ServiceLogin;
 }
