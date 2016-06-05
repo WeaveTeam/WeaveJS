@@ -128,7 +128,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (this.props.readUrlParams)
 		{
 			this.urlParams = MiscUtils.getUrlParams();
-			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.menus.fileMenu.pingAdminConsole();
+			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable); // || this.menus.fileMenu.pingAdminConsole(); TODO: Discuss this behavior
 
 			try
 			{

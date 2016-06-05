@@ -303,42 +303,20 @@ export default class FileMenu implements MenuBarItemProps
 		WeaveArchive.loadUrl(this.weave, String(url), this.updateProgressIndicator);
 	};
 
-	private _adminConsole: any;
-	private get adminConsole():any
-	{
-		try {
-			if (!this._adminConsole) {
-				if (window.opener) {
-					this._adminConsole = window.opener.document.getElementById("AdminConsole");
-				}
-			}
-		}
-		catch (e)
-		{
-			console.error(e);
-		}
-
-		return this._adminConsole;
-	}
-
-	pingAdminConsole():boolean
-	{
-		return !!this.adminConsole;
-	}
-
 	private _saveToServer=(newFileName:string, overwrite:boolean = true) =>
 	{
-		if (this.adminConsole)
-		{
-			var promise = WeaveArchive.serialize(this.weave, this.updateProgressIndicator);
-			promise.then(
-				(result: Uint8Array)=>
-				{
-					let archive = StandardLib.byteArrayToString(result);
-					this.adminConsole.saveWeaveFile(btoa(archive), newFileName, overwrite);
-				}
-			);
-		}
+		var promise = WeaveArchive.serialize(this.weave, this.updateProgressIndicator);
+		promise.then(
+			(result: Uint8Array)=>
+			{
+				weavejs.net.Admin.service.saveWeaveFile(new weavejs.util.JSByteArray(result), newFileName, overwrite);	
+			},
+			(error:any)=>
+			{
+				/* Call login window from here if auth error and retry, otherwise, display error. */
+				console.error(error);
+			}
+		);
 	};
 
 	public saveToServer=()=>

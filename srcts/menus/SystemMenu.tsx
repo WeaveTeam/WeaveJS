@@ -11,6 +11,10 @@ export default class SystemMenu implements MenuBarItemProps
 	{
 		this.weave = weave;
 		this.fileMenu = fileMenu;
+
+		/* Forces the initialization of the service. */
+		/* Hopefully the init flag gets set before our first 'get menu'. */
+		weavejs.net.Admin.service;
 	}
 
 	weave:Weave;
@@ -34,7 +38,7 @@ export default class SystemMenu implements MenuBarItemProps
 			{
 				label: Weave.lang("Save to server"),
 				click: this.fileMenu.saveToServer,
-				shown: this.fileMenu.pingAdminConsole()
+				shown: weavejs.net.Admin.service.initialized
 			},
 			{},
 			{
