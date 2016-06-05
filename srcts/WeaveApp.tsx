@@ -62,6 +62,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
+		landing: "default",
 		renderPath: ['Tabs'],
 		readUrlParams: false
 	};
@@ -331,11 +332,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var activeTabIndex = tabLayoutState && tabLayoutState.activeTabIndex || -1;
 		var title = tabLayoutState && tabLayoutState.title;
 		var defaultPath = ["Layout"];
-
-		if (this.props.landing == "default")
-		{
-			activeTabIndex = -1; // -1 used to open the leading tab , rather than session tab
-		}
 
 		if (!tabs || (tabs && !tabs.length))
 		{
