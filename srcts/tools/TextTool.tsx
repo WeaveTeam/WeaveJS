@@ -9,6 +9,7 @@ import * as jquery from "jquery";
 import MiscUtils from "../utils/MiscUtils";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import StatefulTextField from "../ui/StatefulTextField";
+import StatefulTextArea from "../ui/StatefulTextArea";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 
@@ -91,7 +92,7 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 						[
 							[
 								Weave.lang("Text"),
-								<StatefulTextField ref={ linkReactStateRef(this, {value: this.htmlText}) }/>
+								<StatefulTextArea ref={ linkReactStateRef(this, {value: this.htmlText}) }/>
 							]
 						]
 					),
