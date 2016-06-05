@@ -14,6 +14,12 @@ input[type=number]::-webkit-outer-spin-button {
 	margin: 0;
 }
 
+/* Dowloaded Fonts*/
+@font-face {
+	font-family: 'Michroma';
+	src: url('fonts/Michroma.ttf');
+}
+
 /* d3 css override */
 .axis path,
 .axis line {
@@ -684,11 +690,13 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 .weave-getstarted {
 	padding-left: 20%;
 	padding-right: 20%;
+	font-family: 'Michroma', sans-serif;  /* matched our iweave.com font family theme */
 }
 
 .weave-getstarted-logo { /* matched our iweave.com theme */
-	color: rgb(236, 131, 89);
-	font-size: 128px;
+	color: white;
+	font-size: 64px;
+	font-family: 'Michroma', sans-serif;  /* matched our iweave.com font family theme */
 }
 
 .weave-getstarted-overlay{

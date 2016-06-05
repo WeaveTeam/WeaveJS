@@ -134,7 +134,9 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 			<div style={styleObj}>
 				<div style={containerStyle} className="weave-getstarted">
 					<div style={overlayStyle} className="weave-getstarted-overlay"></div>
-					<h1 style={ {position:"relative"} } className="weave-getstarted-logo">Weave 2.1</h1>
+					<h1 style={ {position:"relative"} } className="weave-getstarted-logo">
+						Weave <span style={ {color:"rgb(236, 131, 89)",fontSize:"54px"} }>2.1</span>
+					</h1>
 					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative"} }>
 						<VBox key="data"
 						      className="weave-getstarted-item"
@@ -156,7 +158,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						      >
 							<i className="fa fa-book" style={disableStyle}></i>
 							<br/>
-							<span style={ disableStyle }> Start <span style={ disableStyle }> Interactive Tour</span></span>
+							<span style={ disableStyle }><span style={ disableStyle }> Interactive Tour</span></span>
 						</VBox>
 					</HBox>
 					{guidanceListUI}
