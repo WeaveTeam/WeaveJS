@@ -936,7 +936,9 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 }
 
 .weave-layout-tabs-bar {
-	border-top: none;
+	padding-bottom: 4px;
+	padding-left: 4px;
+	cursor: default;
 	background: #b0b0b0;
 }
 
@@ -946,8 +948,6 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 
 .weave-layout-tabs-label.active.bottom {
 	margin-top: 0;
-	border-bottom:none;
-	border-top: none;
 	background-color: #ddd;
 	border-bottom-left-radius: 8px;
 	border-bottom-right-radius: 8px;
