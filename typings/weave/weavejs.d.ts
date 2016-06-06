@@ -3015,6 +3015,13 @@ declare module weavejs.api.net.beans {
     }
 }
 declare module weavejs.api.ui {
+    import LinkableString = weavejs.core.LinkableString;
+    interface IAltText {
+        altText: LinkableString;
+    }
+    var IAltText: new (..._: any[]) => IAltText;
+}
+declare module weavejs.api.ui {
     import ILinkableObject = weavejs.api.core.ILinkableObject;
     /**
      * Manages implementations of ILinkableObjectEditor.
