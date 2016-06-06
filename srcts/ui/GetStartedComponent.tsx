@@ -141,14 +141,18 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						<VBox key="data"
 						      className="weave-getstarted-item"
 						      onClick={()=>this.props.onChange("DataSourceManager") }>
-							<i className="fa fa-database"></i>
+							<div className="weave-getstarted-item-icon">
+								<i className="fa fa-database"></i>
+							</div>
 							<br/>
 							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
 						</VBox>
 						<VBox key="charts"
 						      className="weave-getstarted-item"
 						      onClick={()=>this.props.onChange("FileDialog")}>
-							<i className="fa fa-code" ></i>
+							<div className="weave-getstarted-item-icon">
+								<i className="fa fa-code"></i>
+							</div>
 							<br/>
 							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
 						</VBox>
@@ -156,7 +160,9 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						      className="weave-getstarted-item"
 						      style={ {cursor:"default"} }
 						      >
-							<i className="fa fa-book" style={disableStyle}></i>
+							<div style={ disableStyle } className="weave-getstarted-item-icon">
+								<i className="fa fa-book"></i>
+							</div>
 							<br/>
 							<span style={ disableStyle }><span style={ disableStyle }> Interactive Tour</span></span>
 						</VBox>
