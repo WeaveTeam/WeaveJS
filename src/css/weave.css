@@ -754,6 +754,10 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 	font-size: 40px;
 }
 
+.weave-getstarted-item-icon:hover {
+	border: 4px solid white;
+}
+
 
 
 .weave-guidance-list {
