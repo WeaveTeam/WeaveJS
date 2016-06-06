@@ -89,7 +89,7 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		ConfirmationDialog.open(this.props.context,
 			Weave.lang("Load Session:"),
 			<HBox style={{flex: 1, alignItems: "center"}}>
-				<i className="fa fa-exclamation-triangle fa-fw fa-3x" style={{color: "#F78B8B"}}/>
+				<img src="./img/weave_min.png" style={{width: 75}}/>
 				<div className="ui basic segment">
 					<div className="ui basic header">
 						{Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.")}
