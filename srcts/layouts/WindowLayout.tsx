@@ -136,6 +136,11 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 		this.updatePanelState(id, {maximized});
 	}
 
+	getPanelIds():WeavePathArray[]
+	{
+		return this.getSessionState().panels.map(panel => panel.id);
+	}
+	
 	updatePanelState(id:WeavePathArray, diff:PanelState):void
 	{
 		var state = this.getSessionState();

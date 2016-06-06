@@ -255,24 +255,36 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
 		var path = [weave.root.generateUniqueName(baseName)];
 		weave.requestObject(path, type);
-		var instance = weave.getObject(path);
-		var resultType = LinkablePlaceholder.getClass(instance);
+		var possiblePlaceholder = weave.getObject(path);
+		var resultType = LinkablePlaceholder.getClass(possiblePlaceholder);
 		
 		if (resultType != type)
 			return;
 
 		if (React.Component.isPrototypeOf(type))
 		{
-			var placeholder = Weave.AS(instance, LinkablePlaceholder);
-			if (placeholder)
-				Weave.getCallbacks(placeholder).addDisposeCallback(this, this.handlePlaceholderDispose.bind(this, path, placeholder));
 			this.setState({ toolPathToEdit: path });
 			
 			var tabLayout = this.tabLayout;
 			if (tabLayout.activeTabIndex < 0)
 				tabLayout.activeTabIndex = 0;
 			
-			this.addToLayout(path);
+			var tabPath = tabLayout.getPanelIds()[tabLayout.activeTabIndex];
+			LinkablePlaceholder.whenReady(this, weave.getObject(tabLayout.activePanelId), (layout:AnyAbstractLayout) => {
+				layout.addPanel(path);
+			});
+			
+			LinkablePlaceholder.whenReady(this, possiblePlaceholder, (instance:ILinkableObject) => {
+				// hack
+				var INIT = 'initSelectableAttributes';
+				if ((instance as any)[INIT])
+				{
+					var refs = ColumnUtils.findFirstDataSet(this.props.weave.root).concat();
+					var sortedRefs = this.prioritizeNumericColumns(refs);
+					(instance as any)[INIT](sortedRefs);
+				}
+				this.forceUpdate();
+			});
 		}
 	};
 
@@ -295,20 +307,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 		});
 		return sortedRefs.reverse();
-	}
-
-	private handlePlaceholderDispose(path:WeavePathArray, placeholder:LinkablePlaceholder<any>)
-	{
-		// hack
-		var INIT = 'initSelectableAttributes';
-		var instance = placeholder.getInstance();
-		if (instance && instance[INIT])
-		{
-			var refs = ColumnUtils.findFirstDataSet(this.props.weave.root).concat();
-			var sortedRefs = this.prioritizeNumericColumns(refs);
-			instance[INIT](sortedRefs);
-		}
-		this.forceUpdate();
 	}
 
 	get tabLayout():TabLayout
@@ -417,24 +415,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.props.weave.removeObject(id);
 	};
 
-	addToLayout(panelPath:WeavePathArray)
-	{
-		var activeLayout = Weave.AS(this.props.weave.getObject(this.tabLayout.activePanel), AbstractLayout as any) as AnyAbstractLayout;
-		if (activeLayout)
-			activeLayout.addPanel(panelPath);
-		else
-			console.error('TODO - add panel when linkable placeholder is disposed');
-	}
-
-	removeFromLayout(panelPath:WeavePathArray)
-	{
-		var panel = Weave.AS(this.props.weave.getObject(panelPath), React.Component);
-		var element = panel && ReactDOM.findDOMNode(panel);
-		var layout = element && ReactUtils.findComponent(element.parentElement, AbstractLayout as any) as AnyAbstractLayout;
-		if (layout)
-			layout.removePanel(panelPath);
-	}
-	
 	componentWillUpdate(nextProps:WeaveAppProps, nextState:WeaveAppState)
 	{
 		for (var tool of this.toolSet)

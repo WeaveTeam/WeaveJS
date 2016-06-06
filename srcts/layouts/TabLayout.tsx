@@ -100,7 +100,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		return this.props.leadingTabs ? this.props.leadingTabs.length : 0;
 	}
 
-	get activePanel()
+	get activePanelId()
 	{
 		var state = this.getSessionState();
 		var activePanelState = state.tabs[state.activeTabIndex];
@@ -113,7 +113,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		// delay before switching tab
 		this.resetTimer = false;
 		var state = this.getSessionState();
-		if (!_.isEqual(this.activePanel, panel.id))
+		if (!_.isEqual(this.activePanelId, panel.id))
 		{
 			setTimeout(() => {
 				if (!this.resetTimer)
@@ -160,6 +160,11 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		return _.findIndex(panels, (panel) => {
 			return _.isEqual(panel.id, id);
 		});
+	}
+	
+	getPanelIds():WeavePathArray[]
+	{
+		return this.getSessionState().tabs.map(tab => tab.id);
 	}
 
 	addPanel(id:WeavePathArray, label?:string):void

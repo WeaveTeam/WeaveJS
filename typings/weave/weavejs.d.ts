@@ -1037,8 +1037,9 @@ declare module weavejs.api.core {
          * This will add a callback that will only be called once, when this callback collection is disposed.
          * @param relevantContext If this is not null, then the callback will be removed when the relevantContext object is disposed via SessionManager.dispose().  This parameter is typically a 'this' pointer.
          * @param callback The function to call when this callback collection is disposed.
+         * @param allowDelay If this is set to true, this callback will be delayed while callbacksAreDelayed is true.
          */
-        addDisposeCallback(relevantContext: Object, callback: Function): void;
+        addDisposeCallback(relevantContext: Object, callback: Function, allowDelay?: boolean): void;
         /**
          * This function will remove a callback that was previously added.
          * @param relevantContext The relevantContext parameter that was given when the callback was added.
@@ -3123,7 +3124,7 @@ declare module weavejs.core {
         callbacksAreDelayed: boolean;
         delayCallbacks(): void;
         resumeCallbacks(): void;
-        addDisposeCallback(relevantContext: Object, callback: Function): void;
+        addDisposeCallback(relevantContext: Object, callback: Function, allowDelay?: boolean): void;
         dispose(): void;
         /**
          * This flag becomes true after dispose() is called.
@@ -3448,7 +3449,7 @@ declare module weavejs.core {
         dispose(): void;
         addImmediateCallback(relevantContext: Object, callback: Function, runCallbackNow?: boolean, alwaysCallLast?: boolean): void;
         addGroupedCallback(relevantContext: Object, groupedCallback: Function, triggerCallbackNow?: boolean, delayWhileBusy?: boolean): void;
-        addDisposeCallback(relevantContext: Object, callback: Function): void;
+        addDisposeCallback(relevantContext: Object, callback: Function, allowDelay?: boolean): void;
         removeCallback(relevantContext: Object, callback: Function): void;
         triggerCounter: number;
         triggerCallbacks(): void;
@@ -3613,6 +3614,14 @@ declare module weavejs.core {
          */
         static setInstance(possiblePlaceholder: ILinkableObject, instance: ILinkableObject): void;
         static replaceInstanceWithPlaceholder(instance: ILinkableObject): void;
+        /**
+         * Calls a function after a placeholder has been replaced with an instance and the instance session state has been initialized.
+         * The onReady function will be called immediately if possiblePlaceholder is not a LinkablePlaceholder.
+         * @param relevantContext The relevantContext parameter passed to ICallbackCollection.addDisposeCallback().
+         * @param possiblePlaceholder Either a LinkablePlaceholder or another ILinkableObject.
+         * @param onReady The function to call.
+         */
+        static whenReady(relevantContext: ILinkableObject, possiblePlaceholder: ILinkableObject, onReady: (instance: ILinkableObject) => void): void;
     }
 }
 declare module weavejs.core {

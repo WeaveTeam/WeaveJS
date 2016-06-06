@@ -473,6 +473,11 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		return output;
 	}
 	
+	getPanelIds():WeavePathArray[]
+	{
+		return FlexibleLayout.getLeafNodes(this.getSessionState()).map(node => node.id as WeavePathArray);
+	}
+	
 	private static sortLeafNodes(node1:LayoutState, node2:LayoutState):number
 	{
 		var value1:number = node1.maximized ? 1 : 0;

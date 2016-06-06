@@ -26,4 +26,5 @@ export abstract class AbstractLayout<P extends LayoutProps, S> extends SmartComp
 	abstract addPanel(id:WeavePathArray):void;
 	abstract removePanel(id:WeavePathArray):void;
 	abstract maximizePanel(id:WeavePathArray, maximize:boolean):void;
+	abstract getPanelIds():WeavePathArray[];
 }
