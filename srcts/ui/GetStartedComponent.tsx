@@ -40,23 +40,6 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		
 	}
 
-	// openDataSourceManager=(enableInteractiveTour:boolean = false)=>{
-	// 	InteractiveTour.enable  = enableInteractiveTour;
-	// 	 if(this.props.loader)
-	// 		this.props.loader(enableInteractiveTour ? GetStartedComponent.INTERACTIVETOUR : GetStartedComponent.DATA);
-	// 	this.setState({
-	// 		visible:false
-	// 	})
-	// };
-
-	// openFileDialog=()=>{
-	// 	if(this.props.loader)
-	// 		this.props.loader(GetStartedComponent.SESSION);
-	// 	FileDialog.open();
-	// 	this.setState({
-	// 		visible:false
-	// 	})
-	// };
 
 	enableInteractiveTourList=()=>
 	{
@@ -80,12 +63,9 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	{
 		InteractiveTour.steps = this.items[itemName].steps ;
 		InteractiveTour.stepContents = this.items[itemName].contents ;
-		//this.openDataSourceManager(true);
 	};
 
 	render() {
-		// if(!this.state.visible )
-		// 	return <div/>;
 
 		let containerStyle:React.CSSProperties = {
 			position:"absolute",
@@ -121,11 +101,16 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 
 		let styleObj:React.CSSProperties = _.merge({},this.props.style,{position:"relative"});
 
+		let itemTextStyle:React.CSSProperties = {
+			textAlign:"center"
+		};
+
 		/*onClick={this.enableInteractiveTourList}*/
 
 		let disableStyle:React.CSSProperties = {
 			borderColor: "grey",
-			color: "grey"
+			color: "grey",
+			textAlign:"center"
 		};
 
 		// empty div required to move the getStarted item in center of the screen
@@ -137,7 +122,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 				<div style={containerStyle} className="weave-getstarted">
 					<div style={overlayStyle} className="weave-getstarted-overlay"></div>
 					<h1 style={ {position:"relative"} } className="weave-getstarted-logo">
-						Weave <span style={ {color:"rgb(236, 131, 89)",fontSize:"54px"} }>2</span>
+						Weave <span style={ {color:"rgb(236, 131, 89)"} }>2</span>
 					</h1>
 					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative"} }>
 						<VBox key="data"
@@ -147,7 +132,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 								<i className="fa fa-database"></i>
 							</div>
 							<br/>
-							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
+							<span style={itemTextStyle}> Load <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
 						</VBox>
 						<VBox key="charts"
 						      className="weave-getstarted-item"
@@ -156,7 +141,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 								<i className="fa fa-file"></i>
 							</div>
 							<br/>
-							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
+							<span style={itemTextStyle}> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
 						</VBox>
 						<VBox key="tutorials"
 						      className="weave-getstarted-item"
