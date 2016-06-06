@@ -44,6 +44,7 @@ export default class ConfirmationDialog extends React.Component<IConfirmationDia
 				                    okButtonContent={okButtonContent}
 				                    cancelButtonContent={cancelButtonContent}/>,
 			footerContent:
+				<HBox style={{flex:1, justifyContent: "center"}}>
 					<div className="ui buttons">
 						{okButtonContent ? <Button className="primary approve" onClick={onOk as any}>
 							{okButtonContent}
@@ -51,11 +52,12 @@ export default class ConfirmationDialog extends React.Component<IConfirmationDia
 						{cancelButtonContent ? <Button className="secondary deny" onClick={onCancel as any}>
 							{cancelButtonContent}
 						</Button>:null}
-					</div>,
+					</div>
+				</HBox>,
 			resizable: true,
 			modal: true,
-			width: 920,
-			height: 675,
+			width: 480,
+			height: 230,
 			onClose: ConfirmationDialog.close,
 			onOk: onOk,
 			onCancel: onCancel
@@ -70,7 +72,7 @@ export default class ConfirmationDialog extends React.Component<IConfirmationDia
 	render():JSX.Element
 	{
 		return (
-			<VBox style={{flex: 1}}>
+			<VBox style={{flex: 1, justifyContent: "center"}} className="ui basic segment">
 				{this.props.content}
 			</VBox>
 		)

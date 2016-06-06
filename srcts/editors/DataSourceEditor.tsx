@@ -49,7 +49,6 @@ export interface IDataSourceEditorState
 export default class DataSourceEditor extends SmartComponent<IDataSourceEditorProps, IDataSourceEditorState> 
 {
 	dataSourceWatcher = forceUpdateWatcher(this, IDataSource);
-	private column:IAttributeColumn;
 	protected enablePreview:boolean = true;
 	protected tree:WeaveTree;
 	protected editorButtons:Map<React.ReactChild, Function>;
@@ -115,38 +114,6 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 
 		return ReactUtils.generateTable({body: this.editorFields, styles: tableStyles});
 	}
-	
-	renderColumnPreview=():JSX.Element=>
-	{
-		var rows = ColumnUtils.getRecords({
-			id: IQualifiedKey,
-			value: this.column
-		}, null, String);
-
-		rows = rows.map((row) => {
-			return {
-				id: row.id.localName,
-				value: row.value
-			}
-		});
-		var keyType = this.column && this.column.getMetadata("keyType");
-		var dataType = this.column && this.column.getMetadata("dataType");
-		var columnIds = ["id", "value"];
-		var columnTitles:IColumnTitles = {
-			id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key"),
-			value: dataType ? Weave.lang("Value ({0})", dataType) : Weave.lang("Value")
-		};
-		return (
-			<VBox style={{flex: 1}}>
-				<span style={{marginBottom: 5}}>{Weave.lang(rows ? "Selected column has {0} records":"", rows ? rows.length:0)}</span>
-				<FixedDataTable rows={rows}
-							 	columnIds={columnIds}
-							 	idProperty="id"
-							 	showIdColumn={true}
-							 	columnTitles={columnTitles}/>
-			</VBox>
-		)
-	}
 
 	private static nodeEqualityFunc(a:IWeaveTreeNode, b:IWeaveTreeNode):boolean
 	{
@@ -159,6 +126,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	renderPreviewView():JSX.Element
 	{
 		let root = this.props.dataSource.getHierarchyRoot();
+		var columns = this.getColumns();
 		return (
 			<VBox className="ui segment" style={{flex: 1}}>
 				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Preview of") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Preview")}</div>
@@ -175,7 +143,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 					      style={{flex: 1, overflow: 'auto'}}
 					      id="Preview"
 					      ref={InteractiveTour.getMountedTargetComponent}>
-						<DynamicComponent dependencies={[this.column]} render={this.renderTablePreview}/>
+						<DynamicComponent dependencies={[columns]} render={() => {return this.renderTablePreview(columns)}}/>
 					</VBox>
 				</HBox>
 			</VBox>
@@ -193,14 +161,14 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 			</VBox>
 		);
 	}
-	
-	renderTablePreview=():JSX.Element =>
+
+	getColumns():IAttributeColumn[]
 	{
 		var columnSiblings: IWeaveTreeNode[] = this.state.selectedBranch && this.state.selectedBranch.getChildren() || [];
-		
+
 		let leaves:IWeaveTreeNode[] = columnSiblings.filter((n) => !n.isBranch());
 		if (!leaves)
-			return;
+			return [];
 
 		var columns:IAttributeColumn[] = [];
 		for (var leaf of leaves)
@@ -209,11 +177,20 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 			if (columnRef)
 			{
 				var meta = columnRef.getColumnMetadata();
-				if (meta)
-					columns.push(weavejs.WeaveAPI.AttributeColumnCache.getColumn(columnRef.getDataSource(), meta));
+				if (meta) {
+					var column = weavejs.WeaveAPI.AttributeColumnCache.getColumn(columnRef.getDataSource(), meta);
+					columns.push(column);
+					// request all metadata for each geometry column so we get the list of keys
+					for (var sgc of Weave.getDescendants(column, StreamedGeometryColumn))
+						sgc.requestAllMetadata();
+				}
 			}
 		}
-
+		return columns;
+	}
+	
+	renderTablePreview=(columns:IAttributeColumn[]):JSX.Element =>
+	{
 		var names:string[] = columns.map(column => column.getMetadata("title"));
 		var format = _.assign({id: IQualifiedKey},_.zipObject(names, columns));
 		var columnTitles = _.zipObject(names, names);
@@ -225,7 +202,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		});
 
 
-		var keyType = this.column && this.column.getMetadata("keyType");
+		var keyType = columns.length && columns[0].getMetadata("keyType");
 		names.unshift("id");
 		_.assign(columnTitles, {id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key")});
 
@@ -261,13 +238,6 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		// select the first leaf by default
 		if (leaves.indexOf(leaf) < 0)
 			leaf = leaves[0];
-		
-		var ref = Weave.AS(leaf, IColumnReference);
-		this.column = weavejs.WeaveAPI.AttributeColumnCache.getColumn(ref && ref.getDataSource(), ref && ref.getColumnMetadata());
-	
-		// request all metadata for selected geometry column so we get the list of keys
-		for (var sgc of Weave.getDescendants(this.column, StreamedGeometryColumn))
-			sgc.requestAllMetadata();
 		
 		this.setState({
 			selectedBranch: branch,
