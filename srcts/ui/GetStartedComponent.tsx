@@ -117,6 +117,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		let emptyDiv:JSX.Element = guidanceListUI? null : <div/>;
 
 		// important for logo to have position relative as the container's one of the child is absolute
+		/* both padded vbox and hbox class are added to getStarted container, as flex wrap is used , we can expect column layout when screen size is reduced, this ensures spacing*/
 		return (
 			<div style={styleObj}>
 				<div style={containerStyle} className="weave-getstarted">
@@ -124,7 +125,8 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 					<h1 style={ {position:"relative", whiteSpace: "nowrap"} } className="weave-getstarted-logo">
 						Weave <span style={ {color:"rgb(236, 131, 89)"} }>2</span>
 					</h1>
-					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} } className="weave-padded-hbox">
+
+					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} } className="weave-padded-hbox weave-padded-vbox">
 						<VBox key="data"
 						      className="weave-getstarted-item"
 						      onClick={()=>this.props.onChange("DataSourceManager") }>
