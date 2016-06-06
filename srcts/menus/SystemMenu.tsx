@@ -15,6 +15,7 @@ export default class SystemMenu implements MenuBarItemProps
 		/* Forces the initialization of the service. */
 		/* Hopefully the init flag gets set before our first 'get menu'. */
 		weavejs.net.Admin.service;
+		weavejs.net.Admin.service.getAuthenticatedUser();
 	}
 
 	weave:Weave;
@@ -58,6 +59,19 @@ export default class SystemMenu implements MenuBarItemProps
 			{
 				enabled: false,
 				label: "Version: 2.0"
+			},
+			{},
+			{
+				label: weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Not signed in"),
+				click: () => {
+
+				},
+				shown: weavejs.net.Admin.service.initialized
+			},
+			{
+				enabled: weavejs.net.Admin.instance.userHasAuthenticated,
+				label: Weave.lang("Sign out"),
+				shown: weavejs.net.Admin.service.initialized
 			}
 		];
 	}
