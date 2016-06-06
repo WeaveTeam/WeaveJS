@@ -128,6 +128,8 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 			color: "grey"
 		};
 
+		// empty div required to move the getStarted item in center of the screen
+		let emptyDiv:JSX.Element = guidanceListUI? null : <div/>;
 
 		// important for logo to have position relative as the container's one of the child is absolute
 		return (
@@ -135,7 +137,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 				<div style={containerStyle} className="weave-getstarted">
 					<div style={overlayStyle} className="weave-getstarted-overlay"></div>
 					<h1 style={ {position:"relative"} } className="weave-getstarted-logo">
-						Weave <span style={ {color:"rgb(236, 131, 89)",fontSize:"54px"} }>2.1</span>
+						Weave <span style={ {color:"rgb(236, 131, 89)",fontSize:"54px"} }>2</span>
 					</h1>
 					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative"} }>
 						<VBox key="data"
@@ -151,7 +153,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						      className="weave-getstarted-item"
 						      onClick={()=>this.props.onChange("FileDialog")}>
 							<div className="weave-getstarted-item-icon">
-								<i className="fa fa-code"></i>
+								<i className="fa fa-file"></i>
 							</div>
 							<br/>
 							<span> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
@@ -167,6 +169,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 							<span style={ disableStyle }><span style={ disableStyle }> Interactive Tour</span></span>
 						</VBox>
 					</HBox>
+					{emptyDiv}
 					{guidanceListUI}
 
 				</div>
