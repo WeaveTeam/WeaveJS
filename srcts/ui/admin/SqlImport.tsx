@@ -239,72 +239,122 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 
 	render():JSX.Element
 	{
-		let validityButton: React.ReactChild;
+		let validityButtonText: React.ReactChild;
 
 		if (this.state.keyColumnValid === true)
 		{
-			validityButton = Weave.lang("OK");
+			validityButtonText = Weave.lang("OK");
 		}
 		else if (this.state.keyColumnValid === false)
 		{
-			validityButton = Weave.lang("Keys are not unique.");
+			validityButtonText = Weave.lang("Keys are not unique.");
 		}
-		else
-		{
-			validityButton = <Button onClick={this.testKeyColumn}>{Weave.lang("Test") }</Button>;
+		else {
+			validityButtonText = Weave.lang("Test");
 		}
-		let accordion = Accordion.render([
-			Weave.lang("Table"),
-				[
-					[
-						<Checkbox label={Weave.lang("Create a new Weave table entry even if a matching one already exists.") }
-							value={!this.state.append}
-							onChange={(value) => this.setState({ append: !value }) }
-							/>, undefined, undefined
-					],
-					[
-						Weave.lang("SQL schema"),
-						<ComboBox value= { this.state.schema } options= { this.state.schemaOptions } onChange= {(schema) => {this.setState({ schema });} }/>,
-						<Button title={Weave.lang("Refresh") } onClick={this.updateSchemas}><i className="fa fa-refresh"/></Button>
-					],
-					[
-						Weave.lang("SQL table"),
-						<ComboBox value={this.state.table} options={this.state.tableOptions} onChange={(table) => {this.setState({ table });} }/>,
-						<Button title={Weave.lang("Refresh") } onClick={this.updateSchemas}><i className="fa fa-refresh"/></Button>
-					],
-					[
-						Weave.lang("Table display name"),
-						<Input type="text" value={this.state.displayName} onChange={(evt) => this.setState({ displayName: (evt.target as HTMLInputElement).value }) }/>
-					]
-				]
-			],
-			[Weave.lang("Data"),
-				[
-					[
-						Weave.lang("Key column"),
-						<ComboBox value= { this.state.keyColumn } options= { this.state.columnOptions } onChange= {(value) => this.setState({ keyColumn: value, keyColumnValid: null }) }/>,
-						validityButton
-					],
-					[
-						Weave.lang("Key namespace"),
-						<ComboBox allowAdditions= { true} value= { this.state.keyType } options= { this.state.keyTypeSuggestions } onChange= {(value) => this.setState({ keyType: value }) }/>,
-						<Button title={Weave.lang("Refresh") } onClick={this.updateKeyTypeSuggestions}><i className="fa fa-refresh"/></Button>
-					],
-					[
-						Weave.lang("Filter columns"),
-						<ComboBox type="multiple" value={this.state.filteredKeyColumns} options={this.state.columnOptions} onChange={(value) => this.setState({ filteredKeyColumns: value }) }/>
-					]
-				]
-			]
-		);
 
-		return <VBox className="weave-ToolEditor">
-			{accordion}
-			{this.renderErrors()}
-			<HBox>
-				<Button disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
-			</HBox>
-			<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={() => PopupWindow.close(SqlImport.window) } onSuccess={() => this.updateSchemas()} detachable={true}/>
-		</VBox>
+		return (
+			<VBox className="weave-ToolEditor">
+				<div>
+					<div className="ui dividing header">{Weave.lang("Table")}</div>
+					<div className="ui left aligned grid">
+						<div className="one column row" style={{paddingBottom: 0}}>
+							<div className="sixteen wide right aligned column">
+								<Checkbox label={Weave.lang("Create a new Weave table entry even if a matching one already exists.") }
+								          value={!this.state.append}
+								          onChange={(value) => this.setState({ append: !value }) }
+								/>
+							</div>
+						</div>
+						<div className="two column row" style={{paddingBottom: 0}}>
+							<div className="four wide right aligned column">
+								<div className="ui basic segment">
+									{Weave.lang("SQL schema")}
+								</div>
+							</div>
+							<div className="twelve wide column">
+								<HBox style={{flex:1}}>
+									<ComboBox style={{flex: 1}} value= { this.state.schema } options= { this.state.schemaOptions } onChange= {(schema) => {this.setState({ schema });} } fluid={false}/>
+									<Button className="attached" title={Weave.lang("Refresh") } onClick={this.updateSchemas}><i className="fa fa-refresh"/></Button>
+								</HBox>
+							</div>
+						</div>
+						<div className="two column row" style={{paddingBottom: 0}}>
+							<div className="four wide right aligned column">
+								<div className="ui basic segment">
+									{Weave.lang("SQL table")}
+								</div>
+							</div>
+							<div className="twelve wide column">
+								<HBox style={{flex:1}}>
+									<ComboBox value={this.state.table} options={this.state.tableOptions} onChange={(table) => {this.setState({ table });} }/>
+									<Button className="attached" title={Weave.lang("Refresh") } onClick={this.updateSchemas}><i className="fa fa-refresh"/></Button>
+								</HBox>
+							</div>
+						</div>
+						<div className="two column row" style={{paddingBottom: 0}}>
+							<div className="four wide right aligned column">
+								<div className="ui basic segment">
+									{Weave.lang("Table display name")}
+								</div>
+							</div>
+							<div className="twelve wide column">
+								<Input type="text" value={this.state.displayName} onChange={(evt) => this.setState({ displayName: (evt.target as HTMLInputElement).value }) }/>
+							</div>
+						</div>
+					</div>
+					<div className="ui dividing header">{Weave.lang("Data")}</div>
+					<div className="ui left aligned grid">
+						<div className="two column row" style={{paddingBottom: 0}}>
+							<div className="four wide right aligned column">
+								<div className="ui basic segment">
+									{Weave.lang("Key column")}
+								</div>
+							</div>
+							<div className="twelve wide column">
+								<HBox style={{flex:1}}>
+									<ComboBox value= { this.state.keyColumn } options= { this.state.columnOptions } onChange= {(value) => this.setState({ keyColumn: value, keyColumnValid: null }) }/>
+									<Button className="attached" onClick={this.testKeyColumn}>{validityButtonText}</Button>
+								</HBox>
+							</div>
+						</div>
+						<div className="two column row" style={{paddingBottom: 0}}>
+							<div className="four wide right aligned column">
+								<div className="ui basic segment">
+									{Weave.lang("Key namespace")}
+								</div>
+							</div>
+							<div className="twelve wide column">
+								<HBox style={{flex:1}}>
+									<ComboBox allowAdditions= { true} value= { this.state.keyType } options= { this.state.keyTypeSuggestions } onChange= {(value) => this.setState({ keyType: value }) }/>
+									<Button className="attached" title={Weave.lang("Refresh") } onClick={this.updateKeyTypeSuggestions}><i className="fa fa-refresh"/></Button>
+								</HBox>
+							</div>
+						</div>
+						<div className="two column row" style={{paddingBottom: 0}}>
+							<div className="four wide right aligned column">
+								<div className="ui basic segment">
+									{Weave.lang("Filter columns")}
+								</div>
+							</div>
+							<div className="twelve wide column">
+								<HBox style={{flex:1}}>
+									<ComboBox type="multiple" value={this.state.filteredKeyColumns} options={this.state.columnOptions} onChange={(value) => this.setState({ filteredKeyColumns: value }) }/>
+								</HBox>
+							</div>
+						</div>
+						<div className="one column row">
+							{this.renderErrors()}
+						</div>
+						<div className="one column row">
+							<div className="sixteen wide right aligned column">
+								<Button disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
+							</div>
+						</div>
+					</div>
+				</div>
+				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={() => PopupWindow.close(SqlImport.window) } onSuccess={() => this.updateSchemas()} detachable={true}/>
+			</VBox>
+		)
 	}
 }

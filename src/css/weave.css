@@ -329,9 +329,26 @@ div.table-row-selected>div>div>div>div>div {
 
 /* same weave-menubar but can be customized */
 .weave-header.weave-window-header {
-	border-bottom: 1px solid #E6E6E6;
+	/*border-bottom: 1px solid #E6E6E6;
 	background-color: #D5D5D5;
-	padding: 4px 8px 4px 8px;
+	padding: 4px 8px 4px 8px;*/
+	background: #FFF;
+	margin: 0;
+	padding: 1.25rem 1.5rem;
+	box-shadow: none;
+	color: rgba(0,0,0,.85);
+	border-bottom: 1px solid rgba(34,36,38,.15);
+	font-size: 1.42857143rem;
+	line-height: 1.2857em;
+	font-weight: 700;
+}
+
+.weave-header.weave-window-header>.close {
+	color: rgba(0,0,0,.87);
+}
+
+.weave-header.weave-window-header>.close:hover {
+	opacity: 1;
 }
 
 .weave-window-content {
@@ -608,6 +625,20 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 	background-color: rgba(117, 179, 255, 0.6)
 }
 
+/*
+.weave-file-picker-editor {
+	background: rgba(60,64,63,0.9)!important;
+}
+
+.weave-file-picker-container {
+	background: rgba(54, 119, 199, 0.6);
+}
+*/
+
+.weave-server-file-view {
+	background: white;
+}
+
 /* sidebar */
 .weave-sidebar-dropdown {
 	min-width: 0 !important;
@@ -779,6 +810,10 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 	border-color: #85B7D9;
 }
 
+.ui.secondary.button, .ui.secondary.buttons .button {
+	background: rgba(60,64,63,0.9);
+}
+
 /******* Dropdown *****/
 
 .ui.multiple.dropdown>.label {
@@ -874,7 +909,7 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 
 /****** Dimmer ********/
 .ui.dimmer {
-	background-color: rgba(0,0,0,.5);
+	background-color: rgba(204,204,204,0.5);
 }
 
 /****** Modal *********/

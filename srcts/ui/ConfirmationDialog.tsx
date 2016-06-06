@@ -6,7 +6,6 @@ import Button from "../semantic-ui/Button";
 
 export interface IConfirmationDialogProps extends React.Props<ConfirmationDialog>
 {
-	title:string;
 	content:React.ReactChild;
 	okButtonContent:React.ReactChild;
 	cancelButtonContent:React.ReactChild;
@@ -22,7 +21,6 @@ export interface IConfirmationDialogState
 export default class ConfirmationDialog extends React.Component<IConfirmationDialogProps, IConfirmationDialogState> {
 
 	static window:PopupWindow;
-	static element:Element;
 
 	constructor(props:IConfirmationDialogProps)
 	{
@@ -31,49 +29,50 @@ export default class ConfirmationDialog extends React.Component<IConfirmationDia
 
 	static close()
 	{
-		($(ConfirmationDialog.element) as any).modal('hide');
+		ConfirmationDialog.window = null;
 	}
 
-	static open(onOk:Function, onCancel:Function, context:any)
+	static open(context:React.ReactInstance, title:string, content:any, okButtonContent:any, onOk:Function, cancelButtonContent:any, onCancel:Function)
 	{
-		($(ConfirmationDialog.element) as any)
-			.modal({
-				detachable: false,
-				transition: "fade",
-				context,
-				onApprove: onOk,
-				onDeny: onCancel
-			})
-			.modal('show');
+		if (ConfirmationDialog.window)
+			PopupWindow.close(ConfirmationDialog.window);
+
+		ConfirmationDialog.window = PopupWindow.open(context, {
+			title,
+			content:
+				<ConfirmationDialog content={content}
+				                    okButtonContent={okButtonContent}
+				                    cancelButtonContent={cancelButtonContent}/>,
+			footerContent:
+					<div className="ui buttons">
+						{okButtonContent ? <Button className="primary approve" onClick={onOk as any}>
+							{okButtonContent}
+						</Button>:null}
+						{cancelButtonContent ? <Button className="secondary deny" onClick={onCancel as any}>
+							{cancelButtonContent}
+						</Button>:null}
+					</div>,
+			resizable: true,
+			modal: true,
+			width: 920,
+			height: 675,
+			onClose: ConfirmationDialog.close,
+			onOk: onOk,
+			onCancel: onCancel
+		});
 	}
 
 	componentDidMount()
 	{
-		ConfirmationDialog.element = ReactDOM.findDOMNode(this);
+
 	}
 
 	render():JSX.Element
 	{
 		return (
-			<div className="ui modal">
-				<i className="close icon"/>
-				<div className="header">
-					{Weave.lang(this.props.title)}
-				</div>
-				<div className="content">
-					{this.props.content}
-				</div>
-				<div className="actions">
-					<div className="ui buttons">
-						{this.props.okButtonContent ? <Button className="primary approve">
-							{this.props.okButtonContent}
-						</Button>:null}
-						{this.props.cancelButtonContent ? <Button className="secondary deny">
-							{this.props.cancelButtonContent}
-						</Button>:null}
-					</div>
-				</div>
-			</div>
+			<VBox style={{flex: 1}}>
+				{this.props.content}
+			</VBox>
 		)
 	}
 }

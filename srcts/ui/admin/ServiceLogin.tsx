@@ -12,12 +12,16 @@ export interface IServiceLoginProps extends React.Props<ServiceLogin> {
 	onCancel?: () => void;
 	context?: Element;
 	detachable?: boolean;
-	service: WeaveAdminService;
+	service?: WeaveAdminService;
 }
 
 
 export default class ServiceLogin extends React.Component<IServiceLoginProps, Object> {
 
+	defaultProps:IServiceLoginProps = {
+		detachable: false
+	};
+	
 	constructor(props:IServiceLoginProps)
 	{
 		super(props);

@@ -101,7 +101,7 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 			}
 		});
 		selector.submit(function(e:any){
-			//e.preventDefault(); usually use this, but below works best here.
+			e.preventDefault();
 			return false;
 		});
 	}

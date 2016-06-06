@@ -27,6 +27,7 @@ export interface PopupWindowProps extends React.HTMLProps<PopupWindow>
 	onOk?:Function;
 	onCancel?:Function;
 	onClose?:Function;
+	suspendEnter?:boolean;
 }
 
 export interface PopupWindowState
@@ -57,7 +58,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	static defaultProps = {
 		resizable: true,
-		draggable: true
+		draggable: true,
+		suspendEnter: false
 	};
 
 	static open(context:React.ReactInstance, props:PopupWindowProps):PopupWindow
@@ -121,7 +123,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	{
 		var code = event.keyCode;
 
-		if (code == ENTER_KEYCODE && this.props.modal && ReactUtils.hasFocus(this))
+		if (code == ENTER_KEYCODE && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
 			this.onOk();
 
 		if (code == ESC_KEYCODE)
@@ -182,6 +184,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 									this.props.title
 								}
 							</div>
+							<i className="ui close icon" onClick={this.onCancel.bind(this)}/>
 						</HBox>
 					:	null
 				}
@@ -197,10 +200,10 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 							</HBox>
 						:	<HBox className="weave-window-footer">
 								<HBox className="weave-padded-hbox" style={prefixer({flex: 1, justifyContent: "flex-end"})}>
-									<Button onClick={this.onOk.bind(this)}>{Weave.lang(this.props.modal ? "Ok" : "Done")}</Button>
+									<Button colorClass="primary" onClick={this.onOk.bind(this)}>{Weave.lang(this.props.modal ? "Ok" : "Done")}</Button>
 									{
 										this.props.modal
-											?	<Button onClick={this.onCancel.bind(this)} style={{marginLeft: 8}}>{Weave.lang("Cancel")}</Button>
+											?	<Button colorClass="secondary" onClick={this.onCancel.bind(this)} style={{marginLeft: 8}}>{Weave.lang("Cancel")}</Button>
 											:	null
 									}
 								</HBox>

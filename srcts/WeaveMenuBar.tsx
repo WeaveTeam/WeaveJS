@@ -54,8 +54,7 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 					this.controllersMenu
 				]}
 				children={
-					[<SessionHistorySlider key="historySlider" stateLog={this.props.weave.history}/>,
-					<FileDialog key="fileDialog" openUrlHandler={this.fileMenu.loadUrl} openFileHandler={this.fileMenu.handleOpenedFile}/>]
+					[<SessionHistorySlider key="historySlider" stateLog={this.props.weave.history}/>]
 				}
 			/>
 		);
