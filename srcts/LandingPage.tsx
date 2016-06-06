@@ -54,11 +54,10 @@ export default class LandingPage extends React.Component<any, LandingPageState>
 
 		return (
 			<WeaveApp
-				readUrlParams={true}
 				weave={weave}
-				renderPath={weavejs.WeaveAPI.CSVParser.parseCSVRow(this.urlParams.layout)}
 				style={{width: "100%", height: "100%"}}
 				landing={this.state.landing}
+				readUrlParams={true}
 			/>
 		)
 	}

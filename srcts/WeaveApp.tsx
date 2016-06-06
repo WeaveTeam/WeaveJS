@@ -47,6 +47,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 	renderPath?:WeavePathArray;
 	readUrlParams?:boolean;
 	landing?:string;
+	initializeTabs?:boolean;
 }
 
 export interface WeaveAppState
@@ -64,7 +65,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		weave: null,
 		landing: "default",
 		renderPath: ['Tabs'],
-		readUrlParams: false
+		readUrlParams: false,
+		initializeTabs: true
 	};
 
 	constructor(props:WeaveAppProps)
@@ -76,6 +78,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		};
 		this.menus = new WeaveMenus(this, this.props.weave, this.createObject);
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
+		this.urlParams = MiscUtils.getUrlParams();
 	}
 	
 	componentWillReceiveProps(props:WeaveAppProps)
@@ -85,7 +88,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	
 	getRenderPath():WeavePathArray
 	{
-		return this.props.renderPath || WeaveApp.defaultProps.renderPath;
+		var renderPath:WeavePathArray = null;
+		if(this.props.readUrlParams)
+			renderPath = weavejs.WeaveAPI.CSVParser.parseCSVRow(this.urlParams.layout);
+		return renderPath || this.props.renderPath || WeaveApp.defaultProps.renderPath;
 	}
 	
 	getRenderedComponent():React.Component<any, any>
@@ -120,14 +126,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
 	
-	urlParams:{ file: string, editable: boolean};
+	urlParams:{ file: string, editable: boolean, layout: string};
 	
 	componentDidMount()
 	{
 		this.createDefaultSessionElements();
 		if (this.props.readUrlParams)
 		{
-			this.urlParams = MiscUtils.getUrlParams();
 			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable); // || this.menus.fileMenu.pingAdminConsole(); TODO: Discuss this behavior
 
 			try
@@ -182,20 +187,17 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var newTabLayoutPath = [this.props.weave.root.generateUniqueName("Tabs")];
 		var oldTabLayout = this.props.weave.getObject(oldTabLayoutPath) as any;
 		oldTabLayout.removePanel(layoutPath);
-
+		requestObject(this.props.weave, newTabLayoutPath, TabLayout, (tabLayout:TabLayout) => {
+			tabLayout.addPanel(layoutPath);
+		});
 		var content:JSX.Element = (
-			<WeaveComponentRenderer
+			<WeaveApp
 				weave={this.props.weave}
-				path={newTabLayoutPath}
-				defaultType={TabLayout}
+				renderPath={newTabLayoutPath}
+				initializeTabs={false}
 				style={{width: "100%", height: "100%"}}
-				onCreate={(newTabLayout:TabLayout) => {
-					newTabLayout.addPanel(layoutPath)
-				}}
-				props={ { panelRenderer: this.renderTab } }
 			/>
 		);
-
 		var onLoad:Function = () => { };
 		var options:any = { transferStyle: true };
 		ReactUtils.openPopout(content, onLoad, this.restoreTabs, options);
@@ -268,7 +270,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			var tabLayout = this.tabLayout;
 			if (tabLayout.activeTabIndex < 0)
 				tabLayout.activeTabIndex = 0;
-			
+
 			var tabPath = tabLayout.getPanelIds()[tabLayout.activeTabIndex];
 			LinkablePlaceholder.whenReady(this, weave.getObject(tabLayout.activePanelId), (layout:AnyAbstractLayout) => {
 				layout.addPanel(path);
@@ -325,6 +327,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	private initializeTabs=(tabLayout:TabLayout)=>
 	{
+		if(!this.props.initializeTabs)
+			return;
+
 		var tabLayoutState = tabLayout.getSessionState();
 		var tabs = tabLayoutState && tabLayoutState.tabs;
 		var activeTabIndex = tabLayoutState && tabLayoutState.activeTabIndex || -1;
@@ -399,7 +404,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		});
 	};
 
-	addNewLayout=(type?:typeof AbstractLayout)=>
+	addNewTab=(type?:typeof AbstractLayout)=>
 	{
 		var weave = this.props.weave;
 		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type as any);
@@ -409,11 +414,20 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.tabLayout.addPanel(path, layoutName);
 	};
 
-	removeExistingLayout=(id:WeavePathArray, event?:React.MouseEvent)=>
+	removeExistingTab=(id:WeavePathArray)=>
 	{
-		this.tabLayout.removePanel(id, event);
+		this.tabLayout.removePanel(id);
 		this.props.weave.removeObject(id);
 	};
+
+	onTabClick=(panelPath:WeavePathArray, event:React.MouseEvent)=>
+	{
+		if(event.button == 1) // if middle click, close the tab
+		{
+			event.stopPropagation();
+			this.removeExistingTab(panelPath);
+		}
+	}
 
 	componentWillUpdate(nextProps:WeaveAppProps, nextState:WeaveAppState)
 	{
@@ -444,8 +458,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var renderPath = this.getRenderPath();
 		
 		if (!weave)
-			return <VBox>Cannot render WeaveApp without an instance of Weave.</VBox>;
-
+		{
+			return (
+				<VBox style={{flex: 1, justifyContent: "center", alignItems: "center", padding: 10}}>
+					<span>{Weave.lang('Cannot render WeaveApp without an instance of Weave.')}</span>
+				</VBox>
+			);
+		}
 
 		// check in url params to skip BlankPageIntro
 		this.urlParams = MiscUtils.getUrlParams();
@@ -466,7 +485,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		let blankPageIntroScreen:JSX.Element = null;
 		let interactiveTourComponent:JSX.Element = null;
-
 		weaveTabbedComponent =  (
 			<WeaveComponentRenderer
 				weave={weave}
@@ -485,14 +503,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					onAdd: [
 						{
 							label: Weave.lang("Window Layout"),
-							click: () => this.addNewLayout(WindowLayout)
+							click: () => this.addNewTab(WindowLayout)
 						},
 						{
 							label: Weave.lang("Flexible Layout"),
-							click: () => this.addNewLayout(FlexibleLayout)
+							click: () => this.addNewTab(FlexibleLayout)
 						}
 					],
-					onRemove: this.removeExistingLayout,
+					onClick: this.onTabClick,
+					onRemove: this.removeExistingTab,
 					onTabDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
 				} as TabLayoutProps }
 			/>);

@@ -30,7 +30,8 @@ export interface TabLayoutProps extends LayoutProps
 		content: JSX.Element
 	}[];
 	onAdd: MenuItemProps|React.MouseEventHandler;
-	onRemove: (panelId:WeavePathArray, event?:React.MouseEvent) => void;
+	onRemove: (panelId:WeavePathArray) => void;
+	onClick: any; //(panelId:WeavePathArray, event?:React.MouseEvent) => void;
 	onTabDoubleClick: (panelId:WeavePathArray) => void;
 }
 
@@ -178,11 +179,8 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		this.setSessionState(state);
 	}
 
-	removePanel(id:WeavePathArray, event?:React.MouseEvent):void
+	removePanel(id:WeavePathArray):void
 	{
-		if (event)
-			event.stopPropagation();
-
 		var state = this.getSessionState();
 		var index = this.getPanelIndex(id);
 		state.tabs = state.tabs.filter((panel) => {
@@ -255,6 +253,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								className="weave-padded-hbox"
 								onDragOver={(event) => this.onDragOverTab(panel)}
 								onDragLeave={this.onDragLeaveTab}
+								onClick={(event) => this.props.onClick(panel.id, event)}
 								onDoubleClick={() => this.props.onTabDoubleClick && this.props.onTabDoubleClick(panel.id)}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.renamePanel(panel.id, newName)} textContent={panel.label}/>*/}
@@ -262,7 +261,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								{
 									this.props.onRemove
 									?	<CenteredIcon
-											onClick={(event) => this.props.onRemove(panel.id, event)}
+											onClick={(event) => {event.stopPropagation(); this.props.onRemove(panel.id)}}
 											className="weave-tab-icon"
 											title={Weave.lang("Close")}
 											iconProps={{ className:"fa fa-times-circle" }}
