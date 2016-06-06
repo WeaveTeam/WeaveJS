@@ -24,6 +24,10 @@ export default class GeometryLayer extends AbstractFeatureLayer
 	line = Weave.linkableChild(this, SolidLineStyle);
 	geometryColumn = Weave.linkableChild(this, DynamicColumn);
 
+	protected getRequiredAttributes() {
+		return super.getRequiredAttributes().concat([this.geometryColumn]);
+	}
+
 	get selectableAttributes()
 	{
 		return super.selectableAttributes

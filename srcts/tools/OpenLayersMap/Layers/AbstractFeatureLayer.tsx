@@ -8,6 +8,8 @@ import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import KeySet = weavejs.data.key.KeySet;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
+import DynamicColumn = weavejs.data.column.DynamicColumn;
+import ExtendedDynamicColumn = weavejs.data.column.ExtendedDynamicColumn;
 import IKeySet = weavejs.api.data.IKeySet;
 
 export abstract class AbstractFeatureLayer extends AbstractLayer
@@ -21,6 +23,25 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
+
+	/* Cache requiredAttributes array so we don't cause GC churn with every invocation of .requiredAttributes */
+	private _cachedRequiredAttributes: (DynamicColumn | ExtendedDynamicColumn)[];
+	protected getRequiredAttributes():(DynamicColumn | ExtendedDynamicColumn)[]
+	{
+		return [];
+	}
+	/*
+	 * The columns which will be required before this layer bothers loading any features.
+	 * Do not overload this, overload getRequiredAttributes instead.
+	 */
+	get requiredAttributes():(DynamicColumn|ExtendedDynamicColumn)[] {
+		if (!this._cachedRequiredAttributes)
+		{
+			this._cachedRequiredAttributes = this.getRequiredAttributes();
+		}
+
+		return this._cachedRequiredAttributes;
+	}
 
 	getExtent()
 	{
@@ -47,6 +68,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		var keySet = this.probeFilter.target as KeySet;
 		return keySet instanceof KeySet ? keySet : null;
 	}
+
 	isProbed(key:IQualifiedKey):boolean
 	{
 		var keySet = this.probeFilter.target as KeySet;

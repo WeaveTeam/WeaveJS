@@ -50,6 +50,10 @@ export default class LabelLayer extends AbstractGlyphLayer
 		});
 	}
 
+	protected getRequiredAttributes() {
+		return super.getRequiredAttributes().concat([this.text]);
+	}
+
 	constructor()
 	{
 		super();

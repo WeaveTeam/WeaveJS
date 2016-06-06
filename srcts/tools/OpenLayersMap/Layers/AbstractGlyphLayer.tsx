@@ -36,6 +36,11 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 			.set("Longitude / X", this.dataX);
 	}
 
+	protected getRequiredAttributes()
+	{
+		return super.getRequiredAttributes().concat([this.dataX, this.dataY]);
+	}
+
 	constructor()
 	{
 		super();
@@ -52,8 +57,14 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 
 		this.sourceProjection.addGroupedCallback(this, this.updateLocations);
 
-		this.dataX.addGroupedCallback(this, this.updateLocations);
-		this.dataY.addGroupedCallback(this, this.updateLocations, true);
+		/* Use requiredattributes instead of dataX/dataY directly, so we don't add features. */
+		this.requiredAttributes.forEach(
+			(attr) => {
+				attr.addGroupedCallback(this, this.updateLocations);
+			}
+		);
+		
+		this.updateLocations();
 	}
 
 	_getFeatureIds()
@@ -69,7 +80,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 	updateLocations()
 	{
 		/* Update feature locations */
-		var recordIds = this.dataX.keys;
+		var recordIds = _.intersection.apply(null, this.requiredAttributes.map((attr) => attr.keys));
 		var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
 		var removedIds = _.difference(this._getFeatureIds(), recordIds);
 

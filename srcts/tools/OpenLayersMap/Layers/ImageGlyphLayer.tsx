@@ -32,6 +32,10 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 			.set("Image Tint", this.dataColor);
 	}
 
+	protected getRequiredAttributes() {
+		return super.getRequiredAttributes().concat([this.imageURL]);
+	}
+
 	constructor()
 	{
 		super();
