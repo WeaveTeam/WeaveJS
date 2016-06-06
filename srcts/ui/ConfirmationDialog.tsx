@@ -29,7 +29,11 @@ export default class ConfirmationDialog extends React.Component<IConfirmationDia
 
 	static close()
 	{
-		ConfirmationDialog.window = null;
+		if(ConfirmationDialog.window)
+		{
+			PopupWindow.close(ConfirmationDialog.window);
+			ConfirmationDialog.window = null;
+		}
 	}
 
 	static open(context:React.ReactInstance, title:string, content:any, okButtonContent:any, onOk:Function, cancelButtonContent:any, onCancel:Function)
@@ -46,10 +50,14 @@ export default class ConfirmationDialog extends React.Component<IConfirmationDia
 			footerContent:
 				<HBox style={{flex:1, justifyContent: "center"}}>
 					<div className="ui buttons">
-						{okButtonContent ? <Button className="primary approve" onClick={onOk as any}>
+						{okButtonContent ? <Button className="primary" onClick={() => {
+							onOk();
+						}}>
 							{okButtonContent}
 						</Button>:null}
-						{cancelButtonContent ? <Button className="secondary deny" onClick={onCancel as any}>
+						{cancelButtonContent ? <Button className="secondary" onClick={() => {
+							onCancel();
+						}}>
 							{cancelButtonContent}
 						</Button>:null}
 					</div>

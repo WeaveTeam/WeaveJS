@@ -57,7 +57,11 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 
 	static close()
 	{
-		FileDialog.window = null;
+		if(FileDialog.window)
+		{
+			PopupWindow.close(FileDialog.window);
+			FileDialog.window = null;
+		}
 	}
 	
 	static open(context:React.ReactInstance, loadURL:(url:string) => void, loadFile:(file:File) => void)
@@ -95,6 +99,7 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 			Weave.lang("Load Session"),
 			() => {
 				handler(file);
+				ConfirmationDialog.close();
 				FileDialog.close();
 			},
 			Weave.lang("Cancel"),
