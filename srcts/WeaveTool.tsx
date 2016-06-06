@@ -18,6 +18,9 @@ import SmartComponent from "./ui/SmartComponent";
 import classNames from "./modules/classnames";
 import DraggableDiv from "./react-ui/DraggableDiv";
 import {AbstractLayout, AnyAbstractLayout} from "./layouts/AbstractLayout";
+import MouseUtils from "./utils/MouseUtils";
+import LinkableString = weavejs.core.LinkableString;
+import IAltText = weavejs.api.ui.IAltText;
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -93,10 +96,11 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	updateAltText():void
 	{
 		var path = this.props.path;
-		var altTextLinkable = this.watcher && this.watcher.target && (this.watcher.target as IVisTool).altText;
-		var altText = altTextLinkable ? altTextLinkable.value : '';
-		if (this.state.altText != altText)
-			this.setState({altText});
+		var altTextTool = Weave.AS(this.watcher && this.watcher.target, IAltText);
+		var altText = altTextTool && altTextTool.altText;
+		var altTextStr = altText && altText.value;
+		if (this.state.altText != altTextStr)
+			this.setState({altText: altTextStr});
 	}
 	
 	onGearClick=(event:React.MouseEvent):void=>
@@ -214,7 +218,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			<VBox
 				style={this.props.style}
 				className="weave-tool"
-				role="img"
+				aria-labelledby={this.state.altText}
 				onMouseOver={() => {
 					this.setState({ hovered: true });
 				}}

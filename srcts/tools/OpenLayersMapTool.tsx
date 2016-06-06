@@ -84,11 +84,12 @@ function isAlignment(obj:any):boolean
 import URLRequest = weavejs.net.URLRequest;
 import WeavePromise = weavejs.util.WeavePromise;
 import SmartComponent from "../ui/SmartComponent";
+import IAltText = weavejs.api.ui.IAltText;
 
 // set ol proj4
 ol.proj.setProj4(proj4);
 
-export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState>
+export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IAltText
 {
 	public static selectableLayerFilter(layer: ol.layer.Base): boolean
 	{
@@ -270,6 +271,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
+	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 
 	snapZoomToBaseMap = Weave.linkableChild(this, new LinkableBoolean(true));
 
