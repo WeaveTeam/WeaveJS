@@ -14,6 +14,8 @@ import List from "../../react-ui/List";
 import {ListOption} from "../../react-ui/List";
 import ConnectionEditor from "./ConnectionEditor";
 import ServiceLogin from "./ServiceLogin";
+import ConfigurationStorageEditor from "./ConfigurationStorageEditor";
+import ErrorLogComponent from "./ErrorLogComponent";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
@@ -54,25 +56,6 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		let pathComponents = serviceUrl.split('/');
 		pathComponents.pop();
 		return pathComponents.join('/');
-	}
-
-
-	renderErrors(): JSX.Element {
-		if (this.state.errors.length) {
-			return <div className="ui warning message">
-				<i className="close icon" onClick={() => { this.setState({ errors: [] }) } }></i>
-				<div className="header">
-					{Weave.lang("Server Error") }
-				</div>
-				<ul className="list">
-					{this.state.errors.map((message, idx) => (<li key={idx}>{message}</li>)) }
-				</ul>
-			</div>;
-		}
-		else
-		{
-			return <div/>;
-		}
 	}
 
 	static window: PopupWindow;
@@ -132,8 +115,8 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		};
 
 		let title = isConfigConnection ?
-			Weave.lang("Connection {0}", connection) :
-			Weave.lang("Connection {0} is the current configuration storage location.", connection);
+			Weave.lang("Connection {0} is the current configuration storage location.", connection) :
+			Weave.lang("Connection {0}", connection);
 
 		return {
 			value: connection,
@@ -186,11 +169,14 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 							<i className="fa fa-refresh fa-fw"/>
 						</Button>
 					</HBox>
+					<Button title={Weave.lang("Manage configuration storage...")} onClick={()=>ConfigurationStorageEditor.open(this, this.service)}>
+						{Weave.lang("Manage configuration storage...")}
+					</Button>
 				</VBox>
 				<ConnectionEditor refreshFunc={this.updateConnections} service={this.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={_.noop}/>
 				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onSuccess={_.noop} onCancel={() => PopupWindow.close(ConnectionManager.window) } detachable={true}/>
 			</HBox>
-		{ this.renderErrors() }
+			<ErrorLogComponent errors={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
 		</VBox>
 	}
 }

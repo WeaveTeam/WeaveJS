@@ -21,12 +21,12 @@ import WeaveAdminService = weavejs.net.WeaveAdminService;
 import WeavePromise = weavejs.util.WeavePromise;
 import StandardLib = weavejs.util.StandardLib;
 
-interface ILinkedInputProps {
+export interface ILinkedInputProps {
 	field: string,
-	outerComponent: ConnectionEditor,
+	outerComponent: React.Component<any,any>,
 	type?: string
 }
-class LinkedInput extends React.Component<ILinkedInputProps, Object>
+export class LinkedInput extends React.Component<ILinkedInputProps, Object>
 {
 	constructor(props:ILinkedInputProps)
 	{
