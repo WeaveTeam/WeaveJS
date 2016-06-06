@@ -124,7 +124,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 					<h1 style={ {position:"relative", whiteSpace: "nowrap"} } className="weave-getstarted-logo">
 						Weave <span style={ {color:"rgb(236, 131, 89)"} }>2</span>
 					</h1>
-					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} }>
+					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} } className="weave-padded-hbox">
 						<VBox key="data"
 						      className="weave-getstarted-item"
 						      onClick={()=>this.props.onChange("DataSourceManager") }>
