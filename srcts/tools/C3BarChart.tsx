@@ -631,7 +631,8 @@ export default class C3BarChart extends AbstractC3Tool
 				]
 			],
 			[Weave.lang("Titles"), this.getTitlesEditor()],
-			[Weave.lang("Margins"), this.getMarginEditor()]
+			[Weave.lang("Margins"), this.getMarginEditor()],
+			[Weave.lang("Accessibility"), this.getAltTextEditor()]
 		);
 	};
 
