@@ -8215,6 +8215,7 @@ declare module weavejs.net {
      */
     class WeaveAdminService implements IWeaveEntityManagementService {
         static WEAVE_AUTHENTICATION_EXCEPTION: string;
+        static getInstance(url: string): WeaveAdminService;
         static messageLog: any[];
         static messageLogCallbacks: CallbackCollection;
         static messageDisplay(messageTitle: string, message: string, showPopup: boolean): void;
@@ -8248,6 +8249,7 @@ declare module weavejs.net {
         authenticate(user: string, pass: string): WeavePromise<boolean>;
         keepAlive(): WeavePromise<void>;
         getWeaveFileNames(showAllFiles: boolean): WeavePromise<string[]>;
+        saveWeaveFileByteArray(fileContent: JSByteArray, fileName: string, overwriteFile: boolean): WeavePromise<string>;
         saveWeaveFile(fileContent: JSByteArray, fileName: string, overwriteFile: boolean): WeavePromise<string>;
         removeWeaveFile(fileName: string): WeavePromise<string>;
         getWeaveFileInfo(fileName: string): WeavePromise<WeaveFileInfo>;
