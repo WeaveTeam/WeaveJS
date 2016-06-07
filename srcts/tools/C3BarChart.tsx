@@ -27,8 +27,9 @@ import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-import StandardLib = weavejs.util.StandardLib;
 import ColumnUtils = weavejs.data.ColumnUtils;
+import IColumnStatistics = weavejs.api.data.IColumnStatistics;
+import StandardLib = weavejs.util.StandardLib;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -93,7 +94,7 @@ export default class C3BarChart extends AbstractC3Tool
     {
         return this.heightColumns.getObjects(IAttributeColumn)[0]|| this.sortColumn;
     }
-	
+
     private RECORD_FORMAT = {
 		id: IQualifiedKey,
 		heights: {} as RecordHeightsFormat<IAttributeColumn>,
@@ -276,14 +277,14 @@ export default class C3BarChart extends AbstractC3Tool
 		var columns = this.heightColumns.getObjects(IAttributeColumn);
 		for (var index in columns)
 		{
-			var column = columns[index]; 
+			var column = columns[index];
 			var columnName:string = column.getMetadata("title");
 			columnNamesToColor[columnName] = this.chartColors.getHexColor(Number(index), 0, columns.length - 1);
 		}
 
 		if (this.probeKeySet)
 			this.probeKeySet.replaceKeys([qKey]);
-		
+
 		var heightColumns = this.heightColumns.getObjects(IAttributeColumn);
         this.toolTip.show(this, this.chart.internal.d3.event, [qKey], heightColumns);
 		if (heightColumns.length > 1)
@@ -298,7 +299,7 @@ export default class C3BarChart extends AbstractC3Tool
 		this.RECORD_FORMAT.heights.xLabel = this.labelColumn;
 		this.RECORD_DATATYPE.heights = _.zipObject(this.heightColumns.getNames(), columns.map(() => Number)) as any;
 		this.RECORD_DATATYPE.heights.xLabel = String;
-		
+
         this.heightColumnNames = this.heightColumns.getNames();
         this.heightColumnsLabels = columns.map(column => Weave.lang(column.getMetadata("title")));
 
@@ -334,10 +335,10 @@ export default class C3BarChart extends AbstractC3Tool
         }
 
         var keys = {
-			x: "", 
+			x: "",
 			value: new Array<string>()
 		};
-        
+
 		// if label column is specified
         if (this.labelColumn.target)
         {
@@ -371,9 +372,9 @@ export default class C3BarChart extends AbstractC3Tool
 
 		// any reason to cloneDeep here?
         var data:c3.Data = _.cloneDeep(this.c3Config.data);
-		
+
         data.json = _.pluck(this.records, 'heights');
-        
+
 		//need other stuff for data.json to work
 		//this can potentially override column names
 		//c3 limitation
@@ -392,7 +393,7 @@ export default class C3BarChart extends AbstractC3Tool
 
 		let selectionEmpty:boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
 		let thinBars:boolean = this.chart.internal.width <= this.records.length;
-	
+
         this.heightColumnNames.forEach((item:string) => {
 			d3.select(this.element)
 				.selectAll("g")
@@ -452,6 +453,73 @@ export default class C3BarChart extends AbstractC3Tool
 			return Weave.lang('');
 
 		return Weave.lang("{0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
+	}
+
+	public updateAltText():void
+	{
+		var description:string = Weave.lang("Bar Chart showing ");
+
+		for(var i:number = 0; i < this.heightColumns.getObjects().length; i++)
+		{
+			description += ColumnUtils.getTitle(this.heightColumns.getObjects()[i] as IAttributeColumn) + ", ";
+		}
+
+		description += "sorted by ";
+
+		description += ColumnUtils.getTitle(this.sortColumn);
+
+		description += '\n';
+
+		var heights = this.heightColumns.getObjects();
+		if(heights.length == 1)
+		{
+			var heightColumn:IAttributeColumn = heights[0] as IAttributeColumn;
+			var statsHeight:IColumnStatistics = weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(heightColumn);
+			var max = statsHeight.getMin();
+			var min = statsHeight.getMax();
+			var average = statsHeight.getMean();
+			var tmp:number;
+			var max_keys:IQualifiedKey[] = [];
+			var min_keys:IQualifiedKey[]= [];
+
+			for (var k of heightColumn.keys)
+			{
+				tmp = heightColumn.getValueFromKey(k)
+				if(tmp > max)
+					max = tmp;
+				if(tmp < min)
+					min = tmp;
+			}
+
+			for (k of heightColumn.keys)
+			{
+				if(Math.abs(heightColumn.getValueFromKey(k) - max) < 0.001)
+					max_keys.push(k);
+				if(Math.abs(heightColumn.getValueFromKey(k) - min) < 0.001)
+					min_keys.push(k);
+			}
+
+			description += Weave.lang("The maximum {0} is {1} when {2} is ", ColumnUtils.getTitle(heightColumn), max, ColumnUtils.getTitle(this.sortColumn));
+			for (k of max_keys)
+			{
+				description += " " + this.sortColumn.getValueFromKey(k);
+			}
+
+			description += ".";
+			description += '\n';
+			description += Weave.lang("The minimum {0} is {1} when {2} is", ColumnUtils.getTitle(heightColumn), min, ColumnUtils.getTitle(this.sortColumn));
+
+			for (k of min_keys)
+			{
+				description += " " + this.sortColumn.getValueFromKey(k);
+			}
+
+			description += ".";
+			description += "\n";
+
+			description += Weave.lang("The average value is {0}.", StandardLib.roundSignificant(average, 2));
+		}
+		this.altText.value = description;
 	}
 
     protected validate(forced:boolean = false):boolean

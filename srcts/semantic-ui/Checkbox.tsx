@@ -79,7 +79,7 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 				                         name={this.props.name}
 				                         onChange={this.handleChange}
 				                         />
-				{this.props.label ? <label>{this.props.label}</label>:null}
+				{this.props.label ? <label>{this.props.label || " "}</label>:null}
 			</div>
 		);
 	}

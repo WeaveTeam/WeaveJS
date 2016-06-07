@@ -18,7 +18,6 @@ import SmartComponent from "./ui/SmartComponent";
 import classNames from "./modules/classnames";
 import DraggableDiv from "./react-ui/DraggableDiv";
 import {AbstractLayout, AnyAbstractLayout} from "./layouts/AbstractLayout";
-import MouseUtils from "./utils/MouseUtils";
 import LinkableString = weavejs.core.LinkableString;
 import IAltText = weavejs.api.ui.IAltText;
 
