@@ -90,7 +90,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		// layer description style set to flex value 1 to take up the remaining space
 
 		return <HBox key={"layerItem" + index} style={ {alignItems: "center", padding: "4px"} }
-		             className={layer == this.state.selectedLayer ? "weave-list-Item-selected" : "weave-list-Item"}
+		             className={layer == this.state.selectedLayer ? "weave-list-item-selected" : "weave-list-item"}
 		             onMouseDown={ () => {
 		                                    if (this.state.selectedLayer != layer)
 		                                        this.setState({selectedLayer: layer});
