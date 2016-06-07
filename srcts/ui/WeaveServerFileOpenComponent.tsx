@@ -167,7 +167,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 						</FileInfoView>
 					</VBox>
 				</HBox>
-				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={weavejs.net.Admin.service} onSuccess={this.handleSuccess} onCancel={this.handleCancel} context={this.dimmerSelector}/>
+				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={weavejs.net.Admin.service} onSuccess={this.handleSuccess} onCancel={this.handleCancel} context={this.props.context}/>
 			</VBox>
 		);
 	}

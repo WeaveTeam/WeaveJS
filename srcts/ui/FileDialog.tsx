@@ -121,7 +121,7 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		let fileSource = this.state.selected;
 		let EditorClass = FileDialog.storageRegistry.get(fileSource);
 		if (EditorClass)
-			editorJsx = <EditorClass openFileHandler={this.props.openFileHandler} openUrlHandler={this.props.openUrlHandler} openHandler={this.openHandler}/>;
+			editorJsx = <EditorClass openFileHandler={this.props.openFileHandler} openUrlHandler={this.props.openUrlHandler} openHandler={this.openHandler} context={this.props.context}/>;
 		let listOptions:ListOption[] = FileDialog.listItems.map((fileSource:any) => {
 			return {
 				label: (
