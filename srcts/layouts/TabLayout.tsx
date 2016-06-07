@@ -4,6 +4,7 @@ import WeaveComponentRenderer from "../WeaveComponentRenderer";
 import {AbstractLayout, LayoutProps} from "./AbstractLayout";
 import Tabs from "../react-ui/Tabs";
 import {HBox} from "../react-ui/FlexBox";
+import InteractiveTour from "../react-ui/InteractiveTour";
 import ReactUtils from "../utils/ReactUtils";
 import MiscUtils, {Structure} from "../utils/MiscUtils";
 import CenteredIcon from "../react-ui/CenteredIcon";
@@ -188,6 +189,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		var state = this.getSessionState();
 		state.activeTabIndex = indexFromTabsComponent - this.leadingTabsLength;
 		this.setSessionState(state);
+		InteractiveTour.targetComponentOnClick(state.tabs[state.activeTabIndex].label)
 	};
 
 	private getPanelIndex(id:WeavePathArray):number
@@ -334,6 +336,8 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								className="weave-padded-hbox"
 								onDragOver={(event) => this.onDragOverTab(tab)}
 								onDragLeave={this.onDragLeaveTab}
+								id={tab.label}
+				                ref={InteractiveTour.getMountedTargetComponent}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.setTabLabel(tab.id, newName)} textContent={tab.label}/>*/}
 								{tab.label}

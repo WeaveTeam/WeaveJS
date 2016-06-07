@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
+import InteractiveTour from "./InteractiveTour";
 import {MenuItemProps} from "./Menu";
 import Menu from "./Menu";
 import Dropdown from "../semantic-ui/Dropdown";
@@ -130,7 +131,6 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 			this.showMenu(index);
 		}
 	}
-	
 	renderMenuBarItem(index:number, props:MenuBarItemProps):JSX.Element
 	{
 		var menuBarClass = classNames({
@@ -142,16 +142,17 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		let dropdownProps:DropdownProps = {
 			className:menuBarClass,
 			menu:this.props.config[index].menu,
-			ref:index as any,
 			key:index,
 			action:"hide",
 			duration: 0,
+			id:props.label,
+			ref: InteractiveTour.isEnabled() ? InteractiveTour.getMountedTargetComponent : String(index),
 			onClick:() => {
 				this.onClick(index,null);
+				InteractiveTour.targetComponentOnClick(props.label)
 			},
 			onMouseEnter:this.onMouseEnter.bind(this, index),
 		};
-
 		return (
 			<Dropdown {...dropdownProps}>
 				{props.label}

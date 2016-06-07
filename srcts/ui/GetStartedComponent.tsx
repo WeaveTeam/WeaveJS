@@ -3,19 +3,17 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox,VBox} from  "../react-ui/FlexBox";
 import InteractiveTour from  "../react-ui/InteractiveTour";
-import FileDialog from  "../ui/FileDialog";
-import {LandingPageView} from "./LandingPage";
-
+import {LandingPageView} from "../LandingPage";
+import MiscUtils from "../utils/MiscUtils";
 
 export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComponent>
 {
-	//loader:(initialWeaveComponent:string)=>void;
 	onViewSelect:(view:LandingPageView)=>void;
+	showInteractiveTourList?:boolean;
 }
 
 export interface GetStartedComponentState
 {
-	//visible?:boolean;
 	showInteractiveTourList?:boolean;
 }
 
@@ -25,14 +23,18 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	{
 		super(props);
 		this.state = {
-			//visible:true,
-			showInteractiveTourList:false
+			showInteractiveTourList:props.showInteractiveTourList != undefined ? props.showInteractiveTourList:false
 		}
 	}
 
 	componentWillReceiveProps(nextProps:GetStartedComponentProps)
 	{
-		
+		if(this.props.showInteractiveTourList != nextProps.showInteractiveTourList)
+		{
+			this.setState({
+				showInteractiveTourList:nextProps.showInteractiveTourList != undefined ? nextProps.showInteractiveTourList:false
+			});
+		}
 	}
 
 	enableInteractiveTourList=()=>
@@ -44,11 +46,25 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 
 	private items:any = {
 		csvToViz:{
-			steps:["CSV file", "Open file","Preview"],
+			steps:["CSV file", "Location","Preview","Sheet 1","Charts"],
+			stepPointers:["CSV file", "Open file",null,"Sheet 1","Charts"],
 			contents:[
 				"Click on CSV file to load rows of data for visualization",
 				"Click on open a file button to load CSV file from your local machine",
-				"In this table you can see the downloaded data"
+				"In this table you can see the downloaded data",
+				"Click on Layout Tab to add charts of your choice",
+				"Click on charts to select visualization chart of your choice"
+			]
+		},
+		multipleTabViz:{
+			steps:["CSV file", "Location","Preview","Sheet 1","Charts"],
+			stepPointers:["CSV file", "Open file",null,"Sheet 1","Charts"],
+			contents:[
+				"Click on CSV file to load rows of data for visualization",
+				"Click on open a file button to load CSV file from your local machine",
+				"In this table you can see the downloaded data",
+				"Click on Sheet Tab to add charts of your choice",
+				"Click on charts to select visualization chart of your choice"
 			]
 		}
 	};
@@ -57,9 +73,13 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	{
 		InteractiveTour.steps = this.items[itemName].steps ;
 		InteractiveTour.stepContents = this.items[itemName].contents ;
+		InteractiveTour.stepPointers = this.items[itemName].stepPointers ;
+		if(this.props.onViewSelect)
+			this.props.onViewSelect("tour");
 	};
 
 	render() {
+		let urlParams:any = MiscUtils.getUrlParams();
 
 		let containerStyle:React.CSSProperties = {
 			position:"absolute",
@@ -82,24 +102,24 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		};
 
 
-		let guidanceListUI:JSX.Element  = null;
+		let interactiveTourListUI:JSX.Element  = null;
 		if(this.state.showInteractiveTourList)
 		{
-			guidanceListUI = <VBox style={ {position:"relative"} } className="weave-guidance-list">
+			interactiveTourListUI = <VBox style={ {position:"relative", fontFamily:"inherit"} } className="weave-guidance-list">
 								<span className="weave-guidance-list-item"
 								      onClick={ ()=>this.interactiveListItemClick("csvToViz") }>
-									1. CSV Data to Visualization
+									1.  CSV Data to Visualization
 								</span>
 							</VBox>
 		}
 
 		let styleObj:React.CSSProperties = _.merge({},this.props.style,{position:"relative"});
 
+
 		let itemTextStyle:React.CSSProperties = {
 			textAlign:"center"
 		};
 
-		/*onClick={this.enableInteractiveTourList}*/
 
 		let disableStyle:React.CSSProperties = {
 			borderColor: "grey",
@@ -108,7 +128,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		};
 
 		// empty div required to move the getStarted item in center of the screen
-		let emptyDiv:JSX.Element = guidanceListUI? null : <div/>;
+		let emptyDiv:JSX.Element = interactiveTourListUI? null : <div/>;
 
 		// important for logo to have position relative as the container's one of the child is absolute
 		/* both padded vbox and hbox class are added to getStarted container, as flex wrap is used , we can expect column layout when screen size is reduced, this ensures spacing*/
@@ -119,8 +139,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 					<h1 style={ {position:"relative", whiteSpace: "nowrap"} } className="weave-getstarted-logo">
 						Weave <span style={ {color:"rgb(236, 131, 89)"} }>2</span>
 					</h1>
-
-					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} }>
+					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} } >
 						<VBox key="data"
 						      className="weave-getstarted-item"
 						      onClick={()=>this.props.onViewSelect("default") }>
@@ -139,16 +158,19 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						</VBox>
 						<VBox key="tutorials"
 						      className="weave-getstarted-item"
-						      style={ {cursor:"default"} }
+						      style={ Boolean(urlParams.enableTour) ? {cursor:"pointer"} : {cursor:"default"} }
+						      onClick={Boolean(urlParams.enableTour) ? this.enableInteractiveTourList : null}
 						      >
-							<div style={ disableStyle } className="weave-getstarted-item-icon">
+							<div style={ Boolean(urlParams.enableTour) ? {} : disableStyle } className="weave-getstarted-item-icon">
 								<i className="fa fa-book"></i>
 							</div>
-							<span style={ disableStyle }><span style={ disableStyle }> Interactive Tour</span></span>
+							<span style={ Boolean(urlParams.enableTour) ? itemTextStyle : disableStyle }>
+								Interactive <span style={ Boolean(urlParams.enableTour) ? {color:"rgb(236, 131, 89)"} : disableStyle }> Tour</span>
+							</span>
 						</VBox>
 					</HBox>
 					{emptyDiv}
-					{guidanceListUI}
+					{interactiveTourListUI}
 
 				</div>
 			</div>);

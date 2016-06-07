@@ -6,6 +6,7 @@ import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
 import WeaveTree from "../ui/WeaveTree";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import InteractiveTour from "../react-ui/InteractiveTour";
 import Input from "../semantic-ui/Input";
 import Button from "../semantic-ui/Button";
 
@@ -93,7 +94,9 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 									className={"right labeled" + (this.state.validExtension ? "" : " warning") + (this.props.className ?  (" " + this.props.className):"")}
 									ref={linkReactStateRef(this, {value: this.props.targetUrl}, 500)}/>
 				<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
-					<Button style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: 0, whiteSpace: "nowrap", border: "1px solid #E0E1E2"}}>
+					<Button style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: 0, whiteSpace: "nowrap", border: "1px solid #E0E1E2"}}
+					        id="Open file"
+					        ref={InteractiveTour.getPointerTargetComponent}>
 						{Weave.lang("Open file")}
 					</Button>
 				</FileInput>

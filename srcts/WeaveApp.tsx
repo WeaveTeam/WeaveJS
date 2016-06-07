@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import prefixer from "./react-ui/VendorPrefixer";
 import SideBarContainer from "./react-ui/SideBarContainer";
 import {VBox} from "./react-ui/FlexBox";
+import InteractiveTour from "./react-ui/InteractiveTour";
 import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import MiscUtils from "./utils/MiscUtils";
@@ -43,12 +44,14 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 	readUrlParams?:boolean;
 	showFileDialog?:boolean;
 	initializeTabs?:boolean;
+	enableTour?:boolean;
+	onClose?:()=>void;
 }
 
 export interface WeaveAppState
 {
 	toolPathToEdit?:WeavePathArray;
-	initialWeaveComponent?:string;
+	enableTour?:boolean;
 }
 
 export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
@@ -75,8 +78,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		super(props);
 		
 		this.state = {
-			toolPathToEdit: null,
-			initialWeaveComponent:null
+			toolPathToEdit: null
 		};
 		
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
@@ -179,9 +181,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				this.forceUpdate();
 			}
 		}
-
 		if (this.props.showFileDialog)
 			FileDialog.open(this.menus.context, this.menus.fileMenu.load, true /* skip confirmation dialog */);
+		this.setState({
+			enableTour:this.props.enableTour
+		});
 	}
 
 	handleSideBarClose=(editor:WeaveToolEditor)=>
@@ -547,12 +551,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		ReactUtils.getWindow(this).removeEventListener("beforeunload", this.handleUnload);
 	}
 
-	initialLoadingForBlankSession=(initialComponentName:string):void=>{
-		this.setState({
-			initialWeaveComponent:initialComponentName
-		});
-
-	};
 
 	get enableMenuBar():LinkableBoolean
 	{
@@ -634,10 +632,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		progressBarUI = <WeaveProgressBar/>;
 
 
-		// if (this.state.initialWeaveComponent == GetStartedComponent.INTERACTIVETOUR)
-		// {
-		// 	interactiveTourComponent = <InteractiveTour/>
-		// }
+		if (this.state.enableTour)
+		{
+		 	interactiveTourComponent = <InteractiveTour onClose={this.props.onClose}/>
+		}
 
 
 		return (

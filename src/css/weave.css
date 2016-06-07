@@ -746,7 +746,15 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	padding-left: 20%;
 	padding-right: 20%;
 	font-family: 'Michroma', sans-serif;  /* matched our iweave.com font family theme */
+	-webkit-animation:animateChildren .2s 1 ease;
+	animation:animateChildren .2s 1 ease;
 }
+
+.weave-getstarted:nth-child(1) {
+	-webkit-animation: flexGrow 1.2s ease forwards;
+	animation: flexGrow 1.2ms ease forwards;
+}
+
 
 .weave-getstarted-logo { /* matched our iweave.com theme */
 	color: white;
@@ -764,7 +772,7 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	align-items: center;
 	font-size: 18px;
 	cursor: pointer;
-	margin-bottom:16px; /* required to space between each item , when screen size is reduced*/
+	margin-bottom:24px; /* required to space between each item , when screen size is reduced*/
 }
 .weave-getstarted-item-icon {
 	border: 4px solid rgb(236, 131, 89);
@@ -776,7 +784,7 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	justify-content: center;
 	border-radius: 50%;
 	font-size: 40px;
-	margin-bottom:8px;/* required to space between  icon and text */
+	margin-bottom:16px;/* required to space between  icon and text */
 }
 
 .weave-getstarted-item-icon:hover {
@@ -786,8 +794,11 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 
 
 .weave-guidance-list {
+	flex:0.0001; /* 0 does not work so we have to use a small number */
 	color:rgb(236, 131, 89);
 	font-size: 16px;
+	-webkit-animation:flexGrow 500ms ease forwards;/* animation will give .5 for flex value */
+	animation:flexGrow 500ms ease forwards;
 }
 
 .weave-guidance-list-item {
@@ -801,12 +812,107 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	color:white;
 	z-index:1;
 	box-shadow: 0 2px 8px rgba(0,0,0,.4);
-	border: 1px solid #FFBE00;
+	/*border: 1px solid #FFBE00;*/
 }
 
 .weave-guidance-toolTip-arrow {
-	border: 8px solid #FFBE00;
+	border: 8px solid black;
+	/*border: 8px solid #FFBE00;*/
 }
+
+.weave-guidance-pointer{
+	width: 32px;
+	height: 32px;
+}
+
+.weave-guidance-pointer-inner{
+	-webkit-animation:pointer-inner 1.2s infinite ease-in-out;
+	animation:pointer-inner 1.2s infinite ease-in-out;
+	background-color: rgba(255, 165, 0, 1);
+	opacity: .7;
+}
+
+.weave-guidance-pointer-outer{
+	-webkit-animation: pointer-outer 1.2s infinite ease-in-out;
+	animation: pointer-outer 1.2s infinite ease-in-out;
+	background-color: rgba(255, 165, 0, 0.2);
+	border: 2px solid #FFA500;
+	opacity: .9;
+}
+/* Pointer Outer circle Animation */
+/* Chrome, Safari, Opera */
+@-webkit-keyframes pointer-outer {
+	0% {
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+	45% {
+		opacity: .7;
+		-webkit-transform: scale(.75);
+		transform: scale(.75);
+	}
+	100% {
+		opacity: .9;
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+}
+
+/* Standard syntax */
+@keyframes pointer-outer {
+	0% {
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+	45% {
+		opacity: .7;
+		-webkit-transform: scale(.75);
+		transform: scale(.75);
+	}
+	100% {
+		opacity: .9;
+		-webkit-transform: scale(1);
+		transform: scale(1);
+	}
+}
+
+/* Pointer Inner circle Animation */
+/* Chrome, Safari, Opera */
+@-webkit-keyframes pointer-inner {
+	20% {
+		opacity: .9;
+	}
+	90% {
+		opacity: .7;
+	}
+}
+
+/* Standard syntax */
+@keyframes pointer-inner {
+	20% {
+		opacity: .9;
+	}
+	90% {
+		opacity: .7;
+	}
+}
+
+/* Flex Children Addition Animation */
+/* Chrome, Safari, Opera */
+@-webkit-keyframes flexGrow {
+	to {
+		flex: .5;
+	}
+
+}
+/* Standard syntax */
+@keyframes  flexGrow {
+	to {
+		flex: .5;
+	}
+}
+
+
 
 
 /****** Layout - Tab *********/

@@ -5,7 +5,7 @@ import MiscUtils from "./utils/MiscUtils";
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
-export declare type LandingPageView = "splash"|"default"|"file";
+export declare type LandingPageView = "splash"|"default"|"file"|"tour list" |"tour";
 
 export interface LandingPageProps
 {
@@ -21,7 +21,7 @@ export interface LandingPageState
 
 export default class LandingPage extends React.Component<LandingPageProps, LandingPageState>
 {
-	urlParams:any;
+	urlParams:any;  
 
 	constructor(props:LandingPageProps)
 	{
@@ -47,28 +47,26 @@ export default class LandingPage extends React.Component<LandingPageProps, Landi
 		this.state = {view};
 	}
 
+	loadGetStartedComponentWithTourList=()=>{
+		this.props.weave.history.clearHistory(); // important to clear the hsitory created by prev tour
+		this.props.weave.root.removeAllObjects(); // important to clear the all the session state object created by prev tour
+		this.setState({
+			view:"tour list"
+		});
+	};
+
 	render():JSX.Element
 	{
-		// let skipBlankPageIntro:boolean = this.urlParams ? StandardLib.asBoolean(this.urlParams.skipBlankPageIntro) : false;
-		//
-		// // check in loaded weave session state to skip BlankPageIntro
-		// if (weave.root.getObjects(weavejs.api.data.IDataSource).length > 0 || weave.root.getObjects(weavejs.core.LinkablePlaceholder).length > 0)
-		// {
-		// 	skipBlankPageIntro = true;
-		// }
-		//
-		// // check in interaction event in GetStartedcomponent to skip BlankPageIntro
-		// if (this.state.initialWeaveComponent)
-		// {
-		// 	skipBlankPageIntro = true;
-		// }
 
-		if (this.state.view == "splash")
+		if (this.state.view == "splash" || this.state.view == "tour list")
 		{
 			return (
-				<GetStartedComponent style={ {width: "100%", height: "100%"} } onViewSelect={(view:LandingPageView) => {this.setState({view})}} />
+				<GetStartedComponent style={ {width: "100%", height: "100%"} }
+				                     showInteractiveTourList={this.state.view == "tour list"}
+				                     onViewSelect={(view:LandingPageView) => {this.setState({view})}} />
 			);
 		}
+
 
 		return (
 			<WeaveApp
@@ -76,7 +74,9 @@ export default class LandingPage extends React.Component<LandingPageProps, Landi
 				weave={this.props.weave}
 				style={{width: "100%", height: "100%"}}
 				showFileDialog={this.state.view == "file"}
+				enableTour={this.state.view == "tour"}
 				readUrlParams={true}
+			    onClose={this.loadGetStartedComponentWithTourList}
 			/>
 		)
 	}
