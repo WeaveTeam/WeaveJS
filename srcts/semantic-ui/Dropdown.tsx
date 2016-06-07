@@ -6,6 +6,7 @@ import SmartComponent from "../ui/SmartComponent";
 import {MenuItemProps} from "../react-ui/Menu";
 import Menu from "../react-ui/Menu"
 import classNames from "../modules/classnames";
+import ReactUtils from "../utils/ReactUtils";
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
@@ -22,6 +23,7 @@ export interface DropdownProps extends React.HTMLProps<Dropdown>
 	on?:string;
 	duration?: number;
 	open?:boolean;
+	keepOnScreen?:boolean;
 }
 
 export interface DropdownState
@@ -72,10 +74,11 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			onClick: (index:number) => {
 				this.props.onClick && this.props.onClick(null);
 			},
-			context: this.props.context || window,
+			context: (this.props.context && ReactUtils.getDocument(this.props.context)) || window,
 			direction: this.props.direction || 'auto',
 			action: this.props.action || 'activate',
 			on: this.props.on || 'click',
+			keepOnScreen: this.props.keepOnScreen || true,
 			duration: this.props.duration
 		});
 
