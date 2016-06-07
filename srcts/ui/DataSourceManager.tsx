@@ -52,7 +52,7 @@ export interface IDataSourceManagerProps
 
 export interface IDataSourceManagerState
 {
-
+	selected?:IDataSource;
 }
 
 export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
@@ -69,14 +69,12 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
 		.set(GroupedDataTransform, GroupedDataTransformEditor);
 
-	private selectedDataSource:IDataSource;
-	private indexOfSelectedDataSource:number;
+	private selectedIndex:number = 0;
 
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
-		this.selectedDataSource = props.weave.root.getObjects(IDataSource)[0];
-		this.indexOfSelectedDataSource = 0;
+		this.state = {};
 	}
 
 	componentDidMount()
@@ -100,22 +98,28 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		this.forceUpdate();
 	}
 
-	setSelectedDataSource=(dataSource:IDataSource, forceUpdate?:boolean)=>
+	setSelectedDataSource=(dataSource:IDataSource)=>
 	{
-		let dataSources = this.props.weave.root.getObjects(IDataSource);
-		this.selectedDataSource = dataSource;
-		this.indexOfSelectedDataSource = dataSources.findIndex((ds) => ds == dataSource);
-		if (forceUpdate)
-			this.forceUpdate();
+		this.setState({
+			selected: dataSource
+		});
 	}
 
-	getSelectedDataSource=()=>
+	getSelectedDataSource()
 	{
-		if (Weave.wasDisposed(this.selectedDataSource))
+		let sources = this.props.weave.root.getObjects(IDataSource);
+		var selected = this.state.selected;
+		if (!selected || Weave.wasDisposed(selected))
 		{
-			return this.props.weave.root.getObjects(IDataSource)[this.indexOfSelectedDataSource];
+			this.selectedIndex = Math.max(0, Math.min(this.selectedIndex, sources.length - 1));
+			selected = sources[this.selectedIndex];
 		}
-		return this.selectedDataSource;
+		else
+		{
+			this.selectedIndex = sources.indexOf(selected);
+		}
+		
+		return selected;
 	}
 
 	refreshDataSource(dataSource:IDataSource)
@@ -128,16 +132,14 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		if (name)
 		{
 			var names = root.getNames();
-			var dataSourceCopy = root.requestObjectCopy(name, dataSource);
+			root.requestObjectCopy(name, dataSource);
 			root.setNameOrder(names);
-			this.setSelectedDataSource(dataSourceCopy);
 		}
 	}
 
 	removeDataSource(dataSource:IDataSource)
 	{
 		let root = this.props.weave.root;
-		let dataSources = this.props.weave.root.getObjects(IDataSource);
 		root.removeObject(root.getName(dataSource));
 	}
 
@@ -201,7 +203,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 											options={listOptions}
 											multiple={false}
 											selectedValues={ [dataSource] }
-											onChange={ (selectedValues:IDataSource[]) => { this.setSelectedDataSource(selectedValues[0], true);  }}
+											onChange={ (selectedValues:IDataSource[]) => { this.setSelectedDataSource(selectedValues[0]);  }}
 										/>
 									:	<div className="weave-list-item" style={{alignSelf: "flex-start", cursor: "default"}}>
 											{Weave.lang("(None)")}
@@ -212,7 +214,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						<VBox className="ui inverted segment" style={{overflow: "auto", padding: 0, flex: 1}}>
 							<div className="ui medium header" style={{ paddingLeft: 14, paddingTop: 14}}>{Weave.lang("Add more data sources")}</div>
 							{
-								DataMenu.getDataSourceItems(this.props.weave, (ds) => this.setSelectedDataSource(ds, true)).map((dsItem, index) => {
+								DataMenu.getDataSourceItems(this.props.weave, this.setSelectedDataSource).map((dsItem, index) => {
 									return dsItem.shown
 										?   <HBox key={index}
 										          id={dsItem.label as string}
