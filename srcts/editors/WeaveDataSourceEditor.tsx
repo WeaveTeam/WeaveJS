@@ -51,6 +51,19 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			}
 		}
 	}
+
+	get service()
+	{
+		return weavejs.net.WeaveAdminService.getInstance(WeaveDataSourceEditor.getBaseUrl((this.props.dataSource as WeaveDataSource).url.value));
+	}
+
+	private static getBaseUrl(serviceUrl: string): string {
+		if (!serviceUrl) return "/WeaveServices";
+		/* TODO: Use a proper URL parsing library to get the base URL */
+		let pathComponents = serviceUrl.split('/');
+		pathComponents.pop();
+		return pathComponents.join('/');
+	}
 	
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
@@ -79,11 +92,11 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Import Data to Server"),
-				<Button onClick={() => SqlImport.open(this, ds, null)}>{Weave.lang("Import from SQL...")}</Button>
+				<Button onClick={() => SqlImport.open(this, this.service, null)}>{Weave.lang("Import from SQL...")}</Button>
 			],
 			[
 				Weave.lang("Manage Server"),
-				<Button onClick={() => ConnectionManager.open(this, ds, null) }>{Weave.lang("Manage users and connections") }</Button>
+				<Button onClick={() => ConnectionManager.open(this, this.service, null) }>{Weave.lang("Manage users and connections") }</Button>
 			]
 		];
 		return super.editorFields.concat(editorFields)

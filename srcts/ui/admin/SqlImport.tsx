@@ -19,7 +19,7 @@ import WeaveAdminService = weavejs.net.WeaveAdminService;
 
 export interface ISqlImportProps extends React.HTMLProps<SqlImport>
 {
-	dataSource: WeaveDataSource;
+	service: WeaveAdminService;
 	selectIdFunc: (id: number) => void;
 }
 
@@ -42,15 +42,12 @@ export interface ISqlImportState
 }
 
 export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImportState>
-{
-	private service:WeaveAdminService;
+{	
 	private login: ServiceLogin;
 
 	constructor(props:ISqlImportProps)
 	{
 		super(props);
-
-		this.service = new WeaveAdminService(SqlImport.getBaseUrl(props.dataSource.url.value));
 
 		this.state = {
 			append: false,
@@ -69,28 +66,9 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			errors: []
 		};
 
+		this.login = new ServiceLogin(this, this.props.service);
+
 		this.updateKeyTypeSuggestions();
-	}
-
-	private static getBaseUrl(serviceUrl:string):string
-	{
-		if (!serviceUrl) return "/WeaveServices";
-		/* TODO: Use a proper URL parsing library to get the base URL */
-		let pathComponents = serviceUrl.split('/');
-		pathComponents.pop();
-		return pathComponents.join('/');
-	}
-
-	componentWillReceiveProps(nextProps:ISqlImportProps)
-	{
-		if (this.props && this.props.dataSource !== nextProps.dataSource)
-		{
-			Weave.getCallbacks(nextProps.dataSource)
-		}
-	}
-
-	updateService = () => {
-
 	}
 
 	updateSchemas = () => {
@@ -103,7 +81,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	updateTables=(schema:string)=>
 	{
 		if (schema)
-			this.service.getSQLTableNames(schema).then(
+			this.props.service.getSQLTableNames(schema).then(
 				(tableOptions: string[]) => this.setState({ tableOptions }),
 				this.handleError
 			);
@@ -112,7 +90,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	updateColumns=(schema:string, table:string)=>
 	{
 		if (schema && table)
-			this.service.getSQLColumnNames(schema, table).then(
+			this.props.service.getSQLColumnNames(schema, table).then(
 				(columnOptions: string[]) => this.setState({columnOptions}),
 				this.handleError
 			);
@@ -120,7 +98,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 
 	updateKeyTypeSuggestions=()=>
 	{
-		this.service.getKeyTypes().then(
+		this.props.service.getKeyTypes().then(
 			(keyTypeSuggestions:string[])=> this.setState({keyTypeSuggestions}),
 			this.handleError
 		)
@@ -131,7 +109,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 		if ((error.message as string).startsWith(WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION) ||
 			(error.message as string).startsWith("RemoteException: Incorrect username or password."))
 		{
-			if (this.login) this.login.open();
+			if (this.login) this.login.open(() => this.updateSchemas(), () => PopupWindow.close(SqlImport.window));
 		}
 		else
 		{
@@ -142,7 +120,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	testKeyColumn=()=>
 	{
 		if (this.state.schema && this.state.table && this.state.keyColumn)
-			this.service.checkKeyColumnsForSQLImport(
+			this.props.service.checkKeyColumnsForSQLImport(
 				this.state.schema, this.state.table, [this.state.keyColumn]
 			).then(
 				()=>this.setState({keyColumnValid: true}),
@@ -157,15 +135,13 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	{
 		/* TODO: Feedback: on success, close the dialog, on failure update a status widget with the error message. */
 		this.setState({ importInProgress: true });
-		this.service.importSQL(
+		this.props.service.importSQL(
 			this.state.schema, this.state.table, this.state.keyColumn,
 			null /*secondaryKeyColumnName, deprecated */, this.state.displayName,
 			this.state.keyType, this.state.filteredKeyColumns, this.state.append
 		).then(
 			(newId: number) => {
-				this.setState({ importInProgress: false });
-				let ds = this.props.dataSource;
-				ds.hierarchyRefresh.triggerCallbacks();
+				this.setState({ importInProgress: false });;
 				this.props.selectIdFunc(newId);
 				PopupWindow.close(SqlImport.window);
 			},
@@ -177,7 +153,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	}
 
 	static window: PopupWindow;
-	static open(context:React.ReactInstance, ds:WeaveDataSource, selectIdFunc?: (id:number)=>void)
+	static open(context:React.ReactInstance, service:WeaveAdminService, selectIdFunc?: (id:number)=>void)
 	{
 		if (SqlImport.window)
 			PopupWindow.close(SqlImport.window);
@@ -186,7 +162,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			context,
 			{
 				title: Weave.lang("Import from SQL"),
-				content: <SqlImport dataSource={ds} selectIdFunc={selectIdFunc || _.noop}/>,
+				content: <SqlImport service={service} selectIdFunc={selectIdFunc || _.noop}/>,
 				resizable: true,
 				width: 920,
 				height: 675,
@@ -353,7 +329,6 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 						</div>
 					</div>
 				</div>
-				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onCancel={() => PopupWindow.close(SqlImport.window) } onSuccess={() => this.updateSchemas()} detachable={true}/>
 			</VBox>
 		)
 	}
