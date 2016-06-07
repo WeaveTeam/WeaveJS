@@ -194,13 +194,13 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 					<VBox className="ui vertical attached segments" style={{flex:1, justifyContent:"space-between"}}>
 						<VBox className="ui basic inverted segment" style={{flex: 2, overflow: "auto", padding: 0}}>
 							<div className="ui medium header" style={{padding: 0, paddingLeft: 14, paddingTop: 14}}>{Weave.lang("Connected data sources")}</div>
-							<VBox>
-								<List
+							<VBox style={{alignItems: listOptions.length ? null:"center"}}>
+								{listOptions.length ? <List
 									options={listOptions}
 									multiple={false}
 									selectedValues={ [dataSource] }
 									onChange={ (selectedValues:IDataSource[]) => { this.setSelectedDataSource(selectedValues[0], true);  }}
-								/>
+								/>:<div>{Weave.lang("(None)")}</div>}
 							</VBox>
 						</VBox>
 						<VBox className="ui inverted segment" style={{overflow: "auto", padding: 0, flex: 1}}>
