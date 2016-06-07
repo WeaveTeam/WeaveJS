@@ -20,63 +20,60 @@ export interface ILoginState
 export default class Login extends React.Component<ILoginProps, ILoginState> {
 
 	element:Element;
-	username:HTMLInputElement;
-	password:HTMLInputElement;
-	form:HTMLDivElement;
+	static username:HTMLInputElement;
+	static password:HTMLInputElement;
+	static form:HTMLDivElement;
+
+	static window:PopupWindow;
 
 	constructor(props:ILoginProps)
 	{
 		super(props);
 	}
 
-	close()
+	static close()
 	{
-		($(this.element) as any).modal('hide');
+		PopupWindow.close(Login.window);
+		Login.window = null;
 	}
 
-	open(context:Element, detachable:boolean = false)
+	static open(context:React.ReactInstance, handleLogin:(fields:{username:string, password:string})=>void, handleCancel:()=>void)
 	{
-		let selector = $(this.form) as any;
-		let loginSelector = ($(this.element) as any);
-		loginSelector.modal({
-				closable: false,
-				onDeny    : () => {
-					this.props.onCancel && this.props.onCancel();
-					false;
-				},
-				onApprove : () => {
-					selector.submit();
-					return false;
-				},
-				detachable,
-				transition: "fade",
-				context,
-			});
-		if(context)
-			loginSelector.modal({
-				context
-			});
-		loginSelector.modal('show');
+		if (Login.window)
+			PopupWindow.close(Login.window);
+
+		Login.window = PopupWindow.open(context, {
+			title: Weave.lang("Weave Server Login"),
+			content:
+				<Login onLogin={handleLogin} onCancel={handleCancel}/>,
+			footerContent: <div/>,
+			resizable: false,
+			draggable: false,
+			modal: true,
+			suspendEnter: true,
+			width: 400,
+			onClose: Login.close
+		});
 	}
 	
-	invalid()
+	static invalid()
 	{
-		let selector = $(this.form) as any;
+		let selector = $(Login.form) as any;
 		selector.form('clear');
 		selector.form('add errors', {
 			username: Weave.lang("Incorrect Login Credentials")
 		});
-		this.username.focus()
+		Login.username.focus()
 	}
 
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
-		let selector = $(this.form) as any;
+		let selector = $(Login.form) as any;
 		selector.form({
 			onSuccess: (event:any,fields:any) => {
-				let user:string = this.username.value;
-				let password:string = this.password.value;
+				let user:string = Login.username.value;
+				let password:string = Login.password.value;
 				this.props.onLogin && this.props.onLogin({username: user, password});
 			},
 			fields: {
@@ -109,33 +106,29 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 	render():JSX.Element
 	{
 		return (
-			<div className="ui mini modal">
-				<i className="close icon"/>
-				<div className="dividing header">{Weave.lang("Weave Server Login")}</div>
-				<div className="content">
-					<div className="ui header">
-						<div className="sub header">{Weave.lang("Enter your credentials to access files on the Weave Server")}</div>
-					</div>
-					<div ref={(c) => this.form = c} className="ui form">
-						<div className="field">
-							<div className="ui fluid left icon input">
-								<i className="user icon"/>
-								<input ref={(c) => this.username = c} type="text" name="username" placeholder={Weave.lang("User Name")}/>
-							</div>
-						</div>
-						<div className="field">
-							<div className="ui fluid left icon input">
-								<i className="lock icon"/>
-								<input ref={(c) => this.password = c} type="password" name="password" placeholder={Weave.lang("Password")}/>
-							</div>
-						</div>
-						<Button colorClass="primary" className="right floated submit" style={{ marginBottom: 10}}>
-							{Weave.lang("Login")}
-						</Button>
-						<div className="ui error message" style={{marginTop: 60}}></div>
-					</div>
+			<VBox style={{ flex: 1, padding: "1.5em" }}>
+				<div className="ui header">
+					<div className="sub header">{Weave.lang("Enter your credentials to access files on the Weave Server")}</div>
 				</div>
-			</div>
+				<div ref={(c) => Login.form = c} className="ui form">
+					<div className="field">
+						<div className="ui fluid left icon input">
+							<i className="user icon"/>
+							<input ref={(c) => Login.username = c} type="text" name="username" placeholder={Weave.lang("User Name")}/>
+						</div>
+					</div>
+					<div className="field">
+						<div className="ui fluid left icon input">
+							<i className="lock icon"/>
+							<input ref={(c) => Login.password = c} type="password" name="password" placeholder={Weave.lang("Password")}/>
+						</div>
+					</div>
+					<Button colorClass="primary" className="right floated submit">
+						{Weave.lang("Login")}
+					</Button>
+					<div className="ui error message" style={{marginTop: 60}}></div>
+				</div>
+			</VBox>
 		)
 	}
 }
