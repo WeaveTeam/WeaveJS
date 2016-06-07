@@ -126,14 +126,13 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						Weave <span style={ {color:"rgb(236, 131, 89)"} }>2</span>
 					</h1>
 
-					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} } className="weave-padded-hbox weave-padded-vbox">
+					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} }>
 						<VBox key="data"
 						      className="weave-getstarted-item"
 						      onClick={()=>this.props.onChange("DataSourceManager") }>
 							<div className="weave-getstarted-item-icon">
 								<i className="fa fa-database"></i>
 							</div>
-							<br/>
 							<span style={itemTextStyle}> Load <span style={ {color:"rgb(236, 131, 89)"} }> Data</span></span>
 						</VBox>
 						<VBox key="charts"
@@ -142,7 +141,6 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 							<div className="weave-getstarted-item-icon">
 								<i className="fa fa-file"></i>
 							</div>
-							<br/>
 							<span style={itemTextStyle}> Load <span style={ {color:"rgb(236, 131, 89)"} }> Session</span></span>
 						</VBox>
 						<VBox key="tutorials"
@@ -152,7 +150,6 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 							<div style={ disableStyle } className="weave-getstarted-item-icon">
 								<i className="fa fa-book"></i>
 							</div>
-							<br/>
 							<span style={ disableStyle }><span style={ disableStyle }> Interactive Tour</span></span>
 						</VBox>
 					</HBox>
