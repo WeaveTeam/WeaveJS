@@ -93,7 +93,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			renderPath = weavejs.WeaveAPI.CSVParser.parseCSVRow(this.urlParams.layout);
 		return renderPath || this.props.renderPath || WeaveApp.defaultProps.renderPath;
 	}
-	
+
+	getRootLayoutPath():WeavePathArray
+	{
+		return ["Tabs"];
+	}
+
 	getRenderedComponent():React.Component<any, any>
 	{
 		if (!this.props.weave)
@@ -181,11 +186,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		var weave = this.props.weave;
 		var oldTabLayout = Weave.AS(weave.getObject(tabLayoutPath), TabLayout);
-		var newTabLayout = Weave.AS(weave.getObject(this.getRenderPath()), TabLayout);
+		var rootTabLayout = Weave.AS(weave.getObject(this.getRootLayoutPath()), TabLayout);
 		var panelIds = oldTabLayout ? oldTabLayout.getPanelIds() : [];
 		panelIds.map(panelId => {
 			var panel = weave.getObject(panelId) as AnyAbstractLayout;
-			newTabLayout.addPanel(panelId, panel && panel.title);
+			rootTabLayout.addPanel(panelId, panel && panel.title);
 		});
 		weave.removeObject(tabLayoutPath);
 	}
