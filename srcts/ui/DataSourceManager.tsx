@@ -105,13 +105,13 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let dataSources = this.props.weave.root.getObjects(IDataSource);
 		this.selectedDataSource = dataSource;
 		this.indexOfSelectedDataSource = dataSources.findIndex((ds) => ds == dataSource);
-		if(forceUpdate)
+		if (forceUpdate)
 			this.forceUpdate();
 	}
 
 	getSelectedDataSource=()=>
 	{
-		if(Weave.wasDisposed(this.selectedDataSource))
+		if (Weave.wasDisposed(this.selectedDataSource))
 		{
 			return this.props.weave.root.getObjects(IDataSource)[this.indexOfSelectedDataSource];
 		}
@@ -195,12 +195,16 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						<VBox className="ui basic inverted segment" style={{flex: 2, overflow: "auto", padding: 0}}>
 							<div className="ui medium header" style={{padding: 0, paddingLeft: 14, paddingTop: 14}}>{Weave.lang("Connected data sources")}</div>
 							<VBox style={{alignItems: listOptions.length ? null:"center"}}>
-								{listOptions.length ? <List
-									options={listOptions}
-									multiple={false}
-									selectedValues={ [dataSource] }
-									onChange={ (selectedValues:IDataSource[]) => { this.setSelectedDataSource(selectedValues[0], true);  }}
-								/>:<div>{Weave.lang("(None)")}</div>}
+								{
+									listOptions.length
+									?	<List
+											options={listOptions}
+											multiple={false}
+											selectedValues={ [dataSource] }
+											onChange={ (selectedValues:IDataSource[]) => { this.setSelectedDataSource(selectedValues[0], true);  }}
+										/>
+									:	<div>{Weave.lang("(None)")}</div>
+								}
 							</VBox>
 						</VBox>
 						<VBox className="ui inverted segment" style={{overflow: "auto", padding: 0, flex: 1}}>
