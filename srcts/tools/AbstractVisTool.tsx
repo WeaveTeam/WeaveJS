@@ -140,7 +140,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	updateAltText():void
 	{
 		if(this.altTextMode.value == "automatic")
-			this.altText.value = this.panelTitle.value
+			this.altText.value = this.defaultPanelTitle;
 		else
 			this.forceUpdate();
 	}
