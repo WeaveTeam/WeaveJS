@@ -1003,3 +1003,9 @@ div.ui.inverted.segment .weave-list-Item-selected:hover{
 	border-bottom-left-radius: 8px;
 	border-bottom-right-radius: 8px;
 }
+
+.weave-exclamation-triangle {
+	color: #FFDEA2;
+	text-shadow: -1px -1px 0 orange, 1px -1px 0 orange, -1px 1px 0 orange, 1px 1px 0 orange;
+}
+

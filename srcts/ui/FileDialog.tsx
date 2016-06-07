@@ -5,7 +5,6 @@ import List from "../react-ui/List";
 import PopupWindow from "../react-ui/PopupWindow";
 import CenteredIcon from "../react-ui/CenteredIcon";
 import SmartComponent from "./SmartComponent";
-import ConfirmationDialog from "./ConfirmationDialog";
 import WeaveServerFileOpenComponent from "./WeaveServerFileOpenComponent";
 import LocalFileOpenComponent from "./LocalFileOpenComponent";
 
@@ -43,7 +42,6 @@ export interface IFileDialogState
 export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDialogState> {
 	static listItems:{[key:string]:string}[] = [{label: "My Computer" , iconClass:"fa fa-desktop"}, {label: "Weave Server", iconClass: "fa fa-server"}];
 	static window:PopupWindow;
-
 
 	static storageRegistry = new Map< String, React.ComponentClass<IOpenFileProps>>()
 		.set("My Computer", LocalFileOpenComponent)
@@ -87,26 +85,29 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 
 	openHandler=(file:string|File,handler:Function)=>
 	{
-		ConfirmationDialog.open(this.props.context,
-			Weave.lang("Load Session:"),
-			<HBox style={{flex: 1, alignItems: "center"}}>
-				<img src="./img/weave_min.png" style={{width: 75}}/>
-				<div className="ui basic segment">
-					<div className="ui basic header">
-						{Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.")}
-					</div>
-				</div>
-			</HBox>,
-			Weave.lang("Load Session"),
-			() => {
+		PopupWindow.open(this.props.context, {
+			title: Weave.lang("Load Session"),
+			content: (
+				<VBox style={{flex: 1, justifyContent: "center"}}>
+					<HBox style={{flex: 1, alignItems: "center"}}>
+						<i style={{fontSize: 50, marginLeft: 15}} className="fa fa-exclamation-triangle weave-exclamation-triangle"></i>
+						<div style={{margin: 0, marginLeft: 5}} className="ui basic segment">
+							<div className="ui basic header">
+								{Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.")}
+							</div>
+						</div>
+					</HBox>
+				</VBox>
+			),
+			resizable: false,
+			modal: true,
+			width: 480,
+			height: 230,
+			onOk: () => {
 				handler(file);
-				ConfirmationDialog.close();
 				FileDialog.close();
 			},
-			Weave.lang("Cancel"),
-			() => {
-				ConfirmationDialog.close();
-			});
+		});
 	};
 
 	componentDidMount()
