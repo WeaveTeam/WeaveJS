@@ -8217,6 +8217,7 @@ declare module weavejs.net {
      */
     class WeaveAdminService implements IWeaveEntityManagementService {
         static WEAVE_AUTHENTICATION_EXCEPTION: string;
+        static getInstance(url: string): WeaveAdminService;
         static messageLog: any[];
         static messageLogCallbacks: CallbackCollection;
         static messageDisplay(messageTitle: string, message: string, showPopup: boolean): void;
