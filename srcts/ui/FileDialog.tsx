@@ -75,11 +75,12 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 			content:
 				<FileDialog openUrlHandler={loadURL} openFileHandler={loadFile} context={context}/>,
 			footerContent: <div/>,
-			resizable: true,
+			resizable: false,
+			draggable: false,
 			modal: true,
 			suspendEnter: true,
-			width: 920,
-			height: 675,
+			width: "95%",
+			height: "95%",
 			onClose: FileDialog.close
 		});
 	}

@@ -21,8 +21,8 @@ export interface PopupWindowProps extends React.HTMLProps<PopupWindow>
 	draggable?:boolean;
 	top?:number;
 	left?:number;
-	width?:number;
-	height?:number;
+	width?:number|string;
+	height?:number|string;
 	footerContent?:JSX.Element;
 	onOk?:Function;
 	onCancel?:Function;
