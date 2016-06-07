@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from "react";
 import FileMenu from "./FileMenu";
 import FileInput from "../react-ui/FileInput";
@@ -14,8 +15,7 @@ export default class SystemMenu implements MenuBarItemProps
 
 		/* Forces the initialization of the service. */
 		/* Hopefully the init flag gets set before our first 'get menu'. */
-		weavejs.net.Admin.service;
-		weavejs.net.Admin.service.getAuthenticatedUser();
+		weavejs.net.Admin.service.getAuthenticatedUser().then(_.noop, _.noop);
 	}
 
 	weave:Weave;
