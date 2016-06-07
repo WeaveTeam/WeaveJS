@@ -47,8 +47,8 @@ export default class ReactUtils
 		popoutWindow = window.open(title,url,windowSettings);
 		popoutWindow.onbeforeunload = () => {
 			if (container) {
-				ReactDOM.unmountComponentAtNode(container);
 				onBeforeUnLoad && onBeforeUnLoad();
+				ReactDOM.unmountComponentAtNode(container);
 			}
 		};
 		var onloadHandler = () => {
@@ -61,14 +61,10 @@ export default class ReactUtils
 					return;
 				}
 			}
-
 			popoutWindow.document.title = windowOptions.windowName || "Weave Pop-Out";
 			container = popoutWindow.document.createElement('div');
 			container.id = divId;
 			popoutWindow.document.body.appendChild(container);
-
-			onLoad && onLoad();
-
 			if(windowOptions.transferStyle) {
 				$("link, style").each(function () {
 					//Todo: find a better way to clone this link
@@ -77,10 +73,9 @@ export default class ReactUtils
 					$(popoutWindow.document.head).append(link);
 				});
 			}
-
 			polyfill(popoutWindow);
-
 			ReactDOM.render(jsx, container);
+			onLoad && onLoad();
 		};
 
 		popoutWindow.onload = onloadHandler;

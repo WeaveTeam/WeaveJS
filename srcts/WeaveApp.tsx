@@ -179,7 +179,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	restoreTabs=(tabLayoutPath:WeavePathArray):void=>
 	{
-		console.log("restore tabs called", tabLayoutPath)
+		var weave = this.props.weave;
+		var oldTabLayout = Weave.AS(weave.getObject(tabLayoutPath), TabLayout);
+		var newTabLayout = Weave.AS(weave.getObject(this.getRenderPath()), TabLayout);
+		var panelIds = oldTabLayout ? oldTabLayout.getPanelIds() : [];
+		panelIds.map(panelId => {
+			var panel = weave.getObject(panelId) as AnyAbstractLayout;
+			newTabLayout.addPanel(panelId, panel && panel.title);
+		});
+		weave.removeObject(tabLayoutPath);
 	}
 
 	handlePopoutClick=(layoutPath:WeavePathArray, oldTabLayoutPath:WeavePathArray):void=>
@@ -200,7 +208,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		);
 		var onLoad:Function = () => { };
 		var options:any = { transferStyle: true };
-		ReactUtils.openPopout(content, onLoad, this.restoreTabs, options);
+		ReactUtils.openPopout(content, onLoad, () => this.restoreTabs(newTabLayoutPath), options);
 	};
 
 	renderTab=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
