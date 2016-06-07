@@ -3019,6 +3019,8 @@ declare module weavejs.api.ui {
     import LinkableString = weavejs.core.LinkableString;
     interface IAltText {
         altText: LinkableString;
+        altTextMode: LinkableString;
+        updateAltText(): void;
     }
     var IAltText: new (..._: any[]) => IAltText;
 }
@@ -8248,6 +8250,7 @@ declare module weavejs.net {
         authenticate(user: string, pass: string): WeavePromise<boolean>;
         keepAlive(): WeavePromise<void>;
         getWeaveFileNames(showAllFiles: boolean): WeavePromise<string[]>;
+        saveWeaveFileByteArray(fileContent: JSByteArray, fileName: string, overwriteFile: boolean): WeavePromise<string>;
         saveWeaveFile(fileContent: JSByteArray, fileName: string, overwriteFile: boolean): WeavePromise<string>;
         removeWeaveFile(fileName: string): WeavePromise<string>;
         getWeaveFileInfo(fileName: string): WeavePromise<WeaveFileInfo>;
