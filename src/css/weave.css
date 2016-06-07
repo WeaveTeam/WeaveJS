@@ -606,35 +606,35 @@ div.weave-tree-view {
 
 }
 
-.weave-list-Item{
+.weave-list-item{
 	padding:5px;
 	cursor:pointer;
 	background-color: #FFFFFF;
 }
-.weave-list-Item:hover{
+.weave-list-item:hover{
 	background-color: rgba(180, 225, 255, 0.4);
 }
-.weave-list-Item-selected{
+.weave-list-item-selected{
 	background-color: rgba(109, 163, 228, 0.6);
 }
-.weave-list-Item-selected:hover{
+.weave-list-item-selected:hover{
 	background-color: rgba(117, 179, 255, 0.6);
 }
 
-div.ui.inverted.segment .weave-list-Item{
+div.ui.inverted.segment .weave-list-item{
 	background-color: inherit;
 	padding: 5px 10px 5px 10px;
 }
 
-div.ui.inverted.segment .weave-list-Item:hover{
+div.ui.inverted.segment .weave-list-item:hover{
 	color: white;
 }
-div.ui.inverted.segment .weave-list-Item-selected{
+div.ui.inverted.segment .weave-list-item-selected{
 	background-color: rgba(54, 119, 199, 0.6);
 	color: white;
 }
 
-div.ui.inverted.segment .weave-list-Item-selected:hover{
+div.ui.inverted.segment .weave-list-item-selected:hover{
 	background-color: rgba(117, 179, 255, 0.6)
 }
 

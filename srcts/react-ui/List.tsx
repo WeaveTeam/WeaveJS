@@ -144,8 +144,8 @@ export default class List extends React.Component<IListProps, IListState>
                         };
 
 						var className = classNames({
-                            'weave-list-Item' : true,
-                            'weave-list-Item-selected': selected });
+                            'weave-list-item' : true,
+                            'weave-list-item-selected': selected });
 
                         return (
                             <HBox key={index} style={style}  className={ className }  onClick={this.handleChange.bind(this, value) }>
