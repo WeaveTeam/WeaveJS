@@ -26,6 +26,8 @@ import LinkableString = weavejs.core.LinkableString;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import StandardLib = weavejs.util.StandardLib;
+import ColumnUtils = weavejs.data.ColumnUtils;
 
 declare type Record = {
     id: IQualifiedKey,
@@ -169,30 +171,21 @@ export default class C3BarChart extends AbstractC3Tool
                         },
                         multiline: false,
                         format: (num:number):string => {
-							var record = this.records[num];
-							if (record)
-							{
-								if (this.element && this.margin.bottom)
-								{
-									var labelString:string = Weave.lang(record.stringValues.xLabel);
-									if (labelString)
-									{
-										return this.formatXAxisLabel(labelString);
-									}
-									else
-									{
-										return "";
-									}
-								}
-								else
-								{
-									return Weave.lang(record.stringValues.xLabel);
-								}
-                            }
-                            else
-                            {
-                                return "";
-                            }
+
+	                        if(this.horizontalMode.value)
+	                        {
+		                        return this.formatGetStringFromNumber(num);
+	                        }
+	                        else
+	                        {
+								let index = Math.round(num);
+		                        let record = this.records[index];
+
+		                        if(this.labelColumn.getInternalColumn() == null)// if the labelColumn doesn't have any data, use default label
+		                            return null;
+
+		                        return this.labelColumn.getValueFromKey(record.id);// otherwise return the value from the labelColumn
+	                        }
                         }
                     }
                 },
@@ -227,24 +220,27 @@ export default class C3BarChart extends AbstractC3Tool
                 fit: false,
                 multiline: false,
                 format: (num:number):string => {
-					var record = this.records[num];
-                    if (record && this.yLabelColumnDataType !== "number")
-                    {
-                        return Weave.lang(record.stringValues.yLabel) || "";
-                    }
-                    else if (this.groupingMode.value === PERCENT_STACK)
-                    {
-                        return d3.format(".0%")(num);
-                    }
-                    else
-                    {
-                        return String(FormatUtils.defaultNumberFormatting(num));
-                    }
+	                return this.formatGetStringFromNumber(num);
                 }
             }
         };
     }
-	
+
+	//returns correct labels (for axes) from the data column
+	private formatGetStringFromNumber = (value:number):string =>
+	{
+		let heightColumns = this.heightColumns.getObjects();
+		if(this.groupingMode.value === PERCENT_STACK && heightColumns.length > 1)
+		{
+			return Weave.lang("{0%}",StandardLib.roundSignificant(heightColumns[0]));
+		}
+		else if(heightColumns.length > 0)
+		{
+			return ColumnUtils.deriveStringFromNumber(heightColumns[0], value)
+		}
+		return null;
+	};
+
 	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
@@ -556,6 +552,7 @@ export default class C3BarChart extends AbstractC3Tool
     //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor(pushCrumb:Function = null):JSX.Element
 	{
+		console.log("beta", Weave.beta);
 		return Accordion.render(
 			[Weave.lang("Data"), this.getSelectableAttributesEditor(pushCrumb)],
 			[
