@@ -360,6 +360,18 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		return Weave.lang(this.dataY.getMetadata('title'));
 	}
 
+	updateAltText():void
+	{
+		if(this.altTextMode.value == "automatic")
+		{
+			this.altText.value = Weave.lang("Scatter plot of {0} vs {1}", this.xAxisName.value, this.yAxisName.value);
+		}
+		else
+		{
+			this.forceUpdate();
+		}
+	}
+
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void):JSX.Element =>
 	{
@@ -415,6 +427,11 @@ export default class C3ScatterPlot extends AbstractC3Tool
 Weave.registerClass(
 	C3ScatterPlot,
 	["weavejs.tool.C3ScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
-	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+	[
+		weavejs.api.ui.IVisTool_Basic,
+		weavejs.api.core.ILinkableObjectWithNewProperties,
+		weavejs.api.data.ISelectableAttributes,
+		weavejs.api.ui.IAltText
+	],
 	"Scatter Plot"
 );

@@ -1219,3 +1219,63 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	right: 1rem;
 	color: rgba(0,0,0,.87);
 }
+
+.weave-dropzone-file {
+	width: 100%;
+	height: 100%;
+	background: whitesmoke;
+	border: dashed black 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-dropzone-file-error {
+	width: 100%;
+	height: 100%;
+	background: #FFF6F6;
+	border: dashed #E0B4B4 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-data-source-manager-sidebar .weave-data-source-item:hover {
+	color: white;
+	cursor: pointer;
+}
+
+.weave-data-source-item span {
+	padding: 0 10px 0 10px;
+}
+
+.weave-layout-tabs-content {
+	background: #ddd;
+	padding: 2px 4px 4px 4px;
+	border-right: none;
+	border-top: none;
+}
+
+.weave-layout-tabs-bar {
+	padding-bottom: 4px;
+	padding-left: 4px;
+	cursor: default;
+	background: #b0b0b0;
+}
+
+.weave-layout-tabs-label {
+	padding: 5px 8px 5px 8px
+}
+
+.weave-layout-tabs-label.active.bottom {
+	margin-top: 0;
+	background-color: #ddd;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.weave-exclamation-triangle {
+	color: #FFDEA2;
+	text-shadow: -1px -1px 0 orange, 1px -1px 0 orange, -1px 1px 0 orange, 1px 1px 0 orange;
+}
+

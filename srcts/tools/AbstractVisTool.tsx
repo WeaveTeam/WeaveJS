@@ -34,6 +34,9 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import IColumnReference = weavejs.api.data.IColumnReference;
 import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 import ColumnUtils = weavejs.data.ColumnUtils;
+import StatefulTextArea from "../ui/StatefulTextArea";
+import DynamicComponent from "../ui/DynamicComponent";
+import Checkbox from "../semantic-ui/Checkbox";
 
 export class Margin
 {
@@ -65,6 +68,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	constructor(props:P)
 	{
 		super(props);
+		Weave.getCallbacks(this).addGroupedCallback(this, this.updateAltText, true);
 	}
 
 	componentDidMount()
@@ -73,6 +77,10 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	}
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
+	
+	altText:LinkableString = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
+	altTextMode:LinkableString = Weave.linkableChild(this, new LinkableString("automatic"), this.updateAltText, true);
+
 	xAxisName = Weave.linkableChild(this, LinkableString);
 	yAxisName = Weave.linkableChild(this, LinkableString);
 	margin = Weave.linkableChild(this, Margin);
@@ -81,7 +89,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 
 	protected get selectionKeySet()
 	{
@@ -128,6 +135,14 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	get selectableAttributes():Map<string, (IColumnWrapper|ILinkableHashMap)>
 	{
 		return new Map<string, (IColumnWrapper | ILinkableHashMap)>();
+	}
+
+	updateAltText():void
+	{
+		if(this.altTextMode.value == "automatic")
+			this.altText.value = this.panelTitle.value
+		else
+			this.forceUpdate();
 	}
 	
 	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
@@ -275,8 +290,34 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
 		return [
 			[
+				Weave.lang("Mode"),
+				<DynamicComponent dependencies={[this.altTextMode]} render={() => (
+					<HBox>
+						<Checkbox type="radio"
+						          name="auto description checkbox"
+						          value={ this.altTextMode.value == "automatic" }
+						          label={ Weave.lang("Automatic") }
+						          onChange={(value) => { if(value) this.altTextMode.value = "automatic" }}
+						/>
+						<Checkbox type="radio"
+						          name="manual description checkbox"
+						          value={ this.altTextMode.value == "manual" }
+						          label={ Weave.lang("Manual") }
+						          style={{ marginLeft: "15%" }}
+						          onChange={(value)=> { if(value) this.altTextMode.value = "manual" }}
+						/>
+					</HBox>
+				)}/>
+			],
+			[
 				Weave.lang("Alt Text"),
-				<StatefulTextField ref={ linkReactStateRef(this, {value: this.altText})} placeholder={Weave.lang("Enter text description of chart")}/>
+				<DynamicComponent dependencies={[this.altTextMode]} render={() => (
+					<StatefulTextArea
+						ref={ linkReactStateRef(this, {value: this.altText})}
+						readOnly={this.altTextMode.value == "automatic"}
+						placeholder={Weave.lang("Enter a text description for the chart")}
+					/>
+				)}/>
 			]
 		]
 	}

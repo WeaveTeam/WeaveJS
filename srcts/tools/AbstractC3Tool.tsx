@@ -163,6 +163,8 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	{
 		return (
 			<div
+				role="img"
+				aria-label={this.altText.value}
 				ref={(c:HTMLElement) => { this.element = c;}}
 				style={{flex: 1, overflow: "hidden"}}
 				onMouseLeave={ () => this.toolTip.hide() }

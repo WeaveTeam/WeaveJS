@@ -37,7 +37,6 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 export interface IWeaveToolState
 {
 	title?: string;
-	altText?:string;
 	hovered?: boolean;
 	dragging?:boolean;
 	highlightTitle?: boolean;
@@ -64,7 +63,6 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		if (this.watcher)
 		{
 			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.updateTitle);
-			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.updateAltText);
 		}
 
 		this.updateTitle();
@@ -93,16 +91,6 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			this.setState({title});
 	}
 
-	updateAltText():void
-	{
-		var path = this.props.path;
-		var altTextTool = Weave.AS(this.watcher && this.watcher.target, IAltText);
-		var altText = altTextTool && altTextTool.altText;
-		var altTextStr = altText && altText.value;
-		if (this.state.altText != altTextStr)
-			this.setState({altText: altTextStr});
-	}
-	
 	onGearClick=(event:React.MouseEvent):void=>
 	{
 		if (MouseUtils.receivedMouseDown(event.target as Element))
@@ -218,7 +206,8 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			<VBox
 				style={this.props.style}
 				className="weave-tool"
-				aria-labelledby={this.state.altText}
+				aria-label={Weave.lang("{0} Visualization", this.props.path[(this.props.path.length || 0) - 1])}
+				tabIndex={0}
 				onMouseOver={() => {
 					this.setState({ hovered: true });
 				}}

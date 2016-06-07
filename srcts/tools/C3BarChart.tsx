@@ -664,6 +664,11 @@ export default class C3BarChart extends AbstractC3Tool
 Weave.registerClass(
 	C3BarChart,
 	["weavejs.tool.C3BarChart", "weave.visualization.tools::CompoundBarChartTool"],
-	[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+	[
+		weavejs.api.ui.IVisTool_Basic,
+		weavejs.api.core.ILinkableObjectWithNewProperties,
+		weavejs.api.data.ISelectableAttributes,
+		weavejs.api.ui.IAltText
+	],
 	"Bar Chart"
 );

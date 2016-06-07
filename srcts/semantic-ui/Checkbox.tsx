@@ -11,7 +11,7 @@ export interface CheckboxProps extends React.Props<Checkbox>
 	label: string; // important to set them to avoid using jquery // else we have to let jquery to use dom selector to set " set checked"
 	name?: string;
 	style?: React.CSSProperties;
-	onChange?: (value:boolean,event:FormEvent) => void;
+	onChange?: (value:boolean, event:FormEvent) => void;
 	className?:string;
 	value?:boolean;
 	title?:string;
@@ -66,9 +66,11 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	{
 		var props = _.clone(this.props);
 		delete props.children;
+		delete props.className;
+		delete props.style;
 
 		return (
-			<div className={"ui checkbox " + (this.state.value? "checked ": "") + (this.props.disabled ? "disabled ": "")  +(this.props.className || "")}>
+			<div className={"ui " + this.props.type + " checkbox " + (this.state.value? "checked ": "") + (this.props.disabled ? "disabled ": "")  + (this.props.className || "")} style={this.props.style}>
 				<input {...props as any} type={this.props.type ? this.props.type :  "checkbox"}
 				                         value={String(this.state.value)}
 				                         checked={this.state.value}
