@@ -23,7 +23,7 @@ import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
 
 export interface IConnectionManagerProps {
-	dataSource: WeaveDataSource;
+	service: WeaveAdminService;
 }
 
 export interface IConnectionManagerState {
@@ -47,19 +47,11 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 			dbConfigInfo: null,
 			selected: null
 		};
-		this.service = new WeaveAdminService(ConnectionManager.getBaseUrl(props.dataSource.url.value));
-	}
-
-	private static getBaseUrl(serviceUrl: string): string {
-		if (!serviceUrl) return "/WeaveServices";
-		/* TODO: Use a proper URL parsing library to get the base URL */
-		let pathComponents = serviceUrl.split('/');
-		pathComponents.pop();
-		return pathComponents.join('/');
+		this.login = new ServiceLogin(this, this.props.service);
 	}
 
 	static window: PopupWindow;
-	static open(context:React.ReactInstance, ds: WeaveDataSource, selectIdFunc?: (id: number) => void) {
+	static open(context:React.ReactInstance, service:WeaveAdminService, selectIdFunc?: (id: number) => void) {
 		if (ConnectionManager.window)
 			PopupWindow.close(ConnectionManager.window);
 
@@ -67,7 +59,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 			context,
 			{
 				title: Weave.lang("Import from SQL"),
-				content: <ConnectionManager dataSource={ds}/>,
+				content: <ConnectionManager service={service}/>,
 				modal: true,
 				resizable: true,
 				width: 920,
@@ -88,7 +80,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		if ((error.message as string).startsWith(WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION) ||
 			(error.message as string).startsWith("RemoteException: Incorrect username or password."))
 		{
-			if (this.login) this.login.open();
+			if (this.login) this.login.open(this.updateConnections, () => PopupWindow.close(ConnectionManager.window));
 		}
 		else
 		{
@@ -97,12 +89,12 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 	}
 
 	updateConnections=()=>{
-		this.service.getConnectionNames().then(
+		this.props.service.getConnectionNames().then(
 			(connections) => this.setState({ connections }),
 			this.handleError
 		);
 
-		this.service.getDatabaseConfigInfo().then(
+		this.props.service.getDatabaseConfigInfo().then(
 			(dbConfigInfo) => this.setState({ dbConfigInfo }),
 			this.handleError
 		);
@@ -137,7 +129,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 
 	removeConnection=(connection:string)=>
 	{
-		this.service.removeConnectionInfo(connection).then(
+		this.props.service.removeConnectionInfo(connection).then(
 			this.updateConnections, this.handleError
 		);
 	}
@@ -148,8 +140,9 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		return <VBox className="weave-padded-vbox" style={ { flex: 1, overflow: 'auto' } }>
 			<HBox className="weave-padded-hbox" style={ { flex: 1 } }>
 				<VBox className="weave-padded-vbox" style={ {flex: 0.33 } }>
+					<div>{this.props.service.user ? Weave.lang("Signed in as '{0}'.", this.props.service.user) : Weave.lang("Not signed in.") }</div>
 					<VBox className="weave-container" style={ { flex: 1, padding: 0 } }>
-						<div>{this.service.user ? Weave.lang("Logged in as '{0}'.", this.service.user) : Weave.lang("Not logged in.")}</div>
+						
 						<List selectedValues={[this.state.selected]} options={options} 
 						onChange={(selectedValues: any[]) => this.setState({ selected: selectedValues[0] }) }/>
 					</VBox>
@@ -169,12 +162,11 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 							<i className="fa fa-refresh fa-fw"/>
 						</Button>
 					</HBox>
-					<Button title={Weave.lang("Manage configuration storage...")} onClick={()=>ConfigurationStorageEditor.open(this, this.service)}>
+					<Button title={Weave.lang("Manage configuration storage...")} onClick={()=>ConfigurationStorageEditor.open(this, this.props.service)}>
 						{Weave.lang("Manage configuration storage...")}
 					</Button>
 				</VBox>
-				<ConnectionEditor refreshFunc={this.updateConnections} service={this.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={_.noop}/>
-				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={this.service} onSuccess={_.noop} onCancel={() => PopupWindow.close(ConnectionManager.window) } detachable={true}/>
+				<ConnectionEditor refreshFunc={this.updateConnections} service={this.props.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={_.noop}/>
 			</HBox>
 			<ErrorLogComponent errors={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
 		</VBox>

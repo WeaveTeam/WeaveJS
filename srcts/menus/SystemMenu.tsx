@@ -5,7 +5,8 @@ import FileInput from "../react-ui/FileInput";
 import {MenuBarItemProps} from "../react-ui/MenuBar";
 import {MenuItemProps} from "../react-ui/Menu";
 import FileDialog from "../ui/FileDialog";
-
+import ServiceLogin from "../ui/admin/ServiceLogin";
+import PopupWindow from "../react-ui/PopupWindow";
 export default class SystemMenu implements MenuBarItemProps
 {
 	constructor(weave:Weave, fileMenu:FileMenu)
@@ -16,8 +17,10 @@ export default class SystemMenu implements MenuBarItemProps
 		/* Forces the initialization of the service. */
 		/* Hopefully the init flag gets set before our first 'get menu'. */
 		weavejs.net.Admin.service.getAuthenticatedUser().then(_.noop, _.noop);
+		this.login = new ServiceLogin(fileMenu.context, weavejs.net.Admin.service)
 	}
 
+	login: ServiceLogin;
 	weave:Weave;
 	fileMenu:FileMenu; // temp solution
 	label = "Weave";
@@ -38,7 +41,9 @@ export default class SystemMenu implements MenuBarItemProps
 			},
 			{
 				label: Weave.lang("Save to server"),
-				click: this.fileMenu.saveToServer,
+				click: () => {
+					this.login.conditionalOpen(this.fileMenu.saveToServer);
+				},
 				shown: weavejs.net.Admin.service.initialized
 			},
 			{},
@@ -64,14 +69,25 @@ export default class SystemMenu implements MenuBarItemProps
 			{
 				label: weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Not signed in"),
 				click: () => {
-
+					this.login.open();
 				},
 				shown: weavejs.net.Admin.service.initialized
 			},
 			{
 				enabled: weavejs.net.Admin.instance.userHasAuthenticated,
 				label: Weave.lang("Sign out"),
-				shown: weavejs.net.Admin.service.initialized
+				shown: weavejs.net.Admin.service.initialized,
+				click: () => {
+					let signedOutPopup = () => PopupWindow.open(
+						this.fileMenu.context,
+						{
+							title: "Confirmation",
+							content: <div>{Weave.lang("Signed out successfully")}</div>
+						}
+					);
+					/* Log in with invalid credentials to drop session */
+					weavejs.net.Admin.service.authenticate("", "").then(signedOutPopup, signedOutPopup);
+				}
 			}
 		];
 	}

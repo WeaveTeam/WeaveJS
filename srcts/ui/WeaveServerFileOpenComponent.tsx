@@ -25,6 +25,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 			fileNames:[],
 			allFiles:true
 		}
+		this.login = new ServiceLogin(this.props.context, weavejs.net.Admin.service);
 	}
 
 	handleSuccess=(fields:any) => {
@@ -37,7 +38,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 				fileNames
 			});
 		},(error:any) => {
-			this.login.open();
+			this.login.open(this.handleSuccess, this.handleCancel);
 		});
 	};
 
@@ -146,7 +147,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 														});
 													},
 													(error:any) => {
-														this.login.open();
+														this.login.open(this.handleSuccess, this.handleCancel);
 													}
 												);
 						                }}
@@ -167,7 +168,6 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 						</FileInfoView>
 					</VBox>
 				</HBox>
-				<ServiceLogin ref={(c: ServiceLogin) => this.login = c} service={weavejs.net.Admin.service} onSuccess={this.handleSuccess} onCancel={this.handleCancel} context={this.props.context}/>
 			</VBox>
 		);
 	}

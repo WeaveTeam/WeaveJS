@@ -7,54 +7,51 @@ import Login from "./Login";
 
 import WeaveAdminService = weavejs.net.WeaveAdminService;
 
-export interface IServiceLoginProps extends React.Props<ServiceLogin> {
-	onSuccess?: (username:string) => void;
-	onCancel?: () => void;
-	context?: React.ReactInstance;
-	detachable?: boolean;
-	service?: WeaveAdminService;
-}
+export default class ServiceLogin
+{
+	service: WeaveAdminService;
+	context: React.ReactInstance;
 
-
-export default class ServiceLogin extends React.Component<IServiceLoginProps, Object> {
-
-	defaultProps:IServiceLoginProps = {
-		detachable: false
-	};
-	
-	constructor(props:IServiceLoginProps)
+	constructor(context: React.ReactInstance, service: WeaveAdminService)
 	{
-		super(props);
+		this.context = context;
+		this.service = service;
 	}
 
-	login: Login;
-
-	open=():void => {
-		Login.open(this.props.context,this.handleLogin,this.handleCancel);
-	};
-
-	handleLogin=(fields:{username:string, password:string}):void=>
+	open(onSuccess?: (username: string) => void, onCancel?: () => void)
 	{
-		this.props.service.authenticate(fields.username, fields.password).then(
-			() => {
-				if (this.props.onSuccess) this.props.onSuccess(fields.username);
-				Login.close();
+		Login.open(this.context,
+			(fields: { username: string, password: string }): void => {
+				this.service.authenticate(fields.username, fields.password).then(
+					() => {
+						Login.close();
+						if (onSuccess) onSuccess(fields.username);
+					},
+					(error: any) => {
+						Login.invalid();
+					}
+				);
 			},
-			(error: any) => {
-				Login.invalid();
+			() => {
+				Login.close();
+				if (onCancel) onCancel();
 			}
 		);
-	};
+	}
 
-	handleCancel=():void=>
+	/* Only open if needed */
+	conditionalOpen(onSuccess?: (username:string)=>void, onCancel?:()=>void)
 	{
-		Login.close();
-		if (this.props.onCancel) this.props.onCancel();
-	};
-
-	render():JSX.Element
-	{
-		return <div/>;
+		this.service.getAuthenticatedUser().then(
+			(username: string) => {
+				if (username) {
+					onSuccess && onSuccess(username);
+				}
+				else {
+					this.open(onSuccess, onCancel);
+				}
+			}
+		);
 	}
 }
 
