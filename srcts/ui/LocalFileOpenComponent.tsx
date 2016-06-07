@@ -26,7 +26,7 @@ export default class LocalFileOpenComponent extends React.Component<IOpenFilePro
 			<VBox className="weave-file-picker-container" style={{flex: 1, alignItems: "center", padding: 10}}>
 				<VBox style={{flex: 1, alignItems: "center"}}>
 					<Dropzone
-						style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1}}
+						style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1, fontSize: 24}}
 						className={this.state.rejected ? "weave-dropzone-file-error":"weave-dropzone-file"}
 						activeStyle={{border: "8px solid #CCC"}}
 						onDropAccepted={(files:File[]) => {
