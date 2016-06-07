@@ -13,6 +13,18 @@ input[type=number]::-webkit-outer-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
+/****** Altering the default behavior of Input Placeholder on Focus******/
+/* WebKit browsers */
+input:focus::-webkit-input-placeholder { opacity:0; }
+
+/* Mozilla Firefox 4 to 18 */
+input:focus:-moz-placeholder { opacity:0; }
+
+/* Mozilla Firefox 19+ */
+input:focus::-moz-placeholder { opacity:0;}
+
+/* Internet Explorer 10+ */
+input:focus:-ms-input-placeholder { opacity:0; }
 
 /* Dowloaded Fonts*/
 @font-face {
