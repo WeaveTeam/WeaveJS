@@ -5,8 +5,11 @@ import MiscUtils from "./utils/MiscUtils";
 
 const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
-export interface LandingPageState {
-	landing:string;
+export declare type LandingPageView = "splash"|"default"|"file";
+
+export interface LandingPageState
+{
+	view:LandingPageView;
 }
 
 export default class LandingPage extends React.Component<any, LandingPageState>
@@ -20,11 +23,11 @@ export default class LandingPage extends React.Component<any, LandingPageState>
 		this.urlParams = MiscUtils.getUrlParams();
 		var weaveExternalTools:any = window && window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
 		this.state = {
-			landing: (
+			view: (
 				this.urlParams.skipIntro ||     //flag to skip splash screen
 				this.urlParams.file) ||         //if a file is loaded skip splash screen
 				(weaveExternalTools && weaveExternalTools[window.name]) //if exporting from flash skip splash screen
-				? "default":"splash"
+				? "default" : "splash"
 		}
 	}
 
@@ -45,10 +48,10 @@ export default class LandingPage extends React.Component<any, LandingPageState>
 		// 	skipBlankPageIntro = true;
 		// }
 
-		if(this.state.landing == "splash")
+		if(this.state.view == "splash")
 		{
 			return (
-				<GetStartedComponent style={ {width: "100%", height: "100%"} } onChange={(landing:string) => {this.setState({landing})}} />
+				<GetStartedComponent style={ {width: "100%", height: "100%"} } onViewSelect={(view:LandingPageView) => {this.setState({view})}} />
 			);
 		}
 
@@ -56,7 +59,7 @@ export default class LandingPage extends React.Component<any, LandingPageState>
 			<WeaveApp
 				weave={weave}
 				style={{width: "100%", height: "100%"}}
-				landing={this.state.landing}
+				showFileDialog={this.state.view == "file"}
 				readUrlParams={true}
 			/>
 		)
