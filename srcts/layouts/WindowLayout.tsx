@@ -9,7 +9,7 @@ import ReactUtils from "../utils/ReactUtils";
 import DraggableDiv from "../react-ui/DraggableDiv";
 import {DraggableDivState} from "../react-ui/DraggableDiv";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
-import {AbstractLayout, LayoutProps, AnyAbstractLayout} from "./AbstractLayout";
+import {AbstractLayout, LayoutProps, AnyAbstractLayout, PanelDragEvent} from "./AbstractLayout";
 import Div from "../react-ui/Div";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
@@ -155,11 +155,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 	onDragStart(panelDragged:WeavePathArray, event:React.DragEvent)
 	{
 		// (event as any).dataTransfer.setDragImage(this.rootLayout.getElementFromId(panelDragged), 0, 0);
-		event.dataTransfer.setData('text/plain', JSON.stringify({
-			layout: Weave.findPath(Weave.getRoot(this), this),
-			panelDragged
-		}));
-		console.log("drag start", event);
+		PanelDragEvent.setPanelId(event, panelDragged);
 	}
 
 	onDrag(panelDragged:WeavePathArray, event:React.DragEvent)
@@ -169,12 +165,9 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 
 	onDrop(event:React.DragEvent)
 	{
-		var dragData = AbstractLayout.readDragData(event);
-		var panelDragged = dragData.panelDragged;
-		var otherLayout = Weave.followPath(Weave.getRoot(this), dragData.layout) as AbstractLayout;
+		var panelDragged = PanelDragEvent.getPanelId(event);
+		var otherLayout = PanelDragEvent.getLayout(event, Weave.getWeave(this));
 
-		console.log(otherLayout);
-		console.log(ReactUtils.findComponent(Weave.followPath(Weave.getRoot(this), panelDragged) as AbstractLayout), AbstractLayout);
 		// remove the panel from the other layout;
 		// add it to this layout;
 		if(otherLayout && otherLayout != this)
