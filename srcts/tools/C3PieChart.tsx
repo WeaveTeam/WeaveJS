@@ -225,7 +225,7 @@ export default class C3PieChart extends AbstractC3Tool
     }
 
     //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
-    renderEditor =(pushCrumb:Function) :JSX.Element =>{
+    renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void) :JSX.Element =>{
         return(Accordion.render(
             ["Data", this.getSelectableAttributesEditor(pushCrumb)],
             ["Titles", this.getTitlesEditor()],

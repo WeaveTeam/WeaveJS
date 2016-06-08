@@ -577,7 +577,7 @@ export default class C3Histogram extends AbstractC3Tool
 	}
 
     //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor =(pushCrumb:Function):JSX.Element =>
+	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):JSX.Element =>
 	{
 		var linkedColor:Boolean = !!this.fill.color.internalDynamicColumn.targetPath;
 		var hexColor:string  = this.colorColumn && this.colorColumn.ramp ? (this.colorColumn.ramp.state as string[])[0] : "#808080"

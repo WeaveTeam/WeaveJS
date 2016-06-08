@@ -216,7 +216,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return AbstractVisTool.getMenuItems(this);
 	}
 	
-	getSelectableAttributesEditor(pushCrumb:Function = null):React.ReactChild[][]
+	getSelectableAttributesEditor(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void = null):React.ReactChild[][]
 	{
 		return renderSelectableAttributes(this.selectableAttributes, pushCrumb);
 	}
@@ -281,7 +281,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		]
 	}
 
-	renderEditor =(pushCrumb:Function = null):JSX.Element =>
+	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void = null):JSX.Element =>
 	{
 		return Accordion.render(
 			["Data", this.getSelectableAttributesEditor(pushCrumb)],

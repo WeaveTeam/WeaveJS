@@ -28,7 +28,7 @@ export interface ILayerManagerState
 export interface  ILayerManagerProps extends React.HTMLProps<LayerManager>
 {
 	layers: LinkableHashMap;
-	pushCrumb?: Function;
+	pushCrumb?: (title:string,renderFn:()=>JSX.Element , stateObject:any )=>void;
 	selectedLayer?: AbstractLayer; // required as parent can set the selectedLayer too, Case: Crumb Section
 	onLayerSelection?:Function; //selected layer is passed through this function
 
@@ -71,7 +71,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 	{
 		if (this.props.pushCrumb)
 		{
-			this.props.pushCrumb(Weave.lang("{0} layer", this.props.layers.getName(layer)), layer.renderEditor);
+			this.props.pushCrumb(Weave.lang("{0} layer", this.props.layers.getName(layer)), layer.renderEditor,null);
 		}
 		else
 		{

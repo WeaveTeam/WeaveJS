@@ -148,7 +148,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 	}
 
 
-	renderEditor =(pushCrumb:Function = null):JSX.Element =>{
+	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void = null):JSX.Element =>{
 
 		if (!this.filter.target) // scenario arises when tool opened from menu
 			this.initLater();
@@ -197,7 +197,7 @@ export interface IDataFilterEditorState {
 export interface IDataFilterEditorProps {
 	filterEditor:LinkableDynamicObject,
 	selectableAttributes:Map<string, (IColumnWrapper | LinkableHashMap)>
-	pushCrumb?:Function
+	pushCrumb?:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void
 }
 
 

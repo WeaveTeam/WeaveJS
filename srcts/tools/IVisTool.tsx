@@ -20,10 +20,10 @@ export interface IVisToolState
 export interface IVisTool extends ILinkableObject, ISelectableAttributes, IAltText
 {
     title:string;
-	renderEditor(pushCrumb:Function):JSX.Element;
+	renderEditor(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):JSX.Element;
 }
 
-export function renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, pushCrumb:Function):React.ReactChild[][]
+export function renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void):React.ReactChild[][]
 {
 	return weavejs.util.JS.mapEntries(selectableAttributes).map(([key, value]) => {
 			return [
