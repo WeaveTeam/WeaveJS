@@ -7,6 +7,7 @@ import * as c3 from "c3";
 import {ChartAPI, ChartConfiguration} from "c3";
 import ToolTip from "./ToolTip";
 import {HBox, VBox} from "../react-ui/FlexBox";
+import Accordion from "../semantic-ui/Accordion";
 import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 
@@ -224,10 +225,13 @@ export default class C3PieChart extends AbstractC3Tool
     }
 
     //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
-    renderEditor(pushCrumb:Function) :JSX.Element{
-        return(<VBox>
-                { super.renderEditor(pushCrumb) }
-              </VBox>);
+    renderEditor =(pushCrumb:Function) :JSX.Element =>{
+        return(Accordion.render(
+            ["Data", this.getSelectableAttributesEditor(pushCrumb)],
+            ["Titles", this.getTitlesEditor()],
+            ["Margins", this.getMarginEditor()],
+            ["Accessibility", this.getAltTextEditor()]
+        ))
     };
 
     getTitlesEditor():React.ReactChild[][]

@@ -435,7 +435,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
 	}
 	
-	renderEditor(pushCrumb:Function = null):JSX.Element
+	renderEditor = (pushCrumb:Function = null):JSX.Element =>
 	{
 		return Accordion.render(
 			[

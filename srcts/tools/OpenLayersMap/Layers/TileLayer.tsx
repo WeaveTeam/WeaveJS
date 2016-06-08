@@ -167,7 +167,7 @@ export default class TileLayer extends AbstractLayer
 	provider = Weave.linkableChild(this, new LinkableString("osm"));
 	providerOptions = Weave.linkableChild(this, new LinkableVariable(Object, null, {}));
 
-	renderEditor():JSX.Element
+	renderEditor=():JSX.Element=>
 	{
 		return <TileLayerEditor layer={this} editableFields={this.renderEditableFields()}/>;
 	}

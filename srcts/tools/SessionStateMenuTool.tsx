@@ -158,7 +158,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		});
 	}
 
-	renderEditor():JSX.Element
+	renderEditor =():JSX.Element =>
 	{
 		return(
 			<SessionStateMenuToolEditor sessionStateMenuTool={ this }/>

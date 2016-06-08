@@ -161,7 +161,7 @@ export default class BarChartLegend extends React.Component<IVisToolProps, IVisT
 
 	selectableAttributes = new Map<string, (IColumnWrapper | LinkableHashMap)>();
 
-	renderEditor() : JSX.Element{
+	renderEditor =():JSX.Element =>{
 		return(<VBox></VBox>);
 	}
 

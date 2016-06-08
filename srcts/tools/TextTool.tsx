@@ -81,7 +81,7 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 		});
 	}
 
-	renderEditor(pushCrumb:Function = null):JSX.Element
+	renderEditor =(pushCrumb:Function = null):JSX.Element =>
 	{
 		return (
 			<VBox>

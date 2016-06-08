@@ -125,7 +125,7 @@ export default class AbstractLayer implements ILinkableObject
 	}
 
 	//todo:find a better way to pass pushCrumb
-	renderEditor(pushCrumb:Function = null): JSX.Element {
+	renderEditor =(pushCrumb:Function = null): JSX.Element =>{
 		let attributeList: JSX.Element;
 		let idx = 0;
 
