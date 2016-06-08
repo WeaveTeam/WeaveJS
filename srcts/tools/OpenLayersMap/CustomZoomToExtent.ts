@@ -16,7 +16,7 @@ export default class CustomZoomToExtent extends ol.control.Control
 
 		let label: string|HTMLElement = options.label ? options.label : 'E';
 
-		let tipLabel: string = options.tipLabel ? options.tipLabel : 'Fit to extent';
+		let tipLabel: string = options.tipLabel ? options.tipLabel : 'Zoom to extent';
 
 		let button = $("<button>").addClass(className).prop("title", tipLabel).append(label);
 		let div = $("<div>").addClass("ol-unselectable ol-control ol-zoom-extent").append(button);
