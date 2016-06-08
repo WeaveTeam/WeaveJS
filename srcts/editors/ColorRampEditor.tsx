@@ -56,13 +56,18 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 	{
 		if (this.props.pushCrumb)
 		{
-			this.props.pushCrumb("Color Ramp", <ColorRampSelector colorRamp={this.colorRamp} pushCrumb= {this.props.pushCrumb} />);
+			this.props.pushCrumb("Color Ramp", this.renderColorRampSelectorForEditor);
 		}
 		else if (this.props.onButtonClick)
 		{
 			this.props.onButtonClick(event);
 		}
-	}
+	};
+
+	renderColorRampSelectorForEditor=():React.ReactChild =>
+	{
+		return <ColorRampSelector colorRamp={this.colorRamp} pushCrumb= {this.props.pushCrumb} />
+	};
 
 	// for Weave Tool Editor
 	renderCompactView()
@@ -144,7 +149,7 @@ class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRamp
 	{
 		if (this.props.colorRamp)
 			this.props.colorRamp.reverse();
-	}
+	};
 
 	addColor=(color:string,eventType:string)=>
 	{
@@ -158,22 +163,27 @@ class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRamp
 		}
 
 		this.props.colorRamp.setSessionState(colors)
-	}
+	};
 
 
 	handleColorRampSelectionChange = (newColors:number[]) =>
 	{
 		if (this.props.colorRamp)
 			this.props.colorRamp.setSessionState(newColors);
-	}
+	};
 
 	private onCustomizeButtonClick = (event:React.MouseEvent) =>
 	{
 		if (this.props.pushCrumb)
 		{
-			this.props.pushCrumb("Customize" , <ColorRampCustomizer style={ {border:"1px solid lightgrey"} } colorRamp={this.props.colorRamp} pushCrumb={this.props.pushCrumb}/>)
+			this.props.pushCrumb("Customize" , this.renderColorRampCustomizerForEditor)
 		}
-	}
+	};
+
+	renderColorRampCustomizerForEditor =():React.ReactChild =>
+	{
+		return <ColorRampCustomizer style={ {border:"1px solid lightgrey"} } colorRamp={this.props.colorRamp} pushCrumb={this.props.pushCrumb}/>
+	};
 
 	render()
 	{

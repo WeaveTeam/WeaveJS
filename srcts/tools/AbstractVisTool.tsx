@@ -281,7 +281,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		]
 	}
 
-	renderEditor(pushCrumb:Function = null):JSX.Element
+	renderEditor =(pushCrumb:Function = null):JSX.Element =>
 	{
 		return Accordion.render(
 			["Data", this.getSelectableAttributesEditor(pushCrumb)],

@@ -71,7 +71,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 	{
 		if (this.props.pushCrumb)
 		{
-			this.props.pushCrumb(Weave.lang("{0} layer", this.props.layers.getName(layer)), layer.renderEditor(this.props.pushCrumb));
+			this.props.pushCrumb(Weave.lang("{0} layer", this.props.layers.getName(layer)), layer.renderEditor);
 		}
 		else
 		{
@@ -82,7 +82,8 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		}
 		if (e)
 			e.stopPropagation();
-	}
+	};
+
 
 	generateItem=(layer:AbstractLayer, index:number):JSX.Element=>
 	{

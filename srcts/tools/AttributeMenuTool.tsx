@@ -128,7 +128,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		}
 	};
 
-	renderEditor(pushCrumb :Function = null):JSX.Element
+	renderEditor =(pushCrumb :Function = null):JSX.Element=> 
 	{
 		return (
 			<VBox>

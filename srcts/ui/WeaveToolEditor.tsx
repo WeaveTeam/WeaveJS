@@ -29,7 +29,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	public get tool():IVisTool { return this.toolWatcher.target as IVisTool; }
 	public set tool(value:IVisTool) { this.toolWatcher.target = value; }
 	private displayName:string;
-	private mapping_crumb_children:any = {};
+	private mapping_crumb_renderFn:any = {};
 	private mapping_crumb_children_state:any = {};
 	private crumbOrder:string[] = [];
 
@@ -55,7 +55,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			return;
 		}
 
-		this.mapping_crumb_children[title] = uiObject;
+		this.mapping_crumb_renderFn[title] = uiObject;
 		this.setState({
 			activeCrumb: title
 		});
@@ -69,7 +69,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		if (this.tool !== nextProps.tool)
 		{
 			//reset
-			this.mapping_crumb_children = {};
+			this.mapping_crumb_renderFn = {};
 			this.mapping_crumb_children_state = {};
 			this.crumbOrder = [];
 			
@@ -91,7 +91,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		this.crumbOrder[0] = this.displayName;
 
 		// Respective tool Editor is stored under display name
-		this.mapping_crumb_children[this.displayName] = this.tool.renderEditor(this.pushCrumb);
+		this.mapping_crumb_renderFn[this.displayName] = this.tool.renderEditor;
 	}
 
 	// flag to know is editor component mounted due crumb click
@@ -144,7 +144,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			alignItems:"center"
 		};
 
-		let originalEditorUI = this.mapping_crumb_children[this.state.activeCrumb];
+		let editorFunction = this.mapping_crumb_renderFn[this.state.activeCrumb];
+		let originalEditorUI = editorFunction(this.pushCrumb);
 
 		// cloned to add ref function to get the reference of active editor
 		// which helep in setting the state back when it was mounted
