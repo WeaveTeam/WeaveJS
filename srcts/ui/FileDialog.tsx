@@ -31,6 +31,7 @@ export interface IFileDialogProps extends React.Props<FileDialog>
 {
 	openUrlHandler:(url:string) => void;
 	openFileHandler:(file:File) => void;
+	skipConfirmation?: boolean; /* If true, don't ask for confirmation before loading the session */
 	context:React.ReactInstance;
 }
 
@@ -62,7 +63,7 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		}
 	}
 	
-	static open(context:React.ReactInstance, loadURL:(url:string) => void, loadFile:(file:File) => void)
+	static open(context:React.ReactInstance, loadURL:(url:string) => void, loadFile:(file:File) => void, skipConfirmation?: boolean)
 	{
 
 		if (FileDialog.window)
@@ -71,7 +72,7 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		FileDialog.window = PopupWindow.open(context, {
 			title: Weave.lang("Open a Weave Session"),
 			content:
-				<FileDialog openUrlHandler={loadURL} openFileHandler={loadFile} context={context}/>,
+				<FileDialog openUrlHandler={loadURL} openFileHandler={loadFile} context={context} skipConfirmation={skipConfirmation}/>,
 			footerContent: <div/>,
 			resizable: false,
 			draggable: false,
@@ -85,29 +86,37 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 
 	openHandler=(file:string|File,handler:Function)=>
 	{
-		PopupWindow.open(this.props.context, {
-			title: Weave.lang("Load Session"),
-			content: (
-				<VBox style={{flex: 1, justifyContent: "center"}}>
-					<HBox style={{flex: 1, alignItems: "center"}}>
-						<i style={{fontSize: 50, marginLeft: 15}} className="fa fa-exclamation-triangle weave-exclamation-triangle"></i>
-						<div style={{margin: 0, marginLeft: 5}} className="ui basic segment">
-							<div className="ui basic header">
-								{Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.")}
+		if (!this.props.skipConfirmation)
+		{
+			PopupWindow.open(this.props.context, {
+				title: Weave.lang("Load Session"),
+				content: (
+					<VBox style={{ flex: 1, justifyContent: "center" }}>
+						<HBox style={{ flex: 1, alignItems: "center" }}>
+							<i style={{ fontSize: 50, marginLeft: 15 }} className="fa fa-exclamation-triangle weave-exclamation-triangle"></i>
+							<div style={{ margin: 0, marginLeft: 5 }} className="ui basic segment">
+								<div className="ui basic header">
+									{Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.") }
+								</div>
 							</div>
-						</div>
-					</HBox>
-				</VBox>
-			),
-			resizable: false,
-			modal: true,
-			width: 480,
-			height: 230,
-			onOk: () => {
-				handler(file);
-				FileDialog.close();
-			},
-		});
+						</HBox>
+					</VBox>
+				),
+				resizable: false,
+				modal: true,
+				width: 480,
+				height: 230,
+				onOk: () => {
+					handler(file);
+					FileDialog.close();
+				},
+			});
+		}
+		else
+		{
+			handler(file);
+			FileDialog.close();
+		}
 	};
 
 	componentDidMount()
