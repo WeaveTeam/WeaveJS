@@ -4,12 +4,13 @@ import * as _ from "lodash";
 import {HBox,VBox} from  "../react-ui/FlexBox";
 import InteractiveTour from  "../react-ui/InteractiveTour";
 import FileDialog from  "../ui/FileDialog";
+import {LandingPageView} from "./LandingPage";
 
 
 export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComponent>
 {
 	//loader:(initialWeaveComponent:string)=>void;
-	onChange:any;//(landing:string)=>void;
+	onViewSelect:(view:LandingPageView)=>void;
 }
 
 export interface GetStartedComponentState
@@ -20,12 +21,6 @@ export interface GetStartedComponentState
 
 export default class GetStartedComponent extends React.Component<GetStartedComponentProps, GetStartedComponentState>
 {
-
-	static DATA:string = "data";
-	static SESSION:string = "session";
-	static INTERACTIVETOUR:string = "interactive tour";
-
-
 	constructor(props:GetStartedComponentProps)
 	{
 		super(props);
@@ -39,7 +34,6 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 	{
 		
 	}
-
 
 	enableInteractiveTourList=()=>
 	{
@@ -129,7 +123,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 					<HBox style={ {width:"100%",justifyContent: "space-around", position:"relative",flexWrap:"wrap"} }>
 						<VBox key="data"
 						      className="weave-getstarted-item"
-						      onClick={()=>this.props.onChange("DataSourceManager") }>
+						      onClick={()=>this.props.onViewSelect("default") }>
 							<div className="weave-getstarted-item-icon">
 								<i className="fa fa-database"></i>
 							</div>
@@ -137,7 +131,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 						</VBox>
 						<VBox key="charts"
 						      className="weave-getstarted-item"
-						      onClick={()=>this.props.onChange("FileDialog")}>
+						      onClick={()=>this.props.onViewSelect("file")}>
 							<div className="weave-getstarted-item-icon">
 								<i className="fa fa-file"></i>
 							</div>

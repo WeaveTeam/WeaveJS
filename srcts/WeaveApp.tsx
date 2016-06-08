@@ -46,7 +46,7 @@ export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 	weave:Weave;
 	renderPath?:WeavePathArray;
 	readUrlParams?:boolean;
-	landing?:string;
+	showFileDialog?:boolean;
 	initializeTabs?:boolean;
 }
 
@@ -63,7 +63,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
-		landing: "default",
+		showFileDialog: false,
 		renderPath: ['Tabs'],
 		readUrlParams: false,
 		initializeTabs: true
@@ -89,7 +89,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	getRenderPath():WeavePathArray
 	{
 		var renderPath:WeavePathArray = null;
-		if(this.props.readUrlParams)
+		if (this.props.readUrlParams)
 			renderPath = weavejs.WeaveAPI.CSVParser.parseCSVRow(this.urlParams.layout);
 		return renderPath || this.props.renderPath || WeaveApp.defaultProps.renderPath;
 	}
@@ -164,9 +164,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 		}
 		
-		if(this.props.landing == "FileDialog") {
-			FileDialog.open(this.menus.fileMenu.context,this.menus.fileMenu.loadUrl,this.menus.fileMenu.handleOpenedFile, true /* skip confirmation dialog */);
-		}
+		if (this.props.showFileDialog)
+			FileDialog.open(this.menus.fileMenu.context, this.menus.fileMenu.loadUrl, this.menus.fileMenu.handleOpenedFile, true /* skip confirmation dialog */);
 	}
 	
 	handleSideBarClose=()=>
@@ -340,7 +339,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	private initializeTabs=(tabLayout:TabLayout)=>
 	{
-		if(!this.props.initializeTabs)
+		if (!this.props.initializeTabs)
 			return;
 
 		var tabLayoutState = tabLayout.getSessionState();
@@ -435,7 +434,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	onTabClick=(panelPath:WeavePathArray, event:React.MouseEvent)=>
 	{
-		if(event.button == 1) // if middle click, close the tab
+		if (event.button == 1) // if middle click, close the tab
 		{
 			event.stopPropagation();
 			this.removeExistingTab(panelPath);
