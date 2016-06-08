@@ -42,13 +42,14 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 
 	render()
 	{
+		//value prop on input = "" because it allows us to load the same file again by clearing the value explicitly
 		var style = this.props.style || {};
 		style.position = "relative";
 		var props = _.clone(this.props);
 		delete props.children;
 		return (
 			<div style={{position: "relative", display:"flex"}} className={"ui fluid action input " +this.props.className}>
-				<input type="file" onClick={this.handleClick } {...props as any} onChange={this.onChange} style={{display:"none"}}/>
+				<input type="file" value = "" onClick={this.handleClick } {...props as any} onChange={this.onChange} style={{display:"none"}}/>
 				{
 					this.props.children
 				}
