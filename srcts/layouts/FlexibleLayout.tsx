@@ -86,8 +86,9 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		}
 		else
 		{
+			let newFlex = (state.children && state.children.length) ? 1/state.children.length:null;
 			state = {
-				children: [state, {id}],
+				children: [state, {id, flex: newFlex}],
 				direction: state.direction == 'horizontal' ? 'horizontal' : 'vertical'
 			};
 		}
