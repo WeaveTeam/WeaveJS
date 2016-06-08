@@ -17,6 +17,12 @@ export default class InteractionModeCluster extends ol.control.Control
 			"zoom": "fa-search-plus"
 		};
 
+		var nameMapping: { [mode:string]: string} = {
+			"pan": Weave.lang("Pan"),
+			"select": Weave.lang("Selection"),
+			"zoom": Weave.lang("Zoom to Box")
+		}
+
 		var options: any = optOptions || {};
 		var div = $(`
 			<div style="display: flex; flex-direction: column" class="iModeCluster ol-control ol-unselectable">
@@ -40,6 +46,7 @@ export default class InteractionModeCluster extends ol.control.Control
 		{
 			div.find("button." + mode)
 				.addClass(iconMapping[mode])
+				.prop("title", Weave.lang("Set mouse interaction mode to {0}.", Weave.lang(nameMapping[mode])))
 				.click(() => { if (self.interactionMode) self.interactionMode.value = mode; });
 		}
 
@@ -50,6 +57,8 @@ export default class InteractionModeCluster extends ol.control.Control
 
 			div.find("button.modeButton").removeClass("active");
 			div.find("button.modeButton." + mode).addClass("active");
+
+			div.prop("alt", Weave.lang("Mouse interaction mode set to {0}", Weave.lang(nameMapping[mode])));
 		});
 	}
 
