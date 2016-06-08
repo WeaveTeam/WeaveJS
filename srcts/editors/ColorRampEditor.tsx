@@ -66,7 +66,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 
 	renderColorRampSelectorForEditor=():JSX.Element =>
 	{
-		return <ColorRampSelector colorRamp={this.colorRamp} pushCrumb= {this.props.pushCrumb} />
+		return <ColorRampSelector colorRamp={this.props.colorRamp} pushCrumb= {this.props.pushCrumb} />
 	};
 
 	// for Weave Tool Editor
