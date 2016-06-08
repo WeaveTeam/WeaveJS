@@ -148,15 +148,20 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let root = this.props.weave.root;
 
 		let listOptions:ListOption[] = root.getObjects(IDataSource).map(dataSource => {
+			let icon = "fa fa-fw " + (dataSource.isLocal ? "fa-file-o" : "fa-globe");
+			let iconMessage = dataSource.isLocal ? "Does not use remote resources." : "Uses remote resources."
 			return {
 				label: (
 					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
-						<span style={{overflow: "hidden"}}>{dataSource.getLabel()}</span>
+						<HBox className="weave-padded-hbox" style={{ overflow: "hidden" }}>
+							<CenteredIcon iconProps={{ className: icon, title: Weave.lang(iconMessage) }}/>
+							<span style={{overflow: "hidden"}}>{dataSource.getLabel()}</span>
+						</HBox>
 						<HBox>
 							<CenteredIcon onClick={()=>this.refreshDataSource(dataSource)}
-							              iconProps={{ className: "fa fa-refresh", title: "Refresh this datasource" }}/>
+							              iconProps={{ className: "fa fa-refresh", title: Weave.lang("Refresh this datasource") }}/>
 							<CenteredIcon onClick={()=>this.removeDataSource(dataSource)}
-							              iconProps={{ className: "fa fa-times", title: "Delete this datasource" }}/>
+							              iconProps={{ className: "fa fa-times", title: Weave.lang("Delete this datasource") }}/>
 						</HBox>
 					</HBox>
 				),
