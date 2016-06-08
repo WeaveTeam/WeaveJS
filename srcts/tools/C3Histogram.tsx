@@ -621,7 +621,12 @@ export default class C3Histogram extends AbstractC3Tool
 					],
 					[
 						Weave.lang("Aggregation method"),
-						<ComboBox options={[COUNT, SUM, MEAN]} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
+						<DynamicComponent 
+							dependencies={[this.columnToAggregate]} 
+							render={() => 
+								<ComboBox options={[COUNT, SUM, MEAN]} type={this.columnToAggregate.getInternalColumn() ? null:"disabled"} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
+							}
+	                    />
 					],
 				]
 			],
