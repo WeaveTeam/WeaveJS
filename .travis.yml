@@ -6,7 +6,8 @@ before_install:
   - npm install
   - grunt
 install: npm run compile
-deploy:
+after_success:
+  skip_cleanup: true
   provider: script
   script: printDir.sh
   on:
