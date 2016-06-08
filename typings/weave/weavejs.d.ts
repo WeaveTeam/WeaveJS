@@ -2299,6 +2299,11 @@ declare module weavejs.api.data {
      */
     interface IDataSource extends ILinkableObject {
         /**
+         * A boolean determining whether or not a datasource depends on only session-local resources.
+         * @return False if the datasource uses or depends on remote/network resources, true otherwise.
+         */
+        isLocal: boolean;
+        /**
          * Gets the label of the root hierarchy node.
          * @return The label of the root hierarchy node.
          */
@@ -3464,6 +3469,7 @@ declare module weavejs.core {
      * A promise for file content, given a URL.
      */
     class LinkableFile implements ILinkableVariable {
+        isLocal: boolean;
         constructor(defaultValue?: string, taskDescription?: any, responseType?: string);
         result: Object;
         error: Object;
@@ -4459,9 +4465,16 @@ declare module weavejs.data {
     }
 }
 declare module weavejs.data {
+    import IDataSource = weavejs.api.data.IDataSource;
     import ProxyColumn = weavejs.data.column.ProxyColumn;
     class DataSourceUtils {
         static guessDataType(data: any[]): string;
+        /**
+         * Determine whether a datasource that uses columns from other datasources that are remote.
+         * @param  dataSource The datasource to test.
+         * @return            True if a remote column is used by the datasource; false otherwise.
+         */
+        static hasRemoteColumnDependencies(dataSource: IDataSource): boolean;
         /**
          * Fills a ProxyColumn with an appropriate internal column containing the given keys and data.
          * @param proxyColumn A column, pre-filled with metadata
@@ -5848,6 +5861,7 @@ declare module weavejs.data.hierarchy {
     import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
     class GlobalColumnDataSource implements IDataSource {
         static getInstance(root: ILinkableHashMap): IDataSource;
+        isLocal: boolean;
         constructor(root?: ILinkableHashMap);
         getLabel(): string;
         /**
@@ -6351,6 +6365,7 @@ declare module weavejs.data.source {
          */
         label: LinkableString;
         getLabel(): string;
+        isLocal: boolean;
         hierarchyRefresh: ICallbackCollection;
         /**
          * Sets _rootNode to null and triggers callbacks.
@@ -6428,6 +6443,7 @@ declare module weavejs.data.source {
     import LinkableString = weavejs.core.LinkableString;
     class CKANDataSource extends AbstractDataSource implements IDataSource_Service {
         constructor();
+        isLocal: boolean;
         url: LinkableString;
         apiVersion: LinkableNumber;
         useHttpPost: LinkableBoolean;
@@ -6475,6 +6491,7 @@ declare module weavejs.data.source {
      */
     class CSVDataSource extends AbstractDataSource implements IDataSource_File, ILinkableObjectWithNewProperties {
         constructor();
+        isLocal: boolean;
         getLabel(): string;
         csvData: LinkableVariable;
         keyType: LinkableString;
@@ -6547,6 +6564,7 @@ declare module weavejs.data.source {
     import LinkableVariable = weavejs.core.LinkableVariable;
     class CachedDataSource extends AbstractDataSource {
         constructor();
+        isLocal: boolean;
         type: LinkableString;
         state: LinkableVariable;
     }
@@ -6581,6 +6599,7 @@ declare module weavejs.data.source {
         static CONCEPT_NAME: string;
         static VARIABLE_NAME: string;
         constructor();
+        isLocal: boolean;
         keyType: LinkableString;
         apiKey: LinkableString;
         dataSet: LinkableString;
@@ -6600,6 +6619,10 @@ declare module weavejs.data.source {
      */
     class DBFDataSource extends AbstractDataSource implements IDataSource_File {
         constructor();
+        /**
+         * Hack until dbfUrl and shpUrl are turned into LinkableFiles;
+         */
+        isLocal: boolean;
         getLabel(): string;
         keyType: LinkableString;
         keyColName: LinkableString;
@@ -6642,6 +6665,7 @@ declare module weavejs.data.source {
         keyColumn: DynamicColumn;
         dataColumns: ILinkableHashMap;
         constructor();
+        isLocal: boolean;
         selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
         getHierarchyRoot(): IWeaveTreeNode;
     }
@@ -6653,6 +6677,7 @@ declare module weavejs.data.source {
     import LinkableString = weavejs.core.LinkableString;
     class GeoJSONDataSource extends AbstractDataSource implements IDataSource_File {
         constructor();
+        isLocal: boolean;
         getLabel(): string;
         url: LinkableFile;
         keyType: LinkableString;
@@ -6747,6 +6772,7 @@ declare module weavejs.data.source {
     class GroupedDataTransform extends AbstractDataSource implements ISelectableAttributes {
         static DATA_COLUMNNAME_META: string;
         constructor();
+        isLocal: boolean;
         selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
         groupByColumn: DynamicColumn;
         groupKeyType: LinkableString;
@@ -6768,6 +6794,7 @@ declare module weavejs.data.source {
         xColumn: DynamicColumn;
         yColumn: DynamicColumn;
         pointProjection: LinkableString;
+        isLocal: boolean;
         selectableAttributes: Map<string, (weavejs.api.data.IColumnWrapper | weavejs.api.core.ILinkableHashMap)>;
         constructor();
         getHierarchyRoot(): IWeaveTreeNode;
@@ -6789,6 +6816,7 @@ declare module weavejs.data.source {
     class WeaveDataSource extends AbstractDataSource implements IDataSource_Service, IDataSourceWithAuthentication {
         static debug: boolean;
         constructor();
+        isLocal: boolean;
         url: LinkableString;
         hierarchyURL: LinkableString;
         rootId: LinkableVariable;
