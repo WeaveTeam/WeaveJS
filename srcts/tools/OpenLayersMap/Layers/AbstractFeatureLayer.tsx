@@ -329,7 +329,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	{
 		if (fade === undefined) fade = 1;
 
-		let color = fill.color && AbstractFeatureLayer.toColorArray(fill.color, fill.alpha * fade) || [0, 0, 0, 0];
+		let color = (fill.color !== undefined && fill.color !== null) && AbstractFeatureLayer.toColorArray(fill.color, fill.alpha * fade) || [0, 0, 0, 0];
 		return new ol.style.Fill({color});
 	}
 
