@@ -7,7 +7,7 @@ import * as _ from "lodash";
 import Layout, {HORIZONTAL, VERTICAL, LayoutState} from "../react-ui/flexible-layout/Layout";
 import Div from "../react-ui/Div";
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
-import {AbstractLayout, LayoutProps, AnyAbstractLayout} from "./AbstractLayout";
+import {AbstractLayout, LayoutProps, AnyAbstractLayout, PanelDragEvent} from "./AbstractLayout";
 import PanelOverlay from "../PanelOverlay";
 import MiscUtils, {Structure} from "../utils/MiscUtils";
 import MouseUtils from "../utils/MouseUtils";
@@ -42,7 +42,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	private rootLayout:Layout;
 	private layoutRect:ClientRect;
 	private overlay:PanelOverlay;
-	private panelDragged:WeavePathArray;
+	private panelDragged:WeavePathArray; // required because we can't read drag data in dragover event
 	private panelOver:WeavePathArray;
 	private dropZone:DropZone = DropZone.NONE;
 	private prevClientWidth:number;
@@ -133,17 +133,9 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		if (!layout || layout === this.rootLayout || layout.state.maximized)
 			return;
 
-		// this variable is used for knowing what's the drag
-		// data in dragOver because the dragOver event cannot
-		// read drag data.
 		this.panelDragged = panelDragged;
 
-		// hack because dataTransfer doesn't exist on type event
-		(event as any).dataTransfer.setDragImage(this.rootLayout.getElementFromId(panelDragged), 0, 0);
-		event.dataTransfer.setData('text/plain', JSON.stringify({
-			layout: Weave.findPath(Weave.getRoot(this), this),
-			panelDragged
-		}));
+		PanelDragEvent.setPanelId(event, panelDragged, this.rootLayout.getElementFromId(panelDragged));
 	}
 
 	hideOverlay():void
@@ -156,29 +148,14 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		});
 	}
 
-	onDrop(event:React.DragEvent):void
-	{
-		var dragData = AbstractLayout.readDragData(event);
-		var panelDragged = dragData.panelDragged;
-		var otherLayout = Weave.followPath(Weave.getRoot(this), dragData.layout) as AbstractLayout;
-		if (panelDragged)
-		{
-			if(otherLayout && otherLayout != this)
-				otherLayout.removePanel(panelDragged);
-			this.updateLayout(panelDragged);
-			this.panelDragged = null;
-			this.dropZone = DropZone.NONE;
-			this.hideOverlay();
-		}
-	}
-
 	onDragOver(panelOver:WeavePathArray, event:React.DragEvent):void
 	{
 		event.preventDefault(); // allows the drop event to be triggered
-		event.dataTransfer.dropEffect = "move"; // hides the + icon browsers display
-
-		if (!this.panelDragged)
+		
+		if (!PanelDragEvent.hasPanelId(event))
 			return;
+		
+		event.dataTransfer.dropEffect = "move"; // hides the + icon browsers display
 		
 		var dropZone:DropZone;
 		[dropZone, panelOver] = this.getDropZone(panelOver);
@@ -236,14 +213,11 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 
 	getDropZone(panelOver:WeavePathArray):[DropZone, WeavePathArray]
 	{
-		if (!this.panelDragged)
-			return [DropZone.NONE, panelOver];
-		
 		// check for outer drop zones
 		var rootNode = ReactDOM.findDOMNode(this.rootLayout);
 		var rootRect = rootNode.getBoundingClientRect();
 		var panelNode:Element = null;
-		var event = MouseUtils.mouseEvent;
+		var event = MouseUtils.forComponent(this).mouseEvent;
 		
 		if (
 			event.clientX <= rootRect.left + this.outerZoneThickness
@@ -345,76 +319,126 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 
 		return state;
 	}
-	
-	updateLayout(panelDragged:WeavePathArray):void
+
+	onDrop(event:React.DragEvent):void
 	{
-		if (!panelDragged || !this.panelOver || !this.dropZone || _.isEqual(panelDragged, this.panelOver))
+		var sourceLayout = PanelDragEvent.getLayout(event, Weave.getWeave(this));
+		var srcId = PanelDragEvent.getPanelId(event);
+		var destId = this.panelOver;
+		
+		this.handlePanelDrop(sourceLayout, srcId, destId, this.dropZone);
+		
+		// cleanup
+		this.panelDragged = null;
+		this.dropZone = DropZone.NONE;
+		this.hideOverlay();
+	}
+	
+	handlePanelDrop(sourceLayout:AnyAbstractLayout, srcId:WeavePathArray, destId:WeavePathArray, dropZone:DropZone)
+	{
+		if (_.isEqual(destId, OUTER_PANEL_ID))
+			destId = null;
+		
+		if (!srcId || dropZone === DropZone.NONE || _.isEqual(srcId, destId))
 			return;
-
+		
+		var sourceFlexibleLayout = Weave.AS(sourceLayout, FlexibleLayout)
+		
 		var newState:LayoutState = _.cloneDeep(this.getSessionState());
-		var src:LayoutState = FlexibleLayout.findStateNode(newState, panelDragged);
-		var dest:LayoutState = _.isEqual(this.panelOver, OUTER_PANEL_ID) ? {} : FlexibleLayout.findStateNode(newState, this.panelOver);
-
-		if (!src || !dest)
+		var newSourceState:LayoutState;
+		
+		if (sourceLayout == this)
 		{
-			console.error("Unexpected error - could not find matching nodes", newState, src, dest);
+			newSourceState = newState;
+		}
+		else if (sourceFlexibleLayout)
+		{
+			newSourceState = _.cloneDeep(sourceFlexibleLayout.getSessionState());
+		}
+		else if (sourceLayout)
+		{
+			sourceLayout.removePanel(srcId);
+		}
+
+		var srcNode:LayoutState = newSourceState && FlexibleLayout.findStateNode(newSourceState, srcId);
+		var destNode:LayoutState = destId ? FlexibleLayout.findStateNode(newState, destId) : {};
+
+		if (sourceFlexibleLayout && !srcNode)
+		{
+			console.error("Unexpected error = could not find source state node", srcId, newSourceState);
+			return;
+		}
+		if (!destNode)
+		{
+			console.error("Unexpected error - could not find destination state node", destId, newState);
 			return;
 		}
 
-		if (this.dropZone === DropZone.CENTER)
+		if (dropZone === DropZone.CENTER)
 		{
-			var srcId = src.id;
-			src.id = dest.id;
-			dest.id = srcId;
+			if (sourceFlexibleLayout)
+			{
+				srcNode.id = destId;
+			}
+			else if (sourceLayout)
+			{
+				sourceLayout.addPanel(destId);
+			}
+			destNode.id = srcId;
 		}
 		else
 		{
 			if (weavejs.WeaveAPI.Locale.reverseLayout)
 			{
-				if (this.dropZone === DropZone.LEFT)
-					this.dropZone = DropZone.RIGHT;
-				else if (this.dropZone === DropZone.RIGHT)
-					this.dropZone = DropZone.LEFT;
+				if (dropZone === DropZone.LEFT)
+					dropZone = DropZone.RIGHT;
+				else if (dropZone === DropZone.RIGHT)
+					dropZone = DropZone.LEFT;
 			}
 
-			var srcParentArray:LayoutState[] = MiscUtils.findDeep(newState, (obj:LayoutState) => {
-				return Array.isArray(obj) && obj.indexOf(src) >= 0;
-			});
-
-			srcParentArray.splice(srcParentArray.indexOf(src), 1);
-
-			dest.direction = (this.dropZone === DropZone.TOP || this.dropZone === DropZone.BOTTOM) ? VERTICAL : HORIZONTAL;
-
-			if (_.isEqual(this.panelOver, OUTER_PANEL_ID))
+			if (sourceFlexibleLayout)
 			{
-				newState.flex = 0.5;
-				dest.children = [
-					{
-						id: panelDragged,
-						flex: 0.5
-					},
-					newState
-				];
-				newState = dest;
+				var srcParentArray:LayoutState[] = MiscUtils.findDeep(newSourceState, (obj:LayoutState) => {
+					return Array.isArray(obj) && obj.indexOf(srcNode) >= 0;
+				});
+				srcParentArray.splice(srcParentArray.indexOf(srcNode), 1);
 			}
-			else
+
+			destNode.direction = (dropZone === DropZone.TOP || dropZone === DropZone.BOTTOM) ? VERTICAL : HORIZONTAL;
+
+			if (destNode.id)
 			{
-				delete dest.id;
-				dest.children = [
+				delete destNode.id;
+				destNode.children = [
 					{
-						id: panelDragged,
+						id: srcId,
 						flex: 0.5
 					},
 					{
-						id: this.panelOver,
+						id: destId,
 						flex: 0.5
 					}
 				];
 			}
+			else
+			{
+				newState.flex = 0.5;
+				destNode.children = [
+					{
+						id: srcId,
+						flex: 0.5
+					},
+					newState
+				];
+				newState = destNode;
+			}
 
-			if (this.dropZone === DropZone.BOTTOM || this.dropZone === DropZone.RIGHT)
-				dest.children.reverse();
+			if (dropZone === DropZone.BOTTOM || dropZone === DropZone.RIGHT)
+				destNode.children.reverse();
 		}
+		
+		if (sourceFlexibleLayout && sourceFlexibleLayout != this)
+			sourceFlexibleLayout.setSessionState(newSourceState);
 		this.setSessionState(newState);
 	}
 
