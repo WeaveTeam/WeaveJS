@@ -552,7 +552,6 @@ export default class C3BarChart extends AbstractC3Tool
     //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void = null):JSX.Element =>
 	{
-		console.log("beta", Weave.beta);
 		return Accordion.render(
 			[Weave.lang("Data"), this.getSelectableAttributesEditor(pushCrumb)],
 			[
