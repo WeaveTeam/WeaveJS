@@ -210,7 +210,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 			if (Array.isArray(this.props.onAdd))
 			{
 				tabBarChildren = (
-					<Dropdown style={{display: "flex"}} menu={this.props.onAdd as MenuItemProps[]} direction="upward" keepOnScreen={false}>
+					<Dropdown style={{display: "flex"}} menu={this.props.onAdd as MenuItemProps[]} direction="upward" action="hide" keepOnScreen={false}>
 						<HBox className={classNames("weave-layout-tabs-label", "bottom")} style={{flex: 1}}>
 							<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")} iconProps={{ className: "fa fa-plus" }}/>
 						</HBox>
