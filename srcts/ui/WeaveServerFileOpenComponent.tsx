@@ -134,6 +134,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 							                idProperty="filename"
 							                showIdColumn={false}
 							                columnTitles={columnTitles}
+											onCellDoubleClick={(fileName) => {this.props.openHandler("/" + fileName, this.props.openUrlHandler)}}
 							                multiple={false}
 							                disableSort={true}
 							                headerHeight={0}
