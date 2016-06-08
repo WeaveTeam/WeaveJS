@@ -6,3 +6,8 @@ before_install:
   - npm install
   - grunt
 install: npm run compile
+deploy:
+  provider: script
+  script: printDir.sh
+  on:
+    branch: tests
