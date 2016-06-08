@@ -128,7 +128,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 		}
 	};
 
-	renderEditor =(pushCrumb :Function = null):JSX.Element=> 
+	renderEditor =(pushCrumb :(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void = null):JSX.Element=> 
 	{
 		return (
 			<VBox>
@@ -161,7 +161,7 @@ Weave.registerClass(
 interface IAttributeMenuTargetEditorProps
 {
 	attributeMenuTool:AttributeMenuTool;
-	pushCrumb : Function;
+	pushCrumb : (title:string,renderFn:()=>JSX.Element , stateObject:any )=>void;
 }
 
 interface IAttributMenuToolEditorState

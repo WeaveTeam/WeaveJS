@@ -44,7 +44,7 @@ export interface BinningDefinitionEditorProps
 	binnedColumn:BinnedColumn;
 	compact?:boolean;
 	onButtonClick?:React.MouseEventHandler;
-	pushCrumb?:Function;
+	pushCrumb?:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void;
 	insertTableRows?:React.ReactChild[][];
 }
 
@@ -74,22 +74,24 @@ export default class BinningDefinitionEditor extends React.Component<BinningDefi
 		// render for Weave Tool editor
 		if (this.props.pushCrumb)
 		{
-			var [attributeName, attributes] = SelectableAttributeComponent.findSelectableAttributes(this.props.binnedColumn);
-			this.props.pushCrumb(
-				"Binning",
-				<BinningDefinitionSelector
-					showNoneOption={this.props.showNoneOption}
-					attributeName={attributeName}
-					attributes={attributes}
-					pushCrumb={this.props.pushCrumb}
-				/>
-			);
+			this.props.pushCrumb("Binning",this.renderBinningDefinitionSelectorForEditor,null);
 		}
 		else if (this.props.onButtonClick)
 		{
 			this.props.onButtonClick(event);
 		}
-	}
+	};
+
+	renderBinningDefinitionSelectorForEditor=():JSX.Element=>{
+		var [attributeName, attributes] = SelectableAttributeComponent.findSelectableAttributes(this.props.binnedColumn);
+		return <BinningDefinitionSelector
+					showNoneOption={this.props.showNoneOption}
+					attributeName={attributeName}
+					attributes={attributes}
+					pushCrumb={this.props.pushCrumb}
+				/>
+
+	};
 
 	renderCompactView() // render for Weave Tool Editor
 	{
@@ -140,7 +142,7 @@ export interface BinningDefinitionSelectorProps
 	showNoneOption?: boolean;
 	attributeName: string;
 	attributes: Map<string, IColumnWrapper|ILinkableHashMap>;
-	pushCrumb?: Function;
+	pushCrumb?: (title:string,renderFn:()=>JSX.Element , stateObject:any)=>void;
 	insertTableRows?: React.ReactChild[][];
 }
 

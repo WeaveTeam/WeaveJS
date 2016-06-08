@@ -210,7 +210,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	}
 
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor =(pushCrumb:Function):JSX.Element =>
+	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):JSX.Element =>
 	{
 		return ReactUtils.generateTable({
 			body: renderSelectableAttributes(this.selectableAttributes, pushCrumb)

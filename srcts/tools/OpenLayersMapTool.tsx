@@ -909,7 +909,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
-	renderEditor =(pushCrumb:Function): JSX.Element =>
+	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element, stateObject:any)=>void): JSX.Element =>
 	{
 		return <OpenLayersMapToolEditor tool={this} pushCrumb={pushCrumb}/>
 	}
@@ -953,7 +953,7 @@ export interface IOpenLayersMapToolEditorState {
 
 export interface IOpenLayersMapToolEditorProps {
 	tool:OpenLayersMapTool,
-	pushCrumb:Function
+	pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void;
 }
 
 class OpenLayersMapToolEditor extends SmartComponent<IOpenLayersMapToolEditorProps,IOpenLayersMapToolEditorState>{

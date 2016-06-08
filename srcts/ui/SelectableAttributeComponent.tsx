@@ -32,7 +32,7 @@ export interface ISelectableAttributeComponentProps
 {
 	attributeName: string;
 	attributes: Map<string, IColumnWrapper|ILinkableHashMap>
-	pushCrumb?:Function
+	pushCrumb?:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void;
 	showAsList?:boolean;
 	style?: React.CSSProperties;
 	hideButton?: boolean;
@@ -114,7 +114,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 	{
 		if (this.props.pushCrumb)
 		{
-			this.props.pushCrumb("Attributes", this.renderAttributeSelectorForEditor.bind(this,attributeName));
+			this.props.pushCrumb("Attributes", this.renderAttributeSelectorForEditor.bind(this,attributeName),null);
 			return null;
 		}
 		else

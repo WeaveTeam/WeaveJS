@@ -22,7 +22,7 @@ export interface ColorRampEditorProps extends React.Props<ColorRampEditor>
 	colorRamp:ColorRamp;
 	compact?:boolean;
 	onButtonClick?:React.MouseEventHandler;
-	pushCrumb?:Function;
+	pushCrumb?:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void;
 }
 
 export interface ColorRampEditorState 
@@ -56,7 +56,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 	{
 		if (this.props.pushCrumb)
 		{
-			this.props.pushCrumb("Color Ramp", this.renderColorRampSelectorForEditor);
+			this.props.pushCrumb("Color Ramp", this.renderColorRampSelectorForEditor,null);
 		}
 		else if (this.props.onButtonClick)
 		{
@@ -64,7 +64,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 		}
 	};
 
-	renderColorRampSelectorForEditor=():React.ReactChild =>
+	renderColorRampSelectorForEditor=():JSX.Element =>
 	{
 		return <ColorRampSelector colorRamp={this.colorRamp} pushCrumb= {this.props.pushCrumb} />
 	};
@@ -100,7 +100,7 @@ export default class ColorRampEditor extends React.Component<ColorRampEditorProp
 interface ColorRampSelectorProps extends React.Props<ColorRampSelector>
 {
 	colorRamp:ColorRamp;
-	pushCrumb?:Function;
+	pushCrumb?:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void;
 }
 
 interface ColorRampSelectorState
@@ -176,11 +176,11 @@ class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRamp
 	{
 		if (this.props.pushCrumb)
 		{
-			this.props.pushCrumb("Customize" , this.renderColorRampCustomizerForEditor)
+			this.props.pushCrumb("Customize" , this.renderColorRampCustomizerForEditor,null)
 		}
 	};
 
-	renderColorRampCustomizerForEditor =():React.ReactChild =>
+	renderColorRampCustomizerForEditor =():JSX.Element =>
 	{
 		return <ColorRampCustomizer style={ {border:"1px solid lightgrey"} } colorRamp={this.props.colorRamp} pushCrumb={this.props.pushCrumb}/>
 	};
@@ -274,7 +274,7 @@ class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRamp
 interface ColorRampCustomizerProps extends React.HTMLProps<ColorRampCustomizer>
 {
 	colorRamp:ColorRamp;
-	pushCrumb?:Function;
+	pushCrumb?:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void;
 }
 
 interface ColorRampCustomizerState

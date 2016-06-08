@@ -47,7 +47,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	};
 
 	//todo : find a better way to get linked children
-	pushCrumb=(title:string,uiObject:React.ReactChild , stateObject:any = null):void=>
+	pushCrumb=(title:string,renderFn:()=>JSX.Element , stateObject:any = null):void=>
 	{
 		if(stateObject)
 		{
@@ -55,7 +55,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			return;
 		}
 
-		this.mapping_crumb_renderFn[title] = uiObject;
+		this.mapping_crumb_renderFn[title] = renderFn;
 		this.setState({
 			activeCrumb: title
 		});
