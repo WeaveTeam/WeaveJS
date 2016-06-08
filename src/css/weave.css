@@ -370,8 +370,12 @@ div.table-row-selected>div>div>div>div>div {
 
 /* tabs */
 .weave-tab-icon {
-	color: #808080
+	color: #909090
 }
+.weave-tab-icon:hover {
+	color: #000000
+}
+
 .weave-tab-container {
 	border-left: 1px solid #ddd;
 }
@@ -1008,7 +1012,12 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 }
 
 .weave-layout-tabs-label {
-	padding: 5px 8px 5px 8px
+	padding: 5px 8px 5px 8px;
+	border-left: 1px solid #9A9A9A;
+	border-right: 1px solid #9A9A9A;
+	border-bottom: 2px solid #949494;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
 }
 
 .weave-layout-tabs-label.active.bottom {

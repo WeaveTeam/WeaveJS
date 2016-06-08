@@ -264,7 +264,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 											onClick={(event) => {event.stopPropagation(); this.props.onRemove(panel.id)}}
 											className="weave-tab-icon"
 											title={Weave.lang("Close")}
-											iconProps={{ className:"fa fa-times-circle" }}
+											children="✕"
 										/>
 									:	null
 								}
