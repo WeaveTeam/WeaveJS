@@ -42,8 +42,8 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	private rootLayout:Layout;
 	private layoutRect:ClientRect;
 	private overlay:PanelOverlay;
-	private panelDragged:WeavePathArray; // required because we can't read drag data in dragover event
-	private panelOver:WeavePathArray;
+	private draggedId:WeavePathArray; // required because we can't read drag data in dragover event
+	private dragOverId:WeavePathArray;
 	private dropZone:DropZone = DropZone.NONE;
 	private prevClientWidth:number;
 	private prevClientHeight:number;
@@ -98,7 +98,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 
 	removePanel(id:WeavePathArray):void
 	{
-		var state = _.cloneDeep(this.getSessionState());
+		var state = this.getSessionState();
 		var node = FlexibleLayout.findStateNode(state, id);
 		if (node)
 		{
@@ -110,7 +110,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 
 	replacePanel(id:WeavePathArray, newId:WeavePathArray)
 	{
-		var state = _.cloneDeep(this.getSessionState());
+		var state = this.getSessionState();
 		var node:LayoutState = FlexibleLayout.findStateNode(state, id);
 		if(node)
 			node.id = newId;
@@ -121,7 +121,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 
 	maximizePanel(id:WeavePathArray, maximized:boolean):void
 	{
-		var state = _.cloneDeep(this.getSessionState());
+		var state = this.getSessionState();
 		var node = FlexibleLayout.findStateNode(state, id);
 		if (node)
 		{
@@ -138,15 +138,15 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 			this.repositionPanels();
 	}
 
-	onDragStart(panelDragged:WeavePathArray, event:React.DragEvent):void
+	onDragStart(draggedId:WeavePathArray, event:React.DragEvent):void
 	{
-		var layout = this.rootLayout.getComponentFromId(panelDragged);
-		if (!layout || layout === this.rootLayout || layout.state.maximized)
+		var layout = this.rootLayout.getComponentFromId(draggedId);
+		if (!layout)
 			return;
 
-		this.panelDragged = panelDragged;
+		this.draggedId = draggedId;
 
-		PanelDragEvent.setPanelId(event, panelDragged, this.rootLayout.getElementFromId(panelDragged));
+		PanelDragEvent.setPanelId(event, draggedId, layout);
 	}
 
 	hideOverlay():void
@@ -159,9 +159,17 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		});
 	}
 
-	onDragOver(panelOver:WeavePathArray, event:React.DragEvent):void
+	onDragOver(dragOverId:WeavePathArray, event:React.DragEvent):void
 	{
 		event.preventDefault(); // allows the drop event to be triggered
+		
+		if (_.isEqual(dragOverId, OUTER_PANEL_ID))
+		{
+			// do nothing if there are panels
+			var state = this.getSessionState();
+			if (state.id || state.children.length)
+				return;
+		}
 		
 		if (!PanelDragEvent.hasPanelId(event))
 			return;
@@ -169,25 +177,25 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		event.dataTransfer.dropEffect = "move"; // hides the + icon browsers display
 		
 		var dropZone:DropZone;
-		[dropZone, panelOver] = this.getDropZone(panelOver);
+		[dropZone, dragOverId] = this.getDropZone(dragOverId);
 		
 		// hide the overlay if hovering over the panel being dragged
-		if (_.isEqual(this.panelDragged, panelOver))
+		if (_.isEqual(this.draggedId, dragOverId))
 		{
-			this.panelOver = null;
+			this.dragOverId = null;
 			this.dropZone = DropZone.NONE;
 			this.hideOverlay();
 			return;
 		}
 		
 		// stop if nothing changed
-		if (this.panelOver === panelOver && this.dropZone === dropZone)
+		if (this.dragOverId === dragOverId && this.dropZone === dropZone)
 			return;
 
-		this.panelOver = panelOver;
+		this.dragOverId = dragOverId;
 		this.dropZone = dropZone;
 		
-		var rect = this.getLayoutPosition(panelOver);
+		var rect = this.getLayoutPosition(dragOverId);
 		var overlayStyle = _.clone(this.overlay.state.style);
 		overlayStyle.visibility = rect ? "visible" : "hidden";
 		if (rect)
@@ -222,12 +230,20 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		});
 	}
 
-	getDropZone(panelOver:WeavePathArray):[DropZone, WeavePathArray]
+	getDropZone(dragOverId:WeavePathArray):[DropZone, WeavePathArray]
 	{
+		if (_.isEqual(dragOverId, OUTER_PANEL_ID))
+			return [DropZone.CENTER, OUTER_PANEL_ID];
+		
+		var state = this.getSessionState();
+		var node:LayoutState = FlexibleLayout.findStateNode(state, dragOverId);
+		if (node && node.maximized)
+			return [DropZone.CENTER, dragOverId];
+		
 		// check for outer drop zones
-		var rootNode = ReactDOM.findDOMNode(this.rootLayout);
-		var rootRect = rootNode.getBoundingClientRect();
-		var panelNode:Element = null;
+		var rootElement = ReactDOM.findDOMNode(this.rootLayout);
+		var rootRect = rootElement.getBoundingClientRect();
+		var panelElement:Element = null;
 		var event = MouseUtils.forComponent(this).mouseEvent;
 		
 		if (
@@ -236,18 +252,18 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 			|| event.clientY <= rootRect.top + this.outerZoneThickness
 			|| event.clientY >= rootRect.top + rootRect.height - this.outerZoneThickness
 		) {
-			panelOver = OUTER_PANEL_ID;
-			panelNode = rootNode;
+			dragOverId = OUTER_PANEL_ID;
+			panelElement = rootElement;
 		}
 		else
 		{
-			panelNode = this.rootLayout.getElementFromId(panelOver);
+			panelElement = this.rootLayout.getElementFromId(dragOverId);
 		}
+
+		if (this.draggedId === dragOverId)
+			return [DropZone.NONE, dragOverId];
 		
-		if (this.panelDragged === panelOver)
-			return [DropZone.NONE, panelOver];
-		
-		var rect = panelNode.getBoundingClientRect();
+		var rect = panelElement.getBoundingClientRect();
 
 		var center = {
 			x: (rect.right - rect.left) / 2,
@@ -270,12 +286,12 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		};
 
 		if (Math.abs(deltaNorm.x) <= .4 && Math.abs(deltaNorm.y) <= .4)
-			return [DropZone.CENTER, panelOver];
+			return [DropZone.CENTER, dragOverId];
 		
 		var zoneIndex:number = Math.round((polarNorm.theta / (2 * Math.PI) * 4) + 4) % 4;
 
 		var dropZone = [DropZone.RIGHT, DropZone.BOTTOM, DropZone.LEFT, DropZone.TOP][zoneIndex];
-		return [dropZone, panelOver];
+		return [dropZone, dragOverId];
 	}
 
 	simplifyState(state:LayoutState):LayoutState
@@ -335,12 +351,12 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	{
 		var sourceLayout = PanelDragEvent.getLayout(event, Weave.getWeave(this));
 		var srcId = PanelDragEvent.getPanelId(event);
-		var destId = this.panelOver;
+		var destId = this.dragOverId;
 		
 		this.handlePanelDrop(sourceLayout, srcId, destId, this.dropZone);
 		
 		// cleanup
-		this.panelDragged = null;
+		this.draggedId = null;
 		this.dropZone = DropZone.NONE;
 		this.hideOverlay();
 	}
@@ -368,7 +384,10 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		}
 		else if (sourceLayout)
 		{
-			sourceLayout.removePanel(srcId);
+			if (dropZone === DropZone.CENTER && destId)
+				sourceLayout.replacePanel(srcId, destId);
+			else
+				sourceLayout.removePanel(srcId);
 		}
 
 		var srcNode:LayoutState = newSourceState && FlexibleLayout.findStateNode(newSourceState, srcId);
@@ -388,14 +407,14 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		if (dropZone === DropZone.CENTER)
 		{
 			if (sourceFlexibleLayout)
-			{
-				srcNode.id = destId;
-			}
+				srcNode.id = destId; // may be null, but simplifyState() will take care of it
 			else if (sourceLayout)
-			{
-				sourceLayout.addPanel(destId);
-			}
-			destNode.id = srcId;
+				sourceLayout.removePanel(srcId);
+			
+			if (destId)
+				destNode.id = srcId;
+			else
+				newState.id = srcId;
 		}
 		else
 		{
@@ -406,14 +425,9 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 				else if (dropZone === DropZone.RIGHT)
 					dropZone = DropZone.LEFT;
 			}
-
-			if (sourceFlexibleLayout)
-			{
-				var srcParentArray:LayoutState[] = MiscUtils.findDeep(newSourceState, (obj:LayoutState) => {
-					return Array.isArray(obj) && obj.indexOf(srcNode) >= 0;
-				});
-				srcParentArray.splice(srcParentArray.indexOf(srcNode), 1);
-			}
+			
+			if (srcNode)
+				srcNode.id = null; // simplifyState() will remove the node
 
 			destNode.direction = (dropZone === DropZone.TOP || dropZone === DropZone.BOTTOM) ? VERTICAL : HORIZONTAL;
 
@@ -467,8 +481,12 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	{
 		if (_.isEqual(layoutOrId, OUTER_PANEL_ID))
 			layoutOrId = this.rootLayout;
-		var node = layoutOrId instanceof Layout ? ReactDOM.findDOMNode(layoutOrId) : this.rootLayout.getElementFromId(layoutOrId);
-		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, node as HTMLElement);
+		if (!(layoutOrId instanceof Layout))
+			layoutOrId = this.rootLayout.getComponentFromId(layoutOrId);
+		var layout:Layout = layoutOrId as Layout;
+		if (layout.state.maximized)
+			layout = this.rootLayout;
+		return DOMUtils.getOffsetRect(ReactDOM.findDOMNode(this) as HTMLElement, ReactDOM.findDOMNode(layout) as HTMLElement);
 	}
 	
 	repositionPanels=(layout:Layout = null):void=>
@@ -484,7 +502,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		var div:Div = this.refs[JSON.stringify(layout.state.id)] as Div;
 		if (div instanceof Div)
 		{
-			var rect = layout.state.maximized ? this.layoutRect : this.getLayoutPosition(layout);
+			var rect = this.getLayoutPosition(layout);
 			if (rect)
 				div.setState({
 					style: {
@@ -595,7 +613,13 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 			overflow: "hidden" // don't let overflow expand the div size
 		});
 		return (
-			<div ref={ReactUtils.registerComponentRef(this)} {...this.props as React.HTMLAttributes} style={style}>
+			<div
+				ref={ReactUtils.registerComponentRef(this)}
+				{...this.props as React.HTMLAttributes}
+				style={style}
+				onDragOver={ this.onDragOver.bind(this, OUTER_PANEL_ID) }
+			    onDrop={this.onDrop.bind(this)}
+			>
 				{layout}
 				{components}
 				<PanelOverlay ref={(overlay:PanelOverlay) => this.overlay = overlay}/>
