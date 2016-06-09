@@ -116,7 +116,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			if (error)
 				console.error("Failed to retrieve ProjDatabase.zip, and using a non-default projection:", error);
 
-			if (result)
+			if (result && projectionName)
 				console.error("Invalid projection selected:", projectionName);
 		}
 
