@@ -5,13 +5,13 @@ import * as _ from "lodash";
 export interface ProgressBarProps extends React.HTMLProps<ProgressBar>
 {
 	progressValue?:any; //number;
-	visible?:boolean;
 	className?:string;
 	style?:React.CSSProperties;
 }
 
 export interface ProgressBarState
 {
+	visible:boolean;
 }
 
 export default class ProgressBar extends React.Component<ProgressBarProps, ProgressBarState>
@@ -19,6 +19,30 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
 	constructor(props:ProgressBarProps)
 	{
 		super(props);
+
+		this.state ={
+			visible: props.progressValue == 1 ? false : true
+		}
+	}
+
+
+	componentWillReceiveProps(nextProps:ProgressBarProps)
+	{
+		if(nextProps.progressValue != 1)
+		{
+			this.setState({
+				visible:true
+			});
+		}
+	}
+
+	componentDidUpdate(){
+		if(this.props.progressValue == 1)
+		{
+			this.setState({
+				visible:false
+			});
+		}
 	}
 
 	// important to keep its absolute and since its container is relative,
@@ -30,7 +54,7 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
 		let width:number =(this.props.progressValue || 0) /  1 * 100;
 		let progressUI:JSX.Element = null;
 		// width gets value 0 when all task are done
-		if(width != 0 || this.props.visible)
+		if(width != 0 && this.state.visible)
 		{
 			// absolute child
 			progressUI =<div className="weave-progress-bar" style={ {width: String(width) + "%", position:"absolute"} }/>;
