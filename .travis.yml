@@ -3,6 +3,9 @@ notifications:
 language: node_js
 node_js:
   - 0.12
+branches:
+  only:
+    - tests
 before_install:
   - npm install grunt-cli -g
   - npm install
