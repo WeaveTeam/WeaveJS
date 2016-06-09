@@ -111,6 +111,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 
 	onDragOverTab=(panel:TabState)=>
 	{
+		/*
 		// delay before switching tab
 		this.resetTimer = false;
 		var state = this.getSessionState();
@@ -124,6 +125,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 				}
 			}, 500);
 		}
+		*/
 	};
 
 	onDrop=(event:React.DragEvent)=>
