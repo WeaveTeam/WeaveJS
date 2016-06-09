@@ -16,3 +16,5 @@ before_script:
 after_success:
   - chmod a+x printDir.sh
   - ./printDir.sh
+  - cd dist/
+  - .././printDir.sh
