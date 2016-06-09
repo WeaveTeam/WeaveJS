@@ -199,6 +199,21 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		this.setSessionState(state);
 	}
 
+	replacePanel(id:WeavePathArray, newId:WeavePathArray):void
+	{
+		var tabState:TabState = null;
+		var state = this.getSessionState();
+		state.tabs.forEach(item => {
+			if (_.isEqual(id, item.id))
+				tabState = item;
+		});
+		if(tabState)
+			tabState.id = newId;
+		else
+			console.error("Could not find id in this layout", id);
+		this.setSessionState(state);
+	}
+
 	render():JSX.Element
 	{
 		var weave = Weave.getWeave(this);

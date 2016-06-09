@@ -108,6 +108,17 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		}
 	}
 
+	replacePanel(id:WeavePathArray, newId:WeavePathArray)
+	{
+		var state = _.cloneDeep(this.getSessionState());
+		var node:LayoutState = FlexibleLayout.findStateNode(state, id);
+		if(node)
+			node.id = newId;
+		else
+			console.error("Could not find id in this layout", id);
+		this.setSessionState(state);
+	}
+
 	maximizePanel(id:WeavePathArray, maximized:boolean):void
 	{
 		var state = _.cloneDeep(this.getSessionState());
