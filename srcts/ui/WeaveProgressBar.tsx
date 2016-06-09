@@ -59,7 +59,6 @@ export default class WeaveProgressBar extends React.Component<WeaveProgressBarPr
 		if (pendingCount == 0) // hide progress bar and text area
 		{
 			progressBarProps.visible = false;
-			progressBarProps.total = 1; // reset progress bar
 			this._maxProgressBarValue = 0;
 		}
 		else // display progress bar and text area
