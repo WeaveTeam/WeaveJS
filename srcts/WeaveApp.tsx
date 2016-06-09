@@ -165,7 +165,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 		
 		if (this.props.showFileDialog)
-			FileDialog.open(this.menus.fileMenu.context, this.menus.fileMenu.loadUrl, this.menus.fileMenu.handleOpenedFile, true /* skip confirmation dialog */);
+			FileDialog.open(this.menus.fileMenu.context, this.menus.fileMenu.loadUrl, this.menus.fileMenu.loadFile, true /* skip confirmation dialog */);
 	}
 	
 	handleSideBarClose=()=>

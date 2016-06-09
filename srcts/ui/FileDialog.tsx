@@ -107,7 +107,7 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 				width: 480,
 				height: 230,
 				onOk: () => {
-					handler(file);
+					handler(file,true);
 					FileDialog.close();
 				},
 			});

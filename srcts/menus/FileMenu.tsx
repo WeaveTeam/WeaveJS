@@ -171,6 +171,17 @@ export default class FileMenu implements MenuBarItemProps
 			types.unshift('.weave');
 		return types;
 	}
+	
+	loadFile=(file:File, pushHistory:Boolean = false)=>
+	{
+		this.fileName = "";
+
+		if (pushHistory)
+		{
+			history.pushState(null, "", FileMenu.buildBaseUrl());
+		}
+		this.handleOpenedFile(file);
+	};
 
 	handleOpenedFile=(file:File, dataFilesOnly:Boolean = false)=>
 	{
@@ -276,10 +287,15 @@ export default class FileMenu implements MenuBarItemProps
 		return results[0];
 	}
 
-	static buildUrl=(url:String)=>
+	static buildBaseUrl=()=>
 	{
 		return `${window.location.protocol}//${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}` +
-			`${window.location.pathname}?file=${url}`;
+			`${window.location.pathname}`;
+	};
+
+	static buildUrl=(url:String)=>
+	{
+		return FileMenu.buildBaseUrl() + `?file=${url}`;
 	}
 
 	handleHistoryEvent=(event:PopStateEvent)=>
