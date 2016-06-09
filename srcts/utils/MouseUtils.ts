@@ -57,6 +57,33 @@ export default class MouseUtils
 		var instance = MouseUtils.forElement(element);
 		return instance.mouseDownEvent && element && element.contains(instance.mouseDownEvent.target as Element);
 	}
+	
+	static isMouseOver(element:HTMLElement, event:MouseEvent = null, inclusive:boolean = true):boolean
+	{
+		var rect = element.getBoundingClientRect();
+		if (!event)
+			event = MouseUtils.forElement(element).mouseEvent;
+		
+		if (!event)
+		{
+			console.error(
+				"Warning: MouseUtils.isMouseOver(element, null) will not be correct the first time it is called.",
+				"To work around this, call MouseUtils.forElement() first."
+			);
+			return false;
+		}
+		
+		if (inclusive)
+			return event.clientX >= rect.left
+				&& event.clientX <= rect.left + rect.width
+				&& event.clientY >= rect.top
+				&& event.clientY <= rect.top + rect.height;
+		
+		return event.clientX > rect.left
+			&& event.clientX < rect.left + rect.width
+			&& event.clientY > rect.top
+			&& event.clientY < rect.top + rect.height;
+	}
 
 	private static map_window_MouseUtils = new WeakMap<Window, MouseUtils>();
 	
