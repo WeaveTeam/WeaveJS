@@ -38,6 +38,7 @@ import DataSourceManager from "./ui/DataSourceManager";
 import StatefulTextField from "./ui/StatefulTextField";
 import WeaveTree from "./ui/WeaveTree";
 
+import MouseUtils from "./utils/MouseUtils";
 import MiscUtils from "./utils/MiscUtils";
 import DOMUtils from "./utils/DOMUtils";
 import ReactUtils from "./utils/ReactUtils";
@@ -51,6 +52,7 @@ import * as ol from "openlayers";
 
 weavejs.util.StandardLib.lodash = lodash;
 weavejs.util.StandardLib.ol = ol;
+weavejs.util.StandardLib.MouseUtils = MouseUtils;
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 
 import * as jquery from "jquery";
@@ -101,6 +103,7 @@ export
 	StatefulTextField,
 	WeaveTree,
 	
+	MouseUtils,
 	MiscUtils,
 	DOMUtils,
 	ReactUtils,
