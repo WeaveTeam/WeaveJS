@@ -25,7 +25,7 @@ export interface WeaveToolEditorState
 
 export default class WeaveToolEditor extends React.Component<WeaveToolEditorProps, WeaveToolEditorState>
 {
-	private toolWatcher = forceUpdateWatcher(this, weavejs.api.ui.IVisTool);
+	private toolWatcher:LinkableWatcher = forceUpdateWatcher(this, weavejs.api.ui.IVisTool);
 	public get tool():IVisTool { return this.toolWatcher.target as IVisTool; }
 	public set tool(value:IVisTool) { this.toolWatcher.target = value; }
 	private displayName:string;
@@ -64,34 +64,42 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 
 
+	reset=()=>
+	{
+		//reset
+		this.mapping_crumb_renderFn = {};
+		this.mapping_crumb_children_state = {};
+		this.crumbOrder = [];
+	};
+
 	componentWillReceiveProps(nextProps:WeaveToolEditorProps)
 	{
 		if (this.tool !== nextProps.tool)
 		{
-			//reset
-			this.mapping_crumb_renderFn = {};
-			this.mapping_crumb_children_state = {};
-			this.crumbOrder = [];
-			
 			this.handleNewTool(nextProps.tool);
 		}
 	}
 	
 	private handleNewTool(tool:IVisTool)
 	{
-		this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(tool.constructor as new (..._: any[]) => any)
-		this.tool = tool;
-		var state = {
-			activeCrumb: this.displayName
-		};
-		if (this.state)
-			this.setState(state);
-		else
-			this.state = state;
-		this.crumbOrder[0] = this.displayName;
 
-		// Respective tool Editor is stored under display name
-		this.mapping_crumb_renderFn[this.displayName] = this.tool.renderEditor;
+		this.reset();
+		if(tool)
+		{
+			this.tool = tool;
+			this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.tool.constructor as new (..._: any[]) => any);
+			var state = {
+				activeCrumb: this.displayName
+			};
+			if (this.state)
+				this.setState(state);
+			else
+				this.state = state;
+			this.crumbOrder[0] = this.displayName;
+
+			// Respective tool Editor is stored under display name
+			this.mapping_crumb_renderFn[this.displayName] = this.tool.renderEditor;
+		}
 	}
 
 	// flag to know is editor component mounted due crumb click
@@ -137,18 +145,29 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 	private activeEditor:Element;
 
+	
+
 	render()
 	{
+		if(!this.tool)
+		{
+			this.reset();
+			// since forceUpdate is attached with toolWatcher, when tool gets disposed though weaveToolEditor is not rendered from weaveAPP
+			// still we will get a call,
+			// so its important to send empty div
+			// todo:find a better approach // try using react state than weaveCallback after multiple window is implemented
+			return <div/>;
+		}
 
 		var crumbStyle:React.CSSProperties = {
 			alignItems:"center"
 		};
 
-		let editorFunction = this.mapping_crumb_renderFn[this.state.activeCrumb];
+		let editorFunction:Function = this.mapping_crumb_renderFn[this.state.activeCrumb];
 		let originalEditorUI = editorFunction(this.pushCrumb);
 
 		// cloned to add ref function to get the reference of active editor
-		// which helep in setting the state back when it was mounted
+		// which help in setting the state back when it was mounted
 		let editorUI = React.cloneElement(originalEditorUI,{ref: (e:Element) =>{
 			if(typeof originalEditorUI.ref == 'function') // this ensures any ref attached in original Element still works
 			{
