@@ -21,7 +21,17 @@ export default class LandingPage extends React.Component<any, LandingPageState>
 		super(props);
 
 		this.urlParams = MiscUtils.getUrlParams();
-		var weaveExternalTools:any = window && window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
+		var weaveExternalTools: any;
+		/* Wrap this in a try/catch so we don't crash if there's a security exception from accessing a window in another domain. */
+		try
+		{
+			weaveExternalTools = window && window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
+		}
+		catch (e)
+		{
+			weaveExternalTools = null;
+		}
+
 		this.state = {
 			view: (
 				this.urlParams.skipIntro ||     //flag to skip splash screen
