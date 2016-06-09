@@ -162,7 +162,6 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 
 	render():JSX.Element
 	{
-		var menuStyle = this.props.style;
 		var otherProps:any = {};
 
 		for (var key in this.props)
@@ -177,7 +176,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			position: "absolute",
 			left: 0,
 			visibility: "hidden"
-		}, menuStyle);
+		}, this.props.style);
 
 		if (this.element)
 		{
@@ -198,7 +197,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		}
 
 		return (
-			<div className="menu" style={_.merge(menuStyle, this.props.style)} {...otherProps}>
+			<div className="menu" style={menuStyle} {...otherProps}>
 				{this.props.header ? (<div className="header">{this.props.header}</div>):null}
 				{this.renderMenuItems(this.props.menu)}
 			</div>
