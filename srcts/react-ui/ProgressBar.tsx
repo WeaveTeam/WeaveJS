@@ -5,7 +5,6 @@ import * as _ from "lodash";
 export interface ProgressBarProps extends React.HTMLProps<ProgressBar>
 {
 	progressValue?:any; //number;
-	total?:number;
 	visible?:boolean;
 	className?:string;
 	style?:React.CSSProperties;
@@ -28,7 +27,7 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
 	// This will ensure progress bar won't take space on the screen and it overlays on the component below the progress bar
 	render()
 	{
-		let width:number =(this.props.progressValue || 0) / (this.props.total || 1) * 100;
+		let width:number =(this.props.progressValue || 0) /  1 * 100;
 		let progressUI:JSX.Element = null;
 		// width gets value 0 when all task are done
 		if(width != 0 || this.props.visible)
