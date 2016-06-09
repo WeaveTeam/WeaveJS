@@ -36,8 +36,9 @@ export default class ProgressBar extends React.Component<ProgressBarProps, Progr
 		}
 	}
 
+	// this ensures the render function gets progress value 1 atleast once to show full width
 	componentDidUpdate(){
-		if(this.props.progressValue == 1)
+		if(this.props.progressValue == 1 && this.state.visible)
 		{
 			this.setState({
 				visible:false
