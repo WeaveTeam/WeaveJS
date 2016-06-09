@@ -47,7 +47,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	private dropZone:DropZone = DropZone.NONE;
 	private prevClientWidth:number;
 	private prevClientHeight:number;
-	private outerZoneThickness:number = 8;
+	private outerZoneThickness:number = 16;
 	
 	constructor(props:LayoutProps)
 	{
@@ -70,6 +70,14 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	componentDidMount():void
 	{
 		this.repositionPanels();
+		var document = ReactUtils.getDocument(this);
+		document.addEventListener("mouseup", this.onMouseUp, true);
+	}
+	
+	componentWillUnmount():void
+	{
+		var document = ReactUtils.getDocument(this);
+		document.removeEventListener("mouseup", this.onMouseUp, true);
 	}
 
 	componentDidUpdate():void
@@ -149,8 +157,10 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		PanelDragEvent.setPanelId(event, draggedId, layout);
 	}
 
-	hideOverlay():void
+	hideOverlay=():void=>
 	{
+		this.dropZone = DropZone.NONE;
+		
 		var overlayStyle = _.clone(this.overlay.state.style);
 		overlayStyle.visibility = "hidden";
 		overlayStyle.left = overlayStyle.top = overlayStyle.width = overlayStyle.height = 0;
@@ -183,7 +193,6 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		if (_.isEqual(this.draggedId, dragOverId))
 		{
 			this.dragOverId = null;
-			this.dropZone = DropZone.NONE;
 			this.hideOverlay();
 			return;
 		}
@@ -347,7 +356,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		return state;
 	}
 
-	onDrop(event:React.DragEvent):void
+	onDrop(dragOverId:WeavePathArray, event:React.DragEvent):void
 	{
 		var sourceLayout = PanelDragEvent.getLayout(event, Weave.getWeave(this));
 		var srcId = PanelDragEvent.getPanelId(event);
@@ -357,7 +366,22 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		
 		// cleanup
 		this.draggedId = null;
-		this.dropZone = DropZone.NONE;
+		this.hideOverlay();
+	}
+	
+	onDragLeave=(event:React.DragEvent):void=>
+	{
+		if (!MouseUtils.isMouseOver(ReactDOM.findDOMNode(this) as HTMLElement, event.nativeEvent as DragEvent, false))
+			this.hideOverlay();
+	}
+	
+	onDragEnd=(event:React.DragEvent):void=>
+	{
+		this.hideOverlay();
+	}
+	
+	onMouseUp=(event:MouseEvent):void=>
+	{
 		this.hideOverlay();
 	}
 	
@@ -574,7 +598,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 						key={key}
 						onDragOver={ this.onDragOver.bind(this, path) }
 						onDragStart={ this.onDragStart.bind(this, path) }
-					    onDrop={this.onDrop.bind(this)}
+					    onDrop={ this.onDrop.bind(this, path) }
 					>
 						<Div
 							ref={key}
@@ -618,7 +642,9 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 				{...this.props as React.HTMLAttributes}
 				style={style}
 				onDragOver={ this.onDragOver.bind(this, OUTER_PANEL_ID) }
-			    onDrop={this.onDrop.bind(this)}
+			    onDrop={ this.onDrop.bind(this, OUTER_PANEL_ID) }
+				onDragLeave={ this.onDragLeave }
+				onDragEnd={ this.onDragEnd }
 			>
 				{layout}
 				{components}
