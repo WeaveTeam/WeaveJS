@@ -16,6 +16,7 @@ import LinkableVariable = weavejs.core.LinkableVariable;
 import {Structure} from "../utils/MiscUtils";
 import {WeavePathArray} from "../utils/WeaveReactUtils";
 import WeavePath = weavejs.path.WeavePath;
+import MouseUtils from "../utils/MouseUtils";
 
 export interface PanelState
 {
@@ -156,7 +157,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 	{
 		return this.getSessionState().panels.map(panel => panel.id);
 	}
-	
+
 	updatePanelState(id:WeavePathArray, diff:PanelState):void
 	{
 		var state = this.getSessionState();
@@ -174,23 +175,65 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 		PanelDragEvent.setPanelId(event, panelDragged);
 	}
 
-	onDrag(panelDragged:WeavePathArray, event:React.DragEvent)
+	onDrag=(panelDragged:WeavePathArray, event:React.DragEvent)=>
 	{
 		console.log("dragging", event);
 	}
 
-	onDrop(event:React.DragEvent)
+	onDrop=(event:React.DragEvent)=>
 	{
 		var panelDragged = PanelDragEvent.getPanelId(event);
-		var otherLayout = PanelDragEvent.getLayout(event, Weave.getWeave(this));
+		var sourceLayout= PanelDragEvent.getLayout(event, Weave.getWeave(this));
 
 		// remove the panel from the other layout;
 		// add it to this layout;
-		if(otherLayout && otherLayout != this)
+		if(sourceLayout && sourceLayout != this)
 		{
-			otherLayout.removePanel(panelDragged);
-			this.addPanel(panelDragged);
+			var offsetPoint = MouseUtils.getOffsetPoint(ReactDOM.findDOMNode(this) as HTMLElement, event.nativeEvent as MouseEvent);
+			sourceLayout.removePanel(panelDragged);
+			var state = this.getSessionState();
+			state.panels = state.panels.concat({
+				id: panelDragged,
+				position: {
+					left: offsetPoint.x,
+					top: offsetPoint.y,
+					width: "50%",
+					height: "50%"
+				}
+			});
+			this.setSessionState(state);
+			this.hideOverlay();
 		}
+	};
+
+	onDragOver=(event:React.DragEvent)=>
+	{
+		event.preventDefault(); // allows the drop event to be triggered
+		if (!PanelDragEvent.hasPanelId(event))
+			return;
+
+		event.dataTransfer.dropEffect = "move"; // hides the + icon browsers display
+
+		var offsetPoint = MouseUtils.getOffsetPoint(ReactDOM.findDOMNode(this) as HTMLElement, event.nativeEvent as MouseEvent);
+
+		this.overlay.setState({
+			style: {
+				position: "absolute",
+				visibility: "visible",
+				backgroundColor: "rgba(0, 0, 0, 0.2)",
+				left: offsetPoint.x,
+				top: offsetPoint.y,
+				width: "50%",
+				height: "50%"
+			}
+		});
+	};
+
+	hideOverlay=()=>
+	{
+		this.overlay.setState({
+			style: {}
+		})
 	}
 
 	render():JSX.Element
@@ -201,13 +244,14 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 			<div
 				ref={ReactUtils.registerComponentRef(this)}
 				{...this.props as React.HTMLAttributes}
+				onDragOver={this.onDragOver}
+				onDrop={this.onDrop}
 				style={
 					_.merge({flex: 1}, this.props.style, {
 						position: "relative",
 						overflow: "hidden"
 					})
 				}
-			    onDrop={this.onDrop.bind(this)}
 			>
 				{
 					state.panels.map(state => {
