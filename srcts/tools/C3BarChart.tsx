@@ -179,7 +179,7 @@ export default class C3BarChart extends AbstractC3Tool
 	                            return null;
 
 	                        if(record)
-	                            return this.labelColumn.getValueFromKey(record.id);// otherwise return the value from the labelColumn
+	                            return Weave.lang(this.labelColumn.getValueFromKey(record.id));// otherwise return the value from the labelColumn
 
 	                        return null;
                         }
@@ -232,7 +232,7 @@ export default class C3BarChart extends AbstractC3Tool
 		}
 		else if(heightColumns.length > 0)
 		{
-			return ColumnUtils.deriveStringFromNumber(heightColumns[0], value)
+			return Weave.lang(ColumnUtils.deriveStringFromNumber(heightColumns[0], value));
 		}
 		return null;
 	};
