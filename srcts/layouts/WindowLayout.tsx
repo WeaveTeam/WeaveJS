@@ -15,6 +15,7 @@ import Div from "../react-ui/Div";
 import LinkableVariable = weavejs.core.LinkableVariable;
 import {Structure} from "../utils/MiscUtils";
 import {WeavePathArray} from "../utils/WeaveReactUtils";
+import WeavePath = weavejs.path.WeavePath;
 
 export interface PanelState
 {
@@ -108,7 +109,22 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 		state.panels = state.panels.concat({id, position: WindowLayout.generatePosition()});
 		this.setSessionState(state);
 	}
-	
+
+	replacePanel(id:WeavePathArray, newId:WeavePathArray)
+	{
+		var panelState:PanelState = null;
+		var state = this.getSessionState();
+		state.panels.forEach(item => {
+			if (_.isEqual(id, item.id))
+				panelState = item;
+		});
+		if(panelState)
+			panelState.id = newId;
+		else
+			console.error("Could not find id in this layout", id);
+		this.setSessionState(state);
+	}
+
 	static generatePosition():DraggableDivState
 	{
 		return {
