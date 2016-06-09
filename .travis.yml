@@ -11,9 +11,6 @@ before_install:
   - npm install
   - grunt
 install: npm run compile
-deploy:
-  skip_cleanup: true
-  provider: script
-  script: printDir.sh
-  on:
-    branch: tests
+after_success:
+  - chmod a+x printDir.sh
+  - ./printDir.sh
