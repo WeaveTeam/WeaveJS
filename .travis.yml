@@ -11,6 +11,8 @@ before_install:
   - npm install
   - grunt
 install: npm run compile
+after_install:
+  - grunt distall
 after_success:
   - chmod a+x printDir.sh
   - ./printDir.sh
