@@ -224,7 +224,8 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 				left: offsetPoint.x,
 				top: offsetPoint.y,
 				width: "50%",
-				height: "50%"
+				height: "50%",
+			    pointerEvents: "none"
 			}
 		});
 	};
@@ -233,7 +234,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 	{
 		this.overlay.setState({
 			style: {}
-		})
+		});
 	}
 
 	render():JSX.Element
