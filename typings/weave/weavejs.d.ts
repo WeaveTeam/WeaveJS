@@ -9558,6 +9558,7 @@ declare module weavejs.util {
          */
         static lodash: Object;
         static ol: Object;
+        static MouseUtils: Object;
         static formatNumber(number: number, precision?: number): string;
         /**
          * This function will cast a value of any type to a Number,
