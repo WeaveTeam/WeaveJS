@@ -40,6 +40,9 @@ const map_ref_mapping = new WeakMap<ReactComponent, LinkReactStateMapping>();
 
 export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(component:ReactComponent)=>void
 {
+	if (weavejs.WeaveAPI.debugAsyncStack)
+		var stackTrace = new Error("Stack trace for linkReactStateRef()");
+	
 	var prevComponent:ReactComponent;
 	return function(component:ReactComponent):void {
 		if (component)
