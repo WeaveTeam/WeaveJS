@@ -129,7 +129,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		var columns = this.getColumns();
 		return (
 			<VBox className="ui segment" style={{flex: 1}}>
-				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Preview of") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Preview")}</div>
+				<div className="ui medium dividing header" aria-label={Weave.lang("Preview of") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Preview")}</div>
 				<HBox className={root && root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
 					<VBox style={{flex: root && root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
 						<WeaveTree
@@ -152,9 +152,11 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	
 	renderConfigureView():JSX.Element
 	{
+		let registry = weavejs.WeaveAPI.ClassRegistry;
+		let displayName:string = Weave.lang(weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.dataSource.constructor as any));
 		return (
 			<VBox className="ui segment" style={ {border: "none"} }>
-				<div className="ui medium dividing header" aria-labelledby={Weave.lang("Configure") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Configure")}</div>
+				<div className="ui medium dividing header" aria-label={Weave.lang("Configure {0}:{1}",displayName,Weave.lang(this.props.dataSource.getLabel()))}>{Weave.lang("Configure {0}",displayName)}</div>
 				{
 					this.renderFields()
 				}

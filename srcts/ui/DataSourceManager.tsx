@@ -154,7 +154,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 				label: (
 					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
 						<HBox className="weave-padded-hbox" style={{ overflow: "hidden" }}>
-							<CenteredIcon iconProps={{ className: icon, title: Weave.lang(iconMessage) }}/>
+							<CenteredIcon className="" iconProps={{ className: icon, title: Weave.lang(iconMessage) }}/>
 							<span style={{overflow: "hidden"}}>{dataSource.getLabel()}</span>
 						</HBox>
 						<HBox>
