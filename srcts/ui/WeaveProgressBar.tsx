@@ -22,8 +22,7 @@ export default class WeaveProgressBar extends React.Component<WeaveProgressBarPr
 		super(props);
 		Weave.getCallbacks(ProgressIndicator).addGroupedCallback(this, this.forceUpdate);
 	}
-	
-	private _maxProgressBarValue:number = 0;
+
 	private timeBecameBusy:number = 0;
 	private autoVisibleDelay:number = 2000;
 	private visible:boolean = false;
@@ -59,13 +58,9 @@ export default class WeaveProgressBar extends React.Component<WeaveProgressBarPr
 		if (pendingCount == 0) // hide progress bar and text area
 		{
 			progressBarProps.visible = false;
-			this._maxProgressBarValue = 0;
 		}
 		else // display progress bar and text area
 		{
-			if (pendingCount > this._maxProgressBarValue)
-				this._maxProgressBarValue = pendingCount;
-			
 			progressBarProps.progressValue = ProgressIndicator.getNormalizedProgress(); // progress between 0 and 1
 			progressBarProps.visible = this.visible;
 		}
