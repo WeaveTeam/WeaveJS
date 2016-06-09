@@ -172,20 +172,16 @@ export default class C3BarChart extends AbstractC3Tool
                         multiline: false,
                         format: (num:number):string => {
 
-	                        if(this.horizontalMode.value)
-	                        {
-		                        return this.formatGetStringFromNumber(num);
-	                        }
-	                        else
-	                        {
-								let index = Math.round(num);
-		                        let record = this.records[index];
+							let index = Math.round(num);
+	                        let record = this.records[index];
 
-		                        if(this.labelColumn.getInternalColumn() == null)// if the labelColumn doesn't have any data, use default label
-		                            return null;
+	                        if(this.labelColumn.getInternalColumn() == null)// if the labelColumn doesn't have any data, use default label
+	                            return null;
 
-		                        return this.labelColumn.getValueFromKey(record.id);// otherwise return the value from the labelColumn
-	                        }
+	                        if(record)
+	                            return this.labelColumn.getValueFromKey(record.id);// otherwise return the value from the labelColumn
+
+	                        return null;
                         }
                     }
                 },
@@ -506,6 +502,8 @@ export default class C3BarChart extends AbstractC3Tool
         if (Weave.detectChange(this, this.horizontalMode))
         {
             changeDetected = true;
+	        //we override the default behavior of rotated for bar chart and histogram according to the horizontal mode boolean
+	        //rest of the charts, the default value is retained
             this.c3Config.axis.rotated = this.horizontalMode.value;
         }
 
@@ -583,7 +581,7 @@ export default class C3BarChart extends AbstractC3Tool
 			[Weave.lang("Titles"), this.getTitlesEditor()],
 			[Weave.lang("Margins"), this.getMarginEditor()]
 		);
-	}
+	};
 
 	public get deprecatedStateMapping():Object
 	{
