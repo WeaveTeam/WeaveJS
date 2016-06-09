@@ -37,7 +37,7 @@ stateStructure.children = MiscUtils.nullableStructure([stateStructure]);
 
 export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 {
-	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({flex: 1}, stateStructure)), this.forceUpdate, true);
+	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, this.simplifyState({flex: 1})), this.forceUpdate, true);
 	private nextState:Object;
 	private rootLayout:Layout;
 	private layoutRect:ClientRect;
@@ -167,7 +167,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		{
 			// do nothing if there are panels
 			var state = this.getSessionState();
-			if (state.id || state.children.length)
+			if (state.id || (state.children && state.children.length))
 				return;
 		}
 		
