@@ -978,6 +978,11 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	align-items: center;
 }
 
+.weave-dropzone-file:hover {
+	cursor: pointer;
+	background: #EEE;
+}
+
 .weave-dropzone-file-error {
 	width: 100%;
 	height: 100%;
@@ -986,6 +991,10 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	display: flex;
 	justify-content: center;
 	align-items: center;
+}
+
+.weave-dropzone-file-error:hover {
+	cursor: pointer;
 }
 
 .weave-data-source-manager-sidebar .weave-data-source-item:hover {
