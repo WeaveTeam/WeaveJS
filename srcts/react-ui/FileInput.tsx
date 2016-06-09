@@ -10,6 +10,8 @@ export interface FileInputProps extends React.HTMLProps<FileInput>
 
 export default class FileInput extends React.Component<FileInputProps, {}>
 {
+	input:HTMLInputElement;
+
 	constructor(props:FileInputProps)
 	{
 		super(props);
@@ -19,9 +21,8 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 	{
 		if(this.props.onChange)
 			this.props.onChange(e);
-		// simulate the click event we previously stopped
-		//Todo: I Think this is no longer necessary and can be removed
-		//DOMUtils.eventFire(ReactDOM.findDOMNode(this) as HTMLElement, "click");
+		// Might need to simulate the click event we previously stopped
+		// DOMUtils.eventFire(ReactDOM.findDOMNode(this) as HTMLElement, "click");
 	};
 	
 	handleClick=(e:React.MouseEvent)=>
@@ -29,16 +30,6 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 		e.stopPropagation(); // prevent the click event from running on the menubar
 							 // which causes the file menu to be unmounted
 	};
-
-	componentDidMount()
-	{
-		var element:Element = ReactDOM.findDOMNode(this);
-		$(element.querySelector('.ui.button,.weave-menuitem-padding'))
-			.on('click', function(e) {
-				$(element.querySelector('input')).click();
-			})
-		;
-	}
 
 	render()
 	{
@@ -48,13 +39,12 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 		var props = _.clone(this.props);
 		delete props.children;
 		return (
-			<div style={{position: "relative", display:"flex"}} className={"ui fluid action input " +this.props.className}>
-				<input type="file" value = "" onClick={this.handleClick } {...props as any} onChange={this.onChange} style={{display:"none"}}/>
+			<div onClick={(e:React.MouseEvent) => this.input.click() } style={{position: "relative", display:"flex"}} className={"ui fluid action input " + this.props.className}>
+				<input ref={(c) => this.input = c} type="file" value = "" onClick={this.handleClick } {...props as any} onChange={this.onChange} style={{display:"none"}}/>
 				{
 					this.props.children
 				}
 			</div>
-		)
+		);
 	}
-	
 }
