@@ -723,12 +723,13 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 
 /* Weave Progress Bar */
 .weave-progress-bar-background {
-	background-color: #E6E6E6;
+	background-color: transparent;
 }
 
 .weave-progress-bar {
 	background-color: rgba(109, 163, 228, 0.6);
 	transition-duration: 200ms;
+	height: 2px;
 	-webkit-transition: width .1s ease, background-color .1s ease;
 	-moz-transition: width .1s ease, background-color .1s ease;
 	transition: width .1s ease, background-color .1s ease;
