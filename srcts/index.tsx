@@ -17,16 +17,14 @@ $(() => {
 	
 	var showSplash = !!(window as any).SHOW_WEAVE_SPLASH;
 	var weave = new Weave();
-	var weaveApp = ReactDOM.render(
+	ReactDOM.render(
 		<LandingPage
 			weave={weave}
 			initialView={showSplash ? "splash" : "file"}
-			weaveAppRef={weaveApp => (window as any).weaveApp = weaveApp}
+			weaveAppRef={weaveApp => (window as any).weaveApp = weaveApp} // global var for debugging
 		/>,
 		document.getElementById(domId)
 	);
 	
-	// these global variables are only for debugging purposes
-	(window as any).weave = weave;
-	(window as any).weaveApp = weaveApp;
+	(window as any).weave = weave; // global var for debugging
 });
