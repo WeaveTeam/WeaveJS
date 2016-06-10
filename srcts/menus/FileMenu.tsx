@@ -9,6 +9,7 @@ import CheckBoxList from "../react-ui/CheckBoxList";
 import * as FileSaver from "filesaver.js";
 import Input from "../semantic-ui/Input";
 import WeaveArchive from "../WeaveArchive";
+
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IDataSource = weavejs.api.data.IDataSource;
@@ -179,6 +180,7 @@ export default class FileMenu implements MenuBarItemProps
 		if (pushHistory)
 		{
 			history.pushState(null, "", FileMenu.buildBaseUrl());
+			window.document.title = Weave.lang("Weave");
 		}
 		this.handleOpenedFile(file);
 	};
@@ -314,6 +316,7 @@ export default class FileMenu implements MenuBarItemProps
 		{
 			history.pushState(url, "", FileMenu.buildUrl(url));
 			window.onpopstate = this.handleHistoryEvent;
+			window.document.title = Weave.lang("Weave: {0}",this.fileName);
 		}
 
 		WeaveArchive.loadUrl(this.weave, String(url), this.updateProgressIndicator);
