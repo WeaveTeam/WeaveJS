@@ -107,14 +107,19 @@ export default class MouseUtils
 	private static buttonToButtonsMapping = [1, 4, 2];
 	
 	//--------------------
+	//
+	
+	static echoWindowEvents(windowSource:Window, windowTarget:Window) {
+		MouseUtils.mouseEventTypes.forEach(eventType => windowSource.document.addEventListener(eventType, (event) => windowTarget.requestAnimationFrame(() => windowTarget.document.dispatchEvent(event))));
+		MouseUtils.dragEventTypes.forEach(eventType => windowSource.document.addEventListener(eventType, (event) => windowTarget.requestAnimationFrame(() => windowTarget.document.dispatchEvent(event))));
+	}
 
+	static mouseEventTypes = ['click', 'dblclick', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'wheel'];
+	static dragEventTypes = ['dragstart', 'drag', 'dragenter', 'dragleave', 'dragover', 'drop', 'dragend'];
 	constructor(window:Window)
 	{
-		var mouseEventTypes = ['click', 'dblclick', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'wheel'];
-		var dragEventTypes = ['dragstart', 'drag', 'dragenter', 'dragexit', 'dragleave', 'dragover', 'drop', 'dragend'];
-		
-		mouseEventTypes.forEach(eventType => window.document.addEventListener(eventType, this.handleMouseEvent, true));
-		dragEventTypes.forEach(eventType => window.document.addEventListener(eventType, this.handleDragEvent, true));
+		MouseUtils.mouseEventTypes.forEach(eventType => window.document.addEventListener(eventType, this.handleMouseEvent, true));
+		MouseUtils.dragEventTypes.forEach(eventType => window.document.addEventListener(eventType, this.handleDragEvent, true));
 			
 		// for debugging
 		//mouseEventTypes.concat(dragEventTypes).forEach(eventType => window.document.addEventListener(eventType, this.debugEvent, true));
