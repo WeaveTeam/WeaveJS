@@ -156,13 +156,17 @@ export default class ToolTip extends React.Component<IToolTipProps, IToolTipStat
 	{
 		if (keys.length == 0)
 			return this.hide();
+
+		let title = ToolTip.getToolTipTitle(context, keys);
+		let columnNamesToValue = ToolTip.getToolTipData(context, keys, additionalColumns);
+		let showToolTip = !!(title || Object.keys(columnNamesToValue).length);
 		
 		this.setState({
 			x: event.clientX,
 			y: event.clientY,
-			showToolTip: true,
-			title: ToolTip.getToolTipTitle(context, keys),
-			columnNamesToValue: ToolTip.getToolTipData(context, keys, additionalColumns),
+			showToolTip,
+			title,
+			columnNamesToValue,
 			columnNamesToColor: {}
 		});
 	}
