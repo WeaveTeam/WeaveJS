@@ -6,6 +6,7 @@ import {HBox,VBox} from "../react-ui/FlexBox";
 import * as _ from "lodash";
 import * as jquery from "jquery";
 import polyfill from "./polyfill";
+import MouseUtils from "./MouseUtils";
 
 var $:JQueryStatic = (jquery as any)["default"];
 
@@ -61,6 +62,8 @@ export default class ReactUtils
 					return;
 				}
 			}
+
+			MouseUtils.echoWindowEvents(popoutWindow, window); /* Hack to make OpenLayers work correctly in the popout */
 			popoutWindow.document.title = windowOptions.windowName || "Weave Pop-Out";
 			container = popoutWindow.document.createElement('div');
 			container.id = divId;
