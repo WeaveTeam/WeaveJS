@@ -71,13 +71,13 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	{
 		this.repositionPanels();
 		var document = ReactUtils.getDocument(this);
-		document.addEventListener("mouseup", this.onMouseUp, true);
+		document.addEventListener("mouseup", this.onMouseUp);
 	}
 	
 	componentWillUnmount():void
 	{
 		var document = ReactUtils.getDocument(this);
-		document.removeEventListener("mouseup", this.onMouseUp, true);
+		document.removeEventListener("mouseup", this.onMouseUp);
 	}
 
 	componentDidUpdate():void
