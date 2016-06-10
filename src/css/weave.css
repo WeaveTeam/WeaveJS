@@ -201,6 +201,16 @@ div.table-row-selected>div>div>div>div>div {
 	-moz-user-select: none;
 }
 
+.weave-resizer-horizontal {
+	background: #e6e6e6;
+	width:4px;
+}
+
+.weave-resizer-vertical {
+	background: #e6e6e6;
+	height:4px;
+}
+
 /* table */
 .weave-table {
 	font-size: inherit;
@@ -802,6 +812,85 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	border: 8px solid #FFBE00;
 }
 
+
+/****** Layout - Tab *********/
+.weave-layout-tabs-content {
+	background: #ddd;
+	padding: 4px;
+	border-right: none;
+	border-top: none;
+}
+
+.weave-layout-tabs-bar {
+	padding-bottom: 4px;
+	padding-left: 4px;
+	cursor: default;
+	background: #b0b0b0;
+}
+
+.weave-layout-tabs-label {
+	padding: 5px 8px 5px 8px;
+	border-left: 1px solid #9A9A9A;
+	border-right: 1px solid #9A9A9A;
+	border-bottom: 2px solid #949494;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+.weave-layout-tabs-label.active.bottom {
+	margin-top: 0;
+	background-color: #ddd;
+	border-bottom-left-radius: 8px;
+	border-bottom-right-radius: 8px;
+}
+
+/********** Dropzone **********/
+.weave-dropzone-file {
+	width: 100%;
+	height: 100%;
+	background: whitesmoke;
+	border: dashed black 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-dropzone-file:hover {
+	cursor: pointer;
+	background: #EEE;
+}
+
+.weave-dropzone-file-error {
+	width: 100%;
+	height: 100%;
+	background: #FFF6F6;
+	border: dashed #E0B4B4 1px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+
+.weave-dropzone-file-error:hover {
+	cursor: pointer;
+}
+
+
+.weave-data-source-manager-sidebar .weave-data-source-item:hover {
+	color: white;
+	cursor: pointer;
+}
+
+.weave-data-source-item span {
+	padding: 0 10px 0 10px;
+}
+
+
+
+.weave-exclamation-triangle {
+	color: #FFDEA2;
+	text-shadow: -1px -1px 0 orange, 1px -1px 0 orange, -1px 1px 0 orange, 1px 1px 0 orange;
+}
+
 /* Override Semantic ui CSS*/
 
 /******* Breadcrumb *******/
@@ -969,76 +1058,7 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	color: rgba(0,0,0,.87);
 }
 
-.weave-dropzone-file {
-	width: 100%;
-	height: 100%;
-	background: whitesmoke;
-	border: dashed black 1px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
 
-.weave-dropzone-file:hover {
-	cursor: pointer;
-	background: #EEE;
-}
 
-.weave-dropzone-file-error {
-	width: 100%;
-	height: 100%;
-	background: #FFF6F6;
-	border: dashed #E0B4B4 1px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
 
-.weave-dropzone-file-error:hover {
-	cursor: pointer;
-}
-
-.weave-data-source-manager-sidebar .weave-data-source-item:hover {
-	color: white;
-	cursor: pointer;
-}
-
-.weave-data-source-item span {
-	padding: 0 10px 0 10px;
-}
-
-.weave-layout-tabs-content {
-	background: #ddd;
-	padding: 2px 4px 4px 4px;
-	border-right: none;
-	border-top: none;
-}
-
-.weave-layout-tabs-bar {
-	padding-bottom: 4px;
-	padding-left: 4px;
-	cursor: default;
-	background: #b0b0b0;
-}
-
-.weave-layout-tabs-label {
-	padding: 5px 8px 5px 8px;
-	border-left: 1px solid #9A9A9A;
-	border-right: 1px solid #9A9A9A;
-	border-bottom: 2px solid #949494;
-	border-bottom-left-radius: 8px;
-	border-bottom-right-radius: 8px;
-}
-
-.weave-layout-tabs-label.active.bottom {
-	margin-top: 0;
-	background-color: #ddd;
-	border-bottom-left-radius: 8px;
-	border-bottom-right-radius: 8px;
-}
-
-.weave-exclamation-triangle {
-	color: #FFDEA2;
-	text-shadow: -1px -1px 0 orange, 1px -1px 0 orange, -1px 1px 0 orange, 1px 1px 0 orange;
-}
 

@@ -5,9 +5,8 @@ import * as ReactDOM from "react-dom";
 import {HORIZONTAL, VERTICAL, Direction} from "./Layout"
 
 const STYLE_BASE = {
-	background: "#e6e6e6",
     boxSizing: "border-box",
-    backgroundClip: "padding"
+    backgroundClip: "padding-box"
 };
 
 const STYLE_HORIZONTAL = _.merge({
@@ -61,16 +60,20 @@ export default class Resizer extends React.Component<IResizerProps, IResizerStat
 	render():JSX.Element
 	{
 		var style:React.CSSProperties = this.props.direction === HORIZONTAL ? STYLE_HORIZONTAL : STYLE_VERTICAL;
+		var className:string = this.props.direction === HORIZONTAL ? "weave-resizer-horizontal": "weave-resizer-vertical";
 		
 		// makes a copy
 		style = prefixer(style);
 		
-		var spacing = this.props.spacing || Resizer.DEFAULT_SPACING;
-		if (this.props.direction === HORIZONTAL)
-			style.width = spacing;
-		else
-			style.height = spacing;
+		if(this.props.spacing)
+		{
+			if (this.props.direction === HORIZONTAL)
+				style.width = this.props.spacing;
+			else
+				style.height = this.props.spacing;
+		}
 
-		return <span style={style}/>;
+
+		return <span className={className} style={style}/>;
 	}
 }
