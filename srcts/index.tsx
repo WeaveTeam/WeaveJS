@@ -15,10 +15,18 @@ $(() => {
 		return;
 	}
 	
-	var urlParams = MiscUtils.getUrlParams();
-	(window as any).weave = new Weave();
-	(window as any).weaveApp = ReactDOM.render(
-		<LandingPage />,
+	var showSplash = !!(window as any).SHOW_WEAVE_SPLASH;
+	var weave = new Weave();
+	var weaveApp = ReactDOM.render(
+		<LandingPage
+			weave={weave}
+			initialView={showSplash ? "splash" : "file"}
+			weaveAppRef={weaveApp => (window as any).weaveApp = weaveApp}
+		/>,
 		document.getElementById(domId)
 	);
+	
+	// these global variables are only for debugging purposes
+	(window as any).weave = weave;
+	(window as any).weaveApp = weaveApp;
 });

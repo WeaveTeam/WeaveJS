@@ -96,7 +96,8 @@ module.exports = function (grunt) {
 			}
         },
         copy: {
-            main: {expand: true, flatten: true, cwd: 'src/', src: '**/index.html', dest: 'dist/'},
+            index_html: {expand: true, flatten: true, cwd: 'src/', src: 'index.html', dest: 'dist/'},
+            weave_html: {expand: true, flatten: true, cwd: 'src/', src: 'weave.html', dest: 'dist/'},
             css: {expand: true, flatten: true, cwd: 'src/', src: 'css/*.css', dest: 'dist/'},
             img: {expand: true, flatten: true, cwd: 'src/', src: 'img/*.*', dest: 'dist/img'},
             fonts: {expand: true, flatten: true, cwd: 'src/', src: 'css/fonts/*.ttf', dest: 'dist/fonts'},
@@ -120,7 +121,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
-    grunt.registerTask('distcopy', ['copy:main', 'copy:olcss', 'copy:css', 'copy:fontawesomecss', 'copy:fontawesomefont', 'copy:semantic', 'copy:projdb']);
+    grunt.registerTask('distcopy', ['copy:index_html', 'copy:weave_html', 'copy:olcss', 'copy:css', 'copy:fontawesomecss', 'copy:fontawesomefont', 'copy:semantic', 'copy:projdb']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);
     grunt.registerTask('distlibs', ['browserify:distlibs']);
     grunt.registerTask('default', ['ts', 'babel', 'browserify:dev', 'copy']);

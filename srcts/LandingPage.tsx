@@ -7,16 +7,23 @@ const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
 export declare type LandingPageView = "splash"|"default"|"file";
 
+export interface LandingPageProps
+{
+	initialView:LandingPageView;
+	weave:Weave;
+	weaveAppRef:(weaveApp:WeaveApp)=>void;
+}
+
 export interface LandingPageState
 {
 	view:LandingPageView;
 }
 
-export default class LandingPage extends React.Component<any, LandingPageState>
+export default class LandingPage extends React.Component<LandingPageProps, LandingPageState>
 {
 	urlParams:any;
 
-	constructor(props:any)
+	constructor(props:LandingPageProps)
 	{
 		super(props);
 
@@ -31,19 +38,17 @@ export default class LandingPage extends React.Component<any, LandingPageState>
 		{
 			weaveExternalTools = null;
 		}
-
-		this.state = {
-			view: (
-				this.urlParams.skipIntro ||     //flag to skip splash screen
-				this.urlParams.file) ||         //if a file is loaded skip splash screen
-				(weaveExternalTools && weaveExternalTools[window.name]) //if exporting from flash skip splash screen
-				? "default" : "splash"
-		}
+		
+		var view = props.initialView;
+		var exportedFromFlash = weaveExternalTools && weaveExternalTools[window.name];
+		if (this.urlParams.skipIntro || this.urlParams.file || exportedFromFlash)
+			view = "default";
+		
+		this.state = {view};
 	}
 
-	render():JSX.Element {
-
-		let weave:Weave = (window as any).weave;
+	render():JSX.Element
+	{
 		// let skipBlankPageIntro:boolean = this.urlParams ? StandardLib.asBoolean(this.urlParams.skipBlankPageIntro) : false;
 		//
 		// // check in loaded weave session state to skip BlankPageIntro
@@ -58,7 +63,7 @@ export default class LandingPage extends React.Component<any, LandingPageState>
 		// 	skipBlankPageIntro = true;
 		// }
 
-		if(this.state.view == "splash")
+		if (this.state.view == "splash")
 		{
 			return (
 				<GetStartedComponent style={ {width: "100%", height: "100%"} } onViewSelect={(view:LandingPageView) => {this.setState({view})}} />
@@ -67,7 +72,8 @@ export default class LandingPage extends React.Component<any, LandingPageState>
 
 		return (
 			<WeaveApp
-				weave={weave}
+				ref={this.props.weaveAppRef}
+				weave={this.props.weave}
 				style={{width: "100%", height: "100%"}}
 				showFileDialog={this.state.view == "file"}
 				readUrlParams={true}
