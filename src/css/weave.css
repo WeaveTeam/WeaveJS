@@ -739,10 +739,10 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 .weave-progress-bar {
 	background-color: rgba(109, 163, 228, 0.6);
 	transition-duration: 200ms;
-	height: 2px;
-	-webkit-transition: width .1s ease, background-color .1s ease;
-	-moz-transition: width .1s ease, background-color .1s ease;
-	transition: width .1s ease, background-color .1s ease;
+	height: 4px;
+	-webkit-transition: width .1s linear, visibility .1s ease-in-out;
+	-moz-transition: width .1s linear, visibility .1s ease-in-out;
+	transition: width .1s linear, visibility .1s ease-in-out;
 }
 
 /* Weave GetStart Section */
@@ -816,7 +816,13 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 /****** Layout - Tab *********/
 .weave-layout-tabs-content {
 	background: #ddd;
+<<<<<<< HEAD
 	padding: 2px 4px 4px 4px;
+||||||| parent of dd41c9c... copied weave css from develop
+	padding: 4px;
+=======
+	padding: 4px 4px 4px 4px;
+>>>>>>> dd41c9c... copied weave css from develop
 	border-right: none;
 	border-top: none;
 }
