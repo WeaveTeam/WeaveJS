@@ -739,7 +739,7 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 .weave-progress-bar {
 	background-color: rgba(109, 163, 228, 0.9);
 	transition-duration: 200ms;
-	height: 3px;
+	height: 4px;
 	-webkit-transition: width .1s linear, visibility .1s ease-in-out;
 	-moz-transition: width .1s linear, visibility .1s ease-in-out;
 	transition: width .1s linear, visibility .1s ease-in-out;
@@ -816,7 +816,7 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 /****** Layout - Tab *********/
 .weave-layout-tabs-content {
 	background: #ddd;
-	padding: 4px;
+	padding: 4px 4px 4px 4px;
 	border-right: none;
 	border-top: none;
 }
@@ -874,7 +874,6 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	cursor: pointer;
 }
 
-
 .weave-data-source-manager-sidebar .weave-data-source-item:hover {
 	color: white;
 	cursor: pointer;
@@ -883,8 +882,6 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 .weave-data-source-item span {
 	padding: 0 10px 0 10px;
 }
-
-
 
 .weave-exclamation-triangle {
 	color: #FFDEA2;
@@ -1057,12 +1054,3 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	right: 1rem;
 	color: rgba(0,0,0,.87);
 }
-
-.weave-layout-tabs-content {
-	background: #ddd;
-	padding: 4px 4px 4px 4px;
-	border-right: none;
-	border-top: none;
-}
-
-
