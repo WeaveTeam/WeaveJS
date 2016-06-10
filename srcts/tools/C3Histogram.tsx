@@ -41,17 +41,16 @@ import StandardLib = weavejs.util.StandardLib;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
-import ColumnUtils = weavejs.data.ColumnUtils;
 
 declare type Record = {
-	id: weavejs.api.data.IQualifiedKey,
+    id: weavejs.api.data.IQualifiedKey,
 	binnedColumn: number,
 	columnToAggregate: number
 };
 
 const COUNT = "count";
 const SUM = "sum";
-const MEAN = "mean";
+const MEAN = "mean"; 
 declare type AggregationMethod = "count"|"sum"|"mean";
 
 export default class C3Histogram extends AbstractC3Tool
@@ -61,11 +60,11 @@ export default class C3Histogram extends AbstractC3Tool
 	aggregationMethod = Weave.linkableChild(this, new LinkableString("count"));
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
-	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
+    barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
 	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
 	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
 	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
-
+	
 	get colorColumn()
 	{
 		return Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
@@ -99,7 +98,7 @@ export default class C3Histogram extends AbstractC3Tool
 				Weave.copyState(colorBinCol, this.binnedColumn);
 			else
 				Weave.copyState(colorBinCol.internalDynamicColumn, this.binnedColumn.internalDynamicColumn);
-
+			
 			var filteredColumn = Weave.AS(this.binnedColumn.getInternalColumn(), FilteredColumn);
 			if (filteredColumn)
 				Weave.linkState(this.filteredKeySet.keyFilter, filteredColumn.filter);
@@ -120,59 +119,59 @@ export default class C3Histogram extends AbstractC3Tool
 		columnToAggregate: Number
 	};
 
-	private idToRecord:{[id:string]: Record};
-	private keyToIndex:{[key:string]: number};
-	private heightColumnNames:string[];
-	private histData:{[key:string]: number}[];
-	private keys:{x?:string, value:string[]};
+    private idToRecord:{[id:string]: Record};
+    private keyToIndex:{[key:string]: number};
+    private heightColumnNames:string[];
+    private histData:{[key:string]: number}[];
+    private keys:{x?:string, value:string[]};
 	private records:Record[];
-	protected c3ConfigYAxis:c3.YAxisConfiguration;
+    protected c3ConfigYAxis:c3.YAxisConfiguration;
 
 	get internalColorColumn():ColorColumn {
 		return Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
 	}
-
-	constructor(props:IVisToolProps)
-	{
-		super(props);
-
+	
+    constructor(props:IVisToolProps)
+    {
+        super(props);
+		
 		this.filteredKeySet.setSingleKeySource(this.fill.color);
 
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
-		Weave.getCallbacks(this.fill.color.internalDynamicColumn).addGroupedCallback(this, this.setBinnedColumn);
-
+	    Weave.getCallbacks(this.fill.color.internalDynamicColumn).addGroupedCallback(this, this.setBinnedColumn);
+		
 		// don't lock the ColorColumn, so linking to global ColorColumn is possible
 		var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn, false);
 		_colorColumn.ramp.setSessionState([0x808080]);
 		var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn, true);
 		var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn, true);
 
-		this.idToRecord = {};
-		this.keyToIndex = {};
+        this.idToRecord = {};
+        this.keyToIndex = {};
 
-		this.mergeConfig({
-			data: {
-				columns: [],
-				type: "bar",
-				xSort: false,
-				names: {},
-				labels: {
-					format: (v, id, i, j) => {
-						if (this.showValueLabels.value)
-						{
-							return FormatUtils.defaultNumberFormatting(v);
-						}
-						else
-						{
-							return "";
-						}
-					}
-				},
-				color: (color:string, d:any):string => {
-					if (d && d.hasOwnProperty("index"))
+        this.mergeConfig({
+            data: {
+                columns: [],
+                type: "bar",
+                xSort: false,
+                names: {},
+	            labels: {
+		            format: (v, id, i, j) => {
+			            if (this.showValueLabels.value)
+			            {
+				            return FormatUtils.defaultNumberFormatting(v);
+			            }
+			            else
+			            {
+				            return "";
+			            }
+		            }
+	            },
+                color: (color:string, d:any):string => {
+                    if (d && d.hasOwnProperty("index"))
 					{
 						var binIndex = d.index;
 						if (weavejs.WeaveAPI.Locale.reverseLayout)
@@ -180,89 +179,105 @@ export default class C3Histogram extends AbstractC3Tool
 						var cc = this.internalColorColumn;
 						if (cc)
 							return StandardLib.getHexColor(cc.getColorFromDataValue(binIndex));
-					}
-					return "#808080";
-				},
-				onmouseover: (d:any) => {
-					if (d && d.hasOwnProperty("index"))
-					{
-						var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
-						if (!keys)
-							return;
-						this.probeKeySet.replaceKeys(keys);
-						this.toolTip.show(this, this.chart.internal.d3.event, keys, [this.binnedColumn, this.columnToAggregate]);
-					}
-				}
-			},
-			legend: {
-				show: false
-			},
-			axis: {
-				x: {
-					type: "category",
-					label: {
-						text: "",
-						position: "outer-center"
-					},
-					tick: {
-						rotate: this.xAxisLabelAngle.value,
-						culling: {
-							max: null
-						},
-						multiline: false,
-						format: (num:number):string => {
-							return Weave.lang(ColumnUtils.deriveStringFromNumber(this.binnedColumn, num));
-						}
-					}
-				},
-				rotated: false
-			},
-			grid: {
-				x: {
-					show: true
-				},
-				y: {
-					show: true
-				}
-			},
-			bar: {
-				width: {
-					ratio: NaN
-				}
-			}
-		});
-		this.c3ConfigYAxis = {
-			show: true,
-			label: {
-				text: "",
-				position: "outer-middle"
-			},
-			tick: {
-				fit: false,
-				format: (num:number):string => {
-					return Weave.lang(ColumnUtils.deriveStringFromNumber(this.columnToAggregate, num));
-				}
-			}
-		}
-	}
+                    }
+                    return "#808080";
+                },
+                onmouseover: (d:any) => {
+                    if (d && d.hasOwnProperty("index"))
+                    {
+                        var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
+                        if (!keys)
+                            return;
+                        this.probeKeySet.replaceKeys(keys);
+                        this.toolTip.show(this, this.chart.internal.d3.event, keys, [this.binnedColumn, this.columnToAggregate]);
+                    }
+                }
+            },
+            legend: {
+                show: false
+            },
+            axis: {
+                x: {
+                    type: "category",
+                    label: {
+                        text: "",
+                        position: "outer-center"
+                    },
+                    tick: {
+                        rotate: this.xAxisLabelAngle.value,
+                        culling: {
+                            max: null
+                        },
+                        multiline: false,
+                        format: (num:number):string => {
+                            if (this.element)
+                            {
+                                var labelHeight:number = Number(this.margin.bottom)/Math.cos(45*(Math.PI/180));
+                                var labelString:string = Weave.lang(this.getLabelString(num));
+                                if (labelString)
+                                {
+									return this.formatXAxisLabel(labelString);
+                                }
+                                else
+                                {
+                                    return "";
+                                }
+                            }
+                            else
+                            {
+                                return Weave.lang(this.binnedColumn.deriveStringFromNumber(num));
+                            }
+                        }
+                    }
+                },
+                rotated: false
+            },
+            grid: {
+                x: {
+                    show: true
+                },
+                y: {
+                    show: true
+                }
+            },
+            bar: {
+                width: {
+                    ratio: NaN
+                }
+            }
+        });
+        this.c3ConfigYAxis = {
+            show: true,
+            label: {
+                text: "",
+                position: "outer-middle"
+            },
+            tick: {
+                fit: false,
+                format: (num:number):string => {
+                    return Weave.lang(String(FormatUtils.defaultNumberFormatting(num)));
+                }
+            }
+        }
+    }
 
-	private getLabelString(num:number):string
-	{
-		if (weavejs.WeaveAPI.Locale.reverseLayout)
-		{
-			//handle case where labels need to be reversed
-			var temp:number = this.histData.length-1;
-			return Weave.lang(this.binnedColumn.deriveStringFromNumber(temp-num));
-		}
-		else
-			return Weave.lang(this.binnedColumn.deriveStringFromNumber(num));
-	}
+    private getLabelString(num:number):string
+    {
+        if (weavejs.WeaveAPI.Locale.reverseLayout)
+        {
+            //handle case where labels need to be reversed
+            var temp:number = this.histData.length-1;
+            return Weave.lang(this.binnedColumn.deriveStringFromNumber(temp-num));
+        }
+        else
+            return Weave.lang(this.binnedColumn.deriveStringFromNumber(num));
+    }
 
-	rotateAxes()
-	{
-		//this.c3Config.axis.rotated = true;
-		//this.forceUpdate();
-	}
+    rotateAxes()
+    {
+        //this.c3Config.axis.rotated = true;
+        //this.forceUpdate();
+    }
 
 	get defaultXAxisLabel():string
 	{
@@ -289,24 +304,24 @@ export default class C3Histogram extends AbstractC3Tool
 		}
 	}
 
-	private getYAxisLabel():string
-	{
-		var overrideAxisName = this.yAxisName.value;
-		if (overrideAxisName)
-		{
-			return overrideAxisName;
-		}
-		else
-		{
-			return this.defaultYAxisLabel;
-		}
-	}
+    private getYAxisLabel():string
+    {
+        var overrideAxisName = this.yAxisName.value;
+        if (overrideAxisName)
+        {
+            return overrideAxisName;
+        }
+        else
+        {
+            return this.defaultYAxisLabel;
+        }
+    }
 
 	protected handleC3Selection():void
 	{
 		if (!this.selectionKeySet)
 			return;
-
+		
 		var set_selectedKeys = new Set<IQualifiedKey>();
 		var selectedKeys:IQualifiedKey[] = [];
 		for (var d of this.chart.selected())
@@ -325,198 +340,196 @@ export default class C3Histogram extends AbstractC3Tool
 		}
 		this.selectionKeySet.replaceKeys(selectedKeys);
 	}
+	
+    updateStyle()
+    {
+        let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
 
-	updateStyle()
-	{
-		let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+        var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
+        var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
+        var selectedRecords:Record[] = _.filter(this.records, function(record:Record) {
+            return _.includes(selectedKeys, record.id);
+        });
+        var probedRecords:Record[] = _.filter(this.records, function(record:Record) {
+            return _.includes(probedKeys, record.id);
+        });
+        var selectedBinIndices:number[] = _.map(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn') as number[];
+        var probedBinIndices:number[] = _.map(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn') as number[];
 
-		var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
-		var probedKeys:IQualifiedKey[] = this.probeKeySet ? this.probeKeySet.keys : [];
-		var selectedRecords:Record[] = _.filter(this.records, function(record:Record) {
-			return _.includes(selectedKeys, record.id);
-		});
-		var probedRecords:Record[] = _.filter(this.records, function(record:Record) {
-			return _.includes(probedKeys, record.id);
-		});
-		var selectedBinIndices:number[] = _.map(_.uniq(selectedRecords, 'binnedColumn'), 'binnedColumn') as number[];
-		var probedBinIndices:number[] = _.map(_.uniq(probedRecords, 'binnedColumn'), 'binnedColumn') as number[];
+        d3.select(this.element).selectAll("path.c3-shape")
+            .style("stroke",
+                (d: any, i:number, oi:number): string => {
+                    let selected = _.intersection(selectedBinIndices,[i]).length;
+                    let probed = _.intersection(probedBinIndices,[i]).length;
+                    if (probed && selected)
+                        return "white";
+                    else
+                        return "black";
+                })
+            .style("opacity",
+                (d: any, i: number, oi: number): number => {
+                    let selected = _.intersection(selectedBinIndices,[i]).length;
+                    let probed = _.intersection(probedBinIndices,[i]).length;
+                    return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
+                })
+            .style("stroke-opacity",
+                (d: any, i: number, oi: number): number => {
+                    let selected = _.intersection(selectedBinIndices,[i]).length;
+                    let probed = _.intersection(probedBinIndices,[i]).length;
+                    if (probed)
+                        return 1.0;
+                    if (selected)
+                        return 0.5;
+                    return 0.3;
+                })
+            .style("stroke-width",
+                (d: any, i: number, oi: number): number => {
+                    let selected = _.intersection(selectedBinIndices,[i]).length;
+                    let probed = _.intersection(probedBinIndices,[i]).length;
+                    if (probed && selected)
+                        return 2.5;
+                    return probed ? 1.7 : 1.0;
+                });
 
-		d3.select(this.element).selectAll("path.c3-shape")
-			.style("stroke",
-				(d: any, i:number, oi:number): string => {
-					let selected = _.intersection(selectedBinIndices,[i]).length;
-					let probed = _.intersection(probedBinIndices,[i]).length;
-					if (probed && selected)
-						return "white";
-					else
-						return "black";
-				})
-			.style("opacity",
-				(d: any, i: number, oi: number): number => {
-					let selected = _.intersection(selectedBinIndices,[i]).length;
-					let probed = _.intersection(probedBinIndices,[i]).length;
-					return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
-				})
-			.style("stroke-opacity",
-				(d: any, i: number, oi: number): number => {
-					let selected = _.intersection(selectedBinIndices,[i]).length;
-					let probed = _.intersection(probedBinIndices,[i]).length;
-					if (probed)
-						return 1.0;
-					if (selected)
-						return 0.5;
-					return 0.3;
-				})
-			.style("stroke-width",
-				(d: any, i: number, oi: number): number => {
-					let selected = _.intersection(selectedBinIndices,[i]).length;
-					let probed = _.intersection(probedBinIndices,[i]).length;
-					if (probed && selected)
-						return 2.5;
-					return probed ? 1.7 : 1.0;
-				});
+        //handle selected paths
+        d3.select(this.element)
+            .selectAll("path._selection_surround").remove();
+        d3.select(this.element)
+            .selectAll("g.c3-shapes")
+            .selectAll("path._selected_").each( function(d: any, i:number, oi:number) {
+                d3.select(this.parentNode)
+                    .append("path")
+                    .classed("_selection_surround",true)
+                    .attr("d",this.getAttribute("d"))
+                    .style("stroke", "black")
+                    .style("stroke-width", 1.5)
+                ;
+        });
+    }
 
-		//handle selected paths
-		d3.select(this.element)
-			.selectAll("path._selection_surround").remove();
-		d3.select(this.element)
-			.selectAll("g.c3-shapes")
-			.selectAll("path._selected_").each( function(d: any, i:number, oi:number) {
-			d3.select(this.parentNode)
-				.append("path")
-				.classed("_selection_surround",true)
-				.attr("d",this.getAttribute("d"))
-				.style("stroke", "black")
-				.style("stroke-width", 1.5)
-			;
-		});
-	}
-
-	private dataChanged()
-	{
+    private dataChanged()
+    {
 		this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
 
-		this.idToRecord = {};
-		this.keyToIndex = {};
+        this.idToRecord = {};
+        this.keyToIndex = {};
 
-		this.records.forEach((record:Record, index:number) => {
-			this.idToRecord[record.id as any] = record;
-			this.keyToIndex[record.id as any] = index;
-		});
+        this.records.forEach((record:Record, index:number) => {
+            this.idToRecord[record.id as any] = record;
+            this.keyToIndex[record.id as any] = index;
+        });
 
-		this.histData = [];
+        this.histData = [];
 
-		var columnToAggregateNameIsDefined:boolean = !!this.columnToAggregate.getInternalColumn();
+        var columnToAggregateNameIsDefined:boolean = !!this.columnToAggregate.getInternalColumn();
 
-		var numberOfBins = this.binnedColumn.numberOfBins;
-		for (let iBin:number = 0; iBin < numberOfBins; iBin++)
-		{
+        var numberOfBins = this.binnedColumn.numberOfBins;
+        for (let iBin:number = 0; iBin < numberOfBins; iBin++)
+        {
 
-			let recordsInBin:Record[] = _.filter(this.records, { binnedColumn: iBin });
+            let recordsInBin:Record[] = _.filter(this.records, { binnedColumn: iBin });
 
-			if (recordsInBin)
-			{
-				var obj:any = {height:0};
-				if (columnToAggregateNameIsDefined)
-				{
-					obj.height = this.getAggregateValue(recordsInBin, "columnToAggregate", this.aggregationMethod.value);
-					this.histData.push(obj);
-				}
-				else
-				{
-					obj.height = this.getAggregateValue(recordsInBin, "binnedColumn", COUNT);
-					this.histData.push(obj);
-				}
-			}
-		}
+            if (recordsInBin)
+            {
+                var obj:any = {height:0};
+                if (columnToAggregateNameIsDefined)
+                {
+                    obj.height = this.getAggregateValue(recordsInBin, "columnToAggregate", this.aggregationMethod.value);
+                    this.histData.push(obj);
+                }
+                else
+                {
+                    obj.height = this.getAggregateValue(recordsInBin, "binnedColumn", COUNT);
+                    this.histData.push(obj);
+                }
+            }
+        }
 
-		this.keys = { value: ["height"] };
-		if (weavejs.WeaveAPI.Locale.reverseLayout)
-		{
-			this.histData = this.histData.reverse();
-		}
+        this.keys = { value: ["height"] };
+        if (weavejs.WeaveAPI.Locale.reverseLayout)
+        {
+            this.histData = this.histData.reverse();
+        }
 
-		this.c3Config.data.json = this.histData;
-		this.c3Config.data.keys = this.keys;
+        this.c3Config.data.json = this.histData;
+        this.c3Config.data.keys = this.keys;
 	}
 
-	private getAggregateValue(records:Record[], columnToAggregateName:string, aggregationMethod:string):number
-	{
-		var count:number = 0;
-		var sum:number = 0;
+    private getAggregateValue(records:Record[], columnToAggregateName:string, aggregationMethod:string):number
+    {
+        var count:number = 0;
+        var sum:number = 0;
 
-		records.forEach((record:any) => {
-			count++;
-			sum += record[columnToAggregateName as string] as number;
-		});
+        records.forEach((record:any) => {
+            count++;
+            sum += record[columnToAggregateName as string] as number;
+        });
 
-		if (aggregationMethod === MEAN)
-			return sum / count; // convert sum to mean
+        if (aggregationMethod === MEAN)
+            return sum / count; // convert sum to mean
 
-		if (aggregationMethod === COUNT)
-			return count; // use count of finite values
+        if (aggregationMethod === COUNT)
+            return count; // use count of finite values
 
-		// sum
-		return sum;
-	}
+        // sum
+        return sum;
+    }
 
-	protected validate(forced:boolean = false):boolean
-	{
-		var changeDetected:boolean = false;
-		var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin, this.xAxisLabelAngle);
-		if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fill, this.line, this.filteredKeySet, this.showValueLabels))
-		{
-			changeDetected = true;
-			this.dataChanged();
-		}
-		if (axisChange)
-		{
-			changeDetected = true;
-			var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
-			var yLabel:string = Weave.lang(this.getYAxisLabel.bind(this)());
+    protected validate(forced:boolean = false):boolean
+    {
+        var changeDetected:boolean = false;
+        var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin, this.xAxisLabelAngle);
+        if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fill, this.line, this.filteredKeySet, this.showValueLabels))
+        {
+            changeDetected = true;
+            this.dataChanged();
+        }
+        if (axisChange)
+        {
+            changeDetected = true;
+            var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
+            var yLabel:string = Weave.lang(this.getYAxisLabel.bind(this)());
 
-			if (this.records)
-			{
-				var temp:string = "height";
-				if (weavejs.WeaveAPI.Locale.reverseLayout)
-				{
-					this.c3Config.data.axes = {[temp]:'y2'};
-					this.c3Config.axis.y2 = this.c3ConfigYAxis;
-					this.c3Config.axis.y = {show: false};
-					this.c3Config.axis.x.tick.rotate = -1*this.xAxisLabelAngle.value;
-				}
-				else
-				{
-					this.c3Config.data.axes = {[temp]:'y'};
-					this.c3Config.axis.y = this.c3ConfigYAxis;
-					delete this.c3Config.axis.y2;
-					this.c3Config.axis.x.tick.rotate = this.xAxisLabelAngle.value;
-				}
-			}
+            if (this.records)
+            {
+                var temp:string = "height";
+                if (weavejs.WeaveAPI.Locale.reverseLayout)
+                {
+                    this.c3Config.data.axes = {[temp]:'y2'};
+                    this.c3Config.axis.y2 = this.c3ConfigYAxis;
+                    this.c3Config.axis.y = {show: false};
+                    this.c3Config.axis.x.tick.rotate = -1*this.xAxisLabelAngle.value;
+                }
+                else
+                {
+                    this.c3Config.data.axes = {[temp]:'y'};
+                    this.c3Config.axis.y = this.c3ConfigYAxis;
+                    delete this.c3Config.axis.y2;
+                    this.c3Config.axis.x.tick.rotate = this.xAxisLabelAngle.value;
+                }
+            }
 
-			this.c3Config.axis.x.label = {text: xLabel, position:"outer-center"};
-			this.c3ConfigYAxis.label = {text: yLabel, position:"outer-middle"};
-
+            this.c3Config.axis.x.label = {text: xLabel, position:"outer-center"};
+            this.c3ConfigYAxis.label = {text: yLabel, position:"outer-middle"};
+			
 			this.updateConfigMargin();
-		}
+    	}
 
-		if (Weave.detectChange(this, this.horizontalMode))
-		{
-			changeDetected = true;
-			//we override the default behavior of rotated for bar chart and histogram according to the horizontal mode boolean
-			//rest of the charts, the default value is retained
-			this.c3Config.axis.rotated = this.horizontalMode.value;
-		}
+	    if (Weave.detectChange(this, this.horizontalMode))
+	    {
+		    changeDetected = true;
+		    this.c3Config.axis.rotated = this.horizontalMode.value;
+	    }
 
-		if (Weave.detectChange(this, this.barWidthRatio))
-		{
-			changeDetected = true;
-			(this.c3Config.bar.width as {ratio:number}).ratio = this.barWidthRatio.value;
-		}
+        if (Weave.detectChange(this, this.barWidthRatio))
+        {
+            changeDetected = true;
+            (this.c3Config.bar.width as {ratio:number}).ratio = this.barWidthRatio.value;
+        }
 
-		if (changeDetected || forced)
+    	if (changeDetected || forced)
 			return true;
-
+		
 		// update c3 selection
 		if (this.selectionKeySet)
 		{
@@ -533,28 +546,28 @@ export default class C3Histogram extends AbstractC3Tool
 		{
 			this.chart.select(["height"], [], true);
 		}
-
+		
 		this.updateStyle();
-
+		
 		return false;
-	}
+    }
+	
+    get selectableAttributes()
+    {
+        return super.selectableAttributes
+            .set("Group by", this.binnedColumn)
+            .set("Height values (optional)", this.columnToAggregate);
+        //TODO handle remaining attributes
+    }
 
-	get selectableAttributes()
-	{
-		return super.selectableAttributes
-			.set("Group by", this.binnedColumn)
-			.set("Height values (optional)", this.columnToAggregate);
-		//TODO handle remaining attributes
-	}
+    get defaultPanelTitle():string
+    {
+	    if (this.binnedColumn.numberOfBins)
+		    return Weave.lang("Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
 
-	get defaultPanelTitle():string
-	{
-		if (this.binnedColumn.numberOfBins)
-			return Weave.lang("Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
-
-		return Weave.lang("Histogram");
-	}
-
+	    return Weave.lang("Histogram");
+    }
+	
 	updateColor( color:string)
 	{
 		if (this.colorColumn && this.colorColumn.ramp)
@@ -563,7 +576,7 @@ export default class C3Histogram extends AbstractC3Tool
 		}
 	}
 
-	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
+    //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):JSX.Element =>
 	{
 		var linkedColor:Boolean = !!this.fill.color.internalDynamicColumn.targetPath;
@@ -603,17 +616,17 @@ export default class C3Histogram extends AbstractC3Tool
 						<SelectableAttributeComponent
 							attributeName={"Height values (optional)"}
 							attributes={this.selectableAttributes}
-							pushCrumb={ pushCrumb }
+			  				pushCrumb={ pushCrumb }
 						/>
 					],
 					[
 						Weave.lang("Aggregation method"),
-						<DynamicComponent
-							dependencies={[this.columnToAggregate]}
-							render={() =>
+						<DynamicComponent 
+							dependencies={[this.columnToAggregate]} 
+							render={() => 
 								<ComboBox options={[COUNT, SUM, MEAN]} type={this.columnToAggregate.getInternalColumn() ? null:"disabled"} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
 							}
-						/>
+	                    />
 					],
 				]
 			],
@@ -641,37 +654,37 @@ export default class C3Histogram extends AbstractC3Tool
 			[Weave.lang("Titles"), this.getTitlesEditor()],
 			[Weave.lang("Margins"), this.getMarginEditor()]
 		);
-	};
-
-	get deprecatedStateMapping()
-	{
-		return [super.deprecatedStateMapping, {
-			"children": {
-				"visualization": {
-					"plotManager": {
-						"plotters": {
-							"plot": {
-								"filteredKeySet": this.filteredKeySet,
-								"binnedColumn": this.binnedColumn,
-								"columnToAggregate": this.columnToAggregate,
-								"aggregationMethod": this.aggregationMethod,
-								"fillStyle": this.fill,
-								"lineStyle": this.line,
-
-								"drawPartialBins": true,
-								"horizontalMode": false,
-								"showValueLabels": false,
-								"valueLabelColor": 0,
-								"valueLabelHorizontalAlign": "left",
-								"valueLabelMaxWidth": 200,
-								"valueLabelVerticalAlign": "middle"
-							}
-						}
-					}
-				}
-			}
-		}];
 	}
+
+    get deprecatedStateMapping()
+    {
+        return [super.deprecatedStateMapping, {
+            "children": {
+                "visualization": {
+                    "plotManager": {
+                        "plotters": {
+                            "plot": {
+                                "filteredKeySet": this.filteredKeySet,
+								"binnedColumn": this.binnedColumn,
+                                "columnToAggregate": this.columnToAggregate,
+                                "aggregationMethod": this.aggregationMethod,
+								"fillStyle": this.fill,
+                                "lineStyle": this.line,
+
+                                "drawPartialBins": true,
+                                "horizontalMode": false,
+								"showValueLabels": false,
+                                "valueLabelColor": 0,
+                                "valueLabelHorizontalAlign": "left",
+                                "valueLabelMaxWidth": 200,
+                                "valueLabelVerticalAlign": "middle"
+                            }
+                        }
+                    }
+                }
+            }
+        }];
+    }
 }
 
 Weave.registerClass(
