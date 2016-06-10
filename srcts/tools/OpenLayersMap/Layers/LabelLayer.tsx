@@ -6,6 +6,7 @@ import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer"
 import AbstractGlyphLayer from "./AbstractGlyphLayer";
 import AbstractLayer from "./AbstractLayer";
 import OpenLayersMapTool from "../../OpenLayersMapTool";
+import StyleCache from "./StyleCache";
 
 import Bounds2D = weavejs.geom.Bounds2D;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -90,9 +91,10 @@ export default class LabelLayer extends AbstractGlyphLayer
 		{
 			let feature: ol.Feature = this.source.getFeatureById(key.toString());
 
-			if (!feature)
-			{
-				continue;
+			if (!feature) {
+				feature = new ol.Feature({});
+				feature.setId(key);
+				this.source.addFeature(feature);
 			}
 
 			let text: string = this.text.getValueFromKey(key, String);
@@ -170,8 +172,8 @@ export default class LabelLayer extends AbstractGlyphLayer
 			let font = record.font;
 			let feature = record.feature;
 
-			let textColor: string = AbstractFeatureLayer.toColorRGBA(color, 1);
-			let fadedTextColor: string = AbstractFeatureLayer.toColorRGBA(color, 0.5);
+			let textColor: string = StyleCache.toColorRGBA(color, 1);
+			let fadedTextColor: string = StyleCache.toColorRGBA(color, 0.5);
 
 			let selectedStroke: ol.style.Stroke = new ol.style.Stroke({
 				color: "rgba(128,128,128,0.75)", width: 3

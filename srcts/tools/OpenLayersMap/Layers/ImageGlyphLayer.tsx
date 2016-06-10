@@ -5,6 +5,7 @@ import AbstractGlyphLayer from "./AbstractGlyphLayer";
 import AbstractFeatureLayer from "./AbstractFeatureLayer";
 import ImageGlyphCache from "./ImageGlyphCache";
 import AbstractLayer from "./AbstractLayer";
+import StyleCache from "./StyleCache";
 
 // loads jquery from the es6 default module.
 var $:JQueryStatic = (jquery as any)["default"];
@@ -141,14 +142,15 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 			let record = records[idx];
 			let feature = this.source.getFeatureById(recordIds[idx]);
 
-			if (!feature)
-			{
-				continue;
+			if (!feature) {
+				feature = new ol.Feature({});
+				feature.setId(recordIds[idx]);
+				this.source.addFeature(feature);
 			}
 
 			let imageSize = Number(record.imageSize || NaN);
 			if (isNaN(record.alpha)) record.alpha = 1;
-			let color = AbstractFeatureLayer.toColorRGBA(record.color, 1);
+			let color = StyleCache.toColorRGBA(record.color, 1);
 
 			if (!record.imageURL)
 			{

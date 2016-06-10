@@ -1,6 +1,7 @@
 import * as ol from "openlayers";
 import * as _ from "lodash";
 
+import StyleCache from "./StyleCache";
 import AbstractLayer from "./AbstractLayer";
 
 import StandardLib = weavejs.util.StandardLib;
@@ -114,7 +115,7 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 
 		this.selectionFilter.addGroupedCallback(this, selectionKeyHandler, true);
 		this.probeFilter.addGroupedCallback(this, probeKeyHandler, true);
-		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateMetaStyles, true);
+		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateMetaStyles);
 
 		this.selectable.addGroupedCallback(this, this.updateMetaStyles);
 	}
@@ -145,48 +146,6 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 	getToolTipColumns(): Array<any> /* Array<IAttributeColumn> */
 	{
 		return [];
-	}
-
-	static toColorArray(color: string|number, alpha:any)
-	{
-		var colorArray:any;
-
-		if (typeof color == "number")
-		{
-			var hexColor = StandardLib.getHexColor(color as number);
-			if (!hexColor)
-				return null;
-			colorArray = ol.color.asArray(hexColor);
-		}
-		else /* if typeof color is string */
-		{
-			if ((color as string)[0] === "#")
-			{
-				colorArray = ol.color.asArray(color as string);
-			}
-			else
-			{
-				colorArray = ol.color.asArray(StandardLib.getHexColor(Number(color)));
-			}
-		}
-
-		colorArray = [].concat(colorArray); /* Should not be modified since it is cached in ol.color.asArray */
-
-		if (!colorArray)
-		{
-			return null;
-		}
-
-		colorArray[3] = Number(alpha);
-		return colorArray;
-	}
-
-	static toColorRGBA(colorString:any, alpha:any)
-	{
-		var colorArray = AbstractFeatureLayer.toColorArray(colorString, alpha);
-		if (!colorArray)
-			colorArray = [0, 0, 0, 0];
-		return ol.color.asString(colorArray);
 	}
 
 	updateSetFromKeySet(keyFilter:DynamicKeyFilter, previousContents:Set<IQualifiedKey>):void
@@ -323,29 +282,6 @@ export abstract class AbstractFeatureLayer extends AbstractLayer
 		}
 
 		feature.setStyle(newStyle);
-	}
-
-	static olFillFromWeaveFill(fill:any, fade?:any):ol.style.Fill
-	{
-		if (fade === undefined) fade = 1;
-
-		let color = (fill.color !== undefined && fill.color !== null) && AbstractFeatureLayer.toColorArray(fill.color, fill.alpha * fade) || [0, 0, 0, 0];
-		return new ol.style.Fill({color});
-	}
-
-	static olStrokeFromWeaveStroke(stroke:any, fade?:number):ol.style.Stroke
-	{
-		if (fade === undefined) fade = 1;
-
-		let color:Array<number> = (stroke.color !== undefined && stroke.color !== null) && AbstractFeatureLayer.toColorArray(stroke.color, stroke.alpha * fade) || [0, 0, 0, 1];
-
-		let lineCap:string = stroke.lineCap === "none" ? "butt" : stroke.lineCap || "round";
-		let lineJoin:string = stroke.lineJoin === null ? "round" : stroke.lineJoin || "round";
-		let miterLimit:number = Number(stroke.miterLimit);
-		let width:number = Number(stroke.weight);
-		if (width == 0) color[3] = 0; /* If the width is 0, set alpha to 0 to avoid rendering; canvas context would ignore setting width to 0 */
-
-		return new ol.style.Stroke({color, lineCap, lineJoin, miterLimit, width});
 	}
 
 	static getOlProbedStyle(baseStrokeStyle:any):Array<ol.style.Style>

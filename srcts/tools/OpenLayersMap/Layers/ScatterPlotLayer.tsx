@@ -5,6 +5,8 @@ import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer"
 import AbstractGlyphLayer from "./AbstractGlyphLayer";
 import AbstractLayer from "./AbstractLayer";
 
+import StyleCache from "./StyleCache";
+
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -103,57 +105,48 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 
 		for (let record of styleRecords)
 		{
-			let olStroke = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke);
-			let olFill = AbstractFeatureLayer.olFillFromWeaveFill(record.fill);
+			let olStroke = StyleCache.strokeCache.get(record.stroke);
+			let olFill = StyleCache.fillCache.get(record.fill);
 
-			let olStrokeFaded = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke, 0.5);
-			let olFillFaded = AbstractFeatureLayer.olFillFromWeaveFill(record.fill, 0.5);
+			let olStrokeFaded = StyleCache.strokeCache.get(record.stroke, 0.5);
+			let olFillFaded = StyleCache.fillCache.get(record.fill, 0.5);
 
 			let olSelectionStyle = AbstractFeatureLayer.getOlSelectionStyle(olStroke);
 			let olProbedStyle = AbstractFeatureLayer.getOlProbedStyle(olStroke);
 
 			let normalStyle = [new ol.style.Style({
-				image: new ol.style.Circle({
-					fill: fillEnabled ? olFill : undefined, stroke: strokeEnabled ? olStroke : undefined,
-					radius: record.radius,
-				})
+				image: StyleCache.circleCache.get(fillEnabled ? olFill : undefined, strokeEnabled ? olStroke : undefined, record.radius)
 			})];
 
 			let unselectedStyle = [new ol.style.Style({
-				image: new ol.style.Circle({
-					fill: fillEnabled ? olFillFaded : undefined, stroke: strokeEnabled ? olStrokeFaded : undefined,
-					radius: record.radius
-				})
+				image: StyleCache.circleCache.get(fillEnabled ? olFillFaded : undefined, strokeEnabled ? olStrokeFaded : undefined, record.radius)
 			})];
 
 			let selectedStyle = (strokeEnabled || fillEnabled) && [
 				new ol.style.Style({
-					image: new ol.style.Circle({
-						stroke: olSelectionStyle[0].getStroke(),
-						radius: record.radius
-					}),
+					image: StyleCache.circleCache.get(null, olSelectionStyle[0].getStroke(), record.radius),
 					zIndex: olSelectionStyle[0].getZIndex()
 				})
 			];
 
 			let probedStyle = (strokeEnabled || fillEnabled) && [
 				new ol.style.Style({
-					image: new ol.style.Circle({
-						stroke: olProbedStyle[0].getStroke(),
-						radius: record.radius
-					}),
+					image: StyleCache.circleCache.get(null, olProbedStyle[0].getStroke(), record.radius),
 					zIndex: olProbedStyle[0].getZIndex()
 				}),
 				new ol.style.Style({
-					image: new ol.style.Circle({
-						stroke: olProbedStyle[1].getStroke(),
-						radius: record.radius
-					}),
+					image: StyleCache.circleCache.get(null, olProbedStyle[1].getStroke(), record.radius),
 					zIndex: olProbedStyle[1].getZIndex()
 				})
 			];
 
 			let feature = this.source.getFeatureById(record.id);
+
+			if (!feature) {
+				feature = new ol.Feature({});
+				feature.setId(record.id);
+				this.source.addFeature(feature);
+			}
 
 			if (feature)
 			{

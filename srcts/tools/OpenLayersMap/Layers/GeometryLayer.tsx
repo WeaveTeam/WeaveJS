@@ -3,6 +3,7 @@ import * as _ from "lodash";
 import {AbstractFeatureLayer, MetaStyleProperties} from "./AbstractFeatureLayer";
 import AbstractLayer from "./AbstractLayer";
 import OpenLayersMapTool from "../../OpenLayersMapTool";
+import StyleCache from "./StyleCache";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -153,12 +154,12 @@ export default class GeometryLayer extends AbstractFeatureLayer
 			record.fill = this.fill.getStyle(key);
 			record.stroke = this.line.getStyle(key);
 
-			let olStroke = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke);
+			let olStroke = StyleCache.strokeCache.get(record.stroke);
 
-			let olFill = AbstractFeatureLayer.olFillFromWeaveFill(record.fill);
+			let olFill = StyleCache.fillCache.get(record.fill);
 
-			let olStrokeFaded = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke, 0.5);
-			let olFillFaded = AbstractFeatureLayer.olFillFromWeaveFill(record.fill, 0.5);
+			let olStrokeFaded = StyleCache.strokeCache.get(record.stroke, 0.5);
+			let olFillFaded = StyleCache.fillCache.get(record.fill, 0.5);
 
 			let normalStyle = [new ol.style.Style({
 				fill: fillEnabled ? olFill : undefined,
