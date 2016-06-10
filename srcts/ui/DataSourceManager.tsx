@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as _ from "lodash";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
 import InteractiveTour from "../react-ui/InteractiveTour";
@@ -172,34 +173,57 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let editorJsx:JSX.Element;
 		let dataSource = this.getSelectedDataSource();
 
+		let editorStyle:React.CSSProperties = {
+			flex:1,
+			overflow: "auto",
+			border:"none",
+			borderRadius:0,
+			boxShadow:"none"
+		};
+
 		if (dataSource && !Weave.wasDisposed(dataSource))
 		{
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
-				editorJsx = <VBox style={ { flex: 1, overflow:'auto'} }>
-					<EditorClass dataSource={dataSource}/>
-				</VBox>;
+			{
+				editorJsx = <VBox style={ editorStyle }>
+								<EditorClass dataSource={dataSource}/>
+							</VBox>;
+			}
 			else
-				editorJsx = <VBox className="ui segment" style={{flex:1, overflow: "auto", justifyContent: "center", alignItems: "center"}}>
-					<div className="ui centered header">
-						{Weave.lang("Editor not yet implemented for this data source type.")}
-					</div>
-				</VBox>;
+			{
+				editorStyle = _.merge(editorStyle,{ justifyContent: "center", alignItems: "center"});
+				editorJsx = <VBox className="ui segment" style={editorStyle}>
+								<div className="ui centered header">
+									{Weave.lang("Editor not yet implemented for this data source type.")}
+								</div>
+							</VBox>;
+			}
+
 		}
 		else
 		{
-			editorJsx = <VBox className="ui segment" style={{flex:1, overflow: "auto", justifyContent: "center", alignItems: "center"}}>
-				<div className="ui centered header">
-					{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
-				</div>
-			</VBox>;
+			editorStyle = _.merge(editorStyle,{ justifyContent: "center", alignItems: "center"});
+			editorJsx = <VBox className="ui segment" style={editorStyle}>
+							<div className="ui centered header">
+								{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
+							</div>
+						</VBox>;
 		}
 
+		let styleObj:React.CSSProperties = {
+			flex:1,
+			overflow:'auto',
+			border:"none", /* Border and shadow of ui segements in Tab gives contrasting color to its backgrouund */
+			borderRadius:0,
+			boxShadow:"none"
+		};
+
 		return (
-			<HBox className="ui bottom attached segments" style={ {flex:1, overflow:'auto'}}  onMouseEnter={() => this.forceUpdate()} >
+			<HBox className="ui bottom attached segments" style={ styleObj }  onMouseEnter={() => this.forceUpdate()} >
 				<VBox style={{width: 250}} className="weave-data-source-manager-sidebar">
-					<VBox className="ui vertical attached segments" style={{flex:1, justifyContent:"space-between"}}>
-						<VBox className="ui basic inverted segment" style={{flex: 2, overflow: "auto", padding: 0}}>
+					<VBox className="ui vertical attached segments" style={{flex:1, justifyContent:"space-between",border:"none",borderRadius:0}}>
+						<VBox className="ui basic inverted segment" style={{flex: 2, overflow: "auto", padding: 0,border:"none",borderRadius:0}}>
 							<div className="ui medium header" style={{padding: 0, paddingLeft: 14, paddingTop: 14}}>{Weave.lang("Connected data sources")}</div>
 							<VBox style={{alignItems: listOptions.length ? null:"center"}}>
 								{
@@ -216,7 +240,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 								}
 							</VBox>
 						</VBox>
-						<VBox className="ui inverted segment" style={{overflow: "auto", padding: 0, flex: 1}}>
+						<VBox className="ui inverted segment" style={{overflow: "auto", padding: 0, flex: 1,border:"none",borderRadius:0}}>
 							<div className="ui medium header" style={{ paddingLeft: 14, paddingTop: 14}}>{Weave.lang("Add more data sources")}</div>
 							{
 								DataMenu.getDataSourceItems(this.props.weave, this.setSelectedDataSource).map((dsItem, index) => {

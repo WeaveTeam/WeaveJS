@@ -128,7 +128,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let root = this.props.dataSource.getHierarchyRoot();
 		var columns = this.getColumns();
 		return (
-			<VBox className="ui segment" style={{flex: 1}}>
+			<VBox className="ui segment" style={{flex: 1,border:"none",borderRadius:0}}>
 				<div className="ui medium dividing header" aria-label={Weave.lang("Preview of") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Preview")}</div>
 				<HBox className={root && root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
 					<VBox style={{flex: root && root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
@@ -155,7 +155,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let registry = weavejs.WeaveAPI.ClassRegistry;
 		let displayName:string = Weave.lang(weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.dataSource.constructor as typeof IDataSource));
 		return (
-			<VBox className="ui segment" style={ {border: "none"} }>
+			<VBox className="ui segment" style={ {border:"none",borderRadius:0} }>
 				<div className="ui medium dividing header" aria-label={Weave.lang("Configure {0}:{1}",displayName,Weave.lang(this.props.dataSource.getLabel()))}>{Weave.lang("Configure {0}",displayName)}</div>
 				{
 					this.renderFields()
@@ -246,11 +246,11 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 			selectedLeaf: leaf
 		});
 	}
-	
+	/* Border and shadow of ui segements in Tab gives contrasting color to its backgrouund */
 	render():JSX.Element
 	{
 		return (
-			<VBox className="ui vertical segments" style={{flex:1}}>
+			<VBox className="ui vertical segments" style={ {flex:1,border:"none",borderRadius:0,boxShadow:"none"} }>
 				{this.renderConfigureView()}
 				{this.renderPreviewView()}
 			</VBox>
