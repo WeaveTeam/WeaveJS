@@ -23,7 +23,7 @@ export default class LocalFileOpenComponent extends React.Component<IOpenFilePro
 	render():JSX.Element
 	{
 		return (
-			<VBox className="weave-file-picker-container" style={{flex: 1, alignItems: "center", padding: 10}}>
+			<VBox className="weave-file-picker-container" style={{flex: 1, padding: 10}}>
 				<VBox style={{flex: 1, alignItems: "center"}}>
 					<Dropzone
 						style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1, fontSize: 24}}
