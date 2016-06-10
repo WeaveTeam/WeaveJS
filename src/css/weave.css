@@ -737,7 +737,7 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 }
 
 .weave-progress-bar {
-	background-color: rgba(109, 163, 228, 0.6);
+	background-color: rgba(109, 163, 228, 0.9);
 	transition-duration: 200ms;
 	height: 4px;
 	-webkit-transition: width .1s linear, visibility .1s ease-in-out;
@@ -816,13 +816,7 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 /****** Layout - Tab *********/
 .weave-layout-tabs-content {
 	background: #ddd;
-<<<<<<< HEAD
-	padding: 2px 4px 4px 4px;
-||||||| parent of dd41c9c... copied weave css from develop
 	padding: 4px;
-=======
-	padding: 4px 4px 4px 4px;
->>>>>>> dd41c9c... copied weave css from develop
 	border-right: none;
 	border-top: none;
 }

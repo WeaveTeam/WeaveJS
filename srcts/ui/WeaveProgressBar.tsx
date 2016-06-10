@@ -1,7 +1,6 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 import ProgressBar from "../react-ui/ProgressBar";
-import {ProgressBarProps} from "../react-ui/ProgressBar";
+import SmartComponent from "./SmartComponent";
 
 export interface WeaveProgressBarProps extends React.HTMLProps<WeaveProgressBar>
 {
@@ -10,62 +9,55 @@ export interface WeaveProgressBarProps extends React.HTMLProps<WeaveProgressBar>
 
 export interface WeaveProgressBarState
 {
-	
+	visible:boolean;
 }
 
 var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;
 
-export default class WeaveProgressBar extends React.Component<WeaveProgressBarProps, WeaveProgressBarState>
+export default class WeaveProgressBar extends SmartComponent<WeaveProgressBarProps, WeaveProgressBarState>
 {
 	constructor(props:WeaveProgressBarProps)
 	{
 		super(props);
 		Weave.getCallbacks(ProgressIndicator).addGroupedCallback(this, this.forceUpdate);
+		weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.toggleVisible);
+		this.state = {
+			visible: false
+		};
 	}
 
 	private timeBecameBusy:number = 0;
 	private autoVisibleDelay:number = 2000;
-	private visible:boolean = false;
-
+	private autoHideDelay:number = 800;
 	/**
-	 * This will automatically toggle visibility based the target's busy status.
+	 * This will automatically toggle visibility based on the target's busy status.
 	 */
-	private toggleVisible(busy:boolean):void
+	private toggleVisible():void
 	{
-		if (this.visible != busy)
+		var busy:boolean = ProgressIndicator.getTaskCount() > 0;
+		if (this.state.visible != busy)
 		{
-			if (busy)
-			{
-				if (this.timeBecameBusy == -1)
-					this.timeBecameBusy = Date.now();
-				if (Date.now() < this.timeBecameBusy + this.autoVisibleDelay)
-					return;
-			}
-			
-			this.visible = busy;
+			if (this.timeBecameBusy == -1)
+				this.timeBecameBusy = Date.now();
+
+			if (Date.now() < this.timeBecameBusy + (busy ? this.autoVisibleDelay : this.autoHideDelay))
+				return;
+
+			this.setState({
+				visible: busy
+			});
 		}
 		this.timeBecameBusy = -1;
 	}
 
 	render()
 	{
-		var pendingCount:number = ProgressIndicator.getTaskCount();
-		var tempString:String = pendingCount + " Background Task" + (pendingCount == 1 ? '' : 's');
-		var progressBarProps:ProgressBarProps = {};
-		
-		this.toggleVisible(pendingCount > 0);
-		
-		if (pendingCount == 0) // hide progress bar and text area
-		{
-			progressBarProps.progressValue = 1; // 1 means all progress is done 
-		}
-		else // display progress bar and text area
-		{
-			progressBarProps.progressValue = ProgressIndicator.getNormalizedProgress(); // progress between 0 and 1
-		}
-
 		return (
-			<ProgressBar {...progressBarProps} {...this.props as any}/>
-		)
+			<ProgressBar
+				visible={this.state.visible}
+				progressValue={ProgressIndicator.getNormalizedProgress()}
+				{...this.props as any}
+			/>
+		);
 	}
 }
