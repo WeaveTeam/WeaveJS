@@ -272,6 +272,14 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 						)))
 					}
 					onViewChange={this.switchPanelToActive}
+					onTabDoubleClick={(index:number) => {
+						if(this.props.onTabDoubleClick)
+						{
+							let tabIndex = index - leadingTabs.length;
+							if(state.tabs && state.tabs[tabIndex])
+								this.props.onTabDoubleClick && this.props.onTabDoubleClick(state.tabs[tabIndex].id)
+						}
+					}}
 					activeTabIndex={leadingTabs.length + this.activeTabIndex}
 					tabs={
 						leadingTabs.map(tab => tab.content)

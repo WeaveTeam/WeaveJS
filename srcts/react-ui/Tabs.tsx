@@ -26,6 +26,7 @@ export interface TabsProps extends React.Props<Tabs>
 	tabLabelStyle?:React.CSSProperties;
 	tabBarClassName?:string;
 	tabBarStyle?:React.CSSProperties;
+	onTabDoubleClick?:(index:number)=>void;
 }
 
 export interface TabsState
@@ -82,6 +83,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 							      className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
 							      style={this.props.tabLabelStyle}
 							      onClick={() => this.changeTabView(index)}
+							      onDoubleClick={() => this.props.onTabDoubleClick && this.props.onTabDoubleClick(index)}
 							>
 								{label}
 							</HBox>
