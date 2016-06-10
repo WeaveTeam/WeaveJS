@@ -81,13 +81,13 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 	componentDidMount():void
 	{
 		var document = ReactUtils.getDocument(this);
-		document.addEventListener("mouseup", this.onMouseUp, true);
+		document.addEventListener("mouseup", this.onMouseUp);
 	}
 
 	componentWillUnmount():void
 	{
 		var document = ReactUtils.getDocument(this);
-		document.removeEventListener("mouseup", this.onMouseUp, true);
+		document.removeEventListener("mouseup", this.onMouseUp);
 	}
 
 	bringPanelForward(id:WeavePathArray):void
