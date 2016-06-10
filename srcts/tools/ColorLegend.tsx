@@ -264,6 +264,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				textOverflow: "ellipsis",
 				overflow: "hidden",
 				whiteSpace: "nowrap",
+				cursor:"pointer",
 				minWidth:0, /* important to give min-width / width/ max-width else flex item won't go behind intrinsic width */
 				flex:"0.8 0" /* important to give flex value for text, else text width will alter the shape size */
 
