@@ -146,7 +146,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 					/>
 				</HBox>);
 
-			ReactUtils.getDocument(this).addEventListener("click", this.handleClose);
+			ReactUtils.getDocument(this).addEventListener("click", this.handleClose);//event listener added only when pop up is opened
 			this.props.onClick && this.props.onClick(this.state.hexColor);
 			this.setState({buttonLabel: "close"});
 		}
@@ -154,22 +154,35 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 
 	handleClose=() =>
 	{
-		if (this.popup)
+		if (this.element)
 		{
 			this.setState({
 				buttonLabel: this.props.buttonLabel ? this.props.buttonLabel  : "Add color"
 			});
 			ReactUtils.closePopup(this.popup);
 			this.popup = null;
-			ReactUtils.getDocument(this).removeEventListener("click", this.handleClose);
+			ReactUtils.getDocument(this).removeEventListener("click", this.handleClose);//when the popup is closed, event listener removed
 		}
 		this.props.onClose && this.props.onClose(this.state.hexColor);
 	};
 
 	handleChange=(color:any) => {
-		this.setState({ hexColor: '#' + color.hex });
-		this.props.onChange && this.props.onChange('#' + color.hex);
+		if(this.popup)
+		{
+			this.setState({ hexColor: '#' + color.hex });
+			this.props.onChange && this.props.onChange('#' + color.hex);
+		}
 	};
+
+	componentWillUnmount()
+	{
+		if(this.popup)//need to check if it exists or else closePopup crashes
+		{
+			ReactUtils.closePopup(this.popup);
+			this.popup = null;
+		}
+		ReactUtils.getDocument(this).removeEventListener("click", this.handleClose);
+	}
 
 	render():JSX.Element
 	{
