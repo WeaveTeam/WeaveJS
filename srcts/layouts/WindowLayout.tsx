@@ -78,6 +78,18 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 		return this.getSessionState().title;
 	}
 
+	componentDidMount():void
+	{
+		var document = ReactUtils.getDocument(this);
+		document.addEventListener("mouseup", this.onMouseUp, true);
+	}
+
+	componentWillUnmount():void
+	{
+		var document = ReactUtils.getDocument(this);
+		document.removeEventListener("mouseup", this.onMouseUp, true);
+	}
+
 	bringPanelForward(id:WeavePathArray):void
 	{
 		var panelState:PanelState = null;
@@ -202,9 +214,25 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 				}
 			});
 			this.setSessionState(state);
-			this.hideOverlay();
 		}
+		this.hideOverlay();
 	};
+
+	onDragLeave=(event:React.DragEvent):void=>
+	{
+		if (!MouseUtils.isMouseOver(ReactDOM.findDOMNode(this) as HTMLElement, event.nativeEvent as DragEvent, false))
+			this.hideOverlay();
+	};
+
+	onDragEnd=(event:React.DragEvent):void=>
+	{
+		this.hideOverlay();
+	}
+
+	onMouseUp=(event:MouseEvent):void=>
+	{
+		this.hideOverlay();
+	}
 
 	onDragOver=(event:React.DragEvent)=>
 	{
@@ -247,6 +275,8 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 				{...this.props as React.HTMLAttributes}
 				onDragOver={this.onDragOver}
 				onDrop={this.onDrop}
+				onDragLeave={ this.onDragLeave }
+				onDragEnd={ this.onDragEnd }
 				style={
 					_.merge({flex: 1}, this.props.style, {
 						position: "relative",
