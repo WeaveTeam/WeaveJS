@@ -161,8 +161,8 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 			});
 			ReactUtils.closePopup(this.popup);
 			this.popup = null;
-			ReactUtils.getDocument(this).removeEventListener("click", this.handleClose);//when the popup is closed, event listener removed
 		}
+		ReactUtils.getDocument(this).removeEventListener("click", this.handleClose);//when the popup is closed, event listener removed
 		this.props.onClose && this.props.onClose(this.state.hexColor);
 	};
 
