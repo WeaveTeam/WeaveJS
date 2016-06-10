@@ -38,25 +38,33 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 				fileNames
 			});
 		},(error:any) => {
-			this.login.open(this.handleSuccess, this.handleCancel);
+			this.setState({
+				fileNames: [],
+				fileInfo: null
+			});
+			this.openLogin();
 		});
+	};
+
+	openLogin=()=>{
+		this.login.open(this.handleSuccess, this.handleCancel);
 	};
 
 	handleCancel=() => {
 		this.setState({
-			fileNames: []
+			fileNames: [],
+			fileInfo: null
 		});
 	};
 
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
-		this.forceUpdate();
+		this.getWeaveFiles();
 	}
 
 	componentDidUpdate()
 	{
-		this.getWeaveFiles();
 	}
 
 	render():JSX.Element
@@ -147,15 +155,39 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 															fileInfo
 														});
 													},
-													(error:any) => {
-														this.login.open(this.handleSuccess, this.handleCancel);
-													}
+													this.openLogin
 												);
 						                }}
 							/>
 						</VBox>
 					</VBox>
 					<VBox style={ {flex: 1, paddingLeft: 20} }>
+						<span style={{alignSelf: "flex-end"}}>{weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Not signed in")}</span>
+						<Button
+							colorClass="primary"
+							onClick={() => {
+								if(weavejs.net.Admin.instance.userHasAuthenticated)
+								{
+									weavejs.net.Admin.service.authenticate("","").then(() => {
+										this.setState({
+											fileNames: [],
+											fileInfo: null
+										});
+									},
+									() => {
+										this.setState({
+											fileNames: [],
+											fileInfo: null
+										});
+									});
+								} else {
+									this.openLogin();
+								}
+							}}
+						    style={{alignSelf: "flex-end"}}
+						>
+							{weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Sign Out") : Weave.lang("Sign in")}
+						</Button>
 						<FileInfoView fileInfo={this.state.fileInfo}>
 							{this.state.fileInfo ?
 								<Button
