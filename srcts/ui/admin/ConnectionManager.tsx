@@ -15,7 +15,7 @@ import {ListOption} from "../../react-ui/List";
 import ConnectionEditor from "./ConnectionEditor";
 import ServiceLogin from "./ServiceLogin";
 import ConfigurationStorageEditor from "./ConfigurationStorageEditor";
-import ErrorLogComponent from "./ErrorLogComponent";
+import LogComponent from "./LogComponent";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
@@ -28,6 +28,7 @@ export interface IConnectionManagerProps {
 
 export interface IConnectionManagerState {
 	errors?: string[];
+	messages?: string[];
 	connections?: string[];
 	dbConfigInfo?: DatabaseConfigInfo;
 	selected?: string;
@@ -43,6 +44,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		super(props);
 		this.state = {
 			errors: [],
+			messages: [],
 			connections: [],
 			dbConfigInfo: null,
 			selected: null
@@ -169,7 +171,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 				</VBox>
 				<ConnectionEditor refreshFunc={this.updateConnections} service={this.props.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={_.noop}/>
 			</HBox>
-			<ErrorLogComponent errors={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
+			<LogComponent header={Weave.lang("Server error") } messages={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
 		</VBox>
 	}
 }
