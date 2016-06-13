@@ -97,6 +97,7 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 				resizable: true,
 				width: 600,
 				height: 600,
+				footerContent: <div/>,
 				onClose: () => { ConfigurationStorageEditor.window = null }
 			}
 		);
@@ -182,13 +183,12 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 						</div>
 					</div>
 				</div>
-				<div className="one column row">
-					<div className="sixteen wide right aligned column">
-						<Button onClick={this.save}>{Weave.lang("Store Weave configuration at this location")}</Button>
-					</div>
-				</div>
 			</div>
 			<ErrorLogComponent errors={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
+			<HBox>
+				<Button colorClass="primary" onClick={this.save}>{Weave.lang("Store Weave configuration at this location") }</Button>
+				<Button colorClass="secondary" onClick={() => ConfigurationStorageEditor.close() }>{Weave.lang("Cancel") }</Button>
+			</HBox>
 		</VBox>;
 	}
 }
