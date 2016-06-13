@@ -155,18 +155,22 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 
 			let feature = this.source.getFeatureById(record.id);
 
-			if (feature)
+			if (!feature)
 			{
-				let metaStyle:any = {};
-
-				metaStyle.normalStyle = normalStyle;
-				metaStyle.unselectedStyle = unselectedStyle;
-				metaStyle.selectedStyle = selectedStyle;
-				metaStyle.probedStyle = probedStyle;
-
-				feature.setProperties(metaStyle);
-				feature.set("zOrder", zOrder);
+				feature = new ol.Feature({});
+				feature.setId(record.id);
+				this.source.addFeature(feature);
 			}
+
+			let metaStyle:any = {};
+
+			metaStyle.normalStyle = normalStyle;
+			metaStyle.unselectedStyle = unselectedStyle;
+			metaStyle.selectedStyle = selectedStyle;
+			metaStyle.probedStyle = probedStyle;
+
+			feature.setProperties(metaStyle);
+			feature.set("zOrder", zOrder);
 
 			zOrder++;
 		}

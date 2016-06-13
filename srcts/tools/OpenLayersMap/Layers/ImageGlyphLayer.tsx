@@ -141,9 +141,10 @@ export default class ImageGlyphLayer extends AbstractGlyphLayer
 			let record = records[idx];
 			let feature = this.source.getFeatureById(recordIds[idx]);
 
-			if (!feature)
-			{
-				continue;
+			if (!feature) {
+				feature = new ol.Feature({});
+				feature.setId(recordIds[idx]);
+				this.source.addFeature(feature);
 			}
 
 			let imageSize = Number(record.imageSize || NaN);

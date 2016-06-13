@@ -129,8 +129,6 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 			}
 			feature.setGeometry(point);
 		}
-		this.updateStyleData();
-		this.updateMetaStyles();
 	}
 }
 export default AbstractGlyphLayer;
