@@ -9341,6 +9341,8 @@ declare module weavejs.util {
          */
         static traverseStatePath(state: Object, path: any[]): any;
         static replaceUnknownObjectsInState(stateToModify: Object, className?: string): Object;
+        static MouseUtils: Object;
+        static shiftKey(reactInstance: Object): boolean;
     }
 }
 declare module weavejs.util {
@@ -9490,6 +9492,7 @@ declare module weavejs.util {
         static setTimeout(func: Function, delay: number, ...params: any[]): number;
         static clearTimeout(id: number): void;
         static setInterval(func: Function, delay: number, ...params: any[]): number;
+        static clearInterval(id: number): void;
         static requestAnimationFrame(func: Function): number;
         static cancelAnimationFrame(id: number): void;
         /**
@@ -9554,7 +9557,6 @@ declare module weavejs.util {
          */
         static lodash: Object;
         static ol: Object;
-        static MouseUtils: Object;
         static formatNumber(number: number, precision?: number): string;
         /**
          * This function will cast a value of any type to a Number,
