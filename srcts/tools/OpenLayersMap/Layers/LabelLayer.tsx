@@ -90,9 +90,10 @@ export default class LabelLayer extends AbstractGlyphLayer
 		{
 			let feature: ol.Feature = this.source.getFeatureById(key.toString());
 
-			if (!feature)
-			{
-				continue;
+			if (!feature) {
+				feature = new ol.Feature({});
+				feature.setId(key);
+				this.source.addFeature(feature);
 			}
 
 			let text: string = this.text.getValueFromKey(key, String);
