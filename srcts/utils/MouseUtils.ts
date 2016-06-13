@@ -56,7 +56,7 @@ export default class MouseUtils
 	static receivedMouseDown(element:Element):boolean
 	{
 		var instance = MouseUtils.forElement(element);
-		return instance.mouseDownEvent && element && element.contains(instance.mouseDownEvent.target as Element);
+		return instance.mouseDownEvent && element && element.contains(instance.mouseDownTarget as Element);
 	}
 	
 	static isMouseOver(element:HTMLElement, event:MouseEvent = null, edgeInclusive:boolean = true):boolean
@@ -110,11 +110,6 @@ export default class MouseUtils
 		return instance;
 	}
 	
-	private static buttonToButtonsMapping = [1, 4, 2];
-	
-	//--------------------
-	//
-	
 	static echoWindowEventsToOpener(sourceElement:Element)
 	{
 		var sourceWindow = DOMUtils.getWindow(sourceElement);
@@ -125,7 +120,11 @@ export default class MouseUtils
 		var allEvents = MouseUtils.mouseEventTypes.concat(MouseUtils.dragEventTypes);
 		allEvents.forEach(eventType => {
 			sourceWindow.document.addEventListener(eventType, (event) => {
-				if ((event.target instanceof Element && sourceElement.contains(event.target as Element)) || MouseUtils.receivedMouseDown(sourceElement))
+				
+				if (
+					(event.target instanceof Element && sourceElement.contains(event.target as Element))
+					|| (MouseUtils.forElement(sourceElement).mouseButtonDown && MouseUtils.receivedMouseDown(sourceElement))
+				)
 				{
 					sourceWindow.requestAnimationFrame(() => {
 						destinationWindow.document.dispatchEvent(event)
@@ -137,11 +136,13 @@ export default class MouseUtils
 
 	static mouseEventTypes = ['click', 'dblclick', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'wheel'];
 	static dragEventTypes = ['dragstart', 'drag', 'dragenter', 'dragleave', 'dragover', 'drop', 'dragend'];
+	private static buttonToButtonsMapping = [1, 4, 2];
+	
 	constructor(window:Window)
 	{
 		MouseUtils.mouseEventTypes.forEach(eventType => window.document.addEventListener(eventType, this.handleMouseEvent, true));
 		MouseUtils.dragEventTypes.forEach(eventType => window.document.addEventListener(eventType, this.handleDragEvent, true));
-			
+		
 		// for debugging
 		//mouseEventTypes.concat(dragEventTypes).forEach(eventType => window.document.addEventListener(eventType, this.debugEvent, true));
 	}
@@ -156,6 +157,7 @@ export default class MouseUtils
 	 */
 	mouseEvent:MouseEvent = new MouseEvent('mousemove');
 	mouseDownEvent:MouseEvent = null;
+	mouseDownTarget:typeof MouseEvent.prototype.target;
 	
 	private canRelyOnButtonsProp = false;
 	
@@ -163,9 +165,10 @@ export default class MouseUtils
 	{
 		this.mouseEvent = event;
 		if (event.type == 'mousedown')
+		{
 			this.mouseDownEvent = event;
-		if (event.type == 'mouseup')
-			this.mouseDownEvent = null;
+			this.mouseDownTarget = event.target;
+		}
 		if (event.buttons || this.canRelyOnButtonsProp)
 		{
 			this.canRelyOnButtonsProp = true;
