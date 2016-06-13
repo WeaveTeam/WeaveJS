@@ -14,13 +14,15 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IDataSource = weavejs.api.data.IDataSource;
 import StandardLib = weavejs.util.StandardLib;
+import URLRequest = weavejs.net.URLRequest;
 
 export default class FileMenu implements MenuBarItemProps
 {
-	constructor(context:React.ReactInstance, weave:Weave)
+	constructor(context:React.ReactInstance, weave:Weave, onFileLoaded:()=>void)
 	{
 		this.context = context;
 		this.weave = weave;
+		this.onFileLoaded = onFileLoaded;
 	}
 
 	context:React.ReactInstance;
@@ -29,7 +31,8 @@ export default class FileMenu implements MenuBarItemProps
 	bold = false;
 	fileName:string;
 	archive:WeaveArchive;
-	
+	onFileLoaded:()=>void;
+
 	/* stateless component */
 	saveDialog(fileName:string, onSave:(newFileName:string)=>void)
 	{
@@ -172,7 +175,22 @@ export default class FileMenu implements MenuBarItemProps
 			types.unshift('.weave');
 		return types;
 	}
-	
+
+	loadUrl=(url:string, pushHistory = false)=>
+	{
+		this.fileName = String(url).split('/').pop();
+
+		if (pushHistory)
+		{
+			history.pushState(url, "", FileMenu.buildUrl(url));
+			window.onpopstate = this.handleHistoryEvent;
+			window.document.title = Weave.lang("Weave: {0}",this.fileName);
+		}
+		return weavejs.WeaveAPI.URLRequestUtils.request(this.weave.root, new URLRequest(url)).then((result) => {
+			this.loadArchive(result);
+		});
+	};
+
 	loadFile=(file:File, pushHistory:Boolean = false)=>
 	{
 		this.fileName = "";
@@ -194,6 +212,16 @@ export default class FileMenu implements MenuBarItemProps
 		reader.readAsArrayBuffer(file);
 	};
 
+	loadArchive(fileContent:Uint8Array)
+	{
+		WeaveArchive.deserialize(fileContent, this.updateProgressIndicator).then((archive) => {
+			this.archive = archive;
+			archive.setSessionFromArchive(this.weave);
+			this.onFileLoaded();
+		});
+	}
+
+
 	public handleOpenedFileContent(fileName:string, fileContent:Uint8Array, dataFilesOnly:Boolean = false):void
 	{
 		var ext:String = String(fileName.split('.').pop()).toLowerCase();
@@ -201,10 +229,7 @@ export default class FileMenu implements MenuBarItemProps
 
 		if (!dataFilesOnly && ext == 'weave')
 		{
-            WeaveArchive.deserialize(fileContent, this.updateProgressIndicator).then((archive) => {
-	            this.archive = archive;
-	            archive.setSessionFromArchive(this.weave);
-            });
+            this.loadArchive(fileContent);
 			return;
 		}
 
@@ -307,20 +332,6 @@ export default class FileMenu implements MenuBarItemProps
 			this.loadUrl(event.state);
 		}
 	}
-
-	loadUrl=(url:string, pushHistory = false)=>
-	{
-		this.fileName = String(url).split('/').pop();
-
-		if (pushHistory)
-		{
-			history.pushState(url, "", FileMenu.buildUrl(url));
-			window.onpopstate = this.handleHistoryEvent;
-			window.document.title = Weave.lang("Weave: {0}",this.fileName);
-		}
-
-		WeaveArchive.loadUrl(this.weave, String(url), this.updateProgressIndicator);
-	};
 
 	private _saveToServer=(newFileName:string, overwrite:boolean = true) =>
 	{

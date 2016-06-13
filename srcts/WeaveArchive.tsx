@@ -155,26 +155,4 @@ export default class WeaveArchive {
 			}
 		}
 	}
-	/**
-	 * Load a Weave session from bytes of .weave archive into a weave instance.
-	 * @param weave The weave instance to load the session content into.
-	 * @param byteArray The session content as a Uint8Array.
-	 * @param updateCallback A function to invoke as the archive is incrementally decompressed, which takes an object containing a "percent" field and a "fileName" field.
-	 */
-	static setWeaveSessionFromContent(weave:Weave, byteArray: Uint8Array, updateCallback?: UpdateCallback)
-	{
-		return WeaveArchive.deserialize(byteArray, updateCallback).then((archive) => archive.setSessionFromArchive(weave));
-	}
-
-	/**
-	 * Load a Weave session from bytes of .weave archive.
-	 * @param weave The weave instance to load the session content into.
-	 * @param byteArray A URL to load the session content from.
-	 * @param updateCallback A function to invoke as the archive is incrementally decompressed, which takes an object containing a "percent" field and a "fileName" field.
-	 */
-	static loadUrl(weave: Weave, url: string, updateCallback?: UpdateCallback): WeavePromise<void>
-	{
-		return WeaveAPI.URLRequestUtils.request(weave.root, new URLRequest(url))
-			.then((result) => WeaveArchive.setWeaveSessionFromContent(weave, result, updateCallback));
-	}
 }
