@@ -1442,8 +1442,6 @@ declare module weavejs.api.core {
      * An object that implements this empty interface has an associated ICallbackCollection and session state,
      * accessible through the global functions in the weave.api package. In order for an ILinkableObject to
      * be created dynamically at runtime, it must not require any constructor parameters.
-     *
-     * @author adufilie
      */
     interface ILinkableObject {
     }
@@ -4439,7 +4437,7 @@ declare module weavejs.data {
         static getCommonMetadata(columns: any[], propertyName: string): string;
         static getAllCommonMetadata(columns: any[]): Object;
         static sortMetadataPropertyNames(names: any[]): void;
-        static firstDataSet: Array<IWeaveTreeNode & IColumnReference>;
+        static map_root_firstDataSet: WeakMap<ILinkableHashMap, Array<IWeaveTreeNode & IColumnReference>>;
         /**
          * Finds a set of columns from available data sources, preferring ones that are already in use.
          */

@@ -27,6 +27,7 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import StreamedGeometryColumn = weavejs.data.column.StreamedGeometryColumn;
 import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
+import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
 export const PREVIEW:"preview" = "preview";
 export const METADATA:"metadata" = "metadata";
@@ -52,6 +53,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	protected enablePreview:boolean = true;
 	protected tree:WeaveTree;
 	protected editorButtons:Map<React.ReactChild, Function>;
+	protected weaveRoot:ILinkableHashMap;
 
 	constructor(props:IDataSourceEditorProps)
 	{
@@ -80,7 +82,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 
 	componentWillUnmount()
 	{
-		ColumnUtils.firstDataSet = null;
+		ColumnUtils.map_root_firstDataSet.delete(this.weaveRoot);
 	}
 
 	getLabelEditor(labelLinkableString:weavejs.core.LinkableString):[React.ReactChild, React.ReactChild]
@@ -234,15 +236,21 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		var leaf = newLeaf;
 	
 		//firstDataSet should be set if there are leaves which are column refs and unset otherwise
+		let weaveRoot = Weave.getRoot(props.dataSource);
+		if (weaveRoot != this.weaveRoot)
+		{
+			ColumnUtils.map_root_firstDataSet.delete(this.weaveRoot);
+			this.weaveRoot = weaveRoot;
+		}
 		var leaves = branch && branch.getChildren() || [];
 		leaves = leaves.filter(leaf => {
 			var ref = Weave.AS(leaf, IColumnReference);
 			return !!(ref && ref.getColumnMetadata());
 		});
 		if (leaves.length)
-			weavejs.data.ColumnUtils.firstDataSet = leaves as any[];
+			weavejs.data.ColumnUtils.map_root_firstDataSet.set(weaveRoot, leaves as any[]);
 		else
-			weavejs.data.ColumnUtils.firstDataSet = null;
+			weavejs.data.ColumnUtils.map_root_firstDataSet.delete(weaveRoot);
 		
 		// select the first leaf by default
 		if (leaves.indexOf(leaf) < 0)

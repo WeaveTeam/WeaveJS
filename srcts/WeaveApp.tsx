@@ -270,8 +270,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	createObject=(type:new(..._:any[])=>any):void=>
 	{
-		// need to generate path here instead of letting LinkableHashMap generate a name because async types can't be instantiated immediately
 		var weave = this.props.weave;
+		
+		// save this immediately because DataSourceManager clears it when it unmounts
+		var firstDataSet = ColumnUtils.map_root_firstDataSet.get(weave.root);
+		
+		// need to generate path here instead of letting LinkableHashMap generate a name because async types can't be instantiated immediately
 		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
 		var path = [weave.root.generateUniqueName(baseName)];
 		weave.requestObject(path, type);
@@ -307,7 +311,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				var INIT = 'initSelectableAttributes';
 				if ((instance as any)[INIT])
 				{
-					var refs = ColumnUtils.findFirstDataSet(this.props.weave.root).concat();
+					var refs = firstDataSet ? firstDataSet.concat() : ColumnUtils.findFirstDataSet(this.props.weave.root).concat();
 					var sortedRefs = this.prioritizeNumericColumns(refs);
 					(instance as any)[INIT](sortedRefs);
 				}
