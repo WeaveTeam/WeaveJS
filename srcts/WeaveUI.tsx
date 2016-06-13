@@ -52,8 +52,8 @@ import * as ol from "openlayers";
 
 weavejs.util.StandardLib.lodash = lodash;
 weavejs.util.StandardLib.ol = ol;
-weavejs.util.StandardLib.MouseUtils = MouseUtils;
 weavejs.util.DateUtils.moment = (moment as any)['default'];
+weavejs.util.DebugUtils.MouseUtils = MouseUtils;
 
 import * as jquery from "jquery";
 
