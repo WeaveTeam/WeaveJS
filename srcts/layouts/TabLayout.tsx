@@ -29,8 +29,8 @@ export interface TabLayoutProps extends LayoutProps
 	}[];
 	onAdd: MenuItemProps|React.MouseEventHandler;
 	onRemove: (panelId:WeavePathArray) => void;
-	onClick: any; //(panelId:WeavePathArray, event?:React.MouseEvent) => void;
-	onTabDoubleClick: (panelId:WeavePathArray) => void;
+	onTabClick: (panelId:WeavePathArray, event?:React.MouseEvent) => void;
+	onTabDoubleClick: (panelId:WeavePathArray, event?:React.MouseEvent) => void;
 }
 
 export interface LayoutState
@@ -69,7 +69,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 	 */
 	static mergeLayout(into:TabLayout|LinkablePlaceholder<TabLayout>, from:TabLayout|LinkablePlaceholder<TabLayout>)
 	{
-		if(LinkablePlaceholder.getClass(into) != TabLayout || LinkablePlaceholder.getClass(from) != TabLayout)
+		if (LinkablePlaceholder.getClass(into) != TabLayout || LinkablePlaceholder.getClass(from) != TabLayout)
 		{
 			console.error("Unexpected parameters to mergeLayout: ", into, from);
 			return;
@@ -228,7 +228,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 			if (_.isEqual(id, item.id))
 				tabState = item;
 		});
-		if(tabState)
+		if (tabState)
 			tabState.id = newId;
 		else
 			console.error("Could not find id in this layout", id);
@@ -302,8 +302,6 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								className="weave-padded-hbox"
 								onDragOver={(event) => this.onDragOverTab(panel)}
 								onDragLeave={this.onDragLeaveTab}
-								onClick={(event) => this.props.onClick(panel.id, event)}
-								onDoubleClick={() => this.props.onTabDoubleClick && this.props.onTabDoubleClick(panel.id)}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.renamePanel(panel.id, newName)} textContent={panel.label}/>*/}
 								{panel.label}
@@ -321,12 +319,20 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 						)))
 					}
 					onViewChange={this.switchPanelToActive}
-					onTabDoubleClick={(index:number) => {
-						if(this.props.onTabDoubleClick)
+					onTabClick={(index:number, event:React.MouseEvent) => {
+						if (this.props.onTabClick)
 						{
 							let tabIndex = index - leadingTabs.length;
-							if(state.tabs && state.tabs[tabIndex])
-								this.props.onTabDoubleClick && this.props.onTabDoubleClick(state.tabs[tabIndex].id)
+							if (state.tabs && state.tabs[tabIndex])
+								this.props.onTabClick(state.tabs[tabIndex].id, event);
+						}
+					}}
+					onTabDoubleClick={(index:number, event:React.MouseEvent) => {
+						if (this.props.onTabDoubleClick)
+						{
+							let tabIndex = index - leadingTabs.length;
+							if (state.tabs && state.tabs[tabIndex])
+								this.props.onTabDoubleClick(state.tabs[tabIndex].id);
 						}
 					}}
 					activeTabIndex={leadingTabs.length + this.activeTabIndex}
