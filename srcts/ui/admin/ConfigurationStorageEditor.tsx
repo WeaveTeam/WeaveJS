@@ -14,7 +14,7 @@ import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
 import List from "../../react-ui/List";
 import HelpIcon from "../../react-ui/HelpIcon";
-import ErrorLogComponent from "./ErrorLogComponent";
+import LogComponent from "./LogComponent";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
@@ -41,6 +41,7 @@ export interface IConfigurationStorageEditorState
 	showAdvancedOptions?: boolean;
 	metadataIdFields?: string;
 	errors?: string[];
+	messages?: string[];
 }
 
 export default class ConfigurationStorageEditor extends SmartComponent<IConfigurationStorageEditorProps, IConfigurationStorageEditorState>
@@ -49,7 +50,7 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 	{
 		super(props);
 
-		this.state = {errors:[]};
+		this.state = {errors: [], messages: []};
 	}
 
 	updateCurrentConnection()
@@ -114,13 +115,16 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 		this.setState({ errors: this.state.errors.concat([error.toString()]) });
 	}
 
+	handleMessage =(message: string)=>
+	{
+		this.setState({ messages: this.state.errors.concat([message.toString()]) });
+	}
+
 	save=(): void=>
 	{
 		let idFields: string[] = weavejs.WeaveAPI.CSVParser.parseCSVRow(this.state.metadataIdFields);
 		this.props.service.setDatabaseConfigInfo(this.state.connectionName, this.state.connectionPassword, this.state.schemaName, idFields).then(
-			(value: string) => {
-				console.log(value);
-			},
+			this.handleMessage,
 			this.handleError
 		);
 	}
@@ -194,7 +198,8 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 					</div>
 				</div>
 			</div>
-			<ErrorLogComponent errors={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
+			<LogComponent uiClass="positive" header={Weave.lang("Server error")} messages={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
+			<LogComponent header={Weave.lang("Completed") } messages={this.state.messages} clearFunc={() => { this.setState({ messages: [] }) } }/>
 			<HBox>
 				<Button colorClass="primary" onClick={this.save}>{Weave.lang("Store Weave configuration at this location") }</Button>
 				<Button colorClass="secondary" onClick={() => ConfigurationStorageEditor.close() }>{Weave.lang("Cancel") }</Button>

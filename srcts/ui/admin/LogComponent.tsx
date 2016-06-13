@@ -21,27 +21,29 @@ import WeaveAdminService = weavejs.net.WeaveAdminService;
 import WeavePromise = weavejs.util.WeavePromise;
 import StandardLib = weavejs.util.StandardLib;
 
-export interface IErrorLogComponentProps {
-	errors?: string[];
+export interface ILogComponentProps {
+	messages?: string[];
+	uiClass?: string;
 	clearFunc: () => void;
+	header: React.ReactChild;
 }
 
-export default class ErrorLogComponent extends React.Component<IErrorLogComponentProps, Object>
+export default class LogComponent extends React.Component<ILogComponentProps, Object>
 {
-	constructor(props:IErrorLogComponentProps)
+	constructor(props:ILogComponentProps)
 	{
 		super(props);
 	}
 
 	render():JSX.Element {
-		if (this.props.errors.length) {
-			return <div className="ui warning message">
+		if (this.props.messages.length) {
+			return <div className={["ui", this.props.uiClass || "negative", "message"].join(" ")}>
 				<i className="close icon" onClick={this.props.clearFunc}></i>
 				<div className="header">
-					{Weave.lang("Server Error") }
+					{this.props.header}
 				</div>
 				<ul className="list">
-					{this.props.errors.map((message, idx) => (<li key={idx}>{message}</li>)) }
+					{this.props.messages.map((message, idx) => (<li key={idx}>{message}</li>)) }
 				</ul>
 			</div>;
 		}
