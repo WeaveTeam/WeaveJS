@@ -470,7 +470,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		if (event.button == 1) // if middle click, close the tab
 		{
-			event.stopPropagation();
+			event.preventDefault();
 			this.removeExistingTab(panelPath);
 		}
 	}
@@ -556,8 +556,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 							click: () => this.addNewTab(FlexibleLayout)
 						}
 					],
-					onClick: this.onTabClick,
 					onRemove: this.removeExistingTab,
+					onTabClick: this.onTabClick,
 					onTabDoubleClick: (layoutPath:WeavePathArray) => this.handlePopoutClick(layoutPath, renderPath)
 				} as TabLayoutProps }
 			/>);

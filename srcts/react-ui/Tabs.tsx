@@ -26,7 +26,8 @@ export interface TabsProps extends React.Props<Tabs>
 	tabLabelStyle?:React.CSSProperties;
 	tabBarClassName?:string;
 	tabBarStyle?:React.CSSProperties;
-	onTabDoubleClick?:(index:number)=>void;
+	onTabClick?:(index:number, event?:React.MouseEvent)=>void;
+	onTabDoubleClick?:(index:number, event?:React.MouseEvent)=>void;
 }
 
 export interface TabsState
@@ -81,10 +82,16 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 						this.props.labels.map((label, index) => {
 							return (
 								<HBox key={index}
-								      className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
-								      style={this.props.tabLabelStyle}
-								      onClick={() => this.changeTabView(index)}
-								      onDoubleClick={() => this.props.onTabDoubleClick && this.props.onTabDoubleClick(index)}
+								    className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
+								    style={this.props.tabLabelStyle}
+								    onClick={(event:React.MouseEvent) => {
+										if (this.props.onTabClick)
+											this.props.onTabClick(index, event);
+										
+										if (!event.defaultPrevented)
+											this.changeTabView(index);
+									}}
+								    onDoubleClick={(event:React.MouseEvent) => this.props.onTabDoubleClick && this.props.onTabDoubleClick(index, event)}
 								>
 									{label}
 								</HBox>
