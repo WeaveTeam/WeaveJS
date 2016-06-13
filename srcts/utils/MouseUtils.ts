@@ -35,7 +35,7 @@ export default class MouseUtils
 		{
 			console.error(
 				"Warning: MouseUtils.getOffsetPoint(element, null) will not be correct the first time it is called.",
-				"To work around this, call MouseUtils.forElement() first."
+				"To work around this, call MouseUtils.forElement(element) before the mouse event occurs."
 			);
 			return {x: 0, y: 0};
 		}
@@ -59,7 +59,7 @@ export default class MouseUtils
 		return instance.mouseDownEvent && element && element.contains(instance.mouseDownEvent.target as Element);
 	}
 	
-	static isMouseOver(element:HTMLElement, event:MouseEvent = null, inclusive:boolean = true):boolean
+	static isMouseOver(element:HTMLElement, event:MouseEvent = null, edgeInclusive:boolean = true):boolean
 	{
 		var rect = element.getBoundingClientRect();
 		if (!event)
@@ -69,12 +69,12 @@ export default class MouseUtils
 		{
 			console.error(
 				"Warning: MouseUtils.isMouseOver(element, null) will not be correct the first time it is called.",
-				"To work around this, call MouseUtils.forElement() first."
+				"To work around this, call MouseUtils.forElement(element) before the mouse event occurs."
 			);
 			return false;
 		}
 		
-		if (inclusive)
+		if (edgeInclusive)
 			return event.clientX >= rect.left
 				&& event.clientX <= rect.left + rect.width
 				&& event.clientY >= rect.top
