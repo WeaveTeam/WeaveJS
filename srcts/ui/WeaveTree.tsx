@@ -19,6 +19,7 @@ export interface IWeaveTreeProps {
 	hideRoot?: boolean;
 	hideLeaves? : boolean;
 	hideBranches? : boolean;
+	filterFunc?: (node: IWeaveTreeNode) => boolean;
 	multipleSelection?: boolean;
 	onSelect?: (selectedItems: Array<IWeaveTreeNode>) => void;
 	onExpand?: (openItems: Array<IWeaveTreeNode>) => void;
@@ -186,6 +187,11 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	enumerateItems = (node: IWeaveTreeNode, result: Array<[number, IWeaveTreeNode]> = [], depth: number = 0): Array<[number, IWeaveTreeNode]> => {
 		if (!node)
 			return result;
+
+		if (this.props.filterFunc && !this.props.filterFunc(node))
+		{
+			return result;
+		}
 
 		if (node !== this.props.root || !this.props.hideRoot) {
 			if (node.isBranch() || node == this.props.root || !this.props.hideLeaves) {

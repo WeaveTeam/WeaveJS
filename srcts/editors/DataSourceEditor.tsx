@@ -122,6 +122,12 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		else
 			return (a === b);
 	}
+
+	private static isNotGeometryList(node:IWeaveTreeNode):boolean
+	{
+		let glnClass = (weavejs.data.source.WeaveDataSource as any).GeomListNode;
+		return !(node instanceof glnClass);
+	}
 	
 	renderPreviewView():JSX.Element
 	{
@@ -135,6 +141,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 						<WeaveTree
 							root={root}
 							hideLeaves={true}
+							filterFunc={DataSourceEditor.isNotGeometryList}
 							initialSelectedItems={this.state.selectedBranch ? [this.state.selectedBranch] : []}
 							onSelect={(selectedItems) => this.setSelection(this.props, selectedItems && selectedItems[0], this.state.selectedLeaf)}
 						/>
