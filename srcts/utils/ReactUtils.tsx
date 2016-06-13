@@ -47,6 +47,11 @@ export default class ReactUtils
 			windowSettings:string = windowOptions.windowSettings || "width=900, height=700",
 
 		popoutWindow = window.open(title,url,windowSettings);
+		if (!popoutWindow)
+		{
+			console.error("Popout window was blocked");
+			return;
+		}
 		popoutWindow.onbeforeunload = () => {
 			if (container) {
 				onBeforeUnLoad && onBeforeUnLoad();
