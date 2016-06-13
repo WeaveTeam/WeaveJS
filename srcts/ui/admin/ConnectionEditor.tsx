@@ -103,7 +103,7 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 	saveConnection=(overwrite:boolean)=>
 	{
 		let info = new ConnectionInfo()
-		info.is_superuser = this.state.is_superuser;
+		info.is_superuser = !!this.state.is_superuser;
 		info.name = this.state.name;
 		info.pass = this.state.pass;
 		info.folderName = this.state.folderName;
@@ -170,12 +170,12 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 		{
 			return ConnectionEditor.getConnectString(
 				this.state.editorMode,
-				this.state.dbServerAddress,
-				this.state.dbServerPort,
-				this.state.dbDatabaseName,
-				this.state.dbUsername,
-				this.state.dbPassword,
-				this.state.dbDomain);
+				this.state.dbServerAddress || "",
+				this.state.dbServerPort || "",
+				this.state.dbDatabaseName || "",
+				this.state.dbUsername || "",
+				this.state.dbPassword || "",
+				this.state.dbDomain || "");
 		}
 	}
 
