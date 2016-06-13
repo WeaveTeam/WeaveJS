@@ -45,8 +45,10 @@ export default class CKANDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("API Version"),
-				<StatefulTextField ref={linkReactStateRef(this, {value: ds.apiVersion})} type="number" min="1" max="3" step="1"/>,
-				<Checkbox ref={linkReactStateRef(this, { value: ds.useHttpPost})} label={Weave.lang("Use HTTP POST")}/>
+				<HBox className="weave-padded-hbox">
+					<StatefulTextField style={{flex: 1}} ref={linkReactStateRef(this, {value: ds.apiVersion})} type="number" min="1" max="3" step="1"/>
+					<Checkbox ref={linkReactStateRef(this, { value: ds.useHttpPost})} label={Weave.lang("Use HTTP POST")}/>
+				</HBox>
 			],
 			[
 				null,
