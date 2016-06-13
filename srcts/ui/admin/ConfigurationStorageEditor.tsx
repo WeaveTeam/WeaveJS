@@ -153,6 +153,16 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 						<LinkedInput field="connectionPassword" type="password" outerComponent={this}/>
 					</div>
 				</div>
+				<div className="two column row" style={{ paddingBottom: 0 }}>
+					<div className="four wide right aligned column">
+						<div className="ui basic segment">
+							{Weave.lang("Database schema") }
+						</div>
+					</div>
+					<div className="twelve wide column">
+						<LinkedInput field="schemaName" type="text" outerComponent={this}/>
+					</div>
+				</div>
 				<div className="one column row">
 					<div className="sixteen wide right aligned column">
 						<Checkbox label={Weave.lang("Show advanced options")} 
