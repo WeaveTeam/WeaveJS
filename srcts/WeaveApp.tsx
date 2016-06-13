@@ -98,6 +98,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		return ["Tabs"];
 	}
+	
+	getDefaultLayoutPath():WeavePathArray
+	{
+		return ["Layout"];
+	}
 
 	getRenderedComponent():React.Component<any, any>
 	{
@@ -285,6 +290,14 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				tabLayout.activeTabIndex = 0;
 
 			var tabPath = tabLayout.getPanelIds()[tabLayout.activeTabIndex];
+			
+			if (!tabPath)
+			{
+				tabPath = this.getDefaultLayoutPath();
+				weave.requestObject(tabPath, FlexibleLayout);
+				tabLayout.addPanel(tabPath);
+			}
+			
 			LinkablePlaceholder.whenReady(this, weave.getObject(tabLayout.activePanelId), (layout:AnyAbstractLayout) => {
 				layout.addPanel(path);
 			});
@@ -364,7 +377,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var tabs = tabLayoutState && tabLayoutState.tabs;
 		var activeTabIndex = tabLayoutState && tabLayoutState.activeTabIndex || -1;
 		var title = tabLayoutState && tabLayoutState.title;
-		var defaultPath = ["Layout"];
 
 		if (!tabs || (tabs && !tabs.length))
 		{
@@ -382,7 +394,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{
 					// create a window layout and select its tab
 					activeTabIndex = 0;
-					requestObject(this.props.weave, defaultPath, WindowLayout, (instance:WindowLayout) => {
+					requestObject(this.props.weave, this.getDefaultLayoutPath(), WindowLayout, (instance:WindowLayout) => {
 						var ids:WeavePathArray[] = this.props.weave.root.getNames(weavejs.api.ui.IVisTool, true).map(name => [name]);
 						instance.setSessionState({
 							panels: ids.map(id => {
@@ -409,7 +421,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				else
 				{
 					// blank session, will default to data manager
-					this.props.weave.requestObject(defaultPath, FlexibleLayout);
+					this.props.weave.requestObject(this.getDefaultLayoutPath(), FlexibleLayout);
 				}
 				layouts = this.getNonTabLayouts();
 			}
