@@ -917,7 +917,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 	componentDidMount():void
 	{
 		// Hack to make OpenLayers work correctly in popouts
-		//MouseUtils.echoWindowEventsToOpener(ReactDOM.findDOMNode(this));
+		MouseUtils.echoWindowEventsToOpener(ReactDOM.findDOMNode(this));
 
 		if (!OpenLayersMapTool.projectionDbReadyOrFailed)
 		{
