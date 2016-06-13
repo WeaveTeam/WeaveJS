@@ -1,21 +1,18 @@
 import * as React from "react";
 import * as _ from "lodash";
-
 import WeaveComponentRenderer from "../WeaveComponentRenderer";
 import {AbstractLayout, LayoutProps} from "./AbstractLayout";
 import Tabs from "../react-ui/Tabs";
-import {VBox, HBox} from "../react-ui/FlexBox";
+import {HBox} from "../react-ui/FlexBox";
 import ReactUtils from "../utils/ReactUtils";
 import MiscUtils, {Structure} from "../utils/MiscUtils";
 import CenteredIcon from "../react-ui/CenteredIcon";
 import classNames from "../modules/classnames";
+import {MenuItemProps} from "../react-ui/Menu";
+import Dropdown from "../semantic-ui/Dropdown";
+import {WeavePathArray} from "../utils/WeaveReactUtils";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
-import {MenuItemProps} from "../react-ui/Menu";
-import MenuButton from "../react-ui/MenuButton";
-import Dropdown from "../semantic-ui/Dropdown";
-import EditableTextCell from "../react-ui/EditableTextCell";
-import {WeavePathArray} from "../utils/WeaveReactUtils";
 
 export interface TabState
 {
@@ -220,13 +217,14 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 	{
 		var weave = Weave.getWeave(this);
 		var state = this.getSessionState();
+		var plusIcon:JSX.Element = null;
 		var tabBarChildren:JSX.Element = null;
 		var leadingTabs = this.props.leadingTabs || [];
 		if (this.props.onAdd)
 		{
 			if (Array.isArray(this.props.onAdd))
 			{
-				tabBarChildren = (
+				plusIcon = (
 					<Dropdown style={{display: "flex"}} menu={this.props.onAdd as MenuItemProps[]} direction="upward" action="hide" keepOnScreen={false}>
 						<HBox className={classNames("weave-layout-tabs-label", "bottom")} style={{flex: 1}}>
 							<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")} iconProps={{ className: "fa fa-plus" }}/>
@@ -236,7 +234,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 			}
 			else
 			{
-				tabBarChildren = (
+				plusIcon = (
 					<HBox
 						className={classNames("weave-layout-tabs-label", "bottom")}
 						onClick={this.props.onAdd as React.MouseEventHandler}
@@ -246,13 +244,24 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 							title={Weave.lang("Add New...")}
 							iconProps={{ className: "fa fa-plus" }}
 						/>
+
 					</HBox>
 				);
 			}
 		}
 
+		tabBarChildren = (
+			<HBox style={{justifyContent: "space-between"}}>
+				{plusIcon}
+				{/*<HBox>
+					<CenteredIcon iconProps={{className: "fa fa-play fa-flip-horizontal"}}/>
+					<CenteredIcon iconProps={{className: "fa fa-play"}}/>
+				</HBox>*/}
+			</HBox>
+		);
+
 		return (
-			<VBox
+			<HBox
 				ref={ReactUtils.registerComponentRef(this)}
 				style={_.merge({}, this.props.style, {flex: 1})}
 			>
@@ -262,6 +271,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 					tabContentClassName="weave-layout-tabs-content"
 					tabBarClassName="weave-layout-tabs-bar"
 					tabLabelClassName="weave-layout-tabs-label"
+					tabBarStyle={{whiteSpace: "nowrap"}}
 					className=" "
 					labels={
 						leadingTabs.map(tab => tab.label)
@@ -312,7 +322,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 					}
 					tabBarChildren={tabBarChildren}
 				/>
-			</VBox>
+			</HBox>
 		);
 	}
 }

@@ -76,20 +76,22 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 			      className={classNames(this.props.tabBarClassName || "weave-tab-label-container", this.props.location)}
 			      style={this.props.tabBarStyle}
 			>
-				{
-					this.props.labels.map((label, index) => {
-						return (
-							<HBox key={index}
-							      className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
-							      style={this.props.tabLabelStyle}
-							      onClick={() => this.changeTabView(index)}
-							      onDoubleClick={() => this.props.onTabDoubleClick && this.props.onTabDoubleClick(index)}
-							>
-								{label}
-							</HBox>
-						);
-					})
-				}
+				<HBox style={{overflow: "hidden"}}>
+					{
+						this.props.labels.map((label, index) => {
+							return (
+								<HBox key={index}
+								      className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
+								      style={this.props.tabLabelStyle}
+								      onClick={() => this.changeTabView(index)}
+								      onDoubleClick={() => this.props.onTabDoubleClick && this.props.onTabDoubleClick(index)}
+								>
+									{label}
+								</HBox>
+							);
+						})
+					}
+				</HBox>
 				{
 					this.props.tabBarChildren
 				}
