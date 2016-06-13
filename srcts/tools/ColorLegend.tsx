@@ -25,6 +25,7 @@ import BinNamesList from "../ui/BinNamesList";
 import {BinningDefinitionSelector} from "../editors/BinningDefinitionEditor";
 import PrintUtils from "../utils/PrintUtils";
 import Accordion from "../semantic-ui/Accordion";
+import Checkbox from "../semantic-ui/Checkbox";
 
 import ILinkableObject = weavejs.api.core.ILinkableObject;
 import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -58,6 +59,7 @@ import StandardDeviationBinningDefinition = weavejs.data.bin.StandardDeviationBi
 import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
 import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
 import ColumnUtils = weavejs.data.ColumnUtils;
+import Div from "../react-ui/Div";
 
 const SHAPE_TYPE_CIRCLE:string = "circle";
 const SHAPE_TYPE_SQUARE:string = "square";
@@ -81,6 +83,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	shapeSize = Weave.linkableChild(this, new LinkableNumber(25));
 	shapeType = Weave.linkableChild(this, new LinkableString(SHAPE_TYPE_CIRCLE));
 	showLegendName = Weave.linkableChild(this, new LinkableBoolean(true));
+	reverseOrder = Weave.linkableChild(this, new LinkableBoolean(false));
 	//lineStyle = Weave.linkableChild(this, SolidLineStyle);
 	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 
@@ -375,12 +378,21 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 				}
 
+				let legendColumnStyle:React.CSSProperties ={
+					display:"flex",
+					flex:columnFlex,
+					flexDirection:this.reverseOrder.value ? "column-reverse" : "column",
+					minWidth:0,
+					padding: "4px",
+					justifyContent:"space-around"
+				};
+				
 				// min width value is required
 				// flex items will refuse to go below the minimum intrinsic width
 				// unless we specify either width /minwidth /maxwidth
-				columns[colIndex] = <VBox key={colIndex} style={ { flex:columnFlex  , minWidth:0, padding: "4px", justifyContent:"space-around"} }>
+				columns[colIndex] = <div key={colIndex} style={ legendColumnStyle }>
 										{ rows }
-									</VBox> ;
+									</div> ;
 
 			}
 
@@ -471,6 +483,10 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					[
 						Weave.lang("Shape Size"),
 						<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.shapeSize})}/>
+					],
+					[
+						Weave.lang("Reverse Order"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.reverseOrder })} label={" "}/>
 					],
 					[ 
 						Weave.lang("Number of columns"),
