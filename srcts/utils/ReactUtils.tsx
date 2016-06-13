@@ -7,6 +7,7 @@ import * as _ from "lodash";
 import * as jquery from "jquery";
 import polyfill from "./polyfill";
 import MouseUtils from "./MouseUtils";
+import MiscUtils from "./MiscUtils";
 
 var $:JQueryStatic = (jquery as any)["default"];
 
@@ -43,7 +44,7 @@ export default class ReactUtils
 			divId:string = windowOptions.divId || 'popout-container',
 			url:string = windowOptions.url || '_blank',
 			title:string = windowOptions.title || '',
-			windowSettings:string = windowOptions.windowSettings || "width=500, height=500",
+			windowSettings:string = windowOptions.windowSettings || "width=900, height=700",
 
 		popoutWindow = window.open(title,url,windowSettings);
 		popoutWindow.onbeforeunload = () => {
@@ -62,8 +63,7 @@ export default class ReactUtils
 					return;
 				}
 			}
-
-			MouseUtils.echoWindowEvents(popoutWindow, window); /* Hack to make OpenLayers work correctly in the popout */
+			
 			popoutWindow.document.title = windowOptions.windowName || "Weave Pop-Out";
 			container = popoutWindow.document.createElement('div');
 			container.id = divId;
@@ -72,7 +72,7 @@ export default class ReactUtils
 				$("link, style").each(function () {
 					//Todo: find a better way to clone this link
 					var link:any = $(this).clone()[0];
-					link.setAttribute("href", window.location.origin + window.location.pathname + link.getAttribute("href"));
+					link.setAttribute("href", MiscUtils.resolveRelative(window.location.origin + window.location.pathname, link.getAttribute("href")));
 					$(popoutWindow.document.head).append(link);
 				});
 			}
