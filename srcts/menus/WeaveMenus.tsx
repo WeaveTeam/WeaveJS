@@ -13,9 +13,9 @@ export default class WeaveMenus {
 	dataMenu:DataMenu;
 	controllersMenu:ControllersMenu;
 
-	constructor(context:React.ReactInstance, weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	constructor(context:React.ReactInstance, weave:Weave, createObject:(type:new(..._:any[])=>any)=>void, onFileLoaded:()=>void)
 	{
-		this.fileMenu = new FileMenu(context, weave);
+		this.fileMenu = new FileMenu(context, weave, onFileLoaded);
 		this.systemMenu = new SystemMenu(weave, this.fileMenu);
 		this.chartsMenu = new ChartsMenu(weave, createObject);
 		this.dataMenu = new DataMenu(weave, createObject);

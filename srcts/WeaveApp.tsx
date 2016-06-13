@@ -76,7 +76,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			toolPathToEdit: null,
 			initialWeaveComponent:null
 		};
-		this.menus = new WeaveMenus(this, this.props.weave, this.createObject);
+		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded);
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 		this.urlParams = MiscUtils.getUrlParams();
 	}
@@ -328,7 +328,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		return Weave.AS(this.props.weave.getObject(this.getRenderPath()), TabLayout);
 	}
-	
+
+	private getTabLayouts()
+	{
+		return this.props.weave.root.getObjects(TabLayout, true);
+	}
+
 	private getNonTabLayouts()
 	{
 		return this.props.weave.root.getObjects(AbstractLayout as any, true).filter((obj:ILinkableObject) => {
@@ -337,6 +342,18 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			return true;
 		});
 	}
+
+	private onSessionLoaded=()=>
+	{
+		var weave = this.props.weave;
+		weave.requestObject(this.getRootLayoutPath(), TabLayout);
+		var mainTabLayout = weave.getObject(this.getRootLayoutPath()) as TabLayout;
+		var allTabLayouts = this.getTabLayouts();
+		allTabLayouts.forEach(tabLayout => {
+			TabLayout.mergeLayout(mainTabLayout, tabLayout);
+			weave.removeObject(Weave.getPath(tabLayout).getPath());
+		});
+	};
 
 	private initializeTabs=(tabLayout:TabLayout)=>
 	{

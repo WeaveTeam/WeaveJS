@@ -13,6 +13,7 @@ import Dropdown from "../semantic-ui/Dropdown";
 import {WeavePathArray} from "../utils/WeaveReactUtils";
 
 import LinkableVariable = weavejs.core.LinkableVariable;
+import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 
 export interface TabState
 {
@@ -58,6 +59,27 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 	constructor(props:TabLayoutProps)
 	{
 		super(props);
+	}
+
+	/**
+	 * This static function takes a layout session state and combines it
+	 * with another layout session state
+	 * @param into the layout to be merged into
+	 * @param from the layout to be merged from
+	 */
+	static mergeLayout(into:TabLayout|LinkablePlaceholder<TabLayout>, from:TabLayout|LinkablePlaceholder<TabLayout>)
+	{
+		if(LinkablePlaceholder.getClass(into) != TabLayout || LinkablePlaceholder.getClass(from) != TabLayout)
+		{
+			console.error("Unexpected parameters to mergeLayout: ", into, from);
+			return;
+		}
+		var intoState = MiscUtils.normalizeStructure(Weave.getState(into), stateStructure) as LayoutState;
+		var fromState = MiscUtils.normalizeStructure(Weave.getState(from), stateStructure) as LayoutState;
+
+		intoState.tabs = intoState.tabs.concat(fromState.tabs);
+
+		Weave.setState(intoState, fromState);
 	}
 
 	getSessionState():LayoutState
