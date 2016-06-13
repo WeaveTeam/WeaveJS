@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import DOMUtils from "./DOMUtils";
+import ReactUtils from "./ReactUtils";
 
 export default class MouseUtils
 {
@@ -87,6 +88,11 @@ export default class MouseUtils
 
 	private static map_window_MouseUtils = new WeakMap<Window, MouseUtils>();
 	
+	static forInstance(instance:React.ReactInstance):MouseUtils
+	{
+		return MouseUtils.forElement(ReactUtils.getElement(instance));
+	}
+	
 	static forComponent(component:React.Component<any, any>):MouseUtils
 	{
 		return MouseUtils.forElement(ReactDOM.findDOMNode(component));
@@ -109,9 +115,24 @@ export default class MouseUtils
 	//--------------------
 	//
 	
-	static echoWindowEvents(windowSource:Window, windowTarget:Window) {
-		MouseUtils.mouseEventTypes.forEach(eventType => windowSource.document.addEventListener(eventType, (event) => windowTarget.requestAnimationFrame(() => windowTarget.document.dispatchEvent(event))));
-		MouseUtils.dragEventTypes.forEach(eventType => windowSource.document.addEventListener(eventType, (event) => windowTarget.requestAnimationFrame(() => windowTarget.document.dispatchEvent(event))));
+	static echoWindowEventsToOpener(sourceElement:Element)
+	{
+		var sourceWindow = DOMUtils.getWindow(sourceElement);
+		var destinationWindow = sourceWindow.opener;
+		if (!sourceElement || !destinationWindow)
+			return;
+		
+		var allEvents = MouseUtils.mouseEventTypes.concat(MouseUtils.dragEventTypes);
+		allEvents.forEach(eventType => {
+			sourceWindow.document.addEventListener(eventType, (event) => {
+				if ((event.target instanceof Element && sourceElement.contains(event.target as Element)) || MouseUtils.receivedMouseDown(sourceElement))
+				{
+					sourceWindow.requestAnimationFrame(() => {
+						destinationWindow.document.dispatchEvent(event)
+					})
+				}
+			})
+		});
 	}
 
 	static mouseEventTypes = ['click', 'dblclick', 'mousedown', 'mouseenter', 'mouseleave', 'mousemove', 'mouseout', 'mouseover', 'mouseup', 'wheel'];
@@ -143,6 +164,8 @@ export default class MouseUtils
 		this.mouseEvent = event;
 		if (event.type == 'mousedown')
 			this.mouseDownEvent = event;
+		if (event.type == 'mouseup')
+			this.mouseDownEvent = null;
 		if (event.buttons || this.canRelyOnButtonsProp)
 		{
 			this.canRelyOnButtonsProp = true;

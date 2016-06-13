@@ -119,11 +119,11 @@ export default class MiscUtils
 		return str.indexOf(searchString, position) === position;
 	}
 
-	static resolveRelative(path:string, base:string):string
+	static resolveRelative(base:string, path:string):string
 	{
 		// Upper directory
 		if (MiscUtils.startsWith(path, "../"))
-			return MiscUtils.resolveRelative(path.slice(3), base.replace(/\/[^\/]*$/, ""));
+			return MiscUtils.resolveRelative(base.replace(/\/[^\/]*$/, ""), path.slice(3));
 		// Relative to the root
 		if (MiscUtils.startsWith(path, "/"))
 		{
