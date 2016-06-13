@@ -238,7 +238,8 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 
 
 
-		return <VBox className="weave-ToolEditor" style={ { flex: 0.66 } }>
+		return <VBox className="weave-ToolEditor" style={ { flex: 0.66, justifyContent: "space-between"} }>
+			<HBox style={{ overflow: "auto" }}>
 			{Accordion.render(
 				[
 					Weave.lang("Connection Properties"),
@@ -249,11 +250,12 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 					dbEditors
 				]
 			)}
-			<HBox>
-				<Button onClick={() => this.saveConnection(false)}>
+			</HBox>
+			<HBox style={{ alignSelf: "flex-end" }}>
+				<Button colorClass="primary" onClick={() => this.saveConnection(false)}>
 					{Weave.lang("Save changes")}
 				</Button>
-				<Button onClick={() => this.loadFromConnection(this.props.connectionName)}>
+				<Button colorClass="secondary" onClick={() => this.loadFromConnection(this.props.connectionName)}>
 					{Weave.lang("Discard changes")}
 				</Button>
 			</HBox>

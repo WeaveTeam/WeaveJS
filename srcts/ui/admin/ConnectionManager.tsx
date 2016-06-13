@@ -62,6 +62,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 				content: <ConnectionManager service={service}/>,
 				modal: true,
 				resizable: true,
+				footerContent: <div/>,
 				width: 920,
 				height: 675,
 				onClose: () => { ConnectionManager.window = null }

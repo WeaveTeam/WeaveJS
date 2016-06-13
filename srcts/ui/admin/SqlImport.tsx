@@ -165,6 +165,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 				content: <SqlImport service={service} selectIdFunc={selectIdFunc || _.noop}/>,
 				resizable: true,
 				width: 920,
+				footerContent: <div/>,
 				height: 675,
 				onClose: () => {SqlImport.window = null}
 			}
@@ -230,8 +231,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 		}
 
 		return (
-			<VBox className="weave-ToolEditor">
-				<div>
+			<VBox className="weave-ToolEditor" style={{ justifyContent: "space-between" }}>
+				<div style={{ overflow: "auto" }}>
 					<div className="ui dividing header">{Weave.lang("Table")}</div>
 					<div className="ui left aligned grid">
 						<div className="one column row" style={{paddingBottom: 0}}>
@@ -322,13 +323,12 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 						<div className="one column row">
 							{this.renderErrors()}
 						</div>
-						<div className="one column row">
-							<div className="sixteen wide right aligned column">
-								<Button disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
-							</div>
-						</div>
 					</div>
 				</div>
+				<HBox style={{ alignSelf: "flex-end" }}>
+						<Button colorClass="primary" disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
+						<Button colorClass="secondary" disabled={this.state.importInProgress} onClick={() => PopupWindow.close(SqlImport.window) }>{Weave.lang("Cancel") }</Button>
+				</HBox>
 			</VBox>
 		)
 	}
