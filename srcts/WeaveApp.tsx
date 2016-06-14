@@ -1,12 +1,9 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import prefixer from "./react-ui/VendorPrefixer";
 import SideBarContainer from "./react-ui/SideBarContainer";
-import InteractiveTour from "./react-ui/InteractiveTour";
-import {VBox, HBox} from "./react-ui/FlexBox";
+import {VBox} from "./react-ui/FlexBox";
 import WeaveMenuBar from "./WeaveMenuBar";
-import GetStartedComponent from "./ui/GetStartedComponent";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import MiscUtils from "./utils/MiscUtils";
 import WeaveTool from "./WeaveTool";
@@ -60,6 +57,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 {
 	enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 	menus:WeaveMenus;
+	// to be repplaced later by a non static variable
+	static app_to_popout_windows:Map<WeaveApp, Set<Window>> = new Map();
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
@@ -79,6 +78,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded);
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 		this.urlParams = MiscUtils.getUrlParams();
+		WeaveApp.app_to_popout_windows.set(this, new Set());
 	}
 	
 	componentWillReceiveProps(props:WeaveAppProps)
@@ -98,7 +98,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	{
 		return ["Tabs"];
 	}
-	
+
 	getDefaultLayoutPath():WeavePathArray
 	{
 		return ["Layout"];
@@ -135,11 +135,19 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		let fc = bc.internalDynamicColumn.requestGlobalObject(DEFAULT_COLOR_DATA_COLUMN, weavejs.data.column.FilteredColumn, true);
 		fc.filter.requestGlobalObject(DEFAULT_SUBSET_KEYFILTER);
 	}
-	
+
 	urlParams:{ file: string, editable: boolean, layout: string};
-	
+
 	componentDidMount()
 	{
+		// only add this listener if the weave app is a root weave app
+		if(_.isEqual(this.getRenderPath(), this.getRootLayoutPath()))
+		{
+			let window = ReactUtils.getWindow(this);
+			window.addEventListener("beforeunload", this.handleBeforeUnload);
+			window.addEventListener("unload", this.handleUnload);
+		}
+
 		this.createDefaultSessionElements();
 		if (this.props.readUrlParams)
 		{
@@ -169,16 +177,39 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				this.forceUpdate();
 			}
 		}
-		
+
 		if (this.props.showFileDialog)
 			FileDialog.open(this.menus.fileMenu.context, this.menus.fileMenu.loadUrl, this.menus.fileMenu.loadFile, true /* skip confirmation dialog */);
 	}
-	
+
 	handleSideBarClose=()=>
 	{
 		this.setState({ toolPathToEdit: null });
 	};
-	
+
+	/**
+	 * This function will get called when the main WeaveApp gets unloaded
+	 */
+	handleUnload=()=>
+	{
+		WeaveApp.app_to_popout_windows.get(this).forEach((window) => {
+			window.close();
+		});
+	}
+
+	/**
+	 * This function will get called before the window unloads
+	 * and will provide a dialog giving the user a chance to cancel the unloading
+	 * @param event beforeunload event
+	 * @returns {string} the confirmation message
+	 */
+	handleBeforeUnload=(event:BeforeUnloadEvent)=>
+	{
+		var confirmationMessage = Weave.lang("Are you sure you want to exit?");
+		event.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+		return confirmationMessage;              // Gecko, WebKit, Chrome <34
+	};
+
 	handleGearClick=(tool:WeaveTool):void=>
 	{
 		var path = tool.props.path;
@@ -198,16 +229,35 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			rootTabLayout.addPanel(panelId, panel && panel.title);
 		});
 		weave.removeObject(tabLayoutPath);
-	}
+	};
 
 	handlePopoutClick=(layoutPath:WeavePathArray, oldTabLayoutPath:WeavePathArray):void=>
 	{
 		var newTabLayoutPath = [this.props.weave.root.generateUniqueName("Tabs")];
+
 		var oldTabLayout = this.props.weave.getObject(oldTabLayoutPath) as any;
 		oldTabLayout.removePanel(layoutPath);
+
 		requestObject(this.props.weave, newTabLayoutPath, TabLayout, (tabLayout:TabLayout) => {
+			Weave.getCallbacks(tabLayout).addDisposeCallback(this, () => {
+				// close the associated Tab Layout window when the Tab Layout is disposed
+				let window = ReactUtils.getWindow(tabLayout);
+				if(window)
+				{
+					try
+					{
+						WeaveApp.app_to_popout_windows.get(this).delete(window);
+						window.close();
+					}
+					catch(e)
+					{
+
+					}
+				}
+			});
 			tabLayout.addPanel(layoutPath);
 		});
+
 		var content:JSX.Element = (
 			<WeaveApp
 				weave={this.props.weave}
@@ -216,9 +266,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				style={{width: "100%", height: "100%"}}
 			/>
 		);
-		var onLoad:Function = () => { };
 		var options:any = { transferStyle: true };
-		ReactUtils.openPopout(content, onLoad, () => this.restoreTabs(newTabLayoutPath), options);
+		WeaveApp.app_to_popout_windows.get(this).add(ReactUtils.openPopout(content, _.noop, () => this.restoreTabs(newTabLayoutPath), options));
 	};
 
 	renderTab=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
@@ -271,41 +320,41 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	createObject=(type:new(..._:any[])=>any):void=>
 	{
 		var weave = this.props.weave;
-		
+
 		// save this immediately because DataSourceManager clears it when it unmounts
 		var firstDataSet = ColumnUtils.map_root_firstDataSet.get(weave.root);
-		
+
 		// need to generate path here instead of letting LinkableHashMap generate a name because async types can't be instantiated immediately
 		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type);
 		var path = [weave.root.generateUniqueName(baseName)];
 		weave.requestObject(path, type);
 		var possiblePlaceholder = weave.getObject(path);
 		var resultType = LinkablePlaceholder.getClass(possiblePlaceholder);
-		
+
 		if (resultType != type)
 			return;
 
 		if (React.Component.isPrototypeOf(type))
 		{
 			this.setState({ toolPathToEdit: path });
-			
+
 			var tabLayout = this.tabLayout;
 			if (tabLayout.activeTabIndex < 0)
 				tabLayout.activeTabIndex = 0;
 
 			var tabPath = tabLayout.getPanelIds()[tabLayout.activeTabIndex];
-			
+
 			if (!tabPath)
 			{
 				tabPath = this.getDefaultLayoutPath();
 				weave.requestObject(tabPath, FlexibleLayout);
 				tabLayout.addPanel(tabPath);
 			}
-			
+
 			LinkablePlaceholder.whenReady(this, weave.getObject(tabLayout.activePanelId), (layout:AnyAbstractLayout) => {
 				layout.addPanel(path);
 			});
-			
+
 			LinkablePlaceholder.whenReady(this, possiblePlaceholder, (instance:ILinkableObject) => {
 				// hack
 				var INIT = 'initSelectableAttributes';
@@ -486,23 +535,28 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 	}
 
+	componentWillUnmount()
+	{
+		ReactUtils.getWindow(this).removeEventListener("beforeunload", this.handleUnload);
+	}
+
 	initialLoadingForBlankSession=(initialComponentName:string):void=>{
 		this.setState({
 			initialWeaveComponent:initialComponentName
 		});
-		
+
 	};
-		
+
 	get enableMenuBar():LinkableBoolean
 	{
 		return this.enableMenuBarWatcher.target as LinkableBoolean;
 	}
-	
+
 	render():JSX.Element
 	{
 		var weave = this.props.weave;
 		var renderPath = this.getRenderPath();
-		
+
 		if (!weave)
 		{
 			return (
@@ -514,7 +568,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		// check in url params to skip BlankPageIntro
 		this.urlParams = MiscUtils.getUrlParams();
-		
+
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
