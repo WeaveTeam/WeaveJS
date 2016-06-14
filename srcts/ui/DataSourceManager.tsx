@@ -234,7 +234,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 											selectedValues={ [dataSource] }
 											onChange={ (selectedValues:IDataSource[]) => { this.setSelectedDataSource(selectedValues[0]);  }}
 										/>
-									:	<div className="weave-list-item" style={{alignSelf: "flex-start", cursor: "default"}}>
+									:	<div className="weave-list-item" style={{alignSelf: "flex-start", cursor: "default", pointerEvents: "none"}}>
 											{Weave.lang("(None)")}
 										</div>
 								}
