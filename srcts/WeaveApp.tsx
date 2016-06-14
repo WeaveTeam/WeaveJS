@@ -237,7 +237,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				<WeaveComponentRenderer
 					weave={this.props.weave}
 					path={path}
-					style={{width: "100%", height: "100%"}}
+					style={{width: "100%"}}
 					props={{panelRenderer: this.renderTool}}
 				/>
 			</SideBarContainer>
@@ -536,7 +536,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				weave={weave}
 				path={renderPath}
 				defaultType={TabLayout}
-				style={{width: "100%", height: "100%"}}
+				style={{width: "100%"}}
 				onCreate={this.initializeTabs}
 				props={ {
 					panelRenderer: this.renderTab,

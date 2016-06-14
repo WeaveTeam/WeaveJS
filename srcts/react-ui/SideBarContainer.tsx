@@ -186,8 +186,9 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 
 		let containerStyle:React.CSSProperties = {
 			position: "relative",
-			background: "#e0e0e0"
-		}
+			background: "#e0e0e0",
+			display:"flex"
+		};
 
 		if (this.props.mode == "scale")
 		{
@@ -223,13 +224,14 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 		}
 		else
 		{
-			// important to set " style={ {width:"100%",height:"100%"} }" ensures calculated size values are passed on
-			// HBox takes value from VBox through its width and height which in turn takes from resizing div
+			// important to set inner style to make sure flex chain is not broken for automated calculations
+			// setting height percent dont go well with edge browser, so flex values are preferred
+			// flex 1 as ResizingDiv will always have only one child, so flex values grow and shrink both can remain 1
 			containerUI = (
-				<ResizingDiv style={ containerStyle }>
-					<VBox style={ {width:"100%",height:"100%"} }>
+				<ResizingDiv style={ containerStyle } innerStyle={ {display:"flex",flex:1} }>
+					<VBox style={ {width:"100%"} }>
 						{topSideBar}
-						<HBox style={ {flex:1} }>
+						<HBox style={ {flex:"1 0"} }>
 							{leftSideBar}
 							<div style={ wrapperStyle }>
 								{this.props.children}
