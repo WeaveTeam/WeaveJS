@@ -625,6 +625,7 @@ div.weave-tree-view {
 	cursor:pointer;
 	background-color: #FFFFFF;
 }
+.weave-list-item:active,
 .weave-list-item:hover{
 	background-color: rgba(180, 225, 255, 0.4);
 }
@@ -639,8 +640,12 @@ div.ui.inverted.segment .weave-list-item{
 	background-color: inherit;
 	padding: 5px 10px 5px 10px;
 }
-
 div.ui.inverted.segment .weave-list-item:hover{
+	background-color: rgba(180, 225, 255, 0.4);
+	color: white;
+}
+div.ui.inverted.segment .weave-list-item:active{
+	background-color: rgba(117, 172, 228, 0.5);
 	color: white;
 }
 div.ui.inverted.segment .weave-list-item-selected{
