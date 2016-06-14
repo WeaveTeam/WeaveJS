@@ -73,14 +73,19 @@ export default class ReactUtils
 			container = popoutWindow.document.createElement('div');
 			container.id = divId;
 			popoutWindow.document.body.appendChild(container);
-			if(windowOptions.transferStyle) {
-				$("link, style").each(function () {
-					//Todo: find a better way to clone this link
-					var link:any = $(this).clone()[0];
-					link.setAttribute("href", MiscUtils.resolveRelative(window.location.origin + window.location.pathname, link.getAttribute("href")));
-					$(popoutWindow.document.head).append(link);
-				});
+
+			if (windowOptions.transferStyle)
+			{
+				var links = document.getElementsByTagName("link");
+				// make link href absolute
+				for (var i = 0; i < links.length; ++i)
+				{
+					var link = links[i].cloneNode() as HTMLLinkElement;
+					link.setAttribute("href", link.href || "");
+					popoutWindow.document.head.appendChild(link);
+				}
 			}
+
 			polyfill(popoutWindow);
 			ReactDOM.render(jsx, container);
 			onLoad && onLoad();
