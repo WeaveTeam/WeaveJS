@@ -161,7 +161,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 		SqlImport.window = PopupWindow.open(
 			context,
 			{
-				title: Weave.lang("Import from SQL"),
+				title: Weave.lang("Import data from SQL"),
 				content: <SqlImport service={service} selectIdFunc={selectIdFunc || _.noop}/>,
 				resizable: true,
 				width: 920,

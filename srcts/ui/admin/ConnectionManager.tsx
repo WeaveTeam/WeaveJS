@@ -27,6 +27,7 @@ export interface IConnectionManagerProps {
 }
 
 export interface IConnectionManagerState {
+	user?: string;
 	errors?: string[];
 	messages?: string[];
 	connections?: string[];
@@ -60,7 +61,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		ConnectionManager.window = PopupWindow.open(
 			context,
 			{
-				title: Weave.lang("Import from SQL"),
+				title: Weave.lang("Manage Users and Connections"),
 				content: <ConnectionManager service={service}/>,
 				modal: true,
 				resizable: true,
@@ -77,6 +78,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 	{
 		this.element = ReactDOM.findDOMNode(this);
 		this.updateConnections();
+		this.props.service.getAuthenticatedUser().then(user=>this.setState({ user }),error=>this.setState({user: null}));
 	}
 
 	handleError=(error:any): void => {
@@ -143,7 +145,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		return <VBox className="weave-padded-vbox" style={ { flex: 1, overflow: 'auto' } }>
 			<HBox className="weave-padded-hbox" style={ { flex: 1 } }>
 				<VBox className="weave-padded-vbox" style={ {flex: 0.33 } }>
-					<div>{this.props.service.user ? Weave.lang("Signed in as '{0}'.", this.props.service.user) : Weave.lang("Not signed in.") }</div>
+					<div>{this.state.user ? Weave.lang("Signed in as '{0}'.", this.state.user) : Weave.lang("Not signed in.") }</div>
 					<VBox className="weave-container" style={ { flex: 1, padding: 0 } }>
 						
 						<List selectedValues={[this.state.selected]} options={options} 

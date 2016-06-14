@@ -53,7 +53,7 @@ export interface IConnectionEditorState {
 	name?: string;
 	pass?: string;
 	folderName?: string;
-	showPass?: boolean;
+	passShow?: boolean;
 	connectString?: string;
 
 	editorMode?: string;
@@ -64,7 +64,7 @@ export interface IConnectionEditorState {
 	dbUsername?: string;
 	dbPassword?: string;
 	dbDomain?: string;
-	dbShowPass?: boolean;
+	dbPasswordShow?: boolean;
 }
 
 const CUSTOM = "custom";
@@ -87,8 +87,8 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 			pass: "",
 			folderName: "",
 			editorMode: "custom",
-			showPass: false,
-			dbShowPass: false,
+			dbPasswordShow: false,
+			passShow: false
 		};
 	}
 
@@ -133,10 +133,11 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 		);
 	}
 
-	renderLinkedInput=(entry:[React.ReactChild, string, string, React.ReactChild]):[React.ReactChild, JSX.Element]=>
+	renderLinkedInput=(entry:[React.ReactChild, string, string, React.ReactChild, string]):[React.ReactChild, JSX.Element]=>
 	{
-		let [label, field, type, helpText] = entry;
-		let displayType = (type === "password") && !this.state.dbShowPass ? "password" : "text";
+		let [label, field, type, helpText, placeholder] = entry;
+		let showPass = (this.state as any)[field + "Show"] as boolean;
+		let displayType = (type === "password") && !showPass ? "password" : "text";
 
 		let showPassIcon: JSX.Element = null;
 		let leftColumn: React.ReactChild = label;
@@ -148,13 +149,17 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 
 		if (type === "password")
 		{
-			let iconName = this.state.dbShowPass ? "fa fa-eye fa-lg" : "fa fa-eye-slash fa-lg";
-			showPassIcon = <button title={this.state.dbShowPass ? Weave.lang("Hide password") : Weave.lang("Show password") } className="ui button" onClick={() => this.setState({ dbShowPass: !this.state.dbShowPass })}>
+			let iconName = showPass ? "fa fa-eye fa-lg" : "fa fa-eye-slash fa-lg";
+			showPassIcon = <button title={showPass ? Weave.lang("Hide password") : Weave.lang("Show password") } className="ui button" onClick={() => {
+				let option: any = {};
+				option[field + "Show"] = !(this.state as any)[field + "Show"];
+				this.setState(option);
+			}}>
 				<i className={iconName}/>
 			</button>
 		}
 
-		return [leftColumn, <Input className={type === "password" ? "action" : ""} key={field} fluid value={(this.state as any)[field]} type={displayType}
+		return [leftColumn, <Input placeholder={placeholder} className={type === "password" ? "action" : ""} key={field} fluid value={(this.state as any)[field]} type={displayType}
 			onChange={(evt) => this.setState({ [field]: (evt.target as HTMLInputElement).value }) }>
 			{showPassIcon}
 		</Input>];
@@ -179,6 +184,14 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 		}
 	}
 
+	private static DBNAME_MESSAGE = `This field is optional.
+You can specify the name of a default database to connect to.
+For SQL Server, this is an instance name.
+Similarly in PostGreSQL, databases are different from schemas.
+MySQL does not differentiate between the two.`;
+	private static ADDRESS_MESSAGE = `The hostname or IP address of the database server to connect to.`;
+	private static PORT_MESSAGE = `The port on the database server to connect to. If left blank, the default port for the database type selected will be used.`;
+
 	render():JSX.Element
 	{
 
@@ -196,38 +209,38 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 				onChange={(value) => this.setState({ is_superuser: value }) }
 				/>]);
 
-		let dbEditorDefs: [React.ReactChild, string, string, React.ReactChild][];
+		let dbEditorDefs: [React.ReactChild, string, string, React.ReactChild, string][];
 		switch (this.state.editorMode) {
 			case ConnectionInfo.SQLITE:
 				dbEditorDefs = [
-					["SQLite Database File", "dbServerAddress", "text", null]
+					["SQLite Database File", "dbServerAddress", "text", Weave.lang("An absolute path to an SQLite database file. Ensure that your application server has permission to access this file"), null]
 				];
 				break;
 			case ConnectionInfo.MYSQL:
 			case ConnectionInfo.ORACLE:
 			case ConnectionInfo.POSTGRESQL:
 				dbEditorDefs = [
-					["Server Address", "dbServerAddress", "text", null],
-					["Server Port", "dbServerPort", "text", null],
-					["Database Name", "dbDatabaseName", "text", null],
-					["Username", "dbUsername", "text", null],
-					["Password", "dbPassword", "password", null]
+					["Server Address", "dbServerAddress", "text", Weave.lang(ConnectionEditor.ADDRESS_MESSAGE), null],
+					["Server Port", "dbServerPort", "text", Weave.lang(ConnectionEditor.PORT_MESSAGE), String(ConnectionInfo.getDefaultPort(this.state.editorMode))],
+					["Database Name", "dbDatabaseName", "text", Weave.lang(ConnectionEditor.DBNAME_MESSAGE), null],
+					["Username", "dbUsername", "text", null, null],
+					["Password", "dbPassword", "password", null, null]
 				];
 				break;
 			case ConnectionInfo.SQLSERVER:
 				dbEditorDefs = [
-					["Server Address", "dbServerAddress", "text", null],
-					["Server Port", "dbServerPort", "text", null],
-					["Instance Name", "dbDatabaseName", "text", null],
-					["Domain", "dbDomain", "text", null],
-					["Username", "dbUsername", "text", null],
-					["Password", "dbPassword", "password", null]
+					["Server Address", "dbServerAddress", "text", Weave.lang(ConnectionEditor.ADDRESS_MESSAGE), null],
+					["Server Port", "dbServerPort", "text", Weave.lang(ConnectionEditor.PORT_MESSAGE), String(ConnectionInfo.getDefaultPort(this.state.editorMode))],
+					["Instance Name", "dbDatabaseName", "text", Weave.lang(ConnectionEditor.DBNAME_MESSAGE), null],
+					["Domain", "dbDomain", "text", null, null],
+					["Username", "dbUsername", "text", null, null],
+					["Password", "dbPassword", "password", null, null]
 				];
 				break;
 			case CUSTOM:
 			default:
 				dbEditorDefs = [
-					["JDBC Connect String", "connectString", "password", null]
+					["JDBC Connect String", "connectString", "password", null, null]
 				];
 		};
 
@@ -239,7 +252,7 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 
 
 		return <VBox className="weave-ToolEditor" style={ { flex: 0.66, justifyContent: "space-between"} }>
-			<HBox style={{ overflow: "auto" }}>
+			<HBox style={{ overflow: "auto", flex: 1 }}>
 			{Accordion.render(
 				[
 					Weave.lang("Connection Properties"),
