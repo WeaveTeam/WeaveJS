@@ -57,8 +57,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 {
 	enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 	menus:WeaveMenus;
+	rootApp:WeaveApp;
 	// to be repplaced later by a non static variable
-	static app_to_popout_windows:Map<WeaveApp, Set<Window>> = new Map();
+	_popout_windows = new Set<Window>();
+	get popout_windows()
+	{
+		return this.rootApp ? this.rootApp._popout_windows : this._popout_windows;
+	}
 
 	static defaultProps:WeaveAppProps = {
 		weave: null,
@@ -78,7 +83,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded);
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 		this.urlParams = MiscUtils.getUrlParams();
-		WeaveApp.app_to_popout_windows.set(this, new Set());
 	}
 	
 	componentWillReceiveProps(props:WeaveAppProps)
@@ -192,10 +196,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	 */
 	handleUnload=()=>
 	{
-		WeaveApp.app_to_popout_windows.get(this).forEach((window) => {
+		for(let window of this.popout_windows)
 			window.close();
-		});
-	}
+	};
 
 	/**
 	 * This function will get called before the window unloads
@@ -233,6 +236,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	handlePopoutClick=(layoutPath:WeavePathArray, oldTabLayoutPath:WeavePathArray):void=>
 	{
+		if(this.rootApp)
+			return this.rootApp.handlePopoutClick(layoutPath, oldTabLayoutPath);
+
 		var newTabLayoutPath = [this.props.weave.root.generateUniqueName("Tabs")];
 
 		var oldTabLayout = this.props.weave.getObject(oldTabLayoutPath) as any;
@@ -246,7 +252,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{
 					try
 					{
-						WeaveApp.app_to_popout_windows.get(this).delete(window);
+						this.popout_windows.delete(window);
 						window.close();
 					}
 					catch(e)
@@ -260,6 +266,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		var content:JSX.Element = (
 			<WeaveApp
+				ref={(c:WeaveApp) => { if(c) c.rootApp = this }}
 				weave={this.props.weave}
 				renderPath={newTabLayoutPath}
 				initializeTabs={false}
@@ -267,7 +274,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			/>
 		);
 		var options:any = { transferStyle: true };
-		WeaveApp.app_to_popout_windows.get(this).add(ReactUtils.openPopout(content, _.noop, () => this.restoreTabs(newTabLayoutPath), options));
+		this.popout_windows.add(
+			ReactUtils.openPopout(content, _.noop, () => this.restoreTabs(newTabLayoutPath), options)
+		);
 	};
 
 	renderTab=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
