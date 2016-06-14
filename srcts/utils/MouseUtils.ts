@@ -120,7 +120,6 @@ export default class MouseUtils
 		var allEvents = MouseUtils.mouseEventTypes.concat(MouseUtils.dragEventTypes);
 		allEvents.forEach(eventType => {
 			sourceWindow.document.addEventListener(eventType, (event) => {
-				
 				if (
 					(event.target instanceof Element && sourceElement.contains(event.target as Element))
 					|| (MouseUtils.forElement(sourceElement).mouseButtonDown && MouseUtils.receivedMouseDown(sourceElement))
@@ -128,7 +127,7 @@ export default class MouseUtils
 				{
 					sourceWindow.requestAnimationFrame(() => {
 						destinationWindow.document.dispatchEvent(event)
-					})
+					});
 				}
 			})
 		});
