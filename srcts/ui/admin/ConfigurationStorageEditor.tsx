@@ -117,7 +117,7 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 
 	handleMessage =(message: string)=>
 	{
-		this.setState({ messages: this.state.errors.concat([message.toString()]) });
+		this.setState({ messages: this.state.messages.concat([message.toString()]) });
 	}
 
 	save=(): void=>
