@@ -58,8 +58,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 	menus:WeaveMenus;
 	rootApp:WeaveApp;
-	// to be repplaced later by a non static variable
 	_popout_windows = new Set<Window>();
+
 	get popout_windows()
 	{
 		return this.rootApp ? this.rootApp._popout_windows : this._popout_windows;
