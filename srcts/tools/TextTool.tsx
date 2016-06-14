@@ -93,6 +93,10 @@ export default class TextTool extends React.Component<IVisToolProps, IVisToolSta
 							[
 								Weave.lang("Text"),
 								<StatefulTextArea ref={ linkReactStateRef(this, {value: this.htmlText}) }/>
+							],
+							[
+								'',
+								<span>{ Weave.lang("Use '<br>' for a new line") }</span>
 							]
 						]
 					),
