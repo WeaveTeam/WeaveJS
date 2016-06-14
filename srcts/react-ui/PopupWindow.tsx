@@ -89,7 +89,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	componentDidMount()
 	{
-		ReactUtils.getDocument(this).addEventListener("keyup", this.onKeyPress);
+		ReactUtils.getDocument(this).addEventListener("keydown", this.onKeyDown);
 		// re-render now that this.element has been set in the ref callback function
 		this.forceUpdate();
 	}
@@ -119,7 +119,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		PopupWindow.alignWindows();
 	}
 
-	onKeyPress =(event:KeyboardEvent)=>
+	onKeyDown =(event:KeyboardEvent)=>
 	{
 		var code = event.keyCode;
 
@@ -136,7 +136,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	componentWillUnmount()
 	{
-		ReactUtils.getDocument(this).removeEventListener("keyup", this.onKeyPress);
+		ReactUtils.getDocument(this).removeEventListener("keyup", this.onKeyDown);
 	}
 
 	renderOverlay(modal:boolean)
