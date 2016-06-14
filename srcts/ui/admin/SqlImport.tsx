@@ -11,6 +11,7 @@ import PopupWindow from "../../react-ui/PopupWindow";
 import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
 import ServiceLogin from "./ServiceLogin";
+import HelpIcon from "../../react-ui/HelpIcon";
 
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 
@@ -31,6 +32,7 @@ export interface ISqlImportState
 	displayName?: string;
 	keyColumn?: string;
 	keyColumnValid?: boolean;
+	keyColumnTestInProgress?: boolean;
 	keyType?: string;
 	filteredKeyColumns?: string[];
 	schemaOptions?: string[];
@@ -120,15 +122,26 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 	testKeyColumn=()=>
 	{
 		if (this.state.schema && this.state.table && this.state.keyColumn)
-			this.props.service.checkKeyColumnsForSQLImport(
+		{
+			this.setState({ keyColumnTestInProgress: true });
+			let columnCheck = this.props.service.checkKeyColumnsForSQLImport(
 				this.state.schema, this.state.table, [this.state.keyColumn]
-			).then(
-				()=>this.setState({keyColumnValid: true}),
-				(error) => {
-					this.setState({ keyColumnValid: false });
-					this.handleError(error);
-				}
-			)
+			);
+			columnCheck.then(
+					() => { this.setState({ keyColumnValid: true, keyColumnTestInProgress: false});},
+					(error) => {
+						if (error && (error.message as string).startsWith("RemoteException: Values in the selected column do not uniquely identify rows in the table."))
+						{
+							this.setState({ keyColumnValid: false, keyColumnTestInProgress: false });	
+						}
+						else
+						{
+							this.setState({ keyColumnValid: null, keyColumnTestInProgress: false });
+							this.handleError(error);
+						}
+					}
+				);
+		}
 	}
 
 	onImportClick=()=>
@@ -167,7 +180,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 				width: 920,
 				footerContent: <div/>,
 				height: 675,
-				onClose: () => {SqlImport.window = null}
+				onClose: () => {SqlImport.window = null},
+				suspendEnter: true
 			}
 		);
 	}
@@ -216,19 +230,33 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 
 	render():JSX.Element
 	{
-		let validityButtonText: React.ReactChild;
+		let validityButtonText: string;
+		let iconColor: string;
+		let keyColumnTestIconClass: string;
+		if (this.state.keyColumnTestInProgress)
+		{
+			keyColumnTestIconClass = "fa fa-fw fa-circle-o-notch fa-spinner"
+			validityButtonText = Weave.lang("The selected column is currently being tested for value uniqueness.");
+		}
+		else
+		{
+			if (this.state.keyColumnValid === true) {
+				keyColumnTestIconClass = "fa fa-fw fa-check-circle-o";
+				iconColor = "green";
+				validityButtonText = Weave.lang("The selected column contains unique values.");
+			}
+			else if (this.state.keyColumnValid === false) {
+				keyColumnTestIconClass = "fa fa-fw fa-exclamation-circle";
+				iconColor = "red";
+				validityButtonText = Weave.lang("The selected column does not contain unique values.");
+			}
+			else {
+				keyColumnTestIconClass = "fa fa-fw fa-circle-o"
+				iconColor = null;
+				validityButtonText = Weave.lang("The selected column has not been tested for value uniqueness. Click to test.");
+			}			
+		}
 
-		if (this.state.keyColumnValid === true)
-		{
-			validityButtonText = Weave.lang("OK");
-		}
-		else if (this.state.keyColumnValid === false)
-		{
-			validityButtonText = Weave.lang("Keys are not unique.");
-		}
-		else {
-			validityButtonText = Weave.lang("Test");
-		}
 
 		return (
 			<VBox className="weave-ToolEditor" style={{ justifyContent: "space-between" }}>
@@ -272,7 +300,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 						<div className="two column row" style={{paddingBottom: 0}}>
 							<div className="four wide right aligned column">
 								<div className="ui basic segment">
-									{Weave.lang("Table display name")}
+									{Weave.lang("Table display name") }
 								</div>
 							</div>
 							<div className="twelve wide column">
@@ -285,25 +313,38 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 						<div className="two column row" style={{paddingBottom: 0}}>
 							<div className="four wide right aligned column">
 								<div className="ui basic segment">
-									{Weave.lang("Key column")}
+									{Weave.lang("Key column")+" "}
+									<HelpIcon>
+											{Weave.lang("A Column that can uniquely identify each row in the data.")}
+									</HelpIcon>
 								</div>
 							</div>
 							<div className="twelve wide column">
 								<HBox style={{flex:1}}>
-									<ComboBox value= { this.state.keyColumn } options= { this.state.columnOptions } onChange= {(value) => this.setState({ keyColumn: value, keyColumnValid: null }) }/>
-									<Button className="attached" onClick={this.testKeyColumn}>{validityButtonText}</Button>
+									<ComboBox value= { this.state.keyColumn } options= { this.state.columnOptions } onChange= {(value) => {
+										if (value != this.state.keyColumn)
+											this.setState({ keyColumn: value, keyColumnValid: null });
+										}
+									}/>
+									<Button disabled={!this.state.keyColumn} title={validityButtonText} className="attached" onClick={this.testKeyColumn}>
+										<span style={{ whiteSpace: "nowrap" }}><i style={{ color: iconColor }} className={keyColumnTestIconClass}/>{Weave.lang("Test")}</span>
+									</Button>
 								</HBox>
 							</div>
 						</div>
 						<div className="two column row" style={{paddingBottom: 0}}>
 							<div className="four wide right aligned column">
 								<div className="ui basic segment">
-									{Weave.lang("Key namespace")}
+									{Weave.lang("Key namespace") + " "}
+									<HelpIcon>{Weave.lang("Key namespaces are used to link tables using matching key columns.") }</HelpIcon>
 								</div>
 							</div>
 							<div className="twelve wide column">
 								<HBox style={{flex:1}}>
-									<ComboBox allowAdditions= { true} value= { this.state.keyType } options= { this.state.keyTypeSuggestions } onChange= {(value) => this.setState({ keyType: value }) }/>
+									<ComboBox allowAdditions={true} type="search"
+										onNew={(keyType: string): void => {
+											this.setState({ keyType })
+										}} value= {this.state.keyType} options= { this.state.keyTypeSuggestions } onChange= {(value) => this.setState({ keyType: value }) }/>
 									<Button className="attached" title={Weave.lang("Refresh") } onClick={this.updateKeyTypeSuggestions}><i className="fa fa-refresh"/></Button>
 								</HBox>
 							</div>

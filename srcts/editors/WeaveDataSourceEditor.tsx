@@ -64,6 +64,12 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 		pathComponents.pop();
 		return pathComponents.join('/');
 	}
+
+	private selectId=(id:number)=>
+	{
+		/* TODO: Make data preview highlight the new table */
+		this.props.dataSource.hierarchyRefresh.triggerCallbacks();
+	}
 	
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
@@ -92,7 +98,7 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Import Data to Server"),
-				<Button onClick={() => SqlImport.open(this, this.service, null)}>{Weave.lang("Import from SQL...")}</Button>
+				<Button onClick={() => SqlImport.open(this, this.service, this.selectId) }>{Weave.lang("Import from SQL...") }</Button>
 			],
 			[
 				Weave.lang("Manage Server"),
