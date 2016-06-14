@@ -45,7 +45,7 @@ export interface IConnectionEditorProps {
 	connectionName: string;
 	handleError: (error: any) => void;
 	handleMessage: (message: string) => void;
-	refreshFunc: () => void;
+	handleSuccessfulSave: (message: string, password: string) => void;
 }
 
 export interface IConnectionEditorState {
@@ -113,7 +113,7 @@ export default class ConnectionEditor extends SmartComponent<IConnectionEditorPr
 
 		/* If we're editing the connection we have selected, bypass the overwrite confirmation dialog. */
 		savePromise = this.props.service.saveConnectionInfo(info, (info.name === this.props.connectionName) || overwrite);
-		savePromise.then(this.props.handleMessage, _.identity).then(()=>this.loadFromConnection(info.name), this.props.handleError);
+		savePromise.then(this.props.handleMessage, this.props.handleError).then(() => this.props.handleSuccessfulSave(info.name, info.pass));
 	}
 
 	loadFromConnection=(connectionName:string)=>
@@ -213,7 +213,7 @@ MySQL does not differentiate between the two.`;
 		switch (this.state.editorMode) {
 			case ConnectionInfo.SQLITE:
 				dbEditorDefs = [
-					["SQLite Database File", "dbServerAddress", "text", Weave.lang("An absolute path to an SQLite database file. Ensure that your application server has permission to access this file"), null]
+					["SQLite Database File", "dbServerPort", "text", Weave.lang("An absolute path to an SQLite database file. Ensure that your application server has permission to access this file"), null]
 				];
 				break;
 			case ConnectionInfo.MYSQL:
