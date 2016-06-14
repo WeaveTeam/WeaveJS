@@ -66,7 +66,8 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 				footerContent: <div/>,
 				width: 920,
 				height: 675,
-				onClose: () => { ConnectionManager.window = null }
+				onClose: () => { ConnectionManager.window = null },
+				suspendEnter: true
 			}
 		);
 	}
