@@ -379,9 +379,13 @@ export default class ReactUtils
 		return ref;
 	}
 
+	static getWindow(instance:React.ReactInstance):Window
+	{
+		return DOMUtils.getWindow(ReactUtils.getElement(instance));
+	}
 	static getDocument(instance:React.ReactInstance):Document
 	{
-		return DOMUtils.getWindow(ReactUtils.getElement(instance)).document;
+		return ReactUtils.getWindow(instance).document;
 	}
 
 	static getElement(instance:React.ReactInstance):Element
