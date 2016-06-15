@@ -268,7 +268,7 @@ MySQL does not differentiate between the two.`;
 				<Button colorClass="primary" onClick={() => this.saveConnection(false)}>
 					{Weave.lang("Save changes")}
 				</Button>
-				<Button colorClass="secondary" onClick={() => this.loadFromConnection(this.props.connectionName)}>
+				<Button style={{marginLeft: 8}} colorClass="secondary" onClick={() => this.loadFromConnection(this.props.connectionName)}>
 					{Weave.lang("Discard changes")}
 				</Button>
 			</HBox>

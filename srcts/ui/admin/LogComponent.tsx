@@ -21,7 +21,7 @@ import WeaveAdminService = weavejs.net.WeaveAdminService;
 import WeavePromise = weavejs.util.WeavePromise;
 import StandardLib = weavejs.util.StandardLib;
 
-export interface ILogComponentProps {
+export interface ILogComponentProps extends React.HTMLProps<LogComponent> {
 	messages?: string[];
 	uiClass?: string;
 	clearFunc: () => void;
@@ -37,15 +37,17 @@ export default class LogComponent extends React.Component<ILogComponentProps, Ob
 
 	render():JSX.Element {
 		if (this.props.messages.length) {
-			return <div className={["ui", this.props.uiClass || "negative", "message"].join(" ")}>
-				<i className="close icon" onClick={this.props.clearFunc}></i>
-				<div className="header">
-					{this.props.header}
+			return (
+				<div className={["ui", this.props.uiClass || "negative", "message"].join(" ")} {...this.props as any}>
+					<i className="close icon" onClick={this.props.clearFunc}></i>
+					<div className="header">
+						{this.props.header}
+					</div>
+					<ul className="list">
+						{this.props.messages.map((message, idx) => (<li key={idx}>{message}</li>)) }
+					</ul>
 				</div>
-				<ul className="list">
-					{this.props.messages.map((message, idx) => (<li key={idx}>{message}</li>)) }
-				</ul>
-			</div>;
+			);
 		}
 		else {
 			return <div/>;
