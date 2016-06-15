@@ -21,6 +21,7 @@ import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
+import ConfirmationDialog from "../../react-ui/ConfirmationDialog";
 
 export interface IConnectionManagerProps {
 	service: WeaveAdminService;
@@ -165,29 +166,8 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 	}
 
 	removeSelectedConnection = () => {
-		/* TODO: Use a prettier/async confirmation dialog, placeholder for now. */
-		PopupWindow.open(this, {
-			title: Weave.lang("Load Session"),
-			content: (
-				<VBox style={{ flex: 1, justifyContent: "center" }}>
-					<HBox style={{ flex: 1, alignItems: "center" }}>
-						<i style={{ fontSize: 50, marginLeft: 15 }} className="fa fa-exclamation-triangle weave-exclamation-triangle"></i>
-						<div style={{ margin: 0, marginLeft: 5 }} className="ui basic segment">
-							<div className="ui basic header">
-								{Weave.lang("Are you sure you want to delete the connection {0}?", this.state.selected)}
-							</div>
-						</div>
-					</HBox>
-				</VBox>
-			),
-			resizable: false,
-			modal: true,
-			width: 480,
-			height: 230,
-			onOk: () => {
-				this.removeConnection(this.state.selected);
-			},
-		});
+		var confirmationMessage = Weave.lang("Are you sure you want to delete the connection '{0}'?", this.state.selected);
+		ConfirmationDialog.open(this, confirmationMessage, this.removeSelectedConnection);
 	}
 
 	removeConnection=(connection:string)=>

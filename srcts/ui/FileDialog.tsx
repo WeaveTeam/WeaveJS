@@ -11,6 +11,7 @@ import LocalFileOpenComponent from "./LocalFileOpenComponent";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
+import ConfirmationDialog from "../react-ui/ConfirmationDialog";
 var URLRequestUtils = weavejs.WeaveAPI.URLRequestUtils;
 
 export interface FileListItem {
@@ -93,32 +94,13 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 	{
 		if (!this.props.skipConfirmation)
 		{
-			PopupWindow.open(this.props.context, {
-				title: Weave.lang("Load Session"),
-				content: (
-					<VBox style={{ flex: 1, justifyContent: "center" }}>
-						<HBox style={{ flex: 1, alignItems: "center" }}>
-							<i style={{ fontSize: 50, marginLeft: 15 }} className="fa fa-exclamation-triangle weave-exclamation-triangle"></i>
-							<div style={{ margin: 0, marginLeft: 5 }} className="ui basic segment">
-								<div className="ui basic header">
-									{
-										file
-										?	Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.")
-										:	Weave.lang("Are you sure you want start a new session? This will overwrite your current workspace.")
-									}
-								</div>
-							</div>
-						</HBox>
-					</VBox>
-				),
-				resizable: false,
-				modal: true,
-				width: 480,
-				height: 230,
-				onOk: () => {
-					this.props.openHandler(file);
-					FileDialog.close();
-				},
+			var confirmationMessage = file
+				?	Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.")
+				:	Weave.lang("Are you sure you want start a new session? This will overwrite your current workspace.");
+
+			ConfirmationDialog.open(this, confirmationMessage, () => {
+				this.props.openHandler(file);
+				FileDialog.close();
 			});
 		}
 		else
