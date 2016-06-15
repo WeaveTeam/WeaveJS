@@ -9,18 +9,17 @@ import IDataSource_Service = weavejs.api.data.IDataSource_Service;
 import FileMenu from "./FileMenu";
 import FileInput from "../react-ui/FileInput";
 import ChartsMenu from "./ChartsMenu";
+import WeaveMenus from "./WeaveMenus";
 
 export default class DataMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	constructor(owner:WeaveMenus)
 	{
-		this.weave = weave;
-		this.createObject = createObject;
+		this.owner = owner;
 	}
 
+	owner:WeaveMenus;
 	label:string = "Data";
-	weave:Weave;
-	createObject:(type:new(..._:any[])=>any)=>void;
 
 	get menu():MenuItemProps[]
 	{
@@ -36,13 +35,20 @@ export default class DataMenu implements MenuBarItemProps
 //				shown: Weave.beta,
 //				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)... (not implemented yet)")}</FileInput>
 //			},
-			{},
+//			{},
+			this.getExportItems()
+		);
+	}
+			
+	getExportItems():MenuItemProps[]
+	{
+		return [
 			{
 				enabled: this.getColumnsToExport().length > 0,
 				label: Weave.lang("Export CSV"),
 				click: this.exportCSV
 			}
-		);
+		];
 	}
 
 	static getDataSourceItems(weave:Weave, onCreateItem?:(dataSource:IDataSource)=>void)
@@ -93,7 +99,7 @@ export default class DataMenu implements MenuBarItemProps
 	getColumnsToExport=()=>
 	{
 		var columnSet = new Set<weavejs.api.data.IAttributeColumn>();
-		for (var rc of Weave.getDescendants(this.weave.root, weavejs.data.column.ReferencedColumn))
+		for (var rc of Weave.getDescendants(this.owner.weave.root, weavejs.data.column.ReferencedColumn))
 		{
 			var col = rc.getInternalColumn();
 			if (col && col.getMetadata(weavejs.api.data.ColumnMetadata.DATA_TYPE) != weavejs.api.data.DataType.GEOMETRY)
@@ -105,7 +111,7 @@ export default class DataMenu implements MenuBarItemProps
 	exportCSV=()=>
 	{
 		var columns = this.getColumnsToExport();
-		var filter = Weave.AS(this.weave.getObject('defaultSubsetKeyFilter'), weavejs.api.data.IKeyFilter);
+		var filter = Weave.AS(this.owner.weave.getObject('defaultSubsetKeyFilter'), weavejs.api.data.IKeyFilter);
 		var csv = weavejs.data.ColumnUtils.generateTableCSV(columns, filter);	
 		FileSaver.saveAs(new Blob([csv]), "Weave-data-export.csv");
 	}

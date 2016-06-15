@@ -4,49 +4,29 @@ import FileMenu from "./FileMenu";
 import FileInput from "../react-ui/FileInput";
 import {MenuBarItemProps} from "../react-ui/MenuBar";
 import {MenuItemProps} from "../react-ui/Menu";
-import FileDialog from "../ui/FileDialog";
 import ServiceLogin from "../ui/admin/ServiceLogin";
 import PopupWindow from "../react-ui/PopupWindow";
+import WeaveMenus from "./WeaveMenus";
+
 export default class SystemMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave, fileMenu:FileMenu)
+	constructor(owner:WeaveMenus)
 	{
-		this.weave = weave;
-		this.fileMenu = fileMenu;
-
-		/* Forces the initialization of the service. */
-		/* Hopefully the init flag gets set before our first 'get menu'. */
-		weavejs.net.Admin.service.getAuthenticatedUser().then(_.noop, _.noop);
-		this.login = new ServiceLogin(fileMenu.context, weavejs.net.Admin.service)
+		this.owner = owner;
 	}
 
-	login: ServiceLogin;
-	weave:Weave;
-	fileMenu:FileMenu; // temp solution
+	owner:WeaveMenus;
 	label = "Weave";
 	bold = true;
 	
 	get menu():MenuItemProps[]
 	{
+		var items:MenuItemProps[] = [];
 		
-		return [
-			{
-				/*label: <FileInput onChange={this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes().join(',')}><span className="weave-menuitem-padding">{Weave.lang("Open session...")}</span></FileInput>,*/
-				label: "Open Session...",
-				click: () => FileDialog.open(this.fileMenu.context, this.fileMenu.loadUrl, this.fileMenu.loadFile)
-			},
-			{
-				label: Weave.lang("Save session as..."),
-				click: this.fileMenu.saveFile
-			},
-			{
-				label: Weave.lang("Save to server"),
-				click: () => {
-					this.login.conditionalOpen(this.fileMenu.saveToServer);
-				},
-				shown: weavejs.net.Admin.service.initialized
-			},
-			{},
+		if (!this.owner.showFileMenu)
+			items = items.concat(this.owner.fileMenu.getSessionItems(), {});
+		
+		items.push(
 			{
 				label: "Visit iweave.com",
 				click: () => window.open("http://www.iweave.com/")
@@ -69,7 +49,7 @@ export default class SystemMenu implements MenuBarItemProps
 			{
 				label: weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Not signed in"),
 				click: () => {
-					this.login.open();
+					this.owner.login.open();
 				},
 				shown: weavejs.net.Admin.service.initialized
 			},
@@ -79,7 +59,7 @@ export default class SystemMenu implements MenuBarItemProps
 				shown: weavejs.net.Admin.service.initialized,
 				click: () => {
 					let signedOutPopup = () => PopupWindow.open(
-						this.fileMenu.context,
+						this.owner.context,
 						{
 							title: "Confirmation",
 							content: <div>{Weave.lang("Signed out successfully")}</div>
@@ -89,6 +69,8 @@ export default class SystemMenu implements MenuBarItemProps
 					weavejs.net.Admin.service.authenticate("", "").then(signedOutPopup, signedOutPopup);
 				}
 			}
-		];
+		);
+		
+		return items;
 	}
 }
