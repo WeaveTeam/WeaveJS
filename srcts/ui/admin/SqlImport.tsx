@@ -13,8 +13,8 @@ import Input from "../../semantic-ui/Input";
 import ServiceLogin from "./ServiceLogin";
 import HelpIcon from "../../react-ui/HelpIcon";
 
+import WeavePromise = weavejs.util.WeavePromise;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
-
 import Admin = weavejs.net.Admin;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
 
@@ -146,19 +146,23 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 
 	onImportClick=()=>
 	{
-		/* TODO: Feedback: on success, close the dialog, on failure update a status widget with the error message. */
 		this.setState({ importInProgress: true });
-		this.props.service.importSQL(
-			this.state.schema, this.state.table, this.state.keyColumn,
-			null /*secondaryKeyColumnName, deprecated */, this.state.displayName,
-			this.state.keyType, this.state.filteredKeyColumns, this.state.append
+
+		this.props.service.checkKeyColumnsForSQLImport(this.state.schema, this.state.table, [this.state.keyColumn]).then(
+			():WeavePromise<number> => {
+				return this.props.service.importSQL(
+					this.state.schema, this.state.table, this.state.keyColumn,
+					null /*secondaryKeyColumnName, deprecated */, this.state.displayName,
+					this.state.keyType, this.state.filteredKeyColumns, this.state.append
+				);
+			}
 		).then(
 			(newId: number) => {
 				this.setState({ importInProgress: false });;
 				this.props.selectIdFunc(newId);
 				PopupWindow.close(SqlImport.window);
 			},
-			(error:any)=> {
+			(error: any) => {
 				this.setState({ importInProgress: false });
 				this.handleError(error);
 			}

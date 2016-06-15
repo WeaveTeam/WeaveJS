@@ -202,7 +202,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 				</VBox>
 				<ConnectionEditor handleSuccessfulSave={this.handleSuccessfulSave} service={this.props.service} connectionName={this.state.selected} handleError={this.handleError} handleMessage={this.handleMessage}/>
 			</HBox>
-			<LogComponent header={Weave.lang("Operation Completed") } messages={this.state.messages} clearFunc={() => { this.setState({ messages: [] }) } }/>
+			<LogComponent uiClass="positive" header={Weave.lang("Operation Completed") } messages={this.state.messages} clearFunc={() => { this.setState({ messages: [] }) } }/>
 			<LogComponent header={Weave.lang("Server error") } messages={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
 		</VBox>
 	}
