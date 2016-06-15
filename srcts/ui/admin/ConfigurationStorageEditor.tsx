@@ -132,75 +132,79 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 	{
 		let metadataIdRowStyle = this.state.showAdvancedOptions ? {} : { display: "none" };
 
-		return <VBox className="weave-ToolEditor">
-			<p>{Weave.lang("Configuration info for Weave must be stored in an SQL database.")}</p>
-			<p>{Weave.lang('You are currently using the "{0}" connection to store configuration data.', this.state.currentConnectionName)}</p>
-			<p>{Weave.lang("You may switch to a different location, but the existing configuration data will not be copied over.")}</p>
-			<div className="ui left aligned grid">
-				<div className="two column row" style={{paddingBottom: 0}}>
-					<div className="four wide right aligned column">
-						<div className="ui basic segment">
-							{Weave.lang("Connection to use")}
+		return <VBox className="weave-ToolEditor" style={{ flex: 1, justifyContent: "space-between" }}>
+			<VBox style={{ flex: 1 }}>
+				<p>{Weave.lang("Configuration info for Weave must be stored in an SQL database.")}</p>
+				<p>{this.state.currentConnectionName ? Weave.lang('You are currently using the "{0}" connection to store configuration data.', this.state.currentConnectionName) : ""}</p>
+				<p>{this.state.currentConnectionName ? Weave.lang("You may switch to a different location, but the existing configuration data will not be copied over.") : "" }</p>
+				<div className="ui left aligned grid">
+					<div className="two column row" style={{paddingBottom: 0}}>
+						<div className="four wide right aligned column">
+							<div className="ui basic segment">
+								{Weave.lang("Connection to use")}
+							</div>
+						</div>
+						<div className="twelve wide column">
+							<ComboBox style={{flex:1}} value={this.state.connectionName} options={this.state.connectionNames || []}
+								onChange={(value: string) => {this.setState({connectionName: value})}}/>
 						</div>
 					</div>
-					<div className="twelve wide column">
-						<ComboBox style={{flex:1}} value={this.state.connectionName} options={this.state.connectionNames || []}
-							onChange={(value: string) => {this.setState({connectionName: value})}}/>
-					</div>
-				</div>
-				<div className="two column row" style={{ paddingBottom: 0 }}>
-					<div className="four wide right aligned column">
-						<div className="ui basic segment">
-							{Weave.lang("Password")}
+					<div className="two column row" style={{ paddingBottom: 0 }}>
+						<div className="four wide right aligned column">
+							<div className="ui basic segment">
+								{Weave.lang("Password")}
+							</div>
+						</div>
+						<div className="twelve wide column">
+							<LinkedInput field="connectionPassword" type="password" outerComponent={this}/>
 						</div>
 					</div>
-					<div className="twelve wide column">
-						<LinkedInput field="connectionPassword" type="password" outerComponent={this}/>
-					</div>
-				</div>
-				<div className="two column row" style={{ paddingBottom: 0 }}>
-					<div className="four wide right aligned column">
-						<div className="ui basic segment">
-							{Weave.lang("Database schema") }
+					<div className="two column row" style={{ paddingBottom: 0 }}>
+						<div className="four wide right aligned column">
+							<div className="ui basic segment">
+								{Weave.lang("Database schema") }
+							</div>
+						</div>
+						<div className="twelve wide column">
+							<LinkedInput field="schemaName" type="text" outerComponent={this}/>
 						</div>
 					</div>
-					<div className="twelve wide column">
-						<LinkedInput field="schemaName" type="text" outerComponent={this}/>
-					</div>
-				</div>
-				<div className="one column row">
-					<div className="sixteen wide right aligned column">
-						<Checkbox label={Weave.lang("Show advanced options")} 
-							value={this.state.showAdvancedOptions} 
-							onChange={(value:boolean)=>this.setState({showAdvancedOptions: value})}/>
-					</div>
-				</div>
-				<div className="two column row" style={metadataIdRowStyle}>
-					<div className="four wide right aligned column">
-						<div className="ui basic segment">
-							{Weave.lang("Metadata ID field(s)")}
-							<HelpIcon>
-								{Weave.lang("Use this only if you want to use your own custom properties to uniquely identify data columns.")}
-							</HelpIcon>
+					<div className="one column row">
+						<div className="sixteen wide right aligned column">
+							<Checkbox label={Weave.lang("Show advanced options")} 
+								value={this.state.showAdvancedOptions} 
+								onChange={(value:boolean)=>this.setState({showAdvancedOptions: value})}/>
 						</div>
 					</div>
-					<div className="twelve wide column">
-						<LinkedInput field="metadataIdFields" type="text" outerComponent={this}/>
-					</div>
-				</div>
-				<div className="one column row">
-					<div className="sixteen wide column">
-						<div className="ui basic segment">
-							{Weave.lang("The following tables will be created in the schema specified above:")}
-							{Weave.lang("	weave_hiearchy, weave_meta_private, weave_meta_public")}
-							{Weave.lang("If they already exist, no changes will be made.")}
+					<div className="two column row" style={metadataIdRowStyle}>
+						<div className="four wide right aligned column">
+							<div className="ui basic segment">
+								{Weave.lang("Metadata ID field(s)")}
+								<HelpIcon>
+									{Weave.lang("Use this only if you want to use your own custom properties to uniquely identify data columns.")}
+								</HelpIcon>
+							</div>
+						</div>
+						<div className="twelve wide column">
+							<LinkedInput field="metadataIdFields" type="text" outerComponent={this}/>
 						</div>
 					</div>
+					<div className="one column row">
+						<div className="sixteen wide column">
+							<div className="ui basic segment">
+								{Weave.lang("The following tables will be created in the schema specified above:")}
+								{Weave.lang("	weave_hiearchy, weave_meta_private, weave_meta_public")}
+								{Weave.lang("If they already exist, no changes will be made.")}
+							</div>
+						</div>
+					</div>
+					<div className="one column row">
+						<LogComponent header={Weave.lang("Server error") } messages={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
+						<LogComponent uiClass="positive" header={Weave.lang("Completed") } messages={this.state.messages} clearFunc={() => { this.setState({ messages: [] }) } }/>
+					</div>
 				</div>
-			</div>
-			<LogComponent header={Weave.lang("Server error")} messages={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
-			<LogComponent uiClass="positive" header={Weave.lang("Completed") } messages={this.state.messages} clearFunc={() => { this.setState({ messages: [] }) } }/>
-			<HBox>
+			</VBox>
+			<HBox style={{ alignSelf: "flex-end" }}>
 				<Button colorClass="primary" onClick={this.save}>{Weave.lang("Store Weave configuration at this location") }</Button>
 				<Button colorClass="secondary" onClick={() => ConfigurationStorageEditor.close() }>{Weave.lang("Cancel") }</Button>
 			</HBox>

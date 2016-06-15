@@ -143,6 +143,15 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 					return this.props.service.authenticate(connectionName, password).then(
 						() => {
 							this.setState({ selected: connectionName });
+							/* If we logged in successfully with the new connection, and no database config exists, immediately open configuration storage manager. */
+							this.props.service.checkDatabaseConfigExists().then(
+								exists=>{
+									if (!exists)
+									{
+										ConfigurationStorageEditor.open(this, this.props.service);
+									}
+								}
+							)
 						},
 						() => this.handleError(Weave.lang("Failed to log in with new connection. Check your server configuration."))
 					);
