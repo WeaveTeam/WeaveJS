@@ -223,7 +223,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 			<HBox className="ui bottom attached segments" style={ styleObj }  onMouseEnter={() => this.forceUpdate()} >
 				<VBox style={{width: 250}} className="weave-data-source-manager-sidebar">
 					<VBox className="ui vertical attached segments" style={{flex:1, justifyContent:"space-between",border:"none",borderRadius:0}}>
-						<VBox className="ui basic inverted segment" style={{flex: 2, overflow: "auto", padding: 0,border:"none",borderRadius:0}}>
+						<VBox className="ui basic inverted segment" style={{flex: 1, overflow: "auto", padding: 0,border:"none",borderRadius:0}}>
 							<div className="ui medium header" style={{padding: 0, paddingLeft: 14, paddingTop: 14}}>{Weave.lang("Connected data sources")}</div>
 							<VBox style={{alignItems: listOptions.length ? null:"center"}}>
 								{
@@ -240,7 +240,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 								}
 							</VBox>
 						</VBox>
-						<VBox className="ui inverted segment" style={{overflow: "auto", padding: 0, flex: 1,border:"none",borderRadius:0}}>
+						<VBox className="ui inverted segment" style={{overflow: "auto", padding: 0, border:"none",borderRadius:0}}>
 							<div className="ui medium header" style={{ paddingLeft: 14, paddingTop: 14}}>{Weave.lang("Add more data sources")}</div>
 							{
 								DataMenu.getDataSourceItems(this.props.weave, this.setSelectedDataSource).map((dsItem, index) => {
