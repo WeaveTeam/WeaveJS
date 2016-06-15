@@ -12,6 +12,7 @@ import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
 import ServiceLogin from "./ServiceLogin";
 import HelpIcon from "../../react-ui/HelpIcon";
+import LogComponent from "./LogComponent";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
@@ -210,26 +211,6 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 		}
 	}
 
-	renderErrors():JSX.Element
-	{
-		if (this.state.errors.length)
-		{
-			return <div className="ui warning message">
-				<i className="close icon" onClick={()=>{this.setState({errors: []})}}></i>
-				<div className="header">
-					{Weave.lang("Server Error") }
-				</div>
-				<ul className="list">
-					{this.state.errors.map((message, idx) => (<li key={idx}>{message}</li>)) }
-				</ul>
-			</div>;
-		}
-		else
-		{
-			return <div/>;
-		}
-	}
-
 	private element: Element;
 
 	render():JSX.Element
@@ -263,8 +244,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 
 
 		return (
-			<VBox className="weave-ToolEditor" style={{ justifyContent: "space-between" }}>
-				<div style={{ overflow: "auto" }}>
+			<VBox className="weave-ToolEditor" style={{ justifyContent: "space-between", flex: 1 }}>
+				<div style={{ overflow: "auto", flex: 1 }}>
 					<div className="ui dividing header">{Weave.lang("Table")}</div>
 					<div className="ui left aligned grid">
 						<div className="one column row" style={{paddingBottom: 0}}>
@@ -366,7 +347,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 							</div>
 						</div>
 						<div className="one column row">
-							{this.renderErrors()}
+							<LogComponent clearFunc={()=>this.setState({errors: []})} header="Server error" messages={this.state.errors}/>
 						</div>
 					</div>
 				</div>
