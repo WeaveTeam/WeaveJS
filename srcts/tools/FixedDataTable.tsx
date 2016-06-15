@@ -354,7 +354,9 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	onMouseDown=(event:React.MouseEvent, index:number):void =>
 	{
 		//console.log("Down",event,index);
-		
+		if(event.button !== 0)
+			return; // only perform selection on left click
+
 		var selectedIds:string[] = this.state.selectedIds;
 		var id:string = this.getValue(index, this.props.idProperty);
 		
