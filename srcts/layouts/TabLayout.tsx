@@ -53,6 +53,11 @@ const stateStructure:Structure = {
 
 export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 {
+	static get DEFAULT_TAB_PREFIX():string
+	{
+		return Weave.lang("Sheet ");
+	}
+	
 	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({}, stateStructure)), this.forceUpdate, true);
 	private resetTimer:boolean;
 
@@ -156,20 +161,29 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 	{
 		this.resetTimer = true;
 	};
-
-	renamePanel(id:WeavePathArray, newLabel:string)
+	
+	getTabLabel(id:WeavePathArray):string
 	{
 		var state = this.getSessionState();
-		var panelToRename:TabState = null;
-		state.tabs.forEach((panel) => {
-			if (_.isEqual(id, panel.id))
-				panelToRename = panel;
+		for (var tab of state.tabs)
+			if (_.isEqual(id, tab.id))
+				return tab.label;
+		return null;
+	}
+
+	setTabLabel(id:WeavePathArray, newLabel:string)
+	{
+		var state = this.getSessionState();
+		var tabToRename:TabState = null;
+		state.tabs.forEach((tab) => {
+			if (_.isEqual(id, tab.id))
+				tabToRename = tab;
 		});
-		panelToRename.label = newLabel;
+		tabToRename.label = newLabel;
 		this.setSessionState(state);
 	}
 
-	switchPanelToActive=(indexFromTabsComponent:number):void=>
+	private switchPanelToActive=(indexFromTabsComponent:number):void=>
 	{
 		var state = this.getSessionState();
 		state.activeTabIndex = indexFromTabsComponent - this.leadingTabsLength;
@@ -189,15 +203,34 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		return this.getSessionState().tabs.map(tab => tab.id);
 	}
 
-	addPanel(id:WeavePathArray, label?:string):void
+	addPanel(id:WeavePathArray):void
 	{
 		var state = this.getSessionState();
 		state.tabs.push({
 			id,
-			label: label || id[id.length - 1] || "New Tab"
+			label: this.generateNextTabLabel()
 		});
 		state.activeTabIndex = this.getPanelIndex(id);
 		this.setSessionState(state);
+	}
+	
+	private generateNextTabLabel():string
+	{
+		var prefix = TabLayout.DEFAULT_TAB_PREFIX;
+		var next:number = 1;
+		for (var tabLayout of Weave.getDescendants(Weave.getRoot(this), TabLayout))
+		{
+			for (var tabState of tabLayout.getSessionState().tabs)
+			{
+				if (tabState.label.indexOf(prefix) == 0)
+				{
+					var num = weavejs.util.StandardLib.asNumber(tabState.label.substr(prefix.length));
+					if (num >= next)
+						next = Math.floor(num) + 1;
+				}
+			}
+		}
+		return prefix + next;
 	}
 
 	removePanel(id:WeavePathArray):void
@@ -297,18 +330,18 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 					className=" "
 					labels={
 						leadingTabs.map(tab => tab.label)
-						.concat(state.tabs.map((panel) => (
+						.concat(state.tabs.map((tab) => (
 							<HBox
 								className="weave-padded-hbox"
-								onDragOver={(event) => this.onDragOverTab(panel)}
+								onDragOver={(event) => this.onDragOverTab(tab)}
 								onDragLeave={this.onDragLeaveTab}
 							>
-								{/*<EditableTextCell onChange={(newName) => this.renamePanel(panel.id, newName)} textContent={panel.label}/>*/}
-								{panel.label}
+								{/*<EditableTextCell onChange={(newName) => this.setTabLabel(tab.id, newName)} textContent={tab.label}/>*/}
+								{tab.label}
 								{
 									this.props.onRemove
 									?	<CenteredIcon
-											onClick={(event) => {event.stopPropagation(); this.props.onRemove(panel.id)}}
+											onClick={(event) => {event.stopPropagation(); this.props.onRemove(tab.id)}}
 											className="weave-tab-icon"
 											title={Weave.lang("Close")}
 											children="✕"
@@ -338,12 +371,12 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 					activeTabIndex={leadingTabs.length + this.activeTabIndex}
 					tabs={
 						leadingTabs.map(tab => tab.content)
-						.concat(state.tabs.map(panel => (
+						.concat(state.tabs.map(tab => (
 							this.props.panelRenderer
-							?	this.props.panelRenderer(panel.id, {}, this.props.panelRenderer)
+							?	this.props.panelRenderer(tab.id, {}, this.props.panelRenderer)
 							:	<WeaveComponentRenderer
 									weave={weave}
-									path={panel.id}
+									path={tab.id}
 									style={{flex: 1}}
 								/>
 						)))

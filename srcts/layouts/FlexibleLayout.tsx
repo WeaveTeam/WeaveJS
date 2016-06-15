@@ -26,18 +26,21 @@ export enum DropZone {
 
 const OUTER_PANEL_ID:WeavePathArray = []; // special value to indicate dragging over outer drop zone
 
-var stateStructure:any = {
+var structure_LayoutState:any = {
 	id: MiscUtils.nullableStructure(["string"]),
 	children: null,
 	flex: "number",
 	direction: "string",
 	maximized: "boolean"
 };
-stateStructure.children = MiscUtils.nullableStructure([stateStructure]);
+structure_LayoutState.children = MiscUtils.nullableStructure([structure_LayoutState]);
+var structure_FlexibleLayoutState:any = _.merge({title: "string"}, structure_LayoutState);
+
+export type FlexibleLayoutState = {title?: string} & LayoutState;
 
 export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 {
-	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, this.simplifyState({flex: 1})), this.forceUpdate, true);
+	private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, this.simplifyState({flex: 1, title: ""})), this.forceUpdate, true);
 	private nextState:Object;
 	private rootLayout:Layout;
 	private layoutRect:ClientRect;
@@ -55,16 +58,21 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addGroupedCallback(this, this.frameHandler, true);
 	}
 	
-	getSessionState():LayoutState
+	getSessionState():FlexibleLayoutState
 	{
-		return this.linkableState.state as LayoutState;
+		return this.linkableState.state as FlexibleLayoutState;
 	}
 	
-	setSessionState=(state:LayoutState):void=>
+	setSessionState=(state:FlexibleLayoutState):void=>
 	{
-		state = this.simplifyState(MiscUtils.normalizeStructure(state, stateStructure));
+		state = this.simplifyState(MiscUtils.normalizeStructure(state, structure_FlexibleLayoutState));
 		state.flex = 1; // root layout should always have flex 1
 		this.linkableState.state = state;
+	}
+	
+	get title():string
+	{
+		return this.getSessionState().title;
 	}
 
 	componentDidMount():void
@@ -303,7 +311,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		return [dropZone, dragOverId];
 	}
 
-	simplifyState(state:LayoutState):LayoutState
+	simplifyState(state:FlexibleLayoutState, topLevel:boolean = true):FlexibleLayoutState
 	{
 		if (!state)
 			return {};
@@ -322,7 +330,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		var simpleChildren:LayoutState[] = [];
 		for (var i = 0; i < state.children.length; i++)
 		{
-			var child:LayoutState = this.simplifyState(state.children[i]);
+			var child:LayoutState = this.simplifyState(state.children[i], false);
 			if (child.children && (child.direction === state.direction || !child.children.length))
 			{
 				var childChildren:LayoutState[] = child.children;
@@ -342,15 +350,20 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		
 		//Scale flex values between 0 and 1 so they sum to 1, avoiding an apparent
 		//flex bug where space is lost if sum of flex values is less than 1.
-		var totalSizeChildren:number = _.sum(_.map(state.children, "flex"));
+		var totalSizeChildren:number = _.sum(_.map(state.children, child => child.flex));
 		for (var i = 0; i < state.children.length; i++)
 			state.children[i].flex = StandardLib.normalize(state.children[i].flex || 1, 0, totalSizeChildren);
 
 		if (state.children.length === 1)
 		{
 			var flex = state.flex;
-			state = this.simplifyState(state.children[0]);
+			var title = state.title;
+			
+			state = this.simplifyState(state.children[0], false);
+			
 			state.flex = flex;
+			if (topLevel)
+				state.title = title;
 		}
 
 		return state;
@@ -489,16 +502,6 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		if (sourceFlexibleLayout && sourceFlexibleLayout != this)
 			sourceFlexibleLayout.setSessionState(newSourceState);
 		this.setSessionState(newState);
-	}
-
-	generateLayoutState(ids:WeavePathArray[]):Object
-	{
-		// temporary solution - needs improvement
-		return this.simplifyState({
-			flex: 1,
-			direction: HORIZONTAL,
-			children: ids.map(id => { return {id: id, flex: 1} })
-		});
 	}
 
 	getLayoutPosition(layoutOrId:Layout | WeavePathArray):ClientRect
