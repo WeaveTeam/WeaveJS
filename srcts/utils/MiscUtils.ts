@@ -162,23 +162,32 @@ export default class MiscUtils
 
 	private static getParams(query:string):any
 	{
-		var queryParams: any = {};
 		if (!query)
 			return {};
-		var vars: string[] = query.split("&");
-		for (var i: number = 0; i < vars.length; i++) {
-			var pair: string[] = vars[i].split("=");
-			if (typeof queryParams[pair[0]] === "undefined") {
-				queryParams[pair[0]] = decodeURIComponent(pair[1]);
-				// If second entry with this name
+		
+		var queryParams: any = {};
+		var vars = query.split("&");
+		for (var i = 0; i < vars.length; i++)
+		{
+			var name:string;
+			var pos = vars[i].indexOf('=');
+			var name = pos < 0 ? vars[i] : vars[i].substr(0, pos);
+			var value = pos < 0 ? undefined : decodeURIComponent(vars[i].substr(pos + 1));
+			
+			if (typeof queryParams[name] === 'undefined')
+			{
+				queryParams[name] = value;
 			}
-			else if (typeof queryParams[pair[0]] === "string") {
-				var arr: string[] = [queryParams[pair[0]], decodeURIComponent(pair[1])];
-				queryParams[pair[0]] = arr;
-				// If third or later entry with this name
+			else if (typeof queryParams[name] === 'string')
+			{
+				// second entry with this name
+				if (typeof value === 'string')
+					queryParams[name] = [queryParams[name], value];
 			}
-			else {
-				queryParams[pair[0]].push(decodeURIComponent(pair[1]));
+			else
+			{
+				// third or later entry with this name
+				(queryParams[name] as any[]).push(value);
 			}
 		}
 		return queryParams;
