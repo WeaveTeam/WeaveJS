@@ -105,9 +105,6 @@ export default class LabelLayer extends AbstractGlyphLayer
 			let width: number = DOMUtils.getTextWidth(text, font);
 			let height: number = DOMUtils.getTextHeight(text, font);
 
-			let point = feature.getGeometry() as ol.geom.Point;
-			let pixel = map.getPixelFromCoordinate(point.getCoordinates());
-
 			let bounds: Bounds2D = feature.get("Bounds2D") as Bounds2D;
 			if (!bounds)
 			{
@@ -115,6 +112,8 @@ export default class LabelLayer extends AbstractGlyphLayer
 				feature.set("Bounds2D", bounds);
 			}
 
+			let point = feature.getGeometry() as ol.geom.Point;
+			let pixel = point ? map.getPixelFromCoordinate(point.getCoordinates()) : null;
 			if (pixel) 
 			{
 				bounds.setCenter(pixel[0], pixel[1]);
