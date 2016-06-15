@@ -77,6 +77,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 		this.updateLocations();
 	}
 
+	static _projectionErrorsShown= new Set<string>();
 	updateLocations()
 	{
 		/* Update feature locations */
@@ -86,6 +87,16 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 
 		var rawProj = OpenLayersMapTool.getProjection(this.inputProjection);
 		var mapProj = OpenLayersMapTool.getProjection(this.outputProjection);
+
+		if (!rawProj)
+		{
+			if (!AbstractGlyphLayer._projectionErrorsShown.has(this.inputProjection))
+			{
+				AbstractGlyphLayer._projectionErrorsShown.add(this.inputProjection);
+				console.error(`${Weave.className(this)}: Projection ${this.inputProjection} does not exist; check your data configuration. Falling back to EPSG:4326 (Lat/Long)`);
+			}
+			rawProj = OpenLayersMapTool.getProjection("EPSG:4326");
+		}
 
 		for (let id of removedIds)
 		{
