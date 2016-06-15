@@ -91,7 +91,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		{
 			this.urlParams = MiscUtils.getUrlParams();
 		}
-		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded);
+		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded, this.openDataManager, this.enableDataManagerItem);
 		this.menus.showFileMenu = this.urlParams.hasOwnProperty('fileMenu');
 	}
 	
@@ -334,6 +334,16 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		if (tool)
 			this.toolSet.add(tool);
 	};
+		
+	enableDataManagerItem=():boolean=>
+	{
+		return !!this.tabLayout && this.tabLayout.activeTabIndex != -1;
+	}
+
+	openDataManager=()=>
+	{
+		this.tabLayout.activeTabIndex = -1;
+	}
 
 	createObject=(type:new(..._:any[])=>any):void=>
 	{

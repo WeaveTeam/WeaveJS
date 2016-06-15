@@ -24,13 +24,12 @@ export default class DataMenu implements MenuBarItemProps
 	get menu():MenuItemProps[]
 	{
 		return [].concat(
-			// {
-			// 	label: Weave.lang('Manage data...'),
-			// 	click: () => {
-			//
-			//	}
-			// },
-//			{},
+			{
+				enabled: this.owner.enableDataManagerItem(),
+				label: Weave.lang('Manage data...'),
+				click: this.owner.openDataManager
+			},
+			{},
 //			{
 //				shown: Weave.beta,
 //				label: <FileInput onChange={(()=>alert('Not implemented yet')) || this.fileMenu.openFile} accept={this.fileMenu.getSupportedFileTypes(true).join(',')}>{Weave.lang("Import data file(s)... (not implemented yet)")}</FileInput>

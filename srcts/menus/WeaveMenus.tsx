@@ -17,6 +17,8 @@ export default class WeaveMenus
 	weave:Weave;
 	createObject:CreateObjectFunction;
 	onFileLoaded:()=>void;
+	openDataManager:()=>void;
+	enableDataManagerItem:()=>boolean;
 	showFileMenu:boolean = false;
 
 	login:ServiceLogin;
@@ -27,12 +29,14 @@ export default class WeaveMenus
 	dataMenu:DataMenu;
 	controllersMenu:ControllersMenu;
 	
-	constructor(context:React.ReactInstance, weave:Weave, createObject:CreateObjectFunction, onFileLoaded:()=>void)
+	constructor(context:React.ReactInstance, weave:Weave, createObject:CreateObjectFunction, onFileLoaded:()=>void, openDataManager:()=>void, enableDataManagerItem:()=>boolean)
 	{
 		this.context = context;
 		this.weave = weave;
 		this.createObject = createObject;
 		this.onFileLoaded = onFileLoaded;
+		this.openDataManager = openDataManager;
+		this.enableDataManagerItem = enableDataManagerItem;
 		
 		/* Forces the initialization of the service. */
 		/* Hopefully the init flag gets set before our first 'get menu'. */
