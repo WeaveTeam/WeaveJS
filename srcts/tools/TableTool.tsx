@@ -178,7 +178,9 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	handleProbe=(ids:string[]) =>
 	{
-		if(ids && ids.length)
+		if (!this.probeKeySet)
+			return;
+		if (ids && ids.length)
 			this.probeKeySet.replaceKeys(ids && ids.map((id) => weavejs.WeaveAPI.QKeyManager.stringToQKey(id)));
 		else
 			this.probeKeySet.clearKeys();

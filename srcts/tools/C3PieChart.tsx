@@ -109,7 +109,8 @@ export default class C3PieChart extends AbstractC3Tool
 	protected handleC3MouseOver(d:any):void
 	{
 		var key = this.records[d.index].id;
-        this.probeKeySet.replaceKeys([key]);
+		if (this.probeKeySet)
+	        this.probeKeySet.replaceKeys([key]);
         this.toolTip.show(this, this.chart.internal.d3.event, [key], [this.data]);
 	}
 	
