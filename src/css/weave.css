@@ -379,6 +379,9 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 /* tabs */
+.weave-tab-container {
+}
+
 .weave-tab-icon {
 	color: #909090
 }
@@ -386,23 +389,17 @@ div.table-row-selected>div>div>div>div>div {
 	color: #000000
 }
 
-.weave-tab-container {
-	border-left: 1px solid #ddd;
-}
-
-.weave-tab-label-container.top {
-	border-bottom: 1px solid #ddd;
-}
-
-.weave-tab-label-container.bottom {
-    border-top: 1px solid #ddd;
-}
-.weave-tab-label { /* border left , will come from left child,first child gets from Container, border-bottom comes from label container */
+.weave-tab-label {
 	padding: 5px 8px 5px 8px;
-    border-right: 1px solid #ddd;
     cursor: default;
     background: #F8F8F8;
+    border-right: 1px solid #ddd;
 }
+
+.weave-tab-label:nth-child(1) {
+    border-left: 1px solid #ddd;
+}
+
 .weave-tab-label.top {
     border-top: 1px solid #ddd;
 }
@@ -411,33 +408,22 @@ div.table-row-selected>div>div>div>div>div {
     border-bottom: 1px solid #ddd;
 }
 
-.weave-tab-label.active { /* todo: border bottom white is not right way has to match backgroundcolor */
-    border-right: 1px solid #ddd;
+.weave-tab-label.active {
     background: none;
 }
 .weave-tab-label.active.top {
     margin-bottom: -1px; /* to cover the label container border*/
-    border-bottom: 1px solid white;
-    border-top: 1px solid #ddd;
+    border-bottom: 1px solid white; /* todo: border bottom white is not right way has to match backgroundcolor */
 }
 
 .weave-tab-label.active.bottom {
     margin-top: -1px; /* to cover the label container border*/
-    border-bottom: 1px solid #ddd;
-    border-top: 1px solid white;
+    border-top: 1px solid white; /* todo: border bottom white is not right way has to match backgroundcolor */
 }
 
-.weave-tab-content { /* border left , comes from container to cover label region too , top comes from label to distinct the active label */
+.weave-tab-content {
 	/*padding: 8px;*/
-	border-right: 1px solid #ddd;
-}
-
-.weave-tab-content.top {
-    border-bottom: 1px solid #ddd;
-}
-
-.weave-tab-content.bottom {
-    border-top: 1px solid #ddd;
+	border: 1px solid #ddd;
 }
 
 /* menus */

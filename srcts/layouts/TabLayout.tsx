@@ -327,7 +327,6 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 					tabBarClassName="weave-layout-tabs-bar"
 					tabLabelClassName="weave-layout-tabs-label"
 					tabBarStyle={{whiteSpace: "nowrap"}}
-					className=" "
 					labels={
 						leadingTabs.map(tab => tab.label)
 						.concat(state.tabs.map((tab) => (
