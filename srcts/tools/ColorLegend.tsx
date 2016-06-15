@@ -141,12 +141,16 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 	getSelectedBins():number[]
 	{
-		return _.unique(this.selectionKeySet.keys.map((key:IQualifiedKey) => this.binnedColumn.getValueFromKey(key, Number)));
+		if (this.selectionKeySet)
+			return _.unique(this.selectionKeySet.keys.map((key:IQualifiedKey) => this.binnedColumn.getValueFromKey(key, Number)));
+		return [];
 	}
 
 	getProbedBins():number[]
 	{
-		return _.unique(this.probeKeySet.keys.map((key:IQualifiedKey) => this.binnedColumn.getValueFromKey(key, Number)));
+		if (this.probeKeySet)
+			return _.unique(this.probeKeySet.keys.map((key:IQualifiedKey) => this.binnedColumn.getValueFromKey(key, Number)));
+		return [];
 	}
 
 	handleClick(bin:number, event:React.MouseEvent):void
@@ -171,6 +175,8 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 	handleProbe(bin:number, mouseOver:boolean, event:MouseEvent):void
 	{
+		if (!this.probeKeySet)
+			return;
 		if (mouseOver)
 		{
 			var keys:IQualifiedKey[] = this.binnedColumn.getKeysFromBinIndex(bin);

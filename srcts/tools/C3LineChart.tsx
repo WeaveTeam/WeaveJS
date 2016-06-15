@@ -165,8 +165,9 @@ export default class C3LineChart extends AbstractC3Tool
 	protected handleC3MouseOver(d:any):void
 	{
 		var key = this.getQKey(d);
-        this.probeKeySet.replaceKeys([key]);
-	    this.toolTip.show(this, this.chart.internal.d3.event, [key], this.columns.getObjects(IAttributeColumn));
+		if (this.probeKeySet)
+	    	this.probeKeySet.replaceKeys([key]);
+		this.toolTip.show(this, this.chart.internal.d3.event, [key], this.columns.getObjects(IAttributeColumn));
 	}
 	
 	protected handleC3Selection():void

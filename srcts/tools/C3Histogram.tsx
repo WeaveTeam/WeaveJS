@@ -188,7 +188,8 @@ export default class C3Histogram extends AbstractC3Tool
                         var keys = this.binnedColumn.getKeysFromBinIndex(d.index);
                         if (!keys)
                             return;
-                        this.probeKeySet.replaceKeys(keys);
+						if (this.probeKeySet)
+	                        this.probeKeySet.replaceKeys(keys);
                         this.toolTip.show(this, this.chart.internal.d3.event, keys, [this.binnedColumn, this.columnToAggregate]);
                     }
                 }
