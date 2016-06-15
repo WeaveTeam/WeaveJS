@@ -82,9 +82,8 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	
 	private handleNewTool(tool:IVisTool)
 	{
-
 		this.reset();
-		if(tool)
+		if (tool && !Weave.wasDisposed(tool))
 		{
 			this.tool = tool;
 			this.displayName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.tool.constructor as new (..._: any[]) => any);
@@ -142,10 +141,13 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		}
 	}
 
+	componentWillUnmount()
+	{
+		if (this.props.onCloseHandler) // this ensures when tool is removed close handler is called
+			this.props.onCloseHandler();
+	}
 
 	private activeEditor:Element;
-
-	
 
 	render()
 	{
