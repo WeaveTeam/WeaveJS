@@ -17,7 +17,7 @@ export default class LocalFileOpenComponent extends React.Component<IOpenFilePro
 	{
 		let file = (event.target as HTMLInputElement).files[0] as File;
 		if (file)
-			this.props.openHandler(file, this.props.openFileHandler);
+			this.props.openHandler(file);
 	};
 
 	render():JSX.Element
@@ -27,11 +27,11 @@ export default class LocalFileOpenComponent extends React.Component<IOpenFilePro
 				<VBox style={{flex: 1, alignItems: "center"}}>
 					<Dropzone
 						style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1, fontSize: 24}}
-						className={this.state.rejected ? "weave-dropzone-file-error":"weave-dropzone-file"}
+						className={this.state.rejected ? "weave-dropzone-file-error" : "weave-dropzone-file"}
 						activeStyle={{border: "8px solid #CCC"}}
 						onDropAccepted={(files:File[]) => {
 							files.map((file) => {
-								this.props.openHandler(file,this.props.openFileHandler);
+								this.props.openHandler(file);
 							});
 						}}
 						onDropRejected={(files:File[]) => {

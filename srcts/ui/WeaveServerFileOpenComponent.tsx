@@ -12,11 +12,12 @@ import CenteredIcon from "../react-ui/CenteredIcon";
 import {ListOption} from "../react-ui/List";
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 
-export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFileProps, IOpenFileState> {
-
+export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFileProps, IOpenFileState>
+{
 	element:Element;
 	dimmerSelector:any;
 	login:ServiceLogin;
+	
 	constructor(props:IOpenFileProps)
 	{
 		super(props);
@@ -28,7 +29,8 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 		this.login = new ServiceLogin(this.props.context, weavejs.net.Admin.service);
 	}
 
-	handleSuccess=(fields:any) => {
+	handleSuccess=(fields:any) =>
+	{
 		this.getWeaveFiles();
 	};
 
@@ -46,11 +48,14 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 		});
 	};
 
-	openLogin=()=>{
+	openLogin=()=>
+	{
+		if (this.element)
 		this.login.open(this.handleSuccess, this.handleCancel);
 	};
 
-	handleCancel=() => {
+	handleCancel=() =>
+	{
 		this.setState({
 			fileNames: [],
 			fileInfo: null
@@ -65,6 +70,11 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 
 	componentDidUpdate()
 	{
+	}
+	
+	componentWillUnmount()
+	{
+		this.element = null;
 	}
 
 	render():JSX.Element
@@ -142,22 +152,23 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 							                idProperty="filename"
 							                showIdColumn={false}
 							                columnTitles={columnTitles}
-											onCellDoubleClick={(fileName) => {this.props.openHandler("/" + fileName, this.props.openUrlHandler)}}
+											onCellDoubleClick={(fileName) => {this.props.openHandler("/" + fileName)}}
 							                multiple={false}
 							                disableSort={true}
 							                headerHeight={0}
 							                rowHeight={40}
 							                onSelection={(selectedFiles:string[]) => {
-						                    if(selectedFiles[0])
-												weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then(
-													(fileInfo:WeaveFileInfo) => {
-														this.setState({
-															fileInfo
-														});
-													},
-													this.openLogin
-												);
-						                }}
+							                    if (selectedFiles[0])
+													weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then(
+														(fileInfo:WeaveFileInfo) => {
+															if (this.element)
+																this.setState({
+																	fileInfo
+																});
+														},
+														this.openLogin
+													);
+							                }}
 							/>
 						</VBox>
 					</VBox>
@@ -166,7 +177,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 						<Button
 							colorClass="primary"
 							onClick={() => {
-								if(weavejs.net.Admin.instance.userHasAuthenticated)
+								if (weavejs.net.Admin.instance.userHasAuthenticated)
 								{
 									weavejs.net.Admin.service.authenticate("","").then(() => {
 										this.setState({
@@ -192,7 +203,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 							{this.state.fileInfo ?
 								<Button
 									onClick={() => {
-					                    this.props.openHandler("/" + this.state.fileInfo.fileName,this.props.openUrlHandler);
+					                    this.props.openHandler("/" + this.state.fileInfo.fileName);
 									}}
 									style={{marginLeft: 8}}
 								>

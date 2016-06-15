@@ -9,34 +9,68 @@ import CheckBoxList from "../react-ui/CheckBoxList";
 import * as FileSaver from "filesaver.js";
 import Input from "../semantic-ui/Input";
 import WeaveArchive from "../WeaveArchive";
+import FileDialog from "../ui/FileDialog";
+import WeaveMenus from "./WeaveMenus";
 
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
+import KeySet = weavejs.data.key.KeySet;
+import ILinkableCompositeObject = weavejs.api.core.ILinkableCompositeObject;
 import IDataSource = weavejs.api.data.IDataSource;
 import StandardLib = weavejs.util.StandardLib;
 import URLRequest = weavejs.net.URLRequest;
 
 export default class FileMenu implements MenuBarItemProps
 {
-	constructor(context:React.ReactInstance, weave:Weave, onFileLoaded:()=>void)
+	constructor(owner:WeaveMenus)
 	{
-		this.context = context;
-		this.weave = weave;
-		this.onFileLoaded = onFileLoaded;
+		this.owner = owner;
 	}
 
-	context:React.ReactInstance;
-	weave:Weave;
+	owner:WeaveMenus;
 	label = "File";
 	bold = false;
 	fileName:string;
 	archive:WeaveArchive;
-	onFileLoaded:()=>void;
+
+	get menu():MenuItemProps[]
+	{
+		return [].concat(
+			this.getSessionItems(),
+			{},
+			this.owner.dataMenu.getExportItems()
+		);
+
+//			{
+//				label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes().join(',')}><span className="weave-menuitem-padding">{Weave.lang("Open...")}</span></FileInput>
+//			},
+	}
+
+	getSessionItems():MenuItemProps[]
+	{
+		return [
+			{
+				/*label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes().join(',')}><span className="weave-menuitem-padding">{Weave.lang("Open session...")}</span></FileInput>,*/
+				label: "Open Session...",
+				click: () => FileDialog.open(this.owner.context, this.load)
+			},
+			{
+				label: Weave.lang("Save session as..."),
+				click: this.saveFile
+			},
+			{
+				label: Weave.lang("Save to server"),
+				click: () => {
+					this.owner.login.conditionalOpen(this.saveToServer);
+				},
+				shown: weavejs.net.Admin.service.initialized
+			}
+		];
+	}
 
 	/* stateless component */
 	saveDialog(fileName:string, onSave:(newFileName:string)=>void)
 	{
-
 		function dropExtension(fileName:string)
 		{
 			if (!fileName)
@@ -52,7 +86,7 @@ export default class FileMenu implements MenuBarItemProps
 
 		var setShowTopMenuBar = (checked:boolean) =>
 		{
-			var wp = this.weave.requestObject(['WeaveProperties'], LinkableHashMap);
+			var wp = this.owner.weave.requestObject(['WeaveProperties'], LinkableHashMap);
 			var enableMenuBar = wp.requestObject('enableMenuBar', LinkableBoolean);
 			enableMenuBar.value = checked;
 		};
@@ -61,7 +95,6 @@ export default class FileMenu implements MenuBarItemProps
 		{
 			//console.log("Save history");
 		};
-
 
 		var checkboxListOptions = [
 			{
@@ -84,7 +117,7 @@ export default class FileMenu implements MenuBarItemProps
 			onSave((filenameInput.value && filenameInput.value + ".weave") || defaultFileName);
 		};
 
-		PopupWindow.open(this.context, {
+		PopupWindow.open(this.owner.context, {
 			title: Weave.lang("Export session state"),
 			content: (
 				<VBox style={{width: 400, height: 200, padding: 20}}>
@@ -125,20 +158,6 @@ export default class FileMenu implements MenuBarItemProps
 		});
 	}
 
-	get menu():MenuItemProps[]
-	{
-		return [
-			{
-				label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes().join(',')}><span className="weave-menuitem-padding">{Weave.lang("Open...")}</span></FileInput>
-			},
-			{
-				label: Weave.lang("Save As..."),
-				click: this.saveFile
-			},
-			{},
-		];
-	}
-
 	/**
 	 * This function will update the progress given a meta object file name and a percentage progress
 	 *
@@ -152,8 +171,6 @@ export default class FileMenu implements MenuBarItemProps
 			ProgressIndicator.removeTask(meta.currentFile);
 		else
 			ProgressIndicator.updateTask(meta.currentFile, meta.percent/100);
-
-
 	};
 
     openFile=(e:any)=>
@@ -176,32 +193,69 @@ export default class FileMenu implements MenuBarItemProps
 		return types;
 	}
 
-	loadUrl=(url:string, pushHistory = false)=>
+	map_url_file = new Map<string, File>();
+	
+	load=(file_or_url:File|string, pushHistory:boolean = true):void=>
 	{
+		var url = typeof file_or_url === 'string' ? file_or_url as string : '';
+		var file = Weave.AS(file_or_url, File) || this.map_url_file.get(url);
+		if (file)
+			url = 'local://' + file.name;
+		
 		this.fileName = String(url).split('/').pop();
-
+		window.document.title = this.fileName ? Weave.lang("Weave: {0}", this.fileName) : Weave.lang("Weave");
 		if (pushHistory)
+			this.pushHistory(url);
+		
+		if (file)
 		{
-			history.pushState(url, "", FileMenu.buildUrl(url));
-			window.onpopstate = this.handleHistoryEvent;
-			window.document.title = Weave.lang("Weave: {0}",this.fileName);
+			this.map_url_file.set(url, file);
+			this.handleOpenedFile(file);
 		}
-		return weavejs.WeaveAPI.URLRequestUtils.request(this.weave.root, new URLRequest(url)).then((result) => {
-			this.loadArchive(result);
-		});
-	};
+		else if (url)
+		{
+			var fileName = this.fileName;
+			weavejs.WeaveAPI.URLRequestUtils
+				.request(this.owner.weave.root, new URLRequest(url))
+				.then((result) => {
+					// this check attempts to invalidate old requests
+					if (this.fileName == this.fileName)
+						this.loadArchive(result);
+				});
+		}
+		else
+		{
+			this.newSession();
+		}
+	}
 
-	loadFile=(file:File, pushHistory:Boolean = false)=>
+	pushHistory(url:string):void
 	{
-		this.fileName = "";
+		window.history.pushState(url, "", FileMenu.buildUrl(url));
+		window.onpopstate = this.handleHistoryEvent;
+	}
+	
+	handleHistoryEvent=(event:PopStateEvent)=>
+	{
+		this.load(event.state, false);
+	}
 
-		if (pushHistory)
-		{
-			history.pushState(null, "", FileMenu.buildBaseUrl());
-			window.document.title = Weave.lang("Weave");
-		}
-		this.handleOpenedFile(file);
-	};
+	newSession=():void=>
+	{
+		var weave = this.owner.weave;
+		
+		weave.root.setSessionState([], true);
+		
+		for (var ilco of Weave.getDescendants(weave.root, ILinkableCompositeObject))
+			ilco.setSessionState([], true);
+		
+		for (var keySet of Weave.getDescendants(weave.root, KeySet))
+			keySet.clearKeys();
+		
+		weave.history.clearHistory();
+		
+		this.archive = null;
+	}
 
 	handleOpenedFile=(file:File, dataFilesOnly:Boolean = false)=>
 	{
@@ -216,11 +270,10 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		WeaveArchive.deserialize(fileContent, this.updateProgressIndicator).then((archive) => {
 			this.archive = archive;
-			archive.setSessionFromArchive(this.weave);
-			this.onFileLoaded();
+			archive.setSessionFromArchive(this.owner.weave);
+			this.owner.onFileLoaded();
 		});
 	}
-
 
 	public handleOpenedFileContent(fileName:string, fileContent:Uint8Array, dataFilesOnly:Boolean = false):void
 	{
@@ -307,10 +360,11 @@ export default class FileMenu implements MenuBarItemProps
 
 	private findDataSource<T extends (new()=>IDataSource)>(type:new(..._:any[])=>T, filter:(dataSource:T)=>boolean, create:boolean = false):T
 	{
-		var results = Weave.getDescendants(this.weave.root, type).filter(filter);
+		var weave = this.owner.weave;
+		var results = Weave.getDescendants(weave.root, type).filter(filter);
 		var ds:T = results[0];
 		if (!ds && create)
-			return this.weave.root.requestObject('', type);
+			return weave.root.requestObject('', type);
 		return results[0];
 	}
 
@@ -325,17 +379,9 @@ export default class FileMenu implements MenuBarItemProps
 		return FileMenu.buildBaseUrl() + `?file=${url}`;
 	}
 
-	handleHistoryEvent=(event:PopStateEvent)=>
-	{
-		if (event.state)
-		{
-			this.loadUrl(event.state);
-		}
-	}
-
 	private _saveToServer=(newFileName:string, overwrite:boolean = true) =>
 	{
-		var promise = WeaveArchive.serialize(this.weave, this.updateProgressIndicator);
+		var promise = WeaveArchive.serialize(this.owner.weave, this.updateProgressIndicator);
 		promise.then(
 			(result: Uint8Array)=>
 			{
@@ -355,7 +401,7 @@ export default class FileMenu implements MenuBarItemProps
 	};
 
 	private _saveFile = (newFilename:string) => {
-		var promise = WeaveArchive.serialize(this.weave, this.updateProgressIndicator);
+		var promise = WeaveArchive.serialize(this.owner.weave, this.updateProgressIndicator);
 		promise.then(
 			(result:Uint8Array)=>
 			{

@@ -40,6 +40,7 @@ const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
+	rootApp?:WeaveApp;
 	weave:Weave;
 	renderPath?:WeavePathArray;
 	readUrlParams?:boolean;
@@ -57,12 +58,11 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 {
 	enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 	menus:WeaveMenus;
-	rootApp:WeaveApp;
 	_popout_windows = new Set<Window>();
 
 	get popout_windows()
 	{
-		return this.rootApp ? this.rootApp._popout_windows : this._popout_windows;
+		return (this.props.rootApp || this)._popout_windows;
 	}
 
 	static defaultProps:WeaveAppProps = {
@@ -76,13 +76,24 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
+		
 		this.state = {
 			toolPathToEdit: null,
 			initialWeaveComponent:null
 		};
-		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded);
+		
+		if (this.props.rootApp)
+		{
+			this.menus = this.props.rootApp.menus;
+			this.urlParams = this.props.rootApp.urlParams;
+		}
+		else
+		{
+			this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded);
+			this.urlParams = MiscUtils.getUrlParams();
+		}
+		
 		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
-		this.urlParams = MiscUtils.getUrlParams();
 	}
 	
 	componentWillReceiveProps(props:WeaveAppProps)
@@ -145,7 +156,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	componentDidMount()
 	{
 		// only add this listener if the weave app is a root weave app
-		if(_.isEqual(this.getRenderPath(), this.getRootLayoutPath()))
+		if (_.isEqual(this.getRenderPath(), this.getRootLayoutPath()))
 		{
 			let window = ReactUtils.getWindow(this);
 			window.addEventListener("beforeunload", this.handleBeforeUnload);
@@ -169,8 +180,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			if (this.urlParams.file)
 			{
 				// read content from url
-				this.menus.fileMenu.loadUrl(this.urlParams.file);
-				window.document.title = Weave.lang("Weave: {0}",this.urlParams.file);
+				this.menus.fileMenu.load(this.urlParams.file);
 			}
 			else if (weaveExternalTools && weaveExternalTools[window.name])
 			{
@@ -183,7 +193,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		}
 
 		if (this.props.showFileDialog)
-			FileDialog.open(this.menus.fileMenu.context, this.menus.fileMenu.loadUrl, this.menus.fileMenu.loadFile, true /* skip confirmation dialog */);
+			FileDialog.open(this.menus.context, this.menus.fileMenu.load, true /* skip confirmation dialog */);
 	}
 
 	handleSideBarClose=()=>
@@ -196,7 +206,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	 */
 	handleUnload=()=>
 	{
-		for(let window of this.popout_windows)
+		for (let window of this.popout_windows)
 			window.close();
 	};
 
@@ -236,8 +246,8 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	handlePopoutClick=(layoutPath:WeavePathArray, oldTabLayoutPath:WeavePathArray):void=>
 	{
-		if(this.rootApp)
-			return this.rootApp.handlePopoutClick(layoutPath, oldTabLayoutPath);
+		if (this.props.rootApp)
+			return this.props.rootApp.handlePopoutClick(layoutPath, oldTabLayoutPath);
 
 		var newTabLayoutPath = [this.props.weave.root.generateUniqueName("Tabs")];
 
@@ -248,7 +258,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			Weave.getCallbacks(tabLayout).addDisposeCallback(this, () => {
 				// close the associated Tab Layout window when the Tab Layout is disposed
 				let window = ReactUtils.getWindow(tabLayout);
-				if(window)
+				if (window)
 				{
 					try
 					{
@@ -266,7 +276,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		var content:JSX.Element = (
 			<WeaveApp
-				ref={(c:WeaveApp) => { if(c) c.rootApp = this }}
+				rootApp={this}
 				weave={this.props.weave}
 				renderPath={newTabLayoutPath}
 				initializeTabs={false}

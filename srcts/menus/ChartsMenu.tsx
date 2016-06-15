@@ -4,6 +4,7 @@ import {MenuItemProps} from "../react-ui/Menu";
 import PopupWindow from "../react-ui/PopupWindow";
 import IVisTool = weavejs.api.ui.IVisTool;
 import * as WeaveUI from "../WeaveUI";
+import WeaveMenus from "./WeaveMenus";
 
 import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
@@ -12,15 +13,14 @@ import FilteredColumn = weavejs.data.column.FilteredColumn;
 
 export default class ChartsMenu implements MenuBarItemProps
 {
-	constructor(weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	constructor(owner:WeaveMenus)
 	{
-		this.weave = weave;
-		this.createObject = createObject;
+		this.owner = owner;
 	}
 
+	owner:WeaveMenus;
 	label:string = "Charts";
-	weave:Weave;
-	createObject:(type:new(..._:any[])=>any)=>void;
+
 	get menu():MenuItemProps[]
 	{
 		return [].concat(
@@ -59,7 +59,7 @@ export default class ChartsMenu implements MenuBarItemProps
 			}
 			return {
 				label: label,
-				click: this.createObject.bind(this, impl)
+				click: this.owner.createObject.bind(this, impl)
 			};
 		}).filter(item => !!item);
 	}

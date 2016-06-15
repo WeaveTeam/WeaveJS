@@ -1,3 +1,4 @@
+import * as _ from "lodash";
 import * as React from "react";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
@@ -12,11 +13,14 @@ import WeavePromise = weavejs.util.WeavePromise;
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 var URLRequestUtils = weavejs.WeaveAPI.URLRequestUtils;
 
+export interface FileListItem {
+	label:string;
+	iconClass:string;
+	isNewFile?:boolean;
+}
 
 export interface IOpenFileProps {
-	openUrlHandler:(url:string, pushHistory:boolean) => void;
-	openFileHandler:(file:File) => void;
-	openHandler:(file:string|File,handler:Function) => void;
+	openHandler:(file:string|File) => void;
 	context?:React.ReactInstance;
 }
 
@@ -29,50 +33,51 @@ export interface IOpenFileState {
 
 export interface IFileDialogProps extends React.Props<FileDialog>
 {
-	openUrlHandler:(url:string) => void;
-	openFileHandler:(file:File) => void;
+	openHandler:(file:string|File) => void;
 	skipConfirmation?: boolean; /* If true, don't ask for confirmation before loading the session */
 	context:React.ReactInstance;
 }
 
 export interface IFileDialogState
 {
-	selected?:string;
+	selected?:FileListItem;
 }
 
 export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDialogState> {
-	static listItems:{[key:string]:string}[] = [{label: "My Computer" , iconClass:"fa fa-desktop"}, {label: "Weave Server", iconClass: "fa fa-server"}];
+	static NEW_SESSION:FileListItem = {label: "New Session", iconClass: "fa fa-fw fa-file", isNewFile: true};
+	static MY_COMPUTER:FileListItem = {label: "My Computer", iconClass: "fa fa-fw fa-desktop"};
+	static WEAVE_SERVER:FileListItem = {label: "Weave Server", iconClass: "fa fa-fw fa-server"};
+	static listItems = [FileDialog.NEW_SESSION, FileDialog.MY_COMPUTER, FileDialog.WEAVE_SERVER];
 	static window:PopupWindow;
 
-	static storageRegistry = new Map< String, React.ComponentClass<IOpenFileProps>>()
-		.set("My Computer", LocalFileOpenComponent)
-		.set("Weave Server", WeaveServerFileOpenComponent);
+	static storageRegistry = new Map<FileListItem, React.ComponentClass<IOpenFileProps>>()
+		.set(FileDialog.MY_COMPUTER, LocalFileOpenComponent)
+		.set(FileDialog.WEAVE_SERVER, WeaveServerFileOpenComponent);
 
 	constructor(props:IFileDialogProps)
 	{
 		super(props);
-		this.state = {selected: "My Computer"};
+		this.state = {selected: FileDialog.MY_COMPUTER};
 	}
 
 	static close()
 	{
-		if(FileDialog.window)
+		if (FileDialog.window)
 		{
 			PopupWindow.close(FileDialog.window);
 			FileDialog.window = null;
 		}
 	}
 	
-	static open(context:React.ReactInstance, loadURL:(url:string) => void, loadFile:(file:File) => void, skipConfirmation?: boolean)
+	static open(context:React.ReactInstance, openHandler:(file:string|File) => void, skipConfirmation?: boolean)
 	{
-
 		if (FileDialog.window)
 			PopupWindow.close(FileDialog.window);
 
 		FileDialog.window = PopupWindow.open(context, {
 			title: Weave.lang("Open a Weave Session"),
 			content:
-				<FileDialog openUrlHandler={loadURL} openFileHandler={loadFile} context={context} skipConfirmation={skipConfirmation}/>,
+				<FileDialog openHandler={openHandler} context={context} skipConfirmation={skipConfirmation}/>,
 			footerContent: <div/>,
 			resizable: false,
 			draggable: false,
@@ -84,7 +89,7 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		});
 	}
 
-	openHandler=(file:string|File,handler:Function)=>
+	confirmOpenHandler=(file:string|File)=>
 	{
 		if (!this.props.skipConfirmation)
 		{
@@ -96,7 +101,11 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 							<i style={{ fontSize: 50, marginLeft: 15 }} className="fa fa-exclamation-triangle weave-exclamation-triangle"></i>
 							<div style={{ margin: 0, marginLeft: 5 }} className="ui basic segment">
 								<div className="ui basic header">
-									{Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.") }
+									{
+										file
+										?	Weave.lang("Are you sure you want to open this session? This will overwrite your current workspace.")
+										:	Weave.lang("Are you sure you want start a new session? This will overwrite your current workspace.")
+									}
 								</div>
 							</div>
 						</HBox>
@@ -107,14 +116,14 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 				width: 480,
 				height: 230,
 				onOk: () => {
-					handler(file,true);
+					this.props.openHandler(file);
 					FileDialog.close();
 				},
 			});
 		}
 		else
 		{
-			handler(file);
+			this.props.openHandler(file);
 			FileDialog.close();
 		}
 	};
@@ -130,20 +139,32 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		let fileSource = this.state.selected;
 		let EditorClass = FileDialog.storageRegistry.get(fileSource);
 		if (EditorClass)
-			editorJsx = <EditorClass openFileHandler={this.props.openFileHandler} openUrlHandler={this.props.openUrlHandler} openHandler={this.openHandler} context={this.props.context}/>;
-		let listOptions:ListOption[] = FileDialog.listItems.map((fileSource:any) => {
+			editorJsx = (
+				<EditorClass
+					openHandler={this.confirmOpenHandler}
+					context={this.props.context}
+				/>
+			);
+		let listOptions:ListOption[] = FileDialog.listItems.map((fileSource:FileListItem) => {
 			return {
 				label: (
 					<HBox className="weave-padded-hbox" style={{padding: 15, alignItems: "center"}}>
 						<HBox>
-							<CenteredIcon iconProps={{ className: fileSource.iconClass, title: fileSource.label}} style={{fontSize: 26}}/>
+							<CenteredIcon className=" " iconProps={{ className: fileSource.iconClass, title: fileSource.label}} style={{fontSize: 26}}/>
+							{
+								fileSource.isNewFile
+								?	<div style={{position: "relative"}}>
+										<i className="fa fa-asterisk" style={{fontSize: "0.5em", position: "absolute", right: 0}}/>
+									</div>
+								:	null
+							}
 						</HBox>
 						<span style={{overflow: "hidden", marginLeft: 20}}>{fileSource.label}</span>
 					</HBox>
 				),
-				value: fileSource.label
+				value: fileSource
 			};
-		});
+		}).filter(_.identity);
 		
 		return (
 				<div style={{ flex: 1, overflow: "auto", display: "flex", flexDirection: "row"}}>
@@ -152,10 +173,18 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 							options={listOptions}
 							multiple={false}
 							selectedValues={ [fileSource] }
-							onChange={ (selectedValues:string[]) => {
-								this.setState({
-									selected: selectedValues[0]
-								})
+							onChange={ (selectedValues:FileListItem[]) => {
+								if (selectedValues[0] == FileDialog.NEW_SESSION)
+								{
+									this.forceUpdate();
+									weavejs.WeaveAPI.Scheduler.callLater(this, this.confirmOpenHandler, [null]);
+								}
+								else
+								{
+									this.setState({
+										selected: selectedValues[0]
+									});
+								}
 							}}
 						/>
 					</VBox>

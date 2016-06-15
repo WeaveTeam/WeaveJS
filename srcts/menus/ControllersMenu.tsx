@@ -5,6 +5,7 @@ import PopupWindow from "../react-ui/PopupWindow";
 import IVisTool = weavejs.api.ui.IVisTool;
 import * as WeaveUI from "../WeaveUI";
 import MouseoverController from "../editors/MouseoverController";
+import WeaveMenus from "./WeaveMenus";
 
 import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
@@ -14,28 +15,29 @@ import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 
 export default class ControllersMenu implements MenuBarItemProps
 {
-	constructor(context:React.ReactInstance, weave:Weave, createObject:(type:new(..._:any[])=>any)=>void)
+	constructor(owner:WeaveMenus)
 	{
-		this.context = context;
-		this.weave = weave;
-		this.createObject = createObject;
+		this.owner = owner;
 	}
 
+	owner:WeaveMenus;
 	label:string = "Controllers";
-	context:React.ReactInstance;
-	weave:Weave;
-	createObject:(type:new(..._:any[])=>any)=>void;
 	
 	get menu():MenuItemProps[]
 	{
 		return [].concat(
 			{
 				label: Weave.lang("Color settings"),
-				click: () => ColorController.open(this.context, this.weave.getObject("defaultColorColumn") as ColorColumn)
+				click: () => ColorController.open(this.owner.context, this.owner.weave.getObject("defaultColorColumn") as ColorColumn)
 			},
 			{
 				label: Weave.lang("Mouseover settings"),
-				click: () => MouseoverController.open(this.context, this.weave, this.weave.getObject("Probe Header Columns") as ILinkableHashMap, this.weave.getObject("Probed Columns") as ILinkableHashMap)
+				click: () => MouseoverController.open(
+					this.owner.context,
+					this.owner.weave,
+					this.owner.weave.getObject("Probe Header Columns") as ILinkableHashMap,
+					this.owner.weave.getObject("Probed Columns") as ILinkableHashMap
+				)
 			},
 			{},
 			this.getCreateObjectItems()
@@ -65,7 +67,7 @@ export default class ControllersMenu implements MenuBarItemProps
 			}
 			return {
 				label: label,
-				click: this.createObject.bind(this, impl)
+				click: this.owner.createObject.bind(this, impl)
 			};
 		}).filter(item => !!item);
 	}

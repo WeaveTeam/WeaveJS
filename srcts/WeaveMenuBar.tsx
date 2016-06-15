@@ -27,19 +27,9 @@ export interface WeaveMenuBarState
 
 export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
 {
-	systemMenu:SystemMenu;
-	fileMenu:FileMenu;
-	chartsMenu:ChartsMenu;
-	dataMenu:DataMenu;
-	controllersMenu:ControllersMenu;
 	constructor(props:WeaveMenuBarProps)
 	{
 		super(props);
-		this.systemMenu = props.menus.systemMenu;
-		this.fileMenu = props.menus.fileMenu;
-		this.chartsMenu = props.menus.chartsMenu;
-		this.dataMenu = props.menus.dataMenu;
-		this.controllersMenu = props.menus.controllersMenu;
 	}
 	
 	render():JSX.Element
@@ -47,12 +37,7 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 		return (
 			<MenuBar
 				style={this.props.style}
-				config={[
-					this.systemMenu,
-					this.dataMenu,
-					this.chartsMenu,
-					this.controllersMenu
-				]}
+				config={this.props.menus.getMenuList()}
 				children={
 					[<SessionHistorySlider key="historySlider" stateLog={this.props.weave.history}/>]
 				}
