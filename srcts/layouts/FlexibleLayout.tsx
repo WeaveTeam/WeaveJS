@@ -191,9 +191,16 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		
 		if (!PanelDragEvent.hasPanelId(event))
 			return;
-		
-		event.dataTransfer.dropEffect = "move"; // hides the + icon browsers display
-		
+
+		try
+		{
+			event.dataTransfer.dropEffect = "move"; // hides the + icon browsers display
+		}
+		catch(e)
+		{
+			//Edge browser throws an error when the dropeffect property of dataTransfer is set
+		}
+
 		var dropZone:DropZone;
 		[dropZone, dragOverId] = this.getDropZone(dragOverId);
 		
@@ -373,9 +380,10 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	{
 		var sourceLayout = PanelDragEvent.getLayout(event, Weave.getWeave(this));
 		var srcId = PanelDragEvent.getPanelId(event);
-		var destId = this.dragOverId;
+		//r destId = dragOverId;
+		console.log(" srcID, destId", srcId,this.dragOverId);
 		
-		this.handlePanelDrop(sourceLayout, srcId, destId, this.dropZone);
+		this.handlePanelDrop(sourceLayout, srcId, this.dragOverId, this.dropZone);
 		
 		// cleanup
 		this.draggedId = null;
