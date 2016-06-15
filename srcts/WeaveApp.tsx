@@ -82,18 +82,17 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			initialWeaveComponent:null
 		};
 		
+		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
 		if (this.props.rootApp)
 		{
-			this.menus = this.props.rootApp.menus;
 			this.urlParams = this.props.rootApp.urlParams;
 		}
 		else
 		{
-			this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded);
 			this.urlParams = MiscUtils.getUrlParams();
 		}
-		
-		this.enableMenuBarWatcher.root = this.props.weave && this.props.weave.root;
+		this.menus = new WeaveMenus(this, this.props.weave, this.createObject, this.onSessionLoaded);
+		this.menus.showFileMenu = this.urlParams.hasOwnProperty('fileMenu');
 	}
 	
 	componentWillReceiveProps(props:WeaveAppProps)

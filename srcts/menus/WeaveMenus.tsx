@@ -17,7 +17,7 @@ export default class WeaveMenus
 	weave:Weave;
 	createObject:CreateObjectFunction;
 	onFileLoaded:()=>void;
-	showFileMenu:boolean;
+	showFileMenu:boolean = false;
 
 	login:ServiceLogin;
 	
@@ -33,7 +33,6 @@ export default class WeaveMenus
 		this.weave = weave;
 		this.createObject = createObject;
 		this.onFileLoaded = onFileLoaded;
-		this.showFileMenu = MiscUtils.getUrlParams().hasOwnProperty('fileMenu');
 		
 		/* Forces the initialization of the service. */
 		/* Hopefully the init flag gets set before our first 'get menu'. */
