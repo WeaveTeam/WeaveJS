@@ -16,10 +16,10 @@ export interface TabsProps extends React.Props<Tabs>
 	initialActiveTabIndex?:number;
 	activeTabIndex?:number;
 	onViewChange?:(index:number) => void;
-	className?:string;
 	style?:React.CSSProperties;
 	tabHeaderClassName?:string;
 	tabHeaderStyle?:React.CSSProperties;
+	tabContainerClassName?:string;
 	tabContentClassName?:string;
 	tabContentStyle?:React.CSSProperties;
 	tabLabelClassName?:string;
@@ -72,12 +72,20 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 
 	render():JSX.Element
 	{
-		var content = [
-			<HBox key="tabs"
-			      className={classNames(this.props.tabBarClassName || "weave-tab-label-container", this.props.location)}
-			      style={this.props.tabBarStyle}
+		return (
+			<div
+				className={classNames(this.props.tabContainerClassName || "weave-tab-container", this.props.location)}
+			    style={_.merge({}, this.props.style, {flex: 1, display: "flex", flexDirection: this.props.location === BOTTOM ? "column" : "column-reverse"})}
 			>
-				<HBox style={{overflow: "hidden"}}>
+				<VBox key="content" className={classNames(this.props.tabContentClassName || "weave-tab-content", this.props.location)} style={{flex: 1, overflow: "auto"}}>
+					{
+						this.props.tabs[this.state.activeTabIndex]
+					}
+				</VBox>
+				<HBox key="tabs"
+				      className={classNames(this.props.tabBarClassName || "weave-tab-label-container", this.props.location)}
+				      style={this.props.tabBarStyle}
+				>
 					{
 						this.props.labels.map((label, index) => {
 							return (
@@ -98,28 +106,11 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 							);
 						})
 					}
+					{
+						this.props.tabBarChildren
+					}
 				</HBox>
-				{
-					this.props.tabBarChildren
-				}
-			</HBox>,
-			<VBox key="content" className={classNames(this.props.tabContentClassName || "weave-tab-content", this.props.location)} style={{flex: 1, overflow: "auto"}}>
-			{
-				this.props.tabs[this.state.activeTabIndex]
-			}
-			</VBox>
-		];
-
-		if(this.props.location === BOTTOM)
-			content.reverse();
-
-		return (
-			<VBox
-				className={classNames(this.props.className || "weave-tab-container", this.props.location)}
-			    style={_.merge({}, this.props.style, {flex: 1})}
-			>
-				{content}
-			</VBox>
+			</div>
 		);
 	}
 }
