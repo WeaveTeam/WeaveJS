@@ -235,10 +235,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		var weave = this.props.weave;
 		var oldTabLayout = Weave.AS(weave.getObject(tabLayoutPath), TabLayout);
 		var rootTabLayout = Weave.AS(weave.getObject(this.getRootLayoutPath()), TabLayout);
-		var panelIds = oldTabLayout ? oldTabLayout.getPanelIds() : [];
-		panelIds.map(panelId => {
-			var panel = weave.getObject(panelId) as AnyAbstractLayout;
-			rootTabLayout.addPanel(panelId, panel && panel.title);
+		var tabIds = oldTabLayout ? oldTabLayout.getPanelIds() : [];
+		tabIds.map(id => {
+			rootTabLayout.addPanel(id);
+			rootTabLayout.setTabLabel(id, oldTabLayout.getTabLabel(id));
 		});
 		weave.removeObject(tabLayoutPath);
 	};
@@ -465,9 +465,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{
 					// create a window layout and select its tab
 					activeTabIndex = 0;
-					requestObject(this.props.weave, this.getDefaultLayoutPath(), WindowLayout, (instance:WindowLayout) => {
+					requestObject(this.props.weave, this.getDefaultLayoutPath(), WindowLayout, (windowLayout:WindowLayout) => {
 						var ids:WeavePathArray[] = this.props.weave.root.getNames(weavejs.api.ui.IVisTool, true).map(name => [name]);
-						instance.setSessionState({
+						windowLayout.setSessionState({
 							panels: ids.map(id => {
 								var state = DynamicState.traverseState(history.currentState, id);
 								return {
@@ -485,7 +485,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 									maximized: state && state.maximized
 								};
 							}),
-							title: "Layout"
+							title: null
 						});
 					});
 				}
@@ -496,35 +496,21 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				}
 				layouts = this.getNonTabLayouts();
 			}
-
-			tabs = layouts.map((layout) => {
-				return {
-					id: Weave.findPath(this.props.weave.root, layout),
-					label: this.props.weave.root.getName(layout)
-				}
-			});
+			
+			for (var layout of layouts)
+				tabLayout.addPanel(Weave.findPath(this.props.weave.root, layout));
 		}
-
-		if (!title)
-		{
-			title = this.props.weave.root.getName(this.tabLayout);
-		}
-
-		tabLayout.setSessionState({
-			tabs,
-			activeTabIndex,
-			title
-		});
+		
+		tabLayout.activeTabIndex = activeTabIndex;
 	};
 
 	addNewTab=(type?:typeof AbstractLayout)=>
 	{
 		var weave = this.props.weave;
-		var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(type as any);
-		var layoutName = weave.root.generateUniqueName(baseName);
+		var layoutName = weave.root.generateUniqueName("Layout");
 		var path = [layoutName];
 		weave.requestObject(path, type as any);
-		this.tabLayout.addPanel(path, layoutName);
+		this.tabLayout.addPanel(path);
 	};
 
 	removeExistingTab=(id:WeavePathArray)=>
