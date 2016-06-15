@@ -212,9 +212,9 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 						{topSideBar}
 						<HDividedBox style={ {flex:1} }>
 							{leftSideBar}
-							<Wrapper style={ wrapperStyle }>
+							<div style={ wrapperStyle }>
 								{this.props.children}
-							</Wrapper>
+							</div>
 							{rightSideBar}
 						</HDividedBox>
 						{bottomSideBar}
@@ -247,21 +247,4 @@ export default class SideBarContainer extends SmartComponent<SideBarContainerPro
 		return (containerUI);
 	}
 
-}
-
-class Wrapper extends React.Component<React.HTMLProps<Wrapper>,{}>
-{
-	shouldComponentUpdate()
-	{
-		return false;
-	}
-	
-	render()
-	{
-		return (
-			<div className={this.props.className} style={this.props.style}>
-				{this.props.children}
-			</div>
-		);
-	}
 }
