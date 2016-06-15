@@ -380,10 +380,9 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	{
 		var sourceLayout = PanelDragEvent.getLayout(event, Weave.getWeave(this));
 		var srcId = PanelDragEvent.getPanelId(event);
-		//r destId = dragOverId;
-		console.log(" srcID, destId", srcId,this.dragOverId);
-		
-		this.handlePanelDrop(sourceLayout, srcId, this.dragOverId, this.dropZone);
+		var destId = this.dragOverId;
+
+		this.handlePanelDrop(sourceLayout, srcId, destId, this.dropZone);
 		
 		// cleanup
 		this.draggedId = null;
