@@ -35,7 +35,7 @@ export abstract class AbstractLayout<P extends LayoutProps, S> extends SmartComp
 
 export class PanelDragEvent
 {
-	private static DRAG_DATA_TYPE = 'abstract-layout-panel-id'; // lower-case because DataTransfer converts it to lower case anyway
+	private static DRAG_DATA_TYPE = 'text/plain'; // using built in MIMES instead of custom types (used for MS Edge)
 	
 	static hasPanelId(event:React.DragEvent):boolean
 	{
