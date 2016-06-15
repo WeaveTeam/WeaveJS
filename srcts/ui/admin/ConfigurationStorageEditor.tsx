@@ -198,8 +198,8 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 					</div>
 				</div>
 			</div>
-			<LogComponent uiClass="positive" header={Weave.lang("Server error")} messages={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
-			<LogComponent header={Weave.lang("Completed") } messages={this.state.messages} clearFunc={() => { this.setState({ messages: [] }) } }/>
+			<LogComponent header={Weave.lang("Server error")} messages={this.state.errors} clearFunc={() => { this.setState({ errors: [] }) } }/>
+			<LogComponent uiClass="positive" header={Weave.lang("Completed") } messages={this.state.messages} clearFunc={() => { this.setState({ messages: [] }) } }/>
 			<HBox>
 				<Button colorClass="primary" onClick={this.save}>{Weave.lang("Store Weave configuration at this location") }</Button>
 				<Button colorClass="secondary" onClick={() => ConfigurationStorageEditor.close() }>{Weave.lang("Cancel") }</Button>
