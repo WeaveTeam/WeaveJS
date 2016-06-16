@@ -187,7 +187,6 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 		var parent = this.element.offsetParent as HTMLElement;
 		var parentWidth = parent.offsetWidth;
 		var parentHeight = parent.offsetHeight;
-		var edgeBuffer = 25;
 		
 		var mouseOffset = this.getMouseOffset();
 		var mouseDeltaX = mouseOffset.x - this.mouseDownOffset.x;
@@ -205,37 +204,37 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 			{
 				newBounds.xMin += mouseDeltaX;
 				newBounds.xMin = Math.max(newBounds.xMin, oldBounds.xMax - parentWidth, 0);
-				newBounds.xMin = Math.min(newBounds.xMin, oldBounds.xMax - minWidth, parentWidth - edgeBuffer);
+				newBounds.xMin = Math.min(newBounds.xMin, oldBounds.xMax - minWidth);
 			}
 			if (this.activeResizeHandle & Handle.TOP)
 			{
 				newBounds.yMin += mouseDeltaY;
 				newBounds.yMin = Math.max(newBounds.yMin, oldBounds.yMax - parentHeight, 0);
-				newBounds.yMin = Math.min(newBounds.yMin, oldBounds.yMax - minHeight, parentHeight - edgeBuffer);
+				newBounds.yMin = Math.min(newBounds.yMin, oldBounds.yMax - minHeight);
 			}
 			if (this.activeResizeHandle & Handle.RIGHT)
 			{
 				newBounds.xMax += mouseDeltaX;
-				newBounds.xMax = Math.max(newBounds.xMax, oldBounds.xMin + minWidth, edgeBuffer);
-				newBounds.xMax = Math.min(newBounds.xMax, parentWidth);
+				newBounds.xMax = Math.max(newBounds.xMax, oldBounds.xMin + minWidth);
+				newBounds.xMax = Math.min(newBounds.xMax, oldBounds.xMin + parentWidth, parentWidth);
 			}
 			if (this.activeResizeHandle & Handle.BOTTOM)
 			{
 				newBounds.yMax += mouseDeltaY;
 				newBounds.yMax = Math.max(newBounds.yMax, oldBounds.yMin + minHeight);
-				newBounds.yMax = Math.min(newBounds.yMax, parentHeight);
+				newBounds.yMax = Math.min(newBounds.yMax, oldBounds.yMin + parentHeight, parentHeight);
 			}
 		}
 		else // move
 		{
 			newBounds.xMin += mouseDeltaX;
-			newBounds.xMin = Math.max(newBounds.xMin, edgeBuffer - (oldBounds.getWidth() || 0));
-			newBounds.xMin = Math.min(newBounds.xMin, parentWidth - edgeBuffer);
+			newBounds.xMin = Math.max(newBounds.xMin, 0);
+			newBounds.xMin = Math.min(newBounds.xMin, parentWidth - oldBounds.getWidth());
 			newBounds.xMax = newBounds.xMin + oldBounds.getWidth(); // preserve width
 			
 			newBounds.yMin += mouseDeltaY;
 			newBounds.yMin = Math.max(newBounds.yMin, 0);
-			newBounds.yMin = Math.min(newBounds.yMin, parentHeight - edgeBuffer);
+			newBounds.yMin = Math.min(newBounds.yMin, parentHeight - oldBounds.getHeight());
 			newBounds.yMax = newBounds.yMin + oldBounds.getHeight(); // preserve height
 		}
 		
