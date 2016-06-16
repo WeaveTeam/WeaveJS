@@ -42,6 +42,8 @@ import MouseUtils from "./utils/MouseUtils";
 import MiscUtils from "./utils/MiscUtils";
 import DOMUtils from "./utils/DOMUtils";
 import ReactUtils from "./utils/ReactUtils";
+import JSZip from "./modules/jszip";
+
 import * as WeaveReactUtils from "./utils/WeaveReactUtils";
 
 import * as React from "react";
@@ -54,6 +56,7 @@ weavejs.util.StandardLib.lodash = lodash;
 weavejs.util.StandardLib.ol = ol;
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 weavejs.util.DebugUtils.MouseUtils = MouseUtils;
+weavejs.core.WeaveArchive.JSZip = JSZip;
 
 import * as jquery from "jquery";
 
