@@ -608,7 +608,7 @@ export default class C3BarChart extends AbstractC3Tool
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
 					],
 					this.c3Config.legend.show && [
-						Weave.lang("Legend Position (beta)"),
+						Weave.lang("Legend Position"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.legendPosition })} options={LEGEND_POSITIONS}/>
 					],
 					Weave.beta && [
