@@ -10,6 +10,7 @@ import DynamicComponent from "../ui/DynamicComponent";
 import StatefulTextField from "../ui/StatefulTextField";
 import WeaveTree from "../ui/WeaveTree";
 import FixedDataTable from "../tools/FixedDataTable";
+import * as ReactVirtualized from "react-virtualized";
 import {IColumnTitles} from "../tools/FixedDataTable";
 import MenuButton from '../react-ui/MenuButton';
 import ChartsMenu from "../menus/ChartsMenu";
@@ -213,19 +214,40 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		});
 
 
+
 		var keyType = columns.length && columns[0].getMetadata("keyType");
 		names.unshift("id");
-		_.assign(columnTitles, {id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key")});
 
+		let cellDataGetter = (data: { columnData: IAttributeColumn, dataKey: string, rowData: IQualifiedKey }) =>
+		{
+			return data.columnData.getValueFromKey(data.rowData, String);
+		};
+
+		let flexColumns = columns.map((iac,index)=>
+		{
+			return (<ReactVirtualized.FlexColumn cellDataGetter={cellDataGetter} key={index} dataKey="ignored" width={125} columnData={iac} label={iac.getMetadata("title")}/>);
+		});
+		_.assign(columnTitles, {id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key")});
+			// <FixedDataTable rows={rows}
+			// 				columnIds={names}
+			// 				idProperty="id"
+			// 				showIdColumn={!!columns.length}
+			// 				columnTitles={columnTitles as any}
+			//                 disableSort={true}
+			//                 multiple={false}
+		let keys: IQualifiedKey[];
+		if (columns.length)
+		{
+			keys = columns[0].keys;	
+		}
+		else
+		{
+			keys = [];
+		}
 		return (
-			<FixedDataTable rows={rows}
-							columnIds={names}
-							idProperty="id"
-							showIdColumn={!!columns.length}
-							columnTitles={columnTitles as any}
-			                disableSort={true}
-			                multiple={false}
-			/>
+			<ReactVirtualized.FlexTable rowHeight={16} headerHeight={16} height={300} rowGetter={(data: { index: number }) => keys[data.index]} rowCount={keys.length} width={600}>
+				{flexColumns}
+			</ReactVirtualized.FlexTable>
 		);
 	};
 

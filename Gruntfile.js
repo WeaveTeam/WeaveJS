@@ -104,6 +104,7 @@ module.exports = function (grunt) {
             olcss: {expand: true, flatten: true, cwd: 'node_modules/openlayers/css', src: 'ol.css', dest: 'dist/'},
             fontawesomecss: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/css', src: 'font-awesome.css', dest: 'dist/css/'},
             fontawesomefont: {expand: true, flatten: true, cwd: 'node_modules/font-awesome/fonts', src: '*', dest: 'dist/fonts/'},
+            virtualizedcss: {expand: true, flatten: true, cwd: 'node_modules/react-virtualized', src: 'styles.css', dest: 'dist/styles'},
 	    semantic: {expand: true, cwd: 'src/semantic', src: '**', dest: 'dist/semantic/'},
             weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"},
             projdb: {expand: true, flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"}
