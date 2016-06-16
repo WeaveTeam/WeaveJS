@@ -195,9 +195,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			FileDialog.open(this.menus.context, this.menus.fileMenu.load, true /* skip confirmation dialog */);
 	}
 
-	handleSideBarClose=()=>
+	handleSideBarClose=(editor:WeaveToolEditor)=>
 	{
-		this.setState({ toolPathToEdit: null });
+		if (this.props.weave.getObject(this.state.toolPathToEdit) == editor.tool)
+			this.setState({ toolPathToEdit: null });
 	};
 
 	/**
