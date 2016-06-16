@@ -213,11 +213,10 @@ export default class C3Histogram extends AbstractC3Tool
                         format: (num:number):string => {
                             if (this.element)
                             {
-                                var labelHeight:number = Number(this.margin.bottom)/Math.cos(45*(Math.PI/180));
                                 var labelString:string = Weave.lang(this.getLabelString(num));
                                 if (labelString)
                                 {
-									return this.formatXAxisLabel(labelString);
+									return this.formatXAxisLabel(labelString,this.xAxisLabelAngle.value);
                                 }
                                 else
                                 {

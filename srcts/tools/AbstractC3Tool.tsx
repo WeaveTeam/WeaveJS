@@ -396,19 +396,70 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
         return this.props.fontSize + "pt " + this.props.font;
     }
 
-	formatXAxisLabel(label:string):string
+	/**
+	 *
+	 * @param label
+	 * @param angle
+	 * @returns {number}
+	 */
+	getRotatedLabelHeight(label:string, angle:number):number
 	{
-		var labelHeight:number = this.margin.bottom.value - DOMUtils.getTextHeight(label,this.getFontString());
-		var stringSize:number = DOMUtils.getTextWidth(label, this.getFontString());
-		var adjustmentCharacters:number = label.length - Math.floor(label.length * (labelHeight / stringSize));
-		//check if its necessary to put the ellipsis
-		if((adjustmentCharacters - 3) > 0) {
-			var middleIndex:number = Math.floor(label.length/2);
-			var startCut:number = middleIndex - Math.floor(adjustmentCharacters/2);
-			var endCut:number = middleIndex + Math.ceil(adjustmentCharacters/2);
-			var middle:string = label.slice(startCut, endCut);
-			return label.replace(middle, '...');
+		let labelLengthRatio:number = Math.cos(Math.abs(angle)*(Math.PI/180));
+		let labelHeightRatio:number = Math.sin(Math.abs(angle)*(Math.PI/180));
+		var stringHeightFromLength:number = DOMUtils.getTextWidth(label, this.getFontString()) * labelLengthRatio;
+		var stringHeightFromHeight:number = DOMUtils.getTextHeight(label, this.getFontString()) * labelHeightRatio;
+
+		return stringHeightFromHeight + stringHeightFromLength;
+	}
+
+	/**
+	 * Truncate a string from the middle by 'adj' characters and replace with 'replacement'
+	 * @param str String to truncate.
+	 * @param adj Number of characters to remove from the middle.
+	 * @param replacement String to put in place of removed content.
+	 * @returns {string} The string that results from removing 'adj' characters and replacing with 'replacement'
+	 */
+	centerEllipseString(str:string, adj:number, replacement:string)
+	{
+		var middleIndex:number = Math.floor(str.length/2);
+		var startCut:number = middleIndex - Math.floor(adj/2);
+		var endCut:number = middleIndex + Math.floor(adj/2)+adj%2;
+		return str.slice(0, startCut) + replacement + str.slice(endCut);
+	}
+
+	formatXAxisLabel(label:string, angle:number):string
+	{
+		if(Array.isArray(label) && label.length)
+			label = label[0];
+
+		let adjustment = 0;
+		let labelHeight = this.getRotatedLabelHeight(label, angle);
+		let truncatedLabel:string = label;
+		while (labelHeight > this.margin.bottom.value && adjustment < label.length)
+		{
+			adjustment++;
+			truncatedLabel = this.centerEllipseString(label, adjustment, "\u2026"); //unicode "..."
+			labelHeight = this.getRotatedLabelHeight(truncatedLabel, angle);
 		}
-		return label;
+
+		return truncatedLabel;
+	}
+
+	formatYAxisLabel(label:string, angle:number):string
+	{
+		if(Array.isArray(label) && label.length)
+			label = label[0];
+
+		let adjustment = 0;
+		let labelWidth = DOMUtils.getTextWidth(label, this.getFontString());
+		let truncatedLabel:string = label;
+		while (labelWidth > (weavejs.WeaveAPI.Locale.reverseLayout ? this.margin.right.value:this.margin.left.value) && adjustment < label.length)
+		{
+			adjustment++;
+			truncatedLabel = this.centerEllipseString(label, adjustment, "\u2026"); //unicode "..."
+			labelWidth = DOMUtils.getTextWidth(label, this.getFontString());
+		}
+
+		return truncatedLabel;
 	}
 }

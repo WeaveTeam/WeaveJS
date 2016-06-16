@@ -54,6 +54,14 @@ const GROUPING_MODES:ComboBoxOption[] = [
 	{label: "Stacked Bars", value: STACK},
 	{label: "100% Stacked Bars", value: PERCENT_STACK}
 ];
+const BOTTOM:string = 'bottom';
+const RIGHT:string = 'right';
+const INSET:string = 'inset';
+const LEGEND_POSITIONS:ComboBoxOption[] = [
+	{label: "Bottom", value: BOTTOM},
+	{label: "Right", value: RIGHT},
+	{label: "Inset", value: INSET}
+];
 
 export default class C3BarChart extends AbstractC3Tool
 {
@@ -63,6 +71,7 @@ export default class C3BarChart extends AbstractC3Tool
     colorColumn = Weave.linkableChild(this, new AlwaysDefinedColumn("#808080"));
     chartColors = Weave.linkableChild(this, new ColorRamp(ColorRamp.getColorRampByName("Paired")));
     groupingMode = Weave.linkableChild(this, new LinkableString(STACK, this.verifyGroupingMode));
+	legendPosition = Weave.linkableChild(this, new LinkableString(BOTTOM, this.verifyLegendPosition));
     horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
     showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
     showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
@@ -72,6 +81,11 @@ export default class C3BarChart extends AbstractC3Tool
     private verifyGroupingMode(mode:string):boolean
 	{
 		return [GROUP, STACK, PERCENT_STACK].indexOf(mode) >= 0;
+	}
+
+	private verifyLegendPosition(position:string):boolean
+	{
+		return [BOTTOM, RIGHT, INSET].indexOf(position) >= 0;
 	}
 
     get yLabelColumn():IAttributeColumn
@@ -179,7 +193,13 @@ export default class C3BarChart extends AbstractC3Tool
 	                            return null;
 
 	                        if(record)
-	                            return Weave.lang(this.labelColumn.getValueFromKey(record.id));// otherwise return the value from the labelColumn
+	                        {
+		                        let valFromKey = Weave.lang(this.labelColumn.getValueFromKey(record.id));
+		                        if(this.horizontalMode.value)
+			                        return this.formatYAxisLabel(valFromKey,this.xAxisLabelAngle.value);
+		                        return this.formatXAxisLabel(valFromKey,this.xAxisLabelAngle.value);// otherwise return the value from the labelColumn
+
+	                        }
 
 	                        return null;
                         }
@@ -202,7 +222,7 @@ export default class C3BarChart extends AbstractC3Tool
             },
             legend: {
                 show: false,
-                position: "bottom"
+                position: this.legendPosition.value
             }
         });
 
@@ -513,6 +533,12 @@ export default class C3BarChart extends AbstractC3Tool
             (this.c3Config.bar.width as {ratio:number}).ratio = this.barWidthRatio.value;
 		}
 
+	    if (Weave.detectChange(this, this.legendPosition))
+	    {
+		    changeDetected = true;
+		    this.c3Config.legend.position = this.legendPosition.value;
+	    }
+
         if (changeDetected || forced)
 			return true;
 		
@@ -558,6 +584,10 @@ export default class C3BarChart extends AbstractC3Tool
 					[
 						Weave.lang("Grouping mode"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
+					],
+					Weave.beta && this.c3Config.legend.show && [
+						Weave.lang("Legend Position (beta)"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.legendPosition })} options={LEGEND_POSITIONS}/>
 					],
 					Weave.beta && [
 						Weave.lang("Horizontal bars (beta)"),
