@@ -435,7 +435,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		let adjustment = 0;
 		let labelHeight = this.getRotatedLabelHeight(label, angle);
 		let truncatedLabel:string = label;
-		while (labelHeight > this.margin.bottom.value && adjustment < label.length)
+		while (labelHeight > (this.margin.bottom.value - 20) && adjustment < label.length)
 		{
 			adjustment++;
 			truncatedLabel = this.centerEllipseString(label, adjustment, "\u2026"); //unicode "..."

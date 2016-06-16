@@ -13,6 +13,7 @@ import ReactUtils from "../utils/ReactUtils";
 import {ComboBoxOption} from "../semantic-ui/ComboBox";
 import Accordion from "../semantic-ui/Accordion";
 import ChartUtils from "../utils/ChartUtils";
+import StatefulTextField from "../ui/StatefulTextField";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -537,6 +538,10 @@ export default class C3BarChart extends AbstractC3Tool
 	    {
 		    changeDetected = true;
 		    this.c3Config.legend.position = this.legendPosition.value;
+		    if(this.legendPosition.value == RIGHT)
+			    this.c3Config.padding.right = null;
+		    else
+			    this.c3Config.padding.right = this.margin.right.value;
 	    }
 
         if (changeDetected || forced)
@@ -573,6 +578,23 @@ export default class C3BarChart extends AbstractC3Tool
         return Weave.lang("Bar Chart of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
     }
 
+	getMarginEditor():React.ReactChild[][]
+	{
+		return [
+			[
+				Weave.lang("Margins"),
+				<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
+					<StatefulTextField type="number" style={{textAlign: "center", flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.left})}/>
+					<VBox className="weave-padded-vbox" style={{flex: 1}}>
+						<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.top})}/>
+						<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.bottom})}/>
+					</VBox>
+					<StatefulTextField type="number" disabled={this.legendPosition.value == "right"} style={{textAlign: "center", flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.right})}/>
+				</HBox>
+			]
+		];
+	}
+
     //todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void = null):JSX.Element =>
 	{
@@ -585,7 +607,7 @@ export default class C3BarChart extends AbstractC3Tool
 						Weave.lang("Grouping mode"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
 					],
-					Weave.beta && this.c3Config.legend.show && [
+					this.c3Config.legend.show && [
 						Weave.lang("Legend Position (beta)"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.legendPosition })} options={LEGEND_POSITIONS}/>
 					],
