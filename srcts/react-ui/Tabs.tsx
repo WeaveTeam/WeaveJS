@@ -75,7 +75,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 		return (
 			<div
 				className={classNames(this.props.tabContainerClassName || "weave-tab-container", this.props.location)}
-			    style={_.merge({}, this.props.style, {flex: 1, display: "flex", flexDirection: this.props.location === BOTTOM ? "column" : "column-reverse"})}
+			    style={_.merge({}, this.props.style, {overflow: "hidden", flex: 1, display: "flex", flexDirection: this.props.location === BOTTOM ? "column" : "column-reverse"})}
 			>
 				<VBox key="content" className={classNames(this.props.tabContentClassName || "weave-tab-content", this.props.location)} style={{flex: 1, overflow: "auto"}}>
 					{
