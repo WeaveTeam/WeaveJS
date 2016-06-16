@@ -14,7 +14,7 @@ import LinkableWatcher = weavejs.core.LinkableWatcher;
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
 	tool:IVisTool;
-	onCloseHandler:() => void;
+	onCloseHandler:(editor:WeaveToolEditor) => void;
 }
 
 export interface WeaveToolEditorState
@@ -126,7 +126,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	componentWillUpdate()
 	{
 		if (!this.tool && this.props.onCloseHandler) // this ensures when tool is removed close handler is called
-			this.props.onCloseHandler();
+			this.props.onCloseHandler(this);
 	}
 
 	// Has to be handled here as this.refs[this.state.activeCrumb] will be availble only at this stage of the React Component cycle
@@ -144,7 +144,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	componentWillUnmount()
 	{
 		if (this.props.onCloseHandler) // this ensures when tool is removed close handler is called
-			this.props.onCloseHandler();
+			this.props.onCloseHandler(this);
 	}
 
 	private activeEditor:Element;
@@ -261,7 +261,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						:	null
 					}
 					<Button
-						onClick={ () => this.props.onCloseHandler() }
+						onClick={ () => this.props.onCloseHandler(this) }
 					    title="Close editor">
 						&#x2715;
 					</Button>
