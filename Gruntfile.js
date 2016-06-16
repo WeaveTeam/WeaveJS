@@ -121,7 +121,7 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-minifyify');
-    grunt.registerTask('distcopy', ['copy:index_html', 'copy:weave_html', 'copy:olcss', 'copy:css', 'copy:fontawesomecss', 'copy:fontawesomefont', 'copy:semantic', 'copy:projdb']);
+    grunt.registerTask('distcopy', ['copy:index_html', 'copy:weave_html', 'copy:olcss', 'copy:css', 'copy:fontawesomecss', 'copy:fontawesomefont', 'copy:semantic', 'copy:projdb', 'copy:fonts']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);
     grunt.registerTask('distlibs', ['browserify:distlibs']);
     grunt.registerTask('default', ['ts', 'babel', 'browserify:dev', 'copy']);
