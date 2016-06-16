@@ -218,9 +218,12 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	 */
 	handleBeforeUnload=(event:BeforeUnloadEvent)=>
 	{
-		var confirmationMessage = Weave.lang("Are you sure you want to exit?");
-		event.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
-		return confirmationMessage;              // Gecko, WebKit, Chrome <34
+		if (this.popout_windows.size)
+		{
+			var confirmationMessage = Weave.lang("You are about to close multiple Weave windows.");
+			event.returnValue = confirmationMessage; // Gecko, Trident, Chrome 34+
+			return confirmationMessage;              // Gecko, WebKit, Chrome <34
+		}
 	};
 
 	handleGearClick=(tool:WeaveTool):void=>
