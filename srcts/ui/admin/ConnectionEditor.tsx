@@ -213,7 +213,7 @@ MySQL does not differentiate between the two.`;
 		switch (this.state.editorMode) {
 			case ConnectionInfo.SQLITE:
 				dbEditorDefs = [
-					["SQLite Database File", "dbServerPort", "text", Weave.lang("An absolute path to an SQLite database file. Ensure that your application server has permission to access this file"), null]
+					["SQLite Database File", "dbDatabaseName", "text", Weave.lang("An absolute path to an SQLite database file. Ensure that your application server has permission to access this file"), null]
 				];
 				break;
 			case ConnectionInfo.MYSQL:
