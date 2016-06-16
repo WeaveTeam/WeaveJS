@@ -43,7 +43,7 @@ export default class SystemMenu implements MenuBarItemProps
 			{},
 			{
 				enabled: false,
-				label: "Version: 2.0"
+				label: "Version: 2.1"
 			},
 			{},
 			{
