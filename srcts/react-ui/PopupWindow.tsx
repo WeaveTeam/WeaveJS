@@ -136,7 +136,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	componentWillUnmount()
 	{
-		ReactUtils.getDocument(this).removeEventListener("keyup", this.onKeyDown);
+		ReactUtils.getDocument(this).removeEventListener("keydown", this.onKeyDown);
 	}
 
 	renderOverlay(modal:boolean)
