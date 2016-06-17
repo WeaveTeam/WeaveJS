@@ -273,6 +273,10 @@ declare module __global__ {
          * For testing purposes.
          */
         stringifyState(...pathOrType: any[]): string;
+        /**
+         * Shortcut for DebugUtils.debugId() and DebugUtils.debugLookup()
+         */
+        static id(arg?: any): any;
     }
 }
 import Weave = __global__.Weave;
@@ -3852,7 +3856,7 @@ declare module weavejs.core {
          * For debugging, returns debugIds for active tasks.
          */
         debugTasks(): any[];
-        getDescriptions(): any[];
+        getDescriptions(): Array<[any, number, string]>;
         getTaskCount(): number;
         addTask(taskToken: Object, busyObject?: ILinkableObject, description?: string): void;
         hasTask(taskToken: Object): boolean;
@@ -9476,8 +9480,10 @@ declare module weavejs.util {
         static isPrimitive(value: any): boolean;
         /**
          * Makes a deep copy of an object.
+         * @param allowNonPrimitiveRefs If allowNonPrimitiveRefs is true, references to non-primitive objects will be allowed.
+         *                              If allowNonPrimitiveRefs is false, an error will be thrown if a non-primitive object is found.
          */
-        static copyObject<T>(object: T): T;
+        static copyObject<T>(object: T, allowNonPrimitiveRefs?: boolean): T;
         /**
          * AS->JS Language helper for binding class instance functions
          */

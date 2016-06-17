@@ -6,6 +6,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as d3 from "d3";
 import * as c3 from "c3";
+import C3Chart from "./C3Chart";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import * as jquery from "jquery";
 import DOMUtils from "../utils/DOMUtils";
@@ -62,7 +63,6 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		
 		var self = this;
 		this.c3Config = {
-			bindto: null,
 			size: {},
 			padding: {
 				top: 0,
@@ -96,8 +96,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 						this.handleC3MouseOut(d);
 				}
 			},
-            onrendered: function() {
-				self.chart = this.api;
+			onrendered: function() {
 				self.handleC3Render();
 			}
 		};
@@ -125,11 +124,6 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	{
 		ReactUtils.closePopup(this.toolTip);
 		MouseUtils.removePointClickListener(this.element, this.handlePointClick);
-		if (this.chart)
-		{
-			this.chart.destroy();
-			this.chart = null;
-		}
 	}
 
     componentDidUpdate():void
@@ -165,21 +159,36 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
         }
     }
 	
-    render():JSX.Element
-    {
-        return <div ref={(c:HTMLElement) => { this.element = c;}} style={{flex: 1, overflow: "hidden"}} onMouseLeave={ () => this.toolTip.hide() }>
-			<div ref={(c:HTMLElement) => { this.c3Config.bindto = c;}}/>
-		</div>;
-    }
+	render():JSX.Element
+	{
+		return (
+			<div
+				ref={(c:HTMLElement) => { this.element = c;}}
+				style={{flex: 1, overflow: "hidden"}}
+				onMouseLeave={ () => this.toolTip.hide() }
+			>
+				<C3Chart
+					config={weavejs.util.JS.copyObject(this.c3Config, true)}
+					ref={(c:C3Chart) => {
+						this.chartComponent = c;
+						this.chart = c && c.chart
+						if (this.chart)
+							this.handleC3Render();
+					}}
+				/>
+			</div>
+		);
+	}
 
 	protected toolTip:ToolTip;
 	protected element:HTMLElement;
-    protected chart:c3.ChartAPI;
-    protected c3Config:c3.ChartConfiguration;
-    private xAxisClass:AxisClass;
-    private yAxisClass:AxisClass;
-    private y2AxisClass:AxisClass;
-    private busy:boolean;
+	protected chartComponent:C3Chart;
+	protected chart:c3.ChartAPI;
+	protected c3Config:c3.ChartConfiguration;
+	private xAxisClass:AxisClass;
+	private yAxisClass:AxisClass;
+	private y2AxisClass:AxisClass;
+	private busy:boolean;
 
 	private debouncedHandleC3Selection:Function;
 	private debouncedHandleChange:Function;
@@ -193,18 +202,26 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	{
 		if (!Weave.wasDisposed(this) && !Weave.isBusy(this) && !this.busy && this.validate(!this.chart))
 		{
-            this.busy = true;
-            c3.generate(this.c3Config);
+			this.busy = true;
+			if (this.chart && _.isEqual(this.chartComponent.props.config, this.c3Config))
+				this.chart.flush();
+			else
+				this.forceUpdate();
 		}
 	}
 
 	protected handleC3Render():void
 	{
+		if (!this.chart)
+			return;
+		
 		this.busy = false;
 		this.handleChange();
-		if (!this.busy)
-			this.cullAxes();
-		if(this.element && this.chart) {
+		if (this.busy)
+			return;
+
+		this.cullAxes();
+		if (this.element && this.chart) {
 			$(this.element).find(".c3-chart").each( (i,e) => {
 				e.addEventListener("mouseout", (event) => {
 					this.handleC3MouseOut(event);
