@@ -167,13 +167,13 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		{
 			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable); // || this.menus.fileMenu.pingAdminConsole(); TODO: Discuss this behavior
 
+			var weaveExternalTools:any;
 			try
 			{
-				var weaveExternalTools:any = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
+				weaveExternalTools = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
 			}
 			catch (e)
 			{
-				console.error(e);
 			}
 
 			if (this.urlParams.file)
