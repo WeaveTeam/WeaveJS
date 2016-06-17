@@ -35,9 +35,6 @@ import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
 import DynamicState = weavejs.api.core.DynamicState;
 
-
-const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
-
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
 	rootApp?:WeaveApp;
@@ -167,15 +164,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		{
 			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable); // || this.menus.fileMenu.pingAdminConsole(); TODO: Discuss this behavior
 
-			var weaveExternalTools:any;
-			try
-			{
-				weaveExternalTools = window.opener && (window.opener as any)[WEAVE_EXTERNAL_TOOLS];
-			}
-			catch (e)
-			{
-			}
-
+			var weaveExternalTools:any = Weave.getDefinition('window.opener.WeaveExternalTools');
 			if (this.urlParams.file)
 			{
 				// read content from url
