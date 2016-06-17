@@ -47,15 +47,15 @@ declare type CullingMetric = {
 
 export interface IAbstractC3ToolProps extends IVisToolProps
 {
-    font?:string;
-    fontSize?:number;
+	font?:string;
+	fontSize?:number;
 }
 
 export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps, IVisToolState>
 {
-    constructor(props:IVisToolProps)
+	constructor(props:IVisToolProps)
 	{
-        super(props);
+		super(props);
 		
 		this.debouncedHandleC3Selection = _.debounce(this.handleC3Selection.bind(this), 0);
 		this.debouncedHandleChange = _.debounce(this.handleChange.bind(this), 30);
@@ -72,7 +72,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 			},
 			interaction: { brighten: false },
 			transition: { duration: 0 },
-            tooltip: { show: false },
+			tooltip: { show: false },
 			data: {
 				selection: {
 					enabled: true,
@@ -96,27 +96,27 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 						this.handleC3MouseOut(d);
 				}
 			},
-            onrendered: function() {
+			onrendered: function() {
 				self.chart = this.api;
 				self.handleC3Render();
 			}
 		};
 		
-        this.xAxisClass = {axis: "c3-axis-x", grid: "c3-xgrid"};
-        this.yAxisClass = {axis: "c3-axis-y", grid: "c3-ygrid"};
-        this.y2AxisClass = {axis: "c3-axis-y2", grid: "c3-ygrid"};
+		this.xAxisClass = {axis: "c3-axis-x", grid: "c3-xgrid"};
+		this.yAxisClass = {axis: "c3-axis-y", grid: "c3-ygrid"};
+		this.y2AxisClass = {axis: "c3-axis-y2", grid: "c3-ygrid"};
 		this.handlePointClick = this.handlePointClick.bind(this);
 		Weave.getCallbacks(this).addGroupedCallback(this, this.debouncedHandleChange, true);
 		
 		weavejs.WeaveAPI.Scheduler.frameCallbacks.addImmediateCallback(this, this.validateSize);
-    }
+	}
 	
 	componentDidMount()
 	{
 		super.componentDidMount();
 		
 		this.toolTip = ReactUtils.openPopup(this, <ToolTip/>) as ToolTip;
-        MouseUtils.addPointClickListener(this.element, this.handlePointClick);
+		MouseUtils.addPointClickListener(this.element, this.handlePointClick);
 		this.validateSize();
 		this.handleChange();
 	}
@@ -132,7 +132,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		}
 	}
 
-    componentDidUpdate():void
+	componentDidUpdate():void
 	{
 		this.validateSize();
 	}
@@ -141,7 +141,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	{
 		let menuItems:MenuItemProps[] = AbstractVisTool.getMenuItems(this);
 
-		if(Weave.beta)
+		if (Weave.beta)
 			menuItems.push({
 				label: Weave.lang("Print Tool (Beta)"),
 				click: PrintUtils.printTool.bind(null, this.element)
@@ -156,30 +156,30 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 			return;
 		var chartWidth = this.chart.internal && this.chart.internal.config && this.chart.internal.config.size_width;
 		var chartHeight = this.chart.internal && this.chart.internal.config && this.chart.internal.config.size_height;
-        if (chartWidth != this.element.clientWidth || chartHeight != this.element.clientHeight)
+		if (chartWidth != this.element.clientWidth || chartHeight != this.element.clientHeight)
 		{
-            this.c3Config.size = { width: this.element.clientWidth, height: this.element.clientHeight };
+			this.c3Config.size = { width: this.element.clientWidth, height: this.element.clientHeight };
 			if (this.chart)
-	            this.chart.resize({ width: this.element.clientWidth, height: this.element.clientHeight });
-            this.cullAxes();
-        }
-    }
+				this.chart.resize({ width: this.element.clientWidth, height: this.element.clientHeight });
+			this.cullAxes();
+		}
+	}
 	
-    render():JSX.Element
-    {
-        return <div ref={(c:HTMLElement) => { this.element = c;}} style={{flex: 1, overflow: "hidden"}} onMouseLeave={ () => this.toolTip.hide() }>
+	render():JSX.Element
+	{
+		return <div ref={(c:HTMLElement) => { this.element = c;}} style={{flex: 1, overflow: "hidden"}} onMouseLeave={ () => this.toolTip.hide() }>
 			<div ref={(c:HTMLElement) => { this.c3Config.bindto = c;}}/>
 		</div>;
-    }
+	}
 
 	protected toolTip:ToolTip;
 	protected element:HTMLElement;
-    protected chart:c3.ChartAPI;
-    protected c3Config:c3.ChartConfiguration;
-    private xAxisClass:AxisClass;
-    private yAxisClass:AxisClass;
-    private y2AxisClass:AxisClass;
-    private busy:boolean;
+	protected chart:c3.ChartAPI;
+	protected c3Config:c3.ChartConfiguration;
+	private xAxisClass:AxisClass;
+	private yAxisClass:AxisClass;
+	private y2AxisClass:AxisClass;
+	private busy:boolean;
 
 	private debouncedHandleC3Selection:Function;
 	private debouncedHandleChange:Function;
@@ -193,8 +193,8 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	{
 		if (!Weave.wasDisposed(this) && !Weave.isBusy(this) && !this.busy && this.validate(!this.chart))
 		{
-            this.busy = true;
-            c3.generate(this.c3Config);
+			this.busy = true;
+			c3.generate(this.c3Config);
 		}
 	}
 
@@ -204,7 +204,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		this.handleChange();
 		if (!this.busy)
 			this.cullAxes();
-		if(this.element && this.chart) {
+		if (this.element && this.chart) {
 			$(this.element).find(".c3-chart").each( (i,e) => {
 				e.addEventListener("mouseout", (event) => {
 					this.handleC3MouseOut(event);
@@ -237,41 +237,41 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		return forced;
 	}
 	
-    get internalWidth():number
-    {
-        return this.c3Config.size.width - this.c3Config.padding.left - this.c3Config.padding.right;
-    }
+	get internalWidth():number
+	{
+		return this.c3Config.size.width - this.c3Config.padding.left - this.c3Config.padding.right;
+	}
 
-    get internalHeight():number
-    {
-        return this.c3Config.size.height - this.c3Config.padding.top - this.margin.bottom.value;
-    }
+	get internalHeight():number
+	{
+		return this.c3Config.size.height - this.c3Config.padding.top - this.margin.bottom.value;
+	}
 	
 	protected updateConfigMargin()
 	{
-	    this.c3Config.padding.top = this.margin.top.value;
+		this.c3Config.padding.top = this.margin.top.value;
 		
 		if (this.c3Config.axis && this.c3Config.axis.x)
-		    this.c3Config.axis.x.height = this.margin.bottom.value;
+			this.c3Config.axis.x.height = this.margin.bottom.value;
 		else
 			this.c3Config.padding.bottom = this.margin.bottom.value;
-	    
+		
 		if (weavejs.WeaveAPI.Locale.reverseLayout)
-	    {
-	        this.c3Config.padding.left = this.margin.right.value;
-	        this.c3Config.padding.right = this.margin.left.value;
-	    }
-	    else
-	    {
-	        this.c3Config.padding.left = this.margin.left.value;
-	        this.c3Config.padding.right = this.margin.right.value;
-	    }
+		{
+			this.c3Config.padding.left = this.margin.right.value;
+			this.c3Config.padding.right = this.margin.left.value;
+		}
+		else
+		{
+			this.c3Config.padding.left = this.margin.left.value;
+			this.c3Config.padding.right = this.margin.right.value;
+		}
 	}
 	
 	protected updateConfigAxisX()
 	{
 		this.c3Config.axis.x.min = finiteOrNull(this.overrideBounds.xMin.value);
-        this.c3Config.axis.x.max = finiteOrNull(this.overrideBounds.xMax.value);
+		this.c3Config.axis.x.max = finiteOrNull(this.overrideBounds.xMax.value);
 	}
 
 	protected updateConfigAxisY()
@@ -281,12 +281,12 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		if (this.c3Config.axis.y)
 		{
 			this.c3Config.axis.y.min = yMin;
-        	this.c3Config.axis.y.max = yMax;
+			this.c3Config.axis.y.max = yMax;
 		}
 		if (this.c3Config.axis.y2)
 		{
 			this.c3Config.axis.y2.min = yMin;
-        	this.c3Config.axis.y2.max = yMax;
+			this.c3Config.axis.y2.max = yMax;
 		}
 	}
 
@@ -295,17 +295,17 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		AbstractVisTool.handlePointClick(this, event);
 	}
 	
-    private cullAxis(axisSize:number, axisClass:AxisClass):void
-    {
-        //axis label culling
+	private cullAxis(axisSize:number, axisClass:AxisClass):void
+	{
+		//axis label culling
 		var cullingMetric:CullingMetric = this._getCullingMetrics(axisSize,axisClass.axis);
-        var intervalForCulling:number = cullingMetric.interval;
-        d3.select(this.element).selectAll('.' + axisClass.axis + ' .tick text').each(function (e, index) {
-            if (index >= 0)
+		var intervalForCulling:number = cullingMetric.interval;
+		d3.select(this.element).selectAll('.' + axisClass.axis + ' .tick text').each(function (e, index) {
+			if (index >= 0)
 			{
-                d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
-            }
-        });
+				d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
+			}
+		});
 		//grid line culling
 		var gridCullingInterval:number = this.getInterval('.' + axisClass.grid,cullingMetric.displayed);
 		d3.select(this.element).selectAll('.' + axisClass.grid).each(function (e, index) {
@@ -322,42 +322,46 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 				d3.select(this).style('display', index % tickCullingInterval ? 'none' : 'block');
 			}
 		});
-    }
+	}
 
-    protected cullAxes()
-    {
-        this.cullAxis(this.internalWidth, this.xAxisClass);
-        this.cullAxis(this.internalHeight, weavejs.WeaveAPI.Locale.reverseLayout ? this.y2AxisClass : this.yAxisClass);
-    }
-
-    customStyle(array:Array<number>, type:string, filter:string, style:any)
-    {
-        var filtered = d3.select(this.element).selectAll(type).filter(filter);
-        if (filtered.length)
-        {
-            array.forEach((index) => {
-                    d3.select(filtered[0][index]).style(style);
-            });
-        }
-    }
-
-    customSelectorStyle(array:Array<number>, selector:any, style:any)
-    {
-        array.forEach( (index) => {
-            if (selector.length)
-                d3.select(selector[0][index]).style(style);
-        });
-    }
-	
-    private _getCullingMetrics(size:number,axisClass:string):CullingMetric
+	protected cullAxes()
 	{
-        var textHeight:number = DOMUtils.getTextHeight("test", this.getFontString());
-        var labelsToShow:number = Math.floor(size / textHeight);
-        labelsToShow = Math.max(2,labelsToShow);
+		this.cullAxis(this.internalWidth, this.xAxisClass);
+		this.cullAxis(this.internalHeight, weavejs.WeaveAPI.Locale.reverseLayout ? this.y2AxisClass : this.yAxisClass);
+	}
 
-        var tickValues:number = d3.select(this.element).selectAll('.' + axisClass + ' .tick text').size();
-		return {interval: this.getInterval('.' + axisClass + ' .tick text',labelsToShow), total:tickValues, displayed:labelsToShow};
-    }
+	customStyle(array:Array<number>, type:string, filter:string, style:any)
+	{
+		var filtered = d3.select(this.element).selectAll(type).filter(filter);
+		if (filtered.length)
+		{
+			array.forEach((index) => {
+					d3.select(filtered[0][index]).style(style);
+			});
+		}
+	}
+
+	customSelectorStyle(array:Array<number>, selector:any, style:any)
+	{
+		array.forEach( (index) => {
+			if (selector.length)
+				d3.select(selector[0][index]).style(style);
+		});
+	}
+	
+	private _getCullingMetrics(size:number,axisClass:string):CullingMetric
+	{
+		var textHeight:number = DOMUtils.getTextHeight("test", this.getFontString());
+		var labelsToShow:number = Math.floor(size / textHeight);
+		labelsToShow = Math.max(2, labelsToShow);
+
+		var tickValues:number = d3.select(this.element).selectAll('.' + axisClass + ' .tick text').size();
+		return {
+			interval: this.getInterval('.' + axisClass + ' .tick text', labelsToShow),
+			total: tickValues,
+			displayed: labelsToShow
+		};
+	}
 
 	getInterval(classSelector:string, requiredValues:number)
 	{
@@ -374,10 +378,10 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		return interval;
 	}
 
-    getFontString():string
-    {
-        return this.props.fontSize + "pt " + this.props.font;
-    }
+	getFontString():string
+	{
+		return this.props.fontSize + "pt " + this.props.font;
+	}
 
 	/**
 	 *
@@ -387,8 +391,8 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	 */
 	getRotatedLabelHeight(label:string, angle:number):number
 	{
-		let labelLengthRatio:number = Math.cos(Math.abs(angle)*(Math.PI/180));
-		let labelHeightRatio:number = Math.sin(Math.abs(angle)*(Math.PI/180));
+		let labelLengthRatio:number = Math.cos(Math.abs(angle)*(Math.PI / 180));
+		let labelHeightRatio:number = Math.sin(Math.abs(angle)*(Math.PI / 180));
 		var stringHeightFromLength:number = DOMUtils.getTextWidth(label, this.getFontString()) * labelLengthRatio;
 		var stringHeightFromHeight:number = DOMUtils.getTextHeight(label, this.getFontString()) * labelHeightRatio;
 
@@ -404,15 +408,15 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	 */
 	centerEllipseString(str:string, adj:number, replacement:string)
 	{
-		var middleIndex:number = Math.floor(str.length/2);
-		var startCut:number = middleIndex - Math.floor(adj/2);
-		var endCut:number = middleIndex + Math.floor(adj/2)+adj%2;
+		var middleIndex:number = Math.floor(str.length / 2);
+		var startCut:number = middleIndex - Math.floor(adj / 2);
+		var endCut:number = middleIndex + Math.floor(adj / 2) + adj % 2;
 		return str.slice(0, startCut) + replacement + str.slice(endCut);
 	}
 
 	formatXAxisLabel(label:string, angle:number):string
 	{
-		if(Array.isArray(label) && label.length)
+		if (Array.isArray(label) && label.length)
 			label = label[0];
 
 		let adjustment = 0;
@@ -430,13 +434,13 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 
 	formatYAxisLabel(label:string, angle:number):string
 	{
-		if(Array.isArray(label) && label.length)
+		if (Array.isArray(label) && label.length)
 			label = label[0];
 
 		let adjustment = 0;
 		let labelWidth = DOMUtils.getTextWidth(label, this.getFontString());
 		let truncatedLabel:string = label;
-		while (labelWidth > (weavejs.WeaveAPI.Locale.reverseLayout ? this.margin.right.value:this.margin.left.value) && adjustment < label.length)
+		while (labelWidth > (weavejs.WeaveAPI.Locale.reverseLayout ? this.margin.right.value : this.margin.left.value) && adjustment < label.length)
 		{
 			adjustment++;
 			truncatedLabel = this.centerEllipseString(label, adjustment, "\u2026"); //unicode "..."
