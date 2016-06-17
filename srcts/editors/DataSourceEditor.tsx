@@ -46,6 +46,9 @@ export interface IDataSourceEditorState
 	selectedLeaf?: IWeaveTreeNode;
 	showPreviewView?: boolean;
 	guideToTab?:string;
+
+	previewWidth?: number;
+	previewHeight?: number;
 };
 
 export default class DataSourceEditor extends SmartComponent<IDataSourceEditorProps, IDataSourceEditorState> 
@@ -225,7 +228,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 
 		let flexColumns = columns.map((iac,index)=>
 		{
-			return (<ReactVirtualized.FlexColumn cellDataGetter={cellDataGetter} key={index} dataKey="ignored" width={125} columnData={iac} label={iac.getMetadata("title")}/>);
+			return (<ReactVirtualized.FlexColumn flexGrow={1} cellDataGetter={cellDataGetter} key={index} dataKey="ignored" width={125} columnData={iac} label={iac.getMetadata("title")}/>);
 		});
 		_.assign(columnTitles, {id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key")});
 			// <FixedDataTable rows={rows}
@@ -238,16 +241,22 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let keys: IQualifiedKey[];
 		if (columns.length)
 		{
-			keys = columns[0].keys;	
+			keys = columns[0].keys;
 		}
 		else
 		{
 			keys = [];
 		}
 		return (
-			<ReactVirtualized.FlexTable rowHeight={16} headerHeight={16} height={300} rowGetter={(data: { index: number }) => keys[data.index]} rowCount={keys.length} width={600}>
-				{flexColumns}
-			</ReactVirtualized.FlexTable>
+			<ResizingDiv onResize={(state)=>{this.setState({previewHeight: state.height, previewWidth: state.width})}}>
+				<ReactVirtualized.FlexTable 
+					headerHeight={16} 
+					height={this.state.previewHeight} width={this.state.previewWidth}
+					rowGetter={(data: { index: number }) => keys[data.index]} 
+					rowCount={keys.length} rowHeight={16}>
+					{flexColumns}
+				</ReactVirtualized.FlexTable>
+			</ResizingDiv>
 		);
 	};
 
