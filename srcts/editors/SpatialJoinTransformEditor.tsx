@@ -44,7 +44,7 @@ export default class SpatialJoinTransformEditor extends DataSourceEditor {
 						{Weave.lang('The keyType of the "X Coordinate" and "Y Coordinate" columns should match.') }
 					</HelpIcon>
 				</HBox>,
-				<SelectableAttributeComponent attributeName="X" attributes={attributes}/>
+				<SelectableAttributeComponent attributeName="Y" attributes={attributes}/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{ alignItems: "center", justifyContent: "flex-end" }}>
