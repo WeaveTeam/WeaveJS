@@ -168,7 +168,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
 
 		return (
-			<HBox className={className} style={{height: this.titleBarHeight}} onDoubleClick={this.onMaximizeClick}>
+			<HBox className={className} style={{alignItems: 'center', height: this.titleBarHeight}} onDoubleClick={this.onMaximizeClick}>
 				<HBox style={{display: showControls ? "flex" : "none"}}>
 					<CenteredIcon 
 						title={Weave.lang("Configure")}
