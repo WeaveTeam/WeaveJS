@@ -6,6 +6,11 @@ body {
 	margin: 0;
 	color: #333;
 	overflow: hidden;
+	line-height: normal;
+}
+
+p {
+	line-height: normal;
 }
 
 input[type=number]::-webkit-inner-spin-button,
