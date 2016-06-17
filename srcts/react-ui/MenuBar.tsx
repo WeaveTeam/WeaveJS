@@ -1,10 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import {HBox, VBox} from "./FlexBox";
+import {HBox} from "./FlexBox";
 import InteractiveTour from "./InteractiveTour";
 import {MenuItemProps} from "./Menu";
-import Menu from "./Menu";
 import Dropdown from "../semantic-ui/Dropdown";
 import classNames from "../modules/classnames";
 import ReactUtils from "../utils/ReactUtils";
@@ -24,8 +23,8 @@ export interface MenuBarProps extends React.HTMLProps<MenuBar>
 
 export interface MenuBarState
 {
-	showMenu?:boolean;
 	activeMenu?:number;
+	showMenu?:boolean;
 }
 
 export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
@@ -35,102 +34,73 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	{
 		super(props);
 		this.state = {
-			showMenu: false,
-			activeMenu: -1
+			activeMenu: -1,
+			showMenu:false
 		};
-		this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
-	}
-	
-	componentDidMount()
-	{
-		ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown);
-		// TODO Add touch events for mobile
-		this.element = ReactDOM.findDOMNode(this);
 	}
 
-	componentDidUpdate()
-	{
-	}
-	
-	componentWillUnmount()
-	{
-		ReactUtils.getDocument(this).removeEventListener("mousedown", this.onDocumentMouseDown);
-	}
 
-	onDocumentMouseDown(event:MouseEvent)
+	onMenubarItemClick(index:number, event:React.MouseEvent)
 	{
-		var elt = event.target;
+		let activeMenuIndex:number = this.state.activeMenu == index ? -1 : index;
+		this.setState({
+			activeMenu:activeMenuIndex
+		});
 
-		while( elt != null)
+		// this happens when same menuBar item is clicked
+		// so we need to get back to initial mode where no menu item is not showed on mouseEnter,
+		// till click event happens on one of the menubar item
+		// so deactivate show menu
+		if(activeMenuIndex == -1)
 		{
-			if(elt == this.element) {
-				return;
-			}
-			elt = (elt as HTMLElement).parentNode;
-		}
-		this.hideMenus();
-	}
-
-	hideMenus()
-	{
-		this.setState({
-			showMenu: false,
-			activeMenu: -1
-		});
-		Object.keys(this.refs).forEach( (ref,index) => {
-			let menuElement = ReactDOM.findDOMNode(this.refs[index]);
-			let menu = ($(menuElement) as any);
-			menu.dropdown('hide')
-		});
-	}
-
-	hideMenu(index:number)
-	{
-		this.setState({
-			showMenu: false,
-			activeMenu: -1
-		});
-		if(this.refs[index]) {
-			let menuElement = ReactDOM.findDOMNode(this.refs[index]);
-			let menu = ($(menuElement) as any);
-			menu.dropdown('hide')
-		}
-	}
-
-	showMenu(index:number)
-	{
-		this.setState({
-			showMenu: true,
-			activeMenu: index
-		});
-		if(this.refs[index]) {
-			let menuElement = ReactDOM.findDOMNode(this.refs[index]);
-			let menu = ($(menuElement) as any);
-			menu.dropdown('show')
-		}
-	}
-
-	onClick(index:number, event:React.MouseEvent)
-	{
-		if(this.state.showMenu && index === this.state.activeMenu)
-		{
-			// hide menu if click on menubaritem and the menu was already visible
-			this.hideMenu(index);
+			this.setState({
+				showMenu:false
+			});
 		}
 		else
 		{
-			this.showMenu(index);
+			// this happens when one of the menubar item is clicked for the first time
+			if(!this.state.showMenu)
+			{
+				this.setState({
+					showMenu:true
+				});
+			}
 		}
 	}
 
-	onMouseEnter(index:number, event:React.MouseEvent)
+	onMenubarItemMouseEnter(index:number, event:React.MouseEvent)
 	{
-		if(this.state.showMenu && index !== this.state.activeMenu)
+		// this happens , when you mouseEnter happens before click event
+		// we dont want to show menu if click event not happened on one of the menubar Item
+		if(this.state.activeMenu == -1)
 		{
-			this.hideMenus();
-			this.showMenu(index);
+			this.setState({ // Show menu is activated for mouseEnter,only  when its clicked first time on one of the menubar items
+				showMenu:false
+			});
 		}
+
+		// this scenario will happene, when we do mouseenter and leave the menubar
+		// while coming back to same menubar item we dont want to close it
+		if(this.state.activeMenu != index)
+		{
+			this.setState({
+				activeMenu: index
+			});
+		}
+
 	}
+
+	// fired when document mousedown event happens in a area not belongs to menubar items
+	menuBarItemCloseListener=()=>
+	{
+		// reset all
+		this.setState({
+			showMenu:false,
+			activeMenu:-1
+		});
+	};
+	
 	renderMenuBarItem(index:number, props:MenuBarItemProps):JSX.Element
 	{
 		var menuBarClass = classNames({
@@ -139,19 +109,21 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 			"weave-menubar-item-bold": !!props.bold
 		});
 
+
 		let dropdownProps:DropdownProps = {
 			className:menuBarClass,
 			menu:this.props.config[index].menu,
 			key:index,
-			action:"hide",
-			duration: 0,
 			id:props.label,
-			ref: InteractiveTour.isEnabled() ? InteractiveTour.getMountedTargetComponent : String(index),
-			onClick:() => {
-				this.onClick(index,null);
+			openOnMouseEnter:this.state.showMenu,
+			ref:InteractiveTour.getMountedTargetComponent ,
+			onClick:(event:React.MouseEvent) => {
+				this.onMenubarItemClick(index,event);
 				InteractiveTour.targetComponentOnClick(props.label)
 			},
-			onMouseEnter:this.onMouseEnter.bind(this, index),
+			open:this.state.activeMenu == index,
+			onMouseEnter:this.onMenubarItemMouseEnter.bind(this, index),
+			onClose:this.menuBarItemCloseListener
 		};
 		return (
 			<Dropdown {...dropdownProps}>
@@ -163,169 +135,14 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	render():JSX.Element
 	{
 		var style = _.merge({alignItems: 'center'}, this.props.style);
+		let menuBarItemsUI:JSX.Element[] = this.props.config.map((menuBarItemProps, index) => {
+												return this.renderMenuBarItem(index, menuBarItemProps)
+											});
 		return (
 			<HBox className="weave-menubar" {...this.props as React.HTMLAttributes} style={style}>
-				{
-					this.props.config.map((menuBarItemProps, index) => {
-						return this.renderMenuBarItem(index, menuBarItemProps)
-					})
-				}
+				{menuBarItemsUI}
 				{this.props.children}
 			</HBox>
 		)
 	}
 }
-
-/*
-
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import * as _ from "lodash";
-import {HBox, VBox} from "./FlexBox";
-import {MenuItemProps} from "./Menu";
-import Menu from "./Menu";
-import classNames from "../modules/classnames";
-
-export interface MenuBarItemProps
-{
-	label: string;
-	menu: MenuItemProps[];
-	bold?: boolean;
-}
-
-export interface MenuBarProps extends React.HTMLProps<MenuBar>
-{
-	config?:MenuBarItemProps[]
-}
-
-export interface MenuBarState
-{
-	xPos?:number;
-	yPos?:number;
-	showMenu?:boolean;
-	menu?:MenuItemProps[]
-}
-
-export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
-{
-	element:Element;
-	constructor(props:MenuBarProps)
-	{
-		super(props);
-		this.state = {
-			xPos: 0,
-			yPos: 0,
-			showMenu: false,
-			menu: []
-		};
-		this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
-	}
-
-	componentDidMount()
-	{
-		var document = ReactUtils.getDocument(this);
-		document.addEventListener("mousedown", this.onDocumentMouseDown);
-		// TODO Add touch events for mobile
-		this.element = ReactDOM.findDOMNode(this);
-	}
-
-	componentWillUnmount()
-	{
-		var document = ReactUtils.getDocument(this);
-		document.removeEventListener("mousedown", this.onDocumentMouseDown);
-	}
-
-	onDocumentMouseDown(event:MouseEvent)
-	{
-		var elt = event.target;
-
-		while( elt != null)
-		{
-			if(elt == this.element) {
-				return;
-			}
-			elt = (elt as HTMLElement).parentNode;
-		}
-		this.hideMenu();
-	}
-
-	hideMenu()
-	{
-		this.setState({
-			showMenu: false
-		})
-	}
-
-	showMenu(index:number)
-	{
-		var parent = this.refs[index] as HTMLElement;
-		var menuConfig = this.props.config[index].menu;
-		this.setState({
-			showMenu: true,
-			xPos: parent.offsetLeft,
-			yPos: parent.offsetTop + parent.clientHeight,
-			menu: menuConfig
-		});
-	}
-
-	onClick(index:number, event:React.MouseEvent)
-	{
-		if(this.state.showMenu)
-		{
-			// hide menu if click on menubaritem and the menu was already visible
-			this.setState({
-				showMenu: false
-			});
-		}
-		else
-		{
-			this.showMenu(index);
-		}
-	}
-
-	onMouseEnter(index:number, event:React.MouseEvent)
-	{
-		if(this.state.showMenu)
-		{
-			this.showMenu(index);
-		}
-	}
-
-	renderMenuBarItem(index:number, props:MenuBarItemProps):JSX.Element
-	{
-		var menuBarClass = classNames({
-			"weave-menubar-item": true,
-			"weave-menubar-item-bold": !!props.bold
-		});
-
-		return (
-			<div ref={index as any} key={index} className={menuBarClass} {...props as any} onMouseDown={this.onClick.bind(this, index)} onMouseEnter={this.onMouseEnter.bind(this, index)}>
-				{
-					props.label
-				}
-			</div>
-		)
-	}
-
-	render():JSX.Element
-	{
-		var style = _.merge({alignItems: 'center'}, this.props.style);
-		return (
-			<HBox className="weave-menubar" {...this.props as React.HTMLAttributes} style={style}>
-				{
-					this.props.config.map((menuBarItemProps, index) => {
-						return this.renderMenuBarItem(index, menuBarItemProps)
-					})
-				}
-				{
-					this.state.showMenu ?
-						<Menu menu={this.state.menu} xPos={this.state.xPos} yPos={this.state.yPos} onClick={this.hideMenu.bind(this)}/>
-						:
-						null
-				}
-				{this.props.children}
-			</HBox>
-		)
-	}
-}
-*/

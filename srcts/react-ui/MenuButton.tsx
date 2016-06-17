@@ -90,8 +90,7 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 		let dropdownProps:DropdownProps = {
 			className:dropdownClass,
 			menu:this.props.menu,
-			action:"hide",
-			duration: 0
+			action:"hide"
 		};
 
 		return (

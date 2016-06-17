@@ -16,7 +16,7 @@ export default class ContextMenu extends Menu
 		return ReactUtils.openPopup(
 			event.target as Element,
 			<div style={{top:event.clientY, left: event.clientX, position: 'absolute'}}>
-				<Dropdown menu={contextMenuItems} duration={0} open={true}/>
+				<Dropdown menu={contextMenuItems}  open={true}/>
 			</div>,
 			true
 		) as Menu;

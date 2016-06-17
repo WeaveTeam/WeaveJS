@@ -83,9 +83,9 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 
 	componentDidMount()
 	{
-		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
+		/*this.element = ReactDOM.findDOMNode(this) as HTMLElement;
 		if(this.element.style.visibility == "hidden")
-			this.forceUpdate();
+			this.forceUpdate();*/
 	}
 	
 	renderMenuItems(menu:MenuItemProps[])
@@ -172,16 +172,15 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			}
 		}
 
-		var menuStyle:React.CSSProperties = _.merge({
+		var menuStyle:React.CSSProperties = _.merge({},this.props.style,{
 			position: "absolute",
 			left: 0,
-			visibility: "hidden"
-		}, this.props.style);
+			display:"block"
+		});
 
 		if (this.element)
 		{
 			let boundingRect:ClientRect = this.element.getBoundingClientRect();
-			menuStyle.visibility = null;
 			if (weavejs.WeaveAPI.Locale.reverseLayout)
 			{
 				menuStyle.left = 0 - this.element.clientWidth;
