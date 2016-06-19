@@ -43,7 +43,7 @@ import MiscUtils from "./utils/MiscUtils";
 import DOMUtils from "./utils/DOMUtils";
 import ReactUtils from "./utils/ReactUtils";
 import JSZip from "./modules/jszip";
-
+import WeaveArchive from "./WeaveArchive";
 import * as WeaveReactUtils from "./utils/WeaveReactUtils";
 
 import * as React from "react";
@@ -110,5 +110,6 @@ export
 	MiscUtils,
 	DOMUtils,
 	ReactUtils,
-	WeaveReactUtils
+	WeaveReactUtils,
+	WeaveArchive
 };
