@@ -51,8 +51,8 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 			contents:[
 				"Click on CSV file to load rows of data for visualization",
 				"Click on open a file button to load CSV file from your local machine",
-				"In this table you can see the downloaded data",
-				"Click on charts Menu to select visualization chart of your choice",
+				"In this table you can see the data",
+				"Click on charts menu to see the available options",
 				"Click on one of the desired charts to view your data in chart",
 				"Change chart parameters here to understand your data"
 			]
