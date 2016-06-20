@@ -3,10 +3,12 @@ import {MenuBarItemProps} from "../react-ui/MenuBar";
 import {MenuItemProps} from "../react-ui/Menu";
 import PopupWindow from "../react-ui/PopupWindow";
 import IVisTool = weavejs.api.ui.IVisTool;
-import * as WeaveUI from "../weavejs";
 import MouseoverController from "../editors/MouseoverController";
 import WeaveMenus from "./WeaveMenus";
 
+import AttributeMenuTool from "../tools/AttributeMenuTool";
+import DataFilterTool from "../tools/DataFilterTool/DataFilterTool";
+import SessionStateMenuTool from "../tools/SessionStateMenuTool";
 import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
@@ -51,9 +53,9 @@ export default class ControllersMenu implements MenuBarItemProps
 		
 		// temporary solution - only include tools we want
 		impls = [
-			WeaveUI.AttributeMenuTool,
-			WeaveUI.DataFilterTool,
-			WeaveUI.SessionStateMenuTool
+			AttributeMenuTool,
+			DataFilterTool,
+			SessionStateMenuTool
 		];
 
 		return impls.map(impl => {
@@ -74,8 +76,8 @@ export default class ControllersMenu implements MenuBarItemProps
 	
 	static isBeta(impl:new(..._:any[])=>any):boolean
 	{
-		return impl == WeaveUI.SessionStateMenuTool;
-			//impl == WeaveUI.DataFilterTool
-//			|| impl == WeaveUI.AttributeMenuTool
+		return impl == SessionStateMenuTool;
+			//impl == DataFilterTool
+//			|| impl == AttributeMenuTool
 	}
 }

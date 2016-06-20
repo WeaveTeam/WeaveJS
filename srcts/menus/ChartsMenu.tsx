@@ -3,8 +3,19 @@ import {MenuBarItemProps} from "../react-ui/MenuBar";
 import {MenuItemProps} from "../react-ui/Menu";
 import PopupWindow from "../react-ui/PopupWindow";
 import IVisTool = weavejs.api.ui.IVisTool;
-import * as WeaveUI from "../weavejs";
 import WeaveMenus from "./WeaveMenus";
+
+import C3BarChart from "../tools/C3BarChart";
+import ColorLegend from "../tools/ColorLegend";
+import C3Gauge from "../tools/C3Gauge";
+import C3ColorHistogram from "../tools/C3ColorHistogram";
+import C3Histogram from "../tools/C3Histogram";
+import C3LineChart from "../tools/C3LineChart";
+import OpenLayersMapTool from "../tools/OpenLayersMapTool";
+import C3PieChart from "../tools/C3PieChart";
+import C3ScatterPlot from "../tools/C3ScatterPlot";
+import TableTool from "../tools/TableTool";
+import TextTool from "../tools/TextTool";
 
 import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
@@ -35,17 +46,17 @@ export default class ChartsMenu implements MenuBarItemProps
 		
 		// temporary solution - only include tools we want
 		impls = [
-			WeaveUI.C3BarChart,
-			WeaveUI.ColorLegend,
-			WeaveUI.C3Gauge,
-			WeaveUI.C3ColorHistogram,
-			WeaveUI.C3Histogram,
-			WeaveUI.C3LineChart,
-			WeaveUI.OpenLayersMapTool,
-			WeaveUI.C3PieChart,
-			WeaveUI.C3ScatterPlot,
-			WeaveUI.TableTool,
-			WeaveUI.TextTool
+			C3BarChart,
+			ColorLegend,
+			C3Gauge,
+			C3ColorHistogram,
+			C3Histogram,
+			C3LineChart,
+			OpenLayersMapTool,
+			C3PieChart,
+			C3ScatterPlot,
+			TableTool,
+			TextTool
 		];
 
 		return impls.map(impl => {
@@ -66,6 +77,6 @@ export default class ChartsMenu implements MenuBarItemProps
 	
 	static isBeta(impl:new(..._:any[])=>any):boolean
 	{
-		return impl == WeaveUI.C3Gauge;
+		return impl == C3Gauge;
 	}
 }
