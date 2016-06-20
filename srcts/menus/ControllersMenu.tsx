@@ -3,7 +3,7 @@ import {MenuBarItemProps} from "../react-ui/MenuBar";
 import {MenuItemProps} from "../react-ui/Menu";
 import PopupWindow from "../react-ui/PopupWindow";
 import IVisTool = weavejs.api.ui.IVisTool;
-import * as WeaveUI from "../WeaveUI";
+import * as WeaveUI from "../WeaveJS";
 import MouseoverController from "../editors/MouseoverController";
 import WeaveMenus from "./WeaveMenus";
 

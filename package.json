@@ -2,7 +2,7 @@
   "name": "WeaveJS",
   "version": "0.0.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
-  "main": "lib/WeaveUI.js",
+  "main": "lib/WeaveJS.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc && babel -d lib outts",
