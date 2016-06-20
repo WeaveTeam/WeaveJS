@@ -128,7 +128,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				menuMounted:false
 			});
 		}
-		InteractiveTour.isEnabled() ? InteractiveTour.getMountedTargetComponent(ele) : null;
+		InteractiveTour.isEnabled() ? InteractiveTour.registerMountedComponentToStepName(ele) : null;
 
 	};
 

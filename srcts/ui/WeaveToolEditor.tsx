@@ -272,7 +272,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 				</HBox>
 				<VBox id={InteractiveTour.prefix +"Tool editor"}
 				      style={{flex: 1, padding: 8, overflow: "auto"}}
-				      ref={InteractiveTour.getMountedTargetComponent}>
+				      ref={InteractiveTour.registerMountedComponentToStepName}>
 					{editorUI}
 				</VBox>
 			</VBox>

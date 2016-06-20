@@ -51,7 +51,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 	// static method passed to target Component's Reference callback
 	// props.id is matched the ref callback to cache either mounted or unmounted state of the component
-	static getMountedTargetComponent=(mountedElement:any)=>
+	static registerMountedComponentToStepName=(mountedElement:any)=>
 	{
 
 		if(!mountedElement)
