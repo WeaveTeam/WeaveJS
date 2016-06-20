@@ -8,7 +8,7 @@
     "declaration": true
   },
   "exclude":[
-    "node_modules", "outts"
+    "node_modules", "outts", "lib-typings"
   ],
   "compileOnSave": false
 }
