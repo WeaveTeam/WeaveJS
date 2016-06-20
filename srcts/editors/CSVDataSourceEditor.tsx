@@ -93,7 +93,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 				<FileSelector targetUrl={ds.url}
 				              id="Location"
 				              ref={InteractiveTour.getMountedTargetComponent}
-				              onFileChange={()=>InteractiveTour.targetComponentOnClick("Location")}
+				              onFileChange={()=>InteractiveTour.isEnabled()?InteractiveTour.targetComponentOnClick("Location"):null}
 				              placeholder={Weave.lang("http://www.example.com/example.csv")}
 				              style={ {width: "100%"} }
 				              accept={acceptExtension}
