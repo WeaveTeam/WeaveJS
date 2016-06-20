@@ -59,6 +59,7 @@ weavejs.util.DebugUtils.MouseUtils = MouseUtils;
 weavejs.core.WeaveArchive.JSZip = JSZip;
 
 import * as jquery from "jquery";
+import Div from "./react-ui/Div";
 
 // global jQuery needed for semantic
 (window as any).jQuery = (jquery as any)["default"];
@@ -111,5 +112,6 @@ export
 	DOMUtils,
 	ReactUtils,
 	WeaveReactUtils,
-	WeaveArchive
+	WeaveArchive,
+	Div
 };
