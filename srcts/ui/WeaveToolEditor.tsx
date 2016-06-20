@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 
 import {HBox, VBox} from "../react-ui/FlexBox";
+import InteractiveTour from "../react-ui/InteractiveTour";
 import SessionStateEditor from "../ui/SessionStateEditor";
 import {IVisTool} from "../tools/IVisTool";
 import Button from "../semantic-ui/Button";
@@ -10,6 +11,7 @@ import {forceUpdateWatcher} from "../utils/WeaveReactUtils";
 
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
+
 
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
@@ -170,14 +172,18 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 		// cloned to add ref function to get the reference of active editor
 		// which help in setting the state back when it was mounted
-		let editorUI = React.cloneElement(originalEditorUI,{ref: (e:Element) =>{
-			if(typeof originalEditorUI.ref == 'function') // this ensures any ref attached in original Element still works
-			{
-				let refFunction:Function = originalEditorUI.ref as Function;
-				refFunction(e);
-			}
-			this.activeEditor = e;
-		}});
+		let editorUI = React.cloneElement(originalEditorUI,{
+			id:"Tool editor" ,
+			ref: (e:Element) =>{
+					if(typeof originalEditorUI.ref == 'function') // this ensures any ref attached in original Element still works
+					{
+						let refFunction:Function = originalEditorUI.ref as Function;
+						refFunction(e);
+					}
+					InteractiveTour.isEnabled() ? InteractiveTour.getMountedTargetComponent(e) : null;
+					this.activeEditor = e;
+				}
+		});
 
 		var crumbUI:JSX.Element = (
 			<div className="ui breadcrumb">

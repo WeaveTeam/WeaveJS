@@ -46,25 +46,16 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 
 	private items:any = {
 		csvToViz:{
-			steps:["CSV file", "Location","Preview","Sheet 1","Charts"],
-			stepPointers:["CSV file", "Open file",null,"Sheet 1","Charts"],
+			steps:["CSV file", "Location","Preview","Sheet 1","Charts" , "Charts menu","Tool editor"],
+			stepPointers:["CSV file", "Open file",null,"Sheet 1","Charts","Charts menu",null],
 			contents:[
 				"Click on CSV file to load rows of data for visualization",
 				"Click on open a file button to load CSV file from your local machine",
 				"In this table you can see the downloaded data",
-				"Click on Layout Tab to add charts of your choice",
-				"Click on charts to select visualization chart of your choice"
-			]
-		},
-		multipleTabViz:{
-			steps:["CSV file", "Location","Preview","Sheet 1","Charts"],
-			stepPointers:["CSV file", "Open file",null,"Sheet 1","Charts"],
-			contents:[
-				"Click on CSV file to load rows of data for visualization",
-				"Click on open a file button to load CSV file from your local machine",
-				"In this table you can see the downloaded data",
-				"Click on Sheet Tab to add charts of your choice",
-				"Click on charts to select visualization chart of your choice"
+				"Click on Sheet 1 to add charts of your choice",
+				"Click on charts Menu to select visualization chart of your choice",
+				"Click on one of the desired charts to view your data in chart",
+				"Change chart parameters here to understand your data"
 			]
 		}
 	};
@@ -106,11 +97,11 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 		if(this.state.showInteractiveTourList)
 		{
 			interactiveTourListUI = <VBox style={ {position:"relative", fontFamily:"inherit"} } className="weave-guidance-list">
-								<span className="weave-guidance-list-item"
-								      onClick={ ()=>this.interactiveListItemClick("csvToViz") }>
-									1.  CSV Data to Visualization
-								</span>
-							</VBox>
+										<span className="weave-guidance-list-item"
+										      onClick={ ()=>this.interactiveListItemClick("csvToViz") }>
+											1.  CSV Data to Visualization
+										</span>
+									</VBox>
 		}
 
 		let styleObj:React.CSSProperties = _.merge({},this.props.style,{position:"relative"});

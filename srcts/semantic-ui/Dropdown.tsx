@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {MenuItemProps} from "../react-ui/Menu";
+import InteractiveTour from "../react-ui/InteractiveTour";
 import Menu from "../react-ui/Menu"
 import classNames from "../modules/classnames";
 import ReactUtils from "../utils/ReactUtils";
@@ -108,21 +109,40 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	// add mouseDown listener only when menu is opened
 	getMenuRef=(ele:any)=>
 	{
-		this.menuRef = ele;
-		if(this.menuRef)
+
+		if(ele)
 		{
+			this.menuRef = ele;
+			let menuDOMNode = ReactDOM.findDOMNode(this.menuRef as any);
+			this.menuRect = menuDOMNode.getBoundingClientRect();
 			ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown);
-			this.setState({
-				menuMounted:true
-			});
 		}
 		else
 		{
+			this.menuRef = null;
+			this.menuRect = null;
 			ReactUtils.getDocument(this).removeEventListener("mousedown", this.onDocumentMouseDown);
 			this.setState({
 				menuMounted:false
 			});
 		}
+		InteractiveTour.isEnabled() ? InteractiveTour.getMountedTargetComponent(ele) : null;
+
+	};
+
+	menuClickListener=(event:React.MouseEvent)=>
+	{
+		this.setState({ // this ensures any click on menu will close them on dropdown
+			toggleMenu:false
+		});
+
+		if(InteractiveTour.isEnabled())
+		{
+			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
+			InteractiveTour.targetComponentOnClick(menuID)
+		}
+
+		event.stopPropagation(); // we dont want to call the click listener for dropdown
 
 	};
 
@@ -143,23 +163,26 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 			if(this.state.menuMounted) // this ensures menu component is mounted
 			{
-				let menuDOMNode = ReactDOM.findDOMNode(this.menuRef as any);
-				let menuRect:ClientRect = menuDOMNode.getBoundingClientRect();
-
 				if(this.props.direction == "upward")
 				{
-					menuStyle.top = - menuRect.height;
+					menuStyle.top = - this.menuRect.height;
 				}
 				else //automate based on its position on screen
 				{
 					// set updward if the height overflows out of screen height
-					if(menuRect.top + menuRect.height >= window.innerHeight )
+					if(this.menuRect.top + this.menuRect.height >= window.innerHeight )
 					{
-						menuStyle.top = - menuRect.height;
+						menuStyle.top = - this.menuRect.height;
 					}
 				}
 			}
-			menuUI = <Menu ref={this.getMenuRef} menu={this.props.menu} style={menuStyle}/>;
+
+			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
+			menuUI = <Menu id={menuID}
+			               ref={this.getMenuRef}
+			               menu={this.props.menu}
+			               onClick={this.menuClickListener}
+			               style={menuStyle}/>;
 		}
 
 		let styleObject:React.CSSProperties = _.merge({},this.props.style,{
@@ -176,6 +199,23 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				{menuUI}
 			</div>
 		);
+	}
+
+	private menuRect:ClientRect = null;
+	componentDidUpdate()
+	{
+		if(this.menuRef)
+		{
+			// if condition is important else infinte loop will happen calling render and componentDidUpdate again and again
+		    if(!this.state.menuMounted )
+		    {
+			    // need to call render again , as we want to position the menu based on screenflow or direction props
+			    this.setState({
+				    menuMounted:true
+			    });
+		    }
+		}
+
 	}
 	
 

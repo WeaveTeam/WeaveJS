@@ -337,7 +337,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								onDragOver={(event) => this.onDragOverTab(tab)}
 								onDragLeave={this.onDragLeaveTab}
 								id={tab.label}
-				                ref={InteractiveTour.getMountedTargetComponent}
+								ref={InteractiveTour.getMountedTargetComponent}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.setTabLabel(tab.id, newName)} textContent={tab.label}/>*/}
 								{tab.label}

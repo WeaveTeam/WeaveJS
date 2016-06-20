@@ -9,10 +9,6 @@ import LinkableString = weavejs.core.LinkableString;
 
 export interface InteractiveTourProps extends React.HTMLProps<InteractiveTour>
 {
-	direction?:string, //row | column
-	location?:string, // column -> top | bottom (left | middle-default | right)  // row -> left | right (top | middle-default | bottom)
-	type?:string, // start | next | done
-	toolTip?:string,
 	enableToolTip?:boolean,//todo
 	onClose?:Function
 }
@@ -37,6 +33,19 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 	static isEnabled=()=>{
 		return InteractiveTour.steps && InteractiveTour.steps.length > 0;
+	};
+
+	static isLastStep=(index:number)=>{
+		return InteractiveTour.steps && InteractiveTour.steps.length == index + 1;
+	};
+
+	static reset=()=>
+	{
+		InteractiveTour.steps = null;
+		InteractiveTour.stepContents = null;
+		InteractiveTour.stepPointers = null;
+		InteractiveTour.stepComponentMap = {};
+		InteractiveTour.pointerComponentMap = {};
 	};
 
 	// static method passed to target Component's Reference callback
@@ -101,7 +110,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	static targetComponentOnClick=(stepName:string)=>
 	{
 
-		if(InteractiveTour.steps && InteractiveTour.steps.length > 0 && InteractiveTour.steps.indexOf(stepName) != -1)
+		if(InteractiveTour.steps && InteractiveTour.steps.length > 0 && InteractiveTour.steps.indexOf(stepName) != -1 )
 		{
 			let currentStepIndex:number = InteractiveTour.steps.indexOf(stepName); // get index of currentStep
 			let nextStepName:string = InteractiveTour.steps[currentStepIndex + 1]; // increment to find the next step
@@ -131,6 +140,12 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	private targetMountedNode:any = null;
 	private pointerMountedNode:any = null;
 
+
+	resetInteractiveTour=()=>
+	{
+
+	}
+
 	updateNextComponentName=()=>
 	{
 		let nextStepName:string = InteractiveTour.stepName.value;
@@ -141,6 +156,11 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			this.setState({
 				visible:false
 			});
+			InteractiveTour.reset();
+			if(this.props.onClose)
+			{
+				this.props.onClose();
+			}
 		}
 		else
 		{
@@ -183,11 +203,15 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			visible:false
 		});
 
+		InteractiveTour.reset();
+
 		if(this.props.onClose)
 		{
 			this.props.onClose();
 		}
 	};
+
+
 
 
 
@@ -414,9 +438,9 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			pointerStyle.left = pointerElementRect.left + pointerElementRect.width / 2;
 			pointerStyle.top = pointerElementRect.top + pointerElementRect.height / 2;
 			pointerUI = <div style={ pointerStyle } className="weave-guidance-pointer">
-				<div style={ pointerStyleInner } className="weave-guidance-pointer-inner"/>
-				<div style={ pointerStyleOuter } className="weave-guidance-pointer-outer"/>
-			</div>;
+							<div style={ pointerStyleInner } className="weave-guidance-pointer-inner"/>
+							<div style={ pointerStyleOuter } className="weave-guidance-pointer-outer"/>
+						</div>;
 		}
 
 
@@ -431,6 +455,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 					                        style={toolTipPositionStyle}
 					                        location={toolTipPosition}
 					                        onNextClick={!interactionState ? InteractiveTour.targetComponentOnClick : null}
+					                        onDoneClick={InteractiveTour.isLastStep(currentStepIndex) ? this.closeHandler : null}
 					                        enableFooter={!interactionState}
 					                        type={type}
 					                        stepIndex={currentStepIndex}
@@ -476,8 +501,9 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 {
 	location:string;
 	type: string;
-	onClose?:Function;
-	onNextClick?:Function;
+	onClose?:()=>void;
+	onNextClick?:(stepName:string)=>void;
+	onDoneClick?:()=>void;
 	title:string;
 	enableFooter?:boolean;
 	shift?:number;
@@ -635,21 +661,32 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			color:"#FFBE00"
 		};
 
-		let nextButtonStyle:React.CSSProperties = _.merge({alignSelf:"flex-end"},buttonStyle);
 
 		let footerUI:JSX.Element = null;
+		let closeButtonUI:JSX.Element = null;
 		if(this.props.enableFooter)
 		{
 			let tooltipFooter:React.CSSProperties = {
 				display:"flex",
-				alignItems:"center",
-				justifyContent:"space-between",
+				justifyContent:"flex-end",
 				borderTop:"1px solid #FFBE00",
 				paddingTop:"8px"
+
 			};
+
+			let nextButtonUI:JSX.Element = this.props.onNextClick ? <div style={buttonStyle} onClick={this.nextHandler}>Next</div> : null;
+			let doneButtonUI:JSX.Element = this.props.onDoneClick ? <div style={buttonStyle} onClick={this.closeHandler}>Done</div>: null;
+			if(this.props.onDoneClick){
+				nextButtonUI = null;//ensures when done is set , next wont we available
+			}
 			footerUI =  <div style={tooltipFooter}>
-							<div style={nextButtonStyle} onClick={this.nextHandler}>Next</div>
+							{nextButtonUI}
+							{doneButtonUI}
 						</div>;
+		}
+		if(!this.props.onDoneClick)
+		{
+			closeButtonUI = <div style={buttonStyle} onClick={this.closeHandler}>&#x2715;</div>;
 		}
 
 		let contentStyle:React.CSSProperties = {
@@ -664,7 +701,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 								<span style={{color:"#FFBE00"}}>Step ({this.props.stepIndex + 1} of {InteractiveTour.steps.length}) : </span>
 								{this.props.title}
 							</div>
-							<div style={buttonStyle} onClick={this.closeHandler}>&#x2715;</div>
+							{closeButtonUI}
 						</div>
 						<div style={contentStyle}>
 							{this.props.children}

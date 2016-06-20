@@ -175,7 +175,8 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		var menuStyle:React.CSSProperties = _.merge({},this.props.style,{
 			position: "absolute",
 			left: 0,
-			display:"block"
+			display:"block",
+			zIndex:0 // semantic ui dropdwon menu comes with z-index 11
 		});
 
 		if (this.element)
