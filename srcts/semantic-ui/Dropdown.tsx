@@ -185,6 +185,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			}
 
 			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
+			menuID = InteractiveTour.prefix + menuID;
 			menuUI = <Menu id={menuID}
 			               ref={this.getMenuRef}
 			               menu={this.props.menu}

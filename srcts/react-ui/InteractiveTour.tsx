@@ -2,8 +2,6 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 
-
-import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;
 
 
@@ -26,6 +24,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 	static stepName:LinkableString = new LinkableString(); // callback are registered in InteractiveTour Instance
 	static unMountedStepName:string = null;
+	static prefix:string = "weave-tour-";
 	static steps:string[] = []; // props.id are supplied as string of Array. Array supplied in click event of Guidance List element in GetStartedComponent
 	static stepContents:string[] = []; // contents matching steps name
 	static stepPointers:string[] = []; // pointers to click matching steps name
@@ -57,15 +56,13 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 		if(!mountedElement)
 		{
-			/*if(InteractiveTour.stepComponentMap[mountedElement.props.id]){
-				InteractiveTour.stepComponentMap[mountedElement.props.id] = null; // when component is unmounted
-			}*/
 			return;
 		}
 
 		if(InteractiveTour.steps && InteractiveTour.steps.length > 0) // if part of guidance steps
 		{
 			let stepName:string = mountedElement.props.id;
+			stepName = stepName.substr(InteractiveTour.prefix.length); // remove the prefix attached to the stepName
 			let stepIndex:number = InteractiveTour.steps.indexOf(stepName);
 			if(stepIndex > -1)
 			{
@@ -96,17 +93,17 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 		if(!mountedElement)
 		{
-			/*if(InteractiveTour.stepComponentMap[mountedElement.props.id]){
-			 InteractiveTour.stepComponentMap[mountedElement.props.id] = null; // when component is unmounted
-			 }*/
+			
 			return;
 		}
 
 		if(InteractiveTour.stepPointers && InteractiveTour.stepPointers.length > 0) // if part of guidance steps
 		{
-			if(InteractiveTour.stepPointers.indexOf(mountedElement.props.id) > -1)
+			let stepName:string = mountedElement.props.id;
+			stepName = stepName.substr(InteractiveTour.prefix.length); // remove the prefix attached to the stepName
+			if(InteractiveTour.stepPointers.indexOf(stepName) > -1)
 			{
-				InteractiveTour.pointerComponentMap[mountedElement.props.id] = mountedElement;
+				InteractiveTour.pointerComponentMap[stepName] = mountedElement;
 			}
 		}
 

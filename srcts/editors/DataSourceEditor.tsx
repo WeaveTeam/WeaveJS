@@ -150,7 +150,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 					</VBox>
 					<VBox className="weave-padded-vbox"
 					      style={{flex: 1, overflow: 'auto'}}
-					      id="Preview"
+					      id={InteractiveTour.prefix +"Preview"}
 					      ref={InteractiveTour.getMountedTargetComponent}>
 						<DynamicComponent dependencies={columns} render={() => {return this.renderTablePreview(columns)}}/>
 					</VBox>

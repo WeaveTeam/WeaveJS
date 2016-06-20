@@ -91,7 +91,7 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 				</HBox>,
 				/* id, ref, onFileChange are added for Guidance , id and onFileChange argument has to match as they represent step name */
 				<FileSelector targetUrl={ds.url}
-				              id="Location"
+				              id={InteractiveTour.prefix + "Location"}
 				              ref={InteractiveTour.getMountedTargetComponent}
 				              onFileChange={()=>InteractiveTour.isEnabled()?InteractiveTour.targetComponentOnClick("Location"):null}
 				              placeholder={Weave.lang("http://www.example.com/example.csv")}

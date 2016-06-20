@@ -246,7 +246,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 								DataMenu.getDataSourceItems(this.props.weave, this.setSelectedDataSource).map((dsItem, index) => {
 									return dsItem.shown
 										?   <HBox key={index}
-										          id={dsItem.label as string}
+										          id={InteractiveTour.prefix + dsItem.label as string}
 										          ref={InteractiveTour.getMountedTargetComponent}
 										          onClick={() => {dsItem.click(); InteractiveTour.isEnabled()? InteractiveTour.targetComponentOnClick(dsItem.label as string) : null} }
 										          className="weave-data-source-item"
