@@ -46,13 +46,12 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 
 	private items:any = {
 		csvToViz:{
-			steps:["CSV file", "Location","Preview","Sheet 1","Charts" , "Charts menu","Tool editor"],
-			stepPointers:["CSV file", "Open file",null,"Sheet 1","Charts","Charts menu",null],
+			steps:["CSV file", "Location","Preview","Charts" , "Charts menu","Tool editor"],
+			stepPointers:["CSV file", "Open file",null,"Charts","Charts menu",null],
 			contents:[
 				"Click on CSV file to load rows of data for visualization",
 				"Click on open a file button to load CSV file from your local machine",
 				"In this table you can see the downloaded data",
-				"Click on Sheet 1 to add charts of your choice",
 				"Click on charts Menu to select visualization chart of your choice",
 				"Click on one of the desired charts to view your data in chart",
 				"Change chart parameters here to understand your data"

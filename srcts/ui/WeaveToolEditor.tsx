@@ -173,14 +173,12 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		// cloned to add ref function to get the reference of active editor
 		// which help in setting the state back when it was mounted
 		let editorUI = React.cloneElement(originalEditorUI,{
-			id:"Tool editor" ,
 			ref: (e:Element) =>{
 					if(typeof originalEditorUI.ref == 'function') // this ensures any ref attached in original Element still works
 					{
 						let refFunction:Function = originalEditorUI.ref as Function;
 						refFunction(e);
 					}
-					InteractiveTour.isEnabled() ? InteractiveTour.getMountedTargetComponent(e) : null;
 					this.activeEditor = e;
 				}
 		});
@@ -272,7 +270,9 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						&#x2715;
 					</Button>
 				</HBox>
-				<VBox style={{flex: 1, padding: 8, overflow: "auto"}}>
+				<VBox id="Tool editor"
+				      style={{flex: 1, padding: 8, overflow: "auto"}}
+				      ref={InteractiveTour.getMountedTargetComponent}>
 					{editorUI}
 				</VBox>
 			</VBox>

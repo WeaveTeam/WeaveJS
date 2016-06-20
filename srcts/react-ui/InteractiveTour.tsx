@@ -25,6 +25,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 {
 
 	static stepName:LinkableString = new LinkableString(); // callback are registered in InteractiveTour Instance
+	static unMountedStepName:string = null;
 	static steps:string[] = []; // props.id are supplied as string of Array. Array supplied in click event of Guidance List element in GetStartedComponent
 	static stepContents:string[] = []; // contents matching steps name
 	static stepPointers:string[] = []; // pointers to click matching steps name
@@ -44,6 +45,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		InteractiveTour.steps = null;
 		InteractiveTour.stepContents = null;
 		InteractiveTour.stepPointers = null;
+		InteractiveTour.unMountedStepName = null;
 		InteractiveTour.stepComponentMap = {};
 		InteractiveTour.pointerComponentMap = {};
 	};
@@ -75,6 +77,12 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 				if(InteractiveTour.steps[stepIndex] == InteractiveTour.stepPointers[stepIndex])
 				{
 					InteractiveTour.pointerComponentMap[stepName] = mountedElement;
+				}
+				// sometimes after click event for next step is triggered, but component might not got mounted yet
+				if(InteractiveTour.unMountedStepName && InteractiveTour.unMountedStepName == stepName)
+				{
+					InteractiveTour.unMountedStepName = null; // set to null as its mounted
+					InteractiveTour.stepName.value = stepName;
 				}
 			}
 		}
@@ -115,7 +123,18 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			let currentStepIndex:number = InteractiveTour.steps.indexOf(stepName); // get index of currentStep
 			let nextStepName:string = InteractiveTour.steps[currentStepIndex + 1]; // increment to find the next step
 			if(nextStepName)
-				InteractiveTour.stepName.value = nextStepName; // setting the state will trigger callback in InteractiveTour instance
+			{
+				if(InteractiveTour.stepComponentMap[nextStepName]) // check whether nextStep component is mounted
+				{
+					InteractiveTour.stepName.value = nextStepName; // setting the state will trigger callback in InteractiveTour instance
+				}
+				else
+				{
+					// store the step name which has unmounted component and set the session value after component is mounted
+					InteractiveTour.unMountedStepName = nextStepName;
+				}
+
+			}
 			else
 				InteractiveTour.stepName.value = ""
 		}
