@@ -37,7 +37,8 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		super(props);
 
 		this.state = {
-			toggleMenu:this.props.open === undefined ? false : this.props.open
+			toggleMenu:this.props.open === undefined ? false : this.props.open,
+			menuMounted:false
 		};
 
 	}
@@ -104,7 +105,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		this.props.onClick && this.props.onClick(event);
 	};
 
-	private menuRef:any = null;
+	private menuRect:ClientRect = null;
 
 	// add mouseDown listener only when menu is opened
 	getMenuRef=(ele:any)=>
@@ -112,14 +113,15 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 		if(ele)
 		{
-			this.menuRef = ele;
-			let menuDOMNode = ReactDOM.findDOMNode(this.menuRef as any);
+			let menuDOMNode = ReactDOM.findDOMNode(ele);
 			this.menuRect = menuDOMNode.getBoundingClientRect();
 			ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown);
+			this.setState({
+				menuMounted:true
+			});
 		}
 		else
 		{
-			this.menuRef = null;
 			this.menuRect = null;
 			ReactUtils.getDocument(this).removeEventListener("mousedown", this.onDocumentMouseDown);
 			this.setState({
@@ -175,6 +177,11 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 						menuStyle.top = - this.menuRect.height;
 					}
 				}
+				// set leftward if the width overflows out of screen width
+				if(this.menuRect.left + this.menuRect.width >= window.innerWidth )
+				{
+					menuStyle.left = -this.menuRect.width;
+				}
 			}
 
 			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
@@ -201,22 +208,8 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		);
 	}
 
-	private menuRect:ClientRect = null;
-	componentDidUpdate()
-	{
-		if(this.menuRef)
-		{
-			// if condition is important else infinte loop will happen calling render and componentDidUpdate again and again
-		    if(!this.state.menuMounted )
-		    {
-			    // need to call render again , as we want to position the menu based on screenflow or direction props
-			    this.setState({
-				    menuMounted:true
-			    });
-		    }
-		}
 
-	}
+
 	
 
 }
