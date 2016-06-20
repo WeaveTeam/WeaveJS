@@ -4,6 +4,9 @@ import $ from "./modules/jquery";
 import LandingPage from "./LandingPage";
 import MiscUtils from "./utils/MiscUtils";
 
+// this import will run the static initialization code in WeaveJS
+import * as WeaveJS from "./weavejs";
+WeaveJS;
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
 var domId = "weaveElt";
