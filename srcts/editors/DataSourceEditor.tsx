@@ -16,6 +16,7 @@ import MenuButton from '../react-ui/MenuButton';
 import ChartsMenu from "../menus/ChartsMenu";
 import {linkReactStateRef, forceUpdateWatcher} from "../utils/WeaveReactUtils";
 import HelpIcon from "../react-ui/HelpIcon";
+import WeaveDataTable from "../ui/WeaveDataTable";
 
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import IDataSource = weavejs.api.data.IDataSource;
@@ -29,6 +30,7 @@ import ReferencedColumn = weavejs.data.column.ReferencedColumn;
 import StreamedGeometryColumn = weavejs.data.column.StreamedGeometryColumn;
 import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 
 export const PREVIEW:"preview" = "preview";
 export const METADATA:"metadata" = "metadata";
@@ -204,60 +206,12 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		return columns;
 	}
 	
+
 	renderTablePreview=(columns:IAttributeColumn[]):JSX.Element =>
 	{
-		var names:string[] = columns.map(column => column.getMetadata("title"));
-		var format = _.assign({id: IQualifiedKey},_.zipObject(names, columns));
-		var columnTitles = _.zipObject(names, names);
-		var rows = ColumnUtils.getRecords(format, null, String);
-
-		rows = rows.map((row) => {
-			row.id = row.id.localName;
-			return row;
-		});
-
-
-
-		var keyType = columns.length && columns[0].getMetadata("keyType");
-		names.unshift("id");
-
-		let cellDataGetter = (data: { columnData: IAttributeColumn, dataKey: string, rowData: IQualifiedKey }) =>
-		{
-			return data.columnData.getValueFromKey(data.rowData, String);
-		};
-
-		let flexColumns = columns.map((iac,index)=>
-		{
-			return (<ReactVirtualized.FlexColumn flexGrow={1} cellDataGetter={cellDataGetter} key={index} dataKey="ignored" width={125} columnData={iac} label={iac.getMetadata("title")}/>);
-		});
-		_.assign(columnTitles, {id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key")});
-			// <FixedDataTable rows={rows}
-			// 				columnIds={names}
-			// 				idProperty="id"
-			// 				showIdColumn={!!columns.length}
-			// 				columnTitles={columnTitles as any}
-			//                 disableSort={true}
-			//                 multiple={false}
-		let keys: IQualifiedKey[];
-		if (columns.length)
-		{
-			keys = columns[0].keys;
-		}
-		else
-		{
-			keys = [];
-		}
-		return (
-			<ResizingDiv onResize={(state)=>{this.setState({previewHeight: state.height, previewWidth: state.width})}}>
-				<ReactVirtualized.FlexTable 
-					headerHeight={16} 
-					height={this.state.previewHeight} width={this.state.previewWidth}
-					rowGetter={(data: { index: number }) => keys[data.index]} 
-					rowCount={keys.length} rowHeight={16}>
-					{flexColumns}
-				</ReactVirtualized.FlexTable>
-			</ResizingDiv>
-		);
+		let keySet = Weave.disposableChild(this, FilteredKeySet);
+		keySet.setColumnKeySources(columns);
+		return <WeaveDataTable columns={columns} subsetKeySet={keySet}/>
 	};
 
 	setSelection(props:IDataSourceEditorProps, newBranch:IWeaveTreeNode, newLeaf:IWeaveTreeNode)
