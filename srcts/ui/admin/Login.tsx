@@ -43,7 +43,7 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 			PopupWindow.close(Login.window);
 
 		Login.window = PopupWindow.open(context, {
-			title: Weave.lang("Weave Server Login"),
+			title: Weave.lang("Weave Server Sign-In"),
 			content:
 				<Login onLogin={handleLogin} onCancel={handleCancel}/>,
 			footerContent: <div/>,
@@ -61,7 +61,7 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 		let selector = $(Login.form) as any;
 		selector.form('clear');
 		selector.form('add errors', {
-			username: Weave.lang("Incorrect Login Credentials")
+			username: Weave.lang("Incorrect username or password")
 		});
 		Login.username.focus()
 	}
@@ -82,7 +82,7 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 					rules: [
 						{
 							type   : 'empty',
-							prompt : Weave.lang("Please enter your User Name")
+							prompt : Weave.lang("Please enter your username")
 						}
 					]
 				},
@@ -108,13 +108,13 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 		return (
 			<VBox style={{ flex: 1, padding: "1.5em" }}>
 				<div className="ui header">
-					<div className="sub header">{Weave.lang("Enter your credentials to access files on the Weave Server")}</div>
+					<div className="sub header">{Weave.lang("Enter your credentials to access files on the Weave server")}</div>
 				</div>
 				<div ref={(c) => Login.form = c} className="ui form">
 					<div className="field">
 						<div className="ui fluid left icon input">
 							<i className="user icon"/>
-							<input ref={(c) => Login.username = c} type="text" name="username" placeholder={Weave.lang("User Name")}/>
+							<input ref={(c) => Login.username = c} type="text" name="username" placeholder={Weave.lang("User name")}/>
 						</div>
 					</div>
 					<div className="field">
@@ -124,7 +124,7 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 						</div>
 					</div>
 					<Button colorClass="primary" className="right floated submit">
-						{Weave.lang("Login")}
+						{Weave.lang("Sign in")}
 					</Button>
 					<div className="ui error message" style={{marginTop: 60}}></div>
 				</div>
