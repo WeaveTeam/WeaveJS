@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "preserve",
+    "module": "system",
+    "target": "es6",
+    "outFile": "lib-typings/WeaveJS.jsx",
+    "declaration": true
+  },
+  "exclude":[
+    "node_modules", "outts"
+  ],
+  "compileOnSave": false
+}

@@ -5,6 +5,7 @@
   "main": "lib/WeaveJS.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "dts": "tsc -p tsconfig-definitions.json",
     "build": "tsc && babel -d lib outts",
     "compile": "npm run build && browserifyinc -x react -x react-dom -x jquery -x lodash -x d3 -x c3 -x openlayers -x jszip --debug --cachefile browserifycache.json lib/index.js > dist/index.js",
     "compile-libs": "browserifyinc -r react -r react-dom -r jquery -r lodash -r d3 -r c3 -r openlayers -r jszip --debug --cachefile browserifycache.json > dist/libs.js",

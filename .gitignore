@@ -51,3 +51,5 @@ dist
 browserifycache.json
 
 *.iml
+
+lib-typings/
