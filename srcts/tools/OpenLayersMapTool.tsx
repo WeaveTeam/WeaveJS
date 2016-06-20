@@ -29,7 +29,7 @@ import {MenuItemProps} from "../react-ui/Menu";
 import Menu from "../react-ui/Menu";
 import AbstractVisTool from "./AbstractVisTool";
 import {OverrideBounds} from "./AbstractVisTool";
-import ResizingDiv from "../react-ui/ResizingDiv";
+import ResizingDiv from "../ui/ResizingDiv";
 import MiscUtils from "../utils/MiscUtils";
 
 import Button from "../semantic-ui/Button";

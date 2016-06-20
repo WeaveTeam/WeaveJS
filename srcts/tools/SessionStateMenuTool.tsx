@@ -7,7 +7,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import * as _ from "lodash";
 import {MouseEvent} from "react";
 import {CSSProperties} from "react";
-import ResizingDiv from "../react-ui/ResizingDiv";
+import ResizingDiv from "../ui/ResizingDiv";
 import List from "../react-ui/List";
 import EditableTextCell from '../react-ui/EditableTextCell';
 import MiscUtils from "../utils/MiscUtils";

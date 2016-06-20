@@ -1,5 +1,5 @@
 import * as React from "react";
-import ResizingDiv from "./ResizingDiv";
+import ResizingDiv from "../ui/ResizingDiv";
 import SideBar from "./SideBar";
 import {HBox,VBox} from "./FlexBox";
 import {HDividedBox} from "./DividedBox";

@@ -5,7 +5,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 
 
 import CellProps = FixedDataTable.CellProps;
-import ResizingDiv, {ResizingDivState} from "../react-ui/ResizingDiv";
+import ResizingDiv, {ResizingDivState} from "../ui/ResizingDiv";
 import SmartComponent from "../ui/SmartComponent";
 
 export declare type SortDirection = "ASC"|"DESC"|"NONE";

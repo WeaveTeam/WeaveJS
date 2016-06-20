@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {VBox, HBox} from "../react-ui/FlexBox";
 import InteractiveTour from "../react-ui/InteractiveTour";
-import ResizingDiv from "../react-ui/ResizingDiv";
+import ResizingDiv from "../ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
 import DynamicComponent from "../ui/DynamicComponent";

@@ -6,7 +6,7 @@ import {IVisToolProps, IVisToolState} from "./IVisTool";
 import AbstractVisTool from "./AbstractVisTool";
 import {XAxis, YAxis} from "./Axis";
 import {VBox} from "../react-ui/FlexBox";
-import ResizingDiv from "../react-ui/ResizingDiv";
+import ResizingDiv from "../ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
 import FormatUtils from "../utils/FormatUtils";
 import MiscUtils from "../utils/MiscUtils";
