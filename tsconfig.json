@@ -10,7 +10,7 @@
     "declaration": false,
 	"forceConsistentCasingInFileNames": true,
 	"listFiles": true,
-	/*"noImplicitReturns": true,*/
+	"noImplicitReturns": false,
 	"pretty": true
   },
   "exclude":[
@@ -18,4 +18,3 @@
   ],
   "compileOnSave": false
 }
-/* https://www.typescriptlang.org/docs/handbook/compiler-options.html */
