@@ -7,10 +7,15 @@
     "outDir": "outts",
     "inlineSources": true,
     "inlineSourceMap": true,
-    "declaration": true
+    "declaration": false,
+	"forceConsistentCasingInFileNames": true,
+	"listFiles": true,
+	/*"noImplicitReturns": true,*/
+	"pretty": true
   },
   "exclude":[
     "node_modules", "outts"
   ],
   "compileOnSave": false
 }
+/* https://www.typescriptlang.org/docs/handbook/compiler-options.html */
