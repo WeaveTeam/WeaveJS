@@ -31,8 +31,8 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	static stepPointers:string[] = null; // pointers to click matching steps name
 	static stepComponentMap:any = null; // id mapped with component
 	static pointerComponentMap:any = null; // id mapped with component
-	static stepComponentRefCallbackMap:Map<string,Function> = null;
-	static stepPointerRefCallbackMap:Map<string,Function> = null;
+	static stepComponentRefCallbackMap:Map<string,(classInstance:any)=>void > = null;
+	static stepPointerRefCallbackMap:Map<string,(classInstance:any)=>void > = null;
 
 
 	static startTour=(steps:string[],stepContents:string[],stepPointers:string[])=>
@@ -51,7 +51,9 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		{
 			if(!mountedElement)
 			{
-				
+				// we don't want to store the pointer to the old component
+				if(InteractiveTour.stepComponentMap)
+					InteractiveTour.stepComponentMap[stepName] = null;
 				return;
 			}
 				
@@ -85,7 +87,12 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		function registerPointerComponentToStepName(stepName:string ,mountedElement:any)
 		{
 			if(!mountedElement)
+			{
+				// we don't want to store the pointer to the old component
+				if(InteractiveTour.pointerComponentMap)
+					InteractiveTour.pointerComponentMap[stepName] = null;
 				return;
+			}
 
 			if(InteractiveTour.stepPointers && InteractiveTour.stepPointers.length > 0) // if part of guidance steps
 			{
@@ -110,12 +117,12 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		});
 	};
 
-	static getComponentRefCallback=(stepName:string): any =>
+	static getComponentRefCallback=(stepName:string): (classInstance:any)=>void =>
 	{
 		return InteractiveTour.stepComponentRefCallbackMap && InteractiveTour.stepComponentRefCallbackMap.get(stepName);
 	};
 
-	static getPointerRefCallback=(stepName:string): any =>
+	static getPointerRefCallback=(stepName:string): (classInstance:any)=>void =>
 	{
 		return InteractiveTour.stepPointerRefCallbackMap && InteractiveTour.stepPointerRefCallbackMap.get(stepName);
 	};
