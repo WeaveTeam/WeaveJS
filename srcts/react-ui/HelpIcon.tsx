@@ -51,7 +51,7 @@ export default class HelpIcon extends React.Component<HelpIconProps, HelpIconSta
 								position: "absolute",
 								left: event.clientX + 10,
 								top: event.clientY + 10,
-								width: 400
+								maxWidth: 400
 							}}
 							className="weave-help-tooltip"
 							children={this.props.children}
