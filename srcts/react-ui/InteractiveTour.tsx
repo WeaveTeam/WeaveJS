@@ -26,6 +26,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	// Since Tour happens only for the first time , there is no point on creating these objects for the App
 	static stepName:LinkableString = new LinkableString(); // callback are registered in InteractiveTour Instance
 	static unMountedStepName:string = null;
+	static enable:boolean = false;
 	static steps:string[] = null; // props.id are supplied as string of Array. Array supplied in click event of Guidance List element in GetStartedComponent
 	static stepContents:string[] = null; // contents matching steps name
 	static stepPointers:string[] = null; // pointers to click matching steps name
@@ -37,6 +38,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 	static startTour=(steps:string[],stepContents:string[],stepPointers:string[])=>
 	{
+		InteractiveTour.enable = true;
 		// objects are created, when tour is initiated
 		InteractiveTour.steps = steps;
 		InteractiveTour.stepContents = stepContents;
@@ -127,16 +129,13 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		return InteractiveTour.stepPointerRefCallbackMap && InteractiveTour.stepPointerRefCallbackMap.get(stepName);
 	};
 
-	static isEnabled=()=>{
-		return InteractiveTour.steps && InteractiveTour.steps.length > 0;
-	};
-
 	static isLastStep=(index:number)=>{
 		return InteractiveTour.steps && InteractiveTour.steps.length == index + 1;
 	};
 
 	static reset=()=>
 	{
+		InteractiveTour.enable = false;
 		InteractiveTour.steps = null;
 		InteractiveTour.stepContents = null;
 		InteractiveTour.stepPointers = null;

@@ -128,7 +128,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				menuMounted:false
 			});
 		}
-		if(InteractiveTour.isEnabled())
+		if(InteractiveTour.enable)
 		{
 			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
 			let func:any = InteractiveTour.getComponentRefCallback(menuID);
@@ -143,7 +143,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			toggleMenu:false
 		});
 
-		if(InteractiveTour.isEnabled())
+		if(InteractiveTour.enable)
 		{
 			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
 			InteractiveTour.targetComponentOnClick(menuID)

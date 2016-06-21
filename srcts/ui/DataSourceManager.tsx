@@ -247,7 +247,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 									return dsItem.shown
 										?   <HBox key={index}
 										          ref={InteractiveTour.getComponentRefCallback(dsItem.label as string)}
-										          onClick={() => {dsItem.click(); InteractiveTour.isEnabled()? InteractiveTour.targetComponentOnClick(dsItem.label as string) : null} }
+										          onClick={() => {dsItem.click(); InteractiveTour.enable? InteractiveTour.targetComponentOnClick(dsItem.label as string) : null} }
 										          className="weave-data-source-item"
 										          style={{justifyContent: "space-between", padding: 5}}>
 												{Weave.lang(dsItem.label as string)}
