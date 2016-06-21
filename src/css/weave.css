@@ -820,10 +820,7 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	/*border: 8px solid #FFBE00;*/
 }
 
-.weave-guidance-pointer{
-	width: 32px;
-	height: 32px;
-}
+
 
 .weave-guidance-pointer-inner{
 	-webkit-animation:pointer-inner 1.2s infinite ease-in-out;

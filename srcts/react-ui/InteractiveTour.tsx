@@ -467,12 +467,14 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			let pointerStyle:React.CSSProperties = {
 				position:"fixed",
 				pointerEvents:"none",// so that target component will receive events
-				zIndex:1 // pointers comes over the component so its necessary to set 1 as menu too have zindex 1
+				zIndex:1, // pointers comes over the component so its necessary to set 1 as menu too have zindex 1
+				width:32,
+				height:32
 			};
 
-			pointerStyle.left = pointerElementRect.left + pointerElementRect.width / 2;
-			pointerStyle.top = pointerElementRect.top + pointerElementRect.height / 2;
-			pointerUI = <div style={ pointerStyle } className="weave-guidance-pointer">
+			pointerStyle.left = pointerElementRect.left + pointerElementRect.width / 2 - 16;
+			pointerStyle.top = pointerElementRect.top + pointerElementRect.height / 2 -16;
+			pointerUI = <div style={ pointerStyle }>
 							<div style={ pointerStyleInner } className="weave-guidance-pointer-inner"/>
 							<div style={ pointerStyleOuter } className="weave-guidance-pointer-outer"/>
 						</div>;
