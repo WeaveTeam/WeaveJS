@@ -336,7 +336,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								className="weave-padded-hbox"
 								onDragOver={(event) => this.onDragOverTab(tab)}
 								onDragLeave={this.onDragLeaveTab}
-								ref={InteractiveTour.getComponentRefCallback(tab.label)}
+								ref={InteractiveTour.enable ? InteractiveTour.getComponentRefCallback(tab.label): null}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.setTabLabel(tab.id, newName)} textContent={tab.label}/>*/}
 								{tab.label}
