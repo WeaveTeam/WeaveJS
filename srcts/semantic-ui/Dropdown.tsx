@@ -143,6 +143,8 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
 			InteractiveTour.targetComponentOnClick(menuID)
 		}
+		
+		this.props.onClose && this.props.onClose();
 
 		event.stopPropagation(); // we dont want to call the click listener for dropdown
 
