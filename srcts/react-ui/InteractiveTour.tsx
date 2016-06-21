@@ -112,12 +112,12 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 	static getComponentRefCallback=(stepName:string): any =>
 	{
-		return InteractiveTour.stepComponentRefCallbackMap.get(stepName);
+		return InteractiveTour.stepComponentRefCallbackMap && InteractiveTour.stepComponentRefCallbackMap.get(stepName);
 	};
 
 	static getPointerRefCallback=(stepName:string): any =>
 	{
-		return InteractiveTour.stepPointerRefCallbackMap.get(stepName);
+		return InteractiveTour.stepPointerRefCallbackMap && InteractiveTour.stepPointerRefCallbackMap.get(stepName);
 	};
 
 	static isEnabled=()=>{
