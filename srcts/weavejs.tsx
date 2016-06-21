@@ -60,6 +60,7 @@ weavejs.core.WeaveArchive.JSZip = JSZip;
 
 import * as jquery from "jquery";
 import Div from "./react-ui/Div";
+import VendorPrefixer from "./react-ui/VendorPrefixer";
 
 // global jQuery needed for semantic
 (window as any).jQuery = (jquery as any)["default"];
@@ -113,5 +114,6 @@ export
 	ReactUtils,
 	WeaveReactUtils,
 	WeaveArchive,
-	Div
+	Div,
+	VendorPrefixer
 };

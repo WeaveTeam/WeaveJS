@@ -4,7 +4,7 @@
     "jsx": "preserve",
     "module": "system",
     "target": "es6",
-    "outFile": "lib-typings/WeaveJS.jsx",
+    "outFile": "lib-typings/weavejs.jsx",
     "declaration": true
   },
   "exclude":[
