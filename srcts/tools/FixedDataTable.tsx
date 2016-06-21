@@ -102,42 +102,10 @@ export interface ITextCellProps extends CellProps
 	onCellDoubleClick?: (rowIndex?: number, columnKey?: string|number) => void;
 }
 
-export interface ITextCellState
-{
-
-}
-
 export const SortTypes = {
 	ASC: 'ASC' as 'ASC',
 	DESC: 'DESC' as 'DESC',
 };
-
-
-export class TextCell extends React.Component<ITextCellProps, ITextCellState>
-{
-
-	constructor(props:ITextCellProps)
-	{
-		super(props);
-	}
-
-	handleDoubleClick=(event:React.MouseEvent)=>
-	{
-		if (this.props.onCellDoubleClick)
-			this.props.onCellDoubleClick(this.props.rowIndex, this.props.columnKey);
-	}
-
-	render():JSX.Element
-	{
-		const {rowIndex, columnKey, data, sortIndices} = this.props;
-		var value = data[sortIndices[rowIndex]];
-		return (
-			<Cell {...this.props}>
-				<span onDoubleClick={this.handleDoubleClick}>{value && value[columnKey]}</span>
-			</Cell>
-		);
-	}
-}
 
 export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeaderState>
 {
@@ -503,6 +471,20 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		});
 	};
 
+	renderCell=(props: {rowIndex: number, columnKey: string, height: number, width: number}):JSX.Element=>
+	{
+		let row = this.props.rows[this.state.sortIndices[props.rowIndex]];
+
+		let handleDoubleClick = (event:React.MouseEvent)=>{
+			if (this.props.onCellDoubleClick)
+				this.props.onCellDoubleClick(String(props.rowIndex), props.columnKey);
+		}
+		return (<Cell {...props}>
+			<span onDoubleClick={handleDoubleClick}>{row && row[props.columnKey]}</span>
+		</Cell>
+		);
+	}
+
 	render():JSX.Element
 	{
 		var tableContainer:React.CSSProperties = {
@@ -535,6 +517,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 								if (this.props.showIdColumn || id != this.props.idProperty){
 									return (
 										<Column
+											allowCellsRecycling={true}
 											key={index}
 											columnKey={id}
 											header={
@@ -543,23 +526,11 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 													sortDirection={id == this.state.sortId ? this.state.sortDirection : "NONE"}
 													disableSort={this.props.disableSort}
 													columnKey={id}
-												>
-													{this.props.columnTitles ? this.props.columnTitles[id]:id}
+													>
+													{this.props.columnTitles ? this.props.columnTitles[id] : id}
 												</SortHeaderCell>
 											}
-											cell={(props:CellProps) => (
-												<TextCell
-													data={this.props.rows}
-													sortIndices={this.state.sortIndices}
-													onCellDoubleClick={(rowIndex:number, columnKey:string|number) => {
-														this.props.onCellDoubleClick && this.props.onCellDoubleClick(
-															this.getValue(rowIndex, this.props.idProperty),
-															columnKey as string
-														)
-													}}
-													{...props}
-												/>)
-											}
+											cell={this.renderCell}
 											width={this.state.columnWidths[id] || (this.props.evenlyExpandRows ? (evenWidth || this.props.initialColumnWidth):this.props.initialColumnWidth)}
 											isResizable={this.props.allowResizing}
 										/>
