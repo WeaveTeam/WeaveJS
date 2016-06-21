@@ -149,6 +149,15 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			this.props.onCloseHandler(this);
 	}
 
+	closeEditor=(event:React.MouseEvent)=>
+	{
+		this.props.onCloseHandler && this.props.onCloseHandler(this);
+		if(InteractiveTour.isEnabled())
+		{
+			InteractiveTour.targetComponentOnClick("Tool editor");
+		}
+	};
+
 	private activeEditor:Element;
 
 	render()
@@ -266,7 +275,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						:	null
 					}
 					<Button
-						onClick={ () => this.props.onCloseHandler(this) }
+						onClick={ this.closeEditor }
 					    title="Close editor">
 						&#x2715;
 					</Button>
