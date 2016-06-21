@@ -623,7 +623,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		menuBarUI = !this.enableMenuBar || this.enableMenuBar.value || (this.urlParams && this.urlParams.editable)
 			?	<WeaveMenuBar
-					style={prefixer({order: -1, opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
+					style={prefixer({opacity: !this.enableMenuBar || this.enableMenuBar.value ? 1 : 0.5 })}
 					weave={weave}
 					menus={this.menus}
 				/>
@@ -644,9 +644,9 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				{...this.props as React.HTMLAttributes}
 				style={_.merge({flex: 1}, this.props.style)}
 				onContextMenu={ContextMenu.open}>
+				{menuBarUI}
 				{progressBarUI}
 				{weaveTabbedComponent}
-				{menuBarUI}
 				{interactiveTourComponent}
 			</VBox>
 		);

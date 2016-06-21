@@ -97,7 +97,7 @@ export default class ReactUtils
 		return popoutWindow;
 	}
 	
-	static openPopup(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false):React.ReactInstance
+	static openPopup(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(event:MouseEvent)=>void):React.ReactInstance
 	{
 		var document = ReactUtils.getDocument(context);
 		var element = document.body.appendChild(document.createElement("div")) as Element;
@@ -110,6 +110,7 @@ export default class ReactUtils
 				if (element.contains(event.target as HTMLElement))
 					return;
 				ReactUtils.closePopup(popup);
+				onClose && onClose(event);
 			});
 		}
 		
