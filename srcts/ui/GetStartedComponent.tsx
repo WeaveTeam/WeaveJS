@@ -61,9 +61,7 @@ export default class GetStartedComponent extends React.Component<GetStartedCompo
 
 	interactiveListItemClick=(itemName:string)=>
 	{
-		InteractiveTour.steps = this.items[itemName].steps ;
-		InteractiveTour.stepContents = this.items[itemName].contents ;
-		InteractiveTour.stepPointers = this.items[itemName].stepPointers ;
+		InteractiveTour.startTour(this.items[itemName].steps,this.items[itemName].contents,this.items[itemName].stepPointers);
 		if(this.props.onViewSelect)
 			this.props.onViewSelect("tour");
 	};

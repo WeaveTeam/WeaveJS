@@ -248,6 +248,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		return (
 			<VBox className={ classNames(this.props.className) }
 			      style={ this.props.style }
+			      ref={InteractiveTour.getComponentRefCallback("Tool editor")}
 			      onMouseEnter={() => this.forceUpdate()}>
 				<HBox className="weave-ToolEditor-Header">
 					{backButtonUI}
@@ -270,9 +271,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 						&#x2715;
 					</Button>
 				</HBox>
-				<VBox id={InteractiveTour.prefix +"Tool editor"}
-				      style={{flex: 1, padding: 8, overflow: "auto"}}
-				      ref={InteractiveTour.registerMountedComponentToStepName}>
+				<VBox style={{flex: 1, padding: 8, overflow: "auto"}}>
 					{editorUI}
 				</VBox>
 			</VBox>

@@ -95,8 +95,7 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 									ref={linkReactStateRef(this, {value: this.props.targetUrl}, 500)}/>
 				<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
 					<Button style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: 0, whiteSpace: "nowrap", border: "1px solid #E0E1E2"}}
-					        id={InteractiveTour.prefix + "Open file"}
-					        ref={InteractiveTour.getPointerTargetComponent}>
+					        ref={InteractiveTour.getPointerRefCallback("Open file")}>
 						{Weave.lang("Open file")}
 					</Button>
 				</FileInput>

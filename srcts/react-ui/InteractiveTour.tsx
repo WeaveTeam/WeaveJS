@@ -19,17 +19,106 @@ export interface InteractiveTourState
 	tooltipWidth?:number // used this at componentDidUpdate to re-render again to center the toolTip
 }
 
+
 export default class InteractiveTour extends React.Component<InteractiveTourProps,InteractiveTourState>
 {
-
+	// initialize with null values, we don't want occupy memory as they are static variables
+	// Since Tour happens only for the first time , there is no point on creating these objects for the App
 	static stepName:LinkableString = new LinkableString(); // callback are registered in InteractiveTour Instance
 	static unMountedStepName:string = null;
-	static prefix:string = "weave-tour-";
-	static steps:string[] = []; // props.id are supplied as string of Array. Array supplied in click event of Guidance List element in GetStartedComponent
-	static stepContents:string[] = []; // contents matching steps name
-	static stepPointers:string[] = []; // pointers to click matching steps name
-	static stepComponentMap:any = {}; // id mapped with component
-	static pointerComponentMap:any = {}; // id mapped with component
+	static steps:string[] = null; // props.id are supplied as string of Array. Array supplied in click event of Guidance List element in GetStartedComponent
+	static stepContents:string[] = null; // contents matching steps name
+	static stepPointers:string[] = null; // pointers to click matching steps name
+	static stepComponentMap:any = null; // id mapped with component
+	static pointerComponentMap:any = null; // id mapped with component
+	static stepComponentRefCallbackMap:Map<string,Function> = null;
+	static stepPointerRefCallbackMap:Map<string,Function> = null;
+
+
+	static startTour=(steps:string[],stepContents:string[],stepPointers:string[])=>
+	{
+		// objects are created, when tour is initiated
+		InteractiveTour.steps = steps;
+		InteractiveTour.stepContents = stepContents;
+		InteractiveTour.stepPointers = stepPointers;
+		InteractiveTour.stepComponentMap = {};
+		InteractiveTour.pointerComponentMap = {};
+		InteractiveTour.stepComponentRefCallbackMap = new Map();
+		InteractiveTour.stepPointerRefCallbackMap = new Map();
+
+		// closure function preferred over static function , keeping memory in mind
+		function registerMountedComponentToStepName(stepName:string,mountedElement:any)
+		{
+			if(!mountedElement)
+			{
+				
+				return;
+			}
+				
+
+			if(InteractiveTour.steps && InteractiveTour.steps.length > 0) // if part of guidance steps
+			{
+				let stepIndex:number = InteractiveTour.steps.indexOf(stepName);
+				if(stepIndex > -1)
+				{
+					InteractiveTour.stepComponentMap[stepName] = mountedElement;
+					if(stepIndex == 0) // if mounted component is part of first step
+					{
+						InteractiveTour.stepName.value = stepName; // se the state, which will call the callback registered in Guidance Container instance
+					}
+					if(InteractiveTour.steps[stepIndex] == InteractiveTour.stepPointers[stepIndex])
+					{
+						InteractiveTour.pointerComponentMap[stepName] = mountedElement;
+					}
+					// sometimes after click event for next step is triggered, but component might not got mounted yet
+					if(InteractiveTour.unMountedStepName && InteractiveTour.unMountedStepName == stepName)
+					{
+						InteractiveTour.unMountedStepName = null; // set to null as its mounted
+						InteractiveTour.stepName.value = stepName;
+					}
+				}
+			}
+
+		}
+
+		// closure function preferred over static function , keeping memory in mind
+		function registerPointerComponentToStepName(stepName:string ,mountedElement:any)
+		{
+			if(!mountedElement)
+				return;
+
+			if(InteractiveTour.stepPointers && InteractiveTour.stepPointers.length > 0) // if part of guidance steps
+			{
+				if(InteractiveTour.stepPointers.indexOf(stepName) > -1)
+				{
+					InteractiveTour.pointerComponentMap[stepName] = mountedElement;
+				}
+			}
+
+		}
+
+		// for each stepName ref callback function attached bounded with step name.
+		// this ensures callbacks are attached only to current active tour steps
+		// not for all the components in the app.
+		steps.map(function(stepName:string,index:number){
+			InteractiveTour.stepComponentRefCallbackMap.set(stepName,registerMountedComponentToStepName.bind(null,stepName))
+		});
+
+		stepPointers.map(function(stepName:string,index:number){
+			if(stepName)
+				InteractiveTour.stepPointerRefCallbackMap.set(stepName,registerPointerComponentToStepName.bind(null,stepName))
+		});
+	};
+
+	static getComponentRefCallback=(stepName:string): any =>
+	{
+		return InteractiveTour.stepComponentRefCallbackMap.get(stepName);
+	};
+
+	static getPointerRefCallback=(stepName:string): any =>
+	{
+		return InteractiveTour.stepPointerRefCallbackMap.get(stepName);
+	};
 
 	static isEnabled=()=>{
 		return InteractiveTour.steps && InteractiveTour.steps.length > 0;
@@ -45,69 +134,13 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		InteractiveTour.stepContents = null;
 		InteractiveTour.stepPointers = null;
 		InteractiveTour.unMountedStepName = null;
-		InteractiveTour.stepComponentMap = {};
-		InteractiveTour.pointerComponentMap = {};
+		InteractiveTour.stepComponentMap = null;
+		InteractiveTour.pointerComponentMap = null;
+		InteractiveTour.stepComponentRefCallbackMap = null;
+		InteractiveTour.stepPointerRefCallbackMap = null;
 	};
 
-	// static method passed to target Component's Reference callback
-	// props.id is matched the ref callback to cache either mounted or unmounted state of the component
-	static registerMountedComponentToStepName=(mountedElement:any)=>
-	{
-
-		if(!mountedElement)
-		{
-			return;
-		}
-
-		if(InteractiveTour.steps && InteractiveTour.steps.length > 0) // if part of guidance steps
-		{
-			let stepName:string = mountedElement.props.id;
-			stepName = stepName.substr(InteractiveTour.prefix.length); // remove the prefix attached to the stepName
-			let stepIndex:number = InteractiveTour.steps.indexOf(stepName);
-			if(stepIndex > -1)
-			{
-				InteractiveTour.stepComponentMap[stepName] = mountedElement;
-				if(stepIndex == 0) // if mounted component is part of first step
-				{
-					InteractiveTour.stepName.value = stepName; // se the state, which will call the callback registered in Guidance Container instance
-				}
-				if(InteractiveTour.steps[stepIndex] == InteractiveTour.stepPointers[stepIndex])
-				{
-					InteractiveTour.pointerComponentMap[stepName] = mountedElement;
-				}
-				// sometimes after click event for next step is triggered, but component might not got mounted yet
-				if(InteractiveTour.unMountedStepName && InteractiveTour.unMountedStepName == stepName)
-				{
-					InteractiveTour.unMountedStepName = null; // set to null as its mounted
-					InteractiveTour.stepName.value = stepName;
-				}
-			}
-		}
-
-	};
-
-	// static method passed to target Component's Reference callback
-	// props.id is matched the ref callback to cache either mounted or unmounted state of the component
-	static getPointerTargetComponent=(mountedElement:any)=>
-	{
-
-		if(!mountedElement)
-		{
-			
-			return;
-		}
-
-		if(InteractiveTour.stepPointers && InteractiveTour.stepPointers.length > 0) // if part of guidance steps
-		{
-			let stepName:string = mountedElement.props.id;
-			stepName = stepName.substr(InteractiveTour.prefix.length); // remove the prefix attached to the stepName
-			if(InteractiveTour.stepPointers.indexOf(stepName) > -1)
-			{
-				InteractiveTour.pointerComponentMap[stepName] = mountedElement;
-			}
-		}
-
-	};
+	
 
 	// static method passed to target Component's Reference callback
 	// this tell on interactive guidance that user clicked the component that belongs to this step
@@ -155,12 +188,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	// to draw highlighter and overlay
 	private targetMountedNode:any = null;
 	private pointerMountedNode:any = null;
-
-
-	resetInteractiveTour=()=>
-	{
-
-	}
+	
 
 	updateNextComponentName=()=>
 	{
@@ -206,13 +234,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	};
 
 
-
-
-	componentWillReceiveProps(nextProps:InteractiveTourProps)
-	{
-
-	}
-
 	closeHandler=()=>
 	{
 		this.setState({
@@ -226,9 +247,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			this.props.onClose();
 		}
 	};
-
-
-
 
 
 
@@ -449,6 +467,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			let pointerStyle:React.CSSProperties = {
 				position:"fixed",
 				pointerEvents:"none",// so that target component will receive events
+				zIndex:1 // pointers comes over the component so its necessary to set 1 as menu too have zindex 1
 			};
 
 			pointerStyle.left = pointerElementRect.left + pointerElementRect.width / 2;
@@ -560,28 +579,17 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		this.state = {
 			visible:true
 		}
-
 	}
 
-	componentWillReceiveProps(nextProps:InteractiveTourToolTipProps)
-	{
-
-	}
 
 	closeHandler=()=>
 	{
-		if(this.props.onClose)
-		{
-			this.props.onClose();
-		}
+		this.props.onClose && this.props.onClose()
 	};
 
 	 nextHandler=()=>
 	 {
-		 if(this.props.onNextClick)
-		 {
-			 this.props.onNextClick(this.props.title);
-		 }
+		 this.props.onNextClick && this.props.onNextClick(this.props.title);
 	 };
 
 
@@ -593,9 +601,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			minWidth:"200px",
 			maxWidth:"300px"
 		});
-
-
-
+		
 		let containerStyle:React.CSSProperties = {
 			padding:"8px"
 		};
@@ -631,7 +637,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 				containerStyle.position = "relative";
 				containerStyle.left = this.props.shift;
 			}
-
 		}
 		else if(this.props.location == InteractiveTourToolTip.RIGHT || this.props.location == InteractiveTourToolTip.RIGHT_BOTTOM || this.props.location == InteractiveTourToolTip.RIGHT_TOP)
 		{
@@ -646,7 +651,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 				containerStyle.position = "relative";
 				containerStyle.top = this.props.shift;
 			}
-
 		}
 		else if(this.props.location == InteractiveTourToolTip.LEFT || this.props.location == InteractiveTourToolTip.LEFT_BOTTOM || this.props.location == InteractiveTourToolTip.LEFT_TOP)
 		{
@@ -676,8 +680,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			cursor:"pointer",
 			color:"#FFBE00"
 		};
-
-
+		
 		let footerUI:JSX.Element = null;
 		let closeButtonUI:JSX.Element = null;
 		if(this.props.enableFooter)

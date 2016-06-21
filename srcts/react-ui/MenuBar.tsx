@@ -114,9 +114,8 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 			className:menuBarClass,
 			menu:this.props.config[index].menu,
 			key:index,
-			id:InteractiveTour.prefix + props.label,
 			openOnMouseEnter:this.state.showMenu,
-			ref:InteractiveTour.registerMountedComponentToStepName ,
+			ref:InteractiveTour.getComponentRefCallback(props.label) as any,
 			onClick:(event:React.MouseEvent) => {
 				this.onMenubarItemClick(index,event);
 				InteractiveTour.isEnabled() ? InteractiveTour.targetComponentOnClick(props.label) :null

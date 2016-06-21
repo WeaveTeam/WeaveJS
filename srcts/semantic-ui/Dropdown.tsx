@@ -128,7 +128,12 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				menuMounted:false
 			});
 		}
-		InteractiveTour.isEnabled() ? InteractiveTour.registerMountedComponentToStepName(ele) : null;
+		if(InteractiveTour.isEnabled())
+		{
+			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
+			let func:any = InteractiveTour.getComponentRefCallback(menuID);
+			func(ele);
+		}
 
 	};
 
@@ -185,11 +190,8 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 					menuStyle.left = -this.menuRect.width;
 				}
 			}
-
-			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
-			menuID = InteractiveTour.prefix + menuID;
-			menuUI = <Menu id={menuID}
-			               ref={this.getMenuRef}
+			
+			menuUI = <Menu ref={this.getMenuRef}
 			               menu={this.props.menu}
 			               onClick={this.menuClickListener}
 			               style={menuStyle}/>;
