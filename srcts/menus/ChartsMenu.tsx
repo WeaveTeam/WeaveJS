@@ -16,6 +16,7 @@ import C3PieChart from "../tools/C3PieChart";
 import C3ScatterPlot from "../tools/C3ScatterPlot";
 import TableTool from "../tools/TableTool";
 import TextTool from "../tools/TextTool";
+import Sparkline from "../tools/Sparkline";
 
 import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
@@ -55,6 +56,7 @@ export default class ChartsMenu implements MenuBarItemProps
 			OpenLayersMapTool,
 			C3PieChart,
 			C3ScatterPlot,
+			Sparkline,
 			TableTool,
 			TextTool
 		];

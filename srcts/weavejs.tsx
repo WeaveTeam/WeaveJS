@@ -21,6 +21,7 @@ import DataFilterTool from "./tools/DataFilterTool/DataFilterTool";
 import AttributeMenuTool from "./tools/AttributeMenuTool";
 import OpenLayersMapTool from "./tools/OpenLayersMapTool";
 import SessionStateMenuTool from "./tools/SessionStateMenuTool";
+import Sparkline from "./tools/Sparkline";
 import TableTool from "./tools/TableTool";
 import TextTool from "./tools/TextTool";
 import ToolTip from "./tools/ToolTip";
@@ -90,6 +91,7 @@ export
 	OpenLayersMapTool,
 	AttributeMenuTool,
 	SessionStateMenuTool,
+	Sparkline,
 	TableTool,
 	TextTool,
 	ToolTip,
