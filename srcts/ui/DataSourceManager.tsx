@@ -11,7 +11,7 @@ import {MenuItemProps} from "../react-ui/Menu";
 import ControlPanel from "./ControlPanel";
 import DataMenu from "../menus/DataMenu";
 import CenteredIcon from "../react-ui/CenteredIcon";
-
+import Dropzone from "../modules/Dropzone";
 import IDataSource = weavejs.api.data.IDataSource;
 
 /* Import editors and their data sources */
@@ -44,16 +44,19 @@ import ForeignDataMappingTransformEditor from "../editors/ForeignDataMappingTran
 
 import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 import GroupedDataTransformEditor from "../editors/GroupedDataTransformEditor";
+import FileMenu from "../menus/FileMenu";
 
 
 export interface IDataSourceManagerProps
 {
 	weave:Weave;
+	fileMenu?:FileMenu;
 }
 
 export interface IDataSourceManagerState
 {
 	selected?:IDataSource;
+	rejected?:boolean
 }
 
 export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
@@ -75,7 +78,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	constructor(props:IDataSourceManagerProps)
 	{
 		super(props);
-		this.state = {};
+		this.state = {
+			rejected: false
+		};
 	}
 
 	componentDidMount()
@@ -144,6 +149,20 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		root.removeObject(root.getName(dataSource));
 	}
 
+	handleDataFileDrop = (file:File):void =>
+	{
+		var extension = file.name.split('.').pop();
+		if(this.props.fileMenu.getSupportedFileTypes(true).indexOf('.' + extension) != -1)//if file supported
+		{
+			this.props.fileMenu.handleOpenedFile(file);
+		}
+		else
+		{
+			console.log("This data format is not supported yet");//TODO report this status in the editor?
+		}
+
+	};
+
 	render():JSX.Element
 	{
 		let root = this.props.weave.root;
@@ -204,11 +223,35 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		else
 		{
 			editorStyle = _.merge(editorStyle,{ justifyContent: "center", alignItems: "center"});
-			editorJsx = <VBox className="ui segment" style={editorStyle}>
-							<div className="ui centered header">
-								{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
-							</div>
-						</VBox>;
+			editorJsx = <div style={{padding: '10px', display: "flex", flex: 1}}>
+							<Dropzone
+								style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1, fontSize: 24}}
+								className={"weave-dropzone-file"}
+								activeStyle={{border: "8px solid #CCC"}}
+								onDropAccepted={(files:File[]) => {
+											files.map((file) => {
+											this.handleDataFileDrop(file);
+										});
+										this.setState({
+											rejected:false /*to remove the status of a previous rejection*/
+										});
+								}}
+								onDropRejected={(files:File[]) => {
+										this.setState({
+											rejected:true
+										});
+								}}
+								accept=".csv,.geojson,.txt,.tsv,.xls,.shp,.dbf"
+								disableClick={false}>
+								<VBox style={editorStyle}>
+									<div className="ui centered header">
+										{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
+									</div>
+										{ this.state.rejected ?  <span>{Weave.lang("The specified data file could not be uploaded. Only files with the following extensions are allowed: .csv,.geojson,.txt,.tsv,.xls,.shp,.dbf")}</span>
+										: null  }
+								</VBox>
+							</Dropzone>
+						</div>
 		}
 
 		let styleObj:React.CSSProperties = {

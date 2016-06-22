@@ -16,9 +16,11 @@ import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import KeySet = weavejs.data.key.KeySet;
 import ILinkableCompositeObject = weavejs.api.core.ILinkableCompositeObject;
-import IDataSource = weavejs.api.data.IDataSource;
 import StandardLib = weavejs.util.StandardLib;
 import URLRequest = weavejs.net.URLRequest;
+import WeaveAPI = weavejs.WeaveAPI;
+import CSVDataSource = weavejs.data.source.CSVDataSource;
+import IDataSource = weavejs.api.data.IDataSource;
 
 export default class FileMenu implements MenuBarItemProps
 {
@@ -261,7 +263,7 @@ export default class FileMenu implements MenuBarItemProps
 	{
 		let reader:FileReader = new FileReader();
 		reader.onload = (event:any) => {
-			this.handleOpenedFileContent(file.name, event.target.result, dataFilesOnly);
+			this.handleOpenedFileContent(file.name, new Uint8Array(reader.result as ArrayBuffer), dataFilesOnly);
 		};
 		reader.readAsArrayBuffer(file);
 	};
@@ -286,76 +288,76 @@ export default class FileMenu implements MenuBarItemProps
 			return;
 		}
 
-//		if (ext == 'zip')
-//		{
-//			var files:Object = weave.flascc.readZip(fileContent);
-//			for (var fileName:String in files)
-//				handleOpenedFile(fileName, files[fileName], true);
-//
-//			adsp = DraggablePanel.getStaticInstance(AddDataSourcePanel);
-//			if (adsp.parent)
-//				adsp.sendWindowToForeground();
-//
-//			return;
-//		}
-//
-//		function newDataSource(type:Class):any
-//		{
-//			return dataSource = WeaveAPI.globalHashMap.requestObject(fileName, type, false);
-//		}
-//		function getFileUrl():String
-//		{
-//			return WeaveAPI.URLRequestUtils.saveLocalFile(fileName, fileContent);
-//		}
-//
-//		if (ext == 'tsv' || ext == 'txt')
-//		{
-//			adsp = DraggablePanel.openStaticInstance(AddDataSourcePanel);
-//			adsp.dataSourceType = CSVDataSource;
-//			var csvEditor:CSVDataSourceEditor = adsp.editor as CSVDataSourceEditor;
-//			csvEditor.sourceName.text = fileName;
-//			csvEditor.keyTypeSelector.selectedKeyType = fileName;
-//			csvEditor.setText(fileContent.toString(), ext == 'tsv' ? '\t' : ',');
-//		}
-//		else if (ext == 'csv')
-//		{
-//			var csv:CSVDataSource = newDataSource(CSVDataSource);
-//			csv.url.value = getFileUrl();
-//			csv.keyType.value = fileName;
-//		}
-//		else if (ext == 'xls')
-//		{
-//			var xls:XLSDataSource = newDataSource(XLSDataSource);
-//			xls.url.value = getFileUrl();
-//			xls.keyType.value = fileName;
-//		}
-//		else if (ext == 'shp' || ext == 'dbf')
-//		{
-//			adsp = DraggablePanel.openStaticInstance(AddDataSourcePanel);
-//			adsp.dataSourceType = DBFDataSource;
-//			var dbfEditor:DBFDataSourceEditor = adsp.editor as DBFDataSourceEditor;
-//			var fileNameWithoutExt:string = fileName.substr(0, -4);
-//			dbfEditor.sourceName.text = fileNameWithoutExt;
-//			dbfEditor.keyTypeSelector.selectedKeyType = fileNameWithoutExt;
-//			if (ext == 'shp')
-//				dbfEditor.shpURL.text = getFileUrl();
-//			else
-//				dbfEditor.dbfURL.text = getFileUrl();
-//			if (dbfEditor.shpURL.text && dbfEditor.dbfURL.text)
-//				adsp.addSource();
-//		}
-//		else if (ext == 'geojson')
-//		{
-//			var geojson:GeoJSONDataSource = newDataSource(GeoJSONDataSource);
-//			geojson.url.value = getFileUrl();
-//			geojson.keyType.value = fileName;
-//		}
-//
-//		if (dataSource && !FileMenu.initTemplate(dataSource))
-//		{
-//			var dsm:DataSourceManager = DraggablePanel.openStaticInstance(DataSourceManager);
-//			dsm.selectDataSource(dataSource);
-//		}
+		/*if (ext == 'zip')
+		{
+			var files:Object = weave.flascc.readZip(fileContent);
+			for (var fileName:String in files)
+				handleOpenedFile(fileName, files[fileName], true);
+			adsp = DraggablePanel.getStaticInstance(AddDataSourcePanel);
+			if (adsp.parent)
+				adsp.sendWindowToForeground();
+
+			return;
+		}*/
+
+		var newDataSource = (type:typeof IDataSource):any =>
+		{
+			return dataSource = this.owner.weave.root.requestObject(fileName, type, false);
+		};
+		var getFileUrl = ():string =>
+		{
+			return WeaveAPI.URLRequestUtils.saveLocalFile(this.owner.weave.root, fileName, fileContent);
+		};
+
+		//Handling diff files with diff extensions
+		if (ext == 'tsv' || ext == 'txt')
+		{
+			/*adsp = DraggablePanel.openStaticInstance(AddDataSourcePanel);
+			adsp.dataSourceType = CSVDataSource;
+			var csvEditor:CSVDataSourceEditor = adsp.editor as CSVDataSourceEditor;
+			csvEditor.sourceName.text = fileName;
+			csvEditor.keyTypeSelector.selectedKeyType = fileName;
+			csvEditor.setText(fileContent.toString(), ext == 'tsv' ? '\t' : ',');*/
+		}
+		else if (ext == 'csv')
+		{
+			dataSource = newDataSource(CSVDataSource);
+			dataSource.url.value = getFileUrl();
+			dataSource.keyType.value = fileName;
+		}
+		else if (ext == 'xls')
+		{
+			/*var xls:XLSDataSource = newDataSource(XLSDataSource);
+			xls.url.value = getFileUrl();
+			xls.keyType.value = fileName;*/
+		}
+		/*else if (ext == 'shp' || ext == 'dbf')
+		{
+			adsp = DraggablePanel.openStaticInstance(AddDataSourcePanel);
+			adsp.dataSourceType = DBFDataSource;
+			var dbfEditor:DBFDataSourceEditor = adsp.editor as DBFDataSourceEditor;
+			var fileNameWithoutExt:string = fileName.substr(0, -4);
+			dbfEditor.sourceName.text = fileNameWithoutExt;
+			dbfEditor.keyTypeSelector.selectedKeyType = fileNameWithoutExt;
+			if (ext == 'shp')
+				dbfEditor.shpURL.text = getFileUrl();
+			else
+				dbfEditor.dbfURL.text = getFileUrl();
+			if (dbfEditor.shpURL.text && dbfEditor.dbfURL.text)
+				adsp.addSource();
+		}
+		else if (ext == 'geojson')
+		{
+			var geojson:GeoJSONDataSource = newDataSource(GeoJSONDataSource);
+			geojson.url.value = getFileUrl();
+			geojson.keyType.value = fileName;
+		}*/
+
+		/*if (dataSource && !FileMenu.initTemplate(dataSource))
+		{
+			var dsm:DataSourceManager = DraggablePanel.openStaticInstance(DataSourceManager);
+			dsm.selectDataSource(dataSource);
+		}*/
 	}
 
 	private findDataSource<T extends (new()=>IDataSource)>(type:new(..._:any[])=>T, filter:(dataSource:T)=>boolean, create:boolean = false):T

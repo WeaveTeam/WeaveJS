@@ -602,7 +602,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 					leadingTabs: [
 						{
 							label: "Data Sources",
-							content: <DataSourceManager weave={this.props.weave}/>
+							content: <DataSourceManager weave={this.props.weave} fileMenu={ this.menus.fileMenu }/>
 						}
 					],
 					onAdd: [
