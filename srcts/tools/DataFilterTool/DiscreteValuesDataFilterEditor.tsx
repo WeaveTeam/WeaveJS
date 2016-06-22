@@ -2,13 +2,9 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox, VBox} from "../../react-ui/FlexBox";
-import CheckBoxList from "../../react-ui/CheckBoxList";
-import ComboBox from "../../semantic-ui/ComboBox";
-import List from "../../react-ui/List";
-import HSlider from "../../react-ui/RCSlider/HSlider";
-import VSlider from "../../react-ui/RCSlider/VSlider";
 import AbstractFilterEditor from "./AbstractFilterEditor";
 import {FilterEditorProps, FilterEditorState, FilterOption} from "./AbstractFilterEditor";
+import MenuLayoutComponent from '../../ui/MenuLayoutComponent';
 
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 import LinkableString = weavejs.core.LinkableString;
@@ -51,13 +47,7 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 	
 	verifyLayoutMode(value:string):boolean
 	{
-		return [
-			LAYOUT_LIST,
-			LAYOUT_COMBO,
-			LAYOUT_VSLIDER,
-			LAYOUT_HSLIDER,
-			LAYOUT_CHECKBOXLIST
-		].indexOf(value) >= 0;
+		return DiscreteValuesDataFilterEditor.OPTIONS.indexOf(value) >= 0;
 	}
 
 	get deprecatedStateMapping():Object
@@ -85,32 +75,12 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 			this.options = this.getChoices();
 		}
 		let values:any = this.filter ? this.filter.values.state : [];
-		
-		switch (this.layoutMode.value)
-		{
-			case LAYOUT_CHECKBOXLIST:
-				return <VBox style={{flex: 1, padding: 10}}>
-							<CheckBoxList options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-						</VBox>
-				
-			case LAYOUT_LIST:
-				return <List options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-				
-			case LAYOUT_HSLIDER:
-				return <HBox style={{flex: 1, padding: 25}}>
-							<HSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-						</HBox>;
-			
-			case LAYOUT_VSLIDER:
-				return <VBox style={{flex: 1, padding: 25}}>
-							<VSlider type="categorical" options={this.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
-						</VBox>;
-				
-			case LAYOUT_COMBO:
-				return <VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
-							<ComboBox style={{textAlign: "center"}} placeholder={(Weave.lang("Select a value"))} options={this.options} value={ values && values[0]} onChange={(value) => this.onChange([value])}/>
-						</VBox>;
-		}
+
+		return(<MenuLayoutComponent options={ this.options }
+		                            displayMode={ this.layoutMode.value }
+		                            onChange={ this.onChange.bind(this) }
+		                            selectedItems={ values }
+		/>);
 	}
 }
 
