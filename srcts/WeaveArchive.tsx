@@ -155,4 +155,15 @@ export default class WeaveArchive {
 			}
 		}
 	}
+	
+	static setSessionFromUrl(weave:Weave, url:string)
+	{
+		return weavejs.WeaveAPI.URLRequestUtils
+			.request(weave.root, new weavejs.net.URLRequest(url))
+			.then(WeaveArchive.deserialize)
+			.then((archive) => {
+				archive.setSessionFromArchive(weave);
+				return archive;
+			});
+	}
 }
