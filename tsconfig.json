@@ -11,7 +11,7 @@
 	"forceConsistentCasingInFileNames": true,
 	"listFiles": true,
 	"noImplicitReturns": false,
-	"pretty": true
+	"pretty": false
   },
   "exclude":[
     "node_modules", "outts", "lib-typings"
