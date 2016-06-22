@@ -46,7 +46,7 @@ export default class LocalFileOpenComponent extends React.Component<IOpenFilePro
 						<div className="ui horizontal divider" style={{width: "50%"}}>{Weave.lang("Or")}</div>
 						<VBox style={{alignItems: "center"}}>
 							<span>{Weave.lang("Drag it here")}</span>
-							{this.state.rejected ? <span>{Weave.lang("The specified file could not be uploaded. Only files with the following extensions are allowed: weave")}</span>:""}
+							{this.state.rejected ? <span>{Weave.lang("The specified file could not be imported. Only files with the following extensions are allowed: weave")}</span>:""}
 						</VBox>
 					</Dropzone>
 				</VBox>
