@@ -34,7 +34,7 @@ const LAYOUT_COMBO:string = "ComboBox";
 const LAYOUT_VSLIDER:string = "VSlider";
 const LAYOUT_HSLIDER:string = "HSlider";
 
-const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];//todo add the verify callback
+const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];
 
 export interface IAttributeMenuToolState extends IVisToolState
 {

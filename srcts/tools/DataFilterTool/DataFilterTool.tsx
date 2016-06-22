@@ -239,6 +239,8 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		Weave.getCallbacks(this.props.filterEditor).removeCallback(this, this.forceUpdate);
 	}
 
+	private last_discreteFilterLayoutMode:string;
+
 	//UI event handler for attribute menu layout
 	handleFilterTypeChange = (selectedItem:string):void =>
 	{
@@ -267,6 +269,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		if (this.props.filterEditor.target)
 		{
 			(this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state = selectedItem as string;
+			this.last_discreteFilterLayoutMode = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;
 		}
 	}
 
@@ -301,7 +304,8 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		{
 			selectedFilter = FILTER_TYPE.DISCRETE;
 			filterEditorItem = this.filterEditorMap[FILTER_TYPE.DISCRETE]
-			selectedOption = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;
+			/*selectedOption = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;*/
+			selectedOption = this.last_discreteFilterLayoutMode;
 			filterOptionUI = [
 				<span style={labelStyle}>{ Weave.lang("Layout") }</span>,
 				<ComboBox className="weave-sidebar-dropdown"

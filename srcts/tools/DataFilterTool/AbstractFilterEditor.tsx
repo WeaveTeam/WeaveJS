@@ -92,7 +92,7 @@ export default class AbstractFilterEditor
 	{
 		var filter = this.filter;
 		if (filter)
-			filter.values.state = selectedValues;
+			filter.values.state = Array.isArray(selectedValues) ? selectedValues  : [selectedValues];//combobox returns only one selection, rest all menu layout options return [] of selections
 	}
 
 	get deprecatedStateMapping():Object
