@@ -360,19 +360,24 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 					>
 						{this.state.data && this.state.data.map( (data,index) => {
 							let style:React.CSSProperties;
+							let label:string;
 							if(this.orientationMode.value == RECORD){
 								let record:Record = this.records && this.records[index] as Record;
 								style = _.assign(style,{stroke: record.line.color, fill: record.fill.color ,fillOpacity: .25 });
+								label = record.id.toString();
+							} else {
+								label = Weave.lang(weavejs.data.ColumnUtils.getTitle(columns[index]));
 							}
 							return (
-								<div
+								<VBox
 									key={index}
-									style={{flex: 1, overflow:"auto"}}
+									style={{flex: 1, overflow:"auto", position: "relative"}}
 								>
+									<span style={{position: "absolute", top: 0, left: 0}}>{label}</span>
 									<Sparklines key={this.chartType.value} data={data} width={this.state.width} height={this.state.height/this.state.data.length}>
 										{this.getLineComponent(this.chartType.value,style)}
 									</Sparklines>
-								</div>
+								</VBox>
 							)
 						})}
 					</VBox>:""
