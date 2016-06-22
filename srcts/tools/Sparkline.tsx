@@ -36,6 +36,7 @@ import KeySet = weavejs.data.key.KeySet;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import LinkableVariable = weavejs.core.LinkableVariable;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 declare type Record = {
 	id: IQualifiedKey,
@@ -50,7 +51,7 @@ export interface ISparklineProps extends IVisToolProps {
 }
 
 export interface ISparklineState extends IVisToolState {
-	data?:number[];
+	data?:number[][];
 	width?:number;
 	height?:number;
 }
@@ -64,11 +65,19 @@ const CHART_MODES:ComboBoxOption[] = [
 	{label: "Curve", value: CURVE}
 ];
 
+const COLUMN:string = "column";
+const RECORD:string = "record";
+const ORIENTATION_MODES:ComboBoxOption[] = [
+	{label: "Column Oriented", value: COLUMN},
+	{label: "Record Oriented", value: RECORD}
+];
+
 export default class Sparkline extends SmartComponent<ISparklineProps, ISparklineState> implements IVisTool, IInitSelectableAttributes
 {
-	column  = Weave.linkableChild(this, DynamicColumn);
+	columns  = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 	sortColumn = Weave.linkableChild(this, DynamicColumn);
-	chartMode = Weave.linkableChild(this, new LinkableString(LINE, this.verifyChartMode));
+	chartType = Weave.linkableChild(this, new LinkableString(LINE, this.verifyChartMode));
+	orientationMode = Weave.linkableChild(this, new LinkableString(COLUMN, this.verifyOrientationMode));
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
 	panelTitle = Weave.linkableChild(this, LinkableString);
@@ -84,40 +93,45 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		return [LINE, BARS, CURVE].indexOf(mode) >= 0;
 	}
 
-	private RECORD_FORMAT = {
-		id: IQualifiedKey,
-		value: this.column,
-		sort: this.sortColumn,
-		fill: { color: this.fill.color },
-		line: { color: this.line.color }
-	};
-	private RECORD_DATATYPE = {
-		value: Number,
-		sort: Number,
-		fill: { color: String },
-		line: { color: String }
-	};
+	private verifyOrientationMode(mode:string):boolean
+	{
+		return [COLUMN, RECORD].indexOf(mode) >= 0;
+	}
 
 	private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
 	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
+
+	protected isSelected(key:IQualifiedKey):boolean
+	{
+		var keySet = this.selectionFilter.target as KeySet;
+		return keySet instanceof KeySet && keySet.containsKey(key);
+	}
+
+	protected isProbed(key:IQualifiedKey):boolean
+	{
+		var keySet = this.probeFilter.target as KeySet;
+		return keySet instanceof KeySet && keySet.containsKey(key);
+	}
 
 	constructor(props:ISparklineProps)
 	{
 		super(props);
 		Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate);
 		
+		this.line.color.internalDynamicColumn.globalName = "defaultColorColumn";
 		this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
-		this.column.addGroupedCallback(this, this.dataChanged, true);
+		this.columns.addGroupedCallback(this, this.dataChanged, true);
 		this.sortColumn.addGroupedCallback(this, this.dataChanged, true);
-		this.chartMode.addGroupedCallback(this, this.dataChanged, true);
+		this.orientationMode.addGroupedCallback(this, this.dataChanged, true);
+		this.chartType.addGroupedCallback(this, this.forceUpdate, true);
 
 		this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
-		this.selectionFilter.addGroupedCallback(this, this.forceUpdate);
-		this.probeFilter.addGroupedCallback(this, this.forceUpdate);
+		this.selectionFilter.addGroupedCallback(this, this.dataChanged, true);
+		this.probeFilter.addGroupedCallback(this, this.dataChanged, true);
 
 		this.state = {
 			data: [],
@@ -135,15 +149,16 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	get selectableAttributes()
 	{
 		return new Map<string, IColumnWrapper | ILinkableHashMap>()
-			.set("Column", this.column)
+			.set("Columns", this.columns)
 			.set("Sort", this.sortColumn);
 	}
 
 	get defaultPanelTitle():string
 	{
-		if (!this.column)
+		var columns = this.columns.getObjects() as IAttributeColumn[];
+		if (columns.length == 0)
 			return Weave.lang('Sparkline');
-		return Weave.lang("Sparkline of {0}", weavejs.data.ColumnUtils.getTitle(this.column));
+		return Weave.lang("Sparkline of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 	}
 
 	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
@@ -199,14 +214,20 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
 	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void):JSX.Element =>
 	{
+		let columns = this.columns.getObjects(IAttributeColumn);
+
 		return Accordion.render(
 			[Weave.lang("Data"), renderSelectableAttributes(this.selectableAttributes, pushCrumb)],
 			[
 				Weave.lang("Display"),
 				[
 					[
-						Weave.lang("Mode"),
-						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.chartMode })} options={CHART_MODES}/>
+						Weave.lang("Type"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.chartType })} options={CHART_MODES}/>
+					],
+					[
+						Weave.lang("Orientation Mode"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.orientationMode })} options={ORIENTATION_MODES} type={(columns.length <= 1) ? "disabled":null}/>
 					]
 				]
 			],
@@ -219,7 +240,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	get deprecatedStateMapping()
 	{
 		return {
-			"column": this.column,
+			"columns": this.columns,
 			"sortColumn": this.sortColumn
 		};
 	}
@@ -239,18 +260,69 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 
 	dataChanged()
 	{
-		let data:number[] = [];
-		if (this.column)
-		{
-			this.filteredKeySet.setColumnKeySources([this.column]);
+		let data:number[][];
 
-			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
+		let columns = this.columns.getObjects(IAttributeColumn);
+		let names:string[] = this.columns.getNames();
+
+		this.filteredKeySet.setColumnKeySources(columns);
+
+		if (weavejs.WeaveAPI.Locale.reverseLayout)
+		{
+			columns.reverse();
+			names.reverse();
+		}
+
+		if (columns.length)
+		{
+			//single column case
+			let format:any = _.zipObject(names, columns);
+			format = _.assign(format,{
+				id: IQualifiedKey,
+				sort: this.sortColumn,
+				fill: { color: this.fill.color },
+				line: { color: this.line.color }
+			});
+
+			let datatype:any = {
+				sort: Number,
+				fill: { color: String },
+				line: { color: String }
+			};
+			names.forEach( (name,index) => {
+				datatype[name] = Number;
+			});
+
+
+			this.records = weavejs.data.ColumnUtils.getRecords(format, this.filteredKeySet.keys, datatype);
 			this.records = _.sortByOrder(this.records, ["sort"], ["asc"]);
 
-			if(this.records.length)
-				data = this.records.map( (record:any, index:number) => {
-					return record["value"]
-				});
+			if(this.records.length) {
+				if (columns.length == 1) {
+					//single column case
+					data = [
+						this.records.map((record:any, index:number) => {
+							return record[names[0]];
+						})];
+				} else {
+					if(this.orientationMode.value == COLUMN) {
+						//group columns into rows
+						data = names.map((name:string, index:number) => {
+							return this.records.map((record:any, i:number) => {
+								return record[name];
+							})
+						});
+					} else if(this.orientationMode.value == RECORD) {
+						//group records into rows
+						data = this.records.map((record:any, index:number) => {
+							return names.map((name:string, i:number) => {
+								return record[name];
+							})
+						});
+					}
+				}
+			}
+
 		}
 
 		this.setState({
@@ -258,35 +330,52 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		});
 	}
 
-	render()
+	/**
+	 * Gets the Spark Line component depending on the mode
+	 * @param mode - The Sparkline drawing mode
+	 * @returns React.ReactChild - returns the Sparkline to be displayed
+	 */
+	getLineComponent(mode:string, style:React.CSSProperties):React.ReactChild
 	{
-
-		let lineComponent:React.ReactChild;
-		let style:React.CSSProperties;
-
-		switch (this.chartMode.value)
+		switch (mode)
 		{
 			case LINE:
-				lineComponent = <SparklinesLine />;
-				break;
+				return <SparklinesLine style={style}/>;
 			case BARS:
-				lineComponent = <SparklinesBars />;
-				break;
+				return <SparklinesBars style={style} />;
 			case CURVE:
-				lineComponent = <SparklinesCurve />;
-				break;
+				return  <SparklinesCurve style={style} />;
 		}
+	}
+
+	render()
+	{
+		let columns = this.columns.getObjects(IAttributeColumn);
 
 		return (
 			<ResizingDiv style={{flex: 1, whiteSpace: "nowrap"}} onResize={this.handleResize}>
 				{this.state.width && this.state.height ?
-					<div
+					<VBox
 						style={{flex: 1, overflow:"auto"}}
 					>
-						<Sparklines key={this.chartMode.value} data={this.state.data} width={this.state.width} height={this.state.height}>
-							{lineComponent}
-						</Sparklines>
-					</div>:""
+						{this.state.data && this.state.data.map( (data,index) => {
+							let style:React.CSSProperties;
+							if(this.orientationMode.value == RECORD){
+								let record:Record = this.records && this.records[index] as Record;
+								style = _.assign(style,{stroke: record.line.color, fill: record.fill.color ,fillOpacity: .25 });
+							}
+							return (
+								<div
+									key={index}
+									style={{flex: 1, overflow:"auto"}}
+								>
+									<Sparklines key={this.chartType.value} data={data} width={this.state.width} height={this.state.height/this.state.data.length}>
+										{this.getLineComponent(this.chartType.value,style)}
+									</Sparklines>
+								</div>
+							)
+						})}
+					</VBox>:""
 				}
 			</ResizingDiv>
 		);
