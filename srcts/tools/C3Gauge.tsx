@@ -163,17 +163,6 @@ export default class C3Gauge extends AbstractC3Tool
         return super.selectableAttributes.set("Meter", this.meterColumn);
     }
 
-	renderEditor =():JSX.Element =>
-	{
-		return (
-			<VBox>
-				{
-					super.renderEditor()
-				}
-			</VBox>
-		)
-	}
-
 	getMarginEditor():React.ReactChild[][]
 	{
 		return [
