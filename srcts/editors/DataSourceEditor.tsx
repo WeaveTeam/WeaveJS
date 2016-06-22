@@ -10,7 +10,6 @@ import DynamicComponent from "../ui/DynamicComponent";
 import StatefulTextField from "../ui/StatefulTextField";
 import WeaveTree from "../ui/WeaveTree";
 import FixedDataTable from "../tools/FixedDataTable";
-import {IColumnTitles} from "../tools/FixedDataTable";
 import MenuButton from '../react-ui/MenuButton';
 import ChartsMenu from "../menus/ChartsMenu";
 import {linkReactStateRef, forceUpdateWatcher} from "../utils/WeaveReactUtils";

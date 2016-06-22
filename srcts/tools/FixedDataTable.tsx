@@ -9,78 +9,6 @@ import ResizingDiv, {ResizingDivState} from "../ui/ResizingDiv";
 import SmartComponent from "../ui/SmartComponent";
 
 export declare type SortDirection = "ASC"|"DESC"|"NONE";
-export interface IColumnTitles
-{
-	[columnId: string] : string | JSX.Element
-}
-
-export interface  IColumnWidths
-{
-	[columnId: string] : number
-}
-
-export interface IColumnSortDirections
-{
-	[columnId: string] : string
-}
-
-export interface IRow
-{
-	[columnId:string]: React.ReactChild;
-}
-
-export interface IFixedDataTableProps extends React.Props<FixedDataTable>
-{
-	idProperty:string;
-	rows:IRow[];
-	columnIds:string[];
-	columnTitles?:IColumnTitles;
-	enableHover?:boolean;
-	enableSelection?:boolean;
-	disableSort?:boolean;
-	probedIds?:string[];
-	selectedIds?:string[];
-	onHover?:(id:string[]) => void;
-	onSelection?:(id:string[]) => void;
-	onCellDoubleClick?: (rowId: string, columnId: string) => void;
-	showIdColumn?:boolean;
-	rowHeight?:number;
-	headerHeight?:number;
-	initialColumnWidth?:number;
-	evenlyExpandRows?:boolean;
-	allowResizing?:boolean;
-	width?:number;
-	height?:number;
-	showBottomBorder?:boolean;
-	allowClear?: boolean;
-	multiple?: boolean;
-	sortId?:string;
-	sortDirection?: SortDirection;
-	/** 
-	 *	a callback function that will be called if you want to sort the data
-	 *  manually. if this function is provided, the sortFunction will not be used
-	 **/
-	onSortCallback?: (columnKey:string, sortDirection:SortDirection) => void;
-
-	/** 
-	 *  a sort function that will be called if you want to sort the data
-	 *  manually, otherwise the table will be sorted by default using plain value
-	 *  comparison
-	 **/
-	sortFunction?: (rowIndexA:number, rowIndexB:number, columnKey:string) => number;
-}
-
-export interface IFixedDataTableState
-{
-	columnWidths?:IColumnWidths;
-	sortId?:string;
-	sortDirection?:SortDirection;
-	width?:number;
-	height?:number;
-	sortIndices?:number[];
-	probedIds?:string[];
-	selectedIds?:string[];
-}
 
 export interface ISortHeaderProps extends React.Props<SortHeaderCell>
 {
@@ -90,24 +18,12 @@ export interface ISortHeaderProps extends React.Props<SortHeaderCell>
 	columnKey?: string;
 }
 
-export interface ISortHeaderState
-{
-
-}
-
-export interface ITextCellProps extends CellProps
-{
-	data?:IRow[];
-	sortIndices?:number[];
-	onCellDoubleClick?: (rowIndex?: number, columnKey?: string|number) => void;
-}
-
 export const SortTypes = {
 	ASC: 'ASC' as 'ASC',
 	DESC: 'DESC' as 'DESC',
 };
 
-export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeaderState>
+export class SortHeaderCell extends React.Component<ISortHeaderProps, Object>
 {
 	defaultProps:ISortHeaderProps = {
 		disableSort: false
@@ -171,7 +87,63 @@ export class SortHeaderCell extends React.Component<ISortHeaderProps, ISortHeade
 	}
 }
 
-export default class FixedDataTable extends SmartComponent<IFixedDataTableProps, IFixedDataTableState>
+export interface IFixedDataTableProps<RowDatum> extends React.Props<FixedDataTable<RowDatum>>
+{
+	idProperty:string|((row:RowDatum)=>string);
+	rows:RowDatum[];
+	getCellValue?: (row: RowDatum, columnKey: string) => React.ReactChild;
+	columnIds:string[];
+	columnTitles?: { [columnId: string]: string | JSX.Element };
+	enableHover?:boolean;
+	enableSelection?:boolean;
+	disableSort?:boolean;
+	probedIds?:string[];
+	selectedIds?:string[];
+	onHover?:(id:string[]) => void;
+	onSelection?:(id:string[]) => void;
+	onCellDoubleClick?: (rowId: string, columnId: string) => void;
+	showIdColumn?:boolean;
+	rowHeight?:number;
+	headerHeight?:number;
+	initialColumnWidth?:number;
+	evenlyExpandRows?:boolean;
+	allowResizing?:boolean;
+	width?:number;
+	height?:number;
+	showBottomBorder?:boolean;
+	allowClear?: boolean;
+	multiple?: boolean;
+	sortId?:string;
+	sortDirection?: SortDirection;
+
+	/**
+	 *	a callback function that will be called if you want to sort the data
+	 *  manually. if this function is provided, the sortFunction will not be used
+	 **/
+	onSortCallback?: (columnKey:string, sortDirection:SortDirection) => void;
+
+	/** 
+	 *  a sort function that will be called if you want to sort the data
+	 *  manually, otherwise the table will be sorted by default using plain value
+	 *  comparison
+	 **/
+	sortFunction?: (rowIndexA:number, rowIndexB:number, columnKey:string) => number;
+}
+
+export interface IFixedDataTableState
+{
+	columnWidths?: { [columnId: string]: number };
+	sortId?:string;
+	sortDirection?:SortDirection;
+	width?:number;
+	height?:number;
+	sortIndices?:number[];
+	probedIds?:string[];
+	selectedIds?:string[];
+}
+
+
+export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataTableProps<RowDatum>, IFixedDataTableState>
 {
 	private keyDown:boolean;
 	private shiftDown:boolean;
@@ -179,9 +151,10 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	private secondIndex:number;
 	private lastClicked:number;
 	private container:HTMLElement;
-	static defaultProps:IFixedDataTableProps = {
+	static defaultProps:IFixedDataTableProps<any> = {
 		idProperty: "",
 		rows: [],
+		getCellValue: FixedDataTable.defaultGetCellValue,
 		columnTitles:{},
 		columnIds:[],
 		enableHover:true,
@@ -210,7 +183,14 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		}
 	};
 
-	constructor(props:IFixedDataTableProps)
+	static defaultGetCellValue(row:any, columnKey: string):React.ReactChild
+	{
+		return row && row[columnKey];
+	}
+
+	private idPropertyGetter: (row: RowDatum) => string;
+
+	constructor(props:IFixedDataTableProps<RowDatum>)
 	{
 		super(props);
 		var sortIndices:number[] = this.props.rows.map((row, index) => index);
@@ -229,6 +209,24 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			width: props.width,
 			height: props.height
 		};
+
+		this.setIdPropertyGetter(props);
+	}
+
+	setIdPropertyGetter(props:IFixedDataTableProps<RowDatum>)
+	{
+		if (props.idProperty instanceof Function)
+		{
+			this.idPropertyGetter = props.idProperty as (row:RowDatum)=>string;
+		}
+		else
+		{
+			let idProperty = props.idProperty as string;
+			this.idPropertyGetter = (row:RowDatum) =>
+			{
+				return props.getCellValue(row, idProperty) as string;
+			}
+		}
 	}
 
 	moveSelectedToTop():void
@@ -236,9 +234,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		//get sort index of selected records
 		var sortIndices:number[] = this.state.sortIndices;
 		var selectedIndices:number[] = this.state.selectedIds.map( (id:string,index:number) => {
-			let foundIndex:number = _.indexOf(this.props.rows.map((row:IRow) => {
-				return row[this.props.idProperty]
-			}), id);
+			let foundIndex:number = _.indexOf(this.props.rows.map(this.idPropertyGetter), id);
 			return sortIndices.indexOf(foundIndex);
 		});
 		//splice found indices to front of sort list
@@ -258,15 +254,25 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		this.forceUpdate();
 	}
 	
-	getValue(index:number, property:string):string
+	getValue(index:number, columnKey:string):React.ReactChild
+	{
+		if (columnKey === null)
+		{
+			return this.getId(index);
+		}
+		var row = this.props.rows[this.state.sortIndices[index]];
+		return row && this.props.getCellValue(row, columnKey);
+	}
+
+	getId(index:number):string
 	{
 		var row = this.props.rows[this.state.sortIndices[index]];
-		return row && row[property] as string;
+		return row && this.idPropertyGetter(row);
 	}
 
 	getRowClass=(index: number):string =>
 	{
-		var id:string = this.getValue(index, this.props.idProperty);
+		var id:string = this.getId(index);
 
 		if (!id || !this.props.enableHover || !this.props.enableSelection)
 			return "";
@@ -299,7 +305,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 	onMouseEnter=(event:React.MouseEvent, index:number):void =>
 	{
 		//mouse entering, so set the keys
-		var id:string = this.getValue(index, this.props.idProperty);
+		var id:string = this.getId(index);
 		var probedIds:string[] = id ? [id] : [];
 
 		this.setState({
@@ -326,7 +332,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 			return; // only perform selection on left click
 
 		var selectedIds:string[] = this.state.selectedIds;
-		var id:string = this.getValue(index, this.props.idProperty);
+		var id:string = this.getId(index);
 		
 		if (!id)
 			return;
@@ -376,7 +382,7 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 				for (var i:number = start; i <= end; i++)
 				{
-					id = this.getValue(this.state.sortIndices[i], this.props.idProperty);
+					id = this.getId(this.state.sortIndices[i]);
 					if (id)
 						selectedIds.push(id);
 				}
@@ -438,9 +444,11 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 		}
 	};
 
-	componentWillReceiveProps(nextProps:IFixedDataTableProps)
+	componentWillReceiveProps(nextProps:IFixedDataTableProps<RowDatum>)
 	{
 		var newState:IFixedDataTableState = {};
+
+		this.setIdPropertyGetter(nextProps);
 
 		if (nextProps.rows.length !== this.state.sortIndices.length)
 			newState.sortIndices = nextProps.rows.map((row, index) => index);
@@ -473,16 +481,29 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 	renderCell=(props: {rowIndex: number, columnKey: string, height: number, width: number}):JSX.Element=>
 	{
-		let row = this.props.rows[this.state.sortIndices[props.rowIndex]];
+		let value = this.getValue(props.rowIndex, props.columnKey);
 
 		let handleDoubleClick = (event:React.MouseEvent)=>{
 			if (this.props.onCellDoubleClick)
 				this.props.onCellDoubleClick(String(props.rowIndex), props.columnKey);
 		}
 		return (<Cell {...props}>
-			<span onDoubleClick={handleDoubleClick}>{row && row[props.columnKey]}</span>
+			<span onDoubleClick={handleDoubleClick}>{value}</span>
 		</Cell>
 		);
+	}
+
+	getColumnTitle(columnId:string)
+	{
+		if (!this.props.columnTitles) return "";
+		if (columnId == null) {
+			if (!(this.props.idProperty instanceof Function))
+				return this.props.columnTitles[this.props.idProperty as string];
+		}
+		else
+		{
+			return this.props.columnTitles[columnId];
+		}
 	}
 
 	render():JSX.Element
@@ -495,6 +516,44 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 
 		if (this.props.evenlyExpandRows && this.state.width > 0)
 			evenWidth = Math.max(this.state.width / (this.props.columnIds.length - (this.props.showIdColumn ? 0:1)), this.props.initialColumnWidth);
+
+		let columnIds: string[];
+		let idColumnTitle: string;
+		if (this.props.showIdColumn)
+		{
+			columnIds = this.props.columnIds.concat([]);
+			columnIds.unshift(null);
+		}
+		else
+		{
+			columnIds = this.props.columnIds;
+		}
+		
+
+		let columns = columnIds.map((id: string, index: number) => {
+			if (id === this.props.idProperty)
+				return; /* We use null as the sentinel value for the key column, as above. */
+			return (
+				<Column
+					allowCellsRecycling={true}
+					key={index}
+					columnKey={id}
+					header={
+						<SortHeaderCell
+							onSortChange={this.updateSortDirection}
+							sortDirection={id == this.state.sortId ? this.state.sortDirection : "NONE"}
+							disableSort={this.props.disableSort}
+							columnKey={id}
+							>
+							{this.getColumnTitle(id)}
+						</SortHeaderCell>
+					}
+					cell={this.renderCell}
+					width={this.state.columnWidths[id] || (this.props.evenlyExpandRows ? (evenWidth || this.props.initialColumnWidth) : this.props.initialColumnWidth) }
+					isResizable={this.props.allowResizing}
+				/>
+			);
+		});
 
 		return (
 			<ResizingDiv className={this.props.showBottomBorder ? null : "weave-disableBottomBorder"} style={tableContainer} onResize={this.handleResize}>
@@ -513,34 +572,25 @@ export default class FixedDataTable extends SmartComponent<IFixedDataTableProps,
 						isColumnResizing={false}
 					>
 						{
-							this.props.columnIds.map((id:string,index:number) => {
-								if (this.props.showIdColumn || id != this.props.idProperty){
-									return (
-										<Column
-											allowCellsRecycling={true}
-											key={index}
-											columnKey={id}
-											header={
-												<SortHeaderCell
-													onSortChange={this.updateSortDirection}
-													sortDirection={id == this.state.sortId ? this.state.sortDirection : "NONE"}
-													disableSort={this.props.disableSort}
-													columnKey={id}
-													>
-													{this.props.columnTitles ? this.props.columnTitles[id] : id}
-												</SortHeaderCell>
-											}
-											cell={this.renderCell}
-											width={this.state.columnWidths[id] || (this.props.evenlyExpandRows ? (evenWidth || this.props.initialColumnWidth):this.props.initialColumnWidth)}
-											isResizable={this.props.allowResizing}
-										/>
-									);
-								}
-							})
+							columns
 						}
 					</Table>:""
 				}
 			</ResizingDiv>
 		);
+	}
+
+}
+
+/* Stuff for generic object tables */
+export interface IRow {
+	[columnKey: string]: React.ReactChild;
+}
+
+/* Needed because templating doesn't play nice with JSX syntax. */
+export class ObjectFixedDataTable extends FixedDataTable<IRow>
+{
+	constructor(props: IFixedDataTableProps<IRow>) {
+		super(props);
 	}
 }

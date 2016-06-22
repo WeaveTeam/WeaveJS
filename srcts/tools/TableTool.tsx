@@ -5,8 +5,8 @@ import * as ReactDOM from "react-dom";
 import AbstractVisTool from "./AbstractVisTool";
 import Menu, {MenuItemProps} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
-import FixedDataTable from "./FixedDataTable";
-import {IRow, SortTypes, SortDirection} from "./FixedDataTable";
+import {ObjectFixedDataTable, IRow} from "./FixedDataTable";
+import {SortTypes, SortDirection} from "./FixedDataTable";
 import ReactUtils from "../utils/ReactUtils";
 import PrintUtils from "../utils/PrintUtils";
 import StatefulTextField from "../ui/StatefulTextField";
@@ -33,21 +33,24 @@ import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 
 export interface IDataTableState extends IVisToolState
 {
-	data?:IRow[],
+	data?: IRow[],
 	columnTitles?:{[columnId:string]: string},
 	columnIds?:string[],
 	width?:number,
 	height?:number
 }
 
+
 export interface TableEventData {
 	key: IQualifiedKey;
 	column: IAttributeColumn;
 }
 
+
+
 export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool, IInitSelectableAttributes
 {
-	fixedDataTable:FixedDataTable;
+	fixedDataTable: ObjectFixedDataTable;
 
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 
@@ -161,7 +164,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 		var format:any = _.zipObject(names, columns);
 		format[this.idProperty] = IQualifiedKey;
-		var records:IRow[] = ColumnUtils.getRecords(format, this.filteredKeySet.keys, String);
+		var records: IRow[] = ColumnUtils.getRecords(format, this.filteredKeySet.keys, String);
 		records.forEach(record => record[this.idProperty] = record[this.idProperty].toString());
 
 		var titles:string[] = columns.map(column => Weave.lang(column.getMetadata("title")));
@@ -269,7 +272,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	{
 		var columnNames = this.columns.getNames(IAttributeColumn);
 		return (
-			<FixedDataTable
+			<ObjectFixedDataTable
 				columnTitles={this.state.columnTitles}
 				rows={this.state.data}
 				idProperty={this.idProperty}
@@ -288,7 +291,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				evenlyExpandRows={true}
 				allowResizing={true}
 				onSortCallback={this.onSort}
-				ref={(c:FixedDataTable) => this.fixedDataTable = c}
+				ref={(c: ObjectFixedDataTable) => { this.fixedDataTable = c } }
 			/>
 		);
 	}

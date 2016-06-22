@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import DOMUtils from "../utils/DOMUtils";
-import FixedDataTable from "../tools/FixedDataTable";
+import {ObjectFixedDataTable,IRow} from "../tools/FixedDataTable";
 import * as _ from 'lodash';
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
@@ -270,7 +270,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		if (rows[maxRowIndex])
 			this.longestRowJSX = rows[maxRowIndex]["tree"];
 
-		return <FixedDataTable
+		return <ObjectFixedDataTable
 			idProperty={"id"}
 			headerHeight={0}
 			rowHeight={this.rowHeight}

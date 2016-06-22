@@ -1,8 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import FixedDataTable from "../tools/FixedDataTable";
-import {IRow, IColumnTitles} from "../tools/FixedDataTable";
+import {ObjectFixedDataTable, IRow} from "../tools/FixedDataTable";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import ColorRampComponent from "../react-ui/ColorRampComponent";
 
@@ -22,7 +21,7 @@ export interface ColorRampListState
 
 export default class ColorRampList extends React.Component<ColorRampListProps, ColorRampListState>
 {
-	columnTitles:IColumnTitles = {};
+	columnTitles:{[columnId: string]: string|JSX.Element} = {};
 	tableContainer:VBox;
 	tableContainerElement:HTMLElement;
 
@@ -89,7 +88,7 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 		});
 
 		return (
-			<FixedDataTable columnIds={["id", "value"]} 
+			<ObjectFixedDataTable columnIds={["id", "value"]} 
 							idProperty="id" rows={rows} 
 							columnTitles={this.columnTitles} 
 							showIdColumn={false}

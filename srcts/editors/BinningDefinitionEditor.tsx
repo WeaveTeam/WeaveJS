@@ -6,8 +6,6 @@ import Input from "../semantic-ui/Input";
 import Checkbox from "../semantic-ui/Checkbox";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import FixedDataTable from "../tools/FixedDataTable";
-import {IRow} from "../tools/FixedDataTable";
-import {IColumnTitles} from "../tools/FixedDataTable";
 import BinNamesList from "../ui/BinNamesList";
 import ReactUtils from "../utils/ReactUtils";
 import Button from "../semantic-ui/Button";

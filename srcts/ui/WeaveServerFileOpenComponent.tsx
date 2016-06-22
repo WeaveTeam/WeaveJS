@@ -5,7 +5,7 @@ import SmartComponent from "./SmartComponent";
 import ServiceLogin from "../ui/admin/ServiceLogin";
 import {HBox, VBox} from "../react-ui/FlexBox";
 import FixedDataTable from "../tools/FixedDataTable";
-import {IRow, IColumnTitles} from "../tools/FixedDataTable";
+import {ObjectFixedDataTable, IRow} from "../tools/FixedDataTable";
 import FileInfoView from "./FileInfoView";
 import Button from "../semantic-ui/Button";
 import CenteredIcon from "../react-ui/CenteredIcon";
@@ -104,7 +104,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 			} as IRow
 		});
 		let columnIds = ["filename","filelabel"];
-		let columnTitles:IColumnTitles = {};
+		let columnTitles: {[columnId: string]: string|JSX.Element} = {};
 
 		let fileLocationForm:JSX.Element = (
 			<div className="ui form" style={{paddingLeft: "1rem"}}>
@@ -147,7 +147,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 					<VBox style={{flex: 1}}>
 						{fileLocationForm}
 						<VBox style={{flex: 1, border: "1px solid #D6D6D6"}}>
-							<FixedDataTable rows={rows}
+							<ObjectFixedDataTable rows={rows}
 							                columnIds={columnIds}
 							                idProperty="filename"
 							                showIdColumn={false}

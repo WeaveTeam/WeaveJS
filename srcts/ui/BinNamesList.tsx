@@ -1,6 +1,5 @@
 import * as React from "react";
-import FixedDataTable from "../tools/FixedDataTable";
-import {IFixedDataTableProps, IColumnTitles, IRow} from "../tools/FixedDataTable";
+import {ObjectFixedDataTable, IFixedDataTableProps, IRow} from "../tools/FixedDataTable";
 
 import AbstractBinningDefinition = weavejs.data.bin.AbstractBinningDefinition;
 
@@ -49,27 +48,23 @@ export default class BinNamesList extends React.Component<BinNamesListProps, {}>
 			});
 		}
 		
-		var columnTitles:IColumnTitles = {
+		var columnTitles:{[columnId:string]: string|JSX.Element} = {
 			id: "Key",
 			value: "Bin names"
 		};
-		
-		var props:IFixedDataTableProps = {
-			columnIds: ["id", "value"],
-			idProperty: "id",
-			rows,
-			columnTitles,
-			showIdColumn: false,
-			allowResizing: false,
-			evenlyExpandRows: true,
-			enableHover: false,
-			enableSelection: false
-		}
-
-		if(!this.props.showHeaderRow) props.headerHeight = 0;
 
 		return (
-			<FixedDataTable {...props}/>
+			<ObjectFixedDataTable columnIds={["id", "value"]}
+				idProperty="id"
+				rows={rows}
+				columnTitles={columnTitles}
+				headerHeight={this.props.showHeaderRow ? undefined : 0}
+				showIdColumn={false}
+				allowResizing={false}
+				evenlyExpandRows={true}
+				enableHover={false}
+				enableSelection={false}
+			/>
 		);
 	}
 }
