@@ -425,7 +425,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 						style={{flex: 1, overflow:"auto"}}
 					>
 						{this.state.data && this.state.data.map( (data,index) => {
-							let style:React.CSSProperties;
+							let style:React.CSSProperties = {};
 							let label:string;
 							let referenceLineKey:string = this.referenceLineMode.value ? this.referenceLineMode.value:"custom";
 							let normalBandKey:string = this.showNormalBands.value ? "yes":"no";
@@ -435,6 +435,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 								label = record.id.toString();
 							} else {
 								label = Weave.lang(weavejs.data.ColumnUtils.getTitle(columns[index]));
+								style = {};
 							}
 							return (
 								<VBox
