@@ -7,7 +7,8 @@ export default class ConfirmationDialog
 
 	static open(context:React.ReactInstance, message:string, onOk?:()=>void, onCancel?:()=>void)
 	{
-		PopupWindow.open(context, {
+		PopupWindow.open({
+			context,
 			title: Weave.lang("Load Session"),
 			content: (
 				<VBox style={{ flex: 1, justifyContent: "center" }}>

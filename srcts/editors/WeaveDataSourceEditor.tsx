@@ -15,6 +15,7 @@ import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import EntityType = weavejs.api.data.EntityType;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+import PopupWindow from "../react-ui/PopupWindow";
 
 export default class WeaveDataSourceEditor extends DataSourceEditor
 {	
@@ -70,6 +71,29 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 		/* TODO: Make data preview highlight the new table */
 		this.props.dataSource.hierarchyRefresh.triggerCallbacks();
 	}
+
+	openSqlImport = PopupWindow.generateOpener(() => ({
+		context: this,
+		title: Weave.lang("Import data from SQL"),
+		content: <SqlImport service={this.service} selectIdFunc={this.selectId}/>,
+		resizable: true,
+		width: 920,
+		footerContent: <div/>,
+		height: 675,
+		suspendEnter: true
+	}));
+
+	openConnectionManager = PopupWindow.generateOpener(() => ({
+		context: this,
+		title: Weave.lang("Manage Users and Connections"),
+		content: <ConnectionManager service={this.service}/>,
+		modal: true,
+		resizable: true,
+		footerContent: <div/>,
+		width: 920,
+		height: 675,
+		suspendEnter: true
+	}));
 	
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
@@ -98,11 +122,11 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Import Data to Server"),
-				<Button onClick={() => SqlImport.open(this, this.service, this.selectId) }>{Weave.lang("Import from SQL...") }</Button>
+				<Button onClick={this.openSqlImport}>{Weave.lang("Import from SQL...") }</Button>
 			],
 			[
 				Weave.lang("Manage Server"),
-				<Button onClick={() => ConnectionManager.open(this, this.service, null) }>{Weave.lang("Manage users and connections") }</Button>
+				<Button onClick={this.openConnectionManager}>{Weave.lang("Manage users and connections") }</Button>
 			]
 		];
 		return super.editorFields.concat(editorFields)

@@ -52,28 +52,8 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		this.login = new ServiceLogin(this, this.props.service);
 	}
 
-	static window: PopupWindow;
-	static open(context:React.ReactInstance, service:WeaveAdminService, selectIdFunc?: (id: number) => void) {
-		if (ConnectionManager.window)
-			PopupWindow.close(ConnectionManager.window);
-
-		ConnectionManager.window = PopupWindow.open(
-			context,
-			{
-				title: Weave.lang("Manage Users and Connections"),
-				content: <ConnectionManager service={service}/>,
-				modal: true,
-				resizable: true,
-				footerContent: <div/>,
-				width: 920,
-				height: 675,
-				onClose: () => { ConnectionManager.window = null },
-				suspendEnter: true
-			}
-		);
-	}
-
 	private element: Element;
+
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
@@ -85,7 +65,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		if ((error.message as string).startsWith(WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION) ||
 			(error.message as string).startsWith("RemoteException: Incorrect username or password."))
 		{
-			if (this.login) this.login.open(this.updateConnectionsAndUser, () => PopupWindow.close(ConnectionManager.window));
+			if (this.login) this.login.generateOpener(this.updateConnectionsAndUser);
 		}
 		else
 		{
@@ -134,6 +114,17 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		this.setState({ selected: null });
 	}
 
+	openConfigurationStorageEditor = PopupWindow.generateOpener(() => ({
+		context: this,
+		title: Weave.lang("Configuration Storage"),
+		content: <ConfigurationStorageEditor service={this.props.service}/>,
+		modal: true,
+		resizable: true,
+		width: 600,
+		height: 600,
+		footerContent: <div/>,
+	}));
+
 	private handleSuccessfulSave=(connectionName:string, password:string)=>
 	{
 		this.props.service.getAuthenticatedUser().then(
@@ -149,7 +140,6 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 								exists=>{
 									if (!exists)
 									{
-										ConfigurationStorageEditor.open(this, this.props.service);
 									}
 								}
 							)
@@ -205,7 +195,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 							<i className="fa fa-refresh fa-fw"/>
 						</Button>
 					</HBox>
-					<Button style={{marginTop: 8}} title={Weave.lang("Manage configuration storage...")} onClick={()=>ConfigurationStorageEditor.open(this, this.props.service)}>
+					<Button style={{marginTop: 8}} title={Weave.lang("Manage configuration storage...")} onClick={this.openConfigurationStorageEditor}>
 						{Weave.lang("Manage configuration storage...")}
 					</Button>
 				</VBox>

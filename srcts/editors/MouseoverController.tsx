@@ -23,48 +23,16 @@ export interface MouseoverControllerState
 }
 
 const HEADER_COLUMNS = "Header columns";
+const DATA_COLUMNS = "Data columns";
 export default class MouseoverController extends React.Component<MouseoverControllerProps, MouseoverControllerState>
 {
-	static window:PopupWindow;
 	attributes = new Map<string, ILinkableHashMap>();
 
 	constructor(props:MouseoverControllerProps)
 	{
 		super(props);
 		this.attributes.set(HEADER_COLUMNS, props.probedHeaderColumns);
-		this.attributes.set("Data columns", props.probedColumns);
-	}
-
-	static close(window:PopupWindow)
-	{
-		MouseoverController.window = null;
-	}
-
-	static open(context:React.ReactInstance, weave:Weave, probeHeaderColumns:ILinkableHashMap, probedColumns:ILinkableHashMap)
-	{
-		if (!probeHeaderColumns)
-		{
-			//these don't exist, need to create probeHeaderColumns LinkableHashMap
-			probeHeaderColumns = weave.root.requestObject("Probe Header Columns", LinkableHashMap);
-		}
-
-		if (!probedColumns)
-		{
-			//these don't exist, need to create probedColumns LinkableHashMap
-			probedColumns = weave.root.requestObject("Probed Columns", LinkableHashMap);
-		}
-
-		if (MouseoverController.window)
-			PopupWindow.close(MouseoverController.window);
-
-		MouseoverController.window = PopupWindow.open(context, {
-			title: Weave.lang("Mouseover settings"),
-			content: <MouseoverController probedHeaderColumns={probeHeaderColumns} probedColumns={probedColumns}/>,
-			resizable: true,
-			width: 920,
-			height: 675,
-			onClose: MouseoverController.close
-		});
+		this.attributes.set(DATA_COLUMNS, props.probedColumns);
 	}
 
 	render():JSX.Element

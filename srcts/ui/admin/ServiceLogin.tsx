@@ -11,6 +11,7 @@ export default class ServiceLogin
 {
 	service: WeaveAdminService;
 	context: React.ReactInstance;
+	login:Login;
 
 	constructor(context: React.ReactInstance, service: WeaveAdminService)
 	{
@@ -18,26 +19,31 @@ export default class ServiceLogin
 		this.service = service;
 	}
 
-	open(onSuccess?: (username: string) => void, onCancel?: () => void)
-	{
-		Login.open(this.context,
-			(fields: { username: string, password: string }): void => {
-				this.service.authenticate(fields.username, fields.password).then(
-					() => {
-						Login.close();
-						if (onSuccess) onSuccess(fields.username);
-					},
-					(error: any) => {
-						Login.invalid();
-					}
-				);
-			},
+	generateOpener(onSuccess?: (username: string) => void, onCancel?: () => void) {
+		return PopupWindow.generateOpener(() => ({
+			context: this.context,
+			title: Weave.lang("Weave Server Sign-In"),
+			content: <Login ref={(c:Login) => this.login = c} onLogin={(fields: { username: string, password: string })=>this.handleLogin(fields, onSuccess)}/>,
+			footerContent: <div/>,
+			resizable: false,
+			draggable: false,
+			modal: true,
+			suspendEnter: true,
+			width: 400,
+		}));
+	}
+
+	handleLogin = (fields: { username: string, password: string }, onSuccess: (username: string) => void): void => {
+		this.service.authenticate(fields.username, fields.password).then(
 			() => {
-				Login.close();
-				if (onCancel) onCancel();
+				PopupWindow.close(this.login);
+				if (onSuccess) onSuccess(fields.username);
+			},
+			(error: any) => {
+				this.login.invalid();
 			}
 		);
-	}
+	};
 
 	/* Only open if needed */
 	conditionalOpen(onSuccess?: (username:string)=>void, onCancel?:()=>void)
@@ -48,7 +54,7 @@ export default class ServiceLogin
 					onSuccess && onSuccess(username);
 				}
 				else {
-					this.open(onSuccess, onCancel);
+					this.generateOpener(onSuccess, onCancel);
 				}
 			}
 		);

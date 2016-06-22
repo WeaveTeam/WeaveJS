@@ -14,32 +14,52 @@ import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+import LinkableHashMap = weavejs.core.LinkableHashMap;
 
 export default class ControllersMenu implements MenuBarItemProps
 {
 	constructor(owner:WeaveMenus)
 	{
 		this.owner = owner;
+		
 	}
 
 	owner:WeaveMenus;
 	label:string = "Controllers";
 	
+	openColorController = PopupWindow.generateOpener(() => ({
+		context: this.owner.context,
+		title: Weave.lang("Color settings"),
+		content: <ColorController colorColumn={this.owner.weave.getObject("defaultColorColumn") as ColorColumn}/>,
+		resizable: true,
+		width: 920,
+		height: 675
+	}));
+
+	openMouseOverController = PopupWindow.generateOpener(() => ({
+		context: this.owner.context,
+		title: Weave.lang("Mouseover settings"),
+		content: (
+			<MouseoverController
+				probedHeaderColumns={this.owner.weave.root.requestObject("Probe Header Columns", LinkableHashMap)}
+				probedColumns={this.owner.weave.root.requestObject("Probed Columns", LinkableHashMap)}
+			/>
+		),
+		resizable: true,
+		width: 920,
+		height: 675
+	}));
+
 	get menu():MenuItemProps[]
 	{
 		return [].concat(
 			{
 				label: Weave.lang("Color settings"),
-				click: () => ColorController.open(this.owner.context, this.owner.weave.getObject("defaultColorColumn") as ColorColumn)
+				click: this.openColorController
 			},
 			{
 				label: Weave.lang("Mouseover settings"),
-				click: () => MouseoverController.open(
-					this.owner.context,
-					this.owner.weave,
-					this.owner.weave.getObject("Probe Header Columns") as ILinkableHashMap,
-					this.owner.weave.getObject("Probed Columns") as ILinkableHashMap
-				)
+				click: this.openMouseOverController
 			},
 			{},
 			this.getCreateObjectItems()

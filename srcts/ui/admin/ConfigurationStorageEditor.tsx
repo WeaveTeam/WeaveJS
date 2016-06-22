@@ -84,32 +84,6 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 		this.updateCurrentConnection();
 	}
 
-	static window: PopupWindow;
-	static open(context: React.ReactInstance, service:WeaveAdminService) {
-		if (ConfigurationStorageEditor.window)
-			PopupWindow.close(ConfigurationStorageEditor.window);
-
-		ConfigurationStorageEditor.window = PopupWindow.open(
-			context,
-			{
-				title: Weave.lang("Configuration Storage"),
-				content: <ConfigurationStorageEditor service={service}/>,
-				modal: true,
-				resizable: true,
-				width: 600,
-				height: 600,
-				footerContent: <div/>,
-				onClose: () => { ConfigurationStorageEditor.window = null }
-			}
-		);
-	}
-
-	static close()
-	{
-		PopupWindow.close(ConfigurationStorageEditor.window);
-		ConfigurationStorageEditor.window = null;
-	}
-
 	handleError=(error:any)=>
 	{
 		this.setState({ errors: this.state.errors.concat([error.toString()]) });
@@ -207,7 +181,7 @@ export default class ConfigurationStorageEditor extends SmartComponent<IConfigur
 				</VBox>
 				<HBox style={{ justifyContent: "flex-end" }}>
 					<Button colorClass="primary" onClick={this.save}>{Weave.lang("Store Weave configuration at this location") }</Button>
-					<Button colorClass="secondary"  style={{marginLeft: 8}} onClick={() => ConfigurationStorageEditor.close() }>{Weave.lang("Cancel") }</Button>
+					<Button colorClass="secondary"  style={{marginLeft: 8}} onClick={() => PopupWindow.close(this) }>{Weave.lang("Cancel") }</Button>
 				</HBox>
 			</VBox>
 		);

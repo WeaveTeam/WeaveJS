@@ -48,9 +48,7 @@ export default class SystemMenu implements MenuBarItemProps
 			{},
 			{
 				label: weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Not signed in"),
-				click: () => {
-					this.owner.login.open();
-				},
+				click: this.owner.login.generateOpener,
 				shown: weavejs.net.Admin.service.initialized
 			},
 			{
@@ -59,8 +57,8 @@ export default class SystemMenu implements MenuBarItemProps
 				shown: weavejs.net.Admin.service.initialized,
 				click: () => {
 					let signedOutPopup = () => PopupWindow.open(
-						this.owner.context,
 						{
+							context: this.owner.context,
 							title: "Confirmation",
 							content: <div>{Weave.lang("Signed out successfully")}</div>
 						}

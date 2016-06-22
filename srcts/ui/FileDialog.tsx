@@ -61,35 +61,6 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 		this.state = {selected: FileDialog.MY_COMPUTER};
 	}
 
-	static close()
-	{
-		if (FileDialog.window)
-		{
-			PopupWindow.close(FileDialog.window);
-			FileDialog.window = null;
-		}
-	}
-	
-	static open(context:React.ReactInstance, openHandler:(file:string|File) => void, skipConfirmation?: boolean)
-	{
-		if (FileDialog.window)
-			PopupWindow.close(FileDialog.window);
-
-		FileDialog.window = PopupWindow.open(context, {
-			title: Weave.lang("Open a Weave Session"),
-			content:
-				<FileDialog openHandler={openHandler} context={context} skipConfirmation={skipConfirmation}/>,
-			footerContent: <div/>,
-			resizable: false,
-			draggable: false,
-			modal: true,
-			suspendEnter: true,
-			width: "95%",
-			height: "95%",
-			onClose: FileDialog.close
-		});
-	}
-
 	confirmOpenHandler=(file:string|File)=>
 	{
 		if (!this.props.skipConfirmation)
@@ -100,13 +71,13 @@ export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDi
 
 			ConfirmationDialog.open(this, confirmationMessage, () => {
 				this.props.openHandler(file);
-				FileDialog.close();
+				PopupWindow.close(this);
 			});
 		}
 		else
 		{
 			this.props.openHandler(file);
-			FileDialog.close();
+			PopupWindow.close(this);
 		}
 	};
 

@@ -112,7 +112,8 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				}
 				else
 				{
-					PopupWindow.open(this, {
+					PopupWindow.open({
+						context: this,
 						title: Weave.lang("Settings for {0}", this.state.title),
 						modal: false,
 						content: (this.watcher.target as any).renderEditor()

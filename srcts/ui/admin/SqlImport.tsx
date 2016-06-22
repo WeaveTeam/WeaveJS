@@ -18,6 +18,7 @@ import WeavePromise = weavejs.util.WeavePromise;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import Admin = weavejs.net.Admin;
 import WeaveAdminService = weavejs.net.WeaveAdminService;
+import ReactUtils from "../../utils/ReactUtils";
 
 export interface ISqlImportProps extends React.HTMLProps<SqlImport>
 {
@@ -112,7 +113,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 		if ((error.message as string).startsWith(WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION) ||
 			(error.message as string).startsWith("RemoteException: Incorrect username or password."))
 		{
-			if (this.login) this.login.open(() => this.updateSchemas(), () => PopupWindow.close(SqlImport.window));
+			if (this.login) this.login.generateOpener(() => this.updateSchemas());
 		}
 		else
 		{
@@ -161,32 +162,11 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 			(newId: number) => {
 				this.setState({ importInProgress: false });;
 				this.props.selectIdFunc(newId);
-				PopupWindow.close(SqlImport.window);
+				PopupWindow.close(this);
 			},
 			(error: any) => {
 				this.setState({ importInProgress: false });
 				this.handleError(error);
-			}
-		);
-	}
-
-	static window: PopupWindow;
-	static open(context:React.ReactInstance, service:WeaveAdminService, selectIdFunc?: (id:number)=>void)
-	{
-		if (SqlImport.window)
-			PopupWindow.close(SqlImport.window);
-
-		SqlImport.window = PopupWindow.open(
-			context,
-			{
-				title: Weave.lang("Import data from SQL"),
-				content: <SqlImport service={service} selectIdFunc={selectIdFunc || _.noop}/>,
-				resizable: true,
-				width: 920,
-				footerContent: <div/>,
-				height: 675,
-				onClose: () => {SqlImport.window = null},
-				suspendEnter: true
 			}
 		);
 	}
@@ -353,7 +333,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 				</div>
 				<HBox style={{ alignSelf: "flex-end" }}>
 						<Button colorClass="primary" disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
-						<Button colorClass="secondary" disabled={this.state.importInProgress} onClick={() => PopupWindow.close(SqlImport.window) }>{Weave.lang("Cancel") }</Button>
+						<Button colorClass="secondary" disabled={this.state.importInProgress} onClick={() => PopupWindow.close(this) }>{Weave.lang("Cancel") }</Button>
 				</HBox>
 			</VBox>
 		)

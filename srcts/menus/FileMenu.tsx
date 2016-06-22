@@ -48,13 +48,27 @@ export default class FileMenu implements MenuBarItemProps
 //			},
 	}
 
+	openFileDialog = PopupWindow.generateOpener(() => ({
+		context: this.owner.context,
+		title: Weave.lang("Open a Weave Session"),
+		content:
+			<FileDialog openHandler={this.load} context={this.owner.context} skipConfirmation={true}/>,
+		footerContent: <div/>,
+		resizable: false,
+		draggable: false,
+		modal: true,
+		suspendEnter: true,
+		width: "95%",
+		height: "95%"
+	}));
+
 	getSessionItems():MenuItemProps[]
 	{
 		return [
 			{
 				/*label: <FileInput onChange={this.openFile} accept={this.getSupportedFileTypes().join(',')}><span className="weave-menuitem-padding">{Weave.lang("Open session...")}</span></FileInput>,*/
 				label: "Open Session...",
-				click: () => FileDialog.open(this.owner.context, this.load)
+				click: this.openFileDialog
 			},
 			{
 				label: Weave.lang("Save session as..."),
@@ -119,7 +133,8 @@ export default class FileMenu implements MenuBarItemProps
 			onSave((filenameInput.value && filenameInput.value + ".weave") || defaultFileName);
 		};
 
-		PopupWindow.open(this.owner.context, {
+		PopupWindow.open({
+			context: this.owner.context,
 			title: Weave.lang("Export session state"),
 			content: (
 				<VBox style={{width: 400, height: 200, padding: 20}}>

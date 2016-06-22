@@ -1,5 +1,6 @@
 import * as ReactDOM from "react-dom";
 import * as React from "react";
+import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
 import SmartComponent from "../ui/SmartComponent";
 import prefixer from "./VendorPrefixer";
@@ -8,12 +9,14 @@ import Button from "../semantic-ui/Button";
 import MouseUtils from "../utils/MouseUtils";
 import ReactUtils from "../utils/ReactUtils";
 import DraggableDiv, {DraggableDivState} from "./DraggableDiv";
+import Div from "./Div";
+import Popup from "../ui/Popup";
 
 const ENTER_KEYCODE = 13;
-const ESC_KEYCODE = 27;
 
 export interface PopupWindowProps extends React.HTMLProps<PopupWindow>
 {
+	context:React.ReactInstance;
 	title?:string /*|JSX.Element*/;
 	content?:any/*JSX.Element*/;
 	modal?:boolean;
@@ -33,7 +36,6 @@ export interface PopupWindowProps extends React.HTMLProps<PopupWindow>
 export interface PopupWindowState
 {
 	content?:JSX.Element;
-	zIndex?: number;
 }
 
 export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupWindowState>
@@ -41,19 +43,17 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	private minWidth:number = 320;
 	private minHeight:number = 240;
 	private element:HTMLElement;
+	private popup:Popup;
+
 	private mouseDownOffset: {
 		x: number,
 		y: number
-	}
-
-	static windowSet = new Set<PopupWindow>();
+	};
 
 	constructor(props:PopupWindowProps)
 	{
 		super(props);
-		this.state = {
-			zIndex: 0,
-		};
+		this.state = {};
 	}
 
 	static defaultProps = {
@@ -62,36 +62,55 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		suspendEnter: false
 	};
 
-	static open(context:React.ReactInstance, props:PopupWindowProps):PopupWindow
+	static open(props:PopupWindowProps):PopupWindow
 	{
 		// set active window to non active
-		var popupWindow = ReactUtils.openPopup(context, <PopupWindow {...props}/>) as PopupWindow;
-		PopupWindow.windowSet.add(popupWindow);
-		PopupWindow.alignWindows();
+		var popupWindow:PopupWindow = null;
+		var popup = Popup.open(props.context, <PopupWindow {...props} ref={(c:PopupWindow) => popupWindow = c}/>);
+		popupWindow.popup = popup;
 		return popupWindow;
 	}
 
-	static close(popupWindow:PopupWindow)
+	static generateOpener(propsGetter:()=>PopupWindowProps):()=>PopupWindow
 	{
-		PopupWindow.windowSet.delete(popupWindow);
-		ReactUtils.closePopup(popupWindow);
+		var popup:PopupWindow;
+		return () => {
+			if (popup)
+				popup.bringToFront();
+			var props = propsGetter();
+			popup = PopupWindow.open(
+				_.merge({}, props, {
+					onClose: () => {
+						if(props.onClose)
+							props.onClose();
+						popup = null;
+					}
+				}) as PopupWindowProps
+			);
+			return popup;
+		}
 	}
 
-	static alignWindows()
+	bringToFront()
 	{
-		var index = 0;
-		for (var popupWindow of PopupWindow.windowSet)
-		{
-			popupWindow.setState({ zIndex: index});
-			index++;
-		}
+		Popup.bringToFront(this.popup);
+	}
+
+	static close(instance:React.ReactInstance)
+	{
+		var popup = ReactUtils.findComponent(instance, PopupWindow);
+		if(popup)
+			popup.close();
+	}
+
+	close()
+	{
+		Popup.close(this.popup);
 	}
 
 	componentDidMount()
 	{
 		ReactUtils.getDocument(this).addEventListener("keydown", this.onKeyDown);
-		// re-render now that this.element has been set in the ref callback function
-		this.forceUpdate();
 	}
 
 	private onOk()
@@ -108,30 +127,16 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	private onClose()
 	{
+		this.close();
 		this.props.onClose && this.props.onClose();
-		PopupWindow.close(this);
 	}
 
-	private handleClickOnWindow()
-	{
-		PopupWindow.windowSet.delete(this);
-		PopupWindow.windowSet.add(this);
-		PopupWindow.alignWindows();
-	}
-
-	onKeyDown =(event:KeyboardEvent)=>
+	onKeyDown=(event:KeyboardEvent)=>
 	{
 		var code = event.keyCode;
 
 		if (code == ENTER_KEYCODE && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
 			this.onOk();
-
-		if (code == ESC_KEYCODE)
-		{
-			var activeWindow = Array.from(PopupWindow.windowSet.keys()).pop();
-			if (this == activeWindow)
-				this.onCancel();
-		}
 	}
 
 	componentWillUnmount()
@@ -158,7 +163,6 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	{
 
 		var windowStyle:React.CSSProperties = {
-			zIndex: this.state.zIndex,
 			top: this.props.top,
 			left: this.props.left,
 			width: this.props.width,
@@ -173,8 +177,9 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 				className="weave-app weave-window"
 				draggable={false}
 				resizable={this.props.resizable}
-				onMouseDown={() => this.handleClickOnWindow()}
-				ref={(c:DraggableDiv) => this.element = ReactDOM.findDOMNode(c) as HTMLElement}
+				onMouseDown={() => {
+					Popup.bringToFront(this.popup);
+				}}
 			>
 				{
 					this.props.title
@@ -214,7 +219,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		);
 
 		return (
-			<div>
+			<div ref={ReactUtils.registerComponentRef(this)}>
 				{this.props.modal ? this.renderOverlay(this.props.modal) : null}
 				{popupWindow}
 			</div>

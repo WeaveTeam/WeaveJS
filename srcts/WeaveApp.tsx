@@ -35,6 +35,7 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
 import DynamicState = weavejs.api.core.DynamicState;
+import PopupWindow from "./react-ui/PopupWindow";
 
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
@@ -182,7 +183,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			}
 		}
 		if (this.props.showFileDialog)
-			FileDialog.open(this.menus.context, this.menus.fileMenu.load, true /* skip confirmation dialog */);
+			this.menus.fileMenu.openFileDialog();
 		this.setState({
 			enableTour:this.props.enableTour
 		});

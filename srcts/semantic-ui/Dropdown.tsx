@@ -7,6 +7,7 @@ import Menu from "../react-ui/Menu"
 import classNames from "../modules/classnames";
 import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
+import Popup from "../ui/Popup";
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
@@ -29,7 +30,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		closeOnMouseLeave:false
 	};
 
-	menu:React.ReactInstance;
+	menu:Popup;
 
 	constructor(props:DropdownProps) {
 		super(props);
@@ -76,7 +77,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	hideMenu=()=>
 	{
-		ReactUtils.closePopup(this.menu);
+		Popup.close(this.menu);
 		this.menu = null;
 	}
 
@@ -101,7 +102,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		{
 			menuStyle.left = - menuRect.width;
 		}
-		this.menu = ReactUtils.openPopup(this, <Menu menu={this.props.menu} style={menuStyle} ref={this.getMenuRef} onClick={this.menuClickListener}/>, true, () => this.menu = null);
+		this.menu = Popup.open(this, <Menu menu={this.props.menu} style={menuStyle} ref={this.getMenuRef} onClick={this.menuClickListener}/>, true, () => this.menu = null);
 	}
 
 	toggleMenu=()=>

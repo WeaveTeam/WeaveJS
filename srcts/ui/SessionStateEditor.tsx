@@ -30,7 +30,7 @@ export default class SessionStateEditor extends SmartComponent<ISessionStateEdit
 {
     static openInstance(context:React.ReactInstance, name:string, weaveRoot:ILinkableHashMap):ControlPanel{
         var weave = Weave.getWeave(weaveRoot);
-        return ControlPanel.openInstance<ISessionStateEditorProps>(context, weave, SessionStateEditor, {title: Weave.lang('Session State Editor for ' + name)}, { name, weaveRoot});
+        return ControlPanel.openInstance<ISessionStateEditorProps>(weave, SessionStateEditor, {context, title: Weave.lang('Session State Editor for ' + name)}, { name, weaveRoot});
     }
 
     constructor(props:ISessionStateEditorProps)

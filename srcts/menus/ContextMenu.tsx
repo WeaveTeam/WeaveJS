@@ -4,6 +4,7 @@ import ReactUtils from "../utils/ReactUtils";
 import Menu from "../react-ui/Menu";
 import {MenuProps} from "../react-ui/Menu";
 import Dropdown from "../semantic-ui/Dropdown";
+import Popup from "../ui/Popup";
 
 export default class ContextMenu extends Menu
 {
@@ -13,13 +14,13 @@ export default class ContextMenu extends Menu
 	{
 		event.preventDefault();
 		var contextMenuItems = Menu.getMenuItems(event.target as HTMLElement);
-		return ReactUtils.openPopup(
+		return Popup.open(
 			event.target as Element,
 			<div style={{top:event.clientY, left: event.clientX, position: 'absolute'}}>
-				<Dropdown menu={contextMenuItems}  open={true}/>
+				<Dropdown menu={contextMenuItems} open={true}/>
 			</div>,
 			true
-		) as Menu;
+		);
 	}
 	
 	render():JSX.Element
@@ -27,4 +28,3 @@ export default class ContextMenu extends Menu
 		return <Menu {...this.props} onClick={() => ReactUtils.closePopup(this)}/>;
 	}
 }
-	

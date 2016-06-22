@@ -27,37 +27,11 @@ export default class ColorController extends React.Component<ColorControllerProp
 	
 	tabLabels = ["Color theme", "Binning"]; // , "Color Specific Records"]
 	attributes = new Map<string, IColumnWrapper>();
-	static window:PopupWindow;
 
 	constructor(props:ColorControllerProps)
 	{
 		super(props);
 		this.attributes.set("Color data", this.props.colorColumn);
-	}
-	
-	static close(window:PopupWindow)
-	{
-		ColorController.window = null;
-	}
-
-	static open(context:React.ReactInstance, colorColumn:ColorColumn)
-	{
-		if (!colorColumn)
-			return;
-		
-		if (ColorController.window)
-			PopupWindow.close(ColorController.window);
-		
-		ColorController.window = PopupWindow.open(context, {
-			title: Weave.lang("Color settings"),
-			content: <ColorController colorColumn={colorColumn}/>,
-			resizable: true,
-			width: 920,
-			height: 675,
-			onClose: ColorController.close
-		});
-		
-		Weave.getCallbacks(colorColumn).addDisposeCallback(ColorController.window, () => PopupWindow.close(ColorController.window));
 	}
 	
 	get binnedColumn():BinnedColumn { return this.props.colorColumn && this.props.colorColumn.getInternalColumn() as BinnedColumn };

@@ -9,7 +9,6 @@ import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 export interface ILoginProps extends React.Props<Login>
 {
 	onLogin?:(fields:any) => void;
-	onCancel?: () => void;
 }
 
 export interface ILoginState
@@ -20,60 +19,33 @@ export interface ILoginState
 export default class Login extends React.Component<ILoginProps, ILoginState> {
 
 	element:Element;
-	static username:HTMLInputElement;
-	static password:HTMLInputElement;
-	static form:HTMLDivElement;
-
-	static window:PopupWindow;
+	username:HTMLInputElement;
+	password:HTMLInputElement;
+	form:HTMLDivElement;
 
 	constructor(props:ILoginProps)
 	{
 		super(props);
 	}
 
-	static close()
+	invalid()
 	{
-		PopupWindow.close(Login.window);
-		Login.window = null;
-	}
-
-	static open(context:React.ReactInstance, handleLogin:(fields:{username:string, password:string})=>void, handleCancel:()=>void)
-	{
-		if (Login.window)
-			PopupWindow.close(Login.window);
-
-		Login.window = PopupWindow.open(context, {
-			title: Weave.lang("Weave Server Sign-In"),
-			content:
-				<Login onLogin={handleLogin} onCancel={handleCancel}/>,
-			footerContent: <div/>,
-			resizable: false,
-			draggable: false,
-			modal: true,
-			suspendEnter: true,
-			width: 400,
-			onClose: Login.close
-		});
-	}
-	
-	static invalid()
-	{
-		let selector = $(Login.form) as any;
+		let selector = $(this.form) as any;
 		selector.form('clear');
 		selector.form('add errors', {
 			username: Weave.lang("Incorrect username or password")
 		});
-		Login.username.focus()
+		this.username.focus();
 	}
 
 	componentDidMount()
 	{
 		this.element = ReactDOM.findDOMNode(this);
-		let selector = $(Login.form) as any;
+		let selector = $(this.form) as any;
 		selector.form({
 			onSuccess: (event:any,fields:any) => {
-				let user:string = Login.username.value;
-				let password:string = Login.password.value;
+				let user:string = this.username.value;
+				let password:string = this.password.value;
 				this.props.onLogin && this.props.onLogin({username: user, password});
 			},
 			fields: {
@@ -110,17 +82,17 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 				<div className="ui header">
 					<div className="sub header">{Weave.lang("Enter your credentials to access files on the Weave server")}</div>
 				</div>
-				<div ref={(c) => Login.form = c} className="ui form">
+				<div ref={(c) => this.form = c} className="ui form">
 					<div className="field">
 						<div className="ui fluid left icon input">
 							<i className="user icon"/>
-							<input ref={(c) => Login.username = c} type="text" name="username" placeholder={Weave.lang("User name")}/>
+							<input ref={(c) => this.username = c} type="text" name="username" placeholder={Weave.lang("User name")}/>
 						</div>
 					</div>
 					<div className="field">
 						<div className="ui fluid left icon input">
 							<i className="lock icon"/>
-							<input ref={(c) => Login.password = c} type="password" name="password" placeholder={Weave.lang("Password")}/>
+							<input ref={(c) => this.password = c} type="password" name="password" placeholder={Weave.lang("Password")}/>
 						</div>
 					</div>
 					<Button colorClass="primary" className="right floated submit">
@@ -132,6 +104,3 @@ export default class Login extends React.Component<ILoginProps, ILoginState> {
 		)
 	}
 }
-
-
-
