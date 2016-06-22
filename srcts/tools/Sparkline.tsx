@@ -12,12 +12,13 @@ import StatefulTextField from "../ui/StatefulTextField";
 import StatefulTextArea from "../ui/StatefulTextArea";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import ReactUtils from "../utils/ReactUtils";
-import {Sparklines, SparklinesLine, SparklinesBars, SparklinesCurve} from "react-sparklines"
+import {Sparklines, SparklinesLine, SparklinesBars, SparklinesCurve, SparklinesNormalBand, SparklinesReferenceLine} from "react-sparklines"
 import Accordion from "../semantic-ui/Accordion";
 import ResizingDiv, {ResizingDivState} from "../ui/ResizingDiv";
 import SmartComponent from "../ui/SmartComponent";
 import ComboBox, {ComboBoxOption}  from "../semantic-ui/ComboBox";
 import Checkbox from "../semantic-ui/Checkbox";
+import ConfigUtils from "../utils/ConfigUtils";
 
 import StandardLib = weavejs.util.StandardLib;
 import LinkableString = weavejs.core.LinkableString
@@ -72,14 +73,38 @@ const ORIENTATION_MODES:ComboBoxOption[] = [
 	{label: "Record Oriented", value: RECORD}
 ];
 
+const NONE:string = null;
+const MIN:string = "max";
+const MAX:string = "min";
+const MEAN:string = "mean";
+const AVG:string = "avg";
+const MEDIAN:string = "median";
+const REFERENCELINE_MODES:ComboBoxOption[] = [
+	{label: "(None)", value: NONE},
+	{label: "Min", value: MIN},
+	{label: "Max", value: MAX},
+	{label: "Mean", value: MEAN},
+	{label: "Average", value: AVG},
+	{label: "Median", value: MEDIAN},
+];
+
 export default class Sparkline extends SmartComponent<ISparklineProps, ISparklineState> implements IVisTool, IInitSelectableAttributes
 {
 	columns  = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 	sortColumn = Weave.linkableChild(this, DynamicColumn);
+	labelColumn = Weave.linkableChild(this, DynamicColumn);
 	chartType = Weave.linkableChild(this, new LinkableString(LINE, this.verifyChartMode));
 	orientationMode = Weave.linkableChild(this, new LinkableString(COLUMN, this.verifyOrientationMode));
+	referenceLineMode = Weave.linkableChild(this, new LinkableString(NONE, this.verifyReferenceLineMode));
+	showRowLabels = Weave.linkableChild(this, new LinkableBoolean(true));
+	showNormalBands = Weave.linkableChild(this, new LinkableBoolean(false));
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
+	marginTop = Weave.linkableChild(this, new LinkableNumber(0));
+	marginBottom = Weave.linkableChild(this, new LinkableNumber(0));
+	marginLeft = Weave.linkableChild(this, new LinkableNumber(0));
+	marginRight = Weave.linkableChild(this, new LinkableNumber(0));
+
 	panelTitle = Weave.linkableChild(this, LinkableString);
 	altText:LinkableString = Weave.linkableChild(this, new LinkableString(this.panelTitle.value));
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
@@ -97,6 +122,12 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	{
 		return [COLUMN, RECORD].indexOf(mode) >= 0;
 	}
+
+	private verifyReferenceLineMode(mode:string):boolean
+	{
+		return [NONE, MIN, MAX, MEAN, AVG, MEDIAN].indexOf(mode) >= 0;
+	}
+
 
 	private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
 	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
@@ -126,12 +157,21 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 
 		this.columns.addGroupedCallback(this, this.dataChanged, true);
 		this.sortColumn.addGroupedCallback(this, this.dataChanged, true);
+		this.labelColumn.addGroupedCallback(this, this.dataChanged, true);
 		this.orientationMode.addGroupedCallback(this, this.dataChanged, true);
-		this.chartType.addGroupedCallback(this, this.forceUpdate, true);
-
 		this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
 		this.selectionFilter.addGroupedCallback(this, this.dataChanged, true);
 		this.probeFilter.addGroupedCallback(this, this.dataChanged, true);
+
+		this.chartType.addGroupedCallback(this, this.forceUpdate, true);
+		this.showRowLabels.addGroupedCallback(this, this.forceUpdate, true);
+		this.showNormalBands.addGroupedCallback(this, this.forceUpdate, true);
+		this.referenceLineMode.addGroupedCallback(this, this.forceUpdate, true);
+		this.marginTop.addGroupedCallback(this, this.forceUpdate, true);
+		this.marginBottom.addGroupedCallback(this, this.forceUpdate, true);
+		this.marginLeft.addGroupedCallback(this, this.forceUpdate, true);
+		this.marginRight.addGroupedCallback(this, this.forceUpdate, true);
+
 
 		this.state = {
 			data: [],
@@ -188,15 +228,14 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		return [
 			[
 				Weave.lang("Margins"),
-				/*<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
-					{ this.renderNumberEditor(this.margin.left, 1) }
+				<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
+					{ ConfigUtils.renderNumberEditor(this.marginLeft, 1) }
 					<VBox className="weave-padded-vbox" style={{flex: 1}}>
-						{ this.renderNumberEditor(this.margin.top, null) }
-						{ this.renderNumberEditor(this.margin.bottom, null) }
+						{ ConfigUtils.renderNumberEditor(this.marginTop, null) }
+						{ ConfigUtils.renderNumberEditor(this.marginBottom, null) }
 					</VBox>
-					{ this.renderNumberEditor(this.margin.right, 1) }
-				</HBox>*/
-				<div/>
+					{ ConfigUtils.renderNumberEditor(this.marginRight, 1) }
+				</HBox>
 			]
 		];
 	}
@@ -226,9 +265,21 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.chartType })} options={CHART_MODES}/>
 					],
 					[
-						Weave.lang("Orientation Mode"),
+						Weave.lang("Orientation"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.orientationMode })} options={ORIENTATION_MODES} type={(columns.length <= 1) ? "disabled":null}/>
-					]
+					],
+					[
+						Weave.lang("Reference line"),
+						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.referenceLineMode })} options={REFERENCELINE_MODES}/>
+					],
+					[
+						Weave.lang("Show normal bands"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showNormalBands })} label={" "}/>
+					],
+					[
+						Weave.lang("Show line labels"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showRowLabels })} label={" "}/>
+					],
 				]
 			],
 			[Weave.lang("Title"), this.getTitleEditor()],
@@ -331,6 +382,21 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	}
 
 	/**
+	 * Gets the Sparkline reference line component depending on the mode
+	 * @param mode - The Sparkline reference line drawing mode
+	 */
+	getReferenceLineComponent(mode:string)
+	{
+		switch (mode)
+		{
+			case NONE:
+				break;
+			default:
+				return <SparklinesReferenceLine type={mode}/>
+		}
+	}
+
+	/**
 	 * Gets the Spark Line component depending on the mode
 	 * @param mode - The Sparkline drawing mode
 	 * @returns React.ReactChild - returns the Sparkline to be displayed
@@ -342,9 +408,9 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 			case LINE:
 				return <SparklinesLine style={style}/>;
 			case BARS:
-				return <SparklinesBars style={style} />;
+				return <SparklinesBars style={style}/>;
 			case CURVE:
-				return  <SparklinesCurve style={style} />;
+				return  <SparklinesCurve style={style}/>;
 		}
 	}
 
@@ -353,7 +419,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		let columns = this.columns.getObjects(IAttributeColumn);
 
 		return (
-			<ResizingDiv style={{flex: 1, whiteSpace: "nowrap"}} onResize={this.handleResize}>
+			<ResizingDiv style={{flex: 1, whiteSpace: "nowrap", marginTop: this.marginTop.value, marginBottom: this.marginBottom.value, marginLeft: this.marginLeft.value, marginRight: this.marginRight.value}} onResize={this.handleResize}>
 				{this.state.width && this.state.height ?
 					<VBox
 						style={{flex: 1, overflow:"auto"}}
@@ -361,6 +427,8 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 						{this.state.data && this.state.data.map( (data,index) => {
 							let style:React.CSSProperties;
 							let label:string;
+							let referenceLineKey:string = this.referenceLineMode.value ? this.referenceLineMode.value:"custom";
+							let normalBandKey:string = this.showNormalBands.value ? "yes":"no";
 							if(this.orientationMode.value == RECORD){
 								let record:Record = this.records && this.records[index] as Record;
 								style = _.assign(style,{stroke: record.line.color, fill: record.fill.color ,fillOpacity: .25 });
@@ -373,9 +441,11 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 									key={index}
 									style={{flex: 1, overflow:"auto", position: "relative"}}
 								>
-									<span style={{position: "absolute", top: 0, left: 0}}>{label}</span>
-									<Sparklines key={this.chartType.value} data={data} width={this.state.width} height={this.state.height/this.state.data.length}>
+									{this.showRowLabels.value ? <span style={{position: "absolute", top: 0, left: 0}}>{label}</span>:null}
+									<Sparklines key={this.chartType.value.concat(referenceLineKey,normalBandKey)} data={data} width={this.state.width} height={this.state.height/this.state.data.length}>
 										{this.getLineComponent(this.chartType.value,style)}
+										<SparklinesNormalBand style={{fill: 'red', fillOpacity: this.showNormalBands.value ? .1:0}}/>
+										<SparklinesReferenceLine type={referenceLineKey} value={0} style={{ stroke: 'red', strokeOpacity: this.referenceLineMode.value ? .75:0, strokeDasharray: '2, 2'}}/>
 									</Sparklines>
 								</VBox>
 							)

@@ -17,25 +17,33 @@ declare module sparkline {
 		max?: number;
 	}
 
-	export interface ISparklinesLineProps {
-		color?: string;
 
+	export interface ISparklinesNormalBandProps {
 		style?: React.CSSProperties;
+	}
+
+	export interface ISparklinesSeriesProps extends ISparklinesNormalBandProps{
+		color?: string;
+	}
+
+	export interface ISparklinesReferenceLineProps extends ISparklinesNormalBandProps{
+		type?: string;
+		value?: number;
 	}
 
 	export class Sparklines extends React.Component<ISparklinesProps, {}>{ }
 
-	export class SparklinesLine extends React.Component<ISparklinesLineProps, {}>{ }
+	export class SparklinesLine extends React.Component<ISparklinesSeriesProps, {}>{ }
 
-	export class SparklinesReferenceLine extends React.Component<{ type: string }, {}>{ }
+	export class SparklinesReferenceLine extends React.Component<ISparklinesReferenceLineProps, {}>{ }
 
-	export class SparklinesNormalBand extends React.Component<{}, {}>{ }
+	export class SparklinesNormalBand extends React.Component<ISparklinesNormalBandProps, {}>{ }
 
 	export class SparklinesSpots extends React.Component<{}, {}>{ }
 
-	export class SparklinesBars extends React.Component<ISparklinesLineProps, {}>{ }
+	export class SparklinesBars extends React.Component<ISparklinesSeriesProps, {}>{ }
 
-	export class SparklinesCurve extends React.Component<ISparklinesLineProps, {}>{ }
+	export class SparklinesCurve extends React.Component<ISparklinesSeriesProps, {}>{ }
 }
 
 declare module "react-sparklines" {
