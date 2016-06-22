@@ -175,7 +175,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		var menuStyle:React.CSSProperties = _.merge({},this.props.style,{
 			position: "absolute",
 			display:"block",
-			zIndex:1 // override semantic ui dropdown menu z-index as it comes with value 11
+			zIndex:11 // c3-tooltip has zindex 10 so temp we have to use 11 // todo: after we move out of c3 set it to 1
 		});
 
 		if (this.element)
