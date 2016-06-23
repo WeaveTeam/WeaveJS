@@ -5,7 +5,7 @@ import * as ReactDOM from "react-dom";
 import AbstractVisTool from "./AbstractVisTool";
 import Menu, {MenuItemProps} from "../react-ui/Menu";
 import MiscUtils from "../utils/MiscUtils";
-import {ObjectFixedDataTable, IRow} from "./FixedDataTable";
+import FixedDataTable from "./FixedDataTable";
 import {SortTypes, SortDirection} from "./FixedDataTable";
 import ReactUtils from "../utils/ReactUtils";
 import PrintUtils from "../utils/PrintUtils";
@@ -33,7 +33,6 @@ import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 
 export interface IDataTableState extends IVisToolState
 {
-	data?: IRow[],
 	columnTitles?:{[columnId:string]: string},
 	columnIds?:string[],
 	width?:number,
@@ -46,11 +45,15 @@ export interface TableEventData {
 	column: IAttributeColumn;
 }
 
+class AttributeColumnTable extends FixedDataTable<IQualifiedKey> {
+
+}
+
 
 
 export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool, IInitSelectableAttributes
 {
-	fixedDataTable: ObjectFixedDataTable;
+	attributeColumnTable: AttributeColumnTable;
 
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 
@@ -90,7 +93,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.selectionFilter.addGroupedCallback(this, this.forceUpdate);
 		this.probeFilter.addGroupedCallback(this, this.forceUpdate);
 		this.state = {
-			data: [],
 			columnTitles: {},
 			columnIds: [],
 			width:0,
@@ -124,7 +126,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		{
 			menuItems.push({
 				label: Weave.lang("Move selected to top"),
-				click: () => this.fixedDataTable.moveSelectedToTop()
+				click: () => this.attributeColumnTable.moveSelectedToTop()
 			});
 		}
 
@@ -162,18 +164,11 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			names.reverse();
 		}
 
-		var format:any = _.zipObject(names, columns);
-		format[this.idProperty] = IQualifiedKey;
-		var records: IRow[] = ColumnUtils.getRecords(format, this.filteredKeySet.keys, String);
-		records.forEach(record => record[this.idProperty] = record[this.idProperty].toString());
-
 		var titles:string[] = columns.map(column => Weave.lang(column.getMetadata("title")));
 		var columnTitles = _.zipObject(names, titles) as { [columnId: string]: string; };
-		names.unshift(this.idProperty);
 		columnTitles[this.idProperty] = Weave.lang("Key");
 
 		this.setState({
-			data: records,
 			columnTitles,
 			columnIds: names
 		});
@@ -268,14 +263,28 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.events.dispatch({ key, column });
 	}
 
+	getCellValue = (row:IQualifiedKey, columnKey:string):React.ReactChild =>
+	{
+		if (columnKey === null)
+		{
+			return row.toString();
+		}
+		else
+		{
+			let column = this.columns.getObject(columnKey) as IAttributeColumn;
+			return column.getValueFromKey(row, String);
+		}
+	}
+
 	render()
 	{
 		var columnNames = this.columns.getNames(IAttributeColumn);
 		return (
-			<ObjectFixedDataTable
+			<AttributeColumnTable
 				columnTitles={this.state.columnTitles}
-				rows={this.state.data}
-				idProperty={this.idProperty}
+				rows={this.filteredKeySet.keys}
+				idProperty={(key)=>key.toString()}
+				getCellValue={this.getCellValue}
 				selectedIds={this.selectionKeySet && this.selectionKeySet.keys.map(String) as any}
 				probedIds={this.probeKeySet && this.probeKeySet.keys.map(String) as any}
 				sortId={columnNames[this.sortFieldIndex.value]}
@@ -291,7 +300,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				evenlyExpandRows={true}
 				allowResizing={true}
 				onSortCallback={this.onSort}
-				ref={(c: ObjectFixedDataTable) => { this.fixedDataTable = c } }
+				ref={(c: AttributeColumnTable) => { this.attributeColumnTable = c } }
 			/>
 		);
 	}
