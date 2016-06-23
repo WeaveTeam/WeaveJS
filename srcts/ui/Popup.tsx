@@ -3,13 +3,16 @@ import ReactUtils from "../utils/ReactUtils";
 import Div from "../react-ui/Div";
 const ESC_KEYCODE = 27;
 
-export default class Popup extends Div
+export default class Popup extends React.Component<React.HTMLProps<Popup>, React.HTMLAttributes>
 {
 	static popupSet = new Set<Popup>();
 
-	static open(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(event:MouseEvent)=>void):Popup
+	static open(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(popup:Popup)=>void):Popup
 	{
-		var popup = ReactUtils.openPopup(context, <Popup style={{zIndex: 0}}>{jsx}</Popup>, closeOnMouseDown, onClose) as Popup;
+		var popup = ReactUtils.openPopup(context, <Popup style={{zIndex: 0}}>{jsx}</Popup>, closeOnMouseDown, (popup:React.ReactInstance) => {
+			Popup.close(popup as Popup);
+			if(onClose) onClose(popup as Popup);
+		}) as Popup;
 		Popup.popupSet.add(popup);
 		Popup.alignPopups();
 		return popup;
@@ -47,7 +50,17 @@ export default class Popup extends Div
 		var index = 0;
 		for (var popup of Popup.popupSet)
 		{
-			popup.setState({ style: { zIndex: index } });
+			popup.setState({
+				style: {
+					position: "absolute",
+					top: 0,
+					left: 0,
+					width: "100%",
+					height: "100%",
+					pointerEvents: "none",
+					zIndex: index
+				}
+			});
 			index++;
 		}
 	}
@@ -57,5 +70,16 @@ export default class Popup extends Div
 		Popup.popupSet.delete(popup);
 		Popup.popupSet.add(popup);
 		Popup.alignPopups();
+	}
+
+	render()
+	{
+		return (
+			<div {...this.props as any} {...this.state}>
+				<div style={{pointerEvents: "auto"}}>
+					{this.props.children}
+				</div>
+			</div>
+		);
 	}
 }

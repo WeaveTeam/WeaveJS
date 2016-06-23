@@ -97,7 +97,7 @@ export default class ReactUtils
 		return popoutWindow;
 	}
 	
-	static openPopup(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(event:MouseEvent)=>void):React.ReactInstance
+	static openPopup(context:React.ReactInstance, jsx:JSX.Element, closeOnMouseDown:boolean = false, onClose?:(popup:React.ReactInstance)=>void):React.ReactInstance
 	{
 		var document = ReactUtils.getDocument(context);
 		var element = document.body.appendChild(document.createElement("div")) as Element;
@@ -109,8 +109,8 @@ export default class ReactUtils
 			document.addEventListener("mousedown", mousedownHandler = (event:MouseEvent) => {
 				if (element.contains(event.target as HTMLElement))
 					return;
+				onClose && onClose(popup);
 				ReactUtils.closePopup(popup);
-				onClose && onClose(event);
 			});
 		}
 		

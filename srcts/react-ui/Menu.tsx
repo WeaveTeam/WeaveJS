@@ -21,9 +21,13 @@ export interface MenuItemProps
 export interface MenuProps extends React.HTMLProps<Menu>
 {
 	menu:MenuItemProps[];
-	opener: React.ReactInstance;
-	upward?:boolean; // change to direction if more directions are needed
 	header?:React.ReactChild;
+	/**
+	 * optional prop to specify who is opening the menu
+	 * so that in case of overflow we render the menu
+	 * on the other side of the opener
+	 */
+	opener?:React.ReactInstance;
 }
 
 export interface MenuState
@@ -89,8 +93,8 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		// we could get these elements in the ref function
 		// but it's safer here
 		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
-		this.opener = ReactDOM.findDOMNode(this.props.opener) as HTMLElement;
 		this.window = ReactUtils.getWindow(this);
+		this.opener = this.props.opener ? ReactDOM.findDOMNode(this.props.opener) as HTMLElement : null;
 		this.forceUpdate();
 	}
 
@@ -135,7 +139,6 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		});
 
 		var menuItemClass = classNames({
-			'item': true,
 			'disabled': !enabled,
 			'weave-menuitem': true
 		});
@@ -159,7 +162,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 				<span>{props.secondaryLabel}</span>
 				{
 					props.menu
-					?	<Menu opener={this} menu={props.menu}/>
+					?	<Menu menu={props.menu}/>
 					:	null
 				}
 			</div>
@@ -168,41 +171,50 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 
 	render():JSX.Element
 	{
-		var menuStyle:React.CSSProperties = _.clone(this.props.style) || {};
-		menuStyle.position = "absolute";
+		var menuStyle:React.CSSProperties = { position: "absolute" };
+		// if there is an opener, position the menu at the bottom of it
+		// by default
 		if(this.opener)
 		{
-			// this logic should be generic to the menu.
-			var parentRect = this.opener.getBoundingClientRect();
-
-			// place the menu under the opener
-			menuStyle.top = parentRect.bottom;
-			menuStyle.left = parentRect.left;
-
-			if(this.props.upward)
-				menuStyle.top = -parentRect.height;
-
-			else
-			{
-				if(parentRect.top + parentRect.height >= this.window.innerHeight )
-					menuStyle.top = - parentRect.height;
-
-				// set leftward if the width overflows out of screen width
-				if(parentRect.left + parentRect.width >= this.window.innerWidth )
-				{
-					menuStyle.left = - parentRect.width;
-				}
-			}
+			var openerRect = this.opener.getBoundingClientRect();
+			menuStyle.top = openerRect.bottom;
+			menuStyle.left = openerRect.left
 		}
-		if (this.element && weavejs.WeaveAPI.Locale.reverseLayout)
+
+		// get positions and other styles
+		menuStyle = _.merge(menuStyle, this.props.style);
+
+		// this logic should be generic to the menu.
+		// if the menu overflows to the right or bottom
+		// render it the other way
+		if(this.element)
 		{
 			var menuRect = this.element.getBoundingClientRect();
-			menuStyle.left = 0 - this.element.clientWidth;
-			if(menuRect.left - menuStyle.left < 0)
-				menuStyle.left = 0;
+			if(menuRect.left + menuRect.width > this.window.innerWidth)
+			{
+				menuStyle.left -= menuRect.width;
+				if(this.opener)
+					menuStyle.left -= this.opener.clientWidth;
+			}
+			if(menuStyle.top + menuRect.height > this.window.innerHeight)
+			{
+				menuStyle.top -= menuRect.height;
+				if(this.opener)
+					menuStyle.top -= this.opener.clientHeight;
+			}
 		}
+
+		if (this.element && weavejs.WeaveAPI.Locale.reverseLayout)
+		{
+			// TODO fix this logic
+			// var menuRect = this.element.getBoundingClientRect();
+			// menuStyle.left = 0 - this.element.clientWidth;
+			// if(menuRect.left - menuStyle.left < 0)
+			// 	menuStyle.left = 0;
+		}
+
 		return (
-			<div className="menu" {...this.props as any} style={menuStyle}>
+			<div className="weave-menu" {...this.props as any} style={menuStyle}>
 				{this.props.header ? (<div className="header">{this.props.header}</div>):null}
 				{this.renderMenuItems(this.props.menu)}
 			</div>

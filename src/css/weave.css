@@ -433,19 +433,26 @@ div.table-row-selected>div>div>div>div>div {
 
 /* menus */
 .weave-menu {
-	box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
-	-webkit-box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
-	-moz-box-shadow: 0 1px 3px 0 rgba(0,0,0,.08);
-	border-radius: 3px;
-	background-color: #FFFFFF;
-	padding-top: 3px;
-	padding-bottom: 3px;
-	user-select: none;
-	-webkit-user-select: none;
-	-moz-user-select: none;
-	cursor: pointer;
-	z-index: 2147483647; /* max z-index */
+	cursor: auto;
+	outline: 0;
+	top: 100%;
+	min-width: -webkit-max-content;
+	min-width: -moz-max-content;
+	min-width: max-content;
+	margin: 0;
+	padding-top: 7px;
+	padding-bottom: 7px;
+	background: #FFF;
+	font-size: 1em;
+	text-shadow: none;
+	text-align: left;
+	box-shadow: 0 2px 3px 0 rgba(34,36,38,.15);
 	border: 1px solid rgba(34,36,38,.15);
+	border-radius: .28571429rem;
+	-webkit-transition: opacity .1s ease;
+	transition: opacity .1s ease;
+	z-index: 11;
+	will-change: transform, opacity;
 }
 
 /* menubar */
@@ -485,18 +492,27 @@ div.table-row-selected>div>div>div>div>div {
 	font-weight: bold;
 }
 
-
-
 /* menu */
 .weave-menuitem {
 	/* padding-left: 20px; */
 	/* padding-right: 20px; */
-	background-color: rgba(255, 255, 255, 1);
-	justify-content: space-between;
-	padding: 4px 8px 4px 8px;
-	line-height: normal;
-	font-size: 12px;
+	position: relative;
+	cursor: pointer;
+	display: block;
+	border: none;
+	height: auto;
+	text-align: left;
+	border-top: none;
+	line-height: 1em;
+	color: rgba(0,0,0,.87);
+	padding: .71428571rem 1.14285714rem!important;
+	font-size: 1rem;
+	text-transform: none;
 	font-weight: 400;
+	box-shadow: none;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
 }
 
 .weave-menuitem:hover {
@@ -539,7 +555,7 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-menu-divider {
-	margin: 7px 0 8px 0;
+	margin: 7px 0 7px 0;
 	height: 1px;
 	border: none;
 	opacity: 1;

@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as ReactDOM from "react-dom";
 
 /**
  * Provides a way to render a div separately by setting its state.

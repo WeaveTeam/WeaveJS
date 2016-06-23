@@ -6,10 +6,10 @@ import classNames from "../modules/classnames";
 import SmartComponent from "../ui/SmartComponent";
 import Popup from "../ui/Popup";
 import ReactUtils from "../utils/ReactUtils";
+import values = d3.values;
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
-	upward?:boolean; 
 	menu?:MenuItemProps[];
 	openOnMouseEnter?:boolean;
 	closeOnMouseLeave?:boolean;
@@ -98,12 +98,21 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	openMenu=()=>
 	{
+		// var menuStyle:React.CSSProperties= {};
+		// if(this.props.upward)
+		// {
+		// 	var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
+		// 	var menuStyle = {
+		// 		top: rect.top + rect.height
+		// 	}
+		// }
+
 		this.menu = Popup.open(
 			this,
 			<Menu
+				opener={this}
 				ref={this.getMenuRef}
 				menu={this.props.menu}
-				opener={this}
 				onClick={this.menuClickListener}
 			/>
 		);
@@ -137,7 +146,6 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				onClick={this.onClick}
 			    onMouseEnter={this.onMouseEnter}
 			    onMouseLeave={this.onMouseLeave}
-			    className={classNames("ui dropdown", this.props.type, this.props.className)}
 			>
 				{this.props.children}
 			</div>
