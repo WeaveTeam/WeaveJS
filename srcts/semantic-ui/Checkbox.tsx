@@ -7,6 +7,7 @@ import FormEvent = __React.FormEvent;
 export interface CheckboxProps extends React.Props<Checkbox>
 {
 	type?: string;
+	disabled?: boolean;
 	label: string; // important to set them to avoid using jquery // else we have to let jquery to use dom selector to set " set checked"
 	name?: string;
 	style?: React.CSSProperties;
@@ -67,10 +68,11 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 		delete props.children;
 
 		return (
-			<div className={"ui " + this.props.type + " checkbox " + (this.state.value? "checked ": "")  +(this.props.className || "")}>
+			<div className={"ui checkbox " + (this.state.value? "checked ": "") + (this.props.disabled ? "disabled ": "")  +(this.props.className || "")}>
 				<input {...props as any} type={this.props.type ? this.props.type :  "checkbox"}
 				                         value={String(this.state.value)}
 				                         checked={this.state.value}
+				                         disabled={this.props.disabled}
 				                         title={this.props.title}
 				                         name={this.props.name}
 				                         onChange={this.handleChange}

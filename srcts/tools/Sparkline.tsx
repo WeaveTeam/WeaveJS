@@ -3,7 +3,6 @@ import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from
 
 import * as React from "react";
 import * as _ from "lodash";
-import {MouseEvent} from "react";
 import {CSSProperties} from "react";
 import * as jquery from "jquery";
 import MiscUtils from "../utils/MiscUtils";
@@ -19,6 +18,7 @@ import SmartComponent from "../ui/SmartComponent";
 import ComboBox, {ComboBoxOption}  from "../semantic-ui/ComboBox";
 import Checkbox from "../semantic-ui/Checkbox";
 import ConfigUtils from "../utils/ConfigUtils";
+import ToolTip from "./ToolTip";
 
 import StandardLib = weavejs.util.StandardLib;
 import LinkableString = weavejs.core.LinkableString
@@ -96,6 +96,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	chartType = Weave.linkableChild(this, new LinkableString(LINE, this.verifyChartMode));
 	orientationMode = Weave.linkableChild(this, new LinkableString(COLUMN, this.verifyOrientationMode));
 	referenceLineMode = Weave.linkableChild(this, new LinkableString(NONE, this.verifyReferenceLineMode));
+	showAllRecords = Weave.linkableChild(this, new LinkableBoolean(false));
 	showRowLabels = Weave.linkableChild(this, new LinkableBoolean(true));
 	showNormalBands = Weave.linkableChild(this, new LinkableBoolean(false));
 	fill = Weave.linkableChild(this, SolidFillStyle);
@@ -112,6 +113,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 
 	private records:Record[];
+	private toolTip:ToolTip;
 
 	private verifyChartMode(mode:string):boolean
 	{
@@ -127,7 +129,6 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	{
 		return [NONE, MIN, MAX, MEAN, AVG, MEDIAN].indexOf(mode) >= 0;
 	}
-
 
 	private get selectionKeySet() { return this.selectionFilter.getInternalKeyFilter() as KeySet; }
 	private get probeKeySet() { return this.probeFilter.getInternalKeyFilter() as KeySet; }
@@ -159,6 +160,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		this.sortColumn.addGroupedCallback(this, this.dataChanged, true);
 		this.labelColumn.addGroupedCallback(this, this.dataChanged, true);
 		this.orientationMode.addGroupedCallback(this, this.dataChanged, true);
+		this.showAllRecords.addGroupedCallback(this, this.dataChanged, true);
 		this.filteredKeySet.addGroupedCallback(this, this.dataChanged, true);
 		this.selectionFilter.addGroupedCallback(this, this.dataChanged, true);
 		this.probeFilter.addGroupedCallback(this, this.dataChanged, true);
@@ -280,6 +282,10 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 						Weave.lang("Show line labels"),
 						<Checkbox ref={linkReactStateRef(this, { value: this.showRowLabels })} label={" "}/>
 					],
+					[
+						Weave.lang("Show All Records"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showAllRecords })} label={" "} disabled={this.orientationMode.value == COLUMN}/>
+					]
 				]
 			],
 			[Weave.lang("Title"), this.getTitleEditor()],
@@ -299,6 +305,16 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 	componentDidUpdate()
 	{
 
+	}
+
+	componentDidMount()
+	{
+		this.toolTip = ReactUtils.openPopup(this, <ToolTip/>) as ToolTip;
+	}
+
+	componentWillUnmount()
+	{
+		ReactUtils.closePopup(this.toolTip);
 	}
 
 	handleResize=(newSize:ResizingDivState) =>
@@ -364,12 +380,21 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 							})
 						});
 					} else if(this.orientationMode.value == RECORD) {
-						//group records into rows
-						data = this.records.map((record:any, index:number) => {
-							return names.map((name:string, i:number) => {
-								return record[name];
-							})
-						});
+						if (!this.showAllRecords.value) {
+							let records:any[] = this.getInteractedRecords();
+							data = records && records.map((record:any, index:number) => {
+								return names.map((name:string, index:number) => {
+									return record[name]
+								})
+							});
+						} else {
+							//all records case. group records into rows
+							data = this.records.map((record:any, index:number) => {
+								return names.map((name:string, i:number) => {
+									return record[name];
+								})
+							});
+						}
 					}
 				}
 			}
@@ -379,6 +404,31 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		this.setState({
 			data
 		});
+	}
+
+	getInteractedRecords():Record[]
+	{
+		let probeKeys = this.probeKeySet.keys;
+		let selectedKeys = this.selectionKeySet.keys;
+		let records:Record[];
+		if(probeKeys.length) {
+			//show the sparklines for the probed keys
+			records = probeKeys.map((key,index) => {
+				return _.find(this.records, (record:Record) => {
+					return record.id === key;
+				});
+			});
+
+		} else if (selectedKeys.length) {
+			//show the sparklines for the selected keys
+			records = selectedKeys.map((key,index) => {
+				return _.find(this.records, (record:Record) => {
+					return record.id === key;
+				});
+			});
+		}
+
+		return _.sortByOrder(records, ["sort"], ["asc"]);
 	}
 
 	/**
@@ -414,36 +464,99 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		}
 	}
 
+	handleClick=(record:Record, event:React.MouseEvent):void =>
+	{
+		if(this.orientationMode.value == COLUMN || !this.selectionKeySet)
+			return;
+
+		var currentSelection:IQualifiedKey[] = this.selectionKeySet.keys;
+
+		if (_.includes(currentSelection, record.id))
+		{
+			currentSelection = _.difference(currentSelection, [record.id]);
+			this.selectionKeySet.replaceKeys(currentSelection);
+		}
+		else
+		{
+			if ((event.ctrlKey || event.metaKey))
+				this.selectionKeySet.addKeys([record.id]);
+			else
+				this.selectionKeySet.replaceKeys([record.id]);
+		}
+	};
+
+	handleProbe=(record:Record, mouseOver:boolean, event:React.MouseEvent):void =>
+	{
+		if(this.orientationMode.value == COLUMN || !this.probeKeySet)
+			return;
+
+		if (mouseOver)
+		{
+			this.probeKeySet.replaceKeys([record.id]);
+		}
+		else
+		{
+			this.probeKeySet.replaceKeys([]);
+		}
+		let columns = this.columns.getObjects(IAttributeColumn);
+		this.toolTip.show(this, event.nativeEvent as MouseEvent, this.probeKeySet.keys, columns);
+	};
+
+	getSparklines()
+	{
+		var rows:JSX.Element[] = [];
+	}
+
 	render()
 	{
-		let columns = this.columns.getObjects(IAttributeColumn);
-
 		return (
-			<ResizingDiv style={{flex: 1, whiteSpace: "nowrap", marginTop: this.marginTop.value, marginBottom: this.marginBottom.value, marginLeft: this.marginLeft.value, marginRight: this.marginRight.value}} onResize={this.handleResize}>
+			<ResizingDiv
+				style={{flex: 1, whiteSpace: "nowrap", marginTop: this.marginTop.value, marginBottom: this.marginBottom.value, marginLeft: this.marginLeft.value, marginRight: this.marginRight.value}}
+				onResize={this.handleResize}
+				onMouseLeave={ () => this.toolTip.hide() }
+			>
 				{this.state.width && this.state.height ?
 					<VBox
-						style={{flex: 1, overflow:"auto"}}
+						style={{flex: 1, overflow:"auto", height: "100%"}}
 					>
 						{this.state.data && this.state.data.map( (data,index) => {
 							let style:React.CSSProperties = {};
 							let label:string;
 							let referenceLineKey:string = this.referenceLineMode.value ? this.referenceLineMode.value:"custom";
 							let normalBandKey:string = this.showNormalBands.value ? "yes":"no";
+							let interactedRecords:Record[] = this.getInteractedRecords();
+							let interactive:boolean = !this.showAllRecords.value;
 							if(this.orientationMode.value == RECORD){
 								let record:Record = this.records && this.records[index] as Record;
-								style = _.assign(style,{stroke: record.line.color, fill: record.fill.color ,fillOpacity: .25 });
+								if (interactive) {
+									record = interactedRecords[index];
+								}
+								let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
+								let selected:boolean = this.isSelected(record.id);
+								let probed:boolean = this.isProbed(record.id);
+								style = _.assign(style,
+									{
+										stroke: record.line.color,
+										strokeWidth: probed ? 3:(selected ? 2:null),
+										strokeOpacity: (selectionEmpty || selected || probed) ? 1.0 : 0.1,
+										fill: record.fill.color,
+										fillOpacity: (selectionEmpty || selected || probed) ? 0.8 : 0.1 });
 								label = record.id.toString();
 							} else {
+								let columns = this.columns.getObjects(IAttributeColumn);
 								label = Weave.lang(weavejs.data.ColumnUtils.getTitle(columns[index]));
 								style = {};
 							}
 							return (
 								<VBox
 									key={index}
-									style={{flex: 1, overflow:"auto", position: "relative"}}
+									style={{flex: 1, overflow:"hidden", position: "relative"}}
+									onClick={this.handleClick.bind(this,this.records && (interactive ? interactedRecords && interactedRecords[index]:(this.records[index] as Record)))}
+									onMouseMove={this.handleProbe.bind(this,this.records && (interactive ? interactedRecords && interactedRecords[index]:(this.records[index] as Record)), true)}
+									onMouseOut={this.handleProbe.bind(this,this.records && (interactive ? interactedRecords && interactedRecords[index]:(this.records[index] as Record)), false)}
 								>
-									{this.showRowLabels.value ? <span style={{position: "absolute", top: 0, left: 0}}>{label}</span>:null}
-									<Sparklines key={this.chartType.value.concat(referenceLineKey,normalBandKey)} data={data} width={this.state.width} height={this.state.height/this.state.data.length}>
+									{<span style={{position: "absolute", top: 0, left: 0}}>{this.showRowLabels.value ? label:""}</span>}
+									<Sparklines key={this.chartType.value.concat(referenceLineKey,normalBandKey,String(this.probeKeySet.keys),String(this.selectionKeySet.keys))} data={data} width={this.state.width} height={this.state.height/this.state.data.length}>
 										{this.getLineComponent(this.chartType.value,style)}
 										<SparklinesNormalBand style={{fill: 'red', fillOpacity: this.showNormalBands.value ? .1:0}}/>
 										<SparklinesReferenceLine type={referenceLineKey} value={0} style={{ stroke: 'red', strokeOpacity: this.referenceLineMode.value ? .75:0, strokeDasharray: '2, 2'}}/>
