@@ -72,10 +72,18 @@ export default class Popup extends React.Component<React.HTMLProps<Popup>, React
 		Popup.alignPopups();
 	}
 
+	onContextMenu=(event:React.MouseEvent)=>
+	{
+		// disable the context menu on all popups
+		event.preventDefault();
+		if(this.props.onContextMenu)
+			this.props.onContextMenu(event);
+	}
+
 	render()
 	{
 		return (
-			<div {...this.props as any} {...this.state}>
+			<div {...this.props as any} {...this.state} onContextMenu={this.onContextMenu}>
 				<div style={{pointerEvents: "auto"}}>
 					{this.props.children}
 				</div>
