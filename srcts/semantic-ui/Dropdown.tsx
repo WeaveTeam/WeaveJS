@@ -1,21 +1,20 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as _ from "lodash";
-import {MenuItemProps} from "../react-ui/Menu";
+import Menu, {MenuItemProps} from "../react-ui/Menu";
 import InteractiveTour from "../react-ui/InteractiveTour";
-import Menu from "../react-ui/Menu"
 import classNames from "../modules/classnames";
-import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
 import Popup from "../ui/Popup";
+import ReactUtils from "../utils/ReactUtils";
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
-	direction?:string;// upward
+	upward?:boolean; 
 	menu?:MenuItemProps[];
 	openOnMouseEnter?:boolean;
 	closeOnMouseLeave?:boolean;
 	onClose?:()=> void;
+	onOpen?:()=> void;
 }
 
 export interface DropdownState
@@ -44,20 +43,17 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	private element:Element;
 
-	componentDidMount()
+	onMouseLeave=(event:React.MouseEvent)=>
 	{
-		this.element = ReactDOM.findDOMNode(this);
-	}
-
-	onMouseLeaveListener=(event:React.MouseEvent)=>
-	{
-		this.hideMenu();
+		if(this.props.closeOnMouseLeave)
+			this.closeMenu();
 		this.props.onMouseLeave  && this.props.onMouseLeave(event);
 	};
 
-	onMouseEnterListener=(event:React.MouseEvent)=>
+	onMouseEnter=(event:React.MouseEvent)=>
 	{
-		this.showMenu();
+		if(this.props.openOnMouseEnter)
+			this.openMenu();
 		this.props.onMouseEnter  && this.props.onMouseEnter(event);
 	};
 
@@ -68,56 +64,61 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
 			InteractiveTour.targetComponentOnClick(menuID)
 		}
+		// close the menu once an item has been clicked
+		this.closeMenu();
 	};
 
 	onClick=(event:React.MouseEvent)=>
 	{
 		this.toggleMenu();
+		if(this.props.onClick)
+			this.props.onClick(event);
 	};
 
-	hideMenu=()=>
+	closeMenu=()=>
 	{
 		Popup.close(this.menu);
 		this.menu = null;
+		ReactUtils.getDocument(this).removeEventListener("mousedown", this.onDocumentMouseDown);
+		if(this.props.onClose) this.props.onClose();
 	}
 
-	showMenu=()=>
+	onDocumentMouseDown=(event:MouseEvent)=>
 	{
-		var menuStyle:React.CSSProperties = {};
-		var menuRect = this.element.getBoundingClientRect();
-		if(this.props.direction == "upward")
-		{
-			menuStyle.top = - menuRect.height;
-		}
-		else //automate based on its position on screen
-		{
-			// set updward if the height overflows out of screen height
-		}
-		if(menuRect.top + menuRect.height >= ReactUtils.getWindow(this).innerHeight )
-		{
-			menuStyle.top = - menuRect.height;
-		}
-		// set leftward if the width overflows out of screen width
-		if(menuRect.left + menuRect.width >= ReactUtils.getWindow(this).innerWidth )
-		{
-			menuStyle.left = - menuRect.width;
-		}
-		this.menu = Popup.open(this, <Menu menu={this.props.menu} style={menuStyle} ref={this.getMenuRef} onClick={this.menuClickListener}/>, true, () => this.menu = null);
+		// close the menu when you mousedown anywhere except the
+		// dropdown item and the menu
+		var menuElt = ReactDOM.findDOMNode(this.menu);
+		var dropDownElt = ReactDOM.findDOMNode(this);
+		var targetElt = event.target as HTMLElement;
+		if (menuElt && menuElt.contains(targetElt) || dropDownElt.contains(targetElt))
+			return;
+		else
+			this.closeMenu();
+	}
+
+	openMenu=()=>
+	{
+		this.menu = Popup.open(
+			this,
+			<Menu
+				ref={this.getMenuRef}
+				menu={this.props.menu}
+				opener={this}
+				onClick={this.menuClickListener}
+			/>
+		);
+		ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown)
+		if(this.props.onOpen) this.props.onOpen();
 	}
 
 	toggleMenu=()=>
 	{
 		if(this.menu)
-		{
-			this.hideMenu();
-		}
+			this.closeMenu();
 		else
-		{
-			this.showMenu();
-		}
+			this.openMenu();
 	};
 
-	// add mouseDown listener only when menu is opened
 	getMenuRef=(ele:any)=>
 	{
 		if(InteractiveTour.isEnabled())
@@ -131,17 +132,12 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	render() {
 		return (
 			<div
+				ref={(e:HTMLDivElement) => this.element = e}
 				{...this.props as any}
-				onClick={this.showMenu}
-			    onMouseEnter={this.props.openOnMouseEnter ? this.onMouseEnterListener: null}
-			    onMouseLeave={this.props.closeOnMouseLeave ? this.onMouseLeaveListener : null}
-			    className={classNames(
-							{
-								"ui dropdown": true,
-							},
-							this.props.type,
-							this.props.className
-						)}
+				onClick={this.onClick}
+			    onMouseEnter={this.onMouseEnter}
+			    onMouseLeave={this.onMouseLeave}
+			    className={classNames("ui dropdown", this.props.type, this.props.className)}
 			>
 				{this.props.children}
 			</div>

@@ -3,6 +3,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
 import classNames from "../modules/classnames";
+import ReactUtils from "../utils/ReactUtils";
 
 export interface MenuItemProps
 {
@@ -19,9 +20,9 @@ export interface MenuItemProps
 
 export interface MenuProps extends React.HTMLProps<Menu>
 {
-	xPos?: number;
-	yPos?: number;
 	menu:MenuItemProps[];
+	opener: React.ReactInstance;
+	upward?:boolean; // change to direction if more directions are needed
 	header?:React.ReactChild;
 }
 
@@ -49,6 +50,8 @@ const renderDivider = function(index:number):JSX.Element
 export default class Menu extends React.Component<MenuProps, MenuState>
 {
 	element:HTMLElement;
+	opener:HTMLElement;
+	window:Window;
 
 	constructor(props:MenuProps)
 	{
@@ -83,18 +86,21 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 
 	componentDidMount()
 	{
-		/*this.element = ReactDOM.findDOMNode(this) as HTMLElement;
-		if(this.element.style.visibility == "hidden")
-			this.forceUpdate();*/
+		// we could get these elements in the ref function
+		// but it's safer here
+		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
+		this.opener = ReactDOM.findDOMNode(this.props.opener) as HTMLElement;
+		this.window = ReactUtils.getWindow(this);
+		this.forceUpdate();
 	}
-	
+
 	renderMenuItems(menu:MenuItemProps[])
 	{
 		var filteredMenu:MenuItemProps[] = [];
-		
+
 		// remove hidden menu elements
 		filteredMenu = menu.filter(menuItem => menuItem.hasOwnProperty('shown') ? !!menuItem.shown : true);
-	
+
 		// remove redundant separators
 		filteredMenu = filteredMenu.filter((menuItem, index, array) => {
 			var item = menuItem;
@@ -105,11 +111,11 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		// remove the first item if it is a separator
 		if(_.isEqual(filteredMenu[0], SEPARATOR))
 			filteredMenu.shift();
-		
+
 		// remove the last item if it is a separtor
 		if(_.isEqual(filteredMenu[filteredMenu.length - 1], SEPARATOR))
 			filteredMenu.pop();
-		
+
 		return filteredMenu.map((menuItem, index) => {
 			if(_.isEqual(menuItem, SEPARATOR))
 				return renderDivider(index);
@@ -153,7 +159,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 				<span>{props.secondaryLabel}</span>
 				{
 					props.menu
-					?	<Menu menu={props.menu}/>
+					?	<Menu opener={this} menu={props.menu}/>
 					:	null
 				}
 			</div>
@@ -162,39 +168,41 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 
 	render():JSX.Element
 	{
-		var otherProps:any = {};
-
-		for (var key in this.props)
+		var menuStyle:React.CSSProperties = _.clone(this.props.style) || {};
+		menuStyle.position = "absolute";
+		if(this.opener)
 		{
-			if (key !== "style")
-			{
-				otherProps[key] = (this.props as any)[key];
-			}
-		}
+			// this logic should be generic to the menu.
+			var parentRect = this.opener.getBoundingClientRect();
 
-		var menuStyle:React.CSSProperties = _.merge({}, this.props.style, {
-			position: "absolute"
-		});
+			// place the menu under the opener
+			menuStyle.top = parentRect.bottom;
+			menuStyle.left = parentRect.left;
 
-		if (this.element)
-		{
-			let boundingRect:ClientRect = this.element.getBoundingClientRect();
-			if (weavejs.WeaveAPI.Locale.reverseLayout)
-			{
-				menuStyle.left = 0 - this.element.clientWidth;
-				if (boundingRect.left - menuStyle.left < 0)
-					menuStyle.left = 0;
-			}
+			if(this.props.upward)
+				menuStyle.top = -parentRect.height;
+
 			else
 			{
-				var rightOverflow:number = boundingRect.left + this.element.clientWidth - window.innerWidth;
-				if (rightOverflow > 0)
-					menuStyle.left = menuStyle.left - this.element.clientWidth;
+				if(parentRect.top + parentRect.height >= this.window.innerHeight )
+					menuStyle.top = - parentRect.height;
+
+				// set leftward if the width overflows out of screen width
+				if(parentRect.left + parentRect.width >= this.window.innerWidth )
+				{
+					menuStyle.left = - parentRect.width;
+				}
 			}
 		}
-
+		if (this.element && weavejs.WeaveAPI.Locale.reverseLayout)
+		{
+			var menuRect = this.element.getBoundingClientRect();
+			menuStyle.left = 0 - this.element.clientWidth;
+			if(menuRect.left - menuStyle.left < 0)
+				menuStyle.left = 0;
+		}
 		return (
-			<div className="menu" {...otherProps} style={menuStyle}>
+			<div className="menu" {...this.props as any} style={menuStyle}>
 				{this.props.header ? (<div className="header">{this.props.header}</div>):null}
 				{this.renderMenuItems(this.props.menu)}
 			</div>
