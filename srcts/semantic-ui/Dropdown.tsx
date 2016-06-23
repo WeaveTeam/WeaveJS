@@ -10,7 +10,7 @@ import values = d3.values;
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
-	menu?:MenuItemProps[];
+	menuGetter?:() => MenuItemProps[];
 	openOnMouseEnter?:boolean;
 	closeOnMouseLeave?:boolean;
 	onClose?:()=> void;
@@ -70,6 +70,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	onClick=(event:React.MouseEvent)=>
 	{
+		this.forceUpdate();
 		this.toggleMenu();
 		if(this.props.onClick)
 			this.props.onClick(event);
@@ -112,7 +113,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			<Menu
 				opener={this}
 				ref={this.getMenuRef}
-				menu={this.props.menu}
+				menu={this.props.menuGetter()}
 				onClick={this.menuClickListener}
 			/>
 		);

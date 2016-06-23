@@ -68,7 +68,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		return (
 			<Dropdown
 				className={menuBarClass}
-				menu={this.props.config[index].menu}
+				menuGetter={() => this.props.config[index].menu}
 				key={index}
 				ref={(c:Dropdown) => {
 					this.menuItems[index] = c;

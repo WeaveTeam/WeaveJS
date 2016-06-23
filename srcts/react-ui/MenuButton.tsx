@@ -50,7 +50,7 @@ export default class MenuButton extends React.Component<MenuButtonProps, MenuBut
 		return (
 			<Dropdown
 				className={dropdownClass}
-				menu={this.props.menu}
+				menuGetter={() => this.props.menu}
 				{...props as any}
 			>
 				<div style={{display:"flex", justifyContent:"center"}}>
