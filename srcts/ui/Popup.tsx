@@ -1,8 +1,6 @@
 import * as React from "react";
-import SmartComponent from "../ui/SmartComponent";
 import ReactUtils from "../utils/ReactUtils";
 import Div from "../react-ui/Div";
-import PopupWindow from "../react-ui/PopupWindow";
 const ESC_KEYCODE = 27;
 
 export default class Popup extends Div

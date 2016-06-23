@@ -77,16 +77,19 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		return () => {
 			if (popup)
 				popup.bringToFront();
-			var props = propsGetter();
-			popup = PopupWindow.open(
-				_.merge({}, props, {
-					onClose: () => {
-						if(props.onClose)
-							props.onClose();
-						popup = null;
-					}
-				}) as PopupWindowProps
-			);
+			else
+			{
+				var props = propsGetter();
+				popup = PopupWindow.open(
+					_.merge({}, props, {
+						onClose: () => {
+							if(props.onClose)
+								props.onClose();
+							popup = null;
+						}
+					}) as PopupWindowProps
+				);
+			}
 			return popup;
 		}
 	}
