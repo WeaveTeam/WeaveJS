@@ -34,7 +34,7 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 			LAYOUT_CHECKBOXLIST];
 	}
 
-	public layoutMode:LinkableString = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate);
+	public layoutMode:LinkableString = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode));
 	public values:LinkableVariable = Weave.linkableChild(this, LinkableVariable);
 
 	constructor(props:FilterEditorProps) 

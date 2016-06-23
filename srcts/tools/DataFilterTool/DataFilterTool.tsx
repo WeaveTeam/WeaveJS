@@ -239,7 +239,8 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		Weave.getCallbacks(this.props.filterEditor).removeCallback(this, this.forceUpdate);
 	}
 
-	private last_discreteFilterLayoutMode:string;
+	private last_discreteFilterLayoutMode:string;//required for preserving state between filter types
+	private filterTypeSwitched:boolean = false;//indicates if filters have been switched
 
 	//UI event handler for attribute menu layout
 	handleFilterTypeChange = (selectedItem:string):void =>
@@ -249,6 +250,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 			var filterEditorItem:any = this.filterEditorMap[selectedItem];
 
 			this.props.filterEditor.requestLocalObject(filterEditorItem.editorClass, false);
+			this.filterTypeSwitched = true;
 		}
 
 	};
@@ -290,7 +292,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 		if (this.props.filterEditor.target instanceof NumericRangeDataFilterEditor)
 		{
 			selectedFilter = FILTER_TYPE.CONTINUOUS;
-			filterEditorItem = this.filterEditorMap[FILTER_TYPE.CONTINUOUS]
+			filterEditorItem = this.filterEditorMap[FILTER_TYPE.CONTINUOUS];
 			selectedOption = (this.props.filterEditor.target as NumericRangeDataFilterEditor).forceDiscreteValues.state as boolean;
 			filterOptionUI =  [
 				<span style={labelStyle}></span>,
@@ -298,14 +300,19 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 				          label={ filterEditorItem.options[0] }
 				          onChange={ this.handleContinuousFilterOptionChange }
 				/>
-			]
+			];
+			this.filterTypeSwitched = false;//reset
 		}
 		else if (this.props.filterEditor.target instanceof DiscreteValuesDataFilterEditor)
 		{
 			selectedFilter = FILTER_TYPE.DISCRETE;
-			filterEditorItem = this.filterEditorMap[FILTER_TYPE.DISCRETE]
-			/*selectedOption = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;*/
-			selectedOption = this.last_discreteFilterLayoutMode;
+			filterEditorItem = this.filterEditorMap[FILTER_TYPE.DISCRETE];
+
+			if(this.filterTypeSwitched)
+				(this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state = this.last_discreteFilterLayoutMode as string;/*preserving the layout state*/
+
+			selectedOption = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;
+
 			filterOptionUI = [
 				<span style={labelStyle}>{ Weave.lang("Layout") }</span>,
 				<ComboBox className="weave-sidebar-dropdown"
@@ -314,6 +321,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 				          onChange={ this.handleDiscreteFilterOptionChange }
 				/>
 			];
+			this.filterTypeSwitched = false;//reset
 		}
 
 		var filterEditorMapKeys:string[] = Object.keys(this.filterEditorMap);
