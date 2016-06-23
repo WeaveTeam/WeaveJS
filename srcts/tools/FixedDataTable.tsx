@@ -499,12 +499,10 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		};
 
 		//code for heat map
-		if(value < 1)
-			value = 1;
-		if(value < 3.5)
-			value = 3.5;
-		if(value > 5)
-			value = 5;
+		if(value < 65)
+			value = 65;
+		if(value > 90)
+			value = 90;
 
 		let cellStyle = {
 			background : this.colorRamp.getHexColor(value as any, 65, 90)
