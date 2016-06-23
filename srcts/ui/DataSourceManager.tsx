@@ -245,7 +245,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 								disableClick={false}>
 								<VBox style={editorStyle}>
 									<div className="ui centered header">
-										<span className=""></span>
+										{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
 									</div>
 										{ this.state.rejected ?  <span>{Weave.lang("The specified data file could not be imported. Only files with the following extensions are allowed: .csv,.geojson,.txt,.tsv,.xls,.shp,.dbf")}</span>
 										: null  }
