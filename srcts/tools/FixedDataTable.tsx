@@ -482,14 +482,16 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 	renderCell=(props: {rowIndex: number, columnKey: string, height: number, width: number}):JSX.Element=>
 	{
 		let value = this.getValue(props.rowIndex, props.columnKey);
+		let rowId = this.getId(props.rowIndex);
 
 		let handleDoubleClick = (event:React.MouseEvent)=>{
 			if (this.props.onCellDoubleClick)
-				this.props.onCellDoubleClick(String(props.rowIndex), props.columnKey);
+				this.props.onCellDoubleClick(rowId, props.columnKey);
 		}
-		return (<Cell {...props}>
-			<span onDoubleClick={handleDoubleClick}>{value}</span>
-		</Cell>
+		return (
+			<Cell {...props}>
+				<span style={{ width: "100%" }} onDoubleClick={handleDoubleClick}>{value}</span>
+			</Cell>
 		);
 	}
 
@@ -513,26 +515,17 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 			whiteSpace: "nowrap"
 		};
 		var evenWidth:number;
+		let columnIds: string[] = this.props.columnIds.filter((value) => (value !== this.props.idProperty));
 
-		if (this.props.evenlyExpandRows && this.state.width > 0)
-			evenWidth = Math.max(this.state.width / (this.props.columnIds.length - (this.props.showIdColumn ? 0:1)), this.props.initialColumnWidth);
-
-		let columnIds: string[];
-		let idColumnTitle: string;
 		if (this.props.showIdColumn)
 		{
-			columnIds = this.props.columnIds.concat([]);
 			columnIds.unshift(null);
 		}
-		else
-		{
-			columnIds = this.props.columnIds;
-		}
-		
+	
+		if (this.props.evenlyExpandRows && this.state.width > 0)
+			evenWidth = Math.max((this.state.width / columnIds.length), this.props.initialColumnWidth);
 
 		let columns = columnIds.map((id: string, index: number) => {
-			if (id === this.props.idProperty)
-				return; /* We use null as the sentinel value for the key column, as above. */
 			return (
 				<Column
 					allowCellsRecycling={true}
