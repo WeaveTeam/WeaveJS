@@ -9,6 +9,7 @@ import CenteredIcon from "../react-ui/CenteredIcon";
 import SessionStateLog = weavejs.core.SessionStateLog;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import LogEntry = weavejs.core.LogEntry;
+import {KEYCODES} from "../utils/KeyboardUtils";
 
 export interface SessionHistorySliderProps extends React.Props<SessionHistorySlider>
 {
@@ -20,9 +21,6 @@ export interface SessionHistorySliderState
 	max?:number;
 	position?:number;
 }
-
-const Z_KEYCODE = 90;
-const Y_KEYCODE = 89;
 
 export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 {
@@ -82,7 +80,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	handleKeyStroke=(event:KeyboardEvent)=>
 	{
 		// ctrl-z and cmd-z
-		if((event.ctrlKey || event.metaKey) && event.keyCode == Z_KEYCODE)
+		if((event.ctrlKey || event.metaKey) && event.keyCode == KEYCODES.Z)
 		{
 			event.preventDefault();
 			this._stateLog.undo();
@@ -90,7 +88,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 
 
 		// ctrl-y and cmd-y and cmd-shift-z
-		if(((event.ctrlKey || event.metaKey) && event.keyCode == Y_KEYCODE) || (event.metaKey && event.shiftKey && event.keyCode == Z_KEYCODE))
+		if(((event.ctrlKey || event.metaKey) && event.keyCode == KEYCODES.Y) || (event.metaKey && event.shiftKey && event.keyCode == KEYCODES.Z))
 		{
 			event.preventDefault();
 			this._stateLog.redo();

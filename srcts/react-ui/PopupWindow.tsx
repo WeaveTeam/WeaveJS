@@ -11,8 +11,7 @@ import ReactUtils from "../utils/ReactUtils";
 import DraggableDiv, {DraggableDivState} from "./DraggableDiv";
 import Div from "./Div";
 import Popup from "../ui/Popup";
-
-const ENTER_KEYCODE = 13;
+import {KEYCODES} from "../utils/KeyboardUtils";
 
 export interface PopupWindowProps extends React.HTMLProps<PopupWindow>
 {
@@ -138,7 +137,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 	{
 		var code = event.keyCode;
 
-		if (code == ENTER_KEYCODE && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
+		if (code == KEYCODES.ENTER && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
 			this.onOk();
 	}
 

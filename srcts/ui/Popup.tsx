@@ -1,7 +1,7 @@
 import * as React from "react";
 import ReactUtils from "../utils/ReactUtils";
 import Div from "../react-ui/Div";
-const ESC_KEYCODE = 27;
+import {KEYCODES} from "../utils/KeyboardUtils";
 
 export default class Popup extends React.Component<React.HTMLProps<Popup>, React.HTMLAttributes>
 {
@@ -31,7 +31,7 @@ export default class Popup extends React.Component<React.HTMLProps<Popup>, React
 	onKeyDown(event:KeyboardEvent)
 	{
 		var code = event.keyCode;
-		if (code == ESC_KEYCODE)
+		if (code == KEYCODES.ESC)
 		{
 			var activePopup = Array.from(Popup.popupSet.keys()).pop();
 			if (this == activePopup)
