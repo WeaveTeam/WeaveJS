@@ -7,6 +7,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import CellProps = FixedDataTable.CellProps;
 import ResizingDiv, {ResizingDivState} from "../ui/ResizingDiv";
 import SmartComponent from "../ui/SmartComponent";
+import ColorRamp = weavejs.util.ColorRamp;
 
 export declare type SortDirection = "ASC"|"DESC"|"NONE";
 
@@ -150,6 +151,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 	private firstIndex:number;
 	private secondIndex:number;
 	private lastClicked:number;
+	private colorRamp:ColorRamp;//HEATMAP
 	private container:HTMLElement;
 	static defaultProps:IFixedDataTableProps<any> = {
 		idProperty: "",
@@ -211,6 +213,12 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		};
 
 		this.setIdPropertyGetter(props);
+
+		//COLOR RAMP For heat Map
+		this.colorRamp = new weavejs.util.ColorRamp();
+		this.colorRamp.state = [
+			"0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"
+		];
 	}
 
 	setIdPropertyGetter(props:IFixedDataTableProps<RowDatum>)
@@ -479,6 +487,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		});
 	};
 
+	//TODO clean up the heat map code
 	renderCell=(props: {rowIndex: number, columnKey: string, height: number, width: number}):JSX.Element=>
 	{
 		let value = this.getValue(props.rowIndex, props.columnKey);
@@ -487,12 +496,27 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		let handleDoubleClick = (event:React.MouseEvent)=>{
 			if (this.props.onCellDoubleClick)
 				this.props.onCellDoubleClick(rowId, props.columnKey);
-		}
+		};
+
+		//code for heat map
+		if(value < 1)
+			value = 1;
+		if(value < 3.5)
+			value = 3.5;
+		if(value > 5)
+			value = 5;
+
+		let cellStyle = {
+			background : this.colorRamp.getHexColor(value as any, 65, 90)
+		};
 		return (
 			<Cell {...props}>
-				<span style={{ width: "100%" }} onDoubleClick={handleDoubleClick}>{value}</span>
+				<div style={cellStyle}>
+					<span style={{ width: "100%" }} onDoubleClick={handleDoubleClick}>{value}</span>
+				</div>
 			</Cell>
 		);
+		//code for heat map end
 	}
 
 	getColumnTitle(columnId:string)
