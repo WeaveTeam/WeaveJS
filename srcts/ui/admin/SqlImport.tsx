@@ -113,7 +113,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 		if ((error.message as string).startsWith(WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION) ||
 			(error.message as string).startsWith("RemoteException: Incorrect username or password."))
 		{
-			if (this.login) this.login.generateOpener(() => this.updateSchemas());
+			if (this.login) this.login.open(() => this.updateSchemas());
 		}
 		else
 		{

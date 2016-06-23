@@ -65,7 +65,7 @@ export default class ConnectionManager extends SmartComponent<IConnectionManager
 		if ((error.message as string).startsWith(WeaveAdminService.WEAVE_AUTHENTICATION_EXCEPTION) ||
 			(error.message as string).startsWith("RemoteException: Incorrect username or password."))
 		{
-			if (this.login) this.login.generateOpener(this.updateConnectionsAndUser);
+			if (this.login) this.login.open(this.updateConnectionsAndUser);
 		}
 		else
 		{

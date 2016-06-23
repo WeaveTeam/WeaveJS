@@ -51,7 +51,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 	openLogin=()=>
 	{
 		if (this.element)
-		this.login.generateOpener(this.handleSuccess, this.handleCancel);
+		this.login.open(this.handleSuccess, this.handleCancel);
 	};
 
 	handleCancel=() =>

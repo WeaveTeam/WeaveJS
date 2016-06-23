@@ -47,8 +47,8 @@ export default class SystemMenu implements MenuBarItemProps
 			},
 			{},
 			{
-				label: weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Not signed in"),
-				click: this.owner.login.generateOpener,
+				label: weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Signed in as {0}", weavejs.net.Admin.instance.activeConnectionName) : Weave.lang("Sign in..."),
+				click: this.owner.login.open,
 				shown: weavejs.net.Admin.service.initialized
 			},
 			{
