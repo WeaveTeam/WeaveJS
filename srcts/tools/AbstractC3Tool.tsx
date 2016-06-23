@@ -155,8 +155,8 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 			this.c3Config.size = { width: this.element.clientWidth, height: this.element.clientHeight };
 			if (this.chart)
 				this.chart.resize({ width: this.element.clientWidth, height: this.element.clientHeight });
-			this.cullAxes();
 		}
+		this.cullAxes();
 	}
 	
 	render():JSX.Element
@@ -171,7 +171,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 					config={weavejs.util.JS.copyObject(this.c3Config, true)}
 					ref={(c:C3Chart) => {
 						this.chartComponent = c;
-						this.chart = c && c.chart
+						this.chart = c && c.chart;
 						if (this.chart)
 							this.handleC3Render();
 					}}
