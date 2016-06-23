@@ -67,7 +67,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		}
 	}
 
-	onEditLayerClick=(layer:AbstractLayer,e: React.MouseEvent) =>
+	onEditLayerClick=(layer:AbstractLayer) =>
 	{
 		if (this.props.pushCrumb)
 		{
@@ -80,8 +80,6 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 				openedLayer: layer
 			});
 		}
-		if (e)
-			e.stopPropagation();
 	};
 
 
@@ -147,14 +145,18 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 			return (
 				<VBox style={{minHeight: 200, flex: 1}} className="weave-padded-vbox">
 					<HBox>
-						<MenuButton showIcon={false}
-						            style={{flex: "1", alignItems: "center", justifyContent: "center", borderBottomRightRadius:0,borderTopRightRadius:0}} menu={layerTypes.map((layerClass) => ({
+						<MenuButton
+							showIcon={false}
+				            style={{flex: "1", alignItems: "center", justifyContent: "center", borderBottomRightRadius:0,borderTopRightRadius:0}}
+							menu={layerTypes.map((layerClass) => ({
 								label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
-								click: (e:React.MouseEvent) => {
+								click: () => {
 									let newLayer = this.props.layers.requestObject('', layerClass);
 									this.setState({selectedLayer: newLayer});
-									this.onEditLayerClick(newLayer, e);
-								}}))}>
+									this.onEditLayerClick(newLayer);
+								}
+							}))}
+						>
 							<i className="fa fa-plus fa-fw"/>
 						</MenuButton>
 						<Button style={ {flex: "1",borderRadius:0} } disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus fa-fw"/></Button>

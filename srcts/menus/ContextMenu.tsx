@@ -12,7 +12,7 @@ export default class ContextMenu extends Menu
 			return;
 		return Popup.open(
 			event.target as Element,
-			<Menu
+			<ContextMenu
 				menu={contextMenuItems}
 				style={{
 					top: event.clientY,

@@ -11,7 +11,7 @@ export interface MenuItemProps
 	leftIcon?:React.ReactElement<any>;
 	rightIcon?:React.ReactElement<any>;
 	secondaryLabel?:string;
-	click?:Function;
+	click?:()=>void;
 	enabled?:boolean;
 	shown?:boolean;
 	menu?:MenuItemProps[];
@@ -143,16 +143,24 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			'weave-menuitem': true
 		});
 
-		var click = () => {
+		var click = (event:React.MouseEvent) => {
 			if (!props.menu && props.click && enabled)
-				props.click()
+				props.click();
+			else
+			{
+				// block if the menu item is disabled
+				// so that the menu doesn't close
+				event.preventDefault();
+				event.stopPropagation();
+			}
 		};
 
 		return (
-			<div className={menuItemClass}
+			<div
+				className={menuItemClass}
 				onClick={click}
 				key={index}
-			     style={props.itemStyleOverride}
+			    style={props.itemStyleOverride}
 			>
 				<HBox>
 					<div>{props.leftIcon}</div>

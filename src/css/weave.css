@@ -516,18 +516,19 @@ div.table-row-selected>div>div>div>div>div {
 }
 
 .weave-menuitem:hover {
-	background-color: rgba(0,0,0,.05)!important
+	background-color: rgba(0,0,0,.05)
 }
 
 .weave-menuitem:active {
 	background-color: #CCCCCC
 }
 
-.weave-menuitem-disabled {
+.disabled.weave-menuitem {
+	cursor: default;
 	color: #C1C1C1;
 }
 
-.weave-menuitem-disabled:hover {
+.disabled.weave-menuitem:hover {
 	background-color: #FFFFFF;
 }
 

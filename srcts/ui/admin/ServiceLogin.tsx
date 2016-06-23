@@ -19,7 +19,7 @@ export default class ServiceLogin
 		this.service = service;
 	}
 
-	generateOpener(onSuccess?: (username: string) => void, onCancel?: () => void) {
+	generateOpener=(onSuccess?: (username: string) => void, onCancel?: () => void) => {
 		return PopupWindow.generateOpener(() => ({
 			context: this.context,
 			title: Weave.lang("Weave Server Sign-In"),
@@ -29,7 +29,7 @@ export default class ServiceLogin
 			draggable: false,
 			modal: true,
 			suspendEnter: true,
-			width: 400,
+			width: 400
 		}));
 	}
 
