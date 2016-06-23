@@ -9,6 +9,7 @@ import SmartComponent from "../ui/SmartComponent";
 import DynamicComponent from "../ui/DynamicComponent";
 import StatefulTextField from "../ui/StatefulTextField";
 import WeaveTree from "../ui/WeaveTree";
+import TableTool from "../tools/TableTool";
 import FixedDataTable from "../tools/FixedDataTable";
 import MenuButton from '../react-ui/MenuButton';
 import ChartsMenu from "../menus/ChartsMenu";
@@ -180,7 +181,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		);
 	}
 
-	getColumns():IAttributeColumn[]
+	getColumns():IColumnReference[]
 	{
 		var columnSiblings: IWeaveTreeNode[] = this.state.selectedBranch && this.state.selectedBranch.getChildren() || [];
 
@@ -188,16 +189,17 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		if (!leaves)
 			return [];
 
-		var columns:IAttributeColumn[] = [];
+		var columns:IColumnReference[] = [];
 		for (var leaf of leaves)
 		{
 			var columnRef = Weave.AS(leaf, IColumnReference);
 			if (columnRef)
 			{
+				columns.push(columnRef);
 				var meta = columnRef.getColumnMetadata();
+
 				if (meta) {
 					var column = weavejs.WeaveAPI.AttributeColumnCache.getColumn(columnRef.getDataSource(), meta);
-					columns.push(column);
 					// request all metadata for each geometry column so we get the list of keys
 					for (var sgc of Weave.getDescendants(column, StreamedGeometryColumn))
 						sgc.requestAllMetadata();
@@ -207,32 +209,23 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		return columns;
 	}
 	
-	renderTablePreview=(columns:IAttributeColumn[]):JSX.Element =>
+	renderTablePreview=(columnRefs:IColumnReference[]):JSX.Element =>
 	{
-		var names:string[] = columns.map(column => column.getMetadata("title"));
-		var format = _.assign({id: IQualifiedKey},_.zipObject(names, columns));
-		var columnTitles = _.zipObject(names, names);
-		var rows = ColumnUtils.getRecords(format, null, String);
-
-		rows = rows.map((row) => {
-			row.id = row.id.localName;
-			return row;
-		});
-
-		var keyType = columns.length && columns[0].getMetadata("keyType");
-		names.unshift("id");
-		_.assign(columnTitles, {id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key")});
+		let refFunction = (c: TableTool) =>
+		{
+			if (!c) return;
+			Weave.disposableChild(this.weaveRoot, c);
+			c.sortFieldIndex.value = -1;
+			for (let columnRef of columnRefs)
+			{
+				let name = c.columns.generateUniqueName("ReferencedColumn");
+				let refColumn = c.columns.requestObject(name, weavejs.data.column.ReferencedColumn) as weavejs.data.column.ReferencedColumn;
+				refColumn.setColumnReference(columnRef.getDataSource(), columnRef.getColumnMetadata());
+			}
+		}
 
 		return (
-			<FixedDataTable
-				rows={rows}
-				columnIds={names}
-				idProperty="id"
-				showIdColumn={!!columns.length}
-				columnTitles={columnTitles as any}
-				disableSort={true}
-				multiple={false}
-			/>
+			<TableTool ref={refFunction}/>
 		);
 	};
 
