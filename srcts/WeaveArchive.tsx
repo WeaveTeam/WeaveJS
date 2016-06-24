@@ -167,3 +167,8 @@ export default class WeaveArchive {
 			});
 	}
 }
+
+Weave.registerClass(
+	WeaveArchive,
+	["weavejs.core.WeaveArchive"]
+);

@@ -56,7 +56,6 @@ weavejs.util.StandardLib.lodash = lodash;
 weavejs.util.StandardLib.ol = ol;
 weavejs.util.DateUtils.moment = (moment as any)['default'];
 weavejs.util.DebugUtils.MouseUtils = MouseUtils;
-weavejs.core.WeaveArchive.JSZip = JSZip;
 
 import * as jquery from "jquery";
 import Div from "./react-ui/Div";
