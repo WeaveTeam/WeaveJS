@@ -93,7 +93,7 @@ export interface IFixedDataTableProps<RowDatum> extends React.Props<FixedDataTab
 	rows:RowDatum[];
 	getCellValue?: (row: RowDatum, columnKey: string) => React.ReactChild;
 	columnIds:string[];
-	columnTitles?: { [columnId: string]: string | JSX.Element };
+	columnTitles?: { [columnId: string]: React.ReactChild } | ((columnId:string) => React.ReactChild);
 	enableHover?:boolean;
 	enableSelection?:boolean;
 	disableSort?:boolean;
@@ -508,14 +508,21 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 	getColumnTitle(columnId:string)
 	{
 		if (!this.props.columnTitles) return "";
-		if (columnId == null) {
-			if (!(this.props.idProperty instanceof Function))
-				return this.props.columnTitles[this.props.idProperty as string];
+		if (this.props.columnTitles instanceof Function)
+		{
+			return (this.props.columnTitles as ((columnKey: string) => React.ReactChild))(columnId);
 		}
 		else
 		{
-			return this.props.columnTitles[columnId];
+			if (columnId == null) {
+				if (!(this.props.idProperty instanceof Function))
+					return (this.props.columnTitles as { [k: string]: string })[this.props.idProperty as string];
+			}
+			else {
+				return (this.props.columnTitles as {[k: string]: string})[columnId];
+			}
 		}
+
 	}
 
 	render():JSX.Element
