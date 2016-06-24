@@ -498,9 +498,10 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 			if (this.props.onCellDoubleClick)
 				this.props.onCellDoubleClick(rowId, props.columnKey);
 		}
+		/* Inline style here is hack to make div actually fill whole cell for dblclick purposes since we can't attach event handlers to the Cell itself. */
 		return (
 			<Cell key={props.rowIndex+"#"+props.columnKey} {...props}>
-				<span style={{ width: "100%" }} onDoubleClick={handleDoubleClick}>{value}</span>
+				<div style={{ marginLeft: -4, paddingLeft: 4, marginTop: -4, paddingTop: 4, width: props.width, height: props.height}} onDoubleClick={handleDoubleClick}>{value}</div>
 			</Cell>
 		);
 	}
