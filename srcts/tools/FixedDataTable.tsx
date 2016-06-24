@@ -23,7 +23,7 @@ export const SortTypes = {
 	DESC: 'DESC' as 'DESC',
 };
 
-export class SortHeaderCell extends React.Component<ISortHeaderProps, Object>
+export class SortHeaderCell extends SmartComponent<ISortHeaderProps, Object>
 {
 	defaultProps:ISortHeaderProps = {
 		disableSort: false
@@ -308,21 +308,31 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		var id:string = this.getId(index);
 		var probedIds:string[] = id ? [id] : [];
 
-		this.setState({
-			probedIds
-		});
-
 		if (this.props.onHover)
+		{
 			this.props.onHover(probedIds);
+		}
+		else
+		{
+			this.setState({
+				probedIds
+			});
+		}
 	};
 
 	onMouseLeave=(event:React.MouseEvent, index:number):void =>
 	{
 		//console.log("Leave",event,index);
-		this.setState({
-			probedIds: []
-		});
-		this.props.onHover && this.props.onHover([]);
+		if (this.props.onHover)
+		{
+			this.props.onHover([]);
+		}
+		else
+		{
+			this.setState({
+				probedIds: []
+			});
+		}
 	};
 
 	onMouseDown=(event:React.MouseEvent, index:number):void =>
@@ -489,7 +499,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 				this.props.onCellDoubleClick(rowId, props.columnKey);
 		}
 		return (
-			<Cell {...props}>
+			<Cell key={props.rowIndex+"#"+props.columnKey} {...props}>
 				<span style={{ width: "100%" }} onDoubleClick={handleDoubleClick}>{value}</span>
 			</Cell>
 		);
