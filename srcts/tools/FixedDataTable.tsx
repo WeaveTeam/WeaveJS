@@ -508,21 +508,20 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 	getColumnTitle(columnId:string)
 	{
 		if (!this.props.columnTitles) return "";
-		if (this.props.columnTitles instanceof Function)
+		if (typeof this.props.columnTitles === 'function')
 		{
 			return (this.props.columnTitles as ((columnKey: string) => React.ReactChild))(columnId);
 		}
 		else
 		{
 			if (columnId == null) {
-				if (!(this.props.idProperty instanceof Function))
+				if (!(typeof this.props.idProperty === 'function'))
 					return (this.props.columnTitles as { [k: string]: string })[this.props.idProperty as string];
 			}
 			else {
 				return (this.props.columnTitles as {[k: string]: string})[columnId];
 			}
 		}
-
 	}
 
 	render():JSX.Element
