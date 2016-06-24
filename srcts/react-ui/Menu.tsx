@@ -62,7 +62,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	{
 		super(props);
 		this.state = {
-			activeIndex: 0,
+			activeIndex: -1,
 		};
 		this.menuItemList = [];
 	}

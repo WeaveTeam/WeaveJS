@@ -114,6 +114,8 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 		if (code == KEYCODES.ENTER && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
 			this.onOk();
+		else if (code == KEYCODES.ESC && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
+			this.onCancel();
 	}
 
 	private onOk()
