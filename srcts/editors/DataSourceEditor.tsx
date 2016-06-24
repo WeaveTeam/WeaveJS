@@ -158,7 +158,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 						style={{flex: 1, overflow: 'auto'}}
 						ref={InteractiveTour.getComponentRefCallback("Preview")}
 					>
-						<DynamicComponent dependencies={columns} render={() => {return this.renderTablePreview(columns)}}/>
+						{this.renderTablePreview(columns)}
 					</VBox>
 				</HBox>
 			</Section>
