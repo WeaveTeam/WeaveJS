@@ -5,7 +5,8 @@ import InteractiveTour from "./InteractiveTour";
 import {MenuItemProps} from "./Menu";
 import Dropdown from "../semantic-ui/Dropdown";
 import classNames from "../modules/classnames";
-import SmartComponent from "../ui/SmartComponent";
+import ReactUtils from "../utils/ReactUtils";
+import {KEYCODES} from "../utils/KeyboardUtils";
 
 export interface MenuBarItemProps
 {
@@ -56,12 +57,19 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	openMenu(newMenu:Dropdown)
 	{
-		if (this.activeMenu && this.activeMenu != newMenu)
-		{
+		if (this.activeMenu)
 			this.activeMenu.closeMenu();
+		if (this.activeMenu != newMenu)
+		{
 			this.activeMenu = newMenu;
 			this.activeMenu.openMenu();
 		}
+	}
+
+	closeMenu()
+	{
+		if (this.activeMenu)
+			this.activeMenu.closeMenu();
 	}
 
 	onMouseLeave=(event:React.MouseEvent)=>
@@ -92,15 +100,62 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	onMenuOpen(index:number)
 	{
-		this.activeMenu = this.menuItems[index];
+		this.activeMenu = this.menuItems[index]
 	}
 
 	onMenuClose=()=>
 	{
-		this.setState({activeIndex: -1});
 		this.activeMenu = null;
 	}
-	
+
+	handleKeyPress=(event:KeyboardEvent)=>
+	{
+		if (event.keyCode == KEYCODES.LEFT_ARROW)
+		{
+			if (this.activeMenu && this.state.activeIndex > 0)
+				this.openNextMenu(this.state.activeIndex - 1);
+			else if (this.state.activeIndex > 0 && this.state.activeIndex < this.menuItems.length)
+			{
+				this.setState({
+					activeIndex: this.state.activeIndex - 1
+				})
+			}
+		}
+		else if(event.keyCode == KEYCODES.RIGHT_ARROW)
+		{
+			if (this.activeMenu && this.state.activeIndex < this.menuItems.length - 1)
+				this.openNextMenu(this.state.activeIndex + 1);
+			else if (this.state.activeIndex > -1 && this.state.activeIndex < this.menuItems.length - 1)
+			{
+				this.setState({
+					activeIndex: this.state.activeIndex + 1
+				})
+			}
+		}
+		else if(event.keyCode == KEYCODES.ESC)
+		{
+			if(this.activeMenu)
+				this.closeMenu();
+		}
+		else if(event.keyCode == KEYCODES.SPACE)
+		{
+			if(!this.activeMenu && this.state.activeIndex > -1)
+				this.openNextMenu(this.state.activeIndex);
+			else
+				this.closeMenu();
+		}
+	}
+
+	componentDidMount()
+	{
+		ReactUtils.getDocument(this).addEventListener("keydown", this.handleKeyPress);
+	}
+
+	componentWillUnmount()
+	{
+		ReactUtils.getDocument(this).removeEventListener("keydown", this.handleKeyPress);
+	}
+
 	renderMenuBarItem(index:number, props:MenuBarItemProps):JSX.Element
 	{
 		var menuBarClass = classNames({
@@ -114,6 +169,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 			<Dropdown
 				className={menuBarClass}
 				menuGetter={() => this.props.config[index].menu}
+				tabIndex={1}
 				key={index}
 				ref={(c:Dropdown) => {
 					this.menuItems[index] = c;
