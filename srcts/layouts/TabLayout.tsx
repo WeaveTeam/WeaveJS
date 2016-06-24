@@ -282,10 +282,12 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 			if (Array.isArray(this.props.onAdd))
 			{
 				plusIcon = (
-					<Dropdown style={{display: "flex"}} menuGetter={() => this.props.onAdd as MenuItemProps[]}>
-						<HBox className={classNames("weave-layout-tabs-label", "bottom")} style={{flex: 1}}>
-							<CenteredIcon className="weave-tab-icon" title={Weave.lang("Add New...")} iconProps={{ className: "fa fa-plus" }}/>
-						</HBox>
+					<Dropdown
+						className={classNames("weave-layout-tabs-label", "bottom")}
+						style={{display: "flex"}}
+						menuGetter={() => this.props.onAdd as MenuItemProps[]}
+					>
+						<i className={classNames("fa fa-plus", "weave-tab-icon")} title={Weave.lang("Add New...")}/>
 					</Dropdown>
 				);
 			}
@@ -336,6 +338,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								className="weave-padded-hbox"
 								onDragOver={(event) => this.onDragOverTab(tab)}
 								onDragLeave={this.onDragLeaveTab}
+								style={{alignItems: "center"}}
 								ref={InteractiveTour.enable ? InteractiveTour.getComponentRefCallback(tab.label): null}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.setTabLabel(tab.id, newName)} textContent={tab.label}/>*/}

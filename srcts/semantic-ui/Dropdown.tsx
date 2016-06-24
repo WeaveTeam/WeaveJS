@@ -76,7 +76,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	onKeyUp=(event:React.KeyboardEvent)=>
 	{
-		if(event.keyCode == KEYCODES.SPACE)
+		if(event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
 		{
 			this.toggleMenu();
 			event.preventDefault();
@@ -119,7 +119,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	onDocumentKeyUp=(event:KeyboardEvent)=>
 	{
 		// close the menu if key up on space
-		if(event.keyCode == KEYCODES.SPACE)
+		if(event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
 			this.closeMenu();
 	}
 
@@ -170,10 +170,9 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	render() {
 		return (
-			<div
+			<button
 				{...this.props as any}
-				className={classNames("weave-dropdown", this.props.className)}
-				tabIndex={0}
+				className={classNames("weave-transparent-button", "weave-dropdown", this.props.className)}
 				role="button"
 				onKeyUp={this.onKeyUp}
 				onMouseDown={this.onClick}
@@ -181,7 +180,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			    onMouseLeave={this.onMouseLeave}
 			>
 				{this.props.children}
-			</div>
+			</button>
 		);
 	}
 }

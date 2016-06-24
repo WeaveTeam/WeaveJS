@@ -147,12 +147,12 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 
 				<CenteredIcon title={Weave.lang('Undo')}
 							  onClick={() => this._stateLog.undo()}
-							  className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}
+							  className={classNames("weave-icon", 'weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.undoHistory.length})}
 							  iconProps={{className: "fa fa-arrow-left"}}/>
 
 				<CenteredIcon title={Weave.lang('Redo')}
 							  onClick={() => this._stateLog.redo()}
-							  className={classNames('weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}
+							  className={classNames("weave-icon", 'weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}
 							  iconProps={{className:"fa fa-arrow-right"}}/>
 
 				<HSlider options={sliderOptions} selectedValues={[this.state.position as any]} step={1} onChange={this.handleSlider.bind(this)} type={RCSlider.CATEGORICAL}/>

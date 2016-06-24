@@ -104,7 +104,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	onKeyUp=(index:number, event:React.KeyboardEvent)=>
 	{
-		if(event.keyCode == KEYCODES.SPACE)
+		if(event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
 			this.flickerItem(index);
 	}
 

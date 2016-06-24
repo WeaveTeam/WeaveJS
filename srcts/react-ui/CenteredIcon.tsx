@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
+import classNames from "../modules/classnames";
 
 export interface CenteredIconProps extends React.HTMLProps<HTMLSpanElement>
 {
@@ -20,26 +21,18 @@ export default class CenteredIcon extends React.Component<CenteredIconProps, Cen
 	render() 
 	{
 		return (
-			<span
-				className="weave-icon"
+			<button
 				{...this.props}
-				style={_.merge(
-					this.props.style,
-					{alignSelf: "stretch", display: "flex", cursor: "pointer"}
-				)}
+				className={classNames("weave-transparent-button", this.props.className || "weave-icon")}
 			>
 				{
 					this.props.children || (
 						<i
 							{...this.props.iconProps}
-							style={_.merge(
-								this.props.iconProps.style,
-								{alignSelf: "center"}
-							)}
 						/>
 					)
 				}
-			</span>
+			</button>
 		)
 	}
 }

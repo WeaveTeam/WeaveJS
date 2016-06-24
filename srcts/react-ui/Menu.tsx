@@ -213,7 +213,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			if(event.type != "keydown" && event.type != "mouseup")
 				return;
 
-			if (event.type == "keydown" && (event as React.KeyboardEvent).keyCode != KEYCODES.SPACE)
+			if (event.type == "keydown" && (event as React.KeyboardEvent).keyCode != KEYCODES.SPACE && (event as React.KeyboardEvent).keyCode != KEYCODES.ENTER)
 				return;
 
 			if (!props.menu && props.click && enabled)

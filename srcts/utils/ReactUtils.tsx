@@ -117,6 +117,7 @@ export default class ReactUtils
 				if(event.type == "keydown")
 				{
 					if ((event as KeyboardEvent).keyCode != KEYCODES.SPACE &&
+						(event as KeyboardEvent).keyCode != KEYCODES.ENTER &&
 						(event as KeyboardEvent).keyCode != KEYCODES.ESC)
 						return;
 				}
