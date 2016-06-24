@@ -13,11 +13,11 @@ import Div from "./Div";
 import Popup from "../ui/Popup";
 import {KEYCODES} from "../utils/KeyboardUtils";
 
-export interface PopupWindowProps extends React.HTMLProps<PopupWindow>
+export interface PopupWindowProps extends React.Props<PopupWindow>
 {
 	context:React.ReactInstance;
-	title?:string /*|JSX.Element*/;
-	content?:any/*JSX.Element*/;
+	title?:React.ReactChild;
+	content?:React.ReactChild;
 	modal?:boolean;
 	resizable?:boolean;
 	draggable?:boolean;
@@ -82,7 +82,7 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 				popup = PopupWindow.open(
 					_.merge({}, props, {
 						onClose: () => {
-							if(props.onClose)
+							if (props.onClose)
 								props.onClose();
 							popup = null;
 						}
@@ -98,39 +98,14 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 		Popup.bringToFront(this.popup);
 	}
 
-	static close(instance:React.ReactInstance)
-	{
-		var popup = ReactUtils.findComponent(instance, PopupWindow);
-		if(popup)
-			popup.close();
-	}
-
-	close()
-	{
-		Popup.close(this.popup);
-	}
-
 	componentDidMount()
 	{
 		ReactUtils.getDocument(this).addEventListener("keydown", this.onKeyDown);
 	}
 
-	private onOk()
+	componentWillUnmount()
 	{
-		this.props.onOk && this.props.onOk();
-		this.onClose();
-	}
-
-	private onCancel()
-	{
-		this.props.onCancel && this.props.onCancel();
-		this.onClose();
-	}
-
-	private onClose()
-	{
-		this.close();
-		this.props.onClose && this.props.onClose();
+		ReactUtils.getDocument(this).removeEventListener("keydown", this.onKeyDown);
 	}
 
 	onKeyDown=(event:KeyboardEvent)=>
@@ -141,9 +116,35 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 			this.onOk();
 	}
 
-	componentWillUnmount()
+	private onOk()
 	{
-		ReactUtils.getDocument(this).removeEventListener("keydown", this.onKeyDown);
+		if (this.props.onOk)
+			this.props.onOk();
+		this.close();
+	}
+
+	private onCancel()
+	{
+		if (this.props.onCancel)
+			this.props.onCancel();
+		this.close();
+	}
+
+	/**
+	 * Given an Element or React Component, uses ReactUtils.findComponent() to find the enclosing PopupWindow and close it.
+	 */
+	static close(instance:React.ReactInstance)
+	{
+		var popup = ReactUtils.findComponent(instance, PopupWindow);
+		if (popup)
+			popup.close();
+	}
+
+	close()
+	{
+		if (this.props.onClose)
+			this.props.onClose();
+		Popup.close(this.popup);
 	}
 
 	renderOverlay(modal:boolean)
@@ -163,7 +164,6 @@ export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupW
 
 	render():JSX.Element
 	{
-
 		var windowStyle:React.CSSProperties = {
 			top: this.props.top,
 			left: this.props.left,
