@@ -5,6 +5,7 @@ import InteractiveTour from "./InteractiveTour";
 import {MenuItemProps} from "./Menu";
 import Dropdown from "../semantic-ui/Dropdown";
 import classNames from "../modules/classnames";
+import SmartComponent from "../ui/SmartComponent";
 
 export interface MenuBarItemProps
 {
@@ -15,12 +16,13 @@ export interface MenuBarItemProps
 
 export interface MenuBarProps extends React.HTMLProps<MenuBar>
 {
-	config?:MenuBarItemProps[]
+	config?:MenuBarItemProps[];
 }
 
 export interface MenuBarState
 {
-
+	activeIndex?:number;
+	clickedIndex?:number;
 }
 
 export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
@@ -33,18 +35,59 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	{
 		super(props);
 		this.menuItems = [];
+		this.state = {
+			activeIndex: -1,
+			clickedIndex: -1
+		}
 	}
 
 	onMouseEnter(index:number, event:React.MouseEvent)
 	{
 		// allow toggling between menus once the menubar has been clicked on
+		this.openNextMenu(index);
+	}
+
+	openNextMenu(index:number)
+	{
 		var newMenu = this.menuItems[index];
+		this.openMenu(newMenu);
+		this.setState({activeIndex: index});
+	}
+
+	openMenu(newMenu:Dropdown)
+	{
 		if(this.activeMenu && this.activeMenu != newMenu)
 		{
 			this.activeMenu.closeMenu();
 			this.activeMenu = newMenu;
 			this.activeMenu.openMenu();
 		}
+	}
+
+	onMouseLeave=(event:React.MouseEvent)=>
+	{
+		// clear the hover style if no menu is open
+		if(!this.activeMenu)
+			this.setState({activeIndex: -1});
+	}
+
+	onMouseUp=(index:number)=>
+	{
+		this.flickerItem(index);
+	}
+
+	flickerItem=(index:number)=>
+	{
+		this.setState({
+			clickedIndex: index
+		}, () => {
+			// small delay and disable active style
+			setTimeout(() => {
+				this.setState({
+					clickedIndex: -1
+				})
+			}, 100);
+		})
 	}
 
 	onMenuOpen(index:number)
@@ -54,14 +97,16 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	onMenuClose=()=>
 	{
+		this.setState({activeIndex: -1});
 		this.activeMenu = null;
 	}
 	
 	renderMenuBarItem(index:number, props:MenuBarItemProps):JSX.Element
 	{
 		var menuBarClass = classNames({
-			"ui dropdown": true,
 			"weave-menubar-item": true,
+			"weave-menubar-item-hovered": this.state.activeIndex == index,
+			"weave-menubar-item-clicked": this.state.clickedIndex == index,
 			"weave-menubar-item-bold": !!props.bold
 		});
 
@@ -78,6 +123,8 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 					InteractiveTour.enable ? InteractiveTour.targetComponentOnClick(props.label) :null
 				}}
 				onMouseEnter={(event:React.MouseEvent) => this.onMouseEnter(index, event)}
+				onMouseLeave={this.onMouseLeave}
+				onMouseUp={() => this.onMouseUp(index)}
 				onOpen={() => this.onMenuOpen(index)}
 				onClose={this.onMenuClose}
 			>

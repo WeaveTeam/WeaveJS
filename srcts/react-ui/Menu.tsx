@@ -32,7 +32,7 @@ export interface MenuProps extends React.HTMLProps<Menu>
 
 export interface MenuState
 {
-	hovered: number;
+	activeIndex: number;
 }
 
 const REACT_COMPONENT = "reactComponent";
@@ -61,7 +61,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	{
 		super(props);
 		this.state = {
-			hovered: -1,
+			activeIndex: -1,
 		};
 	}
 
@@ -96,6 +96,20 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		this.window = ReactUtils.getWindow(this);
 		this.opener = this.props.opener ? ReactDOM.findDOMNode(this.props.opener) as HTMLElement : null;
 		this.forceUpdate();
+	}
+
+	onMouseEnter=(index:number)=>
+	{
+		this.setState({
+			activeIndex: index
+		});
+	}
+
+	onMouseLeave=()=>
+	{
+		this.setState({
+			activeIndex: -1
+		});
 	}
 
 	renderMenuItems(menu:MenuItemProps[])
@@ -140,7 +154,8 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 
 		var menuItemClass = classNames({
 			'disabled': !enabled,
-			'weave-menuitem': true
+			'weave-menuitem': true,
+			'weave-menuitem-hovered': this.state.activeIndex == index
 		});
 
 		var click = (event:React.MouseEvent) => {
@@ -158,7 +173,9 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		return (
 			<div
 				className={menuItemClass}
-				onClick={click}
+				onMouseUp={click}
+				onMouseEnter={() => this.onMouseEnter(index)}
+				onMouseLeave={this.onMouseLeave}
 				key={index}
 			    style={props.itemStyleOverride}
 			>

@@ -472,11 +472,11 @@ div.table-row-selected>div>div>div>div>div {
 	padding: .5em 1em;
 }
 
-.weave-menubar-item:hover {
+.weave-menubar-item.weave-menubar-item-hovered {
 	background-color: rgba(0,0,0,.05);
 }
 
-.weave-menubar-item:active {
+.weave-menubar-item.weave-menubar-item-clicked {
 	background-color: #CCCCCC;
 }
 
@@ -484,7 +484,7 @@ div.table-row-selected>div>div>div>div>div {
 	opacity: 0.5;
 }
 
-.weave-menubar-item-disabled:hover {
+.weave-menubar-item-disabled {
 	background-color: rgba(0,0,0,0);
 }
 
@@ -515,7 +515,7 @@ div.table-row-selected>div>div>div>div>div {
 	-moz-user-select: none;
 }
 
-.weave-menuitem:hover {
+.weave-menuitem.weave-menuitem-hovered {
 	background-color: rgba(0,0,0,.05)
 }
 

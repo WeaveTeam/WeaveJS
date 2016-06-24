@@ -57,7 +57,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		this.props.onMouseEnter  && this.props.onMouseEnter(event);
 	};
 
-	menuClickListener=(event:React.MouseEvent)=>
+	onMenuMouseUp=(event:React.MouseEvent)=>
 	{
 		if(InteractiveTour.enable)
 		{
@@ -114,7 +114,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				opener={this}
 				ref={this.getMenuRef}
 				menu={this.props.menuGetter()}
-				onClick={this.menuClickListener}
+				onMouseUp={this.onMenuMouseUp}
 			/>
 		);
 		ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown)
@@ -131,7 +131,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	getMenuRef=(ele:any)=>
 	{
-		if(InteractiveTour.isEnabled())
+		if(InteractiveTour.enable)
 		{
 			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
 			let func:any = InteractiveTour.getComponentRefCallback(menuID);
@@ -144,7 +144,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 			<div
 				ref={(e:HTMLDivElement) => this.element = e}
 				{...this.props as any}
-				onClick={this.onClick}
+				onMouseDown={this.onClick}
 			    onMouseEnter={this.onMouseEnter}
 			    onMouseLeave={this.onMouseLeave}
 			>
