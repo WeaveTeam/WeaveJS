@@ -249,7 +249,7 @@ export default class C3BarChart extends AbstractC3Tool
 		let heightColumns = this.heightColumns.getObjects();
 		if(this.groupingMode.value === PERCENT_STACK && heightColumns.length > 1)
 		{
-			return Weave.lang("{0%}",StandardLib.roundSignificant(heightColumns[0]));
+			return Weave.lang("{0}%", StandardLib.roundSignificant(value));
 		}
 		else if(heightColumns.length > 0)
 		{
