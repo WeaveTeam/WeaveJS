@@ -173,15 +173,16 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 				key={index}
 				ref={(c:Dropdown) => {
 					this.menuItems[index] = c;
-					return InteractiveTour.getComponentRefCallback(props.label) as any;
-				}}
-				onClick={(event:React.MouseEvent) => {
-					InteractiveTour.enable ? InteractiveTour.targetComponentOnClick(props.label) :null
+					if(InteractiveTour.enable)
+					{
+						let func:any = InteractiveTour.getComponentRefCallback(props.label);
+						func && func(c);
+					}
 				}}
 				onMouseEnter={(event:React.MouseEvent) => this.onMouseEnter(index, event)}
 				onMouseLeave={this.onMouseLeave}
 				onMouseUp={() => this.onMouseUp(index)}
-				onOpen={() => this.onMenuOpen(index)}
+				onOpen={() => {this.onMenuOpen(index);InteractiveTour.targetComponentOnClick(props.label)} }
 				onClose={this.onMenuClose}
 			>
 				{props.label}
