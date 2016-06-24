@@ -17,7 +17,7 @@ Weave.registerAsyncClass(
 		ReactUtils.onUnmount(
 			component,
 			component => {
-				if (Weave.getOwner(component))
+				if (Weave.findPath(Weave.getOwner(component), component))
 					weavejs.core.LinkablePlaceholder.replaceInstanceWithPlaceholder(component);
 				Weave.dispose(component);
 			}
