@@ -138,11 +138,11 @@ export default class C3LineChart extends AbstractC3Tool
                             {
                                 //handle case where labels need to be reversed
                                 var temp:number = this.columnLabels.length-1;
-                                return Weave.lang(this.columnLabels[temp-d]);
+                                return this.formatXAxisLabel(Weave.lang(this.columnLabels[temp-d]),this.xAxisLabelAngle.value);
                             }
                             else
                             {
-                                return Weave.lang(this.columnLabels[d]);
+                                return this.formatXAxisLabel(Weave.lang(this.columnLabels[d]),this.xAxisLabelAngle.value);
                             }
                         }
                     }
