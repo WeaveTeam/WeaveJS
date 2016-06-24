@@ -507,11 +507,11 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		let cellStyle = {
 			background : this.colorRamp.getHexColor(value as any, 65, 90)
 		};
+
+		/* Inline style here is hack to make div actually fill whole cell for dblclick purposes since we can't attach event handlers to the Cell itself. */
 		return (
-			<Cell {...props}>
-				<div style={cellStyle}>
-					<span style={{ width: "100%" }} onDoubleClick={handleDoubleClick}>{value}</span>
-				</div>
+			<Cell key={props.rowIndex+"#"+props.columnKey} {...props}>
+				<div style={{ marginLeft: -4, paddingLeft: 4, marginTop: -4, paddingTop: 4, width: props.width, height: props.height}} onDoubleClick={handleDoubleClick}>{value}</div>
 			</Cell>
 		);
 		//code for heat map end
