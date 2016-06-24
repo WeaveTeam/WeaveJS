@@ -135,13 +135,15 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	render():JSX.Element
 	{
-		let selectedAttribute = this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn;//get object from name
-
-		return(<MenuLayoutComponent options={ this.options}
-		                     displayMode={ this.layoutMode.value }
-		                     onChange={ this.handleSelection }
-		                     selectedItems={ [selectedAttribute] }
-		/>);
+		let selectedAttribute = this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn;
+		return (
+			<MenuLayoutComponent
+				options={ this.options}
+			    displayMode={ this.layoutMode.value }
+			    onChange={ this.handleSelection }
+			    selectedItems={ [selectedAttribute] }
+			/>
+		);
 	}
 }
 

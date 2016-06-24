@@ -138,10 +138,7 @@ export default class WeaveComponentRenderer extends SmartComponent<IWeaveCompone
 		
 		var props = _.clone(this.props);
 		props.style = _.merge(
-			{
-				flex: 1,
-				overflow: "visible"
-			},
+			{ flex: 1 },
 			props.style
 		);
 		delete props.weave;

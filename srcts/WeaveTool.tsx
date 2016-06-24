@@ -212,7 +212,6 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	{
 		return (
 			<VBox
-				overflow
 				style={this.props.style}
 				className="weave-tool"
 				role="img"

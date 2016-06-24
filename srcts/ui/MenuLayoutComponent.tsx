@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {HBox, VBox} from "../react-ui/FlexBox";
+import FloatingDiv from "../ui/FloatingDiv";
 import List from "../react-ui/List";
 import HSlider from "../react-ui/RCSlider/HSlider";
 import VSlider from "../react-ui/RCSlider/VSlider";
@@ -63,11 +64,15 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 				);*/
 			case LAYOUT_COMBO:
 				return (
-					<VBox overflow style={{flex: 1, justifyContent:"center", padding: 5}}>
-						<ComboBox placeholder={(Weave.lang("Select a column"))}
-						          options={ this.props.options as ComboBoxOption[] }
-						          onChange={ this.props.onChange }
-						          value={ _.head(this.props.selectedItems as any[]) }/>
+					<VBox style={{flex: 1, padding: 5}}>
+						<FloatingDiv useContentHeight style={{flex: 1}}>
+							<ComboBox
+								placeholder={(Weave.lang("Select a column"))}
+								options={ this.props.options as ComboBoxOption[] }
+								onChange={ this.props.onChange }
+								value={ _.head(this.props.selectedItems as any[]) }
+							/>
+						</FloatingDiv>
 					</VBox>
 				);
 			default:
