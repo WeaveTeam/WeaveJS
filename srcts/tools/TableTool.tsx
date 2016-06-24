@@ -33,7 +33,6 @@ import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 
 export interface IDataTableState extends IVisToolState
 {
-	columnIds?:string[],
 	width?:number,
 	height?:number
 }
@@ -92,7 +91,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.selectionFilter.addGroupedCallback(this, this.forceUpdate);
 		this.probeFilter.addGroupedCallback(this, this.forceUpdate);
 		this.state = {
-			columnIds: [],
 			width:0,
 			height:0
 		};
@@ -155,16 +153,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		});
 
 		this.filteredKeySet.setColumnKeySources(columns, sortDirections);
-
-		if (weavejs.WeaveAPI.Locale.reverseLayout)
-		{
-			columns.reverse();
-			names.reverse();
-		}
-
-		this.setState({
-			columnIds: names
-		});
 	}
 
 	handleProbe=(ids:string[]) =>
@@ -197,9 +185,11 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		return Weave.lang("Table of {0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 	}
 
+	static MAX_DEFAULT_COLUMNS = 10;
 	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
 	{
-		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
+		input.slice(0, TableTool.MAX_DEFAULT_COLUMNS)
+			.forEach((item, i) => ColumnUtils.initSelectableAttribute(this.columns, item, i == 0));
 	}
 
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
@@ -278,13 +268,16 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		else
 		{
 			let column = this.columns.getObject(columnKey) as IAttributeColumn;
-			return column.getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
+			return column && column.getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
 		}
 	}
 
 	render()
 	{
 		var columnNames = this.columns.getNames(IAttributeColumn);
+		if (weavejs.WeaveAPI.Locale.reverseLayout)
+			columnNames.reverse();
+		
 		return (
 			<AttributeColumnTable
 				columnTitles={this.getColumnTitle}
@@ -299,7 +292,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				onSelection={this.handleSelection}
 				onCellDoubleClick={this.handleCellDoubleClick}
 				showIdColumn={this.showKeyColumn.value}
-				columnIds={this.state.columnIds}
+				columnIds={columnNames}
 				rowHeight={this.rowHeight.value}
 				headerHeight={this.headerHeight.value}
 				initialColumnWidth={this.columnWidth.value}
