@@ -21,7 +21,7 @@ export default class ServiceLogin
 
 	open=(onSuccess?: (username: string) => void, onCancel?: () => void)=>
 	{
-		this.generateOpener(onSuccess, onCancel);
+		this.generateOpener(onSuccess, onCancel)();
 	}
 
 	generateOpener(onSuccess?: (username: string) => void, onCancel?: () => void)
@@ -36,7 +36,7 @@ export default class ServiceLogin
 			modal: true,
 			suspendEnter: true,
 			width: 400
-		}))();
+		}));
 	}
 
 	handleLogin = (fields: { username: string, password: string }, onSuccess: (username: string) => void): void => {
