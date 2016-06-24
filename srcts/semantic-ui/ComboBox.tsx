@@ -100,12 +100,13 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		this.setState(this.normalizeState(nextProps));
 	}
 
-	componentDidMount() {
+	componentDidMount()
+	{
 		this.forceUpdate();
 	}
 	
-	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState) {
-		this.element = ReactDOM.findDOMNode(this);
+	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
+	{
 		let selector = ($(this.element) as any);
 		selector.dropdown({
 			onChange: (selected:string, text:string) => {
@@ -186,7 +187,12 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	render()
 	{
 		return (
-			<div onClick={this.props.onClick} className={"ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"") +" selection dropdown " + (this.props.className || "")} style={this.props.style}>
+			<div
+				ref={e => this.element = e}
+				onClick={this.props.onClick}
+				className={"ui " + (this.props.type || "") + (this.props.fluid ? " fluid" : "") +" selection dropdown " + (this.props.className || "")}
+				style={this.props.style}
+			>
 				<input type="hidden"/>
 				<i className="dropdown icon"/>
 				<div className="default text">{this.props.placeholder}</div>

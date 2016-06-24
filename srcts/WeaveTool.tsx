@@ -42,7 +42,6 @@ export interface IWeaveToolState
 
 export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
 {
-	private titleBarHeight:number = 25;
 	private watcher:LinkableWatcher;
 	private clickState:boolean;
 
@@ -169,8 +168,8 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		var maximizeTitleText = this.props.maximized ? Weave.lang("Restore") : Weave.lang("Maximize");
 
 		return (
-			<HBox className={className} style={{alignItems: 'center', height: this.titleBarHeight}} onDoubleClick={this.onMaximizeClick}>
-				<HBox style={{display: showControls ? "flex" : "none"}}>
+			<HBox className={className} style={{alignItems: 'center'}} onDoubleClick={this.onMaximizeClick}>
+				<HBox overflow style={{display: showControls ? "flex" : "none"}}>
 					<CenteredIcon 
 						title={Weave.lang("Configure")}
 						onMouseUp={this.onGearClick}
@@ -184,7 +183,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 						{Weave.lang(this.state.title)}
 					</p>
 				</HBox>
-				<HBox style={{display: showControls ? "flex" : "none", flexDirection: "row"}}>
+				<HBox overflow style={{display: showControls ? "flex" : "none", flexDirection: "row"}}>
 					<CenteredIcon
 						title={maximizeTitleText}
 						onMouseUp={this.onMaximizeClick}
@@ -213,6 +212,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	{
 		return (
 			<VBox
+				overflow
 				style={this.props.style}
 				className="weave-tool"
 				role="img"
@@ -232,7 +232,6 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					weave={this.props.weave}
 					path={this.props.path}
 					props={this.props.props}
-					style={{overflow: 'hidden'}}
 				/>
 			</VBox>
 		);

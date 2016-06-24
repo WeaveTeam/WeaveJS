@@ -191,19 +191,19 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 		var swatchStyle:React.CSSProperties = {
 			padding: '4px',
 			background: '#fff',
-			borderRadius: '1px',
-			boxShadow: '0 0 0 1px rgba(0,0,0,.1)',
+			borderRadius: '2px',
+			border: "1px solid rgba(0,0,0,.1)",
 			display: this.props.style && this.props.style.width && this.props.style.height ? 'inline-block' : "block",
-			width:"100%",
-			height:"100%",
+			width: "100%",
+			height: "100%",
 			cursor: 'pointer'
 		};
 		// as color Style is child of SwatchStyle
 		// the size 100% is minus padding border margin values of Swatch style
 		var colorStyle:React.CSSProperties = {
 			borderRadius: '2px',
-			width:"100%",
-			height:"100%",
+			width: "100%",
+			height: "100%",
 			background: this.state.hexColor
 		};
 		let ui:JSX.Element = null;

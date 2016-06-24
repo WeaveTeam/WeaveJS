@@ -30,7 +30,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 	 */
 	private static style(style:React.CSSProperties):React.CSSProperties
 	{
-		return _.merge({}, style, { display: "flex", flexDirection: "row"  });
+		return _.merge({}, style, { display: "flex", flexDirection: "row", overflow: "auto" });
 	}
 
 	constructor(props:React.HTMLProps<HBox>)

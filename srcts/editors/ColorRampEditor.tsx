@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import {VBox, HBox} from "../react-ui/FlexBox";
+import {VBox, HBox, Label} from "../react-ui/FlexBox";
 import ColorRampList from "../ui/ColorRampList";
 import ColorRampComponent from "../react-ui/ColorRampComponent";
 import ColorPicker from "../react-ui/ColorPicker";
@@ -221,8 +221,8 @@ class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRamp
 					</VBox>
 					
 					<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
-					<HBox style={{alignItems: "center"}} className="weave-padded-hbox">
-						{Weave.lang("Filter: ")}
+					<HBox overflow padded style={{alignItems: "center"}} className="weave-padded-hbox">
+						{Weave.lang("Filter:")}
 						<ComboBox
 							fluid={false}
 							value={this.state.selectedFilter}
@@ -237,19 +237,19 @@ class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRamp
 		else
 		{
 			return (
-				<VBox className="weave-padded-vbox" style={{flex: 1}} disabled={!this.props.colorRamp}>
-					<HBox className="weave-padded-hbox" style={{flex: 1}}>
-						<HBox style={{flex: .7, overflow: "auto"}}>
+				<VBox padded overflow style={{flex: 1}} disabled={!this.props.colorRamp}>
+					<HBox padded style={{flex: 1}}>
+						<HBox style={{flex: .7}}>
 							<ColorRampList selectedColors={colors} allColorRamps={filteredRamps} onChange={this.handleColorRampSelectionChange}/>
 						</HBox>
-						<VBox style={{flex: .3, padding:"4px", border:"1px solid lightgrey"}} className="weave-padded-vbox">
+						<VBox padded style={{flex: .3, padding: "4px", border: "1px solid lightgrey"}}>
 							<label style={{marginTop: 5, fontWeight: "bold"}}>{Weave.lang("Customize")}</label>
 							<ColorRampCustomizer colorRamp={this.props.colorRamp} />
 						</VBox>
 					</HBox>
-					<HBox className="weave-padded-hbox">
-						<HBox style={{flex: .7, alignItems: "center"}} className="weave-padded-hbox">
-							{Weave.lang("Filter: ")}
+					<HBox padded overflow>
+						<HBox padded overflow style={{flex: .7, alignItems: "center"}}>
+							{Weave.lang("Filter:")}
 							<ComboBox
 								fluid={false}
 								value={this.state.selectedFilter}
@@ -258,11 +258,15 @@ class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRamp
 								direction="upward"
 							/>
 						</HBox>
-						<HBox style={{flex: .3, justifyContent: "space-between", overflow:"auto"}}>
+						<HBox overflow style={{flex: .3, justifyContent: "space-between"}}>
 							<CenteredIcon onClick={this.reverseColors}>{'↓↑'}</CenteredIcon>
-							<ColorPicker  buttonMode={true} direction={ColorPicker.TOP_LEFT} buttonLabel="Add color"
-							              onChange={(newColor:string) => this.addColor( newColor,"onChange")}
-							              onClick={(newColor:string) => this.addColor( newColor,"onClick")}/>
+							<ColorPicker
+								buttonMode={true}
+								direction={ColorPicker.TOP_LEFT}
+								buttonLabel="Add color"
+								onChange={(newColor:string) => this.addColor(newColor, "onChange")}
+								onClick={(newColor:string) => this.addColor(newColor, "onClick")}
+							/>
 						</HBox>
 					</HBox>
 				</VBox>
@@ -358,35 +362,33 @@ class ColorRampCustomizer extends SmartComponent<ColorRampCustomizerProps, Color
 			return {
 				value: index,
 				label: (
-					<HBox style={{flex: "1 0", justifyContent: "space-between", verticalAlign: "middle"}}>
-						<HBox  className="weave-padded-hbox" style={ {alignItems:"center"} }>
-							<ColorPicker hexColor={hexColor}
-							             onChange={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
-							<span style={{alignSelf: "center", fontFamily: "monospace"}}>{hexColor.toUpperCase()}</span>
-						</HBox>
+					<HBox padded style={{flex: 1, justifyContent: "space-between", alignItems: "center", overflow: "hidden"}}>
+						<ColorPicker hexColor={hexColor}
+						             onChange={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
+						<Label style={{flex: 1, fontFamily: "monospace"}} children={hexColor.toUpperCase()}/>
 						<CenteredIcon iconProps={{className: "fa fa-times fa-fw"}} onClick={() => this.removeColorAtIndex(index)}/>
 					</HBox>
 				)
-			}
+			};
 		});
 
-		let styleObj:React.CSSProperties = this.props.style ? _.merge({},this.props.style,{overflow: "auto",padding:"4px"}) : {overflow: "auto",padding:"4px"}
+		let styleObj:React.CSSProperties = _.merge({}, this.props.style, {overflow: "auto", padding: "4px", flex: 1});
 
 		if (this.props.pushCrumb) // for Weave Tool Editor
 		{
 			return (
-				<VBox  className="weave-padded-vbox">
+				<VBox padded>
 					<div style={{alignSelf:"flex-end"}}>
 						<HBox>
-							<ColorPicker  buttonMode={true} buttonLabel="Add color"  direction={ColorPicker.BOTTOM_LEFT}
+							<ColorPicker  buttonMode={true} buttonLabel="Add color" direction={ColorPicker.BOTTOM_LEFT}
 							              onChange={(newColor:string) => this.addColor( newColor, "onChange")}
 							              onClick={(newColor:string) => this.addColor( newColor, "onClick")}/>
 						</HBox>
 
 					</div>
-					<HBox style={ styleObj } className="weave-padded-hbox">
+					<HBox padded style={ styleObj }>
 						<ColorRampComponent style={{width: 30}} direction="bottom" ramp={hexColors}/>
-						<List style={ {flex:"1 0" } } options={listOptions}/>
+						<List style={ {flex: 1 } } options={listOptions}/>
 					</HBox>
 
 				</VBox>
@@ -395,9 +397,9 @@ class ColorRampCustomizer extends SmartComponent<ColorRampCustomizerProps, Color
 		else // for popUp
 		{
 			return (
-				<HBox style={styleObj} className="weave-padded-hbox">
+				<HBox padded style={styleObj}>
 					<ColorRampComponent style={{width: 30}} direction="bottom" ramp={hexColors}/>
-					<List style={ {flex:"1 0"} }  options={listOptions}/>
+					<List style={ {flex: 1} }  options={listOptions}/>
 				</HBox>
 			);
 		}

@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as _ from "lodash";
-import {HBox, VBox} from "../react-ui/FlexBox";
+import {HBox, VBox, Label} from "../react-ui/FlexBox";
 import {ListOption} from "../react-ui/List";
 import InteractiveTour from "../react-ui/InteractiveTour";
 import List from "../react-ui/List";
@@ -172,17 +172,13 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 			let iconMessage = dataSource.isLocal ? "Does not use remote resources." : "Uses remote resources."
 			return {
 				label: (
-					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
-						<HBox className="weave-padded-hbox" style={{ overflow: "hidden" }}>
-							<CenteredIcon className="" iconProps={{ className: icon, title: Weave.lang(iconMessage) }}/>
-							<span style={{overflow: "hidden"}}>{dataSource.getLabel()}</span>
-						</HBox>
-						<HBox>
-							<CenteredIcon onClick={()=>this.refreshDataSource(dataSource)}
-							              iconProps={{ className: "fa fa-refresh", title: Weave.lang("Refresh this datasource") }}/>
-							<CenteredIcon onClick={()=>this.removeDataSource(dataSource)}
-							              iconProps={{ className: "fa fa-times", title: Weave.lang("Delete this datasource") }}/>
-						</HBox>
+					<HBox padded style={{flex: 1, alignItems: "center"}}>
+						<CenteredIcon className="" iconProps={{ className: icon, title: Weave.lang(iconMessage) }}/>
+						<Label style={{flex: 1}} children={dataSource.getLabel()}/>
+						<CenteredIcon onClick={()=>this.refreshDataSource(dataSource)}
+						              iconProps={{ className: "fa fa-refresh", title: Weave.lang("Refresh this datasource") }}/>
+						<CenteredIcon onClick={()=>this.removeDataSource(dataSource)}
+						              iconProps={{ className: "fa fa-times", title: Weave.lang("Delete this datasource") }}/>
 					</HBox>
 				),
 				value: dataSource
@@ -193,11 +189,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		let dataSource = this.getSelectedDataSource();
 
 		let editorStyle:React.CSSProperties = {
-			flex:1,
-			overflow: "auto",
-			border:"none",
-			borderRadius:0,
-			boxShadow:"none"
+			flex: 1
 		};
 
 		if (dataSource && !Weave.wasDisposed(dataSource))
@@ -205,65 +197,67 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 			let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 			if (EditorClass)
 			{
-				editorJsx = <VBox style={ editorStyle }>
-								<EditorClass dataSource={dataSource}/>
-							</VBox>;
+				editorJsx = (
+					<VBox className="weave-data-source-manager-editor" style={editorStyle}>
+						<EditorClass dataSource={dataSource}/>
+					</VBox>
+				);
 			}
 			else
 			{
-				editorStyle = _.merge(editorStyle,{ justifyContent: "center", alignItems: "center"});
-				editorJsx = <VBox className="ui segment" style={editorStyle}>
-								<div className="ui centered header">
-									{Weave.lang("Editor not yet implemented for this data source type.")}
-								</div>
-							</VBox>;
+				_.merge(editorStyle, {justifyContent: "center", alignItems: "center"});
+				editorJsx = (
+					<VBox className="weave-data-source-manager-editor" style={editorStyle}>
+						<div className="ui centered header">
+							{Weave.lang("Editor not yet implemented for this data source type.")}
+						</div>
+					</VBox>
+				);
 			}
 
 		}
 		else
 		{
-			editorStyle = _.merge(editorStyle,{ justifyContent: "center", alignItems: "center"});
-			editorJsx = <div style={{padding: '10px', display: "flex", flex: 1}}>
-							<Dropzone
-								style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1, fontSize: 24}}
-								className={"weave-dropzone-file"}
-								activeStyle={{border: "8px solid #CCC"}}
-								onDropAccepted={(files:File[]) => {
-											files.map((file) => {
-											this.handleDataFileDrop(file);
-										});
-										this.setState({
-											rejected:false /*to remove the status of a previous rejection*/
-										});
-								}}
-								onDropRejected={(files:File[]) => {
-										this.setState({
-											rejected:true
-										});
-								}}
-								accept=".csv,.geojson,.txt,.tsv,.xls,.shp,.dbf"
-								disableClick={false}>
-								<VBox style={editorStyle}>
-									<div className="ui centered header">
-										{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
-									</div>
-										{ this.state.rejected ?  <span>{Weave.lang("The specified data file could not be imported. Only files with the following extensions are allowed: .csv,.geojson,.txt,.tsv,.xls,.shp,.dbf")}</span>
-										: null  }
-								</VBox>
-							</Dropzone>
-						</div>
+			_.merge(editorStyle, {justifyContent: "center", alignItems: "center"});
+			editorJsx = (
+				<div style={{padding: '10px', display: "flex", flex: 1}}>
+					<Dropzone
+						style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1, fontSize: 24}}
+						className={"weave-dropzone-file"}
+						activeStyle={{border: "8px solid #CCC"}}
+						onDropAccepted={(files:File[]) => {
+							files.forEach((file) => {
+								this.handleDataFileDrop(file);
+							});
+							this.setState({
+								rejected:false /*to remove the status of a previous rejection*/
+							});
+						}}
+						onDropRejected={(files:File[]) => {
+							this.setState({
+								rejected:true
+							});
+						}}
+						accept=".csv,.geojson,.txt,.tsv,.xls,.shp,.dbf"
+						disableClick={false}
+					>
+						<VBox className="weave-data-source-manager-editor" style={editorStyle}>
+							<div className="ui centered header">
+								{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
+							</div>
+							{
+								this.state.rejected
+								?	Weave.lang("The specified data file could not be imported. Only files with the following extensions are allowed: .csv,.geojson,.txt,.tsv,.xls,.shp,.dbf")
+								:	null
+							}
+						</VBox>
+					</Dropzone>
+				</div>
+			);
 		}
 
-		let styleObj:React.CSSProperties = {
-			flex:1,
-			overflow:'auto',
-			border:"none", /* Border and shadow of ui segements in Tab gives contrasting color to its backgrouund */
-			borderRadius:0,
-			boxShadow:"none"
-		};
-
 		return (
-			<HBox className="ui bottom attached segments" style={ styleObj }  onMouseEnter={() => this.forceUpdate()} >
+			<HBox className="ui bottom attached segments" style={ {flex: 1} }  onMouseEnter={() => this.forceUpdate()} >
 				<VBox style={{width: 250}} className="weave-data-source-manager-sidebar">
 					<VBox className="ui vertical attached segments" style={{flex:1, justifyContent:"space-between",border:"none",borderRadius:0}}>
 						<VBox className="ui basic inverted segment" style={{flex: 1, overflow: "auto", padding: 0,border:"none",borderRadius:0}}>

@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {ObjectFixedDataTable, IRow} from "../tools/FixedDataTable";
-import {HBox, VBox} from "../react-ui/FlexBox";
+import {HBox, VBox, Label} from "../react-ui/FlexBox";
 import ColorRampComponent from "../react-ui/ColorRampComponent";
 
 import StandardLib = weavejs.util.StandardLib;
@@ -77,9 +77,9 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 		var rows:IRow[] = this.props.allColorRamps.map((colorRampConfig) => {
 			var row:IRow = {};
 			var rampRow = (
-				<HBox style={{flex: 1}}>
+				<HBox padded style={{flex: 1}}>
 					<ColorRampComponent style={{flex: 1}} ramp={colorRampConfig.colors.map(StandardLib.getHexColor)}/>
-					<HBox style={{flex: 1, paddingLeft: 10}}>{colorRampConfig.name}</HBox>
+					<Label style={{flex: 1}} children={colorRampConfig.name}/>
 				</HBox>
 			);
 			row["id"] = colorRampConfig.name;

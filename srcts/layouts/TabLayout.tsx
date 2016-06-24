@@ -308,7 +308,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		}
 
 		tabBarChildren = (
-			<HBox style={{justifyContent: "space-between"}}>
+			<HBox overflow style={{justifyContent: "space-between"}}>
 				{plusIcon}
 				{/*<HBox>
 					<CenteredIcon iconProps={{className: "fa fa-play fa-flip-horizontal"}}/>

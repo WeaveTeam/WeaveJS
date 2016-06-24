@@ -1,7 +1,7 @@
 import * as React from "react";
 import RCSlider from "./RCSlider";
 import {SliderOption} from "./RCSlider";
-import {HBox} from "../FlexBox";
+import {VBox} from "../FlexBox";
 
 export interface HSliderProps extends React.Props<HSlider>
 {
@@ -26,6 +26,10 @@ export default class HSlider extends React.Component<HSliderProps, any>
 
     render()
     {
-        return <HBox style={{flex: 1}} className="weave-hslider"><RCSlider {...this.props}/></HBox>;
+        return (
+			<VBox overflow style={{flex: 1, justifyContent: "space-around"}} className="weave-hslider">
+				<RCSlider {...this.props}/>
+			</VBox>
+		);
     }
 }

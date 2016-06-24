@@ -61,6 +61,10 @@ input:focus:-ms-input-placeholder { opacity:0; }
 }
 /********************/
 
+.weave-hslider {
+	padding-left: 10px;
+	padding-right: 10px;
+}
 
 /* rc-slider css override */
 .weave-hslider .rc-slider {
@@ -109,6 +113,11 @@ input:focus:-ms-input-placeholder { opacity:0; }
 
 .weave-hslider .rc-slider {
 	background-color: #D0D0D0;
+}
+
+.weave-vslider {
+	padding-top: 10px;
+	padding-bottom: 10px;
 }
 
 .weave-vslider .rc-slider-vertical {
@@ -311,7 +320,6 @@ div.table-row-selected>div>div>div>div>div {
 	margin-top: 0;
 }
 
-
 .weave-padded-hbox > * {
 	flex-shrink: 0;
 	margin-left: 8px;
@@ -332,6 +340,16 @@ div.table-row-selected>div>div>div>div>div {
 	opacity: .1;
 }
 
+.weave-section {
+	padding: 1rem;
+}
+.weave-section > *:nth-child(1) {
+    border-bottom: 1px solid rgba(34,36,38,.15);
+    padding-bottom: 0.25rem;
+    font-size: 1.28rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
 
 
 /***** popup window ******/
@@ -366,7 +384,7 @@ div.table-row-selected>div>div>div>div>div {
 	color: rgba(0,0,0,.85);
 	border-bottom: 1px solid rgba(34,36,38,.15);
 	font-size: 1.42857143rem;
-	line-height: 1.2857em;
+	line-height: normal;
 	font-weight: 700;
 }
 
@@ -503,7 +521,6 @@ div.table-row-selected>div>div>div>div>div {
 	height: auto;
 	text-align: left;
 	border-top: none;
-	line-height: 1em;
 	color: rgba(0,0,0,.87);
 	padding: .71428571rem 1.14285714rem!important;
 	font-size: 1rem;
@@ -997,6 +1014,10 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 
 .weave-data-source-item span {
 	padding: 0 10px 0 10px;
+}
+
+.weave-data-source-manager-editor {
+	background: white;
 }
 
 .weave-exclamation-triangle {

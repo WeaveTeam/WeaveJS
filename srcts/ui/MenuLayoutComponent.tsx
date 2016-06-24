@@ -45,13 +45,13 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 				);
 			case LAYOUT_HSLIDER:
 				return (
-					<HBox style={{ flex: 1, padding: 25}}>
+					<HBox style={{ flex: 1, paddingLeft: 25, paddingRight: 25, overflow: "hidden" }}>
 						<HSlider options={ this.props.options } onChange={ this.props.onChange} selectedValues={ this.props.selectedItems } type="categorical"/>
 					</HBox>
 				);
 			case LAYOUT_VSLIDER:
 				return (
-					<VBox style={{ flex: 1, padding: 25 }}>
+					<VBox style={{ flex: 1, paddingTop: 25, paddingBottom: 25, overflow: "hidden" }}>
 						<VSlider options={ this.props.options } onChange={ this.props.onChange } selectedValues={ this.props.selectedItems } type="categorical"/>
 					</VBox>
 				);
@@ -63,7 +63,7 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 				);*/
 			case LAYOUT_COMBO:
 				return (
-					<VBox style={{flex: 1, justifyContent:"center", padding: 5}}>
+					<VBox overflow style={{flex: 1, justifyContent:"center", padding: 5}}>
 						<ComboBox placeholder={(Weave.lang("Select a column"))}
 						          options={ this.props.options as ComboBoxOption[] }
 						          onChange={ this.props.onChange }
@@ -71,9 +71,7 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 					</VBox>
 				);
 			default:
-				return (
-					<div/>
-				)
+				return null;
 		}
 	}
 }

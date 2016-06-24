@@ -243,7 +243,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 								</div>
 							</div>
 							<div className="twelve wide column">
-								<HBox style={{flex:1}}>
+								<HBox overflow style={{flex:1}}>
 									<ComboBox style={{flex: 1}} value= { this.state.schema } options= { this.state.schemaOptions } onChange= {(schema) => {this.setState({ schema });} } fluid={false}/>
 									<Button className="attached" title={Weave.lang("Refresh") } onClick={this.updateSchemas}><i className="fa fa-refresh"/></Button>
 								</HBox>
@@ -256,7 +256,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 								</div>
 							</div>
 							<div className="twelve wide column">
-								<HBox style={{flex:1}}>
+								<HBox overflow style={{flex:1}}>
 									<ComboBox value={this.state.table} options={this.state.tableOptions} onChange={(table) => {this.setState({ table });} }/>
 									<Button className="attached" title={Weave.lang("Refresh") } onClick={this.updateSchemas}><i className="fa fa-refresh"/></Button>
 								</HBox>
@@ -285,7 +285,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 								</div>
 							</div>
 							<div className="twelve wide column">
-								<HBox style={{flex:1}}>
+								<HBox overflow style={{flex:1}}>
 									<ComboBox value= { this.state.keyColumn } options= { this.state.columnOptions } onChange= {(value) => {
 										if (value != this.state.keyColumn)
 											this.setState({ keyColumn: value, keyColumnValid: null });
@@ -305,7 +305,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 								</div>
 							</div>
 							<div className="twelve wide column">
-								<HBox style={{flex:1}}>
+								<HBox overflow style={{flex:1}}>
 									<ComboBox allowAdditions={true} type="search"
 										onNew={(keyType: string): void => {
 											this.setState({ keyType })
@@ -321,7 +321,7 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 								</div>
 							</div>
 							<div className="twelve wide column">
-								<HBox style={{flex:1}}>
+								<HBox overflow style={{flex:1}}>
 									<ComboBox type="multiple" value={this.state.filteredKeyColumns} options={this.state.columnOptions} onChange={(value) => this.setState({ filteredKeyColumns: value }) }/>
 								</HBox>
 							</div>
@@ -332,8 +332,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 					</div>
 				</div>
 				<HBox style={{ alignSelf: "flex-end" }}>
-						<Button colorClass="primary" disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
-						<Button colorClass="secondary" disabled={this.state.importInProgress} onClick={() => PopupWindow.close(this) }>{Weave.lang("Cancel") }</Button>
+					<Button colorClass="primary" disabled={this.state.importInProgress} onClick={this.onImportClick}>{Weave.lang("Import") }</Button>
+					<Button colorClass="secondary" disabled={this.state.importInProgress} onClick={() => PopupWindow.close(this) }>{Weave.lang("Cancel") }</Button>
 				</HBox>
 			</VBox>
 		)

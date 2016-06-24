@@ -48,7 +48,7 @@ export default class ColorController extends React.Component<ColorControllerProp
 	render():JSX.Element
 	{
 		return (
-			<VBox style={{flex: 1}}>
+			<VBox overflow style={{flex: 1}}>
 				<Tabs
 					initialActiveTabIndex={0}
 					labels={this.tabLabels}
@@ -57,8 +57,8 @@ export default class ColorController extends React.Component<ColorControllerProp
 							<Checkbox ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})} label={Weave.lang("Center color ramp at zero (when binning is disabled)")}/>
 							<ColorRampEditor colorRamp={this.props.colorColumn.ramp}/>
 						</VBox>,
-						<VBox className="weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1, padding: 8}}>
-							<HBox className="weave-padded-hbox" style={ {alignItems: "center"} }>
+						<VBox overflow className="weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1, padding: 8}}>
+							<HBox overflow className="weave-padded-hbox" style={ {alignItems: "center"} }>
 								{Weave.lang("Color data")}
 								<SelectableAttributeComponent attributes={this.attributes} attributeName="Color data"/>
 							</HBox>

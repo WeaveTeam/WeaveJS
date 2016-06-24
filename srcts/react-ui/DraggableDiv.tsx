@@ -334,6 +334,7 @@ export default class DraggableDiv extends SmartComponent<DraggableDivProps, Drag
 	{
 		var content = (
 			<VBox
+				overflow
 				draggable={true}
 				{...this.props}
 				onDragStart={this.onDragStart}

@@ -434,18 +434,17 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 			
 			binUIs.push(
 				<HBox
-					className="weave-padded-hbox"
+					padded
+					overflow
 					key={key}
 					style={ {alignItems: "center"} }
 				>
-					<HBox style={ {alignItems: "center"} }>
-						<Checkbox type="radio"
-								  name="binningDefinitions"
-								  value={ isSelected }
-								  label={ Weave.lang(key) }
-								  onChange = {(value)=> value ? this.setBinningDefinition(binDefn):null}
-						/>
-					</HBox>
+					<Checkbox type="radio"
+							  name="binningDefinitions"
+							  value={ isSelected }
+							  label={ Weave.lang(key) }
+							  onChange = {(value)=> value ? this.setBinningDefinition(binDefn):null}
+					/>
 					<span style={ {flex:1} }/>
 					{
 						renderProps.sessionObjectToLink
@@ -467,19 +466,15 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 		}
 
 		return (
-			<HBox className="weave-padded-hbox" style={{flex: 1}}>
-				<VBox style={{flex: 1, overflow: "auto"}} className="weave-container">
+			<HBox padded style={{flex: 1}}>
+				<VBox padded style={{flex: 1, justifyContent: "space-between"}} className="weave-container">
 					{Weave.lang("Binning type:")}
-					<HBox style={{flex: 1}}>
-						<VBox className="weave-padded-vbox" style={{flex: 1, justifyContent: "space-between"}}>
-							{binUIs}
-						</VBox>
-					</HBox>
+					{binUIs}
 				</VBox>
-				<VBox className="weave-container weave-padded-vbox" style={{flex: 1, padding: 8, overflow: "auto"}}>
+				<VBox padded className="weave-container" style={{flex: 1, padding: 8, overflow: "auto"}}>
 					{
 						this.hasOverrideMinAndMax()
-							?	<HBox className="weave-padded-hbox" style={{alignItems: "center"}}>
+							?	<HBox padded style={{alignItems: "center"}}>
 									<span style={{whiteSpace: "nowrap"}}> {Weave.lang("Override data range")}</span>
 									<StatefulTextField type="number" style={{flex: 1}}
 													   ref={this.linkOverride("overrideInputMin")} placeholder="min"/>

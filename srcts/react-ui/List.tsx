@@ -140,7 +140,9 @@ export default class List extends React.Component<IListProps, IListState>
 
                         var style: React.CSSProperties = {
 							alignItems: "center",
-							whiteSpace: "nowrap"
+							whiteSpace: "nowrap",
+							textOverflow: "ellipsis",
+							overflow: "hidden"
                         };
 
 						var className = classNames({
@@ -149,7 +151,7 @@ export default class List extends React.Component<IListProps, IListState>
 
                         return (
                             <HBox key={index} style={style}  className={ className }  onClick={this.handleChange.bind(this, value) }>
-                                <span style={{ flex: 1, overflow: "hidden"}}>{this.labels[index] || String(value)}</span>
+                                {this.labels[index] || String(value)}
                             </HBox>
                         );
                     })

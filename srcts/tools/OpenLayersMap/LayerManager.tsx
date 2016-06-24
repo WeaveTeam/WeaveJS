@@ -143,11 +143,11 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 			var layerTypes:(new()=>AbstractLayer)[] = [TileLayer, GeometryLayer, LabelLayer, ScatterPlotLayer, ImageGlyphLayer];
 			
 			return (
-				<VBox style={{minHeight: 200, flex: 1}} className="weave-padded-vbox">
+				<VBox padded overflow style={{minHeight: 200, flex: 1}}>
 					<HBox>
 						<MenuButton
 							showIcon={false}
-				            style={{flex: "1", alignItems: "center", justifyContent: "center", borderBottomRightRadius:0,borderTopRightRadius:0}}
+				            style={{flex: 1, alignItems: "center", justifyContent: "center", borderBottomRightRadius: 0, borderTopRightRadius: 0}}
 							menu={layerTypes.map((layerClass) => ({
 								label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
 								click: () => {
@@ -159,9 +159,9 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 						>
 							<i className="fa fa-plus fa-fw"/>
 						</MenuButton>
-						<Button style={ {flex: "1",borderRadius:0} } disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus fa-fw"/></Button>
-						<Button style={ {flex: "1",borderRadius:0} } disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down fa-fw"/></Button>
-						<Button style={ {flex: "1",borderBottomLeftRadius:0,borderTopLeftRadius:0} } disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} onClick={this.moveSelectedUp}><i className="fa fa-arrow-up fa-fw"/></Button>
+						<Button style={ {flex: 1, borderRadius: 0} } disabled={!(this.state.selectedLayer) } onClick={this.removeSelected}><i className="fa fa-minus fa-fw"/></Button>
+						<Button style={ {flex: 1, borderRadius: 0} } disabled={!(this.state.selectedLayer && this.selectionIndex > 0)} onClick={this.moveSelectedDown}> <i className="fa fa-arrow-down fa-fw"/></Button>
+						<Button style={ {flex: 1, borderBottomLeftRadius: 0, borderTopLeftRadius: 0} } disabled={!(this.state.selectedLayer && this.selectionIndex < this.props.layers.getObjects().length - 1)} onClick={this.moveSelectedUp}><i className="fa fa-arrow-up fa-fw"/></Button>
 					</HBox>
 					<div style={{flex: 1, overflow: "auto", border: "1px solid lightgrey"}}>
 						{this.props.layers.getObjects().reverse().map(this.generateItem)}

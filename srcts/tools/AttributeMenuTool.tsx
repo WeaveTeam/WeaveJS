@@ -130,11 +130,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 
 	renderEditor =(pushCrumb :(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void = null):JSX.Element=> 
 	{
-		return (
-			<VBox>
-				<AttributeMenuTargetEditor attributeMenuTool={ this } pushCrumb={ pushCrumb }/>
-			</VBox>
-		);
+		return <AttributeMenuTargetEditor attributeMenuTool={ this } pushCrumb={ pushCrumb }/>;
 	}
 
 	render():JSX.Element
@@ -301,7 +297,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	render ()
 	{
 		return (
-			<VBox>
+			<VBox overflow>
 				{
 					ReactUtils.generateTable({
 							body: [].concat(

@@ -75,21 +75,34 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 		return (
 			<div
 				className={classNames(this.props.tabContainerClassName || "weave-tab-container", this.props.location)}
-			    style={_.merge({}, this.props.style, {overflow: "hidden", flex: 1, display: "flex", flexDirection: this.props.location === BOTTOM ? "column" : "column-reverse"})}
+			    style={_.merge(
+					{},
+					this.props.style,
+					{
+						overflow: "hidden",
+						flex: 1,
+						display: "flex",
+						flexDirection: this.props.location === BOTTOM ? "column" : "column-reverse"
+					}
+				)}
 			>
 				<VBox key="content" className={classNames(this.props.tabContentClassName || "weave-tab-content", this.props.location)} style={{flex: 1, overflow: "auto"}}>
 					{
 						this.props.tabs[this.state.activeTabIndex]
 					}
 				</VBox>
-				<HBox key="tabs"
-				      className={classNames(this.props.tabBarClassName || "weave-tab-label-container", this.props.location)}
-				      style={this.props.tabBarStyle}
+				<HBox
+					overflow
+					key="tabs"
+				    className={classNames(this.props.tabBarClassName || "weave-tab-label-container", this.props.location)}
+				    style={this.props.tabBarStyle}
 				>
 					{
 						this.props.labels.map((label, index) => {
 							return (
-								<HBox key={index}
+								<HBox
+									overflow
+									key={index}
 								    className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
 								    style={this.props.tabLabelStyle}
 								    onClick={(event:React.MouseEvent) => {

@@ -120,7 +120,7 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 						iconName="&#x2715"
 						style={ {fontSize: "16px"} }
 						mouseOverStyle={ {color: "red", background: "none"} }
-						toolTip="click to close Sidebar"
+						toolTip="Close"
 					/>
 				</div>
 			);
@@ -129,7 +129,7 @@ export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
 		return (
 			<div className={this.props.className} style={style}>
 				{closeButtonUI}
-				<div style={ {display: "flex", flexDirection: "inherit", flex: 1} }>
+				<div style={ {display: "flex", flexDirection: "inherit", flex: 1, overflow: "auto"} }>
 					{this.props.children}
 				</div>
 			</div>

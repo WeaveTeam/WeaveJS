@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
-import {VBox, HBox} from "../react-ui/FlexBox";
+import {VBox, HBox, Section} from "../react-ui/FlexBox";
 import InteractiveTour from "../react-ui/InteractiveTour";
 import ResizingDiv from "../ui/ResizingDiv";
 import ReactUtils from "../utils/ReactUtils";
@@ -87,7 +87,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	getLabelEditor(labelLinkableString:weavejs.core.LinkableString):[React.ReactChild, React.ReactChild]
 	{
 		return [
-			<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
+			<HBox padded style={{alignItems: "center", justifyContent: "flex-end"}}>
 				{Weave.lang("Label")}
 				<HelpIcon>{Weave.lang("A label used to identify this data source")}</HelpIcon>
 			</HBox>,
@@ -108,8 +108,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		var tableStyles = {
 			table: { width: "100%", fontSize: "inherit"},
 			td: [
-				{ textAlign: "right", whiteSpace: "nowrap", paddingRight: 8},
-				{ paddingBottom: 8, width: "100%", paddingLeft: 8}
+				{ paddingBottom: 8, textAlign: "right", whiteSpace: "nowrap"},
+				{ paddingBottom: 8, paddingLeft: 8, width: "100%"}
 			]
 		};
 
@@ -135,9 +135,14 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let root = this.props.dataSource.getHierarchyRoot();
 		var columns = this.getColumns();
 		return (
-			<VBox className="ui segment" style={{flex: 1,border:"none",borderRadius:0}}>
-				<div className="ui medium dividing header" aria-label={Weave.lang("Preview of") + " " + this.props.dataSource.getLabel()}>{Weave.lang("Preview")}</div>
-				<HBox className={root && root.hasChildBranches() ? "weave-padded-hbox" : null} style={{flex: 1, border: "none"}}>
+			<Section style={{flex: 1}}>
+				<div aria-label={Weave.lang("Preview of {0}", this.props.dataSource.getLabel())}>
+					{Weave.lang("Preview")}
+				</div>
+				<HBox
+					padded={root && root.hasChildBranches()}
+					style={{flex: 1, border: "none"}}
+				>
 					<VBox style={{flex: root && root.hasChildBranches() ? 1 : 0, overflow: 'auto'}}>
 						<WeaveTree
 							root={root}
@@ -147,13 +152,15 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 							onSelect={(selectedItems) => this.setSelection(this.props, selectedItems && selectedItems[0], this.state.selectedLeaf)}
 						/>
 					</VBox>
-					<VBox className="weave-padded-vbox"
-					      style={{flex: 1, overflow: 'auto'}}
-					      ref={InteractiveTour.enable ? InteractiveTour.getComponentRefCallback("Preview") : null}>
+					<VBox
+						padded
+						style={{flex: 1, overflow: 'auto'}}
+						ref={InteractiveTour.getComponentRefCallback("Preview")}
+					>
 						<DynamicComponent dependencies={columns} render={() => {return this.renderTablePreview(columns)}}/>
 					</VBox>
 				</HBox>
-			</VBox>
+			</Section>
 		);
 	}
 	
@@ -162,12 +169,14 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let registry = weavejs.WeaveAPI.ClassRegistry;
 		let displayName:string = Weave.lang(weavejs.WeaveAPI.ClassRegistry.getDisplayName(this.props.dataSource.constructor as typeof IDataSource));
 		return (
-			<VBox className="ui segment" style={ {border:"none",borderRadius:0} }>
-				<div className="ui medium dividing header" aria-label={Weave.lang("Configure {0}:{1}",displayName,Weave.lang(this.props.dataSource.getLabel()))}>{Weave.lang("Configure {0}",displayName)}</div>
+			<Section overflow>
+				<div aria-label={Weave.lang("Configure {0}:{1}", displayName, Weave.lang(this.props.dataSource.getLabel()))}>
+					{Weave.lang("Configure {0}", displayName)}
+				</div>
 				{
 					this.renderFields()
 				}
-			</VBox>
+			</Section>
 		);
 	}
 
@@ -210,19 +219,19 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 			return row;
 		});
 
-
 		var keyType = columns.length && columns[0].getMetadata("keyType");
 		names.unshift("id");
 		_.assign(columnTitles, {id: keyType ? Weave.lang("Key ({0})", keyType) : Weave.lang("Key")});
 
 		return (
-			<FixedDataTable rows={rows}
-							columnIds={names}
-							idProperty="id"
-							showIdColumn={!!columns.length}
-							columnTitles={columnTitles as any}
-			                disableSort={true}
-			                multiple={false}
+			<FixedDataTable
+				rows={rows}
+				columnIds={names}
+				idProperty="id"
+				showIdColumn={!!columns.length}
+				columnTitles={columnTitles as any}
+				disableSort={true}
+				multiple={false}
 			/>
 		);
 	};
@@ -263,7 +272,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	render():JSX.Element
 	{
 		return (
-			<VBox className="ui vertical segments" style={ {flex:1,border:"none",borderRadius:0,boxShadow:"none"} }>
+			<VBox style={ {flex:1} }>
 				{this.renderConfigureView()}
 				{this.renderPreviewView()}
 			</VBox>

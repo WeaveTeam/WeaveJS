@@ -56,7 +56,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	openMenu(newMenu:Dropdown)
 	{
-		if(this.activeMenu && this.activeMenu != newMenu)
+		if (this.activeMenu && this.activeMenu != newMenu)
 		{
 			this.activeMenu.closeMenu();
 			this.activeMenu = newMenu;
@@ -67,7 +67,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	onMouseLeave=(event:React.MouseEvent)=>
 	{
 		// clear the hover style if no menu is open
-		if(!this.activeMenu)
+		if (!this.activeMenu)
 			this.setState({activeIndex: -1});
 	}
 
@@ -130,14 +130,14 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 			>
 				{props.label}
 			</Dropdown>
-		)
+		);
 	}
 
 	render():JSX.Element
 	{
 		var style = _.merge({alignItems: 'center'}, this.props.style);
 		return (
-			<HBox className="weave-menubar" {...this.props as React.HTMLAttributes} style={style}>
+			<HBox overflow className="weave-menubar" {...this.props as React.HTMLAttributes} style={style}>
 				{
 					this.props.config.map((menuBarItemProps, index) => {
 						return this.renderMenuBarItem(index, menuBarItemProps)
@@ -145,6 +145,6 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 				}
 				{this.props.children}
 			</HBox>
-		)
+		);
 	}
 }
