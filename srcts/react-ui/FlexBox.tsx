@@ -82,6 +82,7 @@ export class Label extends React.Component<React.HTMLProps<Label>, {}>
 			},
 			this.props.style
 		);
-		return <label {...this.props as React.HTMLAttributes} style={style}/>
+		var className:string = classNames('weave-label', this.props.className);
+		return <label {...this.props as React.HTMLAttributes} style={style} className={className}/>
 	}
 }
