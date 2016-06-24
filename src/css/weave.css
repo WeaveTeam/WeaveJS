@@ -451,6 +451,11 @@ div.table-row-selected>div>div>div>div>div {
 	border: 1px solid #ddd;
 }
 
+/* dropdown */
+.weave-dropdown {
+	outline: none;
+}
+
 /* menus */
 .weave-menu {
 	cursor: auto;
@@ -516,6 +521,7 @@ div.table-row-selected>div>div>div>div>div {
 .weave-menuitem {
 	/* padding-left: 20px; */
 	/* padding-right: 20px; */
+	outline: none;
 	position: relative;
 	cursor: pointer;
 	display: block;
@@ -534,7 +540,7 @@ div.table-row-selected>div>div>div>div>div {
 	-moz-user-select: none;
 }
 
-.weave-menuitem.weave-menuitem-hovered {
+.weave-menuitem.weave-menuitem-focused {
 	background-color: rgba(0,0,0,.05)
 }
 
@@ -547,7 +553,7 @@ div.table-row-selected>div>div>div>div>div {
 	color: #C1C1C1;
 }
 
-.disabled.weave-menuitem:hover {
+.disabled.weave-menuitem.weave-menuitem-focused {
 	background-color: #FFFFFF;
 }
 

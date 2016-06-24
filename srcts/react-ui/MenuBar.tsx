@@ -1,4 +1,5 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import {HBox} from "./FlexBox";
 import InteractiveTour from "./InteractiveTour";
@@ -15,9 +16,10 @@ export interface MenuBarItemProps
 	bold?: boolean;
 }
 
-export interface MenuBarProps extends React.HTMLProps<MenuBar>
+export interface MenuBarProps extends React.Props<MenuBar>
 {
 	config?:MenuBarItemProps[];
+	style?:React.CSSProperties;
 }
 
 export interface MenuBarState
@@ -42,10 +44,39 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		}
 	}
 
-	onMouseEnter(index:number, event:React.MouseEvent)
+	onMouseEnter(index:number)
+	{
+		var menu = ReactDOM.findDOMNode(this.menuItems[index]) as HTMLElement;
+		if(menu && menu.focus)
+			menu.focus();
+	}
+
+	onMouseLeave=(index:number)=>
+	{
+		var menu = ReactDOM.findDOMNode(this.menuItems[index]) as HTMLElement;
+		if(menu && menu.blur)
+			menu.blur();
+	}
+
+	onFocus(index:number)
 	{
 		// allow toggling between menus once the menubar has been clicked on
-		this.openNextMenu(index);
+		if(this.activeMenu)
+			this.openNextMenu(index);
+		else
+			this.selectNextMenu(index);
+	}
+
+	onBlur=()=>
+	{
+		// clear the hover style if no menu is open
+		if (!this.activeMenu)
+			this.setState({activeIndex: -1});
+	}
+
+	selectNextMenu(index:number)
+	{
+		this.setState({activeIndex: index});
 	}
 
 	openNextMenu(index:number)
@@ -66,22 +97,15 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		}
 	}
 
-	closeMenu()
-	{
-		if (this.activeMenu)
-			this.activeMenu.closeMenu();
-	}
-
-	onMouseLeave=(event:React.MouseEvent)=>
-	{
-		// clear the hover style if no menu is open
-		if (!this.activeMenu)
-			this.setState({activeIndex: -1});
-	}
-
 	onMouseUp=(index:number)=>
 	{
 		this.flickerItem(index);
+	}
+
+	onKeyUp=(index:number, event:React.KeyboardEvent)=>
+	{
+		if(event.keyCode == KEYCODES.SPACE)
+			this.flickerItem(index);
 	}
 
 	flickerItem=(index:number)=>
@@ -100,6 +124,7 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	onMenuOpen(index:number)
 	{
+		this.flickerItem(index);
 		this.activeMenu = this.menuItems[index]
 	}
 
@@ -110,40 +135,23 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	handleKeyPress=(event:KeyboardEvent)=>
 	{
+		var nextIndex:number = -1;
+
 		if (event.keyCode == KEYCODES.LEFT_ARROW)
 		{
-			if (this.activeMenu && this.state.activeIndex > 0)
-				this.openNextMenu(this.state.activeIndex - 1);
-			else if (this.state.activeIndex > 0 && this.state.activeIndex < this.menuItems.length)
-			{
-				this.setState({
-					activeIndex: this.state.activeIndex - 1
-				})
-			}
+			nextIndex = this.state.activeIndex - 1;
 		}
 		else if(event.keyCode == KEYCODES.RIGHT_ARROW)
 		{
-			if (this.activeMenu && this.state.activeIndex < this.menuItems.length - 1)
-				this.openNextMenu(this.state.activeIndex + 1);
-			else if (this.state.activeIndex > -1 && this.state.activeIndex < this.menuItems.length - 1)
-			{
-				this.setState({
-					activeIndex: this.state.activeIndex + 1
-				})
-			}
+			nextIndex = this.state.activeIndex + 1;
 		}
-		else if(event.keyCode == KEYCODES.ESC)
-		{
-			if(this.activeMenu)
-				this.closeMenu();
-		}
-		else if(event.keyCode == KEYCODES.SPACE)
-		{
-			if(!this.activeMenu && this.state.activeIndex > -1)
-				this.openNextMenu(this.state.activeIndex);
-			else
-				this.closeMenu();
-		}
+
+		var nextItem = this.menuItems[nextIndex];
+		var nextElt:HTMLElement = null;
+		if(nextItem)
+			nextElt = ReactDOM.findDOMNode(nextItem) as HTMLElement;
+		if(nextElt)
+			nextElt.focus();
 	}
 
 	componentDidMount()
@@ -169,7 +177,6 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 			<Dropdown
 				className={menuBarClass}
 				menuGetter={() => this.props.config[index].menu}
-				tabIndex={1}
 				key={index}
 				ref={(c:Dropdown) => {
 					this.menuItems[index] = c;
@@ -179,11 +186,14 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 						func && func(c);
 					}
 				}}
-				onMouseEnter={(event:React.MouseEvent) => this.onMouseEnter(index, event)}
-				onMouseLeave={this.onMouseLeave}
-				onMouseUp={() => this.onMouseUp(index)}
+				onMouseEnter={() => this.onMouseEnter(index)}
+				onFocus={() => this.onFocus(index)}
+				onBlur={this.onBlur}
+				onMouseLeave={() => this.onMouseLeave(index)}
 				onOpen={() => {this.onMenuOpen(index);InteractiveTour.targetComponentOnClick(props.label)} }
 				onClose={this.onMenuClose}
+			    onMouseUp={() => this.onMouseUp(index)}
+			    onKeyUp={(event:React.KeyboardEvent) => this.onKeyUp(index, event)}
 			>
 				{props.label}
 			</Dropdown>

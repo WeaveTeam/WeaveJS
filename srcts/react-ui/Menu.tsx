@@ -4,6 +4,7 @@ import * as _ from "lodash";
 import {HBox, VBox} from "./FlexBox";
 import classNames from "../modules/classnames";
 import ReactUtils from "../utils/ReactUtils";
+import {KEYCODES} from "../utils/KeyboardUtils";
 
 export interface MenuItemProps
 {
@@ -47,7 +48,7 @@ export interface IGetMenuItems
 const renderDivider = function(index:number):JSX.Element
 {
 	return (
-		<div key={index} className="divider weave-menu-divider"/>
+		<div key={"divider#"+ index} className="divider weave-menu-divider"/>
 	);
 };
 
@@ -56,13 +57,14 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	element:HTMLElement;
 	opener:HTMLElement;
 	window:Window;
-
+	menuItemList:HTMLDivElement[];
 	constructor(props:MenuProps)
 	{
 		super(props);
 		this.state = {
-			activeIndex: -1,
+			activeIndex: 0,
 		};
+		this.menuItemList = [];
 	}
 
 	static registerMenuSource(component:React.Component<any, any>)
@@ -88,6 +90,27 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		return [];
 	}
 
+	handleKeyPress=(event:KeyboardEvent)=>
+	{
+		var nextIndex:number = -1;
+
+		if (event.keyCode == KEYCODES.UP_ARROW)
+		{
+			nextIndex = this.state.activeIndex - 1;
+		}
+		else if(event.keyCode == KEYCODES.DOWN_ARROW)
+		{
+			nextIndex = this.state.activeIndex + 1;
+		}
+
+		var nextItem = this.menuItemList[nextIndex];
+		var nextElt:HTMLElement = null;
+		if(nextItem)
+			nextElt = ReactDOM.findDOMNode(nextItem) as HTMLElement;
+		if(nextElt)
+			nextElt.focus();
+	}
+
 	componentDidMount()
 	{
 		// we could get these elements in the ref function
@@ -95,17 +118,38 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		this.element = ReactDOM.findDOMNode(this) as HTMLElement;
 		this.window = ReactUtils.getWindow(this);
 		this.opener = this.props.opener ? ReactDOM.findDOMNode(this.props.opener) as HTMLElement : null;
+		ReactUtils.getDocument(this).addEventListener("keydown", this.handleKeyPress);
+
 		this.forceUpdate();
 	}
 
+	componentWillUnmount()
+	{
+		ReactUtils.getDocument(this).removeEventListener("keydown", this.handleKeyPress);
+	}
+
 	onMouseEnter=(index:number)=>
+	{
+		var menuItem = this.menuItemList[index];
+		if(menuItem)
+			menuItem.focus();
+	}
+
+	onMouseLeave=(index:number)=>
+	{
+		var menuItem = this.menuItemList[index];
+		if(menuItem)
+			menuItem.blur();
+	}
+
+	onFocus=(index:number)=>
 	{
 		this.setState({
 			activeIndex: index
 		});
 	}
 
-	onMouseLeave=()=>
+	onBlur=()=>
 	{
 		this.setState({
 			activeIndex: -1
@@ -134,11 +178,18 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		if(_.isEqual(filteredMenu[filteredMenu.length - 1], SEPARATOR))
 			filteredMenu.pop();
 
-		return filteredMenu.map((menuItem, index) => {
+		var dividerIndex = 0;
+		var menuIndex = 0;
+
+		return filteredMenu.map((menuItem) => {
 			if(_.isEqual(menuItem, SEPARATOR))
-				return renderDivider(index);
+			{
+				return renderDivider(dividerIndex++);
+			}
 			else
-				return this.renderMenuItem(index, menuItem)
+			{
+				return this.renderMenuItem(menuIndex++, menuItem)
+			}
 		});
 	}
 
@@ -155,10 +206,16 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		var menuItemClass = classNames({
 			'disabled': !enabled,
 			'weave-menuitem': true,
-			'weave-menuitem-hovered': this.state.activeIndex == index
+			'weave-menuitem-focused': this.state.activeIndex == index
 		});
 
-		var click = (event:React.MouseEvent) => {
+		var click = (event:React.MouseEvent|React.KeyboardEvent) => {
+			if(event.type != "keydown" && event.type != "mouseup")
+				return;
+
+			if (event.type == "keydown" && (event as React.KeyboardEvent).keyCode != KEYCODES.SPACE)
+				return;
+
 			if (!props.menu && props.click && enabled)
 				props.click();
 			else
@@ -173,10 +230,15 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		return (
 			<div
 				className={menuItemClass}
+				tabIndex={0}
+				ref={(e:HTMLDivElement) => this.menuItemList[index] = e}
 				onMouseUp={click}
+				onKeyDown={click}
+				onFocus={() => this.onFocus(index)}
+				onBlur={this.onBlur}
 				onMouseEnter={() => this.onMouseEnter(index)}
-				onMouseLeave={this.onMouseLeave}
-				key={index}
+				onMouseLeave={() => this.onMouseLeave(index)}
+				key={"item#"+index}
 			    style={props.itemStyleOverride}
 			>
 				<HBox>

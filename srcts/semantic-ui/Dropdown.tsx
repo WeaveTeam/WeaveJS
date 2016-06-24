@@ -7,6 +7,7 @@ import SmartComponent from "../ui/SmartComponent";
 import Popup from "../ui/Popup";
 import ReactUtils from "../utils/ReactUtils";
 import values = d3.values;
+import {KEYCODES} from "../utils/KeyboardUtils";
 
 export interface DropdownProps extends React.HTMLProps<Dropdown>
 {
@@ -41,8 +42,6 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	}
 
-	private element:Element;
-
 	onMouseLeave=(event:React.MouseEvent)=>
 	{
 		if(this.props.closeOnMouseLeave)
@@ -70,17 +69,30 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	onClick=(event:React.MouseEvent)=>
 	{
-		this.forceUpdate();
 		this.toggleMenu();
 		if(this.props.onClick)
 			this.props.onClick(event);
 	};
 
+	onKeyUp=(event:React.KeyboardEvent)=>
+	{
+		if(event.keyCode == KEYCODES.SPACE)
+		{
+			this.toggleMenu();
+			event.preventDefault();
+		}
+		if(this.props.onKeyUp)
+			this.props.onKeyUp(event);
+	}
+
 	closeMenu=()=>
 	{
 		Popup.close(this.menu);
 		this.menu = null;
-		ReactUtils.getDocument(this).removeEventListener("mousedown", this.onDocumentMouseDown);
+		var document = ReactUtils.getDocument(this);
+		document.removeEventListener("mousedown", this.onDocumentMouseDown);
+		document.removeEventListener("keydown", this.onDocumentKeyDown);
+		document.removeEventListener("keyup", this.onDocumentKeyUp);
 		if(this.props.onClose) this.props.onClose();
 	}
 
@@ -94,6 +106,20 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		if (menuElt && menuElt.contains(targetElt) || dropDownElt.contains(targetElt))
 			return;
 		else
+			this.closeMenu();
+	}
+
+	onDocumentKeyDown=(event:KeyboardEvent)=>
+	{
+		// close the menu if key down on space
+		if(event.keyCode == KEYCODES.ESC)
+			this.closeMenu();
+	}
+
+	onDocumentKeyUp=(event:KeyboardEvent)=>
+	{
+		// close the menu if key up on space
+		if(event.keyCode == KEYCODES.SPACE)
 			this.closeMenu();
 	}
 
@@ -117,7 +143,10 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				onMouseUp={this.onMenuMouseUp}
 			/>
 		);
-		ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown)
+		var document = ReactUtils.getDocument(this);
+		document.addEventListener("mousedown", this.onDocumentMouseDown);
+		document.addEventListener("keydown", this.onDocumentKeyDown);
+		document.addEventListener("keyup", this.onDocumentKeyUp);
 		if(this.props.onOpen) this.props.onOpen();
 	}
 
@@ -142,8 +171,11 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	render() {
 		return (
 			<div
-				ref={(e:HTMLDivElement) => this.element = e}
 				{...this.props as any}
+				className={classNames("weave-dropdown", this.props.className)}
+				tabIndex={0}
+				role="button"
+				onKeyUp={this.onKeyUp}
 				onMouseDown={this.onClick}
 			    onMouseEnter={this.onMouseEnter}
 			    onMouseLeave={this.onMouseLeave}

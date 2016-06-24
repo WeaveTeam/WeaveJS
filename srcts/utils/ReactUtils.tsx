@@ -8,6 +8,7 @@ import * as jquery from "jquery";
 import polyfill from "./polyfill";
 import MouseUtils from "./MouseUtils";
 import MiscUtils from "./MiscUtils";
+import {KEYCODES} from "./KeyboardUtils";
 
 var $:JQueryStatic = (jquery as any)["default"];
 
@@ -102,19 +103,30 @@ export default class ReactUtils
 		var document = ReactUtils.getDocument(context);
 		var element = document.body.appendChild(document.createElement("div")) as Element;
 		var popup = ReactDOM.render(jsx, element);
-		var mousedownHandler:EventListener = null;
+		var handler:EventListener = null;
 		
 		if (closeOnMouseDown) 
 		{
-			document.addEventListener("mousedown", mousedownHandler = (event:MouseEvent) => {
-				if (element.contains(event.target as HTMLElement))
-					return;
+			handler=(event:KeyboardEvent|MouseEvent)=>
+			{
+				if(event.type == "mousedown")
+				{
+					if (element.contains(event.target as HTMLElement))
+						return;
+				}
+				if(event.type == "keydown")
+				{
+					if ((event as KeyboardEvent).keyCode != KEYCODES.SPACE ||
+						(event as KeyboardEvent).keyCode != KEYCODES.ESC)
+						return;
+				}
 				onClose && onClose(popup);
 				ReactUtils.closePopup(popup);
-			});
+			}
+			document.addEventListener("mousedown", handler);
+			document.addEventListener("keydown", handler);
 		}
-		
-		ReactUtils.map_popup_element.set(popup, [element, mousedownHandler]);
+		ReactUtils.map_popup_element.set(popup, [element, handler]);
 		return popup;
 	}
 
@@ -129,7 +141,10 @@ export default class ReactUtils
 		
 		var document = DOMUtils.getWindow(element).document;
 		if (handler)
+		{
 			document.removeEventListener("mousedown", handler);
+			document.removeEventListener("keydown", handler);
+		}
 		ReactDOM.unmountComponentAtNode(element);
 		document.body.removeChild(element);
 	}
