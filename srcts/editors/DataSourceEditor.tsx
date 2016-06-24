@@ -216,12 +216,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 			if (!c) return;
 			Weave.disposableChild(this.weaveRoot, c);
 			c.sortFieldIndex.value = -1;
-			for (let columnRef of columnRefs)
-			{
-				let name = c.columns.generateUniqueName("ReferencedColumn");
-				let refColumn = c.columns.requestObject(name, weavejs.data.column.ReferencedColumn) as weavejs.data.column.ReferencedColumn;
-				refColumn.setColumnReference(columnRef.getDataSource(), columnRef.getColumnMetadata());
-			}
+			c.showKeyColumn.value = true;
+			ColumnUtils.replaceColumnsInHashMap(c.columns, columnRefs);
 		}
 
 		return (

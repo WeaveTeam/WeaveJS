@@ -33,7 +33,6 @@ import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 
 export interface IDataTableState extends IVisToolState
 {
-	columnTitles?:{[columnId:string]: string},
 	columnIds?:string[],
 	width?:number,
 	height?:number
@@ -93,7 +92,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		this.selectionFilter.addGroupedCallback(this, this.forceUpdate);
 		this.probeFilter.addGroupedCallback(this, this.forceUpdate);
 		this.state = {
-			columnTitles: {},
 			columnIds: [],
 			width:0,
 			height:0
@@ -164,12 +162,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			names.reverse();
 		}
 
-		var titles:string[] = columns.map(column => Weave.lang(column.getMetadata("title")));
-		var columnTitles = _.zipObject(names, titles) as { [columnId: string]: string; };
-		columnTitles[this.idProperty] = Weave.lang("Key");
-
 		this.setState({
-			columnTitles,
 			columnIds: names
 		});
 	}
@@ -276,12 +269,25 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		}
 	}
 
+	getColumnTitle = (columnKey:string):React.ReactChild =>
+	{
+		if (columnKey === null)
+		{
+			return Weave.lang("Key");
+		}
+		else
+		{
+			let column = this.columns.getObject(columnKey) as IAttributeColumn;
+			return column.getMetadata(weavejs.api.data.ColumnMetadata.TITLE);
+		}
+	}
+
 	render()
 	{
 		var columnNames = this.columns.getNames(IAttributeColumn);
 		return (
 			<AttributeColumnTable
-				columnTitles={this.state.columnTitles}
+				columnTitles={this.getColumnTitle}
 				rows={this.filteredKeySet.keys}
 				idProperty={(key)=>key.toString()}
 				getCellValue={this.getCellValue}
