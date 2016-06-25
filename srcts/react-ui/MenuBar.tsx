@@ -124,7 +124,9 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	onDropdownOpen(index:number)
 	{
-		this.flickerItem(index);
+		this.setState({
+			activeIndex: index
+		});
 		this.activeDropdown = this.dropdownItems[index];
 	}
 
