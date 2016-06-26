@@ -499,19 +499,20 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		};
 
 		//code for heat map
-		if(value < 65)
-			value = 65;
-		if(value > 90)
-			value = 90;
+		if(value < 15)
+			value = 15;
+		if(value > 50)
+			value = 60;
 
 		let cellStyle = {
-			background : this.colorRamp.getHexColor(value as any, 65, 90)
+			background : this.colorRamp.getHexColor(value as any, 15, 60)
 		};
 
 		/* Inline style here is hack to make div actually fill whole cell for dblclick purposes since we can't attach event handlers to the Cell itself. */
 		return (
 			<Cell key={props.rowIndex+"#"+props.columnKey} {...props}>
-				<div style={{ marginLeft: -4, paddingLeft: 4, marginTop: -4, paddingTop: 4, width: props.width, height: props.height}} onDoubleClick={handleDoubleClick}>{value}</div>
+				<div style={{ marginLeft: -4, paddingLeft: 4, marginTop: -4, paddingTop: 4, width: props.width, height: props.height, background : this.colorRamp.getHexColor(value as any, 15, 60)}}
+				     onDoubleClick={handleDoubleClick}>{value}</div>
 			</Cell>
 		);
 		//code for heat map end
