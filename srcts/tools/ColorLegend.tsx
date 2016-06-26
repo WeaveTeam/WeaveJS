@@ -488,7 +488,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					],
 					[
 						Weave.lang("Shape Size"),
-						<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.shapeSize})}/>
+						<StatefulTextField type="number" style={{textAlign: "center", flex: 1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.shapeSize})}/>
 					],
 					[
 						Weave.lang("Reverse Order"),
@@ -496,7 +496,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					],
 					[ 
 						Weave.lang("Number of columns"),
-						<StatefulTextField type="number" style={{textAlign: "center", width:50}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
+						<StatefulTextField type="number" style={{textAlign: "center", flex: 1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
 					]
 				]
 			]

@@ -18,6 +18,12 @@ input[type=number]::-webkit-outer-spin-button {
 	-webkit-appearance: none;
 	margin: 0;
 }
+
+/* disable numerical spinners in Mozilla Firefox */
+input[type=number] {
+	-moz-appearance:textfield;
+}
+
 /****** Altering the default behavior of Input Placeholder on Focus******/
 /* WebKit browsers */
 input:focus::-webkit-input-placeholder { opacity:0; }
