@@ -146,6 +146,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 				<VBox padded overflow style={{minHeight: 200, flex: 1}}>
 					<HBox>
 						<MenuButton
+							className={"ui icon button"}
 							showIcon={false}
 				            style={{flex: 1, alignItems: "center", justifyContent: "center", borderBottomRightRadius: 0, borderTopRightRadius: 0}}
 							menu={layerTypes.map((layerClass) => ({
