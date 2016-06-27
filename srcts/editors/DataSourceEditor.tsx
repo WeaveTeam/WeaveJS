@@ -228,7 +228,11 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	setSelection(props:IDataSourceEditorProps, newBranch:IWeaveTreeNode, newLeaf:IWeaveTreeNode)
 	{
 		let root = props.dataSource.getHierarchyRoot();
-		var branch = newBranch || root;
+
+		let hasChildren:boolean = false;
+		if(newBranch)
+			hasChildren = (newBranch.getChildren() as  IWeaveTreeNode[]).length > 0;
+		var branch =  hasChildren ? newBranch : root;
 		var leaf = newLeaf;
 	
 		//firstDataSet should be set if there are leaves which are column refs and unset otherwise
