@@ -105,6 +105,11 @@ export default class LabelLayer extends AbstractGlyphLayer
 			let width: number = DOMUtils.getTextWidth(text, font);
 			let height: number = DOMUtils.getTextHeight(text, font);
 
+			if (text)
+			{
+				text = _.trim(text);
+			}
+
 			let bounds: Bounds2D = feature.get("Bounds2D") as Bounds2D;
 			if (!bounds)
 			{
