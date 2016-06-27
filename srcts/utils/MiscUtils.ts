@@ -258,7 +258,7 @@ export default class MiscUtils
 			var a:any[] = (Array.isArray(value) ? value : null);
 			if (!a && nullable)
 				return null;
-			return _.map(a, item => MiscUtils.normalizeStructure(item, structure[0]));
+			return _.map(a, item => MiscUtils.normalizeStructure(item, (structure as StructureArray)[0]));
 		}
 		else if (typeof(structure) == "object" && structure)
 		{
