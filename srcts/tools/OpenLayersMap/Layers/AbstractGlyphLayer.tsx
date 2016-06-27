@@ -104,6 +104,7 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 			this.source.removeFeature(feature);
 		}
 
+		let featureAdded = false;
 		for (let i in records)
 		{
 			let record = records[i];
@@ -139,9 +140,11 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 				feature = new ol.Feature({});
 				feature.setId(recordIds[i]);
 				this.source.addFeature(feature);
+				featureAdded = true;
 			}
 			feature.setGeometry(point);
 		}
+		if (featureAdded) this.updateStyleData();
 	}
 }
 export default AbstractGlyphLayer;
