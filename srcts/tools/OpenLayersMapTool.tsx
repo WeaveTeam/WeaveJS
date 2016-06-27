@@ -560,6 +560,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		this.updateResolutionSnapping();
 
 		this.updateZoomAndCenter_weaveToOl();
+		this.map.on("postrender", this.updateResolutionDependentStyles, this);
 	}
 
 	private _lastSize: ol.Size;
@@ -719,6 +720,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			view.on("change:center", this.updateCenter_olToWeave, this);
 			view.on("change:resolution", this.updateZoom_olToWeave, this);
 		});
+
+		this.map.on("postrender", this.updateResolutionDependentStyles, this);
 	}
 
 	getDefaultProjection():string
