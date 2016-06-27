@@ -1,5 +1,4 @@
 import * as React from "react";
-import * as _ from "lodash";
 import classNames from "../modules/classnames";
 
 export interface CenteredIconProps extends React.HTMLProps<HTMLSpanElement>
@@ -13,16 +12,21 @@ export interface CenteredIconState
 
 export default class CenteredIcon extends React.Component<CenteredIconProps, CenteredIconState>
 {
+	private element:HTMLElement;
+
 	constructor(props:CenteredIconProps)
 	{
-		super(props)
+		super(props);
 	}
 
 	render() 
 	{
 		return (
 			<button
+				ref={(e:HTMLButtonElement) => this.element = e}
 				{...this.props}
+				onMouseEnter={() => this.element.focus()}
+				onMouseLeave={() => this.element.blur()}
 				className={classNames("weave-transparent-button", this.props.className || "weave-icon")}
 			>
 				{
