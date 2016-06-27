@@ -36,6 +36,9 @@ export interface IWeaveToolProps extends React.Props<WeaveTool>
 export interface IWeaveToolState
 {
 	title?: string;
+	showCaption?:boolean;
+	caption?:string;
+	captionSize?:string;
 	hovered?: boolean;
 	dragging?:boolean;
 	highlightTitle?: boolean;
@@ -61,15 +64,15 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		
 		if (this.watcher)
 		{
-			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.updateTitle);
+			Weave.getCallbacks(this.watcher).addGroupedCallback(this, this.update);
 		}
 
-		this.updateTitle();
+		this.update();
 	};
 
 	componentDidMount():void
 	{
-		this.updateTitle();
+		this.update();
     }
 
 	componentDidUpdate():void
@@ -79,7 +82,13 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				dragging: false
 			});
 	}
-	
+
+	update():void
+	{
+		this.updateTitle();
+		this.updateCaption();
+	}
+
 	updateTitle():void
 	{
 		var path = this.props.path;
@@ -88,6 +97,17 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			title = path[path.length - 1];
 		if (this.state.title != title)
 			this.setState({title});
+	}
+
+	updateCaption():void
+	{
+		var tool = Weave.AS(this.watcher && this.watcher.target, IAltText);
+		if(tool)
+			this.setState({
+				showCaption: tool.showCaption.value,
+				caption: tool.showCaption.value ? tool.altText.value : null,
+				captionSize: tool.captionSize.value
+			});
 	}
 
 	onGearClick=(event:React.MouseEvent):void=>
@@ -198,6 +218,15 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 			</HBox>
 		);
 	}
+
+	renderCaption()
+	{
+		return (
+			<HBox style={{padding: 20, fontSize: this.state.captionSize}} className="weave-caption-border">
+				{this.state.caption}
+			</HBox>
+		)
+	}
 	
 	render():JSX.Element
 	{
@@ -224,6 +253,13 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					path={this.props.path}
 					props={this.props.props}
 				/>
+				{
+					this.state.showCaption
+						?
+					<div style={{maxHeight: "30%", overflow: "auto"}}>{ this.renderCaption() }</div>
+						:
+					null
+				}
 			</VBox>
 		);
 	}

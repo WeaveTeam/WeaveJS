@@ -3035,6 +3035,7 @@ declare module weavejs.api.ui {
         altText: LinkableString;
         altTextMode: LinkableString;
         showCaption: LinkableBoolean;
+        captionSize: LinkableString;
         updateAltText(): void;
     }
     var IAltText: new (..._: any[]) => IAltText;

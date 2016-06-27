@@ -1279,3 +1279,6 @@ div.ui.inverted.segment .weave-list-item-selected:hover{
 	text-shadow: -1px -1px 0 orange, 1px -1px 0 orange, -1px 1px 0 orange, 1px 1px 0 orange;
 }
 
+.weave-caption-border {
+	border-top: 1px solid lightgrey;
+}

@@ -91,6 +91,10 @@ import StatefulTextArea from "../ui/StatefulTextArea";
 // set ol proj4
 ol.proj.setProj4(proj4);
 
+const SMALL = "small";
+const MEDIUM = "medium";
+const LARGE = "large";
+
 export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IAltText
 {
 	public static selectableLayerFilter(layer: ol.layer.Base): boolean
@@ -221,6 +225,13 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 
 	altText:LinkableString = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
 	altTextMode:LinkableString = Weave.linkableChild(this, new LinkableString("automatic"), this.updateAltText, true);
+	showCaption:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
+	captionSize:LinkableString = Weave.linkableChild(this, new LinkableString("normal"), this.captionSizeVerifier);
+
+	private captionSizeVerifier(size:string)
+	{
+		return [SMALL, MEDIUM, LARGE].indexOf(size) >= 0;
+	}
 
 	updateAltText():void
 	{
