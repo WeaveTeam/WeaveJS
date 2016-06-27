@@ -129,7 +129,9 @@ abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 
 			var coords = point.getCoordinates();
 			if (!isFinite(coords[0]) || !isFinite(coords[1]))
-				continue;
+			{
+				point = null; /* Clear the geometry so the feature doesn't render anymore. */
+			}
 
 			let feature = this.source.getFeatureById(recordIds[i]);
 			if (!feature)
