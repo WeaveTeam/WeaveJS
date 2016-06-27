@@ -238,7 +238,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 								rejected:true
 							});
 						}}
-						accept=".csv,.geojson,.txt,.tsv,.xls,.shp,.dbf"
+						accept=".csv,.geojson,.json,.txt,.tsv,.xls,.shp,.dbf"
 						disableClick={false}
 					>
 						<VBox className="weave-data-source-manager-editor" style={editorStyle}>

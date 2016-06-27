@@ -21,6 +21,7 @@ import URLRequest = weavejs.net.URLRequest;
 import WeaveAPI = weavejs.WeaveAPI;
 import CSVDataSource = weavejs.data.source.CSVDataSource;
 import IDataSource = weavejs.api.data.IDataSource;
+import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
 
 export default class FileMenu implements MenuBarItemProps
 {
@@ -204,7 +205,7 @@ export default class FileMenu implements MenuBarItemProps
 	 */
 	getSupportedFileTypes(dataFilesOnly:Boolean = false):string[]
 	{
-		var types = ['.csv', '.tsv', '.txt', '.shp', '.dbf', '.geojson', '.zip'];
+		var types = ['.csv', '.tsv', '.txt', '.shp', '.dbf', '.geojson', '.zip', '.json'];
 		if (!dataFilesOnly)
 			types.unshift('.weave');
 		return types;
@@ -360,13 +361,13 @@ export default class FileMenu implements MenuBarItemProps
 				dbfEditor.dbfURL.text = getFileUrl();
 			if (dbfEditor.shpURL.text && dbfEditor.dbfURL.text)
 				adsp.addSource();
-		}
-		else if (ext == 'geojson')
-		{
-			var geojson:GeoJSONDataSource = newDataSource(GeoJSONDataSource);
-			geojson.url.value = getFileUrl();
-			geojson.keyType.value = fileName;
 		}*/
+		else if (ext == 'geojson' || ext == 'json')
+		{
+			dataSource = newDataSource(GeoJSONDataSource);
+			dataSource.url.value = getFileUrl();//the callback here checks if it is a valid json object
+			dataSource.keyType.value = fileName;
+		}
 
 		/*if (dataSource && !FileMenu.initTemplate(dataSource))
 		{
