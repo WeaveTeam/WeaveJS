@@ -7,7 +7,6 @@ import ToolTip from "./ToolTip";
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
-import IAltText = weavejs.api.ui.IAltText;
 
 export interface IVisToolProps
 {

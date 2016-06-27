@@ -61,6 +61,8 @@ weavejs.util.DebugUtils.MouseUtils = MouseUtils;
 import * as jquery from "jquery";
 import Div from "./react-ui/Div";
 import VendorPrefixer from "./react-ui/VendorPrefixer";
+import IAltText from "./accessibility/IAltText";
+import {AltTextConfig} from "./accessibility/IAltText";
 
 // global jQuery needed for semantic
 (window as any).jQuery = (jquery as any)["default"];
@@ -75,7 +77,8 @@ export
 	WindowLayout,
 	TabLayout,
 	WeaveDataSourceEditor,
-	
+	IAltText,
+	AltTextConfig,
 	BarChartLegend,
 	BoxWhiskerPlot,
 	ColorLegend,

@@ -30,6 +30,7 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 import StandardLib = weavejs.util.StandardLib;
+import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
     id: IQualifiedKey,
@@ -455,7 +456,7 @@ export default class C3BarChart extends AbstractC3Tool
 		return Weave.lang("{0}", columns.map(column=>weavejs.data.ColumnUtils.getTitle(column)).join(Weave.lang(", ")));
 	}
 
-	public updateAltText():void
+	public getAutomaticDescription():string
 	{
 		var description:string = Weave.lang("Bar Chart showing ");
 
@@ -519,7 +520,7 @@ export default class C3BarChart extends AbstractC3Tool
 
 			description += Weave.lang("The average value is {0}.", StandardLib.roundSignificant(average, 2));
 		}
-		this.altText.value = description;
+		return description;
 	}
 
     protected validate(forced:boolean = false):boolean
@@ -737,7 +738,7 @@ Weave.registerClass(
 		weavejs.api.ui.IVisTool_Basic,
 		weavejs.api.core.ILinkableObjectWithNewProperties,
 		weavejs.api.data.ISelectableAttributes,
-		weavejs.api.ui.IAltText
+		IAltText
 	],
 	"Bar Chart"
 );

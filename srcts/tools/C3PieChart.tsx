@@ -21,6 +21,7 @@ import LinkableNumber = weavejs.core.LinkableNumber;
 import LinkableString = weavejs.core.LinkableString;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
     id: IQualifiedKey,
@@ -283,7 +284,7 @@ Weave.registerClass(
         weavejs.api.ui.IVisTool_Basic,
         weavejs.api.core.ILinkableObjectWithNewProperties,
         weavejs.api.data.ISelectableAttributes,
-        weavejs.api.ui.IAltText
+        IAltText
     ],
 	"Pie Chart"
 );

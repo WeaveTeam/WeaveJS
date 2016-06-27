@@ -37,8 +37,9 @@ import ColumnUtils = weavejs.data.ColumnUtils;
 import StatefulTextArea from "../ui/StatefulTextArea";
 import DynamicComponent from "../ui/DynamicComponent";
 import Checkbox from "../semantic-ui/Checkbox";
-import IAltText = weavejs.api.ui.IAltText;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
+import IAltText from "../accessibility/IAltText";
+import {AltTextConfig} from "../accessibility/IAltText";
 
 export class Margin
 {
@@ -65,16 +66,14 @@ export interface VisToolGroup
 Weave.registerClass(Margin, "weavejs.tool.Margin");
 Weave.registerClass(OverrideBounds, "weavejs.tool.OverrideBounds");
 
-const SMALL = "small";
-const MEDIUM = "medium";
-const LARGE = "large";
+
 
 export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems, IInitSelectableAttributes, IAltText
 {
 	constructor(props:P)
 	{
 		super(props);
-		Weave.getCallbacks(this).addGroupedCallback(this, this.updateAltText, true);
+		Weave.getCallbacks(this).addGroupedCallback(this, this.forceUpdate, true);
 	}
 
 	componentDidMount()
@@ -84,10 +83,7 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
 	
-	altText:LinkableString = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
-	altTextMode:LinkableString = Weave.linkableChild(this, new LinkableString("automatic"), this.updateAltText, true);
-	showCaption:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
-	captionSize:LinkableString = Weave.linkableChild(this, new LinkableString("normal"), this.captionSizeVerifier);
+	altText:AltTextConfig = Weave.linkableChild(this, AltTextConfig, this.forceUpdate, true);
 
 	xAxisName = Weave.linkableChild(this, LinkableString);
 	yAxisName = Weave.linkableChild(this, LinkableString);
@@ -97,11 +93,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
-
-	private captionSizeVerifier(size:string)
-	{
-		return [SMALL, MEDIUM, LARGE].indexOf(size) >= 0;
-	}
 
 	protected get selectionKeySet()
 	{
@@ -130,6 +121,11 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return MiscUtils.evalTemplateString(this.panelTitle.value, this) || this.defaultPanelTitle;
 	}
 
+	getAutomaticDescription():string
+	{
+		return this.title;
+	}
+
 	get defaultPanelTitle():string
 	{
 		return "";
@@ -150,14 +146,6 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return new Map<string, (IColumnWrapper | ILinkableHashMap)>();
 	}
 
-	updateAltText():void
-	{
-		if(this.altTextMode.value == "automatic")
-			this.altText.value = this.defaultPanelTitle;
-		else
-			this.forceUpdate();
-	}
-	
 	initSelectableAttributes(input:(IAttributeColumn | IColumnReference)[]):void
 	{
 		AbstractVisTool.initSelectableAttributes(this.selectableAttributes, input);
@@ -303,31 +291,10 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 	{
 		return [
 			[
-				Weave.lang("Mode"),
-				<DynamicComponent dependencies={[this.altTextMode]} render={() => (
-					<HBox>
-						<Checkbox type="radio"
-						          name="auto description checkbox"
-						          value={ this.altTextMode.value == "automatic" }
-						          label={ Weave.lang("Automatic") }
-						          onChange={(value) => { if(value) this.altTextMode.value = "automatic" }}
-						/>
-						<Checkbox type="radio"
-						          name="manual description checkbox"
-						          value={ this.altTextMode.value == "manual" }
-						          label={ Weave.lang("Manual") }
-						          style={{ marginLeft: "15%" }}
-						          onChange={(value)=> { if(value) this.altTextMode.value = "manual" }}
-						/>
-					</HBox>
-				)}/>
-			],
-			[
 				Weave.lang("Alt Text"),
-				<DynamicComponent dependencies={[this.altTextMode]} render={() => (
+				<DynamicComponent dependencies={[this.altText]} render={() => (
 					<StatefulTextArea
-						ref={ linkReactStateRef(this, {value: this.altText})}
-						readOnly={this.altTextMode.value == "automatic"}
+						ref={ linkReactStateRef(this, {value: this.altText.text})}
 						placeholder={Weave.lang("Enter a text description for the chart")}
 					/>
 				)}/>
@@ -335,36 +302,10 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 			[
 				Weave.lang("Show as caption"),
 				<Checkbox
-					ref={ linkReactStateRef(this, {value: this.showCaption})}
+					ref={ linkReactStateRef(this, {value: this.altText.showAsCaption})}
 				    label=" "
 			    />
-			],
-			[
-				Weave.lang("Size"),
-				<DynamicComponent dependencies={[this.captionSize]} render={() => (
-					<HBox style={{justifyContent: "space-between"}}>
-						<Checkbox type="radio"
-						          name="small caption checkbox"
-						          value={ this.captionSize.value == SMALL }
-						          label={ Weave.lang("Small") }
-						          onChange={(value) => { if(value) this.captionSize.value = SMALL }}
-						/>
-						<Checkbox type="radio"
-						          name="normal caption checkbox"
-						          value={ this.captionSize.value == MEDIUM }
-						          label={ Weave.lang("Medium") }
-						          onChange={(value)=> { if(value) this.captionSize.value = MEDIUM }}
-						/>
-						<Checkbox type="radio"
-						          name="large caption checkbox"
-						          value={ this.captionSize.value == LARGE }
-						          label={ Weave.lang("Large") }
-						          onChange={(value)=> { if(value) this.captionSize.value = LARGE }}
-						/>
-					</HBox>
-				)}/>
-			],
-
+			]
 		]
 	}
 

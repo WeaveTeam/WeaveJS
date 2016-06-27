@@ -24,6 +24,7 @@ import LinkableString = weavejs.core.LinkableString;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableNumber = weavejs.core.LinkableNumber;
+import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
     id: IQualifiedKey,
@@ -436,7 +437,7 @@ Weave.registerClass(
         weavejs.api.ui.IVisTool_Basic,
         weavejs.api.core.ILinkableObjectWithNewProperties,
         weavejs.api.data.ISelectableAttributes,
-        weavejs.api.ui.IAltText
+        IAltText
     ],
 	"Line Chart"
 );

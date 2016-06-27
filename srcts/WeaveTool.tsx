@@ -19,7 +19,7 @@ import classNames from "./modules/classnames";
 import DraggableDiv from "./react-ui/DraggableDiv";
 import {AbstractLayout, AnyAbstractLayout} from "./layouts/AbstractLayout";
 import LinkableString = weavejs.core.LinkableString;
-import IAltText = weavejs.api.ui.IAltText;
+import IAltText from "./accessibility/IAltText";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -38,7 +38,6 @@ export interface IWeaveToolState
 	title?: string;
 	showCaption?:boolean;
 	caption?:string;
-	captionSize?:string;
 	hovered?: boolean;
 	dragging?:boolean;
 	highlightTitle?: boolean;
@@ -103,11 +102,12 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	{
 		var tool = Weave.AS(this.watcher && this.watcher.target, IAltText);
 		if(tool)
+		{
 			this.setState({
-				showCaption: tool.showCaption.value,
-				caption: tool.showCaption.value ? tool.altText.value : null,
-				captionSize: tool.captionSize.value
+				showCaption: tool.altText.showAsCaption.value,
+				caption: tool.altText.text.value || tool.getAutomaticDescription()
 			});
+		}
 	}
 
 	onGearClick=(event:React.MouseEvent):void=>
@@ -222,7 +222,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	renderCaption()
 	{
 		return (
-			<HBox style={{padding: 20, fontSize: this.state.captionSize}} className="weave-caption-border">
+			<HBox style={{padding: 20, overflow: "auto"}} className="weave-caption-border">
 				{this.state.caption}
 			</HBox>
 		)
@@ -256,7 +256,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				{
 					this.state.showCaption
 						?
-					<div style={{maxHeight: "30%", overflow: "auto"}}>{ this.renderCaption() }</div>
+					<div style={{maxHeight: "30%"}}>{ this.renderCaption() }</div>
 						:
 					null
 				}

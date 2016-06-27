@@ -27,6 +27,7 @@ import StandardLib = weavejs.util.StandardLib;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
 	id: IQualifiedKey,
@@ -360,16 +361,9 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		return Weave.lang(this.dataY.getMetadata('title'));
 	}
 
-	updateAltText():void
+	getAutomaticDescription():string
 	{
-		if(this.altTextMode.value == "automatic")
-		{
-			this.altText.value = Weave.lang("Scatter plot of {0} vs {1}", this.xAxisName.value, this.yAxisName.value);
-		}
-		else
-		{
-			this.forceUpdate();
-		}
+		return Weave.lang("Scatter plot of {0} vs {1}", this.xAxisName.value, this.yAxisName.value);
 	}
 
 	//todo:(pushCrumb)find a better way to link to sidebar UI for selectbleAttributes
@@ -431,7 +425,7 @@ Weave.registerClass(
 		weavejs.api.ui.IVisTool_Basic,
 		weavejs.api.core.ILinkableObjectWithNewProperties,
 		weavejs.api.data.ISelectableAttributes,
-		weavejs.api.ui.IAltText
+		IAltText
 	],
 	"Scatter Plot"
 );

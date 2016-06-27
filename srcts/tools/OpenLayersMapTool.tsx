@@ -84,9 +84,10 @@ function isAlignment(obj:any):boolean
 import URLRequest = weavejs.net.URLRequest;
 import WeavePromise = weavejs.util.WeavePromise;
 import SmartComponent from "../ui/SmartComponent";
-import IAltText = weavejs.api.ui.IAltText;
 import DynamicComponent from "../ui/DynamicComponent";
 import StatefulTextArea from "../ui/StatefulTextArea";
+import IAltText from "../accessibility/IAltText";
+import {AltTextConfig} from "../accessibility/IAltText";
 
 // set ol proj4
 ol.proj.setProj4(proj4);
@@ -223,22 +224,11 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		return proj.getExtent();
 	}
 
-	altText:LinkableString = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
-	altTextMode:LinkableString = Weave.linkableChild(this, new LinkableString("automatic"), this.updateAltText, true);
-	showCaption:LinkableBoolean = Weave.linkableChild(this, LinkableBoolean);
-	captionSize:LinkableString = Weave.linkableChild(this, new LinkableString("normal"), this.captionSizeVerifier);
+	altText:AltTextConfig = Weave.linkableChild(this, AltTextConfig, this.forceUpdate, true);
 
-	private captionSizeVerifier(size:string)
+	getAutomaticDescription():string
 	{
-		return [SMALL, MEDIUM, LARGE].indexOf(size) >= 0;
-	}
-
-	updateAltText():void
-	{
-		if(this.altTextMode.value == "automatic")
-			this.altText.value = this.defaultPanelTitle;
-		else
-			this.forceUpdate();
+		return this.title;
 	}
 
 	setOverrideExtent = () => {
@@ -961,7 +951,7 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			<ResizingDiv>
 				<div
 					role="img"
-				    aria-label={this.altText.value}
+				    aria-label={this.altText.text.value || this.getAutomaticDescription()}
 				    ref={(c:HTMLElement) => {this.element = c;}}
 					style={{height:"100%", width: "100%"}}
 				/>
@@ -981,7 +971,7 @@ Weave.registerClass(
 		weavejs.api.ui.IVisTool_Basic,
 		weavejs.api.core.ILinkableObjectWithNewProperties,
 		weavejs.api.core.ILinkableObjectWithNewPaths,
-		weavejs.api.ui.IAltText
+		IAltText
 	],
 	"Map"
 );
@@ -1128,34 +1118,25 @@ class OpenLayersMapToolEditor extends SmartComponent<IOpenLayersMapToolEditorPro
 				]
 			],
 			[
-				Weave.lang("Mode"),
-				<DynamicComponent dependencies={[this.props.tool.altTextMode]} render={() => (
-					<HBox>
-						<Checkbox type="radio"
-						          name="auto description checkbox"
-						          value={ this.props.tool.altTextMode.value == "automatic" }
-						          label={ Weave.lang("Automatic") }
-						          onChange={(value) => { if(value) this.props.tool.altTextMode.value = "automatic" }}
+				Weave.lang("Accessibility"),
+				[
+					[
+						Weave.lang("Alt Text"),
+						<DynamicComponent dependencies={[this.props.tool.altText]} render={() => (
+							<StatefulTextArea
+								ref={ linkReactStateRef(this, {value: this.props.tool.altText.text})}
+								placeholder={Weave.lang("Enter a text description for the chart")}
+							/>
+						)}/>
+					],
+					[
+						Weave.lang("Show as caption"),
+						<Checkbox
+							ref={ linkReactStateRef(this, {value: this.props.tool.altText.showAsCaption})}
+							label=" "
 						/>
-						<Checkbox type="radio"
-						          name="manual description checkbox"
-						          value={ this.props.tool.altTextMode.value == "manual" }
-						          label={ Weave.lang("Manual") }
-						          style={{ marginLeft: "15%" }}
-						          onChange={(value)=> { if(value) this.props.tool.altTextMode.value = "manual" }}
-						/>
-					</HBox>
-				)}/>
-			],
-			[
-				Weave.lang("Alt Text"),
-				<DynamicComponent dependencies={[this.props.tool.altTextMode]} render={() => (
-				<StatefulTextArea
-					ref={ linkReactStateRef(this, {value: this.props.tool.altText})}
-					readOnly={this.props.tool.altTextMode.value == "automatic"}
-					placeholder={Weave.lang("Enter a text description for the chart")}
-				/>
-			)}/>
+					]
+				]
 			]
 		);
 	}

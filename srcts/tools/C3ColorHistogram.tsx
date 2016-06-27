@@ -1,6 +1,7 @@
 import * as React from "react";
 import C3Histogram from "./C3Histogram";
 import {IVisToolProps} from "./IVisTool";
+import IAltText from "../accessibility/IAltText";
 
 export default class C3ColorHistogram extends C3Histogram
 {
@@ -26,7 +27,7 @@ Weave.registerClass(
 		weavejs.api.ui.IVisTool_Basic,
 		weavejs.api.core.ILinkableObjectWithNewProperties,
 		weavejs.api.data.ISelectableAttributes,
-		weavejs.api.ui.IAltText
+		IAltText
 	],
 	"Color Histogram"
 );

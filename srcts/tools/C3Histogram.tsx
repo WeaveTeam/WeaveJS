@@ -41,6 +41,7 @@ import StandardLib = weavejs.util.StandardLib;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
+import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
     id: weavejs.api.data.IQualifiedKey,
@@ -695,7 +696,7 @@ Weave.registerClass(
 		weavejs.api.ui.IVisTool_Basic,
 		weavejs.api.core.ILinkableObjectWithNewProperties,
 		weavejs.api.data.ISelectableAttributes,
-		weavejs.api.ui.IAltText
+		IAltText
 	],
 	"Histogram"
 );
