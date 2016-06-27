@@ -3029,10 +3029,12 @@ declare module weavejs.api.net.beans {
     }
 }
 declare module weavejs.api.ui {
+    import LinkableBoolean = weavejs.core.LinkableBoolean;
     import LinkableString = weavejs.core.LinkableString;
     interface IAltText {
         altText: LinkableString;
         altTextMode: LinkableString;
+        showCaption: LinkableBoolean;
         updateAltText(): void;
     }
     var IAltText: new (..._: any[]) => IAltText;
