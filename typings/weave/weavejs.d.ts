@@ -277,6 +277,12 @@ declare module __global__ {
          * Shortcut for DebugUtils.debugId() and DebugUtils.debugLookup()
          */
         static id(arg?: any): any;
+        /**
+         * Temporary solution
+         */
+        createScript(name: string, targets: {
+            [name: string]: string[];
+        }, script: string, groupedCallback?: boolean): weavejs.core.LinkableCallbackScript;
     }
 }
 import Weave = __global__.Weave;
@@ -4121,59 +4127,6 @@ declare module weavejs.core {
         setSessionState(state: Object): void;
     }
 }
-declare module weavejs.core {
-    import WeavePromise = weavejs.util.WeavePromise;
-    /**
-     * This is an interface for reading and writing data in the Weave file format.
-     *
-     * @author adufilie
-     */
-    class WeaveArchive {
-        /**
-         * This must be set externally.
-         */
-        static JSZip: new (..._: any[]) => any;
-        /**
-         * @param input A Weave file to decode.
-         */
-        constructor(byteArray?: Uint8Array);
-        /**
-         * This is a dynamic object containing all the files (ByteArray objects) in the archive.
-         * The property names used in this object must be valid filenames or serialize() will fail.
-         */
-        files: Object;
-        /**
-         * This is a dynamic object containing all the amf objects stored in the archive.
-         * The property names used in this object must be valid filenames or serialize() will fail.
-         */
-        objects: Object;
-        /**
-         * @private
-         */
-        /**
-         * This function will create a ByteArray containing the objects that have been specified with setObject().
-         * @param contentType A String describing the type of content contained in the objects.
-         * @return A Uint8Array in the Weave file format.
-         */
-        serialize(readableJSON?: boolean): Uint8Array;
-        static ARCHIVE_HISTORY_AMF: string;
-        static ARCHIVE_HISTORY_JSON: string;
-        static ARCHIVE_COLUMN_CACHE_AMF: string;
-        static ARCHIVE_COLUMN_CACHE_JSON: string;
-        /**
-         * Loads a WeaveArchive from file content.
-         */
-        static loadUrl(weave: Weave, fileUrl: string): WeavePromise<void>;
-        /**
-         * Loads a WeaveArchive from file content.
-         */
-        static loadFileContent(weave: Weave, fileContent: Uint8Array): void;
-        /**
-         * This function will create an object that can be saved to a file and recalled later with loadWeaveFileContent().
-         */
-        static createArchive(weave: Weave): WeaveArchive;
-    }
-}
 declare module weavejs.data {
     import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
     import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -5364,6 +5317,7 @@ declare module weavejs.data.column {
     class KeyColumn extends AbstractAttributeColumn {
         constructor(metadata?: Object);
         getMetadata(propertyName: string): string;
+        getMetadataPropertyNames(): any[];
         keyType: LinkableString;
         getValueFromKey(key: IQualifiedKey, dataType?: new (..._: any[]) => any): any;
         keys: any[];
@@ -5447,13 +5401,9 @@ declare module weavejs.data.column {
         getProxyMetadata(): Object;
         getMetadataPropertyNames(): any[];
         /**
-         * internalNonProxyColumn
-         * As long as internalAttributeColumn is a ProxyColumn, this function will
-         * keep traversing internalAttributeColumn until it reaches an IAttributeColumn that
-         * is not a ProxyColumn.
-         * @return An attribute column that is not a ProxyColumn, or null.
+         * internalAttributeColumn
+         * This is the IAttributeColumn object contained in this ProxyColumn.
          */
-        internalNonProxyColumn: IAttributeColumn;
         getInternalColumn(): IAttributeColumn;
         setInternalColumn(newColumn: IAttributeColumn): void;
         /**
