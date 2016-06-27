@@ -216,8 +216,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 			if (!c) return;
 			Weave.disposableChild(this.weaveRoot, c);
 			c.sortFieldIndex.value = -1;
-			c.showKeyColumn.value = true;
 			ColumnUtils.replaceColumnsInHashMap(c.columns, columnRefs);
+			c.handleShowKeyColumn(true);
 		}
 
 		return (

@@ -103,7 +103,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 				)
 			} as IRow
 		});
-		let columnIds = ["filename","filelabel"];
+		let columnIds = ["filelabel"];
 		let columnTitles: {[columnId: string]: string|JSX.Element} = {};
 
 		let fileLocationForm:JSX.Element = (
@@ -150,7 +150,6 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 							<ObjectFixedDataTable rows={rows}
 							                columnIds={columnIds}
 							                idProperty="filename"
-							                showIdColumn={false}
 							                columnTitles={columnTitles}
 											onCellDoubleClick={(fileName) => {this.props.openHandler("/" + fileName)}}
 							                multiple={false}

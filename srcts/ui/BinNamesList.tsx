@@ -54,12 +54,11 @@ export default class BinNamesList extends React.Component<BinNamesListProps, {}>
 		};
 
 		return (
-			<ObjectFixedDataTable columnIds={["id", "value"]}
+			<ObjectFixedDataTable columnIds={["value"]}
 				idProperty="id"
 				rows={rows}
 				columnTitles={columnTitles}
 				headerHeight={this.props.showHeaderRow ? undefined : 0}
-				showIdColumn={false}
 				allowResizing={false}
 				evenlyExpandRows={true}
 				enableHover={false}

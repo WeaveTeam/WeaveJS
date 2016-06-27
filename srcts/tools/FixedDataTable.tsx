@@ -102,7 +102,6 @@ export interface IFixedDataTableProps<RowDatum> extends React.Props<FixedDataTab
 	onHover?:(id:string[]) => void;
 	onSelection?:(id:string[]) => void;
 	onCellDoubleClick?: (rowId: string, columnId: string) => void;
-	showIdColumn?:boolean;
 	rowHeight?:number;
 	headerHeight?:number;
 	initialColumnWidth?:number;
@@ -159,7 +158,6 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		columnIds:[],
 		enableHover:true,
 		enableSelection:true,
-		showIdColumn:false,
 		disableSort:false,
 		rowHeight:30,
 		headerHeight:30,
@@ -515,13 +513,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		}
 		else
 		{
-			if (columnId == null) {
-				if (!(typeof this.props.idProperty === 'function'))
-					return (this.props.columnTitles as { [k: string]: string })[this.props.idProperty as string];
-			}
-			else {
-				return (this.props.columnTitles as {[k: string]: string})[columnId];
-			}
+			return (this.props.columnTitles as {[k: string]: string})[columnId];
 		}
 	}
 
@@ -532,12 +524,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 			whiteSpace: "nowrap"
 		};
 		var evenWidth:number;
-		let columnIds: string[] = this.props.columnIds.filter((value) => (value !== this.props.idProperty));
-
-		if (this.props.showIdColumn)
-		{
-			columnIds.unshift(null);
-		}
+		let columnIds: string[] = this.props.columnIds.concat([]);
 	
 		if (this.props.evenlyExpandRows && this.state.width > 0)
 			evenWidth = Math.max((this.state.width / columnIds.length), this.props.initialColumnWidth);

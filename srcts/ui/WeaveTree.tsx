@@ -274,7 +274,7 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 			idProperty={"id"}
 			headerHeight={0}
 			rowHeight={this.rowHeight}
-			columnIds={["id", "tree"]}
+			columnIds={["tree"]}
 			initialColumnWidth={this.state.columnWidth}
 			rows={rows}
 			selectedIds={selectedIndices}

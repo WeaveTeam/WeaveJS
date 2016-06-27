@@ -88,10 +88,9 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 		});
 
 		return (
-			<ObjectFixedDataTable columnIds={["id", "value"]} 
+			<ObjectFixedDataTable columnIds={["value"]} 
 							idProperty="id" rows={rows} 
 							columnTitles={this.columnTitles} 
-							showIdColumn={false}
 							selectedIds={[selectedId]}
 							allowResizing={false}
 							evenlyExpandRows={true}

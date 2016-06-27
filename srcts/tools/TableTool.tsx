@@ -60,7 +60,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	rowHeight = Weave.linkableChild(this, new LinkableNumber(30));
 	headerHeight = Weave.linkableChild(this, new LinkableNumber(30));
 	sortInDescendingOrder = Weave.linkableChild(this, new LinkableBoolean(false));
-	showKeyColumn = Weave.linkableChild(this, new LinkableBoolean(false));
 
 	panelTitle = Weave.linkableChild(this, new LinkableString);
 
@@ -98,7 +97,35 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 
 	get deprecatedStateMapping()
 	{
-		return {};
+		return {showKeyColumn: this.handleShowKeyColumn};
+	}
+
+	handleShowKeyColumn = (value: boolean) =>
+	{
+		if (value)
+		{
+			let keyCols = this.columns.getObjects(weavejs.data.column.KeyColumn); 
+			if (keyCols.length == 0)
+			{
+				let nameOrder:string[] = this.columns.getNames();
+				this.columns.requestObject("KeyColumn", weavejs.data.column.KeyColumn);
+				this.columns.setNameOrder(nameOrder);
+			}
+		}
+		else
+		{
+			let keyColNames = this.columns.getNames(weavejs.data.column.KeyColumn); 
+			for (let keyColName of keyColNames)
+			{
+				this.columns.removeObject(keyColName);
+			}
+		}
+	}
+
+	get keyColumnShown():boolean
+	{
+		let keyCols = this.columns.getObjects(weavejs.data.column.KeyColumn);
+		return keyCols.length > 0;
 	}
 
 	get title():string
@@ -201,8 +228,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				  .concat([
 					  [
     					  Weave.lang("Show Key Column"),
-    					  <Checkbox ref={linkReactStateRef(this, { value: this.showKeyColumn })} label={" "}/>
-    				  ]  
+						  <Checkbox label={" "} onChange={this.handleShowKeyColumn} value={this.keyColumnShown}/>
+    				  ]
 				  ]),
 			classes: {
 				td: [
@@ -291,7 +318,6 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				onHover={this.handleProbe}
 				onSelection={this.handleSelection}
 				onCellDoubleClick={this.handleCellDoubleClick}
-				showIdColumn={this.showKeyColumn.value}
 				columnIds={columnNames}
 				rowHeight={this.rowHeight.value}
 				headerHeight={this.headerHeight.value}
