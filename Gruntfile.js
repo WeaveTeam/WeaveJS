@@ -107,7 +107,9 @@ module.exports = function (grunt) {
 	        semantic: {expand: true, cwd: 'src/semantic', src: '**', dest: 'dist/semantic/'},
             weavesessions: {expand: true, flatten: true, cwd: 'weave_sessions', src: "*", dest: "dist/"},
             projdb: {expand: true, flatten: true, cwd: 'src/', src: 'ProjDatabase.zip', dest: "dist/"},
-            core: {expand: true, cwd: "WeaveASJS/bin/js-release/", src: "*.*", dest: "dist/core"}
+            core: {expand: true, cwd: "WeaveASJS/bin/js-release/", src: "*.*", dest: "dist/core"},
+            weave_dts: {expand: true, cwd: "WeaveASJS/typings/", src: "weavejs-core.d.ts", dest: "typings/weave/"}
+
         },
         clean: {
             ts: ["outts"],
@@ -115,7 +117,7 @@ module.exports = function (grunt) {
             dist: ["dist/*.js", "dist/*.css", "dist/*.html"]
         },
         exec: {
-            weave_core: {
+            weave_asjs: {
                 command: 'npm run compile-as && npm run compile-dts',
                 stdout: true,
                 maxBuffer: 1000000
@@ -130,11 +132,11 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('grunt-contrib-clean');
     grunt.loadNpmTasks('grunt-exec');
     grunt.loadNpmTasks('grunt-minifyify');
-    grunt.registerTask('distcopy', ['copy:index_html', 'copy:weave_html', 'copy:olcss', 'copy:css', 'copy:fontawesomecss', 'copy:fontawesomefont', 'copy:semantic', 'copy:projdb', 'copy:core']);
+    grunt.registerTask('distcopy', ['copy:index_html', 'copy:weave_html', 'copy:css', 'copy:img', 'copy:fonts','copy:olcss', 'copy:fontawesomecss', 'copy:fontawesomefont', 'copy:semantic', 'copy:projdb', 'copy:core']);
     grunt.registerTask('devlibs', ['browserify:devlibs']);
     grunt.registerTask('distlibs', ['browserify:distlibs']);
-    grunt.registerTask('as2dts', ['exec:weave_core']);
-    grunt.registerTask('default', ['exec:weave_core','ts', 'babel', 'browserify:dev', 'copy']);
-    grunt.registerTask('all', ['exec:weave_core','clean', 'ts', 'babel', 'distlibs', 'copy']);
+    grunt.registerTask('weave_asjs', ['exec:weave_asjs', 'copy:weave_dts']);
+    grunt.registerTask('default', ['weave_asjs','ts', 'babel', 'browserify:dev', 'distcopy']);
+    grunt.registerTask('all', ['clean', 'weave_asjs', 'ts', 'babel', 'distlibs', 'distcopy']);
     grunt.registerTask('distall', ['clean', 'ts', 'babel', 'browserify:dist', 'browserify:distlibs', 'distcopy']);
 };

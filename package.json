@@ -9,7 +9,7 @@
     "build": "tsc && babel -d lib outts",
     "compile": "npm run build && browserifyinc -x react -x react-dom -x jquery -x lodash -x d3 -x c3 -x openlayers -x jszip --debug --cachefile browserifycache.json lib/index.js > dist/index.js",
     "compile-libs": "browserifyinc -r react -r react-dom -r jquery -r lodash -r d3 -r c3 -r openlayers -r jszip --debug --cachefile browserifycache.json > dist/libs.js",
-    "compile-dts": "as2dts --defs-only ./WeaveASJS/ ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/",
+    "compile-dts": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/",
     "compile-as": "node WeaveASJS/build.js",
     "postinstall": "cd lib || npm run build",
     "_compile": "grunt ts && grunt babel",

@@ -4,7 +4,7 @@
         "module": "system",
         "declaration": true,
         "target": "es6",
-        "outFile": "weavejs.js"
+        "outFile": "weavejs-core.js"
     },
-    "exclude": ["weavejs.d.ts"]
+    "exclude": ["weavejs-core.d.ts"]
 }
