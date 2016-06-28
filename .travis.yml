@@ -25,4 +25,4 @@ after_success:
   - .././printDir.sh
   - cd ..
   - export SSHPASS=$DEPLOY_PASS
-  - sshpass -e -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no scp package.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
+  - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no package.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
