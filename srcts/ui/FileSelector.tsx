@@ -56,6 +56,8 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 		{
 			let buffer = reader.result as ArrayBuffer;
 			let fileName = URLRequestUtils.saveLocalFile(Weave.getRoot(this.props.targetUrl), file.name, new Uint8Array(buffer));
+
+			this.props.targetUrl.value = null;/*this allows the data source data to be updated even when the same file name is loaded twice*/
 			this.props.targetUrl.value = fileName;
 		};
 
