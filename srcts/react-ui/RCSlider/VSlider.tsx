@@ -3,7 +3,7 @@ import RCSlider from "./RCSlider";
 import {SliderOption} from "./RCSlider";
 import {HBox} from "../FlexBox";
 
-export interface VSliderProps extends React.Props<VSlider>
+export interface VSliderProps
 {
 	min?:number;
     max?:number;
@@ -13,6 +13,8 @@ export interface VSliderProps extends React.Props<VSlider>
     type:string;
     reversed?:boolean;
     onChange?:(selectedValue:[string]) => void;
+	style?:React.CSSProperties;
+	className?:string;
 }
 
 export default class VSlider extends React.Component<VSliderProps, any>
@@ -22,7 +24,7 @@ export default class VSlider extends React.Component<VSliderProps, any>
         super(props);
     }
 
-    render()
+    render():JSX.Element
     {
         return (
 			<HBox overflow style={{flex: 1, justifyContent: "space-around"}} className="weave-vslider">

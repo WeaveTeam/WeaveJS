@@ -66,6 +66,15 @@ input:focus:-ms-input-placeholder { opacity:0; }
 	white-space: nowrap;
 }
 /********************/
+.weave-rc-slider-container:focus .rc-slider-handle {
+	outline: none;
+	border-color: #57c5f7;
+}
+
+.weave-rc-slider-container
+{
+	outline: none;
+}
 
 .weave-hslider {
 	padding-left: 10px;
@@ -295,11 +304,12 @@ div.table-row-selected>div>div>div>div>div {
 	color:grey;
 }
 
-.weave-icon:hover {
+.weave-icon:focus {
+	outline: none;
 	background-color: rgba(0,0,0,.05);
 }
 
-.weave-icon:focus {
+.weave-icon:hover {
 	outline: none;
 	background-color: rgba(0,0,0,.05);
 }

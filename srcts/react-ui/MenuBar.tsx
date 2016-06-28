@@ -46,16 +46,31 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 
 	onMouseEnter(index:number)
 	{
-		var dropdown = ReactDOM.findDOMNode(this.dropdownItems[index]) as HTMLElement;
-		if(dropdown && dropdown.focus)
-			dropdown.focus();
+		if(this.activeDropdown)
+		{
+			var dropdown = ReactDOM.findDOMNode(this.dropdownItems[index]) as HTMLElement;
+			if(dropdown && dropdown.focus)
+				dropdown.focus();
+		}
+		else
+		{
+			this.setState({activeIndex: index});
+		}
+
 	}
 
 	onMouseLeave=(index:number)=>
 	{
-		var dropdown = ReactDOM.findDOMNode(this.dropdownItems[index]) as HTMLElement;
-		if(dropdown && dropdown.blur)
-			dropdown.blur();
+		if(this.activeDropdown)
+		{
+			var dropdown = ReactDOM.findDOMNode(this.dropdownItems[index]) as HTMLElement;
+			if(dropdown && dropdown.blur)
+				dropdown.blur();
+		}
+		else
+		{
+			this.setState({activeIndex: -1});
+		}
 	}
 
 	onFocus(index:number)
@@ -64,19 +79,16 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 		if(this.activeDropdown)
 			this.openNextDropdown(index);
 		else
-			this.selectNextDropdown(index);
+		{
+			this.setState({activeIndex: index});
+		}
 	}
 
 	onBlur=()=>
 	{
 		// clear the hover style if no dropdown is open
-		if (!this.activeDropdown)
+		if(!this.activeDropdown)
 			this.setState({activeIndex: -1});
-	}
-
-	selectNextDropdown(index:number)
-	{
-		this.setState({activeIndex: index});
 	}
 
 	openNextDropdown(index:number)
@@ -137,6 +149,9 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	onDropdownClose=()=>
 	{
 		this.activeDropdown = null;
+		this.setState({
+			activeIndex: -1
+		});
 	}
 
 	handleDocumentClick=(event:MouseEvent)=>
@@ -151,30 +166,35 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	{
 		var nextIndex:number = -1;
 
-		if (event.keyCode == KEYCODES.LEFT_ARROW)
+		if(this.state.activeIndex >= 0 && this.state.activeIndex < this.dropdownItems.length)
 		{
-			nextIndex = this.state.activeIndex - 1;
-		}
-		else if (event.keyCode == KEYCODES.RIGHT_ARROW)
-		{
-			nextIndex = this.state.activeIndex + 1;
-		}
-		else if (event.keyCode == KEYCODES.ESC)
-		{
-			// if there is no active dropdown
-			// clear the active dropdown
-			if(!this.activeDropdown)
+			if (event.keyCode == KEYCODES.LEFT_ARROW)
 			{
-				this.setState({activeIndex: -1});
+				nextIndex = this.state.activeIndex - 1;
 			}
+			else if (event.keyCode == KEYCODES.RIGHT_ARROW)
+			{
+				nextIndex = this.state.activeIndex + 1;
+			}
+
+			var nextItem = this.dropdownItems[nextIndex];
+			var nextElt:HTMLElement = null;
+			if(nextItem)
+				nextElt = ReactDOM.findDOMNode(nextItem) as HTMLElement;
+			if(nextElt)
+				nextElt.focus();
 		}
 
-		var nextItem = this.dropdownItems[nextIndex];
-		var nextElt:HTMLElement = null;
-		if(nextItem)
-			nextElt = ReactDOM.findDOMNode(nextItem) as HTMLElement;
-		if(nextElt)
-			nextElt.focus();
+		if (event.keyCode == KEYCODES.ESC)
+		{
+			if(this.activeDropdown)
+			{
+				var dropdown = ReactDOM.findDOMNode(this.activeDropdown) as HTMLElement;
+				if(dropdown && dropdown.blur)
+					dropdown.blur();
+			}
+			this.setState({activeIndex: -1});
+		}
 	}
 
 	componentDidMount()

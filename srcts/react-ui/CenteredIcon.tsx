@@ -25,8 +25,6 @@ export default class CenteredIcon extends React.Component<CenteredIconProps, Cen
 			<button
 				ref={(e:HTMLButtonElement) => this.element = e}
 				{...this.props}
-				onMouseEnter={() => this.element.focus()}
-				onMouseLeave={() => this.element.blur()}
 				className={classNames("weave-transparent-button", this.props.className || "weave-icon")}
 			>
 				{

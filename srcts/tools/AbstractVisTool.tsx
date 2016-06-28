@@ -292,12 +292,10 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 		return [
 			[
 				Weave.lang("Alt Text"),
-				<DynamicComponent dependencies={[this.altText]} render={() => (
-					<StatefulTextArea
-						ref={ linkReactStateRef(this, {value: this.altText.text})}
-						placeholder={Weave.lang("Enter a text description for the chart")}
-					/>
-				)}/>
+				<StatefulTextArea
+					ref={ linkReactStateRef(this, {value: this.altText.text})}
+					placeholder={ this.getAutomaticDescription() }
+				/>
 			],
 			[
 				Weave.lang("Show as caption"),

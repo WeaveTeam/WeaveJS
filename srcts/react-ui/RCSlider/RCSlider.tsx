@@ -2,6 +2,7 @@ import * as React from "react";
 import Slider from "rc-slider";
 import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
+import SmartComponent from "../../ui/SmartComponent";
 
 export type SliderOption = {
 	value: any,
@@ -16,17 +17,18 @@ export interface SliderProps
     options?:SliderOption[];
     selectedValues:any[];
     onChange:Function;
-	vertical:boolean;
+	vertical?:boolean;
 	className:string;
 	style:React.CSSProperties;
+	type:string;
 }
 
-export default class RCSlider extends React.Component<any, any>
+export default class RCSlider extends SmartComponent<SliderProps, {}>
 {
     static VERTICAL:string = "vertical";
     static HORIZONTAL:string ="horizontal";
 
-    static NUMERIC:string = "numeric"
+    static NUMERIC:string = "numeric";
     static CATEGORICAL:string = "categorical";
     static NUMERIC_DISCRETE:string = "numeric-discrete";
 
@@ -39,7 +41,7 @@ export default class RCSlider extends React.Component<any, any>
     private min:number;
     private max:number;
 
-    private element:Element;
+    private element:HTMLElement;
     private step:number;
 
     constructor(props:SliderProps)
@@ -49,11 +51,6 @@ export default class RCSlider extends React.Component<any, any>
 		this.onChange = _.debounce(this.onChange.bind(this), 30);
     }
 
-    componentDidMount()
-    {
-        this.element = ReactDOM.findDOMNode(this);
-    }
-	
     componentWillUpdate()
     {
         // if (this.props.type == RCSlider.NUMERIC && this.element && this.element.clientWidth && this.max && this.min)
@@ -70,7 +67,7 @@ export default class RCSlider extends React.Component<any, any>
             this.props.onChange(selectedValues);
         }
 
-        if (this.props.type == RCSlider.NUMERIC) 
+        if (this.props.type == RCSlider.NUMERIC)
 		{
 			// TODO put try catch block
             let selectedValues:any[] = [{
@@ -97,7 +94,8 @@ export default class RCSlider extends React.Component<any, any>
         this.indexToValue.clear();
         this.valueToIndex.clear();
         this.indexToLabel = {};
-		
+		var slider:JSX.Element = null;
+
 		if(!this.props.options)
 		{
 			this.options = [];
@@ -114,21 +112,23 @@ export default class RCSlider extends React.Component<any, any>
 
         if (this.props.type == RCSlider.CATEGORICAL)
         {
-            return <Slider min={0}
-                           max={this.options.length ? this.options.length - 1 : 0}
-                           step={null}
-                           marks={this.indexToLabel}
-                           value={this.valueToIndex.get((this.props.selectedValues || [])[0])}
-                           onChange={this.onChange}
-						   vertical={this.props.vertical}
-						   style={this.props.style}
-						   className={this.props.className}
-                    />;
+            slider = (
+	            <Slider
+		            min={0}
+                    max={this.options.length ? this.options.length - 1 : 0}
+                    step={null}
+                    marks={this.indexToLabel}
+                    value={this.valueToIndex.get((this.props.selectedValues || [])[0])}
+                    onChange={this.onChange}
+                    vertical={this.props.vertical}
+                    style={this.props.style}
+	            />
+            );
 
         }
 
 		var value:{ min:number, max:number } = Object((this.props.selectedValues || [])[0]);
-		
+
         if (this.props.type == RCSlider.NUMERIC)
         {
             let valueToLabel:{[value:number]: string} = {};
@@ -137,14 +137,14 @@ export default class RCSlider extends React.Component<any, any>
                 return option.value;
             });
 
-			if(this.options.length) 
+			if(this.options.length)
 			{
 				this.min = Math.min.apply(null, this.options);
 				this.max = Math.max.apply(null, this.options);
 			}
 			else
 			{
-				this.min = 0; 
+				this.min = 0;
 				this.max = 1;
 			}
 
@@ -153,22 +153,25 @@ export default class RCSlider extends React.Component<any, any>
 				value.min = this.min;
 			if (isNaN(value.max))
 				value.max = this.max;
-			
+
 			let marks:{[value:number]: string} = {};
 			marks[this.min] = valueToLabel[this.min] || "0";
 			marks[this.max] = valueToLabel[this.max] || "1";
             let stepCount:number = (this.max - this.min)/1024;
 
             //todo - needs better handling ? for step count 0
-            return <Slider range={true}
-		                   step={stepCount > 0 ? stepCount :1}
-		                   min={this.min}
-		                   max={this.max}
-		                   marks={marks}
-		                   value={[value.min, value.max]}
-		                   onChange={this.onChange}
-						   vertical={this.props.vertical}
-            		/>;
+            slider = (
+	            <Slider
+		            range={true}
+		            step={stepCount > 0 ? stepCount :1}
+		            min={this.min}
+		            max={this.max}
+		            marks={marks}
+		            value={[value.min, value.max]}
+		            onChange={this.onChange}
+		            vertical={this.props.vertical}
+	            />
+            );
 
 
 
@@ -185,16 +188,30 @@ export default class RCSlider extends React.Component<any, any>
 				value.min = min;
 			if (isNaN(value.max))
 				value.max = max;
-			
-            return <Slider range={true}
-                           min={min}
-                           max={max}
-                           step={null}
-                           marks={this.indexToLabel}
-                           value={[this.valueToIndex.get(value.min), this.valueToIndex.get(value.max)]}
-                           onChange={this.onChange}
-						   vertical={this.props.vertical}
-                    />
+
+            slider = (
+	            <Slider
+		            range={true}
+	                min={min}
+	                max={max}
+	                step={null}
+	                marks={this.indexToLabel}
+	                value={[this.valueToIndex.get(value.min), this.valueToIndex.get(value.max)]}
+	                onChange={this.onChange}
+	                vertical={this.props.vertical}
+	            />
+            );
         }
+	    return (
+		    <div
+			    ref={(e:HTMLDivElement) => this.element = e}
+			    className="weave-rc-slider-container"
+			    onMouseEnter={() => this.element.focus()}
+			    onMouseLeave={() => this.element.blur()}
+			    tabIndex={0}
+		    >
+			    {slider}
+		    </div>
+	    )
     }
 }
