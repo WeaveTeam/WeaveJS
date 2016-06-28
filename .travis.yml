@@ -1,6 +1,10 @@
 notifications:
   email: false
 language: node_js
+addons:
+    apt:
+        packages:
+            - sshpass
 node_js:
   - 0.12
 branches:
@@ -14,7 +18,10 @@ install: npm run compile
 before_script:
   - grunt distall
 after_success:
+  - tar -czf package.tgz dist
   - chmod a+x printDir.sh
   - ./printDir.sh
   - cd dist/
   - .././printDir.sh
+  - export SSHPASS=$DEPLOY_PASS
+  - sshpass -e scp package.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
