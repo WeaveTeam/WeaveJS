@@ -23,5 +23,6 @@ after_success:
   - ./printDir.sh
   - cd dist/
   - .././printDir.sh
+  - cd ..
   - export SSHPASS=$DEPLOY_PASS
   - sshpass -e scp package.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
