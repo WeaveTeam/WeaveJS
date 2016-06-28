@@ -218,7 +218,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 		else
 		{
-			_.merge(editorStyle, {justifyContent: "center", alignItems: "center"});
+			_.merge(editorStyle, {justifyContent: "center", alignItems: "center", width: '100%'});
 			editorJsx = (
 				<div style={{padding: '10px', display: "flex", flex: 1}}>
 					<Dropzone
@@ -242,14 +242,17 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						disableClick={false}
 					>
 						<VBox className="weave-data-source-manager-editor" style={editorStyle}>
-							<div className="ui centered header">
-								{Weave.lang((listOptions.length ? "Select" : "Create") + " a data source on the left.")}
-							</div>
-							{
-								this.state.rejected
-								?	Weave.lang("The specified data file could not be imported. Only files with the following extensions are allowed: .csv,.geojson,.txt,.tsv,.xls,.shp,.dbf")
-								:	null
-							}
+
+							<span className="fa fa-files-o fa-th-large fa-5x"></span>
+
+							<VBox style={{ display: 'flex', fontSize: '14px', padding: '15', alignItems : 'center'}}>
+								{"Drag and drop a data file to create a datasource"}
+								{this.state.rejected ?
+								<span>{Weave.lang("The specified file could not be imported. Only files with the following extensions are allowed: .csv, .tsv, .txt, .shp, .dbf, .geojson, .zip, .json")}</span>
+									:
+								null}
+							</VBox>
+
 						</VBox>
 					</Dropzone>
 				</div>
