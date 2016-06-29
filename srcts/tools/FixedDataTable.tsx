@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as _ from 'lodash';
 import {Table, Column, Cell} from 'fixed-data-table';
-import {HBox, VBox} from "../react-ui/FlexBox";
+import {HBox, VBox, Label} from "../react-ui/FlexBox";
 
 
 import CellProps = FixedDataTable.CellProps;
@@ -60,8 +60,15 @@ export class SortHeaderCell extends SmartComponent<ISortHeaderProps, Object>
 		
 		return (
 			<Cell {...this.props}>
-				<HBox style={{whiteSpace: "nowrap", overflow: "ellipsis"}} onClick={this.onSortChange}>
-					{sortArrow} {this.props.children}
+				<HBox padded onClick={this.onSortChange}>
+					{sortArrow}
+					<Label
+						style={{
+							paddingLeft: sortArrow ? 4 : null,
+							flex: 1
+						}}
+						children={this.props.children}
+					/>
 				</HBox>
 			</Cell>
 		);
@@ -444,7 +451,8 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		else
 		{
 			sortIndices.sort((indexA:number, indexB:number) => {
-				var sortVal = this.props.sortFunction.call(this, indexA, indexB, columnKey);//because 'this' in the sortFunction returns the props objects
+				//use sortFunction.call() because the default sortFunction is not bound but requires 'this' to be a this FixedDataTable
+				var sortVal = this.props.sortFunction.call(this, indexA, indexB, columnKey);
 				if (sortVal !== 0 && sortDirection === SortTypes.ASC)
 					sortVal = sortVal * -1;
 				return sortVal;
