@@ -1,8 +1,8 @@
 {
-  "name": "WeaveJS",
+  "name": "weavejs",
   "version": "0.0.0",
   "description": "Collection of visualization tools and UI for the WeaveJS project.",
-  "main": "lib/WeaveJS.js",
+  "main": "lib/weavejs.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dts": "tsc -p tsconfig-definitions.json",
@@ -11,7 +11,7 @@
     "compile-libs": "browserifyinc -r react -r react-dom -r jquery -r lodash -r d3 -r c3 -r openlayers -r jszip --debug --cachefile browserifycache.json > dist/libs.js",
     "compile-dts": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/",
     "compile-as": "node WeaveASJS/build.js",
-    "postinstall": "cd lib || npm run build",
+    "postinstall": "cd lib || npm run compile-as && npm run compile-dts && npm run build && npm run dts",
     "_compile": "grunt ts && grunt babel",
     "_prepublish": "npm run compile"
   },
@@ -50,6 +50,7 @@
     "react-dom": "0.14.7"
   },
   "dependencies": {
+    "as2dts": "^0.2.3",
     "babel": "^6.1.18",
     "babel-cli": "^6.4.5",
     "browserify-incremental": "^3.1.1",
@@ -71,6 +72,6 @@
     "react-color": "^2.0.0",
     "react-dropzone": "^3.4.0",
     "react-sparklines": "^1.5.2",
-    "typescript": "^1.8.0"
+    "typescript": "^1.8.7"
   }
 }
