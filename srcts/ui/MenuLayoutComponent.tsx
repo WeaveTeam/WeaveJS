@@ -6,6 +6,7 @@ import HSlider from "../react-ui/RCSlider/HSlider";
 import VSlider from "../react-ui/RCSlider/VSlider";
 import ComboBox from '../semantic-ui/ComboBox';
 import {ComboBoxOption} from "../semantic-ui/ComboBox";
+import CheckBoxList from "../react-ui/CheckBoxList";
 import * as _ from 'lodash';
 
 export interface IMenuLayoutComponentProps
@@ -56,12 +57,12 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 						<VSlider options={ this.props.options } onChange={ this.props.onChange } selectedValues={ this.props.selectedItems } type="categorical"/>
 					</VBox>
 				);
-			/*case LAYOUT_CHECKBOXLIST:
+			case LAYOUT_CHECKBOXLIST:
 				return (
 					<VBox style={{flex: 1, padding: 10}}>
-						<CheckBoxList options={this.props.options} selectedValues={values} onChange={this.onChange.bind(this)}/>
+						<CheckBoxList options={this.props.options} selectedValues={this.props.selectedItems} onChange={this.props.onChange}/>
 					</VBox>
-				);*/
+				);
 			case LAYOUT_COMBO:
 				return (
 					<VBox style={{flex: 1, padding: 5}}>
