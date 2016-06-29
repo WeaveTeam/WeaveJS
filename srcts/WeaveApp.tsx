@@ -20,7 +20,6 @@ import TabLayout, {TabLayoutProps} from "./layouts/TabLayout";
 import WindowLayout from "./layouts/WindowLayout";
 import FlexibleLayout from "./layouts/FlexibleLayout";
 import WeaveMenus from "./menus/WeaveMenus";
-import FileDialog from "./ui/FileDialog";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -35,7 +34,6 @@ import IColumnReference = weavejs.api.data.IColumnReference;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 import StandardLib = weavejs.util.StandardLib;
 import DynamicState = weavejs.api.core.DynamicState;
-import PopupWindow from "./react-ui/PopupWindow";
 
 export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 {
@@ -571,9 +569,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				</VBox>
 			);
 		}
-
-		// check in url params to skip BlankPageIntro
-		this.urlParams = MiscUtils.getUrlParams();
 
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
