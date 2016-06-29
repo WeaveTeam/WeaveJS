@@ -584,9 +584,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 			);
 		}
 
-		// check in url params to skip BlankPageIntro
-		this.urlParams = MiscUtils.getUrlParams();
-
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
