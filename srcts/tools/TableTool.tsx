@@ -108,7 +108,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			if (keyCols.length == 0)
 			{
 				let nameOrder:string[] = this.columns.getNames();
-				this.columns.requestObject("KeyColumn", weavejs.data.column.KeyColumn);
+				this.columns.requestObject(null, weavejs.data.column.KeyColumn);
 				this.columns.setNameOrder(nameOrder);
 			}
 		}
@@ -120,7 +120,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				this.columns.removeObject(keyColName);
 			}
 		}
-	}
+	};
 
 	get keyColumnShown():boolean
 	{
