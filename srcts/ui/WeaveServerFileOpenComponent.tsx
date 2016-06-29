@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import {IOpenFileProps, IOpenFileState} from "FileDialog";
 import SmartComponent from "./SmartComponent";
 import ServiceLogin from "../ui/admin/ServiceLogin";
-import {HBox, VBox} from "../react-ui/FlexBox";
+import {HBox, VBox, Label} from "../react-ui/FlexBox";
 import FixedDataTable from "../tools/FixedDataTable";
 import {ObjectFixedDataTable, IRow} from "../tools/FixedDataTable";
 import FileInfoView from "./FileInfoView";
@@ -83,11 +83,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 
 		let fileList:ListOption[] = this.state.fileNames.map((file:any) => {
 			return {
-				label: (
-					<HBox style={{justifyContent: "space-between", alignItems:"center"}}>
-						<span style={{overflow: "hidden"}}>{file}</span>
-					</HBox>
-				),
+				label: <Label style={{flex: 1}}>{file}</Label>,
 				value: file
 			};
 		});
@@ -96,9 +92,9 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 			return {
 				filename: file.value,
 				filelabel: (
-					<HBox className="weave-padded-hbox" >
+					<HBox className="weave-padded-hbox" style={{alignItems: 'center'}}>
 						<CenteredIcon iconProps={{className: "fa fa-file-text-o fa-fw"}}/>
-						{file.value}
+						<Label style={{flex: 1}}>{file.value}</Label>
 					</HBox>
 				)
 			} as IRow
@@ -119,7 +115,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 											allFiles: false
 										});
 									}}/>
-										<label>{Weave.lang("My files")}</label>
+										<Label>{Weave.lang("My files")}</Label>
 									</div>
 								</div>
 							</div>
@@ -131,7 +127,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 											allFiles: true
 										});
 									}}/>
-										<label>{Weave.lang("All files")}</label>
+										<Label>{Weave.lang("All files")}</Label>
 									</div>
 								</div>
 							</div>
