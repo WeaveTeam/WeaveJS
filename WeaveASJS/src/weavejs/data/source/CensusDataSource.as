@@ -71,7 +71,7 @@ package weavejs.data.source
 			var ctn:ColumnTreeNode = new ColumnTreeNode({
 				dataSource: this,
 				data: data,
-				label: function():String { return dataSet.value || name; },
+				"label": function():String { return dataSet.value || name; },
 				hasChildBranches: true,
 				children: function(node:ColumnTreeNode):Array {
 					var children:Array = [];
@@ -93,7 +93,7 @@ package weavejs.data.source
 								concept_node = {
 									dataSource: _ds,
 									data: JS.copyObject(data),
-									label: concept_label,
+									"label": concept_label,
 									idFields: [CONCEPT_NAME],
 									hasChildBranches: false,
 									children: []
@@ -108,7 +108,7 @@ package weavejs.data.source
 							var variable_descriptor:Object = {
 								dataSource: _ds,
 								data: JS.copyObject(concept_node.data),
-								label: variableInfo.title,
+								"label": variableInfo.title,
 								idFields: [CONCEPT_NAME, VARIABLE_NAME],
 								children: null
 							};

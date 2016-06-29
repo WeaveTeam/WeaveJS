@@ -71,11 +71,11 @@ package weavejs.data.source
 		{
 			if (!_rootNode)
 				_rootNode = new ColumnTreeNode({
-					cacheSettings: {label: false},
+					cacheSettings: {"label": false},
 					dataSource: this,
 					dependency: dataColumns,
 					data: this,
-					label: getLabel,
+					"label": getLabel,
 					hasChildBranches: false,
 					children: function():Array {
 						return dataColumns.getNames().map(

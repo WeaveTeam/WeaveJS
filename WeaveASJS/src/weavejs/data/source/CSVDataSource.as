@@ -418,9 +418,9 @@ package weavejs.data.source
 		{
 			if (!_rootNode)
 				_rootNode = new ColumnTreeNode({
-					cacheSettings: {label: false},
+					cacheSettings: {"label": false},
 					dataSource: this,
-					label: getLabel,
+					"label": getLabel,
 					children: function(root:ColumnTreeNode):Array {
 						var items:Array = metadata.getSessionState() as Array;
 						if (!items)
@@ -449,7 +449,7 @@ package weavejs.data.source
 			{
 				return new ColumnTreeNode({
 					dataSource: this,
-					label: getColumnNodeLabel,
+					"label": getColumnNodeLabel,
 					idFields: [METADATA_COLUMN_INDEX, METADATA_COLUMN_NAME],
 					data: metadata
 				});

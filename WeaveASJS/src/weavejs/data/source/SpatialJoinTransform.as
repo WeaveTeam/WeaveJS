@@ -62,7 +62,7 @@ package weavejs.data.source
 				_rootNode = new ColumnTreeNode({
 					dataSource: this,
 					data: this,
-					label: getLabel,
+					"label": getLabel,
 					hasChildBranches: false,
 					children: [
 						generateHierarchyNode({})
