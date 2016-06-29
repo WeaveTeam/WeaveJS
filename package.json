@@ -11,7 +11,7 @@
     "compile-libs": "browserifyinc -r react -r react-dom -r jquery -r lodash -r d3 -r c3 -r openlayers -r jszip --debug --cachefile browserifycache.json > dist/libs.js",
     "compile-dts": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/",
     "compile-as": "node WeaveASJS/build.js",
-    "postinstall": "cd lib || npm run compile-as && npm run compile-dts && npm run build && npm run dts",
+    "postinstall": "cd lib || ( npm run compile-as && npm run compile-dts && npm run build && npm run dts )",
     "_compile": "grunt ts && grunt babel",
     "_prepublish": "npm run compile"
   },
