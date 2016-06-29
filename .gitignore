@@ -53,3 +53,4 @@ browserifycache.json
 *.iml
 
 lib-typings/
+typings/weave/*.d.ts
