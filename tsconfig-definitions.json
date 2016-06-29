@@ -8,7 +8,7 @@
     "declaration": true
   },
   "exclude":[
-    "node_modules", "outts", "lib-typings"
+    "node_modules", "outts", "lib-typings", "WeaveASJS"
   ],
   "compileOnSave": false
 }

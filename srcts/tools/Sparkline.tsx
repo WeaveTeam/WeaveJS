@@ -39,7 +39,7 @@ import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import LinkableVariable = weavejs.core.LinkableVariable;
 import LinkableBoolean = weavejs.core.LinkableBoolean;
 
-declare type Record = {
+export declare type Record = {
 	id: IQualifiedKey,
 	value: number,
 	fill: { color: string },

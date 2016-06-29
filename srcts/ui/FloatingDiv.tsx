@@ -4,7 +4,7 @@ import * as _ from "lodash";
 import ReactUtils from "../utils/ReactUtils";
 import SmartComponent from "../ui/SmartComponent";
 
-declare type Size = {width:number, height:number};
+export declare type Size = {width:number, height:number};
 
 export interface FloatingDivProps extends React.HTMLProps<FloatingDiv>
 {

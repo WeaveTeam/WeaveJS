@@ -43,7 +43,7 @@ export interface TableEventData {
 	column: IAttributeColumn;
 }
 
-class AttributeColumnTable extends FixedDataTable<IQualifiedKey> {
+export class AttributeColumnTable extends FixedDataTable<IQualifiedKey> {
 
 }
 
