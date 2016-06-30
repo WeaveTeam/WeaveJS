@@ -34,6 +34,7 @@ export interface ComboBoxState
 	openMenu?:boolean;
 	options?: ComboBoxOption[]; // structured version(ComboBoxOption) for props.options
 	value?:any | any[]; // we need value as we are updating state from linkreactrefstate
+	direction?:string; //upward | downward
 }
 
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
@@ -48,6 +49,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 		let stateObj:ComboBoxState = this.getStateFromProps(props);
 		stateObj.openMenu = false;
+		stateObj.direction = "downward";
 		this.state = stateObj;
 	}
 
@@ -56,6 +58,13 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		if(this.props.options != nextProps.options || this.props.value != nextProps.value)
 		{
 			this.setState(this.getStateFromProps(nextProps));
+		}
+
+		if(this.props.direction != nextProps.direction )
+		{
+			this.setState({
+				direction:nextProps.direction
+			});
 		}
 	}
 
@@ -169,6 +178,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		});
 		this.props.onRemoved && this.props.onRemoved(option.value);
 		this.props.onChange && this.props.onChange(this.state.value);
+		//required to stop the execution of event listener under this close UI
 		event.stopPropagation();
 	};
 
@@ -192,19 +202,43 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	};
 
-	private menu:ComboBoxMenu = null;
+	private menuRect:ClientRect = null;
+	// called when menu is mounted and unmounted
+	// todo : make combobox update direction even window is resizing
 	menuRefCallback=(c:ComboBoxMenu)=>
 	{
-		this.menu = c;
 		if(c)
 		{
-			ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown)
+			ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown);
+
+			let menuElement = ReactDOM.findDOMNode(c) as HTMLElement;
+			this.menuRect = menuElement.getBoundingClientRect();
+			// todo : make combobox update direction based on it given parent container, default should be window
+			if(this.menuRect.top + this.menuRect.height > window.innerHeight)
+			{
+				//re-render again
+				this.setState({
+					direction:"upward"
+				});
+			}
 		}
 		else
 		{
+			this.menuRect = null;
 			ReactUtils.getDocument(this).removeEventListener("mousedown", this.onDocumentMouseDown);
 		}
 
+	};
+
+	getMenuPositionStyle=():React.CSSProperties =>
+	{
+		if(this.menuRect && this.state.direction == "upward")
+		{
+			return {
+				top: -this.menuRect.height
+			};
+		}
+		return null;
 	};
 
 
@@ -244,8 +278,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					let option:ComboBoxOption = this.getOptionFromValue(value);
 					if(option)
 						(selectedOptions as ComboBoxOption[])[index] = option;
-					//option may not be available instantly those cases render the value
-					//todo: if it sobject convert to string
+					//option may not be available instantly for those cases render the value
+					//todo: if its object convert to string ?
 					let valueText:string = option && option.label? option.label : (typeof value == "string") ? value : "";
 					return <a key={index}
 					          className="ui label">
@@ -259,7 +293,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				let option:ComboBoxOption = this.getOptionFromValue(this.state.value);
 				if(option)
 					selectedOptions = option;
-				//option may not be available instantly those cases render the value
+				//option may not be available instantly for those cases render the value
 				let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
 				textUIs = <div className="text">{Weave.lang(valueText)}</div>;
 			}
@@ -274,6 +308,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		{
 			menuUI = <ComboBoxMenu ref={this.menuRefCallback}
 			                       className="menu transition visible"
+			                       style={this.getMenuPositionStyle()}
 			                       onSelect={this.onChange as any}
 			                       selectedOptions={selectedOptions}
 			                       options={this.state.options}/>;
@@ -286,11 +321,12 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 												});
 
 		let inputUI:JSX.Element = this.renderInput();
+		let className:string = "ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"") +" selection dropdown " + this.state.direction +" " + (this.props.className || "")
 
 		return (
 			<div onClick={this.onClickListener}
 			     tabIndex={0}
-			     className={"ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"") +" selection dropdown " + (this.props.className || "")}
+			     className={className}
 			     style={styleObj}>
 					{inputUI}
 					<i className="dropdown icon"/>
@@ -332,10 +368,10 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 
 	render()
 	{
-		let styleObject:React.CSSProperties = {
+		let styleObject:React.CSSProperties = _.merge({},this.props.style,{
 			display:"block",
 			position:"absolute"
-		};
+		});
 
 		let isMultipleMode:boolean = Array.isArray(this.props.selectedOptions);
 		let optionsUI:JSX.Element[] = this.props.options.map((option:ComboBoxOption,index:number)=>{
