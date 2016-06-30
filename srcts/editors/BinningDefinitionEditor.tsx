@@ -355,7 +355,7 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 		{
 			let renderProps:any = this.getBinDefRenderProps(selectedBinDefn);
 			return (
-				<VBox className="weave-padded-vbox">
+				<VBox overflow className="weave-padded-vbox">
 					{ReactUtils.generateTable({
 						body: [].concat(
 							this.props.insertTableRows || [],
@@ -368,7 +368,7 @@ export class BinningDefinitionSelector extends SmartComponent<BinningDefinitionS
 								],
 								[
 									Weave.lang('Binning method'),
-									<HBox className="weave-padded-hbox" style={ {alignItems: "center"} }>
+									<HBox overflow className="weave-padded-hbox" style={ {alignItems: "center"} }>
 										<ComboBox
 											style={ {flex: 1} }
 											options={options}
