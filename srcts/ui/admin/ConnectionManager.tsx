@@ -15,7 +15,7 @@ import {ListOption} from "../../react-ui/List";
 import ConnectionEditor from "./ConnectionEditor";
 import ServiceLogin from "./ServiceLogin";
 import ConfigurationStorageEditor from "./ConfigurationStorageEditor";
-import LogComponent from "./LogComponent";
+import LogComponent from "./../../react-ui/LogComponent";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;

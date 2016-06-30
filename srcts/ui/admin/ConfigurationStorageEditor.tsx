@@ -14,7 +14,7 @@ import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
 import List from "../../react-ui/List";
 import HelpIcon from "../../react-ui/HelpIcon";
-import LogComponent from "./LogComponent";
+import LogComponent from "./../../react-ui/LogComponent";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;

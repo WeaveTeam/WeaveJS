@@ -12,7 +12,7 @@ import SmartComponent from "../SmartComponent";
 import Input from "../../semantic-ui/Input";
 import ServiceLogin from "./ServiceLogin";
 import HelpIcon from "../../react-ui/HelpIcon";
-import LogComponent from "./LogComponent";
+import LogComponent from "./../../react-ui/LogComponent";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;
