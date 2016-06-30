@@ -14,6 +14,7 @@ import {ComboBoxOption} from "../semantic-ui/ComboBox";
 import Accordion from "../semantic-ui/Accordion";
 import ChartUtils from "../utils/ChartUtils";
 import StatefulTextField from "../ui/StatefulTextField";
+import IAltText from "../accessibility/IAltText";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -30,7 +31,6 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 import StandardLib = weavejs.util.StandardLib;
-import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
     id: IQualifiedKey,
@@ -79,7 +79,7 @@ export default class C3BarChart extends AbstractC3Tool
     showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
     showXAxisLabel = Weave.linkableChild(this, new LinkableBoolean(false));
 	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
-	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8));
+	barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.8), this.verifyBarRatio);
 
     private verifyGroupingMode(mode:string):boolean
 	{
@@ -89,6 +89,11 @@ export default class C3BarChart extends AbstractC3Tool
 	private verifyLegendPosition(position:string):boolean
 	{
 		return [BOTTOM, RIGHT, INSET].indexOf(position) >= 0;
+	}
+
+	private verifyBarRatio(ratio:number):boolean
+	{
+		return (0.0 < ratio) && (ratio < 1.0);
 	}
 
     get yLabelColumn():IAttributeColumn
@@ -696,6 +701,10 @@ export default class C3BarChart extends AbstractC3Tool
 					[
 						Weave.lang("X axis label angle"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+					],
+					[
+						Weave.lang("Bar width ratio"),
+						<StatefulTextField type="number" style={{flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.barWidthRatio})}/>
 					]
 				]
 			],

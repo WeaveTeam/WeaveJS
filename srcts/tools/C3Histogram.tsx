@@ -23,6 +23,8 @@ import Button from "../semantic-ui/Button";
 import DynamicComponent from "../ui/DynamicComponent";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import ChartUtils from "../utils/ChartUtils";
+import StatefulTextField from "../ui/StatefulTextField";
+import IAltText from "../accessibility/IAltText";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -41,7 +43,6 @@ import StandardLib = weavejs.util.StandardLib;
 import LinkableNumber = weavejs.core.LinkableNumber;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
-import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
     id: weavejs.api.data.IQualifiedKey,
@@ -61,11 +62,16 @@ export default class C3Histogram extends AbstractC3Tool
 	aggregationMethod = Weave.linkableChild(this, new LinkableString("count"));
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
-    barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95));
+    barWidthRatio = Weave.linkableChild(this, new LinkableNumber(0.95), this.verifyBarRatio);
 	horizontalMode = Weave.linkableChild(this, new LinkableBoolean(false));
 	showValueLabels = Weave.linkableChild(this, new LinkableBoolean(false));
 	xAxisLabelAngle = Weave.linkableChild(this, new LinkableNumber(-45));
-	
+
+	private verifyBarRatio(ratio:number):boolean
+	{
+		return (0.0 < ratio) && (ratio < 1.0);
+	}
+
 	get colorColumn()
 	{
 		return Weave.AS(this.fill.color.getInternalColumn(), ColorColumn);
@@ -645,6 +651,10 @@ export default class C3Histogram extends AbstractC3Tool
 					[
 						Weave.lang("X axis label angle"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+					],
+					[
+						Weave.lang("Bar width ratio"),
+						<StatefulTextField type="number" style={{flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.barWidthRatio})}/>
 					],
 					!linkedColor && [
 						Weave.lang("Color"),
