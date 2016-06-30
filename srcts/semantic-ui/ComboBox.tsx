@@ -1,11 +1,13 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import ReactUtils from "../utils/ReactUtils";
-import $ from "../modules/jquery";
 import * as _ from "lodash";
 import SmartComponent from "../ui/SmartComponent";
 
-export type ComboBoxOption = { label: string, value: any };
+export type ComboBoxOption = {
+	label: string,
+	value: any
+};
 
 export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 {
@@ -29,14 +31,13 @@ export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 
 export interface ComboBoxState
 {
-	value?: any; // value is always the value property of an option or an array of value property
-	options?: ComboBoxOption[]; // always a {value: any, label: string} array
+	openMenu?:boolean;
+	options?: ComboBoxOption[]; // structured version(ComboBoxOption) for props.options
+	value?:any | any[]; // we need value as we are updating state from linkreactrefstate
 }
 
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
 {
-	element:Element;
-	
 	static defaultProps:ComboBoxProps = {
 		fluid:true
 	};
@@ -44,13 +45,39 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	constructor(props:ComboBoxProps)
 	{
 		super(props);
-		
-		this.state = this.normalizeState(props);
+
+		let stateObj:ComboBoxState = this.getStateFromProps(props);
+		stateObj.openMenu = false;
+		this.state = stateObj;
 	}
-	
-	normalizeState(props:ComboBoxProps):ComboBoxState
+
+	componentWillReceiveProps(nextProps: ComboBoxProps)
 	{
-		var options:ComboBoxOption[] = props.options.map(this.getOption);
+		if(this.props.options != nextProps.options || this.props.value != nextProps.value)
+		{
+			this.setState(this.getStateFromProps(nextProps));
+		}
+	}
+
+
+	//props.options turns into structured ComboBoxOption object
+	//props.value.value turns into state.value object
+	getStateFromProps=(props:ComboBoxProps):ComboBoxState=>
+	{
+		var options:ComboBoxOption[] = props.options.map((option:(string | { label: string, value: any })) =>
+		{
+			if(typeof option === "object" && option)
+			{
+				return option;
+			}
+			else
+			{
+				return{
+					label: option as string,
+					value: option as string
+				}
+			}
+		});
 
 		var value:any = props.value;
 		if(props.valueIncludesLabel)
@@ -70,144 +97,281 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			value: value,
 			options: options
 		}
-	}
+	};
 
-	getOption(option:(string | { label: string, value: any })):ComboBoxOption
-	{
-		if(typeof option === "object" && option)
-		{
-			return option;
-		}
-		else
-		{
-			return {
-				label: option as string,
-				value: option as string
-			}
-		}
-	}
-	
-	private getIndexFromValue(value:any):number
+	// important to get option from value
+	// as this.state.value are updated programatically (for ex:LinkReactStateref)
+	private getOptionFromValue(value:any):ComboBoxOption
 	{
 		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
-		return this.state.options && this.state.options.findIndex((option) => {
+		let index:number =  this.state.options && this.state.options.findIndex((option) => {
 			return equalityFunc(option.value, value);
 		});
+		return this.state.options[index];
 	}
 
-	componentWillReceiveProps(nextProps: ComboBoxProps)
+	// toggles menu open /close
+	onClickListener=(event:React.MouseEvent)=>
 	{
-		this.setState(this.normalizeState(nextProps));
-	}
-
-	componentDidMount()
-	{
-		this.forceUpdate();
-	}
-	
-	componentDidUpdate(prevProps:ComboBoxProps, prevState:ComboBoxState)
-	{
-		let selector = ($(this.element) as any);
-		selector.dropdown({
-			onChange: (selected:string, text:string) => {
-				if (this.props.onNew && text) {
-					this.props.onNew && this.props.onNew(text);
-				}
-				else {
-					if (selected !== "") {
-						if (this.props.type !== "multiple") {
-							let index = Number(selected.substr(2));
-							let value:any = this.state.options[index] && this.state.options[index].value;
-							this.setState({value});
-						} else {
-							let __indices:string[] = (selected as string).split(",");
-
-							let values:any[] = __indices.map((__index) => {
-								let index = Number(__index.substr(2));
-								return this.state.options[index] && this.state.options[index].value;
-							});
-							this.setState({value: values});
-						}
-					}
-				}
-			},
-			onClick: (index:number) => {
-				this.props.onClick && this.props.onClick(null);
-			},
-			onAdd: (addedValue:string, addedText:string) => {
-				let index = Number(addedValue.substr(2));
-				let option = this.state.options[index];
-				let value:any = option && option.value;
-				let values:any = _.clone(this.state.value);
-				if (ReactUtils.hasFocus(this) && !_.includes(values, value)) {
-					values.push(value);
-					this.setState({value: values});
-					this.props.onAdded && this.props.onAdded(value);
-				}
-			},
-			onRemove: (removedValue:string, removedText:string) => {
-				let index = Number(removedValue.substr(2));
-				let option = this.state.options[index];
-				let value:any = option && option.value;
-				if (ReactUtils.hasFocus(this)) {
-					let values:any = _.without(this.state.value, value);
-					this.setState({value: values});
-					this.props.onRemoved && this.props.onRemoved(value);
-				}
-			},
-			context: this.props.context || window,
-			direction: this.props.direction || 'auto',
-			allowAdditions: this.props.allowAdditions || false,
-			match: "text"
+		this.setState({
+			openMenu:!this.state.openMenu
 		});
 
-		if (this.props.type === "multiple") {
-			let indices:string[] = [];
-			this.state.value.forEach((item:any) => {
-				let index:number = this.getIndexFromValue(item);
-				if (index >= 0)
-					indices.push("__"+index);
-			});
-			selector.dropdown('set exactly', indices);
+		this.props.onClick && this.props.onClick(event);
+
+	};
+
+
+	onChange=(index:number,option:ComboBoxOption,event:React.FormEvent) =>
+	{
+
+		if (this.props.onNew && option.label )
+		{
+			this.props.onNew && this.props.onNew(option.label);
 		}
 		else
 		{
-			//single selection
-			let index = this.getIndexFromValue(this.state.value);
-			if (index >= 0)
-				selector.dropdown('set exactly', "__"+index);
-			else {
-				if (!this.props.onNew)
-					selector.dropdown('clear');
+			let value:any | any[] = this.state.options[index].value;
+
+			if (this.props.type == "multiple" )
+			{
+
+				this.props.onAdded && this.props.onAdded(value);
+				// push to state value array
+				(this.state.value as any[]).push(value);
+				// put the reference of this.state.value to local value object
+				// to call props.onChange
+				value = (this.state.value as any[]);
+
+				this.setState({
+					value:value,
+					openMenu:true
+				});
+
 			}
+			else
+			{
+				this.setState({
+					value:value,
+					openMenu:false
+				});
+			}
+
+			this.props.onChange && this.props.onChange(value);
 		}
+	};
+
+	selectedValueRemoveListener=(index:number,option:ComboBoxOption,event:React.MouseEvent)=>
+	{
+		(this.state.value as any[]).splice(index);
+		this.setState({
+			value:this.state.value
+		});
+		this.props.onRemoved && this.props.onRemoved(option.value);
 		this.props.onChange && this.props.onChange(this.state.value);
-	}
+		event.stopPropagation();
+	};
+
+
+
+	onDocumentMouseDown=(event:MouseEvent)=>
+	{
+		// close the menu when you mousedown anywhere except the dropdown item
+		var dropDownElt = ReactDOM.findDOMNode(this);
+		var targetElt = event.target as HTMLElement;
+		if (dropDownElt.contains(targetElt))
+		{
+			return;
+		}
+		else
+		{
+			this.setState({
+				openMenu:false
+			});
+		}
+
+	};
+
+	private menu:ComboBoxMenu = null;
+	menuRefCallback=(c:ComboBoxMenu)=>
+	{
+		this.menu = c;
+		if(c)
+		{
+			ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown)
+		}
+		else
+		{
+			ReactUtils.getDocument(this).removeEventListener("mousedown", this.onDocumentMouseDown);
+		}
+
+	};
+
+
+	renderInput=(isHidden:boolean = true):JSX.Element=>
+	{
+		let inputProps:any = {
+			role:'combobox',
+			'aria-expanded': this.state.openMenu ? "true" : "false",
+			'aria-haspopup': this.state.openMenu ? "true" : "false",
+			'aria-labelledby': (this.props as any)['aria-labelledby'],
+			'aria-label': (this.props as any)['aria-label'],
+			type:isHidden ? "hidden":"",
+		};
+
+		return <input {...inputProps}/>
+	};
+
 
 	render()
 	{
+
+
+		let headerUI:JSX.Element = null;
+		if(this.props.header)
+		{
+			headerUI = <div className="header">{this.props.header}</div>;
+		}
+
+		let textUIs:JSX.Element[] | JSX.Element = null;
+		let selectedOptions:ComboBoxOption | ComboBoxOption[] = null;
+		if(this.state.value)
+		{
+			if(Array.isArray(this.state.value))
+			{
+				selectedOptions =  [] ;
+				textUIs =(this.state.value as any[]).map( (value:any, index:number) => {
+					let option:ComboBoxOption = this.getOptionFromValue(value);
+					if(option)
+						(selectedOptions as ComboBoxOption[])[index] = option;
+					//option may not be available instantly those cases render the value
+					//todo: if it sobject convert to string
+					let valueText:string = option && option.label? option.label : (typeof value == "string") ? value : "";
+					return <a key={index}
+					          className="ui label">
+								{Weave.lang(valueText)}
+								<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
+							</a>;
+				});
+			}
+			else
+			{
+				let option:ComboBoxOption = this.getOptionFromValue(this.state.value);
+				if(option)
+					selectedOptions = option;
+				//option may not be available instantly those cases render the value
+				let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
+				textUIs = <div className="text">{Weave.lang(valueText)}</div>;
+			}
+		}
+		else
+		{
+			textUIs = <div className="default text">{this.props.placeholder}</div>;
+		}
+
+		let menuUI:JSX.Element = null;
+		if(this.state.openMenu )
+		{
+			menuUI = <ComboBoxMenu ref={this.menuRefCallback}
+			                       className="menu transition visible"
+			                       onSelect={this.onChange as any}
+			                       selectedOptions={selectedOptions}
+			                       options={this.state.options}/>;
+		}
+
+
+		let styleObj:React.CSSProperties =  _.merge({},this.props.style,{
+													position:"relative",
+													transform:"none" /* override Semantic UI rotateZ(0)*/
+												});
+
+		let inputUI:JSX.Element = this.renderInput();
+
 		return (
-			<div
-				ref={e => this.element = e}
-				onClick={this.props.onClick}
-				className={"ui " + (this.props.type || "") + (this.props.fluid ? " fluid" : "") +" selection dropdown " + (this.props.className || "")}
-				style={this.props.style}
-			>
-				<input type="hidden"/>
-				<i className="dropdown icon"/>
-				<div className="default text">{this.props.placeholder}</div>
-				<div className="menu">
-				{
-					this.props.header ? 
-					<div className="header">{this.props.header}</div>
-					: null
-				}
-				{
-					//We are using __ index because semantic UI will misbehave when data-value and labels collide
-					this.state.options && this.state.options.map((option, index) => <div className="item" style={this.props.optionStyle} key={index} data-value={"__"+index}>{Weave.lang(option.label)}</div>)
-				}
-				</div>
+			<div onClick={this.onClickListener}
+			     tabIndex={0}
+			     className={"ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"") +" selection dropdown " + (this.props.className || "")}
+			     style={styleObj}>
+					{inputUI}
+					<i className="dropdown icon"/>
+					{textUIs}
+					{menuUI}
 			</div>
 		);
 	}
+
+
 }
+
+interface ComboBoxMenuProps extends React.HTMLProps<ComboBoxMenu>
+{
+	selectedOptions:ComboBoxOption | ComboBoxOption[];
+	options:ComboBoxOption[];
+	optionStyle?:React.CSSProperties;
+}
+
+interface ComboBoxMenuState
+{
+
+}
+
+class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
+{
+	constructor(props:ComboBoxMenuProps)
+	{
+		super(props);
+	}
+
+
+	clickListener=(index:number,option:ComboBoxOption,event:React.MouseEvent) =>
+	{
+		event.preventDefault();
+		event.stopPropagation();
+		this.props.onSelect && (this.props.onSelect as any)(index,option,event);
+	};
+
+	render()
+	{
+		let styleObject:React.CSSProperties = {
+			display:"block",
+			position:"absolute"
+		};
+
+		let isMultipleMode:boolean = Array.isArray(this.props.selectedOptions);
+		let optionsUI:JSX.Element[] = this.props.options.map((option:ComboBoxOption,index:number)=>{
+			let className = "item";
+			if(isMultipleMode)
+			{
+				if((this.props.selectedOptions as ComboBoxOption[]).indexOf(option) != -1)
+				{
+					return null;
+				}
+			}
+			else
+			{
+				if(this.props.selectedOptions  == option)
+					className = className + " active selected";
+			}
+			return  <div className={className}
+			             role="option"
+			             onClick={this.clickListener.bind(this,index,option)}
+			             style={this.props.optionStyle}
+			             key={index}
+			             data-value={index}>
+							{Weave.lang(option.label)}
+					</div>;
+		});
+
+		return  <div style={styleObject}
+		             tabIndex={-1}
+		             className={this.props.className}>
+					{optionsUI}
+				</div>
+
+	}
+
+}
+
+
+
+
