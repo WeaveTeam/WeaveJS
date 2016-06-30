@@ -189,7 +189,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		var state = this.getSessionState();
 		state.activeTabIndex = indexFromTabsComponent - this.leadingTabsLength;
 		this.setSessionState(state);
-		InteractiveTour.enable?InteractiveTour.targetComponentOnClick(state.tabs[state.activeTabIndex].label) : null
+		InteractiveTour.targetComponentOnClick(state.tabs[state.activeTabIndex].label);
 	};
 
 	private getPanelIndex(id:WeavePathArray):number
@@ -339,7 +339,7 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 								onDragOver={(event) => this.onDragOverTab(tab)}
 								onDragLeave={this.onDragLeaveTab}
 								style={{alignItems: "center"}}
-								ref={InteractiveTour.enable ? InteractiveTour.getComponentRefCallback(tab.label): null}
+								ref={InteractiveTour.getComponentRefCallback(tab.label)}
 							>
 								{/*<EditableTextCell onChange={(newName) => this.setTabLabel(tab.id, newName)} textContent={tab.label}/>*/}
 								{tab.label}

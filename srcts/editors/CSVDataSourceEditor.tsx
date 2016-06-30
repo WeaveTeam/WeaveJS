@@ -35,9 +35,10 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 	onUrlChange()
 	{
 		let ds = (this.props.dataSource as CSVDataSource);
-		if(ds.url.value){
+		if (ds.url.value)
+		{
 			this.setState({
-				guideToTab:"Browse"
+				guideToTab: "Browse"
 			})
 		}
 		if (ds.keyType.value === null && ds.url.value)
@@ -71,7 +72,9 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		{
 			let extension = ds.url.value.split('.').pop();
 			validExtension = _.includes(acceptExtension.split(','),"."+extension);
-		} else {
+		}
+		else
+		{
 			validExtension = true;
 		}
 		let columnIds:ComboBoxOption[] = ds.getColumnIds().map( (id, index) => {
@@ -83,20 +86,25 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
 					{Weave.lang("Location")}
-					<HelpIcon className={validExtension ? "":"fa-exclamation-triangle"} style={{color:validExtension? null:"#794B02"}}>
+					<HelpIcon className={validExtension ? "" : "fa-exclamation-triangle"} style={{color: validExtension ? null : "#794B02"}}>
 						<VBox>
-							{validExtension ? Weave.lang("The location of the CSV file for this data source"):Weave.lang("Warning: The file you have chosen has an extension that does not match the expected extension.")}
+							{
+								validExtension
+								?	Weave.lang("The location of the CSV file for this data source")
+								:	Weave.lang("Warning: The file you have chosen has an extension that does not match the expected extension.")
+							}
 						</VBox>
 					</HelpIcon>
 				</HBox>,
 				/* id, ref, onFileChange are added for Guidance , id and onFileChange argument has to match as they represent step name */
-				<FileSelector targetUrl={ds.url}
-				              ref={InteractiveTour.enable ? InteractiveTour.getComponentRefCallback("Location") : null}
-				              onFileChange={()=>InteractiveTour.enable?InteractiveTour.targetComponentOnClick("Location"):null}
-				              placeholder={Weave.lang("http://www.example.com/example.csv")}
-				              style={ {width: "100%"} }
-				              accept={acceptExtension}
-								/>
+				<FileSelector
+					targetUrl={ds.url}
+					ref={InteractiveTour.getComponentRefCallback("Location")}
+					onFileChange={() => InteractiveTour.targetComponentOnClick("Location")}
+					placeholder={Weave.lang("http://www.example.com/example.csv")}
+					style={ {width: "100%"} }
+					accept={acceptExtension}
+				/>
 			],
 			this.getLabelEditor(ds.label),
 			[
@@ -108,10 +116,11 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 						</VBox>
 					</HelpIcon>
 				</HBox>,
-				<ComboBox style={{width: "100%"}}
-				          ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
-				          options={columnIds}
-				          className={keysAreUnique ? "":"error"}
+				<ComboBox
+					style={{width: "100%"}}
+					ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
+					options={columnIds}
+					className={keysAreUnique ? "":"error"}
 				/>
 			],
 			[

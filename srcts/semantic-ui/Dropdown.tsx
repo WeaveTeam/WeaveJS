@@ -32,37 +32,39 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	menu:Popup;
 
-	constructor(props:DropdownProps) {
+	constructor(props:DropdownProps)
+	{
 		super(props);
 
 		this.state = {
 			toggleMenu:this.props.open === undefined ? false : this.props.open,
 			menuMounted:false
 		};
-
 	}
 
 	onMouseLeave=(event:React.MouseEvent)=>
 	{
-		if(this.props.closeOnMouseLeave)
+		if (this.props.closeOnMouseLeave)
 			this.closeMenu();
 		this.props.onMouseLeave  && this.props.onMouseLeave(event);
 	};
 
 	onMouseEnter=(event:React.MouseEvent)=>
 	{
-		if(this.props.openOnMouseEnter)
+		if (this.props.openOnMouseEnter)
 			this.openMenu();
 		this.props.onMouseEnter  && this.props.onMouseEnter(event);
 	};
 
 	onMenuMouseUp=(event:React.MouseEvent)=>
 	{
-		if(InteractiveTour.enable)
-		{
-			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
-			InteractiveTour.targetComponentOnClick(menuID)
-		}
+		let menuID:string = (
+			typeof this.props.children == "string"
+			?	this.props.children as string + " menu"
+			:	"menu"
+		);
+		InteractiveTour.targetComponentOnClick(menuID);
+	
 		// close the menu once an item has been clicked
 		this.closeMenu();
 	};
@@ -70,18 +72,18 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	onClick=(event:React.MouseEvent)=>
 	{
 		this.toggleMenu();
-		if(this.props.onClick)
+		if (this.props.onClick)
 			this.props.onClick(event);
 	};
 
 	onKeyUp=(event:React.KeyboardEvent)=>
 	{
-		if(event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
+		if (event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
 		{
 			this.toggleMenu();
 			event.preventDefault();
 		}
-		if(this.props.onKeyUp)
+		if (this.props.onKeyUp)
 			this.props.onKeyUp(event);
 	}
 
@@ -93,7 +95,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		document.removeEventListener("mousedown", this.onDocumentMouseDown);
 		document.removeEventListener("keydown", this.onDocumentKeyDown);
 		document.removeEventListener("keyup", this.onDocumentKeyUp);
-		if(this.props.onClose) this.props.onClose();
+		if (this.props.onClose) this.props.onClose();
 	}
 
 	onDocumentMouseDown=(event:MouseEvent)=>
@@ -112,21 +114,21 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	onDocumentKeyDown=(event:KeyboardEvent)=>
 	{
 		// close the menu if key down on space
-		if(event.keyCode == KEYCODES.ESC)
+		if (event.keyCode == KEYCODES.ESC)
 			this.closeMenu();
 	}
 
 	onDocumentKeyUp=(event:KeyboardEvent)=>
 	{
 		// close the menu if key up on space
-		if(event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
+		if (event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
 			this.closeMenu();
 	}
 
 	openMenu=()=>
 	{
 		// var menuStyle:React.CSSProperties= {};
-		// if(this.props.upward)
+		// if (this.props.upward)
 		// {
 		// 	var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 		// 	var menuStyle = {
@@ -147,12 +149,12 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		document.addEventListener("mousedown", this.onDocumentMouseDown);
 		document.addEventListener("keydown", this.onDocumentKeyDown);
 		document.addEventListener("keyup", this.onDocumentKeyUp);
-		if(this.props.onOpen) this.props.onOpen();
+		if (this.props.onOpen) this.props.onOpen();
 	}
 
 	toggleMenu=()=>
 	{
-		if(this.menu)
+		if (this.menu)
 			this.closeMenu();
 		else
 			this.openMenu();
@@ -160,15 +162,12 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 
 	getMenuRef=(ele:any)=>
 	{
-		if(InteractiveTour.enable)
-		{
-			let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
-			let func:any = InteractiveTour.getComponentRefCallback(menuID);
-			func(ele);
-		}
+		let menuID:string = typeof this.props.children == "string" ? this.props.children as string  + " menu": "menu";
+		InteractiveTour.callComponentRefCallback(menuID, ele);
 	};
 
-	render() {
+	render()
+	{
 		return (
 			<button
 				{...this.props as any}

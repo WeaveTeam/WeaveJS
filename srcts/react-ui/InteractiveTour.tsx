@@ -119,6 +119,13 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		});
 	};
 
+	static callComponentRefCallback(stepName:string, classInstance:any):void
+	{
+		var func = InteractiveTour.getComponentRefCallback(stepName);
+		if (func)
+			func(classInstance);
+	}
+	
 	static getComponentRefCallback=(stepName:string): (classInstance:any)=>void =>
 	{
 		return InteractiveTour.stepComponentRefCallbackMap && InteractiveTour.stepComponentRefCallbackMap.get(stepName);
@@ -153,6 +160,8 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	// move to nextstep
 	static targetComponentOnClick=(stepName:string)=>
 	{
+		if (!InteractiveTour.enable)
+			return;
 
 		if(InteractiveTour.steps && InteractiveTour.steps.length > 0 && InteractiveTour.steps.indexOf(stepName) != -1 )
 		{

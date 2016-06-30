@@ -12,7 +12,6 @@ import {forceUpdateWatcher} from "../utils/WeaveReactUtils";
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 
-
 export interface WeaveToolEditorProps extends React.HTMLProps<WeaveToolEditor>
 {
 	tool:IVisTool;
@@ -23,7 +22,6 @@ export interface WeaveToolEditorState
 {
 	activeCrumb:string
 }
-
 
 export default class WeaveToolEditor extends React.Component<WeaveToolEditorProps, WeaveToolEditorState>
 {
@@ -51,7 +49,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	//todo : find a better way to get linked children
 	pushCrumb=(title:string,renderFn:()=>JSX.Element , stateObject:any = null):void=>
 	{
-		if(stateObject)
+		if (stateObject)
 		{
 			this.mapping_crumb_children_state[title] = stateObject;
 			return;
@@ -63,8 +61,6 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		});
 		this.crumbOrder.push(title);
 	};
-
-
 
 	reset=()=>
 	{
@@ -134,11 +130,11 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 	// Has to be handled here as this.refs[this.state.activeCrumb] will be availble only at this stage of the React Component cycle
 	componentDidUpdate()
 	{
-		if(this.isCrumbClicked && this.activeEditor) // if component go mounted due to crumb click
+		if (this.isCrumbClicked && this.activeEditor) // if component go mounted due to crumb click
 		{
 			this.isCrumbClicked = false;
 			let stateObj:any = this.mapping_crumb_children_state[this.state.activeCrumb] ; // get the state object which was stored , while editor component was unmounted
-			if(stateObj)
+			if (stateObj)
 				(this.activeEditor as any).setState(stateObj);
 		}
 	}
@@ -151,18 +147,16 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 	closeEditor=(event:React.MouseEvent)=>
 	{
-		this.props.onCloseHandler && this.props.onCloseHandler(this);
-		if(InteractiveTour.enable)
-		{
-			InteractiveTour.targetComponentOnClick("Tool editor");
-		}
+		if (this.props.onCloseHandler)
+			this.props.onCloseHandler(this);
+		InteractiveTour.targetComponentOnClick("Tool editor");
 	};
 
 	private activeEditor:Element;
 
 	render()
 	{
-		if(!this.tool)
+		if (!this.tool)
 		{
 			this.reset();
 			// since forceUpdate is attached with toolWatcher, when tool gets disposed though weaveToolEditor is not rendered from weaveAPP
@@ -182,14 +176,14 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		// cloned to add ref function to get the reference of active editor
 		// which help in setting the state back when it was mounted
 		let editorUI = React.cloneElement(originalEditorUI,{
-			ref: (e:Element) =>{
-					if(typeof originalEditorUI.ref == 'function') // this ensures any ref attached in original Element still works
-					{
-						let refFunction:Function = originalEditorUI.ref as Function;
-						refFunction(e);
-					}
-					this.activeEditor = e;
+			ref: (e:Element) => {
+				if (typeof originalEditorUI.ref == 'function') // this ensures any ref attached in original Element still works
+				{
+					let refFunction:Function = originalEditorUI.ref as Function;
+					refFunction(e);
 				}
+				this.activeEditor = e;
+			}
 		});
 
 		var crumbUI:JSX.Element = (
@@ -243,7 +237,6 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 			</div>
 		);
 
-
 		let backButtonUI:JSX.Element = null;
 		if (this.crumbOrder.length > 1)
 		{
@@ -257,7 +250,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 		return (
 			<VBox className={ classNames(this.props.className) }
 			      style={ this.props.style }
-			      ref={InteractiveTour.enable ? InteractiveTour.getComponentRefCallback("Tool editor") : null}
+			      ref={InteractiveTour.getComponentRefCallback("Tool editor")}
 			      onMouseEnter={() => this.forceUpdate()}>
 				<HBox className="weave-ToolEditor-Header">
 					{backButtonUI}
