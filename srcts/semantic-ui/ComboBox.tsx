@@ -27,6 +27,7 @@ export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 	fluid?:boolean;
 	header?:React.ReactChild
 	optionStyle?:React.CSSProperties;
+	noneOption?:ComboBoxOption;
 }
 
 export interface ComboBoxState
@@ -40,7 +41,8 @@ export interface ComboBoxState
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
 {
 	static defaultProps:ComboBoxProps = {
-		fluid:true
+		fluid:true,
+		noneOption:null
 	};
 	
 	constructor(props:ComboBoxProps)
@@ -102,6 +104,15 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				options = _.uniq(_.union(options, [props.value]), "value");
 			}
 		}
+
+		if(props.noneOption)
+		{
+			options.push({
+				label:props.noneOption.label,
+				value:(props.noneOption.value !== undefined)? props.noneOption.value : null
+			})
+		}
+
 		return {
 			value: value,
 			options: options
@@ -112,11 +123,19 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	// as this.state.value are updated programatically (for ex:LinkReactStateref)
 	private getOptionFromValue(value:any):ComboBoxOption
 	{
-		let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
-		let index:number =  this.state.options && this.state.options.findIndex((option) => {
-			return equalityFunc(option.value, value);
-		});
-		return this.state.options[index];
+		if(value !== (this.props.noneOption && this.props.noneOption.value))
+		{
+			let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
+			let index:number =  this.state.options && this.state.options.findIndex((option:ComboBoxOption) => {
+					return equalityFunc(option.value, value);
+				});
+			return this.state.options[index];
+		}
+		else
+		{
+			return this.props.noneOption;
+		}
+
 	}
 
 	// toggles menu open /close
@@ -141,30 +160,32 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		else
 		{
 			let value:any | any[] = this.state.options[index].value;
+			let openState:boolean = false;
 
 			if (this.props.type == "multiple" )
 			{
 
 				this.props.onAdded && this.props.onAdded(value);
-				// push to state value array
-				(this.state.value as any[]).push(value);
-				// put the reference of this.state.value to local value object
-				// to call props.onChange
-				value = (this.state.value as any[]);
 
-				this.setState({
-					value:value,
-					openMenu:true
-				});
+				if(value !== (this.props.noneOption && this.props.noneOption.value))
+				{
+					// push to state value array
+					(this.state.value as any[]).push(value);
+					// put the reference of this.state.value to local value object
+					// to call props.onChange
+					value = (this.state.value as any[]);
+					openState = true;
+				}
+				else
+				{
+					openState = false
+				}
+			}
 
-			}
-			else
-			{
-				this.setState({
-					value:value,
-					openMenu:false
-				});
-			}
+			this.setState({
+				value:value,
+				openMenu:openState
+			});
 
 			this.props.onChange && this.props.onChange(value);
 		}
@@ -256,11 +277,34 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		return <input {...inputProps}/>
 	};
 
+	// todo: What if value is JSON Object
+	isNoneOption=():boolean => {
+
+		if(!this.props.noneOption)
+		{
+			return false;
+		}
+
+		// !== is used as null == undefined will return true where as null === undefined will return false
+		if(this.state.value ===  this.props.noneOption.value)
+		{
+			return true;
+		}
+		else
+		{
+			//checking array length is important as [] === [] will return false
+			if(Array.isArray(this.state.value))
+			{
+				let arrayFlag:boolean = (this.state.value.length > 0 === (Array.isArray(this.props.noneOption.value) && this.props.noneOption.value.length > 0));
+				return arrayFlag;
+			}
+			return false;
+		}
+
+	};
 
 	render()
 	{
-
-
 		let headerUI:JSX.Element = null;
 		if(this.props.header)
 		{
@@ -269,11 +313,25 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 		let textUIs:JSX.Element[] | JSX.Element = null;
 		let selectedOptions:ComboBoxOption | ComboBoxOption[] = null;
-		if(this.state.value)
+
+
+		if(this.isNoneOption())
 		{
-			if(Array.isArray(this.state.value))
+			if(this.props.noneOption)
+			{
+				textUIs = <div className="text">{Weave.lang(this.props.noneOption.label)}</div>;
+			}
+			else
+			{
+				textUIs = <div className="default text">{this.props.placeholder}</div>;
+			}
+		}
+		else
+		{
+			if(this.props.type == "multiple")
 			{
 				selectedOptions =  [] ;
+
 				textUIs =(this.state.value as any[]).map( (value:any, index:number) => {
 					let option:ComboBoxOption = this.getOptionFromValue(value);
 					if(option)
@@ -283,9 +341,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					let valueText:string = option && option.label? option.label : (typeof value == "string") ? value : "";
 					return <a key={index}
 					          className="ui label">
-								{Weave.lang(valueText)}
-								<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
-							</a>;
+						{Weave.lang(valueText)}
+						<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
+					</a>;
 				});
 			}
 			else
@@ -297,10 +355,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
 				textUIs = <div className="text">{Weave.lang(valueText)}</div>;
 			}
-		}
-		else
-		{
-			textUIs = <div className="default text">{this.props.placeholder}</div>;
 		}
 
 		let menuUI:JSX.Element = null;
