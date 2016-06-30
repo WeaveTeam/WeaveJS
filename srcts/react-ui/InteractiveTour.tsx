@@ -4,7 +4,6 @@ import * as _ from "lodash";
 
 import LinkableString = weavejs.core.LinkableString;
 
-
 export interface InteractiveTourProps extends React.HTMLProps<InteractiveTour>
 {
 	enableToolTip?:boolean,//todo
@@ -18,7 +17,6 @@ export interface InteractiveTourState
 	tooltipHeight?:number // used this at componentDidUpdate to re-render again to center the toolTip
 	tooltipWidth?:number // used this at componentDidUpdate to re-render again to center the toolTip
 }
-
 
 export default class InteractiveTour extends React.Component<InteractiveTourProps,InteractiveTourState>
 {
@@ -35,8 +33,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	static stepComponentRefCallbackMap:Map<string,(classInstance:any)=>void > = null;
 	static stepPointerRefCallbackMap:Map<string,(classInstance:any)=>void > = null;
 
-
-	static startTour=(steps:string[],stepContents:string[],stepPointers:string[])=>
+	static startTour(steps:string[],stepContents:string[],stepPointers:string[])
 	{
 		InteractiveTour.enable = true;
 		// objects are created, when tour is initiated
@@ -51,59 +48,56 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		// closure function preferred over static function , keeping memory in mind
 		function registerMountedComponentToStepName(stepName:string,mountedElement:any)
 		{
-			if(!mountedElement)
+			if (!mountedElement)
 			{
 				// we don't want to store the pointer to the old component
-				if(InteractiveTour.stepComponentMap)
+				if (InteractiveTour.stepComponentMap)
 					InteractiveTour.stepComponentMap[stepName] = null;
 				return;
 			}
-				
 
-			if(InteractiveTour.steps && InteractiveTour.steps.length > 0) // if part of guidance steps
+			if (InteractiveTour.steps && InteractiveTour.steps.length > 0) // if part of guidance steps
 			{
 				let stepIndex:number = InteractiveTour.steps.indexOf(stepName);
-				if(stepIndex > -1)
+				if (stepIndex > -1)
 				{
 					InteractiveTour.stepComponentMap[stepName] = mountedElement;
-					if(stepIndex == 0) // if mounted component is part of first step
+					if (stepIndex == 0) // if mounted component is part of first step
 					{
 						InteractiveTour.stepName.value = stepName; // se the state, which will call the callback registered in Guidance Container instance
 					}
-					if(InteractiveTour.steps[stepIndex] == InteractiveTour.stepPointers[stepIndex])
+					if (InteractiveTour.steps[stepIndex] == InteractiveTour.stepPointers[stepIndex])
 					{
 						InteractiveTour.pointerComponentMap[stepName] = mountedElement;
 					}
 					// sometimes after click event for next step is triggered, but component might not got mounted yet
-					if(InteractiveTour.unMountedStepName && InteractiveTour.unMountedStepName == stepName)
+					if (InteractiveTour.unMountedStepName && InteractiveTour.unMountedStepName == stepName)
 					{
 						InteractiveTour.unMountedStepName = null; // set to null as its mounted
 						InteractiveTour.stepName.value = stepName;
 					}
 				}
 			}
-
 		}
 
 		// closure function preferred over static function , keeping memory in mind
 		function registerPointerComponentToStepName(stepName:string ,mountedElement:any)
 		{
-			if(!mountedElement)
+			if (!mountedElement)
 			{
 				// we don't want to store the pointer to the old component
-				if(InteractiveTour.pointerComponentMap)
+				if (InteractiveTour.pointerComponentMap)
 					InteractiveTour.pointerComponentMap[stepName] = null;
 				return;
 			}
 
-			if(InteractiveTour.stepPointers && InteractiveTour.stepPointers.length > 0) // if part of guidance steps
+			if (InteractiveTour.stepPointers && InteractiveTour.stepPointers.length > 0) // if part of guidance steps
 			{
-				if(InteractiveTour.stepPointers.indexOf(stepName) > -1)
+				if (InteractiveTour.stepPointers.indexOf(stepName) > -1)
 				{
 					InteractiveTour.pointerComponentMap[stepName] = mountedElement;
 				}
 			}
-
 		}
 
 		// for each stepName ref callback function attached bounded with step name.
@@ -114,11 +108,11 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		});
 
 		stepPointers.map(function(stepName:string,index:number){
-			if(stepName)
+			if (stepName)
 				InteractiveTour.stepPointerRefCallbackMap.set(stepName,registerPointerComponentToStepName.bind(null,stepName))
 		});
-	};
-
+	}
+	
 	static callComponentRefCallback(stepName:string, classInstance:any):void
 	{
 		var func = InteractiveTour.getComponentRefCallback(stepName);
@@ -126,21 +120,22 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			func(classInstance);
 	}
 	
-	static getComponentRefCallback=(stepName:string): (classInstance:any)=>void =>
+	static getComponentRefCallback(stepName:string): (classInstance:any)=>void
 	{
 		return InteractiveTour.stepComponentRefCallbackMap && InteractiveTour.stepComponentRefCallbackMap.get(stepName);
-	};
+	}
 
-	static getPointerRefCallback=(stepName:string): (classInstance:any)=>void =>
+	static getPointerRefCallback(stepName:string): (classInstance:any)=>void
 	{
 		return InteractiveTour.stepPointerRefCallbackMap && InteractiveTour.stepPointerRefCallbackMap.get(stepName);
-	};
+	}
 
-	static isLastStep=(index:number)=>{
+	static isLastStep(index:number)
+	{
 		return InteractiveTour.steps && InteractiveTour.steps.length == index + 1;
-	};
+	}
 
-	static reset=()=>
+	static reset()
 	{
 		InteractiveTour.enable = false;
 		InteractiveTour.steps = null;
@@ -153,23 +148,21 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		InteractiveTour.stepPointerRefCallbackMap = null;
 	};
 
-	
-
 	// static method passed to target Component's Reference callback
 	// this tell on interactive guidance that user clicked the component that belongs to this step
 	// move to nextstep
-	static targetComponentOnClick=(stepName:string)=>
+	static targetComponentOnClick(stepName:string)
 	{
 		if (!InteractiveTour.enable)
 			return;
 
-		if(InteractiveTour.steps && InteractiveTour.steps.length > 0 && InteractiveTour.steps.indexOf(stepName) != -1 )
+		if (InteractiveTour.steps && InteractiveTour.steps.length > 0 && InteractiveTour.steps.indexOf(stepName) != -1 )
 		{
 			let currentStepIndex:number = InteractiveTour.steps.indexOf(stepName); // get index of currentStep
 			let nextStepName:string = InteractiveTour.steps[currentStepIndex + 1]; // increment to find the next step
-			if(nextStepName)
+			if (nextStepName)
 			{
-				if(InteractiveTour.stepComponentMap[nextStepName]) // check whether nextStep component is mounted
+				if (InteractiveTour.stepComponentMap[nextStepName]) // check whether nextStep component is mounted
 				{
 					InteractiveTour.stepName.value = nextStepName; // setting the state will trigger callback in InteractiveTour instance
 				}
@@ -178,12 +171,10 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 					// store the step name which has unmounted component and set the session value after component is mounted
 					InteractiveTour.unMountedStepName = nextStepName;
 				}
-
 			}
 			else
 				InteractiveTour.stepName.value = ""
 		}
-
 	};
 
 	constructor(props:InteractiveTourProps)
@@ -203,20 +194,18 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	// to draw highlighter and overlay
 	private targetMountedNode:any = null;
 	private pointerMountedNode:any = null;
-	
 
 	updateNextComponentName=()=>
 	{
 		let nextStepName:string = InteractiveTour.stepName.value;
 
-		
-		if(nextStepName == "") // empty string tell last step is reached , so disable the tour
+		if (nextStepName == "") // empty string tell last step is reached , so disable the tour
 		{
 			this.setState({
 				visible:false
 			});
 			InteractiveTour.reset();
-			if(this.props.onClose)
+			if (this.props.onClose)
 			{
 				this.props.onClose();
 			}
@@ -227,10 +216,10 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			let nextPointerName:string = InteractiveTour.stepPointers[stepIndex];
 			
 			let mountedElement = InteractiveTour.stepComponentMap[nextStepName];
-			if(mountedElement)
+			if (mountedElement)
 			{
 				this.targetMountedNode =  ReactDOM.findDOMNode(mountedElement as any);
-				if(InteractiveTour.stepComponentMap[nextStepName] === InteractiveTour.pointerComponentMap[nextPointerName])
+				if (InteractiveTour.stepComponentMap[nextStepName] === InteractiveTour.pointerComponentMap[nextPointerName])
 				{
 					this.pointerMountedNode = this.targetMountedNode;
 				}
@@ -248,7 +237,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		}
 	};
 
-
 	closeHandler=()=>
 	{
 		this.setState({
@@ -257,19 +245,17 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 		InteractiveTour.reset();
 
-		if(this.props.onClose)
+		if (this.props.onClose)
 		{
 			this.props.onClose();
 		}
 	};
 
-
-
 	render()
 	{
-		if(!this.state.activeStepName || !this.state.visible)
+		if (!this.state.activeStepName || !this.state.visible)
 		{
-			return <div style={ {position:"fixed"} }/>
+			return <div style={ {position:"fixed"} }/>;
 		}
 
 		// todo : try react animation for tooltip mount and unmount when step change
@@ -302,17 +288,13 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			width: "100%"
 		};
 
-
-
 		let mountedElementRect:ClientRect = this.targetMountedNode.getBoundingClientRect();
-
 
 		// duplicate component position to highlighter , and since pointer events is set to none, it will look like component is visible
 		highlighterStyle.left = mountedElementRect.left;
 		highlighterStyle.top = mountedElementRect.top;
 		highlighterStyle.width = mountedElementRect.width;
 		highlighterStyle.height = mountedElementRect.height;
-
 
 		// to overlay other regions in the screen, except the component
 		// we need to split the overlay to four components (top, bottom, right, left) to avoid overlapping on respective target
@@ -364,96 +346,93 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		toolTipPosition = maxSpace >= topSpace ? toolTipPosition : InteractiveTourToolTip.TOP;
 		maxSpace = maxSpace >= topSpace ? maxSpace : topSpace;
 
-
 		let bottomSpace:number =  window.innerHeight - mountedElementRect.bottom;
 		toolTipPosition = maxSpace >= bottomSpace ? toolTipPosition : InteractiveTourToolTip.BOTTOM;
 		maxSpace = maxSpace >= bottomSpace ? maxSpace : bottomSpace;
 
-
 		let pxToShift:number = 0;
 		let toolTipPositionStyle:React.CSSProperties = { position:"absolute"};
 
-		if(toolTipPosition == InteractiveTourToolTip.LEFT)
+		if (toolTipPosition == InteractiveTourToolTip.LEFT)
 		{
 			toolTipPositionStyle.left = mountedElementRect.left;
 			toolTipPositionStyle.top = mountedElementRect.top + mountedElementRect.height / 2 ;
-			if(this.state.tooltipHeight)
+			if (this.state.tooltipHeight)
 			{
 
 				toolTipPositionStyle.top = toolTipPositionStyle.top - (this.state.tooltipHeight / 2);
-				if(toolTipPositionStyle.top < 0)
+				if (toolTipPositionStyle.top < 0)
 				{
 					toolTipPosition = InteractiveTourToolTip.LEFT_TOP;
 					pxToShift =   this.state.tooltipHeight/2 - (mountedElementRect.height / 2);
 				}
-				else if(toolTipPositionStyle.top + this.state.tooltipHeight > window.innerHeight)
+				else if (toolTipPositionStyle.top + this.state.tooltipHeight > window.innerHeight)
 				{
 					toolTipPosition = InteractiveTourToolTip.LEFT_BOTTOM;
 					pxToShift = - this.state.tooltipHeight/2 + (mountedElementRect.height / 2);
 				}
 
 			}
-			if(this.state.tooltipWidth)
+			if (this.state.tooltipWidth)
 			{
 				toolTipPositionStyle.left = toolTipPositionStyle.left - this.state.tooltipWidth;
 			}
 		}
-		else if(toolTipPosition == InteractiveTourToolTip.RIGHT)
+		else if (toolTipPosition == InteractiveTourToolTip.RIGHT)
 		{
 			toolTipPositionStyle.left = mountedElementRect.right;
 			toolTipPositionStyle.top = mountedElementRect.top + mountedElementRect.height / 2;
-			if(this.state.tooltipHeight)
+			if (this.state.tooltipHeight)
 			{
 				toolTipPositionStyle.top = toolTipPositionStyle.top - (this.state.tooltipHeight / 2);
-				if(toolTipPositionStyle.top < 0)
+				if (toolTipPositionStyle.top < 0)
 				{
 					toolTipPosition = InteractiveTourToolTip.RIGHT_TOP;
 					pxToShift =   this.state.tooltipHeight/2 - (mountedElementRect.height / 2);
 				}
-				else if(toolTipPositionStyle.top + this.state.tooltipHeight > window.innerHeight)
+				else if (toolTipPositionStyle.top + this.state.tooltipHeight > window.innerHeight)
 				{
 					toolTipPosition = InteractiveTourToolTip.RIGHT_BOTTOM;
 					pxToShift = - this.state.tooltipHeight/2 + (mountedElementRect.height / 2);
 				}
-
 			}
 		}
-		else if(toolTipPosition == InteractiveTourToolTip.TOP)
+		else if (toolTipPosition == InteractiveTourToolTip.TOP)
 		{
 			toolTipPositionStyle.left = mountedElementRect.left + mountedElementRect.width / 2;
 			toolTipPositionStyle.top = mountedElementRect.top ;
-			if(this.state.tooltipWidth)
+			if (this.state.tooltipWidth)
 			{
 				toolTipPositionStyle.left = toolTipPositionStyle.left - (this.state.tooltipWidth / 2);
-				if(toolTipPositionStyle.left < 0)
+				if (toolTipPositionStyle.left < 0)
 				{
 					toolTipPosition = InteractiveTourToolTip.TOP_LEFT;
 					pxToShift =   this.state.tooltipWidth/2 - (mountedElementRect.width / 2);
 				}
-				else if(toolTipPositionStyle.left + this.state.tooltipWidth > window.innerWidth)
+				else if (toolTipPositionStyle.left + this.state.tooltipWidth > window.innerWidth)
 				{
 					toolTipPosition = InteractiveTourToolTip.TOP_RIGHT;
 					pxToShift = - this.state.tooltipWidth/2 + (mountedElementRect.width / 2);
 				}
 			}
-			if(this.state.tooltipHeight)
+			if (this.state.tooltipHeight)
 			{
 				toolTipPositionStyle.top = toolTipPositionStyle.top - this.state.tooltipHeight;
 			}
 		}
-		else if(toolTipPosition == InteractiveTourToolTip.BOTTOM)
+		else if (toolTipPosition == InteractiveTourToolTip.BOTTOM)
 		{
 			toolTipPositionStyle.left = mountedElementRect.left + mountedElementRect.width / 2;
 			toolTipPositionStyle.top = mountedElementRect.bottom;
-			if(this.state.tooltipWidth)
+			if (this.state.tooltipWidth)
 			{
 				toolTipPositionStyle.left = toolTipPositionStyle.left - (this.state.tooltipWidth / 2);
-				if(toolTipPositionStyle.left < 0)
+				if (toolTipPositionStyle.left < 0)
 				{
 					toolTipPosition = InteractiveTourToolTip.TOP_LEFT;
 					pxToShift =   this.state.tooltipWidth/2 - (mountedElementRect.width / 2);
 				}
-				else if(toolTipPositionStyle.left + this.state.tooltipWidth > window.innerWidth)
+				else if (toolTipPositionStyle.left + this.state.tooltipWidth > window.innerWidth)
 				{
 					toolTipPosition = InteractiveTourToolTip.TOP_RIGHT;
 					pxToShift = - this.state.tooltipWidth/2 + (mountedElementRect.width / 2);
@@ -463,9 +442,9 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 		let type:string = null;
 
-		if(InteractiveTour.steps.indexOf(this.state.activeStepName) == 0)
+		if (InteractiveTour.steps.indexOf(this.state.activeStepName) == 0)
 			type = InteractiveTourToolTip.START;
-		else if(InteractiveTour.steps.indexOf(this.state.activeStepName) == InteractiveTour.steps.length -1)
+		else if (InteractiveTour.steps.indexOf(this.state.activeStepName) == InteractiveTour.steps.length -1)
 			type = InteractiveTourToolTip.DONE;
 		else
 			type = InteractiveTourToolTip.NEXT;
@@ -476,7 +455,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 		let pointerUI:JSX.Element = null;
 		
-		if(this.pointerMountedNode)
+		if (this.pointerMountedNode)
 		{
 			let pointerElementRect:ClientRect = this.targetMountedNode == this.pointerMountedNode ? mountedElementRect : this.pointerMountedNode.getBoundingClientRect();
 			let pointerStyle:React.CSSProperties = {
@@ -489,50 +468,49 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 			pointerStyle.left = pointerElementRect.left + pointerElementRect.width / 2 - 16;
 			pointerStyle.top = pointerElementRect.top + pointerElementRect.height / 2 -16;
-			pointerUI = <div style={ pointerStyle }>
-							<div style={ pointerStyleInner } className="weave-guidance-pointer-inner"/>
-							<div style={ pointerStyleOuter } className="weave-guidance-pointer-outer"/>
-						</div>;
+			pointerUI = (
+				<div style={ pointerStyle }>
+					<div style={ pointerStyleInner } className="weave-guidance-pointer-inner"/>
+					<div style={ pointerStyleOuter } className="weave-guidance-pointer-outer"/>
+				</div>
+			);
 		}
 
-
-		return  <div>
-					<div style={ leftOverlayStyle }/>
-					<div style={ rightOverlayStyle }/>
-					<div style={ topOverlayStyle }/>
-					<div style={ bottomOverlayStyle }/>
-					<div style={ highlighterStyle }/>
-					{pointerUI}
-					<InteractiveTourToolTip ref="toolTip"
-					                        style={toolTipPositionStyle}
-					                        location={toolTipPosition}
-					                        onNextClick={!interactionState ? InteractiveTour.targetComponentOnClick : null}
-					                        onDoneClick={InteractiveTour.isLastStep(currentStepIndex) ? this.closeHandler : null}
-					                        enableFooter={!interactionState}
-					                        type={type}
-					                        stepIndex={currentStepIndex}
-					                        shift={pxToShift}
-					                        title={this.state.activeStepName}
-					                        onClose={this.closeHandler}>
-						{contents}
-					</InteractiveTourToolTip>
-				</div>
-
-
-
-
+		return (
+			<div>
+				<div style={ leftOverlayStyle }/>
+				<div style={ rightOverlayStyle }/>
+				<div style={ topOverlayStyle }/>
+				<div style={ bottomOverlayStyle }/>
+				<div style={ highlighterStyle }/>
+				{pointerUI}
+				<InteractiveTourToolTip ref="toolTip"
+				                        style={toolTipPositionStyle}
+				                        location={toolTipPosition}
+				                        onNextClick={!interactionState ? InteractiveTour.targetComponentOnClick : null}
+				                        onDoneClick={InteractiveTour.isLastStep(currentStepIndex) ? this.closeHandler : null}
+				                        enableFooter={!interactionState}
+				                        type={type}
+				                        stepIndex={currentStepIndex}
+				                        shift={pxToShift}
+				                        title={this.state.activeStepName}
+				                        onClose={this.closeHandler}>
+					{contents}
+				</InteractiveTourToolTip>
+			</div>
+		);
 	}
 
 	componentDidUpdate()
 	{
 		let mountedToolTip = this.refs["toolTip"];
-		if(mountedToolTip)
+		if (mountedToolTip)
 		{
 			let toolTipDOMNode = ReactDOM.findDOMNode(mountedToolTip as any);
 			let toolTipRect:ClientRect = toolTipDOMNode.getBoundingClientRect();
 
 			// if condition is important else infinte loop will happen calling render and componentDidUpdate again and again
-			if(this.state.tooltipHeight != toolTipRect.height || this.state.tooltipWidth != toolTipRect.width)
+			if (this.state.tooltipHeight != toolTipRect.height || this.state.tooltipWidth != toolTipRect.width)
 			{
 				this.setState({// re-render again to center tooltip
 					tooltipHeight:toolTipRect.height,
@@ -540,16 +518,10 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 				});
 			}
 		}
-
-
-
 	}
-
-
-
 }
 
- interface InteractiveTourToolTipProps extends React.HTMLProps<InteractiveTourToolTip>
+interface InteractiveTourToolTipProps extends React.HTMLProps<InteractiveTourToolTip>
 {
 	location:string;
 	type: string;
@@ -562,12 +534,11 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	stepIndex?:number;
 }
 
- interface InteractiveTourToolTipState
+interface InteractiveTourToolTipState
 {
-
 }
 
- class InteractiveTourToolTip extends React.Component<InteractiveTourToolTipProps,InteractiveTourToolTipState>
+class InteractiveTourToolTip extends React.Component<InteractiveTourToolTipProps,InteractiveTourToolTipState>
 {
 	static START:string = "Start";
 	static NEXT:string = "Next";
@@ -580,7 +551,6 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 	static TOP:string = "top";
 	static TOP_LEFT:string = "top left";
 	static TOP_RIGHT:string = "top right";
-
 
 	static LEFT:string = "left";
 	static LEFT_TOP:string = "left top";
@@ -598,17 +568,15 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		}
 	}
 
-
 	closeHandler=()=>
 	{
 		this.props.onClose && this.props.onClose()
 	};
 
-	 nextHandler=()=>
-	 {
-		 this.props.onNextClick && this.props.onNextClick(this.props.title);
-	 };
-
+	nextHandler=()=>
+	{
+		this.props.onNextClick && this.props.onNextClick(this.props.title);
+	};
 
 	render() {
 
@@ -627,7 +595,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			//position:""
 		};
 
-		if(this.props.location == InteractiveTourToolTip.BOTTOM ||  this.props.location == InteractiveTourToolTip.BOTTOM_LEFT || this.props.location == InteractiveTourToolTip.BOTTOM_RIGHT)
+		if (this.props.location == InteractiveTourToolTip.BOTTOM ||  this.props.location == InteractiveTourToolTip.BOTTOM_LEFT || this.props.location == InteractiveTourToolTip.BOTTOM_RIGHT)
 		{
 			styleObject.flexDirection = "column";
 
@@ -635,13 +603,13 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 
-			if(this.props.location != InteractiveTourToolTip.BOTTOM)
+			if (this.props.location != InteractiveTourToolTip.BOTTOM)
 			{
 				containerStyle.position = "relative";
 				containerStyle.left = this.props.shift;
 			}
 		}
-		else if(this.props.location == InteractiveTourToolTip.TOP ||  this.props.location == InteractiveTourToolTip.TOP_LEFT || this.props.location == InteractiveTourToolTip.TOP_RIGHT)
+		else if (this.props.location == InteractiveTourToolTip.TOP ||  this.props.location == InteractiveTourToolTip.TOP_LEFT || this.props.location == InteractiveTourToolTip.TOP_RIGHT)
 		{
 			styleObject.flexDirection = "column-reverse";
 
@@ -649,13 +617,13 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 
-			if(this.props.location != InteractiveTourToolTip.TOP)
+			if (this.props.location != InteractiveTourToolTip.TOP)
 			{
 				containerStyle.position = "relative";
 				containerStyle.left = this.props.shift;
 			}
 		}
-		else if(this.props.location == InteractiveTourToolTip.RIGHT || this.props.location == InteractiveTourToolTip.RIGHT_BOTTOM || this.props.location == InteractiveTourToolTip.RIGHT_TOP)
+		else if (this.props.location == InteractiveTourToolTip.RIGHT || this.props.location == InteractiveTourToolTip.RIGHT_BOTTOM || this.props.location == InteractiveTourToolTip.RIGHT_TOP)
 		{
 			styleObject.flexDirection = "row";
 
@@ -663,13 +631,13 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			arrowStyle["borderBottomColor"] = "transparent";
 			arrowStyle.borderLeftColor = "transparent";
 
-			if(this.props.location != InteractiveTourToolTip.RIGHT)
+			if (this.props.location != InteractiveTourToolTip.RIGHT)
 			{
 				containerStyle.position = "relative";
 				containerStyle.top = this.props.shift;
 			}
 		}
-		else if(this.props.location == InteractiveTourToolTip.LEFT || this.props.location == InteractiveTourToolTip.LEFT_BOTTOM || this.props.location == InteractiveTourToolTip.LEFT_TOP)
+		else if (this.props.location == InteractiveTourToolTip.LEFT || this.props.location == InteractiveTourToolTip.LEFT_BOTTOM || this.props.location == InteractiveTourToolTip.LEFT_TOP)
 		{
 			styleObject.flexDirection = "row-reverse";
 
@@ -677,13 +645,12 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			arrowStyle["borderBottomColor"] = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 
-			if(this.props.location != InteractiveTourToolTip.LEFT)
+			if (this.props.location != InteractiveTourToolTip.LEFT)
 			{
 				containerStyle.position = "relative";
 				containerStyle.top =  this.props.shift;
 			}
 		}
-
 
 		let tooltipHeader:React.CSSProperties = {
 			display:"flex",
@@ -700,7 +667,7 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 		
 		let footerUI:JSX.Element = null;
 		let closeButtonUI:JSX.Element = null;
-		if(this.props.enableFooter)
+		if (this.props.enableFooter)
 		{
 			let tooltipFooter:React.CSSProperties = {
 				display:"flex",
@@ -712,15 +679,17 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 
 			let nextButtonUI:JSX.Element = this.props.onNextClick ? <div style={buttonStyle} onClick={this.nextHandler}>Next</div> : null;
 			let doneButtonUI:JSX.Element = this.props.onDoneClick ? <div style={buttonStyle} onClick={this.closeHandler}>Done</div>: null;
-			if(this.props.onDoneClick){
+			if (this.props.onDoneClick){
 				nextButtonUI = null;//ensures when done is set , next wont we available
 			}
-			footerUI =  <div style={tooltipFooter}>
-							{nextButtonUI}
-							{doneButtonUI}
-						</div>;
+			footerUI = (
+				<div style={tooltipFooter}>
+					{nextButtonUI}
+					{doneButtonUI}
+				</div>
+			);
 		}
-		if(!this.props.onDoneClick)
+		if (!this.props.onDoneClick)
 		{
 			closeButtonUI = <div style={buttonStyle} onClick={this.closeHandler}>&#x2715;</div>;
 		}
@@ -729,22 +698,24 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 			padding:"8px"
 		};
 
-		return (<div style={ styleObject }>
-					<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
-					<div style={containerStyle} className="weave-guidance-toolTip">
-						<div style={tooltipHeader}>
-							<div>
-								<span style={{color:"#FFBE00"}}>Step ({this.props.stepIndex + 1} of {InteractiveTour.steps.length}) : </span>
-								{this.props.title}
-							</div>
-							{closeButtonUI}
+		return (
+			<div style={ styleObject }>
+				<div style={arrowStyle} className="weave-guidance-toolTip-arrow"/>
+				<div style={containerStyle} className="weave-guidance-toolTip">
+					<div style={tooltipHeader}>
+						<div>
+							<span style={{color:"#FFBE00"}}>Step ({this.props.stepIndex + 1} of {InteractiveTour.steps.length}) : </span>
+							{this.props.title}
 						</div>
-						<div style={contentStyle}>
-							{this.props.children}
-						</div>
-						{footerUI}
+						{closeButtonUI}
 					</div>
-				</div>);
+					<div style={contentStyle}>
+						{this.props.children}
+					</div>
+					{footerUI}
+				</div>
+			</div>
+		);
 	}
 }
 
