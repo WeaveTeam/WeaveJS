@@ -14,18 +14,19 @@ export interface DropdownProps extends React.HTMLProps<Dropdown>
 	menuGetter?:() => MenuItemProps[];
 	openOnMouseEnter?:boolean;
 	closeOnMouseLeave?:boolean;
+	activeClassName?:string;
 	onClose?:()=> void;
 	onOpen?:()=> void;
 }
 
 export interface DropdownState
 {
+	active?: boolean;
 }
 
 export default class Dropdown extends SmartComponent<DropdownProps, DropdownState> {
 
 	static defaultProps:DropdownProps = {
-		open: false,
 		openOnMouseEnter:false,
 		closeOnMouseLeave:false
 	};
@@ -36,8 +37,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		super(props);
 
 		this.state = {
-			toggleMenu:this.props.open === undefined ? false : this.props.open,
-			menuMounted:false
+			active: false
 		};
 
 	}
@@ -88,6 +88,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 	closeMenu=()=>
 	{
 		Popup.close(this.menu);
+		this.setState({active: false});
 		this.menu = null;
 		var document = ReactUtils.getDocument(this);
 		document.removeEventListener("mousedown", this.onDocumentMouseDown);
@@ -147,6 +148,7 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		document.addEventListener("mousedown", this.onDocumentMouseDown);
 		document.addEventListener("keydown", this.onDocumentKeyDown);
 		document.addEventListener("keyup", this.onDocumentKeyUp);
+		this.setState({active: true});
 		if(this.props.onOpen) this.props.onOpen();
 	}
 
@@ -172,7 +174,15 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 		return (
 			<button
 				{...this.props as any}
-				className={classNames("weave-transparent-button", "weave-dropdown", this.props.className)}
+				className={
+					classNames("weave-transparent-button",
+								"weave-dropdown",
+								this.props.className,
+								{
+									[this.props.activeClassName]: this.state.active
+								}
+					)
+				}
 				role="button"
 				onKeyUp={this.onKeyUp}
 				onMouseDown={this.onClick}
