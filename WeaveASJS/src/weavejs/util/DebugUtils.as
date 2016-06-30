@@ -295,10 +295,9 @@ package weavejs.util
 			return stateToModify;
 		}
 		
-		public static var MouseUtils:Object;
 		public static function shiftKey(reactInstance:Object):Boolean
 		{
-			return MouseUtils.forInstance(reactInstance).mouseEvent.shiftKey;
+			return Weave.getDefinition('MouseUtils').forInstance(reactInstance).mouseEvent.shiftKey;
 		}
 	}
 }

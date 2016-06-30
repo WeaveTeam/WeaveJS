@@ -29,7 +29,7 @@ import ToolTip from "./tools/ToolTip";
 import HSlider from "./react-ui/RCSlider/HSlider";
 import VSlider from "./react-ui/RCSlider/VSlider";
 import CheckBoxList from "./react-ui/CheckBoxList";
-import {HBox, VBox} from "./react-ui/FlexBox";
+import {HBox, VBox, Section, Label} from "./react-ui/FlexBox";
 import List from "./react-ui/List";
 import Menu from "./react-ui/Menu";
 import MenuBar from "./react-ui/MenuBar";
@@ -56,7 +56,6 @@ import * as ol from "openlayers";
 weavejs.util.StandardLib.lodash = lodash;
 weavejs.util.StandardLib.ol = ol;
 weavejs.util.DateUtils.moment = (moment as any)['default'];
-weavejs.util.DebugUtils.MouseUtils = MouseUtils;
 
 import * as jquery from "jquery";
 import Div from "./react-ui/Div";
@@ -67,6 +66,16 @@ import {AltTextConfig} from "./accessibility/IAltText";
 // global jQuery needed for semantic
 (window as any).jQuery = (jquery as any)["default"];
 (window as any).$ = (jquery as any)["default"];
+
+var cr = weavejs.WeaveAPI.ClassRegistry;
+cr.registerClass(HBox, 'weavejs.ui.HBox');
+cr.registerClass(VBox, 'weavejs.ui.VBox');
+cr.registerClass(Section, 'weavejs.ui.Section');
+cr.registerClass(Label, 'weavejs.ui.Label');
+cr.registerClass(MouseUtils, 'weavejs.util.MouseUtils');
+cr.registerClass(MiscUtils, 'weavejs.util.MiscUtils');
+cr.registerClass(ReactUtils, 'weavejs.util.ReactUtils');
+cr.registerClass(DOMUtils, 'weavejs.util.DOMUtils');
 
 export
 {
@@ -103,6 +112,8 @@ export
 	CheckBoxList,
 	HBox,
 	VBox,
+	Section,
+	Label,
 	List,
 	Menu,
 	MenuBar,
