@@ -1,5 +1,5 @@
-# Weave 2.0
-Web-based Analysis and Visualization Environment
+# WeaveJS
+Web-based Analysis and Visualization Environment for HTML5
 
 #License
 MPL-2.0
