@@ -12,6 +12,7 @@ import ControlPanel from "./ControlPanel";
 import DataMenu from "../menus/DataMenu";
 import CenteredIcon from "../react-ui/CenteredIcon";
 import Dropzone from "../modules/Dropzone";
+import LogComponent from "../react-ui/LogComponent";
 import IDataSource = weavejs.api.data.IDataSource;
 
 /* Import editors and their data sources */
@@ -169,7 +170,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 
 		let listOptions:ListOption[] = root.getObjects(IDataSource).map(dataSource => {
 			let icon = "fa fa-fw " + (dataSource.isLocal ? "fa-file-o" : "fa-globe");
-			let iconMessage = dataSource.isLocal ? "Does not use remote resources." : "Uses remote resources."
+			let iconMessage = dataSource.isLocal ? "Does not use remote resources." : "Uses remote resources.";
 			return {
 				label: (
 					<HBox padded style={{flex: 1, alignItems: "center"}}>
@@ -218,11 +219,11 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 		}
 		else
 		{
-			_.merge(editorStyle, {justifyContent: "center", alignItems: "center", width: '100%'});
+			_.merge(editorStyle, {justifyContent: "center", alignItems: "center", width: '100%', position:'relative', fontSize:'24px'});
 			editorJsx = (
 				<div style={{padding: '10px', display: "flex", flex: 1}}>
 					<Dropzone
-						style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1, fontSize: 24}}
+						style={{display: "flex", flexDirection: "column", alignItems: "center", flex: 1}}
 						className={"weave-dropzone-file"}
 						activeStyle={{border: "8px solid #CCC"}}
 						onDropAccepted={(files:File[]) => {
@@ -242,16 +243,21 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						disableClick={false}
 					>
 						<VBox className="weave-data-source-manager-editor" style={editorStyle}>
-
 							<span className="fa fa-files-o fa-th-large fa-5x"></span>
 
-							<VBox style={{ display: 'flex', fontSize: '14px', padding: '15', alignItems : 'center'}}>
+							<VBox style={{ display: 'flex', fontSize: '16px', padding: '15', alignItems : 'center'}}>
 								{"Drag and drop a data file to create a datasource"}
-								{this.state.rejected ?
-								<span>{Weave.lang("The specified file could not be imported. Only files with the following extensions are allowed: .csv, .tsv, .txt, .shp, .dbf, .geojson, .zip, .json")}</span>
-									:
-								null}
 							</VBox>
+
+							{this.state.rejected ?
+							<LogComponent style={{left:'10px', top:'10px',right:'10px',flex:1, position:'absolute', fontSize:'medium'}} header={ Weave.lang("File Import Error") }
+							              messages={ [Weave.lang("The specified file could not be imported. Only files with the following extensions are allowed: .csv, .tsv, .txt, .shp, .dbf, .geojson, .zip, .json")] }
+							              clearFunc={ (event)=> {
+							                this.setState({rejected:false});
+							                event.stopPropagation();/* without this when the close icon is clicked it causes the file explorer to open*/
+							              } }
+							/>
+								: null}
 
 						</VBox>
 					</Dropzone>

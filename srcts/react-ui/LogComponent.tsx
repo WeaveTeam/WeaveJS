@@ -3,7 +3,7 @@ import * as React from "react";
 export interface ILogComponentProps extends React.HTMLProps<LogComponent> {
 	messages?: string[];
 	uiClass?: string;
-	clearFunc: () => void;
+	clearFunc: (event:React.MouseEvent) => void;
 	header: React.ReactChild;
 }
 
