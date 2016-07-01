@@ -36,6 +36,7 @@ export interface ComboBoxState
 	options?: ComboBoxOption[]; // structured version(ComboBoxOption) for props.options
 	value?:any | any[]; // we need value as we are updating state from linkreactrefstate
 	direction?:string; //upward | downward
+	searchQuery?:string;
 }
 
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
@@ -52,6 +53,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let stateObj:ComboBoxState = this.getStateFromProps(props);
 		stateObj.openMenu = false;
 		stateObj.direction = "downward";
+		stateObj.searchQuery = "";
 		this.state = stateObj;
 	}
 
@@ -184,8 +186,25 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 			this.setState({
 				value:value,
-				openMenu:openState
+				openMenu:openState,
 			});
+
+			if(this.props.type == "search")
+			{
+				// search is done and user selected the option
+				// set search query back to empty
+				if(!openState)
+				{
+					this.setState({
+						searchQuery: ""
+					});
+
+					if(this.inputElement)
+					{
+						(this.inputElement as any).value = "";
+					}
+				}
+			}
 
 			this.props.onChange && this.props.onChange(value);
 		}
@@ -251,6 +270,12 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	};
 
+	private inputElement:HTMLElement = null;
+	inputRefCallback=(c:HTMLElement) =>
+	{
+		this.inputElement = c;
+	}
+
 	getMenuPositionStyle=():React.CSSProperties =>
 	{
 		if(this.menuRect && this.state.direction == "upward")
@@ -263,16 +288,25 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	};
 
 
-	renderInput=(isHidden:boolean = true):JSX.Element=>
+	renderInput=(isHidden:boolean = false):JSX.Element=>
 	{
 		let inputProps:any = {
-			role:'combobox',
-			'aria-expanded': this.state.openMenu ? "true" : "false",
-			'aria-haspopup': this.state.openMenu ? "true" : "false",
-			'aria-labelledby': (this.props as any)['aria-labelledby'],
-			'aria-label': (this.props as any)['aria-label'],
-			type:isHidden ? "hidden":"",
+			type: isHidden ? "hidden":"",
 		};
+
+		if(!isHidden)
+		{
+			inputProps.role = 'combobox';
+			inputProps['aria-expanded'] = this.state.openMenu ? "true" : "false";
+			inputProps['aria-haspopup'] = this.state.openMenu ? "true" : "false";
+			inputProps['aria-labelledby'] = (this.props as any)['aria-labelledby'];
+			inputProps['aria-label'] = (this.props as any)['aria-label'];
+			inputProps.tabIndex = 0;
+			inputProps.autoComplete = "off";
+			inputProps.className = "search";
+			inputProps.onChange = this.searchQueryChangeListener;
+			inputProps.ref = this.inputRefCallback
+		}
 
 		return <input {...inputProps}/>
 	};
@@ -302,6 +336,18 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		}
 
 	};
+
+	searchQueryChangeListener=(event:React.FormEvent)=>{
+		let query:string =  (event.target as any).value;
+		if(this.state.searchQuery !== query)
+		{
+			this.setState({
+				searchQuery:query
+			});
+		}
+
+	};
+
 
 	render()
 	{
@@ -348,12 +394,28 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			}
 			else
 			{
-				let option:ComboBoxOption = this.getOptionFromValue(this.state.value);
-				if(option)
-					selectedOptions = option;
-				//option may not be available instantly for those cases render the value
-				let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
-				textUIs = <div className="text">{Weave.lang(valueText)}</div>;
+				// render Text UI only When search Query is not in operation
+				if( this.state.searchQuery.length == 0)
+				{
+					let option:ComboBoxOption = this.getOptionFromValue(this.state.value);
+					if(option)
+						selectedOptions = option;
+					//option may not be available instantly for those cases render the value
+					let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
+
+					// if input is clicked, but user yet to type the search query
+					// in that case, color the current selection grey
+					if(this.props.type == "search" && this.state.openMenu )
+					{
+						textUIs = <div className="text" style={{color:"grey"}}>{Weave.lang(valueText)}</div>;
+					}
+					else
+					{
+						textUIs = <div className="text">{Weave.lang(valueText)}</div>;
+					}
+
+				}
+
 			}
 		}
 
@@ -365,6 +427,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			                       style={this.getMenuPositionStyle()}
 			                       onSelect={this.onChange as any}
 			                       selectedOptions={selectedOptions}
+			                       searchQuery={this.state.searchQuery}
 			                       options={this.state.options}/>;
 		}
 
@@ -374,7 +437,14 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 													transform:"none" /* override Semantic UI rotateZ(0)*/
 												});
 
-		let inputUI:JSX.Element = this.renderInput();
+		//todo: use of hidden input might require, we might need ot create event manually and disaptch change
+		//todo: so we might need to be set value to it
+		let hiddenInputUI:JSX.Element = this.renderInput(true);
+		let inputUI:JSX.Element = null;
+		if(this.props.type == "search")
+		{
+			inputUI = this.renderInput();
+		}
 		let className:string = "ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"") +" selection dropdown " + this.state.direction +" " + (this.props.className || "")
 
 		return (
@@ -382,6 +452,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			     tabIndex={0}
 			     className={className}
 			     style={styleObj}>
+					{hiddenInputUI}
 					{inputUI}
 					<i className="dropdown icon"/>
 					{textUIs}
@@ -398,6 +469,7 @@ interface ComboBoxMenuProps extends React.HTMLProps<ComboBoxMenu>
 	selectedOptions:ComboBoxOption | ComboBoxOption[];
 	options:ComboBoxOption[];
 	optionStyle?:React.CSSProperties;
+	searchQuery?:string;
 }
 
 interface ComboBoxMenuState
@@ -430,6 +502,13 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 		let isMultipleMode:boolean = Array.isArray(this.props.selectedOptions);
 		let optionsUI:JSX.Element[] = this.props.options.map((option:ComboBoxOption,index:number)=>{
 			let className = "item";
+			if(this.props.searchQuery)
+			{
+				let beginsWithRegExp:RegExp = new RegExp('^' + this.props.searchQuery, 'igm');
+				if(option.label.search(beginsWithRegExp) === -1)
+					return null;
+			}
+
 			if(isMultipleMode)
 			{
 				if((this.props.selectedOptions as ComboBoxOption[]).indexOf(option) != -1)

@@ -46,8 +46,8 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 			          allowAdditions={true}
 			          type="search"
 			          onNew={(content:string):void=>{
-				    this.props.keyTypeProperty.value = content;
-				 }}
+				                this.props.keyTypeProperty.value = content;
+				            }}
 			/>
 		);
 	}

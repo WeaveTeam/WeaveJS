@@ -222,6 +222,7 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 						title={Weave.lang("Change column")}
 						style={dropDownStyle}
 						valueIncludesLabel={true}
+						type="search"
 						value={node ? {label: node.getLabel(), value: node} : null}
 						options={options}
 						onChange={this.setColumn}
