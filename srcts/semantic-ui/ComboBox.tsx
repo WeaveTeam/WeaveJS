@@ -520,6 +520,10 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 			{
 				if(this.props.selectedOptions  == option)
 					className = className + " active selected";
+				else if(this.props.searchQuery)
+				{
+					className = className + " filtered";
+				}
 			}
 			return  <div className={className}
 			             role="option"
