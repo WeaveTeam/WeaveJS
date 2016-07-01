@@ -70,7 +70,7 @@ package weavejs.core
 			return getList(true, filter, filterIncludesPlaceholders);
 		}
 		
-		public function toObject(filter:Class = null, filterIncludesPlaceholders:Boolean = false):Object
+		public function toObject/*/<T>/*/(filter:/*/new(..._:any[])=>T | string/*/Class = null, filterIncludesPlaceholders:Boolean = false):/*/{[name:string]: T & ILinkableObject}/*/Object
 		{
 			var obj:Object = {};
 			for each (var name:String in getList(false, filter, filterIncludesPlaceholders))
