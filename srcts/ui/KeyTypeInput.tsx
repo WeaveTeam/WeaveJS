@@ -22,32 +22,31 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 		super(props);
 		props.keyTypeProperty.addGroupedCallback(this, this.forceUpdate, true);
 	}
-	private input:Input;
-	private element:Element;
 
-	componentDidMount()
+	changeListener=(content:string):void =>
 	{
-		this.element = ReactDOM.findDOMNode(this.input);
-		
-		($(this.element) as any).dropdown();
-	}
+		this.props.keyTypeProperty.value = content;
+	};
 
 	render(): JSX.Element {
-		let keyTypes = WeaveAPI.QKeyManager.getAllKeyTypes();
-		let options = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) => {
+		let options = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) =>
+						{
+							if(keyType == "string")
+							{
+								return null
+							}
 							return {label:keyType, value:keyType} as ComboBoxOption;
-						});
-		
+						}).filter((option:ComboBoxOption)=> option?true:false);
+
+		// none option value should be null, while generating metadata if its null, datasource sets to "string"
 		return (
 			<ComboBox style={{width: "100%"}}
-			          noneOption={{label:"(None)", value:"string"}}
+			          noneOption={{label:"(None)", value:null}}
 			          ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
 			          options={options}
 			          allowAdditions={true}
 			          searchable={true}
-			          onNew={(content:string):void=>{
-				                this.props.keyTypeProperty.value = content;
-				            }}
+			          onChange={this.changeListener}
 			/>
 		);
 	}
