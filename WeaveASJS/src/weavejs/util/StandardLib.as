@@ -631,8 +631,10 @@ package weavejs.util
 		private static function as3SortOn(array:Array, fieldNames:*, options:*):Array
 		{
 			/* Normalize to arrays */
-			if (!(fieldNames is Array)) fieldNames = [fieldNames];
-			if (!(options is Array)) options = [options];
+			if (!(fieldNames is Array))
+				fieldNames = [fieldNames];
+			if (!(options is Array))
+				options = [options];
 
 			/* Get global options */
 			var returnIndexedArray:Boolean = options.some(function(option:int):int {return option & AS3_RETURNINDEXEDARRAY;});
@@ -652,7 +654,8 @@ package weavejs.util
 				{
 					customConvert = function(item:*):String
 					{
-						if (item === undefined || item === null) return "";
+						if (item === undefined || item === null)
+							return "";
 						return String(item[fieldName]);
 					}
 				}
@@ -660,7 +663,8 @@ package weavejs.util
 				{
 					customConvert = function(item:*):String
 					{
-						if (item === undefined || item === null) return "";
+						if (item === undefined || item === null)
+							return "";
 						return String(item[fieldName]).toLocaleLowerCase();
 					}
 				}
@@ -668,8 +672,10 @@ package weavejs.util
 				return customConvert || fieldNames[index];
 			});
 
-			if (!_indexMap) _indexMap = new JS.Map();
+			if (!_indexMap)
+				_indexMap = new JS.Map();
 			_indexMap.clear();
+			
 			if (returnIndexedArray)
 			{
 				/* Assert that this is an object array, this won't necessarily work with primitive types.
@@ -677,7 +683,8 @@ package weavejs.util
 				 * it would take more iteratee-generation code to make this work
 				 * reliably by wrapping it in objects with an attached index, 
 				 * then unpacking it in the iteratee functions. */
-				if (!arrayIsType(array, Object)) JS.error("Warning: Can't do an indexed array sort of non-objects reliably, as there's a higher chance of non-unique items.");
+				if (!arrayIsType(array, Object))
+					JS.error("Warning: Can't do an indexed array sort of non-objects reliably, as there's a higher chance of non-unique items.");
 				array.forEach(function(item:*, index:int):void {_indexMap.set(item, index);})
 			}
 

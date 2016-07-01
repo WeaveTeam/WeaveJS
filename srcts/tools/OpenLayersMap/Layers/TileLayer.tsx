@@ -12,12 +12,14 @@ import ReactUtils from "../../../utils/ReactUtils";
 import LinkableString = weavejs.core.LinkableString;
 import LinkableVariable = weavejs.core.LinkableVariable;
 
-interface ITileLayerEditorProps {
+interface ITileLayerEditorProps
+{
 	layer: TileLayer;
 	editableFields: React.ReactChild[][]
 }
 
-interface ITileLayerEditorState {
+interface ITileLayerEditorState
+{
 }
 
 class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEditorState>
@@ -40,23 +42,22 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 
 	toProviderOptions()
 	{
-		if (!this.props.layer) return;
+		if (!this.props.layer)
+			return;
 
 		if (this.props.layer.provider.value === "custom")
 		{
-			this.props.layer.providerOptions.state =
-				{
-					attributions: this.tempAttributions.value,
-					url: this.tempUrl.value,
-					projection: this.tempProjection.value
-				};
+			this.props.layer.providerOptions.state = {
+				attributions: this.tempAttributions.value,
+				url: this.tempUrl.value,
+				projection: this.tempProjection.value
+			};
 		}
 		else
 		{
-			this.props.layer.providerOptions.state =
-				{
-					layer: this.tempLayer.value
-				};
+			this.props.layer.providerOptions.state = {
+				layer: this.tempLayer.value
+			};
 		}
 	}
 
@@ -95,7 +96,12 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 				layers = null;
 		}
 
-		let providerOptions = [{ value: "osm", label: "OpenStreetMap" }, { value: "stamen", label: "Stamen" }, { value: "mapquest", label: "MapQuest" }, {value: "custom", label: Weave.lang("Custom")}];
+		let providerOptions = [
+			{value: "osm", label: "OpenStreetMap"},
+			{value: "stamen", label: "Stamen"},
+			{value: "mapquest", label: "MapQuest"},
+			{value: "custom", label: Weave.lang("Custom")}
+		];
 
 		let layerSelection: JSX.Element;
 		let editorFields:React.ReactChild[][];
@@ -106,7 +112,7 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 					Weave.lang("Provider"),
 					<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 				]
-			]
+			];
 		}
 		else if (this.props.layer.provider.value === "custom")
 		{
@@ -127,7 +133,7 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 					Weave.lang("Projection"),
 					<StatefulTextField ref={linkReactStateRef(this, { value: this.tempProjection }) }/>
 				]
-			]
+			];
 		}
 		else
 		{
@@ -138,11 +144,12 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 				],
 				[
 					Weave.lang("Layer"),
-					<ComboBox ref={linkReactStateRef(this, { value: this.tempLayer }) }
-					                                     options={layers ? layers.map((name) => { return { label: _.startCase(name), value: name }; }) : [] }/>
+					<ComboBox
+						ref={linkReactStateRef(this, { value: this.tempLayer }) }
+					    options={layers ? layers.map((name) => { return { label: _.startCase(name), value: name }; }) : [] }
+					/>
 				]
-				
-			]
+			];
 		}
 
 		return ReactUtils.generateTable({
@@ -172,7 +179,8 @@ export default class TileLayer extends AbstractLayer
 		return <TileLayerEditor layer={this} editableFields={this.renderEditableFields()}/>;
 	}
 
-	getExtent() {
+	getExtent()
+	{
 		let bounds = super.getExtent();
 		bounds.setCoords(this.olLayer.getExtent());
 		return bounds;
@@ -185,7 +193,8 @@ export default class TileLayer extends AbstractLayer
 		this.olLayer = new ol.layer.Tile();
 	}
 
-	onLayerReady() {
+	onLayerReady()
+	{
 		super.onLayerReady();
 
 		this.provider.addGroupedCallback(this, this.onProviderChange);
@@ -206,7 +215,8 @@ export default class TileLayer extends AbstractLayer
 		else if (this.provider.value == "mapquest")
 		{
 			let layer: string = this.providerOptions.state && (this.providerOptions.state as any).layer;
-			if (!layer || !_.contains(TileLayer.MAPQUEST_LAYERS, layer)) {
+			if (!layer || !_.contains(TileLayer.MAPQUEST_LAYERS, layer))
+			{
 				this.providerOptions.state = _.merge(this.providerOptions.state || {}, { layer: TileLayer.MAPQUEST_LAYERS[0] });
 			}
 		}
@@ -279,9 +289,9 @@ export default class TileLayer extends AbstractLayer
 
 	private static isXYZString(url:string):boolean
 	{
-		return url.indexOf("{x}") != -1 &&
-			url.indexOf("{y}") != -1 &&
-			url.indexOf("{z}") != -1;
+		return url.indexOf("{x}") != -1
+			&& url.indexOf("{y}") != -1
+			&& url.indexOf("{z}") != -1;
 	}
 
 	private getSource():ol.source.Tile
@@ -313,7 +323,8 @@ export default class TileLayer extends AbstractLayer
 	updateTileSource()
 	{
 		let newLayer: ol.source.Tile;
-		try {
+		try
+		{
 			newLayer = this.getSource();
 		}
 		catch(e)
