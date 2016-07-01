@@ -1,6 +1,8 @@
 import WeaveApp from "./WeaveApp";
 import WeaveMenuBar from "./WeaveMenuBar";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
+import DynamicComponent from "./ui/DynamicComponent";
+import LinkableDynamicComponent from "./ui/LinkableDynamicComponent";
 import FlexibleLayout from "./layouts/FlexibleLayout";
 import WindowLayout from "./layouts/WindowLayout";
 import TabLayout from "./layouts/TabLayout";
@@ -82,6 +84,8 @@ export
 	WeaveApp,
 	WeaveMenuBar,
 	WeaveComponentRenderer,
+	DynamicObject,
+	LinkableDynamicObject,
 	FlexibleLayout,
 	WindowLayout,
 	TabLayout,
