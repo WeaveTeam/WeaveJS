@@ -210,6 +210,27 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		}
 	};
 
+	addNewOption=(event:React.MouseEvent)=>
+	{
+		var newOption:ComboBoxOption = {
+			label:this.state.searchQuery,
+			value:this.state.searchQuery
+		};
+
+		this.state.options.unshift(newOption);
+		this.setState({
+			options:this.state.options,
+			openMenu:false,
+			value:this.state.searchQuery,
+			searchQuery:""
+		});
+
+		if(this.inputElement)
+		{
+			(this.inputElement as any).value = "";
+		}
+	};
+
 	selectedValueRemoveListener=(index:number,option:ComboBoxOption,event:React.MouseEvent)=>
 	{
 		(this.state.value as any[]).splice(index);
@@ -337,7 +358,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	};
 
-	searchQueryChangeListener=(event:React.FormEvent)=>{
+	searchQueryChangeListener=(event:React.FormEvent)=>
+	{
 		let query:string =  (event.target as any).value;
 		if(this.state.searchQuery !== query)
 		{
@@ -428,7 +450,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			                       onSelect={this.onChange as any}
 			                       selectedOptions={selectedOptions}
 			                       searchQuery={this.state.searchQuery}
-			                       options={this.state.options}/>;
+			                       options={this.state.options}
+			                       allowAdditions={this.props.allowAdditions}
+									additionListener={this.props.allowAdditions? this.addNewOption : null}/>;
 		}
 
 
@@ -470,6 +494,8 @@ interface ComboBoxMenuProps extends React.HTMLProps<ComboBoxMenu>
 	options:ComboBoxOption[];
 	optionStyle?:React.CSSProperties;
 	searchQuery?:string;
+	allowAdditions?:boolean;
+	additionListener?:(event:React.MouseEvent)=>void;
 }
 
 interface ComboBoxMenuState
@@ -518,12 +544,9 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 			}
 			else
 			{
-				if(this.props.selectedOptions  == option)
+				if(this.props.selectedOptions  == option && !this.props.allowAdditions)
 					className = className + " active selected";
-				else if(this.props.searchQuery)
-				{
-					className = className + " filtered";
-				}
+				
 			}
 			return  <div className={className}
 			             role="option"
@@ -534,6 +557,22 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 							{Weave.lang(option.label)}
 					</div>;
 		});
+
+		let additionUI:JSX.Element = null;
+		if(this.props.allowAdditions)
+		{
+			additionUI = <div role="option"
+			                  className="addition item selected"
+			                  key={this.props.searchQuery}
+			                  onClick={this.props.additionListener}
+			                  data-value={this.props.searchQuery}>
+							Add &nbsp;
+							<b>{this.props.searchQuery}</b>
+						</div>;
+
+			optionsUI.unshift(additionUI);
+
+		}
 
 		return  <div style={styleObject}
 		             tabIndex={-1}
