@@ -114,21 +114,18 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	{
 		if (MouseUtils.receivedMouseDown(event.target as Element))
 		{
-			if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
+			if (this.props.onGearClick)
 			{
-				if (this.props.onGearClick)
-				{
-					this.props.onGearClick(this);
-				}
-				else
-				{
-					PopupWindow.open({
-						context: this,
-						title: Weave.lang("Settings for {0}", this.state.title),
-						modal: false,
-						content: (this.watcher.target as any).renderEditor()
-					});
-				}
+				this.props.onGearClick(this);
+			}
+			else if (this.watcher && this.watcher.target && (this.watcher.target as any).renderEditor)
+			{
+				PopupWindow.open({
+					context: this,
+					title: Weave.lang("Settings for {0}", this.state.title),
+					modal: false,
+					content: (this.watcher.target as any).renderEditor()
+				});
 			}
 		}
 	};

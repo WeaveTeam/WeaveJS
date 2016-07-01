@@ -20,6 +20,7 @@ import TabLayout, {TabLayoutProps} from "./layouts/TabLayout";
 import WindowLayout from "./layouts/WindowLayout";
 import FlexibleLayout from "./layouts/FlexibleLayout";
 import WeaveMenus from "./menus/WeaveMenus";
+import SessionStateEditor from "./ui/SessionStateEditor";
 
 import IDataSource = weavejs.api.data.IDataSource;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -221,6 +222,15 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	handleGearClick=(tool:WeaveTool):void=>
 	{
 		var path = tool.props.path;
+		var obj = this.props.weave.getObject(path);
+		
+		if (obj && !(obj as any).renderEditor) // hack
+		{
+			var toolName = path[0]; // hack
+			SessionStateEditor.openInstance(this, toolName, this.props.weave.root);
+			return;
+		}
+		
 		this.setState({
 			toolPathToEdit: path
 		});
@@ -286,15 +296,18 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 	renderTab=(path:WeavePathArray, panelProps:LayoutPanelProps, panelRenderer?:PanelRenderer)=>
 	{
-
 		// backwards compatibility hack
 		var sideBarUI:JSX.Element = null;
 		var toolToEdit = this.props.weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
 		if (toolToEdit && toolToEdit.renderEditor) // hack
-			sideBarUI = <WeaveToolEditor tool={toolToEdit}
-			                             onCloseHandler={this.handleSideBarClose}
-			                             style={ {flex:1} }
-			                             className="weave-ToolEditor"/>;
+			sideBarUI = (
+				<WeaveToolEditor
+					tool={toolToEdit}
+					onCloseHandler={this.handleSideBarClose}
+					style={ {flex:1} }
+					className="weave-ToolEditor"
+				/>
+			);
 		return(
 			<SideBarContainer barSize={.4} leftChildren={ sideBarUI }>
 				<WeaveComponentRenderer
@@ -550,7 +563,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		ReactUtils.getWindow(this).removeEventListener("beforeunload", this.handleUnload);
 	}
 
-
 	get enableMenuBar():LinkableBoolean
 	{
 		return this.enableMenuBarWatcher.target as LinkableBoolean;
@@ -569,16 +581,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 				</VBox>
 			);
 		}
-
-		// backwards compatibility hack
-		var sideBarUI:JSX.Element = null;
-		var toolToEdit = weave.getObject(this.state.toolPathToEdit) as IVisTool; // hack
-		if (toolToEdit && toolToEdit.renderEditor) // hack
-			sideBarUI = <WeaveToolEditor tool={toolToEdit}
-			                             onCloseHandler={this.handleSideBarClose}
-			                             style={ {flex:1} }
-			                             className="weave-ToolEditor"/>;
-
 
 		let weaveTabbedComponent:JSX.Element = null;
 		let menuBarUI:JSX.Element = null;
@@ -627,12 +629,10 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 
 		progressBarUI = <WeaveProgressBar/>;
 
-
 		if (this.state.enableTour)
 		{
-		 	interactiveTourComponent = <InteractiveTour onClose={this.props.onClose}/>
+		 	interactiveTourComponent = <InteractiveTour onClose={this.props.onClose}/>;
 		}
-
 
 		return (
 			<VBox
