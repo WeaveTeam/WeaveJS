@@ -44,7 +44,7 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 			          ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
 			          options={options}
 			          allowAdditions={true}
-			          type="search"
+			          searchable={true}
 			          onNew={(content:string):void=>{
 				                this.props.keyTypeProperty.value = content;
 				            }}

@@ -28,6 +28,7 @@ export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 	header?:React.ReactChild
 	optionStyle?:React.CSSProperties;
 	noneOption?:ComboBoxOption;
+	searchable?:boolean;
 }
 
 export interface ComboBoxState
@@ -43,7 +44,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 {
 	static defaultProps:ComboBoxProps = {
 		fluid:true,
-		noneOption:null
+		noneOption:null,
+		searchable:false
 	};
 	
 	constructor(props:ComboBoxProps)
@@ -148,7 +150,11 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			openMenu:openState
 		});
 
-		if(!openState)
+		// if search enabled, make the focus to input element when opened
+		// so that user knows there is a input element
+		if(openState && this.props.searchable)
+			this.inputElement && this.inputElement.focus();
+		else
 			this.resetSearchQuery();
 
 		this.props.onClick && this.props.onClick(event);
@@ -181,6 +187,11 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					// to call props.onChange
 					value = (this.state.value as any[]);
 					openState = true;
+					this.resetSearchQuery();
+					// if search enabled, make the focus to input element when opened
+					// so that user knows there is a input element
+					if(openState && this.props.searchable)
+						this.inputElement && this.inputElement.focus();
 				}
 				else
 				{
@@ -201,7 +212,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	};
 
 	resetSearchQuery = ()=>{
-		if(this.props.type == "search")
+		if(this.props.searchable)
 		{
 			// search is done and user selected the option
 			// set search query back to empty
@@ -441,6 +452,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			else
 			{
 				// render Text UI only When search Query is not in operation
+				// for non multiple type
 				if( this.state.searchQuery.length == 0)
 				{
 					let option:ComboBoxOption = this.getOptionFromValue(this.state.value);
@@ -451,7 +463,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 					// if input is clicked, but user yet to type the search query
 					// in that case, color the current selection grey
-					if(this.props.type == "search" && this.state.openMenu )
+					if(this.props.searchable && this.state.openMenu )
 					{
 						textUIs = <div className="text" style={{color:"grey",pointerEvents:"none"}}>{Weave.lang(valueText)}</div>;
 					}
@@ -485,9 +497,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 													transform:"none" /* override Semantic UI rotateZ(0)*/
 												});
 
-		let className:string = "ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"")
+		let className:string = "ui " + (this.props.type || "") + (this.props.searchable ? " search ":"") +(this.props.fluid ? " fluid":"")
 								+" selection dropdown " + this.state.direction  +(this.state.openMenu? " active visible": " ")+
-								+ (this.props.className || "")
+								+ (this.props.className || "");
 
 		let comboxProps:any = {
 			onClick:this.onClickListener,
@@ -499,7 +511,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		//todo: so we might need to be set value to it
 		let hiddenInputUI:JSX.Element = this.renderInput(true);
 		let inputUI:JSX.Element = null;
-		if(this.props.type == "search")
+		if(this.props.searchable)
 		{
 			inputUI = this.renderInput();
 		}
@@ -513,9 +525,9 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		return (
 			<div {...comboxProps}>
 					{hiddenInputUI}
-					{inputUI}
 					<i className="dropdown icon"/>
 					{textUIs}
+					{inputUI}
 					{menuUI}
 			</div>
 		);
