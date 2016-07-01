@@ -52,6 +52,9 @@
     },
     "react-sparklines/react-sparklines.d.ts": {
       "commit": "a45359c3d5c043414840533761b7f8a85130641c"
+    },
+    "pixi.js/pixi.js.d.ts": {
+      "commit": "eff17bc708c00906a108e6edbb4b07b599ba9a48"
     }
   }
 }

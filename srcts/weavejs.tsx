@@ -64,6 +64,7 @@ import Div from "./react-ui/Div";
 import VendorPrefixer from "./react-ui/VendorPrefixer";
 import IAltText from "./accessibility/IAltText";
 import {AltTextConfig} from "./accessibility/IAltText";
+import PIXIScatterPlot from "./tools/PIXIScatterPlot";
 
 // global jQuery needed for semantic
 (window as any).jQuery = (jquery as any)["default"];
@@ -102,6 +103,7 @@ export
 	C3LineChart,
 	C3ScatterPlot,
 	C3PieChart,
+	PIXIScatterPlot,
 	DataFilterTool,
 	OpenLayersMapTool,
 	AttributeMenuTool,
