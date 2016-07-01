@@ -143,9 +143,13 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	// toggles menu open /close
 	onClickListener=(event:React.MouseEvent)=>
 	{
+		let openState:boolean = !this.state.openMenu;
 		this.setState({
-			openMenu:!this.state.openMenu
+			openMenu:openState
 		});
+
+		if(!openState)
+			this.resetSearchQuery();
 
 		this.props.onClick && this.props.onClick(event);
 
@@ -189,24 +193,28 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 				openMenu:openState,
 			});
 
-			if(this.props.type == "search")
-			{
-				// search is done and user selected the option
-				// set search query back to empty
-				if(!openState)
-				{
-					this.setState({
-						searchQuery: ""
-					});
-
-					if(this.inputElement)
-					{
-						(this.inputElement as any).value = "";
-					}
-				}
-			}
+			if(!openState)
+				this.resetSearchQuery();
 
 			this.props.onChange && this.props.onChange(value);
+		}
+	};
+
+	resetSearchQuery = ()=>{
+		if(this.props.type == "search")
+		{
+			// search is done and user selected the option
+			// set search query back to empty
+
+			this.setState({
+				searchQuery: ""
+			});
+
+			if(this.inputElement)
+			{
+				(this.inputElement as any).value = "";
+			}
+
 		}
 	};
 
@@ -257,8 +265,10 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		else
 		{
 			this.setState({
-				openMenu:false
+				openMenu:false,
 			});
+
+			this.resetSearchQuery();
 		}
 
 	};
@@ -291,12 +301,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	};
 
-	private inputElement:HTMLElement = null;
-	inputRefCallback=(c:HTMLElement) =>
-	{
-		this.inputElement = c;
-	}
-
 	getMenuPositionStyle=():React.CSSProperties =>
 	{
 		if(this.menuRect && this.state.direction == "upward")
@@ -308,6 +312,25 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		return null;
 	};
 
+	private inputElement:HTMLElement = null;
+	inputRefCallback=(c:HTMLElement) =>
+	{
+		this.inputElement = c;
+	}
+
+
+	inputClickListener=(event:React.MouseEvent)=>
+	{
+		// this ensures, click on input doesn't listen to listeners attached to its container
+		event.stopPropagation();
+		// if the state is close , make it open
+		if(!this.state.openMenu)
+		{
+			this.setState({
+				openMenu:true
+			})
+		}
+	};
 
 	renderInput=(isHidden:boolean = false):JSX.Element=>
 	{
@@ -327,6 +350,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			inputProps.className = "search";
 			inputProps.onChange = this.searchQueryChangeListener;
 			inputProps.ref = this.inputRefCallback
+			inputProps.onClick = this.inputClickListener
 		}
 
 		return <input {...inputProps}/>
@@ -429,7 +453,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					// in that case, color the current selection grey
 					if(this.props.type == "search" && this.state.openMenu )
 					{
-						textUIs = <div className="text" style={{color:"grey"}}>{Weave.lang(valueText)}</div>;
+						textUIs = <div className="text" style={{color:"grey",pointerEvents:"none"}}>{Weave.lang(valueText)}</div>;
 					}
 					else
 					{
@@ -461,6 +485,16 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 													transform:"none" /* override Semantic UI rotateZ(0)*/
 												});
 
+		let className:string = "ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"")
+								+" selection dropdown " + this.state.direction  +(this.state.openMenu? " active visible": " ")+
+								+ (this.props.className || "")
+
+		let comboxProps:any = {
+			onClick:this.onClickListener,
+			className:className,
+			style:styleObj
+		};
+
 		//todo: use of hidden input might require, we might need ot create event manually and disaptch change
 		//todo: so we might need to be set value to it
 		let hiddenInputUI:JSX.Element = this.renderInput(true);
@@ -469,13 +503,15 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		{
 			inputUI = this.renderInput();
 		}
-		let className:string = "ui " + (this.props.type || "") + (this.props.fluid ? " fluid":"") +" selection dropdown " + this.state.direction +" " + (this.props.className || "")
+		else
+		{
+			comboxProps.tabIndex = 0;
+		}
+
+
 
 		return (
-			<div onClick={this.onClickListener}
-			     tabIndex={0}
-			     className={className}
-			     style={styleObj}>
+			<div {...comboxProps}>
 					{hiddenInputUI}
 					{inputUI}
 					<i className="dropdown icon"/>
