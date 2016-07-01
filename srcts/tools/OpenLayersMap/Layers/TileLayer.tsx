@@ -286,7 +286,8 @@ export default class TileLayer extends AbstractLayer
 
 	private getSource():ol.source.Tile
 	{
-		let params:any = Weave.getState(this.providerOptions);
+		// remove null param values or OpenLayers will throw an error
+		let params:any = _.filter(Weave.getState(this.providerOptions) as any, value => value != null);
 		switch (this.provider.value)
 		{
 			case "stamen":
