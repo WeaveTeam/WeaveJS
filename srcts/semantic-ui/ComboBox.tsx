@@ -40,6 +40,10 @@ export interface ComboBoxState
 	searchQuery?:string;
 }
 
+//todo:
+// support for key board events
+// header for multiple ComboBox
+// scroll to selected option when opened
 export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
 {
 	static defaultProps:ComboBoxProps = {
@@ -576,13 +580,25 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 		});
 
 		let isMultipleMode:boolean = Array.isArray(this.props.selectedOptions);
+		let queryLen:number = this.props.searchQuery.length;
 		let optionsUI:JSX.Element[] = this.props.options.map((option:ComboBoxOption,index:number)=>{
 			let className = "item";
-			if(this.props.searchQuery)
+			let textUI:string | JSX.Element = null;
+			if(this.props.searchQuery && queryLen > 0)
 			{
-				let beginsWithRegExp:RegExp = new RegExp('^' + this.props.searchQuery, 'igm');
-				if(option.label.search(beginsWithRegExp) === -1)
+				let regExp:RegExp = new RegExp( this.props.searchQuery, 'igm');
+				let pos:number = option.label.search(regExp);
+				if(pos == -1)
 					return null;
+
+				let beginText:string = option.label.substr(0,pos);
+				let endText:string = option.label.substr(pos + queryLen , option.label.length-1);
+
+				textUI = <span>{beginText}<b>{this.props.searchQuery}</b>{endText}</span>
+			}
+			else
+			{
+				textUI = Weave.lang(option.label)
 			}
 
 			if(isMultipleMode)
@@ -594,22 +610,23 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 			}
 			else
 			{
-				if(this.props.selectedOptions  == option && !this.props.allowAdditions)
+				if(this.props.selectedOptions  == option && (!this.props.allowAdditions || this.props.searchQuery.length == 0 ))
 					className = className + " active selected";
 				
 			}
+
 			return  <div className={className}
 			             role="option"
 			             onClick={this.clickListener.bind(this,index,option)}
 			             style={this.props.optionStyle}
 			             key={index}
 			             data-value={index}>
-							{Weave.lang(option.label)}
+							{textUI}
 					</div>;
 		});
 
 		let additionUI:JSX.Element = null;
-		if(this.props.allowAdditions)
+		if(this.props.allowAdditions && this.props.searchQuery.length > 0)
 		{
 			additionUI = <div role="option"
 			                  className="addition item selected"
