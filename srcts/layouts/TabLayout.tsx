@@ -189,7 +189,10 @@ export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implem
 		var state = this.getSessionState();
 		state.activeTabIndex = indexFromTabsComponent - this.leadingTabsLength;
 		this.setSessionState(state);
-		InteractiveTour.targetComponentOnClick(state.tabs[state.activeTabIndex].label);
+		
+		var tab = state.tabs[state.activeTabIndex];
+		if (tab)
+			InteractiveTour.targetComponentOnClick(tab.label);
 	};
 
 	private getPanelIndex(id:WeavePathArray):number
