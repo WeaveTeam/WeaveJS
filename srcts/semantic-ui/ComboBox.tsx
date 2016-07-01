@@ -291,7 +291,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 	private menuRect:ClientRect = null;
 	// called when menu is mounted and unmounted
 	// todo : make combobox update direction even window is resizing
-	menuRefCallback=(c:ComboBoxMenu)=>
+	private menuRefCallback=(c:ComboBoxMenu)=>
 	{
 		if(c)
 		{
