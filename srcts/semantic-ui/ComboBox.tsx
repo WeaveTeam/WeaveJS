@@ -25,7 +25,7 @@ export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 	allowAdditions?:boolean;
 	type?:string;
 	fluid?:boolean;
-	header?:React.ReactChild
+	header?:string|React.ReactChild
 	optionStyle?:React.CSSProperties;
 	noneOption?:ComboBoxOption;
 	searchable?:boolean;
@@ -482,6 +482,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		{
 			menuUI = <ComboBoxMenu ref={this.menuRefCallback}
 			                       className="menu transition visible"
+			                       header={this.props.header}
 			                       style={this.getMenuPositionStyle()}
 			                       onSelect={this.onChange as any}
 			                       selectedOptions={selectedOptions}
@@ -544,6 +545,7 @@ interface ComboBoxMenuProps extends React.HTMLProps<ComboBoxMenu>
 	searchQuery?:string;
 	allowAdditions?:boolean;
 	additionListener?:(event:React.MouseEvent)=>void;
+	header?:string|React.ReactChild
 }
 
 interface ComboBoxMenuState
@@ -622,9 +624,16 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 
 		}
 
+		let headerUI:JSX.Element = null;
+		if(this.props.header)
+		{
+			headerUI = <div className="header">{this.props.header}</div>
+		}
+
 		return  <div style={styleObject}
 		             tabIndex={-1}
 		             className={this.props.className}>
+					{headerUI}
 					{optionsUI}
 				</div>
 
