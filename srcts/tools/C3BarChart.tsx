@@ -301,7 +301,7 @@ export default class C3BarChart extends AbstractC3Tool
 	{
 		var columns = this.heightColumns.getObjects(IAttributeColumn);
 		this.filteredKeySet.setColumnKeySources(columns);
-		this.RECORD_FORMAT.heights = _.zipObject(this.heightColumns.getNames(), columns) as any;
+		this.RECORD_FORMAT.heights = this.heightColumns.toObject(IAttributeColumn) as RecordHeightsFormat<IAttributeColumn>;
 		this.RECORD_FORMAT.heights.xLabel = this.labelColumn;
 		this.RECORD_DATATYPE.heights = _.zipObject(this.heightColumns.getNames(), columns.map(() => Number)) as any;
 		this.RECORD_DATATYPE.heights.xLabel = String;
