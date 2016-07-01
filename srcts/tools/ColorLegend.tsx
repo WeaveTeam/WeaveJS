@@ -244,13 +244,82 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		};
 	}
 
+	getCell(cellIndex:number, shapeSize:number, textStyle:React.CSSProperties):JSX.Element
+	{
+		// get the shape Element
+		var shapeType:string = this.shapeType.value;
+		var shapeElement:JSX.Element[] = null;
+		let shapeColor:string = MiscUtils.rgb_a( this.colorColumn.ramp.getColor(cellIndex, 0, this.numberOfBins - 1), 1.0 );
+		let shapeStyle:React.CSSProperties = {
+			backgroundColor:shapeColor
+		};
+		var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
+
+		if(shapeType == SHAPE_TYPE_BOX)
+		{
+			_.merge(shapeStyle, { flex:"1 0", alignItems:"center", justifyContent:"center", height:shapeSize } );
+			shapeElement =  [
+				<HBox key={"box"} style={shapeStyle}>
+					<div style={ {stroke: "black",strokeOpacity: 0.5,backgroundColor: "#FFF"} }>
+						<span style={textStyle}> { Weave.lang(textLabelFunction(cellIndex)) } </span>
+					</div>
+				</HBox>
+			];
+		}
+		else //handle different cases for circle/square/line
+		{
+			let shapeContainerStyle:React.CSSProperties = {
+				width:shapeSize,
+				height:shapeSize
+			};
+
+			shapeStyle.width = "100%";
+
+			switch (shapeType)
+			{
+				case SHAPE_TYPE_CIRCLE :
+					_.merge(shapeStyle,{ paddingTop:"100%", borderRadius:"50%" });
+					break;
+				case SHAPE_TYPE_SQUARE :
+					_.merge(shapeStyle,{ paddingTop:"100%" });
+					break;
+				case SHAPE_TYPE_LINE :
+					shapeContainerStyle.display = "flex";
+					shapeContainerStyle.alignItems = "center";
+					_.merge(shapeStyle,{ height:4 });
+					break;
+			}
+
+
+
+			// shape needs wrapper to enusure the shape maintains an aspect ratio = 1
+			// container gets absolute values
+			// shape is set to use 100percent using width and padding-top
+			shapeElement =  [
+				<div key={shapeType} style={shapeContainerStyle}>
+					<div style={shapeStyle}></div>
+				</div>,
+				<span key={"label"} style={textStyle}>{ Weave.lang(textLabelFunction(cellIndex)) }</span>
+			];
+
+		}
+
+		return(
+			<HBox key={cellIndex}
+			      style={this.getInteractionStyle(cellIndex)}
+			      onClick={this.handleClick.bind(this, cellIndex)}
+			      onMouseMove={this.handleProbe.bind(this, cellIndex, true)}
+			      onMouseOut={this.handleProbe.bind(this, cellIndex, false)}>
+				{shapeElement}
+			</HBox>
+		);
+	}
+
 	render()
 	{
 		if (this.numberOfBins)
 		{
 			//Binned plot case
-			var shapeSize:number = this.shapeSize.value;
-			var shapeType:string = this.shapeType.value;
 			var maxColumns:number = this.maxColumns.value;
 			var columnFlex:number = 1.0/maxColumns;
 
@@ -258,15 +327,12 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 			var extraCells:number = this.numberOfBins % maxColumns == 0 ? 0 :  maxColumns - (this.numberOfBins % maxColumns);
 			var totalCells:number = this.numberOfBins + extraCells;
 
-			if(isNaN(shapeSize))
-			{
-				// shape size dynamically grow with container resize
-				shapeSize = _.max( [1, _.min([shapeSize, this.element.clientHeight / this.numberOfBins]) ] ) ;
-				shapeSize = (shapeSize - (2 * this.cellBorderWidth + 2 * this.cellPadding )) / 2;
-			}
+			// Array of Legend Container based on number of Columns in Session
+			let columns:JSX.Element[] = [];
+			// Array of Legend UI based on number of bins
+			var items:JSX.Element[] = [];
+			var shapeSize:number = this.shapeSize.value;
 
-
-			var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
 			var textStyle:{} = prefixer({
 				paddingLeft: 4,
 				userSelect: "none",
@@ -279,16 +345,41 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 			});
 
-			// Array of Legend Container based on number of Columns in Session
-			let columns:JSX.Element[] = [];
+			if(isNaN(shapeSize))
+			{
+				// shape size dynamically grow with container resize
+				shapeSize = _.max( [1, _.min([shapeSize, this.element.clientHeight / this.numberOfBins]) ] ) ;
+				shapeSize = (shapeSize - (2 * this.cellBorderWidth + 2 * this.cellPadding )) / 2;
+			}
+
+			//calculate cell bins
+			if (this.reverseOrder.value)
+			{
+				//if the cell bins are going to be reversed
+				for (let cellIndex:number = this.numberOfBins -1; cellIndex >= 0; cellIndex--)
+				{
+					items.push(this.getCell(cellIndex, shapeSize, textStyle));
+				}
+			} else {
+				//if the cell bins are in standard order
+				for (let cellIndex:number = 0; cellIndex < this.numberOfBins; cellIndex++)
+				{
+					items.push(this.getCell(cellIndex, shapeSize, textStyle));
+				}
+			}
+
+			for(let extraBinIndex:number = this.numberOfBins; extraBinIndex < totalCells; extraBinIndex++)
+			{
+				//add empty bins for placeholder "empty" items
+				var cellHeight:number = shapeSize + (2 * this.cellPadding) + (2 * this.cellBorderWidth);
+				items.push(<HBox key={cellIndex} style={ {height:cellHeight} } />);
+			}
 
 
 			for (var colIndex:number = 0; colIndex < maxColumns; colIndex++)
 			{
-				// Array of Legend UI based on number of bins
+
 				var rows:JSX.Element[] = [];
-
-
 				// on each column loop - respective cells are picked
 				for (var cellIndex = 0; cellIndex < totalCells; cellIndex++)
 				{
@@ -299,95 +390,14 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					// col[2] gets cells - 2,5 and 8
 					if (cellIndex % maxColumns == colIndex)
 					{
-						// Legend UI are created only for cell-index which are less that bins count
-						if (cellIndex < this.numberOfBins)
-						{
-							// get the shape Element
-							var shapeElement:JSX.Element[] = null;
-							let shapeColor:string = MiscUtils.rgb_a( this.colorColumn.ramp.getColor(cellIndex, 0, this.numberOfBins - 1), 1.0 );
-							let shapeStyle:React.CSSProperties = {
-								backgroundColor:shapeColor
-							};
-
-
-							if(shapeType == SHAPE_TYPE_BOX)
-							{
-								_.merge(shapeStyle, { flex:"1 0", alignItems:"center", justifyContent:"center", height:shapeSize } );
-								shapeElement =  [
-													<HBox key={"box"} style={shapeStyle}>
-														<div style={ {stroke: "black",strokeOpacity: 0.5,backgroundColor: "#FFF"} }>
-															<span style={textStyle}> { Weave.lang(textLabelFunction(cellIndex)) } </span>
-														</div>
-													</HBox>
-												];
-							}
-							else //handle different cases for circle/square/line
-							{
-								let shapeContainerStyle:React.CSSProperties = {
-									width:shapeSize,
-									height:shapeSize
-								};
-
-								shapeStyle.width = "100%";
-
-								switch (shapeType)
-								{
-									case SHAPE_TYPE_CIRCLE :
-										_.merge(shapeStyle,{ paddingTop:"100%", borderRadius:"50%" });
-										break;
-									case SHAPE_TYPE_SQUARE :
-										_.merge(shapeStyle,{ paddingTop:"100%" });
-										break;
-									case SHAPE_TYPE_LINE :
-										shapeContainerStyle.display = "flex";
-										shapeContainerStyle.alignItems = "center";
-										_.merge(shapeStyle,{ height:4 });
-										break;
-								}
-
-
-
-								// shape needs wrapper to enusure the shape maintains an aspect ratio = 1
-								// container gets absolute values
-								// shape is set to use 100percent using width and padding-top
-								shapeElement =  [
-													<div key={shapeType} style={shapeContainerStyle}>
-														<div style={shapeStyle}></div>
-													</div>,
-													<span key={"label"} style={textStyle}>{ Weave.lang(textLabelFunction(cellIndex)) }</span>
-												];
-
-							}
-
-							rows.push(
-										<HBox key={cellIndex}
-										      style={this.getInteractionStyle(cellIndex)}
-										      onClick={this.handleClick.bind(this, cellIndex)}
-										      onMouseMove={this.handleProbe.bind(this, cellIndex, true)}
-										      onMouseOut={this.handleProbe.bind(this, cellIndex, false)}>
-											{shapeElement}
-										</HBox>
-									);
-						}
-						else
-						{
-							// pushing empty row is important
-							// we kept column Vbox Justify-content value = space-around
-							// if number of flexItem in each column aren't equal cell wont align row wise
-							// setting height value is important to match the other cell height
-							var cellHeight:number = shapeSize + (2 * this.cellPadding) + (2 * this.cellBorderWidth);
-							rows.push(<HBox key={cellIndex} style={ {height:cellHeight} } />)
-						}
-
+						rows.push(items[cellIndex]);
 					}
-
-
 				}
 
 				let legendColumnStyle:React.CSSProperties ={
 					display:"flex",
 					flex:columnFlex,
-					flexDirection:this.reverseOrder.value ? "column-reverse" : "column",
+					flexDirection:"column",
 					minWidth:0,
 					padding: "4px",
 					justifyContent:"space-around"
