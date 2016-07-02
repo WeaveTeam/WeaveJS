@@ -565,7 +565,7 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 	}
 
 
-	clickListener=(index:number,option:ComboBoxOption,event:React.MouseEvent) =>
+	private clickListener=(index:number,option:ComboBoxOption,event:React.MouseEvent) =>
 	{
 		event.preventDefault();
 		event.stopPropagation();
