@@ -2,7 +2,7 @@ import * as React from "react";
 import * as _ from "lodash";
 import classNames from "../modules/classnames";
 
-export interface CenteredIconProps extends React.HTMLProps<HTMLSpanElement>
+export interface CenteredIconProps extends React.HTMLProps<CenteredIcon>
 {
 	iconProps?:React.HTMLProps<HTMLImageElement>
 }
@@ -22,7 +22,7 @@ export default class CenteredIcon extends React.Component<CenteredIconProps, Cen
 	{
 		return (
 			<button
-				{...this.props}
+				{...this.props as any}
 				className={classNames("weave-transparent-button", this.props.className || "weave-icon")}
 			>
 				{
