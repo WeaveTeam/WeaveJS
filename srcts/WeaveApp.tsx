@@ -150,6 +150,18 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	}
 
 	urlParams:{ file: string, editable: boolean, layout: string};
+	
+	get openedFromAdminConsole():boolean
+	{
+		try
+		{
+			return !!window.opener.document.getElementById("AdminConsole");
+		}
+		catch (e)
+		{
+			return false;
+		}
+	}
 
 	componentDidMount()
 	{
@@ -164,7 +176,7 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 		this.createDefaultSessionElements();
 		if (this.props.readUrlParams)
 		{
-			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable); // || this.menus.fileMenu.pingAdminConsole(); TODO: Discuss this behavior
+			this.urlParams.editable = StandardLib.asBoolean(this.urlParams.editable) || this.openedFromAdminConsole;
 
 			var weaveExternalTools:any = Weave.getDefinition('window.opener.WeaveExternalTools');
 			if (this.urlParams.file)
