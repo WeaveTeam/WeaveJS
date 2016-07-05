@@ -22,6 +22,7 @@ package weavejs.core
 	import weavejs.api.core.IScheduler;
 	import weavejs.util.DebugTimer;
 	import weavejs.util.DebugUtils;
+	import weavejs.util.Dictionary2D;
 	import weavejs.util.JS;
 	import weavejs.util.StandardLib;
 	
@@ -475,10 +476,14 @@ package weavejs.core
 		
 		private var map_task_time:Object = new JS.WeakMap();
 		
+		private var d2d_context_task_token:Dictionary2D = new Dictionary2D(true, true, Object);
+		
 		public function startTask(relevantContext:Object, iterativeTask:Function, priority:uint, finalCallback:Function = null, description:String = null):void
 		{
+			var taskToken:Object = d2d_context_task_token.get(relevantContext || JS.global, iterativeTask);
+			
 			// do nothing if task already active
-			if (WeaveAPI.ProgressIndicator.hasTask(iterativeTask))
+			if (WeaveAPI.ProgressIndicator.hasTask(taskToken))
 				return;
 			
 			if (debug_async_time)
@@ -487,7 +492,7 @@ package weavejs.core
 				{
 					var value:Array = map_task_time.get(iterativeTask);
 					map_task_time['delete'](iterativeTask);
-					JS.log('interrupted', JS.now()-map_task_time.get(iterativeTask)[0], priority, map_task_time.get(iterativeTask)[1], value);
+					JS.log('interrupted', JS.now() - map_task_time.get(iterativeTask)[0], priority, map_task_time.get(iterativeTask)[1], value);
 				}
 				map_task_time.set(iterativeTask, [JS.now(), new Error('Stack trace')]);
 			}
@@ -505,7 +510,7 @@ package weavejs.core
 				map_task_startTime.set(iterativeTask, JS.now());
 				map_task_elapsedTime.set(iterativeTask, 0);
 			}
-			WeaveAPI.ProgressIndicator.addTask(iterativeTask, relevantContext as ILinkableObject, description);
+			WeaveAPI.ProgressIndicator.addTask(taskToken, relevantContext as ILinkableObject, description);
 			
 			var useTimeParameter:Boolean = iterativeTask.length > 0;
 			
@@ -520,6 +525,8 @@ package weavejs.core
 		 */
 		private function _iterateTask(context:Object, task:Function, priority:int, finalCallback:Function, useTimeParameter:Boolean):void
 		{
+			var taskToken:Object = d2d_context_task_token.get(context || JS.global, task);
+			
 			// remove the task if the context was disposed
 			if (WeaveAPI.SessionManager.objectWasDisposed(context))
 			{
@@ -529,7 +536,7 @@ package weavejs.core
 					map_task_time['delete'](task);
 					JS.log('disposed', JS.now()-map_task_time.get(task)[0], priority, map_task_time.get(task)[1], value);
 				}
-				WeaveAPI.ProgressIndicator.removeTask(task);
+				WeaveAPI.ProgressIndicator.removeTask(taskToken);
 				return;
 			}
 
@@ -543,9 +550,9 @@ package weavejs.core
 			{
 				// perform the next iteration of the task
 				if (useTimeParameter)
-					progress = task(_currentTaskStopTime) as Number;
+					progress = task.call(context, _currentTaskStopTime) as Number;
 				else
-					progress = task() as Number;
+					progress = task.call(context) as Number;
 				
 				if (progress === null || isNaN(progress) || progress < 0 || progress > 1)
 				{
@@ -555,9 +562,9 @@ package weavejs.core
 						JS.log(stackTrace);
 						// this is incorrect behavior, but we can put a breakpoint here
 						if (useTimeParameter)
-							progress = task(_currentTaskStopTime) as Number;
+							progress = task.call(context, _currentTaskStopTime) as Number;
 						else
-							progress = task() as Number;
+							progress = task.call(context) as Number;
 					}
 					progress = 1;
 				}
@@ -566,9 +573,9 @@ package weavejs.core
 					JS.log(JS.now() - time, stackTrace);
 					// this is incorrect behavior, but we can put a breakpoint here
 					if (useTimeParameter)
-						progress = task(_currentTaskStopTime) as Number;
+						progress = task.call(context, _currentTaskStopTime) as Number;
 					else
-						progress = task() as Number;
+						progress = task.call(context) as Number;
 				}
 				if (progress == 1)
 				{
@@ -579,10 +586,10 @@ package weavejs.core
 						JS.log('completed', JS.now()-map_task_time.get(task)[0], priority, map_task_time.get(task)[1], value2);
 					}
 					// task is done, so remove the task
-					WeaveAPI.ProgressIndicator.removeTask(task);
+					WeaveAPI.ProgressIndicator.removeTask(taskToken);
 					// run final callback after task completes and is removed
 					if (finalCallback != null)
-						finalCallback();
+						finalCallback.call(context);
 					return;
 				}
 				
@@ -603,7 +610,7 @@ package weavejs.core
 			
 			// max computation time reached without finishing the task, so update the progress indicator and continue the task later
 			if (progress !== undefined)
-				WeaveAPI.ProgressIndicator.updateTask(task, progress);
+				WeaveAPI.ProgressIndicator.updateTask(taskToken, progress);
 			
 			// Set relevantContext as null for callLater because we always want _iterateTask to be called later.
 			// This makes sure that the task is removed when the actual context is disposed.
