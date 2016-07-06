@@ -179,6 +179,19 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 			if (feature)
 			{
+				//checking for point data
+				if(feature.getGeometry() instanceof ol.geom.MultiPoint)
+				{
+					//TODO replace style to use data
+					normalStyle = [new ol.style.Style({
+						image: new ol.style.Circle({
+							radius: 7,
+							fill: new ol.style.Fill({
+								color: 'black'
+							})
+						})
+					})];
+				}
 				let metaStyle:any = {};
 
 				metaStyle.normalStyle = normalStyle;
