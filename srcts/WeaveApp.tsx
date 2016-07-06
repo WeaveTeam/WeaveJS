@@ -76,7 +76,6 @@ export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppSta
 	constructor(props:WeaveAppProps)
 	{
 		super(props);
-		
 		this.state = {
 			toolPathToEdit: null
 		};

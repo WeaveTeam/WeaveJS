@@ -10,9 +10,13 @@ import SessionStateLog = weavejs.core.SessionStateLog;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 import LogEntry = weavejs.core.LogEntry;
 import {KEYCODES} from "../utils/KeyboardUtils";
+import LinkableBoolean = weavejs.core.LinkableBoolean;
+import DynamicComponent from "../ui/DynamicComponent";
+import {forceUpdateWatcher} from "../utils/WeaveReactUtils";
 
 export interface SessionHistorySliderProps extends React.Props<SessionHistorySlider>
 {
+	showSlider:boolean;
 	stateLog:SessionStateLog;
 }
 
@@ -133,7 +137,6 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	{
 		//<button ref={(c) => this.playButton = c} label={this.getPlayLabel(this._playSpeed, "")} title={Weave.lang('Replay session history')} onClick={() => {if(this.playButton.value) this.play()}}>Replay</button>
 		//className="fa fa-undo fa-flip-horizontal"
-
 		var sliderOptions:SliderOption[] = [];
 		for(var i = 0; i < this.state.max; i++) {
 			sliderOptions.push({
@@ -155,13 +158,23 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 							  className={classNames("weave-icon", 'weave-menubar-item', {"weave-menubar-item-disabled": !this._stateLog.redoHistory.length})}
 							  iconProps={{className:"fa fa-arrow-right"}}/>
 
-				<HSlider options={sliderOptions} selectedValues={[this.state.position as any]} step={1} onChange={this.handleSlider.bind(this)} type={RCSlider.CATEGORICAL}/>
-				{/*<MenuButton width="24" id="menuButton" toolTip="{lang('Menu')}" initialize="menuButton.data = [
-					{label: lang('Clear all history'), click: _stateLog.clearHistory},
-					{label: lang('Clear undo history'), click: function():void { _stateLog.clearHistory(-1); }},
-					{label: lang('Clear redo history'), click: function():void { _stateLog.clearHistory(1); }},
-					{label: getSquashMenuLabel, click: squash, shown: getSquashMenuLabel}
-				];"/>*/}
+				{
+					this.props.showSlider
+						?   <HSlider
+								options={sliderOptions}
+								selectedValues={[this.state.position as any]}
+								step={1}
+								onChange={this.handleSlider.bind(this)}
+								type={RCSlider.CATEGORICAL}
+							/>
+						:   null
+				}
+					{/*<MenuButton width="24" id="menuButton" toolTip="{lang('Menu')}" initialize="menuButton.data = [
+					 {label: lang('Clear all history'), click: _stateLog.clearHistory},
+					 {label: lang('Clear undo history'), click: function():void { _stateLog.clearHistory(-1); }},
+					 {label: lang('Clear redo history'), click: function():void { _stateLog.clearHistory(1); }},
+					 {label: getSquashMenuLabel, click: squash, shown: getSquashMenuLabel}
+					 ];"/>*/}
 			</HBox>
 		);
 	}

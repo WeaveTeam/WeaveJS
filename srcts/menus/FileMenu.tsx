@@ -22,6 +22,7 @@ import WeaveAPI = weavejs.WeaveAPI;
 import CSVDataSource = weavejs.data.source.CSVDataSource;
 import IDataSource = weavejs.api.data.IDataSource;
 import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
+import {getWeaveProperties} from "../ui/WeaveProperties";
 
 export default class FileMenu implements MenuBarItemProps
 {
@@ -103,9 +104,7 @@ export default class FileMenu implements MenuBarItemProps
 
 		var setShowTopMenuBar = (checked:boolean) =>
 		{
-			var wp = this.owner.weave.requestObject(['WeaveProperties'], LinkableHashMap);
-			var enableMenuBar = wp.requestObject('enableMenuBar', LinkableBoolean);
-			enableMenuBar.value = checked;
+			getWeaveProperties(this.owner.weave).enableMenuBar.value = checked;
 		};
 
 		var setSaveHistory = (checked:boolean) =>
