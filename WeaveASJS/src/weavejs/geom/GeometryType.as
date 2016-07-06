@@ -21,6 +21,27 @@ package weavejs.geom
 		public static const LINE:String = "Arc";
 		public static const POLYGON:String = "Polygon";
 		
+		public static function fromGeoJsonType(type:String):String
+		{
+			switch (type)
+			{
+				case GeoJSON.T_MULTI_POINT:
+				case GeoJSON.T_POINT:
+					return POINT;
+				
+				case GeoJSON.T_MULTI_LINE_STRING:
+				case GeoJSON.T_LINE_STRING:
+					return LINE;
+				
+				case GeoJSON.T_MULTI_POLYGON:
+				case GeoJSON.T_POLYGON:
+					return POLYGON;
+				
+				default:
+					return null;
+			}
+		}
+		
 		public static function toGeoJsonType(type:String, multi:Boolean):String
 		{
 			if (type == POINT)
