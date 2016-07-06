@@ -49,7 +49,7 @@ package weavejs.geom
 			return { 'color': Number, 'alpha': Number };
 		}
 		
-		public function getStyle(key:IQualifiedKey):Object
+		public function getStyle(key:IQualifiedKey):/*/{ color:number, alpha:number }/*/Object
 		{
 			return {
 				'color': color.getValueFromKey(key, Number),

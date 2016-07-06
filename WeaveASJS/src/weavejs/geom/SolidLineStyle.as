@@ -85,7 +85,7 @@ package weavejs.geom
 		 */
 		private var map_key_style:Object;
 
-		public function getStyle(key:IQualifiedKey):Object
+		public function getStyle(key:IQualifiedKey):/*/{ color:number, weight:number, alpha:number, caps:string, joints:string, miterLimit:number }/*/Object
 		{
 			if (_triggerCounter != _callbackCollection.triggerCounter)
 			{
