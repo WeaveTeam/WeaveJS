@@ -44,7 +44,7 @@ export interface ComboBoxState
 // support for key board events
 // header for multiple ComboBox
 // scroll to selected option when opened
-export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxState>
+export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxState>
 {
 	static defaultProps:ComboBoxProps = {
 		fluid:true,
@@ -256,9 +256,11 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	selectedValueRemoveListener=(index:number,option:ComboBoxOption,event:React.MouseEvent)=>
 	{
-		(this.state.value as any[]).splice(index);
+		(this.state.value as any[]).splice(index,1);
+		//menu has to be remained opened when removing a selection
 		this.setState({
-			value:this.state.value
+			value:this.state.value,
+			openMenu:true
 		});
 		this.props.onRemoved && this.props.onRemoved(option.value);
 		this.props.onChange && this.props.onChange(this.state.value);
@@ -360,7 +362,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 			inputProps['aria-haspopup'] = this.state.openMenu ? "true" : "false";
 			inputProps['aria-labelledby'] = (this.props as any)['aria-labelledby'];
 			inputProps['aria-label'] = (this.props as any)['aria-label'];
-			inputProps.tabIndex = 0;
 			inputProps.autoComplete = "off";
 			inputProps.className = "search";
 			inputProps.onChange = this.searchQueryChangeListener;
@@ -412,6 +413,7 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 
 	render()
 	{
+		console.log(this.state.value);
 		let headerUI:JSX.Element = null;
 		if(this.props.header)
 		{
@@ -444,13 +446,13 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 					if(option)
 						(selectedOptions as ComboBoxOption[])[index] = option;
 					//option may not be available instantly for those cases render the value
-					//todo: if its object convert to string ?
+					//todo: if its a object, convert to string ?
 					let valueText:string = option && option.label? option.label : (typeof value == "string") ? value : "";
 					return <a key={index}
 					          className="ui label">
-						{Weave.lang(valueText)}
-						<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
-					</a>;
+								{Weave.lang(valueText)}
+								<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
+							</a>;
 				});
 			}
 			else
@@ -509,7 +511,8 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		let comboxProps:any = {
 			onClick:this.onClickListener,
 			className:className,
-			style:styleObj
+			style:styleObj,
+			tabIndex:0
 		};
 
 		//todo: use of hidden input might require, we might need ot create event manually and disaptch change
@@ -519,10 +522,6 @@ export default class ComboBox extends SmartComponent<ComboBoxProps, ComboBoxStat
 		if(this.props.searchable)
 		{
 			inputUI = this.renderInput();
-		}
-		else
-		{
-			comboxProps.tabIndex = 0;
 		}
 
 
