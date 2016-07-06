@@ -9,7 +9,7 @@
     "inlineSourceMap": true,
     "declaration": false,
 	"forceConsistentCasingInFileNames": true,
-	"listFiles": true,
+	"listFiles": false,
 	"noImplicitReturns": false,
 	"pretty": false
   },
