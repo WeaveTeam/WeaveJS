@@ -221,7 +221,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 						ref={(c:ComboBox) => this.comboBox = c}
 						title={Weave.lang("Change column")}
 						style={dropDownStyle}
-						valueIncludesLabel={true}
 						searchable={true}
 						value={node ? {label: node.getLabel(), value: node} : null}
 						options={options}
@@ -313,7 +312,6 @@ export default class SelectableAttributeComponent extends React.Component<ISelec
 							ref={(c:ComboBox) => this.comboBox = c}
 							type="multiple"
 							searchable={true}
-							valueIncludesLabel={true}
 							style={dropDownStyle}
 							value={value}
 							noneOption={{label:"(None)", value:[]}}

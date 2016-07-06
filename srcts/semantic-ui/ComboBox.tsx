@@ -12,7 +12,6 @@ export type ComboBoxOption = {
 export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 {
 	options?: (string | { label: string, value: any })[];
-	valueIncludesLabel?:boolean;
 	value?:any;
 	onChange?:(value:any)=>void;
 	onNew?:(value:any)=>void;
@@ -99,18 +98,20 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		});
 
 		var value:any = props.value;
-		if(props.valueIncludesLabel)
+		if(value && value.hasOwnProperty("label") && value.hasOwnProperty("value"))
 		{
-			if(Array.isArray(props.value))
-			{
-				value = props.value.map((val:any) => val.value);
-				options = _.uniq(_.union(props.value, options), "value")
-			}
-			else
-			{
-				value = props.value && props.value.value;
-				options = _.uniq(_.union(options, [props.value]), "value");
-			}
+			// so get the original value from Value Object
+			value = value.value;
+			// make options have unique value
+			options = _.uniq(_.union(options, [value]), "value");
+			
+		}
+		else if(Array.isArray(value) && value[0] && value[0].hasOwnProperty("label") && value[0].hasOwnProperty("value"))
+		{
+			// so get the original values from each Value Object
+			value = value.map((val:any) => val.value);
+			// make options have unique value
+			options = _.uniq(_.union(value, options), "value")
 		}
 
 		if(props.noneOption)
@@ -131,6 +132,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 	// as this.state.value are updated programatically (for ex:LinkReactStateref)
 	private getOptionFromValue(value:any):ComboBoxOption
 	{
+		// if value is not equal to none Option value find the option
 		if(value !== (this.props.noneOption && this.props.noneOption.value))
 		{
 			let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
@@ -413,75 +415,82 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 	render()
 	{
-		console.log(this.state.value);
-		let headerUI:JSX.Element = null;
-		if(this.props.header)
-		{
-			headerUI = <div className="header">{this.props.header}</div>;
-		}
 
 		let textUIs:JSX.Element[] | JSX.Element = null;
 		let selectedOptions:ComboBoxOption | ComboBoxOption[] = null;
 
+		/***** Render Value UI ******/
 
-		if(this.isNoneOption())
+		//1. check for multiple option
+		//2. check for single option
+		//3. check for none option
+		//4. check for placeholder
+		if(this.props.type == "multiple" && Array.isArray(this.state.value) && (this.state.value as any[]).length > 0)
 		{
-			if(this.props.noneOption)
-			{
-				textUIs = <div className="text">{Weave.lang(this.props.noneOption.label)}</div>;
-			}
-			else
-			{
-				textUIs = <div className="default text">{this.props.placeholder}</div>;
-			}
+			selectedOptions =  [] ;
+
+			textUIs =(this.state.value as any[]).map( (value:any, index:number) => {
+				let option:ComboBoxOption = this.getOptionFromValue(value);
+				if(option)
+					(selectedOptions as ComboBoxOption[])[index] = option;
+				//option may not be available instantly for those cases render the value
+				//todo: if its a object, convert to string ?
+				let valueText:string = option && option.label? option.label : (typeof value == "string") ? value : "";
+				return <a key={index}
+				          className="ui label">
+					{Weave.lang(valueText)}
+					<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
+				</a>;
+			});
 		}
-		else
+		else if(this.state.value && !Array.isArray(this.state.value))
 		{
-			if(this.props.type == "multiple")
+			// render Text UI only When search Query is not in operation
+			// for non multiple type
+			if( this.state.searchQuery.length == 0)
 			{
-				selectedOptions =  [] ;
+				let option:ComboBoxOption = this.getOptionFromValue(this.state.value);
+				if(option)
+					selectedOptions = option;
+				//option may not be available instantly for those cases render the value
+				let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
 
-				textUIs =(this.state.value as any[]).map( (value:any, index:number) => {
-					let option:ComboBoxOption = this.getOptionFromValue(value);
-					if(option)
-						(selectedOptions as ComboBoxOption[])[index] = option;
-					//option may not be available instantly for those cases render the value
-					//todo: if its a object, convert to string ?
-					let valueText:string = option && option.label? option.label : (typeof value == "string") ? value : "";
-					return <a key={index}
-					          className="ui label">
-								{Weave.lang(valueText)}
-								<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
-							</a>;
-				});
-			}
-			else
-			{
-				// render Text UI only When search Query is not in operation
-				// for non multiple type
-				if( this.state.searchQuery.length == 0)
+				// if input is clicked, but user yet to type the search query
+				// in that case, color the current selection grey
+				if(this.props.searchable && this.state.openMenu )
 				{
-					let option:ComboBoxOption = this.getOptionFromValue(this.state.value);
-					if(option)
-						selectedOptions = option;
-					//option may not be available instantly for those cases render the value
-					let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
-
-					// if input is clicked, but user yet to type the search query
-					// in that case, color the current selection grey
-					if(this.props.searchable && this.state.openMenu )
-					{
-						textUIs = <div className="text" style={{color:"grey",pointerEvents:"none"}}>{Weave.lang(valueText)}</div>;
-					}
-					else
-					{
-						textUIs = <div className="text">{Weave.lang(valueText)}</div>;
-					}
-
+					textUIs = <div className="text" style={{color:"grey",pointerEvents:"none"}}>{Weave.lang(valueText)}</div>;
+				}
+				else
+				{
+					textUIs = <div className="text">{Weave.lang(valueText)}</div>;
 				}
 
 			}
 		}
+		else if(this.isNoneOption()) // if value from none option , render the none option
+		{
+			// render Text UI only When search Query is not in operation
+			// for non multiple type
+			if( this.state.searchQuery.length == 0)
+			{
+				if(this.props.searchable && this.state.openMenu )
+				{
+					textUIs = <div className="text" style={{color:"grey",pointerEvents:"none"}}>{Weave.lang(this.props.noneOption.label)}</div>;
+				}
+				else
+				{
+					textUIs = <div className="text">{Weave.lang(this.props.noneOption.label)}</div>;
+				}
+			}
+		}
+		else if(this.props.placeholder) // if placeholder is there render the value text with placeholder
+		{
+			textUIs = <div className="default text">{this.props.placeholder}</div>;
+		}
+
+
+		/***** Render Menu UI ******/
 
 		let menuUI:JSX.Element = null;
 		if(this.state.openMenu )
@@ -514,6 +523,8 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 			style:styleObj,
 			tabIndex:0
 		};
+
+		/***** Render Input UIs ******/
 
 		//todo: use of hidden input might require, we might need ot create event manually and disaptch change
 		//todo: so we might need to be set value to it
