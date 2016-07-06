@@ -256,6 +256,10 @@ div.table-row-selected>div>div>div>div>div {
 	background-color: white;
 }
 
+.weave-tool:focus {
+	outline: 4px solid #cecece;
+}
+
 .weave-tool-title-bar {
 	visibility: hidden;
 	font-size: 14px;
