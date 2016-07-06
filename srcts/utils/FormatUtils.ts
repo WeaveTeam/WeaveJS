@@ -11,11 +11,20 @@ export default class FormatUtils
     {
       return x;
     }
+    else if (x < 0.1)
+    {
+	    return this.defaultNumberRounding(x,4)
+    }
     else
     {
-      return d3.format(",")(d3.round(x, 4));
+      return d3.format(",")(this.defaultNumberRounding(x));
     }
   }
+
+	static defaultNumberRounding(x:number, decimals:number = 1):number
+	{
+		return d3.round(x, decimals);
+	}
 
   static defaultFileSizeFormatting(byteFileSize:number) {
 

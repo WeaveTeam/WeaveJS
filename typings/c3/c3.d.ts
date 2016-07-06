@@ -583,6 +583,7 @@ declare module c3 {
          */
         fit?: boolean;
         multiline?: boolean; // Undocumented
+        rotate?: number; //Undocumented
     }
 
     interface CullingConfiguration {

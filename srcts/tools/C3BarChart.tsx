@@ -15,6 +15,8 @@ import Accordion from "../semantic-ui/Accordion";
 import ChartUtils from "../utils/ChartUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import IAltText from "../accessibility/IAltText";
+import DOMUtils from "../utils/DOMUtils";
+import {CullingMetric} from "./AbstractC3Tool";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -217,10 +219,10 @@ export default class C3BarChart extends AbstractC3Tool
             },
             grid: {
                 x: {
-                    show: true
+                    show: this.showGrid.value
                 },
                 y: {
-                    show: true
+                    show: this.showGrid.value
                 }
             },
             bar: {
@@ -231,7 +233,10 @@ export default class C3BarChart extends AbstractC3Tool
             legend: {
                 show: false,
                 position: this.legendPosition.value
-            }
+            },
+	        subchart: {
+		        show: this.showSubChart.value
+	        }
         });
 
         this.c3ConfigYAxis = {
@@ -244,7 +249,7 @@ export default class C3BarChart extends AbstractC3Tool
                 fit: false,
                 multiline: false,
                 format: (num:number):string => {
-	                return this.formatGetStringFromNumber(num);
+	                return this.formatYAxisLabel(this.formatGetStringFromNumber(num),null);
                 }
             }
         };
@@ -253,17 +258,34 @@ export default class C3BarChart extends AbstractC3Tool
 	//returns correct labels (for axes) from the data column
 	private formatGetStringFromNumber = (value:number):string =>
 	{
+		let formattedValue:number = FormatUtils.defaultNumberRounding(value);
 		let heightColumns = this.heightColumns.getObjects();
 		if(this.groupingMode.value === PERCENT_STACK && heightColumns.length > 1)
 		{
-			return Weave.lang("{0}%", StandardLib.roundSignificant(100 * value));
+			return Weave.lang("{0}%", StandardLib.roundSignificant(100 * formattedValue));
 		}
 		else if(heightColumns.length > 0)
 		{
-			return Weave.lang(ColumnUtils.deriveStringFromNumber(heightColumns[0], value));
+			return Weave.lang(ColumnUtils.deriveStringFromNumber(heightColumns[0], formattedValue));
 		}
 		return null;
 	};
+
+	protected cullAxes()
+	{
+		if (this.canCull)
+		{
+			let cullingMetric:CullingMetric = this.getCullingMetrics({height:this.chart.internal.height, width:this.chart.internal.width});
+
+			//set tick marks for Axes
+			let xDisplayed:number = this.horizontalMode.value ? cullingMetric.verticalLabels:cullingMetric.horizontalLabels;
+			let yDisplayed:number = this.horizontalMode.value ? cullingMetric.horizontalLabels:cullingMetric.verticalLabels;
+
+			this.xAxisTicks.value = xDisplayed > this.records.length ? this.records.length : xDisplayed;
+			this.yAxisTicks.value = yDisplayed > cullingMetric.yAxisTotal ? cullingMetric.yAxisTotal:yDisplayed;
+			this.y2AxisTicks.value = yDisplayed > cullingMetric.y2AxisTotal ? cullingMetric.y2AxisTotal:yDisplayed;
+		}
+	}
 
 	protected handleC3Selection():void
 	{
@@ -541,7 +563,11 @@ export default class C3BarChart extends AbstractC3Tool
 			this.xAxisName,
 			this.yAxisName,
  			this.showXAxisLabel,
-	        this.xAxisLabelAngle
+	        this.xAxisLabelAngle,
+	        this.xAxisTicks,
+	        this.yAxisTicks,
+	        this.y2AxisTicks,
+	        this.horizontalMode
 		);
 		var dataChange = axisChange || Weave.detectChange(this, this.colorColumn, this.chartColors, this.groupingMode, this.filteredKeySet, this.showValueLabels);
 		if (dataChange)
@@ -573,7 +599,7 @@ export default class C3BarChart extends AbstractC3Tool
                     this.c3Config.data.axes = axes;
                     this.c3Config.axis.y2 = this.c3ConfigYAxis;
                     this.c3Config.axis.y = {show: false};
-                    this.c3Config.axis.x.tick.rotate = -1*this.xAxisLabelAngle.value;
+	                this.c3Config.axis.x.tick.rotate = -1*this.xAxisLabelAngle.value;
                 }
                 else
                 {
@@ -590,16 +616,28 @@ export default class C3BarChart extends AbstractC3Tool
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
-			this.updateConfigMargin();
-			this.updateConfigAxisY();
-        }
-		
-        if (Weave.detectChange(this, this.horizontalMode))
-        {
-            changeDetected = true;
+	        if (this.canCull) {
+		        this.c3Config.axis.x.tick.count = this.xAxisTicks.value;
+		        if (weavejs.WeaveAPI.Locale.reverseLayout) {
+			        this.c3Config.axis.y2.tick.count = this.y2AxisTicks.value;
+		        } else {
+			        this.c3Config.axis.y.tick.count = this.yAxisTicks.value;
+		        }
+	        }
+
 	        //we override the default behavior of rotated for bar chart and histogram according to the horizontal mode boolean
 	        //rest of the charts, the default value is retained
-            this.c3Config.axis.rotated = this.horizontalMode.value;
+	        this.c3Config.axis.rotated = this.horizontalMode.value;
+	        if(this.horizontalMode.value) {
+		        if (weavejs.WeaveAPI.Locale.reverseLayout) {
+			        this.c3Config.axis.y2.tick.rotate = this.xAxisLabelAngle.value;
+		        } else {
+			        this.c3Config.axis.y.tick.rotate = this.xAxisLabelAngle.value;
+		        }
+	        }
+
+			this.updateConfigMargin();
+			this.updateConfigAxisY();
         }
 
 		if (Weave.detectChange(this, this.barWidthRatio))
@@ -618,8 +656,24 @@ export default class C3BarChart extends AbstractC3Tool
 			    this.c3Config.padding.right = this.margin.right.value;
 	    }
 
+	    if (Weave.detectChange(this, this.showGrid))
+	    {
+		    changeDetected = true;
+		    this.c3Config.grid.x.show = this.showGrid.value;
+		    this.c3Config.grid.y.show = this.showGrid.value;
+	    }
+
+	    if(Weave.detectChange(this, this.showSubChart))
+	    {
+		    changeDetected = true;
+		    this.c3Config.subchart.show = this.showSubChart.value;
+	    }
+
         if (changeDetected || forced)
-			return true;
+        {
+	        this.cullAxes();
+	        return true;
+        }
 		
 		// update C3 selection and style on already-rendered chart
         var selectedKeys:IQualifiedKey[] = this.selectionKeySet ? this.selectionKeySet.keys : [];
@@ -697,6 +751,14 @@ export default class C3BarChart extends AbstractC3Tool
 					[
 						Weave.lang("Show X axis title"),
 						<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={" "}/>
+					],
+					[
+						Weave.lang("Show grid"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showGrid })} label={" "}/>
+					],
+					Weave.beta && [
+						Weave.lang("Show sub chart (beta)"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showSubChart })} label={" "}/>
 					],
 					[
 						Weave.lang("X axis label angle"),

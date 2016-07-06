@@ -32,6 +32,7 @@ import LinkableString = weavejs.core.LinkableString;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+import LinkableBoolean = weavejs.core.LinkableBoolean;
 
 function finiteOrNull(n:number):number { return isFinite(n) ? n : null; }
 
@@ -40,10 +41,12 @@ declare type AxisClass = {
 	grid:string;
 };
 
-declare type CullingMetric = {
-	interval:number;
-	total:number;
-	displayed:number;
+export type CullingMetric = {
+	xAxisTotal:number;
+	yAxisTotal:number;
+	y2AxisTotal:number;
+	verticalLabels:number;
+	horizontalLabels:number;
 }
 
 export interface IAbstractC3ToolProps extends IVisToolProps
@@ -54,6 +57,12 @@ export interface IAbstractC3ToolProps extends IVisToolProps
 
 export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps, IVisToolState>
 {
+	showGrid = Weave.linkableChild(this, new LinkableBoolean(false));
+	showSubChart = Weave.linkableChild(this, new LinkableBoolean(false));
+	xAxisTicks = Weave.linkableChild(this, new LinkableNumber(0));
+	yAxisTicks = Weave.linkableChild(this, new LinkableNumber(0));
+	y2AxisTicks = Weave.linkableChild(this, new LinkableNumber(0));
+	
 	constructor(props:IVisToolProps)
 	{
 		super(props);
@@ -154,9 +163,11 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		{
 			this.c3Config.size = { width: this.element.clientWidth, height: this.element.clientHeight };
 			if (this.chart)
+			{
 				this.chart.resize({ width: this.element.clientWidth, height: this.element.clientHeight });
+				this.cullAxes();
+			}
 		}
-		this.cullAxes();
 	}
 	
 	render():JSX.Element
@@ -187,9 +198,9 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	protected chartComponent:C3Chart;
 	protected chart:c3.ChartAPI;
 	protected c3Config:c3.ChartConfiguration;
-	private xAxisClass:AxisClass;
-	private yAxisClass:AxisClass;
-	private y2AxisClass:AxisClass;
+	protected xAxisClass:AxisClass;
+	protected yAxisClass:AxisClass;
+	protected y2AxisClass:AxisClass;
 	private busy:boolean;
 
 	private debouncedHandleC3Selection:Function;
@@ -205,6 +216,7 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		if (!Weave.wasDisposed(this) && !Weave.isBusy(this) && !this.busy && this.validate(!this.chart))
 		{
 			this.busy = true;
+			this.cullAxes();
 			if (this.chart && _.isEqual(this.chartComponent.props.config, this.c3Config))
 				this.chart.flush();
 			else
@@ -222,7 +234,6 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		if (this.busy)
 			return;
 
-		this.cullAxes();
 		if (this.element && this.chart) {
 			$(this.element).find(".c3-chart").each( (i,e) => {
 				e.addEventListener("mouseout", (event) => {
@@ -313,40 +324,12 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 	{
 		AbstractVisTool.handlePointClick(this, event);
 	}
-	
-	private cullAxis(axisSize:number, axisClass:AxisClass):void
-	{
-		//axis label culling
-		var cullingMetric:CullingMetric = this._getCullingMetrics(axisSize,axisClass.axis);
-		var intervalForCulling:number = cullingMetric.interval;
-		d3.select(this.element).selectAll('.' + axisClass.axis + ' .tick text').each(function (e, index) {
-			if (index >= 0)
-			{
-				d3.select(this).style('display', index % intervalForCulling ? 'none' : 'block');
-			}
-		});
-		//grid line culling
-		var gridCullingInterval:number = this.getInterval('.' + axisClass.grid,cullingMetric.displayed);
-		d3.select(this.element).selectAll('.' + axisClass.grid).each(function (e, index) {
-			if (index >= 0)
-			{
-				d3.select(this).style('display', index % gridCullingInterval ? 'none' : 'block');
-			}
-		});
-		//tick culling
-		var tickCullingInterval:number = this.getInterval('.'+ axisClass.axis + ' .tick line',cullingMetric.displayed);
-		d3.select(this.element).selectAll('.'+ axisClass.axis + ' .tick line').each(function (e, index) {
-			if (index >= 0)
-			{
-				d3.select(this).style('display', index % tickCullingInterval ? 'none' : 'block');
-			}
-		});
-	}
 
-	protected cullAxes()
+	protected cullAxes() { }
+
+	protected get canCull():boolean
 	{
-		this.cullAxis(this.internalWidth, this.xAxisClass);
-		this.cullAxis(this.internalHeight, weavejs.WeaveAPI.Locale.reverseLayout ? this.y2AxisClass : this.yAxisClass);
+		return (this.chart && this.c3Config && _.has(this.chart, "internal.width") && _.has(this.chart, "internal.height") && _.has(this.c3Config, "axis.x") && _.has(this.c3Config, "axis.y"));
 	}
 
 	customStyle(array:Array<number>, type:string, filter:string, style:any)
@@ -368,33 +351,24 @@ export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps
 		});
 	}
 	
-	private _getCullingMetrics(size:number,axisClass:string):CullingMetric
+	protected getCullingMetrics(chartSize:{width:number, height:number}):CullingMetric
 	{
-		var textHeight:number = DOMUtils.getTextHeight("test", this.getFontString());
-		var labelsToShow:number = Math.floor(size / textHeight);
-		labelsToShow = Math.max(2, labelsToShow);
+		var textHeight:number = DOMUtils.getTextHeight("TEST", this.getFontString())+6;
+		var heightLabelsToShow:number = Math.floor(chartSize.height / textHeight);
+		let widthLabelsToShow:number = Math.floor(chartSize.width / textHeight);
+		heightLabelsToShow = Math.max(2, heightLabelsToShow);
+		widthLabelsToShow = Math.max(2, widthLabelsToShow);
+		let xAxisTotal:number = d3.select(this.element).selectAll('.' + this.xAxisClass.axis + ' .tick text').size();
+		let yAxisTotal:number = d3.select(this.element).selectAll('.' + this.yAxisClass.axis + ' .tick text').size();
+		let y2AxisTotal:number = d3.select(this.element).selectAll('.' + this.y2AxisClass.axis + ' .tick text').size();
 
-		var tickValues:number = d3.select(this.element).selectAll('.' + axisClass + ' .tick text').size();
 		return {
-			interval: this.getInterval('.' + axisClass + ' .tick text', labelsToShow),
-			total: tickValues,
-			displayed: labelsToShow
+			xAxisTotal: xAxisTotal ? xAxisTotal:widthLabelsToShow,
+			yAxisTotal: yAxisTotal ? yAxisTotal:heightLabelsToShow,
+			y2AxisTotal: y2AxisTotal ? y2AxisTotal:heightLabelsToShow,
+			verticalLabels: heightLabelsToShow,
+			horizontalLabels: widthLabelsToShow
 		};
-	}
-
-	getInterval(classSelector:string, requiredValues:number)
-	{
-		var totalValues:number = d3.select(this.element).selectAll(classSelector).size();
-		var interval:number;
-		for (var i:number = 1; i < totalValues; i++)
-		{
-			if (totalValues / i < requiredValues)
-			{
-				interval = i;
-				break;
-			}
-		}
-		return interval;
 	}
 
 	getFontString():string

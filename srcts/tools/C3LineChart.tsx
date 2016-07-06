@@ -13,6 +13,9 @@ import ChartUtils from "../utils/ChartUtils";
 import ComboBox from "../semantic-ui/ComboBox";
 import Accordion from "../semantic-ui/Accordion";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import IAltText from "../accessibility/IAltText";
+import {CullingMetric} from "./AbstractC3Tool";
+import Checkbox from "../semantic-ui/Checkbox";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -24,7 +27,6 @@ import LinkableString = weavejs.core.LinkableString;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import LinkableNumber = weavejs.core.LinkableNumber;
-import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
     id: IQualifiedKey,
@@ -84,11 +86,11 @@ export default class C3LineChart extends AbstractC3Tool
 					var columns = this.columns.getObjects(IAttributeColumn);
                     if (columns[0] && columns[0].getMetadata('dataType') !== "number")
                     {
-                        return Weave.lang(this.yAxisValueToLabel[num]) || "";
+                        return this.formatYAxisLabel(Weave.lang(this.yAxisValueToLabel[num]),null) || "";
                     }
                     else
                     {
-                        return String(FormatUtils.defaultNumberFormatting(num));
+                        return this.formatYAxisLabel(String(FormatUtils.defaultNumberFormatting(num)),null);
                     }
                 }
             }
@@ -106,10 +108,10 @@ export default class C3LineChart extends AbstractC3Tool
             },
             grid: {
                 x: {
-                    show: true
+                    show: this.showGrid.value
                 },
                 y: {
-                    show: true
+                    show: this.showGrid.value
                 }
             },
             point: {
@@ -151,6 +153,9 @@ export default class C3LineChart extends AbstractC3Tool
             },
             legend: {
                 show: false
+            },
+            subchart: {
+                show: this.showSubChart.value
             }
         });
     }
@@ -162,6 +167,23 @@ export default class C3LineChart extends AbstractC3Tool
 		var record = this.records[this.keyToIndex[datum.id]];
 		return record ? record.id : null;
 	}
+
+    protected cullAxes()
+    {
+        if (this.canCull)
+        {
+            let cullingMetric:CullingMetric = this.getCullingMetrics({height:this.chart.internal.height, width:this.chart.internal.width});
+            let columnCount:number = this.columns.getObjects(IAttributeColumn).length;
+            
+            //set tick marks for Axes
+            let xDisplayed:number = cullingMetric.horizontalLabels;
+            let yDisplayed:number = cullingMetric.verticalLabels;
+
+            this.xAxisTicks.value = xDisplayed > columnCount ? columnCount:xDisplayed;
+            this.yAxisTicks.value = yDisplayed > cullingMetric.yAxisTotal ? cullingMetric.yAxisTotal:yDisplayed;
+            this.y2AxisTicks.value = yDisplayed > cullingMetric.y2AxisTotal ? cullingMetric.y2AxisTotal:yDisplayed;
+        }
+    }
 
 	protected handleC3MouseOver(d:any):void
 	{
@@ -193,7 +215,18 @@ export default class C3LineChart extends AbstractC3Tool
     protected validate(forced:boolean = false):boolean
     {
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.columns, this.overrideBounds, this.xAxisName, this.yAxisName, this.margin, this.xAxisLabelAngle);
+        var axisChange:boolean = Weave.detectChange(
+            this,
+            this.columns,
+            this.overrideBounds,
+            this.xAxisName,
+            this.yAxisName,
+            this.margin,
+            this.xAxisLabelAngle,
+            this.xAxisTicks,
+            this.yAxisTicks,
+            this.y2AxisTicks
+        );
 		var dataChanged:boolean = axisChange || Weave.detectChange(this, this.curveType, this.line, this.filteredKeySet);
         if (dataChanged)
         {
@@ -268,8 +301,31 @@ export default class C3LineChart extends AbstractC3Tool
             this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
 
+            if (this.canCull)
+            {
+                this.c3Config.axis.x.tick.count = this.xAxisTicks.value;
+                if (weavejs.WeaveAPI.Locale.reverseLayout) {
+                    this.c3Config.axis.y2.tick.count = this.y2AxisTicks.value;
+                } else {
+                    this.c3Config.axis.y.tick.count = this.yAxisTicks.value;
+                }
+            }
+
 			this.updateConfigMargin();
 			this.updateConfigAxisY();
+        }
+
+        if (Weave.detectChange(this, this.showGrid))
+        {
+            changeDetected = true;
+            this.c3Config.grid.x.show = this.showGrid.value;
+            this.c3Config.grid.y.show = this.showGrid.value;
+        }
+
+        if(Weave.detectChange(this, this.showSubChart))
+        {
+            changeDetected = true;
+            this.c3Config.subchart.show = this.showSubChart.value;
         }
 
         if (changeDetected || forced)
@@ -327,14 +383,14 @@ export default class C3LineChart extends AbstractC3Tool
             .selectAll("path.c3-shape.c3-line")
             .style("opacity",
                 (d: any, i: number, oi: number): number => {
-                    let key = this.records[i].id;
+                    let key = this.records[i] && this.records[i].id;
                     let selected = this.isSelected(key);
                     let probed = this.isProbed(key);
                     return (selectionEmpty || selected || probed) ? 1.0 : 0.3;
                 })
             .style("stroke-width",
                 (d: any, i: number, oi: number): number => {
-                    let key = this.records[i].id;
+                    let key = this.records[i] &&  this.records[i].id;
                     let selected = this.isSelected(key);
                     let probed = this.isProbed(key);
                     return probed ? 3 : (selected ? 2 : 1);
@@ -390,7 +446,15 @@ export default class C3LineChart extends AbstractC3Tool
 				    [
 					    Weave.lang("X axis label angle"),
 					    <ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
-				    ]
+				    ],
+                    [
+                        Weave.lang("Show grid"),
+                        <Checkbox ref={linkReactStateRef(this, { value: this.showGrid })} label={" "}/>
+                    ],
+                    Weave.beta && [
+                        Weave.lang("Show sub chart (beta)"),
+                        <Checkbox ref={linkReactStateRef(this, { value: this.showSubChart })} label={" "}/>
+                    ]
 			    ]
 		    ],
 		    [Weave.lang("Titles"), this.getTitlesEditor()],

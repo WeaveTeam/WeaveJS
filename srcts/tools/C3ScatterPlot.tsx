@@ -10,6 +10,9 @@ import ChartUtils from "../utils/ChartUtils";
 import ComboBox from "../semantic-ui/ComboBox";
 import Accordion from "../semantic-ui/Accordion";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
+import IAltText from "../accessibility/IAltText";
+import {CullingMetric} from "./AbstractC3Tool";
+import Checkbox from "../semantic-ui/Checkbox";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -27,7 +30,6 @@ import StandardLib = weavejs.util.StandardLib;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
-import IAltText from "../accessibility/IAltText";
 
 declare type Record = {
 	id: IQualifiedKey,
@@ -113,6 +115,9 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			legend: {
 				show: false
 			},
+	        subchart: {
+		        show: this.showSubChart.value
+	        },
 			axis: {
 				x: {
 					label: {
@@ -123,11 +128,11 @@ export default class C3ScatterPlot extends AbstractC3Tool
 						format: (num:number):string => {
 							if (this.xAxisValueToLabel && this.dataXType !== "number")
 							{
-								return Weave.lang(this.xAxisValueToLabel[num]) || "";
+								return this.formatXAxisLabel(Weave.lang(this.xAxisValueToLabel[num]), this.xAxisLabelAngle.value) || "";
 							}
 							else
 							{
-								return String(FormatUtils.defaultNumberFormatting(num));
+								return this.formatXAxisLabel(String(FormatUtils.defaultNumberFormatting(num)),this.xAxisLabelAngle.value);
 							}
 						},
 						rotate: this.xAxisLabelAngle.value,
@@ -140,10 +145,10 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			},
 			grid: {
 				x: {
-					show: true
+					show: this.showGrid.value
 				},
 				y: {
-					show: true
+					show: this.showGrid.value
 				}
 			},
 			point: {
@@ -178,15 +183,31 @@ export default class C3ScatterPlot extends AbstractC3Tool
 				format: (num:number):string => {
 					if (this.yAxisValueToLabel && this.dataYType !== "number")
 					{
-						return Weave.lang(this.yAxisValueToLabel[num]) || "";
+						return this.formatYAxisLabel(Weave.lang(this.yAxisValueToLabel[num]),null) || "";
 					}
 					else
 					{
-						return String(FormatUtils.defaultNumberFormatting(num));
+						return this.formatYAxisLabel(String(FormatUtils.defaultNumberFormatting(num)),null);
 					}
 				}
 			}
 		};
+	}
+
+	protected cullAxes()
+	{
+		if (this.canCull)
+		{
+			let cullingMetric:CullingMetric = this.getCullingMetrics({height:this.chart.internal.height, width:this.chart.internal.width});
+
+			//set tick marks for Axes
+			let xDisplayed:number = cullingMetric.horizontalLabels;
+			let yDisplayed:number = cullingMetric.verticalLabels;
+
+			this.xAxisTicks.value = xDisplayed > cullingMetric.xAxisTotal ? cullingMetric.xAxisTotal:xDisplayed;
+			this.yAxisTicks.value = yDisplayed > cullingMetric.yAxisTotal ? cullingMetric.yAxisTotal:yDisplayed;
+			this.y2AxisTicks.value = yDisplayed > cullingMetric.y2AxisTotal ? cullingMetric.y2AxisTotal:yDisplayed;
+		}
 	}
 	
 	protected handleC3MouseOver(d:any):void
@@ -208,6 +229,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 
 	protected validate(forced:boolean = false):boolean
 	{
+		var changeDetected:boolean = false;
 		var xyChanged = Weave.detectChange(this, this.dataX, this.dataY);
 		var dataChanged = xyChanged || Weave.detectChange(this, this.radius, this.fill, this.line, this.filteredKeySet);
 		if (dataChanged)
@@ -230,7 +252,15 @@ export default class C3ScatterPlot extends AbstractC3Tool
 			
 			this.c3Config.data.json = {x: _.map(this.records, 'point.x'), y: _.map(this.records, 'point.y')};
 		}
-		var axisChanged = xyChanged || Weave.detectChange(this, this.xAxisName, this.yAxisName, this.margin, this.xAxisLabelAngle);
+		var axisChanged = xyChanged || Weave.detectChange(this,
+				this.xAxisName,
+				this.yAxisName,
+				this.margin,
+				this.xAxisLabelAngle,
+				this.xAxisTicks,
+				this.yAxisTicks,
+				this.y2AxisTicks
+			);
 		if (axisChanged)
 		{
 			var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
@@ -253,10 +283,34 @@ export default class C3ScatterPlot extends AbstractC3Tool
 
 			this.c3Config.axis.x.label = {text:xLabel, position:"outer-center"};
 			this.c3ConfigYAxis.label = {text:yLabel, position:"outer-middle"};
+
+			if (this.canCull)
+			{
+				this.c3Config.axis.x.tick.count = this.xAxisTicks.value;
+				if (weavejs.WeaveAPI.Locale.reverseLayout) {
+					this.c3Config.axis.y2.tick.count = this.y2AxisTicks.value;
+				} else {
+					this.c3Config.axis.y.tick.count = this.yAxisTicks.value;
+				}
+			}
+
 			this.updateConfigMargin();
 		}
 
-		if (forced || dataChanged || axisChanged)
+		if (Weave.detectChange(this, this.showGrid))
+		{
+			changeDetected = true;
+			this.c3Config.grid.x.show = this.showGrid.value;
+			this.c3Config.grid.y.show = this.showGrid.value;
+		}
+
+		if(Weave.detectChange(this, this.showSubChart))
+		{
+			changeDetected = true;
+			this.c3Config.subchart.show = this.showSubChart.value;
+		}
+
+		if (forced || dataChanged || axisChanged || changeDetected)
 			return true;
 		
 		//after data is loaded we need to remove the clip-path so that points are not
@@ -377,6 +431,14 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					[
 						Weave.lang("X axis label angle"),
 						<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+					],
+					[
+						Weave.lang("Show grid"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showGrid })} label={" "}/>
+					],
+					Weave.beta && [
+						Weave.lang("Show sub chart (beta)"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showSubChart })} label={" "}/>
 					]
 				]
 			],

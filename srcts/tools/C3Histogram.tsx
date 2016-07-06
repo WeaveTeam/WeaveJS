@@ -25,6 +25,7 @@ import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import ChartUtils from "../utils/ChartUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import IAltText from "../accessibility/IAltText";
+import {CullingMetric} from "./AbstractC3Tool";
 
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -204,6 +205,9 @@ export default class C3Histogram extends AbstractC3Tool
             legend: {
                 show: false
             },
+	        subchart: {
+		        show: this.showSubChart.value
+	        },
             axis: {
                 x: {
                     type: "category",
@@ -218,9 +222,10 @@ export default class C3Histogram extends AbstractC3Tool
                         },
                         multiline: false,
                         format: (num:number):string => {
+	                        let index:number = Math.floor(num);
                             if (this.element)
                             {
-                                var labelString:string = Weave.lang(this.getLabelString(num));
+                                var labelString:string = Weave.lang(this.getLabelString(index));
                                 if (labelString)
                                 {
 									return this.formatXAxisLabel(labelString,this.xAxisLabelAngle.value);
@@ -232,7 +237,7 @@ export default class C3Histogram extends AbstractC3Tool
                             }
                             else
                             {
-                                return Weave.lang(this.binnedColumn.deriveStringFromNumber(num));
+                                return this.formatXAxisLabel(Weave.lang(this.binnedColumn.deriveStringFromNumber(index)),this.xAxisLabelAngle.value);
                             }
                         }
                     }
@@ -241,10 +246,10 @@ export default class C3Histogram extends AbstractC3Tool
             },
             grid: {
                 x: {
-                    show: true
+                    show: this.showGrid.value
                 },
                 y: {
-                    show: true
+                    show: this.showGrid.value
                 }
             },
             bar: {
@@ -262,7 +267,7 @@ export default class C3Histogram extends AbstractC3Tool
             tick: {
                 fit: false,
                 format: (num:number):string => {
-                    return Weave.lang(String(FormatUtils.defaultNumberFormatting(num)));
+                    return this.formatYAxisLabel(Weave.lang(String(FormatUtils.defaultNumberFormatting(num))),null);
                 }
             }
         }
@@ -323,6 +328,22 @@ export default class C3Histogram extends AbstractC3Tool
             return this.defaultYAxisLabel;
         }
     }
+
+	protected cullAxes()
+	{
+		if (this.canCull)
+		{
+			let cullingMetric:CullingMetric = this.getCullingMetrics({height:this.chart.internal.height, width:this.chart.internal.width});
+
+			//set tick marks for Axes
+			let xDisplayed:number = this.horizontalMode.value ? cullingMetric.verticalLabels:cullingMetric.horizontalLabels;
+			let yDisplayed:number = this.horizontalMode.value ? cullingMetric.horizontalLabels:cullingMetric.verticalLabels;
+
+			this.xAxisTicks.value = xDisplayed > this.binnedColumn.numberOfBins ? this.binnedColumn.numberOfBins:xDisplayed;
+			this.yAxisTicks.value = yDisplayed > cullingMetric.yAxisTotal ? cullingMetric.yAxisTotal:yDisplayed;
+			this.y2AxisTicks.value = yDisplayed > cullingMetric.y2AxisTotal ? cullingMetric.y2AxisTotal:yDisplayed;
+		}
+	}
 
 	protected handleC3Selection():void
 	{
@@ -485,7 +506,20 @@ export default class C3Histogram extends AbstractC3Tool
     protected validate(forced:boolean = false):boolean
     {
         var changeDetected:boolean = false;
-        var axisChange:boolean = Weave.detectChange(this, this.binnedColumn, this.columnToAggregate, this.aggregationMethod, this.xAxisName, this.yAxisName, this.margin, this.xAxisLabelAngle);
+        var axisChange:boolean = Weave.detectChange(
+	        this,
+	        this.binnedColumn,
+	        this.columnToAggregate,
+	        this.aggregationMethod,
+	        this.xAxisName,
+	        this.yAxisName,
+	        this.margin,
+	        this.xAxisLabelAngle,
+	        this.xAxisTicks,
+	        this.yAxisTicks,
+	        this.y2AxisTicks,
+	        this.horizontalMode
+        );
         if (axisChange || Weave.detectChange(this, this.columnToAggregate, this.fill, this.line, this.filteredKeySet, this.showValueLabels))
         {
             changeDetected = true;
@@ -518,21 +552,46 @@ export default class C3Histogram extends AbstractC3Tool
 
             this.c3Config.axis.x.label = {text: xLabel, position:"outer-center"};
             this.c3ConfigYAxis.label = {text: yLabel, position:"outer-middle"};
+
+	        if (this.canCull) {
+		        this.c3Config.axis.x.tick.count = this.xAxisTicks.value;
+		        if (weavejs.WeaveAPI.Locale.reverseLayout) {
+			        this.c3Config.axis.y2.tick.count = this.y2AxisTicks.value;
+		        } else {
+			        this.c3Config.axis.y.tick.count = this.yAxisTicks.value;
+		        }
+	        }
+
+	        this.c3Config.axis.rotated = this.horizontalMode.value;
+	        if(this.horizontalMode.value) {
+		        if (weavejs.WeaveAPI.Locale.reverseLayout) {
+			        this.c3Config.axis.y2.tick.rotate = this.xAxisLabelAngle.value;
+		        } else {
+			        this.c3Config.axis.y.tick.rotate = this.xAxisLabelAngle.value;
+		        }
+	        }
 			
 			this.updateConfigMargin();
     	}
-
-	    if (Weave.detectChange(this, this.horizontalMode))
-	    {
-		    changeDetected = true;
-		    this.c3Config.axis.rotated = this.horizontalMode.value;
-	    }
 
         if (Weave.detectChange(this, this.barWidthRatio))
         {
             changeDetected = true;
             (this.c3Config.bar.width as {ratio:number}).ratio = this.barWidthRatio.value;
         }
+
+	    if (Weave.detectChange(this, this.showGrid))
+	    {
+		    changeDetected = true;
+		    this.c3Config.grid.x.show = this.showGrid.value;
+		    this.c3Config.grid.y.show = this.showGrid.value;
+	    }
+
+	    if(Weave.detectChange(this, this.showSubChart))
+	    {
+		    changeDetected = true;
+		    this.c3Config.subchart.show = this.showSubChart.value;
+	    }
 
     	if (changeDetected || forced)
 			return true;
@@ -647,6 +706,14 @@ export default class C3Histogram extends AbstractC3Tool
 					[
 						Weave.lang("Show value labels"),
 						<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
+					],
+					[
+						Weave.lang("Show grid"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showGrid })} label={" "}/>
+					],
+					Weave.beta && [
+						Weave.lang("Show sub chart (beta)"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showSubChart })} label={" "}/>
 					],
 					[
 						Weave.lang("X axis label angle"),
