@@ -21,6 +21,8 @@ import {AbstractLayout, AnyAbstractLayout} from "./layouts/AbstractLayout";
 import LinkableString = weavejs.core.LinkableString;
 import IAltText from "./accessibility/IAltText";
 import {KEYCODES} from "./utils/KeyboardUtils";
+import DynamicComponent from "./ui/DynamicComponent";
+import {getWeaveProperties} from "./ui/WeaveProperties";
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -301,11 +303,19 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					props={this.props.props}
 				/>
 				{
-					this.state.showCaption
-						?
-					<div style={{maxHeight: "30%"}}>{ this.renderCaption() }</div>
-						:
-					null
+					<DynamicComponent
+						dependencies={(() => {
+							var ap = getWeaveProperties(this.props.weave).accessibility;
+							return [ap.enableAccessibilityFeatures, ap.enableCaptioning];
+						})()}
+						render={() => {
+							var ap = getWeaveProperties(this.props.weave).accessibility;
+							if(ap.enableAccessibilityFeatures.value && ap.enableCaptioning && this.state.showCaption)
+								return <div style={{maxHeight: "30%"}}>{ this.renderCaption() }</div>;
+							else
+								return null;
+						}}
+					/>
 				}
 			</VBox>
 		);
