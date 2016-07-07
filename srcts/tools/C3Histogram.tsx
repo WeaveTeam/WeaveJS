@@ -126,9 +126,6 @@ export default class C3Histogram extends AbstractC3Tool
 		columnToAggregate: Number
 	};
 
-    private idToRecord:{[id:string]: Record};
-    private keyToIndex:{[key:string]: number};
-    private heightColumnNames:string[];
     private histData:{[key:string]: number}[];
     private keys:{x?:string, value:string[]};
 	private records:Record[];
@@ -154,10 +151,7 @@ export default class C3Histogram extends AbstractC3Tool
 		var _colorColumn:ColorColumn = this.fill.color.internalDynamicColumn.requestLocalObject(ColorColumn, false);
 		_colorColumn.ramp.setSessionState([0x808080]);
 		var _binnedColumn:BinnedColumn = _colorColumn.internalDynamicColumn.requestLocalObject(BinnedColumn, true);
-		var filteredColumn:FilteredColumn = _binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn, true);
-
-        this.idToRecord = {};
-        this.keyToIndex = {};
+		_binnedColumn.internalDynamicColumn.requestLocalObject(FilteredColumn, true);
 
         this.mergeConfig({
             data: {
@@ -278,12 +272,6 @@ export default class C3Histogram extends AbstractC3Tool
         }
         else
             return Weave.lang(this.binnedColumn.deriveStringFromNumber(num));
-    }
-
-    rotateAxes()
-    {
-        //this.c3Config.axis.rotated = true;
-        //this.forceUpdate();
     }
 
 	get defaultXAxisLabel():string
@@ -417,14 +405,6 @@ export default class C3Histogram extends AbstractC3Tool
     private dataChanged()
     {
 		this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
-
-        this.idToRecord = {};
-        this.keyToIndex = {};
-
-        this.records.forEach((record:Record, index:number) => {
-            this.idToRecord[record.id as any] = record;
-            this.keyToIndex[record.id as any] = index;
-        });
 
         this.histData = [];
 
