@@ -78,6 +78,60 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 		return additionalColumns;
 	}
 
+	static getSelectedStyle(record:any, strokeEnabled:boolean, fillEnabled:boolean, olSelectionStyle:Array<ol.style.Style>):Array<ol.style.Style>
+	{
+		return (strokeEnabled || fillEnabled) && [
+				new ol.style.Style({
+					image: new ol.style.Circle({
+						stroke: olSelectionStyle[0].getStroke(),
+						radius: record.radius
+					}),
+					zIndex: olSelectionStyle[0].getZIndex()
+				})
+			];
+	}
+
+	static getProbedStyle(record:any, strokeEnabled:boolean, fillEnabled:boolean, olProbedStyle:Array<ol.style.Style>):Array<ol.style.Style>
+	{
+		return (strokeEnabled || fillEnabled) && [
+				new ol.style.Style({
+					image: new ol.style.Circle({
+						stroke: olProbedStyle[0].getStroke(),
+						radius: record.radius
+					}),
+					zIndex: olProbedStyle[0].getZIndex()
+				}),
+				new ol.style.Style({
+					image: new ol.style.Circle({
+						stroke: olProbedStyle[1].getStroke(),
+						radius: record.radius
+					}),
+					zIndex: olProbedStyle[1].getZIndex()
+				})
+			];
+	}
+
+	static getNormalStyle(record:any, strokeEnabled:boolean, fillEnabled:boolean, olStroke:ol.style.Stroke, olFill:ol.style.Fill):Array<ol.style.Style>
+	{
+		return [new ol.style.Style({
+			image: new ol.style.Circle({
+				fill: fillEnabled ? olFill : undefined, stroke: strokeEnabled ? olStroke : undefined,
+				radius: record.radius,
+			})
+		})];
+	}
+
+	static getUnselectedStyle(record:any, strokeEnabled:boolean, fillEnabled:boolean, olStrokeFaded:ol.style.Stroke, olFillFaded:ol.style.Fill):Array<ol.style.Style>
+	{
+		return [new ol.style.Style({
+			image: new ol.style.Circle({
+				fill: fillEnabled ? olFillFaded : undefined,
+				stroke: strokeEnabled ? olStrokeFaded : undefined,
+				radius: record.radius
+			})
+		})];
+	}
+
 	updateStyleData()
 	{
 		let fillEnabled = this.fill.enable.value;
@@ -112,46 +166,10 @@ export default class ScatterPlotLayer extends AbstractGlyphLayer
 			let olSelectionStyle = AbstractFeatureLayer.getOlSelectionStyle(olStroke);
 			let olProbedStyle = AbstractFeatureLayer.getOlProbedStyle(olStroke);
 
-			let normalStyle = [new ol.style.Style({
-				image: new ol.style.Circle({
-					fill: fillEnabled ? olFill : undefined, stroke: strokeEnabled ? olStroke : undefined,
-					radius: record.radius,
-				})
-			})];
-
-			let unselectedStyle = [new ol.style.Style({
-				image: new ol.style.Circle({
-					fill: fillEnabled ? olFillFaded : undefined, stroke: strokeEnabled ? olStrokeFaded : undefined,
-					radius: record.radius
-				})
-			})];
-
-			let selectedStyle = (strokeEnabled || fillEnabled) && [
-				new ol.style.Style({
-					image: new ol.style.Circle({
-						stroke: olSelectionStyle[0].getStroke(),
-						radius: record.radius
-					}),
-					zIndex: olSelectionStyle[0].getZIndex()
-				})
-			];
-
-			let probedStyle = (strokeEnabled || fillEnabled) && [
-				new ol.style.Style({
-					image: new ol.style.Circle({
-						stroke: olProbedStyle[0].getStroke(),
-						radius: record.radius
-					}),
-					zIndex: olProbedStyle[0].getZIndex()
-				}),
-				new ol.style.Style({
-					image: new ol.style.Circle({
-						stroke: olProbedStyle[1].getStroke(),
-						radius: record.radius
-					}),
-					zIndex: olProbedStyle[1].getZIndex()
-				})
-			];
+			let normalStyle = ScatterPlotLayer.getNormalStyle(record,strokeEnabled,fillEnabled,olStroke,olFill);
+			let unselectedStyle = ScatterPlotLayer.getUnselectedStyle(record,strokeEnabled,fillEnabled,olStrokeFaded,olFillFaded);
+			let selectedStyle = ScatterPlotLayer.getSelectedStyle(record,strokeEnabled,fillEnabled,olSelectionStyle);
+			let probedStyle = ScatterPlotLayer.getProbedStyle(record,strokeEnabled,fillEnabled,olProbedStyle);
 
 			let feature = this.source.getFeatureById(record.id);
 
