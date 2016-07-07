@@ -101,17 +101,18 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		if(value && value.hasOwnProperty("label") && value.hasOwnProperty("value"))
 		{
 			// so get the original value from Value Object
-			value = value.value;
+			value = props.value.value;
 			// make options have unique value
-			options = _.uniq(_.union(options, [value]), "value");
+			options = _.uniq(_.union(options, [props.value]), "value");
+			console.log(options);
 			
 		}
 		else if(Array.isArray(value) && value[0] && value[0].hasOwnProperty("label") && value[0].hasOwnProperty("value"))
 		{
 			// so get the original values from each Value Object
-			value = value.map((val:any) => val.value);
+			value = props.value.map((val:any) => val.value);
 			// make options have unique value
-			options = _.uniq(_.union(value, options), "value")
+			options = _.uniq(_.union(props.value, options), "value")
 		}
 
 		if(props.noneOption)
