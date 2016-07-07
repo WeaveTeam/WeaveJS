@@ -31,7 +31,7 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 		this.tempLayer.addGroupedCallback(this, this.toProviderOptions);
 		this.tempAttributions.addGroupedCallback(this, this.toProviderOptions);
 		this.tempProjection.addGroupedCallback(this, this.toProviderOptions);
-		this.tempUrl.addGroupedCallback(this, this.toProviderOptions)
+		this.tempUrl.addGroupedCallback(this, this.toProviderOptions);
 		this.componentWillReceiveProps(props);
 	}
 
@@ -79,6 +79,7 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 		}
 		Weave.getCallbacks(nextProps.layer).addGroupedCallback(this, this.forceUpdate);
 		nextProps.layer.providerOptions.addGroupedCallback(this, this.fromProviderOptions);
+		this.fromProviderOptions();
 	}
 
 	render(): JSX.Element
@@ -263,7 +264,8 @@ export default class TileLayer extends AbstractLayer
 								break;
 							case "Blue Marble Map":
 								providerName = "custom";
-								params.url = "http://neowms.sci.gsfc.nasa.gov/wms/wms";
+								params.url = "http://demo.opengeo.org/geoserver/wms?layers=nasa:bluemarble";
+								break;
 							default:
 								providerName = "osm";
 								break;
@@ -289,15 +291,15 @@ export default class TileLayer extends AbstractLayer
 
 	private static isXYZString(url:string):boolean
 	{
-		return url.indexOf("{x}") != -1
-			&& url.indexOf("{y}") != -1
-			&& url.indexOf("{z}") != -1;
+		return url && url.indexOf("{x}") != -1 &&
+			url.indexOf("{y}") != -1 &&
+			url.indexOf("{z}") != -1;
 	}
 
 	private getSource():ol.source.Tile
 	{
 		// remove null param values or OpenLayers will throw an error
-		let params:any = _.filter(Weave.getState(this.providerOptions) as any, value => value != null);
+		let params:any = _.pick(Weave.getState(this.providerOptions),_.identity);
 		switch (this.provider.value)
 		{
 			case "stamen":
