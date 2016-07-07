@@ -74,34 +74,26 @@ package weavejs.core
 		{
 			var i:int;
 			var entry:GroupedCallbackEntry;
-			
-			_handlingGroupedCallbacks = true;
+		
+			// Handle grouped callbacks in the order they were triggered,
+			// anticipating that more may be added to the end of the list in the process.
+			for (i = 0; i < _triggeredEntries.length; i++)
 			{
-				// Handle grouped callbacks in the order they were triggered,
-				// anticipating that more may be added to the end of the list in the process.
-				// This first pass does not allow grouped callbacks to call each other immediately.
-				for (i = 0; i < _triggeredEntries.length; i++)
-				{
-					entry = _triggeredEntries[i];
-					entry.handleGroupedCallback();
-				}
-				
-				// after all grouped callbacks have been handled once, run those which were triggered recursively and allow them to call other grouped callbacks immediately.
-				_handlingRecursiveGroupedCallbacks = true;
-				{
-					// handle grouped callbacks that were triggered recursively
-					for (i = 0; i < _triggeredEntries.length; i++)
-					{
-						entry = _triggeredEntries[i];
-						if (entry.triggeredAgain)
-							entry.handleGroupedCallback();
-					}
-				}
-				_handlingRecursiveGroupedCallbacks = false;
+				entry = _triggeredEntries[i];
+				entry.handleGroupedCallback();
 			}
-			_handlingGroupedCallbacks = false;
 			
-			// reset for next frame
+			// Make a second pass to handle grouped callbacks that were triggered recursively.
+			// Note that this list does not contain duplicates and we only make two passes, so it may be possible
+			// for an earlier entry to be triggered twice but only handled once.
+			for (i = 0; i < _triggeredEntries.length; i++)
+			{
+				entry = _triggeredEntries[i];
+				if (entry.triggeredAgain)
+					entry.handleGroupedCallback();
+			}
+			
+			// reset triggered entries for next frame
 			for each (entry in _triggeredEntries)
 				entry.triggered = entry.triggeredAgain = false;
 			_triggeredEntries.length = 0;
@@ -111,16 +103,6 @@ package weavejs.core
 		 * Used as a placeholder for a missing context because null cannot be used as a WeakMap key.
 		 */
 		private static const CONTEXT_PLACEHOLDER:Object = {};
-		
-		/**
-		 * True while handling grouped callbacks.
-		 */
-		private static var _handlingGroupedCallbacks:Boolean = false;
-		
-		/**
-		 * True while handling grouped callbacks called recursively from other grouped callbacks.
-		 */
-		private static var _handlingRecursiveGroupedCallbacks:Boolean = false;
 		
 		/**
 		 * This gets set to true when the static _handleGroupedCallbacks() callback has been added as a frame listener.
@@ -178,22 +160,14 @@ package weavejs.core
 		 */
 		public function trigger():void
 		{
-			// if handling recursive callbacks, call now
-			if (_handlingRecursiveGroupedCallbacks)
-			{
-				handleGroupedCallback();
-			}
-			else if (!triggered)
+			if (!triggered)
 			{
 				// not previously triggered
 				_triggeredEntries.push(this);
 				triggered = true;
 			}
-			else if (_handlingGroupedCallbacks)
-			{
-				// triggered recursively - call later
+			else
 				triggeredAgain = true;
-			}
 		}
 		
 		/**
