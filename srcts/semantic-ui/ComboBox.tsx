@@ -367,8 +367,11 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 			inputProps.autoComplete = "off";
 			inputProps.className = "search";
 			inputProps.onChange = this.searchQueryChangeListener;
-			inputProps.ref = this.inputRefCallback
-			inputProps.onClick = this.inputClickListener
+			inputProps.ref = this.inputRefCallback;
+			inputProps.onClick = this.inputClickListener;
+			inputProps.style={
+				zIndex:0
+			}
 		}
 
 		return <input {...inputProps}/>
@@ -436,11 +439,11 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 				//option may not be available instantly for those cases render the value
 				//todo: if its a object, convert to string ?
 				let valueText:string = option && option.label? option.label : (typeof value == "string") ? value : "";
-				return <a key={index}
+				return  <a key={index}
 				          className="ui label">
-					{Weave.lang(valueText)}
-					<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
-				</a>;
+							{Weave.lang(valueText)}
+							<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
+						</a>;
 			});
 		}
 		else if(this.state.value && !Array.isArray(this.state.value))
@@ -455,16 +458,18 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 				//option may not be available instantly for those cases render the value
 				let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
 
+				let textStyle:React.CSSProperties = {
+					zIndex:0 //override semantic Z-order
+				};
 				// if input is clicked, but user yet to type the search query
 				// in that case, color the current selection grey
 				if(this.props.searchable && this.state.openMenu )
 				{
-					textUIs = <div className="text" style={{color:"grey",pointerEvents:"none"}}>{Weave.lang(valueText)}</div>;
+					textStyle.color = "grey";
+					textStyle.pointerEvents ="none";
 				}
-				else
-				{
-					textUIs = <div className="text">{Weave.lang(valueText)}</div>;
-				}
+				textUIs = <div className="text" style={textStyle}>{Weave.lang(valueText)}</div>;
+
 
 			}
 		}
@@ -474,14 +479,17 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 			// for non multiple type
 			if( this.state.searchQuery.length == 0)
 			{
+				let textStyle:React.CSSProperties = {
+					zIndex:0 //override semantic Z-order
+				};
+
 				if(this.props.searchable && this.state.openMenu )
 				{
-					textUIs = <div className="text" style={{color:"grey",pointerEvents:"none"}}>{Weave.lang(this.props.noneOption.label)}</div>;
+					textStyle.color = "grey";
+					textStyle.pointerEvents ="none";
 				}
-				else
-				{
-					textUIs = <div className="text">{Weave.lang(this.props.noneOption.label)}</div>;
-				}
+				textUIs = <div className="text" style={textStyle}>{Weave.lang(this.props.noneOption.label)}</div>;
+
 			}
 		}
 		else if(this.props.placeholder) // if placeholder is there render the value text with placeholder
@@ -540,7 +548,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		return (
 			<div {...comboxProps}>
 					{hiddenInputUI}
-					<i className="dropdown icon"/>
+					<i className="dropdown icon" style={ {zIndex:0} }/>
 					{textUIs}
 					{inputUI}
 					{menuUI}
