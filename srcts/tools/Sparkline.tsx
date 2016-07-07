@@ -532,8 +532,8 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 									record = interactedRecords[index];
 								}
 								let selectionEmpty: boolean = !this.selectionKeySet || this.selectionKeySet.keys.length === 0;
-								let selected:boolean = this.isSelected(record.id);
-								let probed:boolean = this.isProbed(record.id);
+								let selected:boolean = record && this.isSelected(record.id);
+								let probed:boolean = record && this.isProbed(record.id);
 								style = _.assign(style,
 									{
 										stroke: record.line.color,
