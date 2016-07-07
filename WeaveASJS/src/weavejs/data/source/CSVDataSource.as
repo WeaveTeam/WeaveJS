@@ -616,6 +616,8 @@ package weavejs.data.source
 		 */
 		private function stringsToNumbers(strings:Array, forced:Boolean):Array
 		{
+			var nonNumber:String = null;
+			var foundNumber:Boolean = false;
 			var numbers:Array = new Array(strings.length);
 			var i:int = strings.length;
 			outerLoop: while (i--)
@@ -640,12 +642,22 @@ package weavejs.data.source
 					string = string.split(',').join('');
 				
 				var number:Number = Number(string);
-				if (isNaN(number) && !forced)
-					return null;
+				if (forced || isFinite(number))
+				{
+					foundNumber = true;
+				}
+				else
+				{
+					// only allow one non-number
+					if (nonNumber && nonNumber != string)
+						return null;
+					else
+						nonNumber = string;
+				}
 				
 				numbers[i] = number;
 			}
-			return numbers;
+			return foundNumber ? numbers : null;
 		}
 		
 		private var nullValues:Array = [null, "", "null", "\\N", "NaN"];
