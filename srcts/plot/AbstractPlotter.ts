@@ -16,41 +16,26 @@ import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
  */
 export default class AbstractPlotter implements IPlotter
 {
-	/**
-	 * This function creates a new registered linkable child of the plotter whose callbacks will also trigger the spatial callbacks.
-	 * @return A new instance of the specified class that is registered as a spatial property.
-	 */
-	protected newSpatialProperty<T extends ILinkableObject>(linkableChildClass:new(..._:any[])=>T, callback:()=>void = null, useGroupedCallback:boolean = false):T
+	constructor()
 	{
-		var child:T = Weave.linkableChild(this, linkableChildClass, callback, useGroupedCallback);
-		
-		var thisCC:ICallbackCollection = Weave.getCallbacks(this);
-		var childCC:ICallbackCollection = Weave.getCallbacks(child);
-		// instead of triggering parent callbacks, trigger spatialCallbacks which will in turn trigger parent callbacks.
-		childCC.removeCallback(thisCC, thisCC.triggerCallbacks);
-		Weave.linkableChild(this.spatialCallbacks, child);
-		
-		return child;
+		this.addSpatialDependencies(this.filteredKeySet);
 	}
-	
-	/**
-	 * This function registers a linkable child of the plotter whose callbacks will also trigger the spatial callbacks.
-	 * @param child An object to register as a spatial property.
-	 * @return The child object.
-	 */
-	protected registerSpatialProperty<T extends ILinkableObject>(child:T, callback:()=>void = null, useGroupedCallback:boolean = false):T
-	{
-		Weave.linkableChild(this, child, callback, useGroupedCallback);
 
-		var thisCC:ICallbackCollection = Weave.getCallbacks(this);
-		var childCC:ICallbackCollection = Weave.getCallbacks(child);
-		// instead of triggering parent callbacks, trigger spatialCallbacks which will in turn trigger parent callbacks.
-		childCC.removeCallback(thisCC, thisCC.triggerCallbacks);
-		Weave.linkableChild(this.spatialCallbacks, child);
-		
-		return child;
+	/**
+	 * Registers dependencies that affect data bounds and should trigger spatial callbacks.
+	 */
+	protected addSpatialDependencies(...dependencies:ILinkableObject[])
+	{
+		for (var child of dependencies)
+		{
+			var thisCC:ICallbackCollection = Weave.getCallbacks(this);
+			var childCC:ICallbackCollection = Weave.getCallbacks(child);
+			// instead of triggering parent callbacks, trigger spatialCallbacks which will in turn trigger parent callbacks.
+			childCC.removeCallback(thisCC, thisCC.triggerCallbacks);
+			Weave.linkableChild(this.spatialCallbacks, child);
+		}
 	}
-	
+
 	/**
 	 * This variable should not be set manually.  It cannot be made constant because we cannot guarantee that it will be initialized
 	 * before other properties are initialized, which means it may be null when someone wants to call registerSpatialProperty().
@@ -81,7 +66,7 @@ export default class AbstractPlotter implements IPlotter
 	
 	/**
 	 * This function sets the base IKeySet that is being filtered.
-	 * @param newBaseKeySet A new IKeySet to use as the base for this FilteredKeySet.
+	 * @param keySet A new IKeySet to use as the base for this FilteredKeySet.
 	 */
 	protected setSingleKeySource(keySet:IKeySet):void
 	{
@@ -91,7 +76,7 @@ export default class AbstractPlotter implements IPlotter
 	/** 
 	 * This variable is returned by get keySet().
 	 */
-	protected _filteredKeySet:FilteredKeySet = this.newSpatialProperty(FilteredKeySet);
+	protected _filteredKeySet:FilteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	
 	/**
 	 * @return An IKeySet interface to the record keys that can be passed to the drawRecord() and getDataBoundsFromRecordKey() functions.
@@ -106,8 +91,8 @@ export default class AbstractPlotter implements IPlotter
 	 * When you implement this function, you may use initBoundsArray() for convenience.
 	 * 
 	 * This function returns a Bounds2D object set to the data bounds associated with the given record key.
-	 * @param key The key of a data record.
-	 * @param outputDataBounds A Bounds2D object to store the result in.
+	 * @param recordKey The key of a data record.
+	 * @param output An Array of Bounds2D objects to store the result in.
 	 * @return An Array of Bounds2D objects that make up the bounds for the record.
 	 */
 	public /* abstract */ getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void

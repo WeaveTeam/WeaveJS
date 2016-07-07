@@ -51,7 +51,7 @@ export default class ScatterPlotPlotter extends AbstractGlyphPlotter implements 
 	public colorNegative:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x800000));
 	public colorPositive:LinkableNumber = Weave.linkableChild(this, new LinkableNumber(0x008000));
 	
-	// delare dependency on statistics (for norm values)
+	// declare dependency on statistics (for norm values)
 	private _sizeByStats:IColumnStatistics = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.sizeBy));
 	
 	private colorDataWatcher:LinkableWatcher = Weave.disposableChild(this, LinkableWatcher);

@@ -20,7 +20,7 @@ export interface PIXIScatterPlotState extends IVisToolState
 
 }
 
-export default class PIXIScatterPlot extends AbstractVisTool<IVisToolProps, IVisToolState>
+export default class PIXIScatterPlot extends AbstractVisTool<PIXIScatterPlotProps, PIXIScatterPlotState>
 {
 	element:HTMLDivElement;
 	renderer:PIXI.WebGLRenderer | PIXI.CanvasRenderer;

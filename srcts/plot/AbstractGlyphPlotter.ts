@@ -27,6 +27,7 @@ export default class AbstractGlyphPlotter extends AbstractPlotter implements IOb
 		super();
 
 		this.setColumnKeySources([this.dataX, this.dataY]);
+		this.addSpatialDependencies(this.dataX, this.dataY, this.zoomToSubset, this.statsX, this.statsY, this.sourceProjection, this.destinationProjection);
 	}
 
 	getDescription():string
@@ -44,21 +45,21 @@ export default class AbstractGlyphPlotter extends AbstractPlotter implements IOb
 		return Weave.lang('{0} vs. {1}', titleX, titleY);
 	}
 
-	public dataX:DynamicColumn = this.newSpatialProperty(DynamicColumn);
-	public dataY:DynamicColumn = this.newSpatialProperty(DynamicColumn);
+	public dataX:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
+	public dataY:DynamicColumn = Weave.linkableChild(this, DynamicColumn);
 
-	public zoomToSubset:LinkableBoolean = this.registerSpatialProperty(new LinkableBoolean(false));
+	public zoomToSubset:LinkableBoolean = Weave.linkableChild(this, new LinkableBoolean(false));
 
-	protected statsX:IColumnStatistics = this.registerSpatialProperty(weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.dataX));
-	protected statsY:IColumnStatistics = this.registerSpatialProperty(weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.dataY));
+	protected statsX:IColumnStatistics = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.dataX));
+	protected statsY:IColumnStatistics = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.dataY));
 
 	hack_setSingleKeySource(keySet:IKeySet):void
 	{
 		this.setSingleKeySource(keySet);
 	}
 
-	public sourceProjection:LinkableString = this.newSpatialProperty(LinkableString);
-	public destinationProjection:LinkableString = this.newSpatialProperty(LinkableString);
+	public sourceProjection:LinkableString = Weave.linkableChild(this, LinkableString);
+	public destinationProjection:LinkableString = Weave.linkableChild(this, LinkableString);
 
 	public tempPoint:Point = new Point();
 	private _projector:IProjector;
@@ -150,7 +151,7 @@ export default class AbstractGlyphPlotter extends AbstractPlotter implements IOb
 	/**
 	 * The data bounds for a glyph has width and height equal to zero.
 	 * This function returns a Bounds2D object set to the data bounds associated with the given record key.
-	 * @param key The key of a data record.
+	 * @param recordKey The key of a data record.
 	 * @param output An Array of Bounds2D objects to store the result in.
 	 */
 	getDataBoundsFromRecordKey(recordKey:IQualifiedKey, output:Bounds2D[]):void
