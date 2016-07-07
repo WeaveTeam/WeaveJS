@@ -748,7 +748,11 @@ package
 				return DebugUtils.debugLookup(arg);
 			return DebugUtils.debugId(arg);
 		}
-		
+
+		public static const watch:/*/typeof DebugUtils.watch/*/Function = DebugUtils.watch;
+		public static const unwatch:/*/typeof DebugUtils.unwatch/*/Function = DebugUtils.unwatch;
+		public static const watchState:/*/typeof DebugUtils.watchState/*/Function = DebugUtils.watchState;
+
 		/**
 		 * Temporary solution
 		 */

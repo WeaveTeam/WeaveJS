@@ -103,7 +103,7 @@ package weavejs.util
 		
 		private static const map_target_callback:Object = new JS.WeakMap();
 		
-		public static function watch(target:ILinkableObject = null, callbackReturnsString:Function = null):void
+		public static function watch/*/<T extends ILinkableObject>/*/(target:/*/T/*/ILinkableObject = null, callbackReturnsString:/*/(target:T)=>string/*/Function = null):void
 		{
 			if (!target)
 			{
