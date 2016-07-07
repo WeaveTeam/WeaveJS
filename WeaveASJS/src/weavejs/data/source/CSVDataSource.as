@@ -617,7 +617,7 @@ package weavejs.data.source
 		private function stringsToNumbers(strings:Array, forced:Boolean):Array
 		{
 			var nonNumber:String = null;
-			var foundNumber:Boolean = false;
+			var foundNumber:Boolean = forced;
 			var numbers:Array = new Array(strings.length);
 			var i:int = strings.length;
 			outerLoop: while (i--)
