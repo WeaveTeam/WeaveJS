@@ -14,6 +14,9 @@ import SolidLineStyle = weavejs.geom.SolidLineStyle;
 import DynamicColumn = weavejs.data.column.DynamicColumn;
 import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 import DataType = weavejs.api.data.DataType;
+import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
+import NormalizedColumn = weavejs.data.column.NormalizedColumn;
+import ScatterPlotLayer from "./ScatterPlotLayer";
 
 
 export default class GeometryLayer extends AbstractFeatureLayer
@@ -23,6 +26,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 	fill = Weave.linkableChild(this, SolidFillStyle);
 	line = Weave.linkableChild(this, SolidLineStyle);
 	geometryColumn = Weave.linkableChild(this, DynamicColumn);
+	radius = Weave.linkableChild(this, new AlwaysDefinedColumn(5));
 
 	protected getRequiredAttributes() {
 		return super.getRequiredAttributes().concat([this.geometryColumn]);
@@ -44,10 +48,17 @@ export default class GeometryLayer extends AbstractFeatureLayer
 		return super.editableFields.set("Ignore subset", this.filteredKeySet);
 	}
 
+	private get radiusNorm() { return this.radius.getInternalColumn() as NormalizedColumn; }
+	private get radiusData() { return this.radiusNorm.internalDynamicColumn; }
+
 	constructor()
 	{
 		super();
 		this.fill.color.internalDynamicColumn.globalName = "defaultColorColumn";
+		this.radius.internalDynamicColumn.requestLocalObject(NormalizedColumn, true);
+		this.radiusNorm.min.value = 3;
+		this.radiusNorm.max.value = 25;
+
 		this.filteredKeySet.setColumnKeySources([this.geometryColumn]);
 		
 		this.geoJsonParser = new ol.format.GeoJSON();
@@ -64,6 +75,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 		Weave.getCallbacks(this.fill).addGroupedCallback(this, this.updateStyleData);
 		Weave.getCallbacks(this.line).addGroupedCallback(this, this.updateStyleData);
+		Weave.getCallbacks(this.radius).addGroupedCallback(this, this.updateStyleData);
 
 
 		Weave.getCallbacks(this.filteredKeySet).addGroupedCallback(this, this.updateGeometryData, true);
@@ -152,6 +164,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 			record.id = key;
 			record.fill = this.fill.getStyle(key);
 			record.stroke = this.line.getStyle(key);
+			record.radius = this.radius.getValueFromKey(key);
 
 			let olStroke = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke);
 
@@ -159,6 +172,9 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 			let olStrokeFaded = AbstractFeatureLayer.olStrokeFromWeaveStroke(record.stroke, 0.5);
 			let olFillFaded = AbstractFeatureLayer.olFillFromWeaveFill(record.fill, 0.5);
+
+			let olSelectionStyle = AbstractFeatureLayer.getOlSelectionStyle(olStroke);
+			let olProbedStyle = AbstractFeatureLayer.getOlProbedStyle(olStroke);
 
 			let normalStyle = [new ol.style.Style({
 				fill: fillEnabled ? olFill : undefined,
@@ -180,25 +196,18 @@ export default class GeometryLayer extends AbstractFeatureLayer
 			if (feature)
 			{
 				//checking for point data
-				if(feature.getGeometry() instanceof ol.geom.MultiPoint)
-				{
-					//TODO replace style to use data
-					normalStyle = [new ol.style.Style({
-						image: new ol.style.Circle({
-							radius: 7,
-							fill: new ol.style.Fill({
-								color: 'black'
-							})
-						})
-					})];
+				if(feature.getGeometry() instanceof ol.geom.MultiPoint) {
+					normalStyle = ScatterPlotLayer.getNormalStyle(record,strokeEnabled,fillEnabled,olStroke,olFill);
+					unselectedStyle = ScatterPlotLayer.getUnselectedStyle(record,strokeEnabled,fillEnabled,olStrokeFaded,olFillFaded);
+					selectedStyle = ScatterPlotLayer.getSelectedStyle(record,strokeEnabled,fillEnabled,olSelectionStyle);
+					probedStyle = ScatterPlotLayer.getProbedStyle(record,strokeEnabled,fillEnabled,olProbedStyle);
 				}
-				let metaStyle:any = {};
 
+				let metaStyle:any = {};
 				metaStyle.normalStyle = normalStyle;
 				metaStyle.unselectedStyle = unselectedStyle;
 				metaStyle.selectedStyle = selectedStyle;
 				metaStyle.probedStyle = probedStyle;
-
 				feature.setProperties(metaStyle);
 			}
 		}
