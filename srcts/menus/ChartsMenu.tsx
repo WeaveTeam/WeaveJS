@@ -22,6 +22,7 @@ import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
+import StatsTool from "../tools/StatsTool";
 
 export default class ChartsMenu implements MenuBarItemProps
 {
@@ -58,7 +59,8 @@ export default class ChartsMenu implements MenuBarItemProps
 			C3ScatterPlot,
 			Sparkline,
 			TableTool,
-			TextTool
+			TextTool,
+			StatsTool
 		];
 
 		return impls.map(impl => {
