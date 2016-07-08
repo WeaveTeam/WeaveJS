@@ -83,19 +83,9 @@ package weavejs.core
 				entry.handleGroupedCallback();
 			}
 			
-			// Make a second pass to handle grouped callbacks that were triggered recursively.
-			// Note that this list does not contain duplicates and we only make two passes, so it may be possible
-			// for an earlier entry to be triggered twice but only handled once.
-			for (i = 0; i < _triggeredEntries.length; i++)
-			{
-				entry = _triggeredEntries[i];
-				if (entry.triggeredAgain)
-					entry.handleGroupedCallback();
-			}
-			
 			// reset triggered entries for next frame
 			for each (entry in _triggeredEntries)
-				entry.triggered = entry.triggeredAgain = false;
+				entry.handled = entry.triggered = entry.triggeredAgain = false;
 			_triggeredEntries.length = 0;
 		}
 		
@@ -135,6 +125,11 @@ package weavejs.core
 		}
 		
 		/**
+		 * If true, the callback was handled this frame.
+		 */
+		public var handled:Boolean = false;
+				
+		/**
 		 * If true, the callback was triggered this frame.
 		 */
 		public var triggered:Boolean = false;
@@ -166,8 +161,12 @@ package weavejs.core
 				_triggeredEntries.push(this);
 				triggered = true;
 			}
-			else
+			else if (handled && !triggeredAgain)
+			{
+				// triggered again after being handled
+				_triggeredEntries.push(this);
 				triggeredAgain = true;
+			}
 		}
 		
 		/**
@@ -204,11 +203,10 @@ package weavejs.core
 				recursionCount++;
 				
 				callback.apply(context === CONTEXT_PLACEHOLDER ? callback['this'] : context);
+				handled = true;
 				
 				recursionCount--;
 			}
-			// avoid delayed recursion
-			triggeredAgain = false;
 		}
 		
 		override public function dispose():void
