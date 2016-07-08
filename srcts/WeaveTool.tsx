@@ -2,27 +2,22 @@ import ILinkableObject = weavejs.api.core.ILinkableObject;
 import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 import LinkableWatcher = weavejs.core.LinkableWatcher;
 
-import * as _ from "lodash";
 import * as React from "react";
-import * as ReactDOM from "react-dom";
-import {HBox, VBox} from "./react-ui/FlexBox";
-import prefixer from "./react-ui/VendorPrefixer";
-import CenteredIcon from "./react-ui/CenteredIcon";
 import {CSSProperties} from "react";
-import {IVisTool, IVisToolProps, IVisToolState} from "./tools/IVisTool";
+import {HBox, VBox} from "./react-ui/FlexBox";
+import CenteredIcon from "./react-ui/CenteredIcon";
+import {IVisTool} from "./tools/IVisTool";
 import PopupWindow from "./react-ui/PopupWindow";
 import ReactUtils from "./utils/ReactUtils";
 import MouseUtils from "./utils/MouseUtils";
 import WeaveComponentRenderer from "./WeaveComponentRenderer";
 import SmartComponent from "./ui/SmartComponent";
-import classNames from "./modules/classnames";
-import DraggableDiv from "./react-ui/DraggableDiv";
 import {AbstractLayout, AnyAbstractLayout} from "./layouts/AbstractLayout";
-import LinkableString = weavejs.core.LinkableString;
 import IAltText from "./accessibility/IAltText";
 import {KEYCODES} from "./utils/KeyboardUtils";
 import DynamicComponent from "./ui/DynamicComponent";
 import {getWeaveProperties} from "./ui/WeaveProperties";
+import LinkableString = weavejs.core.LinkableString;
 
 export interface IWeaveToolProps extends React.Props<WeaveTool>
 {
@@ -49,7 +44,6 @@ export interface IWeaveToolState
 export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
 {
 	private watcher:LinkableWatcher;
-	private clickState:boolean;
 	private closeIcon:CenteredIcon;
 	private gearIcon:CenteredIcon;
 
@@ -275,6 +269,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	
 	render():JSX.Element
 	{
+		var ap = getWeaveProperties(this.props.weave).accessibility;
 		return (
 			<VBox
 				style={this.props.style}
@@ -304,10 +299,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				/>
 				{
 					<DynamicComponent
-						dependencies={(() => {
-							var ap = getWeaveProperties(this.props.weave).accessibility;
-							return [ap.enableAccessibilityFeatures, ap.enableCaptioning];
-						})()}
+						dependencies={[ap.enableAccessibilityFeatures, ap.enableCaptioning]}
 						render={() => {
 							var ap = getWeaveProperties(this.props.weave).accessibility;
 							if(ap.enableAccessibilityFeatures.value && ap.enableCaptioning && this.state.showCaption)
