@@ -18,7 +18,10 @@ install: npm run compile
 before_script:
   - grunt distall
 after_success:
-  - tar -czf $TRAVIS_BRANCH.tgz dist
+  - cd dist
+  - tar -czf $TRAVIS_BRANCH.tgz *
+  - cd ..
+  - cp dist/$TRAVIS_BRANCH.tgz .
   - chmod a+x printDir.sh
   - ./printDir.sh
   - cd dist/
@@ -26,3 +29,4 @@ after_success:
   - cd ..
   - export SSHPASS=$DEPLOY_PASS
   - sshpass -e scp -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $TRAVIS_BRANCH.tgz $DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH
+  - sshpass -e ssh $DEPLOY_USER@$DEPLOY_HOST sudo $DEPLOY_PATH/deploy.sh $TRAVIS_BRANCH
