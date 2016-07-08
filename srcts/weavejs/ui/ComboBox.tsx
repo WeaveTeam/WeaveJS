@@ -64,7 +64,8 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 	componentWillReceiveProps(nextProps: ComboBoxProps)
 	{
-		if (this.props.options != nextProps.options || this.props.value != nextProps.value)
+		// == , === will return false for array for same elements as its reference comparison
+		if(!_.isEqual(this.props.options, nextProps.options) || !_.isEqual(this.props.value, nextProps.value))
 		{
 			this.setState(this.getStateFromProps(nextProps));
 		}
@@ -75,6 +76,11 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 				direction:nextProps.direction
 			});
 		}
+	}
+
+	shouldComponentUpdate(nextProps:ComboBoxProps, nextState:ComboBoxState):boolean
+	{
+		return !_.isEqual(this.state, nextState)|| !_.isEqual(this.props, nextProps)
 	}
 
 
@@ -98,12 +104,14 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		});
 
 		var value:any = props.value;
-		if (value && value.hasOwnProperty("label") && value.hasOwnProperty("value"))
+		// if value is sent as ComboBoxOption Signature, extract the original value from them
+		if(value && value.hasOwnProperty("label") && value.hasOwnProperty("value"))
 		{
 			// so get the original value from Value Object
 			value = props.value.value;
 			// make options have unique value
 			options = _.uniq(_.union(options, [props.value]), "value");
+
 		}
 		else if (Array.isArray(value) && value[0] && value[0].hasOwnProperty("label") && value[0].hasOwnProperty("value"))
 		{
@@ -445,7 +453,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 						</a>;
 			});
 		}
-		else if (this.state.value && !Array.isArray(this.state.value))
+		else if(this.state.value)
 		{
 			// render Text UI only When search Query is not in operation
 			// for non multiple type
