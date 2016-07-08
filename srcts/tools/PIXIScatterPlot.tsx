@@ -6,9 +6,9 @@ import * as PIXI from "pixi.js";
 import IPlotter from "../plot/IPlotter";
 import ScatterPlotPlotter from "../plot/ScatterPlotPlotter";
 import Bounds2D = weavejs.geom.Bounds2D;
-import DynamicComponent from "../../outts/ui/DynamicComponent";
+import DynamicComponent from "../ui/DynamicComponent";
 import IPlotTask from "../plot/IPlotTask";
-import DOMUtils from "../../outts/utils/DOMUtils";
+import DOMUtils from "../utils/DOMUtils";
 
 export interface PIXIScatterPlotProps extends IVisToolProps
 {
