@@ -507,6 +507,10 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 					[ 
 						Weave.lang("Number of columns"),
 						<StatefulTextField type="number" style={{textAlign: "center", flex: 1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
+					],
+					[
+						Weave.lang("Show title"),
+						<Checkbox ref={linkReactStateRef(this, { value: this.showLegendName })} label={" "}/>
 					]
 				]
 			]
