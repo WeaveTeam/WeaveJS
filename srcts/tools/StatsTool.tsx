@@ -171,14 +171,14 @@ export default class StatsTool extends React.Component<IVisToolProps, IVisToolSt
 				</HBox>);
 	}
 }
-export interface RecordStatsProps extends React.HTMLProps<RecordStats>
+interface RecordStatsProps extends React.HTMLProps<RecordStats>
 {
 	label:string;
 	color:string;
 	width:string;
 }
 
-export interface RecordStatsState
+interface RecordStatsState
 {
 
 }
@@ -203,7 +203,7 @@ class RecordStats extends React.Component<RecordStatsProps, RecordStatsState>
 			borderRadius:"4px"
 		};
 
-		return  <VBox  style={ {flex:"1",border:"1px solid lightgrey",padding:"4px" } }>
+		return  <VBox  style={ {flex:"1",border:"1px solid lightgrey",borderRadius:"4px",padding:"4px" } }>
 					<HBox style={ {flex:"1"} }>
 						<div style={ {whiteSpace: "nowrap",overflow: "hidden",textOverflow: "ellipsis",padding:"2px"} }>
 							{this.props.label}
