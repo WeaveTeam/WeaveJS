@@ -24,6 +24,7 @@ import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+import ColorRamp = weavejs.util.ColorRamp;
 
 declare type Record = {
 	id: IQualifiedKey,
@@ -38,6 +39,7 @@ export default class StatsTool extends React.Component<IVisToolProps, IVisToolSt
 	min = Weave.linkableChild(this, new LinkableNumber(0));
 	max = Weave.linkableChild(this, new LinkableNumber(100));
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+	private colorRamp:ColorRamp;
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
@@ -61,6 +63,11 @@ export default class StatsTool extends React.Component<IVisToolProps, IVisToolSt
 		this.filteredKeySet.setColumnKeySources([this.label, this.stats]);
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		Weave.getCallbacks(this).addGroupedCallback(this, this.handleChange, true);
+
+		this.colorRamp = new weavejs.util.ColorRamp();
+		this.colorRamp.state = [
+			"0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"
+		];
 	}
 
 	private handleChange():void
@@ -141,16 +148,25 @@ export default class StatsTool extends React.Component<IVisToolProps, IVisToolSt
 	render()
 	{
 		let recordUI:JSX.Element[] = this.records && this.records.map((record:Record,index:number)=>{
-					let color = "green";
-					if(record.stats <= 33)
-					{
-						color = "red";
-					}else if(record.stats > 33 && record.stats < 67){
-						color = "orange";
-					}
-					return <RecordStats key={index} label={record.label} color={color}/>
+
+					let value:number = NaN;
+					//code for heat map
+					if(record.stats < 15)
+						value = 15;
+					else if(record.stats > 50)
+						value = 60;
+					else
+						value = record.stats;
+
+
+					let color = this.colorRamp.getHexColor(value as any, 15, 60)
+
+					return <RecordStats key={index}
+					                    label={record.label}
+					                    color={color}
+										width={String(value)}/>
 				})
-		return (<HBox style={{flex: 1, overflow:"hidden"}}>
+		return (<HBox padded={true} style={{flex: 1, overflow:"hidden"}}>
 					{recordUI}
 				</HBox>);
 	}
@@ -159,6 +175,7 @@ export interface RecordStatsProps extends React.HTMLProps<RecordStats>
 {
 	label:string;
 	color:string;
+	width:string;
 }
 
 export interface RecordStatsState
@@ -173,18 +190,35 @@ class RecordStats extends React.Component<RecordStatsProps, RecordStatsState>
 	}
 
 	render(){
-		return  <VBox style={ {flex:"1",border:"1px solid grey" } }>
-					<div>
-						{this.props.label}
-					</div>
-					<div style={ {flex:"1"} }></div>
-					<div style={ {position:"relative",width:"100%", height:"100px"} }>
+		let valueBoxStyle:React.CSSProperties = {
+			display:"flex",
+			background:this.props.color,
+			width:"60px",
+			height:"60px",
+			alignItems:"center",
+			justifyContent:"center",
+			color:"white",
+			margin:"2px",
+			textShadow:"0px 0px 2px black",
+			borderRadius:"4px"
+		};
+
+		return  <VBox  style={ {flex:"1",border:"1px solid lightgrey",padding:"4px" } }>
+					<HBox style={ {flex:"1"} }>
+						<div style={ {whiteSpace: "nowrap",overflow: "hidden",textOverflow: "ellipsis",padding:"2px"} }>
+							{this.props.label}
+						</div>
+						<div style={ valueBoxStyle }>
+							{this.props.width}
+						</div>
+					</HBox>
+					<div style={ {position:"relative",width:"100%", height:"40px"} }>
 						<HBox style={ {position:"absolute",left:0,top:0,width:"100%", height:"100%"} }>
-							<div style={ {background:"darkgrey",flex:"1 0 33.3%"} }></div>
 							<div style={ {background:"grey",flex:"1 0 33.3%"} }></div>
-							<div style={ {background:"lightgrey",flex:"1 0 33.3%"} }></div>
+							<div style={ {background:"darkgrey",flex:"1 0 33.3%"} }></div>
+							<div style={ {background:"lightgrey",flex:"1 0 33.4%"} }></div>
 						</HBox>
-						<div style={ {position:"absolute",left:0,top:10,bottom:10,width:"20px",background:this.props.color} }>
+						<div style={ {position:"absolute",left:0,top:16,bottom:16,width:this.props.width + "%",background:this.props.color} }>
 						</div>
 					</div>
 				</VBox>
