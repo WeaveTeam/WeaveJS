@@ -1,11 +1,10 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import $ from "./modules/jquery";
-import LandingPage from "./LandingPage";
-import MiscUtils from "./utils/MiscUtils";
+import LandingPage from "./weavejs/dialog/LandingPage";
+import * as WeaveJS from "./weavejs";
 
 // this import will run the static initialization code in WeaveJS
-import * as WeaveJS from "./weavejs";
 WeaveJS;
 //weavejs.WeaveAPI.Locale.reverseLayout = true; // for testing
 
