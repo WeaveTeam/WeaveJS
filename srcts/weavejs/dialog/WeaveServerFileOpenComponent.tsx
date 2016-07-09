@@ -2,7 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {IOpenFileProps, IOpenFileState} from "FileDialog";
 import SmartComponent from "../ui/SmartComponent";
-import ServiceLogin from "../ui/admin/ServiceLogin";
+import ServiceLogin from "../admin/ServiceLogin";
 import {HBox, VBox, Label} from "../ui/flexbox/FlexBox";
 import {ObjectDataTable, IRow} from "../ui/DataTable";
 import FileInfoView from "../ui/FileInfoView";

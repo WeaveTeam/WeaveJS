@@ -3,8 +3,8 @@ import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../util/WeaveReactUtils";
 import {HBox} from "../ui/flexbox/FlexBox";
 import Button from "../ui/Button";
-import SqlImport from "../ui/admin/SqlImport";
-import ConnectionManager from "../ui/admin/ConnectionManager";
+import SqlImport from "../admin/SqlImport";
+import ConnectionManager from "../admin/ConnectionManager";
 import DataSourceEditor, {IDataSourceEditorProps} from "./DataSourceEditor";
 import PopupWindow from "../dialog/PopupWindow";
 

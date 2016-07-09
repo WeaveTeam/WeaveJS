@@ -6,7 +6,7 @@ import FileMenu from "./FileMenu";
 import ChartsMenu from "./ChartsMenu";
 import ControllersMenu from "./ControllersMenu";
 import DataMenu from "./DataMenu";
-import ServiceLogin from "../ui/admin/ServiceLogin";
+import ServiceLogin from "../admin/ServiceLogin";
 
 export type CreateObjectFunction = (type:new(..._:any[])=>any)=>void;
 
