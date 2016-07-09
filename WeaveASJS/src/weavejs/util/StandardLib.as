@@ -17,11 +17,9 @@ package weavejs.util
 {
 	public class StandardLib
 	{
-		/**
-		 * This must be set externally.
-		 */
-		public static var lodash:Object;
-		public static var ol:Object;
+		// these can be set externally
+		public static var lodash:Object = JS.global.lodash;
+		public static var ol:Object = JS.global.openlayers || JS.global.ol;
 		
 		public static function formatNumber(number:Number, precision:int = -1):String
 		{
