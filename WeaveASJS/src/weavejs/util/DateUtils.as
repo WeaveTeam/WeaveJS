@@ -17,8 +17,10 @@ package weavejs.util
 {
 	public class DateUtils
 	{
-		// This can be set externally.
-		public static var moment:* = JS.global.moment;
+		/**
+		 * This must be set externally.
+		 */
+		public static var moment:Object;
 		
 		public static function parse(date:Object, moment_fmt:String, force_utc:Boolean = false, force_local:Boolean = false):Date
 		{
