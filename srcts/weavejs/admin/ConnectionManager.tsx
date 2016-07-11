@@ -1,15 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {HBox, VBox} from "../flexbox/FlexBox";
-import Button from "../Button";
-import PopupWindow from "../../dialog/PopupWindow";
-import SmartComponent from "../SmartComponent";
-import List, {ListOption} from "../List";
+import {HBox, VBox} from "../ui/flexbox/FlexBox";
+import Button from "../ui/Button";
+import PopupWindow from "../dialog/PopupWindow";
+import SmartComponent from "../ui/SmartComponent";
+import List, {ListOption} from "../ui/List";
 import ConnectionEditor from "./ConnectionEditor";
 import ServiceLogin from "./ServiceLogin";
 import ConfigurationStorageEditor from "./ConfigurationStorageEditor";
-import LogComponent from "../LogComponent";
-import ConfirmationDialog from "../../dialog/ConfirmationDialog";
+import LogComponent from "../ui/LogComponent";
+import ConfirmationDialog from "../dialog/ConfirmationDialog";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;

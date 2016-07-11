@@ -1,15 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {HBox, VBox} from "../flexbox/FlexBox";
-import Checkbox from "../Checkbox";
-import ComboBox from "../ComboBox";
-import Button from "../Button";
-import PopupWindow from "../../dialog/PopupWindow";
-import SmartComponent from "../SmartComponent";
-import Input from "../Input";
+import {HBox, VBox} from "../ui/flexbox/FlexBox";
+import Checkbox from "../ui/Checkbox";
+import ComboBox from "../ui/ComboBox";
+import Button from "../ui/Button";
+import PopupWindow from "../dialog/PopupWindow";
+import SmartComponent from "../ui/SmartComponent";
+import Input from "../ui/Input";
 import ServiceLogin from "./ServiceLogin";
-import HelpIcon from "../HelpIcon";
-import LogComponent from "../LogComponent";
+import HelpIcon from "../ui/HelpIcon";
+import LogComponent from "../ui/LogComponent";
 
 import WeavePromise = weavejs.util.WeavePromise;
 import WeaveDataSource = weavejs.data.source.WeaveDataSource;

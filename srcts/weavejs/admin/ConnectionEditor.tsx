@@ -1,12 +1,12 @@
 import * as React from "react";
-import {HBox, VBox} from "../flexbox/FlexBox";
-import Checkbox from "../Checkbox";
-import ComboBox, {ComboBoxOption} from "../ComboBox";
-import Button from "../Button";
-import Accordion from "../Accordion";
-import SmartComponent from "../SmartComponent";
-import Input from "../Input";
-import HelpIcon from "../HelpIcon";
+import {HBox, VBox} from "../ui/flexbox/FlexBox";
+import Checkbox from "../ui/Checkbox";
+import ComboBox, {ComboBoxOption} from "../ui/ComboBox";
+import Button from "../ui/Button";
+import Accordion from "../ui/Accordion";
+import SmartComponent from "../ui/SmartComponent";
+import Input from "../ui/Input";
+import HelpIcon from "../ui/HelpIcon";
 
 import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;

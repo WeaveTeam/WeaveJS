@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import {VBox} from "../flexbox/FlexBox";
-import Button from "../Button";
+import {VBox} from "../ui/flexbox/FlexBox";
+import Button from "../ui/Button";
 
 import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import PopupWindow from "../../dialog/PopupWindow";
+import PopupWindow from "../dialog/PopupWindow";
 import Login from "./Login";
 
 import WeaveAdminService = weavejs.net.WeaveAdminService;
