@@ -21,8 +21,6 @@ package weavejs.api.data
 	 */
 	public class Aggregation
 	{
-		public static const ALL_TYPES:Array/*/string/*/ = [SAME, FIRST, LAST, MEAN, SUM, MIN, MAX, COUNT];
-		
 		public static const SAME:String = "same";
 		public static const FIRST:String = "first";
 		public static const LAST:String = "last";
@@ -32,6 +30,8 @@ package weavejs.api.data
 		public static const MIN:String = "min";
 		public static const MAX:String = "max";
 		public static const COUNT:String = "count";
+		
+		public static const ALL_TYPES:Array/*/string/*/ = [SAME, FIRST, LAST, MEAN, SUM, MIN, MAX, COUNT];
 		
 		/**
 		 * The default aggregation mode.

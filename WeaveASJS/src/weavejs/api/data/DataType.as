@@ -21,12 +21,12 @@ package weavejs.api.data
 	 */
 	public class DataType
 	{
-		public static const ALL_TYPES:Array/*/<string>/*/ = [NUMBER, STRING, DATE, GEOMETRY];
-		
 		public static const NUMBER:String = "number";
 		public static const STRING:String = "string";
 		public static const DATE:String = "date";
 		public static const GEOMETRY:String = "geometry";
+
+		public static const ALL_TYPES:Array/*/<string>/*/ = [NUMBER, STRING, DATE, GEOMETRY];
 		
 		/**
 		 * Gets the Class associated with a dataType metadata value.
