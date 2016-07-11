@@ -62,6 +62,7 @@
     "fixed-data-table": "^0.6.0",
     "font-awesome": "^4.4.0",
     "gulp": "^3.9.1",
+    "gulp-replace": "^0.5.4",
     "gulp-tsc-autoref": "https://github.com/WeaveTeam/gulp-tsc-autoref.git",
     "jquery": "^2.1.4",
     "jszip": "^3.0.0",
