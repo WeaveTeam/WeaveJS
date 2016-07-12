@@ -1,33 +1,33 @@
-import * as React from "react";
+	import * as React from "react";
 
-export interface ButtonProps extends React.HTMLProps<HTMLButtonElement>
-{
-	colorClass?: string;
-}
-
-export interface ButtonState
-{	
-}
-
-export default class Button extends React.Component<ButtonProps, ButtonState>
-{
-	constructor(props:ButtonProps)
+	export interface ButtonProps extends React.HTMLProps<HTMLButtonElement>
 	{
-		super(props);
+		colorClass?: string;
 	}
-	
-	static defaultProps:ButtonProps = {
-		colorClass: ""
+
+	export interface ButtonState
+	{	
 	}
-	
-	render()
+
+	export default class Button extends React.Component<ButtonProps, ButtonState>
 	{
-		return (
-			<button {...this.props} className={"ui " + this.props.colorClass + " button " + (this.props.className || "")}>
-				{
-					this.props.children
-				}
-			</button>
-		);
+		constructor(props:ButtonProps)
+		{
+			super(props);
+		}
+		
+		static defaultProps:ButtonProps = {
+			colorClass: ""
+		}
+		
+		render()
+		{
+			return (
+				<button {...this.props} className={"ui " + this.props.colorClass + " button " + (this.props.className || "")}>
+					{
+						this.props.children
+					}
+				</button>
+			);
+		}
 	}
-}

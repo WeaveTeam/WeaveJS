@@ -1,62 +1,62 @@
-import * as React from "react";
-import classNames from "../../modules/classnames";
+	import * as React from "react";
+	import classNames from "../../modules/classnames";
 
-export interface InputProps extends React.HTMLProps<Input>
-{
-	children?: React.ReactNode;
-	fluid?:boolean;
-	disabled?:boolean;
-}
-
-export interface InputState
-{	
-}
-
-export default class Input extends React.Component<InputProps, InputState>
-{
-	inputElement:HTMLInputElement;
-
-	static defaultProps:InputProps = {
-		fluid:true,
-		disabled:false
-	};
-
-	constructor(props:InputProps)
+	export interface InputProps extends React.HTMLProps<Input>
 	{
-		super(props);
+		children?: React.ReactNode;
+		fluid?:boolean;
+		disabled?:boolean;
 	}
 
-	render()
-	{
-		var inputProps:React.HTMLProps<HTMLInputElement> = {};
+	export interface InputState
+	{	
+	}
 
-		// since typescript doesn't support destructuring yet
-		// we manually remove children from props
-		for (var key in this.props)
+	export default class Input extends React.Component<InputProps, InputState>
+	{
+		inputElement:HTMLInputElement;
+
+		static defaultProps:InputProps = {
+			fluid:true,
+			disabled:false
+		};
+
+		constructor(props:InputProps)
 		{
-			if (key != "children")
-			{
-				(inputProps as any)[key] = (this.props as any)[key];
-			}
+			super(props);
 		}
-		delete inputProps.title;
-		delete inputProps.className;
-		delete inputProps.style;
 
-		var inputClass = classNames({
-			'ui input': true,
-			'fluid': this.props.fluid,
-			'disabled': this.props.disabled
-		}, this.props.className);
+		render()
+		{
+			var inputProps:React.HTMLProps<HTMLInputElement> = {};
 
-		return (
-			<div className={inputClass}
-				 style={this.props.style}>
-				<input {...inputProps} ref={(c) => this.inputElement = c}/>
+			// since typescript doesn't support destructuring yet
+			// we manually remove children from props
+			for (var key in this.props)
+			{
+				if (key != "children")
 				{
-					this.props.children
+					(inputProps as any)[key] = (this.props as any)[key];
 				}
-			</div>
-		);
+			}
+			delete inputProps.title;
+			delete inputProps.className;
+			delete inputProps.style;
+
+			var inputClass = classNames({
+				'ui input': true,
+				'fluid': this.props.fluid,
+				'disabled': this.props.disabled
+			}, this.props.className);
+
+			return (
+				<div className={inputClass}
+					 style={this.props.style}>
+					<input {...inputProps} ref={(c) => this.inputElement = c}/>
+					{
+						this.props.children
+					}
+				</div>
+			);
+		}
 	}
-}

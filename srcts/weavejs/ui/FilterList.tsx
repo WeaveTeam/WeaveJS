@@ -1,25 +1,25 @@
-import * as React from "react";
+	import * as React from "react";
 
-export interface FilterDefinition
-{
-
-}
-
-export interface IFilterListProps<T> extends React.HTMLProps<FilterList<T>> {
-	type: "combo"|"list";
-
-}
-
-export interface IFilterListState<T> {
-	selectedItems: T[];
-}
-
-export default class FilterList<T> extends React.Component<IFilterListProps<T>, IFilterListState<T>>
-{
-	constructor(props:IFilterListProps<T>)
+	export interface FilterDefinition
 	{
-		super(props);
+
 	}
 
+	export interface IFilterListProps<T> extends React.HTMLProps<FilterList<T>> {
+		type: "combo"|"list";
 
-}
+	}
+
+	export interface IFilterListState<T> {
+		selectedItems: T[];
+	}
+
+	export default class FilterList<T> extends React.Component<IFilterListProps<T>, IFilterListState<T>>
+	{
+		constructor(props:IFilterListProps<T>)
+		{
+			super(props);
+		}
+
+
+	}

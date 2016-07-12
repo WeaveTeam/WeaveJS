@@ -1,44 +1,44 @@
-import * as ol from "openlayers";
-import ProbeInteraction from "./ProbeInteraction";
+	import * as ol from "openlayers";
+	import ProbeInteraction from "./ProbeInteraction";
 
-export default class CustomDragZoom extends ol.interaction.DragBox
-{
-	constructor()
+	export default class CustomDragZoom extends ol.interaction.DragBox
 	{
-		super({});
-		this.on('boxstart', CustomDragZoom.prototype.onBoxStart, this);
-		this.on('boxend', CustomDragZoom.prototype.onBoxEnd, this);
-	}
-
-	private _probeInteraction: ProbeInteraction;
-
-	private get probeInteraction(): ProbeInteraction {
-		if (!this._probeInteraction) {
-			for (let interaction of this.getMap().getInteractions().getArray()) {
-				if (interaction instanceof ProbeInteraction) {
-					this._probeInteraction = interaction;
-					break;
-				}
-			}
+		constructor()
+		{
+			super({});
+			this.on('boxstart', CustomDragZoom.prototype.onBoxStart, this);
+			this.on('boxend', CustomDragZoom.prototype.onBoxEnd, this);
 		}
 
-		return this._probeInteraction;
-	}
+		private _probeInteraction: ProbeInteraction;
 
-	onBoxStart(event: any)
-	{
-		if (this.probeInteraction)
-			this.probeInteraction.setActive(false);
-	}
+		private get probeInteraction(): ProbeInteraction {
+			if (!this._probeInteraction) {
+				for (let interaction of this.getMap().getInteractions().getArray()) {
+					if (interaction instanceof ProbeInteraction) {
+						this._probeInteraction = interaction;
+						break;
+					}
+				}
+			}
 
-	onBoxEnd(event: any)
-	{
-		if (this.probeInteraction)
-			this.probeInteraction.setActive(true);
+			return this._probeInteraction;
+		}
 
-		let extent: ol.Extent = this.getGeometry().getExtent();
-		let view: ol.View = this.getMap().getView();
-		let size: ol.Size = this.getMap().getSize();
-		view.fit(this.getGeometry(), size, {constrainResolution: false});
+		onBoxStart(event: any)
+		{
+			if (this.probeInteraction)
+				this.probeInteraction.setActive(false);
+		}
+
+		onBoxEnd(event: any)
+		{
+			if (this.probeInteraction)
+				this.probeInteraction.setActive(true);
+
+			let extent: ol.Extent = this.getGeometry().getExtent();
+			let view: ol.View = this.getMap().getView();
+			let size: ol.Size = this.getMap().getSize();
+			view.fit(this.getGeometry(), size, {constrainResolution: false});
+		}
 	}
-}

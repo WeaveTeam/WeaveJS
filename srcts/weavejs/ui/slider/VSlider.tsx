@@ -1,34 +1,34 @@
-import * as React from "react";
-import RCSlider, {SliderOption} from "./RCSlider";
-import {HBox} from "../flexbox/FlexBox";
+	import * as React from "react";
+	import RCSlider, {SliderOption} from "./RCSlider";
+	import {HBox} from "../flexbox/FlexBox";
 
-export interface VSliderProps
-{
-	min?:number;
-	max?:number;
-	step?:number;
-	options?:SliderOption[];
-	selectedValues?:any[];
-	type:string;
-	reversed?:boolean;
-	onChange?:(selectedValue:[string]) => void;
-	style?:React.CSSProperties;
-	className?:string;
-}
-
-export default class VSlider extends React.Component<VSliderProps, any>
-{
-	constructor(props:VSliderProps)
+	export interface VSliderProps
 	{
-		super(props);
+		min?:number;
+		max?:number;
+		step?:number;
+		options?:SliderOption[];
+		selectedValues?:any[];
+		type:string;
+		reversed?:boolean;
+		onChange?:(selectedValue:[string]) => void;
+		style?:React.CSSProperties;
+		className?:string;
 	}
 
-	render():JSX.Element
+	export default class VSlider extends React.Component<VSliderProps, any>
 	{
-		return (
-			<HBox overflow style={{flex: 1, justifyContent: "space-around"}} className="weave-vslider">
-				<RCSlider vertical={true} {...this.props}/>
-			</HBox>
-		);
+		constructor(props:VSliderProps)
+		{
+			super(props);
+		}
+
+		render():JSX.Element
+		{
+			return (
+				<HBox overflow style={{flex: 1, justifyContent: "space-around"}} className="weave-vslider">
+					<RCSlider vertical={true} {...this.props}/>
+				</HBox>
+			);
+		}
 	}
-}

@@ -1,79 +1,79 @@
-import * as ol from "openlayers";
-import * as jquery from "jquery";
-import OpenLayersMapTool from "./OpenLayersMapTool";
-import LinkableString = weavejs.core.LinkableString;
+	import * as ol from "openlayers";
+	import * as jquery from "jquery";
+	import OpenLayersMapTool from "./OpenLayersMapTool";
+	import LinkableString = weavejs.core.LinkableString;
 
-// loads jquery from the es6 default module.
-var $:JQueryStatic = (jquery as any)["default"];
+	// loads jquery from the es6 default module.
+	var $:JQueryStatic = (jquery as any)["default"];
 
-export default class InteractionModeCluster extends ol.control.Control
-{
-	constructor(optOptions: any)
+	export default class InteractionModeCluster extends ol.control.Control
 	{
-		var iconMapping: {[mode: string]: string} = {
-			"pan": "fa-hand-grab-o",
-			"select": "fa-mouse-pointer",
-			"zoom": "fa-search-plus"
-		};
-
-		var nameMapping: { [mode:string]: string} = {
-			"pan": Weave.lang("Pan"),
-			"select": Weave.lang("Selection"),
-			"zoom": Weave.lang("Zoom to Box")
-		}
-
-		var options: any = optOptions || {};
-		var div = $(`
-			<div style="display: flex; flex-direction: column" class="iModeCluster ol-control ol-unselectable">
-				<button class="modeButton pan fa" style="border-radius: 2px 2px 0 0"></button>
-				<button class="modeButton select fa" style="border-radius: 0"></button>
-				<button class="modeButton zoom fa" style="border-radius: 0 0 2px 2px"></button>
-			</div>
-		`);
-
-		let activeButton: JQuery = div.find("button.activeInteractionMode");
-		let clusterButtons: JQuery = div.find("button.modeButton");
-		let divider: JQuery = div.find("span.modeButton");
-
-		let oldPosition: JQueryCoordinates;
-
-
-		super({ element: div[0], target: options.target });
-
-		let self = this;
-		function setupButton(mode:string)
+		constructor(optOptions: any)
 		{
-			div.find("button." + mode)
-				.addClass(iconMapping[mode])
-				.prop("title", Weave.lang("Set mouse interaction mode to {0}.", Weave.lang(nameMapping[mode])))
-				.click(() => { if (self.interactionMode) self.interactionMode.value = mode; });
+			var iconMapping: {[mode: string]: string} = {
+				"pan": "fa-hand-grab-o",
+				"select": "fa-mouse-pointer",
+				"zoom": "fa-search-plus"
+			};
+
+			var nameMapping: { [mode:string]: string} = {
+				"pan": Weave.lang("Pan"),
+				"select": Weave.lang("Selection"),
+				"zoom": Weave.lang("Zoom to Box")
+			}
+
+			var options: any = optOptions || {};
+			var div = $(`
+				<div style="display: flex; flex-direction: column" class="iModeCluster ol-control ol-unselectable">
+					<button class="modeButton pan fa" style="border-radius: 2px 2px 0 0"></button>
+					<button class="modeButton select fa" style="border-radius: 0"></button>
+					<button class="modeButton zoom fa" style="border-radius: 0 0 2px 2px"></button>
+				</div>
+			`);
+
+			let activeButton: JQuery = div.find("button.activeInteractionMode");
+			let clusterButtons: JQuery = div.find("button.modeButton");
+			let divider: JQuery = div.find("span.modeButton");
+
+			let oldPosition: JQueryCoordinates;
+
+
+			super({ element: div[0], target: options.target });
+
+			let self = this;
+			function setupButton(mode:string)
+			{
+				div.find("button." + mode)
+					.addClass(iconMapping[mode])
+					.prop("title", Weave.lang("Set mouse interaction mode to {0}.", Weave.lang(nameMapping[mode])))
+					.click(() => { if (self.interactionMode) self.interactionMode.value = mode; });
+			}
+
+			for (let key in iconMapping) setupButton(key);
+
+			this.updateInteractionMode_weaveToControl = (() => {
+				let mode = self.interactionMode.value;
+
+				div.find("button.modeButton").removeClass("active");
+				div.find("button.modeButton." + mode).addClass("active");
+
+				div.prop("alt", Weave.lang("Mouse interaction mode set to {0}", Weave.lang(nameMapping[mode])));
+			});
 		}
 
-		for (let key in iconMapping) setupButton(key);
+		private interactionMode: LinkableString;
+		private updateInteractionMode_weaveToControl: Function;
 
-		this.updateInteractionMode_weaveToControl = (() => {
-			let mode = self.interactionMode.value;
+		setMap(map:ol.Map):void
+		{
+			super.setMap(map)
 
-			div.find("button.modeButton").removeClass("active");
-			div.find("button.modeButton." + mode).addClass("active");
+			if (!map)
+				return;
 
-			div.prop("alt", Weave.lang("Mouse interaction mode set to {0}", Weave.lang(nameMapping[mode])));
-		});
+			let mapTool: OpenLayersMapTool = map.get("mapTool") as OpenLayersMapTool;
+			this.interactionMode = mapTool.interactionMode;
+
+			this.interactionMode.addGroupedCallback(mapTool, this.updateInteractionMode_weaveToControl, true);
+		}
 	}
-
-	private interactionMode: LinkableString;
-	private updateInteractionMode_weaveToControl: Function;
-
-	setMap(map:ol.Map):void
-	{
-		super.setMap(map)
-
-		if (!map)
-			return;
-
-		let mapTool: OpenLayersMapTool = map.get("mapTool") as OpenLayersMapTool;
-		this.interactionMode = mapTool.interactionMode;
-
-		this.interactionMode.addGroupedCallback(mapTool, this.updateInteractionMode_weaveToControl, true);
-	}
-}
