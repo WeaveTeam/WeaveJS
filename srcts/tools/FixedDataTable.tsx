@@ -519,7 +519,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		return (
 			<Cell key={props.rowIndex+"#"+props.columnKey} {...props}>
 				<div style={{ marginLeft: -4, paddingLeft: 4, marginTop: -4, paddingTop: 4, width: props.width, height: props.height,background : this.colorRamp.getHexColor(value as any, 0, 100)}}
-				     onDoubleClick={handleDoubleClick}>{value}</div>
+				     onDoubleClick={handleDoubleClick}>{Weave.lang(value)}</div>
 			</Cell>
 		);
 	}
@@ -550,6 +550,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 			evenWidth = Math.max((this.state.width / columnIds.length), this.props.initialColumnWidth);
 
 		let columns = columnIds.map((id: string, index: number) => {
+			console.log("column", this.getColumnTitle(id));
 			return (
 				<Column
 					allowCellsRecycling={true}
@@ -562,7 +563,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 							disableSort={this.props.disableSort}
 							columnKey={id}
 							>
-							{this.getColumnTitle(id)}
+							{Weave.lang(this.getColumnTitle(id))}
 						</SortHeaderCell>
 					}
 					cell={this.renderCell}
