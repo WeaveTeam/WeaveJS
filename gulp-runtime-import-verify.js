@@ -7,7 +7,7 @@ var PluginError		= gutil.PluginError;
 
 function gulpRuntimeImportVerify() {
 
-	var searchPattern = /import[\s+](.+)=[\s+]?.+;/g;
+	var searchPattern = /import[\s+](.+)=[\s+]?(.+);/g;
 
 	return through.obj(function(file, enc, callback) {
 		if (file.isStream()) {
@@ -20,12 +20,26 @@ function gulpRuntimeImportVerify() {
 			var replacements = [];
 			var contents = file.contents.toString();
 			while ((match = searchPattern.exec(contents)) !== null) {
-				var originalText = match[0];
-				var importedName = match[1].trim();
-				replacements.push([
-					originalText,
-					originalText + ` if (!${importedName}) throw Error("Import of '${importedName}' failed.");`
-				]);
+				var refNoExt = match[2].replace(/\//g, '.');
+				['.tsx', '.ts'].forEach(function(ext) {
+					var refext = refNoExt + ext;
+					try
+					{
+						fs.accessSync(path.join(file.base, refext));
+						
+						var originalText = match[0];
+						var importedName = match[1].trim();
+						replacements.push(
+							[
+								originalText,
+								originalText + ` if (!${importedName}) throw Error("Import of '${importedName}' failed.");`
+							]
+						);
+					}
+					catch (e)
+					{
+					}
+				});
 			}
 
 			replacements.forEach(function(replacement) {

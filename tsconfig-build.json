@@ -5,7 +5,7 @@
     "removeComments": false,
     "target": "es6",
     "module": "amd",
-    "outFile": "/dev/null",
+    "outFile": "outts/weavejs.js",
     "inlineSources": true,
     "inlineSourceMap": true,
     "declaration": true,
@@ -16,7 +16,7 @@
   },
   "files": [
   	"srcts/_lib-references.ts",
-  	"srcts/_references.ts"
+  	"srcts-verify/_references.ts"
   ],
   "compileOnSave": false
 }

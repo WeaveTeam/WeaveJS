@@ -8,7 +8,6 @@
 /// <reference path="./../typings/jquery/jquery.d.ts"/>
 /// <reference path="./../typings/jszip/jszip.d.ts"/>
 /// <reference path="./../typings/lodash/lodash.d.ts"/>
-/// <reference path="./../typings/modifications.txt"/>
 /// <reference path="./../typings/moment/moment-node.d.ts"/>
 /// <reference path="./../typings/moment/moment.d.ts"/>
 /// <reference path="./../typings/openlayers/openlayers.d.ts"/>
@@ -33,5 +32,4 @@
 /// <reference path="./../typings/react-swf/react-swf.d.ts"/>
 /// <reference path="./../typings/swfobject/swfobject.d.ts"/>
 /// <reference path="./../typings/tsd.d.ts"/>
-/// <reference path="./../typings/weave/.placeholder"/>
 /// <reference path="./../typings/weave/weavejs-core.d.ts"/>
