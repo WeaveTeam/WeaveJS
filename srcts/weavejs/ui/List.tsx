@@ -1,8 +1,10 @@
 import * as React from "react";
+import * as ReactDOM from "react-dom";
 import * as _ from "lodash";
 import classNames from "../../modules/classnames";
 import {HBox} from "./flexbox/FlexBox";
 import {KEYCODES} from "../util/KeyboardUtils";
+import ReactUtils from "../util/ReactUtils";
 
 export type ListOption = {
 	value:any,
@@ -27,10 +29,12 @@ export interface IListState
 
 export default class List extends React.Component<IListProps, IListState>
 {
-	private checkboxes:HTMLElement[];
-	private lastIndexClicked:number;
+	private lastSelectedIndex:number;
 	private values:any[];
 	private labels:(string|JSX.Element)[];
+
+	private listContainer:HTMLElement;
+	private listItems:HTMLElement[] = [];
 
 	constructor(props:IListProps)
 	{
@@ -40,7 +44,7 @@ export default class List extends React.Component<IListProps, IListState>
 		};
 		if (props.selectedValues)
 		{
-			this.lastIndexClicked = props.selectedValues.length - 1;
+			this.lastSelectedIndex = props.selectedValues.length - 1;
 		}
 		if (this.props.options && this.props.options.length)
 		{
@@ -63,6 +67,16 @@ export default class List extends React.Component<IListProps, IListState>
 		};
 	}
 
+	get numberOfOptions()
+	{
+		return this.props.options.length - 1;
+	}
+
+	componentDidMount()
+	{
+		this.listContainer = ReactDOM.findDOMNode(this) as HTMLElement;
+	}
+
 	componentWillReceiveProps(nextProps:IListProps)
 	{
 		this.values = nextProps.options.map((option:ListOption) => option.value);
@@ -75,113 +89,49 @@ export default class List extends React.Component<IListProps, IListState>
 		}
 	}
 
-	handleKeyDown = (event:React.KeyboardEvent)=>
+	handleKeyDown=(event:React.KeyboardEvent)=>
 	{
-		if (event.shiftKey)
+		if (event.keyCode == KEYCODES.UP_ARROW || event.keyCode == KEYCODES.DOWN_ARROW)
 		{
-			switch (event.keyCode)
+			event.preventDefault();
+			if (event.keyCode == KEYCODES.UP_ARROW)
 			{
-				case KEYCODES.UP_ARROW:
-					this.addOrRemovePreviousValue();
-					break;
-				case KEYCODES.DOWN_ARROW:
-					this.addOrRemoveNextValue();
-					break;
+				this.focusPreviousItem();
 			}
-		}
-		else
-		{
-			switch (event.keyCode)
+			else if (event.keyCode == KEYCODES.DOWN_ARROW)
 			{
-				case KEYCODES.UP_ARROW:
-					this.selectPreviousValue();
-					break;
-				case KEYCODES.DOWN_ARROW:
-					this.selectNextValue();
-					break;
+				this.focusNextItem();
 			}
 		}
 	}
 
-	get numberOfOptions()
+	handleKeyDownOnListItem=(value:any, event:React.KeyboardEvent)=>
 	{
-		return this.props.options.length - 1;
-	}
-
-	get minIndex()
-	{
-		var selectedIndices = this.state.selectedValues.map((selectedValue) => this.values.indexOf(selectedValue));
-		return _.max([_.min(selectedIndices) - 1, 0]);
-	}
-
-	get maxIndex()
-	{
-		var selectedIndices = this.state.selectedValues.map((selectedValue) => this.values.indexOf(selectedValue));
-		return _.min([_.max(selectedIndices) + 1, this.numberOfOptions]);
-	}
-
-	addOrRemoveNextValue()
-	{
-		if(this.lastIndexClicked != this.numberOfOptions)
+		if(event.keyCode == KEYCODES.SPACE)
 		{
-			this.lastIndexClicked = _.min([this.lastIndexClicked + 1, this.numberOfOptions]);
-			var nextValue = this.props.options[this.lastIndexClicked].value;
-			this.addOrRemoveValue(nextValue);
+			event.preventDefault();
+			this.handleChange(value, event);
 		}
 	}
 
-	addOrRemovePreviousValue()
+	focusNextItem()
 	{
-		if(this.lastIndexClicked != 0)
-		{
-			this.lastIndexClicked = _.max([this.lastIndexClicked - 1, 0]);
-			var nextValue = this.props.options[this.lastIndexClicked].value;
-			this.addOrRemoveValue(nextValue);
-		}
+		var index = _.min([this.listItems.indexOf(ReactUtils.getDocument(this).activeElement as HTMLElement) + 1, this.numberOfOptions]);
+		this.focusItem(index);
 	}
 
-	addOrRemoveValue(value:any)
+	focusPreviousItem()
 	{
-		// if the value is already in the list unselect it
-		var selectedValues:any[];
-		if (this.state.selectedValues.indexOf(value) >= 0)
-		{
-			var selectedValues = _.clone(this.state.selectedValues);
-			selectedValues.splice(value, 1);
-			this.setState({
-				selectedValues
-			});
-		}
-		// otherwise select it
-		else
-		{
-			selectedValues = this.state.selectedValues.concat(value);
-			this.setState({
-				selectedValues
-			});
-		}
-		// if (this.props.onChange)
-		// 	this.props.onChange(selectedValues);
+		var index = _.max([this.listItems.indexOf(ReactUtils.getDocument(this).activeElement as HTMLElement) - 1, 0]);
+		this.focusItem(index);
 	}
 
-
-	selectNextValue()
+	focusItem(index:number)
 	{
-		this.setState({
-			selectedValues: [this.props.options[this.maxIndex].value]
-		});
-		this.lastIndexClicked = this.maxIndex;
+		this.listItems[index].focus();
 	}
 
-	selectPreviousValue()
-	{
-		this.setState({
-			selectedValues: [this.props.options[this.minIndex].value]
-		});
-		this.lastIndexClicked = this.minIndex;
-	}
-
-	handleChange(value:any, event:React.MouseEvent)
+	handleChange=(value:any, event:React.MouseEvent|React.KeyboardEvent)=>
 	{
 		var selectedValues:any[] = this.state.selectedValues.concat();
 		// new state of the item in the list
@@ -198,19 +148,19 @@ export default class List extends React.Component<IListProps, IListState>
 			{
 				selectedValues.push(value);
 			}
-			this.lastIndexClicked = currentIndexClicked;
+			this.lastSelectedIndex = currentIndexClicked;
 		}
 		// multiple selection
 		else if (event.shiftKey && this.props.multiple)
 		{
 			selectedValues = [];
-			if (this.lastIndexClicked == null)
+			if (this.lastSelectedIndex == null)
 			{
 				// do nothing
 			}
 			else
 			{
-				var start:number = this.lastIndexClicked;
+				var start:number = this.lastSelectedIndex;
 				var end:number = this.values.indexOf(value);
 
 				if (start > end)
@@ -235,12 +185,12 @@ export default class List extends React.Component<IListProps, IListState>
 			if (selectedValues.length == 1 && selectedValues[0] == value && this.props.allowClear)
 			{
 				selectedValues = [];
-				this.lastIndexClicked = null;
+				this.lastSelectedIndex = null;
 			}
 			else
 			{
 				selectedValues = [value];
-				this.lastIndexClicked = this.values.indexOf(value);
+				this.lastSelectedIndex = this.values.indexOf(value);
 			}
 		}
 
@@ -259,7 +209,7 @@ export default class List extends React.Component<IListProps, IListState>
 		let styleObj:React.CSSProperties = _.merge({}, this.props.style, {overflow: "auto"});
 		let listClassName:string = "weave-list " + this.props.className ? this.props.className : "";
 		return (
-			<div style={styleObj} className={listClassName} tabIndex={0} onKeyDown={this.handleKeyDown}>
+			<div style={styleObj} aria-role="listbox" className={listClassName} tabIndex={0} onKeyDown={this.handleKeyDown}>
 				{
 					this.values.map((value:any, index:number) =>
 					{
@@ -278,8 +228,20 @@ export default class List extends React.Component<IListProps, IListState>
 						});
 
 						return (
-							<HBox key={index} style={style} className={ className }
-							      onClick={this.handleChange.bind(this, value) }>
+							<HBox
+								key={index}
+								ref={(c:HBox) => {
+									this.listItems[index] = ReactDOM.findDOMNode(c) as HTMLElement
+								}}
+								aria-role="option"
+								style={style}
+								tabIndex={0}
+								onMouseEnter={() => this.listItems[index].focus()}
+								onMouseLeave={() => this.listItems[index].blur()}
+								className={ className }
+							    onClick={(event) => this.handleChange(value, event) }
+								onKeyDown={(event) => this.handleKeyDownOnListItem(value, event)}
+							>
 								{this.labels[index] || String(value)}
 							</HBox>
 						);

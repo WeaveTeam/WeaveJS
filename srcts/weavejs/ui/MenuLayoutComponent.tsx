@@ -41,7 +41,7 @@ export default class MenuLayoutComponent extends React.Component<IMenuLayoutComp
 			case LAYOUT_LIST:
 				return (
 					<VBox>
-						<List options={ this.props.options }  onChange={ this.props.onChange } selectedValues={ this.props.selectedItems }/>
+						<List options={ this.props.options } multiple={true} onChange={ this.props.onChange } selectedValues={ this.props.selectedItems }/>
 					</VBox>
 				);
 			case LAYOUT_HSLIDER:
