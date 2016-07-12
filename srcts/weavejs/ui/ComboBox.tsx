@@ -191,8 +191,8 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 			{
 
 				this.props.onAdded && this.props.onAdded(value);
-
-				if (value !== (this.props.noneOption && this.props.noneOption.value))
+				// arrays are compared to ensured none is not selected
+				if (!_.isEqual(value , (this.props.noneOption && this.props.noneOption.value) ) )
 				{
 					// push to state value array
 					(this.state.value as any[]).push(value);
@@ -431,11 +431,30 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 		/***** Render Value UI ******/
 
-		//1. check for multiple option
+		//1. check for none option 
 		//2. check for single option
-		//3. check for none option
+		//3. check for multiple option
 		//4. check for placeholder
-		if (this.props.type == "multiple" && Array.isArray(this.state.value) && (this.state.value as any[]).length > 0)
+		 if (this.isNoneOption()) // if value from none option , render the none option
+		{
+			// render Text UI only When search Query is not in operation
+			// for non multiple type
+			if ( this.state.searchQuery.length == 0)
+			{
+				let textStyle:React.CSSProperties = {
+					zIndex:0 //override semantic Z-order
+				};
+	
+				if (this.props.searchable && this.state.openMenu )
+				{
+					textStyle.color = "grey";
+					textStyle.pointerEvents ="none";
+				}
+				textUIs = <div className="text" style={textStyle}>{Weave.lang(this.props.noneOption.label)}</div>;
+	
+			}
+		}
+		else if (this.props.type == "multiple" && Array.isArray(this.state.value) && (this.state.value as any[]).length > 0)
 		{
 			selectedOptions =  [] ;
 
@@ -477,25 +496,6 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 				}
 				textUIs = <div className="text" style={textStyle}>{Weave.lang(valueText)}</div>;
 
-
-			}
-		}
-		else if (this.isNoneOption()) // if value from none option , render the none option
-		{
-			// render Text UI only When search Query is not in operation
-			// for non multiple type
-			if ( this.state.searchQuery.length == 0)
-			{
-				let textStyle:React.CSSProperties = {
-					zIndex:0 //override semantic Z-order
-				};
-
-				if (this.props.searchable && this.state.openMenu )
-				{
-					textStyle.color = "grey";
-					textStyle.pointerEvents ="none";
-				}
-				textUIs = <div className="text" style={textStyle}>{Weave.lang(this.props.noneOption.label)}</div>;
 
 			}
 		}
