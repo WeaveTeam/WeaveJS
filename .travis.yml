@@ -18,10 +18,7 @@ install: npm run compile
 before_script:
   - grunt distall
 after_success:
-  - cd dist
-  - tar -czf $TRAVIS_BRANCH.tgz *
-  - cd ..
-  - cp dist/$TRAVIS_BRANCH.tgz .
+  - cd dist/ && tar -zcvf ../$TRAVIS_BRANCH.tgz * && cd ..
   - chmod a+x printDir.sh
   - ./printDir.sh
   - cd dist/
