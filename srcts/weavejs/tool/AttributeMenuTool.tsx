@@ -211,7 +211,12 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	handleTargetToolChange = (selectedItem:string):void =>
 	{
 		if (selectedItem)
+		{
 			this.props.attributeMenuTool.targetToolPath.state = selectedItem;
+			//when new tool is changed set the targetAttribute to empty too
+			this.props.attributeMenuTool.targetAttribute.state ="";
+		}
+			
 	};
 
 	get tool():IVisTool
