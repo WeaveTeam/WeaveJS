@@ -175,8 +175,8 @@ export default class Dropdown extends SmartComponent<DropdownProps, DropdownStat
 				role="button"
 				onKeyUp={this.onKeyUp}
 				onMouseDown={this.onClick}
-			    onMouseEnter={this.onMouseEnter}
-			    onMouseLeave={this.onMouseLeave}
+				onMouseEnter={this.onMouseEnter}
+				onMouseLeave={this.onMouseLeave}
 			>
 				{this.props.children}
 			</button>

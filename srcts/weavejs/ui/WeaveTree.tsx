@@ -7,13 +7,15 @@ import * as _ from "lodash";
 
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
-export interface IWeaveTreeState {
+export interface IWeaveTreeState
+{
 	selectedItems?: Array<IWeaveTreeNode>;
 	openItems?: Array<IWeaveTreeNode>;
 	columnWidth?: number;
 }
 
-export interface IWeaveTreeProps {
+export interface IWeaveTreeProps
+{
 	root:IWeaveTreeNode
 	style?: any;
 	hideRoot?: boolean;
@@ -30,7 +32,8 @@ export interface IWeaveTreeProps {
 
 export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTreeState>
 {
-	constructor(props: IWeaveTreeProps) {
+	constructor(props: IWeaveTreeProps)
+	{
 		super(props);
 
 		this.state = { selectedItems: props.initialSelectedItems || [], openItems: props.initialOpenItems || [] };
@@ -42,30 +45,33 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		columnWidth: 0
 	};
 
-	componentWillReceiveProps(nextProps: IWeaveTreeProps) {
-		if (!this.props.root != !nextProps.root || (nextProps.root && !nextProps.root.equals(this.props.root))) {
+	componentWillReceiveProps(nextProps: IWeaveTreeProps)
+	{
+		if (!this.props.root != !nextProps.root || (nextProps.root && !nextProps.root.equals(this.props.root)))
+		{
 			this.setState({ selectedItems: nextProps.initialSelectedItems || [], openItems: nextProps.initialOpenItems || [] });
 		}
 		if (!_.isEqual(nextProps.initialSelectedItems, this.props.initialSelectedItems))//TODO does not work with _.IsEqual
-            this.setState({ selectedItems: nextProps.initialSelectedItems || [] });
-        if (!_.isEqual(nextProps.initialOpenItems, this.props.initialOpenItems))
+			this.setState({ selectedItems: nextProps.initialSelectedItems || [] });
+		if (!_.isEqual(nextProps.initialOpenItems, this.props.initialOpenItems))
 			this.setState({ openItems: nextProps.initialOpenItems || [] });
 	}
 
-	getOpen(node: IWeaveTreeNode): boolean {
-		if (node === this.props.root && this.props.hideRoot) {
+	getOpen(node: IWeaveTreeNode): boolean
+	{
+		if (node === this.props.root && this.props.hideRoot)
 			return true;
-		}
-		else {
+		else
 			return node && !!this.state.openItems.find((otherNode) => otherNode.equals(node));
-		}
 	}
 
-	static arrayChanged<T>(arrayA: Array<T>, arrayB: Array<T>, itemEqFunc: (a: T, b: T) => boolean): boolean {
+	static arrayChanged<T>(arrayA: Array<T>, arrayB: Array<T>, itemEqFunc: (a: T, b: T) => boolean): boolean
+	{
 		return (arrayA.length != arrayB.length) || !arrayA.every((d, i, a) => itemEqFunc(d, arrayB[i]));
 	}
 
-	componentDidUpdate(prevProps: IWeaveTreeProps, prevState: IWeaveTreeState) {
+	componentDidUpdate(prevProps: IWeaveTreeProps, prevState: IWeaveTreeState)
+	{
 		let nodeComp = (a: IWeaveTreeNode, b: IWeaveTreeNode) => {
 			if (a && b)
 				return a.equals(b);
@@ -104,17 +110,17 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 		}		
 	}
 
-	private internalSetOpen(node: IWeaveTreeNode, value: boolean) {
-		if (!node) return;
+	private internalSetOpen(node: IWeaveTreeNode, value: boolean)
+	{
+		if (!node)
+			return;
 		let isOpen = this.getOpen(node);
 		let openItems = this.state.openItems;
 		let selectedItems = this.state.selectedItems;
-		if (value && !isOpen) {
+		if (value && !isOpen)
 			openItems = openItems.concat([node]);
-		}
-		else if (!value && isOpen) {
+		else if (!value && isOpen)
 			openItems = openItems.filter((other) => !node.equals(other));
-		}
 
 		this.setState({ openItems, selectedItems });
 	}
@@ -129,7 +135,8 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 	static EXPANDER_OPEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-play fa-fw fa-rotate-90";
 	static EXPANDER_HIDDEN_CLASS_NAME = "weave-tree-view-icon-expander fa fa-fw hidden-expander";
 
-	private renderItem = (node: IWeaveTreeNode, index: number, depth: number): JSX.Element => {
+	private renderItem = (node: IWeaveTreeNode, index: number, depth: number): JSX.Element =>
+	{
 		let className = WeaveTree.CLASSNAME;
 		let iconClassName = WeaveTree.LEAF_ICON_CLASSNAME;
 		let iconClickFunc: React.MouseEventHandler = null;
@@ -171,20 +178,21 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 						onDoubleClick={(e) => e.stopPropagation() }
 						className={ expanderClassName }
 						style={{ alignSelf: "center" }}
-						></i>
+					/>
 				</span>
 				<span style={{ alignSelf: "stretch", display: "flex" }}>
 					<i
 						style={{ alignSelf: "center" }}
 						className={iconClassName}
-						/>
+					/>
 				</span>
 				{ " " + node.getLabel() }
 			</HBox>
 		</HBox>;
 	};
 
-	enumerateItems = (node: IWeaveTreeNode, result: Array<[number, IWeaveTreeNode]> = [], depth: number = 0): Array<[number, IWeaveTreeNode]> => {
+	enumerateItems = (node: IWeaveTreeNode, result: Array<[number, IWeaveTreeNode]> = [], depth: number = 0): Array<[number, IWeaveTreeNode]> =>
+	{
 		if (!node)
 			return result;
 
@@ -236,8 +244,10 @@ export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTr
 
 	private longestRowJSX:React.ReactChild;
 
-	render(): JSX.Element {
-		if (Weave.isLinkable(this.props.root)) {
+	render(): JSX.Element
+	{
+		if (Weave.isLinkable(this.props.root))
+		{
 			Weave.getCallbacks(this.props.root).addGroupedCallback(this, this.forceUpdate);
 		}
 		this.rowHeight = Math.max(DOMUtils.getTextHeightForClasses("M", WeaveTree.CLASSNAME), 22) + 5;

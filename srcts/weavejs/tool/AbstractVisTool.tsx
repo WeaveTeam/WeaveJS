@@ -288,8 +288,8 @@ export default class AbstractVisTool<P extends IVisToolProps, S extends IVisTool
 				Weave.lang("Show as caption"),
 				<Checkbox
 					ref={ linkReactStateRef(this, {value: this.altText.showAsCaption})}
-				    label=" "
-			    />
+					label=" "
+				/>
 			]
 		]
 	}

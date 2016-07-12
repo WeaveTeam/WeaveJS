@@ -87,7 +87,7 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 		let states = {} as {[key:string]: LinkableDynamicObject[]};
 		for (let wrapper of this.targets.getObjects())
 		{
-			if(!wrapper.target)
+			if (!wrapper.target)
 				continue;
 			var targetName:string = this.targets.getName(wrapper);
 			states[targetName] = WeaveAPI.SessionManager.getSessionState(wrapper.target) as LinkableDynamicObject[];
@@ -109,14 +109,14 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 	//called whenever the choices are added or deleted
 	handleChoices =():void =>
 	{
-		if(WeaveAPI.SessionManager.getCallbackCollection(this).callbacksAreDelayed)
+		if (WeaveAPI.SessionManager.getCallbackCollection(this).callbacksAreDelayed)
 		{
 			this.pendingApply = true;
 			return;
 		}
 
 		var choice = this.choices.getObject(this.selectedChoice.value) as LinkableVariable;
-		if(choice && Weave.detectChange(this.handleChoices, choice))
+		if (choice && Weave.detectChange(this.handleChoices, choice))
 		{
 			this.setTargetStates(choice.getSessionState());
 		}
@@ -125,14 +125,14 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	handleAutoRecord = ():void =>
 	{
-		if(this.autoRecord.value)
+		if (this.autoRecord.value)
 			this.recordSelectedChoice();
 	};
 
 	recordSelectedChoice = ():void =>
 	{
 		var selectedName = this.selectedChoice.value;//current selected choice in the menu tab
-		if(selectedName)//if there is a current selection
+		if (selectedName)//if there is a current selection
 		{
 			var choice:LinkableVariable = this.choices.requestObject(selectedName, LinkableVariable, false);//get its corresponding choice object
 			choice.setSessionState(this.getTargetStates());//update it session state
@@ -160,15 +160,15 @@ export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps,
 
 	render()
 	{
-		if(this.autoRecord.value)
+		if (this.autoRecord.value)
 			this.recordSelectedChoice();
 
 		var selectedChoice = this.choices.getObject(this.selectedChoice.value) as ILinkableVariable;
 		return(
 			<MenuLayoutComponent options={ this.options }
-			                    displayMode={ this.layoutMode.value }
-			                    onChange={ this.handleChoiceSelection.bind(this) }
-			                    selectedItems={ [selectedChoice] }
+								displayMode={ this.layoutMode.value }
+								onChange={ this.handleChoiceSelection.bind(this) }
+								selectedItems={ [selectedChoice] }
 			/>
 		);
 	}
@@ -215,12 +215,12 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 
 			//update the choice state when targets are ADDED
 			let targets = this.props.sessionStateMenuTool.targets;
-			for(let wrapper of targets.getObjects())
+			for (let wrapper of targets.getObjects())
 			{
-				if(!wrapper.target)
+				if (!wrapper.target)
 					continue;
 				name = targets.getName(wrapper);
-				if(!choiceState.hasOwnProperty(name))
+				if (!choiceState.hasOwnProperty(name))
 				{
 					choiceState[name] = WeaveAPI.SessionManager.getSessionState(wrapper.target) as  LinkableDynamicObject[];
 					updated = true;
@@ -228,16 +228,16 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 			}
 
 			//update the choice state when targets are REMOVED
-			for(let targetName in choiceState)
+			for (let targetName in choiceState)
 			{
-				if(!this.props.sessionStateMenuTool.targets.getObject(targetName))
+				if (!this.props.sessionStateMenuTool.targets.getObject(targetName))
 				{
 					delete choiceState[targetName];//remove the associated LinkableDynamicObject
 					updated = true;
 				}
 			}
 
-			if(updated)
+			if (updated)
 				choice.setSessionState(choiceState);//update the new state for that choice
 		});
 	};
@@ -247,20 +247,20 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	removeSelectedChoice =(choice:ILinkableVariable,event:React.MouseEvent):void =>
 	{
 		let ssmt = this.props.sessionStateMenuTool;
-		if(choice)
+		if (choice)
 		{
 			let allNames = ssmt.choices.getNames();
 			//using choice name instead of selected choice because in case the one being deleted is not the currently selected one
 			var  choiceName = ssmt.choices.getName(choice);//get the name of the choice being deleted
 			let deleteIndex:number = allNames.indexOf(choiceName);
 
-			if(deleteIndex < 0)
+			if (deleteIndex < 0)
 				deleteIndex = allNames.length -1;
 
 			ssmt.choices.removeObject(choiceName);//remove the object
 
 			//to update the current selected choice; only if the deleted one WAS the selected one
-			if(choiceName == ssmt.selectedChoice.value)
+			if (choiceName == ssmt.selectedChoice.value)
 			{
 				let newAllNames = ssmt.choices.getNames();//get new list
 				let newSelectedName = newAllNames[Math.min(newAllNames.length -1, deleteIndex)];
@@ -274,7 +274,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	addNewChoice =(name:string = null): string =>
 	{
 		let ssmt = this.props.sessionStateMenuTool;
-		if(!name)
+		if (!name)
 			name = ssmt.choices.generateUniqueName("Item");
 		ssmt.selectedChoice.value = name;
 		ssmt.recordSelectedChoice();
@@ -290,7 +290,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 
 	//reapplies the selected choice when choice items are deleted
 	updateSelectedChoice(choice:LinkableVariable,event:React.MouseEvent){
-		if(!Weave.wasDisposed(choice))
+		if (!Weave.wasDisposed(choice))
 			this.props.sessionStateMenuTool.selectedChoice.value = this.props.sessionStateMenuTool.choices.getName(choice)
 	}
 
@@ -309,7 +309,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 	//removes the target from the target list
 	removeSelectedTarget =(target:LinkableDynamicObject): void =>
 	{
-		if(target)
+		if (target)
 		{
 			var name:string = this.props.sessionStateMenuTool.targets.getName(target);
 			this.props.sessionStateMenuTool.targets.removeObject(name);
@@ -325,12 +325,12 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		try
 		{
 			let path = JSON.parse(this.state.pathInput) as string[];
-			if(!path)
+			if (!path)
 				return;
 			let wrapper = ssmt.targets.requestObject(null, LinkableDynamicObject, false);//create new target object
 			wrapper.targetPath = path;//set its targetPath
 
-			if(wrapper.target)//if valid target is set and exists
+			if (wrapper.target)//if valid target is set and exists
 			{
 				this.setState({
 					pathInput: ""
@@ -363,7 +363,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 					<HBox key={index} style={{justifyContent: "space-between", alignItems:"center"}}>
 						<span style={{overflow: "hidden"}}>{target.targetPath.join(', ')}</span>
 						<CenteredIcon onClick={ ()=>{this.removeSelectedTarget(target)} }
-							              iconProps={{ className: "fa fa-times", title: "Delete this target" }}/>
+										  iconProps={{ className: "fa fa-times", title: "Delete this target" }}/>
 					</HBox>
 				),
 				value:target
@@ -390,9 +390,9 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 					{ Weave.lang("Add target") }
 
 					<Input style={ {flexGrow: 0.5} }
-					       placeholder={ Weave.lang("Paste path here") }
-					       value={ this.state.pathInput }
-					       onChange={ this.handlePathInput }
+						   placeholder={ Weave.lang("Paste path here") }
+						   value={ this.state.pathInput }
+						   onChange={ this.handlePathInput }
 					/>
 
 					<Button onClick={ this.addNewTargetPath }>
@@ -422,7 +422,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 							onChange={ this.handleRename }/>
 
 						<CenteredIcon ref="deleteIcon" onClick={ this.removeSelectedChoice.bind(this,choice) }
-						              iconProps={{ className: "fa fa-times", title: "Delete this choice" }}/>
+									  iconProps={{ className: "fa fa-times", title: "Delete this choice" }}/>
 					</HBox>
 				),
 				value:choice
@@ -430,7 +430,7 @@ class SessionStateMenuToolEditor extends React.Component<ISessionStateMenuToolEd
 		});
 
 		//constructing the selected choice, should correspond to the selected choice in the Tool menu
-		if(ssmt.selectedChoice.value)
+		if (ssmt.selectedChoice.value)
 		{
 			selectedOption = ssmt.choices.getObject(ssmt.selectedChoice.value);
 		}

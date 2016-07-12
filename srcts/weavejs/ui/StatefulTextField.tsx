@@ -29,7 +29,7 @@ export default class StatefulTextField extends React.Component<StatefulTextField
 	
 	handleSelectOnFocus = () =>
 	{
-		if(this.props.selectOnFocus)
+		if (this.props.selectOnFocus)
 		{
 			this.input.inputElement.select();
 		}

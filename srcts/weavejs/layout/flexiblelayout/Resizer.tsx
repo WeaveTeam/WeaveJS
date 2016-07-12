@@ -6,16 +6,16 @@ import {HORIZONTAL, Direction} from "./Layout";
 
 const STYLE_BASE = {
 	background: "#e6e6e6",
-    boxSizing: "border-box",
-    backgroundClip: "padding"
+	boxSizing: "border-box",
+	backgroundClip: "padding"
 };
 
 const STYLE_HORIZONTAL = _.merge({
-    cursor: "col-resize"
+	cursor: "col-resize"
 }, STYLE_BASE);
 
 const STYLE_VERTICAL = _.merge({
-    cursor: "row-resize"
+	cursor: "row-resize"
 }, STYLE_BASE);
 
 export interface IResizerProps extends React.Props<Resizer>

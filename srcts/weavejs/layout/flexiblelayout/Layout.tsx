@@ -130,7 +130,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		var element1Index = resizerIndex;
 		var element2Index = resizerIndex + 1;
-		if(this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout){
+		if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout){
 			element1Index = resizerIndex + 1;
 			element2Index = resizerIndex
 		}
@@ -157,7 +157,7 @@ export default class Layout extends React.Component<LayoutProps, LayoutState>
 
 				var element1Index = index;
 				var element2Index = index + 1;
-				if(this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout){
+				if (this.state.direction === HORIZONTAL && weavejs.WeaveAPI.Locale.reverseLayout){
 					element1Index = index + 1;
 					element2Index = index
 				}

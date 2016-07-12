@@ -206,7 +206,8 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 	{
 		let refFunction = (c: TableTool) =>
 		{
-			if (!c) return;
+			if (!c)
+				return;
 			Weave.disposableChild(this.weaveRoot, c);
 			c.sortFieldIndex.value = -1;
 			ColumnUtils.replaceColumnsInHashMap(c.columns, columnRefs);
@@ -223,7 +224,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		let root = props.dataSource.getHierarchyRoot();
 
 		let hasChildren:boolean = false;
-		if(newBranch)
+		if (newBranch)
 			hasChildren = (newBranch.getChildren() as  IWeaveTreeNode[]).length > 0;
 		var branch =  hasChildren ? newBranch : root;
 		var leaf = newLeaf;

@@ -92,7 +92,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 		this.yAxisValueToLabel = {};
 		this.xAxisValueToLabel = {};
 
-        this.mergeConfig({
+		this.mergeConfig({
 			data: {
 				rows: [],
 				x: "x",
@@ -277,7 +277,7 @@ export default class C3ScatterPlot extends AbstractC3Tool
 					let key = this.records[i].id;
 					let selected = this.isSelected(key);
 					let probed = this.isProbed(key);
-					if(probed && selected)
+					if (probed && selected)
 						return "white";
 					else
 						return "black";

@@ -152,11 +152,11 @@ class ColorRampSelector extends SmartComponent<ColorRampSelectorProps, ColorRamp
 	addColor=(color:string,eventType:string)=>
 	{
 		var colors = this.props.colorRamp.getColors() as number[];
-		if(eventType == "onClick")
+		if (eventType == "onClick")
 		{
 			colors.push(StandardLib.asNumber(color));
 		}
-		else if(eventType == "onChange"){
+		else if (eventType == "onChange"){
 			colors[colors.length -1] = StandardLib.asNumber(color);
 		}
 
@@ -307,11 +307,11 @@ class ColorRampCustomizer extends SmartComponent<ColorRampCustomizerProps, Color
 	addColor=(color:string,eventType:string)=>
 	{
 		var colors = this.props.colorRamp.getColors() as number[];
-		if(eventType == "onClick")
+		if (eventType == "onClick")
 		{
 			colors.push(StandardLib.asNumber(color));
 		}
-		else if(eventType == "onChange"){
+		else if (eventType == "onChange"){
 			colors[colors.length -1] = StandardLib.asNumber(color);
 		}
 
@@ -323,7 +323,7 @@ class ColorRampCustomizer extends SmartComponent<ColorRampCustomizerProps, Color
 		if (this.props.colorRamp)
 		{
 			var colors = this.props.colorRamp.getColors() as number[];
-			if(index != null){
+			if (index != null){
 				colors[index] = StandardLib.asNumber(color);
 			}
 			else
@@ -362,7 +362,7 @@ class ColorRampCustomizer extends SmartComponent<ColorRampCustomizerProps, Color
 				label: (
 					<HBox padded style={{flex: 1, justifyContent: "space-between", alignItems: "center", overflow: "hidden"}}>
 						<ColorPicker hexColor={hexColor}
-						             onChange={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
+									 onChange={(newColor:string) => this.updateColorsAtIndex(index, newColor)}/>
 						<Label style={{flex: 1, fontFamily: "monospace"}} children={hexColor.toUpperCase()}/>
 						<CenteredIcon iconProps={{className: "fa fa-times fa-fw"}} onClick={() => this.removeColorAtIndex(index)}/>
 					</HBox>
@@ -379,8 +379,8 @@ class ColorRampCustomizer extends SmartComponent<ColorRampCustomizerProps, Color
 					<div style={{alignSelf:"flex-end"}}>
 						<HBox>
 							<ColorPicker  buttonMode={true} buttonLabel="Add color" direction={ColorPicker.BOTTOM_LEFT}
-							              onChange={(newColor:string) => this.addColor( newColor, "onChange")}
-							              onClick={(newColor:string) => this.addColor( newColor, "onClick")}/>
+										  onChange={(newColor:string) => this.addColor( newColor, "onChange")}
+										  onClick={(newColor:string) => this.addColor( newColor, "onClick")}/>
 						</HBox>
 
 					</div>

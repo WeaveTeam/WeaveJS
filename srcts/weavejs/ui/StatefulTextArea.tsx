@@ -28,7 +28,7 @@ export default class StatefulTextArea extends React.Component<StatefulTextAreaPr
 
 	handleSelectOnFocus = () =>
 	{
-		if(this.props.selectOnFocus)
+		if (this.props.selectOnFocus)
 		{
 			this.textArea.select();
 		}

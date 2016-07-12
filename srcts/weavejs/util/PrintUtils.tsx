@@ -35,7 +35,7 @@ export default class PrintUtils {
 		);
 		popoutWindow = ReactUtils.openPopout(content, PrintUtils.onLoad, PrintUtils.onBeforeUnLoad, options);
 		var canvasList = tool.getElementsByTagName('canvas');
-		if(canvasList.length)
+		if (canvasList.length)
 			canvas = canvasList.item(0);
 		var data = canvas.toDataURL('image/png');
 		popoutWindow.document.getElementById("printImg").setAttribute('src', data);

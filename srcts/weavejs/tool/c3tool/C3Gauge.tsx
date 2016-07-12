@@ -21,86 +21,86 @@ import LinkableString = weavejs.core.LinkableString;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 declare type Record = {
-    id: IQualifiedKey,
-    meterColumn: number
+	id: IQualifiedKey,
+	meterColumn: number
 };
 
 export default class C3Gauge extends AbstractC3Tool
 {
-    meterColumn = Weave.linkableChild(this, DynamicColumn);
-    binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
+	meterColumn = Weave.linkableChild(this, DynamicColumn);
+	binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
 	colorRamp = Weave.linkableChild(this, ColorRamp);
-    private colStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.meterColumn));
+	private colStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.meterColumn));
 
-    private RECORD_FORMAT = {
-        id: IQualifiedKey,
-        meterColumn: this.meterColumn
-    };
+	private RECORD_FORMAT = {
+		id: IQualifiedKey,
+		meterColumn: this.meterColumn
+	};
 
-    private RECORD_DATATYPE = {
-        meterColumn: Number
-    };
+	private RECORD_DATATYPE = {
+		meterColumn: Number
+	};
 
-    private keyToIndex:{[key:string]: number};
-    private records:Record[];
+	private keyToIndex:{[key:string]: number};
+	private records:Record[];
 
-    constructor(props:IVisToolProps)
-    {
-        super(props);
+	constructor(props:IVisToolProps)
+	{
+		super(props);
 
-        this.filteredKeySet.setSingleKeySource(this.meterColumn);
+		this.filteredKeySet.setSingleKeySource(this.meterColumn);
 
-        this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
-        this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
-        this.probeFilter.targetPath = ['defaultProbeKeySet'];
+		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
+		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
+		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
 		//initializes the binning definition which defines a number of evenly spaced bins
 		this.binningDefinition.requestLocalObject(SimpleBinningDefinition, false);
 		(this.binningDefinition.internalObject as SimpleBinningDefinition).numberOfBins.value = 3;
 		this.binningDefinition.generateBinClassifiersForColumn(this.meterColumn);
 		Weave.linkableChild(this, this.binningDefinition.asyncResultCallbacks);
-	    this.margin.left = Weave.linkableChild(this, new LinkableNumber(0));
-	    this.margin.right = Weave.linkableChild(this, new LinkableNumber(0));
-	    this.margin.top = Weave.linkableChild(this, new LinkableNumber(10));
-	    this.margin.bottom = Weave.linkableChild(this, new LinkableNumber(10));
+		this.margin.left = Weave.linkableChild(this, new LinkableNumber(0));
+		this.margin.right = Weave.linkableChild(this, new LinkableNumber(0));
+		this.margin.top = Weave.linkableChild(this, new LinkableNumber(10));
+		this.margin.bottom = Weave.linkableChild(this, new LinkableNumber(10));
 
-        this.keyToIndex = {};
+		this.keyToIndex = {};
 
-        this.mergeConfig({
-            padding: {
-                top: 10,
-                bottom: 10,
-                left: 10,
-                right: 10
-            },
-            data: {
-                columns: [],
-                type: "gauge",
-                xSort: false,
-                names: {}
-            },
-            gauge: {
-                label: {
-                    format: function(value, ratio)
-                    {
-                        return String(FormatUtils.defaultNumberFormatting(value));
-                    },
-                    show: false
-                },
-                //min: 0,
-                //max: 200, // get max from column statistics
-                //units: ' ',
-                width: 39 // arc width
-            },
-            color: {
-                threshold: {
-                    //unit: ' ', // percentage is default
-                    //max: 200, // should be set by data max using column stats
-                    //values: [30, 60, 90, 100] //should be set in even range using the color ramp
-                }
-            }
-        });
-    }
+		this.mergeConfig({
+			padding: {
+				top: 10,
+				bottom: 10,
+				left: 10,
+				right: 10
+			},
+			data: {
+				columns: [],
+				type: "gauge",
+				xSort: false,
+				names: {}
+			},
+			gauge: {
+				label: {
+					format: function(value, ratio)
+					{
+						return String(FormatUtils.defaultNumberFormatting(value));
+					},
+					show: false
+				},
+				//min: 0,
+				//max: 200, // get max from column statistics
+				//units: ' ',
+				width: 39 // arc width
+			},
+			color: {
+				threshold: {
+					//unit: ' ', // percentage is default
+					//max: 200, // should be set by data max using column stats
+					//values: [30, 60, 90, 100] //should be set in even range using the color ramp
+				}
+			}
+		});
+	}
 
 	protected updateConfigMargin()
 	{
@@ -108,12 +108,12 @@ export default class C3Gauge extends AbstractC3Tool
 		this.c3Config.padding.bottom = this.margin.bottom.value;
 	}
 
-    protected validate(forced:boolean = false):boolean
-    {
-        var changeDetected:boolean = false;
-        if (Weave.detectChange(this, this.meterColumn, this.colorRamp, this.filteredKeySet, this.probeKeySet, this.selectionKeySet, this.colStats, this.binningDefinition, this.margin))
-        {
-            changeDetected = true;
+	protected validate(forced:boolean = false):boolean
+	{
+		var changeDetected:boolean = false;
+		if (Weave.detectChange(this, this.meterColumn, this.colorRamp, this.filteredKeySet, this.probeKeySet, this.selectionKeySet, this.colStats, this.binningDefinition, this.margin))
+		{
+			changeDetected = true;
 			var name = this.meterColumn.getMetadata('title');
 
 			this.records = weavejs.data.ColumnUtils.getRecords(this.RECORD_FORMAT, this.filteredKeySet.keys, this.RECORD_DATATYPE);
@@ -153,15 +153,15 @@ export default class C3Gauge extends AbstractC3Tool
 				this.c3Config.data.columns = [];
 			
 			this.updateConfigMargin();
-        }
+		}
 
-        return changeDetected || forced;
-    }
+		return changeDetected || forced;
+	}
 
 	get selectableAttributes()
-    {
-        return super.selectableAttributes.set("Meter", this.meterColumn);
-    }
+	{
+		return super.selectableAttributes.set("Meter", this.meterColumn);
+	}
 
 	getMarginEditor():React.ReactChild[][]
 	{
@@ -197,30 +197,30 @@ export default class C3Gauge extends AbstractC3Tool
 		});
 	}
 
-    get defaultPanelTitle():string
-    {
-        return Weave.lang("Gauge of {0}", weavejs.data.ColumnUtils.getTitle(this.meterColumn));
-    }
+	get defaultPanelTitle():string
+	{
+		return Weave.lang("Gauge of {0}", weavejs.data.ColumnUtils.getTitle(this.meterColumn));
+	}
 
-    get deprecatedStateMapping()
-    {
-        return [super.deprecatedStateMapping, {
-            "children": {
-                "visualization": {
-                    "plotManager": {
-                        "plotters": {
-                            "plot": {
-                                "filteredKeySet": this.filteredKeySet,
-                                "meterColumn": this.meterColumn,
-                                "colorRamp": this.colorRamp,
-                                "binningDefinition": this.binningDefinition
-                            }
-                        }
-                    }
-                }
-            }
-        }];
-    }
+	get deprecatedStateMapping()
+	{
+		return [super.deprecatedStateMapping, {
+			"children": {
+				"visualization": {
+					"plotManager": {
+						"plotters": {
+							"plot": {
+								"filteredKeySet": this.filteredKeySet,
+								"meterColumn": this.meterColumn,
+								"colorRamp": this.colorRamp,
+								"binningDefinition": this.binningDefinition
+							}
+						}
+					}
+				}
+			}
+		}];
+	}
 }
 
 Weave.registerClass(

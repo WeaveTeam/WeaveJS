@@ -343,7 +343,7 @@ export default class DataTable<RowDatum> extends SmartComponent<IDataTableProps<
 	onMouseDown=(event:React.MouseEvent, index:number):void =>
 	{
 		//console.log("Down",event,index);
-		if(event.button !== 0)
+		if (event.button !== 0)
 			return; // only perform selection on left click
 
 		var selectedIds:string[] = this.state.selectedIds;
@@ -514,7 +514,8 @@ export default class DataTable<RowDatum> extends SmartComponent<IDataTableProps<
 
 	getColumnTitle(columnId:string)
 	{
-		if (!this.props.columnTitles) return "";
+		if (!this.props.columnTitles)
+			return "";
 		if (typeof this.props.columnTitles === 'function')
 		{
 			return (this.props.columnTitles as ((columnKey: string) => React.ReactChild))(columnId);

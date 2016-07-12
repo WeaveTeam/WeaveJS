@@ -485,16 +485,16 @@ export default class InteractiveTour extends React.Component<InteractiveTourProp
 				<div style={ highlighterStyle }/>
 				{pointerUI}
 				<InteractiveTourToolTip ref="toolTip"
-				                        style={toolTipPositionStyle}
-				                        location={toolTipPosition}
-				                        onNextClick={!interactionState ? InteractiveTour.targetComponentOnClick : null}
-				                        onDoneClick={InteractiveTour.isLastStep(currentStepIndex) ? this.closeHandler : null}
-				                        enableFooter={!interactionState}
-				                        type={type}
-				                        stepIndex={currentStepIndex}
-				                        shift={pxToShift}
-				                        title={this.state.activeStepName}
-				                        onClose={this.closeHandler}>
+										style={toolTipPositionStyle}
+										location={toolTipPosition}
+										onNextClick={!interactionState ? InteractiveTour.targetComponentOnClick : null}
+										onDoneClick={InteractiveTour.isLastStep(currentStepIndex) ? this.closeHandler : null}
+										enableFooter={!interactionState}
+										type={type}
+										stepIndex={currentStepIndex}
+										shift={pxToShift}
+										title={this.state.activeStepName}
+										onClose={this.closeHandler}>
 					{contents}
 				</InteractiveTourToolTip>
 			</div>

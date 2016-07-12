@@ -52,7 +52,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 	}
 
 	closeHandler=()=>{
-		if(this.props.onClose){
+		if (this.props.onClose){
 			this.props.onClose();
 		}
 	}
@@ -61,7 +61,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 	render() {
 
 		let urlParams:any = MiscUtils.getUrlParams();
-		if(Boolean(urlParams.skipGuidance))
+		if (Boolean(urlParams.skipGuidance))
 		{
 			return <div/>;
 		}
@@ -90,7 +90,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			position:"absolute"
 		};
 
-		if(this.props.location == GuidanceToolTip.BOTTOM)
+		if (this.props.location == GuidanceToolTip.BOTTOM)
 		{
 			relativeParentStyle.width = "100%";
 
@@ -105,7 +105,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
-		else if(this.props.location == GuidanceToolTip.BOTTOM_RIGHT)
+		else if (this.props.location == GuidanceToolTip.BOTTOM_RIGHT)
 		{
 			wrapperStyle.top = "8px";
 			wrapperStyle.right = "8px";
@@ -116,7 +116,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
-		else if(this.props.location == GuidanceToolTip.BOTTOM_LEFT)
+		else if (this.props.location == GuidanceToolTip.BOTTOM_LEFT)
 		{
 			wrapperStyle.top = "8px";
 			wrapperStyle.left = "8px";
@@ -127,7 +127,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
-		else if(this.props.location == GuidanceToolTip.TOP)
+		else if (this.props.location == GuidanceToolTip.TOP)
 		{
 			relativeParentStyle.width = "100%"; // gets parent width
 
@@ -143,7 +143,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
-		else if(this.props.location == GuidanceToolTip.TOP_RIGHT)
+		else if (this.props.location == GuidanceToolTip.TOP_RIGHT)
 		{
 			wrapperStyle.bottom = "8px";
 			wrapperStyle.right = "8px";
@@ -154,7 +154,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
-		else if(this.props.location == GuidanceToolTip.TOP_LEFT)
+		else if (this.props.location == GuidanceToolTip.TOP_LEFT)
 		{
 			wrapperStyle.bottom = "8px";
 			wrapperStyle.left = "8px";
@@ -165,7 +165,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 			arrowStyle.borderRightColor = "transparent";
 		}
-		else if(this.props.location == GuidanceToolTip.RIGHT)
+		else if (this.props.location == GuidanceToolTip.RIGHT)
 		{
 			wrapperStyle.left = "8px";
 
@@ -176,7 +176,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 			arrowStyle.borderLeftColor = "transparent";
 			
 		}
-		else if(this.props.location == GuidanceToolTip.LEFT)
+		else if (this.props.location == GuidanceToolTip.LEFT)
 		{
 			wrapperStyle.right = "8px";
 
@@ -188,7 +188,7 @@ export default class GuidanceToolTip extends React.Component<GuidanceToolTipProp
 		}
 
 		let closeButtonUI:JSX.Element = null;
-		if(this.props.type === GuidanceToolTip.DONE)
+		if (this.props.type === GuidanceToolTip.DONE)
 		{
 			let closeButtonStyle:React.CSSProperties = {
 				position:"absolute",

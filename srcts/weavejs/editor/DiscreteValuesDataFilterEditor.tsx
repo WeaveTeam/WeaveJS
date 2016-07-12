@@ -74,9 +74,9 @@ export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 		let values:any = this.filter ? this.filter.values.state : [];
 
 		return(<MenuLayoutComponent options={ this.options }
-		                            displayMode={ this.layoutMode.value }
-		                            onChange={ this.onChange.bind(this) }
-		                            selectedItems={ values }
+									displayMode={ this.layoutMode.value }
+									onChange={ this.onChange.bind(this) }
+									selectedItems={ values }
 		/>);
 	}
 }

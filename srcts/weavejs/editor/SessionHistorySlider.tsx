@@ -81,7 +81,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	handleKeyStroke=(event:KeyboardEvent)=>
 	{
 		// ctrl-z and cmd-z
-		if((event.ctrlKey || event.metaKey) && event.keyCode == KEYCODES.Z)
+		if ((event.ctrlKey || event.metaKey) && event.keyCode == KEYCODES.Z)
 		{
 			event.preventDefault();
 			this._stateLog.undo();
@@ -89,7 +89,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 
 
 		// ctrl-y and cmd-y and cmd-shift-z
-		if(((event.ctrlKey || event.metaKey) && event.keyCode == KEYCODES.Y) || (event.metaKey && event.shiftKey && event.keyCode == KEYCODES.Z))
+		if (((event.ctrlKey || event.metaKey) && event.keyCode == KEYCODES.Y) || (event.metaKey && event.shiftKey && event.keyCode == KEYCODES.Z))
 		{
 			event.preventDefault();
 			this._stateLog.redo();
@@ -118,7 +118,7 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 	
 	handleSlider(selectedValue:string[])
 	{
-		if(!selectedValue || !selectedValue.length) {
+		if (!selectedValue || !selectedValue.length) {
 			selectedValue = ["0"];
 		}
 		var delta:number = Number(selectedValue[0]) - this._stateLog.undoHistory.length;
@@ -132,10 +132,10 @@ export default class SessionHistorySlider extends React.Component<SessionHistory
 
 	render():JSX.Element
 	{
-		//<button ref={(c) => this.playButton = c} label={this.getPlayLabel(this._playSpeed, "")} title={Weave.lang('Replay session history')} onClick={() => {if(this.playButton.value) this.play()}}>Replay</button>
+		//<button ref={(c) => this.playButton = c} label={this.getPlayLabel(this._playSpeed, "")} title={Weave.lang('Replay session history')} onClick={() => {if (this.playButton.value) this.play()}}>Replay</button>
 		//className="fa fa-undo fa-flip-horizontal"
 		var sliderOptions:SliderOption[] = [];
-		for(var i = 0; i < this.state.max; i++) {
+		for (var i = 0; i < this.state.max; i++) {
 			sliderOptions.push({
 				value: i,
 				label: ""

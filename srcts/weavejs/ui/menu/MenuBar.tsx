@@ -236,8 +236,8 @@ export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 					InteractiveTour.targetComponentOnClick(props.label)
 				}}
 				onClose={this.onDropdownClose}
-			    onMouseUp={() => this.onMouseUp(index)}
-			    onKeyUp={(event:React.KeyboardEvent) => this.onKeyUp(index, event)}
+				onMouseUp={() => this.onMouseUp(index)}
+				onKeyUp={(event:React.KeyboardEvent) => this.onKeyUp(index, event)}
 			>
 				{props.label}
 			</Dropdown>

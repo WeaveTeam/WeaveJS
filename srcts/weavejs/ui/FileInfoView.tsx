@@ -39,7 +39,7 @@ export default class FileInfoView extends React.Component<IFileInfoViewProps, IF
 	{
 		let selector = ($(this.element).find(".ui.button.copyButton") as any);
 		let selectedElement = selector.get(0);
-		if(selectedElement)
+		if (selectedElement)
 		{
 			this.clipboard = new Clipboard(selectedElement);
 			this.clipboard.on('success', (e) => {

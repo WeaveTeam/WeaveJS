@@ -41,7 +41,7 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 	
 	componentWillReceiveProps(nextProps:CheckboxProps)
 	{
-		if(nextProps.value !== undefined && nextProps.value !== null)
+		if (nextProps.value !== undefined && nextProps.value !== null)
 			this.setState({
 				value: nextProps.value
 			});
@@ -71,13 +71,13 @@ export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxStat
 		return (
 			<div className={"ui " + this.props.type + " checkbox " + (this.state.value? "checked ": "") + (this.props.disabled ? "disabled ": "")  + (this.props.className || "")} style={this.props.style}>
 				<input {...props as any} type={this.props.type ? this.props.type :  "checkbox"}
-				                         value={String(this.state.value)}
-				                         checked={this.state.value}
-				                         disabled={this.props.disabled}
-				                         title={this.props.title}
-				                         name={this.props.name}
-				                         onChange={this.handleChange}
-				                         />
+										 value={String(this.state.value)}
+										 checked={this.state.value}
+										 disabled={this.props.disabled}
+										 title={this.props.title}
+										 name={this.props.name}
+										 onChange={this.handleChange}
+										 />
 				{this.props.label ? <label>{this.props.label || " "}</label>:null}
 			</div>
 		);

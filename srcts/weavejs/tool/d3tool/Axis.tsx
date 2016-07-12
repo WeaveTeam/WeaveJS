@@ -57,9 +57,9 @@ export class XAxis extends AbstractAxis
 	{
 		var axis = d3.svg.axis().scale(this.props.scale).orient(this.orient).tickFormat(this.props.format).tickSize(-1*this.props.length);
 		d3.select(this.element).call(axis).selectAll("text")  // select all the text elements for the xaxis
-          .attr("transform", function(d) {
-             return "translate(" + this.getBBox().height*-2 + "," + (this.getBBox().height+7) + ")rotate(-45)";
-         });
+		  .attr("transform", function(d) {
+			 return "translate(" + this.getBBox().height*-2 + "," + (this.getBBox().height+7) + ")rotate(-45)";
+		 });
 	}
 
 	render()

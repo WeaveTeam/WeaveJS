@@ -112,9 +112,9 @@ export default class ScatterPlotPlotter extends AbstractGlyphPlotter implements 
 		{
 			var sizeData:number = this.sizeBy.getValueFromKey(recordKey, Number);
 			var alpha:number = this.fill.alpha.getValueFromKey(recordKey, Number);
-			if( sizeData < 0 )
+			if ( sizeData < 0 )
 				graphics.beginFill(this.colorNegative.value, alpha);
-			else if( sizeData > 0 )
+			else if ( sizeData > 0 )
 				graphics.beginFill(this.colorPositive.value, alpha);
 			var min:number = this._sizeByStats.getMin();
 			var max:number = this._sizeByStats.getMax();

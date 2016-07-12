@@ -136,7 +136,7 @@ export default class DataFilterTool extends React.Component<IVisToolProps, IVisT
 		if (column)
 			return Weave.lang('Filter for {0}', ColumnUtils.getTitle(column));
 		return Weave.lang('Filter');
-    }
+	}
 
 
 	// it has to be function as Filter DynamicColumn is set at Fly
@@ -296,8 +296,8 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 			filterOptionUI =  [
 				<span style={labelStyle}></span>,
 				<Checkbox value={ selectedOption as boolean}
-				          label={ filterEditorItem.options[0] }
-				          onChange={ this.handleContinuousFilterOptionChange }
+						  label={ filterEditorItem.options[0] }
+						  onChange={ this.handleContinuousFilterOptionChange }
 				/>
 			];
 			this.filterTypeSwitched = false;//reset
@@ -307,7 +307,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 			selectedFilter = FILTER_TYPE.DISCRETE;
 			filterEditorItem = this.filterEditorMap[FILTER_TYPE.DISCRETE];
 
-			if(this.filterTypeSwitched)
+			if (this.filterTypeSwitched)
 				(this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state = this.last_discreteFilterLayoutMode as string;/*preserving the layout state*/
 
 			selectedOption = (this.props.filterEditor.target as DiscreteValuesDataFilterEditor).layoutMode.state as string;
@@ -315,9 +315,9 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 			filterOptionUI = [
 				<span style={labelStyle}>{ Weave.lang("Layout") }</span>,
 				<ComboBox className="weave-sidebar-dropdown"
-				          value={ selectedOption }
-				          options={ filterEditorItem.options }
-				          onChange={ this.handleDiscreteFilterOptionChange }
+						  value={ selectedOption }
+						  options={ filterEditorItem.options }
+						  onChange={ this.handleDiscreteFilterOptionChange }
 				/>
 			];
 			this.filterTypeSwitched = false;//reset
@@ -338,7 +338,7 @@ class DataFilterEditor extends React.Component<IDataFilterEditorProps, IDataFilt
 			]
 		];
 		
-		if(filterOptionUI)
+		if (filterOptionUI)
 		{
 			editorConfigs.push(filterOptionUI)
 		}

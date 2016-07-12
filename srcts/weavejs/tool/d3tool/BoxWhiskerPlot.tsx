@@ -55,7 +55,7 @@ export interface BoxWhiskerPlotState extends IVisToolState
 export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps, BoxWhiskerPlotState>
 {
 	boxwhiskerX = Weave.linkableChild(this, DynamicColumn);
-    boxwhiskerY = Weave.linkableChild(this, DynamicColumn);
+	boxwhiskerY = Weave.linkableChild(this, DynamicColumn);
 
 	scatterX = Weave.linkableChild(this, DynamicColumn);
 	scatterY = Weave.linkableChild(this, DynamicColumn);
@@ -75,9 +75,9 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 
 	private lineXStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.lineX));
 	private lineYStats = Weave.linkableChild(this, weavejs.WeaveAPI.StatisticsCache.getColumnStatistics(this.lineY));
-    // selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
-    // probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
-    // filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
+	// selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	// probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
+	// filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 
 	dataBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
 	screenBounds:Bounds2D = new Bounds2D(0, 0, 0, 0);
@@ -136,7 +136,7 @@ export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps,
 					records.map((record, index) => {
 						var hexColor = StandardLib.getHexColor(Number(record.color));
 
-						if(isNaN(record.x + record.y + record.r))
+						if (isNaN(record.x + record.y + record.r))
 							return <g key={index}/>;
 
 						return <circle key={index}

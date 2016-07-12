@@ -16,7 +16,7 @@ export interface IVisToolState
 
 export interface IVisTool extends ILinkableObject, ISelectableAttributes
 {
-    title:string;
+	title:string;
 	renderEditor(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):JSX.Element;
 }
 

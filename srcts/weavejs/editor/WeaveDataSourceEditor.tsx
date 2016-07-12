@@ -55,7 +55,8 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 	}
 
 	private static getBaseUrl(serviceUrl: string): string {
-		if (!serviceUrl) return "/WeaveServices";
+		if (!serviceUrl)
+			return "/WeaveServices";
 		/* TODO: Use a proper URL parsing library to get the base URL */
 		let pathComponents = serviceUrl.split('/');
 		pathComponents.pop();

@@ -11,25 +11,25 @@ export interface C3ChartProps
 
 export default class C3Chart extends SmartComponent<C3ChartProps, {}>
 {
-    constructor(props:C3ChartProps)
+	constructor(props:C3ChartProps)
 	{
-        super(props);
-    }
+		super(props);
+	}
 
 	private key:number = 0;
-    public chart:c3.ChartAPI;
+	public chart:c3.ChartAPI;
 	
-    render():JSX.Element
-    {
-        return <div key={this.key}/>;
-    }
+	render():JSX.Element
+	{
+		return <div key={this.key}/>;
+	}
 
 	componentDidMount():void
 	{
 		this.updateChart();
 	}
 	
-    componentDidUpdate():void
+	componentDidUpdate():void
 	{
 		this.updateChart();
 	}

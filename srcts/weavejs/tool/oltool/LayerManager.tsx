@@ -34,7 +34,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 	{
 		super(props);
 
-		if(props.layers){
+		if (props.layers){
 			props.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 		}
 		this.state = {
@@ -47,13 +47,13 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 
 	componentWillReceiveProps(nextProps:ILayerManagerProps)
 	{
-		if(this.props.layers != nextProps.layers)
+		if (this.props.layers != nextProps.layers)
 		{
 			this.props.layers.childListCallbacks.removeCallback(this,this.forceUpdate);
 			nextProps.layers.childListCallbacks.addGroupedCallback(this, this.forceUpdate);
 		}
 
-		if(this.props.selectedLayer != nextProps.selectedLayer)
+		if (this.props.selectedLayer != nextProps.selectedLayer)
 		{
 			this.setState({
 				selectedLayer: nextProps.selectedLayer
@@ -83,21 +83,21 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 		// layer description style set to flex value 1 to take up the remaining space
 
 		return <HBox key={"layerItem" + index} style={ {alignItems: "center", padding: "4px"} }
-		             className={layer == this.state.selectedLayer ? "weave-list-item-selected" : "weave-list-item"}
-		             onMouseDown={ () => {
-		                                    if (this.state.selectedLayer != layer)
-		                                        this.setState({selectedLayer: layer});
-		                                    if(this.props.onLayerSelection)
-		                                        this.props.onLayerSelection(layer)
-		                                }
-		                             }
+					 className={layer == this.state.selectedLayer ? "weave-list-item-selected" : "weave-list-item"}
+					 onMouseDown={ () => {
+											if (this.state.selectedLayer != layer)
+												this.setState({selectedLayer: layer});
+											if (this.props.onLayerSelection)
+												this.props.onLayerSelection(layer)
+										}
+									 }
 				>
 				<Checkbox title={ Weave.lang("Show layer") } ref={ linkReactStateRef(this, { value: layer.visible }) } label={ layer.getDescription() }/>
 				<span style={ {flex:1} }></span>
 				<button className="ui button"
-				        title={ Weave.lang("Edit layer") }
-				        style={ {alignSelf: "flex-end", whiteSpace: "nowrap"} }
-				        onClick={ this.onEditLayerClick.bind(this,layer) }>
+						title={ Weave.lang("Edit layer") }
+						style={ {alignSelf: "flex-end", whiteSpace: "nowrap"} }
+						onClick={ this.onEditLayerClick.bind(this,layer) }>
 					<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
 				</button>
 			</HBox>
@@ -142,7 +142,7 @@ export default class LayerManager extends React.Component<ILayerManagerProps, IL
 						<MenuButton
 							className={"ui icon button"}
 							showIcon={false}
-				            style={{flex: 1, alignItems: "center", justifyContent: "center", borderBottomRightRadius: 0, borderTopRightRadius: 0}}
+							style={{flex: 1, alignItems: "center", justifyContent: "center", borderBottomRightRadius: 0, borderTopRightRadius: 0}}
 							menu={layerTypes.map((layerClass) => ({
 								label: weavejs.WeaveAPI.ClassRegistry.getDisplayName(layerClass),
 								click: () => {

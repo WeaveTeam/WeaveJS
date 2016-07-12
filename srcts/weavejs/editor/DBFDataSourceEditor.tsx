@@ -77,7 +77,7 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 				<StatefulTextField style={{width: "100%"}}
 								   selectOnFocus={true} 
 							   	   placeholder={Weave.lang("Example: EPSG:4326")} 
-							       ref={linkReactStateRef(this, { value: dataSource.projection })}/>
+								   ref={linkReactStateRef(this, { value: dataSource.projection })}/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
@@ -85,9 +85,9 @@ export default class DBFDataSourceEditor extends DataSourceEditor
 					<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
 				<ComboBox style={{width: "100%"}}
-				          ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
-				          placeholder={Weave.lang("Auto-generated keys") }
-				          options={dataSource.getColumnNames()}/>
+						  ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
+						  placeholder={Weave.lang("Auto-generated keys") }
+						  options={dataSource.getColumnNames()}/>
 			],
 			[
 				<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>

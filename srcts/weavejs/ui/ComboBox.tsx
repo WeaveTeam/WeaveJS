@@ -64,12 +64,12 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 	componentWillReceiveProps(nextProps: ComboBoxProps)
 	{
-		if(this.props.options != nextProps.options || this.props.value != nextProps.value)
+		if (this.props.options != nextProps.options || this.props.value != nextProps.value)
 		{
 			this.setState(this.getStateFromProps(nextProps));
 		}
 
-		if(this.props.direction != nextProps.direction )
+		if (this.props.direction != nextProps.direction )
 		{
 			this.setState({
 				direction:nextProps.direction
@@ -84,7 +84,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 	{
 		var options:ComboBoxOption[] = props.options.map((option:(string | { label: string, value: any })) =>
 		{
-			if(typeof option === "object" && option)
+			if (typeof option === "object" && option)
 			{
 				return option;
 			}
@@ -98,14 +98,14 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		});
 
 		var value:any = props.value;
-		if(value && value.hasOwnProperty("label") && value.hasOwnProperty("value"))
+		if (value && value.hasOwnProperty("label") && value.hasOwnProperty("value"))
 		{
 			// so get the original value from Value Object
 			value = props.value.value;
 			// make options have unique value
 			options = _.uniq(_.union(options, [props.value]), "value");
 		}
-		else if(Array.isArray(value) && value[0] && value[0].hasOwnProperty("label") && value[0].hasOwnProperty("value"))
+		else if (Array.isArray(value) && value[0] && value[0].hasOwnProperty("label") && value[0].hasOwnProperty("value"))
 		{
 			// so get the original values from each Value Object
 			value = props.value.map((val:any) => val.value);
@@ -113,7 +113,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 			options = _.uniq(_.union(props.value, options), "value")
 		}
 
-		if(props.noneOption)
+		if (props.noneOption)
 		{
 			options.push({
 				label:props.noneOption.label,
@@ -132,7 +132,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 	private getOptionFromValue(value:any):ComboBoxOption
 	{
 		// if value is not equal to none Option value find the option
-		if(value !== (this.props.noneOption && this.props.noneOption.value))
+		if (value !== (this.props.noneOption && this.props.noneOption.value))
 		{
 			let equalityFunc = this.props.valueEqualityFunc || _.isEqual;
 			let index:number =  this.state.options && this.state.options.findIndex((option:ComboBoxOption) => {
@@ -157,7 +157,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 		// if search enabled, make the focus to input element when opened
 		// so that user knows there is a input element
-		if(openState && this.props.searchable)
+		if (openState && this.props.searchable)
 			this.inputElement && this.inputElement.focus();
 		else
 			this.resetSearchQuery();
@@ -184,7 +184,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 				this.props.onAdded && this.props.onAdded(value);
 
-				if(value !== (this.props.noneOption && this.props.noneOption.value))
+				if (value !== (this.props.noneOption && this.props.noneOption.value))
 				{
 					// push to state value array
 					(this.state.value as any[]).push(value);
@@ -195,7 +195,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 					this.resetSearchQuery();
 					// if search enabled, make the focus to input element when opened
 					// so that user knows there is a input element
-					if(openState && this.props.searchable)
+					if (openState && this.props.searchable)
 						this.inputElement && this.inputElement.focus();
 				}
 				else
@@ -209,7 +209,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 				openMenu:openState,
 			});
 
-			if(!openState)
+			if (!openState)
 				this.resetSearchQuery();
 
 			this.props.onChange && this.props.onChange(value);
@@ -217,7 +217,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 	};
 
 	resetSearchQuery = ()=>{
-		if(this.props.searchable)
+		if (this.props.searchable)
 		{
 			// search is done and user selected the option
 			// set search query back to empty
@@ -226,7 +226,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 				searchQuery: ""
 			});
 
-			if(this.inputElement)
+			if (this.inputElement)
 			{
 				(this.inputElement as any).value = "";
 			}
@@ -249,7 +249,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 			searchQuery:""
 		});
 
-		if(this.inputElement)
+		if (this.inputElement)
 		{
 			(this.inputElement as any).value = "";
 		}
@@ -296,14 +296,14 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 	// todo : make combobox update direction even window is resizing
 	private menuRefCallback=(c:ComboBoxMenu)=>
 	{
-		if(c)
+		if (c)
 		{
 			ReactUtils.getDocument(this).addEventListener("mousedown", this.onDocumentMouseDown);
 
 			let menuElement = ReactDOM.findDOMNode(c) as HTMLElement;
 			this.menuRect = menuElement.getBoundingClientRect();
 			// todo : make combobox update direction based on it given parent container, default should be window
-			if(this.menuRect.top + this.menuRect.height > window.innerHeight)
+			if (this.menuRect.top + this.menuRect.height > window.innerHeight)
 			{
 				//re-render again
 				this.setState({
@@ -321,7 +321,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 	getMenuPositionStyle=():React.CSSProperties =>
 	{
-		if(this.menuRect && this.state.direction == "upward")
+		if (this.menuRect && this.state.direction == "upward")
 		{
 			return {
 				top: -this.menuRect.height
@@ -342,7 +342,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		// this ensures, click on input doesn't listen to listeners attached to its container
 		event.stopPropagation();
 		// if the state is close , make it open
-		if(!this.state.openMenu)
+		if (!this.state.openMenu)
 		{
 			this.setState({
 				openMenu:true
@@ -356,7 +356,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 			type: isHidden ? "hidden":"",
 		};
 
-		if(!isHidden)
+		if (!isHidden)
 		{
 			inputProps.role = 'combobox';
 			inputProps['aria-expanded'] = this.state.openMenu ? "true" : "false";
@@ -379,20 +379,20 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 	// todo: What if value is JSON Object
 	isNoneOption=():boolean => {
 
-		if(!this.props.noneOption)
+		if (!this.props.noneOption)
 		{
 			return false;
 		}
 
 		// !== is used as null == undefined will return true where as null === undefined will return false
-		if(this.state.value ===  this.props.noneOption.value)
+		if (this.state.value ===  this.props.noneOption.value)
 		{
 			return true;
 		}
 		else
 		{
 			//checking array length is important as [] === [] will return false
-			if(Array.isArray(this.state.value))
+			if (Array.isArray(this.state.value))
 			{
 				let arrayFlag:boolean = (this.state.value.length > 0 === (Array.isArray(this.props.noneOption.value) && this.props.noneOption.value.length > 0));
 				return arrayFlag;
@@ -405,7 +405,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 	searchQueryChangeListener=(event:React.FormEvent)=>
 	{
 		let query:string =  (event.target as any).value;
-		if(this.state.searchQuery !== query)
+		if (this.state.searchQuery !== query)
 		{
 			this.setState({
 				searchQuery:query
@@ -427,32 +427,32 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		//2. check for single option
 		//3. check for none option
 		//4. check for placeholder
-		if(this.props.type == "multiple" && Array.isArray(this.state.value) && (this.state.value as any[]).length > 0)
+		if (this.props.type == "multiple" && Array.isArray(this.state.value) && (this.state.value as any[]).length > 0)
 		{
 			selectedOptions =  [] ;
 
 			textUIs =(this.state.value as any[]).map( (value:any, index:number) => {
 				let option:ComboBoxOption = this.getOptionFromValue(value);
-				if(option)
+				if (option)
 					(selectedOptions as ComboBoxOption[])[index] = option;
 				//option may not be available instantly for those cases render the value
 				//todo: if its a object, convert to string ?
 				let valueText:string = option && option.label? option.label : (typeof value == "string") ? value : "";
 				return  <a key={index}
-				          className="ui label">
+						  className="ui label">
 							{Weave.lang(valueText)}
 							<i className="delete icon" onClick={this.selectedValueRemoveListener.bind(this,index,option)}></i>
 						</a>;
 			});
 		}
-		else if(this.state.value && !Array.isArray(this.state.value))
+		else if (this.state.value && !Array.isArray(this.state.value))
 		{
 			// render Text UI only When search Query is not in operation
 			// for non multiple type
-			if( this.state.searchQuery.length == 0)
+			if ( this.state.searchQuery.length == 0)
 			{
 				let option:ComboBoxOption = this.getOptionFromValue(this.state.value);
-				if(option)
+				if (option)
 					selectedOptions = option;
 				//option may not be available instantly for those cases render the value
 				let valueText:string = option && option.label? option.label : (typeof this.state.value == "string") ? this.state.value : "";
@@ -462,7 +462,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 				};
 				// if input is clicked, but user yet to type the search query
 				// in that case, color the current selection grey
-				if(this.props.searchable && this.state.openMenu )
+				if (this.props.searchable && this.state.openMenu )
 				{
 					textStyle.color = "grey";
 					textStyle.pointerEvents ="none";
@@ -472,17 +472,17 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 			}
 		}
-		else if(this.isNoneOption()) // if value from none option , render the none option
+		else if (this.isNoneOption()) // if value from none option , render the none option
 		{
 			// render Text UI only When search Query is not in operation
 			// for non multiple type
-			if( this.state.searchQuery.length == 0)
+			if ( this.state.searchQuery.length == 0)
 			{
 				let textStyle:React.CSSProperties = {
 					zIndex:0 //override semantic Z-order
 				};
 
-				if(this.props.searchable && this.state.openMenu )
+				if (this.props.searchable && this.state.openMenu )
 				{
 					textStyle.color = "grey";
 					textStyle.pointerEvents ="none";
@@ -491,7 +491,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 			}
 		}
-		else if(this.props.placeholder) // if placeholder is there render the value text with placeholder
+		else if (this.props.placeholder) // if placeholder is there render the value text with placeholder
 		{
 			textUIs = <div className="default text">{this.props.placeholder}</div>;
 		}
@@ -500,17 +500,17 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		/***** Render Menu UI ******/
 
 		let menuUI:JSX.Element = null;
-		if(this.state.openMenu )
+		if (this.state.openMenu )
 		{
 			menuUI = <ComboBoxMenu ref={this.menuRefCallback}
-			                       className="menu transition visible"
-			                       header={this.props.header}
-			                       style={this.getMenuPositionStyle()}
-			                       onSelect={this.onChange as any}
-			                       selectedOptions={selectedOptions}
-			                       searchQuery={this.state.searchQuery}
-			                       options={this.state.options}
-			                       allowAdditions={this.props.allowAdditions}
+								   className="menu transition visible"
+								   header={this.props.header}
+								   style={this.getMenuPositionStyle()}
+								   onSelect={this.onChange as any}
+								   selectedOptions={selectedOptions}
+								   searchQuery={this.state.searchQuery}
+								   options={this.state.options}
+								   allowAdditions={this.props.allowAdditions}
 									additionListener={this.props.allowAdditions? this.addNewOption : null}/>;
 		}
 
@@ -537,7 +537,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		//todo: so we might need to be set value to it
 		let hiddenInputUI:JSX.Element = this.renderInput(true);
 		let inputUI:JSX.Element = null;
-		if(this.props.searchable)
+		if (this.props.searchable)
 		{
 			inputUI = this.renderInput();
 		}
@@ -601,11 +601,11 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 		let optionsUI:JSX.Element[] = this.props.options.map((option:ComboBoxOption,index:number)=>{
 			let className = "item";
 			let textUI:string | JSX.Element = null;
-			if(this.props.searchQuery && queryLen > 0)
+			if (this.props.searchQuery && queryLen > 0)
 			{
 				let regExp:RegExp = new RegExp( this.props.searchQuery, 'igm');
 				let pos:number = option.label.search(regExp);
-				if(pos == -1)
+				if (pos == -1)
 					return null;
 
 				let beginText:string = option.label.substr(0,pos);
@@ -618,38 +618,38 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 				textUI = Weave.lang(option.label)
 			}
 
-			if(isMultipleMode)
+			if (isMultipleMode)
 			{
-				if((this.props.selectedOptions as ComboBoxOption[]).indexOf(option) != -1)
+				if ((this.props.selectedOptions as ComboBoxOption[]).indexOf(option) != -1)
 				{
 					return null;
 				}
 			}
 			else
 			{
-				if(this.props.selectedOptions  == option && (!this.props.allowAdditions || this.props.searchQuery.length == 0 ))
+				if (this.props.selectedOptions  == option && (!this.props.allowAdditions || this.props.searchQuery.length == 0 ))
 					className = className + " active selected";
 				
 			}
 
 			return  <div className={className}
-			             role="option"
-			             onClick={this.clickListener.bind(this,index,option)}
-			             style={this.props.optionStyle}
-			             key={index}
-			             data-value={index}>
+						 role="option"
+						 onClick={this.clickListener.bind(this,index,option)}
+						 style={this.props.optionStyle}
+						 key={index}
+						 data-value={index}>
 							{textUI}
 					</div>;
 		});
 
 		let additionUI:JSX.Element = null;
-		if(this.props.allowAdditions && this.props.searchQuery.length > 0)
+		if (this.props.allowAdditions && this.props.searchQuery.length > 0)
 		{
 			additionUI = <div role="option"
-			                  className="addition item selected"
-			                  key={this.props.searchQuery}
-			                  onClick={this.props.additionListener}
-			                  data-value={this.props.searchQuery}>
+							  className="addition item selected"
+							  key={this.props.searchQuery}
+							  onClick={this.props.additionListener}
+							  data-value={this.props.searchQuery}>
 							Add &nbsp;
 							<b>{this.props.searchQuery}</b>
 						</div>;
@@ -659,14 +659,14 @@ class ComboBoxMenu extends SmartComponent<ComboBoxMenuProps, ComboBoxMenuState>
 		}
 
 		let headerUI:JSX.Element = null;
-		if(this.props.header)
+		if (this.props.header)
 		{
 			headerUI = <div className="header">{this.props.header}</div>
 		}
 
 		return  <div style={styleObject}
-		             tabIndex={-1}
-		             className={this.props.className}>
+					 tabIndex={-1}
+					 className={this.props.className}>
 					{headerUI}
 					{optionsUI}
 				</div>

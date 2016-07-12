@@ -28,7 +28,7 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 	render(): JSX.Element {
 		let options = weavejs.WeaveAPI.QKeyManager.getAllKeyTypes().map( (keyType:string,index:number) =>
 						{
-							if(keyType == "string")
+							if (keyType == "string")
 							{
 								return null
 							}
@@ -38,12 +38,12 @@ export default class KeyTypeInput extends React.Component<KeyTypeInputProps, Key
 		// none option value should be null, while generating metadata if its null, datasource sets to "string"
 		return (
 			<ComboBox style={{width: "100%"}}
-			          noneOption={{label:"(None)", value:null}}
-			          ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
-			          options={options}
-			          allowAdditions={true}
-			          searchable={true}
-			          onChange={this.changeListener}
+					  noneOption={{label:"(None)", value:null}}
+					  ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
+					  options={options}
+					  allowAdditions={true}
+					  searchable={true}
+					  onChange={this.changeListener}
 			/>
 		);
 	}

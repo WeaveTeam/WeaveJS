@@ -227,8 +227,8 @@ export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImpor
 						<div className="one column row" style={{paddingBottom: 0}}>
 							<div className="sixteen wide right aligned column">
 								<Checkbox label={Weave.lang("Create a new Weave table entry even if a matching one already exists.") }
-								          value={!this.state.append}
-								          onChange={(value) => this.setState({ append: !value }) }
+										  value={!this.state.append}
+										  onChange={(value) => this.setState({ append: !value }) }
 								/>
 							</div>
 						</div>

@@ -9,7 +9,7 @@ export default class ContextMenu extends Menu
 	{
 		event.preventDefault();
 		var contextMenuItems = Menu.getMenuItems(event.target as HTMLElement);
-		if(!contextMenuItems.length)
+		if (!contextMenuItems.length)
 			return;
 		var contextMenu:ContextMenu = null;
 		var popup = Popup.open(

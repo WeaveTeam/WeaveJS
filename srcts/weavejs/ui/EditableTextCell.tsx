@@ -31,7 +31,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 
 	componentWillReceiveProps(nextProps:IEditableTextCellProps)
 	{
-		if(nextProps.textContent != this.props.textContent)
+		if (nextProps.textContent != this.props.textContent)
 		{
 			this.setState({
 				textContent : nextProps.textContent
@@ -59,7 +59,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 	disableEditMode =(event:MouseEvent):void =>
 	{
 		//check if the click target is not within the element and the editable mode is on
-		if(!this.element.contains(event.target as HTMLElement) && this.state.editMode)
+		if (!this.element.contains(event.target as HTMLElement) && this.state.editMode)
 		{
 			this.setState({
 				editMode :false

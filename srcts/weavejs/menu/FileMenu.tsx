@@ -142,7 +142,7 @@ export default class FileMenu implements MenuBarItemProps
 							type="text"
 							style={{flex: 1}}
 							ref={(c:Input) => {
-								if(c && c.inputElement)
+								if (c && c.inputElement)
 								{
 									filenameInput = c.inputElement;
 									c.inputElement.select();
@@ -180,20 +180,20 @@ export default class FileMenu implements MenuBarItemProps
 	 */
 	updateProgressIndicator=(meta:{percent:number, currentFile:string})=>
 	{
-		if(!ProgressIndicator.hasTask(meta.currentFile) && meta.percent < 100)
+		if (!ProgressIndicator.hasTask(meta.currentFile) && meta.percent < 100)
 			ProgressIndicator.addTask(meta.currentFile, null, "Extracting session " + meta.currentFile + ': ' + (meta.percent/100).toString());
-		else if( meta.percent == 100)
+		else if ( meta.percent == 100)
 			ProgressIndicator.removeTask(meta.currentFile);
 		else
 			ProgressIndicator.updateTask(meta.currentFile, meta.percent/100);
 	};
 
-    openFile=(e:any)=>
+	openFile=(e:any)=>
 	{
 		var files = e.target.files as FileList;
 		for (let i = 0; i < files.length; i++)
 			this.handleOpenedFile(files[i]);
-    };
+	};
 
 	/**
 	 * TEMPORARY SOLUTION until we have a place to register file type handlers
@@ -297,7 +297,7 @@ export default class FileMenu implements MenuBarItemProps
 
 		if (!dataFilesOnly && ext == 'weave')
 		{
-            this.loadArchive(fileContent);
+			this.loadArchive(fileContent);
 			return;
 		}
 
@@ -426,7 +426,7 @@ export default class FileMenu implements MenuBarItemProps
 		);
 	};
 
-    public saveFile=()=>
+	public saveFile=()=>
 	{
 
 		this.saveDialog(this.fileName, this._saveFile)

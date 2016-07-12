@@ -152,7 +152,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 											 headerHeight={0}
 											 rowHeight={40}
 											 onSelection={(selectedFiles:string[]) => {
-							                    if (selectedFiles[0])
+												if (selectedFiles[0])
 													weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then(
 														(fileInfo:WeaveFileInfo) => {
 															if (this.element)
@@ -162,7 +162,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 														},
 														this.openLogin
 													);
-							                }}
+											}}
 							/>
 						</VBox>
 					</VBox>
@@ -189,7 +189,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 									this.openLogin();
 								}
 							}}
-						    style={{alignSelf: "flex-end"}}
+							style={{alignSelf: "flex-end"}}
 						>
 							{weavejs.net.Admin.instance.userHasAuthenticated ? Weave.lang("Sign Out") : Weave.lang("Sign in")}
 						</Button>
@@ -197,7 +197,7 @@ export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFi
 							{this.state.fileInfo ?
 								<Button
 									onClick={() => {
-					                    this.props.openHandler("/" + this.state.fileInfo.fileName);
+										this.props.openHandler("/" + this.state.fileInfo.fileName);
 									}}
 									style={{marginLeft: 8}}
 								>

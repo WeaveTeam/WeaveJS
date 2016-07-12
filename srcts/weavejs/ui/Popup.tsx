@@ -10,7 +10,7 @@ export default class Popup extends React.Component<React.HTMLProps<Popup>, React
 	{
 		var popup = ReactUtils.openPopup(context, <Popup style={{zIndex: 0}}>{jsx}</Popup>, closeOnMouseDown, (popup:React.ReactInstance) => {
 			Popup.close(popup as Popup);
-			if(onClose) onClose(popup as Popup);
+			if (onClose) onClose(popup as Popup);
 		}) as Popup;
 		Popup.popupSet.add(popup);
 		Popup.alignPopups();
@@ -75,7 +75,7 @@ export default class Popup extends React.Component<React.HTMLProps<Popup>, React
 	{
 		// disable the context menu on all popups
 		event.preventDefault();
-		if(this.props.onContextMenu)
+		if (this.props.onContextMenu)
 			this.props.onContextMenu(event);
 	}
 

@@ -93,7 +93,8 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 	private getDataFamilies():string[]
 	{
 		let raw_datasets = this.state.datasets;
-		if (!raw_datasets) return ["All"];
+		if (!raw_datasets)
+			return ["All"];
 
 		let families_set = new Set<string>(_.flatten(_.map(raw_datasets, (d) => d.c_dataset)).filter(CensusDataSourceEditor.isUsableFamily));
 		let families_list = _.sortBy(Array.from(families_set));
@@ -104,7 +105,8 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 	private getDataVintages(family:string):string[]
 	{
 		let raw_datasets = this.state.datasets;
-		if (!raw_datasets || !family) return ["All"];
+		if (!raw_datasets || !family)
+			return ["All"];
 
 		let datasetsInFamily = raw_datasets.filter(CensusDataSourceEditor.isInFamily.bind(null, family));
 		let vintages_set = new Set<string>(datasetsInFamily.map((d) => d.c_vintage !== undefined && d.c_vintage.toString()));
@@ -119,7 +121,8 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 	{
 		let raw_datasets = this.state.datasets;
 		let ds = this.props.dataSource as CensusDataSource;
-		if (!raw_datasets || !family || !vintage) return [{ value: ds.dataSet.value, label: ds.dataSet.value}];
+		if (!raw_datasets || !family || !vintage)
+			return [{ value: ds.dataSet.value, label: ds.dataSet.value}];
 
 		let filterFunc = (dataset: CensusRawDataset) => CensusDataSourceEditor.isInFamily(family, dataset) && CensusDataSourceEditor.isOfVintage(vintage, dataset);
 		let makeEntry = (dataset: CensusRawDataset) => { return { value: dataset.identifier, label: dataset.title }; };
@@ -129,7 +132,8 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 	private getDataset(datasetName:string)
 	{
 		let raw_datasets = this.state.datasets;
-		if (!raw_datasets) return null;
+		if (!raw_datasets)
+			return null;
 		return raw_datasets.filter((dataset) => dataset.identifier === datasetName);
 	}
 
@@ -183,16 +187,16 @@ export default class CensusDataSourceEditor extends DataSourceEditor
 			[
 				Weave.lang("Dataset"),
 				<ComboBox className="search" style={{width: "100%"}}
-				          ref={linkReactStateRef(this, { value: ds.dataSet }) }
-				          selectFirstOnInvalid
-				          options={datasets || [{value: dataset, label: datasetLabel}]}/>
+						  ref={linkReactStateRef(this, { value: ds.dataSet }) }
+						  selectFirstOnInvalid
+						  options={datasets || [{value: dataset, label: datasetLabel}]}/>
 			],
 			[
 				Weave.lang("Geographic scope"),
 				<ComboBox style={{width: "100%"}}
-				          ref={linkReactStateRef(this, {value: ds.geographicScope })}
-				          selectFirstOnInvalid
-				          options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
+						  ref={linkReactStateRef(this, {value: ds.geographicScope })}
+						  selectFirstOnInvalid
+						  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
 			],
 		];
 	}

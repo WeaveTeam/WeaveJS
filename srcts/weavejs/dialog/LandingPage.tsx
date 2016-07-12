@@ -62,8 +62,8 @@ export default class LandingPage extends React.Component<LandingPageProps, Landi
 		{
 			return (
 				<GetStartedComponent style={ {width: "100%", height: "100%"} }
-				                     showInteractiveTourList={this.state.view == "tour list"}
-				                     onViewSelect={(view:LandingPageView) => {this.setState({view})}} />
+									 showInteractiveTourList={this.state.view == "tour list"}
+									 onViewSelect={(view:LandingPageView) => {this.setState({view})}} />
 			);
 		}
 
@@ -76,7 +76,7 @@ export default class LandingPage extends React.Component<LandingPageProps, Landi
 				showFileDialog={this.state.view == "file"}
 				enableTour={this.state.view == "tour"}
 				readUrlParams={true}
-			    onClose={this.loadGetStartedComponentWithTourList}
+				onClose={this.loadGetStartedComponentWithTourList}
 			/>
 		)
 	}

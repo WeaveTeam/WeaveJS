@@ -40,10 +40,10 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 	
 	private getRampNameFromRamp(selectedColors:number[])
 	{
-		if(selectedColors)
+		if (selectedColors)
 		{
 			var selectedRampConfig = this.props.allColorRamps.find(v => _.isEqual(v.colors, selectedColors));
-			if(selectedRampConfig)
+			if (selectedRampConfig)
 				return selectedRampConfig.name;
 			return "";
 		}
@@ -51,7 +51,7 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 	
 	componentWillReceiveProps(nextProps:ColorRampListProps)
 	{
-		if(nextProps.selectedColors)
+		if (nextProps.selectedColors)
 		{
 			this.setState({
 				selectedColors: nextProps.selectedColors
@@ -61,10 +61,10 @@ export default class ColorRampList extends React.Component<ColorRampListProps, C
 	
 	handleTableSelection = (id:string[]) =>
 	{
-		if(id.length)
+		if (id.length)
 		{
 			var selectedRampConfig = this.props.allColorRamps.find(v => v.name == id[0]);
-			if(selectedRampConfig)
+			if (selectedRampConfig)
 				this.props.onChange && this.props.onChange(selectedRampConfig.colors);
 		}
 	}

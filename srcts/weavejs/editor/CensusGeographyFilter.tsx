@@ -111,7 +111,8 @@ export class CensusGeographyFilterColumn extends React.Component<CensusGeography
 
 	componentWillReceiveProps(nextProps:CensusGeographyFilterColumnProps)
 	{
-		if (!nextProps) return;
+		if (!nextProps)
+			return;
 		if (nextProps.required)
 		{
 			this.setState({ enabled: true });

@@ -75,7 +75,7 @@ export default class DataMenu implements MenuBarItemProps
 						var baseName = weavejs.WeaveAPI.ClassRegistry.getDisplayName(impl);
 						var path = [weave.root.generateUniqueName(baseName)];
 						var dataSource = weave.requestObject(path, impl);
-						if(onCreateItem)
+						if (onCreateItem)
 							onCreateItem(dataSource);
 					}
 				});

@@ -36,7 +36,7 @@ export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, Wea
 			<MenuBar
 				style={this.props.style}
 				config={this.props.menus.getMenuList()}
-		    >
+			>
 				<DynamicComponent dependencies={[enableSessionHistoryControls, enableSessionHistorySlider]} render={() => {
 					return (
 						enableSessionHistoryControls.value

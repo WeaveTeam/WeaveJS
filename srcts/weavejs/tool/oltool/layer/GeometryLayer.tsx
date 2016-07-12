@@ -106,14 +106,15 @@ export default class GeometryLayer extends AbstractFeatureLayer
 
 		var idc = this.geometryColumn;
 		var keys:Array<IQualifiedKey> = this.filteredKeySet.keys;
-		if (idc.getMetadata(ColumnMetadata.DATA_TYPE) != DataType.GEOMETRY) return;
+		if (idc.getMetadata(ColumnMetadata.DATA_TYPE) != DataType.GEOMETRY)
+			return;
 		var rawGeometries = weavejs.data.ColumnUtils.getGeoJsonGeometries(idc, keys);
 
 		for (let idx = 0; idx < keys.length; idx++)
 		{
-            let rawGeom = rawGeometries[idx];
-            if (!rawGeom)
-                continue;
+			let rawGeom = rawGeometries[idx];
+			if (!rawGeom)
+				continue;
 
 			let id = keys[idx];
 
@@ -195,7 +196,7 @@ export default class GeometryLayer extends AbstractFeatureLayer
 			if (feature)
 			{
 				//checking for point data
-				if(feature.getGeometry() instanceof ol.geom.MultiPoint) {
+				if (feature.getGeometry() instanceof ol.geom.MultiPoint) {
 					normalStyle = ScatterPlotLayer.getNormalStyle(record,strokeEnabled,fillEnabled,olStroke,olFill);
 					unselectedStyle = ScatterPlotLayer.getUnselectedStyle(record,strokeEnabled,fillEnabled,olStrokeFaded,olFillFaded);
 					selectedStyle = ScatterPlotLayer.getSelectedStyle(record,strokeEnabled,fillEnabled,olSelectionStyle);

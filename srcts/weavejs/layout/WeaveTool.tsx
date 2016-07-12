@@ -77,7 +77,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 		this.lastIcon = this.closeIcon;
 		// ReactUtils.getDocument(this).addEventListener("keypress", this.handleKeyPress);
 		this.update();
-    }
+	}
 
 	componentWillUnmount():void
 	{
@@ -101,10 +101,10 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	handleKeyDown=(event:React.KeyboardEvent)=>
 	{
 		// if we hit tab
-		if(event.keyCode == KEYCODES.TAB)
+		if (event.keyCode == KEYCODES.TAB)
 		{
 			// and on close or shift tab and on gear icon
-			if(ReactUtils.hasFocus(this.lastIcon) || (ReactUtils.hasFocus(this) && event.shiftKey))
+			if (ReactUtils.hasFocus(this.lastIcon) || (ReactUtils.hasFocus(this) && event.shiftKey))
 			{
 				// hide the controls
 				this.setState({hovered: false});
@@ -125,7 +125,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 	updateCaption():void
 	{
 		var tool = Weave.AS(this.watcher && this.watcher.target, IAltText);
-		if(tool)
+		if (tool)
 		{
 			this.setState({
 				showCaption: tool.altText.showAsCaption.value,
@@ -238,7 +238,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					/>
 					{
 						Weave.beta
-					    ?	<CenteredIcon
+						?	<CenteredIcon
 								title={this.props.onPopoutClick ? Weave.lang("Display in new window") : Weave.lang("Restore to main window")}
 								onMouseUp={this.onPopoutPopinClick}
 								onClick={this.handlePopoutPopin}
@@ -249,8 +249,8 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 					<CenteredIcon
 						ref={(c:CenteredIcon) => this.closeIcon = c}
 						title={Weave.lang("Close")}
-					    onMouseUp={this.onCloseClick}
-					    onClick={this.handleClose}
+						onMouseUp={this.onCloseClick}
+						onClick={this.handleClose}
 						iconProps={{className: "fa fa-times fa-fw"}}
 					/>
 				</HBox>
@@ -280,15 +280,15 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 				onMouseOver={() => {
 					this.setState({ hovered: true });
 				}}
-			    onMouseLeave={() => {
+				onMouseLeave={() => {
 					this.setState({ hovered: false });
 				}}
-			    onFocus={() => {
-			        this.setState({ hovered: true });
-			    }}
-			    onDragStart={() => {
-			        this.setState({ dragging: true });
-			    }}
+				onFocus={() => {
+					this.setState({ hovered: true });
+				}}
+				onDragStart={() => {
+					this.setState({ dragging: true });
+				}}
 			>
 				<div>{ this.renderTitleBar() }</div>
 				<WeaveComponentRenderer
@@ -302,7 +302,7 @@ export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToo
 						dependencies={[ap.enableAccessibilityFeatures, ap.enableCaptioning]}
 						render={() => {
 							var ap = getWeaveProperties(this.props.weave).accessibility;
-							if(ap.enableAccessibilityFeatures.value && ap.enableCaptioning && this.state.showCaption)
+							if (ap.enableAccessibilityFeatures.value && ap.enableCaptioning && this.state.showCaption)
 								return <div style={{maxHeight: "30%"}}>{ this.renderCaption() }</div>;
 							else
 								return null;

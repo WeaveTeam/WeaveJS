@@ -68,7 +68,8 @@ export default class InteractionModeCluster extends ol.control.Control
 	{
 		super.setMap(map)
 
-		if (!map) return;
+		if (!map)
+			return;
 
 		let mapTool: OpenLayersMapTool = map.get("mapTool") as OpenLayersMapTool;
 		this.interactionMode = mapTool.interactionMode;

@@ -12,21 +12,21 @@ export default class BinNamesList extends React.Component<BinNamesListProps, {}>
 	constructor(props:BinNamesListProps)
 	{
 		super(props);
-		if(this.props.binningDefinition){
+		if (this.props.binningDefinition){
 			Weave.getCallbacks(this.props.binningDefinition).addGroupedCallback(this,this.forceUpdate);
 		}
 	}
 
 	componentWillReceiveProps(nextProps:BinNamesListProps) {
-		if(this.props.binningDefinition !== nextProps.binningDefinition){
+		if (this.props.binningDefinition !== nextProps.binningDefinition){
 			// null is possible when user selects option "none"
-			if(this.props.binningDefinition)Weave.getCallbacks(this.props.binningDefinition).removeCallback(this,this.forceUpdate);
-			if(nextProps.binningDefinition)Weave.getCallbacks(nextProps.binningDefinition).addGroupedCallback(this,this.forceUpdate);
+			if (this.props.binningDefinition)Weave.getCallbacks(this.props.binningDefinition).removeCallback(this,this.forceUpdate);
+			if (nextProps.binningDefinition)Weave.getCallbacks(nextProps.binningDefinition).addGroupedCallback(this,this.forceUpdate);
 		}
 	}
 
 	componentWillUnmount(){
-		if(this.props.binningDefinition)Weave.getCallbacks(this.props.binningDefinition).removeCallback(this,this.forceUpdate);
+		if (this.props.binningDefinition)Weave.getCallbacks(this.props.binningDefinition).removeCallback(this,this.forceUpdate);
 	}
 	
 	static defaultProps:BinNamesListProps = {
@@ -38,7 +38,7 @@ export default class BinNamesList extends React.Component<BinNamesListProps, {}>
 	{
 		var binDef:AbstractBinningDefinition = this.props.binningDefinition;
 		var rows:IRow[] = [];
-		if(binDef)
+		if (binDef)
 		{
 			rows = binDef.getBinNames().map((binName, index) => {
 				return {

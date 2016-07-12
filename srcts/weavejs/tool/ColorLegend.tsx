@@ -118,7 +118,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	{
 		var column = this.colorColumn;
 		var title = this.colorColumn.getMetadata("title");
-		if(title == null)
+		if (title == null)
 			return Weave.lang('Color Legend');
 
 		return Weave.lang("Color Legend of {0}", title);
@@ -198,7 +198,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 	{
 		let menuItems:MenuItemProps[] = AbstractVisTool.getMenuItems(this);
 
-		if(Weave.beta)
+		if (Weave.beta)
 			menuItems.push({
 				label: Weave.lang("Print Tool (Beta)"),
 				click: PrintUtils.printTool.bind(null, ReactDOM.findDOMNode(this))
@@ -247,7 +247,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 		};
 		var textLabelFunction:Function = this.binnedColumn.deriveStringFromNumber.bind(this.binnedColumn);
 
-		if(shapeType == SHAPE_TYPE_BOX)
+		if (shapeType == SHAPE_TYPE_BOX)
 		{
 			_.merge(shapeStyle, { flex:"1 0", alignItems:"center", justifyContent:"center", height:shapeSize } );
 			shapeElement =  [
@@ -298,10 +298,10 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 		return(
 			<HBox key={cellIndex}
-			      style={this.getInteractionStyle(cellIndex)}
-			      onClick={this.handleClick.bind(this, cellIndex)}
-			      onMouseMove={this.handleProbe.bind(this, cellIndex, true)}
-			      onMouseOut={this.handleProbe.bind(this, cellIndex, false)}>
+				  style={this.getInteractionStyle(cellIndex)}
+				  onClick={this.handleClick.bind(this, cellIndex)}
+				  onMouseMove={this.handleProbe.bind(this, cellIndex, true)}
+				  onMouseOut={this.handleProbe.bind(this, cellIndex, false)}>
 				{shapeElement}
 			</HBox>
 		);
@@ -337,7 +337,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 
 			});
 
-			if(isNaN(shapeSize))
+			if (isNaN(shapeSize))
 			{
 				// shape size dynamically grow with container resize
 				shapeSize = _.max( [1, _.min([shapeSize, this.element.clientHeight / this.numberOfBins]) ] ) ;
@@ -360,7 +360,7 @@ export default class ColorLegend extends React.Component<IVisToolProps, IVisTool
 				}
 			}
 
-			for(let extraBinIndex:number = this.numberOfBins; extraBinIndex < totalCells; extraBinIndex++)
+			for (let extraBinIndex:number = this.numberOfBins; extraBinIndex < totalCells; extraBinIndex++)
 			{
 				//add empty bins for placeholder "empty" items
 				var cellHeight:number = shapeSize + (2 * this.cellPadding) + (2 * this.cellBorderWidth);

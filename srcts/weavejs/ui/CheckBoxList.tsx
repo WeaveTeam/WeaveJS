@@ -32,7 +32,7 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
 	{
 		super(props);
 
-		if(!props.options)
+		if (!props.options)
 		{
 			this.state = {
 				checkboxStates: []
@@ -66,7 +66,7 @@ export default class CheckBoxList extends React.Component<ICheckBoxListProps, IC
 		this.values = _.pluck(this.props.options, "value");
 		this.labels = _.pluck(this.props.options, "label");
 		
-		if(!nextProps.options)
+		if (!nextProps.options)
 		{
 			this.setState({
 				checkboxStates: []

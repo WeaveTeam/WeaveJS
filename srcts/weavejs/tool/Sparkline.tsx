@@ -367,7 +367,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 			this.records = weavejs.data.ColumnUtils.getRecords(format, this.filteredKeySet.keys, datatype);
 			this.records = _.sortByOrder(this.records, ["sort"], ["asc"]);
 
-			if(this.records.length) {
+			if (this.records.length) {
 				if (columns.length == 1) {
 					//single column case
 					data = [
@@ -375,14 +375,14 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 							return record[names[0]];
 						})];
 				} else {
-					if(this.orientationMode.value == COLUMN) {
+					if (this.orientationMode.value == COLUMN) {
 						//group columns into rows
 						data = names.map((name:string, index:number) => {
 							return this.records.map((record:any, i:number) => {
 								return record[name];
 							})
 						});
-					} else if(this.orientationMode.value == RECORD) {
+					} else if (this.orientationMode.value == RECORD) {
 						if (!this.showAllRecords.value) {
 							let records:any[] = this.getInteractedRecords();
 							data = records && records.map((record:any, index:number) => {
@@ -414,7 +414,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 		let probeKeys = this.probeKeySet.keys;
 		let selectedKeys = this.selectionKeySet.keys;
 		let records:Record[];
-		if(probeKeys.length) {
+		if (probeKeys.length) {
 			//show the sparklines for the probed keys
 			records = probeKeys.map((key,index) => {
 				return _.find(this.records, (record:Record) => {
@@ -469,7 +469,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 
 	handleClick=(record:Record, event:React.MouseEvent):void =>
 	{
-		if(this.orientationMode.value == COLUMN || !this.selectionKeySet)
+		if (this.orientationMode.value == COLUMN || !this.selectionKeySet)
 			return;
 
 		var currentSelection:IQualifiedKey[] = this.selectionKeySet.keys;
@@ -490,7 +490,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 
 	handleProbe=(record:Record, mouseOver:boolean, event:React.MouseEvent):void =>
 	{
-		if(this.orientationMode.value == COLUMN || !this.probeKeySet)
+		if (this.orientationMode.value == COLUMN || !this.probeKeySet)
 			return;
 
 		if (mouseOver)
@@ -529,7 +529,7 @@ export default class Sparkline extends SmartComponent<ISparklineProps, ISparklin
 							let normalBandKey:string = this.showNormalBands.value ? "yes":"no";
 							let interactedRecords:Record[] = this.getInteractedRecords();
 							let interactive:boolean = !this.showAllRecords.value;
-							if(this.orientationMode.value == RECORD){
+							if (this.orientationMode.value == RECORD){
 								let record:Record = this.records && this.records[index] as Record;
 								if (interactive) {
 									record = interactedRecords[index];

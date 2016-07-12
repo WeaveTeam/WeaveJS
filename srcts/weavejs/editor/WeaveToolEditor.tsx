@@ -247,9 +247,9 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 
 		return (
 			<VBox className={ classNames(this.props.className) }
-			      style={ this.props.style }
-			      ref={InteractiveTour.getComponentRefCallback("Tool editor")}
-			      onMouseEnter={() => this.forceUpdate()}>
+				  style={ this.props.style }
+				  ref={InteractiveTour.getComponentRefCallback("Tool editor")}
+				  onMouseEnter={() => this.forceUpdate()}>
 				<HBox className="weave-ToolEditor-Header">
 					{backButtonUI}
 					<HBox className="weave-padded-hbox" style={ crumbStyle }>
@@ -267,7 +267,7 @@ export default class WeaveToolEditor extends React.Component<WeaveToolEditorProp
 					}
 					<Button
 						onClick={ this.closeEditor }
-					    title="Close editor">
+						title="Close editor">
 						&#x2715;
 					</Button>
 				</HBox>

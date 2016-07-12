@@ -53,7 +53,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 
 	componentWillReceiveProps(props:TabsProps)
 	{
-		if(props.activeTabIndex != null)
+		if (props.activeTabIndex != null)
 			this.setState({
 				activeTabIndex: props.activeTabIndex
 			});
@@ -74,7 +74,7 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 		return (
 			<div
 				className={classNames(this.props.tabContainerClassName || "weave-tab-container", this.props.location)}
-			    style={_.merge(
+				style={_.merge(
 					{},
 					this.props.style,
 					{
@@ -93,8 +93,8 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 				<HBox
 					overflow
 					key="tabs"
-				    className={classNames(this.props.tabBarClassName || "weave-tab-label-container", this.props.location)}
-				    style={this.props.tabBarStyle}
+					className={classNames(this.props.tabBarClassName || "weave-tab-label-container", this.props.location)}
+					style={this.props.tabBarStyle}
 				>
 					{
 						this.props.labels.map((label, index) => {
@@ -102,16 +102,16 @@ export default class Tabs extends React.Component<TabsProps, TabsState>
 								<HBox
 									overflow
 									key={index}
-								    className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
-								    style={this.props.tabLabelStyle}
-								    onClick={(event:React.MouseEvent) => {
+									className={classNames(this.props.tabLabelClassName || "weave-tab-label", {"active": this.state.activeTabIndex == index}, this.props.location)}
+									style={this.props.tabLabelStyle}
+									onClick={(event:React.MouseEvent) => {
 										if (this.props.onTabClick)
 											this.props.onTabClick(index, event);
 										
 										if (!event.defaultPrevented)
 											this.changeTabView(index);
 									}}
-								    onDoubleClick={(event:React.MouseEvent) => this.props.onTabDoubleClick && this.props.onTabDoubleClick(index, event)}
+									onDoubleClick={(event:React.MouseEvent) => this.props.onTabDoubleClick && this.props.onTabDoubleClick(index, event)}
 								>
 									{label}
 								</HBox>

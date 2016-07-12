@@ -17,7 +17,7 @@ export default class FileInput extends React.Component<FileInputProps, {}>
 	
 	onChange=(e:React.FormEvent)=>
 	{
-		if(this.props.onChange)
+		if (this.props.onChange)
 			this.props.onChange(e);
 		// Might need to simulate the click event we previously stopped
 		// DOMUtils.eventFire(ReactDOM.findDOMNode(this) as HTMLElement, "click");

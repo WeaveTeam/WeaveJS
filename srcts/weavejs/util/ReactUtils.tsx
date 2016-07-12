@@ -104,12 +104,12 @@ export default class ReactUtils
 		{
 			handler=(event:KeyboardEvent|MouseEvent)=>
 			{
-				if(event.type == "mousedown")
+				if (event.type == "mousedown")
 				{
 					if (element.contains(event.target as HTMLElement))
 						return;
 				}
-				if(event.type == "keydown")
+				if (event.type == "keydown")
 				{
 					if ((event as KeyboardEvent).keyCode != KEYCODES.SPACE &&
 						(event as KeyboardEvent).keyCode != KEYCODES.ENTER &&
@@ -177,7 +177,7 @@ export default class ReactUtils
 		var columnGridUI:JSX.Element[][] = gridRowsUI.map((row:JSX.Element[]) => {
 
 			let cellsUI:JSX.Element[] = [];
-			for(let index:number = 0 ; index < row.length ; index++)
+			for (let index:number = 0 ; index < row.length ; index++)
 			{
 				let cell = <div className={gridValues[index] + " wide column"}>
 								{row[index]}
@@ -270,7 +270,7 @@ export default class ReactUtils
 		// 				<VBox key={i} style={{flex: 1}}>
 		// 				{
 		// 					column.map((cell, j) => {
-		// 						if(j == 0)
+		// 						if (j == 0)
 		// 							return <HBox key={j} style={_.merge({flex: 1}, styles.td)} className={classes.thead}> {cell} </HBox>
 		// 						let style = Array.isArray(styles.td) ? (styles.td as React.CSSProperties[])[j] : styles.td;
 		// 						return <HBox key={j} style={_.merge({flex: 1}, styles.td)} className={classes.td}> {cell} </HBox>

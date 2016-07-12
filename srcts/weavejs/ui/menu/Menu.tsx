@@ -98,16 +98,16 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		{
 			nextIndex = this.state.activeIndex - 1;
 		}
-		else if(event.keyCode == KEYCODES.DOWN_ARROW)
+		else if (event.keyCode == KEYCODES.DOWN_ARROW)
 		{
 			nextIndex = this.state.activeIndex + 1;
 		}
 
 		var nextItem = this.menuItemList[nextIndex];
 		var nextElt:HTMLElement = null;
-		if(nextItem)
+		if (nextItem)
 			nextElt = ReactDOM.findDOMNode(nextItem) as HTMLElement;
-		if(nextElt)
+		if (nextElt)
 			nextElt.focus();
 	}
 
@@ -131,14 +131,14 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 	onMouseEnter=(index:number)=>
 	{
 		var menuItem = this.menuItemList[index];
-		if(menuItem)
+		if (menuItem)
 			menuItem.focus();
 	}
 
 	onMouseLeave=(index:number)=>
 	{
 		var menuItem = this.menuItemList[index];
-		if(menuItem)
+		if (menuItem)
 			menuItem.blur();
 	}
 
@@ -171,18 +171,18 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		});
 
 		// remove the first item if it is a separator
-		if(_.isEqual(filteredMenu[0], SEPARATOR))
+		if (_.isEqual(filteredMenu[0], SEPARATOR))
 			filteredMenu.shift();
 
 		// remove the last item if it is a separtor
-		if(_.isEqual(filteredMenu[filteredMenu.length - 1], SEPARATOR))
+		if (_.isEqual(filteredMenu[filteredMenu.length - 1], SEPARATOR))
 			filteredMenu.pop();
 
 		var dividerIndex = 0;
 		var menuIndex = 0;
 
 		return filteredMenu.map((menuItem) => {
-			if(_.isEqual(menuItem, SEPARATOR))
+			if (_.isEqual(menuItem, SEPARATOR))
 			{
 				return renderDivider(dividerIndex++);
 			}
@@ -210,7 +210,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		});
 
 		var click = (event:React.MouseEvent|React.KeyboardEvent) => {
-			if(event.type != "keydown" && event.type != "mouseup")
+			if (event.type != "keydown" && event.type != "mouseup")
 				return;
 
 			if (event.type == "keydown" && (event as React.KeyboardEvent).keyCode != KEYCODES.SPACE && (event as React.KeyboardEvent).keyCode != KEYCODES.ENTER)
@@ -239,7 +239,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 				onMouseEnter={() => this.onMouseEnter(index)}
 				onMouseLeave={() => this.onMouseLeave(index)}
 				key={"item#"+index}
-			    style={props.itemStyleOverride}
+				style={props.itemStyleOverride}
 			>
 				<HBox>
 					<div>{props.leftIcon}</div>
@@ -261,7 +261,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		var menuStyle:React.CSSProperties = { position: "absolute" };
 		// if there is an opener, position the menu at the bottom of it
 		// by default
-		if(this.opener)
+		if (this.opener)
 		{
 			var openerRect = this.opener.getBoundingClientRect();
 			menuStyle.top = openerRect.bottom;
@@ -274,19 +274,19 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 		// this logic should be generic to the menu.
 		// if the menu overflows to the right or bottom
 		// render it the other way
-		if(this.element)
+		if (this.element)
 		{
 			var menuRect = this.element.getBoundingClientRect();
-			if(menuRect.left + menuRect.width > this.window.innerWidth)
+			if (menuRect.left + menuRect.width > this.window.innerWidth)
 			{
 				menuStyle.left -= menuRect.width;
-				if(this.opener)
+				if (this.opener)
 					menuStyle.left -= this.opener.clientWidth;
 			}
-			if(menuStyle.top + menuRect.height > this.window.innerHeight)
+			if (menuStyle.top + menuRect.height > this.window.innerHeight)
 			{
 				menuStyle.top -= menuRect.height;
-				if(this.opener)
+				if (this.opener)
 					menuStyle.top -= this.opener.clientHeight;
 			}
 		}
@@ -296,7 +296,7 @@ export default class Menu extends React.Component<MenuProps, MenuState>
 			// TODO fix this logic
 			// var menuRect = this.element.getBoundingClientRect();
 			// menuStyle.left = 0 - this.element.clientWidth;
-			// if(menuRect.left - menuStyle.left < 0)
+			// if (menuRect.left - menuStyle.left < 0)
 			// 	menuStyle.left = 0;
 		}
 

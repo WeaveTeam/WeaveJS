@@ -59,7 +59,7 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 		};
 
 		reader.readAsArrayBuffer(file);
-		if(this.props.onFileChange)
+		if (this.props.onFileChange)
 		{
 			this.props.onFileChange()
 		}
@@ -83,7 +83,7 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 	render():JSX.Element
 	{
 		var hBoxFlex:React.CSSProperties = {};
-		if(this.props.style && this.props.style.flex)
+		if (this.props.style && this.props.style.flex)
 			hBoxFlex.flex = this.props.style.flex;
 		
 		// find a way to not include the border color in this file.
@@ -94,7 +94,7 @@ export default class LinkableFileSelector extends React.Component<IFileSelectorP
 									ref={linkReactStateRef(this, {value: this.props.targetUrl}, 500)}/>
 				<FileInput onChange={this.handleFileChange} accept={this.props.accept}>
 					<Button style={{borderTopLeftRadius: 0, borderBottomLeftRadius: 0, margin: 0, whiteSpace: "nowrap", border: "1px solid #E0E1E2"}}
-					        ref={InteractiveTour.getPointerRefCallback("Open file")}>
+							ref={InteractiveTour.getPointerRefCallback("Open file")}>
 						{Weave.lang("Open file")}
 					</Button>
 				</FileInput>

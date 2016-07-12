@@ -128,7 +128,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 	{
 		var state = this.getSessionState();
 		var node:LayoutState = FlexibleLayout.findStateNode(state, id);
-		if(node)
+		if (node)
 			node.id = newId;
 		else
 			console.error("Could not find id in this layout", id);
@@ -330,7 +330,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 		
 		if (!state.children)
 		{
-			if(!state.id)
+			if (!state.id)
 				state.children = [];
 			return state;
 		}
@@ -348,7 +348,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 					simpleChildren.push(childChild);
 				}
 			}
-			else if(child.children || child.id)
+			else if (child.children || child.id)
 			{
 				simpleChildren.push(child);
 			}
@@ -608,7 +608,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 						key={key}
 						onDragOver={ this.onDragOver.bind(this, path) }
 						onDragStart={ this.onDragStart.bind(this, path) }
-					    onDrop={ this.onDrop.bind(this, path) }
+						onDrop={ this.onDrop.bind(this, path) }
 					>
 						<Div
 							ref={key}
@@ -652,7 +652,7 @@ export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> impl
 				{...this.props as React.HTMLAttributes}
 				style={style}
 				onDragOver={ this.onDragOver.bind(this, OUTER_PANEL_ID) }
-			    onDrop={ this.onDrop.bind(this, OUTER_PANEL_ID) }
+				onDrop={ this.onDrop.bind(this, OUTER_PANEL_ID) }
 				onDragLeave={ this.onDragLeave }
 				onDragEnd={ this.onDragEnd }
 			>

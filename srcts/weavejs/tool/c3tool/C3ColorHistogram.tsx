@@ -11,13 +11,13 @@ export default class C3ColorHistogram extends C3Histogram
 		this.fill.color.internalDynamicColumn.targetPath = ["defaultColorColumn"];
 	}
 	
-    get defaultPanelTitle():string
-    {
-	    if (this.binnedColumn.numberOfBins)
-		    return Weave.lang("Color Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
+	get defaultPanelTitle():string
+	{
+		if (this.binnedColumn.numberOfBins)
+			return Weave.lang("Color Histogram of {0}", weavejs.data.ColumnUtils.getTitle(this.binnedColumn));
 
-	    return Weave.lang("Color Histogram");
-    }
+		return Weave.lang("Color Histogram");
+	}
 }
 
 Weave.registerClass(

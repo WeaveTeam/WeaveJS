@@ -146,7 +146,7 @@ class TileLayerEditor extends React.Component<ITileLayerEditorProps,ITileLayerEd
 					Weave.lang("Layer"),
 					<ComboBox
 						ref={linkReactStateRef(this, { value: this.tempLayer }) }
-					    options={layers ? layers.map((name) => { return { label: _.startCase(name), value: name }; }) : [] }
+						options={layers ? layers.map((name) => { return { label: _.startCase(name), value: name }; }) : [] }
 					/>
 				]
 			];

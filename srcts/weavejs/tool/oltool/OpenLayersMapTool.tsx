@@ -247,7 +247,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		for (let key of Object.keys(bounds))
 		{
 			let value = bounds[key];
-			if (isNaN(value)) return false;
+			if (isNaN(value))
+				return false;
 		}
 		return true;
 	}
@@ -258,7 +259,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		let state: { [coord: string]: number } = Weave.getState(this.extentOverride) as { [coord: string]: number };
 		for (let coord of Object.keys(state))
 		{
-			if (!_.isFinite(state[coord])) return false;
+			if (!_.isFinite(state[coord]))
+				return false;
 		}
 		return true;
 	}
@@ -422,14 +424,16 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		};
 		let interactionMode = this.interactionMode.value || "select";
 		let cursorValues = modesToCursors[interactionMode];
-		if (!this.map) return;
+		if (!this.map)
+			return;
 		let mapElement = this.map.getTargetElement();
 		if (mapElement)
 		{
 			for (let cursor of cursorValues)
 			{
 				$(mapElement).css({cursor});
-				if ($(mapElement).css("cursor") == cursor) return;
+				if ($(mapElement).css("cursor") == cursor)
+					return;
 			}
 		}
 	}
@@ -576,7 +580,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 		var element = this.map.getTargetElement() as HTMLElement;
 		var newSize = [element.offsetWidth, element.offsetHeight];
 
-		if (_.isEqual(this._lastSize, newSize)) return;
+		if (_.isEqual(this._lastSize, newSize))
+			return;
 		this._lastSize = newSize;
 
 		var screenBounds = new Bounds2D(0, 0, newSize[0], newSize[1]);
@@ -943,8 +948,8 @@ export default class OpenLayersMapTool extends React.Component<IVisToolProps, IV
 			<ResizingDiv>
 				<div
 					role="img"
-				    aria-label={this.altText.text.value || this.getAutomaticDescription()}
-				    ref={(c:HTMLElement) => {this.element = c;}}
+					aria-label={this.altText.text.value || this.getAutomaticDescription()}
+					ref={(c:HTMLElement) => {this.element = c;}}
 					style={{height:"100%", width: "100%"}}
 				/>
 			</ResizingDiv>
@@ -1017,9 +1022,9 @@ class OpenLayersMapToolEditor extends SmartComponent<IOpenLayersMapToolEditorPro
 			[
 				Weave.lang("Layers"),
 				<LayerManager layers={this.props.tool.layers}
-				              pushCrumb={ this.props.pushCrumb }
-				              selectedLayer={this.state.selectedLayer}
-				              onLayerSelection={this.updateSelectedLayer}/>
+							  pushCrumb={ this.props.pushCrumb }
+							  selectedLayer={this.state.selectedLayer}
+							  onLayerSelection={this.updateSelectedLayer}/>
 			],
 			[
 				Weave.lang("Display"),

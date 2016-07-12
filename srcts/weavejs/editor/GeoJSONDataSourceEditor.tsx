@@ -27,7 +27,7 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 		let acceptExtension:string = ".json,.geojson,application/vnd.geo+json";
 		
 		//validate if the json is a geo json
-		if(dataSource.url.result)
+		if (dataSource.url.result)
 		{
 			//var json = Weave.getDefinition("JSON");//TODO look into correct serializing of url result
 			var jsonObj = dataSource.url.result;
@@ -66,8 +66,8 @@ export default class GeoJSONDataSourceEditor extends DataSourceEditor
 					<HelpIcon>{Weave.lang("A property that can uniquely identify each row in the data. If there are no such properties, choose \"Auto-generated keys\"")}</HelpIcon>
 				</HBox>,
 				<ComboBox style={{width: "100%"}}
-				          ref={linkReactStateRef(this, { value: dataSource.keyProperty }) } /* searchable field */
-				          options={propertyIds}
+						  ref={linkReactStateRef(this, { value: dataSource.keyProperty }) } /* searchable field */
+						  options={propertyIds}
 				/>
 			],
 			[

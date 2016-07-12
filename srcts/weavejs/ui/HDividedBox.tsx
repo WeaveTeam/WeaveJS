@@ -36,7 +36,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 	constructor(props:React.HTMLProps<HBox>)
 	{
 		super(props)
-		if(this.props.loadWithEqualWidthChildren)
+		if (this.props.loadWithEqualWidthChildren)
 		{
 			this.setEqualWidthChildren();
 		}
@@ -91,7 +91,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 	{
 		// ensures no value is calculated when no resizer is active
 		// todo: try removing mousemove when
-		if(!this.state.dragging )
+		if (!this.state.dragging )
 		{
 			return;
 		}
@@ -114,7 +114,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 
 	private resizerMouseUpHandler = (event:MouseEvent):void =>
 	{
-		if(!isNaN(this.state.activeResizerIndex) )
+		if (!isNaN(this.state.activeResizerIndex) )
 		{
 			//cache the width of left child for released resizer
 			this.leftChildWidths[this.state.activeResizerIndex] =  this.state.resizingLeftChildWidth;
@@ -148,7 +148,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 		var childCount:number = React.Children.count(this.props.children);
 		let leftChildWidthSum:number = 0;
 		React.Children.forEach(this.props.children,function(child:ReactNode , index:number){
-			if(!child)// this case happen in react Composite element based on a condition sometimes null or empty string will come in place of react element
+			if (!child)// this case happen in react Composite element based on a condition sometimes null or empty string will come in place of react element
 				return
 
 			/* ***** Child ****** */
@@ -157,10 +157,10 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 				overflow:"auto"
 			};
 
-			if(childCount - 1 == index)//last child takes rest of the space of the container
+			if (childCount - 1 == index)//last child takes rest of the space of the container
 			{
 
-				if(isNaN(this.containerWidth)) // when render called from constructor for first time
+				if (isNaN(this.containerWidth)) // when render called from constructor for first time
 				{
 					childStyle.flex = 1;
 				}
@@ -174,7 +174,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			else
 			{
 				//set left child width
-				if(this.state.dragging)
+				if (this.state.dragging)
 				{
 					childStyle.width = (this.state.activeResizerIndex == index) ?  this.state.resizingLeftChildWidth : this.leftChildWidths[index];
 				}
@@ -203,7 +203,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 
 
 			//resizer is added right after every child except last child
-			if(childCount - 1 !== index) // resizer not required for last child
+			if (childCount - 1 !== index) // resizer not required for last child
 			{
 				let resizerStyle:React.CSSProperties = this.props.resizerStyle?this.props.resizerStyle:{};
 
@@ -255,7 +255,7 @@ class Resizer extends React.Component<IResizerProps, {}> {
 
 		// setting padding and margin with equal positive and negative values, will ensure the resize-cursor is visible when its 4 px near the resizer
 		// positive and negative negates the 4px layout for rendering Engine, but cursor will become visible when its 4px near
-		if(this.props.type === VERTICAL){
+		if (this.props.type === VERTICAL){
 			_.merge(styleObj, {
 				paddingLeft:"4px",
 				marginLeft:"-4px",
@@ -263,7 +263,7 @@ class Resizer extends React.Component<IResizerProps, {}> {
 				marginRight:"-4px",
 				cursor: "col-resize"
 			});
-		}else if(this.props.type === HORIZONTAL){
+		}else if (this.props.type === HORIZONTAL){
 			_.merge(styleObj, {
 				paddingTop:"4px",
 				marginTop:"-4px",
@@ -272,13 +272,13 @@ class Resizer extends React.Component<IResizerProps, {}> {
 				cursor: "row-resize"
 			});
 		}
-		if(this.props.size)
+		if (this.props.size)
 		{
-			if(this.props.type === VERTICAL)
+			if (this.props.type === VERTICAL)
 			{
 				styleObj.width = 1;
 			}
-			else if(this.props.type === HORIZONTAL)
+			else if (this.props.type === HORIZONTAL)
 			{
 				styleObj.height = 1;
 			}

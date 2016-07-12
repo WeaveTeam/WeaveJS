@@ -61,7 +61,7 @@ export default class AttributeMenuTool extends React.Component<IVisToolProps, IA
 	setToolWatcher =():void =>
 	{
 		this.toolWatcher.targetPath = this.targetToolPath.state as string[];
-		if(this.selectedAttribute.state)
+		if (this.selectedAttribute.state)
 			this.handleSelection(this.choices.getObject(this.selectedAttribute.state as string) as IAttributeColumn);
 		this.forceUpdate();
 	};
@@ -210,7 +210,7 @@ class AttributeMenuTargetEditor extends React.Component<IAttributeMenuTargetEdit
 	//UI event handler for target Tool
 	handleTargetToolChange = (selectedItem:string):void =>
 	{
-		if(selectedItem)
+		if (selectedItem)
 			this.props.attributeMenuTool.targetToolPath.state = selectedItem;
 	};
 

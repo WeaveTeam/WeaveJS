@@ -55,7 +55,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 
 	setSessionState(state:LayoutState):void
 	{
-		if(Array.isArray(state))
+		if (Array.isArray(state))
 		{
 			state = {
 				panels: state
@@ -127,7 +127,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 			if (_.isEqual(id, item.id))
 				panelState = item;
 		});
-		if(panelState)
+		if (panelState)
 			panelState.id = newId;
 		else
 			console.error("Could not find id in this layout", id);
@@ -195,7 +195,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 
 		// remove the panel from the other layout;
 		// add it to this layout;
-		if(sourceLayout && sourceLayout != this)
+		if (sourceLayout && sourceLayout != this)
 		{
 			var offsetPoint = MouseUtils.getOffsetPoint(ReactDOM.findDOMNode(this) as HTMLElement, event.nativeEvent as MouseEvent);
 			sourceLayout.removePanel(panelDragged);
@@ -249,7 +249,7 @@ export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implem
 				top: offsetPoint.y,
 				width: "50%",
 				height: "50%",
-			    pointerEvents: "none"
+				pointerEvents: "none"
 			}
 		});
 	};

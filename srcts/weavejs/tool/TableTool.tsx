@@ -151,7 +151,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 			});
 		}
 
-		if(Weave.beta)
+		if (Weave.beta)
 			menuItems.push({
 				label: Weave.lang("Print Tool (Beta)"),
 				click: PrintUtils.printTool.bind(null, ReactDOM.findDOMNode(this))
@@ -166,9 +166,9 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		var names:string[] = this.columns.getNames();
 
 		var sortDirections = columns.map((column, index) => {
-			if(this.sortFieldIndex.value == index)
+			if (this.sortFieldIndex.value == index)
 			{
-				if(this.sortInDescendingOrder.value)
+				if (this.sortInDescendingOrder.value)
 				{
 					return -1;
 				}
@@ -225,9 +225,9 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				  .concat(this.getTitlesEditor())
 				  .concat([
 					  [
-    					  Weave.lang("Show Key Column"),
+						  Weave.lang("Show Key Column"),
 						  <Checkbox label={" "} onChange={this.handleShowKeyColumn} value={this.keyColumnShown}/>
-    				  ]
+					  ]
 				  ]),
 			classes: {
 				td: [

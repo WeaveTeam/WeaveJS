@@ -148,7 +148,7 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 	handleDataFileDrop = (file:File):void =>
 	{
 		var extension = file.name.split('.').pop();
-		if(this.props.fileMenu.getSupportedFileTypes(true).indexOf('.' + extension) != -1)//if file supported
+		if (this.props.fileMenu.getSupportedFileTypes(true).indexOf('.' + extension) != -1)//if file supported
 		{
 			this.props.fileMenu.handleOpenedFile(file);
 		}
@@ -172,9 +172,9 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 						<CenteredIcon className="" iconProps={{ className: icon, title: Weave.lang(iconMessage) }}/>
 						<Label style={{flex: 1}} children={dataSource.getLabel()}/>
 						<CenteredIcon onClick={()=>this.refreshDataSource(dataSource)}
-						              iconProps={{ className: "fa fa-refresh", title: Weave.lang("Refresh this datasource") }}/>
+									  iconProps={{ className: "fa fa-refresh", title: Weave.lang("Refresh this datasource") }}/>
 						<CenteredIcon onClick={()=>this.removeDataSource(dataSource)}
-						              iconProps={{ className: "fa fa-times", title: Weave.lang("Delete this datasource") }}/>
+									  iconProps={{ className: "fa fa-times", title: Weave.lang("Delete this datasource") }}/>
 					</HBox>
 				),
 				value: dataSource
@@ -246,11 +246,11 @@ export default class DataSourceManager extends React.Component<IDataSourceManage
 
 							{this.state.rejected ?
 							<LogComponent style={{left:'10px', top:'10px',right:'10px',flex:1, position:'absolute', fontSize:'medium'}} header={ Weave.lang("File Import Error") }
-							              messages={ [Weave.lang("The specified file could not be imported. Only files with the following extensions are allowed: .csv, .tsv, .txt, .shp, .dbf, .geojson, .zip, .json")] }
-							              clearFunc={ (event)=> {
-							                this.setState({rejected:false});
-							                event.stopPropagation();/* without this when the close icon is clicked it causes the file explorer to open*/
-							              } }
+										  messages={ [Weave.lang("The specified file could not be imported. Only files with the following extensions are allowed: .csv, .tsv, .txt, .shp, .dbf, .geojson, .zip, .json")] }
+										  clearFunc={ (event)=> {
+											this.setState({rejected:false});
+											event.stopPropagation();/* without this when the close icon is clicked it causes the file explorer to open*/
+										  } }
 							/>
 								: null}
 

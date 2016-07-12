@@ -167,7 +167,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 	};
 
 	handleChange=(color:any) => {
-		if(this.popup)
+		if (this.popup)
 		{
 			this.setState({ hexColor: '#' + color.hex });
 			this.props.onChange && this.props.onChange('#' + color.hex);
@@ -176,7 +176,7 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 
 	componentWillUnmount()
 	{
-		if(this.popup)//need to check if it exists or else closePopup crashes
+		if (this.popup)//need to check if it exists or else closePopup crashes
 		{
 			ReactUtils.closePopup(this.popup);
 			this.popup = null;
@@ -233,8 +233,8 @@ export default class ColorPicker extends React.Component<ColorPickerProps, Color
 
 			ui = <div style={ styleObject }>
 					<div ref={(elt:Element) => this.element = elt as HTMLElement}
-					     style={swatchStyle}
-					     onClick={ this.handleClick }>
+						 style={swatchStyle}
+						 onClick={ this.handleClick }>
 						<div style={colorStyle}></div>
 					</div>
 				</div>
