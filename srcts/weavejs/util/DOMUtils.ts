@@ -93,4 +93,44 @@ export default class DOMUtils
 		}
 		return null;
 	}
+
+	/**
+	 * Detects if an element overflows with respect to its container.
+	 * @param element the element to check.
+	 * @param container an optional element container or the window by default.
+	 * @returns {{left: boolean, top: boolean, bottom: boolean, right: boolean}}
+	 */
+	static detectOverflow(element:HTMLElement, container?:HTMLElement|Window)
+	{
+		var overflow = {
+			left: false,
+			right: false,
+			top: false,
+			bottom: false
+		};
+		if(!element)
+			return overflow;
+
+		if(!container)
+			container = DOMUtils.getWindow(element);
+		
+		var elementRect = element.getBoundingClientRect();
+
+		if(container instanceof Window)
+		{
+			overflow.left = elementRect.left < 0;
+			overflow.right = elementRect.right > container.innerWidth;
+			overflow.bottom = elementRect.bottom > container.innerHeight;
+			overflow.top = elementRect.top < 0;
+		}
+		else
+		{
+			var containerRect = container.getBoundingClientRect();
+			overflow.left = elementRect.left < containerRect.left;
+			overflow.right = elementRect.right > containerRect.right;
+			overflow.top = elementRect.top < containerRect.top;
+			overflow.bottom = elementRect.bottom > containerRect.bottom;
+		}
+		return overflow;
+	}
 }

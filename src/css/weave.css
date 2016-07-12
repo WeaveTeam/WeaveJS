@@ -692,14 +692,15 @@ div.weave-tree-view {
 	cursor:pointer;
 	background-color: #FFFFFF;
 }
-.weave-list-item:active,
-.weave-list-item:hover{
+.weave-list-item:focus,
+.weave-list-item:active{
 	background-color: rgba(180, 225, 255, 0.4);
+	outline:none;
 }
 .weave-list-item-selected{
 	background-color: rgba(109, 163, 228, 0.6);
 }
-.weave-list-item-selected:hover{
+.weave-list-item-selected:focus{
 	background-color: rgba(117, 179, 255, 0.6);
 }
 
@@ -707,7 +708,7 @@ div.ui.inverted.segment .weave-list-item{
 	background-color: inherit;
 	padding: 5px 10px 5px 10px;
 }
-div.ui.inverted.segment .weave-list-item:hover{
+div.ui.inverted.segment .weave-list-item:focus{
 	background-color: rgba(180, 225, 255, 0.4);
 	color: white;
 }
@@ -720,7 +721,7 @@ div.ui.inverted.segment .weave-list-item-selected{
 	color: white;
 }
 
-div.ui.inverted.segment .weave-list-item-selected:hover{
+div.ui.inverted.segment .weave-list-item-selected:focus{
 	background-color: rgba(117, 179, 255, 0.6)
 }
 
