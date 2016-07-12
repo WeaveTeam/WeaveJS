@@ -550,7 +550,6 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 			evenWidth = Math.max((this.state.width / columnIds.length), this.props.initialColumnWidth);
 
 		let columns = columnIds.map((id: string, index: number) => {
-			console.log("column", this.getColumnTitle(id));
 			return (
 				<Column
 					allowCellsRecycling={true}
