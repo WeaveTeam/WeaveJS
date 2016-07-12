@@ -22,7 +22,7 @@ import ColorController from "../editors/ColorController";
 import ColorColumn = weavejs.data.column.ColorColumn;
 import BinnedColumn = weavejs.data.column.BinnedColumn;
 import FilteredColumn = weavejs.data.column.FilteredColumn;
-import StatsTool from "../tools/StatsTool";
+import DataInfoTool from "../tools/DataInfoTool";
 
 export default class ChartsMenu implements MenuBarItemProps
 {
@@ -60,7 +60,7 @@ export default class ChartsMenu implements MenuBarItemProps
 			Sparkline,
 			TableTool,
 			TextTool,
-			StatsTool
+			DataInfoTool
 		];
 
 		return impls.map(impl => {

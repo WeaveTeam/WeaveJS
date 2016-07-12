@@ -26,7 +26,7 @@ import SessionStateMenuTool from "./tools/SessionStateMenuTool";
 import Sparkline from "./tools/Sparkline";
 import TableTool from "./tools/TableTool";
 import TextTool from "./tools/TextTool";
-import StatsTool from "./tools/StatsTool";
+import DataInfoTool from "./tools/DataInfoTool";
 import ToolTip from "./tools/ToolTip";
 
 import HSlider from "./react-ui/RCSlider/HSlider";
@@ -110,7 +110,7 @@ export
 	Sparkline,
 	TableTool,
 	TextTool,
-	StatsTool,
+	DataInfoTool,
 	ToolTip,
 	
 	HSlider,
