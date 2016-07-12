@@ -1,6 +1,6 @@
-	import * as React from "react";
-	import MiscUtils from "../util/MiscUtils";
-
+namespace weavejs.dialog
+{
+	import MiscUtils = weavejs.util.MiscUtils;
 
 	export interface GuidanceToolTipProps extends React.HTMLProps<GuidanceToolTip>
 	{
@@ -14,7 +14,7 @@
 
 	}
 
-	export default class GuidanceToolTip extends React.Component<GuidanceToolTipProps,GuidanceToolTipState>
+	export class GuidanceToolTip extends React.Component<GuidanceToolTipProps,GuidanceToolTipState>
 	{
 		static START:string = "Start";
 		static NEXT:string = "Next";
@@ -220,5 +220,4 @@
 			</div>);
 		}
 	}
-
-
+}

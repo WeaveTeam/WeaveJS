@@ -1,9 +1,9 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox} from "./flexbox/FlexBox";
-	import Button from "./Button";
-	import SmartComponent from "./SmartComponent";
-
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Button = weavejs.ui.Button;
+	import SmartComponent = weavejs.ui.SmartComponent;
 	//TODO support vertical direction
 
 	export interface IButtonGroupProps extends React.HTMLProps<ButtonGroupBar>{
@@ -112,3 +112,4 @@
 					</HBox>);
 		}
 	}
+}

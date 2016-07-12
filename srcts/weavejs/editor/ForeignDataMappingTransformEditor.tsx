@@ -1,8 +1,16 @@
-	import * as React from "react";
-	import {HBox} from "../ui/flexbox/FlexBox";
-	import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-	import DataSourceEditor from "./DataSourceEditor";
-	import HelpIcon from "../ui/HelpIcon";
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import ReactUtils = weavejs.util.ReactUtils;
+	import WeaveTree = weavejs.ui.WeaveTree;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
+	import DataSourceEditor = weavejs.editor.DataSourceEditor;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IDataSourceEditorState = weavejs.editor.IDataSourceEditorState;
+	import HelpIcon = weavejs.ui.HelpIcon;
 
 	import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;
 	import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -13,7 +21,7 @@
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
-	export default class ForeignDataMappingTransformEditor extends DataSourceEditor
+	export class ForeignDataMappingTransformEditor extends DataSourceEditor
 	{
 		get editorFields():[React.ReactChild, React.ReactChild][]
 		{
@@ -42,3 +50,4 @@
 			return super.editorFields.concat(editorFields)
 		}
 	}
+}

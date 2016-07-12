@@ -1,7 +1,8 @@
+namespace weavejs.api.ui
+{
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import WeavePath = weavejs.path.WeavePath;
-	import * as React from "react";
-	import SelectableAttributeComponent from "../../ui/SelectableAttributeComponent";
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
@@ -14,10 +15,10 @@
 	{
 	}
 
-	export interface IVisTool extends ILinkableObject, ISelectableAttributes
+	export class IVisTool extends ISelectableAttributes
 	{
 		title:string;
-		renderEditor(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void):JSX.Element;
+		renderEditor:(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any )=>void)=>JSX.Element;
 	}
 
 	export function renderSelectableAttributes(selectableAttributes:Map<string,(IColumnWrapper|ILinkableHashMap)>, pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void):React.ReactChild[][]
@@ -29,3 +30,4 @@
 				]
 		})
 	}
+}

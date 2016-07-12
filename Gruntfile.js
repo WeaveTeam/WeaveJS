@@ -112,8 +112,9 @@ module.exports = function (grunt) {
 
         },
         clean: {
-            ts: ["outts"],
-            babel: ["lib"],
+            outtsref: ["outtsref"],
+            outts: ["outts"],
+            lib: ["lib"],
             dist: ["dist/*.js", "dist/*.css", "dist/*.html"]
         },
         exec: {

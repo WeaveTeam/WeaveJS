@@ -1,6 +1,6 @@
-	import * as d3 from "d3";
-
-	export default class FormatUtils
+namespace weavejs.util
+{
+	export class FormatUtils
 	{
 		static d3formatter = d3.format(",");
 
@@ -54,3 +54,4 @@
 			return Math.floor(secondsBetween) + " " + Weave.lang("seconds");
 		}
 	}
+}

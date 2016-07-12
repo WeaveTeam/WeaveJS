@@ -1,6 +1,7 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
 	import CensusApi = weavejs.data.source.CensusApi;
 	import LinkableVariable = weavejs.core.LinkableVariable;
@@ -14,7 +15,7 @@
 	export interface CensusGeographyFilterState {
 	}
 
-	export default class CensusGeographyFilter extends React.Component<CensusGeographyFilterProps, CensusGeographyFilterState>
+	export class CensusGeographyFilter extends React.Component<CensusGeographyFilterProps, CensusGeographyFilterState>
 	{
 		constructor(props:CensusGeographyFilterProps)
 		{
@@ -163,3 +164,4 @@
 			}
 		}
 	}
+}

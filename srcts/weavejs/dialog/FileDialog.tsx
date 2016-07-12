@@ -1,16 +1,15 @@
-	import * as _ from "lodash";
-	import * as React from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import List, {ListOption} from "../ui/List";
-	import PopupWindow from "./PopupWindow";
-	import CenteredIcon from "../ui/CenteredIcon";
-	import SmartComponent from "../ui/SmartComponent";
-	import WeaveServerFileOpenComponent from "./WeaveServerFileOpenComponent";
-	import LocalFileOpenComponent from "./LocalFileOpenComponent";
-	import ConfirmationDialog from "./ConfirmationDialog";
-
+namespace weavejs.dialog
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 	import WeavePromise = weavejs.util.WeavePromise;
 	import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
+	import ListOption = weavejs.ui.ListOption;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import CenteredIcon = weavejs.ui.CenteredIcon;
+	import List = weavejs.ui.List;
+	import LocalFileOpenComponent = weavejs.dialog.LocalFileOpenComponent;
+	import WeaveServerFileOpenComponent = weavejs.dialog.WeaveServerFileOpenComponent;
 
 	export interface FileListItem {
 		label:string;
@@ -42,7 +41,7 @@
 		selected?:FileListItem;
 	}
 
-	export default class FileDialog extends SmartComponent<IFileDialogProps, IFileDialogState> {
+	export class FileDialog extends SmartComponent<IFileDialogProps, IFileDialogState> {
 		static NEW_SESSION:FileListItem = {label: "New Session", iconClass: "fa fa-fw fa-file", isNewFile: true};
 		static MY_COMPUTER:FileListItem = {label: "My Computer", iconClass: "fa fa-fw fa-desktop"};
 		static WEAVE_SERVER:FileListItem = {label: "Weave Server", iconClass: "fa fa-fw fa-server"};
@@ -146,3 +145,4 @@
 			)
 		}
 	}
+}

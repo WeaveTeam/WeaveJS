@@ -1,9 +1,11 @@
-	import * as React from "react";
-	import ResizingDiv from "./ResizingDiv";
-	import SideBar from "./SideBar";
-	import {HBox, VBox} from "./flexbox/FlexBox";
-	import {HDividedBox} from "./HDividedBox";
-	import SmartComponent from "./SmartComponent";
+namespace weavejs.ui
+{
+	import ResizingDiv = weavejs.ui.ResizingDiv;
+	import SideBar = weavejs.ui.SideBar;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import HDividedBox = weavejs.ui.HDividedBox;
+	import SmartComponent = weavejs.ui.SmartComponent;
 
 	export interface SideBarContainerProps extends React.Props<SideBarContainer>
 	{
@@ -22,7 +24,7 @@
 	/**
 	 * Provides a way to make elements using percentage coordinates resize properly within a div that uses flex layout.
 	 */
-	export default class SideBarContainer extends SmartComponent<SideBarContainerProps, SideBarContainerState>
+	export class SideBarContainer extends SmartComponent<SideBarContainerProps, SideBarContainerState>
 	{
 		constructor(props:SideBarContainerProps)
 		{
@@ -248,3 +250,4 @@
 		}
 
 	}
+}

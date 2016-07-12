@@ -1,10 +1,10 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import {HBox, VBox} from "./flexbox/FlexBox";
-	import FormatUtils from "../util/FormatUtils";
-	import Button from "./Button";
-	import Clipboard from "../../modules/clipboard";
-
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import FormatUtils = weavejs.util.FormatUtils;
+	import Button = weavejs.ui.Button;
 	import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 
 	export interface IFileInfoViewProps extends React.Props<FileInfoView>
@@ -17,7 +17,7 @@
 	{
 	}
 
-	export default class FileInfoView extends React.Component<IFileInfoViewProps, IFileInfoViewState> {
+	export class FileInfoView extends React.Component<IFileInfoViewProps, IFileInfoViewState> {
 
 		element:Element;
 		clipboard:Clipboard;
@@ -99,3 +99,4 @@
 			)
 		}
 	}
+}

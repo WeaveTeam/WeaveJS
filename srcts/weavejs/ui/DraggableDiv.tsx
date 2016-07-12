@@ -1,14 +1,13 @@
-	import * as ReactDOM from "react-dom";
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {VBox} from "./flexbox/FlexBox";
-	import SmartComponent from "./SmartComponent";
-	import MouseUtils from "../util/MouseUtils";
-	import ReactUtils from "../util/ReactUtils";
-	import DOMUtils from "../util/DOMUtils";
-	import Div from "./Div";
-
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import MouseUtils = weavejs.util.MouseUtils;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import Div = weavejs.ui.Div;
 	import Bounds2D = weavejs.geom.Bounds2D;
+	import DOMUtils = weavejs.util.DOMUtils;
 
 	enum Handle {
 		LEFT = 1,
@@ -36,7 +35,7 @@
 		height:string|number;
 	}
 
-	export default class DraggableDiv extends SmartComponent<DraggableDivProps, DraggableDivState>
+	export class DraggableDiv extends SmartComponent<DraggableDivProps, DraggableDivState>
 	{
 		private element:HTMLElement;
 		private internalOverlay:Div;
@@ -357,3 +356,4 @@
 			return content;
 		}
 	}
+}

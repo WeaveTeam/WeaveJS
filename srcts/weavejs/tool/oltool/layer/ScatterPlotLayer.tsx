@@ -1,8 +1,5 @@
-	import * as ol from "openlayers";
-	import * as _ from "lodash";
-	import {AbstractFeatureLayer} from "./AbstractFeatureLayer";
-	import AbstractGlyphLayer from "./AbstractGlyphLayer";
-
+namespace weavejs.tool.oltool.layer
+{
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -12,8 +9,9 @@
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
+	import AbstractGlyphLayer = weavejs.tool.oltool.layer.AbstractGlyphLayer;
 
-	export default class ScatterPlotLayer extends AbstractGlyphLayer
+	export class ScatterPlotLayer extends AbstractGlyphLayer
 	{
 		get selectableAttributes()
 		{
@@ -195,7 +193,8 @@
 
 	Weave.registerClass(
 		ScatterPlotLayer,
-		["weavejs.layer.ScatterPlotLayer", "weave.visualization.plotters::ScatterPlotPlotter"],
+		["weavejs.tool.oltool.layer.ScatterPlotLayer", "weave.visualization.plotters::ScatterPlotPlotter"],
 		[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 		"Bubbles"
 	);
+}

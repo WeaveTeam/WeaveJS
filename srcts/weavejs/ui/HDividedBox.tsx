@@ -1,8 +1,8 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import {HBox} from "./flexbox/FlexBox";
-	import prefixer from "../css/prefixer";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import prefixer = weavejs.css.prefixer;
 
 	export interface IHDividedBoxState
 	{
@@ -288,3 +288,4 @@
 			return <span style={ styleObj } onMouseDown={this.props.onMouseDown} className={className}/>
 		}
 	}
+}

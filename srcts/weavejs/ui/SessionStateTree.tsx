@@ -1,12 +1,13 @@
-	import * as React from "react";
-	import {HBox} from "./flexbox/FlexBox";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
 	import WeaveTreeItem = weavejs.util.WeaveTreeItem;
 	import ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import SessionManager = weavejs.core.SessionManager;
-
 
 	export interface ISessionTreeProps extends React.HTMLProps<SessionStateTree> {
 		root:WeaveTreeItem;
@@ -22,7 +23,7 @@
 	}
 
 
-	export default class SessionStateTree extends React.Component<ISessionTreeProps, ISessionTreeState>
+	export class SessionStateTree extends React.Component<ISessionTreeProps, ISessionTreeState>
 	{
 		public openedItems:WeaveTreeItem[] = [];
 		public filteredArray:WeaveTreeItem[] = [];
@@ -291,4 +292,5 @@
 			return (branchUI);
 		}
 	}
+}
 

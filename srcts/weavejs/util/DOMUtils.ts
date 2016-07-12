@@ -1,6 +1,8 @@
+namespace weavejs.util
+{
 	import Dictionary2D = weavejs.util.Dictionary2D;
 
-	export default class DOMUtils
+	export class DOMUtils
 	{
 		static getWindow(element:Element):Window
 		{
@@ -134,3 +136,4 @@
 			return overflow;
 		}
 	}
+}

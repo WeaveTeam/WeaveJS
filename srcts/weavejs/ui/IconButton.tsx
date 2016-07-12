@@ -1,8 +1,7 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import prefixer from "../css/prefixer";
-	import SmartComponent from "./SmartComponent";
-	import ReactNode = __React.ReactNode;
+namespace weavejs.ui
+{
+	import prefixer = weavejs.css.prefixer;
+	import SmartComponent = weavejs.ui.SmartComponent;
 
 	export interface IconButtonProps extends React.HTMLProps<IconButton>
 	{
@@ -17,7 +16,7 @@
 		mouseOver?:boolean
 	}
 
-	export default class IconButton extends SmartComponent<IconButtonProps, IconButtonState>
+	export class IconButton extends SmartComponent<IconButtonProps, IconButtonState>
 	{
 		constructor(props:IconButtonProps)
 		{
@@ -145,3 +144,4 @@
 					</span>;
 		}
 	}
+}

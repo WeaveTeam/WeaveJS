@@ -1,47 +1,33 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox, VBox, Label} from "../../ui/flexbox/FlexBox";
-	import List, {ListOption} from "../../ui/List";
-	import InteractiveTour from "../../dialog/InteractiveTour";
-	import {IDataSourceEditorProps} from "../DataSourceEditor";
-	import DataMenu from "../../menu/DataMenu";
-	import CenteredIcon from "../../ui/CenteredIcon";
-	import Dropzone from "../../../modules/Dropzone";
-	import LogComponent from "../../ui/LogComponent";
-	import WeaveDataSourceEditor from "../WeaveDataSourceEditor";
-	import CSVDataSourceEditor from "../CSVDataSourceEditor";
-	import DBFDataSourceEditor from "../DBFDataSourceEditor";
-	import GeoJSONDataSourceEditor from "../GeoJSONDataSourceEditor";
-	import CensusDataSourceEditor from "../CensusDataSourceEditor";
-	import CKANDataSourceEditor from "../CKANDataSourceEditor";
-	import CachedDataSourceEditor from "../CachedDataSourceEditor";
-	import SpatialJoinTransformEditor from "../SpatialJoinTransformEditor";
-	import ForeignDataMappingTransformEditor from "../ForeignDataMappingTransformEditor";
-	import GroupedDataTransformEditor from "../GroupedDataTransformEditor";
-	import FileMenu from "../../menu/FileMenu";
+namespace weavejs.editor.manager
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Label = weavejs.ui.flexbox.Label;
+
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	import List = weavejs.ui.List;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import ControlPanel = weavejs.editor.ControlPanel;
+	import DataMenu = weavejs.menu.DataMenu;
+	import CenteredIcon = weavejs.ui.CenteredIcon;
+	import LogComponent = weavejs.ui.LogComponent;
 	import IDataSource = weavejs.api.data.IDataSource;
 
-	/* Import editors and their data sources */
-	import WeaveDataSource = weavejs.data.source.WeaveDataSource;
+	import FileMenu = weavejs.menu.FileMenu;
+	import ListOption = weavejs.ui.ListOption;
+	import Dropzone = ReactDropzone.Dropzone;
 
-	import CSVDataSource = weavejs.data.source.CSVDataSource;
-
-	import DBFDataSource = weavejs.data.source.DBFDataSource;
-
-	import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
-
-	import CensusDataSource = weavejs.data.source.CensusDataSource;
-
-	import CKANDataSource = weavejs.data.source.CKANDataSource;
-
-	import CachedDataSource = weavejs.data.source.CachedDataSource;
-
-	import SpatialJoinTransform = weavejs.data.source.SpatialJoinTransform;
-
-	import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;
-
-	import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
-
+	import WeaveDataSourceEditor = weavejs.editor.WeaveDataSourceEditor;
+	import CSVDataSourceEditor = weavejs.editor.CSVDataSourceEditor;
+	import DBFDataSourceEditor = weavejs.editor.DBFDataSourceEditor;
+	import GeoJSONDataSourceEditor = weavejs.editor.GeoJSONDataSourceEditor;
+	import CensusDataSourceEditor = weavejs.editor.CensusDataSourceEditor;
+	import CKANDataSourceEditor = weavejs.editor.CKANDataSourceEditor;
+	import CachedDataSourceEditor = weavejs.editor.CachedDataSourceEditor;
+	import SpatialJoinTransformEditor = weavejs.editor.SpatialJoinTransformEditor;
+	import ForeignDataMappingTransformEditor = weavejs.editor.ForeignDataMappingTransformEditor;
+	import GroupedDataTransformEditor = weavejs.editor.GroupedDataTransformEditor;
 
 	export interface IDataSourceManagerProps
 	{
@@ -55,20 +41,8 @@
 		rejected?:boolean
 	}
 
-	export default class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
+	export class DataSourceManager extends React.Component<IDataSourceManagerProps,IDataSourceManagerState>
 	{
-		static editorRegistry = new Map<typeof IDataSource, React.ComponentClass<IDataSourceEditorProps>>()
-			.set(CSVDataSource, CSVDataSourceEditor)
-			.set(DBFDataSource, DBFDataSourceEditor)
-			.set(GeoJSONDataSource, GeoJSONDataSourceEditor)
-			.set(CensusDataSource, CensusDataSourceEditor)
-			.set(CKANDataSource, CKANDataSourceEditor)
-			.set(WeaveDataSource, WeaveDataSourceEditor)
-			.set(CachedDataSource, CachedDataSourceEditor)
-			.set(SpatialJoinTransform, SpatialJoinTransformEditor)
-			.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
-			.set(GroupedDataTransform, GroupedDataTransformEditor);
-
 		private selectedIndex:number = 0;
 
 		constructor(props:IDataSourceManagerProps)
@@ -190,7 +164,7 @@
 
 			if (dataSource && !Weave.wasDisposed(dataSource))
 			{
-				let EditorClass = DataSourceManager.editorRegistry.get(dataSource.constructor as typeof IDataSource);
+				let EditorClass = DataMenu.editorRegistry.get(dataSource.constructor as typeof IDataSource);
 				if (EditorClass)
 				{
 					editorJsx = (
@@ -308,3 +282,4 @@
 			);
 		}
 	}
+}

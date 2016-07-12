@@ -1,8 +1,7 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import ReactUtils from "../util/ReactUtils";
-	import * as _ from "lodash";
-	import SmartComponent from "./SmartComponent";
+namespace weavejs.ui
+{
+	import ReactUtils = weavejs.util.ReactUtils;
+	import SmartComponent = weavejs.ui.SmartComponent;
 
 	export type ComboBoxOption = {
 		label: string,
@@ -44,7 +43,7 @@
 	// support for key board events
 	// header for multiple ComboBox
 	// scroll to selected option when opened
-	export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxState>
+	export class ComboBox extends React.Component<ComboBoxProps, ComboBoxState>
 	{
 		static defaultProps:ComboBoxProps = {
 			fluid:true,
@@ -685,7 +684,4 @@
 		}
 
 	}
-
-
-
-
+}

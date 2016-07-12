@@ -1,4 +1,6 @@
-export default function polyfill(window:any) { (new window.Function(`
+namespace weavejs.util
+{
+export function polyfill(window:any) { (new window.Function(`
 
 //SVGPathSeg API polyfill
 //https://github.com/progers/pathseg
@@ -814,3 +816,4 @@ export default function polyfill(window:any) { (new window.Function(`
 }());
 
 `)()); }
+}

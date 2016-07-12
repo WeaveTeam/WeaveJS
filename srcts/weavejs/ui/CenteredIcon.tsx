@@ -1,6 +1,5 @@
-	import * as React from "react";
-	import classNames from "../../modules/classnames";
-
+namespace weavejs.ui
+{
 	export interface CenteredIconProps extends React.HTMLProps<CenteredIcon>
 	{
 		iconProps?:React.HTMLProps<HTMLImageElement>
@@ -10,7 +9,7 @@
 	{
 	}
 
-	export default class CenteredIcon extends React.Component<CenteredIconProps, CenteredIconState>
+	export class CenteredIcon extends React.Component<CenteredIconProps, CenteredIconState>
 	{
 		constructor(props:CenteredIconProps)
 		{
@@ -35,3 +34,4 @@
 			)
 		}
 	}
+}

@@ -1,9 +1,10 @@
-	import * as PIXI from "pixi.js";
+namespace weavejs.util
+{
 	import SolidLineStyle = weavejs.geom.SolidLineStyle;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import SolidFillStyle = weavejs.geom.SolidFillStyle;
 
-	export default class GraphicsUtils
+	export class GraphicsUtils
 	{
 		static beginLineStyle(graphics:PIXI.Graphics, lineStyle:SolidLineStyle, key:IQualifiedKey)
 		{
@@ -16,3 +17,4 @@
 			graphics.beginFill(style.color, style.alpha);
 		}
 	}
+}

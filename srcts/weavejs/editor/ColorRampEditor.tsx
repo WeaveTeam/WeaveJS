@@ -1,19 +1,21 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {VBox, HBox, Label} from "../ui/flexbox/FlexBox";
-	import ColorRampList from "../ui/ColorRampList";
-	import ColorRampComponent from "../ui/ColorRampComponent";
-	import ColorPicker from "../ui/ColorPicker";
-	import List from "../ui/List";
-	import CenteredIcon from "../ui/CenteredIcon";
-	import Button from "../ui/Button";
-	import ComboBox from "../ui/ComboBox";
-	import {forceUpdateWatcher} from "../util/WeaveReactUtils";
-	import SmartComponent from "../ui/SmartComponent";
-
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Label = weavejs.ui.flexbox.Label;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils;
 	import ColorRamp = weavejs.util.ColorRamp;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import StandardLib = weavejs.util.StandardLib;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import ColorPicker = weavejs.ui.ColorPicker;
+	import ColorRampComponent = weavejs.ui.ColorRampComponent;
+	import Button = weavejs.ui.Button;
+	import ColorRampList = weavejs.ui.ColorRampList;
+	import ComboBox = weavejs.ui.ComboBox;
+	import CenteredIcon = weavejs.ui.CenteredIcon;
+	import List = weavejs.ui.List;
 
 	export interface ColorRampEditorProps extends React.Props<ColorRampEditor>
 	{
@@ -30,9 +32,9 @@
 	const ALL:string = "All";
 	// Three Classes are used (all three classes depends on colorRamp, which is passed from ColorRampEditor)
 	// ColorRampEditor -> ColorRampSelector -> ColorRampCustomizer
-	export default class ColorRampEditor extends React.Component<ColorRampEditorProps, ColorRampEditorState>
+	export class ColorRampEditor extends React.Component<ColorRampEditorProps, ColorRampEditorState>
 	{
-		private colorRampWatcher = forceUpdateWatcher(this, ColorRamp);
+		private colorRampWatcher = WeaveReactUtils.forceUpdateWatcher(this, ColorRamp);
 		public get colorRamp():ColorRamp { return this.colorRampWatcher.target as ColorRamp; }
 		public set colorRamp(value:ColorRamp) { this.colorRampWatcher.target = value; }
 		
@@ -403,3 +405,4 @@
 			}
 		}
 	}
+}

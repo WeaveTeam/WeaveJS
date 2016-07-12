@@ -1,8 +1,10 @@
-	import * as React from "react";
-	import ReactColorPicker from "../../modules/react-color";
-	import ReactUtils from "../util/ReactUtils";
-	import {HBox} from "./flexbox/FlexBox";
-	import Button from "./Button";
+namespace weavejs.ui
+{
+	declare type ReactColorPicker = any;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Button = weavejs.ui.Button;
 
 	//React.props used rather than using React.HTMLProps as onChange has different signature
 	export interface ColorPickerProps extends React.Props<ColorPicker>
@@ -24,7 +26,7 @@
 		buttonLabel?:string|React.ReactChild;
 	}
 
-	export default class ColorPicker extends React.Component<ColorPickerProps, ColorPickerState>
+	export class ColorPicker extends React.Component<ColorPickerProps, ColorPickerState>
 	{
 		popup:React.ReactInstance;
 		element:HTMLElement;
@@ -217,11 +219,13 @@
 				styleObject.height = null;
 
 				let label:string | React.ReactChild = this.state.buttonLabel ? this.state.buttonLabel  : "Add color";
-				ui = <div style={ styleObject }>
+				ui = (
+					<div style={ styleObject }>
 						<div ref={(elt:Element) => this.element = elt as HTMLElement}>
 							<Button  onClick={ this.handleClick }>{label}</Button>
 						</div>
 					</div>
+				);
 			}
 			else
 			{
@@ -243,3 +247,5 @@
 			return (ui);
 		}
 	}
+}
+

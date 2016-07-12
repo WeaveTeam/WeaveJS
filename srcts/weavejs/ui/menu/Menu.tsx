@@ -1,11 +1,11 @@
-	import * as ReactDOM from "react-dom";
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox} from "../flexbox/FlexBox";
-	import classNames from "../../../modules/classnames";
-	import ReactUtils from "../../util/ReactUtils";
-	import {KEYCODES} from "../../util/KeyboardUtils";
+namespace weavejs.ui.menu
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
 
+	// TODO make these static inside Menu
 	export interface MenuItemProps
 	{
 		label?:React.ReactChild;
@@ -52,7 +52,7 @@
 		);
 	};
 
-	export default class Menu extends React.Component<MenuProps, MenuState>
+	export class Menu extends React.Component<MenuProps, MenuState>
 	{
 		element:HTMLElement;
 		opener:HTMLElement;
@@ -94,11 +94,11 @@
 		{
 			var nextIndex:number = -1;
 
-			if (event.keyCode == KEYCODES.UP_ARROW)
+			if (event.keyCode == KeyboardUtils.KEYCODES.UP_ARROW)
 			{
 				nextIndex = this.state.activeIndex - 1;
 			}
-			else if (event.keyCode == KEYCODES.DOWN_ARROW)
+			else if (event.keyCode == KeyboardUtils.KEYCODES.DOWN_ARROW)
 			{
 				nextIndex = this.state.activeIndex + 1;
 			}
@@ -213,7 +213,7 @@
 				if (event.type != "keydown" && event.type != "mouseup")
 					return;
 
-				if (event.type == "keydown" && (event as React.KeyboardEvent).keyCode != KEYCODES.SPACE && (event as React.KeyboardEvent).keyCode != KEYCODES.ENTER)
+				if (event.type == "keydown" && (event as React.KeyboardEvent).keyCode != KeyboardUtils.KEYCODES.SPACE && (event as React.KeyboardEvent).keyCode != KeyboardUtils.KEYCODES.ENTER)
 					return;
 
 				if (!props.menu && props.click && enabled)
@@ -308,3 +308,4 @@
 			);
 		}
 	}
+}

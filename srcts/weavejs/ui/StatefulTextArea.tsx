@@ -1,5 +1,10 @@
-	import * as React from "react";
+namespace weavejs.ui
+{
 	import LinkableVariable = weavejs.core.LinkableVariable;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import Menu = weavejs.ui.menu.Menu;
 
 	export interface StatefulTextAreaProps extends React.HTMLProps<StatefulTextArea> {
 		selectOnFocus?:boolean;
@@ -10,7 +15,7 @@
 		value: string|string[];
 	}
 
-	export default class StatefulTextArea extends React.Component<StatefulTextAreaProps, StatefulTextAreaState>
+	export class StatefulTextArea extends React.Component<StatefulTextAreaProps, StatefulTextAreaState>
 	{
 		textArea:HTMLTextAreaElement;
 
@@ -55,3 +60,4 @@
 			);
 		}
 	}
+}

@@ -1,13 +1,12 @@
-	import * as PIXI from "pixi.js";
-	import IPlotTask from "./IPlotTask";
-
+namespace weavejs.api.ui
+{
 	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
 
-	export default class IPlotter extends ILinkableObject
+	export class IPlotter extends ILinkableObject
 	{
 		/**
 		 * This is an interface for adding callbacks that get called when any spatial properties of the plotter change.
@@ -65,3 +64,4 @@
 	}
 
 	Weave.registerClass(IPlotter, 'weavejs.api.ui.IPlotter');
+}

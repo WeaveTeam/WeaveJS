@@ -1,19 +1,19 @@
-	import * as React from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import {HDividedBox} from "../ui/HDividedBox";
-	import SessionStateTree from "../ui/SessionStateTree";
-	import IconButton from "../ui/IconButton";
-	import LinkableDynamicObjectComponent from "../ui/LinkableDynamicObjectComponent";
-	import SmartComponent from "../ui/SmartComponent";
-	import ControlPanel from "./ControlPanel";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import HDividedBox = weavejs.ui.HDividedBox;
+	import SessionStateTree = weavejs.ui.SessionStateTree;
+	import IconButton = weavejs.ui.IconButton;
+	import LinkableDynamicObjectComponent = weavejs.ui.LinkableDynamicObjectComponent;
 
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import WeaveTreeItem = weavejs.util.WeaveTreeItem;
 	import SessionManager = weavejs.core.SessionManager;
 	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 	import LinkableString = weavejs.core.LinkableString;
-	import FormEvent = __React.FormEvent;
-
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import FormEvent = React.FormEvent;
 
 	export interface ISessionStateEditorProps extends React.HTMLProps<SessionStateEditor>
 	{
@@ -26,7 +26,7 @@
 		activeItem:WeaveTreeItem;
 	}
 
-	export default class SessionStateEditor extends SmartComponent<ISessionStateEditorProps, ISessionStateEditorState>
+	export class SessionStateEditor extends SmartComponent<ISessionStateEditorProps, ISessionStateEditorState>
 	{
 		static openInstance(context:React.ReactInstance, name:string, weaveRoot:ILinkableHashMap):ControlPanel{
 			var weave = Weave.getWeave(weaveRoot);
@@ -202,4 +202,4 @@
 			);
 		}
 	}
-
+}

@@ -1,15 +1,16 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import Checkbox from "../ui/Checkbox";
-	import ComboBox from "../ui/ComboBox";
-	import Button from "../ui/Button";
-	import PopupWindow from "../dialog/PopupWindow";
-	import SmartComponent from "../ui/SmartComponent";
-	import Input from "../ui/Input";
-	import ServiceLogin from "./ServiceLogin";
-	import HelpIcon from "../ui/HelpIcon";
-	import LogComponent from "../ui/LogComponent";
+namespace weavejs.admin
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Checkbox = weavejs.ui.Checkbox;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Button = weavejs.ui.Button;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import Input = weavejs.ui.Input;
+	import ServiceLogin = weavejs.admin.ServiceLogin;
+	import HelpIcon = weavejs.ui.HelpIcon;
+	import LogComponent = weavejs.ui.LogComponent;
 
 	import WeavePromise = weavejs.util.WeavePromise;
 	import WeaveDataSource = weavejs.data.source.WeaveDataSource;
@@ -41,8 +42,8 @@
 		errors?: string[];
 	}
 
-	export default class SqlImport extends SmartComponent<ISqlImportProps, ISqlImportState>
-	{	
+	export class SqlImport extends SmartComponent<ISqlImportProps, ISqlImportState>
+	{
 		private login: ServiceLogin;
 
 		constructor(props:ISqlImportProps)
@@ -113,7 +114,7 @@
 			}
 			else
 			{
-				this.setState({ errors: this.state.errors.concat([error.toString()]) });	
+				this.setState({ errors: this.state.errors.concat([error.toString()]) });
 			}
 		}
 
@@ -130,7 +131,7 @@
 						(error) => {
 							if (error && (error.message as string).startsWith("RemoteException: Values in the selected column do not uniquely identify rows in the table."))
 							{
-								this.setState({ keyColumnValid: false, keyColumnTestInProgress: false });	
+								this.setState({ keyColumnValid: false, keyColumnTestInProgress: false });
 							}
 							else
 							{
@@ -215,7 +216,7 @@
 					keyColumnTestIconClass = "fa fa-fw fa-circle-o"
 					iconColor = null;
 					validityButtonText = Weave.lang("The selected column has not been tested for value uniqueness. Click to test.");
-				}			
+				}
 			}
 
 
@@ -335,3 +336,4 @@
 			)
 		}
 	}
+}

@@ -1,43 +1,38 @@
-	import * as ol from "openlayers";
-	import * as _ from "lodash";
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import MouseUtils from "../../util/MouseUtils";
-	import $ from "../../../modules/jquery";
-	import proj4 from "../../../modules/proj4";
-	import JSZip from "../../../modules/jszip";
-	import PrintUtils from "../../util/PrintUtils";
-	import {IVisToolProps, IVisToolState} from "../../api/ui/IVisTool";
-	import AbstractLayer from "./layer/AbstractLayer";
-	import AbstractFeatureLayer from "./layer/AbstractFeatureLayer";
-	import GeometryLayer from "./layer/GeometryLayer";
-	import TileLayer from "./layer/TileLayer";
-	import ImageGlyphLayer from "./layer/ImageGlyphLayer";
-	import ScatterPlotLayer from "./layer/ScatterPlotLayer";
-	import LabelLayer from "./layer/LabelLayer";
-	import CustomView from "./CustomView";
-	import PanCluster from "./PanCluster";
-	import InteractionModeCluster from "./InteractionModeCluster";
-	import ProbeInteraction from "./ProbeInteraction";
-	import DragSelection from "./DragSelection";
-	import CustomDragZoom from "./CustomDragZoom";
-	import CustomZoomToExtent from "./CustomZoomToExtent";
-	import Menu, {MenuItemProps} from "../../ui/menu/Menu";
-	import AbstractVisTool, {OverrideBounds} from "../AbstractVisTool";
-	import ResizingDiv from "../../ui/ResizingDiv";
-	import MiscUtils from "../../util/MiscUtils";
-	import Button from "../../ui/Button";
-	import Checkbox from "../../ui/Checkbox";
-	import Accordion from "../../ui/Accordion";
-	import StatefulTextField from "../../ui/StatefulTextField";
-	import ComboBox from "../../ui/ComboBox";
-	import LayerManager from "./LayerManager";
-	import {VBox, HBox} from "../../ui/flexbox/FlexBox";
-	import {linkReactStateRef} from "../../util/WeaveReactUtils";
-	import SmartComponent from "../../ui/SmartComponent";
-	import DynamicComponent from "../../ui/DynamicComponent";
-	import StatefulTextArea from "../../ui/StatefulTextArea";
-	import IAltText, {AltTextConfig} from "../../api/ui/IAltText";
+namespace weavejs.tool.oltool
+{
+	import MouseUtils = weavejs.util.MouseUtils;
+	import PrintUtils = weavejs.util.PrintUtils;
+	import AbstractLayer = weavejs.tool.oltool.layer.AbstractLayer;
+	import AbstractFeatureLayer = weavejs.tool.oltool.layer.AbstractFeatureLayer;
+	import GeometryLayer = weavejs.tool.oltool.layer.GeometryLayer;
+	import TileLayer = weavejs.tool.oltool.layer.TileLayer;
+	import ImageGlyphLayer = weavejs.tool.oltool.layer.ImageGlyphLayer;
+	import ScatterPlotLayer = weavejs.tool.oltool.layer.ScatterPlotLayer;
+	import LabelLayer = weavejs.tool.oltool.layer.LabelLayer;
+	import CustomView = weavejs.tool.oltool.CustomView;
+	import PanCluster = weavejs.tool.oltool.PanCluster;
+	import InteractionModeCluster = weavejs.tool.oltool.InteractionModeCluster;
+	import ProbeInteraction = weavejs.tool.oltool.ProbeInteraction;
+	import DragSelection = weavejs.tool.oltool.DragSelection;
+	import CustomDragZoom = weavejs.tool.oltool.CustomDragZoom;
+	import CustomZoomToExtent = weavejs.tool.oltool.CustomZoomToExtent;
+	import Menu = weavejs.ui.menu.Menu;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import ResizingDiv = weavejs.ui.ResizingDiv;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import Button = weavejs.ui.Button;
+	import Checkbox = weavejs.ui.Checkbox;
+	import Accordion = weavejs.ui.Accordion;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import ComboBox = weavejs.ui.ComboBox;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import DynamicComponent = weavejs.ui.DynamicComponent;
+	import StatefulTextArea = weavejs.ui.StatefulTextArea;
+	import IAltText = weavejs.api.ui.IAltText;
+	import IAltTextConfig = weavejs.api.ui.IAltTextConfig;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import ZoomBounds = weavejs.geom.ZoomBounds;
@@ -55,8 +50,15 @@
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
 	import DataType = weavejs.api.data.DataType;
 	import EventCallbackCollection = weavejs.core.EventCallbackCollection;
-
 	import Bounds2D = weavejs.geom.Bounds2D;
+	import IProjectionSRS = weavejs.tool.oltool.IOpenLayersMap;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IOpenLayersMap = weavejs.tool.oltool.IOpenLayersMap;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ILinkableObjectWithNewPaths = weavejs.api.core.ILinkableObjectWithNewPaths;
+	import Projections = weavejs.tool.oltool.Projections;
 
 	interface Alignment
 	{
@@ -78,9 +80,6 @@
 		return obj && (obj.vertical == "top" || obj.vertical == "bottom") && (obj.horizontal == "left" || obj.horizontal == "right");
 	}
 
-	import URLRequest = weavejs.net.URLRequest;
-	import WeavePromise = weavejs.util.WeavePromise;
-
 	// set ol proj4
 	ol.proj.setProj4(proj4);
 
@@ -88,69 +87,8 @@
 	const MEDIUM = "medium";
 	const LARGE = "large";
 
-	export default class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IAltText
+	export class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IProjectionSRS, IAltText
 	{
-		public static selectableLayerFilter(layer: ol.layer.Base): boolean
-		{
-			return layer.get("selectable");
-		}
-
-		private static projectionDbPromise = OpenLayersMapTool.loadProjDatabase();
-
-		static get projectionDbReadyOrFailed():boolean
-		{
-			return !!OpenLayersMapTool.projectionDbPromise.getResult() || !!OpenLayersMapTool.projectionDbPromise.getError();
-		}
-
-		static getProjection(projectionName:string):ol.proj.Projection
-		{
-			let proj = ol.proj.get(projectionName);
-			if (!proj)
-			{
-				let error = OpenLayersMapTool.projectionDbPromise.getError();
-				let result = OpenLayersMapTool.projectionDbPromise.getResult();
-
-				if (!error && !result)
-					console.error("ProjDatabase.zip not ready by the time it was needed.");
-
-				if (error)
-					console.error("Failed to retrieve ProjDatabase.zip, and using a non-default projection:", error);
-
-				if (result && projectionName)
-					console.error("Invalid projection selected:", projectionName);
-			}
-
-			return proj;
-		}
-
-		static loadProjDatabase():WeavePromise<boolean>
-		{
-			return weavejs.WeaveAPI.URLRequestUtils.request(null, new URLRequest("ProjDatabase.zip")).then(
-				(result: Uint8Array) => JSZip().loadAsync(result)
-			).then(
-				(zip: JSZip) => zip.file("ProjDatabase.json").async("string")
-			).then(
-				JSON.parse
-			).then(
-				(db: { [name: string]: string }) =>
-				{
-					for (let newProjName of Object.keys(db)) {
-						let projDef = db[newProjName];
-						if (projDef)
-							proj4.defs(newProjName, projDef);
-					}
-					return true;
-				}
-			);
-		}
-
-		static DEFAULT_PROJECTION:string = "EPSG:4326";
-
-		static projectionVerifier(value:string):boolean
-		{
-			return !!OpenLayersMapTool.getProjection(value);
-		}
-
 		static isGeomColumnOrRef(column: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)):boolean
 		{
 			let iac = Weave.AS(column, weavejs.api.data.IAttributeColumn);
@@ -182,41 +120,7 @@
 			.set(ol.control.ZoomSlider, 3)
 			.set(InteractionModeCluster, 4);
 
-		// TODO: Figure out why setting extent on the projections themselves breaks subsequent renders.
-		static estimatedExtentMap = new Map<string,ol.Extent>();
-		static getEstimatedExtent(proj:ol.proj.Projection):ol.Extent
-		{
-			let extentBounds:Bounds2D = new Bounds2D();
-			let IOTA = Number("1e-10");
-			if (!proj.getExtent())
-			{
-				let code = proj.getCode();
-				if (OpenLayersMapTool.estimatedExtentMap.get(code))
-					return OpenLayersMapTool.estimatedExtentMap.get(code);
-				for (let lat = -180; lat < 180; lat++)
-				{
-					for (let long = -90; long < 180; long++)
-					{
-						let coord:ol.Coordinate = [long, lat];
-						if (coord[0] == -180)
-							coord[0] += IOTA;
-						if (coord[0] == 180)
-							coord[0] -= IOTA;
-						if (coord[1] == -90)
-							coord[1] += IOTA;
-						if (coord[1] == 90)
-							coord[1] -= IOTA;
-
-						let projectedPoint = ol.proj.fromLonLat(coord, proj);
-						extentBounds.includeCoords(projectedPoint[0], projectedPoint[1]);
-					}
-				}
-				return OpenLayersMapTool.estimatedExtentMap.set(code, extentBounds.getCoords()).get(code);
-			}
-			return proj.getExtent();
-		}
-
-		altText:AltTextConfig = Weave.linkableChild(this, AltTextConfig, this.forceUpdate, true);
+		altText:IAltTextConfig = Weave.linkableChild(this, IAltTextConfig, this.forceUpdate, true);
 
 		getAutomaticDescription():string
 		{
@@ -273,7 +177,7 @@
 
 		zoomBounds = Weave.linkableChild(this, ZoomBounds);
 		extentOverride = Weave.linkableChild(this, OverrideBounds);
-		projectionSRS = Weave.linkableChild(this, new LinkableString("EPSG:3857", OpenLayersMapTool.projectionVerifier));
+		projectionSRS = Weave.linkableChild(this, new LinkableString("EPSG:3857", Projections.projectionVerifier));
 		interactionMode = Weave.linkableChild(this, LinkableString);
 
 		layers = Weave.linkableChild(this, new LinkableHashMap(AbstractLayer));
@@ -332,7 +236,7 @@
 
 
 		initSelectableAttributes(input: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)[]): void
-		{	
+		{
 			this.layers.requestObject('', TileLayer);
 			let geoColumns = input.filter(OpenLayersMapTool.isGeomColumnOrRef);
 			let nonGeoColumns = input.filter(_.negate(OpenLayersMapTool.isGeomColumnOrRef));
@@ -559,7 +463,7 @@
 				extent = undefined;
 
 			/* If this is a valid projection, use it. otherwise use default. */
-			let projection = OpenLayersMapTool.getProjection(this.projectionSRS.value) || this.getDefaultProjection();
+			let projection = Projections.getProjection(this.projectionSRS.value) || this.getDefaultProjection();
 			let view = new CustomView({minZoom: this.minZoomLevel.value, maxZoom: this.maxZoomLevel.value, projection, extent});
 			view.set("extent", extent);
 
@@ -705,12 +609,12 @@
 
 			if (dataBounds.isEmpty())
 			{
-				let proj = OpenLayersMapTool.getProjection(this.projectionSRS.value)
+				let proj = Projections.getProjection(this.projectionSRS.value)
 				if (proj)
 				{
-					dataBounds.setCoords(OpenLayersMapTool.getEstimatedExtent(proj));
+					dataBounds.setCoords(Projections.getEstimatedExtent(proj));
 					this.zoomBounds.setDataBounds(dataBounds);
-					return;	
+					return;
 				}
 			}
 			var center = [dataBounds.getXCenter(), dataBounds.getYCenter()];
@@ -743,7 +647,7 @@
 				if (layer instanceof TileLayer)
 					return "EPSG:3857";
 			}
-			return OpenLayersMapTool.DEFAULT_PROJECTION;
+			return Projections.DEFAULT_PROJECTION;
 		}
 
 		requestDetail():void
@@ -933,7 +837,7 @@
 			// Hack to make OpenLayers work correctly in popouts
 			MouseUtils.echoWindowEventsToOpener(ReactDOM.findDOMNode(this));
 
-			if (!OpenLayersMapTool.projectionDbReadyOrFailed)
+			if (!Projections.projectionDbReadyOrFailed)
 			{
 				console.log("Projection database not ready; delaying initialization of map");
 				weavejs.WeaveAPI.Scheduler.callLater(this, this.componentDidMount);
@@ -963,11 +867,12 @@
 
 	Weave.registerClass(
 		OpenLayersMapTool,
-		["weavejs.tool.ol.OpenLayersMapTool", "weavejs.tool.Map", "weave.visualization.tools::MapTool"],
+		["weavejs.tool.oltool.OpenLayersMapTool", "weavejs.tool.Map", "weave.visualization.tools::MapTool"],
 		[
-			weavejs.api.ui.IVisTool_Basic,
-			weavejs.api.core.ILinkableObjectWithNewProperties,
-			weavejs.api.core.ILinkableObjectWithNewPaths,
+			IVisTool,
+			IOpenLayersMap,
+			ILinkableObjectWithNewProperties,
+			ILinkableObjectWithNewPaths,
 			IAltText
 		],
 		"Map"
@@ -1015,7 +920,7 @@
 			let renderNumberEditor = (linkableNumber:LinkableNumber, flex:number)=>
 			{
 				var style: React.CSSProperties = { textAlign: "center", flex, minWidth: 60 };
-				return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, { value: linkableNumber }) }/>;
+				return <StatefulTextField type="number" style={style} ref={WeaveReactUtils.linkReactStateRef(this, { value: linkableNumber }) }/>;
 			}
 
 			return Accordion.render(
@@ -1032,13 +937,13 @@
 						[
 							Weave.lang("Chart title"),
 							<HBox>
-								<StatefulTextField style={{ width: "100%" }} ref= { linkReactStateRef(this, {value: this.props.tool.panelTitle }) } placeholder={this.props.tool.defaultPanelTitle}/>
+								<StatefulTextField style={{ width: "100%" }} ref= { WeaveReactUtils.linkReactStateRef(this, {value: this.props.tool.panelTitle }) } placeholder={this.props.tool.defaultPanelTitle}/>
 							</HBox>
 						],
 						[
 							Weave.lang("Projection SRS"),
 							<HBox>
-								<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={linkReactStateRef(this, { value: this.props.tool.projectionSRS }) }/>
+								<StatefulTextField spellCheck={false} style={{ width: "100%" }} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.projectionSRS }) }/>
 							</HBox>
 						]
 					],
@@ -1049,24 +954,24 @@
 						[
 							Weave.lang("Control location"),
 							<HBox>
-								<ComboBox ref={linkReactStateRef(this, { value: this.props.tool.controlLocation }) } options={controlLocationOpts}/>
+								<ComboBox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.controlLocation }) } options={controlLocationOpts}/>
 							</HBox>
 						],
 						[
 							Weave.lang("Show zoom to extent button"),
-							<Checkbox ref={linkReactStateRef(this, {value: this.props.tool.showZoomExtentButton}) } label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, {value: this.props.tool.showZoomExtentButton}) } label={" "}/>
 						],
 						[
 							Weave.lang("Show zoom buttons"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.props.tool.showZoomButtons }) } label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.showZoomButtons }) } label={" "}/>
 						],
 						[
 							Weave.lang("Show zoom slider"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.props.tool.showZoomSlider }) } label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.showZoomSlider }) } label={" "}/>
 						],
 						[
 							Weave.lang("Show mouse mode selector"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.props.tool.showMouseModeControls }) } label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.showMouseModeControls }) } label={" "}/>
 						],
 					]
 				],
@@ -1076,9 +981,9 @@
 						[
 							Weave.lang("Zoom range"),
 							<HBox className="weave-padded-hbox" style={{ alignItems: "center" }}>
-								<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.props.tool.minZoomLevel }) }/>
+								<StatefulTextField style={{ flex: 1 }} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.minZoomLevel }) }/>
 								{"-"}
-								<StatefulTextField style={{ flex: 1 }} ref={linkReactStateRef(this, { value: this.props.tool.maxZoomLevel }) }/>
+								<StatefulTextField style={{ flex: 1 }} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.tool.maxZoomLevel }) }/>
 							</HBox>
 						],
 						[
@@ -1107,7 +1012,7 @@
 						[
 							Weave.lang("Snap zoom to base map"),
 							<Checkbox
-								ref={linkReactStateRef(this, {value: this.props.tool.snapZoomToBaseMap})}
+								ref={WeaveReactUtils.linkReactStateRef(this, {value: this.props.tool.snapZoomToBaseMap})}
 								label={" "}
 								title={ Weave.lang("Constrain zoom to match tile resolution and avoid 'blurry' appearance.") }
 							/>
@@ -1120,16 +1025,16 @@
 						[
 							Weave.lang("Alt Text"),
 							<DynamicComponent dependencies={[this.props.tool.altText]} render={() => (
-								<StatefulTextArea
-									ref={ linkReactStateRef(this, {value: this.props.tool.altText.text})}
-									placeholder={Weave.lang("Enter a text description for the chart")}
-								/>
-							)}/>
+							<StatefulTextArea
+								ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.props.tool.altText.text})}
+								placeholder={Weave.lang("Enter a text description for the chart")}
+							/>
+						)}/>
 						],
 						[
 							Weave.lang("Show as caption"),
 							<Checkbox
-								ref={ linkReactStateRef(this, {value: this.props.tool.altText.showAsCaption})}
+								ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.props.tool.altText.showAsCaption})}
 								label=" "
 							/>
 						]
@@ -1138,3 +1043,4 @@
 			);
 		}
 	}
+}

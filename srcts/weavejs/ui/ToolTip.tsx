@@ -1,7 +1,5 @@
-	import * as _ from "lodash";
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-
+namespace weavejs.ui
+{
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -25,7 +23,7 @@
 		showToolTip?:boolean;
 	}
 
-	export default class ToolTip extends React.Component<IToolTipProps, IToolTipState>
+	export class ToolTip extends React.Component<IToolTipProps, IToolTipState>
 	{
 		private nameFormat:Function;
 		private valueFormat:Function;
@@ -209,3 +207,4 @@
 			return result;
 		}
 	}
+}

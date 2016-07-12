@@ -32,6 +32,9 @@ node_modules
 #typescript outdir
 outts
 
+#typescript with references outdir
+outtsref
+
 #babel outdir
 lib
 

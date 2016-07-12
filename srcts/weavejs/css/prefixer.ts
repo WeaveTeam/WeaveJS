@@ -1,4 +1,7 @@
-	import {CSSProperties} from "react";
+namespace weavejs.css
+{
+	import CSSProperties = React.CSSProperties;
+
 	var react_prefixes:string[] = ["Moz", "Webkit", "ms"]; // ms or Ms ?
 	var dom_prefixes:string[] = ["Moz", "webKit", "ms"];
 
@@ -25,7 +28,7 @@
 		return vendorSpecificProperties;
 	}
 
-	export default function prefixer(style:CSSProperties):CSSProperties
+	export function prefixer(style:CSSProperties):CSSProperties
 	{
 		var newStyle:CSSProperties = {};
 		for (var property of Object.keys(style))
@@ -43,3 +46,4 @@
 		}
 		return newStyle;
 	}
+}

@@ -9,10 +9,6 @@ package
 	import weavejs.api.core.ILinkableVariable;
 	import weavejs.api.data.IAttributeColumn;
 	import weavejs.api.data.IQualifiedKey;
-	import weavejs.api.ui.IAltText;
-	import weavejs.api.ui.IVisTool;
-	import weavejs.api.ui.IVisTool_Basic;
-	import weavejs.api.ui.IVisTool_Utility;
 	import weavejs.core.EventCallbackCollection;
 	import weavejs.core.LinkableBoolean;
 	import weavejs.core.LinkableCallbackScript;
@@ -158,12 +154,8 @@ package
 			WeaveRootDataTreeNode,
 			SolidLineStyle,
 			SolidFillStyle,
-			IVisTool,
-			IVisTool_Basic,
-			IVisTool_Utility,
 			Admin,
 			EventCallbackCollection,
-			IAltText,
 			BackwardsCompatibility,
 
 			//EntityNodeSearch, //TODO - resolve circular dependency issue

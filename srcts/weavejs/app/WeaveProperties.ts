@@ -1,9 +1,11 @@
+namespace weavejs.app
+{
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 
-	class AccessibilityProperties {
+	export class AccessibilityProperties {
 		enableAccessibilityFeatures = Weave.linkableChild(this, LinkableBoolean);
 		enableCaptioning = Weave.linkableChild(this, LinkableBoolean);
 	}
@@ -23,10 +25,12 @@
 		{
 			return {};
 		}
-	}
-	export function getWeaveProperties(weave:Weave):WeaveProperties
-	{
-		return weave.root.requestObject("WeaveProperties", WeaveProperties, true);
+
+		static getProperties(weave:Weave):WeaveProperties
+		{
+			return weave.root.requestObject("WeaveProperties", WeaveProperties, true);
+		}
 	}
 
-	Weave.registerClass(WeaveProperties, "weavejs.ui.properties.WeaveProperties", [ILinkableObject, ILinkableObjectWithNewProperties]);
+	Weave.registerClass(WeaveProperties, "weavejs.ui.WeaveProperties", [ILinkableObject, ILinkableObjectWithNewProperties]);
+}

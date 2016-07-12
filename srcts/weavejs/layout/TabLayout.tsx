@@ -1,17 +1,16 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import WeaveComponentRenderer from "../ui/WeaveComponentRenderer";
-	import {AbstractLayout, LayoutProps} from "./AbstractLayout";
-	import Tabs from "../ui/Tabs";
-	import {HBox} from "../ui/flexbox/FlexBox";
-	import InteractiveTour from "../dialog/InteractiveTour";
-	import ReactUtils from "../util/ReactUtils";
-	import MiscUtils, {Structure} from "../util/MiscUtils";
-	import CenteredIcon from "../ui/CenteredIcon";
-	import classNames from "../../modules/classnames";
-	import {MenuItemProps} from "../ui/menu/Menu";
-	import Dropdown from "../ui/Dropdown";
-	import {WeavePathArray} from "../util/WeaveReactUtils";
+namespace weavejs.layout
+{
+	import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
+	import Tabs = weavejs.ui.Tabs;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import Structure = weavejs.util.Structure;
+	import CenteredIcon = weavejs.ui.CenteredIcon;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import Dropdown = weavejs.ui.Dropdown;
+	import WeavePathArray = weavejs.util.WeavePathArray;
 
 	import LinkableVariable = weavejs.core.LinkableVariable;
 	import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
@@ -34,7 +33,7 @@
 		onTabDoubleClick: (panelId:WeavePathArray, event?:React.MouseEvent) => void;
 	}
 
-	export interface LayoutState
+	export interface TabLayoutState
 	{
 		tabs: TabState[];
 		activeTabIndex:number;
@@ -52,7 +51,7 @@
 		title: "string"
 	};
 
-	export default class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements weavejs.api.core.ILinkableVariable
+	export class TabLayout extends AbstractLayout<TabLayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 	{
 		static get DEFAULT_TAB_PREFIX():string
 		{
@@ -80,20 +79,20 @@
 				console.error("Unexpected parameters to mergeLayout: ", into, from);
 				return;
 			}
-			var intoState = MiscUtils.normalizeStructure(Weave.getState(into), stateStructure) as LayoutState;
-			var fromState = MiscUtils.normalizeStructure(Weave.getState(from), stateStructure) as LayoutState;
+			var intoState = MiscUtils.normalizeStructure(Weave.getState(into), stateStructure) as TabLayoutState;
+			var fromState = MiscUtils.normalizeStructure(Weave.getState(from), stateStructure) as TabLayoutState;
 
 			intoState.tabs = intoState.tabs.concat(fromState.tabs);
 
 			Weave.setState(intoState, fromState);
 		}
 
-		getSessionState():LayoutState
+		getSessionState():TabLayoutState
 		{
-			return this.linkableState.state as LayoutState;
+			return this.linkableState.state as TabLayoutState;
 		}
 
-		setSessionState(state:LayoutState):void
+		setSessionState(state:TabLayoutState):void
 		{
 			this.linkableState.state = MiscUtils.normalizeStructure(state, stateStructure);
 		}
@@ -402,3 +401,4 @@
 		[weavejs.api.core.ILinkableVariable],
 		'Tab Layout'
 	);
+}

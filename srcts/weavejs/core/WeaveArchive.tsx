@@ -1,5 +1,5 @@
-	import JSZip from "../../modules/jszip";
-
+namespace weavejs.core
+{
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import WeaveAPI = weavejs.WeaveAPI;
 	import AttributeColumnCache = weavejs.data.AttributeColumnCache;
@@ -10,7 +10,8 @@
 
 	export type UpdateCallback = (meta: { percent: number, currentFile: string }) => void;
 
-	export default class WeaveArchive {
+	export class WeaveArchive
+	{
 		private static FOLDER_AMF = "weave-amf";
 		private static FOLDER_JSON = "weave-json";
 		private static FOLDER_FILES = "weave-files";
@@ -171,3 +172,4 @@
 		WeaveArchive,
 		["weavejs.core.WeaveArchive"]
 	);
+}

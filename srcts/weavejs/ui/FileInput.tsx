@@ -1,12 +1,11 @@
-	import * as _ from "lodash";
-	import * as React from "react";
-
+namespace weavejs.ui
+{
 	export interface FileInputProps extends React.HTMLProps<FileInput>
 	{
 		onChange:React.FormEventHandler;
 	}
 
-	export default class FileInput extends React.Component<FileInputProps, {}>
+	export class FileInput extends React.Component<FileInputProps, {}>
 	{
 		input:HTMLInputElement;
 
@@ -46,3 +45,4 @@
 			);
 		}
 	}
+}

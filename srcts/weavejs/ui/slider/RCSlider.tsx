@@ -1,8 +1,6 @@
-	import * as React from "react";
-	import Slider from "rc-slider";
-	import * as _ from "lodash";
-	import SmartComponent from "../SmartComponent";
-
+namespace weavejs.ui.slider
+{
+	import SmartComponent = weavejs.ui.SmartComponent;
 	export type SliderOption = {
 		value: any,
 		label: string
@@ -22,7 +20,7 @@
 		type:string;
 	}
 
-	export default class RCSlider extends SmartComponent<SliderProps, {}>
+	export class RCSlider extends SmartComponent<SliderProps, {}>
 	{
 		static VERTICAL:string = "vertical";
 		static HORIZONTAL:string ="horizontal";
@@ -214,3 +212,4 @@
 			)
 		}
 	}
+}

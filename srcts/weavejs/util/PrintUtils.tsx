@@ -1,11 +1,7 @@
-	import * as React from "react";
-	import * as jquery from "jquery";
-	import ReactUtils from "./ReactUtils";
-
-	var $:JQueryStatic = (jquery as any)["default"];
-
-	export default class PrintUtils {
-
+namespace weavejs.util
+{
+	export class PrintUtils
+	{
 		static onBeforeUnLoad=() => { };
 
 		static onLoad=() => { }
@@ -43,3 +39,4 @@
 			popoutWindow.close();
 		}
 	}
+}

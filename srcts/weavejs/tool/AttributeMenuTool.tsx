@@ -1,12 +1,18 @@
-	import * as React from "react";
-	import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "../api/ui/IVisTool";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import ReactUtils from "../util/ReactUtils";
-	import ComboBox from "../ui/ComboBox";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import HelpIcon from "../ui/HelpIcon";
-	import MenuLayoutComponent from "../ui/MenuLayoutComponent";
+namespace weavejs.tool
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import List = weavejs.ui.List;
+	import HSlider = weavejs.ui.slider.HSlider;
+	import VSlider = weavejs.ui.slider.VSlider;
+	import SliderOption = weavejs.ui.slider.SliderOption;
+	import ComboBox = weavejs.ui.ComboBox;
+	import ComboBoxOption = weavejs.ui.ComboBoxOption;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import HelpIcon = weavejs.ui.HelpIcon;
+	import MenuLayoutComponent = weavejs.ui.MenuLayoutComponent;
 
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -19,6 +25,10 @@
 	import WeaveAPI = weavejs.WeaveAPI;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 
 	const LAYOUT_LIST:string = "List";
 	const LAYOUT_COMBO:string = "ComboBox";
@@ -31,7 +41,7 @@
 	{
 	}
 
-	export default class AttributeMenuTool extends React.Component<IVisToolProps, IAttributeMenuToolState> implements IVisTool
+	export class AttributeMenuTool extends React.Component<IVisToolProps, IAttributeMenuToolState> implements IVisTool
 	{
 		constructor (props:IVisToolProps)
 		{
@@ -264,7 +274,7 @@
 					<ComboBox
 						className="weave-sidebar-dropdown"
 						placeholder={Weave.lang("Select an attribute")}
-						ref={ linkReactStateRef(this, { value: this.props.attributeMenuTool.targetAttribute })}
+						ref={ WeaveReactUtils.linkReactStateRef(this, { value: this.props.attributeMenuTool.targetAttribute })}
 						options={ this.getTargetToolAttributeOptions() }
 					/>
 				],
@@ -272,7 +282,7 @@
 					Weave.lang("Layout mode"),
 					<ComboBox
 						className="weave-sidebar-dropdown"
-						ref={ linkReactStateRef(this, { value: this.props.attributeMenuTool.layoutMode })}
+						ref={ WeaveReactUtils.linkReactStateRef(this, { value: this.props.attributeMenuTool.layoutMode })}
 						options={ menuOptions }
 					/>
 				]
@@ -286,7 +296,7 @@
 					Weave.lang("Title"),
 					<StatefulTextField
 						className="ui input fluid"
-						ref={ linkReactStateRef(this, { value:this.props.attributeMenuTool.panelTitle }) }
+						ref={ WeaveReactUtils.linkReactStateRef(this, { value:this.props.attributeMenuTool.panelTitle }) }
 					/>
 				]
 			];
@@ -315,3 +325,4 @@
 			);
 		}
 	}
+}

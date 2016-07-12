@@ -1,9 +1,7 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox, VBox} from "./flexbox/FlexBox";
-	import SessionStateTree from "./SessionStateTree";
-	import IconButton from "./IconButton";
-	import SmartComponent from "./SmartComponent";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
 	import LinkableDynamicObject = weavejs.core.LinkableDynamicObject;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -24,7 +22,7 @@
 		linkedObjectName?:string;
 	}
 
-	export default class LinkableDynamicObjectComponent extends SmartComponent<ILinkableDynamicObjectComponentProps, ILinkableDynamicObjectComponentState>
+	export class LinkableDynamicObjectComponent extends SmartComponent<ILinkableDynamicObjectComponentProps, ILinkableDynamicObjectComponentState>
 	{
 		constructor(props:ILinkableDynamicObjectComponentProps)
 		{
@@ -126,3 +124,4 @@
 			);
 		}
 	}
+}

@@ -1,5 +1,5 @@
-	import * as _ from "lodash";
-	import * as React from "react";
+namespace weavejs.ui
+{
 	import LinkableVariable = weavejs.core.LinkableVariable;
 
 	export interface StatefulRangeSliderProps extends React.HTMLProps<StatefulRangeSlider> {
@@ -11,7 +11,7 @@
 		value: number;
 	}
 
-	export default class StatefulRangeSlider extends React.Component<StatefulRangeSliderProps, StatefulRangeSliderState>
+	export class StatefulRangeSlider extends React.Component<StatefulRangeSliderProps, StatefulRangeSliderState>
 	{
 		constructor(props: StatefulRangeSliderProps) {
 			super(props);
@@ -36,3 +36,4 @@
 			);
 		}
 	}
+}

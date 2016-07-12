@@ -1,13 +1,16 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import FileSelector from "../ui/FileSelector";
-	import DataSourceEditor from "./DataSourceEditor";
-	import ComboBox from "../ui/ComboBox";
-	import KeyTypeInput from "../ui/KeyTypeInput";
-	import HelpIcon from "../ui/HelpIcon";
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import FileSelector = weavejs.ui.FileSelector;
+	import DataSourceEditor = weavejs.editor.DataSourceEditor;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IDataSourceEditorState = weavejs.editor.IDataSourceEditorState;
+	import ComboBox = weavejs.ui.ComboBox;
+	import KeyTypeInput = weavejs.ui.KeyTypeInput;
+	import HelpIcon = weavejs.ui.HelpIcon;
 
 	import DBFDataSource = weavejs.data.source.DBFDataSource;
 	import EntityNode = weavejs.data.hierarchy.EntityNode;
@@ -17,7 +20,7 @@
 	import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 	import WeaveAPI = weavejs.WeaveAPI;
 
-	export default class DBFDataSourceEditor extends DataSourceEditor
+	export class DBFDataSourceEditor extends DataSourceEditor
 	{
 		get editorFields():[React.ReactChild, React.ReactChild][]
 		{
@@ -77,7 +80,7 @@
 					<StatefulTextField style={{width: "100%"}}
 									   selectOnFocus={true} 
 								   	   placeholder={Weave.lang("Example: EPSG:4326")} 
-									   ref={linkReactStateRef(this, { value: dataSource.projection })}/>
+									   ref={WeaveReactUtils.linkReactStateRef(this, { value: dataSource.projection })}/>
 				],
 				[
 					<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
@@ -85,7 +88,7 @@
 						<HelpIcon>{Weave.lang("A Column that can uniquely identify each row in the data. If there are no such columns, choose \"Auto-generated keys\"")}</HelpIcon>
 					</HBox>,
 					<ComboBox style={{width: "100%"}}
-							  ref={linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
+							  ref={WeaveReactUtils.linkReactStateRef(this, { value: dataSource.keyColName })} /* searchable field */
 							  placeholder={Weave.lang("Auto-generated keys") }
 							  options={dataSource.getColumnNames()}/>
 				],
@@ -101,3 +104,4 @@
 			return super.editorFields.concat(editorFields)
 		}
 	}
+}

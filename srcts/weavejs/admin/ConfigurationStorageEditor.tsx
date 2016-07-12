@@ -1,13 +1,16 @@
-	import * as React from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import Checkbox from "../ui/Checkbox";
-	import ComboBox from "../ui/ComboBox";
-	import {LinkedInput} from "./ConnectionEditor";
-	import Button from "../ui/Button";
-	import PopupWindow from "../dialog/PopupWindow";
-	import SmartComponent from "../ui/SmartComponent";
-	import HelpIcon from "../ui/HelpIcon";
-	import LogComponent from "../ui/LogComponent";
+namespace weavejs.admin
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Checkbox = weavejs.ui.Checkbox;
+	import ComboBoxOption = weavejs.ui.ComboBoxOption;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Button = weavejs.ui.Button;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import List = weavejs.ui.List;
+	import HelpIcon = weavejs.ui.HelpIcon;
+	import LogComponent = weavejs.ui.LogComponent;
 
 	import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 	import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
@@ -37,7 +40,7 @@
 		messages?: string[];
 	}
 
-	export default class ConfigurationStorageEditor extends SmartComponent<IConfigurationStorageEditorProps, IConfigurationStorageEditorState>
+	export class ConfigurationStorageEditor extends SmartComponent<IConfigurationStorageEditorProps, IConfigurationStorageEditorState>
 	{
 		constructor(props:IConfigurationStorageEditorProps)
 		{
@@ -180,3 +183,4 @@
 			);
 		}
 	}
+}

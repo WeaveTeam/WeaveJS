@@ -1,6 +1,8 @@
-	import * as React from "react";
-	import {VBox} from "../ui/flexbox/FlexBox";
-	import AttributeSelector from "../ui/AttributeSelector";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import AttributeSelector = weavejs.ui.AttributeSelector;
 
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ColorColumn = weavejs.data.column.ColorColumn;
@@ -22,7 +24,7 @@
 
 	const HEADER_COLUMNS = "Header columns";
 	const DATA_COLUMNS = "Data columns";
-	export default class MouseoverController extends React.Component<MouseoverControllerProps, MouseoverControllerState>
+	export class MouseoverController extends React.Component<MouseoverControllerProps, MouseoverControllerState>
 	{
 		attributes = new Map<string, ILinkableHashMap>();
 
@@ -42,3 +44,4 @@
 			);
 		}
 	}
+}

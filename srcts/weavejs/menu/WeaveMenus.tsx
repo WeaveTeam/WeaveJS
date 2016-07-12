@@ -1,16 +1,12 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {MenuBarItemProps} from "../ui/menu/MenuBar";
-	import SystemMenu from "./SystemMenu";
-	import FileMenu from "./FileMenu";
-	import ChartsMenu from "./ChartsMenu";
-	import ControllersMenu from "./ControllersMenu";
-	import DataMenu from "./DataMenu";
-	import ServiceLogin from "../admin/ServiceLogin";
+namespace weavejs.menu
+{
+	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
+	import SystemMenu = weavejs.menu.SystemMenu;
+	import ServiceLogin = weavejs.admin.ServiceLogin;
 
 	export type CreateObjectFunction = (type:new(..._:any[])=>any)=>void;
 
-	export default class WeaveMenus
+	export class WeaveMenus
 	{
 		context:React.ReactInstance;
 		weave:Weave;
@@ -67,3 +63,4 @@
 			];
 		}
 	}
+}

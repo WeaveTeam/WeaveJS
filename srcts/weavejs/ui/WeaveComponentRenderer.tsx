@@ -1,11 +1,10 @@
+namespace weavejs.ui
+{
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
-
-	import * as _ from "lodash";
-	import * as React from "react";
-	import ReactUtils from "../util/ReactUtils";
-	import {VBox} from "./flexbox/FlexBox";
-	import SmartComponent from "./SmartComponent";
+	import ReactUtils = weavejs.util.ReactUtils;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import SmartComponent = weavejs.ui.SmartComponent;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 
 	export interface IWeaveComponentRendererProps extends React.HTMLProps<WeaveComponentRenderer>
@@ -24,7 +23,7 @@
 		target?:ILinkableObject;
 	}
 
-	export default class WeaveComponentRenderer extends SmartComponent<IWeaveComponentRendererProps, IWeaveComponentRendererState>
+	export class WeaveComponentRenderer extends SmartComponent<IWeaveComponentRendererProps, IWeaveComponentRendererState>
 	{
 		watcher:LinkableWatcher = Weave.disposableChild(this, new LinkableWatcher(null, null, this.handleWatcher.bind(this)));
 		generatedComponent:React.Component<any, any> & ILinkableObject;
@@ -149,3 +148,4 @@
 	}
 
 	weavejs.WeaveAPI.ClassRegistry.registerClass(WeaveComponentRenderer, 'weavejs.ui.WeaveComponentRenderer');
+}

@@ -1,13 +1,13 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import ComboBox from "../ui/ComboBox";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import CensusGeographyFilter from "./CensusGeographyFilter";
-	import DataSourceEditor, {IDataSourceEditorProps, IDataSourceEditorState} from "./DataSourceEditor";
-	import KeyTypeInput from "../ui/KeyTypeInput";
-	import HelpIcon from "../ui/HelpIcon";
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import ComboBox = weavejs.ui.ComboBox;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import CensusGeographyFilter = weavejs.editor.CensusGeographyFilter;
+	import KeyTypeInput = weavejs.ui.KeyTypeInput;
+	import HelpIcon = weavejs.ui.HelpIcon;
 
 	import EntityNode = weavejs.data.hierarchy.EntityNode;
 	import EntityType = weavejs.api.data.EntityType;
@@ -46,7 +46,7 @@
 		requires?: string[]; /* Required geography filter names */
 	}
 
-	export default class CensusDataSourceEditor extends DataSourceEditor
+	export class CensusDataSourceEditor extends DataSourceEditor
 	{
 		constructor(props:IDataSourceEditorProps)
 		{
@@ -174,7 +174,7 @@
 				[
 					Weave.lang("API key"),
 					<StatefulTextField style={{width: "100%"}}
-									   ref={linkReactStateRef(this, { content: ds.apiKey }) }/>
+									   ref={WeaveReactUtils.linkReactStateRef(this, { content: ds.apiKey }) }/>
 				],
 				[
 					<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
@@ -187,14 +187,14 @@
 				[
 					Weave.lang("Dataset"),
 					<ComboBox className="search" style={{width: "100%"}}
-							  ref={linkReactStateRef(this, { value: ds.dataSet }) }
+							  ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.dataSet }) }
 							  selectFirstOnInvalid
 							  options={datasets || [{value: dataset, label: datasetLabel}]}/>
 				],
 				[
 					Weave.lang("Geographic scope"),
 					<ComboBox style={{width: "100%"}}
-							  ref={linkReactStateRef(this, {value: ds.geographicScope })}
+							  ref={WeaveReactUtils.linkReactStateRef(this, {value: ds.geographicScope })}
 							  selectFirstOnInvalid
 							  options={this.state.geographies || [{value: ds.geographicScope.value, label: ds.geographicScope.value}]}/>
 				],
@@ -214,3 +214,4 @@
 			)
 		}
 	}
+}

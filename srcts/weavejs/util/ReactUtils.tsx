@@ -1,11 +1,9 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import DOMUtils from "./DOMUtils";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import * as _ from "lodash";
-	import * as jquery from "jquery";
-	import polyfill from "./polyfill";
-	import {KEYCODES} from "./KeyboardUtils";
+namespace weavejs.util
+{
+	import DOMUtils = weavejs.util.DOMUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
 
 	export type ReactComponent = React.Component<any, any> & React.ComponentLifecycle<any, any>;
 
@@ -27,7 +25,7 @@
 		td?:string|string[];
 	}
 
-	export default class ReactUtils
+	export class ReactUtils
 	{
 		private static map_popup_element = new WeakMap<React.ReactInstance, [Element, EventListener]>();
 
@@ -97,7 +95,7 @@
 		{
 			var document = ReactUtils.getDocument(context);
 			var element = document.body.appendChild(document.createElement("div")) as Element;
-			var popup = ReactDOM.render(jsx, element);
+			var popup = ReactDOM.render(jsx as any, element);
 			var handler:EventListener = null;
 			
 			if (closeOnMouseDown) 
@@ -111,9 +109,9 @@
 					}
 					if (event.type == "keydown")
 					{
-						if ((event as KeyboardEvent).keyCode != KEYCODES.SPACE &&
-							(event as KeyboardEvent).keyCode != KEYCODES.ENTER &&
-							(event as KeyboardEvent).keyCode != KEYCODES.ESC)
+						if ((event as KeyboardEvent).keyCode != KeyboardUtils.KEYCODES.SPACE &&
+							(event as KeyboardEvent).keyCode != KeyboardUtils.KEYCODES.ENTER &&
+							(event as KeyboardEvent).keyCode != KeyboardUtils.KEYCODES.ESC)
 							return;
 					}
 					onClose && onClose(popup);
@@ -278,7 +276,7 @@
 			// 				}
 			// 				</VBox>
 			// 			)
-			// 			
+			//
 			// 		})
 			// 	}
 			// 	</HBox>
@@ -462,3 +460,4 @@
 			return ReactUtils.findComponent(element.parentElement, type);
 		}
 	}
+}

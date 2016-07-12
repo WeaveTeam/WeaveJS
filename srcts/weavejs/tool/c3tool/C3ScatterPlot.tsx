@@ -1,15 +1,12 @@
-	import {IVisToolProps} from "../../api/ui/IVisTool";
-	import AbstractC3Tool from "./AbstractC3Tool";
-	import * as _ from "lodash";
-	import * as d3 from "d3";
-	import FormatUtils from "../../util/FormatUtils";
-	import * as React from "react";
-	import * as c3 from "c3";
-	import ChartUtils from "../../util/ChartUtils";
-	import ComboBox from "../../ui/ComboBox";
-	import Accordion from "../../ui/Accordion";
-	import {linkReactStateRef} from "../../util/WeaveReactUtils";
-	import IAltText from "../../api/ui/IAltText";
+namespace weavejs.tool.c3tool
+{
+	import FormatUtils = weavejs.util.FormatUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ChartUtils = weavejs.util.ChartUtils;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Accordion = weavejs.ui.Accordion;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
 
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -27,6 +24,9 @@
 	import EntityNode = weavejs.data.hierarchy.EntityNode;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import IAltText = weavejs.api.ui.IAltText;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -36,7 +36,7 @@
 		line: { color: string }
 	};
 
-	export default class C3ScatterPlot extends AbstractC3Tool
+	export class C3ScatterPlot extends AbstractC3Tool
 	{
 		dataX = Weave.linkableChild(this, DynamicColumn);
 		dataY = Weave.linkableChild(this, DynamicColumn);
@@ -375,7 +375,7 @@
 					[
 						[
 							Weave.lang("X axis label angle"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
 						]
 					]
 				],
@@ -419,12 +419,13 @@
 
 	Weave.registerClass(
 		C3ScatterPlot,
-		["weavejs.tool.C3ScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
+		["weavejs.tool.c3tool.C3ScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
 		[
-			weavejs.api.ui.IVisTool_Basic,
+			weavejs.api.ui.IVisTool,
 			weavejs.api.core.ILinkableObjectWithNewProperties,
 			weavejs.api.data.ISelectableAttributes,
 			IAltText
 		],
 		"Scatter Plot"
 	);
+}

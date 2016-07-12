@@ -1,15 +1,14 @@
+namespace weavejs.tool.oltool.layer
+{
 	import WeavePath = weavejs.path.WeavePath;
-	import * as React from "react";
-	import OpenLayersMapTool from "../OpenLayersMapTool";
-	import StatefulTextField from "../../../ui/StatefulTextField";
-	import StatefulRangeSlider from "../../../ui/StatefulRangeSlider";
-	import ComboBox from "../../../ui/ComboBox";
-	import Checkbox from "../../../ui/Checkbox";
-	import {linkReactStateRef} from "../../../util/WeaveReactUtils";
-	import DynamicComponent from "../../../ui/DynamicComponent";
-	import ReactUtils from "../../../util/ReactUtils";
-	import {renderSelectableAttributes} from "../../../api/ui/IVisTool";
-
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import StatefulRangeSlider = weavejs.ui.StatefulRangeSlider;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Checkbox = weavejs.ui.Checkbox;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import DynamicComponent = weavejs.ui.DynamicComponent;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
+	import ReactUtils = weavejs.util.ReactUtils;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -21,7 +20,7 @@
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
 	import WeaveAPI = weavejs.WeaveAPI;
-
+	import Projections = weavejs.tool.oltool.Projections;
 
 	export type EditableField = [
 		LinkableBoolean|LinkableString|LinkableNumber,
@@ -29,8 +28,10 @@
 	] | LinkableVariable | IFilteredKeySet;
 
 	import Bounds2D = weavejs.geom.Bounds2D;
+	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
+	import IOpenLayersMap = weavejs.tool.oltool.IOpenLayersMap;
 
-	export default class AbstractLayer implements ILinkableObject
+	export class AbstractLayer implements ILinkableObject
 	{
 		opacity = Weave.linkableChild(this, new LinkableNumber(1));
 		visible = Weave.linkableChild(this, new LinkableBoolean(true));
@@ -48,6 +49,11 @@
 		getExtent():Bounds2D
 		{
 			return new Bounds2D();
+		}
+
+		public static selectableLayerFilter(layer: ol.layer.Base): boolean
+		{
+			return layer.get("selectable");
 		}
 
 		private renderEditableField(value:EditableField, key:string):[React.ReactChild, React.ReactChild]
@@ -79,7 +85,7 @@
 			{
 				return [
 					Weave.lang(key),
-					<StatefulRangeSlider valueFormat={(value) => " " + Math.round(value * 100) + "%"} min={0} max={1} step={0.01} style={{ display: "inline", width: "50px", verticalAlign: "middle" }} ref={linkReactStateRef(this, { value }) }/>
+					<StatefulRangeSlider valueFormat={(value) => " " + Math.round(value * 100) + "%"} min={0} max={1} step={0.01} style={{ display: "inline", width: "50px", verticalAlign: "middle" }} ref={WeaveReactUtils.linkReactStateRef(this, { value }) }/>
 				]
 			}
 
@@ -87,26 +93,26 @@
 				if (typeof options[0] === typeof "") {
 					return [
 						Weave.lang(key),
-						<ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options as string[]} />
+						<ComboBox key={key} ref={WeaveReactUtils.linkReactStateRef(this, { value: lv }) } options={options as string[]} />
 					]; /* searchable field */
 				}
 				else if (typeof options[0] === typeof {}) {
 					return [
 						Weave.lang(key),
-						<ComboBox key={key} ref={linkReactStateRef(this, { value: lv }) } options={options}/>
+						<ComboBox key={key} ref={WeaveReactUtils.linkReactStateRef(this, { value: lv }) } options={options}/>
 					];
 				}
 				else {
 					return [
 						Weave.lang(key),
-						<StatefulTextField key={key} ref={linkReactStateRef(this, { value: lv }) }/>
+						<StatefulTextField key={key} ref={WeaveReactUtils.linkReactStateRef(this, { value: lv }) }/>
 					];
 				}
 			}
 			else if (lv instanceof LinkableBoolean) {
 				return [
 					Weave.lang(key),
-					<Checkbox key={key} ref={linkReactStateRef(this, { value: lv }) } label={" "}/>
+					<Checkbox key={key} ref={WeaveReactUtils.linkReactStateRef(this, { value: lv }) } label={" "}/>
 				];
 			}
 			else return ["",""];
@@ -162,14 +168,14 @@
 
 		onLayerReady():void
 		{
-			let parent = Weave.getAncestor(this, OpenLayersMapTool);
+			let parent = Weave.getAncestor(this, IOpenLayersMap);
 			this.projectionSRS = parent.projectionSRS;
 			this.projectionSRS.addGroupedCallback(this, this.updateProjection, true);
 		}
 
 		/*abstract*/ updateProjection(): void {}
 
-		parent: OpenLayersMapTool = null;
+		parent: IOpenLayersMap = null;
 
 		private _source: ol.source.Source;
 
@@ -232,7 +238,7 @@
 
 		get outputProjection():string
 		{
-			return (this.projectionSRS && this.projectionSRS.value) || (this.parent && this.parent.getDefaultProjection()) || OpenLayersMapTool.DEFAULT_PROJECTION;
+			return (this.projectionSRS && this.projectionSRS.value) || (this.parent && this.parent.getDefaultProjection()) || Projections.DEFAULT_PROJECTION;
 		}
 
 		getDescription():string
@@ -249,3 +255,4 @@
 			}
 		}
 	}
+}

@@ -1,12 +1,12 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {Table, Column, Cell} from "fixed-data-table";
-	import {HBox, Label} from "./flexbox/FlexBox";
-	import ResizingDiv, {ResizingDivState} from "./ResizingDiv";
-	import SmartComponent from "./SmartComponent";
-
-
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Label = weavejs.ui.flexbox.Label;
 	import CellProps = FixedDataTable.CellProps;
+	import Cell = FixedDataTable.Cell;
+	import Column = FixedDataTable.Column;
+	import Table = FixedDataTable.Table;
 
 	export declare type SortDirection = "ASC"|"DESC"|"NONE";
 
@@ -149,7 +149,7 @@
 	}
 
 
-	export default class DataTable<RowDatum> extends SmartComponent<IDataTableProps<RowDatum>, IDataTableState>
+	export class DataTable<RowDatum> extends SmartComponent<IDataTableProps<RowDatum>, IDataTableState>
 	{
 		private keyDown:boolean;
 		private shiftDown:boolean;
@@ -585,18 +585,5 @@
 				</ResizingDiv>
 			);
 		}
-
 	}
-
-	/* Stuff for generic object tables */
-	export interface IRow {
-		[columnKey: string]: React.ReactChild;
-	}
-
-	/* Needed because templating doesn't play nice with JSX syntax. */
-	export class ObjectDataTable extends DataTable<IRow>
-	{
-		constructor(props: IDataTableProps<IRow>) {
-			super(props);
-		}
-	}
+}

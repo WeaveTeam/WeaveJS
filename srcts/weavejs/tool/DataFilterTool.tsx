@@ -1,12 +1,15 @@
-	import * as React from "react";
-	import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "../api/ui/IVisTool";
-	import AbstractFilterEditor from "../editor/AbstractFilterEditor";
-	import NumericRangeDataFilterEditor from "../editor/NumericRangeDataFilterEditor";
-	import DiscreteValuesDataFilterEditor from "../editor/DiscreteValuesDataFilterEditor";
-	import {VBox} from "../ui/flexbox/FlexBox";
-	import ReactUtils from "../util/ReactUtils";
-	import ComboBox from "../ui/ComboBox";
-	import Checkbox from "../ui/Checkbox";
+namespace weavejs.tool
+{
+	import AbstractFilterEditor = weavejs.editor.AbstractFilterEditor;
+	import NumericRangeDataFilterEditor = weavejs.editor.NumericRangeDataFilterEditor;
+	import DiscreteValuesDataFilterEditor = weavejs.editor.DiscreteValuesDataFilterEditor;
+
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Checkbox = weavejs.ui.Checkbox;
 
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
@@ -24,8 +27,12 @@
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import WeaveAPI = weavejs.WeaveAPI;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 
-	export default class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
+	export class DataFilterTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, ILinkableObjectWithNewProperties
 	{
 		public filter:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(ColumnDataFilter),this.handleFilterWatcher);
 		public filterEditor:LinkableDynamicObject = Weave.linkableChild(this, new LinkableDynamicObject(AbstractFilterEditor),this.handleEditor,true);
@@ -355,3 +362,4 @@
 		}
 
 	}
+}

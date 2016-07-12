@@ -1,9 +1,10 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HDividedBox} from "./HDividedBox";
-	import WeaveTree from "./WeaveTree";
-	import SmartComponent from "./SmartComponent";
-	import DynamicComponent from "./DynamicComponent";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import HDividedBox = weavejs.ui.HDividedBox;
+	import ButtonGroupBar = weavejs.ui.ButtonGroupBar;
+	import WeaveTree = weavejs.ui.WeaveTree;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
@@ -16,6 +17,9 @@
 	import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import DynamicComponent = weavejs.ui.DynamicComponent;
+	import Button = weavejs.ui.Button;
 
 	export interface IHierarchyExplorerProps
 	{
@@ -30,7 +34,7 @@
 	{
 	}
 
-	export default class HierarchyExplorer extends SmartComponent<IHierarchyExplorerProps, IHierarchyExplorerState>
+	export class HierarchyExplorer extends SmartComponent<IHierarchyExplorerProps, IHierarchyExplorerState>
 	{
 		constructor(props:IHierarchyExplorerProps)
 		{
@@ -92,3 +96,4 @@
 			</HDividedBox>;
 		}
 	}
+}

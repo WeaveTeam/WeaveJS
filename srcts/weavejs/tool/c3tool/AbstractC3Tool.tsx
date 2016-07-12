@@ -1,20 +1,14 @@
-	import AbstractVisTool from "../AbstractVisTool";
-	import {IVisToolProps, IVisToolState} from "../../api/ui/IVisTool";
-	import * as _ from "lodash";
-	import * as React from "react";
-	import * as d3 from "d3";
-	import * as c3 from "c3";
-	import C3Chart from "./C3Chart";
-	import * as jquery from "jquery";
-	import DOMUtils from "../../util/DOMUtils";
-	import MouseUtils from "../../util/MouseUtils";
-	import ReactUtils from "../../util/ReactUtils";
-	import ToolTip from "../../ui/ToolTip";
-	import {MenuItemProps} from "../../ui/menu/Menu";
-	import PrintUtils from "../../util/PrintUtils";
-
-	// loads jquery from the es6 default module.
-	var $:JQueryStatic = (jquery as any)["default"];
+namespace weavejs.tool.c3tool
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import DOMUtils = weavejs.util.DOMUtils;
+	import MouseUtils = weavejs.util.MouseUtils;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import ToolTip = weavejs.ui.ToolTip;
+	import Menu = weavejs.ui.menu.Menu;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import PrintUtils = weavejs.util.PrintUtils;
 
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -29,6 +23,10 @@
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 	import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import AbstractVisTool = weavejs.tool.AbstractVisTool;
+	import C3Chart = weavejs.tool.c3tool.C3Chart;
 
 	function finiteOrNull(n:number):number { return isFinite(n) ? n : null; }
 
@@ -49,7 +47,7 @@
 		fontSize?:number;
 	}
 
-	export default class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps, IVisToolState>
+	export class AbstractC3Tool extends AbstractVisTool<IAbstractC3ToolProps, IVisToolState>
 	{
 		constructor(props:IVisToolProps)
 		{
@@ -466,3 +464,4 @@
 			return truncatedLabel;
 		}
 	}
+}

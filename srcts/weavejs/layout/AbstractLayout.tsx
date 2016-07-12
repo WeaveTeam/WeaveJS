@@ -1,9 +1,10 @@
-	import * as React from "react";
-	import SmartComponent from "../ui/SmartComponent";
-	import {WeavePathArray} from "../util/WeaveReactUtils";
-	import MiscUtils from "../util/MiscUtils";
-	import ReactUtils from "../util/ReactUtils";
-	import MouseUtils from "../util/MouseUtils";
+namespace weavejs.layout
+{
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import WeavePathArray = weavejs.util.WeavePathArray;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import MouseUtils = weavejs.util.MouseUtils;
 
 	export type LayoutPanelProps = {
 		maximized?:boolean;
@@ -84,3 +85,4 @@
 			return ReactUtils.findComponent(panel, AbstractLayout as any) as AnyAbstractLayout;
 		}
 	}
+}

@@ -1,12 +1,12 @@
-	import * as PIXI from "pixi.js";
-
+namespace weavejs.api.ui
+{
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 
 	/**
 	 * An IPlotTask provides information for an IPlotter for rendering a plot asynchronously.
 	 */
-	export default class IPlotTask
+	export class IPlotTask
 	{
 		/**
 		 * This is the off-screen buffer, which may change
@@ -47,3 +47,4 @@
 	}
 
 	weavejs.WeaveAPI.ClassRegistry.registerClass(IPlotTask, 'weavejs.api.ui.IPlotTask');
+}

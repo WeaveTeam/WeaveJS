@@ -1,18 +1,16 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import classNames from "../../modules/classnames";
-	import MiscUtils, {Structure} from "../util/MiscUtils";
-	import ReactUtils from "../util/ReactUtils";
-	import DraggableDiv, {DraggableDivState} from "../ui/DraggableDiv";
-	import WeaveComponentRenderer from "../ui/WeaveComponentRenderer";
-	import {AbstractLayout, LayoutProps, PanelDragEvent} from "./AbstractLayout";
-	import Div from "../ui/Div";
-	import {WeavePathArray} from "../util/WeaveReactUtils";
-	import MouseUtils from "../util/MouseUtils";
-
+namespace weavejs.layout
+{
+	import ReactUtils = weavejs.util.ReactUtils;
+	import DraggableDiv = weavejs.ui.DraggableDiv;
+	import DraggableDivState = weavejs.ui.DraggableDivState;
+	import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
+	import Div = weavejs.ui.Div;
 	import LinkableVariable = weavejs.core.LinkableVariable;
+	import Structure = weavejs.util.Structure;
+	import WeavePathArray = weavejs.util.WeavePathArray;
 	import WeavePath = weavejs.path.WeavePath;
+	import MouseUtils = weavejs.util.MouseUtils;
+	import MiscUtils = weavejs.util.MiscUtils;
 
 	export interface PanelState
 	{
@@ -21,7 +19,7 @@
 		maximized?: boolean;
 	}
 
-	export interface LayoutState
+	export interface WindowLayoutState
 	{
 		panels:PanelState[];
 		title:string;
@@ -43,7 +41,7 @@
 		title: "string"
 	};
 
-	export default class WindowLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
+	export class WindowLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 	{
 		private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, MiscUtils.normalizeStructure({}, stateStructure)), this.forceUpdate, true);
 		private overlay:Div;
@@ -53,7 +51,7 @@
 			super(props);
 		}
 
-		setSessionState(state:LayoutState):void
+		setSessionState(state:WindowLayoutState):void
 		{
 			if (Array.isArray(state))
 			{
@@ -64,9 +62,9 @@
 			this.linkableState.state = MiscUtils.normalizeStructure(state, stateStructure);
 		}
 
-		getSessionState():LayoutState
+		getSessionState():WindowLayoutState
 		{
-			return this.linkableState.state as LayoutState;
+			return this.linkableState.state as WindowLayoutState;
 		}
 
 		get title()
@@ -331,3 +329,4 @@
 		[weavejs.api.core.ILinkableVariable],
 		"Window Layout"
 	);
+}

@@ -1,23 +1,30 @@
+namespace weavejs.layout
+{
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import LinkablePlaceholder = weavejs.core.LinkablePlaceholder;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import prefixer = weavejs.css.prefixer;
+	import CenteredIcon = weavejs.ui.CenteredIcon;
+	import CSSProperties = React.CSSProperties;
 
-	import * as React from "react";
-	import {CSSProperties} from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import CenteredIcon from "../ui/CenteredIcon";
-	import {IVisTool} from "../api/ui/IVisTool";
-	import PopupWindow from "../dialog/PopupWindow";
-	import ReactUtils from "../util/ReactUtils";
-	import MouseUtils from "../util/MouseUtils";
-	import WeaveComponentRenderer from "../ui/WeaveComponentRenderer";
-	import SmartComponent from "../ui/SmartComponent";
-	import {AbstractLayout, AnyAbstractLayout} from "./AbstractLayout";
-	import IAltText from "../api/ui/IAltText";
-	import {KEYCODES} from "../util/KeyboardUtils";
-	import DynamicComponent from "../ui/DynamicComponent";
-	import {getWeaveProperties} from "../app/WeaveProperties";
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import MouseUtils = weavejs.util.MouseUtils;
+	import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import DraggableDiv = weavejs.ui.DraggableDiv;
+	import AbstractLayout = weavejs.layout.AbstractLayout;
+	import AnyAbstractLayout = weavejs.layout.AnyAbstractLayout;
 	import LinkableString = weavejs.core.LinkableString;
+	import IAltText = weavejs.api.ui.IAltText;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
+	import WeaveProperties = weavejs.app.WeaveProperties;
+	import DynamicComponent = weavejs.ui.DynamicComponent;
 
 	export interface IWeaveToolProps extends React.Props<WeaveTool>
 	{
@@ -41,7 +48,7 @@
 		highlightTitle?: boolean;
 	}
 
-	export default class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
+	export class WeaveTool extends SmartComponent<IWeaveToolProps, IWeaveToolState>
 	{
 		private watcher:LinkableWatcher;
 		private closeIcon:CenteredIcon;
@@ -101,7 +108,7 @@
 		handleKeyDown=(event:React.KeyboardEvent)=>
 		{
 			// if we hit tab
-			if (event.keyCode == KEYCODES.TAB)
+			if (event.keyCode == KeyboardUtils.KEYCODES.TAB)
 			{
 				// and on close or shift tab and on gear icon
 				if (ReactUtils.hasFocus(this.lastIcon) || (ReactUtils.hasFocus(this) && event.shiftKey))
@@ -269,7 +276,7 @@
 		
 		render():JSX.Element
 		{
-			var ap = getWeaveProperties(this.props.weave).accessibility;
+			var ap = WeaveProperties.getProperties(this.props.weave).accessibility;
 			return (
 				<VBox
 					style={this.props.style}
@@ -301,7 +308,7 @@
 						<DynamicComponent
 							dependencies={[ap.enableAccessibilityFeatures, ap.enableCaptioning]}
 							render={() => {
-								var ap = getWeaveProperties(this.props.weave).accessibility;
+								var ap = WeaveProperties.getProperties(this.props.weave).accessibility;
 								if (ap.enableAccessibilityFeatures.value && ap.enableCaptioning && this.state.showCaption)
 									return <div style={{maxHeight: "30%"}}>{ this.renderCaption() }</div>;
 								else
@@ -313,3 +320,4 @@
 			);
 		}
 	}
+}

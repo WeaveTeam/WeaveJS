@@ -1,12 +1,9 @@
-	import * as React from "react";
-	import {HBox, VBox} from "./flexbox/FlexBox";
-	import FloatingDiv from "./FloatingDiv";
-	import List from "./List";
-	import HSlider from "./slider/HSlider";
-	import VSlider from "./slider/VSlider";
-	import ComboBox, {ComboBoxOption} from "./ComboBox";
-	import CheckBoxList from "./CheckBoxList";
-	import * as _ from "lodash";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import HSlider = weavejs.ui.slider.HSlider;
+	import VSlider = weavejs.ui.slider.VSlider;
 
 	export interface IMenuLayoutComponentProps
 	{
@@ -27,7 +24,7 @@
 
 	}
 
-	export default class MenuLayoutComponent extends React.Component<IMenuLayoutComponentProps, IMenuLayoutComponentState>
+	export class MenuLayoutComponent extends React.Component<IMenuLayoutComponentProps, IMenuLayoutComponentState>
 	{
 		constructor(props:IMenuLayoutComponentProps)
 		{
@@ -80,3 +77,4 @@
 			}
 		}
 	}
+}

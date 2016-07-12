@@ -1,12 +1,9 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox, VBox} from "./flexbox/FlexBox";
-	import {ButtonGroupBar} from "./ButtonGroupBar";
-	import HierarchyExplorer from "./HierarchyExplorer";
-	import SelectableAttributeComponent from "./SelectableAttributeComponent";
-	import SmartComponent from "./SmartComponent";
-	import ControlPanel from "../editor/ControlPanel";
-	import Button from "./Button";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ButtonGroupBar = weavejs.ui.ButtonGroupBar;
+	import HierarchyExplorer = weavejs.ui.HierarchyExplorer;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
@@ -19,6 +16,8 @@
 	import HierarchyUtils = weavejs.data.hierarchy.HierarchyUtils;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import ControlPanel = weavejs.editor.ControlPanel;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
 
 	export interface IAttributeSelectorProps
 	{
@@ -31,7 +30,7 @@
 		selectedAttributeName?:string;
 	}
 
-	export default class AttributeSelector extends SmartComponent<IAttributeSelectorProps, IAttributeSelectorState>
+	export class AttributeSelector extends SmartComponent<IAttributeSelectorProps, IAttributeSelectorState>
 	{
 		private rootNode:IWeaveTreeNode;
 
@@ -255,3 +254,4 @@
 			);
 		};
 	}
+}

@@ -1,13 +1,14 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import SmartComponent from "../ui/SmartComponent";
-	import prefixer from "../css/prefixer";
-	import Button from "../ui/Button";
-	import ReactUtils from "../util/ReactUtils";
-	import DraggableDiv from "../ui/DraggableDiv";
-	import Popup from "../ui/Popup";
-	import {KEYCODES} from "../util/KeyboardUtils";
+namespace weavejs.dialog
+{
+	import ReactUtils = weavejs.util.ReactUtils;
+	import DraggableDiv = weavejs.ui.DraggableDiv;
+	import Popup = weavejs.ui.Popup;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import prefixer = weavejs.css.prefixer;
+	import Button = weavejs.ui.Button;
 
 	export interface PopupWindowProps extends React.Props<PopupWindow>
 	{
@@ -33,7 +34,7 @@
 		content?:JSX.Element;
 	}
 
-	export default class PopupWindow extends SmartComponent<PopupWindowProps, PopupWindowState>
+	export class PopupWindow extends SmartComponent<PopupWindowProps, PopupWindowState>
 	{
 		private minWidth:number = 320;
 		private minHeight:number = 240;
@@ -108,9 +109,9 @@
 		{
 			var code = event.keyCode;
 
-			if (code == KEYCODES.ENTER && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
+			if (code == KeyboardUtils.KEYCODES.ENTER && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
 				this.onOk();
-			else if (code == KEYCODES.ESC && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
+			else if (code == KeyboardUtils.KEYCODES.ESC && this.props.modal && !this.props.suspendEnter && ReactUtils.hasFocus(this))
 				this.onCancel();
 		}
 
@@ -226,3 +227,4 @@
 			);
 		}
 	}
+}

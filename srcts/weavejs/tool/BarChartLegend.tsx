@@ -1,9 +1,10 @@
-	import {IVisTool, IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
-	import * as React from "react";
-	import {CSSProperties} from "react";
-	import prefixer from "../css/prefixer";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import MiscUtils from "../util/MiscUtils";
+namespace weavejs.tool
+{
+	import CSSProperties = React.CSSProperties;
+	import prefixer = weavejs.css.prefixer;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import MiscUtils = weavejs.util.MiscUtils;
 
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import ColorRamp = weavejs.util.ColorRamp;
@@ -13,12 +14,15 @@
 	import DynamicKeySet = weavejs.data.key.DynamicKeySet;
 	import LinkableString = weavejs.core.LinkableString;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisTool = weavejs.api.ui.IVisTool;
 
 	const SHAPE_TYPE_CIRCLE:string = "circle";
 	const SHAPE_TYPE_SQUARE:string = "square";
 	const SHAPE_TYPE_LINE:string = "line";
 
-	export default class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties
+	export class BarChartLegend extends React.Component<IVisToolProps, IVisToolState> implements IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties
 	{
 		chartColors = Weave.linkableChild(this, ColorRamp);
 		columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
@@ -190,3 +194,4 @@
 		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
 		"Bar Chart Legend"
 	);
+}

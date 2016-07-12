@@ -1,10 +1,9 @@
-	import * as _ from "lodash";
-	import * as React from "react";
-
+namespace weavejs.ui
+{
 	/**
 	 * A SmartComponent knows when it should update and when it's ok to setState().
 	 */
-	export default class SmartComponent<P,S> extends React.Component<P, S>
+	export class SmartComponent<P,S> extends React.Component<P, S>
 	{
 		constructor(props:P)
 		{
@@ -41,3 +40,4 @@
 				|| !_.isEqual(this.context, nextContext);
 		}
 	}
+}

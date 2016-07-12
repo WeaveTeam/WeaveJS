@@ -1,9 +1,7 @@
-	/*this component displays text that is editable on a double click*/
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import Input from "./Input";
-	import SmartComponent from "./SmartComponent";
-	import {VBox} from "./flexbox/FlexBox";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
 	export interface IEditableTextCellProps extends React.Props<EditableTextCell>//not extending react.HTML properties because onChange have different signatures
 	{
@@ -19,7 +17,7 @@
 		textContent?:string
 	}
 
-	export default class EditableTextCell extends SmartComponent<IEditableTextCellProps, IEditableTextCellState>
+	export class EditableTextCell extends SmartComponent<IEditableTextCellProps, IEditableTextCellState>
 	{
 		constructor(props:IEditableTextCellProps)
 		{
@@ -114,3 +112,4 @@
 			);
 		}
 	}
+}

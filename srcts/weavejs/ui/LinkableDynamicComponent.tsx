@@ -1,7 +1,6 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-
-	export default class LinkableDynamicComponent extends React.Component<any, any> implements weavejs.api.core.ILinkableVariable
+namespace weavejs.ui
+{
+	export class LinkableDynamicComponent extends React.Component<any, any> implements weavejs.api.core.ILinkableVariable
 	{
 		private linkableState = Weave.linkableChild(this, weavejs.core.LinkableVariable, this.forceUpdate, true);
 		
@@ -50,3 +49,4 @@
 	}
 
 	Weave.registerClass(LinkableDynamicComponent, 'weavejs.ui.LinkableDynamicComponent', [weavejs.api.core.ILinkableVariable]);
+}

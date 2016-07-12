@@ -1,10 +1,8 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import classNames from "../../modules/classnames";
-	import {HBox} from "./flexbox/FlexBox";
-	import {KEYCODES} from "../util/KeyboardUtils";
-	import ReactUtils from "../util/ReactUtils";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
+	import ReactUtils = weavejs.util.ReactUtils;
 
 	export type ListOption = {
 		value:any,
@@ -27,7 +25,7 @@
 		selectedValues?:any[];
 	}
 
-	export default class List extends React.Component<IListProps, IListState>
+	export class List extends React.Component<IListProps, IListState>
 	{
 		private lastSelectedIndex:number;
 		private values:any[];
@@ -91,14 +89,14 @@
 
 		handleKeyDown=(event:React.KeyboardEvent)=>
 		{
-			if (event.keyCode == KEYCODES.UP_ARROW || event.keyCode == KEYCODES.DOWN_ARROW)
+			if (event.keyCode == KeyboardUtils.KEYCODES.UP_ARROW || event.keyCode == KeyboardUtils.KEYCODES.DOWN_ARROW)
 			{
 				event.preventDefault();
-				if (event.keyCode == KEYCODES.UP_ARROW)
+				if (event.keyCode == KeyboardUtils.KEYCODES.UP_ARROW)
 				{
 					this.focusPreviousItem();
 				}
-				else if (event.keyCode == KEYCODES.DOWN_ARROW)
+				else if (event.keyCode == KeyboardUtils.KEYCODES.DOWN_ARROW)
 				{
 					this.focusNextItem();
 				}
@@ -107,7 +105,7 @@
 
 		handleKeyDownOnListItem=(value:any, event:React.KeyboardEvent)=>
 		{
-			if(event.keyCode == KEYCODES.SPACE)
+			if(event.keyCode == KeyboardUtils.KEYCODES.SPACE)
 			{
 				event.preventDefault();
 				this.handleChange(value, event);
@@ -251,3 +249,4 @@
 			);
 		}
 	}
+}

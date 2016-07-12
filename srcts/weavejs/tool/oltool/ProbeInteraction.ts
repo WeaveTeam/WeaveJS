@@ -1,16 +1,16 @@
-	import * as React from "react";
-	import * as ol from "openlayers";
-	import AbstractFeatureLayer from "./layer/AbstractFeatureLayer";
-	import OpenLayersMapTool from "./OpenLayersMapTool";
-	import ToolTip from "../../ui/ToolTip";
-	import ReactUtils from "../../util/ReactUtils";
+namespace weavejs.tool.oltool
+{
+	import IToolTipState = weavejs.ui.IToolTipState;
+	import ToolTip = weavejs.ui.ToolTip;
+	import ReactUtils = weavejs.util.ReactUtils;
 
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import KeySet = weavejs.data.key.KeySet;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import AbstractFeatureLayer = weavejs.tool.oltool.layer.AbstractFeatureLayer;
 
-	export default class ProbeInteraction extends ol.interaction.Pointer
+	export class ProbeInteraction extends ol.interaction.Pointer
 	{
 		private topKey: IQualifiedKey;
 		private topZIndex: number;
@@ -61,7 +61,7 @@
 			this.topLayer = null;
 			this.topKey = null;
 			
-			map.forEachFeatureAtPixel(pixel, this.onFeatureAtPixel, this, OpenLayersMapTool.selectableLayerFilter);
+			map.forEachFeatureAtPixel(pixel, this.onFeatureAtPixel, this, AbstractFeatureLayer.selectableLayerFilter);
 
 
 
@@ -72,7 +72,7 @@
 			
 			for (let layer of map.getLayers().getArray())
 			{
-				if (!OpenLayersMapTool.selectableLayerFilter(layer))
+				if (!AbstractFeatureLayer.selectableLayerFilter(layer))
 					continue;
 				let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 				let keySet: KeySet = weaveLayerObject.probeKeySet;
@@ -103,7 +103,7 @@
 		{
 			for (let layer of this.getMap().getLayers().getArray())
 			{
-				if (!OpenLayersMapTool.selectableLayerFilter(layer))
+				if (!AbstractFeatureLayer.selectableLayerFilter(layer))
 					continue;
 				let weaveLayerObject: AbstractFeatureLayer = layer.get("layerObject");
 				let keySet: KeySet = weaveLayerObject.probeKeySet;
@@ -114,3 +114,4 @@
 			this.toolTip.hide();
 		}
 	}
+}

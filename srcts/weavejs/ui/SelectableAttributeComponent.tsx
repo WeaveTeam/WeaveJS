@@ -1,13 +1,8 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox} from "./flexbox/FlexBox";
-	import Button from "./Button";
-	import AttributeSelector from "./AttributeSelector";
-	import ComboBox from "./ComboBox";
-	import ControlPanel from "../editor/ControlPanel";
-	import ReactUtils from "../util/ReactUtils";
-	import DynamicComponent from "./DynamicComponent";
-
+namespace weavejs.ui
+{
+	import ReactUtils = weavejs.util.ReactUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -23,6 +18,11 @@
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import WeaveRootDataTreeNode = weavejs.data.hierarchy.WeaveRootDataTreeNode;
+	import ControlPanel = weavejs.editor.ControlPanel;
+	import AttributeSelector = weavejs.ui.AttributeSelector;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Button = weavejs.ui.Button;
+	import DynamicComponent = weavejs.ui.DynamicComponent;
 
 	export interface ISelectableAttributeComponentProps
 	{
@@ -38,7 +38,7 @@
 	{
 	}
 
-	export default class SelectableAttributeComponent extends React.Component<ISelectableAttributeComponentProps, ISelectableAttributeComponentState>
+	export class SelectableAttributeComponent extends React.Component<ISelectableAttributeComponentProps, ISelectableAttributeComponentState>
 	{
 		constructor (props:ISelectableAttributeComponentProps)
 		{
@@ -333,3 +333,4 @@
 			}
 		}
 	}
+}

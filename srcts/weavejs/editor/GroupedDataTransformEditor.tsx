@@ -1,11 +1,17 @@
-	import * as React from "react";
-	import {HBox} from "../ui/flexbox/FlexBox";
-	import HelpIcon from "../ui/HelpIcon";
-	import Checkbox from "../ui/Checkbox";
-	import DynamicComponent from "../ui/DynamicComponent";
-	import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-	import DataSourceEditor from "./DataSourceEditor";
-	import KeyTypeInput from "../ui/KeyTypeInput";
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import ReactUtils = weavejs.util.ReactUtils;
+	import WeaveTree = weavejs.ui.WeaveTree;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import HelpIcon = weavejs.ui.HelpIcon;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
+	import DataSourceEditor = weavejs.editor.DataSourceEditor;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IDataSourceEditorState = weavejs.editor.IDataSourceEditorState;
+	import KeyTypeInput = weavejs.ui.KeyTypeInput;
 
 	import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
@@ -13,8 +19,10 @@
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import DynamicComponent = weavejs.ui.DynamicComponent;
+	import Checkbox = weavejs.ui.Checkbox;
 
-	export default class ForeignDataMappingTransformEditor extends DataSourceEditor
+	export class GroupedDataTransformEditor extends DataSourceEditor
 	{
 		private isFiltered=():boolean=>
 		{
@@ -58,7 +66,7 @@
 						<HelpIcon>
 							{Weave.lang('The keyType of the "Group by" column should match the keyType of each column to be transformed. The values in this column will be treated as foreign keys which map to aggregated values in the transformed columns.')}
 						</HelpIcon>
-					</HBox>, 
+					</HBox>,
 					<SelectableAttributeComponent attributeName="Group by" attributes={attributes}/>
 				],
 				[
@@ -85,3 +93,4 @@
 			return super.editorFields.concat(editorFields)
 		}
 	}
+}

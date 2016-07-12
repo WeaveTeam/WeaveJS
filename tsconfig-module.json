@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": true,
+    "jsx": "react",
+    "removeComments": false,
+    "target": "es6",
+    "module": "umd",
+    "outDir": "outts",
+    "declaration": false,
+    "forceConsistentCasingInFileNames": true,
+    "listFiles": false,
+    "noImplicitReturns": false,
+    "pretty": false
+  },
+  "files":[
+    "srcts/module.ts"
+  ],
+  "compileOnSave": false
+}

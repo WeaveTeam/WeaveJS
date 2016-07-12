@@ -1,24 +1,28 @@
-	import {IVisTool, IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
-	import * as _ from "lodash";
-	import * as React from "react";
-	import {CSSProperties} from "react";
-	import MiscUtils from "../util/MiscUtils";
-	import ReactUtils from "../util/ReactUtils";
-	import * as ReactDOM from "react-dom";
-	import prefixer from "../css/prefixer";
-	import ToolTip from "../ui/ToolTip";
-	import AbstractVisTool from "./AbstractVisTool";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import Menu, {MenuItemProps} from "../ui/menu/Menu";
-	import ColorRampComponent from "../ui/ColorRampComponent";
-	import ComboBox from "../ui/ComboBox";
-	import ColorRampEditor from "../editor/ColorRampEditor";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import {BinningDefinitionSelector} from "../editor/BinningDefinitionEditor";
-	import PrintUtils from "../util/PrintUtils";
-	import Accordion from "../ui/Accordion";
-	import Checkbox from "../ui/Checkbox";
+namespace weavejs.tool
+{
+	import MiscUtils = weavejs.util.MiscUtils;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import CSSProperties = React.CSSProperties;
+	import prefixer = weavejs.css.prefixer;
+	import ToolTip = weavejs.ui.ToolTip;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Menu = weavejs.ui.menu.Menu;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import IGetMenuItems = weavejs.ui.menu.IGetMenuItems;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
+	import ColorRampComponent = weavejs.ui.ColorRampComponent;
+	import Input = weavejs.ui.Input;
+	import ComboBox = weavejs.ui.ComboBox;
+	import ColorRampEditor = weavejs.editor.ColorRampEditor;
+	import Button = weavejs.ui.Button;
+	import ColorController = weavejs.editor.ColorController;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import BinningDefinitionSelector = weavejs.editor.BinningDefinitionSelector;
+	import PrintUtils = weavejs.util.PrintUtils;
+	import Accordion = weavejs.ui.Accordion;
+	import Checkbox = weavejs.ui.Checkbox;
 
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import IBinningDefinition = weavejs.api.data.IBinningDefinition;
@@ -52,6 +56,10 @@
 	import CategoryBinningDefinition = weavejs.data.bin.CategoryBinningDefinition;
 	import NaturalJenksBinningDefinition = weavejs.data.bin.NaturalJenksBinningDefinition;
 	import ColumnUtils = weavejs.data.ColumnUtils;
+	import Div = weavejs.ui.Div;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisTool = weavejs.api.ui.IVisTool;
 
 	const SHAPE_TYPE_CIRCLE:string = "circle";
 	const SHAPE_TYPE_SQUARE:string = "square";
@@ -64,7 +72,7 @@
 		{label: "Box", value: SHAPE_TYPE_BOX}
 	];
 
-	export default class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool, IInitSelectableAttributes
+	export class ColorLegend extends React.Component<IVisToolProps, IVisToolState> implements weavejs.api.core.ILinkableObjectWithNewProperties, IVisTool, IInitSelectableAttributes
 	{
 		panelTitle = Weave.linkableChild(this, LinkableString);
 		filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
@@ -482,27 +490,27 @@
 					[
 						[
 							Weave.lang("Chart title"),
-							<StatefulTextField ref={ linkReactStateRef(this, {value: this.panelTitle})} placeholder={this.defaultPanelTitle}/>
+							<StatefulTextField ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.panelTitle})} placeholder={this.defaultPanelTitle}/>
 						],
 						[
 							Weave.lang("Shape type"),
-							<ComboBox ref={linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/> 
+							<ComboBox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.shapeType })} options={SHAPE_MODES}/>
 						],
 						[
 							Weave.lang("Shape Size"),
-							<StatefulTextField type="number" style={{textAlign: "center", flex: 1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.shapeSize})}/>
+							<StatefulTextField type="number" style={{textAlign: "center", flex: 1, minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.shapeSize})}/>
 						],
 						[
 							Weave.lang("Reverse Order"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.reverseOrder })} label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.reverseOrder })} label={" "}/>
 						],
 						[ 
 							Weave.lang("Number of columns"),
-							<StatefulTextField type="number" style={{textAlign: "center", flex: 1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.maxColumns})}/>
+							<StatefulTextField type="number" style={{textAlign: "center", flex: 1, minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.maxColumns})}/>
 						],
 						[
 							Weave.lang("Show title"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.showLegendName })} label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.showLegendName })} label={" "}/>
 						]
 					]
 				]
@@ -529,6 +537,7 @@
 	Weave.registerClass(
 		ColorLegend,
 		["weavejs.tool.ColorLegend", "weave.visualization.tools::ColorBinLegendTool"],
-		[weavejs.api.ui.IVisTool_Basic, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 		"Color Legend"
 	);
+}

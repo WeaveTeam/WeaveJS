@@ -1,13 +1,20 @@
-	import * as React from "react";
-	import {VBox, HBox, Section} from "../ui/flexbox/FlexBox";
-	import InteractiveTour from "../dialog/InteractiveTour";
-	import ReactUtils from "../util/ReactUtils";
-	import SmartComponent from "../ui/SmartComponent";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import WeaveTree from "../ui/WeaveTree";
-	import TableTool from "../tool/TableTool";
-	import {linkReactStateRef, forceUpdateWatcher} from "../util/WeaveReactUtils";
-	import HelpIcon from "../ui/HelpIcon";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Section = weavejs.ui.flexbox.Section;
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	import ResizingDiv = weavejs.ui.ResizingDiv;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import DynamicComponent = weavejs.ui.DynamicComponent;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveTree = weavejs.ui.WeaveTree;
+	import TableTool = weavejs.tool.TableTool;
+	import MenuButton = weavejs.ui.menu.MenuButton;
+	import ChartsMenu = weavejs.menu.ChartsMenu;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import HelpIcon = weavejs.ui.HelpIcon;
 
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import IDataSource = weavejs.api.data.IDataSource;
@@ -40,9 +47,9 @@
 		guideToTab?:string;
 	};
 
-	export default class DataSourceEditor extends SmartComponent<IDataSourceEditorProps, IDataSourceEditorState> 
+	export class DataSourceEditor extends SmartComponent<IDataSourceEditorProps, IDataSourceEditorState>
 	{
-		dataSourceWatcher = forceUpdateWatcher(this, IDataSource);
+		dataSourceWatcher = WeaveReactUtils.forceUpdateWatcher(this, IDataSource);
 		protected enablePreview:boolean = true;
 		protected tree:WeaveTree;
 		protected editorButtons:Map<React.ReactChild, Function>;
@@ -85,7 +92,7 @@
 					{Weave.lang("Label")}
 					<HelpIcon>{Weave.lang("A label used to identify this data source")}</HelpIcon>
 				</HBox>,
-				<StatefulTextField placeholder={this.props.dataSource.getLabel()} style={{ width: "100%", userSelect: false }} ref={linkReactStateRef(this, {value: labelLinkableString}, 500)}/>
+				<StatefulTextField placeholder={this.props.dataSource.getLabel()} style={{ width: "100%", userSelect: false }} ref={WeaveReactUtils.linkReactStateRef(this, {value: labelLinkableString}, 500)}/>
 			];
 		}
 		
@@ -266,3 +273,4 @@
 			);
 		}
 	};
+}

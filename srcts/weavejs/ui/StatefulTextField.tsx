@@ -1,6 +1,10 @@
-	import * as React from "react";
-	import Input from "./Input";
+namespace weavejs.ui
+{
 	import LinkableVariable = weavejs.core.LinkableVariable;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import Menu = weavejs.ui.menu.Menu;
 
 	export interface StatefulTextFieldProps extends React.HTMLProps<StatefulTextField> {
 		selectOnFocus?:boolean;
@@ -11,7 +15,7 @@
 		value: string|string[];
 	}
 
-	export default class StatefulTextField extends React.Component<StatefulTextFieldProps, StatefulTextFieldState>
+	export class StatefulTextField extends React.Component<StatefulTextFieldProps, StatefulTextFieldState>
 	{
 		constructor(props: StatefulTextFieldProps) {
 			super(props);
@@ -54,3 +58,4 @@
 			);
 		}
 	}
+}

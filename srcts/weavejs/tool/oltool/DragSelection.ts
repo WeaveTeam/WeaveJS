@@ -1,10 +1,8 @@
-	import * as ol from "openlayers";
-	import AbstractFeatureLayer from "./layer/AbstractFeatureLayer";
-	import AbstractLayer from "./layer/AbstractLayer";
-	import ProbeInteraction from "./ProbeInteraction";
-	import AbstractVisTool from "../AbstractVisTool";
-	import OpenLayersMapTool from "./OpenLayersMapTool";
-
+namespace weavejs.tool.oltool
+{
+	import AbstractFeatureLayer = weavejs.tool.oltool.layer.AbstractFeatureLayer;
+	import AbstractLayer = weavejs.tool.oltool.layer.AbstractLayer;
+	import IOpenLayersMap = weavejs.tool.oltool.IOpenLayersMap;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import KeySet = weavejs.data.key.KeySet;
 
@@ -14,7 +12,7 @@
 		ADD = 1
 	};
 
-	export default class DragSelection extends ol.interaction.DragBox
+	export class DragSelection extends ol.interaction.DragBox
 	{
 		private mode: DragSelectionMode;
 		private _probeInteraction: ProbeInteraction;
@@ -33,7 +31,7 @@
 			let event = mapBrowserEvent.originalEvent as MouseEvent;
 			let width = endPixel[0] - startPixel[0];
 			let height = endPixel[1] - startPixel[1];
-			let tool = mapBrowserEvent.map.get("mapTool") as OpenLayersMapTool;
+			let tool = mapBrowserEvent.map.get("mapTool") as IOpenLayersMap;
 			this.probeInteraction.setActive(true);
 			if (width * width + height * height <= 64)
 			{
@@ -43,7 +41,7 @@
 						return false;
 					if (weaveLayer.probeKeySet && weaveLayer.probeKeySet.keys.length)
 						return weaveLayer;
-				}, this, OpenLayersMapTool.selectableLayerFilter) as AbstractFeatureLayer;
+				}, this, AbstractFeatureLayer.selectableLayerFilter);
 
 				if (probeLayer instanceof AbstractFeatureLayer)
 				{
@@ -72,7 +70,7 @@
 				{
 					if (interaction instanceof ProbeInteraction)
 					{
-						this._probeInteraction = interaction;
+						this._probeInteraction = interaction as ProbeInteraction;
 						break;
 					}
 				}
@@ -155,3 +153,4 @@
 				this.probeInteraction.setActive(true);
 		}
 	}
+}

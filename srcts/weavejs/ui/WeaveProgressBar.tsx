@@ -1,7 +1,5 @@
-	import * as React from "react";
-	import ProgressBar from "./ProgressBar";
-	import SmartComponent from "./SmartComponent";
-
+namespace weavejs.ui
+{
 	export interface WeaveProgressBarProps extends React.HTMLProps<WeaveProgressBar>
 	{
 		
@@ -14,7 +12,7 @@
 
 	var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;
 
-	export default class WeaveProgressBar extends SmartComponent<WeaveProgressBarProps, WeaveProgressBarState>
+	export class WeaveProgressBar extends SmartComponent<WeaveProgressBarProps, WeaveProgressBarState>
 	{
 		constructor(props:WeaveProgressBarProps)
 		{
@@ -61,3 +59,4 @@
 			);
 		}
 	}
+}

@@ -1,17 +1,19 @@
-	import * as React from "react";
-	import AbstractLayer from "./layer/AbstractLayer";
-	import TileLayer from "./layer/TileLayer";
-	import GeometryLayer from "./layer/GeometryLayer";
-	import LabelLayer from "./layer/LabelLayer";
-	import ScatterPlotLayer from "./layer/ScatterPlotLayer";
-	import ImageGlyphLayer from "./layer/ImageGlyphLayer";
-	import {VBox, HBox} from "../../ui/flexbox/FlexBox";
-	import Checkbox from "../../ui/Checkbox";
-	import {linkReactStateRef} from "../../util/WeaveReactUtils";
-	import Button from "../../ui/Button";
-	import MenuButton from "../../ui/menu/MenuButton";
+namespace weavejs.tool.oltool
+{
+	import Checkbox = weavejs.ui.Checkbox;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils;
+	import Button = weavejs.ui.Button;
+	import MenuButton = weavejs.ui.menu.MenuButton;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
+	import AbstractLayer = weavejs.tool.oltool.layer.AbstractLayer;
+	import TileLayer = weavejs.tool.oltool.layer.TileLayer;
+	import GeometryLayer = weavejs.tool.oltool.layer.GeometryLayer;
+	import LabelLayer = weavejs.tool.oltool.layer.LabelLayer;
+	import ScatterPlotLayer = weavejs.tool.oltool.layer.ScatterPlotLayer;
+	import ImageGlyphLayer = weavejs.tool.oltool.layer.ImageGlyphLayer;
 
 	export interface ILayerManagerState
 	{
@@ -19,16 +21,15 @@
 		openedLayer?: AbstractLayer;
 	}
 
-	export interface  ILayerManagerProps extends React.HTMLProps<LayerManager>
+	export interface ILayerManagerProps extends React.HTMLProps<LayerManager>
 	{
 		layers: LinkableHashMap;
 		pushCrumb?: (title:string,renderFn:()=>JSX.Element , stateObject:any )=>void;
 		selectedLayer?: AbstractLayer; // required as parent can set the selectedLayer too, Case: Crumb Section
 		onLayerSelection?:Function; //selected layer is passed through this function
-
 	}
 
-	export default class LayerManager extends React.Component<ILayerManagerProps, ILayerManagerState>
+	export class LayerManager extends React.Component<ILayerManagerProps, ILayerManagerState>
 	{
 		constructor(props:ILayerManagerProps)
 		{
@@ -42,8 +43,6 @@
 				openedLayer: null
 			}
 		}
-
-
 
 		componentWillReceiveProps(nextProps:ILayerManagerProps)
 		{
@@ -76,7 +75,6 @@
 			}
 		};
 
-
 		generateItem=(layer:AbstractLayer, index:number):JSX.Element=>
 		{
 			/* Stop propagation is necessary because otherwise state linkage breaks when the selectedLayer changes. */
@@ -85,22 +83,22 @@
 			return <HBox key={"layerItem" + index} style={ {alignItems: "center", padding: "4px"} }
 						 className={layer == this.state.selectedLayer ? "weave-list-item-selected" : "weave-list-item"}
 						 onMouseDown={ () => {
-												if (this.state.selectedLayer != layer)
-													this.setState({selectedLayer: layer});
-												if (this.props.onLayerSelection)
-													this.props.onLayerSelection(layer)
-											}
-										 }
-					>
-					<Checkbox title={ Weave.lang("Show layer") } ref={ linkReactStateRef(this, { value: layer.visible }) } label={ layer.getDescription() }/>
-					<span style={ {flex:1} }></span>
-					<button className="ui button"
-							title={ Weave.lang("Edit layer") }
-							style={ {alignSelf: "flex-end", whiteSpace: "nowrap"} }
-							onClick={ this.onEditLayerClick.bind(this,layer) }>
-						<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
-					</button>
-				</HBox>
+											if (this.state.selectedLayer != layer)
+												this.setState({selectedLayer: layer});
+											if (this.props.onLayerSelection)
+												this.props.onLayerSelection(layer)
+										}
+									 }
+			>
+				<Checkbox title={ Weave.lang("Show layer") } ref={ WeaveReactUtils.linkReactStateRef(this, { value: layer.visible }) } label={ layer.getDescription() }/>
+				<span style={ {flex:1} }></span>
+				<button className="ui button"
+						title={ Weave.lang("Edit layer") }
+						style={ {alignSelf: "flex-end", whiteSpace: "nowrap"} }
+						onClick={ this.onEditLayerClick.bind(this,layer) }>
+					<i className="fa fa-angle-right" aria-hidden="true" style={ {fontWeight:"bold"} }/>
+				</button>
+			</HBox>
 		}
 
 		moveSelectedUp=()=>
@@ -180,3 +178,4 @@
 			}
 		}
 	}
+}

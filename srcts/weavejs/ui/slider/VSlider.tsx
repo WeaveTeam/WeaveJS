@@ -1,6 +1,8 @@
-	import * as React from "react";
-	import RCSlider, {SliderOption} from "./RCSlider";
-	import {HBox} from "../flexbox/FlexBox";
+namespace weavejs.ui.slider
+{
+	import RCSlider = weavejs.ui.slider.RCSlider;
+	import SliderOption = weavejs.ui.slider.SliderOption;
+	import HBox = weavejs.ui.flexbox.HBox;
 
 	export interface VSliderProps
 	{
@@ -16,7 +18,7 @@
 		className?:string;
 	}
 
-	export default class VSlider extends React.Component<VSliderProps, any>
+	export class VSlider extends React.Component<VSliderProps, any>
 	{
 		constructor(props:VSliderProps)
 		{
@@ -32,3 +34,4 @@
 			);
 		}
 	}
+}

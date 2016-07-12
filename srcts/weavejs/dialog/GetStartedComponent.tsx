@@ -1,9 +1,9 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import InteractiveTour from "./InteractiveTour";
-	import {LandingPageView} from "./LandingPage";
-	import MiscUtils from "../util/MiscUtils";
+namespace weavejs.dialog
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
 
 	export interface GetStartedComponentProps extends React.HTMLProps<GetStartedComponent>
 	{
@@ -16,7 +16,7 @@
 		showInteractiveTourList?:boolean;
 	}
 
-	export default class GetStartedComponent extends React.Component<GetStartedComponentProps, GetStartedComponentState>
+	export class GetStartedComponent extends React.Component<GetStartedComponentProps, GetStartedComponentState>
 	{
 		constructor(props:GetStartedComponentProps)
 		{
@@ -179,3 +179,4 @@
 			);
 		}
 	}
+}

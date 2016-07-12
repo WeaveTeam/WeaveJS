@@ -1,13 +1,12 @@
-	import AbstractFeatureLayer from "./AbstractFeatureLayer";
-	import * as _ from "lodash";
-	import * as ol from "openlayers";
-	import OpenLayersMapTool from "../OpenLayersMapTool";
-
+namespace weavejs.tool.oltool.layer
+{
+	import OpenLayersMapTool = weavejs.tool.oltool.OpenLayersMapTool;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import LinkableString = weavejs.core.LinkableString;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import GeneralizedGeometry = weavejs.geom.GeneralizedGeometry;
+	import Projections = weavejs.tool.oltool.Projections;
 
 	interface LocationRecord
 	{
@@ -16,11 +15,11 @@
 		id: IQualifiedKey;
 	}
 
-	abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
+	export abstract class AbstractGlyphLayer extends AbstractFeatureLayer {
 
 		dataX = Weave.linkableChild(this, DynamicColumn);
 		dataY = Weave.linkableChild(this, DynamicColumn);
-		sourceProjection = Weave.linkableChild(this, new LinkableString("EPSG:4326", OpenLayersMapTool.projectionVerifier));
+		sourceProjection = Weave.linkableChild(this, new LinkableString("EPSG:4326", Projections.projectionVerifier));
 
 		get editableFields()
 		{
@@ -84,8 +83,8 @@
 			var records:Array<LocationRecord> = weavejs.data.ColumnUtils.getRecords({ "dataX": this.dataX, "dataY": this.dataY }, recordIds);
 			var removedIds = _.difference(this._getFeatureIds(), recordIds);
 
-			var rawProj = OpenLayersMapTool.getProjection(this.inputProjection);
-			var mapProj = OpenLayersMapTool.getProjection(this.outputProjection);
+			var rawProj = Projections.getProjection(this.inputProjection);
+			var mapProj = Projections.getProjection(this.outputProjection);
 
 			if (!rawProj)
 			{
@@ -94,7 +93,7 @@
 					AbstractGlyphLayer._projectionErrorsShown.add(this.inputProjection);
 					console.error(`${Weave.className(this)}: Projection ${this.inputProjection} does not exist; check your data configuration. Falling back to EPSG:4326 (Lat/Long)`);
 				}
-				rawProj = OpenLayersMapTool.getProjection("EPSG:4326");
+				rawProj = Projections.getProjection("EPSG:4326");
 			}
 
 			for (let id of removedIds)
@@ -146,4 +145,4 @@
 			if (featureAdded) this.updateStyleData();
 		}
 	}
-	export default AbstractGlyphLayer;
+}

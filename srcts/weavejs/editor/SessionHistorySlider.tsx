@@ -1,15 +1,16 @@
-	import * as React from "react";
-	import {HBox} from "../ui/flexbox/FlexBox";
-	import ReactUtils from "../util/ReactUtils";
-	import HSlider from "../ui/slider/HSlider";
-	import RCSlider, {SliderOption} from "../ui/slider/RCSlider";
-	import classNames from "../../modules/classnames";
-	import CenteredIcon from "../ui/CenteredIcon";
-	import {KEYCODES} from "../util/KeyboardUtils";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import HSlider = weavejs.ui.slider.HSlider;
+	import RCSlider = weavejs.ui.slider.RCSlider;
+	import SliderOption = weavejs.ui.slider.SliderOption;
+	import CenteredIcon = weavejs.ui.CenteredIcon;
 	import SessionStateLog = weavejs.core.SessionStateLog;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import LogEntry = weavejs.core.LogEntry;
-	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
 
 	export interface SessionHistorySliderProps extends React.Props<SessionHistorySlider>
 	{
@@ -23,7 +24,7 @@
 		position?:number;
 	}
 
-	export default class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
+	export class SessionHistorySlider extends React.Component<SessionHistorySliderProps, SessionHistorySliderState>
 	{
 		private _stateLogWatcher:LinkableWatcher = Weave.linkableChild(this, new LinkableWatcher(SessionStateLog));
 
@@ -81,7 +82,7 @@
 		handleKeyStroke=(event:KeyboardEvent)=>
 		{
 			// ctrl-z and cmd-z
-			if ((event.ctrlKey || event.metaKey) && event.keyCode == KEYCODES.Z)
+			if ((event.ctrlKey || event.metaKey) && event.keyCode == KeyboardUtils.KEYCODES.Z)
 			{
 				event.preventDefault();
 				this._stateLog.undo();
@@ -89,7 +90,7 @@
 
 
 			// ctrl-y and cmd-y and cmd-shift-z
-			if (((event.ctrlKey || event.metaKey) && event.keyCode == KEYCODES.Y) || (event.metaKey && event.shiftKey && event.keyCode == KEYCODES.Z))
+			if (((event.ctrlKey || event.metaKey) && event.keyCode == KeyboardUtils.KEYCODES.Y) || (event.metaKey && event.shiftKey && event.keyCode == KeyboardUtils.KEYCODES.Z))
 			{
 				event.preventDefault();
 				this._stateLog.redo();
@@ -176,4 +177,5 @@
 			);
 		}
 	}
-	Weave.registerClass(SessionHistorySlider, "weavejs.editors.SessionHistorySlider");
+	Weave.registerClass(SessionHistorySlider, "weavejs.editor.SessionHistorySlider");
+}

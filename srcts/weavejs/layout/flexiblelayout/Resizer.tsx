@@ -1,8 +1,6 @@
-	import prefixer from "../../css/prefixer";
-	import * as _ from "lodash";
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import {HORIZONTAL, Direction} from "./Layout";
+namespace weavejs.layout.flexiblelayout
+{
+	import prefixer = weavejs.css.prefixer;
 
 	const STYLE_BASE = {
 		background: "#e6e6e6",
@@ -29,7 +27,7 @@
 		active?: boolean;
 	}
 
-	export default class Resizer extends React.Component<IResizerProps, IResizerState>
+	export class Resizer extends React.Component<IResizerProps, IResizerState>
 	{
 		static DEFAULT_SPACING = 4;
 		
@@ -74,3 +72,4 @@
 			return <span style={style}/>;
 		}
 	}
+}

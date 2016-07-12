@@ -1,10 +1,10 @@
-	import {IVisToolProps} from "../../api/ui/IVisTool";
-	import AbstractC3Tool from "./AbstractC3Tool";
-	import FormatUtils from "../../util/FormatUtils";
-	import * as React from "react";
-	import {HBox, VBox} from "../../ui/flexbox/FlexBox";
-	import StatefulTextField from "../../ui/StatefulTextField";
-	import {linkReactStateRef} from "../../util/WeaveReactUtils";
+namespace weavejs.tool.c3tool
+{
+	import FormatUtils = weavejs.util.FormatUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
 
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -19,13 +19,15 @@
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import LinkableString = weavejs.core.LinkableString;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
 
 	declare type Record = {
 		id: IQualifiedKey,
 		meterColumn: number
 	};
 
-	export default class C3Gauge extends AbstractC3Tool
+	export class C3Gauge extends AbstractC3Tool
 	{
 		meterColumn = Weave.linkableChild(this, DynamicColumn);
 		binningDefinition = Weave.linkableChild(this, DynamicBinningDefinition);
@@ -169,12 +171,12 @@
 				[
 					Weave.lang("Margins"),
 					<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
-						<StatefulTextField type="number" disabled={true} style={{textAlign: "center", flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.left})}/>
+						<StatefulTextField type="number" disabled={true} style={{textAlign: "center", flex:1, minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.margin.left})}/>
 						<VBox className="weave-padded-vbox" style={{flex: 1}}>
-							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.top})}/>
-							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.bottom})}/>
+							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.margin.top})}/>
+							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.margin.bottom})}/>
 						</VBox>
-						<StatefulTextField type="number" disabled={true} style={{textAlign: "center", flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.right})}/>
+						<StatefulTextField type="number" disabled={true} style={{textAlign: "center", flex:1, minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.margin.right})}/>
 					</HBox>
 				]
 			];
@@ -192,7 +194,7 @@
 
 				return [
 					Weave.lang(row[0]),
-					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+					<StatefulTextField ref={ WeaveReactUtils.linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
 				]
 			});
 		}
@@ -225,7 +227,7 @@
 
 	Weave.registerClass(
 		C3Gauge,
-		["weavejs.tool.C3Gauge", "weave.visualization.tools::GaugeTool"],
+		["weavejs.tool.c3tool.C3Gauge", "weave.visualization.tools::GaugeTool"],
 		[
 			weavejs.api.ui.IVisTool,
 			weavejs.api.core.ILinkableObjectWithNewProperties,
@@ -233,3 +235,4 @@
 		],
 		"Gauge"
 	);
+}

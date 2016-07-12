@@ -1,5 +1,5 @@
-	import * as React from "react";
-
+namespace weavejs.editor
+{
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableString = weavejs.core.LinkableString;
 	import ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
@@ -26,9 +26,7 @@
 	{
 	}
 
-	export default class AbstractFilterEditor
-		extends React.Component<FilterEditorProps, FilterEditorState>
-		implements ILinkableObjectWithNewProperties
+	export class AbstractFilterEditor extends React.Component<FilterEditorProps, FilterEditorState> implements ILinkableObjectWithNewProperties
 	{
 		public showPlayButton = Weave.linkableChild(this, new LinkableBoolean(false));
 		public showToggle = Weave.linkableChild(this, new LinkableBoolean(true));
@@ -104,3 +102,4 @@
 			};
 		}
 	}
+}

@@ -1,9 +1,11 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {ObjectDataTable, IRow} from "./DataTable";
-	import {HBox, VBox, Label} from "./flexbox/FlexBox";
-	import ColorRampComponent from "./ColorRampComponent";
-
+namespace weavejs.ui
+{
+	import ObjectDataTable = weavejs.ui.ObjectDataTable;
+	import IRow = weavejs.ui.IRow;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Label = weavejs.ui.flexbox.Label;
+	import ColorRampComponent = weavejs.ui.ColorRampComponent;
 	import StandardLib = weavejs.util.StandardLib;
 
 	export interface ColorRampListProps extends React.Props<ColorRampList>
@@ -18,7 +20,7 @@
 		selectedColors?:number[];
 	}
 
-	export default class ColorRampList extends React.Component<ColorRampListProps, ColorRampListState>
+	export class ColorRampList extends React.Component<ColorRampListProps, ColorRampListState>
 	{
 		columnTitles:{[columnId: string]: string|JSX.Element} = {};
 		tableContainer:VBox;
@@ -87,13 +89,16 @@
 			});
 
 			return (
-				<ObjectDataTable columnIds={["value"]}
-								 idProperty="id" rows={rows}
-								 columnTitles={this.columnTitles}
-								 selectedIds={[selectedId]}
-								 allowResizing={false}
-								 evenlyExpandRows={true}
-								 onSelection={this.handleTableSelection}/>
+				<ObjectDataTable
+					columnIds={["value"]}
+					idProperty="id" rows={rows}
+					columnTitles={this.columnTitles}
+					selectedIds={[selectedId]}
+					allowResizing={false}
+					evenlyExpandRows={true}
+					onSelection={this.handleTableSelection}
+				/>
 			);
 		}
 	}
+}

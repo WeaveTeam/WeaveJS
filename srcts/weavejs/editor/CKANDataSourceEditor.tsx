@@ -1,9 +1,13 @@
-	import * as React from "react";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import Checkbox from "../ui/Checkbox";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import {HBox} from "../ui/flexbox/FlexBox";
-	import DataSourceEditor, {IDataSourceEditorProps} from "./DataSourceEditor";
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import Checkbox = weavejs.ui.Checkbox;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import DataSourceEditor = weavejs.editor.DataSourceEditor;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IDataSourceEditorState = weavejs.editor.IDataSourceEditorState;
 	import CKANDataSource = weavejs.data.source.CKANDataSource;
 	import EntityNode = weavejs.data.hierarchy.EntityNode;
 	import EntityType = weavejs.api.data.EntityType;
@@ -13,7 +17,7 @@
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
 
-	export default class CKANDataSourceEditor extends DataSourceEditor
+	export class CKANDataSourceEditor extends DataSourceEditor
 	{
 		private _dataSourceNode:ColumnTreeNode
 		constructor(props:IDataSourceEditorProps)
@@ -29,29 +33,30 @@
 				this.getLabelEditor(ds.label),
 				[
 					Weave.lang("Source URL *"), 
-					<StatefulTextField selectOnFocus={true} style={{width: "100%"}} ref={linkReactStateRef(this, { value: ds.url})}/>
+					<StatefulTextField selectOnFocus={true} style={{width: "100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.url})}/>
 				],
 				[
 					Weave.lang("Items to show in hierarchy"),
 					<HBox className="weave-padded-hbox">
-						<Checkbox ref={linkReactStateRef(this, {value: ds.showPackages})} label={Weave.lang("Packages")}/>
-						<Checkbox ref={linkReactStateRef(this, {value: ds.showGroups})} label={Weave.lang("Groups")}/>
-						<Checkbox ref={linkReactStateRef(this, {value: ds.showTags})} label={Weave.lang("Tags")}/>
+						<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, {value: ds.showPackages})} label={Weave.lang("Packages")}/>
+						<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, {value: ds.showGroups})} label={Weave.lang("Groups")}/>
+						<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, {value: ds.showTags})} label={Weave.lang("Tags")}/>
 					</HBox>
 				],
 				[
 					Weave.lang("API Version"),
-					<StatefulTextField style={{flex: 1}} ref={linkReactStateRef(this, {value: ds.apiVersion})} type="number" min="1" max="3" step="1"/>
+					<StatefulTextField style={{flex: 1}} ref={WeaveReactUtils.linkReactStateRef(this, {value: ds.apiVersion})} type="number" min="1" max="3" step="1"/>
 				],
 				[
 					null,
-					<Checkbox ref={linkReactStateRef(this, { value: ds.useHttpPost})} label={Weave.lang("Use HTTP POST")}/>
+					<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.useHttpPost})} label={Weave.lang("Use HTTP POST")}/>
 				],
 				[
 					null,
-					<Checkbox ref={linkReactStateRef(this, { value: ds.useDataStore})} label={Weave.lang("Use Data Store if available")}/>
+					<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.useDataStore})} label={Weave.lang("Use Data Store if available")}/>
 				]
 			];
 			return super.editorFields.concat(editorFields);
 		}
 	}
+}

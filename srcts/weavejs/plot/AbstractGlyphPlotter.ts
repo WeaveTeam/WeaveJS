@@ -1,4 +1,5 @@
-	import AbstractPlotter from "./AbstractPlotter";
+namespace weavejs.plot
+{
 	import Point = weavejs.geom.Point;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
@@ -20,7 +21,7 @@
 	/**
 	 * A glyph represents a point of data at an X and Y coordinate.
 	 */
-	export default class AbstractGlyphPlotter extends AbstractPlotter implements IObjectWithDescription
+	export class AbstractGlyphPlotter extends AbstractPlotter implements IObjectWithDescription
 	{
 		constructor()
 		{
@@ -188,3 +189,4 @@
 			}
 		}
 	}
+}

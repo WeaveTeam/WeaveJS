@@ -1,5 +1,5 @@
-	import * as React from "react";
-
+namespace weavejs.ui
+{
 	export interface ColorRampComponentProps extends React.HTMLProps<HTMLDivElement>
 	{
 		ramp: string[];
@@ -10,7 +10,7 @@
 	{
 	}
 
-	export default class ColorRampComponent extends React.Component<ColorRampComponentProps, ColorRampComponentState>
+	export class ColorRampComponent extends React.Component<ColorRampComponentProps, ColorRampComponentState>
 	{
 		constructor(props:ColorRampComponentProps)
 		{
@@ -30,3 +30,4 @@
 			return (<div {...this.props} style={style}/>);
 		}
 	}
+}

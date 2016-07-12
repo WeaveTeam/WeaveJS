@@ -1,13 +1,12 @@
-	import * as React from "react";
-	import * as d3 from "d3";
-	import * as _ from "lodash";
-	import {IVisToolProps, IVisToolState} from "../../api/ui/IVisTool";
-	import AbstractVisTool from "../AbstractVisTool";
-	import {XAxis, YAxis} from "./Axis";
-	import ResizingDiv from "../../ui/ResizingDiv";
-	import ReactUtils from "../../util/ReactUtils";
-	import FormatUtils from "../../util/FormatUtils";
-	import MiscUtils from "../../util/MiscUtils";
+namespace weavejs.tool.d3tool
+{
+	import AbstractVisTool = weavejs.tool.AbstractVisTool;
+	import XAxis = weavejs.tool.d3tool.XAxis;
+	import YAxis = weavejs.tool.d3tool.YAxis;
+	import ResizingDiv = weavejs.ui.ResizingDiv;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import FormatUtils = weavejs.util.FormatUtils;
+	import MiscUtils = weavejs.util.MiscUtils;
 
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -17,6 +16,8 @@
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import StandardLib = weavejs.util.StandardLib;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
 
 	export declare type ScatterPlotRecord = {
 		id: IQualifiedKey,
@@ -52,7 +53,7 @@
 		height?:number;
 	}
 
-	export default class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps, BoxWhiskerPlotState>
+	export class BoxWhiskerPlot extends AbstractVisTool<BoxWhiskerPlotProps, BoxWhiskerPlotState>
 	{
 		boxwhiskerX = Weave.linkableChild(this, DynamicColumn);
 		boxwhiskerY = Weave.linkableChild(this, DynamicColumn);
@@ -328,7 +329,8 @@
 
 	Weave.registerClass(
 		BoxWhiskerPlot,
-		"weavejs.tool.BoxWhiskerPlot",
+		"weavejs.tool.d3tool.BoxWhiskerPlot",
 		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
 		"Box and Whisker Plot"
 	);
+}

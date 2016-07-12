@@ -1,11 +1,6 @@
-	import * as ol from "openlayers";
-	import * as jquery from "jquery";
-
-	// loads jquery from the es6 default module.
-	var $:JQueryStatic = (jquery as any)["default"];
-
-
-	export default class PanCluster extends ol.control.Control
+namespace weavejs.tool.oltool
+{
+	export class PanCluster extends ol.control.Control
 	{
 		constructor(optOptions?:any)
 		{
@@ -82,3 +77,4 @@
 			}
 		}
 	}
+}

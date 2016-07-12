@@ -1,15 +1,15 @@
-	import * as React from "react";
-
+namespace weavejs.ui
+{
 	export interface ButtonProps extends React.HTMLProps<HTMLButtonElement>
 	{
 		colorClass?: string;
 	}
 
 	export interface ButtonState
-	{	
+	{
 	}
 
-	export default class Button extends React.Component<ButtonProps, ButtonState>
+	export class Button extends React.Component<ButtonProps, ButtonState>
 	{
 		constructor(props:ButtonProps)
 		{
@@ -31,3 +31,4 @@
 			);
 		}
 	}
+}

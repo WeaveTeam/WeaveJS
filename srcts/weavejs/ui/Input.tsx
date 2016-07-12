@@ -1,6 +1,5 @@
-	import * as React from "react";
-	import classNames from "../../modules/classnames";
-
+namespace weavejs.ui
+{
 	export interface InputProps extends React.HTMLProps<Input>
 	{
 		children?: React.ReactNode;
@@ -9,10 +8,10 @@
 	}
 
 	export interface InputState
-	{	
+	{
 	}
 
-	export default class Input extends React.Component<InputProps, InputState>
+	export class Input extends React.Component<InputProps, InputState>
 	{
 		inputElement:HTMLInputElement;
 
@@ -60,3 +59,4 @@
 			);
 		}
 	}
+}

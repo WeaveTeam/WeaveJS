@@ -1,16 +1,14 @@
-	import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "../api/ui/IVisTool";
-	import * as React from "react";
-	import * as _ from "lodash";
-	import Menu, {MenuItemProps, IGetMenuItems} from "../ui/menu/Menu";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import MiscUtils from "../util/MiscUtils";
-	import Accordion from "../ui/Accordion";
-	import StatefulTextArea from "../ui/StatefulTextArea";
-	import Checkbox from "../ui/Checkbox";
-	import IAltText, {AltTextConfig} from "../api/ui/IAltText";
-
+namespace weavejs.tool
+{
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import IGetMenuItems = weavejs.ui.menu.IGetMenuItems;
+	import Menu = weavejs.ui.menu.Menu;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import MiscUtils = weavejs.util.MiscUtils;
+	import Accordion = weavejs.ui.Accordion;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import KeySet = weavejs.data.key.KeySet;
@@ -26,7 +24,15 @@
 	import IColumnReference = weavejs.api.data.IColumnReference;
 	import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 	import ColumnUtils = weavejs.data.ColumnUtils;
+	import StatefulTextArea = weavejs.ui.StatefulTextArea;
+	import Checkbox = weavejs.ui.Checkbox;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import IAltText = weavejs.api.ui.IAltText;
+	import IAltTextConfig = weavejs.api.ui.IAltTextConfig;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 
 	export class Margin
 	{
@@ -55,7 +61,7 @@
 
 
 
-	export default class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems, IInitSelectableAttributes, IAltText
+	export class AbstractVisTool<P extends IVisToolProps, S extends IVisToolState> extends React.Component<P, S> implements IVisTool, ILinkableObjectWithNewProperties, IGetMenuItems, IInitSelectableAttributes, IAltText
 	{
 		constructor(props:P)
 		{
@@ -70,7 +76,7 @@
 
 		panelTitle = Weave.linkableChild(this, LinkableString);
 		
-		altText:AltTextConfig = Weave.linkableChild(this, AltTextConfig, this.forceUpdate, true);
+		altText:IAltTextConfig = Weave.linkableChild(this, IAltTextConfig, this.forceUpdate, true);
 
 		xAxisName = Weave.linkableChild(this, LinkableString);
 		yAxisName = Weave.linkableChild(this, LinkableString);
@@ -227,7 +233,7 @@
 		renderNumberEditor(linkableNumber:LinkableNumber, flex:number):JSX.Element
 		{
 			var style:React.CSSProperties = {textAlign: "center", flex, minWidth: 60};
-			return <StatefulTextField type="number" style={style} ref={linkReactStateRef(this, {value: linkableNumber})}/>;
+			return <StatefulTextField type="number" style={style} ref={WeaveReactUtils.linkReactStateRef(this, {value: linkableNumber})}/>;
 		}
 
 		getMarginEditor():React.ReactChild[][]
@@ -269,7 +275,7 @@
 				
 				return [
 					Weave.lang(row[0]),
-					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+					<StatefulTextField ref={ WeaveReactUtils.linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
 				]
 			});
 		}
@@ -280,14 +286,14 @@
 				[
 					Weave.lang("Alt Text"),
 					<StatefulTextArea
-						ref={ linkReactStateRef(this, {value: this.altText.text})}
+						ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.altText.text})}
 						placeholder={ this.getAutomaticDescription() }
 					/>
 				],
 				[
 					Weave.lang("Show as caption"),
 					<Checkbox
-						ref={ linkReactStateRef(this, {value: this.altText.showAsCaption})}
+						ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.altText.showAsCaption})}
 						label=" "
 					/>
 				]
@@ -373,3 +379,4 @@
 			}
 		}
 	}
+}

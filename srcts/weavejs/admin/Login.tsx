@@ -1,8 +1,9 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import {VBox} from "../ui/flexbox/FlexBox";
-	import Button from "../ui/Button";
-
+namespace weavejs.admin
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import Button = weavejs.ui.Button;
 	import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
 
 	export interface ILoginProps extends React.Props<Login>
@@ -15,7 +16,7 @@
 
 	}
 
-	export default class Login extends React.Component<ILoginProps, ILoginState> {
+	export class Login extends React.Component<ILoginProps, ILoginState> {
 
 		element:Element;
 		username:HTMLInputElement;
@@ -103,3 +104,4 @@
 			)
 		}
 	}
+}

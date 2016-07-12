@@ -1,19 +1,13 @@
-	import * as jquery from "jquery";
-	import * as ol from "openlayers";
-	import * as _ from "lodash";
-	import AbstractGlyphLayer from "./AbstractGlyphLayer";
-	import AbstractFeatureLayer from "./AbstractFeatureLayer";
-	import ImageGlyphCache from "./ImageGlyphCache";
-
-	// loads jquery from the es6 default module.
-	var $:JQueryStatic = (jquery as any)["default"];
-
+namespace weavejs.tool.oltool.layer
+{
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
+	import ImageGlyphCache = weavejs.tool.oltool.layer.ImageGlyphCache;
+	import AbstractGlyphLayer = weavejs.tool.oltool.layer.AbstractGlyphLayer;
 
-	export default class ImageGlyphLayer extends AbstractGlyphLayer
+	export class ImageGlyphLayer extends AbstractGlyphLayer
 	{
 		private imageGlyphCache:ImageGlyphCache;
 
@@ -173,7 +167,8 @@
 
 	Weave.registerClass(
 		ImageGlyphLayer,
-		["weavejs.layer.ImageGlyphLayer", "weave.visualization.plotters::ImageGlyphPlotter"],
+		["weavejs.tool.oltool.layer.ImageGlyphLayer", "weave.visualization.plotters::ImageGlyphPlotter"],
 		[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 		"Icons"
 	);
+}

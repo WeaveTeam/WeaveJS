@@ -1,6 +1,8 @@
-	import * as React from "react";
-	import {HBox} from "./flexbox/FlexBox";
-	import ReactUtils from "../util/ReactUtils";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ReactUtils = weavejs.util.ReactUtils;
 
 	export interface HelpIconProps extends React.HTMLProps<HelpIcon>
 	{
@@ -11,7 +13,7 @@
 		
 	}
 
-	export default class HelpIcon extends React.Component<HelpIconProps, HelpIconState>
+	export class HelpIcon extends React.Component<HelpIconProps, HelpIconState>
 	{
 		constructor(props:HelpIconProps)
 		{
@@ -63,3 +65,4 @@
 			)
 		}
 	}
+}

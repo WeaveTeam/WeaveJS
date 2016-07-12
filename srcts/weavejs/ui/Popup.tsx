@@ -1,8 +1,9 @@
-	import * as React from "react";
-	import ReactUtils from "../util/ReactUtils";
-	import {KEYCODES} from "../util/KeyboardUtils";
+namespace weavejs.ui
+{
+	import ReactUtils = weavejs.util.ReactUtils;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
 
-	export default class Popup extends React.Component<React.HTMLProps<Popup>, React.HTMLAttributes>
+	export class Popup extends React.Component<React.HTMLProps<Popup>, React.HTMLAttributes>
 	{
 		static popupSet = new Set<Popup>();
 
@@ -30,7 +31,7 @@
 		onKeyDown(event:KeyboardEvent)
 		{
 			var code = event.keyCode;
-			if (code == KEYCODES.ESC)
+			if (code == KeyboardUtils.KEYCODES.ESC)
 			{
 				var activePopup = Array.from(Popup.popupSet.keys()).pop();
 				if (this == activePopup)
@@ -90,3 +91,4 @@
 			);
 		}
 	}
+}

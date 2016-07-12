@@ -1,12 +1,16 @@
-	import * as React from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import Checkbox from "../ui/Checkbox";
-	import ComboBox, {ComboBoxOption} from "../ui/ComboBox";
-	import Button from "../ui/Button";
-	import Accordion from "../ui/Accordion";
-	import SmartComponent from "../ui/SmartComponent";
-	import Input from "../ui/Input";
-	import HelpIcon from "../ui/HelpIcon";
+namespace weavejs.admin
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Checkbox = weavejs.ui.Checkbox;
+	import ComboBoxOption = weavejs.ui.ComboBoxOption;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Button = weavejs.ui.Button;
+	import Accordion = weavejs.ui.Accordion;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import Input = weavejs.ui.Input;
+	import List = weavejs.ui.List;
+	import HelpIcon = weavejs.ui.HelpIcon;
 
 	import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 	import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
@@ -72,7 +76,7 @@
 		{ label: Weave.lang("Custom"), value: CUSTOM}
 	];
 
-	export default class ConnectionEditor extends SmartComponent<IConnectionEditorProps, IConnectionEditorState> {
+	export class ConnectionEditor extends SmartComponent<IConnectionEditorProps, IConnectionEditorState> {
 		constructor(props:IConnectionEditorProps)
 		{
 			super(props);
@@ -330,3 +334,4 @@
 			return result;
 		}
 	}
+}

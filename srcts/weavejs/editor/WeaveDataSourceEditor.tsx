@@ -1,18 +1,22 @@
-	import * as React from "react";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import {HBox} from "../ui/flexbox/FlexBox";
-	import Button from "../ui/Button";
-	import SqlImport from "../admin/SqlImport";
-	import ConnectionManager from "../admin/ConnectionManager";
-	import DataSourceEditor, {IDataSourceEditorProps} from "./DataSourceEditor";
-	import PopupWindow from "../dialog/PopupWindow";
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Button = weavejs.ui.Button;
+	import SqlImport = weavejs.admin.SqlImport;
+	import ConnectionManager = weavejs.admin.ConnectionManager;
+	import DataSourceEditor = weavejs.editor.DataSourceEditor;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IDataSourceEditorState = weavejs.editor.IDataSourceEditorState;
 
 	import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 	import EntityNode = weavejs.data.hierarchy.EntityNode;
 	import EntityType = weavejs.api.data.EntityType;
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
-	import MenuButton from "../ui/menu/MenuButton";
+	import MenuButton = weavejs.ui.menu.MenuButton;
+	import PopupWindow = weavejs.dialog.PopupWindow;
 
 
 	const SQL:string = "SQL";
@@ -20,8 +24,8 @@
 
 	const dataImportTypes:string[] = [SQL];
 
-	export default class WeaveDataSourceEditor extends DataSourceEditor
-	{	
+	export class WeaveDataSourceEditor extends DataSourceEditor
+	{
 		componentWillReceiveProps(props:IDataSourceEditorProps)
 		{
 			super.componentWillReceiveProps(props);
@@ -119,13 +123,13 @@
 				[
 					Weave.lang("Service URL"), 
 					<StatefulTextField style={{width: "100%"}} 
-									   ref={linkReactStateRef(this, { value: ds.url }, 500) } 
+									   ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.url }, 500) }
 									   placeholder={weavejs.net.WeaveDataServlet.DEFAULT_URL}/>
 				],
 				[
 					Weave.lang("Root hierarchy ID"),
 					<StatefulTextField style={{width: "100%"}}
-									   ref={linkReactStateRef(this, { value: ds.rootId }, 500) } 
+									   ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.rootId }, 500) }
 									   placeholder={Weave.lang("Hierarchy ID") }/>
 				],
 				[
@@ -164,4 +168,5 @@
 		}
 	}
 
-	Weave.registerClass(WeaveDataSourceEditor, "weavejs.editors.WeaveDataSourceEditor", []);
+	Weave.registerClass(WeaveDataSourceEditor, "weavejs.editor.WeaveDataSourceEditor", []);
+}

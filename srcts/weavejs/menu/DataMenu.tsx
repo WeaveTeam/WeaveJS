@@ -1,14 +1,46 @@
-	import * as React from "react";
-	import * as FileSaver from "filesaver.js";
-	import {MenuBarItemProps} from "../ui/menu/MenuBar";
-	import {MenuItemProps} from "../ui/menu/Menu";
-	import DataSourceManager from "../editor/manager/DataSourceManager";
-	import WeaveMenus from "./WeaveMenus";
+namespace weavejs.menu
+{
+	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import DataSourceManager = weavejs.editor.manager.DataSourceManager;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import IDataSource_File = weavejs.api.data.IDataSource_File;
 	import IDataSource_Service = weavejs.api.data.IDataSource_Service;
+	import WeaveMenus = weavejs.menu.WeaveMenus;
 
-	export default class DataMenu implements MenuBarItemProps
+	/* Import editors and their data sources */
+	import WeaveDataSource = weavejs.data.source.WeaveDataSource;
+	import WeaveDataSourceEditor = weavejs.editor.WeaveDataSourceEditor;
+
+	import CSVDataSource = weavejs.data.source.CSVDataSource;
+	import CSVDataSourceEditor = weavejs.editor.CSVDataSourceEditor;
+
+	import DBFDataSource = weavejs.data.source.DBFDataSource;
+	import DBFDataSourceEditor = weavejs.editor.DBFDataSourceEditor;
+
+	import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
+	import GeoJSONDataSourceEditor = weavejs.editor.GeoJSONDataSourceEditor;
+
+	import CensusDataSource = weavejs.data.source.CensusDataSource;
+	import CensusDataSourceEditor = weavejs.editor.CensusDataSourceEditor;
+
+	import CKANDataSource = weavejs.data.source.CKANDataSource;
+	import CKANDataSourceEditor = weavejs.editor.CKANDataSourceEditor;
+
+	import CachedDataSource = weavejs.data.source.CachedDataSource;
+	import CachedDataSourceEditor = weavejs.editor.CachedDataSourceEditor;
+
+	import SpatialJoinTransform = weavejs.data.source.SpatialJoinTransform;
+	import SpatialJoinTransformEditor = weavejs.editor.SpatialJoinTransformEditor;
+
+	import ForeignDataMappingTransform = weavejs.data.source.ForeignDataMappingTransform;
+	import ForeignDataMappingTransformEditor = weavejs.editor.ForeignDataMappingTransformEditor;
+
+	import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
+	import GroupedDataTransformEditor = weavejs.editor.GroupedDataTransformEditor;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+
+	export class DataMenu implements MenuBarItemProps
 	{
 		constructor(owner:WeaveMenus)
 		{
@@ -47,13 +79,25 @@
 			];
 		}
 
+		static editorRegistry = new Map<typeof IDataSource, React.ComponentClass<IDataSourceEditorProps>>()
+			.set(CSVDataSource, CSVDataSourceEditor)
+			.set(DBFDataSource, DBFDataSourceEditor)
+			.set(GeoJSONDataSource, GeoJSONDataSourceEditor)
+			.set(CensusDataSource, CensusDataSourceEditor)
+			.set(CKANDataSource, CKANDataSourceEditor)
+			.set(WeaveDataSource, WeaveDataSourceEditor)
+			.set(CachedDataSource, CachedDataSourceEditor)
+			.set(SpatialJoinTransform, SpatialJoinTransformEditor)
+			.set(ForeignDataMappingTransform, ForeignDataMappingTransformEditor)
+			.set(GroupedDataTransform, GroupedDataTransformEditor);
+
 		static getDataSourceItems(weave:Weave, onCreateItem?:(dataSource:IDataSource)=>void)
 		{
 			var registry = weavejs.WeaveAPI.ClassRegistry;
 			var impls = registry.getImplementations(IDataSource);
 			
 			// filter out those data sources without editors
-			impls = impls.filter(impl => DataSourceManager.editorRegistry.has(impl));
+			impls = impls.filter(impl => DataMenu.editorRegistry.has(impl));
 		
 			var items:MenuItemProps[] = [];
 			for (var partition of weavejs.core.ClassRegistryImpl.partitionClassList(impls, IDataSource_File, IDataSource_Service))
@@ -112,3 +156,4 @@
 			FileSaver.saveAs(new Blob([csv]), "Weave-data-export.csv");
 		}
 	}
+}

@@ -1,24 +1,25 @@
-	import {IVisTool, IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
-	import * as React from "react";
-	import * as jquery from "jquery";
-	import MiscUtils from "../util/MiscUtils";
-	import {VBox} from "../ui/flexbox/FlexBox";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import StatefulTextArea from "../ui/StatefulTextArea";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import ReactUtils from "../util/ReactUtils";
-
-	// loads jquery from the es6 default module.
-	var $:JQueryStatic = (jquery as any)["default"];
-
+namespace weavejs.tool
+{
+	import MouseEvent = React.MouseEvent;
+	import CSSProperties = React.CSSProperties;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import StatefulTextArea = weavejs.ui.StatefulTextArea;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import ReactUtils = weavejs.util.ReactUtils;
 	import StandardLib = weavejs.util.StandardLib;
 	import LinkableString = weavejs.core.LinkableString
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisTool = weavejs.api.ui.IVisTool;
 
-	export default class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
+	export class TextTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
 	{
 		htmlText = Weave.linkableChild(this, new LinkableString(""));
 		padding = Weave.linkableChild(this, new LinkableNumber(4));
@@ -71,7 +72,7 @@
 
 				return [
 					Weave.lang(row[0]),
-					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+					<StatefulTextField ref={ WeaveReactUtils.linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
 				]
 			});
 		}
@@ -87,7 +88,7 @@
 							[
 								[
 									Weave.lang("Text"),
-									<StatefulTextArea ref={ linkReactStateRef(this, {value: this.htmlText}) }/>
+									<StatefulTextArea ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.htmlText}) }/>
 								],
 								[
 									'',
@@ -145,3 +146,4 @@
 		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties],
 		"Text"
 	);
+}

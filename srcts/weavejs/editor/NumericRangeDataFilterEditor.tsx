@@ -1,9 +1,9 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import AbstractFilterEditor, {FilterEditorProps} from "./AbstractFilterEditor";
-	import HSlider from "../ui/slider/HSlider";
-	import {HBox} from "../ui/flexbox/FlexBox";
-
+namespace weavejs.editor
+{
+	import HSlider = weavejs.ui.slider.HSlider;
+	import VSlider = weavejs.ui.slider.VSlider;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableString = weavejs.core.LinkableString;
 	import ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
@@ -13,7 +13,7 @@
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 
-	export default class NumericRangeDataFilterEditor extends AbstractFilterEditor
+	export class NumericRangeDataFilterEditor extends AbstractFilterEditor
 	{
 		static get OPTIONS():string[]{
 			return ["Force Discrete Values"];
@@ -70,4 +70,5 @@
 		}
 	}
 
-	Weave.registerClass(NumericRangeDataFilterEditor, "weavejs.tool.NumericRangeDataFilterEditor", [weavejs.api.core.ILinkableObjectWithNewProperties]);
+	Weave.registerClass(NumericRangeDataFilterEditor, "weavejs.editor.NumericRangeDataFilterEditor", [weavejs.api.core.ILinkableObjectWithNewProperties]);
+}

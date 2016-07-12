@@ -1,11 +1,14 @@
-	import * as React from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import Tabs from "../ui/Tabs";
-	import Checkbox from "../ui/Checkbox";
-	import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-	import BinningDefinitionEditor from "./BinningDefinitionEditor";
-	import ColorRampEditor from "./ColorRampEditor";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Tabs = weavejs.ui.Tabs;
+	import Checkbox = weavejs.ui.Checkbox;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
+	import BinningDefinitionEditor = weavejs.editor.BinningDefinitionEditor;
+	import ColorRampEditor = weavejs.editor.ColorRampEditor;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import PopupWindow = weavejs.dialog.PopupWindow;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ColorColumn = weavejs.data.column.ColorColumn;
 	import BinnedColumn = weavejs.data.column.BinnedColumn;
@@ -21,7 +24,7 @@
 		
 	}
 
-	export default class ColorController extends React.Component<ColorControllerProps, ColorControllerState>
+	export class ColorController extends React.Component<ColorControllerProps, ColorControllerState>
 	{
 		
 		tabLabels = ["Color theme", "Binning"]; // , "Color Specific Records"]
@@ -53,7 +56,7 @@
 						labels={this.tabLabels}
 						tabs={[
 							<VBox key={this.tabLabels[1]} style={ {flex: 1, padding: 8} } className="weave-padded-vbox">
-								<Checkbox ref={linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})} label={Weave.lang("Center color ramp at zero (when binning is disabled)")}/>
+								<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, {value: this.props.colorColumn.rampCenterAtZero})} label={Weave.lang("Center color ramp at zero (when binning is disabled)")}/>
 								<ColorRampEditor colorRamp={this.props.colorColumn.ramp}/>
 							</VBox>,
 							<VBox overflow className="weave-padded-vbox" key={this.tabLabels[0]} style={{flex: 1, padding: 8}}>
@@ -70,3 +73,4 @@
 			);
 		}
 	}
+}

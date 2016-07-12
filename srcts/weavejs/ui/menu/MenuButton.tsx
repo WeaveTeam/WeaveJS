@@ -1,9 +1,6 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import Menu, {MenuItemProps} from "./Menu";
-	import Dropdown from "../Dropdown";
-	import classNames from "../../../modules/classnames";
+namespace weavejs.ui.menu
+{
+	import Dropdown = weavejs.ui.Dropdown;
 
 	export interface MenuButtonProps extends React.HTMLProps<MenuButton>
 	{
@@ -17,7 +14,7 @@
 		
 	}
 
-	export default class MenuButton extends React.Component<MenuButtonProps, MenuButtonState>
+	export class MenuButton extends React.Component<MenuButtonProps, MenuButtonState>
 	{
 		element:HTMLElement;
 		menu:Menu;
@@ -62,3 +59,4 @@
 			);
 		}
 	}
+}

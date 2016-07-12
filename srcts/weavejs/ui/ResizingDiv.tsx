@@ -1,7 +1,6 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import ReactUtils from "../util/ReactUtils";
+namespace weavejs.ui
+{
+	import ReactUtils = weavejs.util.ReactUtils;
 
 	export interface ResizingDivProps extends React.HTMLProps<ResizingDiv>
 	{
@@ -18,7 +17,7 @@
 	/**
 	 * Provides a way to make elements using percentage coordinates resize properly within a div that uses flex layout.
 	 */
-	export default class ResizingDiv extends React.Component<ResizingDivProps, ResizingDivState>
+	export class ResizingDiv extends React.Component<ResizingDivProps, ResizingDivState>
 	{
 		state:ResizingDivState = {};
 		outerDiv:HTMLDivElement;
@@ -65,3 +64,4 @@
 			);
 		}
 	}
+}

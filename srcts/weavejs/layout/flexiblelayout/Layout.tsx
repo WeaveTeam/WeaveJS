@@ -1,11 +1,8 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import prefixer from "../../css/prefixer";
-	import ReactUtils from "../../util/ReactUtils";
-	import MouseUtils from "../../util/MouseUtils";
-	import Resizer from "./Resizer";
-	import ResizerOverlay from "./ResizerOverlay";
+namespace weavejs.layout.flexiblelayout
+{
+	import prefixer = weavejs.css.prefixer;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import MouseUtils = weavejs.util.MouseUtils;
 
 	export const VERTICAL:"vertical" = "vertical";
 	export const HORIZONTAL:"horizontal" = "horizontal";
@@ -27,7 +24,7 @@
 		spacing?: number;
 	}
 
-	export default class Layout extends React.Component<LayoutProps, LayoutState>
+	export class Layout extends React.Component<LayoutProps, LayoutState>
 	{
 		public children:Layout[];
 		private resizers:Resizer[];
@@ -277,3 +274,5 @@
 			);
 		}
 	}
+}
+

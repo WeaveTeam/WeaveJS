@@ -1,12 +1,18 @@
-	import * as React from "react";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import FileSelector from "../ui/FileSelector";
-	import KeyTypeInput from "../ui/KeyTypeInput";
-	import DataSourceEditor from "./DataSourceEditor";
-	import ComboBox from "../ui/ComboBox";
-	import HelpIcon from "../ui/HelpIcon";
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import ReactUtils = weavejs.util.ReactUtils;
+	import WeaveTree = weavejs.ui.WeaveTree;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import FileSelector = weavejs.ui.FileSelector;
+	import KeyTypeInput = weavejs.ui.KeyTypeInput;
+	import DataSourceEditor = weavejs.editor.DataSourceEditor;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IDataSourceEditorState = weavejs.editor.IDataSourceEditorState;
+	import ComboBox = weavejs.ui.ComboBox;
+	import HelpIcon = weavejs.ui.HelpIcon;
 
 	import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
 	import GeoJSON = weavejs.geom.GeoJSON;
@@ -17,7 +23,7 @@
 	import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 	import WeaveAPI = weavejs.WeaveAPI;
 
-	export default class GeoJSONDataSourceEditor extends DataSourceEditor
+	export class GeoJSONDataSourceEditor extends DataSourceEditor
 	{
 		get editorFields():[React.ReactChild, React.ReactChild][]
 		{
@@ -58,7 +64,7 @@
 					<StatefulTextField style={{width: "100%"}}
 									   selectOnFocus={true} 
 									   placeholder={Weave.lang("Example: EPSG:4326")} 
-								   	   ref={linkReactStateRef(this, { value: dataSource.projection })}/>
+								   	   ref={WeaveReactUtils.linkReactStateRef(this, { value: dataSource.projection })}/>
 				],
 				[
 					<HBox className="weave-padded-hbox" style={{alignItems: "center", justifyContent: "flex-end"}}>
@@ -66,7 +72,7 @@
 						<HelpIcon>{Weave.lang("A property that can uniquely identify each row in the data. If there are no such properties, choose \"Auto-generated keys\"")}</HelpIcon>
 					</HBox>,
 					<ComboBox style={{width: "100%"}}
-							  ref={linkReactStateRef(this, { value: dataSource.keyProperty }) } /* searchable field */
+							  ref={WeaveReactUtils.linkReactStateRef(this, { value: dataSource.keyProperty }) } /* searchable field */
 							  options={propertyIds}
 					/>
 				],
@@ -82,3 +88,4 @@
 			return super.editorFields.concat(editorFields)
 		}
 	}
+}

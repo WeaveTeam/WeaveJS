@@ -1,9 +1,8 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import {HBox} from "./flexbox/FlexBox";
-	import DOMUtils from "../util/DOMUtils";
-	import {ObjectDataTable} from "./DataTable";
-	import * as _ from "lodash";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import DOMUtils = weavejs.util.DOMUtils;
 
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 
@@ -30,7 +29,7 @@
 		onDoubleClick?: (item: IWeaveTreeNode) => void;
 	};
 
-	export default class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTreeState>
+	export class WeaveTree extends React.Component<IWeaveTreeProps, IWeaveTreeState>
 	{
 		constructor(props: IWeaveTreeProps)
 		{
@@ -107,7 +106,7 @@
 				{
 					this.setState({columnWidth: newColumnWidth});
 				}
-			}		
+			}
 		}
 
 		private internalSetOpen(node: IWeaveTreeNode, value: boolean)
@@ -231,7 +230,7 @@
 			var body = document.getElementsByTagName("body")[0];
 			let div = document.createElement("span");
 			body.appendChild(div);
-			let renderedRow = ReactDOM.render(rowJSX as React.ReactElement<any>, div);
+			let renderedRow = ReactDOM.render(rowJSX as any, div); // TODO fix type of rowJSX
 			let node = ReactDOM.findDOMNode(renderedRow) as HTMLDivElement;
 			node.style.display = "inline-block";
 			node.style.width = null;
@@ -294,3 +293,4 @@
 			/>;
 		}
 	}
+}

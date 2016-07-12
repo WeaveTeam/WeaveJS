@@ -1,7 +1,7 @@
-	import * as React from "react";
-	import WeaveApp from "../app/WeaveApp";
-	import GetStartedComponent from "./GetStartedComponent";
-	import MiscUtils from "../util/MiscUtils";
+namespace weavejs.dialog
+{
+	import WeaveApp = weavejs.app.WeaveApp;
+	import MiscUtils = weavejs.util.MiscUtils;
 
 	const WEAVE_EXTERNAL_TOOLS = "WeaveExternalTools";
 
@@ -19,7 +19,7 @@
 		view:LandingPageView;
 	}
 
-	export default class LandingPage extends React.Component<LandingPageProps, LandingPageState>
+	export class LandingPage extends React.Component<LandingPageProps, LandingPageState>
 	{
 		urlParams:any;  
 
@@ -81,3 +81,4 @@
 			)
 		}
 	}
+}

@@ -1,6 +1,5 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-
+namespace weavejs.ui
+{
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 
 	export interface DynamicComponentProps extends React.Props<DynamicComponent>
@@ -13,7 +12,7 @@
 	{
 	}
 
-	export default class DynamicComponent extends React.Component<DynamicComponentProps, DynamicComponentState>
+	export class DynamicComponent extends React.Component<DynamicComponentProps, DynamicComponentState>
 	{
 		constructor(props:DynamicComponentProps)
 		{
@@ -57,3 +56,4 @@
 	}
 
 	weavejs.WeaveAPI.ClassRegistry.registerClass(DynamicComponent, 'weavejs.ui.DynamicComponent');
+}

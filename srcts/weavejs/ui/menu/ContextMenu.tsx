@@ -1,9 +1,10 @@
-	import * as React from "react";
-	import Menu from "./Menu";
-	import ReactUtils from "../../util/ReactUtils";
-	import Popup from "../Popup";
+namespace weavejs.ui.menu
+{
+	import Menu = weavejs.ui.menu.Menu;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import Popup = weavejs.ui.Popup;
 
-	export default class ContextMenu extends Menu
+	export class ContextMenu extends Menu
 	{
 		static open(event:React.MouseEvent)
 		{
@@ -38,3 +39,4 @@
 			return <Menu ref={ReactUtils.registerComponentRef} {...this.props} onClick={this.handleClick} />
 		}
 	}
+}

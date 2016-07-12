@@ -72,3 +72,4 @@ declare module "react-color" {
 	type ColorPicker = React.ClassicComponent<ColorPickerProps, {}>;
 	var ColorPicker: React.ClassicComponentClass<ColorPickerProps>;
 }
+declare var ReactColorPicker:any;

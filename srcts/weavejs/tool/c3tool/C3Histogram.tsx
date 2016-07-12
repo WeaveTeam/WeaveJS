@@ -1,22 +1,28 @@
-	import {IVisToolProps} from "../../api/ui/IVisTool";
-	import AbstractC3Tool from "./AbstractC3Tool";
-	import ColorPicker from "../../ui/ColorPicker";
-	import * as _ from "lodash";
-	import * as d3 from "d3";
-	import * as React from "react";
-	import * as c3 from "c3";
-	import FormatUtils from "../../util/FormatUtils";
-	import Checkbox from "../../ui/Checkbox";
-	import ComboBox from "../../ui/ComboBox";
-	import Accordion from "../../ui/Accordion";
-	import {linkReactStateRef} from "../../util/WeaveReactUtils";
-	import ColorRampEditor from "../../editor/ColorRampEditor";
-	import BinningDefinitionEditor from "../../editor/BinningDefinitionEditor";
-	import DynamicComponent from "../../ui/DynamicComponent";
-	import SelectableAttributeComponent from "../../ui/SelectableAttributeComponent";
-	import ChartUtils from "../../util/ChartUtils";
-	import StatefulTextField from "../../ui/StatefulTextField";
-	import IAltText from "../../api/ui/IAltText";
+namespace weavejs.tool.c3tool
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ColorPicker = weavejs.ui.ColorPicker;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import ChartAPI = c3.ChartAPI;
+	import ChartConfiguration = c3.ChartConfiguration;
+	import FormatUtils = weavejs.util.FormatUtils;
+	import DOMUtils = weavejs.util.DOMUtils;
+	import MouseEvent = React.MouseEvent;
+	import ToolTip = weavejs.ui.ToolTip;
+	import Checkbox = weavejs.ui.Checkbox;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Accordion = weavejs.ui.Accordion;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import ColorController = weavejs.editor.ColorController;
+	import ColorRampEditor = weavejs.editor.ColorRampEditor;
+	import BinningDefinitionEditor = weavejs.editor.BinningDefinitionEditor;
+	import Button = weavejs.ui.Button;
+	import DynamicComponent = weavejs.ui.DynamicComponent;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
+	import ChartUtils = weavejs.util.ChartUtils;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import IAltText = weavejs.api.ui.IAltText
 
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -35,6 +41,8 @@
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
 
 	declare type Record = {
 		id: weavejs.api.data.IQualifiedKey,
@@ -47,7 +55,7 @@
 	const MEAN = "mean"; 
 	declare type AggregationMethod = "count"|"sum"|"mean";
 
-	export default class C3Histogram extends AbstractC3Tool
+	export class C3Histogram extends AbstractC3Tool
 	{
 		binnedColumn = Weave.linkableChild(this, BinnedColumn, this.setColorColumn, true);
 		columnToAggregate = Weave.linkableChild(this, DynamicColumn);
@@ -600,10 +608,10 @@
 						],
 						[
 							Weave.lang("Aggregation method"),
-							<DynamicComponent 
-								dependencies={[this.columnToAggregate]} 
-								render={() => 
-									<ComboBox options={[COUNT, SUM, MEAN]} type={this.columnToAggregate.getInternalColumn() ? null:"disabled"} ref={linkReactStateRef(this, {value : this.aggregationMethod })}/>
+							<DynamicComponent
+								dependencies={[this.columnToAggregate]}
+								render={() =>
+									<ComboBox options={[COUNT, SUM, MEAN]} type={this.columnToAggregate.getInternalColumn() ? null:"disabled"} ref={WeaveReactUtils.linkReactStateRef(this, {value : this.aggregationMethod })}/>
 								}
 							/>
 						],
@@ -614,19 +622,19 @@
 					[
 						Weave.beta && [
 							Weave.lang("Horizontal bars (beta)"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.horizontalMode })} label={" "}/>
 						],
 						[
 							Weave.lang("Show value labels"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
 						],
 						[
 							Weave.lang("X axis label angle"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
 						],
 						[
 							Weave.lang("Bar width ratio"),
-							<StatefulTextField type="number" style={{flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.barWidthRatio})}/>
+							<StatefulTextField type="number" style={{flex:1, minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.barWidthRatio})}/>
 						],
 						!linkedColor && [
 							Weave.lang("Color"),
@@ -673,12 +681,13 @@
 
 	Weave.registerClass(
 		C3Histogram,
-		["weavejs.tool.C3Histogram", "weave.visualization.tools::HistogramTool"],
+		["weavejs.tool.c3tool.C3Histogram", "weave.visualization.tools::HistogramTool"],
 		[
-			weavejs.api.ui.IVisTool_Basic,
+			weavejs.api.ui.IVisTool,
 			weavejs.api.core.ILinkableObjectWithNewProperties,
 			weavejs.api.data.ISelectableAttributes,
 			IAltText
 		],
 		"Histogram"
 	);
+}

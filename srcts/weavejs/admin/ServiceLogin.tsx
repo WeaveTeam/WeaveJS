@@ -1,10 +1,13 @@
-	import * as React from "react";
-	import PopupWindow from "../dialog/PopupWindow";
-	import Login from "./Login";
+namespace weavejs.admin
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import Button = weavejs.ui.Button;
 
 	import WeaveAdminService = weavejs.net.WeaveAdminService;
 
-	export default class ServiceLogin
+	export class ServiceLogin
 	{
 		service: WeaveAdminService;
 		context: React.ReactInstance;
@@ -72,4 +75,4 @@
 			);
 		}
 	}
-
+}

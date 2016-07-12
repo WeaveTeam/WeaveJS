@@ -12,7 +12,7 @@
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
     },
     "react/react.d.ts": {
-      "commit": "741430a178043bfca40e3a343b8b6f7610104093"
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
     },
     "lodash/lodash.d.ts": {
       "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
@@ -27,7 +27,7 @@
       "commit": "68548c2daab053869f323d475419c693478bbb73"
     },
     "react/react-dom.d.ts": {
-      "commit": "4c41545030eba44b27ce7209112dbf862f6b1d78"
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
     },
     "swfobject/swfobject.d.ts": {
       "commit": "dc9dabe74a5be62613b17a3605309783a12ff28a"
@@ -58,6 +58,33 @@
     },
     "react-notification-system/react-notification-system.d.ts": {
       "commit": "6dff9058d3968f2f7eea6b336fd930a1c39da575"
+    },
+    "react/react-global.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
+    },
+    "react/react-addons-create-fragment.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
+    },
+    "react/react-addons-css-transition-group.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
+    },
+    "react/react-addons-transition-group.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
+    },
+    "react/react-addons-linked-state-mixin.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
+    },
+    "react/react-addons-pure-render-mixin.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
+    },
+    "react/react-addons-perf.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
+    },
+    "react/react-addons-test-utils.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
+    },
+    "react/react-addons-update.d.ts": {
+      "commit": "3f97b234196b36a4cc9218e75c6d7e7e01dc8ac1"
     }
   }
 }

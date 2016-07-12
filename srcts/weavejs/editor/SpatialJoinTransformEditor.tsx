@@ -1,10 +1,15 @@
-	import * as React from "react";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import {HBox} from "../ui/flexbox/FlexBox";
-	import HelpIcon from "../ui/HelpIcon";
-	import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
-	import DataSourceEditor from "./DataSourceEditor";
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import HelpIcon = weavejs.ui.HelpIcon;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
+	import DataSourceEditor = weavejs.editor.DataSourceEditor;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IDataSourceEditorState = weavejs.editor.IDataSourceEditorState;
+	import KeyTypeInput = weavejs.ui.KeyTypeInput;
 
 	import SpatialJoinTransform = weavejs.data.source.SpatialJoinTransform;
 	import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
@@ -12,7 +17,8 @@
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
-	export default class SpatialJoinTransformEditor extends DataSourceEditor {
+	export class SpatialJoinTransformEditor extends DataSourceEditor
+	{
 		get editorFields(): [React.ReactChild, React.ReactChild][] {
 			let ds = (this.props.dataSource as SpatialJoinTransform);
 
@@ -55,9 +61,10 @@
 					<StatefulTextField style={{ width: "100%" }}
 						selectOnFocus={true}
 						placeholder={Weave.lang("Example: EPSG:4326") }
-						ref={linkReactStateRef(this, { value: ds.pointProjection }) }/>
+						ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.pointProjection }) }/>
 				]
 			];
 			return super.editorFields.concat(editorFields)
 		}
 	}
+}

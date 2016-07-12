@@ -1,20 +1,20 @@
+namespace weavejs.layout
+{
 	import StandardLib = weavejs.util.StandardLib;
 	import LinkableVariable = weavejs.core.LinkableVariable;
-
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import Layout, {HORIZONTAL, VERTICAL, LayoutState} from "./flexiblelayout/Layout";
-	import Div from "../ui/Div";
-	import WeaveComponentRenderer from "../ui/WeaveComponentRenderer";
-	import {AbstractLayout, LayoutProps, AnyAbstractLayout, PanelDragEvent} from "./AbstractLayout";
-	import PanelOverlay from "../ui/PanelOverlay";
-	import MiscUtils from "../util/MiscUtils";
-	import MouseUtils from "../util/MouseUtils";
-	import ReactUtils from "../util/ReactUtils";
-	import DOMUtils from "../util/DOMUtils";
-	import {WeavePathArray} from "../util/WeaveReactUtils";
-
+	import Div = weavejs.ui.Div;
+	import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
+	import PanelOverlay = weavejs.ui.PanelOverlay;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import Structure = weavejs.util.Structure;
+	import MouseUtils = weavejs.util.MouseUtils;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import DOMUtils = weavejs.util.DOMUtils;
+	import WeavePathArray = weavejs.util.WeavePathArray;
+	import Layout = weavejs.layout.flexiblelayout.Layout;
+	import LayoutState = weavejs.layout.flexiblelayout.LayoutState;
+	import VERTICAL = weavejs.layout.flexiblelayout.VERTICAL;
+	import HORIZONTAL = weavejs.layout.flexiblelayout.HORIZONTAL;
 	export enum DropZone {
 		NONE,
 		LEFT,
@@ -38,7 +38,7 @@
 
 	export type FlexibleLayoutState = {title?: string} & LayoutState;
 
-	export default class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
+	export class FlexibleLayout extends AbstractLayout<LayoutProps, {}> implements weavejs.api.core.ILinkableVariable
 	{
 		private linkableState = Weave.linkableChild(this, new LinkableVariable(null, null, this.simplifyState({flex: 1, title: ""})), this.forceUpdate, true);
 		private nextState:Object;
@@ -670,3 +670,4 @@
 		[weavejs.api.core.ILinkableVariable],
 		'Flexible Layout'
 	);
+}

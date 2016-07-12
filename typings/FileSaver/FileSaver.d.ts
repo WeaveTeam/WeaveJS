@@ -29,6 +29,10 @@ interface FileSaver {
 	 disableAutoBOM?: boolean
     ): void
 }
+declare module FileSaver
+{
+	export var saveAs:FileSaver;
+}
 
 declare module "filesaver.js"
 {

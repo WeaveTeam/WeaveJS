@@ -1,8 +1,6 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import reactUpdate from "react-addons-update";
-	import ReactUtils, {ReactComponent} from "./ReactUtils";
-
+namespace weavejs.util
+{
+	import ReactComponent = weavejs.util.ReactComponent;
 	import LinkableVariable = weavejs.core.LinkableVariable;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
@@ -28,41 +26,42 @@
 	export declare type WeavePathArray = string[];
 
 	const UNLINK = "unlinkReactState";
+	const map_ref_mapping = new WeakMap<ReactComponent, LinkReactStateMapping>();
 
-		export function unlinkReactState(component:ReactComponent):void
+	export class WeaveReactUtils
+	{
+		static unlinkReactState(component:ReactComponent):void
 		{
 			if (component && component.componentWillUpdate && (component.componentWillUpdate as any)[UNLINK])
 				(component.componentWillUpdate as any)[UNLINK]();
 		}
 
-		const map_ref_mapping = new WeakMap<ReactComponent, LinkReactStateMapping>();
-
-		export function linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(component:ReactComponent)=>void
+		static linkReactStateRef(context:ILinkableObject, mapping:LinkReactStateMapping, delay:number = 0):(component:ReactComponent)=>void
 		{
 			if (weavejs.WeaveAPI.debugAsyncStack)
-				var stackTrace = new Error("Stack trace for linkReactStateRef()");
+				var stackTrace = new Error("Stack trace for WeaveReactUtils.linkReactStateRef()");
 			
 			var prevComponent:ReactComponent;
 			return function(component:ReactComponent):void {
 				if (component)
 				{
-					linkReactState(context, component, mapping, delay);
+					WeaveReactUtils.linkReactState(context, component, mapping, delay);
 					map_ref_mapping.set(component, mapping);
 				}
 				else if (prevComponent)
 				{
-					unlinkReactState(prevComponent);
+					WeaveReactUtils.unlinkReactState(prevComponent);
 				}
 				prevComponent = component;
 			};
 		}
 
-		export function linkReactState(context:ILinkableObject, component:ReactComponent, mapping:LinkReactStateMapping, delay:number = 0)
+		static linkReactState(context:ILinkableObject, component:ReactComponent, mapping:LinkReactStateMapping, delay:number = 0)
 		{
 			if (!component)
 				throw new Error("linkReactState(): component cannot be null");
 			
-			unlinkReactState(component);
+			WeaveReactUtils.unlinkReactState(component);
 			
 			let localContext = Weave.disposableChild(context, {});
 			let reactState = component.state != null ? component.state : {};
@@ -83,7 +82,7 @@
 					return;
 				}
 				authority = null;
-				var updatedReactState = reactUpdate(reactState, reactUpdateSpec);
+				var updatedReactState = React.addons.update(reactState, reactUpdateSpec);
 				if (!_.isEqual(reactState, updatedReactState))
 					component.setState(reactState = updatedReactState);
 			}
@@ -98,7 +97,7 @@
 				// stop if context was disposed
 				if (Weave.wasDisposed(context))
 				{
-					unlinkReactState(component);
+					WeaveReactUtils.unlinkReactState(component);
 					return;
 				}
 				
@@ -160,7 +159,7 @@
 			};
 			component.componentWillUpdate = newComponentWillUpdate;
 
-			ReactUtils.onUnmount(component, unlinkReactState);
+			ReactUtils.onUnmount(component, WeaveReactUtils.unlinkReactState);
 			
 			authority();
 		}
@@ -168,7 +167,7 @@
 		/**
 		 * Shortcut for boilerplate code that creates a LinkableWatcher which calls forceUpdate() on a component.
 		 */
-		export function forceUpdateWatcher(component:ReactComponent, type:new(..._:any[])=>ILinkableObject, defaultPath:(typeof LinkableWatcher.prototype.targetPath) = null):LinkableWatcher
+		static forceUpdateWatcher(component:ReactComponent, type:new(..._:any[])=>ILinkableObject, defaultPath:(typeof LinkableWatcher.prototype.targetPath) = null):LinkableWatcher
 		{
 			var watcher = Weave.disposableChild(component, new LinkableWatcher(type, null, component.forceUpdate.bind(component)));
 			if (defaultPath)
@@ -176,7 +175,7 @@
 			return watcher;
 		}
 
-		export function requestObject<T extends ReactComponent>(weave:Weave, path:string[]/* TODO change to WeavePathArray */, type:new(..._:any[])=>T, onCreate:(instance:T) => void):void
+		static requestObject<T extends ReactComponent>(weave:Weave, path:string[]/* TODO change to WeavePathArray */, type:new(..._:any[])=>T, onCreate:(instance:T) => void):void
 		{
 			var oldObject = weave.getObject(path);
 			weave.requestObject(path, type);
@@ -190,3 +189,5 @@
 				});
 			}
 		}
+	}
+}

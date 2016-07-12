@@ -1,8 +1,10 @@
-	import * as React from "react";
-	import Input from "./Input";
-	import ComboBox, {ComboBoxOption} from "./ComboBox";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
+namespace weavejs.ui
+{
 	import LinkableString = weavejs.core.LinkableString;
+	import Input = weavejs.ui.Input;
+	import ComboBox = weavejs.ui.ComboBox;
+	import ComboBoxOption = weavejs.ui.ComboBoxOption;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
 	import WeaveAPI = weavejs.WeaveAPI;
 
 	export interface KeyTypeInputProps extends React.HTMLProps<Input> {
@@ -13,7 +15,7 @@
 
 	}
 
-	export default class KeyTypeInput extends React.Component<KeyTypeInputProps, KeyTypeInputState>
+	export class KeyTypeInput extends React.Component<KeyTypeInputProps, KeyTypeInputState>
 	{
 		constructor(props: KeyTypeInputProps) {
 			super(props);
@@ -39,7 +41,7 @@
 			return (
 				<ComboBox style={{width: "100%"}}
 						  noneOption={{label:"(None)", value:null}}
-						  ref={linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
+						  ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.keyTypeProperty }) }
 						  options={options}
 						  allowAdditions={true}
 						  searchable={true}
@@ -48,3 +50,4 @@
 			);
 		}
 	}
+}

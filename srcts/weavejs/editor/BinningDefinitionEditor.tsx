@@ -1,15 +1,20 @@
-	import * as React from "react";
-	import {VBox, HBox} from "../ui/flexbox/FlexBox";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import HelpIcon from "../ui/HelpIcon";
-	import Checkbox from "../ui/Checkbox";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import BinNamesList from "../ui/BinNamesList";
-	import ReactUtils from "../util/ReactUtils";
-	import Button from "../ui/Button";
-	import ComboBox from "../ui/ComboBox";
-	import SmartComponent from "../ui/SmartComponent";
-	import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import HelpIcon = weavejs.ui.HelpIcon;
+	import Input = weavejs.ui.Input;
+	import Checkbox = weavejs.ui.Checkbox;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import FixedDataTable = weavejs.ui.DataTable;
+	import BinNamesList = weavejs.ui.BinNamesList;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import Button = weavejs.ui.Button;
+	import ComboBox = weavejs.ui.ComboBox;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import DynamicTableClassNames = weavejs.util.DynamicTableClassNames;
+	import SelectableAttributeComponent = weavejs.ui.SelectableAttributeComponent;
 
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -47,7 +52,7 @@
 	{
 	}
 
-	export default class BinningDefinitionEditor extends React.Component<BinningDefinitionEditorProps, BinningDefinitionEditorState>
+	export class BinningDefinitionEditor extends React.Component<BinningDefinitionEditorProps, BinningDefinitionEditorState>
 	{
 		// mapping of readable Names with Class Names for UI
 		static binClassToBinLabel = new Map<typeof AbstractBinningDefinition, string>()
@@ -251,7 +256,7 @@
 				var abd:any = def;
 				if (abd[property] && this.compareTargetBinningType(def))
 				{
-					return linkReactStateRef(this, {value: abd[property]}, 500);
+					return WeaveReactUtils.linkReactStateRef(this, {value: abd[property]}, 500);
 				}
 			}
 		}
@@ -276,7 +281,7 @@
 
 		private linkBinningDefinition(value:LinkableString|LinkableNumber)
 		{
-			return linkReactStateRef(this, {value}, 500);
+			return WeaveReactUtils.linkReactStateRef(this, {value}, 500);
 		}
 
 		private hasOverrideMinAndMax():boolean
@@ -488,5 +493,4 @@
 			);
 		}
 	}
-
-
+}

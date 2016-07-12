@@ -1,17 +1,19 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import InteractiveTour from "../dialog/InteractiveTour";
-	import FileSelector from "../ui/FileSelector";
-	import DataSourceEditor, {IDataSourceEditorProps} from "./DataSourceEditor";
-	import KeyTypeInput from "../ui/KeyTypeInput";
-	import PopupWindow from "../dialog/PopupWindow";
-	import CSVMetadataEditor, {MetadataEntry} from "./CSVMetadataEditor";
-	import Button from "../ui/Button";
-	import ComboBox, {ComboBoxOption} from "../ui/ComboBox";
-	import HelpIcon from "../ui/HelpIcon";
-
+namespace weavejs.editor
+{
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import ReactUtils = weavejs.util.ReactUtils;
+	import WeaveTree = weavejs.ui.WeaveTree;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	import FileSelector = weavejs.ui.FileSelector;
+	import DataSourceEditor = weavejs.editor.DataSourceEditor;
+	import KeyTypeInput = weavejs.ui.KeyTypeInput;
+	import ComboBox = weavejs.ui.ComboBox;
+	import IDataSourceEditorProps = weavejs.editor.IDataSourceEditorProps;
+	import IDataSourceEditorState = weavejs.editor.IDataSourceEditorState;
+	import HelpIcon = weavejs.ui.HelpIcon;
 	import CSVDataSource = weavejs.data.source.CSVDataSource;
 	import EntityNode = weavejs.data.hierarchy.EntityNode;
 	import EntityType = weavejs.api.data.EntityType;
@@ -21,8 +23,11 @@
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
 	import IColumnReference = weavejs.api.data.IColumnReference;
+	import ComboBoxOption = weavejs.ui.ComboBoxOption;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import Button = weavejs.ui.Button;
 
-	export default class CSVDataSourceEditor extends DataSourceEditor
+	export class CSVDataSourceEditor extends DataSourceEditor
 	{
 		private _dataSourceNode:ColumnTreeNode;
 		constructor(props:IDataSourceEditorProps)
@@ -149,7 +154,7 @@
 					</HBox>,
 					<ComboBox
 						style={{width: "100%"}}
-						ref={linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
+						ref={WeaveReactUtils.linkReactStateRef(this, { value: ds.keyColumn }) } /* searchable field */
 						options={columnIds}
 						placeholder={Weave.lang("Auto-generated keys")}
 						className={keysAreUnique ? "":"error"}
@@ -204,3 +209,4 @@
 			);
 		}
 	}
+}

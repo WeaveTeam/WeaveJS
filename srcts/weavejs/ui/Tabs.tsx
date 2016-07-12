@@ -1,7 +1,7 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox, VBox} from "./flexbox/FlexBox";
-	import classNames from "../../modules/classnames";
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
 	const TOP:"top" = "top";
 	const BOTTOM:"bottom" = "bottom";
@@ -34,7 +34,7 @@
 		activeTabIndex:number;
 	}
 
-	export default class Tabs extends React.Component<TabsProps, TabsState>
+	export class Tabs extends React.Component<TabsProps, TabsState>
 	{
 		
 		constructor(props:TabsProps)
@@ -126,3 +126,4 @@
 			);
 		}
 	}
+}

@@ -1,28 +1,22 @@
-	import AbstractVisTool from "./AbstractVisTool";
-	import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "../api/ui/IVisTool";
-	import * as React from "react";
-	import * as _ from "lodash";
-	import MiscUtils from "../util/MiscUtils";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import ReactUtils from "../util/ReactUtils";
-	import {
-		Sparklines,
-		SparklinesLine,
-		SparklinesBars,
-		SparklinesCurve,
-		SparklinesNormalBand,
-		SparklinesReferenceLine
-	} from "react-sparklines";
-	import Accordion from "../ui/Accordion";
-	import ResizingDiv, {ResizingDivState} from "../ui/ResizingDiv";
-	import SmartComponent from "../ui/SmartComponent";
-	import ComboBox, {ComboBoxOption} from "../ui/ComboBox";
-	import Checkbox from "../ui/Checkbox";
-	import ConfigUtils from "../util/ConfigUtils";
-	import ToolTip from "../ui/ToolTip";
-
+namespace weavejs.tool
+{
+	import CSSProperties = React.CSSProperties;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import StatefulTextArea = weavejs.ui.StatefulTextArea;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import ReactUtils = weavejs.util.ReactUtils;
+	import Accordion = weavejs.ui.Accordion;
+	import ResizingDiv= weavejs.ui.ResizingDiv;
+	import ResizingDivState = weavejs.ui.ResizingDivState;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import ComboBox = weavejs.ui.ComboBox;
+	import ComboBoxOption = weavejs.ui.ComboBoxOption;
+	import Checkbox = weavejs.ui.Checkbox;
+	import ConfigUtils = weavejs.util.ConfigUtils;
+	import ToolTip = weavejs.ui.ToolTip;
 	import StandardLib = weavejs.util.StandardLib;
 	import LinkableString = weavejs.core.LinkableString
 	import LinkableNumber = weavejs.core.LinkableNumber;
@@ -41,6 +35,16 @@
 	import DynamicKeyFilter = weavejs.data.key.DynamicKeyFilter;
 	import LinkableVariable = weavejs.core.LinkableVariable;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import SparklinesReferenceLine = sparkline.SparklinesReferenceLine;
+	import Sparklines = sparkline.Sparklines;
+	import SparklinesLine = sparkline.SparklinesLine;
+	import SparklinesBars = sparkline.SparklinesBars;
+	import SparklinesCurve = sparkline.SparklinesCurve;
+	import SparklinesNormalBand = sparkline.SparklinesNormalBand;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
 
 	export declare type Record = {
 		id: IQualifiedKey,
@@ -91,7 +95,7 @@
 		{label: "Median", value: MEDIAN},
 	];
 
-	export default class Sparkline extends SmartComponent<ISparklineProps, ISparklineState> implements IVisTool, IInitSelectableAttributes
+	export class Sparkline extends SmartComponent<ISparklineProps, ISparklineState> implements IVisTool, IInitSelectableAttributes
 	{
 		columns  = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		sortColumn = Weave.linkableChild(this, DynamicColumn);
@@ -223,7 +227,7 @@
 
 				return [
 					Weave.lang(row[0]),
-					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+					<StatefulTextField ref={ WeaveReactUtils.linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
 				]
 			});
 		}
@@ -250,7 +254,7 @@
 			return [
 				[
 					Weave.lang("Alt Text"),
-					<StatefulTextField ref={ linkReactStateRef(this, {value: this.altText})} placeholder={Weave.lang("Enter text description of chart")}/>
+					<StatefulTextField ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.altText})} placeholder={Weave.lang("Enter text description of chart")}/>
 				]
 			]
 		}
@@ -267,27 +271,27 @@
 					[
 						[
 							Weave.lang("Type"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.chartType })} options={CHART_MODES}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.chartType })} options={CHART_MODES}/>
 						],
 						[
 							Weave.lang("Orientation"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.orientationMode })} options={ORIENTATION_MODES} type={(columns.length <= 1) ? "disabled":null}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.orientationMode })} options={ORIENTATION_MODES} type={(columns.length <= 1) ? "disabled":null}/>
 						],
 						[
 							Weave.lang("Reference line"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.referenceLineMode })} options={REFERENCELINE_MODES}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.referenceLineMode })} options={REFERENCELINE_MODES}/>
 						],
 						[
 							Weave.lang("Show normal bands"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.showNormalBands })} label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.showNormalBands })} label={" "}/>
 						],
 						[
 							Weave.lang("Show line labels"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.showRowLabels })} label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.showRowLabels })} label={" "}/>
 						],
 						[
 							Weave.lang("Show All Records"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.showAllRecords })} label={" "} disabled={this.orientationMode.value == COLUMN}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.showAllRecords })} label={" "} disabled={this.orientationMode.value == COLUMN}/>
 						]
 					]
 				],
@@ -580,3 +584,4 @@
 		[weavejs.api.ui.IVisTool, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 		"Sparkline"
 	);
+}

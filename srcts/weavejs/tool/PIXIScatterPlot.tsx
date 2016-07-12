@@ -1,12 +1,13 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import AbstractVisTool from "./AbstractVisTool";
-	import {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
-	import * as PIXI from "pixi.js";
-	import IPlotter from "../api/ui/IPlotter";
-	import ScatterPlotPlotter from "../plot/ScatterPlotPlotter";
-	import DOMUtils from "../util/DOMUtils";
+namespace weavejs.tool
+{
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import ScatterPlotPlotter = weavejs.plot.ScatterPlotPlotter;
 	import Bounds2D = weavejs.geom.Bounds2D;
+	import DynamicComponent = weavejs.ui.DynamicComponent;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
+	import DOMUtils = weavejs.util.DOMUtils;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
 
 	export interface PIXIScatterPlotProps extends IVisToolProps
 	{
@@ -18,7 +19,7 @@
 
 	}
 
-	export default class PIXIScatterPlot extends AbstractVisTool<PIXIScatterPlotProps, PIXIScatterPlotState>
+	export class PIXIScatterPlot extends AbstractVisTool<PIXIScatterPlotProps, PIXIScatterPlotState>
 	{
 		element:HTMLDivElement;
 		renderer:PIXI.WebGLRenderer | PIXI.CanvasRenderer;
@@ -81,9 +82,10 @@
 		PIXIScatterPlot,
 		["weavejs.tool.PIXIScatterPlot", "weave.visualization.tools::ScatterPlotTool"],
 		[
-			weavejs.api.ui.IVisTool_Basic,
+			weavejs.api.ui.IVisTool,
 			weavejs.api.core.ILinkableObjectWithNewProperties,
 			weavejs.api.data.ISelectableAttributes,
 		],
 		"Scatter Plot"
 	);
+}

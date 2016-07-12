@@ -1,12 +1,9 @@
-	import * as React from "react";
-	import MenuBar from "./MenuBar";
-	import SessionHistorySlider from "../../editor/SessionHistorySlider";
-	import WeaveMenus from "../../menu/WeaveMenus";
-	import DynamicComponent from "../DynamicComponent";
-	import {getWeaveProperties} from "../../app/WeaveProperties";
-	import LinkableBoolean = weavejs.core.LinkableBoolean;
-	import LinkableHashMap = weavejs.core.LinkableHashMap;
-	import LinkableWatcher = weavejs.core.LinkableWatcher;
+namespace weavejs.ui.menu
+{
+	import SessionHistorySlider = weavejs.editor.SessionHistorySlider;
+	import WeaveMenus = weavejs.menu.WeaveMenus;
+	import MenuBar = weavejs.ui.menu.MenuBar;
+	import WeaveProperties = weavejs.app.WeaveProperties;
 
 	export interface WeaveMenuBarProps extends React.HTMLProps<WeaveMenuBar>
 	{
@@ -20,7 +17,7 @@
 		
 	}
 
-	export default class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
+	export class WeaveMenuBar extends React.Component<WeaveMenuBarProps, WeaveMenuBarState>
 	{
 		constructor(props:WeaveMenuBarProps)
 		{
@@ -29,8 +26,8 @@
 
 		render():JSX.Element
 		{
-			var enableSessionHistorySlider = getWeaveProperties(this.props.weave).showSessionHistorySlider;
-			var enableSessionHistoryControls = getWeaveProperties(this.props.weave).enableSessionHistoryControls;
+			var enableSessionHistorySlider = WeaveProperties.getProperties(this.props.weave).showSessionHistorySlider;
+			var enableSessionHistoryControls = WeaveProperties.getProperties(this.props.weave).enableSessionHistoryControls;
 
 			return (
 				<MenuBar
@@ -48,3 +45,4 @@
 			);
 		}
 	}
+}

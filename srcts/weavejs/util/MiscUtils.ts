@@ -1,12 +1,11 @@
-	import * as _ from "lodash";
-
+namespace weavejs.util
+{
 	export declare type Structure = "string" | "boolean" | "number" | StructureFunction | StructureObject | StructureArray | StructureNullable;
 	export declare type StructureFunction = ((a:any)=>any);
 	export interface StructureObject {[key: string]: Structure};
 	export interface StructureArray extends Array<Structure>{};
 	export interface StructureNullable {nullable: Structure};
-
-	export default class MiscUtils
+	export class MiscUtils
 	{
 		/**
 		 * Generates an "rgba()" string for CSS.
@@ -296,3 +295,4 @@
 			return {nullable: structure};
 		}
 	}
+}

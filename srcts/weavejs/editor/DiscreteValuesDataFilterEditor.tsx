@@ -1,8 +1,8 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import AbstractFilterEditor, {FilterEditorProps, FilterOption} from "./AbstractFilterEditor";
-	import MenuLayoutComponent from "../ui/MenuLayoutComponent";
-
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import MenuLayoutComponent = weavejs.ui.MenuLayoutComponent;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableString = weavejs.core.LinkableString;
 	import ColumnDataFilter = weavejs.data.key.ColumnDataFilter;
@@ -19,9 +19,7 @@
 	export const LAYOUT_HSLIDER:string = "HSlider";
 	export const LAYOUT_CHECKBOXLIST:string = "CheckBoxList";
 
-
-
-	export default class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
+	export class DiscreteValuesDataFilterEditor extends AbstractFilterEditor
 	{
 		static get OPTIONS():string[]{
 			return [LAYOUT_LIST,
@@ -81,4 +79,5 @@
 		}
 	}
 
-	Weave.registerClass(DiscreteValuesDataFilterEditor, "weavejs.tool.DiscreteValuesDataFilterEditor", [weavejs.api.core.ILinkableObjectWithNewProperties]);
+	Weave.registerClass(DiscreteValuesDataFilterEditor, "weavejs.editor.DiscreteValuesDataFilterEditor", [weavejs.api.core.ILinkableObjectWithNewProperties]);
+}

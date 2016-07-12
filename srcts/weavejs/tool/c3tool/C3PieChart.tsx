@@ -1,11 +1,13 @@
-	import {IVisToolProps} from "../../api/ui/IVisTool";
-	import AbstractC3Tool from "./AbstractC3Tool";
-	import * as _ from "lodash";
-	import * as React from "react";
-	import Accordion from "../../ui/Accordion";
-	import StatefulTextField from "../../ui/StatefulTextField";
-	import {linkReactStateRef} from "../../util/WeaveReactUtils";
-	import IAltText from "../../api/ui/IAltText";
+namespace weavejs.tool.c3tool
+{
+	import ChartAPI = c3.ChartAPI;
+	import ChartConfiguration = c3.ChartConfiguration;
+	import ToolTip = weavejs.ui.ToolTip;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Accordion = weavejs.ui.Accordion;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
 
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -17,6 +19,9 @@
 	import LinkableString = weavejs.core.LinkableString;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
+	import IAltText = weavejs.api.ui.IAltText;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -28,7 +33,7 @@
 
 	const recordsToBeDisplayed = 360;
 
-	export default class C3PieChart extends AbstractC3Tool
+	export class C3PieChart extends AbstractC3Tool
 	{
 		data = Weave.linkableChild(this, DynamicColumn);
 		label = Weave.linkableChild(this, DynamicColumn);
@@ -242,7 +247,7 @@
 
 				return [
 					Weave.lang(row[0]),
-					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+					<StatefulTextField ref={ WeaveReactUtils.linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
 				]
 			});
 		}
@@ -273,12 +278,13 @@
 
 	Weave.registerClass(
 		C3PieChart,
-		["weavejs.tool.C3PieChart", "weave.visualization.tools::PieChartTool"],
+		["weavejs.tool.c3tool.C3PieChart", "weave.visualization.tools::PieChartTool"],
 		[
-			weavejs.api.ui.IVisTool_Basic,
+			weavejs.api.ui.IVisTool,
 			weavejs.api.core.ILinkableObjectWithNewProperties,
 			weavejs.api.data.ISelectableAttributes,
 			IAltText
 		],
 		"Pie Chart"
 	);
+}

@@ -1,16 +1,16 @@
-	import {IVisToolProps} from "../../api/ui/IVisTool";
-	import AbstractC3Tool from "./AbstractC3Tool";
-	import * as _ from "lodash";
-	import * as d3 from "d3";
-	import FormatUtils from "../../util/FormatUtils";
-	import * as React from "react";
-	import * as c3 from "c3";
-	import ChartUtils from "../../util/ChartUtils";
-	import ComboBox from "../../ui/ComboBox";
-	import Accordion from "../../ui/Accordion";
-	import {linkReactStateRef} from "../../util/WeaveReactUtils";
-	import IAltText from "../../api/ui/IAltText";
-
+namespace weavejs.tool.c3tool
+{
+	import FormatUtils = weavejs.util.FormatUtils;
+	import ChartConfiguration = c3.ChartConfiguration;
+	import ChartAPI = c3.ChartAPI;
+	import MouseEvent = React.MouseEvent;
+	import ToolTip = weavejs.ui.ToolTip;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ChartUtils = weavejs.util.ChartUtils;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Accordion = weavejs.ui.Accordion;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -21,6 +21,9 @@
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import LinkableNumber = weavejs.core.LinkableNumber;
+	import IAltText = weavejs.api.ui.IAltText;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -28,7 +31,7 @@
 		line: {color: string }
 	};
 
-	export default class C3LineChart extends AbstractC3Tool
+	export class C3LineChart extends AbstractC3Tool
 	{
 		columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		line = Weave.linkableChild(this, SolidLineStyle);
@@ -385,7 +388,7 @@
 					[
 						[
 							Weave.lang("X axis label angle"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
 						]
 					]
 				],
@@ -428,12 +431,14 @@
 
 	Weave.registerClass(
 		C3LineChart,
-		["weavejs.tool.C3LineChart", "weave.visualization.tools::LineChartTool"],
+		["weavejs.tool.c3tool.C3LineChart", "weave.visualization.tools::LineChartTool"],
 		[
-			weavejs.api.ui.IVisTool_Basic,
+			weavejs.api.ui.IVisTool,
 			weavejs.api.core.ILinkableObjectWithNewProperties,
 			weavejs.api.data.ISelectableAttributes,
 			IAltText
 		],
 		"Line Chart"
 	);
+}
+

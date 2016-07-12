@@ -1,7 +1,6 @@
-	import * as ol from "openlayers";
-	import ProbeInteraction from "./ProbeInteraction";
-
-	export default class CustomDragZoom extends ol.interaction.DragBox
+namespace weavejs.tool.oltool
+{
+	export class CustomDragZoom extends ol.interaction.DragBox
 	{
 		constructor()
 		{
@@ -16,7 +15,7 @@
 			if (!this._probeInteraction) {
 				for (let interaction of this.getMap().getInteractions().getArray()) {
 					if (interaction instanceof ProbeInteraction) {
-						this._probeInteraction = interaction;
+						this._probeInteraction = interaction as ProbeInteraction;
 						break;
 					}
 				}
@@ -42,3 +41,4 @@
 			view.fit(this.getGeometry(), size, {constrainResolution: false});
 		}
 	}
+}

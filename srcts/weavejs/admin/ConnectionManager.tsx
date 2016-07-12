@@ -1,20 +1,21 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import Button from "../ui/Button";
-	import PopupWindow from "../dialog/PopupWindow";
-	import SmartComponent from "../ui/SmartComponent";
-	import List, {ListOption} from "../ui/List";
-	import ConnectionEditor from "./ConnectionEditor";
-	import ServiceLogin from "./ServiceLogin";
-	import ConfigurationStorageEditor from "./ConfigurationStorageEditor";
-	import LogComponent from "../ui/LogComponent";
-	import ConfirmationDialog from "../dialog/ConfirmationDialog";
+namespace weavejs.admin
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Button = weavejs.ui.Button;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import List = weavejs.ui.List;
+	import ListOption = weavejs.ui.ListOption;
+	import ui = weavejs.ui;
+	import ConfigurationStorageEditor = weavejs.admin.ConfigurationStorageEditor;
+	import LogComponent = weavejs.ui.LogComponent;
 
 	import ConnectionInfo = weavejs.net.beans.ConnectionInfo;
 	import DatabaseConfigInfo = weavejs.net.beans.DatabaseConfigInfo;
 	import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 	import WeaveAdminService = weavejs.net.WeaveAdminService;
+	import ConfirmationDialog = weavejs.dialog.ConfirmationDialog;
 
 	export interface IConnectionManagerProps {
 		service: WeaveAdminService;
@@ -29,7 +30,7 @@
 		selected?: string;
 	}
 
-	export default class ConnectionManager extends SmartComponent<IConnectionManagerProps, IConnectionManagerState>
+	export class ConnectionManager extends SmartComponent<IConnectionManagerProps, IConnectionManagerState>
 	{
 		private login: ServiceLogin;
 		constructor(props:IConnectionManagerProps)
@@ -199,3 +200,4 @@
 			</VBox>
 		}
 	}
+}

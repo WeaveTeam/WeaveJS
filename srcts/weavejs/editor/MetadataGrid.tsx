@@ -1,14 +1,16 @@
-	import * as React from "react"
-	import * as _ from "lodash"
-	import {VBox, HBox} from "../ui/flexbox/FlexBox"
-	import {ObjectDataTable, IRow} from "../ui/DataTable";
-	import EditableTextCell from "../ui/EditableTextCell";
-	import ComboBox, {ComboBoxOption} from "../ui/ComboBox";
-
+namespace weavejs.editor
+{
 	import IColumnReference = weavejs.api.data.IColumnReference;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import ColumnMetadata = weavejs.api.data.ColumnMetadata;
+	import EditableTextCell = weavejs.ui.EditableTextCell;
+	import ComboBox = weavejs.ui.ComboBox;
+	import ObjectDataTable = weavejs.ui.ObjectDataTable;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import ComboBoxOption = weavejs.ui.ComboBoxOption;
+	import IRow = weavejs.ui.IRow;
 
 	export type MetadataEntry = {[key:string]:any};
 
@@ -25,7 +27,7 @@
 	}
 
 
-	export default class MetadataGrid extends React.Component<MetadataGridProps, MetadataGridState>
+	export class MetadataGrid extends React.Component<MetadataGridProps, MetadataGridState>
 	{
 
 		constructor(props:MetadataGridProps)
@@ -223,3 +225,4 @@
 				</VBox>);
 		}
 	}
+}

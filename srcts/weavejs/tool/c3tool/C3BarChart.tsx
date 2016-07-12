@@ -1,19 +1,17 @@
-	import {IVisToolProps} from "../../api/ui/IVisTool";
-	import AbstractC3Tool from "./AbstractC3Tool";
-	import * as _ from "lodash";
-	import * as d3 from "d3";
-	import FormatUtils from "../../util/FormatUtils";
-	import * as React from "react";
-	import * as c3 from "c3";
-	import {HBox, VBox} from "../../ui/flexbox/FlexBox";
-	import ComboBox, {ComboBoxOption} from "../../ui/ComboBox";
-	import Checkbox from "../../ui/Checkbox";
-	import {linkReactStateRef} from "../../util/WeaveReactUtils";
-	import Accordion from "../../ui/Accordion";
-	import ChartUtils from "../../util/ChartUtils";
-	import StatefulTextField from "../../ui/StatefulTextField";
-	import IAltText from "../../api/ui/IAltText";
-
+namespace weavejs.tool.c3tool
+{
+	import FormatUtils = weavejs.util.FormatUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import ComboBox = weavejs.ui.ComboBox;
+	import Checkbox = weavejs.ui.Checkbox;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import ReactUtils = weavejs.util.ReactUtils;
+	import ComboBoxOption = weavejs.ui.ComboBoxOption;
+	import Accordion = weavejs.ui.Accordion;
+	import ChartUtils = weavejs.util.ChartUtils;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import IAltText = weavejs.api.ui.IAltText;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -29,6 +27,8 @@
 	import ColumnUtils = weavejs.data.ColumnUtils;
 	import IColumnStatistics = weavejs.api.data.IColumnStatistics;
 	import StandardLib = weavejs.util.StandardLib;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import AbstractC3Tool = weavejs.tool.c3tool.AbstractC3Tool;
 
 	declare type Record = {
 		id: IQualifiedKey,
@@ -64,7 +64,7 @@
 		{label: "Inset", value: INSET}
 	];
 
-	export default class C3BarChart extends AbstractC3Tool
+	export class C3BarChart extends AbstractC3Tool
 	{
 		heightColumns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 		labelColumn = Weave.linkableChild(this, DynamicColumn);
@@ -547,11 +547,11 @@
 				changeDetected = true;
 				this.dataChanged();
 			}
-			
+
 			if (axisChange)
 			{
 				changeDetected = true;
-				
+
 				var xLabel:string = Weave.lang(this.xAxisName.value) || this.defaultXAxisLabel;
 				var yLabel:string = Weave.lang(this.yAxisName.value) || this.defaultYAxisLabel;
 
@@ -656,12 +656,12 @@
 				[
 					Weave.lang("Margins"),
 					<HBox className="weave-padded-hbox" style={{alignItems: 'center'}} >
-						<StatefulTextField type="number" style={{textAlign: "center", flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.left})}/>
+						<StatefulTextField type="number" style={{textAlign: "center", flex:1, minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.margin.left})}/>
 						<VBox className="weave-padded-vbox" style={{flex: 1}}>
-							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.top})}/>
-							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.bottom})}/>
+							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.margin.top})}/>
+							<StatefulTextField type="number" style={{textAlign: "center", minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.margin.bottom})}/>
 						</VBox>
-						<StatefulTextField type="number" disabled={this.legendPosition.value == "right"} style={{textAlign: "center", flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.margin.right})}/>
+						<StatefulTextField type="number" disabled={this.legendPosition.value == "right"} style={{textAlign: "center", flex:1, minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.margin.right})}/>
 					</HBox>
 				]
 			];
@@ -677,32 +677,32 @@
 					[
 						[
 							Weave.lang("Grouping mode"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.groupingMode })} options={GROUPING_MODES}/>
 						],
 						this.c3Config.legend.show && [
 							Weave.lang("Legend Position"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.legendPosition })} options={LEGEND_POSITIONS}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.legendPosition })} options={LEGEND_POSITIONS}/>
 						],
 						Weave.beta && [
 							Weave.lang("Horizontal bars (beta)"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.horizontalMode })} label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.horizontalMode })} label={" "}/>
 						],
 						[
 							Weave.lang("Show value labels"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
-		
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.showValueLabels })} label={" "}/>
+
 						],
 						[
 							Weave.lang("Show X axis title"),
-							<Checkbox ref={linkReactStateRef(this, { value: this.showXAxisLabel })} label={" "}/>
+							<Checkbox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.showXAxisLabel })} label={" "}/>
 						],
 						[
 							Weave.lang("X axis label angle"),
-							<ComboBox style={{width:"100%"}} ref={linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
+							<ComboBox style={{width:"100%"}} ref={WeaveReactUtils.linkReactStateRef(this, { value: this.xAxisLabelAngle })} options={ChartUtils.getAxisLabelAngleChoices()}/>
 						],
 						[
 							Weave.lang("Bar width ratio"),
-							<StatefulTextField type="number" style={{flex:1, minWidth: 60}} ref={linkReactStateRef(this, {value: this.barWidthRatio})}/>
+							<StatefulTextField type="number" style={{flex:1, minWidth: 60}} ref={WeaveReactUtils.linkReactStateRef(this, {value: this.barWidthRatio})}/>
 						]
 					]
 				],
@@ -740,12 +740,13 @@
 
 	Weave.registerClass(
 		C3BarChart,
-		["weavejs.tool.C3BarChart", "weave.visualization.tools::CompoundBarChartTool"],
+		["weavejs.tool.c3tool.C3BarChart", "weave.visualization.tools::CompoundBarChartTool"],
 		[
-			weavejs.api.ui.IVisTool_Basic,
+			weavejs.api.ui.IVisTool,
 			weavejs.api.core.ILinkableObjectWithNewProperties,
 			weavejs.api.data.ISelectableAttributes,
 			IAltText
 		],
 		"Bar Chart"
 	);
+}

@@ -1,15 +1,16 @@
-	import {IVisTool, IVisToolProps, IVisToolState, renderSelectableAttributes} from "../api/ui/IVisTool";
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import AbstractVisTool from "./AbstractVisTool";
-	import Menu, {MenuItemProps} from "../ui/menu/Menu";
-	import MiscUtils from "../util/MiscUtils";
-	import DataTable, {SortTypes, SortDirection} from "../ui/DataTable";
-	import ReactUtils from "../util/ReactUtils";
-	import PrintUtils from "../util/PrintUtils";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import Checkbox from "../ui/Checkbox";
+namespace weavejs.tool
+{
+	import Menu = weavejs.ui.menu.Menu;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import FixedDataTable = weavejs.ui.DataTable;
+	import SortTypes = weavejs.ui.SortTypes;
+	import SortDirection = weavejs.ui.SortDirection;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import PrintUtils = weavejs.util.PrintUtils;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import Checkbox = weavejs.ui.Checkbox;
 
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -28,6 +29,13 @@
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 	import EventCallbackCollection = weavejs.core.EventCallbackCollection;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
+	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
+	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
+	import DataTable = weavejs.ui.DataTable;
 
 	export interface IDataTableState extends IVisToolState
 	{
@@ -35,19 +43,16 @@
 		height?:number
 	}
 
-
 	export interface TableEventData {
 		key: IQualifiedKey;
 		column: IAttributeColumn;
 	}
 
-	export class AttributeColumnTable extends DataTable<IQualifiedKey> {
-
+	export class AttributeColumnTable extends DataTable<IQualifiedKey>
+	{
 	}
 
-
-
-	export default class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool, IInitSelectableAttributes
+	export class TableTool extends React.Component<IVisToolProps, IDataTableState> implements IVisTool, IInitSelectableAttributes
 	{
 		attributeColumnTable: AttributeColumnTable;
 
@@ -250,7 +255,7 @@
 
 				return [
 					Weave.lang(row[0]),
-					<StatefulTextField ref={ linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
+					<StatefulTextField ref={ WeaveReactUtils.linkReactStateRef(this, {value: row[1]})} placeholder={row[2] as string}/>
 				]
 			});
 		}
@@ -332,6 +337,7 @@
 	Weave.registerClass(
 		TableTool,
 		["weavejs.tool.TableTool", "weave.visualization.tools::TableTool", "weave.visualization.tools::AdvancedTableTool"],
-		[weavejs.api.ui.IVisTool_Utility, weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
+		[IVisTool, ILinkableObjectWithNewProperties, ISelectableAttributes],
 		"Table"
 	);
+}

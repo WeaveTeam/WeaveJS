@@ -1,20 +1,25 @@
-	import AbstractVisTool from "./AbstractVisTool";
-	import {IVisToolProps, IVisToolState} from "../api/ui/IVisTool";
-	import * as React from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import List, {ListOption} from "../ui/List";
-	import EditableTextCell from "../ui/EditableTextCell";
-	import MiscUtils from "../util/MiscUtils";
-	import ComboBox from "../ui/ComboBox";
-	import CheckBox from "../ui/Checkbox";
-	import Button from "../ui/Button";
-	import CenteredIcon from "../ui/CenteredIcon";
-	import {linkReactStateRef} from "../util/WeaveReactUtils";
-	import Tabs from "../ui/Tabs";
-	import Input from "../ui/Input";
-	import StatefulTextField from "../ui/StatefulTextField";
-	import MenuLayoutComponent from "../ui/MenuLayoutComponent";
-	import ReactUtils from "../util/ReactUtils";
+namespace weavejs.tool
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import List = weavejs.ui.List;
+
+	import MouseEvent = React.MouseEvent;
+	import CSSProperties = React.CSSProperties;
+	import ResizingDiv = weavejs.ui.ResizingDiv;
+	import EditableTextCell = weavejs.ui.EditableTextCell;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import ComboBox = weavejs.ui.ComboBox;
+	import CheckBox = weavejs.ui.Checkbox;
+	import Button = weavejs.ui.Button;
+	import CenteredIcon = weavejs.ui.CenteredIcon;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import Tabs = weavejs.ui.Tabs;
+	import Input = weavejs.ui.Input;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import MenuLayoutComponent = weavejs.ui.MenuLayoutComponent;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import ListOption = weavejs.ui.ListOption;
 
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 	import LinkableVariable = weavejs.core.LinkableVariable;
@@ -24,6 +29,8 @@
 	import ILinkableVariable = weavejs.api.core.ILinkableVariable;
 	import WeaveAPI = weavejs.WeaveAPI;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
+	import IVisToolProps = weavejs.api.ui.IVisToolProps;
+	import IVisToolState = weavejs.api.ui.IVisToolState;
 
 	const LAYOUT_LIST:string = "List";
 	const LAYOUT_COMBO:string = "ComboBox";
@@ -31,7 +38,7 @@
 	const LAYOUT_HSLIDER:string = "HSlider";
 	const menuOptions:string[] = [LAYOUT_LIST, LAYOUT_COMBO, LAYOUT_HSLIDER, LAYOUT_VSLIDER];
 
-	export default class SessionStateMenuTool extends AbstractVisTool<IVisToolProps, IVisToolState>
+	export class SessionStateMenuTool extends AbstractVisTool<IVisToolProps, IVisToolState>
 	{
 		public selectedChoice = Weave.linkableChild(this, LinkableString, this.forceUpdate, true);
 		public layoutMode = Weave.linkableChild(this, new LinkableString(LAYOUT_LIST, this.verifyLayoutMode), this.forceUpdate, true);
@@ -177,7 +184,7 @@
 	Weave.registerClass(
 		SessionStateMenuTool,
 		["weavejs.tool.SessionStateMenu", "weave.ui::SessionStateMenuTool"],
-		[weavejs.api.ui.IVisTool_Utility/*, weavejs.api.core.ILinkableObjectWithNewProperties*/],
+		[weavejs.api.ui.IVisTool/*, weavejs.api.core.ILinkableObjectWithNewProperties*/],
 		"Session State Menu Tool"
 	);
 
@@ -468,7 +475,7 @@
 					Weave.lang("Title"),
 					<StatefulTextField
 						className="ui input fluid"
-						ref={ linkReactStateRef(this, { value:this.props.sessionStateMenuTool.panelTitle }) }
+						ref={ WeaveReactUtils.linkReactStateRef(this, { value:this.props.sessionStateMenuTool.panelTitle }) }
 					/>
 				]
 			];
@@ -479,13 +486,13 @@
 			return[
 				[
 					Weave.lang("Auto-update active menu item"),
-					<CheckBox ref={ linkReactStateRef(this, {value: this.props.sessionStateMenuTool.autoRecord}) } label={" "}/>
+					<CheckBox ref={ WeaveReactUtils.linkReactStateRef(this, {value: this.props.sessionStateMenuTool.autoRecord}) } label={" "}/>
 				],
 				[//layout
 					Weave.lang("Layout mode"),
 					<ComboBox
 						className="weave-sidebar-dropdown"
-						ref={ linkReactStateRef(this, { value: this.props.sessionStateMenuTool.layoutMode })}
+						ref={ WeaveReactUtils.linkReactStateRef(this, { value: this.props.sessionStateMenuTool.layoutMode })}
 						options={ menuOptions }
 					/>
 				]
@@ -519,3 +526,4 @@
 			);
 		}
 	}
+}

@@ -1,9 +1,6 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import DOMUtils from "./DOMUtils";
-	import ReactUtils from "./ReactUtils";
-
-	export default class MouseUtils
+namespace weavejs.util
+{
+	export class MouseUtils
 	{
 		static addPointClickListener(target:HTMLElement, listener:(event:MouseEvent)=>void, pixelThreshold:number = 1):void
 		{
@@ -206,3 +203,4 @@
 			);
 		}
 	}
+}

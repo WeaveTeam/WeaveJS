@@ -4,17 +4,20 @@
     "jsx": "preserve",
     "removeComments": false,
     "target": "es6",
-    "outDir": "outts",
+    "module": "amd",
+    "outFile": "outts/weavejs.js",
     "inlineSources": true,
     "inlineSourceMap": true,
-    "declaration": false,
+    "declaration": true,
 	"forceConsistentCasingInFileNames": true,
 	"listFiles": false,
 	"noImplicitReturns": false,
 	"pretty": false
   },
-  "exclude":[
-    "node_modules", "outts", "lib-typings", "WeaveASJS"
+  "exclude": [
+    "node_modules", "srcts", "outts", "lib-typings", "WeaveASJS",
+    "outtsref/libs.ts", "outtsref/index.tsx", "outtsref/module.ts",
+    "outtsref/libs.ts", "outts/weavejs.d.ts"
   ],
   "compileOnSave": false
 }

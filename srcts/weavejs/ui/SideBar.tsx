@@ -1,7 +1,8 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import IconButton from "./IconButton";
-	import SmartComponent from "./SmartComponent";
+namespace weavejs.ui
+{
+	import ReactUtils = weavejs.util.ReactUtils;
+	import IconButton = weavejs.ui.IconButton;
+	import SmartComponent = weavejs.ui.SmartComponent;
 
 	export interface SideBarProps extends React.HTMLProps<SideBar>
 	{
@@ -16,7 +17,7 @@
 		open:boolean // this ensures sidebar can act as on its own 
 	}
 
-	export default class SideBar extends SmartComponent<SideBarProps, SideBarState>
+	export class SideBar extends SmartComponent<SideBarProps, SideBarState>
 	{
 		constructor(props:SideBarProps)
 		{
@@ -134,3 +135,4 @@
 			);
 		}
 	}
+}

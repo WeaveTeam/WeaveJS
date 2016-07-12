@@ -1,13 +1,10 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import {HBox} from "../flexbox/FlexBox";
-	import InteractiveTour from "../../dialog/InteractiveTour";
-	import {MenuItemProps} from "./Menu";
-	import Dropdown from "../Dropdown";
-	import classNames from "../../../modules/classnames";
-	import ReactUtils from "../../util/ReactUtils";
-	import {KEYCODES} from "../../util/KeyboardUtils";
+namespace weavejs.ui.menu
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	import Dropdown = weavejs.ui.Dropdown;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
 
 	export interface MenuBarItemProps
 	{
@@ -28,7 +25,7 @@
 		clickedIndex?:number;
 	}
 
-	export default class MenuBar extends React.Component<MenuBarProps, MenuBarState>
+	export class MenuBar extends React.Component<MenuBarProps, MenuBarState>
 	{
 		element:Element;
 		dropdownItems:Dropdown[];
@@ -116,7 +113,7 @@
 
 		onKeyUp=(index:number, event:React.KeyboardEvent)=>
 		{
-			if (event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
+			if (event.keyCode == KeyboardUtils.KEYCODES.SPACE || event.keyCode == KeyboardUtils.KEYCODES.ENTER)
 				this.flickerItem(index);
 		}
 
@@ -168,11 +165,11 @@
 
 			if (this.state.activeIndex >= 0 && this.state.activeIndex < this.dropdownItems.length)
 			{
-				if (event.keyCode == KEYCODES.LEFT_ARROW)
+				if (event.keyCode == KeyboardUtils.KEYCODES.LEFT_ARROW)
 				{
 					nextIndex = this.state.activeIndex - 1;
 				}
-				else if (event.keyCode == KEYCODES.RIGHT_ARROW)
+				else if (event.keyCode == KeyboardUtils.KEYCODES.RIGHT_ARROW)
 				{
 					nextIndex = this.state.activeIndex + 1;
 				}
@@ -185,7 +182,7 @@
 					nextElt.focus();
 			}
 
-			if (event.keyCode == KEYCODES.ESC)
+			if (event.keyCode == KeyboardUtils.KEYCODES.ESC)
 			{
 				if (this.activeDropdown)
 				{
@@ -259,3 +256,4 @@
 			);
 		}
 	}
+}

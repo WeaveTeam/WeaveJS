@@ -1,8 +1,6 @@
-	import * as ol from "openlayers";
-	import * as _ from "lodash";
-	import {AbstractFeatureLayer} from "./AbstractFeatureLayer";
-	import OpenLayersMapTool from "../OpenLayersMapTool";
-	import ScatterPlotLayer from "./ScatterPlotLayer";
+namespace weavejs.tool.oltool.layer
+{
+	import Projections = weavejs.tool.oltool.Projections;
 
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -16,9 +14,9 @@
 	import DataType = weavejs.api.data.DataType;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import NormalizedColumn = weavejs.data.column.NormalizedColumn;
+	import AbstractFeatureLayer = weavejs.tool.oltool.layer.AbstractFeatureLayer;
 
-
-	export default class GeometryLayer extends AbstractFeatureLayer
+	export class GeometryLayer extends AbstractFeatureLayer
 	{
 		private geoJsonParser:ol.format.GeoJSON;
 
@@ -119,10 +117,10 @@
 				let id = keys[idx];
 
 				let geometry = this.geoJsonParser.readGeometry(rawGeom,
-					{ dataProjection: OpenLayersMapTool.getProjection(this.inputProjection),
-					featureProjection: OpenLayersMapTool.getProjection(this.outputProjection)});
+					{ dataProjection: Projections.getProjection(this.inputProjection),
+					featureProjection: Projections.getProjection(this.outputProjection)});
 
-				if (geometry.getExtent().some(_.isNaN))
+				if ((geometry.getExtent() as number[]).some(_.isNaN))
 				{
 					console.error("Dropping feature", id, "due to containing NaN coordinates. Possibly misconfigured projection?");
 					continue;
@@ -216,7 +214,8 @@
 
 	Weave.registerClass(
 		GeometryLayer,
-		["weavejs.layer.GeometryLayer", "weave.visualization.plotters::GeometryPlotter"],
+		["weavejs.tool.oltool.layer.GeometryLayer", "weave.visualization.plotters::GeometryPlotter"],
 		[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 		"Geometries"
 	);
+}

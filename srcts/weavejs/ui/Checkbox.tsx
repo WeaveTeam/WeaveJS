@@ -1,7 +1,6 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import SmartComponent from "./SmartComponent";
-	import FormEvent = __React.FormEvent;
+namespace weavejs.ui
+{
+	import SmartComponent = weavejs.ui.SmartComponent;
 
 	export interface CheckboxProps extends React.Props<Checkbox>
 	{
@@ -10,7 +9,7 @@
 		label: string; // important to set them to avoid using jquery // else we have to let jquery to use dom selector to set " set checked"
 		name?: string;
 		style?: React.CSSProperties;
-		onChange?: (value:boolean, event:FormEvent) => void;
+		onChange?: (value:boolean, event:React.FormEvent) => void;
 		className?:string;
 		value?:boolean;
 		title?:string;
@@ -21,7 +20,7 @@
 		value?:boolean;
 	}
 
-	export default class Checkbox extends SmartComponent<CheckboxProps, CheckboxState>
+	export class Checkbox extends SmartComponent<CheckboxProps, CheckboxState>
 	{
 		element:Element;
 		selector:any;
@@ -47,9 +46,9 @@
 				});
 		}
 
-		
-		
-		handleChange=(event:FormEvent)=>
+
+
+		handleChange=(event:React.FormEvent)=>
 		{
 			this.setState({
 				value:!this.state.value
@@ -83,3 +82,4 @@
 			);
 		}
 	}
+}

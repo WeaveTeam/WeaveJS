@@ -1,7 +1,5 @@
-	import * as ol from "openlayers";
-	import * as _ from "lodash";
-	import AbstractLayer from "./AbstractLayer";
-
+namespace weavejs.tool.oltool.layer
+{
 	import StandardLib = weavejs.util.StandardLib;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import KeySet = weavejs.data.key.KeySet;
@@ -10,6 +8,7 @@
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import ExtendedDynamicColumn = weavejs.data.column.ExtendedDynamicColumn;
 	import IKeySet = weavejs.api.data.IKeySet;
+	import AbstractLayer = weavejs.tool.oltool.layer.AbstractLayer;
 
 	export abstract class AbstractFeatureLayer extends AbstractLayer
 	{
@@ -403,5 +402,4 @@
 		selectedStyle: ol.style.Style|Array<ol.style.Style>;
 		probedStyle: ol.style.Style|Array<ol.style.Style>;
 	};
-
-	export default AbstractFeatureLayer;
+}

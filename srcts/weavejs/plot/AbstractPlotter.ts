@@ -1,7 +1,8 @@
+namespace weavejs.plot
+{
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
-	import IPlotTask from "../api/ui/IPlotTask";
-	import IPlotter from "../api/ui/IPlotter";
+	import IPlotter = weavejs.api.ui.IPlotter;
 	import Rectangle = weavejs.geom.Rectangle;
 	import ILinkableObject = weavejs.api.core.ILinkableObject;
 	import ICallbackCollection = weavejs.api.core.ICallbackCollection;
@@ -10,11 +11,12 @@
 	import IKeySet = weavejs.api.data.IKeySet;
 	import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 	import IFilteredKeySet = weavejs.api.data.IFilteredKeySet;
+	import IPlotTask = weavejs.api.ui.IPlotTask;
 
 	/**
 	 * This is a base implementation for an IPlotter.
 	 */
-	export default class AbstractPlotter implements IPlotter
+	export class AbstractPlotter implements IPlotter
 	{
 		constructor()
 		{
@@ -39,7 +41,7 @@
 		/**
 		 * This variable should not be set manually.  It cannot be made constant because we cannot guarantee that it will be initialized
 		 * before other properties are initialized, which means it may be null when someone wants to call registerSpatialProperty().
-		 */		
+		 */
 		private _spatialCallbacks:ICallbackCollection = null;
 
 		/**
@@ -102,7 +104,7 @@
 		
 		/**
 		 * variables for template code
-		 */		
+		 */
 		protected clipRectangle:Rectangle = new Rectangle();
 
 		/**
@@ -171,3 +173,6 @@
 			return output[0] as Bounds2D;
 		}
 	}
+}
+
+

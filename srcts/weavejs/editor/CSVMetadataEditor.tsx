@@ -1,15 +1,13 @@
-	import * as React from "react"
-	import * as _ from "lodash"
-	import {VBox, HBox} from "../ui/flexbox/FlexBox"
-	import List, {ListOption} from "../ui/List";
-	import MetadataGrid from "./MetadataGrid";
-
+namespace weavejs.editor
+{
 	import IColumnReference = weavejs.api.data.IColumnReference;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import CSVDataSource = weavejs.data.source.CSVDataSource;
-
-	export type MetadataEntry = {[key:string]:any};
+	import List = weavejs.ui.List;
+	import ListOption = weavejs.ui.ListOption;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import HBox = weavejs.ui.flexbox.HBox;
 
 	export interface CSVMetadataEditorProps extends React.Props<CSVMetadataEditor>
 	{
@@ -24,7 +22,7 @@
 	}
 
 
-	export default class CSVMetadataEditor extends React.Component<CSVMetadataEditorProps, CSVMetadataEditorState>
+	export class CSVMetadataEditor extends React.Component<CSVMetadataEditorProps, CSVMetadataEditorState>
 	{
 
 		constructor(props:CSVMetadataEditorProps)
@@ -111,3 +109,4 @@
 			</HBox>);
 		}
 	}
+}

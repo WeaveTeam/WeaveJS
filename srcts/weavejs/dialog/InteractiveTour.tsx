@@ -1,7 +1,5 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-
+namespace weavejs.dialog
+{
 	import LinkableString = weavejs.core.LinkableString;
 
 	export interface InteractiveTourProps extends React.HTMLProps<InteractiveTour>
@@ -18,7 +16,7 @@
 		tooltipWidth?:number // used this at componentDidUpdate to re-render again to center the toolTip
 	}
 
-	export default class InteractiveTour extends React.Component<InteractiveTourProps,InteractiveTourState>
+	export class InteractiveTour extends React.Component<InteractiveTourProps,InteractiveTourState>
 	{
 		// initialize with null values, we don't want occupy memory as they are static variables
 		// Since Tour happens only for the first time , there is no point on creating these objects for the App
@@ -718,5 +716,4 @@
 			);
 		}
 	}
-
-
+}

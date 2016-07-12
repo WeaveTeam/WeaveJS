@@ -1,6 +1,5 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-
+namespace weavejs.ui
+{
 	const toolOverlayStyle:React.CSSProperties = {
 		background: "#000",
 		opacity: .2,
@@ -19,7 +18,7 @@
 	{
 		style: React.CSSProperties;
 	}
-	export default class PanelOverlay extends React.Component<IPanelOverlayProps, IPanelOverlayState>
+	export class PanelOverlay extends React.Component<IPanelOverlayProps, IPanelOverlayState>
 	{
 		constructor(props:IPanelOverlayProps)
 		{
@@ -34,3 +33,4 @@
 			return <div style={this.state.style}/>;
 		}
 	}
+}

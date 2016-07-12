@@ -1,15 +1,13 @@
-	import * as _ from "lodash";
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as c3 from "c3";
-	import SmartComponent from "../../ui/SmartComponent";
+namespace weavejs.tool.c3tool
+{
+	import SmartComponent = weavejs.ui.SmartComponent;
 
 	export interface C3ChartProps
 	{
 		config:c3.ChartConfiguration;
 	}
 
-	export default class C3Chart extends SmartComponent<C3ChartProps, {}>
+	export class C3Chart extends SmartComponent<C3ChartProps, {}>
 	{
 		constructor(props:C3ChartProps)
 		{
@@ -61,3 +59,4 @@
 			this.chart = null;
 		}
 	}
+}

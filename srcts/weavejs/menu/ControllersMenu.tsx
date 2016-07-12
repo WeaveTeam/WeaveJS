@@ -1,21 +1,23 @@
-	import * as React from "react";
-	import {MenuBarItemProps} from "../ui/menu/MenuBar";
-	import {MenuItemProps} from "../ui/menu/Menu";
-	import PopupWindow from "../dialog/PopupWindow";
-	import MouseoverController from "../editor/MouseoverController";
-	import WeaveMenus from "./WeaveMenus";
-	import AttributeMenuTool from "../tool/AttributeMenuTool";
-	import DataFilterTool from "../tool/DataFilterTool";
-	import SessionStateMenuTool from "../tool/SessionStateMenuTool";
-	import ColorController from "../editor/ColorController";
+namespace weavejs.menu
+{
+	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import PopupWindow = weavejs.dialog.PopupWindow;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import MouseoverController = weavejs.editor.MouseoverController;
+	import WeaveMenus = weavejs.menu.WeaveMenus;
+
+	import AttributeMenuTool = weavejs.tool.AttributeMenuTool;
+	import DataFilterTool = weavejs.tool.DataFilterTool;
+	import SessionStateMenuTool = weavejs.tool.SessionStateMenuTool;
+	import ColorController = weavejs.editor.ColorController;
 	import ColorColumn = weavejs.data.column.ColorColumn;
 	import BinnedColumn = weavejs.data.column.BinnedColumn;
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
 
-	export default class ControllersMenu implements MenuBarItemProps
+	export class ControllersMenu implements MenuBarItemProps
 	{
 		constructor(owner:WeaveMenus)
 		{
@@ -100,3 +102,4 @@
 	//			|| impl == AttributeMenuTool
 		}
 	}
+}

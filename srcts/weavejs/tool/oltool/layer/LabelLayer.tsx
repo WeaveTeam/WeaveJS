@@ -1,15 +1,14 @@
-	import * as ol from "openlayers";
-	import * as _ from "lodash";
-	import DOMUtils from "../../../util/DOMUtils";
-	import {AbstractFeatureLayer} from "./AbstractFeatureLayer";
-	import AbstractGlyphLayer from "./AbstractGlyphLayer";
+namespace weavejs.tool.oltool.layer
+{
+	import DOMUtils = weavejs.util.DOMUtils;
+	import OpenLayersMapTool = weavejs.tool.oltool.OpenLayersMapTool;
 
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import DynamicColumn = weavejs.data.column.DynamicColumn;
 	import AlwaysDefinedColumn = weavejs.data.column.AlwaysDefinedColumn;
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
-
+	import AbstractGlyphLayer = weavejs.tool.oltool.layer.AbstractGlyphLayer;
 	interface LabelRecord
 	{
 		feature: ol.Feature;
@@ -20,7 +19,7 @@
 		bounds: weavejs.geom.Bounds2D;
 	}
 
-	export default class LabelLayer extends AbstractGlyphLayer
+	export class LabelLayer extends AbstractGlyphLayer
 	{
 		size = Weave.linkableChild(this, AlwaysDefinedColumn);
 		text = Weave.linkableChild(this, DynamicColumn);
@@ -205,7 +204,9 @@
 
 	Weave.registerClass(
 		LabelLayer,
-		["weavejs.layer.LabelLayer", "weave.visualization.plotters::TextGlyphPlotter", "weave.visualization.plotters::GeometryLabelPlotter"],
+		["weavejs.tool.oltool.layer.LabelLayer", "weave.visualization.plotters::TextGlyphPlotter", "weave.visualization.plotters::GeometryLabelPlotter"],
 		[weavejs.api.core.ILinkableObjectWithNewProperties, weavejs.api.data.ISelectableAttributes],
 		"Labels"
 	);
+}
+

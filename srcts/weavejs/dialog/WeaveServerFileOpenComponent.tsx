@@ -1,17 +1,19 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import {IOpenFileProps, IOpenFileState} from "FileDialog";
-	import SmartComponent from "../ui/SmartComponent";
-	import ServiceLogin from "../admin/ServiceLogin";
-	import {HBox, VBox, Label} from "../ui/flexbox/FlexBox";
-	import {ObjectDataTable, IRow} from "../ui/DataTable";
-	import FileInfoView from "../ui/FileInfoView";
-	import Button from "../ui/Button";
-	import CenteredIcon from "../ui/CenteredIcon";
-	import {ListOption} from "../ui/List";
+namespace weavejs.dialog
+{
+	import ServiceLogin = weavejs.admin.ServiceLogin;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Label = weavejs.ui.flexbox.Label;
+	import IRow = weavejs.ui.IRow;
 	import WeaveFileInfo = weavejs.net.beans.WeaveFileInfo;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import ListOption = weavejs.ui.ListOption;
+	import CenteredIcon = weavejs.ui.CenteredIcon;
+	import ObjectDataTable = weavejs.ui.ObjectDataTable;
+	import Button = weavejs.ui.Button;
+	import FileInfoView = weavejs.ui.FileInfoView;
 
-	export default class WeaveServerFileOpenComponent extends SmartComponent<IOpenFileProps, IOpenFileState>
+	export class WeaveServerFileOpenComponent extends SmartComponent<IOpenFileProps, IOpenFileState>
 	{
 		element:Element;
 		dimmerSelector:any;
@@ -143,15 +145,15 @@
 							{fileLocationForm}
 							<VBox style={{flex: 1, border: "1px solid #D6D6D6"}}>
 								<ObjectDataTable rows={rows}
-												 columnIds={columnIds}
-												 idProperty="filename"
-												 columnTitles={columnTitles}
-												 onCellDoubleClick={(fileName) => {this.props.openHandler("/" + fileName)}}
-												 multiple={false}
-												 disableSort={true}
-												 headerHeight={0}
-												 rowHeight={40}
-												 onSelection={(selectedFiles:string[]) => {
+												columnIds={columnIds}
+												idProperty="filename"
+												columnTitles={columnTitles}
+												onCellDoubleClick={(fileName) => {this.props.openHandler("/" + fileName)}}
+												multiple={false}
+												disableSort={true}
+												headerHeight={0}
+												rowHeight={40}
+												onSelection={(selectedFiles:string[]) => {
 													if (selectedFiles[0])
 														weavejs.net.Admin.service.getWeaveFileInfo(selectedFiles[0]).then(
 															(fileInfo:WeaveFileInfo) => {
@@ -210,3 +212,4 @@
 			);
 		}
 	}
+}

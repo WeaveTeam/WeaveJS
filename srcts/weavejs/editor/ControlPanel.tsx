@@ -1,20 +1,13 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import PopupWindow, {PopupWindowProps} from "../dialog/PopupWindow";
+namespace weavejs.editor
+{
 	import Dictionary2D = weavejs.util.Dictionary2D;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import PopupWindowProps = weavejs.dialog.PopupWindowProps;
 
-	export interface IControlPanelProps
+	export class ControlPanel extends PopupWindow
 	{
-	}
+		//TODO - ok/cancel buttons with targets like in Flash Weave
 
-	export interface IControlPanelState
-	{
-	}
-
-	export default class ControlPanel extends PopupWindow
-	{
-		//TODO - ok/cancel buttons with targets like in Flash Weave	
-		
 		static d2d_weave_class_popup = new Dictionary2D<Weave, typeof React.Component, PopupWindow>(true, true);
 		static openInstance<P>(weave:Weave, ComponentType:new(..._:any[])=>React.Component<P, any>, popupProps:PopupWindowProps = null, componentProps:P = null):ControlPanel
 		{
@@ -40,3 +33,4 @@
 			return popup;
 		}
 	}
+}

@@ -1,7 +1,5 @@
-	import * as React from "react";
-	import classnames from "../../modules/classnames";
-	import * as _ from "lodash";
-
+namespace weavejs.ui
+{
 	export interface ProgressBarProps extends React.HTMLProps<HTMLDivElement>
 	{
 		progressValue?:number;
@@ -11,11 +9,12 @@
 		visible:boolean;
 	}
 
-	export default function progressBar(props:ProgressBarProps)
+	/* stateless component */
+	export function ProgressBar(props:ProgressBarProps)
 	{
 		return (
 			<div {...props as any}
-				className={classnames("weave-progress-bar-background", props.className)}
+				className={classNames("weave-progress-bar-background", props.className)}
 				style={_.merge({width: "100%", position:"relative"}, props.style)}
 			>
 				{
@@ -26,3 +25,4 @@
 			</div>
 		);
 	}
+}

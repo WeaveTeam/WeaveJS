@@ -7,8 +7,10 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dts": "tsc -p tsconfig-definitions.json",
     "build": "tsc && babel -d lib outts",
-    "compile": "npm run build && browserifyinc -x react -x react-dom -x jquery -x lodash -x d3 -x c3 -x openlayers -x jszip --debug --cachefile browserifycache.json lib/index.js > dist/index.js",
-    "compile-libs": "browserifyinc -r react -r react-dom -r jquery -r lodash -r d3 -r c3 -r openlayers -r jszip --debug --cachefile browserifycache.json > dist/libs.js",
+    "compile": "grunt clean:outtsref && npm run compile-as && npm run compile-dts && grunt copy:weave_dts && gulp && tsc && babel outts/weavejs.js --out-file dist/weavejs.js && npm run compile-app && grunt copy",
+    "compile-libs": "tsc -p tsconfig-libs.json && babel outts/libs.js --out-file lib/libs.js && browserifyinc --cachefile  browserifycache.json lib/libs.js > dist/libs.js",
+    "compile-module": "tsc -p tsconfig-module.json && babel outts/module.js --out-file lib/module.js",
+    "compile-app": "tsc -p tsconfig-app.json && babel outts/index.js --out-file dist/index.js",
     "compile-dts": "as2dts --defs-only ./WeaveASJS/src ./WeaveASJS/typings/src && tsc -d -p ./WeaveASJS/typings/",
     "compile-as": "node WeaveASJS/build.js",
     "postinstall": "cd lib || ( npm run compile-as && npm run compile-dts && npm run build && npm run dts )",
@@ -26,7 +28,6 @@
   "author": "WeaveTeam <devteam@iweave.com>",
   "license": "MPL-2.0",
   "devDependencies": {
-    "as2dts": "^0.2.3",
     "babel-plugin-transform-object-rest-spread": "^6.1.18",
     "babel-preset-es2015": "^6.1.18",
     "babel-preset-react": "^6.1.18",
@@ -42,8 +43,7 @@
     "grunt-minifyify": "^3.2.1",
     "grunt-ts": "^5.3.2",
     "minifyify": "^7.1.0",
-    "tsd": "^0.6.5",
-    "typescript": "^1.8.7"
+    "tsd": "^0.6.5"
   },
   "peerDependencies": {
     "react": "0.14.7",
@@ -61,6 +61,8 @@
     "filesaver.js": "^0.2.0",
     "fixed-data-table": "^0.6.0",
     "font-awesome": "^4.4.0",
+    "gulp": "^3.9.1",
+    "gulp-tsc-autoref": "https://github.com/WeaveTeam/gulp-tsc-autoref.git",
     "jquery": "^2.1.4",
     "jszip": "^3.0.0",
     "lodash": "^3.10.1",

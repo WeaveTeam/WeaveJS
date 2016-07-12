@@ -1,27 +1,31 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import prefixer from "../css/prefixer";
-	import SideBarContainer from "../ui/SideBarContainer";
-	import {VBox} from "../ui/flexbox/FlexBox";
-	import InteractiveTour from "../dialog/InteractiveTour";
-	import WeaveMenuBar from "../ui/menu/WeaveMenuBar";
-	import WeaveComponentRenderer from "../ui/WeaveComponentRenderer";
-	import MiscUtils from "../util/MiscUtils";
-	import WeaveTool from "../layout/WeaveTool";
-	import {LayoutPanelProps, PanelRenderer, AbstractLayout, AnyAbstractLayout} from "../layout/AbstractLayout";
-	import DataSourceManager from "../editor/manager/DataSourceManager";
-	import ContextMenu from "../ui/menu/ContextMenu";
-	import {IVisTool} from "../api/ui/IVisTool";
-	import ReactUtils from "../util/ReactUtils";
-	import {forceUpdateWatcher, requestObject, WeavePathArray} from "../util/WeaveReactUtils";
-	import WeaveProgressBar from "../ui/WeaveProgressBar";
-	import WeaveToolEditor from "../editor/WeaveToolEditor";
-	import TabLayout, {TabLayoutProps} from "../layout/TabLayout";
-	import WindowLayout from "../layout/WindowLayout";
-	import FlexibleLayout from "../layout/FlexibleLayout";
-	import WeaveMenus from "../menu/WeaveMenus";
-	import SessionStateEditor from "../editor/SessionStateEditor";
-	import NotificationSystem from "../../modules/NotificationSystem";
+namespace weavejs.app
+{
+	import prefixer = weavejs.css.prefixer;
+	import SideBarContainer = weavejs.ui.SideBarContainer;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	import WeaveMenuBar = weavejs.ui.menu.WeaveMenuBar;
+	import WeaveComponentRenderer = weavejs.ui.WeaveComponentRenderer;
+	import MiscUtils = weavejs.util.MiscUtils;
+	import WeaveTool = weavejs.layout.WeaveTool;
+	import LayoutPanelProps = weavejs.layout.LayoutPanelProps;
+	import PanelRender = weavejs.layout.PanelRenderer;
+	import AbstractLayout = weavejs.layout.AbstractLayout;
+	import AnyAbstractLayout = weavejs.layout.AnyAbstractLayout;
+	import DataSourceManager = weavejs.editor.manager.DataSourceManager;
+	import ContextMenu = weavejs.ui.menu.ContextMenu;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils;
+	import WeavePathArray = weavejs.util.WeavePathArray;
+	import WeaveProgressBar = weavejs.ui.WeaveProgressBar;
+	import WeaveToolEditor = weavejs.editor.WeaveToolEditor;
+	import TabLayout = weavejs.layout.TabLayout;
+	import TabLayoutProps = weavejs.layout.TabLayoutProps;
+	import WindowLayout = weavejs.layout.WindowLayout;
+	import FlexibleLayout = weavejs.layout.FlexibleLayout;
+	import WeaveMenus = weavejs.menu.WeaveMenus;
+	import SessionStateEditor = weavejs.editor.SessionStateEditor;
 
 	import IDataSource = weavejs.api.data.IDataSource;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -36,6 +40,7 @@
 	import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
 	import StandardLib = weavejs.util.StandardLib;
 	import DynamicState = weavejs.api.core.DynamicState;
+	import PanelRenderer = weavejs.layout.PanelRenderer;
 
 	export interface WeaveAppProps extends React.HTMLProps<WeaveApp>
 	{
@@ -55,9 +60,9 @@
 		enableTour?:boolean;
 	}
 
-	export default class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
+	export class WeaveApp extends React.Component<WeaveAppProps, WeaveAppState>
 	{
-		enableMenuBarWatcher:LinkableWatcher = forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
+		enableMenuBarWatcher:LinkableWatcher = WeaveReactUtils.forceUpdateWatcher(this, LinkableBoolean, ['WeaveProperties', 'enableMenuBar']);
 		menus:WeaveMenus;
 		static notificationSystem:NotificationSystem.System;
 		_popout_windows = new Set<Window>();
@@ -272,7 +277,7 @@
 			var oldTabLayout = this.props.weave.getObject(oldTabLayoutPath) as any;
 			oldTabLayout.removePanel(layoutPath);
 
-			requestObject(this.props.weave, newTabLayoutPath, TabLayout, (tabLayout:TabLayout) => {
+			WeaveReactUtils.requestObject(this.props.weave, newTabLayoutPath, TabLayout, (tabLayout:TabLayout) => {
 				Weave.getCallbacks(tabLayout).addDisposeCallback(this, () => {
 					// close the associated Tab Layout window when the Tab Layout is disposed
 					let window = ReactUtils.getWindow(tabLayout);
@@ -496,7 +501,7 @@
 					{
 						// create a window layout and select its tab
 						activeTabIndex = 0;
-						requestObject(this.props.weave, this.getDefaultLayoutPath(), WindowLayout, (windowLayout:WindowLayout) => {
+						WeaveReactUtils.requestObject(this.props.weave, this.getDefaultLayoutPath(), WindowLayout, (windowLayout:WindowLayout) => {
 							var ids:WeavePathArray[] = this.props.weave.root.getNames(weavejs.api.ui.IVisTool, true).map(name => [name]);
 							windowLayout.setSessionState({
 								panels: ids.map(id => {
@@ -661,3 +666,4 @@
 			);
 		}
 	}
+}

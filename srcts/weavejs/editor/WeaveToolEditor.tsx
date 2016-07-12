@@ -1,11 +1,12 @@
-	import * as React from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import InteractiveTour from "../dialog/InteractiveTour";
-	import SessionStateEditor from "./SessionStateEditor";
-	import {IVisTool} from "../api/ui/IVisTool";
-	import Button from "../ui/Button";
-	import classNames from "../../modules/classnames";
-	import {forceUpdateWatcher} from "../util/WeaveReactUtils";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	import SessionStateEditor = weavejs.editor.SessionStateEditor;
+	import IVisTool = weavejs.api.ui.IVisTool;
+	import Button = weavejs.ui.Button;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils;
 
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
@@ -21,9 +22,9 @@
 		activeCrumb:string
 	}
 
-	export default class WeaveToolEditor extends React.Component<WeaveToolEditorProps, WeaveToolEditorState>
+	export class WeaveToolEditor extends React.Component<WeaveToolEditorProps, WeaveToolEditorState>
 	{
-		private toolWatcher:LinkableWatcher = forceUpdateWatcher(this, weavejs.api.ui.IVisTool);
+		private toolWatcher:LinkableWatcher = WeaveReactUtils.forceUpdateWatcher(this, weavejs.api.ui.IVisTool);
 		public get tool():IVisTool { return this.toolWatcher.target as IVisTool; }
 		public set tool(value:IVisTool) { this.toolWatcher.target = value; }
 		private displayName:string;
@@ -278,3 +279,4 @@
 			);
 		}
 	}
+}

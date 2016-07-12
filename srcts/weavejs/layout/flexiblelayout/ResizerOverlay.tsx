@@ -1,11 +1,8 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import * as _ from "lodash";
-	import prefixer from "../../css/prefixer";
-	import Resizer from "./Resizer";
-	import {HORIZONTAL, Direction} from "./Layout";
-	import MouseUtils from "../../util/MouseUtils";
-	import ReactUtils from "../../util/ReactUtils";
+namespace weavejs.layout.flexiblelayout
+{
+	import prefixer = weavejs.css.prefixer;
+	import MouseUtils = weavejs.util.MouseUtils;
+	import ReactUtils = weavejs.util.ReactUtils;
 
 	const mouseevents:string[] = ["mouseover", "mouseout", "mouseleave"];
 
@@ -31,7 +28,7 @@
 		y?: number;
 	};
 
-	export default class ResizerOverlay extends React.Component<IResizerOverlayProps, IResizerOverlayState>
+	export class ResizerOverlay extends React.Component<IResizerOverlayProps, IResizerOverlayState>
 	{
 		constructor(props: IResizerOverlayProps)
 		{
@@ -125,3 +122,4 @@
 			return <span style={prefixer(style)}/>;
 		}
 	}
+}

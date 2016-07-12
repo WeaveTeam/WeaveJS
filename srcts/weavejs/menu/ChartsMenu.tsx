@@ -1,25 +1,25 @@
-	import * as React from "react";
-	import {MenuBarItemProps} from "../ui/menu/MenuBar";
-	import {MenuItemProps} from "../ui/menu/Menu";
-	import WeaveMenus from "./WeaveMenus";
-	import C3BarChart from "../tool/c3tool/C3BarChart";
-	import ColorLegend from "../tool/ColorLegend";
-	import C3Gauge from "../tool/c3tool/C3Gauge";
-	import C3ColorHistogram from "../tool/c3tool/C3ColorHistogram";
-	import C3Histogram from "../tool/c3tool/C3Histogram";
-	import C3LineChart from "../tool/c3tool/C3LineChart";
-	import OpenLayersMapTool from "../tool/oltool/OpenLayersMapTool";
-	import C3PieChart from "../tool/c3tool/C3PieChart";
-	import C3ScatterPlot from "../tool/c3tool/C3ScatterPlot";
-	import TableTool from "../tool/TableTool";
-	import TextTool from "../tool/TextTool";
-	import Sparkline from "../tool/Sparkline";
+namespace weavejs.menu
+{
+	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
 	import IVisTool = weavejs.api.ui.IVisTool;
+	import C3BarChart = weavejs.tool.c3tool.C3BarChart;
+	import ColorLegend = weavejs.tool.ColorLegend;
+	import C3ColorHistogram = weavejs.tool.c3tool.C3ColorHistogram;
+	import C3Histogram = weavejs.tool.c3tool.C3Histogram;
+	import C3LineChart = weavejs.tool.c3tool.C3LineChart;
+	import OpenLayersMapTool = weavejs.tool.oltool.OpenLayersMapTool;
+	import C3PieChart = weavejs.tool.c3tool.C3PieChart;
+	import C3ScatterPlot = weavejs.tool.c3tool.C3ScatterPlot;
+	import TableTool = weavejs.tool.TableTool;
+	import TextTool = weavejs.tool.TextTool;
+	import Sparkline = weavejs.tool.Sparkline;
 	import ColorColumn = weavejs.data.column.ColorColumn;
 	import BinnedColumn = weavejs.data.column.BinnedColumn;
 	import FilteredColumn = weavejs.data.column.FilteredColumn;
+	import C3Gauge = weavejs.tool.c3tool.C3Gauge;
 
-	export default class ChartsMenu implements MenuBarItemProps
+	export class ChartsMenu implements MenuBarItemProps
 	{
 		constructor(owner:WeaveMenus)
 		{
@@ -39,10 +39,9 @@
 		getCreateObjectItems()
 		{
 			var registry = weavejs.WeaveAPI.ClassRegistry;
-			var impls = registry.getImplementations(IVisTool);
 			
 			// temporary solution - only include tools we want
-			impls = [
+			var impls = [
 				C3BarChart,
 				ColorLegend,
 				C3Gauge,
@@ -78,3 +77,4 @@
 			return impl == C3Gauge;
 		}
 	}
+}

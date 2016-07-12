@@ -1,14 +1,14 @@
-	import * as React from "react";
-	import {ObjectDataTable, IRow} from "./DataTable";
-
+namespace weavejs.ui
+{
+	import ObjectDataTable = weavejs.ui.ObjectDataTable;
 	import AbstractBinningDefinition = weavejs.data.bin.AbstractBinningDefinition;
 
 	export interface BinNamesListProps {
 		binningDefinition:AbstractBinningDefinition;
 		showHeaderRow?:boolean;
 	}
-	export default class BinNamesList extends React.Component<BinNamesListProps, {}>{
-		
+	export class BinNamesList extends React.Component<BinNamesListProps, {}>
+	{
 		constructor(props:BinNamesListProps)
 		{
 			super(props);
@@ -67,3 +67,4 @@
 			);
 		}
 	}
+}

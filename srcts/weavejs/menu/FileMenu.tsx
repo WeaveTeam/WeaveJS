@@ -1,16 +1,17 @@
-	import * as React from "react";
-	import {HBox, VBox} from "../ui/flexbox/FlexBox";
-	import PopupWindow from "../dialog/PopupWindow";
-	import {MenuBarItemProps} from "../ui/menu/MenuBar";
-	import {MenuItemProps} from "../ui/menu/Menu";
-	import CheckBoxList from "../ui/CheckBoxList";
-	import * as FileSaver from "filesaver.js";
-	import Input from "../ui/Input";
-	import WeaveArchive from "../core/WeaveArchive";
-	import FileDialog from "../dialog/FileDialog";
-	import WeaveMenus from "./WeaveMenus";
-	import {getWeaveProperties} from "../app/WeaveProperties";
-	import WeaveApp from "../app/WeaveApp";
+namespace weavejs.menu
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import FileInput = weavejs.ui.FileInput;
+	import ICheckBoxListProps = weavejs.ui.ICheckBoxListProps;
+	import CheckBoxList = weavejs.ui.CheckBoxList;
+	import Input = weavejs.ui.Input;
+	import WeaveArchive = weavejs.core.WeaveArchive;
+	import WeaveMenus = weavejs.menu.WeaveMenus;
+	import FileDialog = weavejs.dialog.FileDialog;
 
 	import LinkableBoolean = weavejs.core.LinkableBoolean;
 	import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -22,8 +23,11 @@
 	import CSVDataSource = weavejs.data.source.CSVDataSource;
 	import IDataSource = weavejs.api.data.IDataSource;
 	import GeoJSONDataSource = weavejs.data.source.GeoJSONDataSource;
+	import WeaveProperties = weavejs.app.WeaveProperties;
 
-	export default class FileMenu implements MenuBarItemProps
+	var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;
+
+	export class FileMenu implements MenuBarItemProps
 	{
 		constructor(owner:WeaveMenus)
 		{
@@ -103,7 +107,7 @@
 
 			var setShowTopMenuBar = (checked:boolean) =>
 			{
-				getWeaveProperties(this.owner.weave).enableMenuBar.value = checked;
+				WeaveProperties.getProperties(this.owner.weave).enableMenuBar.value = checked;
 			};
 
 			var setSaveHistory = (checked:boolean) =>
@@ -455,5 +459,4 @@
 			this.saveDialog(this.fileName, this._saveFile)
 	  	}
 	}
-
-	var ProgressIndicator = weavejs.WeaveAPI.ProgressIndicator;
+}

@@ -1,5 +1,5 @@
-	import * as React from "react";
-
+namespace weavejs.ui
+{
 	export interface ILogComponentProps extends React.HTMLProps<LogComponent> {
 		messages?: string[];
 		uiClass?: string;
@@ -7,7 +7,7 @@
 		header: React.ReactChild;
 	}
 
-	export default class LogComponent extends React.Component<ILogComponentProps, Object>
+	export class LogComponent extends React.Component<ILogComponentProps, Object>
 	{
 		constructor(props:ILogComponentProps)
 		{
@@ -33,3 +33,4 @@
 			}
 		}
 	}
+}

@@ -1,11 +1,8 @@
+namespace weavejs.tool.oltool.layer
+{
 	import Dictionary2D = weavejs.util.Dictionary2D;
 
-	import * as jquery from "jquery";
-
-	// loads jquery from the es6 default module.
-	var $:JQueryStatic = (jquery as any)["default"];
-
-	class ImageGlyphCache
+	export class ImageGlyphCache
 	{
 		private baseImageElements:Map<string,HTMLImageElement>;
 		private canvasMap:Dictionary2D<string,string,HTMLCanvasElement>;
@@ -104,5 +101,4 @@
 			return image;
 		}
 	}
-
-	export default ImageGlyphCache;
+}

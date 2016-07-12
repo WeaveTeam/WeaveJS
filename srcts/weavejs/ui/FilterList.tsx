@@ -1,25 +1,24 @@
-	import * as React from "react";
-
+namespace weavejs.ui
+{
 	export interface FilterDefinition
 	{
-
 	}
 
-	export interface IFilterListProps<T> extends React.HTMLProps<FilterList<T>> {
+	export interface IFilterListProps<T> extends React.HTMLProps<FilterList<T>>
+	{
 		type: "combo"|"list";
-
 	}
 
-	export interface IFilterListState<T> {
+	export interface IFilterListState<T>
+	{
 		selectedItems: T[];
 	}
 
-	export default class FilterList<T> extends React.Component<IFilterListProps<T>, IFilterListState<T>>
+	export class FilterList<T> extends React.Component<IFilterListProps<T>, IFilterListState<T>>
 	{
 		constructor(props:IFilterListProps<T>)
 		{
 			super(props);
 		}
-
-
 	}
+}

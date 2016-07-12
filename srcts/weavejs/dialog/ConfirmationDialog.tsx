@@ -1,8 +1,9 @@
-	import * as React from "react";
-	import PopupWindow from "./PopupWindow";
-	import {VBox, HBox} from "../ui/flexbox/FlexBox";
+namespace weavejs.dialog
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
-	export default class ConfirmationDialog
+	export class ConfirmationDialog
 	{
 
 		static open(context:React.ReactInstance, message:string, onOk?:()=>void, onCancel?:()=>void)
@@ -31,3 +32,4 @@
 			});
 		}
 	}
+}

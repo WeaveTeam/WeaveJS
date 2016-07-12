@@ -1,8 +1,7 @@
-	import * as _ from "lodash";
-	import * as React from "react";
-	import SmartComponent from "./SmartComponent";
-	import ReactUtils from "../util/ReactUtils";
-
+namespace weavejs.ui
+{
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import ReactUtils = weavejs.util.ReactUtils;
 	export interface AccordionProps extends React.HTMLProps<Accordion>
 	{
 		collapsible?: boolean;
@@ -15,7 +14,7 @@
 		activeChild: number; // index of child
 	}
 
-	export default class Accordion extends SmartComponent<AccordionProps, AccordionState>
+	export class Accordion extends SmartComponent<AccordionProps, AccordionState>
 	{
 		constructor(props:AccordionProps)
 		{
@@ -100,3 +99,4 @@
 			);
 		}
 	}
+}

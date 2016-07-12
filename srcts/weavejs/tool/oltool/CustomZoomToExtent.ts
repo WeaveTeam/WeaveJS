@@ -1,11 +1,8 @@
-	import * as ol from "openlayers";
-	import * as jquery from "jquery";
-	import OpenLayersMapTool from "./OpenLayersMapTool";
+namespace weavejs.tool.oltool
+{
+	import OpenLayersMapTool = weavejs.tool.oltool.OpenLayersMapTool;
 
-	// loads jquery from the es6 default module.
-	var $:JQueryStatic = (jquery as any)["default"];
-
-	export default class CustomZoomToExtent extends ol.control.Control
+	export class CustomZoomToExtent extends ol.control.Control
 	{
 		private extent: ol.Extent;
 		constructor(opt_options?: olx.control.ZoomToExtentOptions)
@@ -51,5 +48,6 @@
 			if (extent)
 				view.fit(extent, map.getSize());
 		}
-
 	}
+}
+

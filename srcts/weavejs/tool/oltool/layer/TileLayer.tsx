@@ -1,12 +1,12 @@
-	import * as ol from "openlayers";
-	import * as _ from "lodash";
-	import AbstractLayer from "./AbstractLayer";
-	import * as React from "react";
-	import ComboBox from "../../../ui/ComboBox";
-	import StatefulTextField from "../../../ui/StatefulTextField";
-	import {linkReactStateRef} from "../../../util/WeaveReactUtils";
-	import OpenLayersMapTool from "../OpenLayersMapTool";
-	import ReactUtils from "../../../util/ReactUtils";
+namespace weavejs.tool.oltool.layer
+{
+	import ComboBox = weavejs.ui.ComboBox;
+	import StatefulTextField = weavejs.ui.StatefulTextField;
+	import WeaveReactUtils = weavejs.util.WeaveReactUtils
+	import Projections = weavejs.tool.oltool.Projections;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 
 	import LinkableString = weavejs.core.LinkableString;
 	import LinkableVariable = weavejs.core.LinkableVariable;
@@ -110,7 +110,7 @@
 				editorFields = [
 					[
 						Weave.lang("Provider"),
-						<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+						<ComboBox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 					]
 				];
 			}
@@ -119,19 +119,19 @@
 				editorFields = [
 					[
 						Weave.lang("Provider"),
-						<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+						<ComboBox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 					],
 					[
 						Weave.lang("URL"),
-						<StatefulTextField ref={linkReactStateRef(this, { value: this.tempUrl }) }/>
+						<StatefulTextField ref={WeaveReactUtils.linkReactStateRef(this, { value: this.tempUrl }) }/>
 					],
 					[
 						Weave.lang("Attribution"),
-						<StatefulTextField ref={linkReactStateRef(this, { value: this.tempAttributions }) }/>
+						<StatefulTextField ref={WeaveReactUtils.linkReactStateRef(this, { value: this.tempAttributions }) }/>
 					],
 					[
 						Weave.lang("Projection"),
-						<StatefulTextField ref={linkReactStateRef(this, { value: this.tempProjection }) }/>
+						<StatefulTextField ref={WeaveReactUtils.linkReactStateRef(this, { value: this.tempProjection }) }/>
 					]
 				];
 			}
@@ -140,12 +140,12 @@
 				editorFields = [
 					[
 						Weave.lang("Provider"),
-						<ComboBox ref={linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
+						<ComboBox ref={WeaveReactUtils.linkReactStateRef(this, { value: this.props.layer.provider }) } options={providerOptions}/>
 					],
 					[
 						Weave.lang("Layer"),
 						<ComboBox
-							ref={linkReactStateRef(this, { value: this.tempLayer }) }
+							ref={WeaveReactUtils.linkReactStateRef(this, { value: this.tempLayer }) }
 							options={layers ? layers.map((name) => { return { label: _.startCase(name), value: name }; }) : [] }
 						/>
 					]
@@ -167,7 +167,7 @@
 		}
 	}
 
-	export default class TileLayer extends AbstractLayer
+	export class TileLayer extends AbstractLayer
 	{
 		oldProviderName:string;
 
@@ -224,11 +224,11 @@
 
 		updateProjection()
 		{
-			var proj = OpenLayersMapTool.getProjection(this.outputProjection);
+			var proj = Projections.getProjection(this.outputProjection);
 			if (proj)
 			{
-				this.olLayer.setExtent(OpenLayersMapTool.getEstimatedExtent(proj));
-			}			
+				this.olLayer.setExtent(Projections.getEstimatedExtent(proj));
+			}
 		}
 
 		static STAMEN_LAYERS = ["watercolor", "toner"];
@@ -338,7 +338,8 @@
 
 	Weave.registerClass(
 		TileLayer,
-		["weavejs.layer.TileLayer", "weave.visualization.plotters::WMSPlotter"],
+		["weavejs.tool.oltool.layer.TileLayer", "weave.visualization.plotters::WMSPlotter"],
 		[weavejs.api.core.ILinkableObjectWithNewProperties],
 		"Base map"
 	);
+}

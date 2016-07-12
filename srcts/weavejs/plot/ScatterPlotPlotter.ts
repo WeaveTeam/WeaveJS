@@ -1,3 +1,5 @@
+namespace weavejs.plot
+{
 	import LinkableWatcher = weavejs.core.LinkableWatcher;
 	import IKeySet = weavejs.api.data.IKeySet;
 	import ColorColumn = weavejs.data.column.ColorColumn;
@@ -10,9 +12,9 @@
 	import LinkableNumber = weavejs.core.LinkableNumber;
 	import SolidFillStyle = weavejs.geom.SolidFillStyle;
 	import StandardLib = weavejs.util.StandardLib;
-	import IPlotter from "../api/ui/IPlotter";
-	import AbstractGlyphPlotter from "./AbstractGlyphPlotter";
-	import GraphicsUtils from "../util/GraphicsUtils";
+	import IPlotter = weavejs.api.ui.IPlotter;
+	import AbstractGlyphPlotter = weavejs.plot.AbstractGlyphPlotter;
+	import GraphicsUtils = weavejs.util.GraphicsUtils;
 	import ISelectableAttributes = weavejs.api.data.ISelectableAttributes;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
@@ -21,7 +23,7 @@
 	import IAttributeColumn = weavejs.api.data.IAttributeColumn;
 	import IObjectWithDescription = weavejs.api.ui.IObjectWithDescription;
 
-	export default class ScatterPlotPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
+	export class ScatterPlotPlotter extends AbstractGlyphPlotter implements ISelectableAttributes
 	{
 		public ScatterPlotPlotter()
 		{
@@ -184,3 +186,4 @@
 	Weave.registerClass(ScatterPlotPlotter, 'weavejs.plot.ScatterPlotPlotter', [IPlotter, IObjectWithDescription, ISelectableAttributes]);
 
 	weavejs.WeaveAPI.ClassRegistry.registerImplementation(IPlotter, ScatterPlotPlotter, "Scatterplot");
+}

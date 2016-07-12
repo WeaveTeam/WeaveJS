@@ -1,6 +1,7 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import SmartComponent from "./SmartComponent";
+namespace weavejs.ui
+{
+	import ReactUtils = weavejs.util.ReactUtils;
+	import SmartComponent = weavejs.ui.SmartComponent;
 
 	export declare type Size = {width:number, height:number};
 
@@ -22,7 +23,7 @@
 	/**
 	 * Provides a way to make elements using percentage coordinates resize properly within a div that uses flex layout.
 	 */
-	export default class FloatingDiv extends SmartComponent<FloatingDivProps, FloatingDivState>
+	export class FloatingDiv extends SmartComponent<FloatingDivProps, FloatingDivState>
 	{
 		constructor(props:FloatingDivProps)
 		{
@@ -98,3 +99,4 @@
 			);
 		}
 	}
+}

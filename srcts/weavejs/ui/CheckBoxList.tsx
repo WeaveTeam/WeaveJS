@@ -1,8 +1,7 @@
-	import * as React from "react";
-	import * as _ from "lodash";
-	import {HBox} from "./flexbox/FlexBox";
-	import Checkbox from "./Checkbox";
-
+namespace weavejs.ui
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
 	export type CheckBoxOption = {
 		value:any, 
 		label:string
@@ -21,7 +20,7 @@
 		checkboxStates:boolean[];
 	}
 
-	export default class CheckBoxList extends React.Component<ICheckBoxListProps, ICheckBoxListState>
+	export class CheckBoxList extends React.Component<ICheckBoxListProps, ICheckBoxListState>
 	{
 		private checkboxes:HTMLElement[];
 		
@@ -135,3 +134,4 @@
 			);
 		}
 	}
+}

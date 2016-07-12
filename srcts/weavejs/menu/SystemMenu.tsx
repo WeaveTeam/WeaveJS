@@ -1,10 +1,13 @@
-	import * as React from "react";
-	import {MenuBarItemProps} from "../ui/menu/MenuBar";
-	import {MenuItemProps} from "../ui/menu/Menu";
-	import PopupWindow from "../dialog/PopupWindow";
-	import WeaveMenus from "./WeaveMenus";
+namespace weavejs.menu
+{
+	import FileInput = weavejs.ui.FileInput;
+	import MenuBarItemProps = weavejs.ui.menu.MenuBarItemProps;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
+	import ServiceLogin = weavejs.admin.ServiceLogin;
+	import PopupWindow = weavejs.dialog.PopupWindow;
+	import WeaveMenus = weavejs.menu.WeaveMenus;
 
-	export default class SystemMenu implements MenuBarItemProps
+	export class SystemMenu implements MenuBarItemProps
 	{
 		constructor(owner:WeaveMenus)
 		{
@@ -68,3 +71,4 @@
 			return items;
 		}
 	}
+}

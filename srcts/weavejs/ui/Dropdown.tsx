@@ -1,13 +1,12 @@
-	import * as React from "react";
-	import * as ReactDOM from "react-dom";
-	import Menu, {MenuItemProps} from "./menu/Menu";
-	import InteractiveTour from "../dialog/InteractiveTour";
-	import classNames from "../../modules/classnames";
-	import SmartComponent from "./SmartComponent";
-	import Popup from "./Popup";
-	import ReactUtils from "../util/ReactUtils";
-	import {KEYCODES} from "../util/KeyboardUtils";
-	import values = d3.values;
+namespace weavejs.ui
+{
+	import Menu = weavejs.ui.menu.Menu;
+	import InteractiveTour = weavejs.dialog.InteractiveTour;
+	import SmartComponent = weavejs.ui.SmartComponent;
+	import Popup = weavejs.ui.Popup;
+	import ReactUtils = weavejs.util.ReactUtils;
+	import KeyboardUtils = weavejs.util.KeyboardUtils;
+	import MenuItemProps = weavejs.ui.menu.MenuItemProps;
 
 	export interface DropdownProps extends React.HTMLProps<Dropdown>
 	{
@@ -22,7 +21,7 @@
 	{
 	}
 
-	export default class Dropdown extends SmartComponent<DropdownProps, DropdownState> {
+	export class Dropdown extends SmartComponent<DropdownProps, DropdownState> {
 
 		static defaultProps:DropdownProps = {
 			open: false,
@@ -78,7 +77,7 @@
 
 		onKeyUp=(event:React.KeyboardEvent)=>
 		{
-			if (event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
+			if (event.keyCode == KeyboardUtils.KEYCODES.SPACE || event.keyCode == KeyboardUtils.KEYCODES.ENTER)
 			{
 				this.toggleMenu();
 				event.preventDefault();
@@ -114,14 +113,14 @@
 		onDocumentKeyDown=(event:KeyboardEvent)=>
 		{
 			// close the menu if key down on space
-			if (event.keyCode == KEYCODES.ESC)
+			if (event.keyCode == KeyboardUtils.KEYCODES.ESC)
 				this.closeMenu();
 		}
 
 		onDocumentKeyUp=(event:KeyboardEvent)=>
 		{
 			// close the menu if key up on space
-			if (event.keyCode == KEYCODES.SPACE || event.keyCode == KEYCODES.ENTER)
+			if (event.keyCode == KeyboardUtils.KEYCODES.SPACE || event.keyCode == KeyboardUtils.KEYCODES.ENTER)
 				this.closeMenu();
 		}
 
@@ -183,3 +182,4 @@
 			);
 		}
 	}
+}

@@ -1,11 +1,13 @@
-	import * as React from "react";
-	import Button from "../ui/Button";
-	import DataSourceEditor from "./DataSourceEditor";
+namespace weavejs.editor
+{
+	import HBox = weavejs.ui.flexbox.HBox;
+	import VBox = weavejs.ui.flexbox.VBox;
+	import Button = weavejs.ui.Button;
 
 	import CachedDataSource = weavejs.data.source.CachedDataSource;
 
-	export default class CachedDataSourceEditor extends DataSourceEditor
-	{	
+	export class CachedDataSourceEditor extends DataSourceEditor
+	{
 		get editorFields():[React.ReactChild, React.ReactChild][]
 		{
 			let ds = (this.props.dataSource as CachedDataSource);
@@ -20,4 +22,5 @@
 		}
 	}
 
-	Weave.registerClass(CachedDataSourceEditor, "weavejs.editors.CachedDataSourceEditor", []);
+	Weave.registerClass(CachedDataSourceEditor, "weavejs.editor.CachedDataSourceEditor", []);
+}
