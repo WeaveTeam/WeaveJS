@@ -1,11 +1,14 @@
 import * as React from "react";
 import {HBox} from "../ui/flexbox/FlexBox";
 import HelpIcon from "../ui/HelpIcon";
+import Checkbox from "../ui/Checkbox";
+import DynamicComponent from "../ui/DynamicComponent";
 import SelectableAttributeComponent from "../ui/SelectableAttributeComponent";
 import DataSourceEditor from "./DataSourceEditor";
 import KeyTypeInput from "../ui/KeyTypeInput";
 
 import GroupedDataTransform = weavejs.data.source.GroupedDataTransform;
+import FilteredColumn = weavejs.data.column.FilteredColumn;
 import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import ILinkableHashMap = weavejs.api.core.ILinkableHashMap;
 import LinkableHashMap = weavejs.core.LinkableHashMap;
@@ -13,6 +16,32 @@ import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 
 export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 {
+	private isFiltered=():boolean=>
+	{
+		let ds = (this.props.dataSource as GroupedDataTransform);
+		return Weave.IS(ds.groupByColumn.getInternalColumn(), FilteredColumn);
+	}
+
+	private setFiltered=(enabled:boolean)=>
+	{
+		let ds = (this.props.dataSource as GroupedDataTransform);
+		if (this.isFiltered() === enabled)
+			return; /* No change */
+
+		if (enabled)
+		{
+			let groupByState = Weave.getState(ds.groupByColumn);
+			let filteredColumn = ds.groupByColumn.requestLocalObject(FilteredColumn) as FilteredColumn;
+			Weave.setState(filteredColumn.internalDynamicColumn, groupByState);
+			filteredColumn.filter.targetPath = ['defaultSubsetKeyFilter'];
+		}
+		else
+		{
+			let filteredColumn = Weave.AS(ds.groupByColumn.getInternalColumn(), FilteredColumn);
+			Weave.setState(ds.groupByColumn, Weave.getState(filteredColumn.internalDynamicColumn));
+		}
+	}
+
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
 		let ds = (this.props.dataSource as GroupedDataTransform);
@@ -44,6 +73,13 @@ export default class ForeignDataMappingTransformEditor extends DataSourceEditor
 			[
 				Weave.lang("Data to transform"),
 				<SelectableAttributeComponent attributeName="Data to transform" attributes={attributes}/>
+			],
+			[
+				Weave.lang("Filter grouped records using subset"),
+				<DynamicComponent dependencies={[ds.groupByColumn]} render={()=>
+					<Checkbox label={" "} value={this.isFiltered()}
+						onChange={this.setFiltered}/>}
+				/>
 			]
 		];
 		return super.editorFields.concat(editorFields)
