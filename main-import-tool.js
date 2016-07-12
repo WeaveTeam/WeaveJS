@@ -8,11 +8,12 @@ var lodash = require('lodash');
 * -d: Base source directory.
 * -a: Append missing imports, or generate new list of imports if main import file does not exist.
 * -x: A comma-separated list of paths to exclude from the output.
+* --ext: A comma-separated list of extensions to include in the output. Default: .tsx,.ts
 * (Default behavior): Print error and return non-zero if not all files are referenced.
 */
 
 /* Cribbed from https://gist.github.com/kethinov/6658166 */
-var walkSync = function(dir, excluded, filelist) {
+var walkSync = function(dir, excluded, extensions, filelist) {
 	var files = fs.readdirSync(dir);
 	files.forEach(function(file) {
 		var fullPath = path.posix.join(dir, file);
@@ -22,20 +23,25 @@ var walkSync = function(dir, excluded, filelist) {
 		}
 		if (fs.statSync(fullPath).isDirectory())
 		{
-			walkSync(fullPath, excluded, filelist);
+			walkSync(fullPath, excluded, extensions, filelist);
 		}
 		else {
-			filelist.push(fullPath);
+			var extension = path.extname(file);
+			if (lodash.includes(extensions, extension))
+			{
+				filelist.push(fullPath);	
+			}
 		}
 	});
 	return filelist;
 };
 
-var args = parseArgs(process.argv, {string: ["d", "f", "x"], boolean: "a"});
+var args = parseArgs(process.argv, {string: ["d", "f", "x", "ext"], boolean: "a"});
 var sourceDir = args.d;
 var importFileName = args.f;
 var appendImports = args.a;
 var excludedFiles = args.x ? args.x.split(",") : [];
+var extensions = args.ext ? args.ext.split(",") : [".tsx", ".ts"];
 
 excludedFiles.push(importFileName);
 
@@ -51,7 +57,7 @@ if (!importFileName)
 	process.exit(-1);
 }
 
-var filePaths = new Set(walkSync(sourceDir, excludedFiles, []).map(function (filePath) {
+var filePaths = new Set(walkSync(sourceDir, excludedFiles, extensions, []).map(function (filePath) {
 	return "./" + path.posix.relative(path.posix.dirname(importFileName), filePath);
 }));
 
