@@ -228,7 +228,7 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 
 		if(colName){
 			columnTitleUI = <div style={ {whiteSpace: "nowrap",overflow: "hidden",textOverflow: "ellipsis",padding:"2px",flex:"1 0"} }>
-								{colName}
+								{Weave.lang(colName)}
 							</div>
 		}
 
@@ -237,7 +237,7 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 		if(this.props.showRecordValue)
 		{
 			recordValueUI = <div style={ valueBoxStyle }>
-								{recordValue}
+								{Weave.lang(recordValue)}
 							</div>;
 		}
 
@@ -263,11 +263,12 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 				};
 				
 				infoUIs = colMetaDataPropertyNames.map((metaDataPropertyName:string , index:number)=>{
-					if(this.props.column.getMetadata(metaDataPropertyName))
+					let metadata = this.props.column.getMetadata(metaDataPropertyName);
+					if(metadata)
 					{
 						return  ( <HBox key={index} style={ infoStyle }>
-									<div style={ {flex:"1 0"} }>{metaDataPropertyName}</div>
-									<div>{this.props.column.getMetadata(metaDataPropertyName)}</div>
+									<div style={ {flex:"1 0"} }>{Weave.lang(metaDataPropertyName)}</div>
+									<div>{Weave.lang(metadata)}</div>
 								</HBox>);
 					}
 					else
