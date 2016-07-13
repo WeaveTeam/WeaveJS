@@ -25,7 +25,8 @@ var walkSync = function(dir, excluded, extensions, filelist) {
 		{
 			walkSync(fullPath, excluded, extensions, filelist);
 		}
-		else {
+		else
+		{
 			var extension = path.extname(file);
 			if (lodash.includes(extensions, extension))
 			{
@@ -57,16 +58,80 @@ if (!importFileName)
 	process.exit(-1);
 }
 
-var filePaths = new Set(walkSync(sourceDir, excludedFiles, extensions, []).map(function (filePath) {
+var rootPath = path.posix.dirname(importFileName);
+var filePaths = walkSync(sourceDir, excludedFiles, extensions, []);
+var match;
+var fileExists = function(filePath) {
+	try
+	{
+		fs.accessSync(filePath);
+		return true;
+	}
+	catch (e)
+	{
+		return false;
+	}
+};
+var findFilePathFromQName = function(qname, extensions) {
+	var refNoExt = path.posix.join(rootPath, qname.replace(/\./g, '/'));
+	for (var ext of extensions)
+	{
+		var refext = refNoExt + ext;
+		if (fileExists(refext))
+			return refext;
+	}
+};
+var getOrInit = (map, key, type) => map.has(key) ? map.get(key) : map.set(key, new type()).get(key);
+var depsTree = new Map();
+var initDeps = function(filePath) {
+	var deps = getOrInit(depsTree, filePath, Set);
+	var fileContent = fs.readFileSync(filePath, "utf8");
+	var importPattern = /import[\s+].+=[\s+]?(.+);/g;
+	while (match = importPattern.exec(fileContent))
+	{
+		var ref = findFilePathFromQName(match[1], ['.tsx', '.ts']);
+		if (ref)
+			deps.add(ref);
+	}
+};
+var propagateDeps = function(filePath, chain) {
+	//console.log('propagate',filePath, chain);
+	var index = chain.indexOf(filePath);
+	if (index >= 0)
+		throw new Error(`Found circular dependency: ${
+			chain
+				.slice(index)
+				.concat(filePath)
+				.map(filePath => path.posix.basename(filePath))
+				.join(' -> ')
+		}`);
+
+	chain.push(filePath);
+	for (var ref of depsTree.get(filePath))
+	{
+		for (var link of chain)
+			if (link != ref)
+				depsTree.get(link).add(ref); // automatically adds more iterations to outer loop
+		propagateDeps(ref, chain);
+	}
+	chain.pop();
+};
+filePaths.forEach(initDeps);
+filePaths.forEach(filePath => console.log('prop',filePath)||propagateDeps(filePath, []));
+filePaths.sort((f1, f2) => depsTree.get(f1).has(f2) - depsTree.get(f2).has(f1));
+
+filePaths = filePaths.map(function (filePath) {
 	return "./" + path.posix.relative(path.posix.dirname(importFileName), filePath);
-}));
+});
+
+filePaths = new Set(filePaths);
 
 /* Get the existing references from the master file */
 
 var referencePattern = /\/\/\/[\s+]<reference path="(.+)"\/>/g;
 var importFileContent = "";
 
-if (fs.existsSync(importFileName))
+if (fileExists(importFileName))
 {
 	importFileContent = fs.readFileSync(importFileName, "utf8");
 	while ((match = referencePattern.exec(importFileContent)) !== null) {
