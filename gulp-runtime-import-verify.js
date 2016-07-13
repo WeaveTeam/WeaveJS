@@ -20,7 +20,7 @@ function gulpRuntimeImportVerify() {
 			var replacements = [];
 			var contents = file.contents.toString();
 			while ((match = searchPattern.exec(contents)) !== null) {
-				var refNoExt = match[2].replace(/\//g, '.');
+				var refNoExt = match[2].replace(/\./g, '/');
 				['.tsx', '.ts'].forEach(function(ext) {
 					var refext = refNoExt + ext;
 					try

@@ -13,7 +13,7 @@
     "pretty": false
   },
   "files":[
-    "srcts/index.tsx"
+    "srcts-verify/index.tsx"
   ],
   "compileOnSave": false
 }
