@@ -77,7 +77,7 @@ export default class HierarchyExplorer extends SmartComponent<IHierarchyExplorer
 		let selectedFolderNodes: IWeaveTreeNode[] = firstPath ? [firstPath[firstPath.length - 2]] : [this.props.root.getChildren()[0]];
 		let openFolderNodes = firstPath ? firstPath.slice(0, firstPath.length - 2) : null;
 
-		return <HDividedBox style={{ flex: 1 }} loadWithEqualWidthChildren>
+		return <HDividedBox style={{ flex: 1 }} loadWithEqualWidthChildren={true}>
 			<div style={{display: "flex"}}>
 				<WeaveTree ref={(c) => { if (c) this.folderTree = c } } hideRoot hideLeaves
 					initialSelectedItems={selectedFolderNodes} initialOpenItems={openFolderNodes} root={this.props.root} onSelect={()=>this.forceUpdate()}/>

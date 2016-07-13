@@ -35,25 +35,16 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 
 	constructor(props:React.HTMLProps<HBox>)
 	{
-		super(props)
-		if (this.props.loadWithEqualWidthChildren)
-		{
-			this.setEqualWidthChildren();
-		}
+		super(props);
 	}
 
-	setEqualWidthChildren=():void=>{
-		var childCount:number = React.Children.count(this.props.children);
-
-		React.Children.forEach(this.props.children,function(child:ReactNode , index:number) {
-			this.leftChildWidths[index] = String(100/childCount) + "%";
-		}.bind(this));
-
-	}
+	private isEqualWidthChildrenRendered:boolean = false;
+	
 
 	// caching the widths of all left child
 	// this ensures when we switch resizer the width is maintained
-	private leftChildWidths:number[] = [];
+	// string for percentage values
+	private leftChildWidths:number[]  = [];
 	private containerWidth:number = NaN;
 
 	state:IHDividedBoxState = {
@@ -61,7 +52,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 		resizingLeftChildWidth:null, // needs to be null as default value, to avoid warning for NaN  as "mutated Style"
 		mouseXPos:NaN,
 		dragging:false
-	}
+	};
 
 	// set the state with initial values from mouse event
 	private resizerMouseDownHandler = (index:number, event:React.MouseEvent):void=>
@@ -83,7 +74,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 
 		event.stopPropagation();
 		event.preventDefault();
-	}
+	};
 
 
 	// resizingLeftChildWidth and mouseXPos state values are updated while dragging
@@ -107,9 +98,7 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 
 		event.stopPropagation();
 		event.preventDefault();
-	}
-
-
+	};
 
 
 	private resizerMouseUpHandler = (event:MouseEvent):void =>
@@ -120,7 +109,6 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 			this.leftChildWidths[this.state.activeResizerIndex] =  this.state.resizingLeftChildWidth;
 		}
 
-		//this.containerWidth = NaN;
 
 		// reset all values to avoid conflicts in next resizing event
 		this.setState({
@@ -138,28 +126,46 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 
 		event.stopPropagation();
 		event.preventDefault();
-	}
+	};
 
 
 	render()
 	{
+
+		// setting the flag to true to ensure on next rendering, width value comes from user interaction
+		if(this.state.dragging && this.props.loadWithEqualWidthChildren)
+		{
+			this.isEqualWidthChildrenRendered = true;
+		}
+
+
 		var childrenUI:any[]  = [];
 		// storing childCount is important, to make sure resizer is not added after last child
 		var childCount:number = React.Children.count(this.props.children);
+
+		// summing up all child width , helps to set the last child width by subtracting from container width
 		let leftChildWidthSum:number = 0;
-		React.Children.forEach(this.props.children,function(child:ReactNode , index:number){
+		React.Children.forEach(this.props.children,(child:ReactNode , index:number)=>
+		{
 			if (!child)// this case happen in react Composite element based on a condition sometimes null or empty string will come in place of react element
-				return
+				return;
 
 			/* ***** Child ****** */
 
 			var childStyle:React.CSSProperties = {
 				overflow:"auto"
 			};
-
-			if (childCount - 1 == index)//last child takes rest of the space of the container
+			
+			// special case
+			// when rendered for first time, if equalchildrenwidth requested
+			// render all child width as percentage
+			// note: only once (mostly for absolute child in the container)
+			if(this.props.loadWithEqualWidthChildren && !this.isEqualWidthChildrenRendered)
 			{
-
+				childStyle.width = String(100/childCount) + "%";
+			}
+			else if (childCount - 1 == index)//last child takes rest of the space of the container
+			{
 				if (isNaN(this.containerWidth)) // when render called from constructor for first time
 				{
 					childStyle.flex = 1;
@@ -219,8 +225,8 @@ export class HDividedBox extends React.Component<IHDividedBoxProps, IHDividedBox
 				childrenUI.push(resizerUI);
 				leftChildWidthSum = leftChildWidthSum + (this.props.resizerSize?this.props.resizerSize :1);
 			}
-			
-		}.bind(this));
+
+		});
 
 		var styleObj:React.CSSProperties = HDividedBox.style(this.props.style);
 		styleObj.position = "relative"; //important to accommodate if any children is absolute
