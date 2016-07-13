@@ -12,6 +12,13 @@ import WeaveDataSource = weavejs.data.source.WeaveDataSource;
 import EntityNode = weavejs.data.hierarchy.EntityNode;
 import EntityType = weavejs.api.data.EntityType;
 import IWeaveTreeNode = weavejs.api.data.IWeaveTreeNode;
+import MenuButton from "../ui/menu/MenuButton";
+
+
+const SQL:string = "SQL";
+const CSV:string = "CSV";
+
+const dataImportTypes:string[] = [SQL];
 
 export default class WeaveDataSourceEditor extends DataSourceEditor
 {	
@@ -31,7 +38,7 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 		{
 			(this.props.dataSource as WeaveDataSource).rootId.state = null;
 		}
-	}
+	};
 
 	setHierarchySelection():void {
 		if (this.tree && this.props.dataSource)
@@ -80,6 +87,10 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 		suspendEnter: true
 	}));
 
+	openCsvImport = () =>{
+		console.log("opening the csv import opo");
+	};
+
 	openConnectionManager = PopupWindow.generateOpener(() => ({
 		context: this,
 		title: Weave.lang("Manage Users and Connections"),
@@ -119,7 +130,30 @@ export default class WeaveDataSourceEditor extends DataSourceEditor
 			],
 			[
 				Weave.lang("Import Data to Server"),
-				<Button onClick={this.openSqlImport}>{Weave.lang("Import from SQL...") }</Button>
+				/*<Button onClick={this.openSqlImport}>{Weave.lang("Import from SQL...") }</Button>*/
+				<MenuButton
+					className={"ui icon button"}
+					showIcon={false}
+					style={{flex: 1, alignItems: "center", justifyContent: "center"}}
+				    menu={
+				        dataImportTypes.map((importType:string) => {
+							if (importType == SQL)
+							{
+			                    var click = this.openSqlImport;
+							}
+			                else if (importType == CSV)
+			                {
+			                    //var click =  this.openCsvImport;
+			                }
+
+							return{
+							    label:Weave.lang(importType),
+							    click:click
+							}
+				        })
+				    }
+				>{Weave.lang("Import Data")}
+				</MenuButton>
 			],
 			[
 				Weave.lang("Manage Server"),
