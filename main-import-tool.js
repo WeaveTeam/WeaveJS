@@ -1,6 +1,6 @@
 var parseArgs = require('minimist');
 var fs = require('fs');
-var path = require('path');
+var path = require('path').posix;
 var lodash = require('lodash');
 /**
 * main-import-tool
@@ -13,10 +13,11 @@ var lodash = require('lodash');
 */
 
 /* Cribbed from https://gist.github.com/kethinov/6658166 */
-var walkSync = function(dir, excluded, extensions, filelist) {
+function walkSync(dir, excluded, extensions, filelist)
+{
 	var files = fs.readdirSync(dir);
 	files.forEach(function(file) {
-		var fullPath = path.posix.join(dir, file);
+		var fullPath = path.join(dir, file);
 		if (lodash.includes(excluded, fullPath))
 		{
 			return;
@@ -35,7 +36,7 @@ var walkSync = function(dir, excluded, extensions, filelist) {
 		}
 	});
 	return filelist;
-};
+}
 
 var args = parseArgs(process.argv, {string: ["d", "f", "x", "ext"], boolean: "a"});
 var sourceDir = args.d;
@@ -58,10 +59,11 @@ if (!importFileName)
 	process.exit(-1);
 }
 
-var rootPath = path.posix.dirname(importFileName);
+var rootPath = path.dirname(importFileName);
 var filePaths = walkSync(sourceDir, excludedFiles, extensions, []);
 var match;
-var fileExists = function(filePath) {
+function fileExists(filePath)
+{
 	try
 	{
 		fs.accessSync(filePath);
@@ -71,70 +73,81 @@ var fileExists = function(filePath) {
 	{
 		return false;
 	}
-};
-var findFilePathFromQName = function(qname, extensions) {
-	var refNoExt = path.posix.join(rootPath, qname.replace(/\./g, '/'));
+}
+function findFilePathFromQName(qname, extensions)
+{
+	var refNoExt = path.join(rootPath, qname.replace(/\./g, '/'));
 	for (var ext of extensions)
 	{
 		var refext = refNoExt + ext;
 		if (fileExists(refext))
 			return refext;
 	}
-};
+}
 var getOrInit = (map, key, type) => map.has(key) ? map.get(key) : map.set(key, new type()).get(key);
-var depsTree = new Map();
-var initDeps = function(filePath) {
-	var deps = getOrInit(depsTree, filePath, Set);
-	var fileContent = fs.readFileSync(filePath, "utf8");
+var map2d_file_dep_chain = new Map();
+function initDeps(file)
+{
+	var map_dep_chain = getOrInit(map2d_file_dep_chain, file, Map);
+	var fileContent = fs.readFileSync(file, "utf8");
 	var importPattern = /import[\s+].+=[\s+]?(.+);/g;
 	while (match = importPattern.exec(fileContent))
 	{
-		var ref = findFilePathFromQName(match[1], ['.tsx', '.ts']);
-		if (ref)
-			deps.add(ref);
+		var dep = findFilePathFromQName(match[1], ['.tsx', '.ts']);
+		if (dep)
+			map_dep_chain.set(dep, [file, dep]);
 	}
-};
-var propagateDeps = function(filePath, chain) {
-	var index = chain.indexOf(filePath);
-	if (index >= 0)
-		return console.error(`Found circular dependency: ${
-			chain
-				.slice(index)
-				.concat(filePath)
-				.map(filePath => path.posix.basename(filePath))
-				.join(' -> ')
-		}`);
+}
+function formatDepChain(chain)
+{
+	return chain.map(filePath => path.basename(filePath)).join(' -> ');
+}
+function checkDependency(file, dep, chain)
+{
+	var map_dep_chain = map2d_file_dep_chain.get(file);
+	var hasChain = map_dep_chain.get(dep);
+	if (hasChain !== undefined)
+		return hasChain;
 
-	chain.push(filePath);
-	for (var ref of depsTree.get(filePath))
+	if (!chain)
+		chain = [];
+
+	// avoid infinite recursion
+	if (chain.indexOf(file) >= 0)
+		return null;
+
+	chain.push(file);
+	hasChain = false;
+	for (let [ref, hasRef] of map_dep_chain)
 	{
-		if (propagateDeps(ref, chain))
+		if (ref == dep || !hasRef)
+			continue;
+		let subChain = checkDependency(ref, dep, chain);
+		if (subChain)
 		{
-			for (var link of chain)
-				if (link != ref)
-					depsTree.get(link).add(ref); // automatically adds more iterations to outer loop
-		}
-		else
-		{
-			depsTree.get(filePath).delete(ref);
+			let newChain = checkDependency(file, ref).concat(subChain.slice(1));
+			if (!hasChain || newChain.length < hasChain.length)
+				map_dep_chain.set(dep, hasChain = newChain);
 		}
 	}
 	chain.pop();
 
-	return true;
-};
+	map_dep_chain.set(dep, hasChain);
+	return hasChain;
+}
 filePaths.forEach(initDeps);
-filePaths.forEach(filePath => {
-	console.log('Calculating dependencies for', filePath);
-	propagateDeps(filePath, []);
+filePaths.forEach(f => {
+	var chain = checkDependency(f, f);
+	if (chain)
+		console.error(`Found circular dependency: ${formatDepChain(chain)}`);
 });
-filePaths.sort((f1, f2) => depsTree.get(f1).has(f2) - depsTree.get(f2).has(f1));
+filePaths.sort((f1, f2) => !!checkDependency(f1, f2) - !!checkDependency(f2, f1) || (f1>f2)-(f1<f2));
 
 filePaths = filePaths.map(function (filePath) {
-	return "./" + path.posix.relative(path.posix.dirname(importFileName), filePath);
+	return "./" + path.relative(path.dirname(importFileName), filePath);
 });
 
-filePaths = new Set(filePaths);
+filePathSet = new Set(filePaths);
 
 /* Get the existing references from the master file */
 
@@ -146,7 +159,7 @@ if (fileExists(importFileName))
 	importFileContent = fs.readFileSync(importFileName, "utf8");
 	while ((match = referencePattern.exec(importFileContent)) !== null) {
 		var referencePath = match[1];
-		filePaths.delete(referencePath);
+		filePathSet.delete(referencePath);
 	}
 }
 else if (!args.a)
@@ -155,7 +168,7 @@ else if (!args.a)
 	process.exit(1);
 }
 
-if (filePaths.size)
+if (filePathSet.size)
 {
 	if (args.a)
 	{
@@ -166,7 +179,7 @@ if (filePaths.size)
 		console.error('Adding these files to the main import file.');
 
 		var stream = fs.createWriteStream(importFileName, {flags: 'w'});
-		stream.write(importFileContent);
+		//stream.write(importFileContent);
 		filePaths.forEach(
 			function (filePath) {
 				stream.write(`/// <reference path="${filePath}"/>\n`);
