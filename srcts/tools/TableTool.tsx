@@ -12,6 +12,7 @@ import PrintUtils from "../utils/PrintUtils";
 import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import Checkbox from "../semantic-ui/Checkbox";
+import ColorRampEditor from "../editors/ColorRampEditor";
 
 import FilteredKeySet = weavejs.data.key.FilteredKeySet;
 import IAttributeColumn = weavejs.api.data.IAttributeColumn;
@@ -30,6 +31,7 @@ import QKeyManager = weavejs.data.key.QKeyManager;
 import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 import IInitSelectableAttributes = weavejs.api.ui.IInitSelectableAttributes;
 import EventCallbackCollection = weavejs.core.EventCallbackCollection;
+import ColorRamp = weavejs.util.ColorRamp;
 
 export interface IDataTableState extends IVisToolState
 {
@@ -54,6 +56,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 	attributeColumnTable: AttributeColumnTable;
 
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
+	heatMapColors = Weave.linkableChild(this, new ColorRamp(["0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"]));
+	enableHeatMap = Weave.linkableChild(this, new LinkableBoolean(false));
 
 	sortFieldIndex = Weave.linkableChild(this, new LinkableNumber(0));
 	columnWidth = Weave.linkableChild(this, new LinkableNumber(85));
@@ -229,7 +233,19 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 					  [
     					  Weave.lang("Show Key Column"),
 						  <Checkbox label={" "} onChange={this.handleShowKeyColumn} value={this.keyColumnShown}/>
-    				  ]
+    				  ],
+					  [
+						  Weave.lang("Show Heat Map"),
+						  <Checkbox label={" "} ref={linkReactStateRef(this, { value: this.enableHeatMap })}/>
+					  ],
+					  [
+						  Weave.lang("Color theme"),
+						  <ColorRampEditor
+							  compact={true}
+							  colorRamp={this.heatMapColors}
+							  pushCrumb={ pushCrumb }
+						  />
+					  ]
 				  ]),
 			classes: {
 				td: [
@@ -304,7 +320,7 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 		var columnNames = this.columns.getNames(IAttributeColumn);
 		if (weavejs.WeaveAPI.Locale.reverseLayout)
 			columnNames.reverse();
-		
+
 		return (
 			<AttributeColumnTable
 				columnTitles={this.getColumnTitle}
@@ -325,6 +341,8 @@ export default class TableTool extends React.Component<IVisToolProps, IDataTable
 				evenlyExpandRows={true}
 				allowResizing={true}
 				onSortCallback={this.onSort}
+				colorRamp={this.heatMapColors}
+				enableHeatMap={this.enableHeatMap.value}
 				ref={(c: AttributeColumnTable) => { this.attributeColumnTable = c } }
 			/>
 		);

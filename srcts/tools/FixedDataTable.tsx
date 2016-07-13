@@ -7,7 +7,7 @@ import {HBox, VBox, Label} from "../react-ui/FlexBox";
 import CellProps = FixedDataTable.CellProps;
 import ResizingDiv, {ResizingDivState} from "../ui/ResizingDiv";
 import SmartComponent from "../ui/SmartComponent";
-import ColorRamp = weavejs.util.ColorRamp;//temp: for heat map
+import ColorRamp = weavejs.util.ColorRamp;
 
 export declare type SortDirection = "ASC"|"DESC"|"NONE";
 
@@ -122,6 +122,8 @@ export interface IFixedDataTableProps<RowDatum> extends React.Props<FixedDataTab
 	multiple?: boolean;
 	sortId?:string;
 	sortDirection?: SortDirection;
+	colorRamp?:ColorRamp;
+	enableHeatMap?:boolean
 
 	/**
 	 *	a callback function that will be called if you want to sort the data
@@ -157,7 +159,6 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 	private firstIndex:number;
 	private secondIndex:number;
 	private lastClicked:number;
-	private colorRamp:ColorRamp;//HEATMAP
 	private container:HTMLElement;
 	static defaultProps:IFixedDataTableProps<any> = {
 		idProperty: "",
@@ -176,6 +177,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		showBottomBorder: true,
 		allowClear:true,
 		multiple:true,
+		enableHeatMap:false,
 		sortFunction: function(indexA:number, indexB:number, columnKey:string):number {
 			var valueA = this.getValue(indexA, columnKey);
 			var valueB = this.getValue(indexB, columnKey);
@@ -218,12 +220,6 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 		};
 
 		this.setIdPropertyGetter(props);
-
-		//COLOR RAMP For heat Map
-		this.colorRamp = new weavejs.util.ColorRamp();
-		this.colorRamp.state = [
-			"0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"
-		];
 	}
 
 	setIdPropertyGetter(props:IFixedDataTableProps<RowDatum>)
@@ -504,7 +500,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 	};
 
 	//TODO clean up the heat map code
-	renderCell=(props: {rowIndex: number, columnKey: string, height: number, width: number}):JSX.Element=>
+	renderCell=(props: {rowIndex: number, columnKey: string, height: number, width: number}):JSX.Element =>
 	{
 		let value = this.getValue(props.rowIndex, props.columnKey);
 		let rowId = this.getId(props.rowIndex);
@@ -514,12 +510,31 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 				this.props.onCellDoubleClick(rowId, props.columnKey);
 		};
 
+		let cellStyle:React.CSSProperties = {
+			marginLeft: -4,
+			paddingLeft: 4,
+			marginTop: -4,
+			paddingTop: 4,
+			width: props.width,
+			height: props.height
+		};
+
+		// numbers may come as string value
+		if(this.props.enableHeatMap && Number(value) != NaN)
+		{
+			// todo : automate min max value form all columns
+			// give editor config for user to set that manually too (as 0 to 1 or 1 to 100 are usually expected for heatmap)
+			cellStyle["background"] =  this.props.colorRamp.getHexColor(value as any, 0, 100)
+		}
+
+		let cellValue:number | string = typeof value == 'number' ? value as number : Weave.lang(value as string);
 
 		/* Inline style here is hack to make div actually fill whole cell for dblclick purposes since we can't attach event handlers to the Cell itself. */
 		return (
 			<Cell key={props.rowIndex+"#"+props.columnKey} {...props}>
-				<div style={{ marginLeft: -4, paddingLeft: 4, marginTop: -4, paddingTop: 4, width: props.width, height: props.height,background : this.colorRamp.getHexColor(value as any, 0, 100)}}
-				     onDoubleClick={handleDoubleClick}>{Weave.lang(value)}</div>
+				<div style={cellStyle}  onDoubleClick={handleDoubleClick}>
+					{cellValue}
+				</div>
 			</Cell>
 		);
 	}
@@ -562,7 +577,7 @@ export default class FixedDataTable<RowDatum> extends SmartComponent<IFixedDataT
 							disableSort={this.props.disableSort}
 							columnKey={id}
 							>
-							{Weave.lang(this.getColumnTitle(id))}
+							{Weave.lang(this.getColumnTitle(id) as string)}
 						</SortHeaderCell>
 					}
 					cell={this.renderCell}
