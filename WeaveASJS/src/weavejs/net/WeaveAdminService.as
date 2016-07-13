@@ -373,15 +373,10 @@ package weavejs.net
 			return invokeAdmin(getWeaveFileNames, arguments);
 		}
 
-		public function saveWeaveFileByteArray(fileContent:JSByteArray, fileName:String, overwriteFile:Boolean):WeavePromise/*/<string>/*/
+		public function saveWeaveFileByteArray(fileContent:/*/Uint8Array/*/Array, fileName:String, overwriteFile:Boolean):WeavePromise/*/<string>/*/
 		{
-			var base64:String = JS.global.btoa(StandardLib.byteArrayToString(fileContent.data));
+			var base64:String = JS.global.btoa(StandardLib.byteArrayToString(fileContent));
 			return invokeAdmin(saveWeaveFileByteArray, [base64, fileName, overwriteFile]);
-		}
-
-		public function saveWeaveFile(fileContent:JSByteArray, fileName:String, overwriteFile:Boolean):WeavePromise/*/<string>/*/
-		{
-			return this.saveWeaveFileByteArray.apply(this, arguments);
 		}
 
 		public function removeWeaveFile(fileName:String):WeavePromise/*/<string>/*/
@@ -503,7 +498,7 @@ package weavejs.net
 		/////////////////
 		// File uploads
 		
-		public function uploadFile(fileName:String, bytes:/*/Uint8Array/*/Array):WeavePromise/*/<void>/*/
+		public function uploadFileByteArray(fileName:String, bytes:/*/Uint8Array/*/Array):WeavePromise/*/<void>/*/
 		{
 			// queue up requests for uploading chunks at a time, then return the token of the last chunk
 			
@@ -516,11 +511,12 @@ package weavejs.net
 			do
 			{
 				var chunkLength:int = Math.min(chunkSize, bytes.length - offset);
-				var chunk:Object = bytes.subarray(offset, offset+chunkLength);
+				var chunk:* = bytes.subarray(offset, offset+chunkLength);
 
 				offset += chunkLength;
-				
-				promise = invokeAdmin(uploadFile, [fileName, chunk, offset > 0], true); // queued -- important!
+
+				var base64:String = JS.global.btoa(StandardLib.byteArrayToString(chunk));
+				promise = invokeAdmin(uploadFileByteArray, [fileName, base64, offset > 0], true); // queued -- important!
 			}
 			while (offset < bytes.length);
 			

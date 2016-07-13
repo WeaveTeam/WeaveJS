@@ -174,7 +174,7 @@ package weavejs.net
 			//////////////////////////////
 			// Weave client config files
 			service.addHook(
-				service.saveWeaveFile,
+				service.saveWeaveFileByteArray,
 				null,
 				function(result:*, _:*):void
 				{

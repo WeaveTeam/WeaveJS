@@ -400,7 +400,7 @@ export default class FileMenu implements MenuBarItemProps
 		promise.then(
 			(result: Uint8Array)=>
 			{
-				weavejs.net.Admin.service.saveWeaveFile(new weavejs.util.JSByteArray(result), newFileName, overwrite);	
+				weavejs.net.Admin.service.saveWeaveFileByteArray(result, newFileName, overwrite);
 			},
 			(error:any)=>
 			{
