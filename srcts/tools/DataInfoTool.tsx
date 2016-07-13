@@ -8,6 +8,7 @@ import {HBox, VBox} from "../react-ui/FlexBox";
 import StatefulTextField from "../ui/StatefulTextField";
 import {linkReactStateRef} from "../utils/WeaveReactUtils";
 import Accordion from "../semantic-ui/Accordion";
+import ColorRampEditor from "../editors/ColorRampEditor";
 
 
 import StandardLib = weavejs.util.StandardLib;
@@ -30,6 +31,7 @@ import KeySet = weavejs.data.key.KeySet;
 import {ComboBoxOption} from "../semantic-ui/ComboBox";
 import ComboBox from "../semantic-ui/ComboBox";
 import Checkbox from "../semantic-ui/Checkbox";
+import KeyFilter = weavejs.data.key.KeyFilter;
 
 
 const layoutModes:ComboBoxOption[] = [
@@ -37,38 +39,40 @@ const layoutModes:ComboBoxOption[] = [
 	{label:"Horizontal" , value:"horizontal"}
 ];
 
-export default class DataInfoTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool
+export default class DataInfoTool extends React.Component<IVisToolProps, IVisToolState> implements IVisTool,IInitSelectableAttributes
 {
 	columns = Weave.linkableChild(this, new LinkableHashMap(IAttributeColumn));
 	layout = Weave.linkableChild(this, new LinkableString("horizontal"));
 	showRecordBar = Weave.linkableChild(this, new LinkableBoolean(true));
 	showRecordValue = Weave.linkableChild(this, new LinkableBoolean(true));
 	columnMetaDataProperties = Weave.linkableChild(this,  LinkableHashMap );
+	colorRamp = Weave.linkableChild(this, new ColorRamp(["0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"]));
 	columnNames:string[] = null;
 	
 	filteredKeySet = Weave.linkableChild(this, FilteredKeySet);
 	selectionFilter = Weave.linkableChild(this, DynamicKeyFilter);
 	probeFilter = Weave.linkableChild(this, DynamicKeyFilter);
-	private colorRamp:ColorRamp;
 
 	panelTitle = Weave.linkableChild(this, LinkableString);
 
 	constructor(props:IVisToolProps)
 	{
 		super(props);
-		this.filteredKeySet.setColumnKeySources(this.columns.getObjects(IAttributeColumn) as IAttributeColumn[]);
+		// new column when added will ensure subsetkey filter know its sources to get keys
+		this.columns.childListCallbacks.addImmediateCallback(this,this.updateFilterKeySources,true);
+
 		this.filteredKeySet.keyFilter.targetPath = ['defaultSubsetKeyFilter'];
 		this.selectionFilter.targetPath = ['defaultSelectionKeySet'];
 		this.probeFilter.targetPath = ['defaultProbeKeySet'];
 
 		Weave.getCallbacks(this).addGroupedCallback(this, this.handleChange, true);
-
-		this.colorRamp = new weavejs.util.ColorRamp();
-		this.colorRamp.state = [
-			"0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"
-		];
 	}
 
+
+	updateFilterKeySources=()=>
+	{
+		this.filteredKeySet.setColumnKeySources(this.columns.getObjects(IAttributeColumn) as IAttributeColumn[]);
+	};
 
 
 	get defaultPanelTitle():string
@@ -85,8 +89,8 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 	{
 		if (!Weave.wasDisposed(this) && !Weave.isBusy(this))
 		{
-			var columnChanged = Weave.detectChange(this, this.columns) || Weave.detectChange(this, this.columnMetaDataProperties);
-			var dataChanged = columnChanged || Weave.detectChange(this, this.filteredKeySet) ||  Weave.detectChange(this, this.probeFilter);
+			var columnChanged = Weave.detectChange(this, this.columns,this.columnMetaDataProperties);
+			var dataChanged = columnChanged || Weave.detectChange(this, this.probeFilter, this.selectionFilter,  this.filteredKeySet) ;
 
 			if(dataChanged)
 				this.columnNames = this.columns.getNames();
@@ -97,14 +101,16 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 
 	protected get probeKeySet()
 	{
-		var keySet = this.probeFilter.target as KeySet;
+		let keySet = this.probeFilter.target as KeySet;
 		return keySet instanceof KeySet ? keySet : null;
 	}
-	protected isProbed(key:IQualifiedKey):boolean
+
+	protected get selectionKeySet()
 	{
-		var keySet = this.probeFilter.target as KeySet;
-		return keySet instanceof KeySet && keySet.containsKey(key);
+		let keySet = this.selectionFilter.target as KeySet;
+		return keySet instanceof KeySet ? keySet : null;
 	}
+
 
 
 
@@ -122,21 +128,24 @@ export default class DataInfoTool extends React.Component<IVisToolProps, IVisToo
 
 	renderEditor =(pushCrumb:(title:string,renderFn:()=>JSX.Element , stateObject:any)=>void = null):JSX.Element =>
 	{
-		return <DataInfoEditor tool={this} pushCrumb={pushCrumb}/>;
+		return <DataInfoEditor tool={this} pushCrumb={pushCrumb} />;
 	};
 
 	render()
 	{
 		let columnObjects = this.columns && this.columns.getObjects();
 		let key = this.probeKeySet && this.probeKeySet.keys[0];
-		let columnUI:JSX.Element[] = columnObjects && columnObjects.map((col:IAttributeColumn,index:number)=>{
+		key = key ? key : this.filteredKeySet.keys[0];
+
+		let columnUI:JSX.Element[] = columnObjects && columnObjects.map( (col:IAttributeColumn,index:number) =>
+			{
 				let colName = weavejs.data.ColumnUtils.getTitle(col);
-				let propNames:LinkableVariable = this.columnMetaDataProperties.getObject(colName) as LinkableVariable;
+				let metaDataPropNames:LinkableVariable = this.columnMetaDataProperties.getObject(colName) as LinkableVariable;
 
 				let metaDataProps:string[] = null;
-				if(propNames && propNames.state)
+				if(metaDataPropNames && metaDataPropNames.state)
 				{
-					metaDataProps = propNames.state as string[]
+					metaDataProps = metaDataPropNames.state as string[]
 				}
 
 				return <ColumnStats key={index}
@@ -185,27 +194,17 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 	constructor(props:ColumnStatsProps)
 	{
 		super(props)
-		if(props.colorRamp)
-		{
-			this.colorRamp = props.colorRamp;
-		}
-		else
-		{
-			this.colorRamp = new weavejs.util.ColorRamp();
-			this.colorRamp.state = [
-				"0xFF0000","0xFFFF66","0xCCFF66","0x33CC00"
-			];
-		}
+		
+		
 	}
 
-	private colorRamp:ColorRamp;
 
 	render(){
 
 
 		let colName = weavejs.data.ColumnUtils.getTitle(this.props.column);
 		let recordValue = this.props.recordKey ? this.props.column.getValueFromKey(this.props.recordKey) : null;
-		let color = recordValue ? this.colorRamp.getHexColor(recordValue as any, 0, 100) : null;
+		let color = recordValue ? this.props.colorRamp.getHexColor(recordValue as any, 0, 100) : null;
 
 		let valueBoxStyle:React.CSSProperties = {
 			display:"flex",
@@ -241,12 +240,9 @@ class ColumnStats extends React.Component<ColumnStatsProps, ColumnStatsState>
 							</div>;
 		}
 
-
 		if(this.props.columnMetaDataProperties )
 		{
 			let colMetaDataPropertyNames:string[] = this.props.columnMetaDataProperties as string[];
-			
-				
 
 			let infoUIs:JSX.Element[] = null;
 			if(colMetaDataPropertyNames)
@@ -407,6 +403,13 @@ class DataInfoEditor extends React.Component<IDataInfoEditorProps, IDataInfoEdit
 		return [
 			[Weave.lang("Layout"), <ComboBox style={{width:"100%"}} placeholder="Select a layout mode" ref={linkReactStateRef(this, { value: this.props.tool.layout })} options={layoutModes}/>],
 			[Weave.lang("Show Record Bar"),<Checkbox ref={linkReactStateRef(this, { value: this.props.tool.showRecordBar })} label={" "}/>],
+			[Weave.lang("Color theme"),
+				<ColorRampEditor
+					compact={true}
+					colorRamp={this.props.tool.colorRamp}
+					pushCrumb={ this.props.pushCrumb }
+				/>
+			],
 			[Weave.lang("Show Record Value"),<Checkbox ref={linkReactStateRef(this, { value: this.props.tool.showRecordValue })} label={" "}/>]
 		];
 	}
