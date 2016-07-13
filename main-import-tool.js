@@ -95,10 +95,9 @@ var initDeps = function(filePath) {
 	}
 };
 var propagateDeps = function(filePath, chain) {
-	//console.log('propagate',filePath, chain);
 	var index = chain.indexOf(filePath);
 	if (index >= 0)
-		throw new Error(`Found circular dependency: ${
+		return console.error(`Found circular dependency: ${
 			chain
 				.slice(index)
 				.concat(filePath)
@@ -109,15 +108,26 @@ var propagateDeps = function(filePath, chain) {
 	chain.push(filePath);
 	for (var ref of depsTree.get(filePath))
 	{
-		for (var link of chain)
-			if (link != ref)
-				depsTree.get(link).add(ref); // automatically adds more iterations to outer loop
-		propagateDeps(ref, chain);
+		if (propagateDeps(ref, chain))
+		{
+			for (var link of chain)
+				if (link != ref)
+					depsTree.get(link).add(ref); // automatically adds more iterations to outer loop
+		}
+		else
+		{
+			depsTree.get(filePath).delete(ref);
+		}
 	}
 	chain.pop();
+
+	return true;
 };
 filePaths.forEach(initDeps);
-filePaths.forEach(filePath => console.log('prop',filePath)||propagateDeps(filePath, []));
+filePaths.forEach(filePath => {
+	console.log('Calculating dependencies for', filePath);
+	propagateDeps(filePath, []);
+});
 filePaths.sort((f1, f2) => depsTree.get(f1).has(f2) - depsTree.get(f2).has(f1));
 
 filePaths = filePaths.map(function (filePath) {
