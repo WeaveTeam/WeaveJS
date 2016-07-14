@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dts": "tsc -p tsconfig-definitions.json",
     "build": "tsc && babel -d lib outts",
-    "compile": "grunt clean:srcts-verify && npm run compile-as && npm run compile-dts && grunt copy:weave_dts && gulp && tsc -p tsconfig-build.json && babel outts/weavejs.js --out-file dist/weavejs.js && npm run compile-app && grunt copy",
+    "compile": "npm run compile-as && npm run compile-dts && grunt copy:weave_dts && tsc -p tsconfig.json && babel outts/weavejs.js --out-file dist/weavejs.js && npm run compile-app && grunt copy",
     "compile-libs": "tsc -p tsconfig-libs.json && babel outts/libs.js --out-file lib/libs.js && browserifyinc --cachefile  browserifycache.json lib/libs.js > dist/libs.js",
     "compile-module": "tsc -p tsconfig-module.json && babel outts/module.js --out-file lib/module.js",
     "compile-app": "tsc -p tsconfig-app.json && babel outts/index.js --out-file dist/index.js",
@@ -43,7 +43,8 @@
     "grunt-minifyify": "^3.2.1",
     "grunt-ts": "^5.3.2",
     "minifyify": "^7.1.0",
-    "tsd": "^0.6.5"
+    "tsd": "^0.6.5",
+    "tsort": "^0.0.1"
   },
   "peerDependencies": {
     "react": "0.14.7",

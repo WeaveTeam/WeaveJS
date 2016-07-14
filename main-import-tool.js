@@ -4,6 +4,8 @@ var parseArgs = require('minimist');
 var fs = require('fs');
 var path = require('path').posix;
 var lodash = require('lodash');
+var tsort = require('tsort');
+
 /**
 * main-import-tool
 * -f: Filename for main import file.
@@ -63,7 +65,9 @@ if (!importFileName)
 
 var rootPath = path.dirname(importFileName);
 var filePaths = walkSync(sourceDir, excludedFiles, extensions, []);
+var graph = tsort();
 var match;
+
 function fileExists(filePath)
 {
 	try
@@ -76,34 +80,65 @@ function fileExists(filePath)
 		return false;
 	}
 }
-function findFilePathFromQName(qname, extensions)
+
+function findFileWithExtension(fileNoExt, extensions)
 {
-	var refNoExt = path.join(rootPath, qname.replace(/\./g, '/'));
 	for (var ext of extensions)
 	{
-		var refext = refNoExt + ext;
+		var refext = fileNoExt + ext;
 		if (fileExists(refext))
 			return refext;
 	}
 }
+
 var getOrInit = (map, key, type) => map.has(key) ? map.get(key) : map.set(key, new type()).get(key);
 var map2d_file_dep_chain = new Map();
+
 function initDeps(file)
 {
 	var map_dep_chain = getOrInit(map2d_file_dep_chain, file, Map);
 	var fileContent = fs.readFileSync(file, "utf8");
-	var importPattern = /import[\s+].+=[\s+]?(.+);/g;
+	
+	// check for import statements
+	// Example: import Baz = foo.bar.Baz;
+	var importPattern = /^\s*import\s+(?:[^\s]+)\s*=\s*([^\s]+);/gm;
 	while (match = importPattern.exec(fileContent))
 	{
-		var dep = findFilePathFromQName(match[1], ['.tsx', '.ts']);
+		let fileNoExt = path.join(rootPath, match[1].replace(/\./g, '/'));
+		let dep = findFileWithExtension(fileNoExt, ['.tsx', '.ts']);
 		if (dep)
+		{
+			if (debug)
+				console.log(file, '>', path.basename(dep));
+
 			map_dep_chain.set(dep, [file, dep]);
+			graph.add(file, dep);
+		}
+	}
+
+	// check for extends class in same package
+	// Example: export class Foo extends Bar<Baz>
+	var extendsPattern = /^\s*(?:export\s+)?class\s+(?:[^\s]+)\s+(?:implements\s+(?:[^\s]+)\s+)?extends\s+([^\s<]+)/gm;
+	while (match = extendsPattern.exec(fileContent))
+	{
+		let fileNoExt = path.join(path.dirname(file), match[1]);
+		let dep = findFileWithExtension(fileNoExt, ['.tsx', '.ts']);
+		if (dep)
+		{
+			if (debug)
+				console.log(file, 'extends', path.basename(dep));
+			
+			map_dep_chain.set(dep, [file, dep]);
+			graph.add(file, dep);
+		}
 	}
 }
+
 function formatDepChain(chain)
 {
 	return chain.map(filePath => path.basename(filePath)).join(' -> ');
 }
+
 function checkDependency(file, dep, chain)
 {
 	var map_dep_chain = map2d_file_dep_chain.get(file);
@@ -137,20 +172,20 @@ function checkDependency(file, dep, chain)
 	map_dep_chain.set(dep, hasChain);
 	return hasChain;
 }
+
+// get direct dependencies
 filePaths.forEach(initDeps);
+
+// topological sort
+var ordered = graph.sort().reverse();
+filePaths = Array.from(new Set(ordered.concat(filePaths)));
+filePaths = filePaths.slice(ordered.length).concat(ordered);
+
+// check for circular dependencies
 filePaths.forEach(f => {
 	var chain = checkDependency(f, f);
 	if (chain)
 		console.error(`Found circular dependency: ${formatDepChain(chain)}`);
-});
-filePaths.sort((f1, f2) => {
-	var result = !!checkDependency(f1, f2) - !!checkDependency(f2, f1);
-	if (result && debug)
-	{
-		[f1, f2] = [path.basename(f1), path.basename(f2)];
-		console.log(result < 0 ? f1 : f2, '<', result < 0 ? f2 : f1);
-	}
-	return result;
 });
 
 filePaths = filePaths.map(function (filePath) {

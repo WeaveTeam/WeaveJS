@@ -32,9 +32,6 @@ node_modules
 #typescript outdir
 outts
 
-#typescript with import verification
-srcts-verify
-
 #babel outdir
 lib
 

@@ -112,7 +112,6 @@ module.exports = function (grunt) {
 
         },
         clean: {
-            "srcts-verify": ["srcts-verify"],
             outts: ["outts"],
             lib: ["lib"],
             dist: ["dist/*.js", "dist/*.css", "dist/*.html"]
