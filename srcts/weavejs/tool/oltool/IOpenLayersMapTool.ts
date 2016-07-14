@@ -6,7 +6,7 @@ namespace weavejs.tool.oltool
 	/**
 	 *
 	 */
-	export interface IOpenLayersMap
+	export interface IOpenLayersMapTool
 	{
 		/**
 		 *
@@ -19,8 +19,10 @@ namespace weavejs.tool.oltool
 		interactionMode:LinkableString;
 	}
 
-	export class IOpenLayersMap
+	export class IOpenLayersMapTool
 	{
+		static MAP_TOOL = "IOpenLayersMapTool";
 	}
-	weavejs.WeaveAPI.ClassRegistry.registerClass(IOpenLayersMap, 'weavejs.api.ui.IOpenLayersMap');
+	
+	weavejs.WeaveAPI.ClassRegistry.registerClass(IOpenLayersMapTool, 'weavejs.api.ui.IOpenLayersMapTool');
 }

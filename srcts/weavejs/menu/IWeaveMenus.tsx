@@ -16,5 +16,7 @@ namespace weavejs.menu
 		fileMenu:{getSessionItems:()=>MenuItemProps[]}
 		dataMenu:{getExportItems:()=>MenuItemProps[]}
 		getMenuList:()=>MenuItemProps[];
-	};
+	}
+
+	export class IWeaveMenus { }
 }

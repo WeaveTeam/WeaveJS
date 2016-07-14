@@ -39,11 +39,16 @@ namespace weavejs.ui
 			super(props);
 		}
 
+		renderAttributeSelectorForEditor=(attributeName:string):React.ReactChild =>
+		{
+			return <AttributeSelector attributeName={ attributeName } attributes={ this.props.attributes }/>
+		};
+
 		launchAttributeSelector=(attributeName:string):ControlPanel=>
 		{
 			if (this.props.pushCrumb)
 			{
-				this.props.pushCrumb("Attributes", <AttributeSelector attributeName={ attributeName } attributes={ this.props.attributes }/>, null);
+				this.props.pushCrumb("Attributes", this.renderAttributeSelectorForEditor.bind(this,attributeName),null);
 				return null;
 			}
 			else

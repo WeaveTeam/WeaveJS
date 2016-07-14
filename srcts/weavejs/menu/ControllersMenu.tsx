@@ -5,7 +5,6 @@ namespace weavejs.menu
 	import PopupWindow = weavejs.dialog.PopupWindow;
 	import IVisTool = weavejs.api.ui.IVisTool;
 	import MouseoverController = weavejs.editor.MouseoverController;
-	import IWeaveMenus = weavejs.menu.IWeaveMenus;
 
 	import AttributeMenuTool = weavejs.tool.AttributeMenuTool;
 	import DataFilterTool = weavejs.tool.DataFilterTool;

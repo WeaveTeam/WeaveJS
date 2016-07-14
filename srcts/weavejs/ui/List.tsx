@@ -237,8 +237,8 @@ namespace weavejs.ui
 									onMouseEnter={() => this.listItems[index].focus()}
 									onMouseLeave={() => this.listItems[index].blur()}
 									className={ className }
-								    onClick={(event) => this.handleChange(value, event) }
-									onKeyDown={(event) => this.handleKeyDownOnListItem(value, event)}
+								    onClick={(event:React.MouseEvent) => this.handleChange(value, event) }
+									onKeyDown={(event:React.KeyboardEvent) => this.handleKeyDownOnListItem(value, event)}
 								>
 									{this.labels[index] || String(value)}
 								</HBox>

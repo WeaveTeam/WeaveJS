@@ -51,10 +51,9 @@ namespace weavejs.tool.oltool
 	import DataType = weavejs.api.data.DataType;
 	import EventCallbackCollection = weavejs.core.EventCallbackCollection;
 	import Bounds2D = weavejs.geom.Bounds2D;
-	import IProjectionSRS = weavejs.tool.oltool.IOpenLayersMap;
+	import IOpenLayersMapTool = weavejs.tool.oltool.IOpenLayersMapTool;
 	import IVisToolProps = weavejs.api.ui.IVisToolProps;
 	import IVisToolState = weavejs.api.ui.IVisToolState;
-	import IOpenLayersMap = weavejs.tool.oltool.IOpenLayersMap;
 	import IVisTool = weavejs.api.ui.IVisTool;
 	import ILinkableObjectWithNewProperties = weavejs.api.core.ILinkableObjectWithNewProperties;
 	import ILinkableObjectWithNewPaths = weavejs.api.core.ILinkableObjectWithNewPaths;
@@ -87,7 +86,7 @@ namespace weavejs.tool.oltool
 	const MEDIUM = "medium";
 	const LARGE = "large";
 
-	export class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IProjectionSRS, IAltText
+	export class OpenLayersMapTool extends React.Component<IVisToolProps, IVisToolState> implements IOpenLayersMapTool, IAltText
 	{
 		static isGeomColumnOrRef(column: (weavejs.api.data.IAttributeColumn | weavejs.api.data.IColumnReference)):boolean
 		{
@@ -387,7 +386,7 @@ namespace weavejs.tool.oltool
 				target: this.element
 			});
 
-			this.map.set("mapTool", this);
+			this.map.set(IOpenLayersMapTool.MAP_TOOL, this);
 
 			/* Setup custom interactions */
 
@@ -870,7 +869,7 @@ namespace weavejs.tool.oltool
 		["weavejs.tool.oltool.OpenLayersMapTool", "weavejs.tool.Map", "weave.visualization.tools::MapTool"],
 		[
 			IVisTool,
-			IOpenLayersMap,
+			IOpenLayersMapTool,
 			ILinkableObjectWithNewProperties,
 			ILinkableObjectWithNewPaths,
 			IAltText

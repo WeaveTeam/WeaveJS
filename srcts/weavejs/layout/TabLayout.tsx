@@ -338,7 +338,7 @@ namespace weavejs.layout
 							.concat(state.tabs.map((tab) => (
 								<HBox
 									className="weave-padded-hbox"
-									onDragOver={(event) => this.onDragOverTab(tab)}
+									onDragOver={() => this.onDragOverTab(tab)}
 									onDragLeave={this.onDragLeaveTab}
 									style={{alignItems: "center"}}
 									ref={InteractiveTour.getComponentRefCallback(tab.label)}

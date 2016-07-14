@@ -2,7 +2,7 @@ namespace weavejs.tool.oltool
 {
 	import AbstractFeatureLayer = weavejs.tool.oltool.layer.AbstractFeatureLayer;
 	import AbstractLayer = weavejs.tool.oltool.layer.AbstractLayer;
-	import IOpenLayersMap = weavejs.tool.oltool.IOpenLayersMap;
+	import IOpenLayersMapTool = weavejs.tool.oltool.IOpenLayersMapTool;
 	import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 	import KeySet = weavejs.data.key.KeySet;
 
@@ -31,7 +31,7 @@ namespace weavejs.tool.oltool
 			let event = mapBrowserEvent.originalEvent as MouseEvent;
 			let width = endPixel[0] - startPixel[0];
 			let height = endPixel[1] - startPixel[1];
-			let tool = mapBrowserEvent.map.get("mapTool") as IOpenLayersMap;
+			let tool = mapBrowserEvent.map.get(IOpenLayersMapTool.MAP_TOOL) as IOpenLayersMapTool;
 			this.probeInteraction.setActive(true);
 			if (width * width + height * height <= 64)
 			{

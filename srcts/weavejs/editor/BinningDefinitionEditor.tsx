@@ -34,6 +34,7 @@ namespace weavejs.editor
 	import DynamicBinningDefinition = weavejs.data.bin.DynamicBinningDefinition;
 	import IColumnWrapper = weavejs.api.data.IColumnWrapper;
 	import ILinkableHashmap = weavejs.api.core.ILinkableHashMap;
+	import ColumnSelector = weavejs.ui.ColumnSelector;
 
 	// temporary hack
 	function Weave_linkState(a:any, b:any) { if (a != b) Weave.linkState(a, b); }
@@ -83,7 +84,7 @@ namespace weavejs.editor
 		};
 
 		renderBinningDefinitionSelectorForEditor=():JSX.Element=>{
-			var [attributeName, attributes] = SelectableAttributeComponent.findSelectableAttributes(this.props.binnedColumn);
+			var [attributeName, attributes] = ColumnSelector.findSelectableAttributes(this.props.binnedColumn);
 			return <BinningDefinitionSelector
 						showNoneOption={this.props.showNoneOption}
 						attributeName={attributeName}
@@ -119,7 +120,7 @@ namespace weavejs.editor
 
 		renderFullView() // render for PopUp
 		{
-			var [attributeName, attributes] = SelectableAttributeComponent.findSelectableAttributes(this.props.binnedColumn);
+			var [attributeName, attributes] = ColumnSelector.findSelectableAttributes(this.props.binnedColumn);
 			return (
 				<BinningDefinitionSelector
 					showNoneOption={this.props.showNoneOption}

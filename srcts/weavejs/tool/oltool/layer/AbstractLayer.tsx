@@ -29,7 +29,7 @@ namespace weavejs.tool.oltool.layer
 
 	import Bounds2D = weavejs.geom.Bounds2D;
 	import renderSelectableAttributes = weavejs.api.ui.renderSelectableAttributes;
-	import IOpenLayersMap = weavejs.tool.oltool.IOpenLayersMap;
+	import IOpenLayersMapTool = weavejs.tool.oltool.IOpenLayersMapTool;
 
 	export class AbstractLayer implements ILinkableObject
 	{
@@ -168,14 +168,14 @@ namespace weavejs.tool.oltool.layer
 
 		onLayerReady():void
 		{
-			let parent = Weave.getAncestor(this, IOpenLayersMap);
+			let parent = Weave.getAncestor(this, IOpenLayersMapTool);
 			this.projectionSRS = parent.projectionSRS;
 			this.projectionSRS.addGroupedCallback(this, this.updateProjection, true);
 		}
 
 		/*abstract*/ updateProjection(): void {}
 
-		parent: IOpenLayersMap = null;
+		parent: IOpenLayersMapTool = null;
 
 		private _source: ol.source.Source;
 
