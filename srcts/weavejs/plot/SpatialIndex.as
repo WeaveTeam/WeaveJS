@@ -36,25 +36,22 @@ package weave.utils
 	import weave.primitives.KDTree;
 	import weave.primitives.SimpleGeometry;
 
-import weavejs.api.core.ICallbackCollection;
+	import weavejs.api.core.ICallbackCollection;
 
-import weavejs.api.core.ILinkableObject;
-import weavejs.api.data.IQualifiedKey;
-import weavejs.api.data.ISimpleGeometry;
-import weavejs.geom.BLGNode;
-import weavejs.geom.Bounds2D;
-import weavejs.geom.GeneralizedGeometry;
-import weavejs.geom.KDTree;
-import weavejs.geom.Point;
-import weavejs.geom.SimpleGeometry;
+	import weavejs.api.core.ILinkableObject;
+	import weavejs.api.data.IQualifiedKey;
+	import weavejs.api.data.ISimpleGeometry;
+	import weavejs.geom.BLGNode;
+	import weavejs.geom.Bounds2D;
+	import weavejs.geom.GeneralizedGeometry;
+	import weavejs.geom.KDTree;
+	import weavejs.geom.Point;
+	import weavejs.geom.SimpleGeometry;
 
-/**
+	/**
 	 * This class provides an interface to a collection of spatially indexed IShape objects.
 	 * This class will not detect changes to the shapes you add to the index.
 	 * If you change the bounds of the shapes, you will need to call SpatialIndex.createIndex().
-	 * 
-	 * @author adufilie
-	 * @author kmonico
 	 */
 	public class SpatialIndex implements ILinkableObject
 	{
