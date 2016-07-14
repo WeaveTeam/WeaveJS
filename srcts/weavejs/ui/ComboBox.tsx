@@ -17,6 +17,7 @@ export interface ComboBoxProps extends React.HTMLProps<ComboBox>
 	onNew?:(value:any)=>void;
 	onRemoved?:(value:any)=>void;
 	onAdded?:(value:any)=>void;
+	onAddNewOption?:(value:any)=>void;
 	selectFirstOnInvalid?:boolean;
 	context?:Element;
 	direction?:string;
@@ -57,7 +58,7 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 
 		let stateObj:ComboBoxState = this.getStateFromProps(props);
 		stateObj.openMenu = false;
-		stateObj.direction = "downward";
+		stateObj.direction = props.direction || "downward";
 		stateObj.searchQuery = "";
 		this.state = stateObj;
 	}
@@ -261,6 +262,8 @@ export default class ComboBox extends React.Component<ComboBoxProps, ComboBoxSta
 		{
 			(this.inputElement as any).value = "";
 		}
+
+		this.props.onAddNewOption && this.props.onAddNewOption(newOption.value);
 	};
 
 	selectedValueRemoveListener=(index:number,option:ComboBoxOption,event:React.MouseEvent)=>

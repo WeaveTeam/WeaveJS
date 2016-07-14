@@ -174,7 +174,7 @@ export default class DataSourceEditor extends SmartComponent<IDataSourceEditorPr
 		);
 	}
 
-	getColumns():IColumnReference[]
+	getColumns=():IColumnReference[] =>
 	{
 		var columnSiblings: IWeaveTreeNode[] = this.state.selectedBranch && this.state.selectedBranch.getChildren() || [];
 

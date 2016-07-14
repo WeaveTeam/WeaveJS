@@ -10,6 +10,7 @@ export interface IEditableTextCellProps extends React.Props<EditableTextCell>//n
 	textContent?:string
 	onChange?:(newName:string)=> void
 	style?:React.CSSProperties
+	emptyText?:string
 }
 
 export interface IEditableTextCellState
@@ -22,12 +23,17 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 {
 	constructor(props:IEditableTextCellProps)
 	{
+
 		super(props);
 		this.state = {
 			editMode: false,
 			textContent: props.textContent
 		}
 	}
+
+	static defaultProps:IEditableTextCellProps = {
+		emptyText: 'Double click to edit and rename'
+	};
 
 	componentWillReceiveProps(nextProps:IEditableTextCellProps)
 	{
@@ -64,7 +70,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 			this.setState({
 				editMode :false
 			});
-			this.props.onChange.call(this, this.state.textContent);//onChange called once element is no longer in focus
+			this.props.onChange && this.props.onChange(this.state.textContent);//onChange called once element is no longer in focus
 		}
 
 	};
@@ -90,7 +96,7 @@ export default class EditableTextCell extends SmartComponent<IEditableTextCellPr
 
 				:
 				<div>
-					{ this.state.textContent ? this.state.textContent : 'Double click to edit and rename'}
+					{ this.state.textContent ? this.state.textContent : this.props.emptyText}
 				</div>
 				}
 			</VBox>

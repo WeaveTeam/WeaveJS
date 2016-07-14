@@ -6,6 +6,9 @@ import InteractiveTour from "../dialog/InteractiveTour";
 import FileSelector from "../ui/FileSelector";
 import DataSourceEditor, {IDataSourceEditorProps} from "./DataSourceEditor";
 import KeyTypeInput from "../ui/KeyTypeInput";
+import PopupWindow from "../dialog/PopupWindow";
+import CSVMetadataEditor, {MetadataEntry} from "./CSVMetadataEditor";
+import Button from "../ui/Button";
 import ComboBox, {ComboBoxOption} from "../ui/ComboBox";
 import HelpIcon from "../ui/HelpIcon";
 
@@ -17,6 +20,7 @@ import URLRequestUtils = weavejs.api.data.IWeaveTreeNode;
 import ColumnUtils = weavejs.data.ColumnUtils;
 import IQualifiedKey = weavejs.api.data.IQualifiedKey;
 import ColumnTreeNode = weavejs.data.hierarchy.ColumnTreeNode;
+import IColumnReference = weavejs.api.data.IColumnReference;
 
 export default class CSVDataSourceEditor extends DataSourceEditor
 {
@@ -42,7 +46,26 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 			this.forceUpdate();
 		}
 	}
-	
+
+	handleMetadataUpdate=(newMeta:MetadataEntry, selectedIds:Array<number|string>) =>
+	{
+		//handle a metadata update for the specified entry and key:value pair
+		let ds = (this.props.dataSource as CSVDataSource);
+		let newState:{[key:string]:any} = ds.metadata.getSessionState() || {};
+		selectedIds.forEach( (id:number|string, index:number) => {
+			var currentMeta:Object = ds.generateMetadataForColumnId(id);
+			newState[id] = weavejs.WeaveAPI.SessionManager.combineDiff(currentMeta, newMeta);
+
+			// remove missing values
+			_.forEach(newState[id], (value:any, key:string) => {
+				if(!newState[id][key])
+					delete newState[id][key];
+			});
+		});
+
+		ds.metadata.setSessionState(newState);
+	};
+
 	handleProps(props:IDataSourceEditorProps)
 	{
 		super.handleProps(props);
@@ -55,6 +78,20 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 		}
 		Weave.getCallbacks(ds.url).addGroupedCallback(this, this.onUrlChange);
 	}
+
+	openMetadataEditor = PopupWindow.generateOpener(() => ({
+		context: this,
+		title: Weave.lang("Edit Column Metadata"),
+		content: <CSVMetadataEditor
+			datasource={this.props.dataSource as CSVDataSource}
+		    onChangeCallback={this.handleMetadataUpdate}
+		/>,
+		resizable: true,
+		width: 920,
+		footerContent: <div/>,
+		height: 675,
+		suspendEnter: true
+	}));
 
 	get editorFields():[React.ReactChild, React.ReactChild][]
 	{
@@ -123,6 +160,10 @@ export default class CSVDataSourceEditor extends DataSourceEditor
 					<HelpIcon>{Weave.lang("Key namespaces are used to link tables using matching key columns.")}</HelpIcon>
 				</HBox>,
 				<KeyTypeInput keyTypeProperty={ds.keyType}/>
+			],
+			[
+				Weave.lang("Edit Metadata"),
+				<Button onClick={this.openMetadataEditor}>{Weave.lang("Edit Column Metadata...") }</Button>
 			]
 		];
 		return super.editorFields.concat(editorFields);
